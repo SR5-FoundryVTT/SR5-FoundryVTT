@@ -2,20 +2,20 @@ const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fie
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const TechnomancerActorData: DataSchema = {
+const TechnomancerActorData = {
     technomancer: new SchemaField({
         attribute: new StringField({ required: true, initial: "" }),
         submersion: new NumberField({ required: true, initial: 0 }),
     }, { required: true }),
 }
 
-const CharacterAttributes: DataSchema = {
+const CharacterAttributes = {
     ...SM.Attributes,
     initiation: new SchemaField(SM.AttributeField, { required: true }),
     submersion: new SchemaField(SM.AttributeField, { required: true }),
 }
 
-const CharacterModifiers: DataSchema = {
+const CharacterModifiers = {
     ...SM.CommonModifiers,
     ...SM.MatrixModifiers,
     drain: new NumberField({ required: false, initial: 0 }),
@@ -46,7 +46,7 @@ const CharacterModifiers: DataSchema = {
     reach: new NumberField({ required: false, initial: 0 }),
 }
 
-const CharacterData: DataSchema = {
+const CharacterData = {
     ...SM.CommonData,
     ...SM.MatrixActorData,
     ...SM.TwoTrackActorData,
@@ -70,7 +70,7 @@ const CharacterData: DataSchema = {
 }
 
 export class Character extends foundry.abstract.TypeDataModel<typeof CharacterData, Actor.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return CharacterData;
     }
 }

@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const CritterPowerData: DataSchema = {
+const CritterPowerData = {
     ...SM.DescriptionPartData,
     ...SM.ActionPartData,
     ...SM.ImportFlags,
@@ -38,7 +38,7 @@ const CritterPowerData: DataSchema = {
 }
 
 export class CritterPower extends foundry.abstract.TypeDataModel<typeof CritterPowerData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return CritterPowerData;
     }
 }

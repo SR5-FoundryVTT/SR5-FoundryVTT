@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-export const TechnologyData: DataSchema = {
+export const TechnologyData = {
     rating: new NumberField({ required: true, initial: 0 }),
     availability: new StringField({ required: true, initial: '' }),
     quantity: new NumberField({ required: true, initial: 0 }),
@@ -14,6 +14,6 @@ export const TechnologyData: DataSchema = {
     networkController: new StringField({ required: false, initial: '' }),
 }
 
-export const TechnologyPartData: DataSchema = {
+export const TechnologyPartData = {
     technology: new SchemaField(TechnologyData)
 }

@@ -3,7 +3,7 @@ import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fiel
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 import { SR } from "../../constants";
 
-const SpritePowerData: DataSchema = {
+const SpritePowerData = {
     ...SM.DescriptionPartData,
     ...SM.ActionPartData,
     ...SM.ImportFlags,
@@ -21,7 +21,7 @@ const SpritePowerData: DataSchema = {
 }
 
 export class SpritePower extends foundry.abstract.TypeDataModel<typeof SpritePowerData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return SpritePowerData;
     }
 }

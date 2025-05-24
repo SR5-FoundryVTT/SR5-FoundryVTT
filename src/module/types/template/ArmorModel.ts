@@ -2,13 +2,13 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const ActorArmorData: DataSchema = {
+const ActorArmorData = {
     ...SM.BaseValuePair,
     ...SM.ModifiableValue,
     label: new StringField({ initial: '' }),
 };
 
-export const ActorArmor: DataSchema = {
+export const ActorArmor = {
     ...ActorArmorData,
     fire: new NumberField(),
     electric: new NumberField(),

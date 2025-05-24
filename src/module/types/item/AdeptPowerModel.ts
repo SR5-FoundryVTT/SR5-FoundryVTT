@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const AdeptPowerData: DataSchema = {
+const AdeptPowerData = {
     ...SM.DescriptionPartData,
     ...SM.ActionPartData,
     ...SM.ImportFlags,
@@ -14,7 +14,7 @@ const AdeptPowerData: DataSchema = {
 }
 
 export class AdeptPower extends foundry.abstract.TypeDataModel<typeof AdeptPowerData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return AdeptPowerData;
     }
 }

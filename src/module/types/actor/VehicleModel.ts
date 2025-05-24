@@ -2,19 +2,19 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const VehicleStat: DataSchema = {
+const VehicleStat = {
     ...SM.ModifiableValue,
     label: new StringField({ required: true, initial: "" }),
     temp: new NumberField({ required: true, initial: 0 }),
     hidden: new BooleanField({ required: true, initial: false }),
 }
 
-const VehicleAttributes: DataSchema = {
+const VehicleAttributes = {
     ...SM.Attributes,
     pilot: new SchemaField(SM.AttributeField, { required: true }),
 }
 
-const VehicleStats: DataSchema = {
+const VehicleStats = {
     pilot: new SchemaField(VehicleStat, { required: true }),
     handling: new SchemaField(VehicleStat, { required: true }),
     off_road_handling: new SchemaField(VehicleStat, { required: true }),
@@ -25,7 +25,7 @@ const VehicleStats: DataSchema = {
     seats: new SchemaField(VehicleStat, { required: true }),
 }
 
-const VehicleModCategories: DataSchema = {
+const VehicleModCategories = {
     body: new NumberField({ required: true, initial: 0 }),
     power_train: new NumberField({ required: true, initial: 0 }),
     protection: new NumberField({ required: true, initial: 0 }),
@@ -34,7 +34,7 @@ const VehicleModCategories: DataSchema = {
     weapons: new NumberField({ required: true, initial: 0 }),
 }
 
-const VehicleData: DataSchema = {
+const VehicleData = {
     ...SM.CommonData,
     ...SM.ArmorActorData,
     ...SM.MatrixActorData,
@@ -73,7 +73,7 @@ const VehicleData: DataSchema = {
 }
 
 export class Vehicle extends foundry.abstract.TypeDataModel<typeof VehicleData, Actor.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return VehicleData;
     }
 }

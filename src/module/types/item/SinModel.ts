@@ -2,13 +2,13 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const LicenseData: DataSchema = {
+const LicenseData = {
     name: new StringField({ required: true, initial: '' }),
     rtg: new StringField({ required: true, initial: '' }),
     description: new HTMLField({ required: true, initial: '' }),
 }
 
-const SinData: DataSchema = {
+const SinData = {
     ...SM.DescriptionPartData,
     ...SM.TechnologyPartData,
     ...SM.ImportFlags,
@@ -16,7 +16,7 @@ const SinData: DataSchema = {
 }
 
 export class Sin extends foundry.abstract.TypeDataModel<typeof SinData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return SinData;
     }
 }

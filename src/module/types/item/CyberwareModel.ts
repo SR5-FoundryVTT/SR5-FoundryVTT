@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const CyberwareData: DataSchema = {
+const CyberwareData = {
     ...SM.DescriptionPartData,
     ...SM.TechnologyPartData,
     ...SM.ActionPartData,
@@ -18,7 +18,7 @@ const CyberwareData: DataSchema = {
 }
 
 export class Cyberware extends foundry.abstract.TypeDataModel<typeof CyberwareData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return CyberwareData;
     }
 }

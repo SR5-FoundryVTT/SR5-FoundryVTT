@@ -2,46 +2,46 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const Living: DataSchema = {
+const Living = {
     wounds: new NumberField({ required: true, initial: 0 }),
     pain_tolerance: new NumberField({ required: true, initial: 0 }),
 }
 
-const Overflow: DataSchema = {
+const Overflow = {
     overflow: new SchemaField(SM.ValueMaxPair),
 }
 
-export const TrackType: DataSchema = {
+export const TrackType = {
     ...SM.ValueMaxPair,
     ...SM.ModifiableValue,
     label: new StringField({ required: false, initial: '' }),
     disable: new BooleanField({ required: false, initial: false })
 }
 
-export const OverflowTrackType: DataSchema = {
+export const OverflowTrackType = {
     ...TrackType,
     ...Overflow,
 }
 
-export const PhysicalTrack: DataSchema = {
+export const PhysicalTrack = {
     ...OverflowTrackType,
     ...Living,
 }
 
-export const StunTrack: DataSchema = {
+export const StunTrack = {
     ...TrackType,
     ...Living,
 }
 
-export const MatrickTrack: DataSchema = {
+export const MatrickTrack = {
     ...TrackType
 }
 
-export const MatrixTracks: DataSchema = {
+export const MatrixTracks = {
     matrix: new SchemaField(MatrickTrack)
 }
 
-export const Tracks: DataSchema = {
+export const Tracks = {
     physical: new SchemaField(PhysicalTrack),
     stun: new SchemaField(StunTrack),
 }

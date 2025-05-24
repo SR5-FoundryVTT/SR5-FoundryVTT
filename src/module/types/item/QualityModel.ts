@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const QualityData: DataSchema = {
+const QualityData = {
     ...SM.DescriptionPartData,
     ...SM.ActionPartData,
     ...SM.ImportFlags,
@@ -16,7 +16,7 @@ const QualityData: DataSchema = {
 }
 
 export class Quality extends foundry.abstract.TypeDataModel<typeof QualityData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return QualityData;
     }
 }

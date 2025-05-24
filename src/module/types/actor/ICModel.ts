@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const ICAttributes: DataSchema = {
+const ICAttributes = {
     rating: new SchemaField(SM.AttributeField, { required: true }),
     attack: new SchemaField(SM.AttributeField, { required: true }),
     sleaze: new SchemaField(SM.AttributeField, { required: true }),
@@ -10,7 +10,7 @@ const ICAttributes: DataSchema = {
     firewall: new SchemaField(SM.AttributeField, { required: true }),
 }
 
-export const ICData: DataSchema = {
+export const ICData = {
     ...SM.CommonData,
     ...SM.MatrixActorData,
     ...SM.MatrixTrackActorData,
@@ -34,7 +34,7 @@ export const ICData: DataSchema = {
 }
 
 export class IC extends foundry.abstract.TypeDataModel<typeof ICData, Actor.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return ICData;
     }
 }

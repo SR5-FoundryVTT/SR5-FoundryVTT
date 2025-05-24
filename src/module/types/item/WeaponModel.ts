@@ -2,12 +2,12 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-export const BlastData: DataSchema = {
+export const BlastData = {
     radius: new NumberField({ required: true, initial: 0 }),
     dropoff: new NumberField({ required: true, initial: 0 }),
 }
 
-const AmmunitionData: DataSchema = {
+const AmmunitionData = {
     spare_clips: new SchemaField(SM.ValueMaxPair, { required: true }),
     current: new SchemaField(SM.ValueMaxPair, { required: true }),
     clip_type: new StringField({
@@ -28,7 +28,7 @@ const AmmunitionData: DataSchema = {
     partial_reload_value: new NumberField({ required: true, initial: 0 }),
 }
 
-const RangeData: DataSchema = {
+const RangeData = {
     short: new NumberField({ required: true, initial: 0 }),
     medium: new NumberField({ required: true, initial: 0 }),
     long: new NumberField({ required: true, initial: 0 }),
@@ -41,31 +41,31 @@ const RangeData: DataSchema = {
     attribute: new StringField({ required: false, initial: '' }),
 }
 
-const FiringModeData: DataSchema = {
+const FiringModeData = {
     single_shot: new BooleanField({ required: true, initial: false }),
     semi_auto: new BooleanField({ required: true, initial: false }),
     burst_fire: new BooleanField({ required: true, initial: false }),
     full_auto: new BooleanField({ required: true, initial: false }),
 }
 
-const RangeWeaponData: DataSchema = {
+const RangeWeaponData = {
     category: new StringField({ required: true, initial: '' }),
     ranges: new SchemaField(RangeData, { required: true }),
     rc: new SchemaField(SM.ModifiableValue, { required: true }),
     modes: new SchemaField(FiringModeData, { required: true }),
 }
 
-const MeleeWeaponData: DataSchema = {
+const MeleeWeaponData = {
     reach: new NumberField({ required: true, initial: 0 }),
 }
 
-const ThrownWeaponData: DataSchema = {
+const ThrownWeaponData = {
     range: new SchemaField(RangeData, { required: true }),
     blast: new SchemaField(BlastData, { required: true }),
 }
 
 
-const WeaponData: DataSchema = {
+const WeaponData = {
     ...SM.DescriptionPartData,
     ...SM.TechnologyPartData,
     ...SM.ActionPartData,
@@ -89,7 +89,7 @@ const WeaponData: DataSchema = {
 
 
 export class Weapon extends foundry.abstract.TypeDataModel<typeof WeaponData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return WeaponData;
     }
 }

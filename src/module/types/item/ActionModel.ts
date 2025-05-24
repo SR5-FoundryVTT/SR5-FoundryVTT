@@ -2,12 +2,12 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-export const ActionTypeLabel: DataSchema = {
+export const ActionTypeLabel = {
     label: new StringField({ required: true, initial: '' }),
     uuid: new StringField({ required: true, initial: '' }),
 };
 
-export const ActionResultData: DataSchema = {
+export const ActionResultData = {
     success: new SchemaField({
         matrix: new SchemaField({
             placeMarks: new BooleanField({ required: true, initial: false }),
@@ -15,7 +15,7 @@ export const ActionResultData: DataSchema = {
     } as DataSchema)
 };
 
-export const MinimalActionData: DataSchema = {
+export const MinimalActionData = {
     skill: new StringField({ required: true, initial: '' }),
     attribute: new StringField({ required: true, initial: '' }),
     attribute2: new StringField({ required: true, initial: '' }),
@@ -24,7 +24,7 @@ export const MinimalActionData: DataSchema = {
     limit: new SchemaField(SM.ModifiableValueLinked)
 };
 
-export const DamageData: DataSchema = {
+export const DamageData = {
     ...SM.ModifiableValueLinked,
     type: new SchemaField(SM.BaseValuePair),
     element: new SchemaField(SM.BaseValuePair),
@@ -37,7 +37,7 @@ export const DamageData: DataSchema = {
     }, { required: false }),
 };
 
-export const OpposedTestData: DataSchema = {
+export const OpposedTestData = {
     type: new StringField({ required: true, initial: '' }),
     description: new StringField({ required: true, initial: '' }),
     resist: new SchemaField({
@@ -45,7 +45,7 @@ export const OpposedTestData: DataSchema = {
     }),
 };
 
-export const ActionRollData: DataSchema = {
+export const ActionRollData = {
     test: new StringField({ required: true, initial: '' }),
     type: new StringField({ required: true, initial: '' }),
     categories: new ArrayField(new StringField({ required: true, initial: '' })),
@@ -63,11 +63,11 @@ export const ActionRollData: DataSchema = {
     rool_mode: new StringField({ required: true, initial: '' }),
 };
 
-export const ActionPartData: DataSchema = {
+export const ActionPartData = {
     action: new SchemaField(ActionRollData),
 };
 
-export const ActionData: DataSchema = {
+export const ActionData = {
     ...ActionPartData,
     ...SM.ImportFlags,
     ...SM.DescriptionPartData,
@@ -75,7 +75,7 @@ export const ActionData: DataSchema = {
 };
 
 export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return ActionData;
     }
 }

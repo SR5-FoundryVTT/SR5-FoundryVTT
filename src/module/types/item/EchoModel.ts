@@ -2,13 +2,13 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const EchoData: DataSchema = {
+const EchoData = {
     ...SM.DescriptionPartData,
     ...SM.ImportFlags
 };
 
 export class Echo extends foundry.abstract.TypeDataModel<typeof EchoData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return EchoData;
     }
 }

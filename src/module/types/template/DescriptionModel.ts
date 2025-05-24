@@ -2,12 +2,12 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const DescriptionData: DataSchema = {
+const DescriptionData = {
     value: new StringField({ required: true, initial: '' }),
     chat: new StringField({ required: true, initial: '' }),
     source: new StringField({ required: true, initial: '' }),
 }
 
-export const DescriptionPartData: DataSchema = {
+export const DescriptionPartData = {
     description: new SchemaField(DescriptionData)
 }

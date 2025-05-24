@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const SourceEntityField: DataSchema = {
+const SourceEntityField = {
     id: new StringField({ required: true }),
     name: new StringField({ required: true, initial: '' }),
     pack: new StringField({ required: false, initial: '' }),
@@ -10,7 +10,7 @@ const SourceEntityField: DataSchema = {
     data: new ObjectField({ required: false, initial: {} }),
 };
 
-const HostData: DataSchema = {
+const HostData = {
     ...SM.DevicePartData,
     ...SM.DescriptionPartData,
     ...SM.ActionPartData,
@@ -22,7 +22,7 @@ const HostData: DataSchema = {
 }
 
 export class Host extends foundry.abstract.TypeDataModel<typeof HostData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return HostData;
     }
 }

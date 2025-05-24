@@ -23,7 +23,7 @@ const ArmorData = {
 };
 
 export class Armor extends foundry.abstract.TypeDataModel<typeof ArmorData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return ArmorData;
     }
 }

@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const SummoningData: DataSchema = {
+const SummoningData = {
     spirit: new SchemaField({
         type: new StringField({ required: true, initial: '' }),
         force: new NumberField({ required: true, initial: 0 }),
@@ -10,7 +10,7 @@ const SummoningData: DataSchema = {
     }, { required: true }),
 };
 
-const CompilationData: DataSchema = {
+const CompilationData = {
     sprite: new SchemaField({
         type: new StringField({ required: true, initial: '' }),
         level: new NumberField({ required: true, initial: 0 }),
@@ -18,7 +18,7 @@ const CompilationData: DataSchema = {
     }, { required: true }),
 };
 
-const CallInActionData: DataSchema = {
+const CallInActionData = {
     ...CompilationData,
     ...SummoningData,
     ...SM.DescriptionPartData,
@@ -32,7 +32,7 @@ const CallInActionData: DataSchema = {
 }
 
 export class CallInAction extends foundry.abstract.TypeDataModel<typeof CallInActionData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return CallInActionData;
     }
 }

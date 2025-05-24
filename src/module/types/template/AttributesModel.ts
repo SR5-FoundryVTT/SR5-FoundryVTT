@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-export const AttributeField: DataSchema = {
+export const AttributeField = {
     ...SM.BaseValuePair,
     ...SM.ModifiableValue,
     hide: new BooleanField({ required: true, initial: false }),
@@ -11,14 +11,14 @@ export const AttributeField: DataSchema = {
     temp: new NumberField({ required: false, initial: 0 }),
 };
 
-const EdgeAttributeField: DataSchema = {
+const EdgeAttributeField = {
     ...AttributeField,
     uses: new NumberField({ required: true, initial: 0 }),
     max: new NumberField({ required: true, initial: 0 }),
 };
 
 //todo
-export const Attributes: DataSchema = {
+export const Attributes = {
     // [name: string]: AttributeField,
     edge: new SchemaField(EdgeAttributeField)
 };

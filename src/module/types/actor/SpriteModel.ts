@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const SpriteData: DataSchema = {
+const SpriteData = {
     ...SM.CommonData,
     ...SM.MatrixActorData,
     level: new NumberField({ required: true, initial: 0 }),
@@ -23,7 +23,7 @@ const SpriteData: DataSchema = {
 }
 
 export class Sprite extends foundry.abstract.TypeDataModel<typeof SpriteData, Actor.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return SpriteData;
     }
 }

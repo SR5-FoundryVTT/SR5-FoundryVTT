@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DataSchema } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs";
 import { ShadowrunModel as SM } from "../ShadowrunModel";
 
-const CombatSpellData: DataSchema = {
+const CombatSpellData = {
     type: new StringField({
         required: true,
         initial: '',
@@ -10,7 +10,7 @@ const CombatSpellData: DataSchema = {
     }),
 }
 
-const DetectionSpellData: DataSchema = {
+const DetectionSpellData = {
     type: new StringField({
         required: true,
         initial: '',
@@ -20,7 +20,7 @@ const DetectionSpellData: DataSchema = {
     extended: new BooleanField({ required: true, initial: false }),
 }
 
-const IllusionSpellData: DataSchema = {
+const IllusionSpellData = {
     type: new StringField({
         required: true,
         initial: '',
@@ -33,14 +33,14 @@ const IllusionSpellData: DataSchema = {
     }),
 }
 
-const ManipulationSpellData: DataSchema = {
+const ManipulationSpellData = {
     damaging: new BooleanField({ required: true, initial: false }),
     mental: new BooleanField({ required: true, initial: false }),
     environmental: new BooleanField({ required: true, initial: false }),
     physical: new BooleanField({ required: true, initial: false }),
 }
 
-const RitualSpellData: DataSchema = {
+const RitualSpellData = {
     ritual: new SchemaField({
         type: new StringField({
             required: true,
@@ -50,7 +50,7 @@ const RitualSpellData: DataSchema = {
     }, { required: true }),
 }
 
-const SpellPartData: DataSchema = {
+const SpellPartData = {
     type: new StringField({
         required: true,
         initial: '',
@@ -82,7 +82,7 @@ const SpellPartData: DataSchema = {
 }
 
 export class Spell extends foundry.abstract.TypeDataModel<typeof SpellPartData, Item.Implementation> {
-    static override defineSchema(): DataSchema {
+    static override defineSchema() {
         return SpellPartData;
     }
 }

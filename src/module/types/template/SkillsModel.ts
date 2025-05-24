@@ -4,7 +4,7 @@ import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
-export const SkillField: DataSchema = {
+export const SkillField = {
     ...SM.BaseValuePair,
     ...SM.ModifiableValue,
     name: new StringField({ required: true, initial: '' }),
@@ -21,7 +21,7 @@ export const SkillField: DataSchema = {
 }
 
 //todo
-export const KnowledgeSkillList: DataSchema = {
+export const KnowledgeSkillList = {
     attribute: new StringField({ required: true, initial: '' }),
     value: new SchemaField(SkillField),
 }

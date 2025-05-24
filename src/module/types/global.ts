@@ -6,6 +6,8 @@ import { SR5ChatMessage } from "../chatMessage/SR5ChatMessage";
 import { SR5Combat } from "../combat/SR5Combat";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
+import { SR5Token } from "../token/SR5Token";
+
 import { Translation } from '../utils/strings';
 
 import { Character } from "./actor/CharacterModel";
@@ -48,6 +50,10 @@ declare module "fvtt-types/configuration" {
         Item: typeof SR5Item;
         Roll: typeof SR5Roll;
         Sheet: typeof FormApplication;
+    }
+
+    interface ObjectClassConfig {
+        token: typeof SR5Token;
     }
 
     interface AssumeHookRan {
