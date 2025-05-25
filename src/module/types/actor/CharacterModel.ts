@@ -1,5 +1,6 @@
+import { CommonModifiers, MatrixModifiers, CommonData, MatrixActorData, TwoTrackActorData, ArmorActorData, MagicActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CharacterLimits } from "./CommonModel";
+import { Attributes, AttributeField } from "../template/AttributesModel";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const TechnomancerActorData = {
     technomancer: new SchemaField({
@@ -9,14 +10,14 @@ const TechnomancerActorData = {
 }
 
 const CharacterAttributes = {
-    ...SM.Attributes,
-    initiation: new SchemaField(SM.AttributeField, { required: true }),
-    submersion: new SchemaField(SM.AttributeField, { required: true }),
+    ...Attributes,
+    initiation: new SchemaField(AttributeField, { required: true }),
+    submersion: new SchemaField(AttributeField, { required: true }),
 }
 
 const CharacterModifiers = {
-    ...SM.CommonModifiers,
-    ...SM.MatrixModifiers,
+    ...CommonModifiers,
+    ...MatrixModifiers,
     drain: new NumberField({ required: false, initial: 0 }),
     armor: new NumberField({ required: false, initial: 0 }),
     physical_limit: new NumberField({ required: false, initial: 0 }),
@@ -46,24 +47,24 @@ const CharacterModifiers = {
 }
 
 const CharacterData = {
-    ...SM.CommonData,
-    ...SM.MatrixActorData,
-    ...SM.TwoTrackActorData,
-    ...SM.ArmorActorData,
-    ...SM.MagicActorData,
-    ...SM.WoundsActorData,
-    ...SM.MovementActorData,
+    ...CommonData,
+    ...MatrixActorData,
+    ...TwoTrackActorData,
+    ...ArmorActorData,
+    ...MagicActorData,
+    ...WoundsActorData,
+    ...MovementActorData,
     ...TechnomancerActorData,
-    ...SM.NPCActorData,
+    ...NPCActorData,
     attributes: new SchemaField(CharacterAttributes, { required: true }),
-    values: new SchemaField(SM.PhysicalCombatValues, { required: true }),
+    values: new SchemaField(PhysicalCombatValues, { required: true }),
     metatype: new StringField({ required: true, initial: "" }),
     full_defense_attribute: new StringField({ required: true, initial: "" }),
     is_critter: new BooleanField({ required: true, initial: false }),
-    limits: new SchemaField(SM.CharacterLimits, { required: true }),
+    limits: new SchemaField(CharacterLimits, { required: true }),
     modifiers: new SchemaField({
         //todo
-        // ...SM.Modifiers,
+        // ...Modifiers,
         ...CharacterModifiers,
     }, { required: true }),
 }

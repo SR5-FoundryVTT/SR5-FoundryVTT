@@ -1,5 +1,9 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { ValueMaxPair, ModifiableValue } from "../template/BaseModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { TechnologyPartData } from "../template/TechnologyModel";
+import { ActionPartData } from "./ActionModel";
 
 export const BlastData = {
     radius: new NumberField({ required: true, initial: 0 }),
@@ -7,8 +11,8 @@ export const BlastData = {
 }
 
 const AmmunitionData = {
-    spare_clips: new SchemaField(SM.ValueMaxPair, { required: true }),
-    current: new SchemaField(SM.ValueMaxPair, { required: true }),
+    spare_clips: new SchemaField(ValueMaxPair, { required: true }),
+    current: new SchemaField(ValueMaxPair, { required: true }),
     clip_type: new StringField({
         required: true,
         initial: '',
@@ -50,7 +54,7 @@ const FiringModeData = {
 const RangeWeaponData = {
     category: new StringField({ required: true, initial: '' }),
     ranges: new SchemaField(RangeData, { required: true }),
-    rc: new SchemaField(SM.ModifiableValue, { required: true }),
+    rc: new SchemaField(ModifiableValue, { required: true }),
     modes: new SchemaField(FiringModeData, { required: true }),
 }
 
@@ -65,10 +69,10 @@ const ThrownWeaponData = {
 
 
 const WeaponData = {
-    ...SM.DescriptionPartData,
-    ...SM.TechnologyPartData,
-    ...SM.ActionPartData,
-    ...SM.ImportFlags,
+    ...DescriptionPartData,
+    ...TechnologyPartData,
+    ...ActionPartData,
+    ...ImportFlags,
     category: new StringField({
         required: true,
         initial: '',

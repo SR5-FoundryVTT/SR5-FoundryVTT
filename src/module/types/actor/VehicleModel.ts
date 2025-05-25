@@ -1,16 +1,19 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { CommonData, ArmorActorData, MatrixActorData, MovementActorData, PhysicalTrackActorData, PhysicalCombatValues, CommonModifiers } from "./CommonModel";
+import { Attributes, AttributeField } from "../template/AttributesModel";
+import { ModifiableValue } from "../template/BaseModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
 
 const VehicleStat = {
-    ...SM.ModifiableValue,
+    ...ModifiableValue,
     label: new StringField({ required: true, initial: "" }),
     temp: new NumberField({ required: true, initial: 0 }),
     hidden: new BooleanField({ required: true, initial: false }),
 }
 
 const VehicleAttributes = {
-    ...SM.Attributes,
-    pilot: new SchemaField(SM.AttributeField, { required: true }),
+    ...Attributes,
+    pilot: new SchemaField(AttributeField, { required: true }),
 }
 
 const VehicleStats = {
@@ -34,13 +37,13 @@ const VehicleModCategories = {
 }
 
 const VehicleData = {
-    ...SM.CommonData,
-    ...SM.ArmorActorData,
-    ...SM.MatrixActorData,
-    ...SM.MovementActorData,
-    ...SM.ImportFlags,
-    ...SM.PhysicalTrackActorData,
-    value: new SchemaField(SM.PhysicalCombatValues, { required: true }),
+    ...CommonData,
+    ...ArmorActorData,
+    ...MatrixActorData,
+    ...MovementActorData,
+    ...ImportFlags,
+    ...PhysicalTrackActorData,
+    value: new SchemaField(PhysicalCombatValues, { required: true }),
     vehicleType: new StringField({
         required: true,
         initial: "ground",
@@ -64,8 +67,8 @@ const VehicleData = {
     networkController: new StringField({ required: true, initial: "" }),
     modifiers: new SchemaField({
         //todo
-        // ...SM.Modifiers,
-        ...SM.CommonModifiers,
+        // ...Modifiers,
+        ...CommonModifiers,
     }, { required: true }),
     modificationCategories: new SchemaField(VehicleModCategories, { required: true }),
     modPoints: new NumberField({ required: true, initial: 0 }),

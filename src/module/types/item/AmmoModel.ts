@@ -1,10 +1,13 @@
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { TechnologyPartData } from "../template/TechnologyModel";
+import { BlastData } from "./WeaponModel";
 
 const AmmoData = {
-    ...SM.DescriptionPartData,
-    ...SM.TechnologyPartData,
-    ...SM.ImportFlags,
+    ...DescriptionPartData,
+    ...TechnologyPartData,
+    ...ImportFlags,
     element: new StringField({
         required: true,
         initial: '',
@@ -30,7 +33,7 @@ const AmmoData = {
         ],
     }),
     replaceDamage: new BooleanField({ required: true, initial: false }),
-    blast: new SchemaField(SM.BlastData, { required: true }),
+    blast: new SchemaField(BlastData, { required: true }),
     accuracy: new NumberField({ required: true, initial: 0 }),
 }
 

@@ -1,5 +1,7 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { ActionPartData } from "./ActionModel";
 
 const SummoningData = {
     spirit: new SchemaField({
@@ -20,9 +22,9 @@ const CompilationData = {
 const CallInActionData = {
     ...CompilationData,
     ...SummoningData,
-    ...SM.DescriptionPartData,
-    ...SM.ActionPartData,
-    ...SM.ImportFlags,
+    ...DescriptionPartData,
+    ...ActionPartData,
+    ...ImportFlags,
     actor_type: new StringField({
         required: true,
         initial: '',

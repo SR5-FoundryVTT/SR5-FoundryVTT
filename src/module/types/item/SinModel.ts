@@ -1,5 +1,7 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { TechnologyPartData } from "../template/TechnologyModel";
 
 const LicenseData = {
     name: new StringField({ required: true, initial: '' }),
@@ -8,9 +10,9 @@ const LicenseData = {
 }
 
 const SinData = {
-    ...SM.DescriptionPartData,
-    ...SM.TechnologyPartData,
-    ...SM.ImportFlags,
+    ...DescriptionPartData,
+    ...TechnologyPartData,
+    ...ImportFlags,
     licenses: new ArrayField(new SchemaField(LicenseData), { required: true, initial: [] }),
 }
 

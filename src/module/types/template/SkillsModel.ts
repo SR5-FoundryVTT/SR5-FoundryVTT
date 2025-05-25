@@ -1,15 +1,15 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { BaseValuePair, ModifiableValue, KeyValuePair } from "./BaseModel";
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
 export const SkillField = {
-    ...SM.BaseValuePair,
-    ...SM.ModifiableValue,
+    ...BaseValuePair,
+    ...ModifiableValue,
     name: new StringField({ required: true, initial: '' }),
     hide: new BooleanField({ required: false, initial: false }),
     label: new StringField({ required: false, initial: '' }),
-    bonus: new ArrayField(new SchemaField(SM.KeyValuePair)),
+    bonus: new ArrayField(new SchemaField(KeyValuePair)),
     //todo
     attribute: new StringField({ required: false, initial: '' }),
     _delete: new BooleanField({ required: false, initial: false }),

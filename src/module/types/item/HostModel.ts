@@ -1,5 +1,7 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ActionPartData } from "./ActionModel";
+import { DevicePartData } from "./DeviceModel";
 
 const SourceEntityField = {
     id: new StringField({ required: true }),
@@ -10,12 +12,12 @@ const SourceEntityField = {
 };
 
 const HostData = {
-    ...SM.DevicePartData,
-    ...SM.DescriptionPartData,
-    ...SM.ActionPartData,
+    ...DevicePartData,
+    ...DescriptionPartData,
+    ...ActionPartData,
     rating: new NumberField({ required: true, default: 1 }),
     //todo
-    // marks: new SchemaField(SM.MatrixMarks, { required: true }),
+    // marks: new SchemaField(MatrixMarks, { required: true }),
     ic: new ArrayField(new SchemaField(SourceEntityField), { required: true }),
     customAttributes: new BooleanField({ required: true, initial: false }),
 }

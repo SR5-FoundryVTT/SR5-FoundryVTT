@@ -1,9 +1,9 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { BaseValuePair, ModifiableValue } from "./BaseModel";
 
 export const AttributeField = {
-    ...SM.BaseValuePair,
-    ...SM.ModifiableValue,
+    ...BaseValuePair,
+    ...ModifiableValue,
     hide: new BooleanField({ required: true, initial: false }),
     label: new StringField({ required: true, initial: '' }),
     limit: new StringField({ required: false, initial: '' }),

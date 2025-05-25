@@ -1,7 +1,7 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { ValueMaxPair } from "./BaseModel";
 
 export const ConditionData = {
-    ...SM.ValueMaxPair,
+    ...ValueMaxPair,
     label: new StringField({ required: false, initial: '' }),
 };

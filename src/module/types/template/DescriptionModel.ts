@@ -1,5 +1,4 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 const DescriptionData = {
     value: new StringField({ required: true, initial: '' }),

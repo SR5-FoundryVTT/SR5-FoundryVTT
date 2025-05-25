@@ -1,10 +1,12 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { ActionPartData } from "./ActionModel";
 
 const ComplexFormData = {
-    ...SM.DescriptionPartData,
-    ...SM.ImportFlags,
-    ...SM.ActionPartData,
+    ...DescriptionPartData,
+    ...ImportFlags,
+    ...ActionPartData,
     target: new StringField({
         required: true,
         initial: '',

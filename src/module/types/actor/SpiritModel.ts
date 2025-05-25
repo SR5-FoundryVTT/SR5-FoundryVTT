@@ -1,29 +1,31 @@
+import { Attributes } from "../template/AttributesModel";
+import { AwakendLimits } from "../template/LimitsModel";
+import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CommonModifiers } from "./CommonModel";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
 
 export const SpiritData = {
-    ...SM.CommonData,
-    ...SM.MagicActorData,
-    ...SM.TwoTrackActorData,
-    ...SM.ArmorActorData,
-    ...SM.WoundsActorData,
-    ...SM.MovementActorData,
-    ...SM.NPCActorData,
+    ...CommonData,
+    ...MagicActorData,
+    ...TwoTrackActorData,
+    ...ArmorActorData,
+    ...WoundsActorData,
+    ...MovementActorData,
+    ...NPCActorData,
     summonerUuid: new StringField({ required: true, initial: "" }),
-    values: new SchemaField(SM.PhysicalCombatValues, { required: true }),
+    values: new SchemaField(PhysicalCombatValues, { required: true }),
     spiritType: new StringField({
         required: true,
         initial: "spirit",
         choices: Object.keys(SR5CONFIG.spiritTypes),
     }),
     force: new NumberField({ required: true, initial: 0 }),
-    limits: new SchemaField(SM.AwakendLimits, { required: true }),
+    limits: new SchemaField(AwakendLimits, { required: true }),
     services: new NumberField({ required: true, initial: 0 }),
-    attributes: new SchemaField(SM.Attributes, { required: true }),
+    attributes: new SchemaField(Attributes, { required: true }),
     modifiers: new SchemaField({
         //todo
-        // ...SM.Modifiers,
-        ...SM.CommonModifiers,
+        // ...Modifiers,
+        ...CommonModifiers,
     }, { required: true }),
 }
 

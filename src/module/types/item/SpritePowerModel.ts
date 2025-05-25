@@ -1,11 +1,12 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
-import { SR } from "../../constants";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { ActionPartData } from "./ActionModel";
 
 const SpritePowerData = {
-    ...SM.DescriptionPartData,
-    ...SM.ActionPartData,
-    ...SM.ImportFlags,
+    ...DescriptionPartData,
+    ...ActionPartData,
+    ...ImportFlags,
     duration: new StringField({
         required: true,
         initial: '',

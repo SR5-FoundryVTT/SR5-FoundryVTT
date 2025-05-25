@@ -1,5 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { ValueMaxPair, ModifiableValue } from "./BaseModel";
 
 const Living = {
     wounds: new NumberField({ required: true, initial: 0 }),
@@ -7,12 +7,12 @@ const Living = {
 }
 
 const Overflow = {
-    overflow: new SchemaField(SM.ValueMaxPair),
+    overflow: new SchemaField(ValueMaxPair),
 }
 
 export const TrackType = {
-    ...SM.ValueMaxPair,
-    ...SM.ModifiableValue,
+    ...ValueMaxPair,
+    ...ModifiableValue,
     label: new StringField({ required: false, initial: '' }),
     disable: new BooleanField({ required: false, initial: false })
 }

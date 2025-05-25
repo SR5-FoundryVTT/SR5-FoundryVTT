@@ -1,10 +1,12 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { TechnologyPartData } from "../template/TechnologyModel";
 
 const ProgramData = {
-    ...SM.DescriptionPartData,
-    ...SM.TechnologyPartData,
-    ...SM.ImportFlags,
+    ...DescriptionPartData,
+    ...TechnologyPartData,
+    ...ImportFlags,
     type: new StringField({
         required: true,
         initial: '',

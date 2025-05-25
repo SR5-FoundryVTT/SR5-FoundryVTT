@@ -1,5 +1,8 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/BaseModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+
 
 export const ActionTypeLabel = {
     label: new StringField({ required: true, initial: '' }),
@@ -10,8 +13,8 @@ export const ActionResultData = {
     success: new SchemaField({
         matrix: new SchemaField({
             placeMarks: new BooleanField({ required: true, initial: false }),
-        } as DataSchema),
-    } as DataSchema)
+        }),
+    })
 };
 
 export const MinimalActionData = {
@@ -20,14 +23,14 @@ export const MinimalActionData = {
     attribute2: new StringField({ required: true, initial: '' }),
     mod: new NumberField({ required: true, initial: 0 }),
     armor: new BooleanField({ required: true, initial: false }),
-    limit: new SchemaField(SM.ModifiableValueLinked)
+    limit: new SchemaField(ModifiableValueLinked)
 };
 
 export const DamageData = {
-    ...SM.ModifiableValueLinked,
-    type: new SchemaField(SM.BaseValuePair),
-    element: new SchemaField(SM.BaseValuePair),
-    ap: new SchemaField(SM.ModifiableValueLinked),
+    ...ModifiableValueLinked,
+    type: new SchemaField(BaseValuePair),
+    element: new SchemaField(BaseValuePair),
+    ap: new SchemaField(ModifiableValueLinked),
     source: new SchemaField({
         actorId: new StringField({ required: true, initial: '' }),
         itemId: new StringField({ required: true, initial: '' }),
@@ -50,7 +53,7 @@ export const ActionRollData = {
     categories: new ArrayField(new StringField({ required: true, initial: '' })),
     spec: new BooleanField({ required: true, initial: false }),
     mod_description: new StringField({ required: true, initial: '' }),
-    threshlold: new SchemaField(SM.BaseValuePair),
+    threshlold: new SchemaField(BaseValuePair),
     extended: new BooleanField({ required: true, initial: false }),
     modifiers: new ArrayField(new StringField({ required: true, initial: '' })),
     damage: new SchemaField(DamageData),
@@ -58,7 +61,7 @@ export const ActionRollData = {
     followed: new SchemaField({
         test: new StringField({ required: true, initial: '' })
     }),
-    dice_pool_mod: new SchemaField(SM.ModList),
+    dice_pool_mod: new SchemaField(ModList),
     rool_mode: new StringField({ required: true, initial: '' }),
 };
 
@@ -68,8 +71,8 @@ export const ActionPartData = {
 
 export const ActionData = {
     ...ActionPartData,
-    ...SM.ImportFlags,
-    ...SM.DescriptionPartData,
+    ...ImportFlags,
+    ...DescriptionPartData,
     result: new SchemaField(ActionResultData),
 };
 

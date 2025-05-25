@@ -1,5 +1,6 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { ModifiableValue } from "./BaseModel";
+import { ConditionData } from "./ConditionModel";
 
 export const TechnologyData = {
     rating: new NumberField({ required: true, initial: 0 }),
@@ -7,8 +8,8 @@ export const TechnologyData = {
     quantity: new NumberField({ required: true, initial: 0 }),
     cost: new NumberField({ required: true, initial: 0 }),
     equipped: new BooleanField({ required: false, initial: false }),
-    conceal: new SchemaField(SM.ModifiableValue),
-    condition_monitor: new SchemaField(SM.ConditionData),
+    conceal: new SchemaField(ModifiableValue),
+    condition_monitor: new SchemaField(ConditionData),
     wireless: new BooleanField({ required: false, initial: false }),
     networkController: new StringField({ required: false, initial: '' }),
 }

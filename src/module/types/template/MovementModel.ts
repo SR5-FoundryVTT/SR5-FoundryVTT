@@ -1,8 +1,8 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { ModifiableValue } from "./BaseModel";
 
 const MovementField = {
-    ...SM.ModifiableValue,
+    ...ModifiableValue,
     value: new NumberField({ required: true, initial: 0 }),
     mult: new NumberField({ required: true, initial: 0 }),
     base: new NumberField({ required: true, initial: 0 }),

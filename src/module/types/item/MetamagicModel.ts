@@ -1,10 +1,12 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { ActionPartData } from "./ActionModel";
 
 const MetamagicData = {
-    ...SM.DescriptionPartData,
-    ...SM.ActionPartData,
-    ...SM.ImportFlags,
+    ...DescriptionPartData,
+    ...ActionPartData,
+    ...ImportFlags,
 }
 
 export class Metamagic extends foundry.abstract.TypeDataModel<typeof MetamagicData, Item.Implementation> {

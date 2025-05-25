@@ -1,9 +1,9 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { BaseValuePair, ModifiableValue } from "./BaseModel";
 
 const LimitField = {
-    ...SM.BaseValuePair,
-    ...SM.ModifiableValue,
+    ...BaseValuePair,
+    ...ModifiableValue,
     label: new StringField({ required: false, initial: '' }),
     hide: new BooleanField({ required: false, initial: false }),
 }

@@ -1,36 +1,28 @@
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
-
-export const CommonData = {
-    ...SM.DescriptionPartData,
-    attributes: new SchemaField(SM.Attributes, { required: true }),
-    limits: new SchemaField(SM.Limits, { required: true }),
-    skills: new SchemaField(SM.CharacterSkills, { required: true }),
-    // special: new SchemaField(SM.SpecialTrait, { required: true }),
-    initiative: new SchemaField(SM.Initiative, { required: true }),
-    // modifiers: new SchemaField(SM.Modifiers, { required: true }),
-    //todo fix
-    situation_modifiers: new ObjectField({ required: true, initial: {} }),
-    values: new SchemaField(SM.CommonValues, { required: true }),
-    // inventories: new SchemaField(SM.InventoriesData, { required: true }),
-    visibilityChecks: new SchemaField(SM.VisibilityChecks, { required: true }),
-    category_visibility: new SchemaField(SM.CategoryVisibility, { required: true }),
-}
+import { DeviceAttribute } from "../item/DeviceModel";
+import { ActorArmor } from "../template/ArmorModel";
+import { Attributes, AttributeField } from "../template/AttributesModel";
+import { BaseValuePair, ModifiableValue } from "../template/BaseModel";
+import { MatrixTracks, PhysicalTrack, StunTrack, Tracks } from "../template/ConditionMonitorsModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { Limits, AwakendLimits, MatrixLimits } from "../template/LimitsModel";
+import { Movement } from "../template/MovementModel";
+import { KnowledgeSkillList } from "../template/SkillsModel";
 
 export const CharacterSkills = {
     //todo
-    // active: new SchemaField(SM.Skills, { required: true }),
-    language: new SchemaField(SM.KnowledgeSkillList, { required: true }),
+    // active: new SchemaField(Skills, { required: true }),
+    language: new SchemaField(KnowledgeSkillList, { required: true }),
     //todo
-    // knowledge: new SchemaField(SM.KnowledgeSkills, { required: true }),
+    // knowledge: new SchemaField(KnowledgeSkills, { required: true }),
 }
 
 export const InitiativeType = {
     base: new SchemaField({
-        ...SM.BaseValuePair, ...SM.ModifiableValue
+        ...BaseValuePair, ...ModifiableValue
     }, { required: true }),
     dice: new SchemaField({
-        ...SM.BaseValuePair, ...SM.ModifiableValue,
+        ...BaseValuePair, ...ModifiableValue,
         text: new StringField({ required: true, initial: "" }),
     }, { required: true }),
 }
@@ -55,14 +47,14 @@ export const MagicData = {
 }
 
 export const MatrixAttributes = {
-    att1: new SchemaField(SM.DeviceAttribute, { required: true }),
-    att2: new SchemaField(SM.DeviceAttribute, { required: true }),
-    att3: new SchemaField(SM.DeviceAttribute, { required: true }),
-    att4: new SchemaField(SM.DeviceAttribute, { required: true }),
+    att1: new SchemaField(DeviceAttribute, { required: true }),
+    att2: new SchemaField(DeviceAttribute, { required: true }),
+    att3: new SchemaField(DeviceAttribute, { required: true }),
+    att4: new SchemaField(DeviceAttribute, { required: true }),
 }
 
 export const MatrixAttributeField = {
-    ...SM.AttributeField,
+    ...AttributeField,
     device_att: new StringField({
         required: true,
         initial: "att1",
@@ -71,7 +63,7 @@ export const MatrixAttributeField = {
 }
 
 export const MatrixTrackActorData = {
-    track: new SchemaField(SM.MatrixTracks, { required: true }),
+    track: new SchemaField(MatrixTracks, { required: true }),
 }
 
 export const CategoryVisibility = {
@@ -84,8 +76,8 @@ export const NPCData = {
 }
 
 export const MatrixData = {
-    dice: new SchemaField({...SM.BaseValuePair, ...SM.ModifiableValue}, { required: true }),
-    base: new SchemaField({...SM.BaseValuePair, ...SM.ModifiableValue}, { required: true }),
+    dice: new SchemaField({...BaseValuePair, ...ModifiableValue}, { required: true }),
+    base: new SchemaField({...BaseValuePair, ...ModifiableValue}, { required: true }),
     attack: new ObjectField({
         required: true,
         initial: {},
@@ -106,12 +98,12 @@ export const InventoryData = {
 }
 
 export const CommonValues = {
-    string: new SchemaField(SM.ModifiableValue, { required: true }),
+    string: new SchemaField(ModifiableValue, { required: true }),
 }
 
 export const PhysicalCombatValues = {
-    recoil: new SchemaField(SM.ModifiableValue, { required: true }),
-    recoil_compensation: new SchemaField(SM.ModifiableValue, { required: true }),
+    recoil: new SchemaField(ModifiableValue, { required: true }),
+    recoil_compensation: new SchemaField(ModifiableValue, { required: true }),
 }
 
 export const MeatSpaceVisibility = {
@@ -136,7 +128,7 @@ export const VisibilityChecks = {
 }
 
 export const ArmorActorData = {
-    armor: new SchemaField(SM.ActorArmor, { required: true }),
+    armor: new SchemaField(ActorArmor, { required: true }),
 }
 
 export const WoundType = {
@@ -144,19 +136,19 @@ export const WoundType = {
 }
 
 export const WoundsActorData = {
-    wounds: new SchemaField(SM.WoundType, { required: true }),
+    wounds: new SchemaField(WoundType, { required: true }),
 }
 
 export const PhysicalTrackActorData = {
-    track: new SchemaField({ physical: new SchemaField(SM.PhysicalTrack, { required: true }) }, { required: true }),
+    track: new SchemaField({ physical: new SchemaField(PhysicalTrack, { required: true }) }, { required: true }),
 }
 
 export const StunTrackActorData = {
-    track: new SchemaField({ physical: new SchemaField(SM.StunTrack, { required: true }) }, { required: true }),
+    track: new SchemaField({ physical: new SchemaField(StunTrack, { required: true }) }, { required: true }),
 }
 
 export const TwoTrackActorData = {
-    track: new SchemaField(SM.Tracks, { required: true }),
+    track: new SchemaField(Tracks, { required: true }),
 }
 
 export const MagicActorData = {
@@ -168,7 +160,7 @@ export const MatrixActorData = {
 }
 
 export const MovementActorData = {
-    movement: new SchemaField(SM.Movement, { required: true }),
+    movement: new SchemaField(Movement, { required: true }),
 }
 
 export const NPCActorData = {
@@ -177,8 +169,8 @@ export const NPCActorData = {
 }
 
 export const CharacterLimits = {
-    ...SM.AwakendLimits,
-    ...SM.MatrixLimits,
+    ...AwakendLimits,
+    ...MatrixLimits,
 }
 
 export const CommonModifiers = {
@@ -196,4 +188,20 @@ export const MatrixModifiers = {
     matrix_initiative: new NumberField({ required: false, initial: 0 }),
     matrix_initiative_dice: new NumberField({ required: false, initial: 0 }),
     matrix_track: new NumberField({ required: false, initial: 0 }),
+}
+
+export const CommonData = {
+    ...DescriptionPartData,
+    attributes: new SchemaField(Attributes, { required: true }),
+    limits: new SchemaField(Limits, { required: true }),
+    skills: new SchemaField(CharacterSkills, { required: true }),
+    // special: new SchemaField(SpecialTrait, { required: true }),
+    initiative: new SchemaField(Initiative, { required: true }),
+    // modifiers: new SchemaField(Modifiers, { required: true }),
+    //todo fix
+    situation_modifiers: new ObjectField({ required: true, initial: {} }),
+    values: new SchemaField(CommonValues, { required: true }),
+    // inventories: new SchemaField(InventoriesData, { required: true }),
+    visibilityChecks: new SchemaField(VisibilityChecks, { required: true }),
+    category_visibility: new SchemaField(CategoryVisibility, { required: true }),
 }

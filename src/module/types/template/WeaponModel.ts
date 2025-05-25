@@ -1,8 +1,8 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { ModifiableValue } from "./BaseModel";
 
 const RangeTemplateData = {
-    ...SM.ModifiableValue,
+    ...ModifiableValue,
     distance: new NumberField({ required: true, initial: 0 }),
     label: new StringField({ required: false, initial: '' }),
 }

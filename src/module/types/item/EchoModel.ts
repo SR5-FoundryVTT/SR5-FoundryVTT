@@ -1,9 +1,10 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
 
 const EchoData = {
-    ...SM.DescriptionPartData,
-    ...SM.ImportFlags
+    ...DescriptionPartData,
+    ...ImportFlags
 };
 
 export class Echo extends foundry.abstract.TypeDataModel<typeof EchoData, Item.Implementation> {

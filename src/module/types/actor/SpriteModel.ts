@@ -1,9 +1,9 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { CommonData, MatrixActorData, CommonModifiers } from "./CommonModel";
 
 const SpriteData = {
-    ...SM.CommonData,
-    ...SM.MatrixActorData,
+    ...CommonData,
+    ...MatrixActorData,
     level: new NumberField({ required: true, initial: 0 }),
     services: new NumberField({ required: true, initial: 0 }),
     registered: new BooleanField({ required: true, initial: false }),
@@ -14,8 +14,8 @@ const SpriteData = {
     }),
     modifiers: new SchemaField({
         //todo
-        // ...SM.Modifiers,
-        ...SM.CommonModifiers,
+        // ...Modifiers,
+        ...CommonModifiers,
     }, { required: true }),
 
     technomancerUuid: new StringField({ required: true, initial: "" }),

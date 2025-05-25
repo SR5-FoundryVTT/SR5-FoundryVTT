@@ -1,5 +1,7 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { TechnologyPartData } from "../template/TechnologyModel";
 
 export const ArmorPartData = {
     armor: new SchemaField({
@@ -16,9 +18,9 @@ export const ArmorPartData = {
 
 const ArmorData = {
     ...ArmorPartData,
-    ...SM.DescriptionPartData,
-    ...SM.ImportFlags,
-    ...SM.TechnologyPartData,
+    ...DescriptionPartData,
+    ...ImportFlags,
+    ...TechnologyPartData,
 };
 
 export class Armor extends foundry.abstract.TypeDataModel<typeof ArmorData, Item.Implementation> {

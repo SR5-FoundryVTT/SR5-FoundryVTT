@@ -1,5 +1,7 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ShadowrunModel as SM } from "../ShadowrunModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { TechnologyPartData } from "../template/TechnologyModel";
 
 export const DevicePartData = {
     category: new StringField({
@@ -8,7 +10,7 @@ export const DevicePartData = {
         choices: ['commlink', 'cyberdeck', 'rcc', 'host', ''],
     }),
     //todo
-    //atts: new SchemaField(SM.MatrixAttributes),
+    //atts: new SchemaField(MatrixAttributes),
     networkDevices: new ArrayField(new StringField({ required: true, initial: '' })),
 };
 
@@ -24,9 +26,9 @@ export const DeviceAttribute = {
     
 const DeviceData = {
     ...DevicePartData,
-    ...SM.DescriptionPartData,
-    ...SM.TechnologyPartData,
-    ...SM.ImportFlags,
+    ...DescriptionPartData,
+    ...TechnologyPartData,
+    ...ImportFlags,
 };
 
 export class Device extends foundry.abstract.TypeDataModel<typeof DeviceData, Item.Implementation> {
