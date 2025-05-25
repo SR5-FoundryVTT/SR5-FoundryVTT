@@ -167,7 +167,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
     describe('RangeData preparation', () => {
         it('Check for weapon modification recoil modifiers' , async () => {
-            const weapon = new SR5Item({type: 'weapon', name: 'Test', system: {range: {rc: {base: 2}}}}) as unknown as Shadowrun.WeaponItemData;
+            const weapon = new SR5Item({type: 'weapon', name: 'Test', system: {range: {rc: {value: 2}}}}) as unknown as Shadowrun.WeaponItemData;
             const mods: SR5Item[] = [];
             mods.push(new SR5Item({type: 'modification', name: 'TestModA', system: {type: 'weapon', rc: 2}}));
 

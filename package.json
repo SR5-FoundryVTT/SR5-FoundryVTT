@@ -4,7 +4,7 @@
     ],
     "devDependencies": {
         "@ethaks/fvtt-quench": "^0.10.0",
-        "@foundryvtt/foundryvtt-cli": "^1.0.0-rc.4",
+        "@foundryvtt/foundryvtt-cli": "^1.0.3",
         "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
         "@types/node": "^22.5.2",
         "@typescript-eslint/eslint-plugin": "^6.13.2",
