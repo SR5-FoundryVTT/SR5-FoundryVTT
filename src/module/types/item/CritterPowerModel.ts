@@ -5,36 +5,31 @@ import { ActionPartData } from "./ActionModel";
 import { ArmorPartData } from "./ArmorModel";
 
 const CritterPowerData = {
-    ...DescriptionPartData,
-    ...ActionPartData,
-    ...ImportFlags,
-    ...ArmorPartData,
+    ...DescriptionPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
+    ...ArmorPartData(),
     category: new StringField({
         required: true,
         initial: '',
-        choices: Object.keys(SR5CONFIG.critterPower.categories),
     }),
     powerType: new StringField({
         required: true,
         initial: '',
-        choices: Object.keys(SR5CONFIG.critterPower.types),
     }),
     range: new StringField({
         required: true,
         initial: '',
-        choices: Object.keys(SR5CONFIG.critterPower.ranges),
     }),
     duration: new StringField({
         required: true,
         initial: '',
-        choices: Object.keys(SR5CONFIG.critterPower.durations),
     }),
     karma: new NumberField({ required: true, initial: 0 }),
     rating: new NumberField({ required: true, initial: 0 }),
     optional: new StringField({
         required: true,
         initial: '',
-        choices: Object.keys(SR5CONFIG.critterPower.optional),
     }),
     enabled: new BooleanField({ required: true, initial: false }),
 }

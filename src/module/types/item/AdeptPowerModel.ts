@@ -5,10 +5,10 @@ import { ActionPartData } from "./ActionModel";
 import { ArmorPartData } from "./ArmorModel";
 
 const AdeptPowerData = {
-    ...DescriptionPartData,
-    ...ActionPartData,
-    ...ImportFlags,
-    ...ArmorPartData,
+    ...DescriptionPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
+    ...ArmorPartData(),
     pp: new NumberField({ required: true, initial: 0 }),
     type: new StringField({ required: true, initial: ''}),
     drain: new BooleanField({ required: true, initial: false }),

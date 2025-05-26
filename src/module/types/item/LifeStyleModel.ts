@@ -3,8 +3,8 @@ import { DescriptionPartData } from "../template/DescriptionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 
 const LifestyleData = {
-    ...DescriptionPartData,
-    ...ImportFlags,
+    ...DescriptionPartData(),
+    ...ImportFlags(),
     type: new StringField({ required: true, initial: '' }),
     comforts: new NumberField({ required: true, initial: 0 }),
     security: new NumberField({ required: true, initial: 0 }),

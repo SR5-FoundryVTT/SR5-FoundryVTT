@@ -5,9 +5,9 @@ import { TechnologyPartData } from "../template/TechnologyModel";
 import { BlastData } from "./WeaponModel";
 
 const AmmoData = {
-    ...DescriptionPartData,
-    ...TechnologyPartData,
-    ...ImportFlags,
+    ...DescriptionPartData(),
+    ...TechnologyPartData(),
+    ...ImportFlags(),
     element: new StringField({
         required: true,
         initial: '',
@@ -33,7 +33,7 @@ const AmmoData = {
         ],
     }),
     replaceDamage: new BooleanField({ required: true, initial: false }),
-    blast: new SchemaField(BlastData, { required: true }),
+    blast: new SchemaField(BlastData(), { required: true }),
     accuracy: new NumberField({ required: true, initial: 0 }),
 }
 

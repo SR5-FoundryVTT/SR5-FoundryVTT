@@ -5,14 +5,14 @@ import { ImportFlags } from "../template/ImportFlagsModel";
 import { TechnologyPartData } from "../template/TechnologyModel";
 import { ActionPartData } from "./ActionModel";
 
-export const BlastData = {
+export const BlastData = () => ({
     radius: new NumberField({ required: true, initial: 0 }),
     dropoff: new NumberField({ required: true, initial: 0 }),
-}
+});
 
-const AmmunitionData = {
-    spare_clips: new SchemaField(ValueMaxPair, { required: true }),
-    current: new SchemaField(ValueMaxPair, { required: true }),
+const AmmunitionData = () => ({
+    spare_clips: new SchemaField(ValueMaxPair(), { required: true }),
+    current: new SchemaField(ValueMaxPair(), { required: true }),
     clip_type: new StringField({
         required: true,
         initial: '',
@@ -29,9 +29,9 @@ const AmmunitionData = {
         ],
     }),
     partial_reload_value: new NumberField({ required: true, initial: 0 }),
-}
+});
 
-const RangeData = {
+const RangeData = () => ({
     short: new NumberField({ required: true, initial: 0 }),
     medium: new NumberField({ required: true, initial: 0 }),
     long: new NumberField({ required: true, initial: 0 }),
@@ -39,40 +39,38 @@ const RangeData = {
     category: new StringField({
         required: true,
         initial: '',
-        choices: Object.keys(SR5CONFIG.weaponRangeCategories),
     }),
     attribute: new StringField({ required: false, initial: '' }),
-}
+});
 
-const FiringModeData = {
+const FiringModeData = () => ({
     single_shot: new BooleanField({ required: true, initial: false }),
     semi_auto: new BooleanField({ required: true, initial: false }),
     burst_fire: new BooleanField({ required: true, initial: false }),
     full_auto: new BooleanField({ required: true, initial: false }),
-}
+});
 
-const RangeWeaponData = {
+const RangeWeaponData = () => ({
     category: new StringField({ required: true, initial: '' }),
-    ranges: new SchemaField(RangeData, { required: true }),
-    rc: new SchemaField(ModifiableValue, { required: true }),
-    modes: new SchemaField(FiringModeData, { required: true }),
-}
+    ranges: new SchemaField(RangeData(), { required: true }),
+    rc: new SchemaField(ModifiableValue(), { required: true }),
+    modes: new SchemaField(FiringModeData(), { required: true }),
+});
 
-const MeleeWeaponData = {
+const MeleeWeaponData = () => ({
     reach: new NumberField({ required: true, initial: 0 }),
-}
+});
 
-const ThrownWeaponData = {
-    range: new SchemaField(RangeData, { required: true }),
-    blast: new SchemaField(BlastData, { required: true }),
-}
-
+const ThrownWeaponData = () => ({
+    range: new SchemaField(RangeData(), { required: true }),
+    blast: new SchemaField(BlastData(), { required: true }),
+});
 
 const WeaponData = {
-    ...DescriptionPartData,
-    ...TechnologyPartData,
-    ...ActionPartData,
-    ...ImportFlags,
+    ...DescriptionPartData(),
+    ...TechnologyPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
     category: new StringField({
         required: true,
         initial: '',
@@ -84,12 +82,11 @@ const WeaponData = {
         ],
     }),
     subcategory: new StringField({ required: true, initial: '' }),
-    ammo: new SchemaField(AmmunitionData, { required: true }),
-    range: new SchemaField(RangeWeaponData, { required: true }),
-    melee: new SchemaField(MeleeWeaponData, { required: true }),
-    thrown: new SchemaField(ThrownWeaponData, { required: true }),
+    ammo: new SchemaField(AmmunitionData(), { required: true }),
+    range: new SchemaField(RangeWeaponData(), { required: true }),
+    melee: new SchemaField(MeleeWeaponData(), { required: true }),
+    thrown: new SchemaField(ThrownWeaponData(), { required: true }),
 }
-
 
 export class Weapon extends foundry.abstract.TypeDataModel<typeof WeaponData, Item.Implementation> {
     static override defineSchema() {

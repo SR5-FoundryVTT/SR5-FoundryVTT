@@ -4,9 +4,9 @@ import { ImportFlags } from "../template/ImportFlagsModel";
 import { TechnologyPartData } from "../template/TechnologyModel";
 
 const ProgramData = {
-    ...DescriptionPartData,
-    ...TechnologyPartData,
-    ...ImportFlags,
+    ...DescriptionPartData(),
+    ...TechnologyPartData(),
+    ...ImportFlags(),
     type: new StringField({
         required: true,
         initial: '',

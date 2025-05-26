@@ -4,28 +4,27 @@ import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsAc
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 export const SpiritData = {
-    ...CommonData,
-    ...MagicActorData,
-    ...TwoTrackActorData,
-    ...ArmorActorData,
-    ...WoundsActorData,
-    ...MovementActorData,
-    ...NPCActorData,
+    ...CommonData(),
+    ...MagicActorData(),
+    ...TwoTrackActorData(),
+    ...ArmorActorData(),
+    ...WoundsActorData(),
+    ...MovementActorData(),
+    ...NPCActorData(),
     summonerUuid: new StringField({ required: true, initial: "" }),
-    values: new SchemaField(PhysicalCombatValues, { required: true }),
+    values: new SchemaField(PhysicalCombatValues(), { required: true }),
     spiritType: new StringField({
         required: true,
-        initial: "spirit",
-        choices: Object.keys(SR5CONFIG.spiritTypes),
+        initial: "",
     }),
     force: new NumberField({ required: true, initial: 0 }),
-    limits: new SchemaField(AwakendLimits, { required: true }),
+    limits: new SchemaField(AwakendLimits(), { required: true }),
     services: new NumberField({ required: true, initial: 0 }),
-    attributes: new SchemaField(Attributes, { required: true }),
+    attributes: new SchemaField(Attributes(), { required: true }),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,
-        ...CommonModifiers,
+        ...CommonModifiers(),
     }, { required: true }),
 }
 

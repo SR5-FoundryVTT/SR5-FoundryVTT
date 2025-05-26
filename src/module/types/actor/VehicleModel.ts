@@ -4,46 +4,46 @@ import { Attributes, AttributeField } from "../template/AttributesModel";
 import { ModifiableValue } from "../template/BaseModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 
-const VehicleStat = {
-    ...ModifiableValue,
+const VehicleStat = () => ({
+    ...ModifiableValue(),
     label: new StringField({ required: true, initial: "" }),
     temp: new NumberField({ required: true, initial: 0 }),
     hidden: new BooleanField({ required: true, initial: false }),
-}
+});
 
-const VehicleAttributes = {
-    ...Attributes,
-    pilot: new SchemaField(AttributeField, { required: true }),
-}
+const VehicleAttributes = () => ({
+    ...Attributes(),
+    pilot: new SchemaField(AttributeField(), { required: true }),
+});
 
-const VehicleStats = {
-    pilot: new SchemaField(VehicleStat, { required: true }),
-    handling: new SchemaField(VehicleStat, { required: true }),
-    off_road_handling: new SchemaField(VehicleStat, { required: true }),
-    speed: new SchemaField(VehicleStat, { required: true }),
-    off_road_speed: new SchemaField(VehicleStat, { required: true }),
-    acceleration: new SchemaField(VehicleStat, { required: true }),
-    sensor: new SchemaField(VehicleStat, { required: true }),
-    seats: new SchemaField(VehicleStat, { required: true }),
-}
+const VehicleStats = () => ({
+    pilot: new SchemaField(VehicleStat(), { required: true }),
+    handling: new SchemaField(VehicleStat(), { required: true }),
+    off_road_handling: new SchemaField(VehicleStat(), { required: true }),
+    speed: new SchemaField(VehicleStat(), { required: true }),
+    off_road_speed: new SchemaField(VehicleStat(), { required: true }),
+    acceleration: new SchemaField(VehicleStat(), { required: true }),
+    sensor: new SchemaField(VehicleStat(), { required: true }),
+    seats: new SchemaField(VehicleStat(), { required: true }),
+});
 
-const VehicleModCategories = {
+const VehicleModCategories = () => ({
     body: new NumberField({ required: true, initial: 0 }),
     power_train: new NumberField({ required: true, initial: 0 }),
     protection: new NumberField({ required: true, initial: 0 }),
     electromagnetic: new NumberField({ required: true, initial: 0 }),
     cosmetic: new NumberField({ required: true, initial: 0 }),
     weapons: new NumberField({ required: true, initial: 0 }),
-}
+});
 
 const VehicleData = {
-    ...CommonData,
-    ...ArmorActorData,
-    ...MatrixActorData,
-    ...MovementActorData,
-    ...ImportFlags,
-    ...PhysicalTrackActorData,
-    value: new SchemaField(PhysicalCombatValues, { required: true }),
+    ...CommonData(),
+    ...ArmorActorData(),
+    ...MatrixActorData(),
+    ...MovementActorData(),
+    ...ImportFlags(),
+    ...PhysicalTrackActorData(),
+    value: new SchemaField(PhysicalCombatValues(), { required: true }),
     vehicleType: new StringField({
         required: true,
         initial: "ground",
@@ -62,15 +62,15 @@ const VehicleData = {
         initial: "speed",
         choices: ["speed", "handling"],
     }),
-    vehicle_stats: new SchemaField(VehicleStats, { required: true }),
-    attributes: new SchemaField(VehicleAttributes, { required: true }),
+    vehicle_stats: new SchemaField(VehicleStats(), { required: true }),
+    attributes: new SchemaField(VehicleAttributes(), { required: true }),
     networkController: new StringField({ required: true, initial: "" }),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,
         ...CommonModifiers,
     }, { required: true }),
-    modificationCategories: new SchemaField(VehicleModCategories, { required: true }),
+    modificationCategories: new SchemaField(VehicleModCategories(), { required: true }),
     modPoints: new NumberField({ required: true, initial: 0 }),
 }
 

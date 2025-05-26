@@ -3,7 +3,7 @@ import { DescriptionPartData } from "../template/DescriptionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 import { TechnologyPartData } from "../template/TechnologyModel";
 
-export const ArmorPartData = {
+export const ArmorPartData = () => ({
     armor: new SchemaField({
         mod: new BooleanField({ required: true, initial: false }),
         value: new NumberField({ required: true, initial: 0 }),
@@ -14,13 +14,13 @@ export const ArmorPartData = {
         radiation: new NumberField({ required: true, initial: 0 }),
         hardened: new BooleanField({ required: true, initial: false }),
     }, { required: true })
-};
+});
 
 const ArmorData = {
-    ...ArmorPartData,
-    ...DescriptionPartData,
-    ...ImportFlags,
-    ...TechnologyPartData,
+    ...ArmorPartData(),
+    ...DescriptionPartData(),
+    ...ImportFlags(),
+    ...TechnologyPartData(),
 };
 
 export class Armor extends foundry.abstract.TypeDataModel<typeof ArmorData, Item.Implementation> {

@@ -4,9 +4,9 @@ import { ImportFlags } from "../template/ImportFlagsModel";
 import { ActionPartData } from "./ActionModel";
 
 const MetamagicData = {
-    ...DescriptionPartData,
-    ...ActionPartData,
-    ...ImportFlags,
+    ...DescriptionPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
 }
 
 export class Metamagic extends foundry.abstract.TypeDataModel<typeof MetamagicData, Item.Implementation> {

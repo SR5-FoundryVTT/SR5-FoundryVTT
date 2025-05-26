@@ -3,8 +3,8 @@ import { DescriptionPartData } from "../template/DescriptionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 
 const ContactData = {
-    ...DescriptionPartData,
-    ...ImportFlags,
+    ...DescriptionPartData(),
+    ...ImportFlags(),
     type: new StringField({ required: true, initial: '' }),
     connection: new NumberField({ required: true, initial: 0 }),
     loyalty: new NumberField({ required: true, initial: 0 }),

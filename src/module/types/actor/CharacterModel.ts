@@ -2,22 +2,22 @@ import { CommonModifiers, MatrixModifiers, CommonData, MatrixActorData, TwoTrack
 import { Attributes, AttributeField } from "../template/AttributesModel";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
-const TechnomancerActorData = {
+const TechnomancerActorData = () => ({
     technomancer: new SchemaField({
         attribute: new StringField({ required: true, initial: "" }),
         submersion: new NumberField({ required: true, initial: 0 }),
     }, { required: true }),
-}
+});
 
-const CharacterAttributes = {
-    ...Attributes,
-    initiation: new SchemaField(AttributeField, { required: true }),
-    submersion: new SchemaField(AttributeField, { required: true }),
-}
+const CharacterAttributes = () => ({
+    ...Attributes(),
+    initiation: new SchemaField(AttributeField(), { required: true }),
+    submersion: new SchemaField(AttributeField(), { required: true }),
+});
 
-const CharacterModifiers = {
-    ...CommonModifiers,
-    ...MatrixModifiers,
+const CharacterModifiers = () => ({
+    ...CommonModifiers(),
+    ...MatrixModifiers(),
     drain: new NumberField({ required: false, initial: 0 }),
     armor: new NumberField({ required: false, initial: 0 }),
     physical_limit: new NumberField({ required: false, initial: 0 }),
@@ -44,28 +44,28 @@ const CharacterModifiers = {
     fade: new NumberField({ required: false, initial: 0 }),
     multi_defense: new NumberField({ required: false, initial: 0 }),
     reach: new NumberField({ required: false, initial: 0 }),
-}
+});
 
 const CharacterData = {
-    ...CommonData,
-    ...MatrixActorData,
-    ...TwoTrackActorData,
-    ...ArmorActorData,
-    ...MagicActorData,
-    ...WoundsActorData,
-    ...MovementActorData,
-    ...TechnomancerActorData,
-    ...NPCActorData,
-    attributes: new SchemaField(CharacterAttributes, { required: true }),
-    values: new SchemaField(PhysicalCombatValues, { required: true }),
+    ...CommonData(),
+    ...MatrixActorData(),
+    ...TwoTrackActorData(),
+    ...ArmorActorData(),
+    ...MagicActorData(),
+    ...WoundsActorData(),
+    ...MovementActorData(),
+    ...TechnomancerActorData(),
+    ...NPCActorData(),
+    attributes: new SchemaField(CharacterAttributes(), { required: true }),
+    values: new SchemaField(PhysicalCombatValues(), { required: true }),
     metatype: new StringField({ required: true, initial: "" }),
     full_defense_attribute: new StringField({ required: true, initial: "" }),
     is_critter: new BooleanField({ required: true, initial: false }),
-    limits: new SchemaField(CharacterLimits, { required: true }),
+    limits: new SchemaField(CharacterLimits(), { required: true }),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,
-        ...CharacterModifiers,
+        ...CharacterModifiers(),
     }, { required: true }),
 }
 

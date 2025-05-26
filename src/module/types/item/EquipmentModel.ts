@@ -5,10 +5,10 @@ import { TechnologyPartData } from "../template/TechnologyModel";
 import { ActionPartData } from "./ActionModel";
 
 const EquipmentData = {
-    ...DescriptionPartData,
-    ...TechnologyPartData,
-    ...ActionPartData,
-    ...ImportFlags,
+    ...DescriptionPartData(),
+    ...TechnologyPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
 }
 
 export class Equipment extends foundry.abstract.TypeDataModel<typeof EquipmentData, Item.Implementation> {

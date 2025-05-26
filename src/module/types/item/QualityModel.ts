@@ -4,9 +4,9 @@ import { ImportFlags } from "../template/ImportFlagsModel";
 import { ActionPartData } from "./ActionModel";
 
 const QualityData = {
-    ...DescriptionPartData,
-    ...ActionPartData,
-    ...ImportFlags,
+    ...DescriptionPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
     type: new StringField({
         required: true,
         initial: '',

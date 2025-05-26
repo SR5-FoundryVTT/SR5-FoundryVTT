@@ -4,18 +4,16 @@ import { ImportFlags } from "../template/ImportFlagsModel";
 import { ActionPartData } from "./ActionModel";
 
 const SpritePowerData = {
-    ...DescriptionPartData,
-    ...ActionPartData,
-    ...ImportFlags,
+    ...DescriptionPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
     duration: new StringField({
         required: true,
         initial: '',
-        choices: SR5CONFIG.spritePower.durations
     }),
     optional: new StringField({
         required: true,
         initial: '',
-        choices: SR5CONFIG.spritePower.optional
     }),
     enabled: new BooleanField({ required: true, initial: false }),
 }

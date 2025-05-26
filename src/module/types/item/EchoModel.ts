@@ -3,8 +3,8 @@ import { DescriptionPartData } from "../template/DescriptionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 
 const EchoData = {
-    ...DescriptionPartData,
-    ...ImportFlags
+    ...DescriptionPartData(),
+    ...ImportFlags()
 };
 
 export class Echo extends foundry.abstract.TypeDataModel<typeof EchoData, Item.Implementation> {

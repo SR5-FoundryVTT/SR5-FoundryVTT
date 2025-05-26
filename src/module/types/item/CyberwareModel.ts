@@ -6,11 +6,11 @@ import { ActionPartData } from "./ActionModel";
 import { ArmorPartData } from "./ArmorModel";
 
 const CyberwareData = {
-    ...DescriptionPartData,
-    ...TechnologyPartData,
-    ...ActionPartData,
-    ...ImportFlags,
-    ...ArmorPartData,
+    ...DescriptionPartData(),
+    ...TechnologyPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
+    ...ArmorPartData(),
     essence: new NumberField({ required: true, initial: 0 }),
     capacity: new NumberField({ required: true, initial: 0 }),
     grade: new StringField({

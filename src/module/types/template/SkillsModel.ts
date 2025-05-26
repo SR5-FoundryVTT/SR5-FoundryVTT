@@ -3,13 +3,13 @@ import { BaseValuePair, ModifiableValue, KeyValuePair } from "./BaseModel";
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
-export const SkillField = {
-    ...BaseValuePair,
-    ...ModifiableValue,
+const SkillField = () => ({
+    ...BaseValuePair(),
+    ...ModifiableValue(),
     name: new StringField({ required: true, initial: '' }),
     hide: new BooleanField({ required: false, initial: false }),
     label: new StringField({ required: false, initial: '' }),
-    bonus: new ArrayField(new SchemaField(KeyValuePair)),
+    bonus: new ArrayField(new SchemaField(KeyValuePair())),
     //todo
     attribute: new StringField({ required: false, initial: '' }),
     _delete: new BooleanField({ required: false, initial: false }),
@@ -17,10 +17,10 @@ export const SkillField = {
     canDefault: new BooleanField({ required: false, initial: false }),
     id: new StringField({ required: false, initial: '' }),
     link: new StringField({ required: false, initial: '' }),
-}
+});
 
 //todo
-export const KnowledgeSkillList = {
+export const KnowledgeSkillList = () => ({
     attribute: new StringField({ required: true, initial: '' }),
-    value: new SchemaField(SkillField),
-}
+    value: new SchemaField(SkillField()),
+});

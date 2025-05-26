@@ -4,9 +4,9 @@ import { ImportFlags } from "../template/ImportFlagsModel";
 import { ActionPartData } from "./ActionModel";
 
 const ComplexFormData = {
-    ...DescriptionPartData,
-    ...ImportFlags,
-    ...ActionPartData,
+    ...DescriptionPartData(),
+    ...ImportFlags(),
+    ...ActionPartData(),
     target: new StringField({
         required: true,
         initial: '',

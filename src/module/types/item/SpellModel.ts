@@ -1,14 +1,14 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-const CombatSpellData = {
+const CombatSpellData = ()=> ({
     type: new StringField({
         required: true,
         initial: '',
         choices: ['direct', 'indirect', '']
     }),
-}
+});
 
-const DetectionSpellData = {
+const DetectionSpellData = () => ({
     type: new StringField({
         required: true,
         initial: '',
@@ -16,9 +16,9 @@ const DetectionSpellData = {
     }),
     passive: new BooleanField({ required: true, initial: false }),
     extended: new BooleanField({ required: true, initial: false }),
-}
+});
 
-const IllusionSpellData = {
+const IllusionSpellData = () => ({
     type: new StringField({
         required: true,
         initial: '',
@@ -29,16 +29,16 @@ const IllusionSpellData = {
         initial: '',
         choices: ['single-sense', 'multi-sense', '']
     }),
-}
+});
 
-const ManipulationSpellData = {
+const ManipulationSpellData = () => ({
     damaging: new BooleanField({ required: true, initial: false }),
     mental: new BooleanField({ required: true, initial: false }),
     environmental: new BooleanField({ required: true, initial: false }),
     physical: new BooleanField({ required: true, initial: false }),
-}
+});
 
-const RitualSpellData = {
+const RitualSpellData = () => ({
     ritual: new SchemaField({
         type: new StringField({
             required: true,
@@ -46,7 +46,7 @@ const RitualSpellData = {
             choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter', '']
         }),
     }, { required: true }),
-}
+});
 
 const SpellPartData = {
     type: new StringField({
@@ -72,11 +72,11 @@ const SpellPartData = {
     }),
 
     extended: new BooleanField({ required: true, initial: false }),
-    combat: new SchemaField(CombatSpellData, { required: true }),
-    detection: new SchemaField(DetectionSpellData, { required: true }),
-    illusion: new SchemaField(IllusionSpellData, { required: true }),
-    manipulation: new SchemaField(ManipulationSpellData, { required: true }),
-    ritual: new SchemaField(RitualSpellData, { required: true }),
+    combat: new SchemaField(CombatSpellData(), { required: true }),
+    detection: new SchemaField(DetectionSpellData(), { required: true }),
+    illusion: new SchemaField(IllusionSpellData(), { required: true }),
+    manipulation: new SchemaField(ManipulationSpellData(), { required: true }),
+    ritual: new SchemaField(RitualSpellData(), { required: true }),
 }
 
 export class Spell extends foundry.abstract.TypeDataModel<typeof SpellPartData, Item.Implementation> {
