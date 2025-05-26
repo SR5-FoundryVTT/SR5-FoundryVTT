@@ -9,12 +9,12 @@ export class ConditionMonitorsPrep {
         const { track, attributes, modifiers } = system;
 
         track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
-        track.stun.max = track.stun.base + Number(modifiers.stun_track);
-        track.stun.label = SR5.damageTypes.stun as string;
+        track.stun.max = track.stun.base + modifiers.stun_track;
+        track.stun.label = SR5.damageTypes.stun;
         track.stun.disabled = false;
     }
 
-    static preparePhysical(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'sprite'>) {
+    static preparePhysical(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
         const { track, attributes, modifiers } = system;
 
         track.physical.base = 8 + Math.ceil(attributes.body.value / 2);

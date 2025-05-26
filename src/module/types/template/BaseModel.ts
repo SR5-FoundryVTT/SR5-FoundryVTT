@@ -17,13 +17,13 @@ export const MatrixAttribute = new StringField({
 });
 
 export const BaseValuePair = () => ({
-    base: new NumberField(),
-    value: new NumberField(),
+    value: new NumberField({required: true, initial: 0}),
+    base: new NumberField({required: true, initial: 0}),
 });
 
 export const ValueMaxPair = () => ({
-    value: new NumberField(),
-    max: new NumberField(),
+    value: new NumberField({ required: true, initial: 0 }),
+    max: new NumberField({ required: true, initial: 0 }),
 });
 
 export const ModListEntry = () => ({
