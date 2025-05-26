@@ -34,10 +34,8 @@
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
 
     /* Type Checking */
-    "strict": false /* Enable all strict type-checking options. */,
+    "strict": true /* Enable all strict type-checking options. */,
     "noImplicitAny": false /* Enable error reporting for expressions and declarations with an implied 'any' type. */,
-    "strictNullChecks": false /* When type checking, take into account 'null' and 'undefined'. */,
-    "strictFunctionTypes": false /* When assigning functions, check to ensure parameters and the return values are subtype-compatible. */,
     "noUnusedLocals": false /* Enable error reporting when local variables aren't read. */,
     "noImplicitReturns": true /* Enable error reporting for codepaths that do not explicitly return in a function. */,
     "noFallthroughCasesInSwitch": true /* Enable error reporting for fallthrough cases in switch statements. */,
