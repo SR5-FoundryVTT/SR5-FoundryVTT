@@ -76,6 +76,7 @@ declare module "fvtt-types/configuration" {
 
     interface DataModelConfig {
         Actor: {
+            base: typeof Character;
             character: typeof Character;
             critter: typeof Critter;
             ic: typeof IC;

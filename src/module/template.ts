@@ -57,7 +57,7 @@ export default class Template extends MeasuredTemplate {
      * @returns Template instance. Not drawn on scene.
      */
     static fromItem(item: SR5Item, onComplete?: () => void): Template | undefined {
-        if (!canvas.scene) return;
+        if (!canvas.scene) return undefined;
 
         // Either use blast data or default values.
         const blast = item.getBlastData();

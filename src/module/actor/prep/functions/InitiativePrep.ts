@@ -3,13 +3,14 @@ import MatrixActorData = Shadowrun.MatrixActorData;
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import { SystemActor } from '../../SR5Actor';
 
 export class InitiativePrep {
     /**
      * Current initiative is the selected initiative to be used within FoundryVTT Combat.
      *
      */
-    static prepareCurrentInitiative(system: ActorTypesData) {
+    static prepareCurrentInitiative(system: Actor.SystemOfType<SystemActor>) {
         const { initiative } = system;
 
         if (initiative.perception === 'matrix') initiative.current = initiative.matrix;
@@ -32,7 +33,7 @@ export class InitiativePrep {
     /**
      * Physical initiative
      */
-    static prepareMeatspaceInit(system: ActorTypesData) {
+    static prepareMeatspaceInit(system: Actor.SystemOfType<SystemActor>) {
         const { initiative, attributes, modifiers } = system;
 
         initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
@@ -44,7 +45,7 @@ export class InitiativePrep {
         initiative.meatspace.dice.value = Helpers.calcTotal(initiative.meatspace.dice, {min: 0, max: 5});
     }
 
-    static prepareAstralInit(system: ActorTypesData & MagicActorData) {
+    static prepareAstralInit(system: Actor.SystemOfType<SystemActor>) {
         const { initiative, attributes, modifiers } = system;
 
         initiative.astral.base.base = attributes.intuition.value * 2;

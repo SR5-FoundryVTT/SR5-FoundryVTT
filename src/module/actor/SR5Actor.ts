@@ -29,6 +29,8 @@ import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import AEChangeData = ActiveEffect.ChangeData;
 
+export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' | 'sprite';
+
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
  *
@@ -44,7 +46,7 @@ import AEChangeData = ActiveEffect.ChangeData;
  * </code></pre>
  *
  */
-export class SR5Actor<SubType extends Actor.SubType = Actor.SubType> extends Actor<SubType> {
+export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<SubType> {
     // This is the default inventory name and label for when no other inventory has been created.
     defaultInventory: Shadowrun.InventoryData = {
         name: 'Carried',
@@ -285,23 +287,22 @@ export class SR5Actor<SubType extends Actor.SubType = Actor.SubType> extends Act
      * Reduce all changes across multiple active effects that match the given set of partial keys
      * @param partialKeys Can either be complete keys or partial keys
      */
-    _reduceEffectChangesByKeys(partialKeys: string[]): EffectChangeData[] {
+    _reduceEffectChangesByKeys(partialKeys: string[]): AEChangeData[] {
         // Collect only those changes matching the given partial keys.
-        const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
+        const changes = this.effects.reduce((changes: AEChangeData[], effect) => {
             if (effect.disabled) return changes;
 
             // include changes partially matching given keys.
             const overrideChanges = effect.changes
                 .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
                 .map(origChange => {
-                    const change: EffectChangeData = {
+                    const change: AEChangeData = {
                         key: String(origChange.key),
                         value: String(origChange.value),
-                        mode: Number(origChange.mode),
+                        mode: Number(origChange.mode) as CONST.ACTIVE_EFFECT_MODES,
                         priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
+                        effect: effect
                     };
-                    //@ts-expect-error
-                    change.effect = effect;
                     return change;
                 });
 
@@ -512,11 +513,11 @@ export class SR5Actor<SubType extends Actor.SubType = Actor.SubType> extends Act
     /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
      *  Please check SR5ActorType for reference.
      */
-    isType<ST extends Actor.SubType = Actor.SubType>(type: ST): this is SR5Actor<ST> {
+    isType<ST extends SystemActor = SystemActor>(type: ST): this is SR5Actor<ST> {
         return this.type === type;
     }
 
-    asType<ST extends readonly Actor.SubType[]>(...types: ST): SR5Actor<ST[number]> | undefined {
+    asType<ST extends readonly SystemActor[]>(...types: ST): SR5Actor<ST[number]> | undefined {
         return types.some((t) => this.isType(t)) ? this : undefined;
     }
 

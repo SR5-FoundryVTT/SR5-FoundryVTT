@@ -1,4 +1,5 @@
 import {FLAGS, SYSTEM_NAME} from './constants';
+const { BaseGrid, SquareGrid } = foundry.grid;
 
 interface DistanceOptions {
     gridSpaces?: boolean
@@ -53,5 +54,5 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
 
 export function canvasInit() {
     // Add a custom measureDistances function, overwriting default to add more movement styles.
-    SquareHex.prototype.measureDistances = measureDistances;
+    SquareGrid.prototype.measureDistances = measureDistances;
 }

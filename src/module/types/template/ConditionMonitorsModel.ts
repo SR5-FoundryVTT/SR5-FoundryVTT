@@ -13,8 +13,9 @@ const Overflow = () => ({
 export const TrackType = () => ({
     ...ValueMaxPair(),
     ...ModifiableValue(),
-    label: new StringField({ required: false, initial: '' }),
-    disable: new BooleanField({ required: false, initial: false })
+    base: new NumberField({ required: true, initial: 0 }),
+    label: new StringField({ required: true, blank: true, initial: '' }),
+    disabled: new BooleanField({ required: false, initial: false })
 });
 
 export const OverflowTrackType = () => ({
@@ -41,6 +42,6 @@ export const MatrixTracks = () => ({
 });
 
 export const Tracks = () => ({
-    physical: new SchemaField(PhysicalTrack()),
     stun: new SchemaField(StunTrack()),
+    physical: new SchemaField(PhysicalTrack()),
 });

@@ -10,7 +10,7 @@ const ICAttributes = () => ({
     firewall: new SchemaField(AttributeField(), { required: true }),
 });
 
-export const ICData = {
+const ICData = {
     ...CommonData(),
     ...MatrixActorData(),
     ...MatrixTrackActorData(),

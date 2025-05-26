@@ -1,4 +1,4 @@
-const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField } = foundry.data.fields;
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 import { DeviceAttribute } from "../item/DeviceModel";
 import { ActorArmor } from "../template/ArmorModel";
 import { Attributes, AttributeField } from "../template/AttributesModel";
@@ -90,13 +90,6 @@ export const MatrixData = () => ({
     }),
 });
 
-export const InventoryData = () => ({
-    name: new StringField({ required: true, initial: "" }),
-    type: new StringField({ required: true, initial: "" }),
-    items: new ArrayField(new StringField({ required: true, initial: "" }), { required: true }),
-    showAll: new BooleanField({ required: false, initial: false }),
-});
-
 export const CommonValues = () => ({
     string: new SchemaField(ModifiableValue(), { required: true }),
 });
@@ -182,6 +175,9 @@ export const CommonModifiers = () => ({
     defense_ranged: new NumberField({ required: false, initial: 0 }),
     soak: new NumberField({ required: false, initial: 0 }),
     recoil: new NumberField({ required: false, initial: 0 }),
+    stun_track: new NumberField({ required: false, initial: 0 }),
+    physical_track: new NumberField({ required: false, initial: 0 }),
+    physical_overflow_track: new NumberField({ required: false, initial: 0 }),
 });
 
 export const MatrixModifiers = () => ({
@@ -189,6 +185,13 @@ export const MatrixModifiers = () => ({
     matrix_initiative_dice: new NumberField({ required: false, initial: 0 }),
     matrix_track: new NumberField({ required: false, initial: 0 }),
 });
+
+const InventoryData = {
+    name: new StringField({ required: true, initial: "" }),
+    type: new StringField({ required: true, initial: "" }),
+    itemIds: new ArrayField(new StringField({ required: true, initial: "" }), { required: true }),
+    showAll: new BooleanField({ required: false, initial: false }),
+};
 
 export const CommonData = () => ({
     ...DescriptionPartData(),
@@ -201,7 +204,7 @@ export const CommonData = () => ({
     //todo fix
     situation_modifiers: new ObjectField({ required: true, initial: {} }),
     values: new SchemaField(CommonValues(), { required: true }),
-    // inventories: new SchemaField(InventoriesData, { required: true }),
+    // inventories: new TypedObjectField(new SchemaField(InventoryData), { required: true }),
     visibilityChecks: new SchemaField(VisibilityChecks(), { required: true }),
     category_visibility: new SchemaField(CategoryVisibility(), { required: true }),
 });

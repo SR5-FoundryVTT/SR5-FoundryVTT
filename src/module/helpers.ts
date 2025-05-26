@@ -307,14 +307,18 @@ export class Helpers {
 
     // TODO: Foundry 0.9 Should TokenDocument be used instead of Token?
     // TODO: Check canvas.scene.tokens
+    /**
+     * Retrieve a Token by its ID from the current canvas.
+     * @param id The token's ID. If omitted, returns the first controlled token or undefined.
+     * @returns The Token instance or undefined if not found.
+     */
     static getToken(id?: string): Token | undefined {
-        if (!canvas || !canvas.ready || !canvas.tokens) return;
+        if (!canvas || !canvas.ready || !canvas.tokens) return undefined;
 
-        for (const token of canvas.tokens.placeables) {
-            if (token.id === id) {
-                return token;
-            }
-        }
+        if (id) return canvas.tokens.placeables.find(token => token.id === id);
+
+        // If no id is provided, return the first controlled token if available
+        return canvas.tokens.controlled.length > 0 ? canvas.tokens.controlled[0] : undefined;
     }
 
     /**
@@ -334,9 +338,9 @@ export class Helpers {
 
     static getSceneTokenDocument(sceneId, tokenId): TokenDocument | undefined {
         const scene = game.scenes?.get(sceneId);
-        if (!scene) return;
+        if (!scene) return undefined;
         const token = scene.tokens.get(tokenId);
-        if (!token) return;
+        if (!token) return undefined;
 
         return token;
     }
@@ -418,7 +422,6 @@ export class Helpers {
      * @returns 
      */
     static getTokenLOSHeight(token: TokenDocument): number {
-        //@ts-expect-error TODO: foundry-vtt-types v10
         return token.flags['wall-height']?.tokenHeight ?? 0;
     }
 
@@ -617,18 +620,14 @@ export class Helpers {
      * This only works for embedded items at the moment
      */
     static findDamageSource(damageData: DamageData): SR5Item | undefined {
-        if (!game.actors) return;
+        if (!game.actors) return undefined;
 
-        if (!damageData.source) {
-            return;
-        }
+        if (!damageData.source) return undefined;
 
         const actorId = damageData.source.actorId;
         const actorSource = game.actors.get(actorId)
 
-        if (!actorSource) {
-            return;
-        }
+        if (!actorSource) return undefined;
 
         // First search the actor itself for the item
         const itemId = damageData.source.itemId;
@@ -701,17 +700,14 @@ export class Helpers {
      * @param idLength How long should the id (GUID) be?
      */
     static getRandomIdSkillFieldDataEntry(skillDataPath: string, skillField: SkillField, idLength: number = DEFAULT_ID_LENGTH): { id: string, updateSkillData: { [skillDataPath: string]: { [id: string]: SkillField } } } | undefined {
-        if (!skillDataPath || skillDataPath.length === 0) return;
+        if (!skillDataPath || skillDataPath.length === 0) return undefined;
 
         const id = randomID(idLength);
         const updateSkillData = {
             [skillDataPath]: {[id]: skillField}
         };
 
-        return {
-            id,
-            updateSkillData
-        }
+        return { id, updateSkillData }
     }
 
     /**
@@ -843,8 +839,8 @@ export class Helpers {
      * Fetch entities from global or pack collections using data acquired by Foundry Drag&Drop process
      * @param data Foundry Drop Data
      */
-    static async getEntityFromDropData(data: { type: 'Actor' | 'Item', pack: string, id: string }): Promise<SR5Actor | SR5Item | undefined> {
-        if (!game.actors || !game.items) return;
+    static async getEntityFromDropData(data: { type: 'Actor' | 'Item', pack: string, id: string }): Promise<Actor.Stored | Item.Stored | undefined> {
+        if (!game.actors || !game.items) return undefined;
 
         if (data.pack && data.type === 'Actor')
             return await Helpers.getEntityFromCollection(data.pack, data.id) as unknown as SR5Actor;
@@ -857,6 +853,8 @@ export class Helpers {
 
         if (data.type === 'Item')
             return game.items.get(data.id);
+    
+        return undefined;
     }
 
     /**
@@ -922,18 +920,16 @@ export class Helpers {
     }
 
     static getMarkIdDocuments(markId: string): TargetedDocument | undefined {
-        if (!game.scenes || !game.items) return;
+        if (!game.scenes || !game.items) return undefined;
 
         const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
 
         const scene = game.scenes.get(sceneId);
-        if (!scene) return;
+        if (!scene) return undefined;
         const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
         const item = target?.actor?.items?.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
 
-        return {
-            scene, target, item
-        }
+        return { scene, target, item };
     }
 
     /**
@@ -965,14 +961,14 @@ export class Helpers {
         const pack = game.packs.find(pack =>
             pack.metadata.system === SYSTEM_NAME &&
             pack.metadata.name === packName);
-        if (!pack) return;
+        if (!pack) return undefined;
 
         // TODO: Use predefined ids instead of names...
         const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(new RegExp(' ', 'g'), '_') === actionName.toLowerCase());
-        if (!packEntry) return;
+        if (!packEntry) return undefined;
 
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
-        if (!item || item.type !== 'action') return;
+        if (!item || item.type !== 'action') return undefined;
 
         console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;
@@ -1032,13 +1028,12 @@ export class Helpers {
         let availableActors =  game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
 
         if(availableActors.length == 0) {
-            return
+            return undefined;
         }
 
         if(availableActors.length == 1) {
             return availableActors[0]
-        }
-        else {
+        } else {
             let allActors = ''
             game.actors?.filter( e => e.isOwner && e.hasPlayerOwner).forEach(t => {
                     allActors = allActors.concat(`

@@ -46,6 +46,8 @@ const CharacterModifiers = () => ({
     reach: new NumberField({ required: false, initial: 0 }),
 });
 
+console.log(CharacterAttributes());
+
 const CharacterData = {
     ...CommonData(),
     ...MatrixActorData(),
@@ -68,6 +70,8 @@ const CharacterData = {
         ...CharacterModifiers(),
     }, { required: true }),
 }
+
+console.log(CharacterData);
 
 export class Character extends foundry.abstract.TypeDataModel<typeof CharacterData, Actor.Implementation> {
     static override defineSchema() {

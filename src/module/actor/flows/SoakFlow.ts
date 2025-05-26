@@ -3,7 +3,7 @@ import {SR5Item} from '../../item/SR5Item';
 import DamageData = Shadowrun.DamageData;
 
 export class SoakFlow {
-    knocksDown(damage: DamageData, actor:SR5Actor) {
+    knocksDown(damage: DamageData, actor: SR5Actor) {
         // TODO: SR5 195 Called Shot Knock Down (Melee Only), requires attacker STR and actually announcing that called shot.
         const gelRoundsEffect = this.isDamageFromGelRounds(damage) ? -2 : 0;  // SR5 434
         const impactDispersionEffect = this.isDamageFromImpactDispersion(damage) ? -2 : 0  // FA 52

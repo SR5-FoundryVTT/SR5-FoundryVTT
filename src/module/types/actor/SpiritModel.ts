@@ -3,7 +3,7 @@ import { AwakendLimits } from "../template/LimitsModel";
 import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CommonModifiers } from "./CommonModel";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-export const SpiritData = {
+const SpiritData = {
     ...CommonData(),
     ...MagicActorData(),
     ...TwoTrackActorData(),
