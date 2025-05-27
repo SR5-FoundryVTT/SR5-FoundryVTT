@@ -12,7 +12,7 @@ export const TechnologyPrep = {
      * See SR5#228 'Matrix Damage'
      * @param technology The system technology section to be altered
      */
-    prepareConditionMonitor(technology: Shadowrun.TechnologyData) {        
+    prepareConditionMonitor(technology: Item.SystemOfType<'ammo' | 'armor' | 'device' | 'equipment' | 'modification' | 'program' | 'sin' | 'bioware' | 'cyberware' | 'weapon'>['technology']) {        
         // taMiF: This seems to be legacy code to avoid a migration.
         //        Leave it in, as it doesn't hurt for now.
         if (technology.condition_monitor === undefined) {
@@ -30,13 +30,14 @@ export const TechnologyPrep = {
      * @param technology The system technology section to be altered
      * @param equippedMods Those item mods that are equipped.
      */
-    prepareConceal(technology: Shadowrun.TechnologyData, equippedMods: SR5Item<'modification'>[]) {
+    prepareConceal(technology: Item.SystemOfType<'ammo' | 'armor' | 'device' | 'equipment' | 'modification' | 'program' | 'sin' | 'bioware' | 'cyberware' | 'weapon'>['technology'], equippedMods: SR5Item<'modification'>[]) {
         // Calculate conceal data.
+        //@ts-expect-error
         if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: []};
 
         const concealParts = new PartsList<number>();
         equippedMods.forEach((mod) => {
-            if (mod.system.conceal  && mod.system.conceal > 0) {
+            if (mod.system.conceal && mod.system.conceal > 0) {
                 concealParts.addUniquePart(mod.name as string, mod.system.conceal);
             }
         });

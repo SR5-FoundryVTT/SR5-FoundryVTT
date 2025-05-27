@@ -2,7 +2,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { DeviceAttribute } from "../item/DeviceModel";
 import { ActorArmor } from "../template/ArmorModel";
 import { Attributes, AttributeField } from "../template/AttributesModel";
-import { BaseValuePair, ModifiableValue } from "../template/BaseModel";
+import { ModifiableValue } from "../template/BaseModel";
 import { ConditionData } from "../template/ConditionModel";
 import { MatrixTracks, PhysicalTrack, StunTrack, Tracks } from "../template/ConditionMonitorsModel";
 import { DescriptionPartData } from "../template/DescriptionModel";

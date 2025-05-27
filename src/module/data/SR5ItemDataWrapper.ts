@@ -435,6 +435,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getTechnology(): TechnologyData|undefined {
         if ("technology" in this.data.system)
             return this.data.system.technology;
+        return;
     }
 
     getRange(): CritterPowerRange|SpellRange|RangeWeaponData|undefined {
@@ -448,6 +449,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
         if (this.data.type === 'weapon')
             return this.data.system.range as RangeWeaponData;
+        return;
     }
 
     getModificationCategory(): string {

@@ -15,7 +15,7 @@ const HostData = {
     ...DevicePartData(),
     ...DescriptionPartData(),
     ...ActionPartData(),
-    rating: new NumberField({ required: true, default: 1 }),
+    rating: new NumberField({ required: true, nullable: false, default: 1 }),
     //todo
     // marks: new SchemaField(MatrixMarks, { required: true }),
     ic: new ArrayField(new SchemaField(SourceEntityField()), { required: true }),

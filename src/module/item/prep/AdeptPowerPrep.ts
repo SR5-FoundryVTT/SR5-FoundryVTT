@@ -3,14 +3,14 @@
  */
 
 export const AdeptPowerPrep = {
-    prepareBaseData(system: Shadowrun.AdeptPowerData) {
+    prepareBaseData(system: Item.SystemOfType<'adept_power'>) {
         AdeptPowerPrep.prepareType(system);
     },
     /**
      * Determine Adept Power Type based on action type.
      * @param action 
      */
-    prepareType(system: Shadowrun.AdeptPowerData) {
+    prepareType(system: Item.SystemOfType<'adept_power'>) {
         system.type = system.action.type ? 'active' : 'passive';
     }
 }

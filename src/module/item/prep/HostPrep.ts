@@ -1,14 +1,14 @@
 import HostData = Shadowrun.HostData;
 import {MatrixRules} from "../../rules/MatrixRules";
 
-export function HostDataPreparation(system: HostData) {
+export function HostDataPreparation(system: Item.SystemOfType<'host'>) {
     HostPrep.setDeviceCategory(system);
     HostPrep.prepareMatrixAttributes(system);
 }
 
 
 export class HostPrep {
-    static setDeviceCategory(system: HostData) {
+    static setDeviceCategory(system: Item.SystemOfType<'host'>) {
         // Host matrix 'devices' are always hosts and never commlink / cyberdecks.
         system.category = 'host';
     }
@@ -22,7 +22,7 @@ export class HostPrep {
      * 
      * @param system
      */
-    static prepareMatrixAttributes(system: HostData) {
+    static prepareMatrixAttributes(system: Item.SystemOfType<'host'>) {
         const { customAttributes } = system;
 
         const hostAttributeRatings = MatrixRules.hostMatrixAttributeRatings(system.rating);

@@ -1,4 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { MatrixAttributes } from "../actor/CommonModel";
 import { DescriptionPartData } from "../template/DescriptionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 import { TechnologyPartData } from "../template/TechnologyModel";
@@ -9,8 +10,7 @@ export const DevicePartData = () => ({
         initial: '',
         choices: ['commlink', 'cyberdeck', 'rcc', 'host', ''],
     }),
-    //todo
-    //atts: new SchemaField(MatrixAttributes),
+    atts: new SchemaField(MatrixAttributes(), { required: true }),
     networkDevices: new ArrayField(new StringField({ required: true, initial: '' })),
 });
 

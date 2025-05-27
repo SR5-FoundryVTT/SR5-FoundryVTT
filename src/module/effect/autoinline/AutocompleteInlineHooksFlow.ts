@@ -100,6 +100,8 @@ export const AutocompleteInlineHooksFlow =  {
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;
             return {data: new SuccessTestClass({}, {actor: item.actor, item}).data};
         }
+
+        return {};
     },
 
     /**
@@ -168,5 +170,6 @@ export const AutocompleteInlineHooksFlow =  {
             
             return {data: opposedTest.data};
         }
+        return {};
     }
 }

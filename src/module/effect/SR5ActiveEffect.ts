@@ -387,7 +387,6 @@ export class SR5ActiveEffect extends ActiveEffect {
          * label -> name
          * @deprecated since v11
          */
-        // @ts-expect-error TODO: foundry-vtt-types v10
         this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
 
         return data;

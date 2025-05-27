@@ -3,10 +3,10 @@ import { ModifiableValue } from "./BaseModel";
 import { ConditionData } from "./ConditionModel";
 
 const TechnologyData = () => ({
-    rating: new NumberField({ required: true, initial: 0 }),
+    rating: new NumberField({ required: true, nullable: false, initial: 0 }),
     availability: new StringField({ required: true, initial: '' }),
-    quantity: new NumberField({ required: true, initial: 0 }),
-    cost: new NumberField({ required: true, initial: 0 }),
+    quantity: new NumberField({ required: true, nullable: false, initial: 0 }),
+    cost: new NumberField({ required: true, nullable: false, initial: 0 }),
     equipped: new BooleanField({ required: false, initial: false }),
     conceal: new SchemaField(ModifiableValue()),
     condition_monitor: new SchemaField(ConditionData()),

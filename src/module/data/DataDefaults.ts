@@ -10,7 +10,6 @@ import ValueField = Shadowrun.ValueField;
 import GenericValueField = Shadowrun.GenericValueField;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import RangeData = Shadowrun.RangeData;
-import { DeepPartial } from "@league-of-foundry-developers/foundry-vtt-types/src/types/utils.mjs";
 
 interface MinimalItemData {
     // Whatever name you want to give but not ''.
@@ -60,7 +59,7 @@ export class DataDefaults {
      * 
      * @param partialDamageData give partial DamageData fields to overwrite default values
      */
-    static damageData(partialDamageData: RecursivePartial<DamageData> = {}): DamageData {
+    static damageData(partialDamageData: Partial<DamageData> = {}): DamageData {
         const data: DamageData = {
             type: {
                 base: 'physical',
@@ -140,7 +139,7 @@ export class DataDefaults {
      * @param partialActionRollData 
      * @returns 
      */
-    static actionRollData(partialActionRollData: DeepPartial<ActionRollData> = {}): ActionRollData {
+    static actionRollData(partialActionRollData: Partial<ActionRollData> = {}): ActionRollData {
         return foundry.utils.mergeObject({
             type: '',
             categories: [],

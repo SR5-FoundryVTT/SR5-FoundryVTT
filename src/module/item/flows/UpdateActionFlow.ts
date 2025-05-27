@@ -1,6 +1,5 @@
 import { SR5Item } from "../SR5Item";
 import { SR5 } from '../../config';
-import { DeepPartial } from "@league-of-foundry-developers/foundry-vtt-types/src/types/utils.mjs";
 
 /**
  * Handling of SR5Item.update changes around ActionRollData.
@@ -12,7 +11,7 @@ export const UpdateActionFlow = {
      * @param changeData The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onUpdateAlterActionData(changeData: DeepPartial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+    onUpdateAlterActionData(changeData: Partial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
         UpdateActionFlow.onSkillUpdateAlterAttribute(changeData, item);
         UpdateActionFlow.onSkillUpdateAlterAttribute2(changeData, item);
     },
@@ -25,7 +24,7 @@ export const UpdateActionFlow = {
      * @param changeData  The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onSkillUpdateAlterAttribute(changeData: DeepPartial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+    onSkillUpdateAlterAttribute(changeData: Partial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
         // Only change to connected attribute when no attribute has already been chosen.
         if (!('action' in item.system) || item.system.action?.attribute !== '') return;
         const skillIdOrLabel = foundry.utils.getProperty(changeData, 'system.action.skill');
@@ -57,7 +56,7 @@ export const UpdateActionFlow = {
      * @param changeData The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onSkillUpdateAlterAttribute2(changeData: DeepPartial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+    onSkillUpdateAlterAttribute2(changeData: Partial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
         if (!foundry.utils.getProperty(changeData, 'system.action.skill')) return;
 
         changeData['system.action.attribute2'] = '';
@@ -158,7 +157,7 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectCallInActionTestIntoChangeData(type: string, changeData: DeepPartial<Shadowrun.CallInActionItemData>, applyData) {
+    injectCallInActionTestIntoChangeData(type: string, changeData: Partial<Shadowrun.CallInActionItemData>, applyData) {
         if (changeData.system?.actor_type === undefined) return;
 
         if (changeData.system.actor_type === 'spirit') {

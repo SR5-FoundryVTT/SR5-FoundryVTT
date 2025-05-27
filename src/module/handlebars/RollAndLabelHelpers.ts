@@ -36,8 +36,11 @@ export const registerRollAndLabelHelpers = () => {
                     return 'green';
                 case 6:
                     return 'green';
+                default:
+                    return '';
             }
         }
+        return '';
     });
 
     Handlebars.registerHelper('elementIcon', function (element) {
