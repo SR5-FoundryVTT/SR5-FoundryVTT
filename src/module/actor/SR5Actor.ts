@@ -1668,42 +1668,33 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         if (modifier === 0) return;
 
         const combat: SR5Combat = game.combat as unknown as SR5Combat;
-        const combatants = combat.getActorCombatant(this);
-        if (!combatants) return;
+        const combatant = combat.getActorCombatant(this);
 
-        for (const combatant of combatants) {
-            // Token might not be part of active combat.
-            if (!combatant || !combatant.initiative) continue;
+        // Token might not be part of active combat.
+        if (!combatant || !combatant.initiative) return;
 
-            // While not prohibiting, inform user about missing resource.
-            if (combatant.initiative + modifier < 0) {
-                ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
-            }
-
-            await combat.adjustInitiative(combatant, modifier);
+        // While not prohibiting, inform user about missing resource.
+        if (combatant.initiative + modifier < 0) {
+            ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
         }
+
+        await combat.adjustInitiative(combatant, modifier);
     }
 
     /**
-     * Determine if this actor is an active combatant.
+     * Determine if this actor is an active combatant in the current combat.
      * 
-     * @returns true, when active. false, when not in combat.
+     * @returns true if the actor is a combatant with an initiative score, false otherwise.
      */
     get combatActive(): boolean {
         if (!game.combat) return false;
-        const combatants = (game.combat as SR5Combat).getActorCombatant(this);
-        if (!combatants) return false;
-
-        for (const combatant of combatants)
-            if (combatant && combatant.initiative)
-                return true;
-
-        return false;
+        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
+        return !!(combatant && typeof combatant.initiative === "number");
     }
 
-    get combatant(): Combatant | undefined {
-        if (!this.combatActive) return;
-        return (game.combat as SR5Combat).getActorCombatant(this)?.[0];
+    get combatant(): Combatant | null {
+        if (!this.combatActive) return null;
+        return (game.combat as SR5Combat).getActorCombatant(this);
     }
 
     /**
@@ -1713,7 +1704,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     get combatInitiativeScore(): number {
         if (!game.combat) return 0;
-        const combatant = (game.combat as SR5Combat).getActorCombatant(this)?.[0];
+        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
         if (!combatant || !combatant.initiative) return 0;
         return combatant.initiative;
     }
@@ -1724,6 +1715,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
     getVehicleStats(): Shadowrun.VehicleStats | undefined {
         if (this.isType('vehicle')) return this.system.vehicle_stats;
+        return undefined;
     }
 
     /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.

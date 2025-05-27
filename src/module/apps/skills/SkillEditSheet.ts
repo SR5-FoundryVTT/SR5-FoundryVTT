@@ -5,6 +5,8 @@ import { LinksHelpers } from "../../utils/links";
 import { parseDropData } from "../../utils/sheets";
 import { Translation } from '../../utils/strings';
 
+const DocumentSheetV2 = foundry.applications.api.DocumentSheetV2;
+
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
 
@@ -33,7 +35,6 @@ export class SkillEditSheet extends DocumentSheet {
             submitOnChange: true,
             closeOnSubmit: false,
             resizable: true,
-            viewPermission: foundry.CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER,
         });
     }
 
