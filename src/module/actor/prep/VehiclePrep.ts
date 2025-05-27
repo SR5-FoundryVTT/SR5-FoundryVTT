@@ -14,7 +14,7 @@ import { SR } from '../../constants';
 
 
 export class VehiclePrep {
-    static prepareBaseData(system: Shadowrun.VehicleData) {
+    static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
         SkillsPrep.prepareSkillData(system);
 
         ModifiersPrep.prepareModifiers(system);
@@ -23,7 +23,7 @@ export class VehiclePrep {
         ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(system: Shadowrun.VehicleData, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5ItemDataWrapper[]) {
         VehiclePrep.prepareVehicleStats(system);
         VehiclePrep.prepareDeviceAttributes(system);
         VehiclePrep.prepareLimits(system);
@@ -52,7 +52,7 @@ export class VehiclePrep {
         VehiclePrep.prepareRecoilCompensation(system);
     }
 
-    static prepareVehicleStats(system: Shadowrun.VehicleData) {
+    static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, isOffRoad, isDrone } = system;
         // set the value for the stats
         for (let [key, stat] of Object.entries(vehicle_stats)) {
@@ -93,7 +93,7 @@ export class VehiclePrep {
      * Rulings here are a bit vague and current system implementation makes it more vague.
      * 
      */
-    static prepareAttributesWithPilot(system: Shadowrun.VehicleData) {
+    static prepareAttributesWithPilot(system: Actor.SystemOfType<'vehicle'>) {
         const { attributes, vehicle_stats } = system;
 
 
@@ -118,7 +118,7 @@ export class VehiclePrep {
         });
     }
 
-    static prepareAttributesWithBody(system: Shadowrun.VehicleData) {
+    static prepareAttributesWithBody(system: Actor.SystemOfType<'vehicle'>) {
         const { attributes } = system;
 
         // R5.0#125 'Drone Arm' - while not ALL vehicles have arms, leave it up to the user to NOT cast if they shouldn't.
@@ -135,7 +135,7 @@ export class VehiclePrep {
         });
     }
 
-    static prepareLimits(system: Shadowrun.VehicleData) {
+    static prepareLimits(system: Actor.SystemOfType<'vehicle'>) {
         const { limits, vehicle_stats, isOffRoad } = system;
 
         limits.mental.base = Helpers.calcTotal(vehicle_stats.sensor);
@@ -149,13 +149,13 @@ export class VehiclePrep {
     /**
      * Apply SR5#269 'Drones in the matrix' rules.
      */
-    static prepareDeviceAttributes(system: Shadowrun.VehicleData) {
+    static prepareDeviceAttributes(system: Actor.SystemOfType<'vehicle'>) {
         const {matrix, vehicle_stats} = system;
 
         matrix.rating = vehicle_stats.pilot.value;
     }
 
-    static prepareConditionMonitor(system: Shadowrun.VehicleData) {
+    static prepareConditionMonitor(system: Actor.SystemOfType<'vehicle'>) {
         const { track, attributes, matrix, isDrone, modifiers } = system;
 
         const halfBody = Math.ceil(Helpers.calcTotal(attributes.body) / 2);
@@ -173,7 +173,7 @@ export class VehiclePrep {
         matrix.condition_monitor.max = 8 + Math.ceil(rating / 2) + Number(modifiers.matrix_track);
     }
 
-    static prepareMovement(system: Shadowrun.VehicleData) {
+    static prepareMovement(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, movement, isOffRoad } = system;
 
         let speedTotal = Helpers.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
@@ -187,7 +187,7 @@ export class VehiclePrep {
         movement.run.value = Helpers.calcTotal(movement.run, {min: 0});
     }
 
-    static prepareMeatspaceInit(system: Shadowrun.VehicleData) {
+    static prepareMeatspaceInit(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, initiative, modifiers } = system;
 
         const pilot = Helpers.calcTotal(vehicle_stats.pilot);
@@ -201,7 +201,7 @@ export class VehiclePrep {
         Helpers.calcTotal(initiative.meatspace.dice);
     }
 
-    static prepareArmor(system: Shadowrun.VehicleData) {
+    static prepareArmor(system: Actor.SystemOfType<'vehicle'>) {
         const { armor, modifiers } = system;
 
         armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp'] || 0));
@@ -212,7 +212,7 @@ export class VehiclePrep {
     /**
      * Prepare the base actor recoil compensation without item influence.
      */
-    static prepareRecoilCompensation(system: Shadowrun.VehicleData) {
+    static prepareRecoilCompensation(system: Actor.SystemOfType<'vehicle'>) {
         const {attributes} = system;
 
         const recoilCompensation = RangedWeaponRules.vehicleRecoilCompensationValue(attributes.body.value);
@@ -229,7 +229,7 @@ export class VehiclePrep {
      * NOTE: This is a hack around the actor type character centric preparation design still present in the system.
      *       Times is short, perfect solutions are costly.
      */
-    static prepareAttributeRanges(system: Shadowrun.VehicleData) {
+    static prepareAttributeRanges(system: Actor.SystemOfType<'vehicle'>) {
         const ranges = SR.actorTypeAttributes['vehicle'];
         Helpers.calcTotal(system.attributes.strength, ranges.strength);
         Helpers.calcTotal(system.attributes.agility, ranges.agility);

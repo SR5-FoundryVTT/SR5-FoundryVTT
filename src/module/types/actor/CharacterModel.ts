@@ -15,35 +15,36 @@ const CharacterAttributes = () => ({
     submersion: new SchemaField(AttributeField(), { required: true }),
 });
 
-const CharacterModifiers = () => ({
+export const CharacterModifiers = () => ({
     ...CommonModifiers(),
     ...MatrixModifiers(),
-    drain: new NumberField({ required: true, initial: 0 }),
-    armor: new NumberField({ required: true, initial: 0 }),
-    physical_limit: new NumberField({ required: true, initial: 0 }),
-    astral_limit: new NumberField({ required: true, initial: 0 }),
-    social_limit: new NumberField({ required: true, initial: 0 }),
-    mental_limit: new NumberField({ required: true, initial: 0 }),
-    stun_track: new NumberField({ required: true, initial: 0 }),
-    physical_track: new NumberField({ required: true, initial: 0 }),
-    physical_overflow_track: new NumberField({ required: true, initial: 0 }),
-    meat_initiative: new NumberField({ required: true, initial: 0 }),
-    meat_initiative_dice: new NumberField({ required: true, initial: 0 }),
-    astral_initiative: new NumberField({ required: true, initial: 0 }),
-    astral_initiative_dice: new NumberField({ required: true, initial: 0 }),
-    composure: new NumberField({ required: true, initial: 0 }),
-    lift_carry: new NumberField({ required: true, initial: 0 }),
-    judge_intentions: new NumberField({ required: true, initial: 0 }),
-    memory: new NumberField({ required: true, initial: 0 }),
-    walk: new NumberField({ required: true, initial: 0 }),
-    run: new NumberField({ required: true, initial: 0 }),
-    wound_tolerance: new NumberField({ required: true, initial: 0 }),
-    pain_tolerance_stun: new NumberField({ required: true, initial: 0 }),
-    pain_tolerance_physical: new NumberField({ required: true, initial: 0 }),
-    essence: new NumberField({ required: true, initial: 0 }),
-    fade: new NumberField({ required: true, initial: 0 }),
-    multi_defense: new NumberField({ required: true, initial: 0 }),
-    reach: new NumberField({ required: true, initial: 0 }),
+    drain: new NumberField({ required: true, nullable: false, initial: 0 }),
+    armor: new NumberField({ required: true, nullable: false, initial: 0 }),
+    physical_limit: new NumberField({ required: true, nullable: false, initial: 0 }),
+    astral_limit: new NumberField({ required: true, nullable: false, initial: 0 }),
+    social_limit: new NumberField({ required: true, nullable: false, initial: 0 }),
+    mental_limit: new NumberField({ required: true, nullable: false, initial: 0 }),
+    stun_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    matrix_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    physical_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    physical_overflow_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    meat_initiative: new NumberField({ required: true, nullable: false, initial: 0 }),
+    meat_initiative_dice: new NumberField({ required: true, nullable: false, initial: 0 }),
+    astral_initiative: new NumberField({ required: true, nullable: false, initial: 0 }),
+    astral_initiative_dice: new NumberField({ required: true, nullable: false, initial: 0 }),
+    composure: new NumberField({ required: true, nullable: false, initial: 0 }),
+    lift_carry: new NumberField({ required: true, nullable: false, initial: 0 }),
+    judge_intentions: new NumberField({ required: true, nullable: false, initial: 0 }),
+    memory: new NumberField({ required: true, nullable: false, initial: 0 }),
+    walk: new NumberField({ required: true, nullable: false, initial: 0 }),
+    run: new NumberField({ required: true, nullable: false, initial: 0 }),
+    wound_tolerance: new NumberField({ required: true, nullable: false, initial: 0 }),
+    pain_tolerance_stun: new NumberField({ required: true, nullable: false, initial: 0 }),
+    pain_tolerance_physical: new NumberField({ required: true, nullable: false, initial: 0 }),
+    essence: new NumberField({ required: true, nullable: false, initial: 0 }),
+    fade: new NumberField({ required: true, nullable: false, initial: 0 }),
+    multi_defense: new NumberField({ required: true, nullable: false, initial: 0 }),
+    reach: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 const CharacterData = {
@@ -69,7 +70,7 @@ const CharacterData = {
     }, { required: true }),
 }
 
-console.log(CharacterData);
+console.log("CharacterData:", CharacterData);
 
 export class Character extends foundry.abstract.TypeDataModel<typeof CharacterData, Actor.Implementation> {
     static override defineSchema() {

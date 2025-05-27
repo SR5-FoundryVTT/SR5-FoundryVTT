@@ -1,6 +1,7 @@
 import { Attributes } from "../template/AttributesModel";
 import { AwakendLimits } from "../template/LimitsModel";
-import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CommonModifiers } from "./CommonModel";
+import { CharacterModifiers } from "./CharacterModel";
+import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CommonModifiers, CharacterLimits } from "./CommonModel";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 const SpiritData = {
@@ -17,16 +18,18 @@ const SpiritData = {
         required: true,
         initial: "",
     }),
-    force: new NumberField({ required: true, initial: 0 }),
-    limits: new SchemaField(AwakendLimits(), { required: true }),
-    services: new NumberField({ required: true, initial: 0 }),
+    force: new NumberField({ required: true, nullable: false, initial: 0 }),
+    limits: new SchemaField(CharacterLimits(), { required: true }),
+    services: new NumberField({ required: true, nullable: false, initial: 0 }),
     attributes: new SchemaField(Attributes(), { required: true }),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,
-        ...CommonModifiers(),
+        ...CharacterModifiers(),
     }, { required: true }),
 }
+
+console.log("SpiritData", SpiritData);
 
 export class Spirit extends foundry.abstract.TypeDataModel<typeof SpiritData, Actor.Implementation> {
     static override defineSchema() {

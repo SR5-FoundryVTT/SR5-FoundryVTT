@@ -2,16 +2,15 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { BaseValuePair, ModifiableValue } from "./BaseModel";
 
 const LimitField = () => ({
-    ...BaseValuePair(),
     ...ModifiableValue(),
-    label: new StringField({ required: false, initial: '' }),
-    hide: new BooleanField({ required: false, initial: false }),
+    label: new StringField({ required: true, initial: '' }),
+    hidden: new BooleanField({ required: true, initial: false }),
 });
 
 export const Limits = () => ({
-    social: new SchemaField(LimitField()),
-    mental: new SchemaField(LimitField()),
-    physical: new SchemaField(LimitField()),
+    social: new SchemaField(LimitField(), { required: true }),
+    mental: new SchemaField(LimitField(), { required: true }),
+    physical: new SchemaField(LimitField(), { required: true }),
 });
 
 export const AwakendLimits = () => ({
@@ -25,4 +24,13 @@ export const MatrixLimits = () => ({
     stealth: new SchemaField(LimitField()),
     firewall: new SchemaField(LimitField()),
     data_processing: new SchemaField(LimitField()),
+});
+
+export const VehicleLimits = () => ({
+    ...Limits(),
+    sensor: new SchemaField(LimitField(), { required: true }),
+    pilot: new SchemaField(LimitField(), { required: true }),
+    handling: new SchemaField(LimitField(), { required: true }),
+    speed: new SchemaField(LimitField(), { required: true }),
+    acceleration: new SchemaField(LimitField(), { required: true }),
 });

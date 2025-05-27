@@ -2,7 +2,6 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { BaseValuePair, ModifiableValue } from "./BaseModel";
 
 export const AttributeField = () => ({
-    ...BaseValuePair(),
     ...ModifiableValue(),
     hidden: new BooleanField({ required: true, initial: false }),
     label: new StringField({ required: true, initial: '' }),
@@ -12,8 +11,8 @@ export const AttributeField = () => ({
 
 const EdgeAttributeField = () => ({
     ...AttributeField(),
-    uses: new NumberField({ required: true, initial: 0 }),
-    max: new NumberField({ required: true, initial: 0 }),
+    uses: new NumberField({ required: true, nullable: false, initial: 0 }),
+    max: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 export const Attributes = () => ({

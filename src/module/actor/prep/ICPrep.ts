@@ -13,7 +13,7 @@ import {SkillsPrep} from "./functions/SkillsPrep";
 
 
 export class ICPrep {
-    static prepareBaseData(system: ICData) {
+    static prepareBaseData(system: Actor.SystemOfType<'ic'>) {
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearLimitMods(system);
         SkillsPrep.prepareSkillData(system);
@@ -24,7 +24,7 @@ export class ICPrep {
         ICPrep.addHostAttributes(system);
     }
 
-    static prepareDerivedData(system: ICData, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'ic'>, items: SR5ItemDataWrapper[]) {
         ICPrep.prepareMatrixAttributes(system);
 
         SkillsPrep.prepareSkills(system);
@@ -47,10 +47,11 @@ export class ICPrep {
      * This is intentional as not to pollute template.json with actor type specific data.
      *
      */
-    static addMissingTracks(system: ICData) {
+    static addMissingTracks(system: Actor.SystemOfType<'ic'>) {
         // Newly created actors SHOULD have this by template.
         // Legacy actors MIGHT not have it, therefore make sure it's there.
         const track = system.track || {};
+
         if (!track.matrix) track.matrix = DataDefaults.trackData();
         system.track = track;
     }
@@ -59,17 +60,17 @@ export class ICPrep {
      * Add IC modifiers only to the misc tab.
      * @param system
      */
-    static prepareModifiers(system: ICData) {
+    static prepareModifiers(system: Actor.SystemOfType<'ic'>) {
         let modifiers = ModifiersPrep.commonModifiers as string[];
         modifiers = modifiers.concat(ModifiersPrep.matrixModifiers as string[]);
         ModifiersPrep.setupModifiers(system, modifiers);
     }
 
-    static prepareMatrix(system: ICData) {
+    static prepareMatrix(system: Actor.SystemOfType<'ic'>) {
         system.matrix.rating = MatrixRules.getICDeviceRating(system.host.rating);
     }
 
-    static prepareMatrixTrack(system: ICData) {
+    static prepareMatrixTrack(system: Actor.SystemOfType<'ic'>) {
         const { modifiers, track, matrix } = system;
 
         // Prepare internal matrix condition monitor values
@@ -83,7 +84,7 @@ export class ICPrep {
         track.matrix.label = SR5.damageTypes.matrix;
     }
 
-    static prepareMatrixInit(system: ICData) {
+    static prepareMatrixInit(system: Actor.SystemOfType<'ic'>) {
         const { initiative, modifiers, host } = system;
 
 
@@ -101,7 +102,7 @@ export class ICPrep {
     /**
      * For connected hosts overwrite matrix attributes with the hosts attributes, otherwise leave as is.
      */
-    static prepareHostAttributes(system: ICData) {
+    static prepareHostAttributes(system: Actor.SystemOfType<'ic'>) {
         if (!system.host.id || !system.host.atts) return;
 
         Object.keys(system.host.atts).forEach(deviceAttribute => {
@@ -114,7 +115,7 @@ export class ICPrep {
     /**
      * Hide all meat attributes from display
      */
-    static hideMeatAttributes(system: ICData) {
+    static hideMeatAttributes(system: Actor.SystemOfType<'ic'>) {
         const { attributes } = system;
 
         for (const attribute of Object.values(attributes)) {
@@ -127,11 +128,11 @@ export class ICPrep {
      * 
      * As the rating attribute is only derived, it's not included in base data or template.json.
      */
-    static addHostAttributes(system: ICData) {
+    static addHostAttributes(system: Actor.SystemOfType<'ic'>) {
         system.attributes['rating'] = DataDefaults.attributeData({label: 'SR5.Rating'});
     }
 
-    static prepareMeatAttributes(system: ICData) {
+    static prepareMeatAttributes(system: Actor.SystemOfType<'ic'>) {
         const { attributes, host } = system;
 
         for (const id of Object.keys(SR5.attributes)) {
@@ -156,7 +157,7 @@ export class ICPrep {
     /**
      * Calculate all matrix attributes without the meat attributes
      */
-    static prepareMatrixAttributes(system: ICData) {
+    static prepareMatrixAttributes(system: Actor.SystemOfType<'ic'>) {
         const { matrix } = system;
 
         for (const id of Object.keys(SR5.matrixAttributes)) {

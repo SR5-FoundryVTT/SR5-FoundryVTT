@@ -20,6 +20,8 @@ const SpriteData = {
     technomancerUuid: new StringField({ required: true, initial: "" }),
 }
 
+console.log("SpriteData", SpriteData);
+
 export class Sprite extends foundry.abstract.TypeDataModel<typeof SpriteData, Actor.Implementation> {
     static override defineSchema() {
         return SpriteData;

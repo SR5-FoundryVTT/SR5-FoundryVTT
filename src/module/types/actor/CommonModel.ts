@@ -3,6 +3,7 @@ import { DeviceAttribute } from "../item/DeviceModel";
 import { ActorArmor } from "../template/ArmorModel";
 import { Attributes, AttributeField } from "../template/AttributesModel";
 import { BaseValuePair, ModifiableValue } from "../template/BaseModel";
+import { ConditionData } from "../template/ConditionModel";
 import { MatrixTracks, PhysicalTrack, StunTrack, Tracks } from "../template/ConditionMonitorsModel";
 import { DescriptionPartData } from "../template/DescriptionModel";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/LimitsModel";
@@ -19,10 +20,14 @@ export const CharacterSkills = () => ({
 
 export const InitiativeType = () => ({
     base: new SchemaField({
-        ...BaseValuePair(), ...ModifiableValue()
+        ...ModifiableValue(),
+        value: new NumberField({required: true, nullable: false, initial: 0}),
+        base: new NumberField({required: true, nullable: false, initial: 0}),
     }, { required: true }),
     dice: new SchemaField({
-        ...BaseValuePair(), ...ModifiableValue(),
+        ...ModifiableValue(),
+        value: new NumberField({required: true, nullable: false, initial: 0}),
+        base: new NumberField({required: true, nullable: false, initial: 0}),
         text: new StringField({ required: true, initial: "" }),
     }, { required: true }),
 });
@@ -32,7 +37,7 @@ export const Initiative = () => ({
     astral: new SchemaField(InitiativeType(), { required: true }),
     matrix: new SchemaField(InitiativeType(), { required: true }),
     current: new SchemaField(InitiativeType(), { required: true }),
-    edge: new BooleanField({ required: false, initial: false }),
+    edge: new BooleanField({ required: true, initial: false }),
     perception: new StringField({ required: true, initial: "" }),
 });
 
@@ -76,18 +81,23 @@ export const NPCData = () => ({
 });
 
 export const MatrixData = () => ({
-    dice: new SchemaField({...BaseValuePair(), ...ModifiableValue()}, { required: true }),
-    base: new SchemaField({...BaseValuePair(), ...ModifiableValue()}, { required: true }),
-    attack: new ObjectField({
-        required: true,
-        initial: {},
-        schema: {
-            att1: new StringField({ required: true, initial: "attack" }),
-            att2: new StringField({ required: true, initial: "attack" }),
-            att3: new StringField({ required: true, initial: "attack" }),
-            att4: new StringField({ required: true, initial: "attack" }),
-        }
-    }),
+    dice: new SchemaField(ModifiableValue(), { required: true }),
+    base: new SchemaField(ModifiableValue(), { required: true }),
+
+    attack: new SchemaField(MatrixAttributeField(), { required: true }),
+    sleaze: new SchemaField(MatrixAttributeField(), { required: true }),
+    data_processing: new SchemaField(MatrixAttributeField(), { required: true }),
+    firewall: new SchemaField(MatrixAttributeField(), { required: true }),
+
+    condition_monitor: new SchemaField(ConditionData(), { required: true }),
+    rating: new NumberField({ required: true, nullable: false, initial: 0 }),
+    name: new StringField({ required: true, initial: "" }),
+    device: new StringField({ required: true, initial: "" }),
+    is_cyberdeck: new BooleanField({ required: true, initial: false }),
+    hot_sim: new BooleanField({ required: true, initial: false }),
+    running_silent: new BooleanField({ required: true, initial: false }),
+    item: new AnyField({ required: false }),
+    // marks: new TypedObjectField(new NumberField({ required: true, initial: 0 }), { required: true }),
 });
 
 export const CommonValues = () => ({
@@ -162,35 +172,38 @@ export const NPCActorData = () => ({
 });
 
 export const CharacterLimits = () => ({
+    ...Limits(),
     ...AwakendLimits(),
     ...MatrixLimits(),
 });
 
 export const CommonModifiers = () => ({
-    defense: new NumberField({ required: false, initial: 0 }),
-    defense_dodge: new NumberField({ required: false, initial: 0 }),
-    defense_parry: new NumberField({ required: false, initial: 0 }),
-    defense_block: new NumberField({ required: false, initial: 0 }),
-    defense_melee: new NumberField({ required: false, initial: 0 }),
-    defense_ranged: new NumberField({ required: false, initial: 0 }),
-    soak: new NumberField({ required: false, initial: 0 }),
-    recoil: new NumberField({ required: false, initial: 0 }),
-    stun_track: new NumberField({ required: false, initial: 0 }),
-    physical_track: new NumberField({ required: false, initial: 0 }),
-    physical_overflow_track: new NumberField({ required: false, initial: 0 }),
+    defense: new NumberField({ required: true, initial: 0 }),
+    defense_dodge: new NumberField({ required: true, initial: 0 }),
+    defense_parry: new NumberField({ required: true, initial: 0 }),
+    defense_block: new NumberField({ required: true, initial: 0 }),
+    defense_melee: new NumberField({ required: true, initial: 0 }),
+    defense_ranged: new NumberField({ required: true, initial: 0 }),
+    soak: new NumberField({ required: true, initial: 0 }),
+    recoil: new NumberField({ required: true, initial: 0 }),
+    matrix_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    stun_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    physical_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    physical_overflow_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    wound_tolerance: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 export const MatrixModifiers = () => ({
-    matrix_initiative: new NumberField({ required: false, initial: 0 }),
-    matrix_initiative_dice: new NumberField({ required: false, initial: 0 }),
-    matrix_track: new NumberField({ required: false, initial: 0 }),
+    matrix_initiative: new NumberField({ required: true, initial: 0 }),
+    matrix_initiative_dice: new NumberField({ required: true, initial: 0 }),
+    matrix_track: new NumberField({ required: true, initial: 0 }),
 });
 
 const InventoryData = {
     name: new StringField({ required: true, initial: "" }),
     type: new StringField({ required: true, initial: "" }),
     itemIds: new ArrayField(new StringField({ required: true, initial: "" }), { required: true }),
-    showAll: new BooleanField({ required: false, initial: false }),
+    showAll: new BooleanField({ required: true, initial: false }),
 };
 
 export const CommonData = () => ({
@@ -198,7 +211,7 @@ export const CommonData = () => ({
     attributes: new SchemaField(Attributes(), { required: true }),
     limits: new SchemaField(Limits(), { required: true }),
     skills: new SchemaField(CharacterSkills(), { required: true }),
-    // special: new SchemaField(SpecialTrait, { required: true }),
+    special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane', ''], initial: '' }),
     initiative: new SchemaField(Initiative(), { required: true }),
     // modifiers: new SchemaField(Modifiers, { required: true }),
     //todo fix

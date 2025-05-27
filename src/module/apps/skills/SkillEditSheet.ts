@@ -8,7 +8,7 @@ import { Translation } from '../../utils/strings';
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
 
-    get document(): SR5Actor {
+    override get document(): SR5Actor {
         return super.document as SR5Actor;
     }
 
@@ -21,7 +21,7 @@ export class SkillEditSheet extends DocumentSheet {
         return `system.skills.active.${this.skillId}`;
     }
 
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         return foundry.utils.mergeObject(options, {
             id: 'skill-editor',
@@ -33,10 +33,11 @@ export class SkillEditSheet extends DocumentSheet {
             submitOnChange: true,
             closeOnSubmit: false,
             resizable: true,
+            viewPermission: foundry.CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER,
         });
     }
 
-    get title(): string {
+    override get title(): string {
         const label = this.document.getSkillLabel(this.skillId);
         return `${game.i18n.localize('SR5.EditSkill')} - ${game.i18n.localize(label as Translation)}`;
     }
@@ -100,9 +101,7 @@ export class SkillEditSheet extends DocumentSheet {
         if (event.currentTarget.name === 'skill.base') updateData[this._updateString()].base = base;
     }
 
-
-    /** @override */
-    async _updateObject(event, formData) {
+    override async _updateObject(event, formData) {
         // Without an actual input field used, avoid a unneeded update...
         // ...the update would happen due to how _onUpdateObject works.
         if (event.currentTarget) {
@@ -112,7 +111,7 @@ export class SkillEditSheet extends DocumentSheet {
         }
     }
 
-    activateListeners(html) {
+    override activateListeners(html) {
         super.activateListeners(html);
 
         /**
@@ -141,7 +140,7 @@ export class SkillEditSheet extends DocumentSheet {
         await this.document.update(updateData);
     }
 
-    async _onDrop(event) {
+    override async _onDrop(event) {
         if (!game.items || !game.actors || !game.scenes) return;
 
         event.preventDefault();
@@ -216,7 +215,7 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
-    getData(): SkillEditFormData {
+    override getData(): SkillEditFormData {
         const data = super.getData();
 
         // skill property will hold a direct skill reference

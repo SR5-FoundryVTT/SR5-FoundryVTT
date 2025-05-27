@@ -9,8 +9,6 @@ import { Helpers } from '../../helpers';
 import { PartsList } from "../../parts/PartsList";
 import { SR5ItemDataWrapper } from "../../data/SR5ItemDataWrapper";
 import { SkillFlow } from "../flows/SkillFlow";
-import SpiritType = Shadowrun.SpiritType;
-import SpiritData = Shadowrun.SpiritData;
 import { CharacterPrep } from './CharacterPrep';
 import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
@@ -19,7 +17,7 @@ import { SR } from '../../constants';
 
 
 export class SpiritPrep {
-    static prepareBaseData(system: SpiritData) {
+    static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
         SpiritPrep.prepareSpiritSpecial(system);
         SkillsPrep.prepareSkillData(system);
 
@@ -29,7 +27,7 @@ export class SpiritPrep {
         ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(system: SpiritData, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5ItemDataWrapper[]) {
         SpiritPrep.prepareSpiritBaseData(system);
 
         // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.
@@ -54,12 +52,12 @@ export class SpiritPrep {
         CharacterPrep.prepareRecoilCompensation(system);
     }
 
-    static prepareSpiritSpecial(data: SpiritData) {
+    static prepareSpiritSpecial(data: Actor.SystemOfType<'spirit'>) {
         // Spirits will always be awakened.
         data.special = 'magic';
     }
 
-    static prepareSpiritBaseData(data: SpiritData) {
+    static prepareSpiritBaseData(data: Actor.SystemOfType<'spirit'>) {
         const overrides = this.getSpiritStatModifiers(data.spiritType);
 
         if (overrides) {
@@ -84,15 +82,15 @@ export class SpiritPrep {
             }
 
             // prepare initiative data
-            initiative.meatspace.base.base = force * 2 + overrides.init + Number(modifiers['astral_initiative']);
-            initiative.meatspace.base.mod = PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meat_initiative']));
+            initiative.meatspace.base.base = force * 2 + overrides.init + modifiers.astral_initiative;
+            initiative.meatspace.base.mod = PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", modifiers.meat_initiative);
             initiative.meatspace.dice.base = 2;
-            initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
+            initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", modifiers.meat_initiative_dice);
 
-            initiative.astral.base.base = force * 2 + overrides.astral_init + Number(modifiers['astral_initiative_dice']);
-            initiative.astral.base.mod = PartsList.AddUniquePart(initiative.astral.base.mod, "SR5.Bonus", Number(modifiers['astral_initiative']));
+            initiative.astral.base.base = force * 2 + overrides.astral_init + modifiers.astral_initiative_dice;
+            initiative.astral.base.mod = PartsList.AddUniquePart(initiative.astral.base.mod, "SR5.Bonus", modifiers.astral_initiative);
             initiative.astral.dice.base = 3;
-            initiative.astral.dice.mod = PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", Number(modifiers['astral_initiative_dice']));
+            initiative.astral.dice.mod = PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", modifiers.astral_initiative_dice);
         }
     }
 
@@ -111,7 +109,7 @@ export class SpiritPrep {
         return DataDefaults.skillData({ label, attribute, canDefault: false })
     }
 
-    static prepareSpiritArmor(data: SpiritData) {
+    static prepareSpiritArmor(data: Actor.SystemOfType<'spirit'>) {
         const { armor, attributes } = data;
         armor.base = (attributes.essence.value ?? 0) * 2;
         armor.value = Helpers.calcTotal(armor);
@@ -121,7 +119,7 @@ export class SpiritPrep {
     /**
      * get the attribute and initiative modifiers and skills
      */
-    static getSpiritStatModifiers(spiritType: SpiritType) {
+    static getSpiritStatModifiers(spiritType: string) {
         if (!spiritType) return;
 
         const overrides = {
@@ -718,7 +716,7 @@ export class SpiritPrep {
      * 
      * @param system The spirit system data to prepare
      */
-    static prepareAttributesWithForce(system: Shadowrun.SpiritData) {
+    static prepareAttributesWithForce(system: Actor.SystemOfType<'spirit'>) {
         const { attributes, force } = system;
 
         // Allow value to be understandable when displayed.

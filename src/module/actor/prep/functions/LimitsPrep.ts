@@ -1,11 +1,10 @@
 import { LimitRules } from './../../../rules/LimitRules';
 import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
-import {SR5} from "../../../config";
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import { SR5 } from "../../../config";
 
 export class LimitsPrep {
-    static prepareLimits(system: ActorTypesData) {
+    static prepareLimits(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { limits, modifiers, special } = system;
 
         // Apply the actor local modifiers defined on the sheet.
@@ -14,7 +13,8 @@ export class LimitsPrep {
         limits.social.mod = PartsList.AddUniquePart(limits.social.mod, "SR5.Bonus", Number(modifiers['social_limit']));
         
         // Determine if the astral limit is relevant.
-        limits.astral.hidden = special !== 'magic';
+        if ('astral' in limits)
+            limits.astral.hidden = special !== 'magic';
 
         for (let [name, limit] of Object.entries(limits)) {
             Helpers.calcTotal(limit);
@@ -22,8 +22,7 @@ export class LimitsPrep {
         }
     }
 
-    static prepareLimitBaseFromAttributes(system: ActorTypesData) {
-
+    static prepareLimitBaseFromAttributes(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
         const { limits, attributes } = system;
 
         // Default limits are derived directly from attributes.
@@ -35,7 +34,7 @@ export class LimitsPrep {
     /**
      * Some limits are derived from others or must be caluclated last.
      */
-    static prepareDerivedLimits(system: ActorTypesData) {
+    static prepareDerivedLimits(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
         const {limits, modifiers, special, attributes} = system;
 
         if (special === 'magic') {

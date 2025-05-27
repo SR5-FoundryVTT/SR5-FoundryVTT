@@ -55,7 +55,7 @@ export const ActionRollData = () => ({
     followed: new SchemaField({
         test: new StringField({ required: true, initial: '' })
     }),
-    dice_pool_mod: new SchemaField(ModList()),
+    dice_pool_mod: ModList(),
     rool_mode: new StringField({ required: true, initial: '' }),
 });
 

@@ -17,13 +17,13 @@ export const MatrixAttribute = new StringField({
 });
 
 export const BaseValuePair = () => ({
-    value: new NumberField({required: true, initial: 0}),
-    base: new NumberField({required: true, initial: 0}),
+    value: new NumberField({required: true, nullable: false, initial: 0}),
+    base: new NumberField({required: true, nullable: false, initial: 0}),
 });
 
 export const ValueMaxPair = () => ({
-    value: new NumberField({ required: true, initial: 0 }),
-    max: new NumberField({ required: true, initial: 0 }),
+    value: new NumberField({ required: true, nullable: false, initial: 0 }),
+    max: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 export const ModListEntry = () => ({
@@ -31,14 +31,13 @@ export const ModListEntry = () => ({
     value: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
-export const ModList = () => ({
-    list: new ArrayField(new SchemaField(ModListEntry()))
-});
+export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
 
 export const ModifiableValue = () => ({
-    mod: new SchemaField(ModList()),
+    ...BaseValuePair(),
+    mod: ModList(),
     override: new SchemaField(ModListEntry()),
-    temp: new NumberField({ required: false, initial: 0 }),
+    temp: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 export const ModifiableValueLinked = () => ({
@@ -48,7 +47,6 @@ export const ModifiableValueLinked = () => ({
 });
 
 export const ValueField = () => ({
-    ...BaseValuePair(),
     ...ModifiableValue(),
     label: new StringField({ required: false, initial: '' }),
     manualMod: new StringField({ required: false, initial: '' }),

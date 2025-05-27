@@ -2,16 +2,15 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 import { BaseValuePair, ModifiableValue } from "./BaseModel";
 
 const ActorArmorData = () => ({
-    ...BaseValuePair(),
     ...ModifiableValue(),
-    label: new StringField({ initial: '' }),
+    label: new StringField({ require: true, initial: '' }),
 });
 
 export const ActorArmor = () => ({
     ...ActorArmorData(),
-    fire: new NumberField(),
-    electric: new NumberField(),
-    cold: new NumberField(),
-    acid: new NumberField(),
+    fire: new NumberField({ required: true, nullable: false, initial: 0 }),
+    electric: new NumberField({ required: true, nullable: false, initial: 0 }),
+    cold: new NumberField({ required: true, nullable: false, initial: 0 }),
+    acid: new NumberField({ required: true, nullable: false, initial: 0 }),
     hardened: new BooleanField({ required: true, initial: false }),
 });

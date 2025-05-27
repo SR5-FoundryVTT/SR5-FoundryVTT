@@ -4,10 +4,8 @@ import { InitiativePrep } from './functions/InitiativePrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
-import SpriteType = Shadowrun.SpriteType;
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
-import SpriteData = Shadowrun.SpriteData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
 
@@ -15,40 +13,40 @@ import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
  * Prepare a Sprite Type of Actor
  */
 export class SpritePrep {
-    static prepareBaseData(data: SpriteData) {
-        SpritePrep.prepareSpriteSpecial(data);
-        SkillsPrep.prepareSkillData(data);
+    static prepareBaseData(system: Actor.SystemOfType<'sprite'>) {
+        SpritePrep.prepareSpriteSpecial(system);
+        SkillsPrep.prepareSkillData(system);
 
-        ModifiersPrep.prepareModifiers(data);
-        ModifiersPrep.clearAttributeMods(data);
-        ModifiersPrep.clearLimitMods(data);
+        ModifiersPrep.prepareModifiers(system);
+        ModifiersPrep.clearAttributeMods(system);
+        ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(data: SpriteData, items: SR5ItemDataWrapper[]) {
-        SpritePrep.prepareSpriteMatrixAttributes(data);
-        SpritePrep.prepareSpriteAttributes(data);
-        SpritePrep.prepareSpriteSkills(data);
+    static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5ItemDataWrapper[]) {
+        SpritePrep.prepareSpriteMatrixAttributes(system);
+        SpritePrep.prepareSpriteAttributes(system);
+        SpritePrep.prepareSpriteSkills(system);
 
-        AttributesPrep.prepareAttributes(data);
-        SkillsPrep.prepareSkills(data);
+        AttributesPrep.prepareAttributes(system);
+        SkillsPrep.prepareSkills(system);
 
-        LimitsPrep.prepareLimits(data);
+        LimitsPrep.prepareLimits(system);
 
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
 
-        SpritePrep.prepareSpriteConditionMonitor(data);
-        SpritePrep.prepareSpriteInitiative(data);
+        SpritePrep.prepareSpriteConditionMonitor(system);
+        SpritePrep.prepareSpriteInitiative(system);
 
-        InitiativePrep.prepareCurrentInitiative(data);
+        InitiativePrep.prepareCurrentInitiative(system);
     }
 
-    static prepareSpriteSpecial(data: SpriteData) {
+    static prepareSpriteSpecial(system: Actor.SystemOfType<'sprite'>) {
         // Sprites are always awakened
-        data.special = 'resonance';
+        system.special = 'resonance';
     }
 
-    static prepareSpriteAttributes(data: SpriteData) {
-        const {attributes, level, spriteType} = data;
+    static prepareSpriteAttributes(system: Actor.SystemOfType<'sprite'>) {
+        const {attributes, level, spriteType} = system;
 
         const overrides = this.getSpriteStatModifiers(spriteType);
 
@@ -57,8 +55,8 @@ export class SpritePrep {
         Helpers.calcTotal(attributes.resonance);
     }
 
-    static prepareSpriteMatrixAttributes(data: SpriteData) {
-        const {level, matrix, spriteType} = data;
+    static prepareSpriteMatrixAttributes(system: Actor.SystemOfType<'sprite'>) {
+        const {level, matrix, spriteType} = system;
 
         const matrixAtts = ['attack', 'sleaze', 'data_processing', 'firewall'];
 
@@ -75,8 +73,8 @@ export class SpritePrep {
         matrix.rating = level;
     }
 
-    static prepareSpriteSkills(data: SpriteData) {
-        const {skills, level, spriteType} = data;
+    static prepareSpriteSkills(system: Actor.SystemOfType<'sprite'>) {
+        const {skills, level, spriteType} = system;
 
         const overrides = this.getSpriteStatModifiers(spriteType);
 
@@ -87,14 +85,14 @@ export class SpritePrep {
         }
     }
 
-    static prepareSpriteConditionMonitor(data: SpriteData) {
-        const {matrix, level, modifiers} = data;
+    static prepareSpriteConditionMonitor(system: Actor.SystemOfType<'sprite'>) {
+        const {matrix, level, modifiers} = system;
 
         matrix.condition_monitor.max = 8 + Math.ceil(level / 2) + Number(modifiers.matrix_track);
     }
 
-    static prepareSpriteInitiative(data: SpriteData) {
-        const {initiative, level, spriteType, modifiers} = data;
+    static prepareSpriteInitiative(system: Actor.SystemOfType<'sprite'>) {
+        const {initiative, level, spriteType, modifiers} = system;
 
         // always in matrix perception
         initiative.perception = 'matrix';
@@ -115,7 +113,7 @@ export class SpritePrep {
      * Get the stat modifiers for the specified type of sprite
      * @param spriteType
      */
-    static getSpriteStatModifiers(spriteType: SpriteType) {
+    static getSpriteStatModifiers(spriteType: string) {
         const overrides = {
             attack: 0,
             sleaze: 0,

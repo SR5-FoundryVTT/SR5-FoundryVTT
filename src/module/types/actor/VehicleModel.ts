@@ -3,11 +3,12 @@ import { CommonData, ArmorActorData, MatrixActorData, MovementActorData, Physica
 import { Attributes, AttributeField } from "../template/AttributesModel";
 import { ModifiableValue } from "../template/BaseModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
+import { VehicleLimits } from "../template/LimitsModel";
 
 const VehicleStat = () => ({
     ...ModifiableValue(),
     label: new StringField({ required: true, initial: "" }),
-    temp: new NumberField({ required: true, initial: 0 }),
+    temp: new NumberField({ required: true, nullable: false, initial: 0 }),
     hidden: new BooleanField({ required: true, initial: false }),
 });
 
@@ -28,12 +29,12 @@ const VehicleStats = () => ({
 });
 
 const VehicleModCategories = () => ({
-    body: new NumberField({ required: true, initial: 0 }),
-    power_train: new NumberField({ required: true, initial: 0 }),
-    protection: new NumberField({ required: true, initial: 0 }),
-    electromagnetic: new NumberField({ required: true, initial: 0 }),
-    cosmetic: new NumberField({ required: true, initial: 0 }),
-    weapons: new NumberField({ required: true, initial: 0 }),
+    body: new NumberField({ required: true, nullable: false, initial: 0 }),
+    power_train: new NumberField({ required: true, nullable: false, initial: 0 }),
+    protection: new NumberField({ required: true, nullable: false, initial: 0 }),
+    electromagnetic: new NumberField({ required: true, nullable: false, initial: 0 }),
+    cosmetic: new NumberField({ required: true, nullable: false, initial: 0 }),
+    weapons: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 const VehicleData = {
@@ -68,11 +69,14 @@ const VehicleData = {
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,
-        ...CommonModifiers,
+        ...CommonModifiers(),
     }, { required: true }),
     modificationCategories: new SchemaField(VehicleModCategories(), { required: true }),
     modPoints: new NumberField({ required: true, initial: 0 }),
+    limits: new SchemaField(VehicleLimits(), { required: true }),
 }
+
+console.log("VehicleData", VehicleData);
 
 export class Vehicle extends foundry.abstract.TypeDataModel<typeof VehicleData, Actor.Implementation> {
     static override defineSchema() {

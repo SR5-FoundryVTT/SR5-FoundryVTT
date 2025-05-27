@@ -4,7 +4,6 @@ import { BaseValuePair, ModifiableValue, KeyValuePair } from "./BaseModel";
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
 const SkillField = () => ({
-    ...BaseValuePair(),
     ...ModifiableValue(),
     name: new StringField({ required: true, initial: '' }),
     hide: new BooleanField({ required: false, initial: false }),

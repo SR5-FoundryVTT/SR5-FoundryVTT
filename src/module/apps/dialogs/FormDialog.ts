@@ -1,10 +1,10 @@
-export interface FormDialogData extends DialogData{
+export interface FormDialogData extends Dialog.Data<JQuery> {
 	templateData: object;
 	templatePath: string;
 	onAfterClose?: Function;
 }
 
-export interface FormDialogOptions extends DialogOptions {
+export interface FormDialogOptions extends Dialog.Options {
     // When true, will apply dialog form element inputs to this.data.
     applyFormChangesOnSubmit: boolean | null
 }
@@ -17,13 +17,13 @@ export interface FormDialogOptions extends DialogOptions {
  */
 export class FormDialog extends Dialog<FormDialogOptions> {
     selection: object;
-    selectedButton: string;
-    form: HTMLFormElement;
+    selectedButton!: string;
+    form!: HTMLFormElement;
 
     _onAfterClose: Function;
     _selectionPromise: Promise<object>;
-    _selectionResolve: Function;
-    _selectionReject: Function;
+    _selectionResolve!: Function;
+    _selectionReject!: Function;
     _templateData: object;
     _templatePath: string;
 
