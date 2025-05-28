@@ -145,12 +145,12 @@ input[type='text'].display {
 // Private Roll
 // Self Roll
 .chat-message.whisper {
-    background: linear-gradient(rgba(84, 84, 105, 0.5), rgba(0, 0, 0, 0.5)), url('assets/page.webp') repeat;
+    background: linear-gradient(rgba(64, 64, 85, 0.5), rgba(0, 0, 0, 0.5)), url('assets/page.webp') repeat;
 }
 
 // Blind Roll
 .chat-message.blind {
-    background: linear-gradient(rgba(107, 71, 107, 0.25), rgba(0, 0, 0, 0.5)), url('assets/page.webp') repeat;
+    background: linear-gradient(rgba(87, 51, 87, 0.25), rgba(0, 0, 0, 0.5)), url('assets/page.webp') repeat;
 }
 
 .chat-message .message-header,

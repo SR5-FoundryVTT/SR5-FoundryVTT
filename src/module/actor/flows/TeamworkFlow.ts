@@ -15,9 +15,9 @@ export class TeamworkTest {
     
     static async chatLogListeners(chatLog: ChatLog, html) {
          // setup chat listener messages for each message as some need the message context instead of chatlog context.
-         html.find('.chat-message').each(async (index, element) => {
-            element = $(element);
-            const id = element.data('messageId');
+         // @ts-expect-error TODO: querySelectorAll?
+         $(html).find('.chat-message').each(async (index, element) => {
+            const id = $(element).data('messageId');
             const message = game.messages?.get(id);
             if (!message) return;
 
@@ -26,11 +26,11 @@ export class TeamworkTest {
     }
 
     static async chatMessageListeners(message: ChatMessage, html) {
-        if( !html.find('.sr5-teamwork-addparticipant'))
-            return;
+        html = $(html);
+        if( !html?.find('.sr5-teamwork-addparticipant') ) return;
 
-        html.find('.sr5-teamwork-addparticipant').on('click', _ => this.addParticipant(message));
-        html.find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
+        $(html).find('.sr5-teamwork-addparticipant').on('click', _ => this.addParticipant(message));
+        $(html).find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
     }
 
     /**
@@ -66,7 +66,6 @@ export class TeamworkTest {
     static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest, teamworkData: TeamworkMessageData) {
         //wrap the old content to presever it, this is necessary for pre-render hooks
         const wrapper = document.createElement("dív");
-        //@ts-expect-error v11 type
         wrapper.innerHTML = message.content;
 
         let participantsRoot = wrapper.getElementsByClassName("sr5-teamwork-participants")[0];
@@ -108,7 +107,6 @@ export class TeamworkTest {
      */
     static async rollTeamworkTest(message: ChatMessage) {
         let teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
-        //@ts-expect-error v11 type
         let actor = game.actors?.get(message.speaker.actor)
         
         actor?.rollTeamworkTest(teamworkData.skill, teamworkData)
@@ -137,8 +135,8 @@ export class TeamworkTest {
 
         const message = fromUuidSync(socketMessage.data.messageUuid);
 
-        message?.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData)
-        message?.update({content: socketMessage.data.content})
+        message?.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData);
+        message?.update({content: socketMessage.data.content});
     }
 
 }

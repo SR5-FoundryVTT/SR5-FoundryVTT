@@ -10,7 +10,8 @@ import { SR5Actor } from '../module/actor/SR5Actor';
 import { SR5Item } from '../module/item/SR5Item';
 
 export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testActor;
     let testItem;
@@ -199,7 +200,6 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers({}).source, defaultSourceModifiers);
                 assert.deepEqual(new DocumentSituationModifiers(undefined).source, defaultSourceModifiers);
-                //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers(null).source, defaultSourceModifiers);
                 //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers(0).source, defaultSourceModifiers);

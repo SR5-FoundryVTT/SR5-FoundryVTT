@@ -5,6 +5,7 @@ import { ActionFlow } from "../item/flows/ActionFlow";
 import { createTagifyOnInput } from "../utils/sheets";
 import { Translation } from "../utils/strings";
 import { SR5ActiveEffect } from "./SR5ActiveEffect";
+import { ActiveEffectConfigV1 } from "./ActiveEffectConfigV1";
 
 /**
  * Shadowrun system alters some behaviors of Active Effects, making a custom ActiveEffectConfig necessary.
@@ -28,14 +29,16 @@ import { SR5ActiveEffect } from "./SR5ActiveEffect";
  * While actors apply effects as part of their prepareData flow the modifier apply-to target applies effects as part of the calculation of their
  * situational modifiers and others still can behave differently.
  */
-export class SR5ActiveEffectConfig extends ActiveEffectConfig {
+export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
     override object: SR5ActiveEffect;
+    // @ts-expect-error Foundry v13 This is not type issue, but a type override for legacy Application v1 support...
+    override document: SR5ActiveEffect;
 
     override get template(): string {
         return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
     }
 
-    override async getData(options?: Application.RenderOptions): Promise<ActiveEffectConfig.Data> {
+    override async getData(options?: Application.RenderOptions): Promise<any> {
         const data = await super.getData(options) as any;
 
         data.modes = this.applyModifyLabelToCustomMode(data.modes);
@@ -47,7 +50,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
         data.applyToOptions = this.prepareApplyToOptions();
         data.hasChanges = this.prepareEffectHasChanges();
-        data.isv11 = game.version.startsWith('11.');
+        data.isv11 = game.release.generation === 11;
 
         return data;
     }
@@ -154,7 +157,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         const inputElement = html.find('input#test-selection').get(0) as HTMLInputElement;
 
         // Tagify expects this format for localized tags.
-        // @ts-expect-error TODO: I've been lazy and need proper typing of class SuccessTest
         const values = Object.values(game.shadowrun5e.tests).map(((test: any) => ({
             label: test.label, id: test.name
         })));

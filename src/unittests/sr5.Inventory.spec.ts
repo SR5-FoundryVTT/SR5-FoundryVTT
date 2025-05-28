@@ -4,7 +4,8 @@ import { SR5Item } from '../module/item/SR5Item';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
-    const { describe, it, assert, should, before, after } = context;
+    const { describe, it, should, before, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testActor;
     let testItem;

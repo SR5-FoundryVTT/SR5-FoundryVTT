@@ -1,7 +1,5 @@
 //todo: v10 foundry-vtt-types 
-//@ts-expect-error
 export default class AstralVisionFilter extends AbstractBaseFilter {
-  //@ts-expect-error
   static override defaultUniforms = {
     luminanceThreshold: 0.5,
     alphaThreshold: 0.1,
@@ -11,7 +9,6 @@ export default class AstralVisionFilter extends AbstractBaseFilter {
    * fragment shader based on the following snippets:
    * @link https://gitlab.com/peginc/swade/-/blob/develop/src/module/vision/InfravisionFilter.ts?ref_type=heads
    */
-  //@ts-expect-error
   static override fragmentShader = `
   varying vec2 vTextureCoord;
   uniform sampler2D uSampler;

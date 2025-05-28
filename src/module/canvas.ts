@@ -1,4 +1,5 @@
 import {FLAGS, SYSTEM_NAME} from './constants';
+const { BaseGrid, SquareGrid } = foundry.grid;
 
 interface DistanceOptions {
     gridSpaces?: boolean
@@ -16,8 +17,8 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
 
     // Track the total number of diagonals
     let nDiagonal = 0;
-    const rule = this.diagonalRule;
-    const d = canvas.dimensions as Canvas.Dimensions;
+    const rule = game.settings.get(SYSTEM_NAME, FLAGS.DiagonalMovement);;
+    const d = canvas!.dimensions as Canvas.Dimensions;
 
     // Iterate over measured segments
     return segments.map((s) => {
@@ -36,28 +37,22 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
         if (rule === '1-2-1') {
             let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
             let spaces = nd10 * 2 + (nd - nd10) + ns;
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            return spaces * canvas.dimensions.distance;
+            return spaces * canvas!.dimensions!.distance;
         }
 
         // Treat diagonal as straight line
         else if (rule === 'EUCL') {
-            // @ts-expect-error TODO: foundry-vtt-types v10
             // return Math.round(Math.hypot(nx, ny) * canvas.scene.data.gridDistance);
-            return Math.round(Math.hypot(nx, ny) * canvas.scene?.grid.distance);
+            return Math.round(Math.hypot(nx, ny) * canvas.scene!.grid!.distance);
         }
 
         // Treat diagonal as straight movement
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        else return (ns + nd) * canvas.scene?.grid.distance;
+        else return (ns + nd) * canvas!.scene!.grid!.distance;
     });
 };
 
 
 export function canvasInit() {
-    //@ts-expect-error TODO: foundry-vtt-types v10
-    // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
-    canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, FLAGS.DiagonalMovement);
     // Add a custom measureDistances function, overwriting default to add more movement styles.
     SquareGrid.prototype.measureDistances = measureDistances;
 }

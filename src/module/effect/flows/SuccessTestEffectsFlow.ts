@@ -1,12 +1,12 @@
 import { SR5ActiveEffect } from "../SR5ActiveEffect";
 import { SuccessTest } from "../../tests/SuccessTest";
-import { ActiveEffectData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { OpposedTest } from "../../tests/OpposedTest";
 import { SR5Item } from "../../item/SR5Item";
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
 import { SocketMessage } from "../../sockets";
 import { FLAGS } from "../../constants";
+import { ActiveEffectData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs";
 
 /**
  * Handle the SR5ActiveEffects flow for a SuccessTest.
@@ -157,7 +157,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         const effectsData: ActiveEffectData[] = [];
         for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
-            const effectData = effect.toObject() as ActiveEffectData;
+            const effectData = effect.toObject() as unknown as ActiveEffectData;
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {
@@ -169,7 +169,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         }
 
         for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
-            const effectData = effect.toObject() as ActiveEffectData;
+            const effectData = effect.toObject() as unknown as ActiveEffectData;
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {

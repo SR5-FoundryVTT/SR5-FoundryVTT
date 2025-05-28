@@ -1,9 +1,10 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
-import { EffectChangeData, EffectChangeDataSource } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import { SYSTEM_NAME } from "../constants";
 import { SR5Item } from "../item/SR5Item";
 import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
+import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs";
+import { AnyDocument } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/data/abstract/client-document.mjs";
 
 
 
@@ -20,11 +21,6 @@ import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
  * can apply to actors, tests and also only to actors targeted by tests.
  */
 export class SR5ActiveEffect extends ActiveEffect {
-    // Foundry Core typing missing... TODO: foundry-vtt-types v10
-    public active: boolean;
-    public origin: string | null;
-    public changes: EffectChangeData[];
-
     /**
      * Can be used to determine if the origin of the effect is a document owned by another document.
      *
@@ -43,8 +39,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
-    public get source(): SR5Actor | SR5Item | null {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
+    public get source(): AnyDocument | Record<string, unknown> | null {
         return this.origin ? fromUuidSync(this.origin) : null;
     }
 
@@ -77,11 +72,11 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Render the sheet of the active effect source
      */
     public renderSourceSheet() {
-        return this.source?.sheet?.render(true);
+        if (this.source instanceof SR5Actor || this.source instanceof SR5Item)
+            return this.source?.sheet?.render(true);
     }
 
     async toggleDisabled() {
-        // @ts-expect-error  TODO: foundry-vtt-types v10
         return this.update({ disabled: !this.disabled });
     }
 
@@ -126,7 +121,6 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (value === undefined) return null;
 
         // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
-        //@ts-expect-error // TODO: foundry-vtt-types
         return super._applyAdd(actor, change, current, delta, changes);
     }
 
@@ -152,7 +146,6 @@ export class SR5ActiveEffect extends ActiveEffect {
             return null;
         }
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         return super._applyOverride(actor, change, current, delta, changes);
     }
 
@@ -176,7 +169,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns Either the configured value or 'actor' as a default.
      */
     get applyTo() {
-        return this.getFlag(SYSTEM_NAME, 'applyTo') as Shadowrun.EffectApplyTo || 'actor';
+        return this.flags[game.system.id]?.applyTo || 'actor';
     }
 
     /**
@@ -185,7 +178,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * When this flag is set, the parent item wireless status is taken into account.
      */
     get onlyForWireless(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'onlyForWireless') as boolean || false;
+        return this.flags[game.system.id]?.onlyForEquipped || false;
     }
 
     /**
@@ -194,7 +187,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * When this flag is set, the parent item enabled status is taken into account.
      */
     get onlyForEquipped(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'onlyForEquipped') as boolean || false;
+        return this.flags[game.system.id]?.onlyForEquipped || false;
     }
 
     /**
@@ -203,7 +196,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * When this flag is set, this effect shouldn't apply always.
      */
     get onlyForItemTest(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'onlyForItemTest') as boolean || false;
+        return this.flags[game.system.id]?.onlyForItemTest || false;
     }
 
     /**
@@ -213,7 +206,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns true, when the effect has been applied by a test.
      */
     get appliedByTest(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'appliedByTest') as boolean || false;
+        return this.flags[game.system.id]?.appliedByTest || false;
     }
 
     get selectionTests(): string[] {
@@ -241,10 +234,10 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (this.onlyForEquipped && !this.parent.isEquipped()) return true;
         if (this.onlyForWireless && !this.parent.isWireless()) return true;
-        if (this.parent.isCritterPower && !this.parent.isEnabled()) return true;
-        if (this.parent.isSpritePower && !this.parent.isEnabled()) return true;
+        if (this.parent.isType('critter_power') && !this.parent.isEnabled()) return true;
+        if (this.parent.isType('sprite_power') && !this.parent.isEnabled()) return true;
 
-        return false; 
+        return false;
     }
 
     /**
@@ -278,7 +271,6 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param change 
      */
     override apply(object: any, change) {
-        // @ts-expect-error
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
@@ -344,11 +336,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             if (targetType === "Array") {
                 const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                delta = this._castArray(change.value, innerType);
+                delta = this.__castArray(change.value, innerType);
             }
-            //@ts-expect-error TODO: foundry-vtt-types v10
-            else delta = this._castDelta(change.value, targetType);
+            else delta = this.__castDelta(change.value, targetType);
         } catch (err) {
             console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
             return;
@@ -359,11 +349,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         const changes = {};
         switch (change.mode) {
             case modes.ADD:
-                //@ts-expect-error TODO: foundry-vtt-types v10
                 this._applyAdd(object, change, current, delta, changes);
                 break;
             case modes.MULTIPLY:
-                //@ts-expect-error TODO: foundry-vtt-types v10
                 this._applyMultiply(object, change, current, delta, changes);
                 break;
             case modes.OVERRIDE:
@@ -371,7 +359,6 @@ export class SR5ActiveEffect extends ActiveEffect {
                 break;
             case modes.UPGRADE:
             case modes.DOWNGRADE:
-                //@ts-expect-error TODO: foundry-vtt-types v10
                 this._applyUpgrade(object, change, current, delta, changes);
                 break;
             default:
@@ -395,15 +382,70 @@ export class SR5ActiveEffect extends ActiveEffect {
      * All migrations here are taken from FoundryVtt common.js BaseActiveEffect#migrateData
      * for v11.315
      */
-    // @ts-expect-error foundry-vtt-types v10
     static override migrateData(data: any) {
         /**
          * label -> name
          * @deprecated since v11
          */
-        // @ts-expect-error TODO: foundry-vtt-types v10
         this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
 
         return data;
+    }
+    /**
+     * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
+   * Cast a raw EffectChangeData change string to an Array of an inner type.
+   * @param {string} raw      The raw string value
+   * @param {string} type     The target data type of inner array elements
+   * @returns {Array<*>}      The parsed delta cast as a typed array
+   */
+    __castArray(raw, type) {
+        let delta;
+        try {
+            delta = this.__parseOrString(raw);
+            delta = delta instanceof Array ? delta : [delta];
+        } catch (e) {
+            delta = [raw];
+        }
+        return delta.map(d => this.__castDelta(d, type));
+    }
+
+    /**
+     * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
+    * Cast a raw EffectChangeData change string to the desired data type.
+    * @param {string} raw      The raw string value
+    * @param {string} type     The target data type that the raw value should be cast to match
+    * @returns {*}             The parsed delta cast to the target data type
+    */
+    __castDelta(raw, type) {
+        let delta;
+        switch (type) {
+            case "boolean":
+                delta = Boolean(this.__parseOrString(raw));
+                break;
+            case "number":
+                delta = Number.fromString(raw);
+                if (Number.isNaN(delta)) delta = 0;
+                break;
+            case "string":
+                delta = String(raw);
+                break;
+            default:
+                delta = this.__parseOrString(raw);
+        }
+        return delta;
+    }
+
+    /**
+     * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
+     * Parse serialized JSON, or retain the raw string.
+     * @param {string} raw      A raw serialized string
+     * @returns {*}             The parsed value, or the original value if parsing failed
+     */
+    __parseOrString(raw) {
+        try {
+            return JSON.parse(raw);
+        } catch (err) {
+            return raw;
+        }
     }
 }

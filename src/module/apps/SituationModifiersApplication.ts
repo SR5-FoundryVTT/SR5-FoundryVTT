@@ -217,7 +217,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
 
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
-        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied.total}</div>`);
+        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied!.total}</div>`);
         const modifierDescription = $(`<div class="modifier-description open-recoil-modifier">${game.i18n.localize("SR5.ModifierTypes.Recoil")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'recoil'));
 
@@ -496,7 +496,7 @@ export class SituationModifiersApplication extends FormApplication {
         
         // For GMs try scene for no selection.
         if (!document && game.user?.isGM) {
-            document = canvas.scene;
+            document = canvas!.scene;
         } 
 
         // Try user character as last fallback.

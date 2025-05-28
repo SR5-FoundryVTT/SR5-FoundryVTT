@@ -57,7 +57,7 @@ jobs:
               env:
                   MINIMUM: ${{ fromJson(env.MANIFEST_JSON).compatibility.minimum }}
                   VERIFIED: ${{ fromJson(env.MANIFEST_JSON).compatibility.verified }}
-                  MAXIMUM: 12
+                  MAXIMUM: ${{ fromJson(env.MANIFEST_JSON).compatibility.maximum }}
               with:
                   url: 'https://api.foundryvtt.com/_api/packages/release_version'
                   method: 'POST'

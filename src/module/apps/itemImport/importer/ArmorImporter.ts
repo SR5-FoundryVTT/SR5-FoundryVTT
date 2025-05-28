@@ -5,7 +5,7 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowrun.ArmorData> {
     public armorTranslations: any;
-    public override categoryTranslations: any;
+    public declare categoryTranslations: any;
     public files = ['armor.xml'];
 
     CanParse(jsonObject: object): boolean {
@@ -59,7 +59,6 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
             datas.push(item);
         }
 
-        // @ts-expect-error
         return await Item.create(datas) as Item;
     }
 }

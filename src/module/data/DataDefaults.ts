@@ -59,7 +59,7 @@ export class DataDefaults {
      * 
      * @param partialDamageData give partial DamageData fields to overwrite default values
      */
-    static damageData(partialDamageData: RecursivePartial<DamageData> = {}): DamageData {
+    static damageData(partialDamageData: Partial<DamageData> = {}): DamageData {
         const data: DamageData = {
             type: {
                 base: 'physical',
@@ -139,7 +139,7 @@ export class DataDefaults {
      * @param partialActionRollData 
      * @returns 
      */
-    static actionRollData(partialActionRollData: DeepPartial<ActionRollData> = {}): ActionRollData {
+    static actionRollData(partialActionRollData: Partial<ActionRollData> = {}): ActionRollData {
         return foundry.utils.mergeObject({
             type: '',
             categories: [],

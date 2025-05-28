@@ -16,7 +16,7 @@ export const shadowrunRolling = (quench: QuenchBatchContext) => {
     describe('SR5Roll', () => {
         it('Amount of dice to bethrown in shadowrun style pool, excluding explosions', async () => {
             const roll = new SR5Roll('100d6');
-            await roll.evaluate({async: true});
+            await roll.evaluate();
             
             assert.equal(roll.pool, 100);
             assert.equal(roll.poolThrown, 100);
@@ -24,7 +24,7 @@ export const shadowrunRolling = (quench: QuenchBatchContext) => {
 
         it('Amount of dice thrown in shadowrun style pool, including explosions', async () => {
             const roll = new SR5Roll('100d6x6');
-            await roll.evaluate({async: true});
+            await roll.evaluate();
 
             assert.equal(roll.pool, 100);
             // More often than not, this should result in at least one dice explosion... :-)

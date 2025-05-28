@@ -85,7 +85,7 @@ export class NetworkDeviceFlow {
     private static async _handleAddDeviceToNetwork(controller: SR5Item, device: SR5Item|SR5Actor): Promise<any> {
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller) && !NetworkDeviceFlow._currentUserCanModifyDevice(device)) return console.error(`User isn't owner or GM of this device`, controller);
 
-        const controllerData = controller.asDevice || controller.asHost;
+        const controllerData = controller.asType('device', 'host');
         if (!controllerData) return console.error(`Device isn't capable of accepting network devices`, controller);
         const networkController = device.getNetworkController();
 
@@ -126,7 +126,7 @@ export class NetworkDeviceFlow {
      */
     static async removeDeviceLinkFromNetwork(controller: SR5Item, deviceLink: string) {
         console.log(`Shadowrun 5e | Removing device with uuid ${deviceLink} from network`);
-        const controllerData = controller.asController();
+        const controllerData = controller.asType('host', 'device');
         const device = await NetworkDeviceFlow.resolveLink(deviceLink);
 
         // Remove an existing item from the network.
@@ -196,7 +196,7 @@ export class NetworkDeviceFlow {
         if (!controller) return;
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(controller)) return;
 
-        const controllerData = controller.asController();
+        const controllerData = controller.asType('host', 'device');
         if (!controllerData) return;
 
         // Remove device from it's controller.
@@ -207,7 +207,7 @@ export class NetworkDeviceFlow {
 
     private static async _removeControllerFromAllDevices(controller: SR5Item) {
         if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
-        const controllerData = controller.asController();
+        const controllerData = controller.asType('host', 'device');
         if (!controllerData) return;
 
         const networkDevices = controllerData.system.networkDevices;
@@ -234,7 +234,7 @@ export class NetworkDeviceFlow {
      */
     static async getNetworkDevices(controller: SR5Item): Promise<(SR5Item | SR5Actor)[]> {
         const devices: (SR5Item|SR5Actor)[] = [];
-        const controllerData = controller.asController();
+        const controllerData = controller.asType('host', 'device');
         if (!controllerData) return devices;
 
         for (const link of controllerData.system.networkDevices) {

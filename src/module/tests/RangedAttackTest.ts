@@ -80,7 +80,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
      */
     _prepareFireMode() {        
         // No fire modes selectable on dialog for invalid item provided.
-        const weapon = this.item.asWeapon;
+        const weapon = this.item.asType('weapon');
         if (!weapon) return;
 
         this.data.fireModes = FireModeRules.availableFireModes(weapon.system.range.modes);
@@ -174,7 +174,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
      *       It's done this way as no matter the fire mode, you can fire it.
      */
     override canConsumeDocumentResources() {
-        if (!this.item.isRangedWeapon) return true;
+        if (!this.item.isRangedWeapon()) return true;
         
         // Ammo consumption
         const fireMode = this.data.fireMode;
@@ -204,7 +204,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
      */
     async consumeWeaponAmmo(): Promise<boolean> {
         if (!this.item) return true;
-        if (!this.item.isRangedWeapon) return true;
+        if (!this.item.isRangedWeapon()) return true;
 
         const fireMode = this.data.fireMode;
         if (fireMode.value === 0) return true;

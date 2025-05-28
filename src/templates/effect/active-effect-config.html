@@ -4,15 +4,15 @@
     <header class="sheet-header">
         <!-- icon deprecated in v12. Remove this when v11 support is revoked. -->
         <img src="{{#if isv11}}{{data.icon}}{{else}}{{data.img}}{{/if}}"/>
-        <h1 class="effect-title">{{ data.name }}</h1>
+        <h1 class="effect-title">{{ data.name }} TEST2</h1>
     </header>
 
     <!-- Effect Configuration Tabs -->
     <nav class="sheet-tabs tabs">
-        <a class="item" data-tab="details"><i class="fas fa-book"></i> {{localize "EFFECT.TabDetails"}}</a>
+        <a class="item" data-tab="details"><i class="fas fa-book"></i> {{localize "EFFECT.TABS.details"}}</a>
         <a class="item" data-tab="applyTo"><i class="fas fa-filter"></i> {{localize "SR5.ActiveEffect.ApplyTo"}}</a>
-        <a class="item" data-tab="duration"><i class="fas fa-clock"></i> {{localize "EFFECT.TabDuration"}}</a>
-        <a class="item" data-tab="effects"><i class="fas fa-cogs"></i> {{localize "EFFECT.TabEffects"}}</a>
+        <a class="item" data-tab="duration"><i class="fas fa-clock"></i> {{localize "EFFECT.TABS.duration"}}</a>
+        <a class="item" data-tab="effects"><i class="fas fa-cogs"></i> {{localize "EFFECT.TABS.changes"}}</a>
         <a class="item" data-tab="help"><i class="fas fa-book"></i> {{localize "SR5.Help"}}</a>
     </nav>
 
@@ -20,38 +20,22 @@
     <section class="tab" data-tab="details">
 
         <div class="form-group">
-            <label>{{ localize "EFFECT.Name" }}</label>
+            <label>{{ localize "EFFECT.FIELDS.name.label" }}</label>
             <div class="form-fields">
                 <input type="text" name="name" value="{{ data.name }}"/>
             </div>
         </div>
 
         <div class="form-group">
-            <!-- Label changed in v12. Remove this when v11 support is revoked. -->
-            {{#if isv11}}
-            <label>{{ localize "EFFECT.Icon" }}</label>
-            {{else}}
-            <label>{{ localize "EFFECT.Image" }}</label>
-            {{/if}}
+            <label>{{ localize "EFFECT.FIELDS.img.label" }}</label>
             <div class="form-fields">
-                <!-- icon deprecated in v12. Remove this when v11 support is revoked. -->
-                {{#if isv11}}
-                {{filePicker target="icon" type="image"}}
-                {{else}}
                 {{filePicker target="img" type="image"}}
-                {{/if}}
-                <!-- icon deprecated in v12. Remove this when v11 support is revoked. -->
                 <input class="image" type="text" name="{{#if isv11}}icon{{else}}img{{/if}}" placeholder="path/image.png" value="{{#if isv11}}{{data.icon}}{{else}}{{data.img}}{{/if}}"/>
             </div>
         </div>
 
         <div class="form-group">
-            <!-- icon deprecated in v12. Remove this when v11 support is revoked. -->
-            {{#if isv11}}
-            <label>{{ localize "EFFECT.IconTint" }}</label>
-            {{else}}
-            <label>{{ localize "EFFECT.Tint" }}</label>
-            {{/if}}
+            <label>{{ localize "EFFECT.FIELDS.tint.label" }}</label>
             <div class="form-fields">
                 <input class="color" type="text" name="tint" value="{{data.tint}}"/>
                 <input type="color" value="{{data.tint}}" data-edit="tint"/>
@@ -59,13 +43,13 @@
         </div>
 
         <div class="form-group">
-            <label>{{ localize "EFFECT.Disabled" }}</label>
+            <label>{{ localize "EFFECT.FIELDS.disabled.label" }}</label>
             <input type="checkbox" name="disabled" {{ checked data.disabled }}/>
         </div>
 
         {{#if isActorEffect}}
         <div class="form-group">
-            <label>{{ localize "EFFECT.Origin" }}</label>
+            <label>{{ localize "EFFECT.FIELDS.origin.label" }}</label>
             <div class="form-fields">
                 <input type="text" name="origin" value="{{ data.origin }}" disabled/>
             </div>
@@ -158,20 +142,20 @@
     <!-- Duration Tab -->
     <section class="tab" data-tab="duration">
         <div class="form-group">
-            <label>{{ localize "EFFECT.DurationSecs" }}</label>
+            <label>{{ localize "EFFECT.FIELDS.duration.seconds.label" }}</label>
             <div class="form-fields">
                 <input type="number" name="duration.seconds" value="{{ data.duration.seconds }}"/>
             </div>
         </div>
         <div class="form-group">
-            <label>{{ localize "EFFECT.StartTime" }}</label>
+            <label>{{ localize "EFFECT.FIELDS.duration.startTime.label" }}</label>
             <div class="form-fields">
                 <input type="number" name="duration.startTime" value="{{ data.duration.startTime }}"/>
             </div>
         </div>
         <hr/>
         <div class="form-group">
-            <label>{{ localize "EFFECT.DurationTurns" }}</label>
+            <label>{{ localize "EFFECT.FIELDS.duration.turns.label" }}</label>
             <div class="form-fields">
                 <label>{{ localize "COMBAT.Rounds" }}</label>
                 <input type="number" name="duration.rounds" value="{{ data.duration.rounds }}"/>
@@ -180,14 +164,14 @@
             </div>
         </div>
         <div class="form-group">
-            <label>{{ localize "EFFECT.Combat" }}</label>
+            <label>{{ localize "EFFECT.FIELDS.duration.combat.label" }}</label>
             <div class="form-fields">
                 <input type="text" name="duration.combat" value="{{ data.duration.combat }}" disabled/>
             </div>
         </div>
 
         <div class="form-group">
-            <label>{{ localize "EFFECT.StartTurns" }}</label>
+            <label>{{ localize "EFFECT.FIELDS.duration.startTurn.label" }}</label>
             <div class="form-fields">
                 <label>{{ localize "COMBAT.Round" }}</label>
                 <input type="number" name="duration.startRound" value="{{ data.duration.startRound }}"/>

@@ -5,6 +5,8 @@ import { LinksHelpers } from "../../utils/links";
 import { parseDropData } from "../../utils/sheets";
 import { Translation } from '../../utils/strings';
 
+const DocumentSheetV2 = foundry.applications.api.DocumentSheetV2;
+
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
 
@@ -100,10 +102,7 @@ export class SkillEditSheet extends DocumentSheet {
         if (event.currentTarget.name === 'skill.base') updateData[this._updateString()].base = base;
     }
 
-
-    /** @override */
-    // @ts-expect-error // SkillEditSheet vs DocumentSheet typing, I don't quite get it...
-    async _updateObject(event, formData) {
+    override async _updateObject(event, formData) {
         // Without an actual input field used, avoid a unneeded update...
         // ...the update would happen due to how _onUpdateObject works.
         if (event.currentTarget) {
@@ -217,11 +216,9 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
-    // @ts-expect-error // Missing DocumentSheetData typing
-    getData(): SkillEditFormData {
+    override getData(): SkillEditFormData {
         const data = super.getData();
 
-        //@ts-expect-error TODO: foundry-vtt-types v10'
         // skill property will hold a direct skill reference
         data['skill'] = foundry.utils.getProperty(data.data, this._updateString());
         data['editable_name'] = this._allowSkillNameEditing();

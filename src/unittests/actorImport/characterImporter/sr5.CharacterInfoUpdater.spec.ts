@@ -4,7 +4,7 @@ import { SR5TestingDocuments } from '../../utils';
 import { SR5Actor } from '../../../module/actor/SR5Actor';
 
 export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, assert, before, beforeEach, after } = context;
 
     let testActorFactory;
     let importOptions = {};

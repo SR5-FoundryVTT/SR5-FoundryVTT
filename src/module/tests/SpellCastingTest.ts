@@ -60,7 +60,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      * Spellcasting test category directly depends on the spell cast.
      */
     override get testCategories(): Shadowrun.ActionCategories[] {
-        const spell = this.item?.asSpell;
+        const spell = this.item?.asType('spell');
         if (!spell) return [];
 
         switch (spell.system.category) {

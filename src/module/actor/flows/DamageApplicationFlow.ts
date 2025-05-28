@@ -59,7 +59,7 @@ export class DamageApplicationFlow {
     }
 
     static handleRenderChatMessage(app: ChatMessage, html, data) {
-        html.on('click', '.apply-damage', event => DamageApplicationFlow.chatMessageActionApplyDamage(html, event));
+        $(html).on('click', '.apply-damage', event => DamageApplicationFlow.chatMessageActionApplyDamage(html, event));
     }
 
     /**

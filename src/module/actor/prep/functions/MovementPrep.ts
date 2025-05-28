@@ -1,9 +1,7 @@
-import MovementActorData = Shadowrun.MovementActorData;
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 import {PartsList} from "../../../parts/PartsList";
 
 export class MovementPrep {
-    static prepareMovement(system: ActorTypesData & MovementActorData) {
+    static prepareMovement(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
         const { attributes, modifiers } = system;
 
         const movement = system.movement;

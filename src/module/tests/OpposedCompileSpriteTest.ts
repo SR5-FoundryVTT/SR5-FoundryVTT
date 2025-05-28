@@ -127,7 +127,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
     async finalizeSummonedSprite() {
         if (!this.actor) return;
 
-        const technomancer = this.against.actor as Actor;
+        const technomancer = this.against.actor!;
 
         const updateData = {
             // 'system.services': this.deriveSpriteServices(),
@@ -147,7 +147,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      * @param updateData The update data to add the permission to, that's applied to the sprite actor. 
      */
     _addOwnershipToUpdateData(updateData: object) {
-        const summoner = this.against.actor as Actor;
+        const summoner = this.against.actor!;
 
         // Set permissions for all users using the summoner as main character.
         const users = game.users?.filter(user => user.character?.uuid === summoner.uuid);
@@ -157,7 +157,6 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
         users.forEach(user => {
             if (user.isGM) return;
             // #TODO: Add a setting to define that this should be done and what permission it should be done with.
-            //@ts-expect-error v10
             ownership[user.id] = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
         })
         updateData['ownership'] = ownership

@@ -4,11 +4,11 @@ import WoundsActorData = Shadowrun.WoundsActorData;
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class WoundsPrep {
-    static prepareWounds(system: ActorTypesData & TwoTrackActorData & WoundsActorData) {
+    static prepareWounds(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
         const { modifiers, track } = system;
-        
+
         // The actor overall has a wound tolerance.
-        const damageTolerance = Number(modifiers['wound_tolerance']);
+        const damageTolerance = modifiers.wound_tolerance;
         const woundBoxesThreshold = MonitorRules.woundModifierBoxesThreshold(damageTolerance);
 
         // Each track defines it's local pain tolerance.

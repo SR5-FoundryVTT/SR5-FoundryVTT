@@ -7,7 +7,7 @@ import { emptySpirit } from './spirits';
 
 
 export const spiritImporterTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, assert, before, beforeEach, after } = context;
 
     let testActor;
     const actorType = 'spirit';

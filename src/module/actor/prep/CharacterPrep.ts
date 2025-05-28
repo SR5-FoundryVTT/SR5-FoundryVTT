@@ -16,7 +16,7 @@ import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 
 export class CharacterPrep {
-    static prepareBaseData(system: Shadowrun.CharacterData) {
+    static prepareBaseData(system: Actor.SystemOfType<'character'>) {
         CharacterPrep.addSpecialAttributes(system);
         SkillsPrep.prepareSkillData(system);
 
@@ -35,7 +35,7 @@ export class CharacterPrep {
      * @param system
      * @param items
      */
-    static prepareDerivedData(system: Shadowrun.CharacterData, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'character'>, items: SR5ItemDataWrapper[]) {
         AttributesPrep.prepareAttributes(system);
         AttributesPrep.prepareEssence(system, items);
 
@@ -73,7 +73,7 @@ export class CharacterPrep {
      * 
      * @param system Physical humanoid system data.
      */
-    static prepareRecoil(system: Shadowrun.CharacterData | Shadowrun.CritterData | Shadowrun.SpiritData | Shadowrun.VehicleData) {
+    static prepareRecoil(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>) {
         Helpers.calcTotal(system.values.recoil, { min: 0 });
     }
 
@@ -82,7 +82,7 @@ export class CharacterPrep {
      * 
      * @param system Character system data
      */
-    static prepareRecoilCompensation(system: Shadowrun.CharacterData | Shadowrun.CritterData | Shadowrun.SpiritData) {
+    static prepareRecoilCompensation(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
         const recoilCompensation = RangedWeaponRules.humanoidRecoilCompensationValue(system.attributes.strength.value);
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
         system.values.recoil_compensation.base = baseRc;
@@ -91,7 +91,7 @@ export class CharacterPrep {
         Helpers.calcTotal(system.values.recoil_compensation, { min: 0 });
     }
 
-    static addSpecialAttributes(system: Shadowrun.CharacterData) {
+    static addSpecialAttributes(system: Actor.SystemOfType<'character'>) {
         const { attributes } = system;
 
         // This is necessary to support critter actor types.

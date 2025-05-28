@@ -33,7 +33,7 @@ export class InventoryFlow {
         // This will happen if there has been some tempering with inventory data.
         // To prevent this causing issues, just set it to default data
         if (actor.system.inventories === undefined) {
-            actor.system.inventories = foundry.utils.duplicate(game.model.Actor[actor.type].inventories);
+            actor.system.inventories = foundry.utils.duplicate((game.model.Actor[actor.type] as any).inventories);
         }
 
         this.actor = actor;
@@ -51,7 +51,10 @@ export class InventoryFlow {
         name = InventoryFlow._sanitzeName(name);
 
         if (name.length === 0) return console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
-        if (this.exists(name)) return ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
+        if (this.exists(name)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
+            return;
+        }
         if (this.actor.defaultInventory.name === name) return;
 
         const updateData = {
@@ -145,8 +148,10 @@ export class InventoryFlow {
         console.debug(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
 
         // Disallow editing of default inventory.
-        if (this.disallowRename(current))
-            return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+        if (this.disallowRename(current)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+            return;
+        }
 
         newName = InventoryFlow._sanitzeName(newName);
 

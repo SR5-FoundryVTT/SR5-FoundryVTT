@@ -159,7 +159,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
      */
     _prepareSummoningData(data: SummonSpiritTestData) {
         if (!this.item) return;
-        const summoning = this.item.asCallInAction;
+        const summoning = this.item.asType('call_in_action');
         if (!summoning || !this.item.isSummoning) return;
 
         data.spiritTypes = this._prepareSpiritTypes();

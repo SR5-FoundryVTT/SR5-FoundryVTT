@@ -11,7 +11,7 @@ export const UpdateActionFlow = {
      * @param changeData The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onUpdateAlterActionData(changeData: DeepPartial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+    onUpdateAlterActionData(changeData: Partial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
         UpdateActionFlow.onSkillUpdateAlterAttribute(changeData, item);
         UpdateActionFlow.onSkillUpdateAlterAttribute2(changeData, item);
     },
@@ -24,15 +24,17 @@ export const UpdateActionFlow = {
      * @param changeData  The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onSkillUpdateAlterAttribute(changeData: DeepPartial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+    onSkillUpdateAlterAttribute(changeData: Partial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
         // Only change to connected attribute when no attribute has already been chosen.
-        if (item.system.action?.attribute !== '') return;
+        if (!('action' in item.system) || item.system.action?.attribute !== '') return;
         const skillIdOrLabel = foundry.utils.getProperty(changeData, 'system.action.skill');
         if (skillIdOrLabel === undefined || skillIdOrLabel === '') return;
 
         // CASE - Sidebar item not owned by actor.
         if (item.actor === null) {
-            const skill = game.model.Actor.character.skills.active[skillIdOrLabel];
+            // Attempt to safely access the skill data structure, fallback to undefined if not present
+            const skillsActive = (game as any)?.model?.Actor?.character?.skills?.active;
+            const skill = skillsActive ? skillsActive[skillIdOrLabel] : undefined;
             if (skill === undefined) return;
 
             changeData['system.action.attribute'] = skill.attribute;
@@ -54,7 +56,7 @@ export const UpdateActionFlow = {
      * @param changeData The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onSkillUpdateAlterAttribute2(changeData: DeepPartial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+    onSkillUpdateAlterAttribute2(changeData: Partial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
         if (!foundry.utils.getProperty(changeData, 'system.action.skill')) return;
 
         changeData['system.action.attribute2'] = '';
@@ -155,7 +157,7 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectCallInActionTestIntoChangeData(type: string, changeData: DeepPartial<Shadowrun.CallInActionItemData>, applyData) {
+    injectCallInActionTestIntoChangeData(type: string, changeData: Partial<Shadowrun.CallInActionItemData>, applyData) {
         if (changeData.system?.actor_type === undefined) return;
 
         if (changeData.system.actor_type === 'spirit') {

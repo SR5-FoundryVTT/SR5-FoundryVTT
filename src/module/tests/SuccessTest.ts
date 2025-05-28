@@ -269,7 +269,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     _prepareRollMode(data, options: TestOptions): Shadowrun.FoundryRollMode {
         if (options.rollMode !== undefined) return options.rollMode;
         if (data.action && data.action.roll_mode) return data.action.roll_mode;
-        else return game.settings.get(CORE_NAME, CORE_FLAGS.RollMode) as Shadowrun.FoundryRollMode;
+        else return game.settings.get(CORE_NAME, 'rollMode') as Shadowrun.FoundryRollMode;
     }
 
     /**
@@ -677,10 +677,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.actor && this.data.sourceActorUuid) {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
             const document = await fromUuid(this.data.sourceActorUuid) || undefined;
-            // @ts-expect-error
             this.actor = document instanceof TokenDocument ?
-                document.actor :
-                document as SR5Actor;
+                (document.actor ?? undefined) :
+                (document as SR5Actor | undefined);
         }
 
         // Populate the item document.
@@ -1138,7 +1137,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This can either be from an items action or a pre-configured action.
      */
     get hasAction(): boolean {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         return !foundry.utils.isEmpty(this.data.action);
     }
 
@@ -1617,8 +1615,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
     async rollDiceSoNice() {
-        // @ts-expect-error
-        if (!game.dice3d || !game.user || !game.users) return;
+        if (!game.user || !game.users) return;
+
+        const dice3d = game.modules.get("dice-so-nice")?.api;
+        if (!dice3d) return;
 
         console.debug('Shadowrun5e | Initiating DiceSoNice throw');
 
@@ -1631,8 +1631,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         let whisper: User[] | null = null;
         // ...for gmOnlyContent check permissions
         if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER'));
+            whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true);
         }
         // ...for rollMode include GM when GM roll
         if (this.data.options?.rollMode === 'gmroll' || this.data.options?.rollMode === "blindroll") {
@@ -1644,8 +1643,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const blind = this.data.options?.rollMode === 'blindroll';
         const synchronize = this.data.options?.rollMode === 'publicroll';
 
-        // @ts-expect-error
-        game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
+        (dice3d as any).showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
     /**
@@ -1795,7 +1793,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * What ChatMessage rollMode is this test supposed to use?
      */
     get _rollMode(): string {
-        return this.data.options?.rollMode as string ?? game.settings.get('core', 'rollmode');
+        return this.data.options?.rollMode as string ?? game.settings.get('core', 'rollMode');
     }
 
     /**
@@ -1820,7 +1818,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const messageData = {
             user: game.user?.id,
             // Use type roll, for Foundry built in content visibility.
-            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             speaker: {
                 actor,
                 alias,
@@ -1839,8 +1836,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        // @ts-expect-error TODO: Types Provide proper SuccessTestData and SuccessTestOptions
-        ChatMessage.applyRollMode(messageData, this._rollMode);
+        ChatMessage.applyRollMode(messageData, game.settings.get("core", "rollMode")!);
 
         return messageData;
     }
@@ -1852,7 +1848,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async saveToMessage(uuid: string | undefined = this.data.messageUuid) {
         if (!uuid) return;
 
-        const message = await fromUuid(uuid);
+        const message = await fromUuid(uuid) as ChatMessage;
 
         await message?.setFlag(SYSTEM_NAME, FLAGS.Test, this.toJSON());
     }
@@ -1867,13 +1863,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param data
      */
     static async chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.show-roll').on('click', this._chatToggleCardRolls);
-        html.find('.show-description').on('click', this._chatToggleCardDescription);
-        html.find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
-        html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
-        html.find('.result-action').on('click', this._castResultAction);
-        html.find('.chat-select-link').on('click', this._selectSceneToken);
-        html.find('.test-action').on('click', this._castTestAction);
+        // TODO: .querySelectorAll ?
+        $(html).find('.show-roll').on('click', this._chatToggleCardRolls);
+        $(html).find('.show-description').on('click', this._chatToggleCardDescription);
+        $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
+        $(html).find('.place-template').on('click', this._placeItemBlastZoneTemplate);
+        $(html).find('.result-action').on('click', this._castResultAction);
+        $(html).find('.chat-select-link').on('click', this._selectSceneToken);
+        $(html).find('.test-action').on('click', this._castTestAction);
 
         DamageApplicationFlow.handleRenderChatMessage(message, html, data);
 
@@ -1922,9 +1919,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
         // setup chat listener messages for each message as some need the message context instead of ChatLog context.
-        html.find('.chat-message').each(async (index, element) => {
-            element = $(element);
-            const id = element.data('messageId');
+        // @ts-expect-error Leaving this for somone that cares.
+        $(html).find('.chat-message').each(async (index, element) => {
+            const id = $(element).data('messageId');
             const message = game.messages?.get(id);
             if (!message) return;
 

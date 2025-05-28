@@ -25,7 +25,7 @@ export class SoakRules {
         // Note: This also takes care of the vehicle immunity, since physical damage that does not exceed armor
         // will be converted to stun damage and then reduced to 0. This does not work with drones wearing armor
         // but we do not support this.
-        if (damageData.type.value === 'stun' && actor.isVehicle()) {
+        if (damageData.type.value === 'stun' && actor.isType('vehicle')) {
             return Helpers.reduceDamageByHits(damageData, damageData.value, 'SR5.VehicleStunImmunity');
         }
 
@@ -38,16 +38,16 @@ export class SoakRules {
      * @param actor The actor affected by the damage
      * @returns The updated damage data
      */
-    static modifyPhysicalDamageForArmor(damage: DamageData, actor : SR5Actor): DamageData {
+    static modifyPhysicalDamageForArmor(damage: DamageData, actor: SR5Actor): DamageData {
         const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
 
         if (damage.type.value === 'physical') {
             // Physical damage is only transformed for some actors
-            if (!actor.isCharacter() && !actor.isSpirit() && !actor.isCritter() && !actor.isVehicle()) {
+            if (!['character', 'spirit', 'critter', 'vehicle'].includes(actor.type)) {
                 return updatedDamage;
             }
 
-            const modifiedArmor = actor.getModifiedArmor(damage);
+            const modifiedArmor = (actor as SR5Actor<'character' | 'critter' | 'spirit' | 'vehicle'>).getModifiedArmor(damage);
             if (modifiedArmor) {
                 const armorWillChangeDamageType = modifiedArmor.value > damage.value;
 
@@ -74,7 +74,7 @@ export class SoakRules {
 
             // Only characters can receive biofeedback damage at the moment.
             // TODO Technomancer and Sprites special rules?
-            if (!actor.isCharacter()) {
+            if (!actor.isType('character')) {
                 return updatedDamage;
             }
 

@@ -21,9 +21,8 @@ export const AutocompleteInlineHooksFlow =  {
      */
     setupHook: () => {
         // Module might not be installed.
-        const aipModule = game.modules.get("autocomplete-inline-properties");
+        const aipModule = game.modules.get("autocomplete-inline-properties") as any;
         if (!aipModule) return;
-        // @ts-expect-error
         // API might be missing.
         const api = aipModule.API;
         if (!api) return;
@@ -34,7 +33,7 @@ export const AutocompleteInlineHooksFlow =  {
         const config = {
             packageName: "shadowrun5e",
             sheetClasses: [{
-                name: "ActiveEffectConfig",
+                name: "SR5ActiveEffectConfig",
                 fieldConfigs: [
                     { selector: `.tab[data-tab="effects"] .autocomplete-key-actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
                     { selector: `.tab[data-tab="effects"] .autocomplete-key-targeted_actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
@@ -101,6 +100,8 @@ export const AutocompleteInlineHooksFlow =  {
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;
             return {data: new SuccessTestClass({}, {actor: item.actor, item}).data};
         }
+
+        return {};
     },
 
     /**
@@ -169,5 +170,6 @@ export const AutocompleteInlineHooksFlow =  {
             
             return {data: opposedTest.data};
         }
+        return {};
     }
 }

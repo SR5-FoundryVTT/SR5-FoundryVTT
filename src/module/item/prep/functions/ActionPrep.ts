@@ -117,7 +117,7 @@ export const ActionPrep = {
         const limitParts = new PartsList(action.limit.mod);
         const dpParts = new PartsList(action.dice_pool_mod);
         equippedMods.forEach((mod) => {
-            const modification = mod.asModification();
+            const modification = mod.asType('modification');
             if (!modification) return;
 
             if (modification.system.accuracy) limitParts.addUniquePart(mod.name as string, modification.system.accuracy);
