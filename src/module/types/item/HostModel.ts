@@ -22,6 +22,8 @@ const HostData = {
     customAttributes: new BooleanField({ required: true, initial: false }),
 }
 
+console.log("HostData", HostData);
+
 export class Host extends foundry.abstract.TypeDataModel<typeof HostData, Item.Implementation> {
     static override defineSchema() {
         return HostData;

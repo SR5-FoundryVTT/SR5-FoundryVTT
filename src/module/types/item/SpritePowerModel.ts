@@ -18,6 +18,8 @@ const SpritePowerData = {
     enabled: new BooleanField({ required: true, initial: false }),
 }
 
+console.log("SpritePowerData", SpritePowerData);
+
 export class SpritePower extends foundry.abstract.TypeDataModel<typeof SpritePowerData, Item.Implementation> {
     static override defineSchema() {
         return SpritePowerData;

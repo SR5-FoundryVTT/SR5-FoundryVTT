@@ -8,7 +8,6 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
-import { ConfiguredData } from '@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes.mjs';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -97,10 +96,10 @@ export class SR5ItemSheet extends ItemSheet {
      */
     static override get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ['sr5', 'sheet', 'item'],
+            classes: Array.from(['sr5', 'sheet', 'item']),
             width: 735,
             height: 450,
-            tabs: [{ navSelector: '.tabs', contentSelector: '.sheetbody' }],
+            tabs: Array.from([{ navSelector: '.tabs', contentSelector: '.sheetbody' }]),
         });
     }
 
@@ -129,7 +128,7 @@ export class SR5ItemSheet extends ItemSheet {
         if ('action' in itemData && itemData.action) {
             try {
                 const action = itemData.action as any;
-                if (itemData.action.mod === 0) delete action.mod;
+                if (itemData.action.mod.length === 0) delete action.mod;
                 if (action.limit === 0) delete action.limit;
                 if (action.damage) {
                     if (action.damage.mod === 0) delete action.damage.mod;
@@ -199,7 +198,7 @@ export class SR5ItemSheet extends ItemSheet {
         data['effects'] = prepareSortedEffects(this.item.effects.contents);
         data['itemEffects'] = prepareSortedItemEffects(this.object);
 
-        if (this.item.isHost) {
+        if (this.item.isType('host')) {
             data['markedDocuments'] = this.item.getAllMarkedDocuments();
         }
 
@@ -483,7 +482,7 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // Add items to hosts WAN.
-        if (this.item.isHost && data.type === 'Actor') {
+        if (this.item.isType('host') && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid);
             if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
             return await this.item.addIC(actor.id, data.pack);
@@ -636,10 +635,10 @@ export class SR5ItemSheet extends ItemSheet {
         const type = 'modification';
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type as ConfiguredData<'Item'>['type'],
+            type: type as Item.SubType,
             system: { type: 'weapon' }
         };
-        const item = new SR5Item(itemData, { parent: this.item });
+        const item = new SR5Item(itemData);
         await this.item.createNestedItem(item._source);
     }
 
@@ -669,9 +668,9 @@ export class SR5ItemSheet extends ItemSheet {
         const type = 'ammo';
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type as ConfiguredData<'Item'>['type']
+            type: type as Item.SubType
         };
-        const item = new SR5Item(itemData, { parent: this.item });
+        const item = new SR5Item(itemData);
         await this.item.createNestedItem(item._source);
     }
 
@@ -842,7 +841,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
-        if (!this.item.isHost) return;
+        if (!this.item.isType('host')) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -859,7 +858,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
-        if (!this.item.isHost) return;
+        if (!this.item.isType('host')) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -875,7 +874,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksDelete(event) {
         event.stopPropagation();
 
-        if (!this.item.isHost) return;
+        if (!this.item.isType('host')) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -889,7 +888,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksClearAll(event) {
         event.stopPropagation();
 
-        if (!this.item.isHost) return;
+        if (!this.item.isType('host')) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;

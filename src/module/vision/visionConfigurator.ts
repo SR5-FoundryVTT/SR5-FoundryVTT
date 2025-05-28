@@ -10,7 +10,7 @@ export default class VisionConfigurator {
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
             type: DetectionMode.DETECTION_TYPES.SIGHT,
-          });
+        });
   
         CONFIG.Canvas.visionModes.astralPerception = new VisionMode({
             id: 'astralPerception',
@@ -39,7 +39,7 @@ export default class VisionConfigurator {
             id: 'thermographic',
             label: 'SR5.Vision.ThermographicVision',
             type: DetectionMode.DETECTION_TYPES.SIGHT,
-          });
+        });
     }
 
     static configureLowlight() {
@@ -47,7 +47,7 @@ export default class VisionConfigurator {
             id: 'lowlight',
             label: 'SR5.Vision.LowLight',
             type: DetectionMode.DETECTION_TYPES.SIGHT,
-          });
+        });
     }
 
     static configureAR() {
@@ -55,7 +55,7 @@ export default class VisionConfigurator {
             id: 'augmentedReality',
             label: 'SR5.Vision.AugmentedReality',
             type: DetectionMode.DETECTION_TYPES.SIGHT,
-          });
+        });
     }
-  }
+}
   

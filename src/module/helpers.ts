@@ -214,7 +214,7 @@ export class Helpers {
                 $(checkmark).removeClass('fa-check-circle');
             }
         };
-        html.find('label.checkbox').each(function () {
+        html.find('label.checkbox').each(function (this: any) {
             setContent(this);
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
@@ -468,7 +468,7 @@ export class Helpers {
      * @returns An array tokens.
      */
     static getTargetedTokens(): Token[] {
-        if (!canvas.ready || !game.user) return [];
+        if (!canvas!.ready || !game.user) return [];
 
         return Array.from(game.user.targets);
     }
@@ -839,20 +839,20 @@ export class Helpers {
      * Fetch entities from global or pack collections using data acquired by Foundry Drag&Drop process
      * @param data Foundry Drop Data
      */
-    static async getEntityFromDropData(data: { type: 'Actor' | 'Item', pack: string, id: string }): Promise<Actor.Stored | Item.Stored | undefined> {
+    static async getEntityFromDropData(data: { type: 'Actor' | 'Item', pack: string, id: string }): Promise<SR5Actor | SR5Item | undefined> {
         if (!game.actors || !game.items) return undefined;
 
         if (data.pack && data.type === 'Actor')
-            return await Helpers.getEntityFromCollection(data.pack, data.id) as unknown as SR5Actor;
+            return await Helpers.getEntityFromCollection(data.pack, data.id) as SR5Actor;
 
         if (data.pack && data.type === 'Item')
-            return await Helpers.getEntityFromCollection(data.pack, data.id) as unknown as SR5Item;
+            return await Helpers.getEntityFromCollection(data.pack, data.id) as SR5Item;
 
         if (data.type === 'Actor')
-            return game.actors.get(data.id);
+            return game.actors.get(data.id) as SR5Actor;
 
         if (data.type === 'Item')
-            return game.items.get(data.id);
+            return game.items.get(data.id) as SR5Item;
     
         return undefined;
     }

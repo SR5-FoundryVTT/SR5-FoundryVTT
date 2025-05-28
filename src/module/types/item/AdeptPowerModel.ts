@@ -15,6 +15,8 @@ const AdeptPowerData = {
     level: new NumberField({ required: true, initial: 0 }),
 }
 
+console.log("AdeptPowerData", AdeptPowerData);
+
 export class AdeptPower extends foundry.abstract.TypeDataModel<typeof AdeptPowerData, Item.Implementation> {
     static override defineSchema() {
         return AdeptPowerData;

@@ -20,6 +20,8 @@ const BiowareData = {
     }),
 }
 
+console.log("BiowareData", BiowareData);
+
 export class Bioware extends foundry.abstract.TypeDataModel<typeof BiowareData, Item.Implementation> {
     static override defineSchema() {
         return BiowareData;

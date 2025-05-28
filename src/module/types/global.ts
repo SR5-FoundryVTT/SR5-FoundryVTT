@@ -1,5 +1,3 @@
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5ChatMessage } from "../chatMessage/SR5ChatMessage";
@@ -57,7 +55,7 @@ declare module "fvtt-types/configuration" {
     }
 
     interface AssumeHookRan {
-        ready: never;
+        ready: true;
     }
 
     interface System {
@@ -83,6 +81,9 @@ declare module "fvtt-types/configuration" {
             spirit: typeof Spirit;
             sprite: typeof Sprite;
             vehicle: typeof Vehicle;
+        };
+        Combat: {
+            base: typeof SR5Combat;
         };
         Item: {
             action: typeof Action;

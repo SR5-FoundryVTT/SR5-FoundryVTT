@@ -23,7 +23,7 @@ export const ActiveDefenseRules = {
             },
         };
 
-        if (!weapon.isMeleeWeapon) return activeDefenses;
+        if (!weapon.isMeleeWeapon()) return activeDefenses;
 
         // Melee weapon specific active defenses.
         activeDefenses['dodge'] = {

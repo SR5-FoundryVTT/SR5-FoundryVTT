@@ -6,8 +6,8 @@ import { TechnologyPartData } from "../template/TechnologyModel";
 import { ActionPartData } from "./ActionModel";
 
 export const BlastData = () => ({
-    radius: new NumberField({ required: true, initial: 0 }),
-    dropoff: new NumberField({ required: true, initial: 0 }),
+    radius: new NumberField({ required: true, nullable: false, initial: 0 }),
+    dropoff: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 const AmmunitionData = () => ({
@@ -87,6 +87,8 @@ const WeaponData = {
     melee: new SchemaField(MeleeWeaponData(), { required: true }),
     thrown: new SchemaField(ThrownWeaponData(), { required: true }),
 }
+
+console.log("WeaponData", WeaponData);
 
 export class Weapon extends foundry.abstract.TypeDataModel<typeof WeaponData, Item.Implementation> {
     static override defineSchema() {

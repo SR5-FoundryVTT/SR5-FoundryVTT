@@ -69,7 +69,6 @@ export class ComplexFormImporter extends DataImporter<Shadowrun.ComplexFormItemD
             items.push(item);
         }
 
-        // @ts-expect-error
         return await Item.create(items) as Item;
     }
 }

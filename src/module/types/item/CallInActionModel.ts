@@ -32,6 +32,8 @@ const CallInActionData = {
     }),
 }
 
+console.log("CallInActionData", CallInActionData);
+
 export class CallInAction extends foundry.abstract.TypeDataModel<typeof CallInActionData, Item.Implementation> {
     static override defineSchema() {
         return CallInActionData;

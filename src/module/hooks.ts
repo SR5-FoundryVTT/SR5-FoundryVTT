@@ -337,7 +337,6 @@ ___________________
         CONFIG.Actor.dataModels["Sprite"] = Sprite;
         CONFIG.Actor.dataModels["Vehicle"] = Vehicle;
 
-
         registerSystemSettings();
         registerSystemKeybindings();
 
@@ -517,9 +516,9 @@ ___________________
      * @param id
      */
     static async updateIcConnectedToHostItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
-        if (!canvas.ready || !game.actors) return;
+        if (canvas === undefined || !canvas.ready || !game.actors) return;
 
-        if (item.isHost) {
+        if (item.isType('host')) {
             // Collect actors from sidebar and active scene to update / rerender
             let connectedIC = [
                 // All sidebar actors should also include tokens with linked actors.
@@ -532,7 +531,7 @@ ___________________
             ];
 
             // Update host data on the ic actor.
-            const host = item.asHost;
+            const host = item.asType('host');
             if (!host) return;
             for (const ic of connectedIC) {
                 if (!ic) continue;

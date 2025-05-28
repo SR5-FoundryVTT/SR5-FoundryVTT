@@ -8,8 +8,8 @@ import BiowareItemData = Shadowrun.BiowareItemData;
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class WareImporter extends DataImporter<WareItemData, WareData> {
-    public override categoryTranslations: any;
-    public override itemTranslations: any;
+    declare public categoryTranslations: any;
+    declare public itemTranslations: any;
     public files = ['cyberware.xml', 'bioware.xml'];
 
     CanParse(jsonObject: object): boolean {

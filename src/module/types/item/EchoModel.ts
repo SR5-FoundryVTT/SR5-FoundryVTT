@@ -7,6 +7,8 @@ const EchoData = {
     ...ImportFlags()
 };
 
+console.log("EchoData", EchoData);
+
 export class Echo extends foundry.abstract.TypeDataModel<typeof EchoData, Item.Implementation> {
     static override defineSchema() {
         return EchoData;

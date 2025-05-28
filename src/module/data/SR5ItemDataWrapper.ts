@@ -26,10 +26,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data.system as ShadowrunItemDataData;
     }
 
-    isAreaOfEffect(): boolean {
-        return this.isGrenade() || this.isAoESpell() || this.isAoEAmmo();
-    }
-
     /** Should only be used to check for actual armor item type.
      * NOTE: Should you only care about a possible armor value use couldHaveArmor instead.
      */
@@ -57,10 +53,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getArmorValue() > 0;
     }
 
-    isGrenade(): boolean {
-        return this.isThrownWeapon() && (this.getData().thrown?.blast.radius ?? 0) > 0;
-    }
-
     isThrownWeapon(): boolean {
         if (!this.isWeapon()) return false;
         const weaponData = this.getData() as WeaponData;
@@ -75,18 +67,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data.type === 'modification';
     }
 
-    isWeaponModification(): boolean {
-        if (!this.isModification()) return false;
-        const modification = this.data as ModificationItemData;
-        return modification.system.type === 'weapon';
-    }
-
-    isArmorModification(): boolean {
-        if (!this.isModification()) return false;
-        const modification = this.data as ModificationItemData;
-        return modification.system.type === 'armor';
-    }
-
     isVehicleModification(): boolean {
         if (!this.isModification()) return false;
         const modification = this.data as ModificationItemData;
@@ -98,25 +78,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         const modification = this.data as ModificationItemData;
         return modification.system.type === 'drone';
     }
-
-    isProgram(): boolean {
-        return this.data.type === 'program';
-    }
-
-    isQuality(): boolean {
-        return this.data.type === 'quality';
-    }
-
-    isAmmo(): boolean {
-        return this.data.type === 'ammo';
-    }
-
-    isAoEAmmo(): boolean {
-        if (!this.isAmmo()) return false;
-        const ammoData = this.getData() as AmmoData;
-        return (ammoData.blast.radius ?? 0) > 0;
-    }
-
     isCyberware(): boolean {
         return this.data.type === 'cyberware';
     }

@@ -29,6 +29,8 @@ const ModificationData = {
     slots: new NumberField({ required: true, initial: 0 }),
 }
 
+console.log("ModificationData", ModificationData);
+
 export class Modification extends foundry.abstract.TypeDataModel<typeof ModificationData, Item.Implementation> {
     static override defineSchema() {
         return ModificationData;

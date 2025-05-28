@@ -84,7 +84,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
 
     prepareMeleeReach() {
         if (!this.against.item) return;
-        this.data.isMeleeAttack = this.against.item.isMeleeWeapon;
+        this.data.isMeleeAttack = this.against.item.isMeleeWeapon();
         if (!this.data.isMeleeAttack) return;
 
         if (!this.actor) return;
@@ -93,7 +93,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         // NOTE: ... this should be a choice of the player
         // TODO: This is a legacy selection approach as there wasn't a way to access to used item in the original attack test.
         //       Instead this might be replaced with a direct reference with this.against.item.system.defenseReach?
-        const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((weapon) => weapon.isMeleeWeapon);
+        const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((weapon) => weapon.isMeleeWeapon());
         equippedMeleeWeapons.forEach(weapon => {
             this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());
         });
@@ -145,7 +145,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
      */
     applyPoolRangedFireModModifier() {
         if (!this.against.item) return;
-        if (!this.against.item.isRangedWeapon) return;
+        if (!this.against.item.isRangedWeapon()) return;
 
         const fireMode = this.against.item.getLastFireMode();
 

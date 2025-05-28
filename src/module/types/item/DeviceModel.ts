@@ -14,22 +14,14 @@ export const DevicePartData = () => ({
     networkDevices: new ArrayField(new StringField({ required: true, initial: '' })),
 });
 
-export const DeviceAttribute = () => ({
-    value: new NumberField({ required: true, initial: 0 }),
-    att: new StringField({
-        required: true,
-        initial: '',
-        choices: ['attack', 'sleaze', 'data_processing', 'firewall'],
-    }),
-    editable: new BooleanField({ required: true, initial: false }),
-});
-    
 const DeviceData = {
     ...DevicePartData(),
     ...DescriptionPartData(),
     ...TechnologyPartData(),
     ...ImportFlags(),
 };
+
+console.log("DeviceData", DeviceData);
 
 export class Device extends foundry.abstract.TypeDataModel<typeof DeviceData, Item.Implementation> {
     static override defineSchema() {

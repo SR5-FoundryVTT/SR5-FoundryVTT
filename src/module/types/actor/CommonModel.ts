@@ -1,5 +1,4 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
-import { DeviceAttribute } from "../item/DeviceModel";
 import { ActorArmor } from "../template/ArmorModel";
 import { Attributes, AttributeField } from "../template/AttributesModel";
 import { ModifiableValue } from "../template/BaseModel";
@@ -49,6 +48,16 @@ export const MagicData = () => ({
     }),
     projecting: new BooleanField({ required: true, initial: false, }),
     initiation: new NumberField({ required: true, initial: 0, }),
+});
+
+export const DeviceAttribute = () => ({
+    value: new NumberField({ required: true, initial: 0 }),
+    att: new StringField({
+        required: true,
+        initial: '',
+        choices: ['attack', 'sleaze', 'data_processing', 'firewall'],
+    }),
+    editable: new BooleanField({ required: true, initial: false }),
 });
 
 export const MatrixAttributes = () => ({

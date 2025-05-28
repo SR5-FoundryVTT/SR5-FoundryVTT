@@ -20,6 +20,8 @@ const CyberwareData = {
     }),
 }
 
+console.log("CyberwareData", CyberwareData);
+
 export class Cyberware extends foundry.abstract.TypeDataModel<typeof CyberwareData, Item.Implementation> {
     static override defineSchema() {
         return CyberwareData;

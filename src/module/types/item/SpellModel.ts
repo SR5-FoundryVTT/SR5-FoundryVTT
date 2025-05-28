@@ -79,6 +79,8 @@ const SpellPartData = {
     ritual: new SchemaField(RitualSpellData(), { required: true }),
 }
 
+console.log("SpellPartData", SpellPartData);
+
 export class Spell extends foundry.abstract.TypeDataModel<typeof SpellPartData, Item.Implementation> {
     static override defineSchema() {
         return SpellPartData;

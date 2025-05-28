@@ -78,7 +78,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     }
 
     getOverwatchScore() {
-        const os = this.flags.shadowrun5e.overwatchScore;
+        const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os || 0;
     }
 
@@ -561,11 +561,11 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return this.getSkills() !== undefined;
     }
 
-    getSkills(): Shadowrun.CharacterSkills {
+    getSkills(): Actor.SystemOfType<SubType>['skills'] {
         return this.system.skills;
     }
 
-    getActiveSkills(): Shadowrun.Skills {
+    getActiveSkills(): Actor.SystemOfType<SubType>['skills']['active'] {
         return this.system.skills.active;
     }
 
@@ -727,6 +727,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
         }
+        return;
     }
 
     /**
@@ -1418,6 +1419,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         await this._addDamageToTrack(rest, track);
         await this._addDamageToOverflow(overflow, track);
+        return undefined;
     }
 
     
@@ -1442,6 +1444,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         if (this.isType('ic') || this.isType('sprite')) {
             await this._addDamageToTrack(rest, track);
         }
+        return undefined;
     }
 
     /**
@@ -1510,8 +1513,9 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         // Emerged actors use a personal device like condition monitor.
         if (this.isMatrixActor) {
-            return await this.update({'system.matrix.condition_monitor': track});
+            return await (this as SR5Actor).update({'system.matrix.condition_monitor': track});
         }
+        return;
     }
 
     /** Calculate damage overflow only based on max and current track values.
@@ -1599,12 +1603,11 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         // Find fitting status and fallback to dead if not found.
         const status = CONFIG.statusEffects.find(e => e.id === newStatus);
-        const effect = status || CONFIG.controlIcons.defeated;
+        const effect = status;
 
         // Avoid applying defeated status multiple times.
         const existing = this.effects.reduce((arr, e) => {
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            if ( (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
+            if ( effect && (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
                 arr.push(e.id as string);
             }
             return arr;
@@ -1615,7 +1618,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         // @ts-expect-error
         // Set effect as active, as we've already made sure it isn't.
         // Otherwise Foundry would toggle on/off, even though we're still dead.
-        await token.object.toggleEffect(effect, { overlay: true, active: true });
+        await token.object.toggleEffect(effect || CONFIG.controlIcons.defeated, { overlay: true, active: true });
+        return;
     }
 
     /**
@@ -1765,14 +1769,14 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     async addICHost(item: SR5Item) {
         if (!this.isType('ic')) return;
-        if (!item.isHost) return;
+        if (!item.isType('host')) return;
 
-        const host = item.asHost;
+        const host = item.asType('host');
         if (!host) return;
         await this._updateICHostData(host);
     }
 
-    async _updateICHostData(hostData: Shadowrun.HostItemData) {
+    async _updateICHostData(hostData: SR5Item<'host'>) {
         const updateData = {
             // @ts-expect-error _id is missing on internal typing...
             id: hostData._id,
@@ -1811,9 +1815,9 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     /**
      * Get the host item connect to this ic type actor.
      */
-    getICHost(): SR5Item | undefined {
+    getICHost(): SR5Item<'host'> | undefined {
         if (!this.isType('ic')) return;
-        return game.items?.get(this.system.host.id);
+        return game.items?.get(this.system.host.id) as SR5Item<'host'>;
     }
 
     /**
@@ -1901,7 +1905,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
     async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
-        if (!canvas.ready) return;
+        if (canvas === undefined || !canvas.ready) return;
 
         if (this.isType('ic') && this.hasHost()) {
             return await this.getICHost()?.setMarks(target, marks, options);
@@ -1986,13 +1990,12 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param options
      */
     getMarks(target: Token, item?: SR5Item, options?: { scene?: Scene }): number {
-        if (!canvas.ready) return 0;
+        if (canvas === undefined || !canvas.ready) return 0;
         if (target instanceof SR5Item) {
             console.error('Not yet supported');
             return 0;
         }
         if (!target.actor || !target.actor.isMatrixActor) return 0;
-
 
         const scene = options?.scene || canvas.scene as Scene;
         // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
@@ -2113,8 +2116,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * 
      * @returns true, if the actor can interact with the physical plane
      */
-    get hasPhysicalBody() {
-        return this.isType('character') || this.isType('critter') || this.isType('spirit') || this.isType('vehicle');
+    get hasPhysicalBody(): Boolean {
+        return Boolean(this.asType('character', 'critter', 'spirit', 'vehicle'));
     }
 
     /**
@@ -2160,8 +2163,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         
         // For a set of items, assure only the selected is equipped.
         const updateData = sameTypeItems.map(item => ({
-                _id: item.id,
-                'system.technology.equipped': item.id === unequipItem.id
+            _id: item.id,
+            'system.technology.equipped': item.id === unequipItem.id
         }));
 
         await this.updateEmbeddedDocuments('Item', updateData);

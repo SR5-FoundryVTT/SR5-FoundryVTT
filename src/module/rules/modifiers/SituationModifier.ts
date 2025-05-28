@@ -45,15 +45,13 @@ export type ModifierTypes = Partial<keyof typeof SR5['modifierTypes']>;
  * all types for a document.
  */
 export class SituationModifier {
-    type: Shadowrun.SituationModifierType;
+    type: Shadowrun.SituationModifierType | undefined;
     // A reference to the modifiers this handler is used within.
     modifiers?: DocumentSituationModifiers
     // The original source modifier data. This shouldn't be altered.
     source: SourceModifierData
     // The applied modifier data, originating from the original source data.
-    applied: Modifier
-
-    globalActivesApplied: boolean;
+    applied: Modifier | undefined;
 
     // The effects flow for this modifier.
     effects: SituationModifierEffectsFlow<this>;

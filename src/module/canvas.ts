@@ -18,7 +18,7 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
     // Track the total number of diagonals
     let nDiagonal = 0;
     const rule = game.settings.get(SYSTEM_NAME, FLAGS.DiagonalMovement);;
-    const d = canvas.dimensions as Canvas.Dimensions;
+    const d = canvas!.dimensions as Canvas.Dimensions;
 
     // Iterate over measured segments
     return segments.map((s) => {
@@ -37,7 +37,7 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
         if (rule === '1-2-1') {
             let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
             let spaces = nd10 * 2 + (nd - nd10) + ns;
-            return spaces * canvas.dimensions!.distance;
+            return spaces * canvas!.dimensions!.distance;
         }
 
         // Treat diagonal as straight line
@@ -47,7 +47,7 @@ const measureDistances = function (segments, options: DistanceOptions = {}) {
         }
 
         // Treat diagonal as straight movement
-        else return (ns + nd) * canvas.scene!.grid!.distance;
+        else return (ns + nd) * canvas!.scene!.grid!.distance;
     });
 };
 

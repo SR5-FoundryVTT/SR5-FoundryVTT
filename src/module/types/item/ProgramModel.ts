@@ -14,6 +14,8 @@ const ProgramData = {
     }),
 }
 
+console.log("ProgramData", ProgramData);
+
 export class Program extends foundry.abstract.TypeDataModel<typeof ProgramData, Item.Implementation> {
     static override defineSchema() {
         return ProgramData;

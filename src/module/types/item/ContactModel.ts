@@ -14,6 +14,8 @@ const ContactData = {
     linkedActor: new StringField({ required: true, initial: '' }),
 }
 
+console.log("ContactData", ContactData);
+
 export class Contact extends foundry.abstract.TypeDataModel<typeof ContactData, Item.Implementation> {
     static override defineSchema() {
         return ContactData;

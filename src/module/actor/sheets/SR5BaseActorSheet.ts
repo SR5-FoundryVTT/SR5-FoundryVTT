@@ -217,7 +217,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
         let data = super.getData() as any;
-        const actorData = this.actor.toObject(false);
+        const actorData = (this.actor as SR5Actor).toObject(false);
 
         data = {
             ...data,
@@ -250,6 +250,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.contentVisibility = this._prepareContentVisibility(data);
 
+        //@ts-expect-error
         if ('description' in actorData.system)
             //@ts-expect-error
             data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
@@ -418,7 +419,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Create drag data
         const dragData = {
             actorId: this.actor.id,
-            sceneId: this.actor.isToken ? canvas.scene?.id : null,
+            sceneId: this.actor.isToken ? canvas!.scene?.id : null,
             tokenId: this.actor.isToken ? this.actor.token?.id : null,
             type: '',
             data: {}
@@ -649,7 +650,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Add the item to the selected inventory.
         if (this.selectedInventory !== this.actor.defaultInventory.name)
-            await this.actor.inventory.addItems(this.selectedInventory, new items[0](itemData, { parent: this.actor }));
+            await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
     }
 
     async _onItemEdit(event) {
@@ -1157,7 +1158,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (this.actor.isType('ic') && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1176,7 +1178,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (this.actor.isType('ic') && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1194,7 +1197,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (this.actor.isType('ic') && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1210,7 +1214,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (this.actor.isType('ic') && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const userConsented = await Helpers.confirmDeletion();
@@ -1680,8 +1685,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
 
         // Disallow editing of default inventory.
-        if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory))
-            return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+        if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+            return;
+        }
 
 
         $('.selection-inventory').hide();
@@ -1823,7 +1830,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMatrixAttributeSelected(event) {
         if (!("matrix" in this.actor.system)) return;
 
-        let iid = this.actor.system.matrix.device;
+        let iid = this.actor.system.matrix!.device;
         let item = this.actor.items.get(iid);
         if (!item) {
             console.error('could not find item');

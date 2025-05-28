@@ -27,7 +27,7 @@ export class HostPrep {
 
         const hostAttributeRatings = MatrixRules.hostMatrixAttributeRatings(system.rating);
         Object.values(system.atts).forEach(attribute => {
-            attribute.value = customAttributes ? attribute.value : hostAttributeRatings.pop();
+            attribute.value = customAttributes ? attribute.value : hostAttributeRatings.pop()!;
             attribute.editable = customAttributes;
         })
     }

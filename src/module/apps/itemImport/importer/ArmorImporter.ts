@@ -59,7 +59,6 @@ export class ArmorImporter extends DataImporter<Shadowrun.ArmorItemData, Shadowr
             datas.push(item);
         }
 
-        // @ts-expect-error
         return await Item.create(datas) as Item;
     }
 }

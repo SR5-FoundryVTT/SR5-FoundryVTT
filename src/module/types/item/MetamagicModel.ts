@@ -9,6 +9,8 @@ const MetamagicData = {
     ...ImportFlags(),
 }
 
+console.log("MetamagicData", MetamagicData);
+
 export class Metamagic extends foundry.abstract.TypeDataModel<typeof MetamagicData, Item.Implementation> {
     static override defineSchema() {
         return MetamagicData;

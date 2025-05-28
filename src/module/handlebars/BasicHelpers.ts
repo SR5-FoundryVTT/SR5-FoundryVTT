@@ -60,37 +60,37 @@ export const registerBasicHelpers = () => {
         if (v2 === 0) return 0;
         return v1 / v2;
     });
-    Handlebars.registerHelper('hasprop', function (obj, prop, options) {
+    Handlebars.registerHelper('hasprop', function (this: any, obj, prop, options) {
         if (obj.hasOwnProperty(prop)) {
             return options.fn(this);
         } else return options.inverse(this);
     });
-    Handlebars.registerHelper('ifin', function (val, arr, options) {
+    Handlebars.registerHelper('ifin', function (this: any, val, arr, options) {
         if (arr.includes(val)) return options.fn(this);
         else return options.inverse(this);
     });
     // if greater than
-    Handlebars.registerHelper('ifgt', function (v1, v2, options) {
+    Handlebars.registerHelper('ifgt', function (this: any, v1, v2, options) {
         if (v1 > v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if less than
-    Handlebars.registerHelper('iflt', function (v1, v2, options) {
+    Handlebars.registerHelper('iflt', function (this: any, v1, v2, options) {
         if (v1 < v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if less than or equal
-    Handlebars.registerHelper('iflte', function (v1, v2, options) {
+    Handlebars.registerHelper('iflte', function (this: any, v1, v2, options) {
         if (v1 <= v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if not equal
-    Handlebars.registerHelper('ifne', function (v1, v2, options) {
+    Handlebars.registerHelper('ifne', function (this: any, v1, v2, options) {
         if (v1 !== v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if equal
-    Handlebars.registerHelper('ife', function (v1, v2, options) {
+    Handlebars.registerHelper('ife', function (this: any, v1, v2, options) {
         if (v1 === v2) return options.fn(this);
         else return options.inverse(this);
     });
@@ -104,6 +104,7 @@ export const registerBasicHelpers = () => {
         if (foundry.utils.getType(value) === 'Array') return value.length === 0;
         if (foundry.utils.getType(value) === 'Object') return Object.keys(value).length === 0;
         if (foundry.utils.getType(value) === 'string') return value.length === 0;
+        return false; // for all other types, we assume it's not empty
     });
     Handlebars.registerHelper('not', function (v1) {
         return !v1;

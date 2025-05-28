@@ -18,7 +18,7 @@ export const registerSystemKeybindings = () => {
         name: "SR5.Keybinding.OverwatchScoreTracker.Label",
         hint: "SR5.Keybinding.OverwatchScoreTracker.Hint",
         editable: [{ key: "KeyO", modifiers: [] }],
-        onDown: () => new OverwatchScoreTracker().render(true),
+        onDown: () => { new OverwatchScoreTracker().render(true); },
     });
 
     game.keybindings.register("shadowrun5e", "hide-test-dialog", {

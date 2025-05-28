@@ -196,19 +196,19 @@ export abstract class VersionMigration {
     protected async IterateItems(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
         for (const item of game.items!.contents) {
             try {
-                if (!(await this.ShouldMigrateItemData(item))) {
+                if (!(await this.ShouldMigrateItemData(item as SR5Item))) {
                     continue;
                 }
 
                 console.log(`Migrating Item: ${item.name}`);
-                const updateData = await this.MigrateItemData(item);
+                const updateData = await this.MigrateItemData(item as SR5Item);
 
                 if (foundry.utils.isEmpty(updateData)) {
                     continue;
                 }
 
                 expandObject(updateData);
-                entityUpdates.set(item, {
+                entityUpdates.set(item as SR5Item, {
                     updateData,
                     embeddedItems: null,
                     embeddedEffects: updateData.effects || null
@@ -227,13 +227,13 @@ export abstract class VersionMigration {
     protected async IterateActors(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
         for (const actor of game.actors!.contents) {
             try {
-                if (!(await this.ShouldMigrateActorData(actor))) {
+                if (!(await this.ShouldMigrateActorData(actor as SR5Actor))) {
                     continue;
                 }
 
                 console.log(`Migrating Actor ${actor.name}`);
                 console.log(actor);
-                const updateData = await this.MigrateActorData(actor);
+                const updateData = await this.MigrateActorData(actor as SR5Actor);
                 console.log(updateData);
                 let items = [];
                 if (updateData.items) {
@@ -243,7 +243,7 @@ export abstract class VersionMigration {
 
                 expandObject(updateData);
 
-                entityUpdates.set(actor, {
+                entityUpdates.set(actor as SR5Actor, {
                     updateData,
                     embeddedItems: items,
                     embeddedEffects: updateData.effects || null

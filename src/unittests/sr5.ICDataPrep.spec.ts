@@ -31,7 +31,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
 
 
         it('visibility checks', async () => {
-            const actor = await testActor.create({ type: 'ic' }) as SR5Actor;
+            const actor = await testActor.create({ type: 'ic' }) as SR5Actor<'ic'>;
             assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
@@ -41,7 +41,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('has meat attributes based on the host rating', async () => {
-            const ic = await testActor.create({ type: 'ic', 'system.host.rating': 5}) as SR5Actor;
+            const ic = await testActor.create({ type: 'ic', 'system.host.rating': 5}) as SR5Actor<'ic'>;
 
             assert.strictEqual(ic.system.attributes.agility.value, 5);
             assert.strictEqual(ic.system.attributes.reaction.value, 5);
@@ -54,7 +54,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('has rating attribute based on the host rating', async () => {
-            const ic = await testActor.create({ type: 'ic', 'system.host.rating': 5}) as SR5Actor;
+            const ic = await testActor.create({ type: 'ic', 'system.host.rating': 5}) as SR5Actor<'ic'>;
 
             assert.strictEqual(ic.system.attributes.rating.value, 5);
         });

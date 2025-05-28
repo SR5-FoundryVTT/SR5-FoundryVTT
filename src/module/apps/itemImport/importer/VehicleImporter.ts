@@ -3,7 +3,6 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { VehicleParser } from '../parser/vehicle/VehicleParser';
 import { Constants } from './Constants';
 import { SR5Actor } from '../../../actor/SR5Actor';
-import { StoredDocument } from '@league-of-foundry-developers/foundry-vtt-types/src/types/utils.mjs';
 
 export class VehicleImporter extends DataImporter<Shadowrun.VehicleActorData, Shadowrun.VehicleData> {
     public files = ["vehicles.xml"];

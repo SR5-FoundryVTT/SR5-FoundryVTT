@@ -16,6 +16,8 @@ const ComplexFormData = {
     fade: new NumberField({ required: true, initial: 0 }),
 }
 
+console.log("ComplexFormData", ComplexFormData);
+
 export class ComplexForm extends foundry.abstract.TypeDataModel<typeof ComplexFormData, Item.Implementation> {
     static override defineSchema() {
         return ComplexFormData;

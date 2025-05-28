@@ -16,6 +16,8 @@ const LifestyleData = {
     // mods: new ArrayField({ required: true, initial: [] }),
 }
 
+console.log("LifestyleData", LifestyleData);
+
 export class Lifestyle extends foundry.abstract.TypeDataModel<typeof LifestyleData, Item.Implementation> {
     static override defineSchema() {
         return LifestyleData;

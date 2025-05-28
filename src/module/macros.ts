@@ -24,7 +24,7 @@ export async function createItemMacro(dropData, slot) {
     if (!(item instanceof SR5Item)) return console.error(`Shadowrun 5e | Macro Drop expected an item document but got a different document type`, item);
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    let macro = game.macros.contents.find((m) => m.name === item.name) as Macro;
+    let macro = game.macros.contents.find((m: Macro.Stored<"script" | "chat">) => m.name === item.name) as Macro;
     if (!macro) {
         macro = await Macro.create(
             {
@@ -76,7 +76,7 @@ export async function createSkillMacro(data: {skillId: string, skill: SkillField
 
     // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
     const name = Helpers.getSkillLabelOrName(skill);
-    const existingMacro = game.macros.contents.find(macro => macro.name === name);
+    const existingMacro = game.macros.contents.find((macro: Macro.Stored<"script" | "chat">) => macro.name === name);
     if (existingMacro) return;
 
     // Setup macro data.
