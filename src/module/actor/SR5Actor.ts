@@ -1187,9 +1187,10 @@ export class SR5Actor extends Actor {
             threshold: options.threshold ?? defaultThreshold
         };
 
+        //TODO: Lokalisierung
         const action = this.skillActionData(options.byLabel ? teamworkData.skill.label : teamworkData.skill.id, options);
         if (!action) return;
-        if (!teamworkData.criticalGlitch) {
+        if (!teamworkData.criticalGlitched) {
             action.limit.mod.push({ name: "Teamwork", value: teamworkData.additionalLimit })
         }
 

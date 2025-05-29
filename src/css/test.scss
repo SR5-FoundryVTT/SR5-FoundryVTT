@@ -12,6 +12,7 @@
     .form-group-element-2 {
       flex: 2;
     }
+
     .form-group-element-1-right {
       flex: 1;
       text-align: right;
@@ -27,163 +28,133 @@
     }
   }
 
-  /* Styles nur im Teamwork-Dialog anwenden */
+  /* Nur im Teamwork-Dialog */
   &#teamwork-dialog {
-    /* CLOSED SELECT bleibt Default! */
 
-    /* Nur die LISTE override’n */
-    select.form-control option,
-    select option {
-      background-color: #4d4d4d !important;  /* unselektierter Eintrag */
-      color:            #ffffff !important;
-    }
+    /* Geschlossene Selects unverändert lassen */
 
-    select.form-control option:checked,
-    select option:checked {
-      background-color: #767676 !important;  /* selektierter Eintrag */
-      color:            #ffffff !important;
-    }
-
-    select.form-control option:hover,
-    select option:hover {
-      background-color: #5e5e5e !important;  /* Hover-Zustand */
-      color:            #ffffff !important;
-    }
-    
-    /* STYLE FÜR OPTGROUP-LABELS */
-    select.form-control optgroup,
-    select optgroup {
-      /* dunkler als die Einträge */
-      background-color: #3b3b3b !important;
-      /* etwas helleres Grau für den Text */
-      color:            #cccccc !important;
-      /* hebt sie vom Rest ab */
-      font-weight:      bold !important;
-      /* ein klein wenig Innenabstand */
-      padding:         0.25em 0.5em !important;
-    }
-
-    /* FALLS DER BROWSER DAS OPTGROUP-LABEL IGNORIERT, KANNST DU EIN DISABLED OPTION ALS GRUPPENÜBERSCHRIFT BENUTZEN */
-    /* Beispiel im Template:
-       <option disabled class="group-label">Active Skills</option>
-       <option value="...">Skill 1</option>
-    */
-    select.form-control option.group-label {
-      background-color: #3b3b3b !important;
-      color:            #cccccc !important;
-      font-weight:      bold !important;
+    /* Dropdown-Listen im Dark-Theme */
+    select.form-control,
+    select {
+      & option,
+      & optgroup {
+        background-color: var(--color-input-bg) !important;
+        color: var(--color-input-text) !important;
+      }
+      & option               { background-color: #4d4d4d !important; }
+      & option:checked       { background-color: #767676 !important; }
+      & option:hover         { background-color: #5e5e5e !important; }
+      & optgroup             { background-color: #3b3b3b !important; font-weight: bold; padding: .25em .5em !important; }
+      & option.group-label   { background-color: #3b3b3b !important; }
     }
 
     .dialog-content-teamwork.grid-two-col {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  column-gap: 1em;
-  row-gap: 0.5em;
-  align-items: center;
-  /* Damit Inputs in der rechten Spalte einheitlich breit sind: */
-  .form-control, input[type="number"], input[type="text"] {
-    width: 100%;
-    max-width: 20em; // optional, je nach Wunsch
-    box-sizing: border-box;
-    text-align: right;
-  }
-  label {
-    justify-self: start;
-  }
-  /* Dropdown‐Liste selbst (wenn geöffnet) von Deinem Dark‐Theme */
-  select.form-control optgroup {
-    background-color: #3b3b3b !important;
-    color: #cccccc !important;
-    font-weight: bold !important;
-    padding: 0.25em 0.5em !important;
-  }
-  select.form-control option {
-    background-color: #4d4d4d !important;
-    color: #ffffff !important;
-  }
-  select.form-control option:checked {
-    background-color: #767676 !important;
-    color: #ffffff !important;
-  }
-  select.form-control option:hover {
-    background-color: #5e5e5e !important;
-    color: #ffffff !important;
-  }
-}
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 1em;
+      row-gap: .5em;
+      align-items: center;
 
-/* Im Teamwork-Dialog Textinputs (Filter & Threshold) immer weiß */
-.dialog-content-teamwork input[name="filter"],
-.dialog-content-teamwork input[name="threshold"] {
-  color: #ffffff !important;
-}
+      label { justify-self: start; }
 
-/* Limit‐Textfeld immer weiß, mit dunklem Hintergrund */
-.dialog-content-teamwork input[name="limit"] {
-  color: #ffffff !important;
-  background-color: var(--color-input-bg) !important;
-}
+      /* Inputs & Selects in rechter Spalte */
+      .form-control,
+      input[type="number"],
+      input[type="text"] {
+        width: 100%;
+        max-width: 20em;
+        box-sizing: border-box;
+        text-align: right;
+      }
+    }
 
-/* Wenn der Nutzer einen Wert eintippt und das datalist‐Dropdown erscheint */
-datalist#sr5-teamwork-limit-options option {
-  /* dunkelgrauer Hintergrund */
-  background-color: #4d4d4d !important;
-  /* weiße Schrift */
-  color:            #ffffff !important;
-}
+    /* Weiße Schrift in Textinputs */
+    .dialog-content-teamwork {
+      input[name="filter"],
+      input[name="threshold"],
+      input[name="limitNumber"] {
+        color: #ffffff !important;
+      }
 
-/* Falls Dein Browser datalist‐Optionen im <select>‐Look rendern kann */
-select[name="limit"] {
-  background-color: var(--color-input-bg) !important;
-  color:            var(--color-input-text) !important;
-}
+      /* Limit-Text als Input */
+      input[name="limit"] {
+        background-color: var(--color-input-bg) !important;
+        color: #ffffff !important;
+      }
 
-/* Container für Limit-Zeile */
-.limit-container {
-  display: flex;
-  align-items: center;
-}
+      /* datalist-Optionen */
+      datalist#sr5-teamwork-limit-options option {
+        background-color: #4d4d4d !important;
+        color: #ffffff !important;
+      }
 
-/* Stelle sicher, dass das Select die restliche Breite einnimmt */
-.limit-container .form-control {
-  flex: 1;
-}
+      /* Fallback-Select für Limits */
+      select[name="limit"],
+      select[name="limitSelect"] {
+        background-color: var(--color-input-bg) !important;
+        color: var(--color-input-text) !important;
+      }
 
-/* Container für Limit-Felder: 6ch für Zahl, Rest für Select */
-.limit-controls {
-  display: grid;
-  grid-template-columns: 6ch auto;
-  column-gap: 0.5em;
-  align-items: center;
+      /* Layout der Limit-Zeile */
+      .limit-controls {
+        display: grid;
+        grid-template-columns: 6ch auto;
+        column-gap: .5em;
+        align-items: center;
 
-  /* das Text-Input auf exakt 6 Zeichen Breite */
-  .limit-number {
-    width: 6ch;
-    min-width: 6ch;
-    max-width: 6ch;
-    text-align: center;
-    box-sizing: border-box;
-    color: var(--color-input-text) !important;
-    background: var(--color-input-bg) !important;
-  }
-
-  /* das Dropdown füllt den Rest */
-  .limit-select {
-    width: 100%;
+        .limit-number {
+          width: 6ch; min-width: 6ch; max-width: 6ch;
+          text-align: center;
+          box-sizing: border-box;
+          background: var(--color-input-bg) !important;
+          color: var(--color-input-text) !important;
+        }
+        .limit-select {
+          width: 100%;
+        }
+      }
+    }
   }
 }
 
-/* Im Teamwork-Dialog Textinputs (Filter, Threshold & LimitNumber) immer weiß */
-.dialog-content-teamwork input[name="filter"],
-.dialog-content-teamwork input[name="threshold"],
-.dialog-content-teamwork input[name="limitNumber"] {
-  color: #ffffff !important;
-}
+/* -- Teilnehmer‐Kachel -- */
+.teamwork-participant {
+  border: 1px solid var(--color-border-dark);
+  border-radius: 4px;
+  margin-bottom: .5em;
+  background: var(--color-dialog-bg);
+  color: var(--color-input-text);
+  overflow: hidden;
 
-.dialog-content-teamwork select[name="limitSelect"] {
-  background-color: var(--color-input-bg) !important;
-  color:            var(--color-input-text) !important;
-}
-
-
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: .5em 1em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    &::-webkit-details-marker { display: none; }
   }
+
+  .different-skills {
+    padding: .5em 1em;
+    background: var(--color-toolbar-bg);
+    border-top: 1px solid var(--color-border-dark);
+  }
+
+  &[open] .different-skills {
+    animation: expand .2s ease-out forwards;
+  }
+}
+
+/* Glitch‐Nachricht */
+.glitch-message {
+  color: #ff4d4d;
+  font-style: italic;
+  &.critical { font-weight: bold; }
+}
+
+@keyframes expand {
+  from { opacity: 0; transform: scaleY(.95); }
+  to   { opacity: 1; transform: scaleY(1); }
 }

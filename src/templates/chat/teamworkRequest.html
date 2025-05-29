@@ -29,18 +29,18 @@
   <div class="card-main-content">
     <div class="card-content">
       <ul class="test-params">
-        <li><strong>{{localize "SR5.Skill"}}:</strong> {{skill.label}}</li>
+        <li><strong>{{localize "SR5.Skill"}}:</strong> {{localizeSkill skill}}</li>
         {{#if attribute}}
+        {{#if limit}}
+        <li><strong>{{localize "SR5.Limit"}}:</strong> {{localize limit}}</li>
+        {{/if}}
         <li><strong>{{localize "SR5.Attribute"}}:</strong> {{localize attribute}}</li>
         {{/if}}
         {{#if threshold}}
         <li><strong>{{localize "SR5.Threshold"}}:</strong> {{threshold}}</li>
         {{/if}}
-        {{#if limit}}
-        <li><strong>{{localize "SR5.Limit"}}:</strong> {{limit}}</li>
-        {{/if}}
         {{#if allowOtherSkills}}
-        <li><em>{{localize "SR5.Dialogs.Teamwork.AllowOtherSkills"}}</em></li>
+        <li><em>{{localize "SR5.Skill.Teamwork.OtherSkillsAllowed"}}</em></li>
         {{/if}}
       </ul>
     </div>
@@ -56,7 +56,7 @@
         name=this.name
         netHits=this.netHits
         glitched=this.glitched
-        criticalGlitch=this.criticalGlitch
+        criticalGlitched=this.criticalGlitched
     }}
   {{/each}}
 </div>

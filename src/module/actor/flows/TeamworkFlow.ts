@@ -10,6 +10,10 @@ import { JournalEnrichers, TestAttributes } from '../../journal/enricher';
 import { DataDefaults } from '../../data/DataDefaults';
 import { TestCreator } from '../../tests/TestCreator';
 import { SR5Roll } from '../../rolls/SR5Roll';
+import { SR5 } from '../../config';
+
+export type AttributeKey = keyof typeof SR5.attributes;
+export type LimitKey = keyof typeof SR5.limits;
 
 export interface TeamworkMessageData {
     /** Liste aller wählbaren Akteure */
@@ -17,7 +21,7 @@ export interface TeamworkMessageData {
     /** Aktuell ausgewählter Skill */
     skill: SkillEntry;
     /** Aktuell ausgewähltes Attribut */
-    attribute?: Shadowrun.ActorAttribute;
+    attribute?: AttributeKey;
     /** Vorgeschlagener Schwellenwert */
     threshold?: number;
     limit?: string;
@@ -27,24 +31,37 @@ export interface TeamworkMessageData {
     showAllowOtherSkills: boolean;
     additionalDice: Shadowrun.ValueMaxPair<number>;
     additionalLimit: number;
-    criticalGlitch: boolean;
+    criticalGlitched: boolean;
     specialization: boolean;
     participants: ParticipantEntry[];
-    criticalGlitched: boolean;
 }
 
 interface ParticipantEntry {
-    name: string;
+    actor: SR5Actor;
     netHits: number;
     glitched: boolean;
     criticalGlitched: boolean;
+    differentSkill: Shadowrun.SkillField | undefined,
+    differentAttribute: AttributeEntry | undefined,
+    differentLimit: LimitEntry | undefined
 }
 
 export interface SkillEntry {
     id: string;
     label: string;
-    attribute: Shadowrun.ActorAttribute;      // neu
-    defaultLimit: string;                     // ne
+    attribute: AttributeKey;   
+    limit: LimitKey;                    
+}
+
+export interface AttributeEntry {
+    name: AttributeKey;
+    label: string;
+}
+
+export interface LimitEntry {
+    name: LimitKey;
+    label: string;
+    base?: number;
 }
 
 export interface SkillGroup {
@@ -69,8 +86,8 @@ export class TeamworkFlow {
             .map(([id, s]) => ({
                 id,
                 label: game.i18n.localize(s.label as Translation) ?? s.name,
-                attribute: s.attribute as Shadowrun.ActorAttribute,
-                defaultLimit: attrs[s.attribute]?.limit ?? ""
+                attribute: s.attribute as AttributeKey,
+                limit: attrs[s.attribute]?.limit as LimitKey ?? ""
             }))
             .sort(sortBy);
         if (activeSkills.length) groups.push({ group: "Active Skills", skills: activeSkills });
@@ -81,8 +98,8 @@ export class TeamworkFlow {
             .map(([id, skill]) => ({
                 id,
                 label: game.i18n.localize(skill.label as Translation) ?? skill.name,
-                attribute: skill.attribute as Shadowrun.ActorAttribute,
-                defaultLimit: attrs[skill.attribute]?.limit ?? ""
+                attribute: skill.attribute as AttributeKey,
+                limit: attrs[skill.attribute]?.limit as LimitKey ?? ""
             }))
             .sort(sortBy);
 
@@ -98,8 +115,8 @@ export class TeamworkFlow {
                 .map(([id, s]) => ({
                     id,
                     label: game.i18n.localize(s.label as Translation) ?? s.name,
-                    attribute: s.attribute as Shadowrun.ActorAttribute,
-                    defaultLimit: attrs[s.attribute]?.limit ?? ""
+                    attribute: s.attribute as AttributeKey,
+                    limit: attrs[s.attribute]?.limit as LimitKey ?? ""
                 }))
                 .sort(sortBy);
             if (list.length) groups.push({ group: `Knowledge (${catKey})`, skills: list });
@@ -109,10 +126,10 @@ export class TeamworkFlow {
     }
 
     /** Flache Liste aller Attribute für den Dialog */
-    static buildAttributeList(actor: SR5Actor): { name: Shadowrun.ActorAttribute; label: string }[] {
+    static buildAttributeList(actor: SR5Actor): { name: AttributeKey; label: string }[] {
         return Object.entries(actor.getAttributes())
             .map(([key, field]) => ({
-                name: key as Shadowrun.ActorAttribute,
+                name: key as AttributeKey,
                 label: game.i18n.localize(field.label as Translation)
             }))
             .sort((a, b) => a.label.localeCompare(b.label));
@@ -161,9 +178,7 @@ export class TeamworkFlow {
             lockedSkill: false
         }).select();
 
-        if (!dialogData) return;
-
-        console.log(dialogData);
+        if (dialogData.cancelled) return;
 
         // Setze initiales Flag-Objekt
         const teamworkData = {
@@ -175,7 +190,7 @@ export class TeamworkFlow {
             allowOtherSkills: dialogData.allowOtherSkills,
             showAllowOtherSkills: dialogData.showAllowOtherSkills,
             participants: [],
-            criticalGlitch: false,
+            criticalGlitched: false,
             additionalDice: {
                 value: 0,
                 max: dialogData.actor.getSkill(dialogData.skill.id).base ?? 0
@@ -184,8 +199,14 @@ export class TeamworkFlow {
             specialization: dialogData.specialization
         };
 
+        const templateContext = {
+            ...teamworkData,
+            limit: (SR5.limits as Record<string, string>)[dialogData.limit] ?? undefined,
+            attribute: (SR5.attributes as Record<string, string>)[dialogData.attribute] ?? undefined
+        };
+
         // Rendern und ChatMessage anlegen
-        const content = await renderTemplate("systems/shadowrun5e/dist/templates/chat/teamworkRequest.html", teamworkData);
+        const content = await renderTemplate("systems/shadowrun5e/dist/templates/chat/teamworkRequest.html", templateContext);
         const msg = await ChatMessage.create({
             user: user.id,
             speaker: ChatMessage.getSpeaker(),
@@ -233,27 +254,21 @@ export class TeamworkFlow {
 
         const actor: SR5Actor = selection.actor;
 
-        console.log("Selection: ", selection)
-
         // 1) Basis-ActionData holen
         const skillAction: Shadowrun.ActionRollData | undefined = actor.skillActionData(selection.skill.id, { specialization: selection.specialization });
         if (!skillAction) {
-            ui.notifications?.error("SR5.Errors.NoSkillDataFound", { localize: true });
             return;
         }
-        console.log("skillAction 1: ", skillAction)
 
         // 2) Attribut überschreiben, falls der User ein anderes gewählt hat
         const attribute = JournalEnrichers.getAttributeKeyByLabel(selection.attribute ?? "");
         if (attribute !== '') {
             skillAction.attribute = attribute;
         }
-        console.log("skillAction 2: ", skillAction)
 
         // 3) Threshold eintragen
         const threshold = selection.threshold ?? 0;
         skillAction.threshold = { value: threshold, base: threshold };
-        console.log("skillAction 3: ", skillAction)
 
 
         // 4) Limit setzen: Zahl vs. Attribut-Limit
@@ -269,11 +284,9 @@ export class TeamworkFlow {
             skillAction.limit.base = actual;
             skillAction.limit.attribute = limit as Shadowrun.LimitAttribute;
         }
-        console.log("skillAction: 4", skillAction)
 
         // 5) Test erstellen & ausführen
         try {
-            console.log("skillAction: ", skillAction)
             const test = await TestCreator.fromAction(skillAction, actor);
             if (!test) return;
             test.data.title = teamworkData.skill.label;
@@ -286,6 +299,7 @@ export class TeamworkFlow {
                 results
             );
         } catch (err) {
+            //TODO: Lokalisierung
             console.error("Fehler im Teilnehmer-Wurf:", err);
             ui.notifications?.error("Fehler im Teilnehmer-Wurf:", err);
         }
@@ -301,36 +315,47 @@ export class TeamworkFlow {
     static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest) {
 
         // 1.) Flag auslesen
-        const data = (await message.getFlag(SYSTEM_NAME, FLAGS.Test)) as TeamworkMessageData;
+        const teamworkData = (await message.getFlag(SYSTEM_NAME, FLAGS.Test)) as TeamworkMessageData;
+
+        console.log(teamworkData, results);
 
         // 2.) Neue Teilnehmer-Info anhängen
         const netHits = results.data.values.netHits.value;
-        data.participants.push({
-            name: actor.name ?? '',
+        teamworkData.participants.push({
+            actor: actor,
             netHits,
             glitched: results.rolls[0].glitched,
-            criticalGlitched: data.criticalGlitched
+            criticalGlitched: teamworkData.criticalGlitched,
+            differentSkill: results.data.action.skill !== teamworkData.skill.id ? actor.getSkill(results.data.action.skill) : undefined,
+            differentAttribute: results.data.action.attribute !== teamworkData.attribute ? (SR5.attributes as Record<AttributeKey, string>)[results.data.action.attribute] : undefined,
+            differentLimit: typeof teamworkData.limit === "string"
+                ? (results.data.action.limit.attribute !== teamworkData.limit
+                    ? (SR5.limits as Record<LimitKey, string>)[results.data.action.limit.attribute]
+                    : undefined)
+                : (typeof teamworkData.limit === "number" && results.data.action.limit.base !== teamworkData.limit
+                    ? `${results.data.action.limit.base}`
+                    : undefined)
         });
 
         // 3.) Content komplett neu rendern
         const content = await renderTemplate(
             "systems/shadowrun5e/dist/templates/chat/teamworkRequest.html",
-            data
+            teamworkData
         );
 
         // 5. Aktualisiere teamworkData
-        data.additionalDice.value = (data.additionalDice.value ?? 0) + netHits;
-        data.additionalLimit = (data.additionalLimit ?? 0) + (results.rolls[0].total > 0 && !results.rolls[0].glitched ? 1 : 0);
-        data.criticalGlitch = data.criticalGlitch || (results.rolls[0].criticalGlitched);
+        teamworkData.additionalDice.value = (teamworkData.additionalDice.value ?? 0) + netHits;
+        teamworkData.additionalLimit = (teamworkData.additionalLimit ?? 0) + (results.rolls[0].total > 0 && !results.rolls[0].glitched ? 1 : 0);
+        teamworkData.criticalGlitched = teamworkData.criticalGlitched || (results.rolls[0].criticalGlitched);
 
         // 4.) ChatMessage updaten — Content + Flag
         try {
             if (game.user?.isGM) {
-                await message.setFlag(SYSTEM_NAME, FLAGS.Test, data);
+                await message.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData);
                 await message.update({ content });
             }
             else {
-                this._sendUpdateSocketMessage(message, content, data)
+                await this._sendUpdateSocketMessage(message, content, teamworkData)
             }
         } catch (err) {
             ui.notifications?.error(`Teamwork: ${err}`);
@@ -348,8 +373,6 @@ export class TeamworkFlow {
         const actor = game.actors?.get((teamworkData.actor as any)._id);
 
         if (!actor) return;
-
-        console.log("rollTeamwork-Data ", teamworkData)
 
         await actor.rollTeamworkTest(teamworkData);
     }

@@ -1,4 +1,23 @@
-<div class="participant">
-   <strong>{{name}}</strong>: {{netHits}}
-   {{#if glitched}}<span class="{{#if criticalGlitched}}critical-{{/if}}glitch">{{localize "SR5.Skill.Teamwork.{{#if criticalGlitched}}Critical{{/if}}Glitched"}}</span>{{/if}}
-</div>
+<details class="teamwork-participant">
+  <summary>
+    <span {{#if glitched}}class="glitch-message {{#ife criticalGlitched true}}critical{{/ife}}"
+      {{/if}}><strong>{{name}}</strong>: {{netHits}}</span>
+  </summary>
+  {{#if (or differentSkill differentAttribute differentLimit glitched)}}
+  <div class="different-skills">
+    {{#if glitched}}
+    {{#ife criticalGlitched true}}
+    {{localize "SR5.GlitchCritical"}}
+    {{else}}
+    {{localize "SR5.Glitch"}}
+    {{/ife}}
+    {{/if}}
+    {{#if differentSkill}}<span>{{localize "SR5.Skill.Teamwork.DifferentSkill"}}: {{localizeSkill
+      differentSkill}}</span>{{/if}}
+    {{#if differentAttribute}}<span>{{localize "SR5.Skill.Teamwork.DifferentAttribute"}}: {{localize
+      differentAttribute}}</span>{{/if}}
+    {{#if differentLimit}}<span>{{localize "SR5.Skill.Teamwork.DifferentLimit"}}: {{localize
+      differentLimit}}</span>{{/if}}
+  </div>
+  {{/if}}
+</details>

@@ -340,6 +340,14 @@
         },
         "RangedWeaponTest": {
             "EnvironmentalOverwriteSet": "Environmental modifiers have been manually set to a fixed value!"
+        },
+        "Teamwork": {
+            "Title": "Teamwork Test",
+            "Filter": {
+                "Actor": "Filter Actor",
+                "Placeholder": "Actor Name"
+            },
+            "AllowOtherSkills": "Allow other Skills"
         }
     },
     "SR5.DicePool": "Pool",
@@ -992,11 +1000,13 @@
         "Survival": "Survival",
         "Swimming": "Swimming",
         "Teamwork": {
-            "CriticalGlitched": "Critical Glitched",
-            "Glitched": "Glitched",
+            "DifferentSkill": "Diff. Skill",
+            "DifferentAttribute": "Diff. Attribute",
+            "DifferentLimit": "Diff. Limit",
             "ParticipantActor": "Choose actor",
             "RollIt": "Roll it",
-            "TakePart": "Take part"
+            "TakePart": "Take part",
+            "OtherSkillsAllowed": "Other Skills Allowed"
         },
         "ThrowingWeapons": "Throwing Weapons",
         "Tracking": "Tracking",
@@ -1321,6 +1331,9 @@
             "PreparedSpirit": "Use a prepared spirit actor instead of creating a generic one",
             "ReagentDrams": "Drams of reagents used for altering summoning limit",
             "SpiritType": "Type of the summoned spirit"
+        },
+        "Teamwork": {
+            "AllowOtherSkills": "When enabled, participants may contribute different skills to the Teamwork test."
         },
         "Test": {
             "Extended": "Test will be thrown as an extended test until threshold is reached",

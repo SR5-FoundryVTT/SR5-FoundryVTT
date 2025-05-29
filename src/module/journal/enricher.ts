@@ -191,12 +191,11 @@ export class JournalEnrichers {
             ui.notifications?.error("No actor found to perform this test.");
             return;
         }
-
-        console.log("🔍 [rollTest] searching for skill label:", testAttributes.skill, testAttributes.opposedSkill);
-        console.log("🔍 [rollTest] actor.system.skills:", actor.system.skills);
+        
         const rawLabel = testAttributes.skill;
         const found = actor.getSkillByLabel(rawLabel!);
-        console.log("   → actor.getSkillByLabel returned:", found);
+
+
         //TODO: Opposed Limit und Schwellenwert einbauen
         const testData = DataDefaults.actionRollData({
             attribute: this.getAttributeKeyByLabel(testAttributes.attribute),
@@ -259,6 +258,7 @@ export class JournalEnrichers {
             }
 
         } catch (error) {
+            //TODO: Lokalisierung
             console.error(`Fehler beim Ausführen von Makro '${macroName}' aus '${compendiumKey}':`, error);
             ui.notifications?.error("Fehler beim Ausführen des Makros. Siehe Konsole für Details.");
         }

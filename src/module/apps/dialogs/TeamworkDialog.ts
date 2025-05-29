@@ -1,6 +1,6 @@
 import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
 import { SR5Actor } from "../../actor/SR5Actor";
-import { SkillEntry, SkillGroup, TeamworkFlow } from "../../actor/flows/TeamworkFlow";
+import { AttributeEntry, AttributeKey, LimitEntry, LimitKey, SkillEntry, SkillGroup, TeamworkFlow } from "../../actor/flows/TeamworkFlow";
 import { SR5 } from "../../config";
 
 export interface TeamWorkDialogData extends FormDialogData {
@@ -11,11 +11,11 @@ export interface TeamWorkDialogData extends FormDialogData {
   /** Gruppierte und sortierte Skills des ausgewählten Akteurs */
   skills: SkillGroup[];
   /** Sortierte Attribute des ausgewählten Akteurs */
-  attributes: Shadowrun.Attributes;
+  attributes: Record<AttributeKey, string>;
   /** Aktuell ausgewählter Skill */
   selectedSkill?: SkillEntry;
   /** Aktuell ausgewähltes Attribut */
-  selectedAttribute?: Shadowrun.ActorAttribute;
+  selectedAttribute?: AttributeEntry;
   /** Vorgeschlagener Schwellenwert */
   threshold: number;
   /** Checkbox: auch andere Skills erlauben */
@@ -24,11 +24,11 @@ export interface TeamWorkDialogData extends FormDialogData {
   filter: string;
   /** Soll die Checkbox angezeigt werden? */
   showAllowOtherSkills: boolean;
-  limitNumber: number;
-  limitSelect: string;
-  limits: Record<string, string>;
+  selectedLimit: LimitEntry;
+  limits: Record<LimitKey, string>;
   request: boolean;
   specialization: boolean;
+  cancelled: boolean;
 }
 
 
@@ -64,19 +64,19 @@ export class TeamWorkDialog extends FormDialog {
       ? TeamworkFlow.buildAttributeList(selectedActor)
       : [];
     const skills = TeamworkFlow.buildSkillGroups(selectedActor);
-    const selectedSkill = teamworkData.selectedSkill
-      ? skills
-        .flatMap(group => group.skills)
-        .find(s => s.label === teamworkData.selectedSkill || s.id === teamworkData.selectedSkill)
-      : undefined;
-    const selectedAttribute = teamworkData.selectedAttribute
-      ? attributes.find(a => a.name === teamworkData.selectedAttribute || a.label === teamworkData.selectedAttribute)
-      : undefined;
+    const givenSkill: SkillEntry | undefined = teamworkData.selectedSkill
+    ? skills
+        .flatMap(g => g.skills)
+        .find(s => s.id === teamworkData.selectedSkill || s.label === teamworkData.selectedSkill)
+    : undefined;
+    const selectedSkill: SkillEntry = givenSkill ?? skills[0]?.skills[0]!;
+    const attributeKey = teamworkData.selectedAttribute ?? selectedSkill?.attribute
+    const selectedAttribute = (attributes)[attributeKey];
 
     const threshold = teamworkData.threshold ?? 0;
     const showAllowOtherSkills = true;
     const allowOtherSkills = showAllowOtherSkills;
-    const limit = teamworkData.limit ?? selectedSkill?.defaultLimit ?? ''
+    const limit = teamworkData.limit != null && teamworkData.limit !== "" ? teamworkData.limit : selectedSkill?.limit ?? "";
     const request = teamworkData.request;
     const lockedSkill = teamworkData.lockedSkill;
 
@@ -91,13 +91,18 @@ export class TeamWorkDialog extends FormDialog {
       showAllowOtherSkills: showAllowOtherSkills,
       allowOtherSkills: allowOtherSkills,
       filter: '',
-      limitNumber: typeof limit === "number" ? limit : undefined,
-      limitSelect: typeof limit === "string" ? limit : '',
+      limit: {
+        name: typeof limit === "string" ? limit : '',
+        label: typeof limit === "string" ? SR5.limits[limit] : '',
+        base: typeof limit === "number" ? limit : undefined
+      },
       limits: SR5.limits,
       request: request,
       lockedSkill: lockedSkill,
       specialization: false
     };
+
+    console.log(templateData);
 
     const buttons = {
       roll: { label: game.i18n.localize("SR5.Roll"), icon: '<i class="fas fa-handshake"></i>' },
@@ -113,8 +118,6 @@ export class TeamWorkDialog extends FormDialog {
     };
 
     super(data, options);
-
-    console.log(data);
 
     // Initialisiere Deine Caches
     this.baseActors = actors;
@@ -175,7 +178,7 @@ export class TeamWorkDialog extends FormDialog {
     };
   }
 
-  override onAfterClose(html: JQuery<HTMLElement>): object {
+  override onAfterClose(html: JQuery<HTMLElement>): object | undefined {
 
     const {
       selectedActor,
@@ -202,15 +205,7 @@ export class TeamWorkDialog extends FormDialog {
   }
 
   override _emptySelection(): object {
-    return {
-      actor: this.data.selectedActor,
-      attribute: this.data.selectedAttribute,
-      skill: this.data.selectedSkill,
-      threshold: this.data.threshold,
-      limit: this.data.limitNumber ? this.data.limitNumber : this.data.limitSelect,          // neu
-      allowOtherSkills: this.data.allowOtherSkills,
-      specialization: this.data.specialization
-    };
+    return { cancelled: true };
   }
 
   override async _onChangeInput(event: any): Promise<void> {
@@ -221,8 +216,6 @@ export class TeamWorkDialog extends FormDialog {
     if (name === 'actor') {
       const uuid = el.value;
 
-      console.log("Uuid: ", uuid)
-
       const actor = this.baseActors.find(a => a.uuid === uuid);
       if (!actor) return;                  // falls nichts gefunden wurde, abbrechen
       data.selectedActor = actor;
@@ -232,8 +225,6 @@ export class TeamWorkDialog extends FormDialog {
 
       data.filter = '';
       data.actors = this.baseActors;
-
-      console.log("Actor wurde ausgewählt: ", data.selectedActor)
 
       await this.render();
       return;
@@ -260,11 +251,9 @@ export class TeamWorkDialog extends FormDialog {
 
       // 2) Setze Attribut und Limit
       data.selectedSkill = newSkill;
-      data.selectedAttribute = newSkill.attribute;
-      data.limitSelect = newSkill.defaultLimit;
-
-      // 3) Aktualisiere threshold ggf. auf 0 oder bestaetige alten Wert
-      data.threshold = 0;
+      data.selectedAttribute = {name: newSkill.attribute, label: SR5.attributes[newSkill.attribute]};
+      data.selectedLimit.name = newSkill.limit;
+      data.selectedLimit.label = SR5.attributes[newSkill.limit];
 
       // 4) Re-render um UI up-to-date zu halten
       await this.render();
