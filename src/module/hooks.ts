@@ -417,13 +417,25 @@ ___________________
         console.debug('Shadowrun5e | Registering new chat messages related hooks');
     }
 
+    /**
+     * Extend rendering of Sidebar tab 'ActorDirectory' by
+     * - the Chummer Actor Import button
+     * @param app Foundry ActorDirectory app instance
+     * @param html HTML element of the app
+     */
     static renderActorDirectory(app: Application, html: HTMLElement) {
-        if(!game.user?.isGM){
+        if(!game.user?.isGM) {
             return 
         }
+
+        // Already exists, no need to add again.
+        const existing = $(html).find('#chummer-actor-import');
+        if (existing.length > 0) {
+            return;
+        }
         
-        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('footer').before(button);
+        const button = $('<button id="chummer-actor-import" class="sr5 flex0">Import Chummer Data</button>');
+        $(html).find('footer').append(button);
         button.on('click', (event) => {
             new Import().render(true);
         });
@@ -435,15 +447,20 @@ ___________________
      * 
      * @param app Foundry ItemDirectory app instance
      * @param html HTML element of the app
-     * @returns 
      */
     static renderItemDirectory(app: Application, html: HTMLElement) {
         if(!game.user?.isGM){
             return 
         }
+
+        // Already exists, no need to add again.
+        const existing = $(html).find('#chummer-item-import');
+        if (existing.length > 0) {
+            return;
+        }
         
-        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('footer').before(button);
+        const button = $('<button id="chummer-item-import" class="sr5 flex0">Import Chummer Data</button>');
+        $(html).find('footer').append(button);
         button.on('click', (event) => {
             new Import().render(true);
         });
