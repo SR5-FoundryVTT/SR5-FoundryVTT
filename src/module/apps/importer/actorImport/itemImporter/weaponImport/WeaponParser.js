@@ -90,16 +90,9 @@ export class WeaponParser {
             action.skill = chummerWeapon.skill.toLowerCase().replace(/\s/g, '_');
         // Instead of direct skill, rely on a category mapping by the rules.
         } else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('exotic')) {
-            action.skill = chummerWeapon.category
-                .toLowerCase()
-                .replace(' weapons', '')
-                .replace(/\s/g, '_');
+            action.skill = chummerWeapon.category.toLowerCase().replace(/\s/g, '_');
         } else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('laser weapons')) {
-            action.skill = 'exotic_range';
-        }
-
-        if (action.skill.includes('exotic')) {
-            action.skill = action.skill.replace('_weapon', '');
+            action.skill = 'exotic_ranged_weapon';
         }
 
         action.attribute = 'agility';

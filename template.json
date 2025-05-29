@@ -196,7 +196,7 @@
                             "mod": [],
                             "specs": []
                         },
-                        "exotic_melee": {
+                        "exotic_melee_weapon": {
                             "value": 0,
                             "values": [],
                             "weapons": [],
@@ -205,7 +205,7 @@
                             "mod": [],
                             "group": ""
                         },
-                        "exotic_range": {
+                        "exotic_ranged_weapon": {
                             "value": 0,
                             "values": [],
                             "weapons": [],
@@ -751,7 +751,7 @@
                             "mod": [],
                             "specs": []
                         },
-                        "pilot_water_craft": {
+                        "pilot_watercraft": {
                             "value": 0,
                             "attribute": "reaction",
                             "canDefault": false,
@@ -1053,7 +1053,7 @@
                 "body": 0,
                 "cosmetic": 0,
                 "electromagnetic": 0,
-                "power_train": 0,
+                "powertrain": 0,
                 "protection": 0,
                 "weapons": 0
             },   

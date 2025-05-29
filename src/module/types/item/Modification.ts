@@ -24,5 +24,5 @@ declare namespace Shadowrun {
 
     export type MountType = 'barrel' | 'stock' | 'top' | 'side' | 'internal' | '';
 
-    export type ModificationCategoryType = 'body' | 'cosmetic' | 'electromagnetic' | 'power_train' | 'protection' | 'weapons' | '';
+    export type ModificationCategoryType = 'body' | 'cosmetic' | 'electromagnetic' | 'powertrain' | 'protection' | 'weapons' | '';
 }
