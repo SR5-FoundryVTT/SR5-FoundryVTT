@@ -15,6 +15,40 @@
         "verified": "13.342",
         "maximum": "13"
     },
+    "documentTypes": {
+        "Actor": {
+            "character": {},
+            "critter": {},
+            "ic": {},
+            "spirit": {},
+            "sprite": {},
+            "vehicle": {}
+        },
+        "Item": {
+            "action": {},
+            "armor": {},
+            "adept_power": {},
+            "bioware": {},
+            "call_in_action": {},
+            "complex_form": {},
+            "contact": {},
+            "critter_power": {},
+            "cyberware": {},
+            "device": {},
+            "echo": {},
+            "equipment": {},
+            "host": {},
+            "lifestyle": {},
+            "metamagic": {},
+            "modification": {},
+            "program": {},
+            "quality": {},
+            "sin": {},
+            "spell": {},
+            "sprite_power": {},
+            "weapon": {}
+        }
+    },
     "scripts": [],
     "esmodules": ["dist/bundle.js"],
     "styles": ["dist/bundle.css"],
