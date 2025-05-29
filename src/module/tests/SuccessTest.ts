@@ -16,7 +16,6 @@ import OpposedTestData = Shadowrun.OpposedTestData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import ActionRollData = Shadowrun.ActionRollData;
 import MinimalActionData = Shadowrun.MinimalActionData;
-import ActionResultData = Shadowrun.ActionResultData;
 import ResultActionData = Shadowrun.ResultActionData;
 import { TestCreator } from "./TestCreator";
 import Template from "../template";
@@ -27,6 +26,7 @@ import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
+import { ActionResultType } from '../types/item/ActionModel';
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -1119,9 +1119,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Helper to get an items action result information.
      */
-    get results(): ActionResultData | undefined {
-        if (!this.item) return;
-        return this.item.getActionResult();
+    get results(): ActionResultType | undefined {
+        return this.item?.getActionResult();
     }
 
     /**

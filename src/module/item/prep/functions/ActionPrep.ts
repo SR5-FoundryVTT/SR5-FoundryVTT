@@ -1,3 +1,4 @@
+import { ActionRollType } from 'src/module/types/item/ActionModel';
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import { SR5Item } from './../../SR5Item';
@@ -12,7 +13,7 @@ export const ActionPrep = {
      * @param equippedMods Equipped modifications on that item.
      * @param equippedAmmo Equipped ammunition on that item.
      */
-    prepareData(action: Shadowrun.ActionRollData, item: SR5Item, equippedMods: SR5Item[], equippedAmmo?: SR5Item) {
+    prepareData(action: ActionRollType, item: SR5Item, equippedMods: SR5Item[], equippedAmmo?: SR5Item) {
         ActionPrep.clearMods(action);
         ActionPrep.prepareDamageSource(action, item);
         ActionPrep.prepareWithMods(action, equippedMods);
@@ -24,7 +25,7 @@ export const ActionPrep = {
      * 
      * @param action The ActionRollData to alter.
      */
-    clearMods(action: Shadowrun.ActionRollData) {
+    clearMods(action: ActionRollType) {
         action.alt_mod = 0;
         action.limit.mod = [];
         action.damage.mod = [];

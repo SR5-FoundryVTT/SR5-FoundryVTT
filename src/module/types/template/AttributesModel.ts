@@ -16,17 +16,19 @@ const EdgeAttributeField = () => ({
 });
 
 export const Attributes = () => ({
-    body: new SchemaField(AttributeField(), {required: true}),
-    agility: new SchemaField(AttributeField(), {required: true}),
-    reaction: new SchemaField(AttributeField(), {required: true}),
-    strength: new SchemaField(AttributeField(), {required: true}),
-    willpower: new SchemaField(AttributeField(), {required: true}),
-    logic: new SchemaField(AttributeField(), {required: true}),
-    intuition: new SchemaField(AttributeField(), {required: true}),
-    charisma: new SchemaField(AttributeField(), {required: true}),
-    magic: new SchemaField(AttributeField(), {required: true}),
-    resonance: new SchemaField(AttributeField(), {required: true}),
-    essence: new SchemaField(AttributeField(), {required: true}),
+    body: new SchemaField(AttributeField(), { required: true }),
+    agility: new SchemaField(AttributeField(), { required: true }),
+    reaction: new SchemaField(AttributeField(), { required: true }),
+    strength: new SchemaField(AttributeField(), { required: true }),
+    willpower: new SchemaField(AttributeField(), { required: true }),
+    logic: new SchemaField(AttributeField(), { required: true }),
+    intuition: new SchemaField(AttributeField(), { required: true }),
+    charisma: new SchemaField(AttributeField(), { required: true }),
+    magic: new SchemaField(AttributeField(), { required: true }),
+    resonance: new SchemaField(AttributeField(), { required: true }),
+    essence: new SchemaField(AttributeField(), { required: true }),
 
     edge: new SchemaField(EdgeAttributeField(), { required: true}),
 });
+
+export type AttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof Attributes>>;

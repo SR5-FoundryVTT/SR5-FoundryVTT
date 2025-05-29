@@ -56,3 +56,5 @@ export const KeyValuePair = () => ({
     key: new StringField({ required: true, initial: '' }),
     value: new StringField({ required: true, initial: '' }),
 });
+
+export type ModifiableValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValue>>;

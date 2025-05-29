@@ -18,13 +18,10 @@ import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
 import ConditionData = Shadowrun.ConditionData;
-import ActionRollData = Shadowrun.ActionRollData;
 import AmmoData = Shadowrun.AmmoData;
 import RangeWeaponData = Shadowrun.RangeWeaponData;
 import SpellRange = Shadowrun.SpellRange;
 import CritterPowerRange = Shadowrun.CritterPowerRange;
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ActionResultData = Shadowrun.ActionResultData;
 import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import RollEvent = Shadowrun.RollEvent;
@@ -49,6 +46,7 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+import { ActionResultType, ActionRollType } from '../types/item/ActionModel';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -113,7 +111,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
 
     private get wrapper(): SR5ItemDataWrapper {
         // we need to cast here to unknown first to make ts happy
-        return new SR5ItemDataWrapper(this as unknown as ShadowrunItemData);
+        return new SR5ItemDataWrapper(this);
     }
 
     // Flag Functions
@@ -380,7 +378,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     }
 
     getEquippedMods(): SR5Item<'modification'>[] {
-        return this.items.filter((item) => item.isWeaponModification() && item.isEquipped());
+        return this.items.filter((item) => item.isWeaponModification() && item.isEquipped()) as SR5Item<'modification'>[];
     }
 
     get hasExplosiveAmmo(): boolean {
@@ -498,7 +496,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         });
 
         if (!ammo) return;
-        await ammo.update({ 'system.technology.quantity': Math.max(0, Number(ammo.system.technology?.quantity) - reloadedBullets) });
+        await ammo.update({ system: { technology: { quantity: Math.max(0, Number(ammo.system.technology?.quantity) - reloadedBullets) } } });
     }
 
     async equipNestedItem(id: string, type: string, options: { unequipOthers?: boolean, toggle?: boolean } = {}) {
@@ -619,10 +617,12 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         }];
     }
 
-    getActionResult(): ActionResultData | undefined {
-        if (!this.isType('action')) return;
-
-        return this.wrapper.getActionResult();
+    /**
+     * Retrieve the action result for this item if it is of type 'action'.
+     * @returns The action result, or undefined if not applicable.
+     */
+    getActionResult(): ActionResultType | undefined {
+        return this.isType('action') ? this.system.result : undefined;
     }
 
     /**
@@ -800,8 +800,9 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return !!action.damage.type.base;
     }
 
-    getAction(): ActionRollData | undefined {
-        return this.wrapper.getAction();
+    getAction(): ActionRollType | undefined {
+        //@ts-expect-error foundry-vtt-types v13 bug
+        return 'action' in this.system ? this.system.action : undefined;
     }
 
     getExtended(): boolean {

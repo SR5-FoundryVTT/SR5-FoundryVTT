@@ -1,13 +1,9 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { BaseValuePair, ModifiableValue } from "./BaseModel";
-
-const ActorArmorData = () => ({
-    ...ModifiableValue(),
-    label: new StringField({ require: true, initial: '' }),
-});
+import { ModifiableValue } from "./BaseModel";
 
 export const ActorArmor = () => ({
-    ...ActorArmorData(),
+    ...ModifiableValue(),
+    label: new StringField({ require: true, initial: '' }),
     fire: new NumberField({ required: true, nullable: false, initial: 0 }),
     electric: new NumberField({ required: true, nullable: false, initial: 0 }),
     cold: new NumberField({ required: true, nullable: false, initial: 0 }),

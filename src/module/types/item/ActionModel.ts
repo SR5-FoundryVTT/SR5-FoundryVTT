@@ -78,3 +78,6 @@ export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, It
 };
 
 console.log("ActionData", ActionData, new Action());
+
+export type ActionRollType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionRollData>>;
+export type ActionResultType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionResultData>>;

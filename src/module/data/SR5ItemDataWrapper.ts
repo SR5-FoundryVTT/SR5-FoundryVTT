@@ -1,7 +1,6 @@
 import { DataWrapper } from './DataWrapper';
 import ConditionData = Shadowrun.ConditionData;
 import ModList = Shadowrun.ModList;
-import ActionRollData = Shadowrun.ActionRollData;
 import SpellData = Shadowrun.SpellData;
 import TechnologyData = Shadowrun.TechnologyData;
 import CritterPowerRange = Shadowrun.CritterPowerRange;
@@ -14,9 +13,6 @@ import ActionResultData = Shadowrun.ActionResultData;
 import AmmunitionData = Shadowrun.AmmunitionData;
 import WeaponData = Shadowrun.WeaponData;
 import DeviceData = Shadowrun.DeviceData;
-import AmmoData = Shadowrun.AmmoData;
-import SpritePowerData = Shadowrun.SpritePowerData;
-import CritterPowerData = Shadowrun.CritterPowerData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
@@ -205,14 +201,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.isAction() && this.getData().result.success.matrix.placeMarks;
     }
 
-    isSin(): boolean {
-        return this.data.type === 'sin';
-    }
-
-    isLifestyle(): boolean {
-        return this.data.type === 'lifestyle';
-    }
-
     getId(): string {
         // @ts-expect-error // TODO: Foundry Where is my foundry base data?
         return this.data._id;
@@ -319,10 +307,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
     isAction(): boolean {
         return this.data.type === 'action';
-    }
-
-    getAction(): ActionRollData|undefined {
-        return this.getData().action;
     }
 
     getActionDicePoolMod(): number | undefined {
