@@ -56,14 +56,14 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('monitor calculation', async () => {
-            const actor = await testActor.create({ type: 'character' }) as SR5Actor;
+            const actor = await testActor.create({ type: 'character', system: {attributes: {willpower: {base: 1}, body: {base: 1}}} }) as SR5Actor;
 
             let character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
             // Check default values.
             assert.strictEqual(character.system.track.stun.max, 9); // 8 + round_up(1 / 2)
             assert.strictEqual(character.system.track.physical.max, 9); // 8 + round_up(1 / 2)
-            assert.strictEqual(character.system.track.physical.overflow.max, SR.attributes.ranges.body.min); // body value
+            assert.strictEqual(character.system.track.physical.overflow.max, 1); // body value
 
             // Check calculated values after update.
             await actor.update({
@@ -91,7 +91,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('initiative calculation', async () => {
-            const actor = await testActor.create({ type: 'character' }) as SR5Actor;
+            const actor = await testActor.create({ type: 'character', system: {attributes: {reaction: {base: 1}, intuition: {base: 1}}} }) as SR5Actor;
 
             const character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
@@ -163,7 +163,16 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('limit calculation', async () => {
-            const actor = await testActor.create({ type: 'character' }) as SR5Actor;
+            const actor = await testActor.create({ type: 'character', system: {
+                attributes: {
+                    reaction: {base: 1}, 
+                    intuition: {base: 1}, 
+                    strength: {base: 1}, 
+                    body: {base: 1}, 
+                    logic: {base: 1}, 
+                    willpower: {base: 1}, 
+                    charisma: {base: 1}, 
+                    essence: {base: 1}}} }) as SR5Actor;
 
             let character = actor.asCharacter() as Shadowrun.CharacterActorData;
 
@@ -190,7 +199,9 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('movement calculation', async () => {
-            const actor = await testActor.create({ type: 'character' }) as SR5Actor;
+            const actor = await testActor.create({ type: 'character', system: {
+                attributes: {
+                    agility: {base: 1}}} }) as SR5Actor;
 
             let character = actor.asCharacter() as Shadowrun.CharacterActorData;
 

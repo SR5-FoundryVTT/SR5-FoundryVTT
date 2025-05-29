@@ -5,6 +5,7 @@ import { ActionFlow } from "../item/flows/ActionFlow";
 import { createTagifyOnInput } from "../utils/sheets";
 import { Translation } from "../utils/strings";
 import { SR5ActiveEffect } from "./SR5ActiveEffect";
+import { ActiveEffectConfigV1 } from "./ActiveEffectConfigV1";
 
 /**
  * Shadowrun system alters some behaviors of Active Effects, making a custom ActiveEffectConfig necessary.
@@ -28,8 +29,10 @@ import { SR5ActiveEffect } from "./SR5ActiveEffect";
  * While actors apply effects as part of their prepareData flow the modifier apply-to target applies effects as part of the calculation of their
  * situational modifiers and others still can behave differently.
  */
-export class SR5ActiveEffectConfig extends ActiveEffectConfig {
+export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
     override object: SR5ActiveEffect;
+    // @ts-expect-error Foundry v13 This is not type issue, but a type override for legacy Application v1 support...
+    override document: SR5ActiveEffect;
 
     override get template(): string {
         return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';

@@ -94,7 +94,6 @@ export class HooksManager {
         Hooks.on('canvasInit', canvasInit.bind(HooksManager));
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
-        Hooks.on('renderSceneControls', HooksManager.renderSceneControls.bind(HooksManager));
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(HooksManager));
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory.bind(HooksManager));
@@ -412,26 +411,20 @@ ___________________
         }
     }
 
-    static renderSceneControls(controls, html) {
-        html.find('[data-tool="overwatch-score-tracker"]').on('click', (event) => {
-            event.preventDefault();
-            new OverwatchScoreTracker().render(true);
-        });
-    }
-
     static getSceneControlButtons(controls) {
-        const tokenControls = controls.find((c) => c.name === 'token');
-
         if (game.user?.isGM) {
-            tokenControls.tools.push({
+            const overwatchScoreTrackControl = { 
                 name: 'overwatch-score-tracker',
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',
                 icon: 'fas fa-network-wired',
-                button: true
-            });
+                button: true,
+                onClick: () => new OverwatchScoreTracker().render(true)
+            };
+            controls.tokens.tools[overwatchScoreTrackControl.name] = overwatchScoreTrackControl;
         }
 
-        tokenControls.tools.push(SituationModifiersApplication.getControl());
+        const situationModifiersControl = SituationModifiersApplication.getControl();
+        controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
     }
 
     /**
@@ -445,25 +438,33 @@ ___________________
         console.debug('Shadowrun5e | Registering new chat messages related hooks');
     }
 
-    static renderActorDirectory(app: Application, html: JQuery) {
+    static renderActorDirectory(app: Application, html: HTMLElement) {
         if(!game.user?.isGM){
             return 
         }
         
         const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
-        html.find('footer').before(button);
+        $(html).find('footer').before(button);
         button.on('click', (event) => {
             new Import().render(true);
         });
     }
 
-    static renderItemDirectory(app: Application, html: JQuery) {
-        if (!game.user?.isGM) {
-            return
+    /**
+     * Extend rendering of Sidebar tab 'ItemDirectory' by
+     * - the Chummer Item Import button
+     * 
+     * @param app Foundry ItemDirectory app instance
+     * @param html HTML element of the app
+     * @returns 
+     */
+    static renderItemDirectory(app: Application, html: HTMLElement) {
+        if(!game.user?.isGM){
+            return 
         }
 
         const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
-        html.find('footer').before(button);
+        $(html).find('footer').before(button);
         button.on('click', (event) => {
             new Import().render(true);
         });

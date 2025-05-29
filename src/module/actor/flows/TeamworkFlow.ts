@@ -15,9 +15,9 @@ export class TeamworkTest {
     
     static async chatLogListeners(chatLog: ChatLog, html) {
          // setup chat listener messages for each message as some need the message context instead of chatlog context.
-         html.find('.chat-message').each(async (index, element) => {
-            element = $(element);
-            const id = element.data('messageId');
+         // @ts-expect-error TODO: querySelectorAll?
+         $(html).find('.chat-message').each(async (index, element) => {
+            const id = $(element).data('messageId');
             const message = game.messages?.get(id);
             if (!message) return;
 
@@ -26,11 +26,11 @@ export class TeamworkTest {
     }
 
     static async chatMessageListeners(message: ChatMessage, html) {
-        if( !html.find('.sr5-teamwork-addparticipant'))
-            return;
+        html = $(html);
+        if( !html?.find('.sr5-teamwork-addparticipant') ) return;
 
-        html.find('.sr5-teamwork-addparticipant').on('click', async _ => await this.addParticipant(message));
-        html.find('.sr5-teamwork-start').on('click', async _ => await this.rollTeamworkTest(message));
+        $(html).find('.sr5-teamwork-addparticipant').on('click', async _ => await this.addParticipant(message));
+        $(html).find('.sr5-teamwork-start').on('click', async _ => await this.rollTeamworkTest(message));
     }
 
     /**

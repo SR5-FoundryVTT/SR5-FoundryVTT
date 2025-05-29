@@ -86,12 +86,14 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.deepEqual(actor.system.attributes.body.mod, []);
             assert.strictEqual(actor.system.attributes.body.value, 3);
 
-            // Agility should be overwritten as a object property without system behavior.
-            // However total will be calculated to be 1 again due to the systems ValueField flow
+            // Foundry default behavior will overwrite the object property directly (4)
+            // Though the system ValueField flow will calculate it to be the attribut min. value again (0)
+            // as base is 0, no mods exist and no value override is set, due to the change targeting a property instead
+            // of the ValueField itself.
             assert.deepEqual(actor.system.attributes.agility.mod, []);
             assert.equal(actor.system.attributes.agility.override, undefined);
             assert.strictEqual(actor.system.attributes.agility.base, 0);
-            assert.strictEqual(actor.system.attributes.agility.value, 1);
+            assert.strictEqual(actor.system.attributes.agility.value, 0);
 
             // A ValueField value outside of value calculation should still work
             // Skill automatics normally can default, which we overwrite here.
@@ -450,7 +452,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(actor.system.attributes.body.value, 3);
         });
 
-        it('A wireless and equipped only effect should if it is disabled', async () => {
+        it('A wireless and equipped only effect should not apply if it the effec titself disabled', async () => {
             const actor = await testActor.create({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
                 { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: true } } },
@@ -464,8 +466,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 changes: [{ key: 'system.attributes.body', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
+            // The value will match the attribute min value (0) due to ValueField flow.
             assert.lengthOf(actor.system.attributes.body.mod, 0);
-            assert.equal(actor.system.attributes.body.value, 1);
+            assert.equal(actor.system.attributes.body.value, 0);
         });
 
         it('A extended test should not apply effects on extended rolls', async () => {
