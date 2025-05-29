@@ -35,7 +35,7 @@ export const registerSystemSettings = () => {
             'EUCL': 'SETTINGS.Euclidean',
         },
         onChange: async () => {
-            if (canvas === undefined || !canvas.ready) return;
+            if (!canvas.ready) return;
             await canvas.scene?.view(); // Re-renders the whole scene canvas
         }
     });

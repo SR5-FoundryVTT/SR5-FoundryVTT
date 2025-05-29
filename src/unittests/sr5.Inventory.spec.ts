@@ -22,7 +22,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
     describe('InventoryFlow testing', () => {
         it('create a new inventory and know of its existance', async () => {
-            const actor = await testActor.create({ type: 'character' });
+            const actor = new SR5Actor<'character'>({ type: 'character' });
 
             await actor.inventory.create('test');
 
@@ -34,20 +34,22 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
             });
 
             assert.strictEqual(actor.inventory.exists('test'), true);
+            await actor.delete();
         });
 
         it('remove an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = await testActor.create({ 'type': 'character', 'system.inventories': inventoriesData });
+            const actor = new SR5Actor<'character'>({ type: 'character', system: { inventories: inventoriesData } });
 
             await actor.inventory.remove('test');
 
             assert.notExists(actor.system.inventories['test']);
+            await actor.delete();
         });
 
         it('add and remove an item to and from an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = await testActor.create({ 'type': 'character', 'system.inventories': inventoriesData });
+            const actor = new SR5Actor<'character'>({ type: 'character', system: { inventories: inventoriesData } });
             const item = await actor.createEmbeddedDocuments('Item', [{ type: 'weapon', name: 'Test Weapon' }]);
 
             await actor.inventory.addItems('test', item);
@@ -56,11 +58,12 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
             await actor.inventory.removeItem(item[0]);
             assert.deepEqual(actor.system.inventories.test.itemIds, []);
+            await actor.delete();
         });
 
         it('rename an existing inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: ['notAnItemId'] } };
-            const actor = await testActor.create({ 'type': 'character', 'system.inventories': inventoriesData });
+            const actor = new SR5Actor<'character'>({ type: 'character', system: { inventories: inventoriesData } });
 
             const before = 'test';
             const after = 'betterTest';
@@ -73,10 +76,11 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
                 label: after,
                 itemIds: ['notAnItemId'],
             });
+            await actor.delete();
         });
 
         it('create and rename an inventory including prohibited foundry chars', async () => {
-            const actor = await testActor.create({ type: 'character' });
+            const actor = new SR5Actor<'character'>({ type: 'character' });
 
             await actor.inventory.create('Test.');
 
@@ -106,6 +110,8 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
                 label: 'Fisch',
                 itemIds: [],
             });
+
+            await actor.delete();
         });
     });
 };

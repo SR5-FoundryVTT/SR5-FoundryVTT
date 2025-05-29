@@ -23,41 +23,46 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {
-           const actionData = {
-                'system.action.test': 'SuccessTest',
-                'type': 'action',
-                'system.action.type': 'simple',
-                'system.action.attribute': 'body',
-                'system.action.skill': 'automatics',
-                'system.action.spec': false,
-                'system.action.limit': {
-                    base: 1,
-                    value: 1,
-                    attribute: 'physical',
+            const action = new SR5Item<'action'>({
+                type: 'action',
+                system: {
+                    action: {
+                        test: 'SuccessTest',
+                        type: 'simple',
+                        attribute: 'body',
+                        skill: 'automatics',
+                        spec: false,
+                        limit: {
+                            base: 1,
+                            value: 1,
+                            attribute: 'physical',
+                        },
+                        threshold: {
+                            base: 1,
+                            value: 1,
+                        },
+                        damage: {
+                            ap: { value: 5, base: 5, mod: [] },
+                            attribute: "",
+                            base: 5,
+                            base_formula_operator: "add",
+                            element: { value: '', base: '' },
+                            itemSource: { actorId: '', itemId: '', itemType: '', itemName: '' },
+                            mod: [],
+                            type: { value: 'physical', base: 'physical' },
+                            value: 5
+                        }
+                    }
                 },
-                'system.action.threshold': {
-                    base: 1,
-                    value: 1,
-                },
-                'system.action.damage': {
-                    ap: {value: 5, base: 5, mod: Array(0)},
-                    attribute: "",
-                    base: 5,
-                    base_formula_operator: "add",
-                    element: {value: '', base: ''},
-                    itemSource: {actorId: '', itemId: '', itemType: '', itemName: ''},
-                    mod: [],
-                    type: {value: 'physical', base: 'physical'},
-                    value: 5
+            });
+
+            const actor = new SR5Actor<'character'>({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 5 } },
+                    skills: { active: { automatics: { base: 45 } } }
                 }
-            };
-
-            const action = await testItem.create(actionData);
-
-            const actorData = {'type': 'character',
-                               'system.attributes.body.base': 5,
-                               'system.skills.active.automatics.base': 45};
-            const actor = await testActor.create(actorData);
+            });
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 
@@ -74,6 +79,9 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
                 // TODO: Implement mocking for SR5Roll to test none-random results
             }
+
+            await action.delete();
+            await actor.delete();
         });
 
         it('evaluate a roll from simple pool data', async () => {
@@ -84,46 +92,52 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('evaluate an opposed roll from a opposed action', async () => {
-            const actionData = {
-                'type': 'action',
-                'data.action.test': 'SuccessTest',
-
-                'data.action.type': 'simple',
-                'data.action.attribute': 'body',
-                'data.action.skill': 'automatics',
-                'data.action.spec': false,
-                'data.action.limit': {
-                    base: 1,
-                    value: 1,
-                    attribute: 'physical',
-                },
-                'data.action.threshold': {
-                    base: 1,
-                    value: 1,
-                },
-                'data.action.opposed': {
-                    "type": "custom",
-                    // TODO: This could maybe simply be SuccessTest?
-                    "test": "OpposedTest",
-                    "attribute": "reaction",
-                    "attribute2": "intuition",
-                    "skill": "",
-                    "mod": 0,
-                    "description": ""
+            const action = new SR5Item<'action'>({
+                type: 'action',
+                system: {
+                    action: {
+                        test: 'SuccessTest',
+                        type: 'simple',
+                        attribute: 'body',
+                        skill: 'automatics',
+                        spec: false,
+                        limit: {
+                            base: 1,
+                            value: 1,
+                            attribute: 'physical',
+                        },
+                        threshold: {
+                            base: 1,
+                            value: 1,
+                        },
+                        opposed: {
+                            type: 'custom',
+                            test: 'OpposedTest',
+                            attribute: 'reaction',
+                            attribute2: 'intuition',
+                            skill: '',
+                            mod: 0,
+                            description: ''
+                        }
+                    }
                 }
-            };
-
-            const action = await testItem.create(actionData);
-            const actorData = {'type': 'character',
-                               'data.attributes.body.base': 5,
-                               'data.skills.active.automatics.base': 45};
-            const actor = await testActor.create(actorData);
+            });
+            const actor = new SR5Actor<'character'>({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 5 } },
+                    skills: { active: { automatics: { base: 45 } } }
+                }
+            });
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 
             if (test) {
                 await test.toMessage();
             }
+
+            await action.delete();
+            await actor.delete();
         });
     });
 

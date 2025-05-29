@@ -84,9 +84,9 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
     async setOverwatchScore(value) {
         const num = parseInt(value);
-        if (!isNaN(num)) {
+        if (!isNaN(num))
             return this.setFlag(SYSTEM_NAME, 'overwatchScore', num);
-        }
+        return;
     }
 
     /**
@@ -232,7 +232,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * NOTE: This method is unused at the moment, keep it for future inspiration.
      */
     applyOverrideActiveEffects() {
-        const changes = this.effects.reduce((changes: ChangeData[], effect) => {
+        const changes = this.effects.reduce((changes: AEChangeData[], effect) => {
             if (effect.disabled) return changes;
 
             // include changes partially matching given keys.
@@ -251,7 +251,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
             return changes.concat(overrideChanges);
         }, []);
         // Sort changes according to priority, in case it's ever needed.
-        changes.sort((a, b) => a.priority - b.priority);
+        changes.sort((a, b) => a.priority! - b.priority!);
 
         for (const change of changes) {
             change.effect.apply(this, change);
@@ -272,7 +272,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * A helper method to apply a active effect changes collection (which might come from multiple active effects)
      * @param changes
      */
-    _applyActiveEffectChanges(changes: EffectChangeData[]) {
+    _applyActiveEffectChanges(changes: AEChangeData[]) {
         const overrides = {};
 
         for (const change of changes) {
@@ -309,7 +309,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
             return changes.concat(overrideChanges);
         }, []);
         // Sort changes according to priority, in case it's ever needed.
-        changes.sort((a, b) => a.priority - b.priority);
+        changes.sort((a, b) => a.priority! - b.priority!);
 
         return changes;
     }
@@ -374,7 +374,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         const uses = Math.min(edge.value, usesLeft + by);
 
-        await this.update({'system.attributes.edge.uses': uses});
+        await this.update({ system: { attributes: { edge: { uses } } } });
     }
 
     getEdge(): Shadowrun.EdgeAttributeField {
@@ -462,7 +462,6 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     get recoil(): number {
         if(!this.system.values.hasOwnProperty('recoil')) return 0;
-        //@ts-expect-error
         return this.system.values.recoil.value;
     }
 
@@ -580,7 +579,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         if ('networkController' in this.system) {
             this.system.networkController;
-            await this.update({ system: { 'networkController': networkController }});
+            await this.update({ system: { networkController }});
         }
     }
 
@@ -766,11 +765,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const id = randomID(16);
         const value = {};
         value[id] = skill;
-        const fieldName = `system.skills.knowledge.${category}.value`;
-        const updateData = {};
-        updateData[fieldName] = value;
-
-        await this.update(updateData);
+        await this.update({ system: { skills: { knowledge: { [category]: { value } } } } });
 
         return id;
     }
@@ -1281,8 +1276,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         condition = this.__addDamageToTrackValue(damage, condition);
 
-        const updateData = {['system.technology.condition_monitor']: condition};
-        await device.update(updateData);
+        await device.update({ system: { technology: { condition_monitor: condition } } });
     }
 
     /**
@@ -1306,8 +1300,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         // Apply damage to track and trigger derived value calculation.
         track = this.__addDamageToTrackValue(damage, track);
-        const updateData = {[`system.track.${damage.type.value}`]: track};
-        await this.update(updateData);
+        await this.update({ system: { track: { [damage.type.value]: track } } });
 
         // Apply any wounds modifier delta to an active combatant.
         const woundsAfter = this.getWoundModifier();
@@ -1335,8 +1328,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         overflow.value += damage.value;
         overflow.value = Math.min(overflow.value, overflow.max);
 
-        const updateData = {[`system.track.${damage.type.value}.overflow`]: overflow};
-        await this.update(updateData);
+        await this.update({ system: { track: { [damage.type.value]: { overflow } } } });
     }
 
     /**
@@ -1503,17 +1495,17 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         // If a matrix device is used, damage that instead of the actor.
         const device = this.getMatrixDevice();
         if (device) {
-            return await device.update({'system.technology.condition_monitor': track});
+            return await device.update({ system: { technology: { condition_monitor: track } } });
         }
 
         // IC actors use a matrix track.
         if (this.isType('ic')) {
-            return await this.update({'system.track.matrix': track});
+            return await this.update({ system: { track: { matrix: track } } });
         }
 
         // Emerged actors use a personal device like condition monitor.
         if (this.isMatrixActor) {
-            return await (this as SR5Actor).update({'system.matrix.condition_monitor': track});
+            return await this.update({ system: { matrix: { condition_monitor: track } } });
         }
         return;
     }
@@ -1735,13 +1727,12 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         // NOTE: In THEORY almost all actor types can drive a vehicle.
         // ... drek, in theory a drone could drive another vehicle even...
 
-        await this.update({'system.driver': driver.id});
+        await this.update({ system: { driver: driver.id } });
     }
 
     async removeVehicleDriver() {
         if (!this.isType('vehicle') || !this.hasDriver()) return;
-
-        await this.update({'system.driver': ''});
+        await this.update({ system: { driver: '' } });
     }
 
     hasDriver(): boolean {
@@ -1778,14 +1769,13 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
     async _updateICHostData(hostData: SR5Item<'host'>) {
         const updateData = {
-            // @ts-expect-error _id is missing on internal typing...
             id: hostData._id,
             rating: hostData.system.rating,
             atts: foundry.utils.duplicate(hostData.system.atts)
         }
 
         // Some host data isn't stored on the IC actor (marks) and won't cause an automatic render.
-        await this.update({'system.host': updateData}, {render: false});
+        await this.update({ system: { host: updateData } }, { render: false });
         await this.sheet?.render();
     }
 
@@ -1794,14 +1784,13 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     async removeICHost() {
         if (!this.isType('ic')) return;
-
         const updateData = {
             id: null,
             rating: 0,
             atts: null
         }
 
-        await this.update({'system.host': updateData});
+        await this.update({ system: { host: updateData } });
     }
 
     /**
@@ -1826,7 +1815,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     async addSummoner(actor: SR5Actor) {
         if (!this.isType('spirit') || !actor.isType('character')) return;
-        await this.update({ 'system.summonerUuid': actor.uuid });
+        await this.update({ system: { summonerUuid: actor.uuid } });
     }
 
     /**
@@ -1834,7 +1823,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     async removeSummoner() {
         if (!this.isType('spirit')) return;
-        await this.update({ 'system.summonerUuid': null });
+        await this.update({ system: { summonerUuid: null } });
     }
 
     /**
@@ -1843,7 +1832,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     async addTechnomancer(actor: SR5Actor) {
         if (!this.isType('sprite') || !actor.isType('character')) return;
-        await this.update({ 'system.technomancerUuid': actor.uuid });
+            await this.update({ system: { technomancerUuid: actor.uuid } });
     }
 
     /**
@@ -1851,7 +1840,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     async removeTechnomancer() {
         if (!this.isType('sprite')) return;
-        await this.update({ 'system.technomancerUuid': '' });
+            await this.update({ system: { technomancerUuid: '' } });
     }
     /** Check if this actor is of one or multiple given actor types
      *
@@ -1905,7 +1894,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
     async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
-        if (canvas === undefined || !canvas.ready) return;
+        if (!canvas.ready) return;
 
         if (this.isType('ic') && this.hasHost()) {
             return await this.getICHost()?.setMarks(target, marks, options);
@@ -1940,7 +1929,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
         matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
-        await this.update({'system.matrix.marks': matrixData.marks});
+        await this.update({ system: { matrix: { marks: matrixData.marks } } });
     }
 
     /**
@@ -1956,7 +1945,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
             updateData[`-=${markId}`] = null;
         }
 
-        await this.update({'system.matrix.marks': updateData});
+        await this.update({ system: { matrix: { marks: updateData } } });
     }
 
     /**
@@ -1968,7 +1957,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const updateData = {}
         updateData[`-=${markId}`] = null;
 
-        await this.update({'system.matrix.marks': updateData});
+        await this.update({ system: { matrix: { marks: updateData } } });
     }
 
     getAllMarks(): Shadowrun.MatrixMarks | undefined {
@@ -1990,7 +1979,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param options
      */
     getMarks(target: Token, item?: SR5Item, options?: { scene?: Scene }): number {
-        if (canvas === undefined || !canvas.ready) return 0;
+        if (!canvas.ready) return 0;
         if (target instanceof SR5Item) {
             console.error('Not yet supported');
             return 0;
@@ -2062,7 +2051,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         if (!automateDefenseMod || !this.combatActive) return;
 
         const multiDefenseModi = CombatRules.defenseModifierForPreviousAttacks(previousAttacks + 1);
-        await this.update({'system.modifiers.multi_defense': multiDefenseModi});
+        await this.update({ system: { modifiers: { multi_defense: multiDefenseModi } } });
     }
 
     /**
@@ -2075,7 +2064,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         if (this.system.modifiers.multi_defense === 0) return;
 
         console.debug('Shadowrun 5e | Removing consecutive defense modifier.', this);
-        await this.update({'system.modifiers.multi_defense': 0});
+        await this.update({ system: { modifiers: { multi_defense: 0 } } });
     }
 
     /**
@@ -2168,10 +2157,5 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         }));
 
         await this.updateEmbeddedDocuments('Item', updateData);
-    }
-
-    override async update(data, options?): Promise<this> {
-        // @ts-expect-error
-        return await super.update(data, options);
     }
 }

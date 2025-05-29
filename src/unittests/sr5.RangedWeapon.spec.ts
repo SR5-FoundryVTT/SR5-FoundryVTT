@@ -32,7 +32,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
         const item = items[0] as SR5Item<'weapon'>;
         // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}) as SR5Item;
         //@ts-expect-error
-        const ammoItem = new SR5Item({type: 'ammo', name: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}}, {parent: item});
+        const ammoItem = new SR5Item<'ammo'>({type: 'ammo', name: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}}, {parent: item});
         await item.createNestedItem(ammoItem.toObject());
 
         // NOTE: I don't know why ammo is not equipped when created as such... this can be removed, if that is fixed.

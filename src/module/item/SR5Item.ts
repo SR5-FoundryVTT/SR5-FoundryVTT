@@ -426,7 +426,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         if (!this.isType('weapon')) return;
 
         const value = Math.max(0, this.system.ammo.current.value - fired);
-        return await this.update({ 'system.ammo.current.value': value });
+        return await this.update({ system: { ammo: { current: { value } } } });
     }
 
     /**
@@ -453,9 +453,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     async reloadAmmo(partialReload: boolean) {
         const weapon = this.asType('weapon');
         if (!weapon) return;
-
-        // Reload this weapons ammunition to it's max capacity.
-        const updateData = {};
 
         // Prepare reloading by getting ammunition information.
         const ammo = this.getEquippedAmmo()!;
@@ -489,12 +486,16 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         // Prepare what can be reloaded.
         const reloadedBullets = Math.min(missingBullets, availableBullets, partialReload ? partialReloadBulletsNeeded : Infinity);
 
-
-        if (weapon.system.ammo.spare_clips.max > 0) {
-            updateData['system.ammo.spare_clips.value'] = Math.max(0, weapon.system.ammo.spare_clips.value - 1);
-        }
-        updateData['system.ammo.current.value'] = remainingBullets + reloadedBullets;
-        await this.update(updateData);
+        await this.update({
+            system: {
+                ammo: {
+                    ...(weapon.system.ammo.spare_clips.max > 0
+                        ? { spare_clips: { value: Math.max(0, weapon.system.ammo.spare_clips.value - 1) } }
+                        : {}),
+                    current: { value: remainingBullets + reloadedBullets }
+                }
+            }
+        });
 
         if (!ammo) return;
         await ammo.update({ 'system.technology.quantity': Math.max(0, Number(ammo.system.technology?.quantity) - reloadedBullets) });
@@ -544,7 +545,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
             description: '',
         });
 
-        await this.update({ 'system.licenses': licenses });
+        await this.update({ system: { licenses } });
     }
 
     isWeaponModification(): this is SR5Item<'modification'> & { system : { type: 'weapon' } } {
@@ -559,7 +560,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     async removeLicense(index) {
         if (this.isType('sin')) {
             const licenses = this.system.licenses.splice(index, 1);
-            await this.update({ 'system.licenses': licenses });
+            await this.update({ system: { licenses } });
         }
     }
 
@@ -602,7 +603,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     static getTargets() {
         if (!game.ready || !game.user) return;
         const { character } = game.user;
-        const { controlled } = canvas!.tokens!;
+        const { controlled } = canvas.tokens!;
         const targets = controlled.reduce<SR5Actor[]>((arr, t) => t.actor ? [...arr, t.actor] : arr, []);
         if (character instanceof SR5Actor && controlled.length === 0) targets.push(character);
         if (!targets.length) throw new Error(`You must designate a specific Token as the roll target`);
@@ -822,7 +823,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     }
 
     async setNetworkController(networkController: string | undefined): Promise<void> {
-        await this.update({ 'system.technology.networkController': networkController });
+        await this.update({ system: { technology: { networkController } } });
     }
 
     getRange(): CritterPowerRange | SpellRange | RangeWeaponData | undefined {
@@ -973,7 +974,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     setSource(source: string) {
         //@ts-expect-error
         if (!this.system.description) this.system.description = { chat: '', source: '', value: '' };
-        this.update({ 'system.description.source': source });
+        this.update({ system: { description: { source } } });
         this.render(true);
     }
 
@@ -1111,7 +1112,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         });
         host.system.ic.push(sourceEntity);
 
-        await this.update({ 'system.ic': host.system.ic });
+        await this.update({ system: { ic: host.system.ic } });
     }
 
     /**
@@ -1127,7 +1128,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
 
         host.system.ic.splice(index, 1);
 
-        await this.update({ 'system.ic': host.system.ic });
+        await this.update({ system: { ic: host.system.ic } });
     }
 
     get _isNestedItem(): boolean {
@@ -1156,7 +1157,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return this;
     }
 
-    override async update(data, options?): Promise<this> {
+    override async update(data: Item.UpdateData | undefined, options?: Item.Database.UpdateOperation): Promise<this> {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem) {
             return this.updateNestedItem(data);
@@ -1179,7 +1180,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      *       SR5Item and SR5Actor.
      */
     async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
-        if (!canvas!.ready) return;
+        if (!canvas.ready) return;
 
         if (!this.isType('host')) {
             console.error('Only Host item types can place matrix marks!');
@@ -1187,7 +1188,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         }
 
         // Both scene and item are optional.
-        const scene = options?.scene || canvas!.scene as Scene;
+        const scene = options?.scene || canvas.scene as Scene;
         const item = options?.item;
 
         // Build the markId string. If no item has been given, there still will be a third split element.
@@ -1200,7 +1201,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
         host.system.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
-        await this.update({ 'system.marks': host.system.marks });
+        await this.update({ system: { marks: host.system.marks } });
     }
 
     getMarksById(markId: string): number {
@@ -1226,11 +1227,11 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      * @return Will always return a number. At least zero, for no marks placed.
      */
     getMarks(target: SR5Actor, item?: SR5Item, options?: { scene?: Scene }): number {
-        if (!canvas!.ready) return 0;
+        if (!canvas.ready) return 0;
         if (!this.isType('host')) return 0;
 
         // Scene is optional.
-        const scene = options?.scene || canvas!.scene as Scene;
+        const scene = options?.scene || canvas.scene as Scene;
         item = item || target.getMatrixDevice();
 
         const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);
@@ -1259,7 +1260,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
             updateData[`-=${markId}`] = null;
         }
 
-        await this.update({ 'system.marks': updateData });
+        await this.update({ system: { marks: updateData } });
     }
 
     /**
@@ -1271,7 +1272,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         const updateData = {}
         updateData[`-=${markId}`] = null;
 
-        await this.update({ 'system.marks': updateData });
+        await this.update({ system: { marks: updateData } });
     }
 
     /**

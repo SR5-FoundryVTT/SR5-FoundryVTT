@@ -24,7 +24,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
 
     describe('CharacterDataPrep', () => {
         it('default attribute values', async () => {
-            const character = await testActor.create({ type: 'character', 'system.metatype': 'human' }) as SR5Actor<'character'>;
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
 
             // Check for attribute min values;
             console.log('Physical attributes');
@@ -44,21 +44,33 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             console.log('Special special attributes');
             assert.strictEqual(character.system.attributes.resonance.value, SR.attributes.ranges['resonance'].min);
             assert.strictEqual(character.system.attributes.magic.value, SR.attributes.ranges['magic'].min);
+
+            await character.delete();
         });
 
 
         it('visibility checks', async () => {
-            const actor = await testActor.create({ type: 'character', 'system.metatype': 'human' });
-            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, true);
-            assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
-            assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
-            assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, true);
-            assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, true);
-            assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            assert.strictEqual(character.system.visibilityChecks.astral.hasAura, true);
+            assert.strictEqual(character.system.visibilityChecks.astral.astralActive, false);
+            assert.strictEqual(character.system.visibilityChecks.astral.affectedBySpell, false);
+            assert.strictEqual(character.system.visibilityChecks.meat.hasHeat, true);
+            assert.strictEqual(character.system.visibilityChecks.matrix.hasIcon, true);
+            assert.strictEqual(character.system.visibilityChecks.matrix.runningSilent, false);
+
+            await character.delete();
         });
 
         it('monitor calculation', async () => {
-            const character = await testActor.create({ type: 'character', system: {attributes: {willpower: {base: 1}, body: {base: 1}}} }) as SR5Actor<'character'>;
+            const character = new SR5Actor<'character'>({
+                type: 'character',
+                system: {
+                    attributes: {
+                        willpower: {base: 1},
+                        body: {base: 1}
+                    }
+                }
+            });
 
             // Check default values.
             assert.strictEqual(character.system.track.stun.max, 9); // 8 + round_up(1 / 2)
@@ -67,29 +79,49 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
 
             // Check calculated values after update.
             await character.update({
-                'system.attributes.body.base': 6,
-                'system.attributes.willpower.base': 6,
+                system: {
+                    attributes: {
+                        body: { base: 6 },
+                        willpower: { base: 6 }
+                    }
+                }
             });
 
             assert.strictEqual(character.system.track.stun.max, 11); // 8 + round_up(6 / 2)
             assert.strictEqual(character.system.track.physical.max, 11); // 8 + round_up(6 / 2)
             assert.strictEqual(character.system.track.physical.overflow.max, 6); // body value
+
+            character.delete();
         });
 
         it('Matrix condition monitor track calculation with modifiers', async () => {
-            const character = await testActor.create({ type: 'character', 'system.modifiers.matrix_track': 1 }) as SR5Actor<'character'>;
+            const character = new SR5Actor<'character'>({
+                type: 'character',
+                system: {modifiers: { matrix_track: 1 } }
+            });
+
             await character.createEmbeddedDocuments('Item', [{
-                'name': 'Commlink',
-                'type': 'device',
-                'system.category': 'commlink',
-                'system.technology.equipped': true
+                name: 'Commlink',
+                type: 'device',
+                system: {
+                    category: 'commlink',
+                    technology: { equipped: true }
+                }
             }]);
 
             assert.equal(character.system.matrix.condition_monitor.max, 10); // 9 + 1
         });
 
         it('initiative calculation', async () => {
-            const character = await testActor.create({ type: 'character', system: {attributes: {reaction: {base: 1}, intuition: {base: 1}}} }) as SR5Actor<'character'>;
+            const character = new SR5Actor<'character'>({
+                type: 'character',
+                system: {
+                    attributes: {
+                        reaction: {base: 1},
+                        intuition: {base: 1}
+                    }
+                }
+            });
 
             // Check default values.
             assert.strictEqual(character.system.initiative.meatspace.base.base, 2); // REA+INT
@@ -102,28 +134,31 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
 
             // Check calculated values.
             await character.update({
-                // Meatspace ini
-                'system.attributes.reaction.base': 6,
-                'system.attributes.intuition.base': 6, 
-                'system.modifiers.meat_initiative': 2, 
-                'system.modifiers.meat_initiative_dice': 1,
-
-                // Astral ini
-                'system.modifiers.astral_initiative': 2, 
-                'system.modifiers.astral_initiative_dice': 1,
-
-                // Matrix ini
-                'system.modifiers.matrix_initiative': 2, 
-                'system.modifiers.matrix_initiative_dice': 1,
+                system: {
+                    attributes: {
+                        reaction: { base: 6 },
+                        intuition: { base: 6 }
+                    },
+                    modifiers: {
+                        meat_initiative: 2,
+                        meat_initiative_dice: 1,
+                        astral_initiative: 2,
+                        astral_initiative_dice: 1,
+                        matrix_initiative: 2,
+                        matrix_initiative_dice: 1
+                    }
+                }
             });
 
             // Matrix ini - Cold SIM
             await character.createEmbeddedDocuments('Item', [{
-                'name': 'Commlink',
-                'type': 'device',
-                'system.category': 'commlink',
-                'system.technology.equipped': true,
-                'system.atts.att3.value': 6,
+                name: 'Commlink',
+                type: 'device',
+                system: {
+                    category: 'commlink',
+                    technology: { equipped: true },
+                    atts: { att3: { value: 6 } }
+                }
             }]);
 
             assert.strictEqual(character.system.initiative.meatspace.base.value, 14); // REA+INT
@@ -134,28 +169,27 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.initiative.astral.dice.value, 3);
 
             // Matrix ini - Hot SIM
-            await character.update({
-                'system.matrix.hot_sim': true
-            });
+            await character.update({ system: { matrix: { hot_sim: true } } });
 
             assert.strictEqual(character.system.initiative.matrix.dice.value, 5); // Cold SIM
 
 
             // Check for ini dice upper limits
             await character.update({
-                // Meatspace ini
-                'system.modifiers.meat_initiative_dice': 6,
-
-                // Astral ini
-                'system.modifiers.astral_initiative_dice': 6,
-
-                // Matrix ini
-                'system.modifiers.matrix_initiative_dice': 6,
+                system: {
+                    modifiers: {
+                        meat_initiative_dice: 6,
+                        astral_initiative_dice: 6,
+                        matrix_initiative_dice: 6
+                    }
+                }
             });
 
             assert.strictEqual(character.system.initiative.meatspace.dice.value, 5);
             assert.strictEqual(character.system.initiative.matrix.dice.value, 5);
             assert.strictEqual(character.system.initiative.astral.dice.value, 5);
+
+            character.delete();
         });
 
         it('limit calculation', async () => {
@@ -170,21 +204,25 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                     charisma: {base: 1}, 
                     essence: {base: 1}}}
                 }
-            ) as SR5Actor<'character'>;
+            );
 
             assert.strictEqual(character.system.limits.physical.value, 2); // (STR*2 + BOD + REA) / 3
             assert.strictEqual(character.system.limits.mental.value, 2);   // (LOG*2 + INT + WIL) / 3
             assert.strictEqual(character.system.limits.social.value, 3);   // (CHA*2 + WILL + ESS) / 3
 
             await character.update({
-                'system.attributes.strength.base': 6,
-                'system.attributes.body.base': 6,
-                'system.attributes.reaction.base': 6,
-                'system.attributes.logic.base': 6,
-                'system.attributes.intuition.base': 6,
-                'system.attributes.willpower.base': 6,
-                'system.attributes.charisma.base': 6,
-                'system.attributes.essence.base': 6,
+                system: {
+                    attributes: {
+                        strength: { base: 6 },
+                        body: { base: 6 },
+                        reaction: { base: 6 },
+                        logic: { base: 6 },
+                        intuition: { base: 6 },
+                        willpower: { base: 6 },
+                        charisma: { base: 6 },
+                        essence: { base: 6 },
+                    }
+                }
             });
 
             assert.strictEqual(character.system.limits.physical.value, 8);
@@ -202,9 +240,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.movement.walk.value, 2); // AGI * 2
             assert.strictEqual(character.system.movement.run.value, 4);  // AGI * 4
 
-            await character.update({
-                'system.attributes.agility.base': 6
-            });
+            await character.update({ system: { attributes: { agility: { base: 6 } } } });
 
             assert.strictEqual(character.system.movement.walk.value, 12);
             assert.strictEqual(character.system.movement.run.value, 24);
@@ -213,9 +249,17 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         it('skill calculation', async () => {
             const character = await testActor.create({
                 type: 'character',
-                'system.skills.active.arcana.base': 6,
-                'system.skills.active.arcana.bonus': [{ key: 'Test', value: 1 }],
-                'system.skills.active.arcana.specs': ['Test']
+                system: {
+                    skills: {
+                        active: {
+                            arcana: {
+                                base: 6,
+                                bonus: [{ key: 'Test', value: 1 }],
+                                specs: ['Test']
+                            }
+                        }
+                    }
+                }
             }) as SR5Actor<'character'>;
 
             assert.strictEqual(character.system.skills.active.arcana.value, 7);
@@ -232,8 +276,12 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.wounds.value, 0);
 
             await character.update({
-                'system.track.stun.value': 3,
-                'system.track.physical.value': 3,
+                system: {
+                    track: {
+                        stun: { value: 3 },
+                        physical: { value: 3 }
+                    }
+                }
             });
 
             assert.strictEqual(character.system.track.stun.value, 3);
@@ -247,9 +295,15 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         it('damage application with low pain/wound tolerance', async () => {
             const character = await testActor.create({
                 type: 'character',
-                'system.track.stun.value': 6,
-                'system.track.physical.value': 6,
-                'system.modifiers.wound_tolerance': -1
+                system: {
+                    track: {
+                        stun: { value: 6 },
+                        physical: { value: 6 }
+                    },
+                    modifiers: {
+                        wound_tolerance: -1
+                    }
+                }
             }) as SR5Actor<'character'>;
 
             assert.strictEqual(character.system.track.stun.value, 6);
@@ -261,10 +315,16 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         it('damage application with high pain tolerance / damage compensators', async () => {
             const character = await testActor.create({
                 type: 'character',
-                'system.track.stun.value': 9,
-                'system.track.physical.value': 9,
-                'system.modifiers.pain_tolerance_stun': 3,
-                'system.modifiers.pain_tolerance_physical': 6
+                system: {
+                    track: {
+                        stun: { value: 9 },
+                        physical: { value: 9 }
+                    },
+                    modifiers: {
+                        pain_tolerance_stun: 3,
+                        pain_tolerance_physical: 6
+                    }
+                }
             }) as SR5Actor<'character'>;
 
             assert.strictEqual(character.system.track.stun.value, 9);
@@ -276,12 +336,17 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         it('damage application with high AND low pain to lerance / damage compensators', async () => {
             const character = await testActor.create({
                 type: 'character',
-                'system.track.stun.value': 9,
-                'system.track.physical.value': 9,
-                'system.modifiers.pain_tolerance_stun': 3,
-                'system.modifiers.pain_tolerance_physical': 6,
-                'system.modifiers.wound_tolerance': -1
-
+                system: {
+                    track: {
+                        stun: { value: 9 },
+                        physical: { value: 9 }
+                    },
+                    modifiers: {
+                        pain_tolerance_stun: 3,
+                        pain_tolerance_physical: 6,
+                        wound_tolerance: -1
+                    }
+                }
             }) as SR5Actor<'character'>;
 
             /**
@@ -306,7 +371,14 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('A NPC Grunt should only have physical track', async () => {
-            const character = await testActor.create({ type: 'character', 'system.is_npc': true, 'system.npc.is_grunt': true, 'system.attributes.willpower.base': 6}) as SR5Actor<'character'>;
+            const character = await testActor.create({
+                type: 'character',
+                system: {
+                    is_npc: true,
+                    npc: { is_grunt: true },
+                    attributes: { willpower: { base: 6 } }
+                }
+            }) as SR5Actor<'character'>;
             
             assert.strictEqual(character.system.track.stun.value, 0);
             assert.strictEqual(character.system.track.stun.disabled, true);

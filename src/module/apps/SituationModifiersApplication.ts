@@ -496,7 +496,7 @@ export class SituationModifiersApplication extends FormApplication {
         
         // For GMs try scene for no selection.
         if (!document && game.user?.isGM) {
-            document = canvas!.scene;
+            document = canvas.scene;
         } 
 
         // Try user character as last fallback.

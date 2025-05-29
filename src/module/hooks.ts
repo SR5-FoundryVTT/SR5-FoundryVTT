@@ -516,7 +516,7 @@ ___________________
      * @param id
      */
     static async updateIcConnectedToHostItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
-        if (canvas === undefined || !canvas.ready || !game.actors) return;
+        if (!canvas.ready || !game.actors) return;
 
         if (item.isType('host')) {
             // Collect actors from sidebar and active scene to update / rerender

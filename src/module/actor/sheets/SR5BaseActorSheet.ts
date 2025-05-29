@@ -419,7 +419,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Create drag data
         const dragData = {
             actorId: this.actor.id,
-            sceneId: this.actor.isToken ? canvas!.scene?.id : null,
+            sceneId: this.actor.isToken ? canvas.scene?.id : null,
             tokenId: this.actor.isToken ? this.actor.token?.id : null,
             type: '',
             data: {}

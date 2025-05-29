@@ -120,7 +120,7 @@ export default class Template extends MeasuredTemplate {
                 reject: reject
             };
 
-            const canvasElement = canvas!.app!.renderer!.view! as HTMLCanvasElement;
+            const canvasElement = canvas.app!.renderer!.view! as HTMLCanvasElement;
 
             // Use canvas.view to attach DOM events
             canvasElement.addEventListener("mousemove", this.#events.move);
@@ -140,7 +140,7 @@ export default class Template extends MeasuredTemplate {
         this.destroy();
 
         // Detach event listeners from the canvas DOM element
-        const canvasElement = canvas!.app!.renderer!.view! as HTMLCanvasElement;
+        const canvasElement = canvas.app!.renderer!.view! as HTMLCanvasElement;
         canvasElement.removeEventListener("mousemove", this.#events.move);
         canvasElement.removeEventListener("mousedown", this.#events.confirm);
         canvasElement.removeEventListener("contextmenu", this.#events.cancel);

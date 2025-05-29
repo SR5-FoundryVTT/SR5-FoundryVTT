@@ -468,7 +468,7 @@ export class Helpers {
      * @returns An array tokens.
      */
     static getTargetedTokens(): Token[] {
-        if (!canvas!.ready || !game.user) return [];
+        if (!canvas.ready || !game.user) return [];
 
         return Array.from(game.user.targets);
     }

@@ -22,42 +22,47 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
     
     describe('VehicleDataPrep', () => {
         it('Matrix condition monitor track calculation with modifiers', async () => {
-            const vehicle = await testActor.create({ type: 'vehicle' }) as SR5Actor<'vehicle'>;
+            const vehicle = new SR5Actor<'vehicle'>({ type: 'vehicle' });
             assert.equal(vehicle.system.matrix.condition_monitor.max, 8);
 
-            await vehicle.update({ 'system.modifiers.matrix_track': 1 });
+            await vehicle.update({ system: { modifiers: { matrix_track: 1 } } });
             assert.equal(vehicle.system.matrix.condition_monitor.max, 9);
 
             console.log('visibility checks');
 
+            await vehicle.delete();
         });
 
-        it('visibility checks', () => {
-            let actor = new SR5Actor({ "system.attributes.body.base": 5, name: 'Testing', type: 'vehicle' });
-            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, false);
-            assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
-            assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
-            assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, true);
-            assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, true);
-            assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
+        it('visibility checks', async () => {
+            const vehicle = new SR5Actor<'vehicle'>({ system: { attributes: { body: { base : 5 } } }, name: 'Testing', type: 'vehicle' });
+            assert.strictEqual(vehicle.system.visibilityChecks.astral.hasAura, false);
+            assert.strictEqual(vehicle.system.visibilityChecks.astral.astralActive, false);
+            assert.strictEqual(vehicle.system.visibilityChecks.astral.affectedBySpell, false);
+            assert.strictEqual(vehicle.system.visibilityChecks.meat.hasHeat, true);
+            assert.strictEqual(vehicle.system.visibilityChecks.matrix.hasIcon, true);
+            assert.strictEqual(vehicle.system.visibilityChecks.matrix.runningSilent, false);
+
+            await vehicle.delete();
         });
 
-        it('Recoil compensation', () => {
-            const vehicle = new SR5Actor<'vehicle'>({ "system.attributes.body.base": 5, name: 'Testing', type: 'vehicle' });
+        it('Recoil compensation', async () => {
+            const vehicle = new SR5Actor<'vehicle'>({ system: { attributes: { body: { base: 5 } } }, name: 'Testing', type: 'vehicle' });
             if (!vehicle) return assert.fail();
 
             assert.strictEqual(vehicle.system.values.recoil_compensation.value, 5); // SR5#175: 5
+
+            await vehicle.delete();
         });
 
         it('Attributes based on pilot', async () => {
             // Create temporary actor
-            const vehicle = await testActor.create({
+            const vehicle = new SR5Actor<'vehicle'>({
                 type: 'vehicle',
                 system: {
                     vehicle_stats: { pilot: { base: 3 } },
                     attributes: { body: { base: 5 } }
                 }
-            }) as SR5Actor<'vehicle'>;
+            });
 
             // Mental Attributes should be pilot. SR5#199
             assert.strictEqual(vehicle.system.attributes.willpower.value, 3);
@@ -74,6 +79,7 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
             // Strength should be body (when using a drone arm, Rigger50#125), we default to that...
             assert.strictEqual(vehicle.system.attributes.strength.value, 5);
 
+            await vehicle.delete();
         });
     });
 };
