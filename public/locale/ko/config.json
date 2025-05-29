@@ -104,7 +104,7 @@
             "TargetedActor": "목표 액터",
             "TestItem": "물품을 통한 판정"
         },
-				"CannotAddTestViaItemToActor": "액터에 '물품을 통한 판정' 종류의 액티브 이펙트 추가 불가",
+        "CannotAddTestViaItemToActor": "액터에 '물품을 통한 판정' 종류의 액티브 이펙트 추가 불가",
         "Modes": {
             "Modify": "수정"
         },
@@ -113,7 +113,7 @@
         "OnlyForItemTest": "상위 물품 판정에만 적용",
         "OnlyForWireless": "무선이 활성화된 경우에만 적용",
         "Test": {
-					  "ActionCategories": "행동 범주 필터",
+            "ActionCategories": "행동 범주 필터",
             "Attributes": "특성치 필터",
             "Limits": "한계치 필터",
             "Skills": "기술 필터",
@@ -235,13 +235,13 @@
     "SR5.Contact": {
         "Blackmail": "협박",
         "Connection": "영향력",
-				"DropActor": "해당 연줄과 연결할 액터 끌어서 놓기",
-        "Family": "가족",	
+        "DropActor": "해당 연줄과 연결할 액터 끌어서 놓기",
+        "Family": "가족",
         "Group": "그룹",
-				"LinkedActor": "액터",
+        "LinkedActor": "액터",
         "Loyalty": "친밀도",
         "Type": "유형"
-    },		
+    },
     "SR5.Contacts": "연줄",
     "SR5.Continue": "계속",
     "SR5.Cost": "비용",
@@ -308,7 +308,7 @@
     "SR5.DamageReplace": "피해 대체",
     "SR5.DamageType": "유형",
     "SR5.DamageValue": "피해량",
-		"SR5.DefaultCategoryVisibility": "비어있는 범주 보기",
+    "SR5.DefaultCategoryVisibility": "비어있는 범주 보기",
     "SR5.Defaulting": "무리",
     "SR5.Defender": "방어자",
     "SR5.DefenderNetHits": "방어자 순 성공횟수",
@@ -586,8 +586,8 @@
     "SR5.KnowledgeSkillStreet": "길거리 지식",
     "SR5.Labels": {
         "Action": {
-					  "ActiveTest": "판정",
-					  "Category": "범주",
+            "ActiveTest": "판정",
+            "Category": "범주",
             "DamageResistanceTest": "피해 저항 판정",
             "Modifier": "수정치",
             "Modifiers": "수정치",
@@ -599,7 +599,7 @@
             "CreateInventory": "물품 보관 장소 생성",
             "CritterPowers": "생명체 능력",
             "DeviceRating": "장치 등급",
-						"DisabledOptionCritterPowers": "추가 생명체 능력 - 사용 불가능",
+            "DisabledOptionCritterPowers": "추가 생명체 능력 - 사용 불가능",
             "DisabledOptionSpritePowers": "추가 요정 능력 - 사용 불가능",
             "EnabledOptionCritterPowers": "추가 생명체 능력 - 사용 가능",
             "EnabledOptionSpritePowers": "추가 요정 능력 - 사용 가능",
@@ -618,7 +618,7 @@
             "SpritePowers": "요정 능력",
             "TestKBoardModifiers": "{skip}: 결과창 생략. {descr}: 설명만 보임.",
             "VehicleConfiguration": "탑승물 설정"
-        },				
+        },
         "Inventory": {
             "All": "전체",
             "Carried": "소지",
@@ -848,7 +848,7 @@
     "SR5.Qty": "수량",
     "SR5.Quality": "특징",
     "SR5.QualityType": "유형",
-    "SR5.QualityTypeLifeModule": "인생 모듈",		
+    "SR5.QualityTypeLifeModule": "인생 모듈",
     "SR5.QualityTypeNegative": "부정적",
     "SR5.QualityTypePositive": "긍정적",
     "SR5.Quantity": "수량",
@@ -874,7 +874,7 @@
     "SR5.RollComposure": "평정심",
     "SR5.RollCustom": "맞춤 설정",
     "SR5.RollDefense": "방어",
-		"SR5.RollDrain": "드레인",
+    "SR5.RollDrain": "드레인",
     "SR5.RollFade": "페이드",
     "SR5.RollJudgeIntentions": "의심",
     "SR5.RollLiftCarry": "들기&운반",
@@ -1252,11 +1252,11 @@
             "OnlyForWireless": "무선 활성화 된 물품에만 효과가 적용됨"
         },
         "Item": {
-            "ActionCategories": "판정의 기본 범주 대신 사용할 행동 범주를 선택합니다. 액티브 이펙트를 사용하여 판정 수치를 수정하는데 범주를 사용 가능",					
+            "ActionCategories": "판정의 기본 범주 대신 사용할 행동 범주를 선택합니다. 액티브 이펙트를 사용하여 판정 수치를 수정하는데 범주를 사용 가능",
             "ActionModifier": "판정의 기본 수정치 대신 선택한 풀 수정치가 사용됨",
             "ActionRollMode": "이 행동을 시전 할 때 무리한 굴림 방식을 사용함. 전체 채팅 설정에 덮어 써짐.",
             "AmmoReplaceDamage": "무기 피해를 수정하는 대신 대체하도록 설정",
-            "DisabledForPreparedActor": "준비된 액터를 사용하기에 비활성화됨"					
+            "DisabledForPreparedActor": "준비된 액터를 사용하기에 비활성화됨"
         },
         "Modifiers": {
             "armor": "총 방어구 수치 수정",
@@ -1551,6 +1551,6 @@
     "TYPES.Item.sin": "SIN",
     "TYPES.Item.spell": "주문",
     "TYPES.Item.sprite_power": "요정 능력",
-		"TYPES.Item.vehicle": "탑승물",
+    "TYPES.Item.vehicle": "탑승물",
     "TYPES.Item.weapon": "무기"
 }

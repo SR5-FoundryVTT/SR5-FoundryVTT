@@ -112,9 +112,9 @@
     "SR5.Contact": {
         "SR5.Blackmail": "Chantagem",
         "SR5.Connection": "Conexao",
+        "SR5.ContactType": "Tipo",
         "SR5.Family": "Familia",
-        "SR5.Loyalty": "Lealdade",
-        "SR5.ContactType": "Tipo"
+        "SR5.Loyalty": "Lealdade"
     },
     "SR5.Contacts": "Contatos",
     "SR5.Continue": "Continuar",
