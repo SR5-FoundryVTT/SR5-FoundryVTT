@@ -44,15 +44,15 @@ module.exports = {
         "@typescript-eslint/explicit-function-return-type": "off", // Implicit type returns aren't a bad thing
         "@typescript-eslint/strict-boolean-expressions": "off", // I might turn this off.  Javascript's fluid truthiness logic is just too nice
         "@typescript-eslint/class-literal-property-style": "off", // SuccessTest implementation heavily uses this and I don't see the value of refactoring it, yet.
-        "@typescript-eslint/ban-ts-comment": "error",
+        "@typescript-eslint/ban-ts-comment": "warn", // With Foundry v13, this got a bit annoying: TODO: foundry-vtt-types v9
         "@typescript-eslint/no-unused-vars": "error",
         "prefer-const": "error",
         "@typescript-eslint/no-confusing-void-expression": "off", // I do like my if () return console.error() and similar statements...
-        "@typescript-eslint/no-misused-promises": "error",
+        "@typescript-eslint/no-misused-promises": "off", // With Foundry v13 and $(html) this caused issues on async callbacks
         "@typescript-eslint/prefer-optional-chain": "error",
         "@typescript-eslint/no-floating-promises": "off", // Allow executing async functions in a sync method, if async isn't needed.
         "no-case-declarations": "off", // We use this in switch / case and it does improve readability
-        "@typescript-eslint/promise-function-async": "error",
+        "@typescript-eslint/promise-function-async": "warn", // With Foundry v13 this caused a few issues, so I set it to warn for now.
         "@typescript-eslint/no-empty-interface": "error",
         "@typescript-eslint/consistent-indexed-object-style": "error",
         "@typescript-eslint/ban-types": "error", //Maybe this should be error?
