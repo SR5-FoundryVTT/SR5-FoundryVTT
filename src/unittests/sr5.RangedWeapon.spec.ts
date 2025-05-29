@@ -26,7 +26,10 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
     })
 
     const getWeaponWithEquippedAmmo = async (weaponAmmo: number, weaponAmmoMax: number, ammoQuantity: number) => {
-        const item = await testItem.create({type: 'weapon', system: {category: 'ranged', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}) as SR5Item;
+        const actor = await testActor.create({type: 'character', name: 'Test Character'});
+        const items = actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}]);
+        const item = items[0] as SR5Item;
+        // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}) as SR5Item;
         //@ts-expect-error
         const ammoItem = new SR5Item({type: 'ammo', name: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}}, {parent: item});
         await item.createNestedItem(ammoItem.toObject());
@@ -40,7 +43,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
     describe('Handle recoil, recoil compensation and recoil modifier', () => {
         it('Combine actor and item recoil compensation', async () => {
             // const actor = await testActor.create({type: 'character'});
-            // const item = await testItem.create({type: 'weapon', system: {category: 'ranged'}});
+            // const item = await testItem.create({type: 'weapon', system: {category: 'range'}});
             // const modification = new SR5Item({name: 'Mod', type: 'modification', system: {type: 'weapon', rc: 2}}, {parent: item});
             // //@ts-expect-error TODO: foundry-vtt-types v10
             // await item.createNestedItem(modification._source);
@@ -54,14 +57,20 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
         });
 
         it('Reload weapon causes reduction in available clips', async () => {
-            const item = await testItem.create({type: 'weapon', system: {category: 'ranged', ammo: {current: {value: 0, max: 30}, spare_clips: {value: 1, max: 1}}}}) as SR5Item;
+            const actor = await testActor.create({type: 'character', name: 'Test Character'});
+            const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}, spare_clips: {value: 1, max: 1}}}}]);
+            const item = items[0] as SR5Item;
+            // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}, spare_clips: {value: 1, max: 1}}}}) as SR5Item;
             assert.strictEqual(item.system.ammo?.spare_clips.value, 1);
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo?.spare_clips.value, 0);
         });
 
         it('Reloads weapon fully when no ammo is used', async () => {
-            const item = await testItem.create({type: 'weapon', system: {category: 'ranged', ammo: {current: {value: 0, max: 30}}}}) as SR5Item;
+            const actor = await testActor.create({type: 'character', name: 'Test Character'});
+            const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}]);
+            const item = items[0] as SR5Item;
+            // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}) as SR5Item;
             assert.strictEqual(item.system.ammo?.current.value, 0);
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo?.current.value, item.system.ammo?.current.max);

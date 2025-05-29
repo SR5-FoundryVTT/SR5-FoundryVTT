@@ -244,7 +244,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this.parent.isCritterPower && !this.parent.isEnabled()) return true;
         if (this.parent.isSpritePower && !this.parent.isEnabled()) return true;
 
-        return false; 
+        return false;
     }
 
     /**
@@ -344,11 +344,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             if (targetType === "Array") {
                 const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                delta = this._castArray(change.value, innerType);
+                delta = this.__castArray(change.value, innerType);
             }
-            //@ts-expect-error TODO: foundry-vtt-types v10
-            else delta = this._castDelta(change.value, targetType);
+            else delta = this.__castDelta(change.value, targetType);
         } catch (err) {
             console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
             return;
@@ -405,5 +403,62 @@ export class SR5ActiveEffect extends ActiveEffect {
         this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
 
         return data;
+    }
+    /**
+     * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
+   * Cast a raw EffectChangeData change string to an Array of an inner type.
+   * @param {string} raw      The raw string value
+   * @param {string} type     The target data type of inner array elements
+   * @returns {Array<*>}      The parsed delta cast as a typed array
+   */
+    __castArray(raw, type) {
+        let delta;
+        try {
+            delta = this.__parseOrString(raw);
+            delta = delta instanceof Array ? delta : [delta];
+        } catch (e) {
+            delta = [raw];
+        }
+        return delta.map(d => this.__castDelta(d, type));
+    }
+
+    /**
+     * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
+    * Cast a raw EffectChangeData change string to the desired data type.
+    * @param {string} raw      The raw string value
+    * @param {string} type     The target data type that the raw value should be cast to match
+    * @returns {*}             The parsed delta cast to the target data type
+    */
+    __castDelta(raw, type) {
+        let delta;
+        switch (type) {
+            case "boolean":
+                delta = Boolean(this.__parseOrString(raw));
+                break;
+            case "number":
+                delta = Number.fromString(raw);
+                if (Number.isNaN(delta)) delta = 0;
+                break;
+            case "string":
+                delta = String(raw);
+                break;
+            default:
+                delta = this.__parseOrString(raw);
+        }
+        return delta;
+    }
+
+    /**
+     * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
+     * Parse serialized JSON, or retain the raw string.
+     * @param {string} raw      A raw serialized string
+     * @returns {*}             The parsed value, or the original value if parsing failed
+     */
+    __parseOrString(raw) {
+        try {
+            return JSON.parse(raw);
+        } catch (err) {
+            return raw;
+        }
     }
 }
