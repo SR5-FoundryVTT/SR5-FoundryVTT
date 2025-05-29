@@ -70,10 +70,11 @@ const ActionData = {
     result: new SchemaField(ActionResultData()),
 };
 
-console.log("ActionData", ActionData);
 
 export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, Item.Implementation> {
     static override defineSchema() {
         return ActionData;
     }
 };
+
+console.log("ActionData", ActionData, new Action());

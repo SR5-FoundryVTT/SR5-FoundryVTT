@@ -8,6 +8,7 @@ export const DevicePartData = () => ({
     category: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['commlink', 'cyberdeck', 'rcc', 'host', ''],
     }),
     atts: new SchemaField(MatrixAttributes(), { required: true }),
@@ -21,10 +22,11 @@ const DeviceData = {
     ...ImportFlags(),
 };
 
-console.log("DeviceData", DeviceData);
 
 export class Device extends foundry.abstract.TypeDataModel<typeof DeviceData, Item.Implementation> {
     static override defineSchema() {
         return DeviceData;
     }
 }
+
+console.log("DeviceData", DeviceData, new Device());

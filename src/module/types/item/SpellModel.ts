@@ -4,6 +4,7 @@ const CombatSpellData = ()=> ({
     type: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['direct', 'indirect', '']
     }),
 });
@@ -12,6 +13,7 @@ const DetectionSpellData = () => ({
     type: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['directional', 'psychic', 'area', '']
     }),
     passive: new BooleanField({ required: true, initial: false }),
@@ -22,11 +24,13 @@ const IllusionSpellData = () => ({
     type: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['obvious', 'realistic', '']
     }),
     sense: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['single-sense', 'multi-sense', '']
     }),
 });
@@ -43,31 +47,36 @@ const RitualSpellData = () => ({
         type: new StringField({
             required: true,
             initial: '',
+            blank: true,
             choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter', '']
         }),
     }, { required: true }),
 });
 
-const SpellPartData = {
+const SpellData = {
     type: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['physical', 'mana', '']
     }),
     category: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['combat', 'detection', 'health', 'illusion', 'manipulation', 'ritual', '']
     }),
     drain: new NumberField({ required: true, initial: 0 }),
     range: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['touch', 'los', 'los_a', '']
     }),
     duration: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['instant', 'sustained', 'permanent', '']
     }),
 
@@ -79,10 +88,11 @@ const SpellPartData = {
     ritual: new SchemaField(RitualSpellData(), { required: true }),
 }
 
-console.log("SpellPartData", SpellPartData);
 
-export class Spell extends foundry.abstract.TypeDataModel<typeof SpellPartData, Item.Implementation> {
+export class Spell extends foundry.abstract.TypeDataModel<typeof SpellData, Item.Implementation> {
     static override defineSchema() {
-        return SpellPartData;
+        return SpellData;
     }
 }
+
+console.log("SpellPartData", SpellData, new Spell());

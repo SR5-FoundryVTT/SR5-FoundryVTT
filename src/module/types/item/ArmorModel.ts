@@ -23,10 +23,11 @@ const ArmorData = {
     ...TechnologyPartData(),
 };
 
-console.log("ArmorData", ArmorData);
 
 export class Armor extends foundry.abstract.TypeDataModel<typeof ArmorData, Item.Implementation> {
     static override defineSchema() {
         return ArmorData;
     }
 }
+
+console.log("ArmorData", ArmorData, new Armor());

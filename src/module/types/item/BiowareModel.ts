@@ -16,14 +16,16 @@ const BiowareData = {
     grade: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['alpha', 'beta', 'delta', 'gamma', ''],
     }),
 }
 
-console.log("BiowareData", BiowareData);
 
 export class Bioware extends foundry.abstract.TypeDataModel<typeof BiowareData, Item.Implementation> {
     static override defineSchema() {
         return BiowareData;
     }
 }
+
+console.log("BiowareData", BiowareData, new Bioware());

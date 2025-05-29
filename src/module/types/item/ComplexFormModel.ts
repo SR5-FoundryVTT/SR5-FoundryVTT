@@ -10,16 +10,18 @@ const ComplexFormData = {
     target: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['persona', 'device', 'file', 'self', 'sprite', 'other', ''],
     }),
     duration: new StringField({ required: true, initial: '' }),
     fade: new NumberField({ required: true, initial: 0 }),
 }
 
-console.log("ComplexFormData", ComplexFormData);
 
 export class ComplexForm extends foundry.abstract.TypeDataModel<typeof ComplexFormData, Item.Implementation> {
     static override defineSchema() {
         return ComplexFormData;
     }
 }
+
+console.log("ComplexFormData", ComplexFormData, new ComplexForm());

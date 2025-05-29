@@ -15,17 +15,17 @@ const HostData = {
     ...DevicePartData(),
     ...DescriptionPartData(),
     ...ActionPartData(),
-    rating: new NumberField({ required: true, nullable: false, default: 1 }),
+    rating: new NumberField({ required: true, nullable: false, initial: 1 }),
     //todo
     // marks: new SchemaField(MatrixMarks, { required: true }),
     ic: new ArrayField(new SchemaField(SourceEntityField()), { required: true }),
     customAttributes: new BooleanField({ required: true, initial: false }),
 }
 
-console.log("HostData", HostData);
-
 export class Host extends foundry.abstract.TypeDataModel<typeof HostData, Item.Implementation> {
     static override defineSchema() {
         return HostData;
     }
 }
+
+console.log("HostData", HostData, new Host());

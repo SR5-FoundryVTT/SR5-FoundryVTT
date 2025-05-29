@@ -70,10 +70,11 @@ const CharacterData = {
     }, { required: true }),
 }
 
-console.log("CharacterData:", CharacterData);
 
 export class Character extends foundry.abstract.TypeDataModel<typeof CharacterData, Actor.Implementation> {
     static override defineSchema() {
         return CharacterData;
     }
 }
+
+console.log("CharacterData:", CharacterData, new Character());

@@ -7,14 +7,12 @@ import { MatrixTracks, PhysicalTrack, StunTrack, Tracks } from "../template/Cond
 import { DescriptionPartData } from "../template/DescriptionModel";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/LimitsModel";
 import { Movement } from "../template/MovementModel";
-import { KnowledgeSkillList } from "../template/SkillsModel";
+import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/SkillsModel";
 
 export const CharacterSkills = () => ({
-    //todo
-    // active: new SchemaField(Skills, { required: true }),
+    active: Skills(),
     language: new SchemaField(KnowledgeSkillList(), { required: true }),
-    //todo
-    // knowledge: new SchemaField(KnowledgeSkills, { required: true }),
+    knowledge: new SchemaField(KnowledgeSkills(), { required: true }),
 });
 
 export const InitiativeType = () => ({
@@ -44,7 +42,6 @@ export const MagicData = () => ({
     attribute: new StringField({
         required: true,
         initial: "magic",
-        choices: ["magic", "resonance"],
     }),
     projecting: new BooleanField({ required: true, initial: false, }),
     initiation: new NumberField({ required: true, initial: 0, }),
@@ -54,8 +51,9 @@ export const DeviceAttribute = () => ({
     value: new NumberField({ required: true, initial: 0 }),
     att: new StringField({
         required: true,
+        blank: true,
         initial: '',
-        choices: ['attack', 'sleaze', 'data_processing', 'firewall'],
+        choices: ['', 'attack', 'sleaze', 'data_processing', 'firewall'],
     }),
     editable: new BooleanField({ required: true, initial: false }),
 });
@@ -106,7 +104,7 @@ export const MatrixData = () => ({
     hot_sim: new BooleanField({ required: true, initial: false }),
     running_silent: new BooleanField({ required: true, initial: false }),
     item: new AnyField({ required: false }),
-    // marks: new TypedObjectField(new NumberField({ required: true, initial: 0 }), { required: true }),
+    marks: new TypedObjectField(new NumberField({ required: true, initial: 0 }), { required: true }),
 });
 
 export const CommonValues = () => ({
@@ -208,25 +206,25 @@ export const MatrixModifiers = () => ({
     matrix_track: new NumberField({ required: true, initial: 0 }),
 });
 
-const InventoryData = {
+const InventoryData = () => ({
     name: new StringField({ required: true, initial: "" }),
     type: new StringField({ required: true, initial: "" }),
     itemIds: new ArrayField(new StringField({ required: true, initial: "" }), { required: true }),
     showAll: new BooleanField({ required: true, initial: false }),
-};
+});
 
 export const CommonData = () => ({
     ...DescriptionPartData(),
     attributes: new SchemaField(Attributes(), { required: true }),
     limits: new SchemaField(Limits(), { required: true }),
     skills: new SchemaField(CharacterSkills(), { required: true }),
-    special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane', ''], initial: '' }),
+    special: new StringField({ required: true, blank: true, choices: ['magic', 'resonance', 'mundane', ''], initial: '' }),
     initiative: new SchemaField(Initiative(), { required: true }),
     // modifiers: new SchemaField(Modifiers, { required: true }),
     //todo fix
     situation_modifiers: new ObjectField({ required: true, initial: {} }),
     values: new SchemaField(CommonValues(), { required: true }),
-    // inventories: new TypedObjectField(new SchemaField(InventoryData), { required: true }),
+    inventories: new TypedObjectField(new SchemaField(InventoryData()), { required: true }),
     visibilityChecks: new SchemaField(VisibilityChecks(), { required: true }),
     category_visibility: new SchemaField(CategoryVisibility(), { required: true }),
 });

@@ -16,14 +16,16 @@ const CyberwareData = {
     grade: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['alpha', 'beta', 'delta', 'gamma', ''],
     }),
 }
 
-console.log("CyberwareData", CyberwareData);
 
 export class Cyberware extends foundry.abstract.TypeDataModel<typeof CyberwareData, Item.Implementation> {
     static override defineSchema() {
         return CyberwareData;
     }
 }
+
+console.log("CyberwareData", CyberwareData, new Cyberware());

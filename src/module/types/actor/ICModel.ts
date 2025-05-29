@@ -32,10 +32,11 @@ const ICData = {
     }, { required: true }),
 }
 
-console.log("ICData", ICData);
 
 export class IC extends foundry.abstract.TypeDataModel<typeof ICData, Actor.Implementation> {
     static override defineSchema() {
         return ICData;
     }
 }
+
+console.log("ICData", ICData, new IC());

@@ -29,10 +29,11 @@ const SpiritData = {
     }, { required: true }),
 }
 
-console.log("SpiritData", SpiritData);
 
 export class Spirit extends foundry.abstract.TypeDataModel<typeof SpiritData, Actor.Implementation> {
     static override defineSchema() {
         return SpiritData;
     }
 }
+
+console.log("SpiritData", SpiritData, new Spirit());

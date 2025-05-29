@@ -10,14 +10,16 @@ const ProgramData = {
     type: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['common_program', 'hacking_program', '']
     }),
 }
 
-console.log("ProgramData", ProgramData);
 
 export class Program extends foundry.abstract.TypeDataModel<typeof ProgramData, Item.Implementation> {
     static override defineSchema() {
         return ProgramData;
     }
 }
+
+console.log("ProgramData", ProgramData, new Program());

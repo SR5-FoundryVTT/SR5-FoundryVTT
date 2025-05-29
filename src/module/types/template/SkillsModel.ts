@@ -1,4 +1,4 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 import { BaseValuePair, ModifiableValue, KeyValuePair } from "./BaseModel";
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
@@ -18,8 +18,20 @@ const SkillField = () => ({
     link: new StringField({ required: false, initial: '' }),
 });
 
-//todo
+export const Skills = () => new TypedObjectField(new SchemaField(SkillField()), { required: true, initial: {} });
+
 export const KnowledgeSkillList = () => ({
-    attribute: new StringField({ required: true, initial: '' }),
-    value: new SchemaField(SkillField()),
+    attribute: new StringField({
+        required: true,
+        initial: 'charisma',
+        choices: ["willpower", "logic", "intuition", "charisma"]
+    }),
+    value: Skills(),
+});
+
+export const KnowledgeSkills = () => ({
+    street: new SchemaField(KnowledgeSkillList()),
+    academic: new SchemaField(KnowledgeSkillList()),
+    professional: new SchemaField(KnowledgeSkillList()),
+    interests: new SchemaField(KnowledgeSkillList()),
 });

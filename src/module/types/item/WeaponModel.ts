@@ -16,6 +16,7 @@ const AmmunitionData = () => ({
     clip_type: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: [
             'removable_clip',
             'break_action',
@@ -36,10 +37,7 @@ const RangeData = () => ({
     medium: new NumberField({ required: true, initial: 0 }),
     long: new NumberField({ required: true, initial: 0 }),
     extreme: new NumberField({ required: true, initial: 0 }),
-    category: new StringField({
-        required: true,
-        initial: '',
-    }),
+    category: new StringField({ required: true, initial: '' }),
     attribute: new StringField({ required: false, initial: '' }),
 });
 
@@ -74,12 +72,8 @@ const WeaponData = {
     category: new StringField({
         required: true,
         initial: '',
-        choices: [
-            'melee',
-            'ranged',
-            'thrown',
-            ''
-        ],
+        blank: true,
+        choices: ['melee', 'ranged', 'thrown', ''],
     }),
     subcategory: new StringField({ required: true, initial: '' }),
     ammo: new SchemaField(AmmunitionData(), { required: true }),
@@ -88,10 +82,11 @@ const WeaponData = {
     thrown: new SchemaField(ThrownWeaponData(), { required: true }),
 }
 
-console.log("WeaponData", WeaponData);
 
 export class Weapon extends foundry.abstract.TypeDataModel<typeof WeaponData, Item.Implementation> {
     static override defineSchema() {
         return WeaponData;
     }
 }
+
+console.log("WeaponData", WeaponData, new Weapon());

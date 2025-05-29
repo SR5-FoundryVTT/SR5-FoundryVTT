@@ -76,10 +76,11 @@ const VehicleData = {
     limits: new SchemaField(VehicleLimits(), { required: true }),
 }
 
-console.log("VehicleData", VehicleData);
 
 export class Vehicle extends foundry.abstract.TypeDataModel<typeof VehicleData, Actor.Implementation> {
     static override defineSchema() {
         return VehicleData;
     }
 }
+
+console.log("VehicleData", VehicleData, new Vehicle());

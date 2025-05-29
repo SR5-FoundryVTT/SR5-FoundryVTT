@@ -19,10 +19,11 @@ export const CritterData = {
     }, { required: true }),
 }
 
-console.log("CritterData", CritterData);
 
 export class Critter extends foundry.abstract.TypeDataModel<typeof CritterData, Actor.Implementation> {
     static override defineSchema() {
         return CritterData;
     }
 }
+
+console.log("CritterData", CritterData, new Critter());

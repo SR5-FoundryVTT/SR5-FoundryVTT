@@ -10,16 +10,19 @@ const ModificationData = {
     type: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['weapon', 'armor', 'vehicle', 'drone', '']
     }),
     mount_point: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['barrel', 'stock', 'top', 'side', 'internal', '']
     }),
     modification_category: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons', '']
     }),
     dice_pool: new NumberField({ required: true, initial: 0 }),
@@ -29,10 +32,11 @@ const ModificationData = {
     slots: new NumberField({ required: true, initial: 0 }),
 }
 
-console.log("ModificationData", ModificationData);
 
 export class Modification extends foundry.abstract.TypeDataModel<typeof ModificationData, Item.Implementation> {
     static override defineSchema() {
         return ModificationData;
     }
 }
+
+console.log("ModificationData", ModificationData, new Modification());

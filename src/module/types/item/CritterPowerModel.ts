@@ -34,10 +34,11 @@ const CritterPowerData = {
     enabled: new BooleanField({ required: true, initial: false }),
 }
 
-console.log("CritterPowerData", CritterPowerData);
 
 export class CritterPower extends foundry.abstract.TypeDataModel<typeof CritterPowerData, Item.Implementation> {
     static override defineSchema() {
         return CritterPowerData;
     }
 }
+
+console.log("CritterPowerData", CritterPowerData, new CritterPower());

@@ -37,10 +37,11 @@ const AmmoData = {
     accuracy: new NumberField({ required: true, initial: 0 }),
 }
 
-console.log("AmmoData", AmmoData);
 
 export class Ammo extends foundry.abstract.TypeDataModel<typeof AmmoData, Item.Implementation> {
     static override defineSchema() {
         return AmmoData;
     }
 }
+
+console.log("AmmoData", AmmoData, new Ammo());

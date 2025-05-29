@@ -16,10 +16,11 @@ const SinData = {
     licenses: new ArrayField(new SchemaField(LicenseData()), { required: true, initial: [] }),
 }
 
-console.log("SinData", SinData);
 
 export class Sin extends foundry.abstract.TypeDataModel<typeof SinData, Item.Implementation> {
     static override defineSchema() {
         return SinData;
     }
 }
+
+console.log("SinData", SinData, new Sin());

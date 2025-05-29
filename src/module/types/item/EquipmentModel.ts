@@ -11,10 +11,11 @@ const EquipmentData = {
     ...ImportFlags(),
 }
 
-console.log("EquipmentData", EquipmentData);
 
 export class Equipment extends foundry.abstract.TypeDataModel<typeof EquipmentData, Item.Implementation> {
     static override defineSchema() {
         return EquipmentData;
     }
 }
+
+console.log("EquipmentData", EquipmentData, new Equipment());

@@ -28,14 +28,16 @@ const CallInActionData = {
     actor_type: new StringField({
         required: true,
         initial: '',
+        blank: true,
         choices: ['spirit', 'sprite', ''],
     }),
 }
 
-console.log("CallInActionData", CallInActionData);
 
 export class CallInAction extends foundry.abstract.TypeDataModel<typeof CallInActionData, Item.Implementation> {
     static override defineSchema() {
         return CallInActionData;
     }
 }
+
+console.log("CallInActionData", CallInActionData, new CallInAction());
