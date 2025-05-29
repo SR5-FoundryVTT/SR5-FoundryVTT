@@ -199,7 +199,7 @@ export class MatrixNetworkFlow {
 
     /**
      * Disconnect the given actor from the network.
-     * 
+     *
      * @param slave This matrix icon will be disconnected from it's network.
      */
     static async disconnectNetwork(slave: Shadowrun.NetworkDevice) {
@@ -213,7 +213,7 @@ export class MatrixNetworkFlow {
 
     /**
      * Determine if the given device is connected to any network
-     * 
+     *
      * @param slave A matrix network device.
      * @returns true, if the device is connected to a network.
      */
@@ -251,12 +251,23 @@ export class MatrixNetworkFlow {
 
     /**
      * Collect all grids.
-     * 
+     *
      * @param options.players If true, only grids visible to players are returned.
      */
     static getGrids(options = {players: true}): SR5Item[] {
         const grids = game.items?.filter(item => item.isGrid) ?? [];
         if (options.players) return grids.filter(grid => grid.matrixIconVisibleToPlayer);
         return grids;
+    }
+
+    /**
+     * Collect all networks.
+     *
+     * @param options.players If true, only networks visible to players are returned.
+     */
+    static getNetworks(options = {players: false}): SR5Item[] {
+        const networks = game.items?.filter(item => item.isNetwork) ?? [];
+        if (options.players) return networks.filter(network => network.matrixIconVisibleToPlayer);
+        return networks;
     }
 }

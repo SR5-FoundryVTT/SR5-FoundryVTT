@@ -3,14 +3,18 @@
     <div class="flexrow align-start">
         <div>
             <label>
-                {{localize "SR5.Labels.ActorSheet.Network"}}:
                 {{#if network}}
-                {{network.name}}
-                <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                    <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
-                </a>
+                    {{localize "SR5.Labels.ActorSheet.Network"}}: {{network.name}}
+                    <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                        <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                    </a>
                 {{else}}
-                {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                    {{!When no network is connected, allow the GM only to freely select one }}
+                    {{#if user.isGM}}
+                        <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                    {{else}}
+                        {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                    {{/if}}
                 {{/if}}
             </label>
         </div>

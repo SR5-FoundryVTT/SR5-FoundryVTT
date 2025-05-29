@@ -20,6 +20,7 @@ import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
+import { SelectMatrixNetworkDialog } from '../../apps/dialogs/SelectMatrixNetworkDialog';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -220,7 +221,8 @@ export class SR5BaseActorSheet extends ActorSheet {
             // @ts-expect-error TODO: foundry-vtt-types v10
             data: actorData.system,
             // @ts-expect-error TODO: foundry-vtt-types v10
-            system: actorData.system
+            system: actorData.system,
+            user: game.user
         }
 
         // Sheet related general purpose fields. These aren't persistent.
@@ -375,6 +377,9 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
+
+        // Matrix Network
+        html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
     }
 
     /**
@@ -2043,5 +2048,18 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     get itemEffectApplyTos() {
         return ['actor', 'item', 'test_all', 'test_item', 'modifier'];
+    }
+
+    /**
+    * Allow the user to select a matrix network to connect to.
+    */
+    async _onConnectToMatrixNetwork(event) {
+        event.stopPropagation();
+
+        const dialog = new SelectMatrixNetworkDialog();
+        const network = await dialog.select();
+        if (dialog.canceled) return;
+
+        await this.document.connectNetwork(network);
     }
 }

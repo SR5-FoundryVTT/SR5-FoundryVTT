@@ -208,9 +208,9 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
     /**
      * Retrieve all matrix actions from the corresponding pack to be displayed.
-     * 
+     *
      * If a marked document is selected, only actions with a mark requirement will show.
-     * 
+     *
      * @returns Alphabetically sorted array of matrix actions.
      */
     async getMatrixActions() {
@@ -258,9 +258,9 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
     /**
      * Open a document from a DOM node containing a dataset uuid.
-     * 
+     *
      * This is intended to let deckers open marked documents they're FoundryVTT user has permissions for.
-     * 
+     *
      * @param event Any interaction event
      */
     async _onOpenMarkedDocument(event) {
@@ -278,10 +278,10 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
     /**
      * Select a marked document on the deckers marks list.
-     * 
-     * This is intended to filter the available list of matrix actions and to 
+     *
+     * This is intended to filter the available list of matrix actions and to
      * use the selected marked document as the target for rolling on that.
-     * 
+     *
      * @param event Any interaction event
      */
     async _onSelectMarkedDocument(event) {
