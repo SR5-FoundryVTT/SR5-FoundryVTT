@@ -8,7 +8,6 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
-import { SR } from '../constants';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -86,6 +85,12 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     sourceIsUuid: boolean
 
     isUsingRangeCategory: boolean
+
+    // Allow users to view what values is calculated and what isn´t
+    calculatedEssence: boolean
+    calculatedCost: boolean
+    calculatedAvailability: boolean
+    ratingForCalculation: boolean
 }
 
 /**
@@ -129,11 +134,12 @@ export class SR5ItemSheet extends ItemSheet {
         const itemData = this.item.system;
 
         const linkedActor = await this.item.getLinkedActor();
-        const calculatedEssence = itemData.technology?.calculated.essence.adjusted;
-        const calculatedCost = calculatedEssence ? true : itemData.technology?.calculated.cost.adjusted ?? false;
-        const calculatedAvailability = calculatedEssence ? true : itemData.technology?.calculated.availability.adjusted ?? false;
-        const ratingForCalculation = calculatedEssence || calculatedCost || calculatedAvailability;
-
+        
+        // Calculated values for derived data.
+        data.calculatedEssence = itemData.technology?.calculated.essence.adjusted ?? false;
+        data.calculatedCost = data.calculatedEssence ? true : itemData.technology?.calculated.cost.adjusted ?? false;
+        data.calculatedAvailability = data.calculatedEssence ? true : itemData.technology?.calculated.availability.adjusted ?? false;
+        data.ratingForCalculation = data.calculatedEssence || data.calculatedCost || data.calculatedAvailability;
 
         if (itemData.action) {
             try {
@@ -249,11 +255,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         return {
             ...data,
-            calculatedAvailability,
-            calculatedCost,
-            calculatedEssence,
-            linkedActor,
-            ratingForCalculation
+            linkedActor
         }
     }
 
