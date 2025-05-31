@@ -294,6 +294,8 @@
     "SR5.CyberwareGradeAlpha": "Alphaware",
     "SR5.CyberwareGradeBeta": "Betaware",
     "SR5.CyberwareGradeDelta": "Deltaware",
+    "SR5.CyberwareGradeGamma": "Gammaware",
+    "SR5.CyberwareGradeGrey": "Greyware",
     "SR5.CyberwareGradeStandard": "Standard",
     "SR5.CyberwareGradeUsed": "Used",
     "SR5.DIALOG.MissingModuleContent": "In order for source PDFs to be shown, the pdf-pager module must be installed and a PDF matching the code created.",
@@ -1258,8 +1260,10 @@
             "ActionCategories": "Select action categories to use instead of the test's default categories. Using Active Effects you can use categories to modify test values",
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",
             "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
+            "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
             "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
-            "DisabledForPreparedActor": "Disabled due to use of prepared actor"
+            "DisabledForPreparedActor": "Disabled due to use of prepared actor",
+            "CostAdjustment": "Adjust actual cost based on the item rating"
         },
         "Modifiers": {
             "armor": "Modifies total armor value",
