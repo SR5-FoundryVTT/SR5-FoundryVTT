@@ -1,6 +1,7 @@
 import { Helpers } from "../../../helpers";
 import { PartsList } from "../../../parts/PartsList";
 import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
+import { ItemCostFlow } from "../../flows/ItemCostFlow";
 import { SR5Item } from "../../SR5Item";
 
 /**
@@ -71,8 +72,8 @@ export const TechnologyPrep = {
         const baseCost = Number(technology.cost ?? 0);
         const rating = item.getRating();
 
-        const actualCost = technology.calculated.cost.adjusted ? baseCost * rating : baseCost;
-        technology.calculated.cost.value = actualCost
+        const { value } = ItemCostFlow.prepareCostValue(baseCost, technology.calculated.cost.adjusted, rating);
+        technology.calculated.cost.value = value;
     },
 
 }
