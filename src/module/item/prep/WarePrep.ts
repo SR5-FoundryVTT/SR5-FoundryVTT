@@ -1,6 +1,7 @@
 import { SR } from "../../constants";
 import { Helpers } from "../../helpers";
 import { ItemAvailabilityFlow } from "../flows/ItemAvailabilityFlow";
+import { ItemCostFlow } from "../flows/ItemCostFlow";
 
 
 /**
@@ -36,28 +37,22 @@ export const WarePrep = {
         const actualEssence = Helpers.roundTo(floatEssence, 4);
         system.technology.calculated.essence.adjusted = true;
 
-        // Alter availability values.
+        // Alter availability values and code.
         let availability = String(system.technology.availability ?? 0);
-        const availParts = ItemAvailabilityFlow.parseAvailibility(availability);
+        let availParts = ItemAvailabilityFlow.parseAvailibility(availability);
         if (!availParts) {
             availability += availMod !== 0 ? (availMod > 0 ? ` (+${availMod})` : ` (${availMod})`) : '';
         } else {
-            const availabilityAdjusted = system.technology.calculated.availability.adjusted ?? false;
-
-            const actualAvailibility = availabilityAdjusted
-                ? availParts.availability * rating + availMod
-                : availParts.availability + availMod;
+            const { value } = ItemAvailabilityFlow.prepareAvailabilityValue(availability, system.technology.calculated.availability.adjusted, rating);
+            availParts = ItemAvailabilityFlow.parseAvailibility(value);
+            const actualAvailibility = availParts.availability + availMod;
             availability = `${actualAvailibility}${availParts.restriction}`;
         }
 
-        // Alter cost values.
-        const cost = Number(system.technology.cost ?? 0);
-        const costAdjusted = system.technology.calculated.cost.adjusted ?? false;
-
-        const actualCost = costAdjusted
-            ? cost * rating * costMod
-            : cost * costMod;
-
+        // Alter cost by grade modifier.
+        const baseCost = Number(system.technology.cost ?? 0);
+        const { value } = ItemCostFlow.prepareCostValue(baseCost, system.technology.calculated.cost.adjusted, rating);
+        const actualCost = value * costMod;
 
         system.technology.calculated.essence.value = actualEssence;
         system.technology.calculated.availability.value = availability;
