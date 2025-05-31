@@ -796,7 +796,7 @@
                 "armor": {
                     "base": 0,
                     "value": 0,
-                    "mod": false,
+                    "mod": 0,
                     "acid": 0,
                     "cold": 0,
                     "fire": 0,

@@ -174,49 +174,29 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Reduce nested items into typed lists.
          */
-        const itemTypeMap = {
-            ammo: 0,
-            weaponMod: 1,
-            armorMod: 2,
-            vehicleMod: 3,
-            droneMod: 4,
-        } as const;
+        const itemTypes = this.item.items.reduce(
+            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
+                const itemData = nestedItem.toObject();
+                // itemData.descriptionHTML = await TextEditor.enrichHTML(itemData.system.description.value);
 
-        const itemTypes: [
-            Shadowrun.AmmoItemData[],
-            Shadowrun.ModificationItemData[],
-            Shadowrun.ModificationItemData[],
-            Shadowrun.ModificationItemData[],
-            Shadowrun.ModificationItemData[]
-        ] = [[], [], [], [], []];
+                //@ts-expect-error
+                if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData); // TODO: foundry-vtt-types v10
+                //@ts-expect-error TODO: foundry-vtt-types v10
+                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
+                //@ts-expect-error TODO: foundry-vtt-types v10
+                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
+                //@ts-expect-error TODO: foundry-vtt-types v10
+                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'vehicle') sheetItemData[3].push(itemData);
+                //@ts-expect-error TODO: foundry-vtt-types v10
+                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'drone') sheetItemData[4].push(itemData);
 
-        for (const nestedItem of this.item.items) {
-            const itemData = nestedItem.toObject();
-            const { type } = nestedItem;
+                return sheetItemData;
+            },
+            [[], [], [], [], []],
+        );
 
-            let index: number | undefined;
-
-            if (type === 'ammo') {
-                index = itemTypeMap.ammo;
-            } else if (type === 'modification') {
-                const systemType = (nestedItem.system as Shadowrun.ModificationData).type;
-
-                switch (systemType) {
-                    case 'weapon': index = itemTypeMap.weaponMod; break;
-                    case 'armor': index = itemTypeMap.armorMod; break;
-                    case 'vehicle': index = itemTypeMap.vehicleMod; break;
-                    case 'drone': index = itemTypeMap.droneMod; break;
-                }
-            }
-
-            if (index !== undefined) {
-                // @ts-expect-error
-                itemTypes[index].push(itemData);
-            }
-        }
-
-        for (const items of itemTypes) {
-            for (const item of items) {
+        for (const itemType of itemTypes) {
+            for (const item of itemType) {
                 // @ts-expect-error
                 item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value);
             }

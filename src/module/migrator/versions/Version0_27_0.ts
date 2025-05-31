@@ -1,25 +1,23 @@
-/**
- * Version 0.8 comes with a complete rework of the original roller design in ShadowrunRoller.
- * instead rolls are handled within the SuccessTest class or subclasses of that using ActionRollData as their basis.
- *
- * What class is to be used is defined within each action (active, followed, opposed, resist). Migration needs to map
- * these classes to their item types.
- */
-import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../../actor/SR5Actor";
 import {VersionMigration} from "../VersionMigration";
 
-export class Version0_26_0 extends VersionMigration {
+/**
+ * Version 0.27.0
+ * 
+ * Fixing a few spirit type names to match the Chummer formatting.
+ */
+
+export class Version0_27_0 extends VersionMigration {
     get SourceVersion(): string {
-        return '0.25.1';
+        return '0.26.1';
     }
 
     get TargetVersion(): string {
-        return Version0_26_0.TargetVersion;
+        return Version0_27_0.TargetVersion;
     }
 
     static get TargetVersion(): string {
-        return "0.26.0";
+        return "0.27.0";
     }
 
     protected override async ShouldMigrateSceneData(scene: Scene) {

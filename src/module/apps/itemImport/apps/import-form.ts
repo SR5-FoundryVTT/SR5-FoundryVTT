@@ -22,8 +22,8 @@ export class Import extends Application {
     private githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
-        version: "v5.225.884",
-        branch: "2279966a4e9cae60c225a94c5e5289d7a2fadce4",
+        version: "v5.225.898",
+        branch: "2df4c99143df4e46a5be64f122096c3d9c0efdf7",
     } as const;
 
     private currentParsedFile: string;

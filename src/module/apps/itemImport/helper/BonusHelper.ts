@@ -93,7 +93,6 @@ export class BonusHelper {
 
     public static async addBonus(sheet: BC.ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
         await this.addEffects(sheet, bonus);
-        // await this.addItems(sheet, bonus);
     }
 
     private static async addEffects(sheet: BC.ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
@@ -107,7 +106,6 @@ export class BonusHelper {
             }
         }
 
-        // TODO - threshold, sharedthresholdoffset, thresholdoffset
         if (bonus.conditionmonitor) {
             const cm  = bonus.conditionmonitor;
 
@@ -147,7 +145,6 @@ export class BonusHelper {
             }
         }
 
-        //TODO Precedent
         if (bonus.skillattribute) {
             for (const skill of IH.getArray(bonus.skillattribute)) {
                 const attributeTable: Record<string, string> = {
@@ -177,7 +174,6 @@ export class BonusHelper {
                                 .filter(skillId => !excludedSkill || skillId !== excludedSkill)
                                 .map(skillId => ({ value: skillId.replace("_", " ").capitalize(), id: skillId }))
 
-                // TODO remove
                 if (!skills || !skills.length)
                     console.log("Error skillcategory:", skillCategory.name._TEXT);
                 else
@@ -206,7 +202,6 @@ export class BonusHelper {
             }
         }
 
-        //TODO condition & applytoRating
         if (bonus.specificskill) {
             for (const skill of IH.getArray(bonus.specificskill)) {
                 const name = skill.name._TEXT;
@@ -221,68 +216,4 @@ export class BonusHelper {
             }
         }
     }
-/*
-    private static async addItems(sheet: ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
-        sheet.flags ??= { shadowrun5e: { embeddedItems: [] } };
-
-        if (bonus.addgear) {
-            const name = bonus.addgear.name._TEXT;
-            const foundItem = await IH.findItem(name);
-    
-            if (foundItem) {
-                const itemBase = foundItem.toObject();
-
-                if (bonus.addgear.rating?._TEXT) {
-                    const rating = +bonus.addgear.rating._TEXT;
-
-                    if ('rating' in itemBase.system) {
-                        itemBase.system.rating = rating;
-                    } else if ('technology' in itemBase.system) {
-                        itemBase.system.technology.rating = rating;
-                    }
-                }
-
-                sheet.flags.shadowrun5e.embeddedItems.push(itemBase);
-            } else {
-                console.log(`[Gear Missing (Bonus)]\nSheet: ${sheet.name}\nMod: ${name}`);
-            }
-        }
-
-        if (bonus.addqualities) {
-            for (const quality of IH.getArray(bonus.addqualities.addquality)) {
-                const name = quality._TEXT;
-                
-                if (!name) continue;
-                const foundItem = await IH.findTrait(name);
-
-                if (!foundItem) {
-                    console.log(`[Quality Missing (Bonus)]\nSheet: ${sheet.name}\nMod: ${name}`);
-                    continue;
-                }
-
-                const itemBase = foundItem.toObject();
-
-                if (quality.$?.select)
-                    itemBase.name += ` (${quality.$.select})`
-    
-                if (quality.$?.rating && 'rating' in itemBase.system)
-                    itemBase.system.rating = +quality.$?.rating;
-
-                sheet.flags.shadowrun5e.embeddedItems.push(itemBase);
-            }
-        }
-
-        if (bonus.addspell) {
-            const name = bonus.addspell._TEXT;
-            const foundItem = await IH.findMagic(name);
-    
-            if (foundItem) {
-                sheet.flags.shadowrun5e.embeddedItems.push(foundItem.toObject());
-            } else {
-                console.log(`[Spell Missing (Bonus)]\nSheet: ${sheet.name}\nMod: ${name}`);
-            }
-        }
-
-    }
-*/
 }

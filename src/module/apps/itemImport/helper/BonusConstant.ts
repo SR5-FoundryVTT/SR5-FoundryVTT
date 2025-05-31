@@ -76,8 +76,6 @@ export class BonusConstant {
             tags: { selection_tests: '[{"value":"Drain Test", "id":"DrainTest"}]' }
         },
         handling: { key: "system.vehicle_stats.handling.mod" },
-        // initiative: { key: "system.modifiers.meat_initiative", overrides: { name: "Increase Initiative" } },
-        // initiativepassadd: { key: "system.modifiers.initiative_pass", overrides: { name: "Increase Initiative Pass" } },
         initiativedice: { key: "system.modifiers.meat_initiative_dice", overrides: { name: "Increase Initiative Dice" } },
         judgeintentions: { key: "system.modifiers.judge_intentions" },
         matrixinitiativediceadd: { key: "system.modifiers.matrix_initiative_dice", overrides: { name: "Increase Matrix Initiative Dice" } },
