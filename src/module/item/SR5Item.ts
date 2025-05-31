@@ -1089,7 +1089,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         if (!icData) return;
 
         // Add IC to the hosts IC order
-        const sourceEntity = DataDefaults.sourceItemData({
+        const sourceEntity = DataDefaults.createData('source_entity_field', {
             id: actor.id as string,
             name: actor.name as string,
             type: 'Actor',

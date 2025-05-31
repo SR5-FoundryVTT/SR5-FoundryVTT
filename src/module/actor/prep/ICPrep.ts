@@ -52,7 +52,7 @@ export class ICPrep {
         // Legacy actors MIGHT not have it, therefore make sure it's there.
         const track = system.track || {};
 
-        if (!track.matrix) track.matrix = DataDefaults.trackData();
+        if (!track.matrix) track.matrix = DataDefaults.createData('track');
         system.track = track;
     }
 
@@ -129,7 +129,7 @@ export class ICPrep {
      * As the rating attribute is only derived, it's not included in base data or template.json.
      */
     static addHostAttributes(system: Actor.SystemOfType<'ic'>) {
-        system.attributes['rating'] = DataDefaults.attributeData({label: 'SR5.Rating'});
+        system.attributes['rating'] = DataDefaults.createData('attribute_field', {label: 'SR5.Rating'});
     }
 
     static prepareMeatAttributes(system: Actor.SystemOfType<'ic'>) {

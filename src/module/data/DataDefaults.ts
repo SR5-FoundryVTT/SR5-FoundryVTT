@@ -1,24 +1,32 @@
-import {SKILL_DEFAULT_NAME} from "../constants";
 import FireModeData = Shadowrun.FireModeData;
-import SourceEntityField = Shadowrun.SourceEntityField;
-import ValueField = Shadowrun.ValueField;
-import RangeData = Shadowrun.RangeData;
 import DataSchema = foundry.data.fields.DataSchema;
 const { SchemaField } = foundry.data.fields;
-import { DamageData, MinimalActionData, ActionRollData } from "../types/item/ActionModel";
+import { ActionRollData, DamageData, MinimalActionData } from "../types/item/ActionModel";
+import { AttributeField } from "../types/template/AttributesModel";
 import { ArmorData } from "../types/template/ArmorModel";
-import { Track } from "../types/template/ConditionMonitorsModel";
+import { DescriptionData } from "../types/template/DescriptionModel";
 import { LimitField } from "../types/template/LimitsModel";
+import { RangeData } from "../types/item/WeaponModel";
 import { SkillField } from "../types/template/SkillsModel";
+import { SourceEntityField } from "../types/item/HostModel";
+import { TechnologyData } from "../types/template/TechnologyModel";
+import { Track } from "../types/template/ConditionMonitorsModel";
+import { ValueField } from "../types/template/BaseModel";
 
 const schemaMap = {
-    armor: ArmorData(),
-    damage: DamageData(),
-    minimal_action: MinimalActionData(),
     action_roll: ActionRollData(),
+    armor: ArmorData(),
+    attribute_field: AttributeField(),
+    damage: DamageData(),
+    description: DescriptionData(),
     limit_field: LimitField(),
+    minimal_action: MinimalActionData(),
+    range: RangeData(),
     skill_field: SkillField(),
+    source_entity_field: SourceEntityField(),
+    technology: TechnologyData(),
     track: Track(),
+    value_field: ValueField(),
 } as const;
 
 type schemaCreateData = {
@@ -73,65 +81,20 @@ export class DataDefaults {
         }
     }
 
+    /**
+     * Creates and initializes data for a given schema key.
+     *
+     * @template K - The key of the schema to use, constrained to the keys of `schemaMap`.
+     * @param key - The schema key for which to create data.
+     * @param createData - Optional initial data to populate the schema with. Defaults to an empty object.
+     * @returns The initialized data object conforming to the schema associated with the provided key.
+     */
     static createData<K extends keyof typeof schemaMap>(
         key: K,
         createData: schemaCreateData[K] = {}
     ): schemaInitializedData[K] {
         const schema = schemaMap[key] as DataSchema;
         return new SchemaField(schema).getInitialValue(createData) as schemaInitializedData[K];
-    }
-
-    /**
-     * Build a damage track field for use in document data.
-     * @param partialTrackData Injet any track property
-     * @returns 
-     */
-    static trackData(partialTrackData: Partial<TrackType> = {}): TrackType {
-        return foundry.utils.mergeObject({
-            value: 0,
-            max: 0,
-            label: '',
-            mod: [],
-            disabled: false,
-            wounds: 0
-        }, partialTrackData) as TrackType;
-    }
-
-    /**
-     * Data structure used to reference other document types.
-     * 
-     * Example usage:
-     * Host references other IC actors it's able to start in combat.
-     * 
-     * TODO: This uses the v8 old style Document.id pattern instead of v9 style uuid pattern.
-     * 
-     * @param partialSourceEntityData 
-     * @returns 
-     */
-    static sourceItemData(partialSourceEntityData: Partial<SourceEntityField> = {}): SourceEntityField {
-        return foundry.utils.mergeObject({
-            id: '',
-            name: '',
-            pack: null,
-            type: 'Actor',
-            // @ts-expect-error
-            system: partialSourceEntityData.system || undefined
-        }, partialSourceEntityData) as SourceEntityField;
-    }
-
-    /**
-     * Build a numerical value field for use anywhere necessary
-     * 
-     * @param partialValueData Inject any value property
-     */
-    static valueData(partialValueData: Partial<ValueField> = {}) {
-        return foundry.utils.mergeObject({
-            base: 0,
-            value: 0,
-            temp: 0,
-            mod: [],
-            label: ''
-        }, partialValueData) as ValueField;
     }
 
     /**
@@ -149,76 +112,5 @@ export class DataDefaults {
             mode: 'single_shot',
             action: 'simple'
         }, partialFireModeData);
-    }
-
-    static weaponRangeData(partialRangeData: Partial<RangeData> = {}): RangeData {
-        return foundry.utils.mergeObject({
-            short: 0,
-            medium: 0,
-            long: 0,
-            extreme: 0,
-            category: 'manual',
-        }, partialRangeData);
-    }
-
-    /**
-     * Build a description data segment
-     * 
-     * @param partialDescriptionData 
-     * @returns 
-     */
-    static descriptionData(partialDescriptionData: Partial<Shadowrun.DescriptionData> = {}) {
-        return foundry.utils.mergeObject({
-            value: '',
-            chat: '',
-            source: ''
-        }, partialDescriptionData) as Shadowrun.DescriptionData;
-    }
-
-    /**
-     * Build a technology data segment
-     * 
-     * @param partialTechnologyData 
-     * @returns 
-     */
-    static technologyData(partialTechnologyData: Partial<Shadowrun.TechnologyData> = {}) {
-        return foundry.utils.mergeObject({
-            rating: '',
-            availability: '',
-            quantity: 1,
-            cost: 0,
-            equipped: false,
-            conceal: {
-                base: 0,
-                value: 0,
-                mod: [],
-            },
-            condition_monitor: {
-                label: '',
-                value: 0,
-                max: 0,
-            },
-            wireless: true,
-            networkController: undefined
-        }, partialTechnologyData) as Shadowrun.TechnologyData;
-    }
-
-    /**
-     * Build a attribute data segment.
-     * 
-     * @param partialAttributeData
-     * @returns Merged of partial and basic attribute data
-     */
-    static attributeData(partialAttributeData: Partial<Shadowrun.AttributeField> = {}) {
-        return foundry.utils.mergeObject({
-            value: 0,
-            mod: [],
-            base: 0,
-            label: '',
-            hidden: false,
-            device_att: '',
-            temp: 0,
-            limit: ''
-        }, partialAttributeData) as Shadowrun.AttributeField;
     }
 }

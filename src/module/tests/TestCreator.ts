@@ -575,11 +575,11 @@ export const TestCreator = {
      */
     _minimalTestData: function(): any {
         return {
-            pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
-            limit: DataDefaults.valueData({label: 'SR5.Limit'}),
-            threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
+            pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
+            limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
+            threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),
             damage: DataDefaults.createData('damage'),
-            modifiers: DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'}),
+            modifiers: DataDefaults.createData('value_field', {label: 'SR5.Labels.Action.Modifiers'}),
             values: {},
             action: DataDefaults.createData('action_roll'),
             opposed: {}

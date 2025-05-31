@@ -113,7 +113,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
     }
 
     calculateFadeDamage() {
-        if (!this.actor) return DataDefaults.valueData();
+        if (!this.actor) return DataDefaults.createData('value_field');
 
         const fade = Number(this.data.fade);
         const resonance = this.actor.getAttribute('resonance').value;

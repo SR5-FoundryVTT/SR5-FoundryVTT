@@ -95,7 +95,7 @@ export class CharacterPrep {
         const { attributes } = system;
 
         // This is necessary to support critter actor types.
-        attributes.initiation = DataDefaults.attributeData({ base: system.magic.initiation, label: "SR5.Initiation", hidden: true });;
-        attributes.submersion = DataDefaults.attributeData({ base: system.technomancer.submersion, label: "SR5.Submersion", hidden: true });;
+        attributes.initiation = DataDefaults.createData('attribute_field', { base: system.magic.initiation, label: "SR5.Initiation", hidden: true });;
+        attributes.submersion = DataDefaults.createData('attribute_field', { base: system.technomancer.submersion, label: "SR5.Submersion", hidden: true });;
     }
 }

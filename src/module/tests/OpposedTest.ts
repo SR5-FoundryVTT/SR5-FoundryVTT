@@ -46,7 +46,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         delete data.targetActorsUuid;
 
         data.values = data.values || {};
-        data.values.againstNetHits = DataDefaults.valueData({label: 'SR5.NetHits'});
+        data.values.againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits'});
 
         return data;
     }
@@ -74,7 +74,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      */
     calculateAgainstNetHits() {
         const base = Math.max(this.against.hits.value - this.hits.value, 0);
-        const againstNetHits = DataDefaults.valueData({label: 'SR5.NetHits', base});
+        const againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits', base});
         againstNetHits.value = Helpers.calcTotal(againstNetHits, {min: 0});
         return againstNetHits;
     }
@@ -99,9 +99,9 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
             previousMessageId,
 
-            pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
-            limit: DataDefaults.valueData({label: 'SR5.Limit'}),
-            threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
+            pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
+            limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
+            threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),
             //@ts-expect-error
             values: {},
 

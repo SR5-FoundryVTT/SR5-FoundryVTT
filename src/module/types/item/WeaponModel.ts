@@ -22,7 +22,7 @@ const AmmunitionData = () => ({
     partial_reload_value: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
-const RangeData = () => ({
+export const RangeData = () => ({
     short: new NumberField({ required: true, nullable: false, initial: 0 }),
     medium: new NumberField({ required: true, nullable: false, initial: 0 }),
     long: new NumberField({ required: true, nullable: false, initial: 0 }),

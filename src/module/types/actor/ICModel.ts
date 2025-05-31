@@ -15,12 +15,9 @@ const ICData = {
     ...CommonData(),
     ...MatrixActorData(),
     ...MatrixTrackActorData(),
-    icType: new StringField({
-        required: true,
-        initial: "",
-    }),
+    icType: new StringField({ required: true, initial: "" }),
     host: new SchemaField({
-        rating: new NumberField({ required: true, initial: 0 }),
+        rating: new NumberField({ required: true, nullable: false, initial: 0 }),
         id: new StringField({ required: true, initial: "" }),
         atts: new SchemaField(MatrixAttributes(), { required: true }),
     }, { required: true }),

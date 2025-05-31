@@ -195,7 +195,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                         hardened,
                         mod: null, // Without this, the system defaults to an empty array for mod and thinks this is an armor accessory, therefore not applying hardened armor rules
                     },
-                    technology: DataDefaults.technologyData({
+                    technology: DataDefaults.createData('technology', {
                         equipped: true,
                     })
                 }

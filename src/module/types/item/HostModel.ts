@@ -3,10 +3,10 @@ import { DescriptionPartData } from "../template/DescriptionModel";
 import { ActionPartData } from "./ActionModel";
 import { DevicePartData } from "./DeviceModel";
 
-const SourceEntityField = () => ({
-    id: new StringField({ required: true }),
+export const SourceEntityField = () => ({
+    id: new StringField({ required: true, initial: '' }),
     name: new StringField({ required: true, initial: '' }),
-    pack: new StringField({ required: true, initial: '' }),
+    pack: new StringField({ required: true, nullable: true, initial: null }),
     type: new StringField({ required: true, initial: 'Actor', choices: ['Actor', 'Item'] }),
     data: new ObjectField({ required: false, initial: {} }),
 });

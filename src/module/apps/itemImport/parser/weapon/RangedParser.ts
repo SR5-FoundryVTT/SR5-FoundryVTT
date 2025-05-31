@@ -23,7 +23,7 @@ export class RangedParser extends WeaponParserBase {
         }
 
         const rangeCategory = ImportHelper.StringValue(jsonData, jsonData.hasOwnProperty('range') ? 'range' : 'category');
-        item.system.range.ranges = DataDefaults.weaponRangeData(this.GetRangeDataFromImportedCategory(rangeCategory));
+        item.system.range.ranges = DataDefaults.createData('range', this.GetRangeDataFromImportedCategory(rangeCategory));
 
         item.system.ammo.current.value = this.GetAmmo(jsonData);
         item.system.ammo.current.max = this.GetAmmo(jsonData);
