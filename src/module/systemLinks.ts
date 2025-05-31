@@ -4,14 +4,24 @@
 import { Translation } from './utils/strings';
 
 export const RenderSettings = {
+    /**
+     * Insert the system link, depending on Foundry VTT version.
+     */
     listen: () => {
-        Hooks.on("renderSettings", async (_app, $html) => {
-            const html = $html[0]!;
-            
-            const systemRow = html.querySelector('.settings-sidebar li.system');
+        Hooks.on("renderSettings", async (_app, html: HTMLElement) => {
+            // try v13 HTML structure first
+            const infoElement = html.firstChild as HTMLElement;
+            let systemRow = infoElement?.querySelector('.system');
+            if (!systemRow) {
+                // try <v13 HTML structure
+                html = html[0]!;
+                systemRow = html?.querySelector('.settings-sidebar li.system');
+            }
+
             const systemInfo = systemRow?.cloneNode(false);
 
-            if (!(systemInfo instanceof HTMLLIElement)) {
+            // v13 => div element \ v12 => li element
+            if (!((systemInfo instanceof HTMLDivElement) || (systemInfo instanceof HTMLLIElement))) {
                 throw Error("Unexpected error attach system information to settings sidebar");
             }
 

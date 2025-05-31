@@ -1867,13 +1867,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param data
      */
     static async chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.show-roll').on('click', this._chatToggleCardRolls);
-        html.find('.show-description').on('click', this._chatToggleCardDescription);
-        html.find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
-        html.find('.place-template').on('click', this._placeItemBlastZoneTemplate);
-        html.find('.result-action').on('click', this._castResultAction);
-        html.find('.chat-select-link').on('click', this._selectSceneToken);
-        html.find('.test-action').on('click', this._castTestAction);
+        // TODO: .querySelectorAll ?
+        $(html).find('.show-roll').on('click', this._chatToggleCardRolls);
+        $(html).find('.show-description').on('click', this._chatToggleCardDescription);
+        $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet);
+        $(html).find('.place-template').on('click', this._placeItemBlastZoneTemplate);
+        $(html).find('.result-action').on('click', this._castResultAction);
+        $(html).find('.chat-select-link').on('click', this._selectSceneToken);
+        $(html).find('.test-action').on('click', this._castTestAction);
 
         DamageApplicationFlow.handleRenderChatMessage(message, html, data);
 
@@ -1922,9 +1923,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
         // setup chat listener messages for each message as some need the message context instead of ChatLog context.
-        html.find('.chat-message').each(async (index, element) => {
-            element = $(element);
-            const id = element.data('messageId');
+        // @ts-expect-error Leaving this for somone that cares.
+        $(html).find('.chat-message').each(async (index, element) => {
+            const id = $(element).data('messageId');
             const message = game.messages?.get(id);
             if (!message) return;
 

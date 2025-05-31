@@ -87,9 +87,9 @@ export class JournalEnrichers {
 
     static async chatlogRequestHooks(html) {
           // setup chat listener messages for each message as some need the message context instead of chatlog context.
-          html.find('.chat-message').each(async (index, element) => {
-            element = $(element);
-            const id = element.data('messageId');
+          // @ts-expect-error TODO: querySelectorAll?
+          $(html).find('.chat-message').each(async (index, element) => {
+            const id = $(element).data('messageId');
             const message = game.messages?.get(id);
             if (!message) return;
 
@@ -98,11 +98,12 @@ export class JournalEnrichers {
     }
 
     static async messageRequestHooks(html) {
-        html.find('.sr5-requestAnswer').on('click', async (ev) => {
+        $(html).find('.sr5-requestAnswer').on('click', async (ev) => {
             const element = ev.currentTarget
 
             const rollType = element.dataset.request
             const rollEntity = element.dataset.rollentity
+            // @ts-expect-error TODO: foundryvtt 13
             const threshold = parseInt(element.dataset.threshold)
 
             let actor = await Helpers.chooseFromAvailableActors()
@@ -113,6 +114,7 @@ export class JournalEnrichers {
                 return
             }
 
+            // @ts-expect-error TODO: foundryvtt 13
            actor[rollType](rollEntity, {threshold: {base: threshold, value: threshold} })
         })
     }
