@@ -73,6 +73,7 @@ export const TechnologyPrep = {
         const rating = item.getRating();
 
         const { value } = ItemCostFlow.prepareCostValue(baseCost, technology.calculated.cost.adjusted, rating);
+
         technology.calculated.cost.value = value;
     },
 

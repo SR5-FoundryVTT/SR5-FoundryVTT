@@ -12,7 +12,7 @@ export class Migrator {
     private static readonly s_Versions: VersionDefinition[] = [
         { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
         { versionNumber: Version0_18_0.TargetVersion, migration: new Version0_18_0() },
-        { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() },
+        { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() }
     ];
 
     /**
