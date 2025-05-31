@@ -86,7 +86,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
 
             // Set an unexsting random property and check for it to be set.
             assert.notProperty(embeddedAmmo.system, 'test');
-            await embeddedAmmo.update({'system.test': true});
+            await embeddedAmmo.update({ system: { test: true } });
             assert.property(embeddedAmmo.system, 'test');
             assert.propertyVal(embeddedAmmo.system, 'test', true);
 

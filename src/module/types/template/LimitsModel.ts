@@ -1,8 +1,9 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 import { BaseValuePair, ModifiableValue } from "./BaseModel";
 
-const LimitField = () => ({
+export const LimitField = () => ({
     ...ModifiableValue(),
+    attribute: new StringField({ required: true, initial: '' }), // Does it use it?
     label: new StringField({ required: true, initial: '' }),
     hidden: new BooleanField({ required: true, initial: false }),
 });
@@ -34,3 +35,5 @@ export const VehicleLimits = () => ({
     speed: new SchemaField(LimitField(), { required: true }),
     acceleration: new SchemaField(LimitField(), { required: true }),
 });
+
+export type LimitFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof LimitField>>;

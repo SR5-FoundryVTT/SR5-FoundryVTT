@@ -10,31 +10,31 @@ const Overflow = () => ({
     overflow: new SchemaField(ValueMaxPair()),
 });
 
-export const TrackType = () => ({
+export const Track = () => ({
     ...ValueMaxPair(),
     ...ModifiableValue(),
-    base: new NumberField({ required: true, initial: 0 }),
+    base: new NumberField({ required: true, initial: 0 }), // Does if use it?
     label: new StringField({ required: true, blank: true, initial: '' }),
     disabled: new BooleanField({ required: false, initial: false })
 });
 
-export const OverflowTrackType = () => ({
-    ...TrackType(),
+export const OverflowTrack = () => ({
+    ...Track(),
     ...Overflow(),
 });
 
 export const PhysicalTrack = () => ({
-    ...OverflowTrackType(),
+    ...OverflowTrack(),
     ...Living(),
 });
 
 export const StunTrack = () => ({
-    ...TrackType(),
+    ...Track(),
     ...Living(),
 });
 
 export const MatrickTrack = () => ({
-    ...TrackType()
+    ...Track()
 });
 
 export const MatrixTracks = () => ({
@@ -45,3 +45,6 @@ export const Tracks = () => ({
     stun: new SchemaField(StunTrack()),
     physical: new SchemaField(PhysicalTrack()),
 });
+
+export type TrackType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof Track>>;
+export type OverflowTrackType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof OverflowTrack>>;

@@ -1,10 +1,9 @@
 import {DamageApplicationDialog} from "../../apps/dialogs/DamageApplicationDialog";
 import {SR5Actor} from "../SR5Actor";
-import DamageData = Shadowrun.DamageData;
-import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import { Helpers } from '../../helpers';
 import { TestCreator } from '../../tests/TestCreator';
+import { DamageType } from "src/module/types/item/ActionModel";
 
 export class DamageApplicationFlow {
 
@@ -14,9 +13,9 @@ export class DamageApplicationFlow {
      * @param actors The actors that are affected
      * @param damage The damage the actors will receive
      */
-    async runApplyDamage(actors: SR5Actor[], damage : DamageData) {
+    async runApplyDamage(actors: SR5Actor[], damage : DamageType) {
         // Show user the affected actors and the damage values
-        const damageApplicationDialog = await new DamageApplicationDialog(actors, damage);
+        const damageApplicationDialog = new DamageApplicationDialog(actors, damage);
         await damageApplicationDialog.select();
 
         if (damageApplicationDialog.canceled) {
@@ -32,7 +31,7 @@ export class DamageApplicationFlow {
      *
      * @param damage The damage to apply. Stun damage will be turned to physical for grunts.
      */
-    async applyDamageToActor(actor : SR5Actor, damage: DamageData) {
+    async applyDamageToActor(actor : SR5Actor, damage: DamageType) {
         if (damage.value <= 0) {
             return;
         }
@@ -44,8 +43,8 @@ export class DamageApplicationFlow {
         await actor.addDamage(damage);
     }
 
-    private changeStunToPhysicalForGrunts(actor : SR5Actor, damage: DamageData): DamageData {
-        const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
+    private changeStunToPhysicalForGrunts(actor : SR5Actor, damage: DamageType): DamageType {
+        const updatedDamage = foundry.utils.duplicate(damage) as DamageType;
         if (!actor.isGrunt()) {
             return updatedDamage;
         }
@@ -74,7 +73,7 @@ export class DamageApplicationFlow {
         const applyDamage = $(event.currentTarget);
 
         const value = Number(applyDamage.data('damageValue'));
-        const type = String(applyDamage.data('damageType')) as DamageType;
+        const type = String(applyDamage.data('damageType')) as DamageType['type']['value'];
         const ap = Number(applyDamage.data('damageAp'));
         const element = String(applyDamage.data('damageElement')) as DamageElement;
         let damage = Helpers.createDamageData(value, type, ap, element);

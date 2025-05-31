@@ -1,5 +1,6 @@
 import { DataDefaults } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
+import { DamageType } from "../types/item/ActionModel";
 import { DrainRules } from "./DrainRules";
 
 /**
@@ -36,11 +37,11 @@ export const ConjuringRules = {
      * @param force The force level chosen for summoning
      * @param magic The magic attribute level of the summoner
      */
-    calcDrainDamage: (hitsSpirit, force: number, magic: number): Shadowrun.DamageData => {
+    calcDrainDamage: (hitsSpirit, force: number, magic: number): DamageType => {
         if (hitsSpirit < 0) hitsSpirit = 0;
         if (magic < 0) magic = 1;
 
-        const damage = DataDefaults.damageData();
+        const damage = DataDefaults.createData('damage');
         damage.base = ConjuringRules.summoningDrainValue(hitsSpirit);
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(force, magic);
         Helpers.calcTotal(damage, {min: 0});

@@ -139,7 +139,7 @@ export class CombatSpellRules {
         if (spellType === '' || combatType === '')
             console.warn(`Shadowrun5e | The given spell or combat spell types are empty and won't form a complete defense test action`);
 
-        const itemAction = DataDefaults.minimalActionData();
+        const itemAction = DataDefaults.createData('minimal_action');
 
         if (spellType === 'mana' && combatType === 'direct') {
             itemAction.attribute = 'willpower';

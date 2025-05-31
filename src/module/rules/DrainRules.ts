@@ -21,7 +21,7 @@ export class DrainRules {
         if (magic < 0) magic = 1;
         if (hits < 0) hits = 0;
 
-        const damage = DataDefaults.damageData();
+        const damage = DataDefaults.createData('damage');
         damage.base = drain;
         Helpers.calcTotal(damage, {min: 0});
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);

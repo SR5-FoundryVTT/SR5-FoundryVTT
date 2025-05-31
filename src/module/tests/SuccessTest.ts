@@ -253,7 +253,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.opposed = data.opposed || undefined;
         data.modifiers = this._prepareModifiersData(data.modifiers);
 
-        data.damage = data.damage || DataDefaults.damageData();
+        data.damage = data.damage || DataDefaults.createData('damage');
 
         data.extendedRoll = data.extendedRoll || false;
 

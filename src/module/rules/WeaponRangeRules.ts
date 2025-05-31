@@ -30,7 +30,7 @@ export class WeaponRangeTestBehavior {
         data.range = 0;
         data.targetRanges = [];
         data.targetRangesSelected = 0;
-        data.damage = data.damage || DataDefaults.damageData();
+        data.damage = data.damage || DataDefaults.createData('damage');
     }
 
     /**

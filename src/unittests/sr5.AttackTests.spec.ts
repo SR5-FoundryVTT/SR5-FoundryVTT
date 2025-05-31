@@ -205,15 +205,8 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
         }
 
         const getVehicleWithArmor = async (armorValue: number): Promise<SR5Actor> => {
-            const armor = DataDefaults.actorArmor({
-                value: armorValue,
-                base: armorValue,
-            });
-            return await testActor.create({
-                type: 'vehicle', system: {
-                    armor,
-                },
-            }) as SR5Actor;
+            const armor = DataDefaults.createData('armor', { value: armorValue, base: armorValue });
+            return new SR5Actor<'vehicle'>({ type: 'vehicle', system: { armor } });
         }
 
         const getDamage = (damageValue: number, {
@@ -225,7 +218,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             ap?: number,
             element?: DamageElement
         } = {}): DamageData => {
-            return DataDefaults.damageData({
+            return DataDefaults.createData('damage',{
                 type: {
                     value: type,
                     base: type,

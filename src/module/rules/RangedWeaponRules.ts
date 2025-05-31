@@ -43,7 +43,7 @@ export const RangedWeaponRules = {
     recoilCompensation(item: SR5Item): number {
         let compensation = item.recoilCompensation;
         if (item.actor) {
-            compensation += item.actor.recoilCompensation;
+            compensation += item.actor.recoilCompensation();
         }
         return compensation;
     },

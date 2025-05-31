@@ -13,7 +13,7 @@ export const ActionPrep = {
      * @param equippedMods Equipped modifications on that item.
      * @param equippedAmmo Equipped ammunition on that item.
      */
-    prepareData(action: ActionRollType, item: SR5Item, equippedMods: SR5Item[], equippedAmmo?: SR5Item) {
+    prepareData(action: ActionRollType, item: SR5Item, equippedMods: SR5Item<'modification'>[], equippedAmmo?: SR5Item<'ammo'>) {
         ActionPrep.clearMods(action);
         ActionPrep.prepareDamageSource(action, item);
         ActionPrep.prepareWithMods(action, equippedMods);
@@ -39,7 +39,7 @@ export const ActionPrep = {
      * @param action The ActionRollData to alter.
      * @param item The item to use as a source.
      */
-    prepareDamageSource(action: Shadowrun.ActionRollData, item: SR5Item) {
+    prepareDamageSource(action: ActionRollType, item: SR5Item) {
         if (!item.actor?.system) return;
 
         action.damage.source = {
@@ -55,7 +55,7 @@ export const ActionPrep = {
      * @param action The systems data action property to be altered.
      * @param equippedAmmo The equipped ammunition item
      */
-    prepareWithAmmo(action: Shadowrun.ActionRollData, equippedAmmo?: SR5Item) {
+    prepareWithAmmo(action: ActionRollType, equippedAmmo?: SR5Item<'ammo'>) {
         // No equipped ammo, just calculate the damage directly.
         if (!equippedAmmo) {            
             action.damage.element.value = action.damage.element.base;
@@ -65,8 +65,7 @@ export const ActionPrep = {
         }
 
         // Collect weapon value modifications from used ammunition.
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
-        const ammoData = equippedAmmo.system as AmmoData;
+        const ammoData = equippedAmmo.system;
         const limitParts = new PartsList(action.limit.mod);
 
         // Some ammunition want to replace the weapons damage, others modify it.
@@ -107,13 +106,7 @@ export const ActionPrep = {
      * @param action The systems data action property to be altered.
      * @param equippedMods Those item mods that are equipped
      */
-    prepareWithMods(action: Shadowrun.ActionRollData, equippedMods: SR5Item[]) {
-        // @ts-expect-error
-        // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
-        if (action.damage.base_formula_operator === '+') {
-            action.damage.base_formula_operator = 'add';
-        }
-
+    prepareWithMods(action: ActionRollType, equippedMods: SR5Item[]) {
         // Collect weapon value modifications from modifications.
         const limitParts = new PartsList(action.limit.mod);
         const dpParts = new PartsList(action.dice_pool_mod);
@@ -135,7 +128,7 @@ export const ActionPrep = {
      * 
      * @param action To be altered action data.
      */
-    calculateValues(action: Shadowrun.ActionRollData) {
+    calculateValues(action: ActionRollType) {
         action.damage.value = Helpers.calcTotal(action.damage);
         action.damage.ap.value = Helpers.calcTotal(action.damage.ap);
         action.limit.value = Helpers.calcTotal(action.limit);

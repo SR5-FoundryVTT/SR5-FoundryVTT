@@ -33,7 +33,7 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
         this._prepareRitualData(data);
 
         data.drain = data.drain || 0;
-        data.drainDamage = data.drainDamage || DataDefaults.damageData();
+        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
 
         return data;
     }
@@ -172,7 +172,7 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
      * NOTE: This will be called by the opposing test via a follow up test action.
      */
     calcDrain(opposingHits: number) {
-        if (!this.actor) return DataDefaults.damageData();
+        if (!this.actor) return DataDefaults.createData();
 
         this.data.drain = RitualRules.drainValue(opposingHits, this.data.reagents, this.data.force);
         this.data.drainDamage = RitualRules.calcDrainDamage(opposingHits, this.data.drain, this.actor.getAttribute('magic').value);

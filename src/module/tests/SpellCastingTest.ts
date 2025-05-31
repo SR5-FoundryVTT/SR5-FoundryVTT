@@ -29,7 +29,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         data.force = data.force || 0;
         data.drain = data.drain || 0;
         data.reckless = data.reckless || false;
-        data.drainDamage = data.drainDamage || DataDefaults.damageData();
+        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
 
         return data;
     }
@@ -129,7 +129,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      * Derive the actual drain damage from spellcasting values.
      */
     calcDrainDamage() {
-        if (!this.actor) return DataDefaults.damageData();
+        if (!this.actor) return DataDefaults.createData();
 
         const force = Number(this.data.force);
         const drain = Number(this.data.drain);

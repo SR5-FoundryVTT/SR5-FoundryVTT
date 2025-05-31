@@ -82,7 +82,7 @@ export class SpellParser {
         system.action.type = 'varies';
         system.action.skill = 'spellcasting';
         system.action.attribute = 'magic';
-        system.action.damage = DataDefaults.damageData();
+        system.action.damage = DataDefaults.createData('damage');
         system.action.damage.type.base = '';
         system.action.damage.type.value = '';
     }

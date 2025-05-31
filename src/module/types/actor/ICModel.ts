@@ -1,8 +1,9 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 import { CommonData, MatrixActorData, MatrixTrackActorData, MatrixAttributes, CommonModifiers, MatrixModifiers } from "./CommonModel";
-import { AttributeField } from "../template/AttributesModel";
+import { AttributeField, Attributes } from "../template/AttributesModel";
 
 const ICAttributes = () => ({
+    ...Attributes(),
     rating: new SchemaField(AttributeField(), { required: true }),
     attack: new SchemaField(AttributeField(), { required: true }),
     sleaze: new SchemaField(AttributeField(), { required: true }),

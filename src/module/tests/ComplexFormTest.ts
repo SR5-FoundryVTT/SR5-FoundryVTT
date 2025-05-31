@@ -24,7 +24,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         // Restore previous values or set defaults.
         data.level =  data.level || 0;
         data.fade = data.face || 0;
-        data.fadeDamage = data.fadeDamage || DataDefaults.damageData();
+        data.fadeDamage = data.fadeDamage || DataDefaults.createData('damage');
 
         return data;
     }

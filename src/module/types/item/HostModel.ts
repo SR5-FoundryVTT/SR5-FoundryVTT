@@ -1,4 +1,4 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 import { DescriptionPartData } from "../template/DescriptionModel";
 import { ActionPartData } from "./ActionModel";
 import { DevicePartData } from "./DeviceModel";
@@ -6,7 +6,7 @@ import { DevicePartData } from "./DeviceModel";
 const SourceEntityField = () => ({
     id: new StringField({ required: true }),
     name: new StringField({ required: true, initial: '' }),
-    pack: new StringField({ required: false, initial: '' }),
+    pack: new StringField({ required: true, initial: '' }),
     type: new StringField({ required: true, initial: 'Actor', choices: ['Actor', 'Item'] }),
     data: new ObjectField({ required: false, initial: {} }),
 });
@@ -16,8 +16,7 @@ const HostData = {
     ...DescriptionPartData(),
     ...ActionPartData(),
     rating: new NumberField({ required: true, nullable: false, initial: 1 }),
-    //todo
-    // marks: new SchemaField(MatrixMarks, { required: true }),
+    marks: new TypedObjectField(new NumberField({ required: true, nullable: false, initial: 0 }), { required: true }),
     ic: new ArrayField(new SchemaField(SourceEntityField()), { required: true }),
     customAttributes: new BooleanField({ required: true, initial: false }),
 }

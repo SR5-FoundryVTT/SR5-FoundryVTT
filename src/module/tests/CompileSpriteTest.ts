@@ -2,6 +2,7 @@ import { SR5 } from "../config";
 import { DataDefaults } from "../data/DataDefaults";
 import { PartsList } from "../parts/PartsList";
 import { CompilationRules } from "../rules/CompilationRules";
+import { DamageType } from "../types/item/ActionModel";
 import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 
 
@@ -35,7 +36,7 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
         this._prepareCompilationData(data);
 
         data.fade = data.fade || 0;
-        data.fadeDamage = data.fadeDamage || DataDefaults.damageData();
+        data.fadeDamage = data.fadeDamage || DataDefaults.createData('damage');
 
         return data;
     }
@@ -148,8 +149,8 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
         this.data.fadeDamage = this.calcFadeDamage(opposingHits);
     }
 
-    calcFadeDamage(opposingHits: number): Shadowrun.DamageData {
-        if (!this.actor) return DataDefaults.damageData();
+    calcFadeDamage(opposingHits: number): DamageType {
+        if (!this.actor) return DataDefaults.createData('damage');
 
         const resonance = this.actor.getAttribute('resonance').value;
         const level = this.data.level;

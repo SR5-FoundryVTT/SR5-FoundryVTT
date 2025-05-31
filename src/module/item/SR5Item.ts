@@ -224,9 +224,8 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
             ActionPrep.prepareData(action, this, equippedMods, equippedAmmo);
         }
 
-        const range = this.getWeaponRange();
-        if (range && range.rc) {
-            RangePrep.prepareData(range, equippedMods);
+        if (this.isRangedWeapon() && this.system.range.rc) {
+            RangePrep.prepareData(this.system.range, equippedMods);
         }
 
         // Switch item data preparation between types...
@@ -287,12 +286,10 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      * @returns 
      */
     async getChatData(htmlOptions = {}) {
-        const system = foundry.utils.duplicate(this.system) as Item.SystemOfType<SubType>;
+        const system = foundry.utils.duplicate(this.system) as Item.SystemOfType<SystemItem>;
         const { labels } = this;
-        //@ts-expect-error
         if (!system.description) system.description = { chat: '', source: '', value: '' };
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
-        //@ts-expect-error
         if (!system.description.value) system.description.value = '';
         system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions });
 
@@ -800,9 +797,8 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return !!action.damage.type.base;
     }
 
-    getAction(): ActionRollType | undefined {
-        //@ts-expect-error foundry-vtt-types v13 bug
-        return 'action' in this.system ? this.system.action : undefined;
+    getAction(this: SR5Item): ActionRollType | undefined {
+        return this.system.action;
     }
 
     getExtended(): boolean {
@@ -825,15 +821,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
 
     async setNetworkController(networkController: string | undefined): Promise<void> {
         await this.update({ system: { technology: { networkController } } });
-    }
-
-    getRange(): CritterPowerRange | SpellRange | RangeWeaponData | undefined {
-        return this.wrapper.getRange();
-    }
-
-    getWeaponRange(): RangeWeaponData | undefined {
-        if (this.isRangedWeapon())
-            return this.getRange() as RangeWeaponData;
     }
 
     getRollName(): string {
@@ -1032,7 +1019,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      */
     get unhandledRecoil(): number {
         if (!this.isRangedWeapon()) return 0;
-        return Math.max(this.actor.recoil - this.totalRecoilCompensation, 0);
+        return Math.max(this.actor.recoil() - this.totalRecoilCompensation, 0);
     }
 
     /**
@@ -1062,10 +1049,10 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      */
     get currentRecoilCompensation(): number {
         if (!this.actor || !this.isRangedWeapon()) return 0;
-        return Math.max(this.totalRecoilCompensation - this.actor.recoil, 0);
+        return Math.max(this.totalRecoilCompensation - this.actor.recoil(), 0);
     }
 
-    getReach(): number {
+    getReach(this: SR5Item): number {
         if (this.isMeleeWeapon())
             return this.system.melee.reach ?? 0;
         return 0;

@@ -29,7 +29,7 @@ export class FadeTest extends SuccessTest<FadeTestData> {
             data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
         // This test is part of either a standalone test or created with its own data (i.e. edge reroll).
         } else {
-            data.incomingFade = data.incomingFade ?? DataDefaults.damageData();
+            data.incomingFade = data.incomingFade ?? DataDefaults.createData('damage');
             data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
         }
 
@@ -53,7 +53,7 @@ export class FadeTest extends SuccessTest<FadeTestData> {
     static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor<'character'>) {
         const documentAction = await super._getDocumentTestAction(item, actor);
 
-        if (!actor.isType('character') || !actor.isEmerged) {
+        if (!actor.isType('character') || !actor.isEmerged()) {
             console.error(`Shadowrun 5e | A ${this.name} expected an emerged actor but got this`, actor);
             return documentAction;
         }

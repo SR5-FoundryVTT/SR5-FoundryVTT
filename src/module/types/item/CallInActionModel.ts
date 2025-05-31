@@ -20,8 +20,8 @@ const CompilationData = () => ({
 });
 
 const CallInActionData = {
-    ...CompilationData,
-    ...SummoningData,
+    ...CompilationData(),
+    ...SummoningData(),
     ...DescriptionPartData(),
     ...ActionPartData(),
     ...ImportFlags(),

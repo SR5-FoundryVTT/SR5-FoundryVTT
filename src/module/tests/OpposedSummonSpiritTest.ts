@@ -128,9 +128,11 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
         const summoner = this.against.actor as SR5Actor;        
 
         const updateData = {
-            'system.services': this.deriveSpiritServices(),
-            'system.summonerUuid': summoner.uuid
-        }
+            system: {
+                services: this.deriveSpiritServices(),
+                summonerUuid: summoner.uuid
+            }
+        };
 
         this._addOwnershipToUpdateData(updateData);
 
@@ -171,7 +173,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
             // Reuse a prepared actor...
             const preparedActor = await this.getPreparedSpiritActor();
             if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared spirit actor');
-            await preparedActor.update({ 'system.summonerUuid': summoner.uuid });
+            await preparedActor.update({ system: { summonerUuid: summoner.uuid } });
             
         } else {
             // Create a new spirit actor from scratch...

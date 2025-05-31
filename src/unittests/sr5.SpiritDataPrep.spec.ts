@@ -43,7 +43,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
 
         it('Spirit default/overrides by example type', async () => {
-            const spirit = new SR5Actor<'spirit'>({ type: 'spirit', 'system.spiritType': 'air' });
+            const spirit = new SR5Actor<'spirit'>({ type: 'spirit', system: { spiritType: 'air' } });
 
             // Without adequate force there will be negative base values with minimum attribute values.
             assert.strictEqual(spirit.system.attributes.body.base, -2);
@@ -81,7 +81,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             await spirit.delete();
         });
         it('A NPC Grunt should only have physical track', async () => {
-            const spirit = await testActor.create({ type: 'spirit', 'system.is_npc': true, 'system.npc.is_grunt': true }) as SR5Actor<'spirit'>;
+            const spirit = new SR5Actor<'spirit'>({ type: 'spirit', system: { is_npc: true, npc: { is_grunt: true } } });
 
             assert.strictEqual(spirit.system.track.stun.value, 0);
             assert.strictEqual(spirit.system.track.stun.disabled, true);

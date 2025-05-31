@@ -4,6 +4,7 @@ const ImportFlagData = () => ({
     name: new StringField({ required: true, initial: '' }),
     type: new StringField({ required: true, initial: '' }),
     subType: new StringField({ required: true, initial: '' }),
+    isImported: new BooleanField({ required: true, initial: false }),
     isFreshImport: new BooleanField({ required: true, initial: false }),
 });
 

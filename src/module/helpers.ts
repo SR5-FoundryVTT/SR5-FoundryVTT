@@ -1,14 +1,8 @@
-import AttributeField = Shadowrun.AttributeField;
+import { DamageType } from "./types/item/ActionModel";
 import SkillField = Shadowrun.SkillField;
-import ModifiableValue = Shadowrun.ModifiableValue;
 import GenericValueField = Shadowrun.GenericValueField;
-import LabelField = Shadowrun.LabelField;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
-import DamageData = Shadowrun.DamageData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
-import DamageType = Shadowrun.DamageType;
-import DamageElement = Shadowrun.DamageElement;
-import Skills = Shadowrun.Skills;
 import TargetedDocument = Shadowrun.TargetedDocument;
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
@@ -18,6 +12,11 @@ import { SR5Item } from './item/SR5Item';
 import { PartsList } from './parts/PartsList';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
+import { ModifiableValueType } from "./types/template/BaseModel";
+import { AttributeFieldType } from "./types/template/AttributesModel";
+import { SkillFieldType, SkillsType } from "./types/template/SkillsModel";
+
+type OneOrMany<T> = T | T[];
 
 interface CalcTotalOptions {
     // Min/Max value range
@@ -34,7 +33,7 @@ export class Helpers {
      * @param value
      * @param options min will a apply a minimum value, max will apply a maximum value.
      */
-    static calcTotal(value: ModifiableValue, options?: CalcTotalOptions): number {
+    static calcTotal(value: ModifiableValueType, options?: CalcTotalOptions): number {
         if (value.mod === undefined) value.mod = [];
 
         const parts = new PartsList(value.mod);
@@ -143,7 +142,7 @@ export class Helpers {
         return newData;
     }
 
-    static isMatrix(atts?: boolean | (AttributeField | string | SkillField)[] | AttributeField | string | SkillField) {
+    static isMatrix(atts: boolean | OneOrMany<string | AttributeFieldType | SkillFieldType>): boolean {
         if (!atts) return false;
         if (typeof atts === 'boolean') return atts;
         // array of labels to check for on the incoming data
@@ -162,14 +161,9 @@ export class Helpers {
         atts = atts.filter((att) => att);
         // iterate over the attributes and return true if we find a matrix att
         for (const att of atts) {
-            if (typeof att === 'string') {
-                if (matrixLabels.indexOf(att) >= 0) {
-                    return true;
-                }
-            } else if (typeof att === 'object' && (att as LabelField).label !== undefined) {
-                if (matrixLabels.indexOf(att.label ?? '') >= 0) {
-                    return true;
-                }
+            const label = typeof att === 'object' ? att.label : att;
+            if (matrixLabels.includes(label)) {
+                return true;
             }
         }
         // if we don't find anything return false
@@ -592,8 +586,14 @@ export class Helpers {
         return actor.img || '';
     }
 
-    static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem?: SR5Item): DamageData {
-        const damage = DataDefaults.damageData({type: {base: '', value: ''}});
+    static createDamageData(
+        value: number,
+        type: DamageType['type']['value'],
+        ap: number = 0,
+        element: DamageType['element']['value'] = '',
+        sourceItem?: SR5Item
+    ): DamageType {
+        const damage = DataDefaults.createData('damage') as DamageType;
         damage.base = value;
         damage.value = value;
         damage.type.base = type;
@@ -619,7 +619,7 @@ export class Helpers {
      * Retrieves the item causing the damage, if there is any.
      * This only works for embedded items at the moment
      */
-    static findDamageSource(damageData: DamageData): SR5Item | undefined {
+    static findDamageSource(damageData: DamageType): SR5Item | undefined {
         if (!game.actors) return undefined;
 
         if (!damageData.source) return undefined;
@@ -661,12 +661,12 @@ export class Helpers {
      * do this instead
      * > reduceDamageByHits(incoming, hits, label)
      *
-     * @param incoming A DamageData value to be modified from
+     * @param incoming A DamageType value to be modified from
      * @param hits Positive or negative hits to change the damage value with.
      * @param modificationLabel The translatable label for the modification
      */
-    static modifyDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
-        const modified = foundry.utils.duplicate(incoming) as DamageData;
+    static modifyDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageData {
+        const modified = foundry.utils.duplicate(incoming) as DamageType;
         modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
@@ -677,11 +677,11 @@ export class Helpers {
      *
      * Should you want RAISE the damage value, use modifyDamageByHits directly.
      *
-     * @param incoming A DamageData value to be modified from
+     * @param incoming A DamageType value to be modified from
      * @param hits Positive hits to reduce the damage value with! Should the hits amount be negative, use modifyDamageByHits.
      * @param modificationLabel The translatable label for the modification
      */
-    static reduceDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
+    static reduceDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageData {
         if (hits < 0) hits = 0;
         return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
@@ -736,7 +736,7 @@ export class Helpers {
         return {[path]: {[`-=${key}`]: null}};
     }
 
-    static localizeSkill(skill: SkillField): string {
+    static localizeSkill(skill: SkillFieldType): string {
         return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
     }
 
@@ -750,7 +750,7 @@ export class Helpers {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted Skills given by the skills parameter
      */
-    static sortSkills(skills: Skills, asc: boolean = true): Skills {
+    static sortSkills(skills: SkillsType, asc: boolean = true): SkillsType {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
             const comparatorA = Helpers.localizeSkill(a) || aId;

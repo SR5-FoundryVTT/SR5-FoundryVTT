@@ -119,7 +119,7 @@ export class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
                 value: damageElement,
             }
         }
-        return DataDefaults.damageData(partialDamageData);
+        return DataDefaults.createData('damage', partialDamageData);
     }
 
     protected parseDamageType(parsedType: string | undefined): DamageType {

@@ -26,6 +26,7 @@
         },
         "Item": {
             "action": {},
+            "ammo": {},
             "armor": {},
             "adept_power": {},
             "bioware": {},

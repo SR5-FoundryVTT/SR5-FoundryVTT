@@ -12,7 +12,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
-        data.damage = data.damage || DataDefaults.damageData();
+        data.damage = data.damage || DataDefaults.createData('damage');
 
         return data;
     }

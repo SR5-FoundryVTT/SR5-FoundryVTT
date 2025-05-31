@@ -28,6 +28,14 @@ import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import AEChangeData = ActiveEffect.ChangeData;
+import { ActionRollType, DamageType } from '../types/item/ActionModel';
+import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/AttributesModel';
+import { VehicleStatsType, VehicleStatType } from '../types/actor/VehicleModel';
+import { LimitFieldType } from '../types/template/LimitsModel';
+import { SkillFieldType } from '../types/template/SkillsModel';
+import { ConditionType } from '../types/template/ConditionModel';
+import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitorsModel';
+import { BaseArmorType } from '../types/template/ArmorModel';
 
 export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' | 'sprite';
 
@@ -317,7 +325,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     /**
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */
-    findActiveSkill(skillName?: string): Shadowrun.SkillField | undefined {
+    findActiveSkill(skillName?: string): SkillFieldType | undefined {
         // Check for faulty to catch empty names as well as missing parameters.
         if (!skillName) return;
 
@@ -330,43 +338,38 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return Object.values(skills).find(skill => skill.name === skillName);
     }
 
-    findAttribute(id?: string): Shadowrun.AttributeField | undefined {
+    findAttribute(id?: string): AttributeFieldType | undefined {
         if (id === undefined) return;
         const attributes = this.getAttributes();
         if (!attributes) return;
         return attributes[id];
     }
 
-    findVehicleStat(statName?: string): Shadowrun.VehicleStat | undefined {
-        if (statName === undefined) return;
-
-        const vehicleStats = this.getVehicleStats();
-        if (vehicleStats)
-            return vehicleStats[statName];
+    findVehicleStat(statName: string): AttributeFieldType | undefined {
+        return this.getVehicleStats()?.[statName];
     }
 
-    findLimitFromAttribute(attributeName?: string): Shadowrun.LimitField | undefined {
+    findLimitFromAttribute(this: SR5Actor, attributeName?: string): LimitFieldType | undefined {
         if (attributeName === undefined) return undefined;
         const attribute = this.findAttribute(attributeName);
         if (!attribute?.limit) return undefined;
         return this.findLimit(attribute.limit);
     }
 
-    findLimit(limitName?: string): Shadowrun.LimitField | undefined {
+    findLimit(this: SR5Actor, limitName?: string): LimitFieldType | undefined {
         if (!limitName) return undefined;
         return this.system.limits[limitName];
     }
 
-    getWoundModifier(): number {
-        if (!("wounds" in this.system)) return 0;
-        return -1 * this.system.wounds.value || 0;
+    getWoundModifier(this: SR5Actor): number {
+        return -1 * (this.system.wounds?.value ?? 0);
     }
 
     /** Use edge on actors that have an edge attribute.
      *
      * NOTE: This doesn't only include characters but spirits, critters and more.
      */
-    async useEdge(by: number = -1) {
+    async useEdge(this: SR5Actor, by: number = -1) {
         const edge = this.getEdge();
         if (edge && edge.value === 0) return;
         // NOTE: There used to be a bug which could lower edge usage below zero. Let's quietly ignore and reset. :)
@@ -377,12 +380,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         await this.update({ system: { attributes: { edge: { uses } } } });
     }
 
-    getEdge(): Shadowrun.EdgeAttributeField {
+    getEdge(this: SR5Actor): EdgeAttributeFieldType {
         return this.system.attributes.edge;
-    }
-
-    hasArmor(): boolean {
-        return "armor" in this.system;
     }
 
     /**
@@ -391,13 +390,13 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param damage If given will be applied to the armor to get modified armor.
      * @returns Armor or modified armor.
      */
-    getArmor(damage?:Shadowrun.DamageData) {
+    getArmor(damage?: DamageType): BaseArmorType {
         // Prepare base armor data.
-        const armor = "armor" in this.system ? 
+        const armor = ("armor" in this.system ? 
             foundry.utils.duplicate(this.system.armor) : 
-            DataDefaults.actorArmor();
+            DataDefaults.createData('armor')) as unknown as BaseArmorType;
         // Prepare damage to apply to armor.
-        damage = damage || DataDefaults.damageData();
+        damage = damage || DataDefaults.createData('damage');
 
         Helpers.calcTotal(damage);
         Helpers.calcTotal(damage.ap);
@@ -405,7 +404,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         // Modify by penetration
         if (damage.ap.value !== 0)
             PartsList.AddUniquePart(armor.mod, 'SR5.AP', damage.ap.value);
-                
+
         // Modify by element
         if (damage.element.value !== '') {
             const armorForDamageElement = armor[damage.element.value] || 0;
@@ -418,13 +417,11 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return armor;
     }
 
-    getMatrixDevice(): SR5Item | undefined {
-        if (!("matrix" in this.system)) return;
-        const matrix = this.system.matrix;
-        if (matrix.device) return this.items.get(matrix.device);
+    getMatrixDevice(this: SR5Actor): SR5Item | undefined {
+        return this.system.matrix?.device ? this.items.get(this.system.matrix.device) : undefined;
     }
 
-    getFullDefenseAttribute(): Shadowrun.AttributeField | undefined {
+    getFullDefenseAttribute(this: SR5Actor): AttributeFieldType | undefined {
         if (this.isType('vehicle')) {
             return this.findVehicleStat('pilot');
         } else if (this.isType('character')) {
@@ -432,6 +429,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
             if (!att) att = 'willpower';
             return this.findAttribute(att);
         }
+        return undefined;
     }
 
     getEquippedWeapons(): SR5Item[] {
@@ -441,37 +439,27 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     /**
      * Amount of recoil compensation this actor has available (without the weapon used).
      */
-    get recoilCompensation(): number {
-        if(!this.system.values.hasOwnProperty('recoil_compensation')) return 0;
-        //@ts-expect-error
-        return this.system.values.recoil_compensation.value;
+    recoilCompensation(this: SR5Actor): number {
+        return "recoil_compensation" in this.system.values ? this.system.values.recoil_compensation.value : 0;
     }
 
-    
     /**
      * Current recoil compensation with current recoil included.
      * 
      * @returns A positive number or zero.
     */
     get currentRecoilCompensation(): number {
-        return Math.max(this.recoilCompensation - this.recoil, 0);
+        return Math.max(this.recoilCompensation() - this.recoil(), 0);
     }
     
     /**
      * Amount of progressive recoil this actor has accrued.
      */
-    get recoil(): number {
-        if(!this.system.values.hasOwnProperty('recoil')) return 0;
-        return this.system.values.recoil.value;
+    recoil(this: SR5Actor): number {
+        return "recoil" in this.system.values ? this.system.values.recoil.value : 0;
     }
 
-    getDeviceRating(): number {
-        if (!("matrix" in this.system)) return 0;
-        // @ts-expect-error // parseInt does indeed allow number types.
-        return parseInt(this.system.matrix.rating);
-    }
-
-    getAttributes(): Shadowrun.Attributes {
+    getAttributes(this: SR5Actor): AttributesType {
         return this.system.attributes;
     }
 
@@ -484,7 +472,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param name An attribute or other stats name.
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
-    getAttribute(name: string): Shadowrun.AttributeField {
+    getAttribute(this:SR5Actor, name: string): Shadowrun.AttributeField {
         // First check vehicle stats, as they don't always exist.
         const stats = this.getVehicleStats();
         if (stats && stats[name]) return stats[name];
@@ -494,19 +482,17 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return attributes[name];
     }
 
-    getLimits(): Shadowrun.Limits {
+    getLimits(this: SR5Actor): Shadowrun.Limits {
         return this.system.limits;
     }
 
-    getLimit(name: string): Shadowrun.LimitField {
+    getLimit(this: SR5Actor, name: string): Shadowrun.LimitField {
         const limits = this.getLimits();
         return limits[name];
     }
 
-    isGrunt() {
-        if (!("is_npc" in this.system) || !("npc" in this.system)) return false;
-
-        return this.system.is_npc && this.system.npc.is_grunt;
+    isGrunt(this: SR5Actor): boolean {
+        return Boolean(this.system.is_npc || this.system.npc?.is_grunt);
     }
 
     /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
@@ -516,7 +502,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return this.type === type;
     }
 
-    asType<ST extends readonly SystemActor[]>(...types: ST): SR5Actor<ST[number]> | undefined {
+    asType<ST extends readonly SystemActor[]>(this: SR5Actor, ...types: ST): SR5Actor<ST[number]> | undefined {
         return types.some((t) => this.isType(t)) ? this : undefined;
     }
 
@@ -549,7 +535,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         }
     }
 
-    getVehicleTypeSkill(): Shadowrun.SkillField | undefined {
+    getVehicleTypeSkill(): SkillFieldType | undefined {
         if (!this.isType('vehicle')) return;
 
         const name = this.getVehicleTypeSkillName();
@@ -560,11 +546,11 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return this.getSkills() !== undefined;
     }
 
-    getSkills(): Actor.SystemOfType<SubType>['skills'] {
+    getSkills(this: SR5Actor): Actor.SystemOfType<SystemActor>['skills'] {
         return this.system.skills;
     }
 
-    getActiveSkills(): Actor.SystemOfType<SubType>['skills']['active'] {
+    getActiveSkills(this: SR5Actor): Actor.SystemOfType<SystemActor>['skills']['active'] {
         return this.system.skills.active;
     }
 
@@ -611,7 +597,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     /**
      * Determine if an actor is awakened / magical in some kind.
      */
-    get isAwakened(): boolean {
+    isAwakened(this: SR5Actor): boolean {
         return this.system.special === 'magic';
     }
 
@@ -619,7 +605,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * This actor is emerged as a matrix native actor (Technomancers, Sprites)
      *
      */
-    get isEmerged(): boolean {
+    isEmerged(this: SR5Actor): boolean {
         if (this.isType('sprite')) return true;
         if (this.isType('character') && this.system.special === 'resonance') return true;
 
@@ -666,7 +652,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param id Either the searched id, name or translated label of a skill
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
-    getSkill(id: string, options = {byLabel: false}): Shadowrun.SkillField | undefined {
+    getSkill(this: SR5Actor, id: string, options = {byLabel: false}): SkillFieldType | undefined {
         if (options.byLabel)
             return this.getSkillByLabel(id);
 
@@ -699,10 +685,10 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param searchedFor The translated output of either the skill label (after localize) or name of the skill in question.
      * @return The first skill found with a matching translation or name.
      */
-    getSkillByLabel(searchedFor: string): Shadowrun.SkillField | undefined {
+    getSkillByLabel(searchedFor: string): SkillFieldType | undefined {
         if (!searchedFor) return;
 
-        const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
+        const possibleMatch = (skill: SkillFieldType): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
 
         const skills = this.getSkills();
 
@@ -714,8 +700,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         // Iterate over all different knowledge skill categories
         for (const categoryKey in skills.knowledge) {
             if (!skills.knowledge.hasOwnProperty(categoryKey)) continue;
-            // Typescript can't follow the flow here...
-            const categorySkills = skills.knowledge[categoryKey].value as Shadowrun.SkillField[];
+            // TODO: check this function Typescript can't follow the flow here...
+            const categorySkills = skills.knowledge[categoryKey].value as SkillFieldType[];
             for (const [id, skill] of Object.entries(categorySkills)) {
                 if (searchedFor === possibleMatch(skill))
                     return {...skill, id};
@@ -755,13 +741,13 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The id of the created knowledge skill.
      */
-    async addKnowledgeSkill(category: keyof Shadowrun.KnowledgeSkills, skill: Partial<Shadowrun.SkillField>={name: SKILL_DEFAULT_NAME}): Promise<string|undefined> {
+    async addKnowledgeSkill(this: SR5Actor, category: keyof Shadowrun.KnowledgeSkills, skill: Partial<Shadowrun.SkillField>={name: SKILL_DEFAULT_NAME}): Promise<string|undefined> {
         if (!this.system.skills.knowledge.hasOwnProperty(category)) {
             console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
             return;
         }
-        
-        skill = DataDefaults.skillData(skill);
+
+        skill = DataDefaults.createData('skill_field', skill);
         const id = randomID(16);
         const value = {};
         value[id] = skill;
@@ -777,7 +763,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @returns The new active skill id.
      */
     async addActiveSkill(skillData: Partial<Shadowrun.SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
-        const skill = DataDefaults.skillData(skillData);
+        const skill = DataDefaults.createData('skill_field', skillData);
 
         const activeSkillsPath = 'system.skills.active';
         const updateSkillDataResult = Helpers.getRandomIdSkillFieldDataEntry(activeSkillsPath, skill);
@@ -937,8 +923,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      *
      * @param options
      */
-    async rollDeviceRating(options?: Shadowrun.ActorRollOptions) {
-        const rating = this.getDeviceRating();
+    async rollDeviceRating(this: SR5Actor, options?: Shadowrun.ActorRollOptions) {
+        const rating = this.system.matrix?.rating || 0;
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
         const testCls = this.tests._getTestClass('SuccessTest');
@@ -1039,7 +1025,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
-        const action = DataDefaults.actionRollData({attribute: name, test: AttributeOnlyTest.name});
+        const action = DataDefaults.createData('action_roll', {attribute: name, test: AttributeOnlyTest.name});
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, {showDialog});
         if (!test) return;
@@ -1136,9 +1122,9 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param parts The Value.mod field as a PartsList
      * @param atts The attributes used for the success test.
      */
-    _addMatrixParts(parts: PartsList<number>, atts) {
+    _addMatrixParts(this: SR5Actor, parts: PartsList<number>, atts) {
         if (Helpers.isMatrix(atts)) {
-            if (!("matrix" in this.system)) return;
+            if (!this.system.matrix) return;
 
             // Apply general matrix modifiers based on commlink/cyberdeck status.
             const matrix = this.system.matrix;
@@ -1162,7 +1148,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param skillId Any skill, no matter if active, knowledge or language
      * @param options
      */
-    skillActionData(skillId: string, options: Shadowrun.SkillRollOptions = {}): Shadowrun.ActionRollData|undefined {
+    skillActionData(skillId: string, options: Shadowrun.SkillRollOptions = {}): ActionRollType | undefined {
         const byLabel = options.byLabel || false;
         const skill = this.getSkill(skillId, {byLabel});
         if (!skill) {
@@ -1180,7 +1166,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         // Should a specialization be used?
         const spec = options.specialization || false;
 
-        return DataDefaults.actionRollData({
+        return DataDefaults.createData('action_roll', {
             skill: skillId,
             spec,
             attribute: skill.attribute,
@@ -1248,12 +1234,12 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
-    __addDamageToTrackValue(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData): Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData {
+    __addDamageToTrackValue(damage: DamageType, track: TrackType | OverflowTrackType | ConditionType): TrackType | OverflowTrackType | ConditionType {
         if (damage.value === 0) return track;
         if (track.value === track.max) return track;
 
         //  Avoid cross referencing.
-        track = foundry.utils.duplicate(track);
+        track = foundry.utils.duplicate(track) as TrackType | OverflowTrackType | ConditionType;
 
         track.value += damage.value;
         if (track.value > track.max) {
@@ -1265,7 +1251,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return track;
     }
 
-    async _addDamageToDeviceTrack(damage: Shadowrun.DamageData, device: SR5Item) {
+    async _addDamageToDeviceTrack(damage: DamageType, device: SR5Item) {
         if (!device) return;
 
         let condition = device.getCondition();
@@ -1277,6 +1263,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         condition = this.__addDamageToTrackValue(damage, condition);
 
         await device.update({ system: { technology: { condition_monitor: condition } } });
+        return;
     }
 
     /**
@@ -1291,7 +1278,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param damage The damage to be taken.
      * @param track The track to apply that damage to.
      */
-    async _addDamageToTrack(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData) {
+    async _addDamageToTrack(damage: DamageType, track: TrackType | OverflowTrackType | ConditionType) {
         if (damage.value === 0) return;
         if (track.value === track.max) return;
 
@@ -1317,7 +1304,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param track The track to overflow the damage into.
      * @returns 
      */
-    async _addDamageToOverflow(damage: Shadowrun.DamageData, track: Shadowrun.OverflowTrackType) {
+    async _addDamageToOverflow(damage: DamageType, track: OverflowTrackType) {
         if (damage.value === 0) return;
         if (track.overflow.value === track.overflow.max) return;
 
@@ -1338,7 +1325,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param track What track should be healed?
      * @param healing How many boxes of healing should be done?
      */
-    async healDamage(track: Shadowrun.DamageType, healing: number) {
+    async healDamage(track: DamageType['type']['value'], healing: number) {
         console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
 
         // @ts-expect-error
@@ -1370,7 +1357,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param damage The to be applied damage.
      * @returns overflow damage after stun damage is full.
      */
-    async addStunDamage(damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData> {
+    async addStunDamage(damage: DamageType): Promise<DamageType> {
         if (damage.type.value !== 'stun') return damage;
 
         const track = this.getStunTrack();
@@ -1396,7 +1383,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * 
      * @param damage The to be applied damage.
      */
-    async addPhysicalDamage(damage: Shadowrun.DamageData) {
+    async addPhysicalDamage(damage: DamageType) {
         if (damage.type.value !== 'physical') {
             return damage;
         }
@@ -1420,7 +1407,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * - IC has a local matrix.condition_monitor
      * - Characters have matrix devices (items) with their local track
      */
-    async addMatrixDamage(damage: Shadowrun.DamageData) {
+    async addMatrixDamage(damage: DamageType) {
         if (damage.type.value !== 'matrix') return;
 
 
@@ -1445,7 +1432,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param damage Damage to be applied
      * @returns overflow damage.
      */
-    async addDamage(damage: Shadowrun.DamageData) {
+    async addDamage(damage: DamageType) {
         switch(damage.type.value) {
             case 'matrix':
                 await this.addMatrixDamage(damage);
@@ -1477,7 +1464,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         value = Math.max(value, 0);
 
         // Use artificial damage to be consistent across other damage application Actor methods.
-        const damage = DataDefaults.damageData({
+        const damage = DataDefaults.createData({
             type: {base: 'matrix', value: 'matrix'},
             base: value,
             value: value
@@ -1512,16 +1499,14 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
     /** Calculate damage overflow only based on max and current track values.
      */
-    _calcDamageOverflow(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.ConditionData): { overflow: Shadowrun.DamageData, rest: Shadowrun.DamageData } {
+    _calcDamageOverflow(damage: DamageType, track: TrackType | ConditionType): { overflow: DamageType, rest: DamageType } {
         const freeTrackDamage = track.max - track.value;
-        const overflowDamage = damage.value > freeTrackDamage ?
-            damage.value - freeTrackDamage :
-            0;
+        const overflowDamage = damage.value > freeTrackDamage ? damage.value - freeTrackDamage : 0;
         const restDamage = damage.value - overflowDamage;
 
         //  Avoid cross referencing.
-        const overflow = foundry.utils.duplicate(damage);
-        const rest = foundry.utils.duplicate(damage);
+        const overflow = foundry.utils.duplicate(damage) as DamageType;
+        const rest = foundry.utils.duplicate(damage) as DamageType;
 
         overflow.value = overflowDamage;
         rest.value = restDamage;
@@ -1529,14 +1514,12 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return {overflow, rest};
     }
 
-    getStunTrack(): Shadowrun.TrackType | void {
-        if ("track" in this.system && "stun" in this.system.track)
-            return this.system.track.stun;
+    getStunTrack(this: SR5Actor): TrackType | undefined {
+        return this.system.track && 'stun' in this.system.track ? this.system.track.stun : undefined;
     }
 
-    getPhysicalTrack(): Shadowrun.OverflowTrackType | void {
-        if ("track" in this.system && "physical" in this.system.track)
-            return this.system.track.physical;
+    getPhysicalTrack(this: SR5Actor): OverflowTrackType | undefined {
+        return this.system.track && 'physical' in this.system.track ? this.system.track.physical : undefined;
     }
 
     /**
@@ -1544,17 +1527,14 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      *
      * Use this method for whenever you need to access this actors matrix damage track as it's source might differ.
      */
-    getMatrixTrack(): Shadowrun.ConditionData | undefined {
+    getMatrixTrack(this: SR5Actor): ConditionType | undefined {
         // Some actors will have a direct matrix track.
-        if ("track" in this.system && "matrix" in this.system.track) {
+        if (this.system.track && "matrix" in this.system.track)
             return this.system.track.matrix;
-        }
 
         // Some actors will have a personal matrix condition monitor, like a device condition monitor.
-        if (this.isMatrixActor) {
-            // @ts-expect-error isMatrixActor checks for the matrix attribute
+        if (this.system.matrix)
             return this.system.matrix.condition_monitor;
-        }
 
         // Fallback to equipped matrix device.
         const device = this.getMatrixDevice();
@@ -1637,12 +1617,12 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         }
     }
 
-    getModifiedArmor(damage: Shadowrun.DamageData): Shadowrun.ActorArmorData {
+    getModifiedArmor(damage: DamageType): BaseArmorType {
         if (!damage.ap?.value) {
             return this.getArmor();
         }
 
-        const modified = foundry.utils.duplicate(this.getArmor());
+        const modified = foundry.utils.duplicate(this.getArmor()) as BaseArmorType;
         if (modified) {
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
             modified.value = Helpers.calcTotal(modified, {min: 0});
@@ -1705,11 +1685,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return combatant.initiative;
     }
 
-    hasDamageTracks(): boolean {
-        return "track" in this.system;
-    }
-
-    getVehicleStats(): Shadowrun.VehicleStats | undefined {
+    getVehicleStats(): VehicleStatsType | undefined {
         if (this.isType('vehicle')) return this.system.vehicle_stats;
         return undefined;
     }
@@ -2057,7 +2033,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     /**
      * Remove the consecutive defense per turn modifier.
      */
-    async removeDefenseMultiModifier() {
+    async removeDefenseMultiModifier(this: SR5Actor) {
         const automateDefenseMod = game.settings.get(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier);
         if (!automateDefenseMod || !this.combatActive) return;
 
@@ -2087,8 +2063,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param additional New recoil to be added
      */
     async addRecoil(additional: number) {
-        const base = this.recoil + additional;
-        await this.update({'system.values.recoil.base': base});
+        const base = this.recoil() + additional;
+        await this.update({ system: { values: { recoil: { base } } } });
     }
 
     /**
@@ -2096,8 +2072,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     async clearProgressiveRecoil() {
         if (!this.hasPhysicalBody) return;
-        if (this.recoil === 0) return;
-        await this.update({'system.values.recoil.base': 0});
+        if (this.recoil() === 0) return;
+        await this.update({ system: { values: { recoil: { base: 0 } } } });
     }
 
     /**
@@ -2146,16 +2122,14 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         // If the given item is the only of it's type, allow unequipping.
         if (sameTypeItems.length === 1 && sameTypeItems[0].id === unequipItem.id) {
-            await unequipItem.update({'system.technology.equipped': !unequipItem.isEquipped()});
+            await unequipItem.update({ system: { technology: { equipped: !unequipItem.isEquipped() } } });
             return
         }
         
         // For a set of items, assure only the selected is equipped.
-        const updateData = sameTypeItems.map(item => ({
+        await this.updateEmbeddedDocuments('Item', sameTypeItems.map(item => ({
             _id: item.id,
-            'system.technology.equipped': item.id === unequipItem.id
-        }));
-
-        await this.updateEmbeddedDocuments('Item', updateData);
+            system: { technology: { equipped: item.id === unequipItem.id } }
+        })));
     }
 }

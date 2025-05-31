@@ -1,5 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
-import { ActorArmor } from "../template/ArmorModel";
+import { ArmorData } from "../template/ArmorModel";
 import { Attributes, AttributeField } from "../template/AttributesModel";
 import { ModifiableValue } from "../template/BaseModel";
 import { ConditionData } from "../template/ConditionModel";
@@ -104,7 +104,7 @@ export const MatrixData = () => ({
     hot_sim: new BooleanField({ required: true, initial: false }),
     running_silent: new BooleanField({ required: true, initial: false }),
     item: new AnyField({ required: false }),
-    marks: new TypedObjectField(new NumberField({ required: true, initial: 0 }), { required: true }),
+    marks: new TypedObjectField(new NumberField({ required: true, nullable: false, initial: 0 }), { required: true }),
 });
 
 export const CommonValues = () => ({
@@ -138,11 +138,11 @@ export const VisibilityChecks = () => ({
 });
 
 export const ArmorActorData = () => ({
-    armor: new SchemaField(ActorArmor(), { required: true }),
+    armor: new SchemaField(ArmorData(), { required: true }),
 });
 
 export const WoundType = () => ({
-    value: new NumberField({ required: true, initial: 0 }),
+    value: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 export const WoundsActorData = () => ({
@@ -197,6 +197,7 @@ export const CommonModifiers = () => ({
     stun_track: new NumberField({ required: true, nullable: false, initial: 0 }),
     physical_track: new NumberField({ required: true, nullable: false, initial: 0 }),
     physical_overflow_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    multi_defense: new NumberField({ required: true, nullable: false, initial: 0 }),
     wound_tolerance: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
@@ -211,6 +212,7 @@ const InventoryData = () => ({
     type: new StringField({ required: true, initial: "" }),
     itemIds: new ArrayField(new StringField({ required: true, initial: "" }), { required: true }),
     showAll: new BooleanField({ required: true, initial: false }),
+    label: new StringField({ required: true, initial: "" }),
 });
 
 export const CommonData = () => ({
@@ -228,3 +230,6 @@ export const CommonData = () => ({
     visibilityChecks: new SchemaField(VisibilityChecks(), { required: true }),
     category_visibility: new SchemaField(CategoryVisibility(), { required: true }),
 });
+
+export type InventoryType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof InventoryData>>;
+export type InventoriesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof CommonData>>['inventories'];

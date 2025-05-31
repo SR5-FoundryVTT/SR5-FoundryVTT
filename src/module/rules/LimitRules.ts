@@ -36,7 +36,7 @@ export const LimitRules = {
      * @returns A magic limit field based on the magic attribute
      */
     calculateMagicLimit(magic: AttributeField): LimitField {
-        return DataDefaults.limitField({
+        return DataDefaults.createData('limit_field', {
             base: magic.value,
             label: magic.label
         });
@@ -48,7 +48,7 @@ export const LimitRules = {
      * @returns A hidden limit as to not show it on the sheet limits.
      */
     calculateInitiationSubmersionLimit(initiation: number): LimitField {
-        return DataDefaults.limitField({
+        return DataDefaults.createData('limit_field', {
             base: initiation,
             value: initiation,
             label: SR5.limits.initiation,

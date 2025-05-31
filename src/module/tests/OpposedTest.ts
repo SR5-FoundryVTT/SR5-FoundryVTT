@@ -116,7 +116,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
         // Casting an opposed action doesn't give as complete ActionData from the original.
         // Therefore we must create an empty dummy action.
-        let action = DataDefaults.actionRollData();
+        let action = DataDefaults.createData('action_roll');
 
         // Allow the OpposedTest to overwrite action data using its class default action.
         action = TestCreator._mergeMinimalActionDataInOrder(action,

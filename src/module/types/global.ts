@@ -182,7 +182,7 @@ declare module "fvtt-types/configuration" {
 
     namespace ActiveEffect {
         interface ChangeData {
-            effect?: SR5ActiveEffect;
+            effect: SR5ActiveEffect;
         }
     }
 

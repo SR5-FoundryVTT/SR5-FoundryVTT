@@ -42,7 +42,7 @@ export const RitualRules = {
         if (hits < 0) hits = 0;
         if (magic < 0) magic = 1;
 
-        const damage = DataDefaults.damageData();
+        const damage = DataDefaults.createData('damage');
         damage.base = drain;
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);
         Helpers.calcTotal(damage, { min: 0 });

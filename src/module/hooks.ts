@@ -308,6 +308,7 @@ ___________________
         CONFIG.SR5 = SR5;
 
         CONFIG.Item.dataModels["action"] = Action;
+        CONFIG.Item.dataModels["ammo"] = Ammo;
         CONFIG.Item.dataModels["armor"] = Armor;
         CONFIG.Item.dataModels["adept_power"] = AdeptPower;
         CONFIG.Item.dataModels["bioware"] = Bioware;

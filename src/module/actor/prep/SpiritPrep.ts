@@ -106,7 +106,7 @@ export class SpiritPrep {
         const label = SR5.activeSkills[skillId];
         const attribute = SR5.activeSkillAttribute[skillId];
 
-        return DataDefaults.skillData({ label, attribute, canDefault: false })
+        return DataDefaults.createData('skill_field', { label, attribute, canDefault: false })
     }
 
     static prepareSpiritArmor(data: Actor.SystemOfType<'spirit'>) {

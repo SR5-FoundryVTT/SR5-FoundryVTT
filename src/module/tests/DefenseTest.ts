@@ -26,7 +26,7 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
     override _prepareData(data, options?) {
         data = super._prepareData(data, options);
 
-        const damage = data.against ? data.against.damage : DataDefaults.damageData();
+        const damage = data.against ? data.against.damage : DataDefaults.createData('damage');
 
         data.incomingDamage = foundry.utils.duplicate(damage);
         data.modifiedDamage = foundry.utils.duplicate(damage);

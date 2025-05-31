@@ -3,19 +3,18 @@ import { BaseValuePair, ModifiableValue, KeyValuePair } from "./BaseModel";
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
-const SkillField = () => ({
+export const SkillField = () => ({
     ...ModifiableValue(),
     name: new StringField({ required: true, initial: '' }),
-    hide: new BooleanField({ required: false, initial: false }),
-    label: new StringField({ required: false, initial: '' }),
+    hidden: new BooleanField({ required: true, initial: false }),
+    label: new StringField({ required: true, initial: '' }),
     bonus: new ArrayField(new SchemaField(KeyValuePair())),
-    //todo
-    attribute: new StringField({ required: false, initial: '' }),
-    _delete: new BooleanField({ required: false, initial: false }),
-    specs: new ArrayField(new StringField({ required: false, initial: '' })),
-    canDefault: new BooleanField({ required: false, initial: false }),
-    id: new StringField({ required: false, initial: '' }),
-    link: new StringField({ required: false, initial: '' }),
+    attribute: new StringField({ required: true, initial: '' }),
+    _delete: new BooleanField({ required: true, initial: false }), // Does it use it?
+    specs: new ArrayField(new StringField({ required: true, initial: '' })),
+    canDefault: new BooleanField({ required: true, initial: false }),
+    id: new StringField({ required: true, initial: '' }),
+    link: new StringField({ required: true, initial: '' }),
 });
 
 export const Skills = () => new TypedObjectField(new SchemaField(SkillField()), { required: true, initial: {} });
@@ -35,3 +34,7 @@ export const KnowledgeSkills = () => ({
     professional: new SchemaField(KnowledgeSkillList()),
     interests: new SchemaField(KnowledgeSkillList()),
 });
+
+export type SkillFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof SkillField>>;
+// Not yet implemented in fvtt-types curently
+export type SkillsType = Record<string, SkillFieldType>;

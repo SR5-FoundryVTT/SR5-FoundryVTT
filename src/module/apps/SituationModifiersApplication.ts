@@ -139,7 +139,7 @@ class MagicModifiersHandler extends ModifiersHandler {
         console.log(`${SYSTEM_NAME} | Magic modifier HUD on renderTokenHUD`);
 
         // Don't add awakened modifiers to token hud for mundane actors.
-        if (!actor.isAwakened) return;
+        if (!actor.isAwakened()) return;
 
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');

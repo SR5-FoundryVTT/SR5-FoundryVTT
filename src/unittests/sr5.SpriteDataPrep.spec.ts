@@ -40,7 +40,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Sprites default/override values by example type', async () => {
-            const sprite = new SR5Actor<'sprite'>({ type: 'sprite', 'system.spriteType': 'courier' });
+            const sprite = new SR5Actor<'sprite'>({ type: 'sprite', system: { spriteType: 'courier' } });
 
             assert.strictEqual(sprite.system.matrix.sleaze.base, 3);
             assert.strictEqual(sprite.system.matrix.data_processing.base, 1);
@@ -51,7 +51,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(sprite.system.skills.active.hacking.base, 0);
 
-            await sprite.update({ 'system.level': 6 });
+            await sprite.update({ system: { level: 6 } });
 
             assert.strictEqual(sprite.system.level, 6);
 

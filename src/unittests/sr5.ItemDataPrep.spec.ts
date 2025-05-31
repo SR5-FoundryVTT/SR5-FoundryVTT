@@ -30,32 +30,32 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         it('Calculate the correct device item condition monitor', async () => {
             const device = new SR5Item<'device'>({type: 'device', name: 'TestDevice'});
             
-            device.technology.rating = 4;
-            TechnologyPrep.prepareConditionMonitor(device.technology);
+            device.system.technology.rating = 4;
+            TechnologyPrep.prepareConditionMonitor(device.system.technology);
 
-            assert.equal(device.technology.condition_monitor.max, 10);
+            assert.equal(device.system.technology.condition_monitor.max, 10);
 
             await device.delete();
         });
         it('Calculate the correct device item condition monitor for rounded values', async () => {
             const device = new SR5Item<'device'>({type: 'device', name: 'TestDevice'});
 
-            device.technology.rating = 5;
-            TechnologyPrep.prepareConditionMonitor(device.technology);
+            device.system.technology.rating = 5;
+            TechnologyPrep.prepareConditionMonitor(device.system.technology);
 
-            assert.equal(device.technology.condition_monitor.max, 11);
+            assert.equal(device.system.technology.condition_monitor.max, 11);
 
             await device.delete();
         });
         it('Calculate a condition monitor for devices with malformed technology data', async () => {
             const device = new SR5Item<'device'>({type: 'device', name: 'TestDevice'});
             
-            device.technology.rating = 4;
+            device.system.technology.rating = 4;
             // @ts-expect-error // test-case makes this necessary
             device.technology.condition_monitor = undefined;
-            TechnologyPrep.prepareConditionMonitor(device.technology);
+            TechnologyPrep.prepareConditionMonitor(device.system.technology);
 
-            assert.equal(device.technology.condition_monitor.max, 10);
+            assert.equal(device.system.technology.condition_monitor.max, 10);
 
             await device.delete();
         });
@@ -68,10 +68,10 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             mods.push(new SR5Item<'modification'>({type: 'modification', name: 'UniqueNameA', system: {conceal: 2}}));
             mods.push(new SR5Item<'modification'>({type: 'modification', name: 'UniqueNameB', system: {conceal: 4}}));
             
-            TechnologyPrep.prepareConceal(device.technology, mods);
+            TechnologyPrep.prepareConceal(device.system.technology, mods);
 
-            assert.equal(device.technology.conceal.value, 6);
-            assert.equal(device.technology.conceal.mod.length, 2);
+            assert.equal(device.system.technology.conceal.value, 6);
+            assert.equal(device.system.technology.conceal.mod.length, 2);
 
             await device.delete();
         });
@@ -80,11 +80,11 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
     describe('ActionRollData preparation', () => {
         it('Check for damage base_formula_operator migration', async () => {
             const action = new SR5Item<'action'>({type: 'action', name: 'TestAction'});
-            action.action.damage.base_formula_operator = '+';
+            action.system.action.damage.base_formula_operator = 'add';
 
-            ActionPrep.prepareWithMods(action.action, []);
+            ActionPrep.prepareWithMods(action.system.action, []);
 
-            assert.equal(action.action.damage.base_formula_operator, 'add');
+            assert.equal(action.system.action.damage.base_formula_operator, 'add');
             await action.delete();
         });
 

@@ -43,7 +43,11 @@ export const ModifiableValue = () => ({
 export const ModifiableValueLinked = () => ({
     ...ModifiableValue(),
     attribute: new StringField({ required: false, initial: '' }),
-    base_formula_operator: new StringField({ required: false, initial: '' }),
+    base_formula_operator: new StringField({
+        required: false,
+        initial: 'add',
+        choices: ['add', 'subtract', 'multiply', 'divide']
+    }),
 });
 
 export const ValueField = () => ({
@@ -58,3 +62,4 @@ export const KeyValuePair = () => ({
 });
 
 export type ModifiableValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValue>>;
+export type ModifiableValueLinkedType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValueLinked>>;

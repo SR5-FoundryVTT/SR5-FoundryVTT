@@ -17,26 +17,16 @@ const AmmunitionData = () => ({
         required: true,
         initial: '',
         blank: true,
-        choices: [
-            'removable_clip',
-            'break_action',
-            'belt_fed',
-            'internal_magazin',
-            'muzzle_loader',
-            'cylinder',
-            'drum',
-            'bow',
-            ''
-        ],
+        choices: ['removable_clip', 'break_action', 'belt_fed', 'internal_magazin', 'muzzle_loader', 'cylinder', 'drum', 'bow', ''],
     }),
-    partial_reload_value: new NumberField({ required: true, initial: 0 }),
+    partial_reload_value: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 const RangeData = () => ({
-    short: new NumberField({ required: true, initial: 0 }),
-    medium: new NumberField({ required: true, initial: 0 }),
-    long: new NumberField({ required: true, initial: 0 }),
-    extreme: new NumberField({ required: true, initial: 0 }),
+    short: new NumberField({ required: true, nullable: false, initial: 0 }),
+    medium: new NumberField({ required: true, nullable: false, initial: 0 }),
+    long: new NumberField({ required: true, nullable: false, initial: 0 }),
+    extreme: new NumberField({ required: true, nullable: false, initial: 0 }),
     category: new StringField({ required: true, initial: '' }),
     attribute: new StringField({ required: false, initial: '' }),
 });
@@ -56,7 +46,7 @@ const RangeWeaponData = () => ({
 });
 
 const MeleeWeaponData = () => ({
-    reach: new NumberField({ required: true, initial: 0 }),
+    reach: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 const ThrownWeaponData = () => ({
@@ -90,3 +80,6 @@ export class Weapon extends foundry.abstract.TypeDataModel<typeof WeaponData, It
 }
 
 console.log("WeaponData", WeaponData, new Weapon());
+
+export type AmmunitionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof AmmunitionData>>;
+export type RangeWeaponType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangeWeaponData>>;

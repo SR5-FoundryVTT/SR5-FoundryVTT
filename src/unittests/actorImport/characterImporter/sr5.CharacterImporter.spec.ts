@@ -27,8 +27,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         let testItem = new SR5TestingDocuments(SR5Item);
 
         it('Does nothing when no character found', async () => {
-            const item = await testItem.create({ type: 'weapon' }) as SR5Item;
-            const character = await testActor.create({ 'type': 'character', 'system.metatype': 'human' });
+            const item = new SR5Item<'weapon'>({ type: 'weapon' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await character.createEmbeddedDocuments('Item', [item]);
             assert.lengthOf(character.items, 1);
 
@@ -37,13 +37,16 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.lengthOf(character.items, 1);
             assert.strictEqual(character.items.contents[0].name, item.name);
             assert.strictEqual(character.items.contents[0].type, item.type);
+
+            await item.delete();
+            await character.delete();
         });
 
         it('Clears all imported items', async () => {
-            const item = await testItem.create({ type: 'weapon' }) as SR5Item;
-            await item.update({'system.importFlags.isImported': true})
+            const item = new SR5Item<'weapon'>({ type: 'weapon' });
+            await item.update({ system: { importFlags: { isImported: true } } });
 
-            const character = await testActor.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await character.createEmbeddedDocuments('Item', [item]);
 
             assert.lengthOf(character.items, 1);
@@ -51,12 +54,15 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.isEmpty(character.items);
+
+            await item.delete();
+            await character.delete();
         });
 
         it('Clears all items but not imported ones', async () => {
-            const item = await testItem.create({ type: 'weapon' }) as SR5Item;
+            const item = new SR5Item<'weapon'>({ type: 'weapon' });
 
-            const character = await testActor.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await character.createEmbeddedDocuments('Item', [item]);
 
             assert.lengthOf(character.items, 1);
@@ -64,11 +70,14 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.lengthOf(character.items, 1);
+
+            await item.delete();
+            await character.delete();
         });
 
         it('Clears all items but actions', async () => {
-            const item = await testItem.create({ type: 'action' }) as SR5Item;
-            const character = await testActor.create({ 'type': 'character', 'system.metatype': 'human' });
+            const item = new SR5Item<'action'>({ type: 'action' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await character.createEmbeddedDocuments('Item', [item]);
             
             assert.lengthOf(character.items, 1);
@@ -78,25 +87,32 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.lengthOf(character.items, 1);
             assert.strictEqual(character.items.contents[0].name, item.name);
             assert.strictEqual(character.items.contents[0].type, item.type);
+
+            await item.delete();
+            await character.delete();
         });
 
         it('Clears all items but effects', async () => {
-            let item = await testItem.create({ type: 'weapon' }) as Item;
+            let item = new SR5Item<'weapon'>({ type: 'weapon' });
             item.createEmbeddedDocuments('ActiveEffect', [{
                 origin: item.uuid,
                 disabled: false,
                 label: 'Test Effect',
                 changes: [
                     { key: 'system.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
-                    { key: 'system.attributes.body', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+                    { key: 'system.attributes.body', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
+                ]
             }]);
-            const character = await testActor.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await character.createEmbeddedDocuments('Item', [item]);
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.lengthOf(character.items, 1);
             assert.strictEqual(character.items.contents[0].name, item.name);
             assert.strictEqual(character.items.contents[0].type, item.type);
+
+            await item.delete();
+            await character.delete();
         });
     });
 

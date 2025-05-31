@@ -233,7 +233,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            const action = DataDefaults.actionRollData({ test: 'SuccessTest' });
+            const action = DataDefaults.createData('action_roll', { test: 'SuccessTest' });
 
             const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
 
@@ -559,7 +559,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            const action = DataDefaults.actionRollData({ test: SkillTest.name, limit: { attribute: 'social' } });
+            const action = DataDefaults.createData('action_roll', { test: SkillTest.name, limit: { attribute: 'social' } });
             const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
 
             // Simulate relevant part of #execute
@@ -596,7 +596,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             // CASE - Test uses the same category
-            let action = DataDefaults.actionRollData({ test: 'SkillTest', categories: ['social'] });
+            let action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['social'] });
             let test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
 
             // Simulate relevant part of #execute
@@ -608,7 +608,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(test.pool.value, 3);
 
             // CASE - Test uses different category
-            action = DataDefaults.actionRollData({ test: 'SkillTest', categories: ['matrix'] });
+            action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['matrix'] });
             test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
 
             // Simulate relevant part of #execute
@@ -620,7 +620,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(test.pool.value, 0);
 
             // CASE - Test uses no category
-            action = DataDefaults.actionRollData({ test: 'SkillTest', categories: [] });
+            action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: [] });
             test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
 
             // Simulate relevant part of #execute

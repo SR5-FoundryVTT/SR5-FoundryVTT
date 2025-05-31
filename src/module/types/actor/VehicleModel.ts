@@ -5,27 +5,20 @@ import { ModifiableValue } from "../template/BaseModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 import { VehicleLimits } from "../template/LimitsModel";
 
-const VehicleStat = () => ({
-    ...ModifiableValue(),
-    label: new StringField({ required: true, initial: "" }),
-    temp: new NumberField({ required: true, nullable: false, initial: 0 }),
-    hidden: new BooleanField({ required: true, initial: false }),
-});
-
 const VehicleAttributes = () => ({
     ...Attributes(),
     pilot: new SchemaField(AttributeField(), { required: true }),
 });
 
 const VehicleStats = () => ({
-    pilot: new SchemaField(VehicleStat(), { required: true }),
-    handling: new SchemaField(VehicleStat(), { required: true }),
-    off_road_handling: new SchemaField(VehicleStat(), { required: true }),
-    speed: new SchemaField(VehicleStat(), { required: true }),
-    off_road_speed: new SchemaField(VehicleStat(), { required: true }),
-    acceleration: new SchemaField(VehicleStat(), { required: true }),
-    sensor: new SchemaField(VehicleStat(), { required: true }),
-    seats: new SchemaField(VehicleStat(), { required: true }),
+    pilot: new SchemaField(AttributeField(), { required: true }),
+    handling: new SchemaField(AttributeField(), { required: true }),
+    off_road_handling: new SchemaField(AttributeField(), { required: true }),
+    speed: new SchemaField(AttributeField(), { required: true }),
+    off_road_speed: new SchemaField(AttributeField(), { required: true }),
+    acceleration: new SchemaField(AttributeField(), { required: true }),
+    sensor: new SchemaField(AttributeField(), { required: true }),
+    seats: new SchemaField(AttributeField(), { required: true }),
 });
 
 const VehicleModCategories = () => ({
@@ -84,3 +77,5 @@ export class Vehicle extends foundry.abstract.TypeDataModel<typeof VehicleData, 
 }
 
 console.log("VehicleData", VehicleData, new Vehicle());
+
+export type VehicleStatsType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof VehicleStats>>;

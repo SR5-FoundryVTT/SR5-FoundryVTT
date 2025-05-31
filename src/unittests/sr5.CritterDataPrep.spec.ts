@@ -46,8 +46,15 @@ export const shadowrunSR5CritterDataPrep = (context: QuenchBatchContext) => {
             await critter.delete();
         });
         it('A NPC Grunt should only have physical track', async () => {
-            const critter = new SR5Actor<'critter'>({ type: 'critter', 'system.is_npc': true, 'system.npc.is_grunt': true, 'system.attributes.willpower.base': 6}) as SR5Actor<'critter'>;
-            
+            const critter = new SR5Actor<'critter'>({
+                type: 'critter',
+                system: {
+                    is_npc: true,
+                    npc: { is_grunt: true },
+                    attributes: { willpower: { base: 6 } }
+                }
+            });
+
             assert.strictEqual(critter.system.track.stun.value, 0);
             assert.strictEqual(critter.system.track.stun.disabled, true);
             assert.strictEqual(critter.system.track.physical.disabled, false);

@@ -49,19 +49,23 @@ export default class VehicleParser {
             }
 
             await vehicleActor.update({
-                'system.driver': actor.id,
-                'system.vehicle_stats.pilot.base': vehicle.pilot,
-                'system.vehicle_stats.handling.base': handling,
-                'system.vehicle_stats.off_road_handling.base': off_road_handling,
-                'system.vehicle_stats.speed.base': speed,
-                'system.vehicle_stats.off_road_speed.base': off_road_speed,
-                'system.vehicle_stats.acceleration.base': vehicle.accel,
-                'system.vehicle_stats.sensor.base': vehicle.sensor,
-                'system.vehicle_stats.seats.base': vehicle.seats,
-                'system.attributes.body.base': vehicle.body,
-                'system.armor.base': vehicle.armor,
-                'system.isDrone': vehicle.isdrone === "True",
-                'folder': actor.folder?.id
+                system: {
+                    driver: actor.id,
+                    vehicle_stats: {
+                        pilot: { base: vehicle.pilot },
+                        handling: { base: handling },
+                        off_road_handling: { base: off_road_handling },
+                        speed: { base: speed },
+                        off_road_speed: { base: off_road_speed },
+                        acceleration: { base: vehicle.accel },
+                        sensor: { base: vehicle.sensor },
+                        seats: { base: vehicle.seats }
+                    },
+                    attributes: { body: { base: vehicle.body } },
+                    armor: { base: vehicle.armor },
+                    isDrone: vehicle.isdrone === "True"
+                },
+                folder: actor.folder?.id
             });
 
             await vehicleActor.createEmbeddedDocuments('Item', (await Promise.all(promises)).flat());

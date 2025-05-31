@@ -32,19 +32,23 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 alias: 'ImportTester',
             };
 
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.name, 'ImportTester');
             assert.strictEqual(character.prototypeToken.name, 'ImportTester');
+
+            await character.delete();
         });
 
         it('Sets placeholder when no alias', async () => {
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.name, '[Name not found]');
             assert.strictEqual(character.prototypeToken.name, '[Name not found]');
+
+            await character.delete();
         });
     });
 
@@ -171,7 +175,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 ],
             };
 
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.system.attributes.body.value, 3);
@@ -185,6 +189,8 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
 
             assert.strictEqual(character.system.attributes.edge.value, 3);
             assert.strictEqual(character.system.attributes.essence.value, 6);
+
+            await character.delete();
         });
 
         it('Imports magic attribute', async () => {
@@ -210,11 +216,13 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 ],
             };
 
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.system.attributes.magic.value, 7);
             assert.strictEqual(character.system.attributes.resonance.value, 0);
+
+            await character.delete();
         });
 
         it('Imports resonance attribute', async () => {
@@ -240,11 +248,13 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 ],
             };
 
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.system.attributes.magic.value, 0);
             assert.strictEqual(character.system.attributes.resonance.value, 7);
+
+            await character.delete();
         });
     });
 };

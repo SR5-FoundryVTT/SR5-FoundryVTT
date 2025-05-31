@@ -15,33 +15,63 @@ export const MinimalActionData = () => ({
     skill: new StringField({ required: true, initial: '' }),
     attribute: new StringField({ required: true, initial: '' }),
     attribute2: new StringField({ required: true, initial: '' }),
-    mod: new NumberField({ required: true, initial: 0 }),
+    mod: new NumberField({ required: true, nullable: false, initial: 0 }),
     armor: new BooleanField({ required: true, initial: false }),
     limit: new SchemaField(ModifiableValueLinked())
 });
 
 export const DamageData = () => ({
     ...ModifiableValueLinked(),
-    type: new SchemaField(BaseValuePair()),
-    element: new SchemaField(BaseValuePair()),
+    type: new SchemaField({
+        base: new StringField({
+            required: true,
+            initial: 'physical',
+            choices: ["physical", "matrix", "stun"]
+        }),
+        value: new StringField({
+            required: true,
+            initial: 'physical',
+            choices: ["physical", "matrix", "stun"]
+        }),
+    }),
+    element: new SchemaField({
+        base: new StringField({
+            required: true,
+            initial: '',
+            blank: true,
+            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+        }),
+        value: new StringField({
+            required: true,
+            initial: '',
+            blank: true,
+            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+        }),
+    }),
     ap: new SchemaField(ModifiableValueLinked()),
     source: new SchemaField({
         actorId: new StringField({ required: true, initial: '' }),
         itemId: new StringField({ required: true, initial: '' }),
         itemName: new StringField({ required: true, initial: '' }),
         itemType: new StringField({ required: true, initial: '' }),
-    }, { required: false }),
+    }, { required: true }),
 });
 
 export const OpposedTestData = () => ({
     type: new StringField({ required: true, initial: '' }),
     description: new StringField({ required: true, initial: '' }),
-    resist: new SchemaField({
+    mod: new NumberField({ required: true, nullable: false, initial: 0 }), // Does it use it?
+    skill: new StringField({ required: true, initial: '' }), // Does it use it?
+    attribute: new StringField({ required: true, initial: '' }), // Does it use it?
+    attribute2: new StringField({ required: true, initial: '' }), // Does it use it?
+    test: new StringField({ required: true, initial: '' }), // Does it use it?
+    resist: new SchemaField({ // Does it use it?
         test: new StringField({ required: true, initial: '' }),
     }),
 });
 
 export const ActionRollData = () => ({
+    ...MinimalActionData(),
     test: new StringField({ required: true, initial: '' }),
     type: new StringField({ required: true, initial: '' }),
     categories: new ArrayField(new StringField({ required: true, initial: '' })),
@@ -53,8 +83,13 @@ export const ActionRollData = () => ({
     damage: new SchemaField(DamageData()),
     opposed: new SchemaField(OpposedTestData()),
     followed: new SchemaField({
-        test: new StringField({ required: true, initial: '' })
+        test: new StringField({ required: true, initial: '' }),
+        mod: new NumberField({ required: true, nullable: false, initial: 0 }), // Does it use it?
+        skill: new StringField({ required: true, initial: '' }), // Does it use it?
+        attribute: new StringField({ required: true, initial: '' }), // Does it use it?
+        attribute2: new StringField({ required: true, initial: '' }), // Does it use it?
     }),
+    alt_mod: new NumberField({ required: true, initial: 0 }),
     dice_pool_mod: ModList(),
     rool_mode: new StringField({ required: true, initial: '' }),
 });
@@ -79,5 +114,7 @@ export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, It
 
 console.log("ActionData", ActionData, new Action());
 
+export type DamageType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof DamageData>>;
 export type ActionRollType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionRollData>>;
 export type ActionResultType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionResultData>>;
+export type MinimalActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MinimalActionData>>;

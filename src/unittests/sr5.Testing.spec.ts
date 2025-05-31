@@ -47,7 +47,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                             base: 5,
                             base_formula_operator: "add",
                             element: { value: '', base: '' },
-                            itemSource: { actorId: '', itemId: '', itemType: '', itemName: '' },
+                            // itemSource: { actorId: '', itemId: '', itemType: '', itemName: '' },
                             mod: [],
                             type: { value: 'physical', base: 'physical' },
                             value: 5

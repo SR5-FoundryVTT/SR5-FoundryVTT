@@ -23,6 +23,8 @@ import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
+import { InventoryType } from 'src/module/types/actor/CommonModel';
+import { SkillsType } from 'src/module/types/template/SkillsModel';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -125,7 +127,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         skills: null
     }
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
-    _scroll: string;
+    _scroll!: string;
     _inventoryOpenClose: Record<string, boolean> = {};
 
     // Store the currently selected inventory.
@@ -516,8 +518,8 @@ export class SR5BaseActorSheet extends ActorSheet {
                 const actor = await fromUuid(data.uuid) as SR5Actor;
                 const itemData = {
                     name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
-                    type: 'contact',
-                    'system.linkedActor': actor.uuid
+                    type: 'contact' as Item.SubType,
+                    system: {linkedActor: actor.uuid }
                 };
                 await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
             }
@@ -895,7 +897,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 }
             };
 
-            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
+            (['firewall', 'data_processing', 'sleaze', 'attack'] as MatrixAttribute[]).forEach(att => cleanupAttribute(att));
         }
     }
 
@@ -1233,7 +1235,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._filterActiveSkills(sheetData);
     }
 
-    _filterSkills(data: SR5ActorSheetData, skills: Skills = {}) {
+    _filterSkills(data: SR5ActorSheetData, skills: SkillsType = {}) : SkillsType {
         const filteredSkills = {};
         for (let [key, skill] of Object.entries(skills)) {
             // Don't show hidden skills.
@@ -1562,7 +1564,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             return console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item);
         }
 
-        await item.update({ 'system.technology.quantity': quantity });
+        await item.update({ system: { technology: { quantity } } });
     }
 
     /**
@@ -1573,7 +1575,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const item = this.actor.items.get(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
-            await item.update({ 'system.technology.rating': rtg });
+            await item.update({ system: { technology: { rating: rtg } } });
         }
     }
 
@@ -1591,8 +1593,8 @@ export class SR5BaseActorSheet extends ActorSheet {
             await this.document.equipOnlyOneItemOfType(item);
         } else {
             await this.actor.updateEmbeddedDocuments('Item', [{
-                '_id': iid,
-                'system.technology.equipped': !item.isEquipped(),
+                _id: iid,
+                system: { technology: { equipped: !item.isEquipped() } }
             }]);
         }
 
@@ -1614,16 +1616,14 @@ export class SR5BaseActorSheet extends ActorSheet {
                 return;
             case 'enabled_option':
                 await this.actor.updateEmbeddedDocuments('Item', [{
-                    '_id': iid,
-                    'system.optional': 'disabled_option',
-                    'system.enabled': false,
+                    _id: iid,
+                    system: { optional: 'disabled_option', enabled: false }
                 }]);
                 break;
             case 'disabled_option':
                 await this.actor.updateEmbeddedDocuments('Item', [{
-                    '_id': iid,
-                    'system.optional': 'enabled_option',
-                    'system.enabled': true,
+                    _id: iid,
+                    system: { optional: 'enabled_option', enabled: true }
                 }]);
                 break;
         }
@@ -1887,7 +1887,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 $(checkmark).removeClass('fa-check-circle');
             }
         };
-        html.find('label.checkbox').each(function () {
+        html.find('label.checkbox').each(function (this: any) {
             setContent(this);
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
@@ -1923,7 +1923,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     _hideSituationModifier(category: Shadowrun.SituationModifierType): boolean {
         switch (category) {
             case 'background_count':
-                return !this.actor.isAwakened;
+                return !this.actor.isAwakened();
             case 'environmental':
                 return this.actor.isType('sprite');
             // Defense modifier is already shown in general modifier section.

@@ -41,7 +41,7 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
             const actor = new SR5Actor<'character'>({type: 'character'});
 
             assert.notProperty(actor.system, 'test');
-            await actor.update({'system.test': true});
+            await actor.update({ system: { test: true } });
 
             assert.property(actor.system, 'test');
             assert.propertyVal(actor.system, 'test', true);

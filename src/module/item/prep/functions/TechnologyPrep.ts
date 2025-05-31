@@ -33,7 +33,7 @@ export const TechnologyPrep = {
      */
     prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[]) {
         // Calculate conceal data.
-        if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: [] as any[], override: {name: '', value: 0}, temp: 0};
+        if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: [], override: {name: '', value: 0}, temp: 0};
 
         const concealParts = new PartsList<number>();
         equippedMods.forEach((mod) => {

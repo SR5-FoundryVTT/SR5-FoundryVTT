@@ -34,7 +34,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
             data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
         // This test is part of either a standalone test or created with its own data (i.e. edge reroll).
         } else {
-            data.incomingDrain = data.incomingDrain ?? DataDefaults.damageData();
+            data.incomingDrain = data.incomingDrain ?? DataDefaults.createData('damage');
             data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
         }
 

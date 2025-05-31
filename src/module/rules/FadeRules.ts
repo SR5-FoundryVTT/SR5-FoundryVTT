@@ -17,7 +17,7 @@ export const FadeRules = {
         if (hits < 0) hits = 0;
         if (resonance < 1) resonance = 1;
 
-        const damage = DataDefaults.damageData();
+        const damage = DataDefaults.createData('damage');
         damage.base = fade;
         Helpers.calcTotal(damage, {min: 0});
 

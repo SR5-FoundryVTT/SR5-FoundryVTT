@@ -231,7 +231,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
      */
     get recoilBeforeAttack(): number {
         if (!this.actor) return 0;
-        return this.actor.recoil;
+        return this.actor.recoil();
     }
 
     /**
@@ -242,6 +242,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         
         const fireMode = this.data.fireMode;
         const fireModeRecoil = fireMode.recoil ? fireMode.value : 0;
-        return this.actor.recoil + fireModeRecoil;
+        return this.actor.recoil() + fireModeRecoil;
     }
 }

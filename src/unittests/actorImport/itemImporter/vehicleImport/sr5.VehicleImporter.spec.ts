@@ -26,7 +26,7 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Vehicle Parser', () => {
         it('parses vehicles', async () => {
-            const actor = await testActor.create({ type: 'character' }) as SR5Actor<'vehicle'>;
+            const actor = new SR5Actor<'vehicle'>({ type: 'character' });
 
             const parsedVehicles = await vehicleParser.parseVehicles(
                 actor,
@@ -50,6 +50,10 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
             assert.deepEqual(drone.system.vehicle_stats.seats.hidden, true);
             assert.deepEqual(vehicle.system.vehicle_stats.seats.value, 3);
             assert.deepEqual(vehicle.system.vehicle_stats.seats.hidden, false);
+
+            await actor.delete();
+            await drone.delete();
+            await vehicle.delete();
         });
     });
 };

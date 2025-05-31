@@ -41,7 +41,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         this._prepareSummoningData(data);
 
         data.drain = data.drain || 0;
-        data.drainDamage = data.drainDamage || DataDefaults.damageData();
+        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
 
         return data;
     }
@@ -184,7 +184,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
     }
 
     calcDrainDamage(opposingHits: number): Shadowrun.DamageData {
-        if (!this.actor) return DataDefaults.damageData();
+        if (!this.actor) return DataDefaults.createData('damage');
 
         const magic = this.actor.getAttribute('magic').value;
         const force = this.data.force;

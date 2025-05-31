@@ -1,19 +1,37 @@
 import {SKILL_DEFAULT_NAME} from "../constants";
-import DamageData = Shadowrun.DamageData;
 import FireModeData = Shadowrun.FireModeData;
-import ActionRollData = Shadowrun.ActionRollData;
-import LimitField = Shadowrun.LimitField;
-import SkillField = Shadowrun.SkillField;
-import TrackType = Shadowrun.TrackType;
 import SourceEntityField = Shadowrun.SourceEntityField;
 import ValueField = Shadowrun.ValueField;
-import GenericValueField = Shadowrun.GenericValueField;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import RangeData = Shadowrun.RangeData;
+import DataSchema = foundry.data.fields.DataSchema;
+const { SchemaField } = foundry.data.fields;
+import { DamageData, MinimalActionData, ActionRollData } from "../types/item/ActionModel";
+import { ArmorData } from "../types/template/ArmorModel";
+import { Track } from "../types/template/ConditionMonitorsModel";
+import { LimitField } from "../types/template/LimitsModel";
+import { SkillField } from "../types/template/SkillsModel";
+
+const schemaMap = {
+    armor: ArmorData(),
+    damage: DamageData(),
+    minimal_action: MinimalActionData(),
+    action_roll: ActionRollData(),
+    limit_field: LimitField(),
+    skill_field: SkillField(),
+    track: Track(),
+} as const;
+
+type schemaCreateData = {
+    [K in keyof typeof schemaMap]: foundry.data.fields.SchemaField.CreateData<typeof schemaMap[K]>;
+};
+
+type schemaInitializedData = {
+    [K in keyof typeof schemaMap]: foundry.data.fields.SchemaField.InitializedData<typeof schemaMap[K]>;
+};
 
 interface MinimalItemData {
     // Whatever name you want to give but not ''.
-    name?: string
+    name?: string;
     // Whatever item type you want to have.
     type: string
 }
@@ -54,169 +72,13 @@ export class DataDefaults {
             throw new Error(`FoundryVTT doesn't have item type: ${type} registered in ${entityType}`);
         }
     }
-    /**
-     * Damage data to hold everything around damaging actors.
-     * 
-     * @param partialDamageData give partial DamageData fields to overwrite default values
-     */
-    static damageData(partialDamageData: Partial<DamageData> = {}): DamageData {
-        const data: DamageData = {
-            type: {
-                base: 'physical',
-                value: 'physical',
-            },
-            element: {
-                base: '',
-                value: '',
-            },
-            base: 0,
-            value: 0,
-            ap: {
-                base: 0,
-                value: 0,
-                mod: [],
-                attribute: '',
-                base_formula_operator: 'add',
-            },
-            attribute: '',
-            mod: [],
-            base_formula_operator: 'add',
-            source: {
-                actorId: '',
-                itemId: '',
-                itemType: '',
-                itemName: ''
-            }
-        }
-        return foundry.utils.mergeObject(data, partialDamageData) as DamageData;
-    }
 
-    /**
-     * Armor data used within actor documents.
-     * 
-     * @param partialActorArmorData Inject partial armor data
-     */
-    static actorArmor(partialActorArmorData: Partial<Shadowrun.ActorArmor> = {}): Shadowrun.ActorArmor {
-        return foundry.utils.mergeObject({
-            value: 0,
-            mod: [],
-            base: 0,
-            label: '',
-            fire: 0,
-            electric: 0,
-            cold: 0,
-            acid: 0,
-            hardened: false
-        }, partialActorArmorData) as Shadowrun.ActorArmor;
-    }
-
-    /**
-     * Build a minimal viable action roll data structure.
-     * 
-     * @param partialActionData Inject any minimal action property
-     */
-    static minimalActionData(partialActionData: Partial<MinimalActionData> = {}) {
-        return foundry.utils.mergeObject({
-            attribute: '',
-            attribute2: '',
-            skill: '',
-            mod: 0,
-            armor: false,
-            limit: {
-                value: 0,
-                attribute: '',
-                mod: [],
-                base: 0,
-            }
-        }, partialActionData) as MinimalActionData;
-    }
-
-    /**
-     * Build a action data capable of rolling a test.
-     * 
-     * This is used instead of game.model.Item.action.action as fields like armor don't mesh well with TestCreator._mergeMinimalActionDataInOrder
-     * 
-     * @param partialActionRollData 
-     * @returns 
-     */
-    static actionRollData(partialActionRollData: Partial<ActionRollData> = {}): ActionRollData {
-        return foundry.utils.mergeObject({
-            type: '',
-            categories: [],
-            attribute: '',
-            attribute2: '',
-            skill: '',
-            spec: false,
-            mod: 0,
-            mod_description: '',
-            damage: this.damageData(),
-            modifiers: [],
-            limit: {
-                value: 0,
-                base: 0,
-                attribute: '',
-                mod: []
-            },
-            threshold: {
-                value: 0,
-                base: 0
-            },
-            extended: false,
-            opposed: {
-                test: '',
-                type: '',
-                attribute: '',
-                attribute2: '',
-                skill: '',
-                mod: 0,
-                description: ''
-            },
-            followed: {
-                test: '',
-                attribute: '',
-                attribute2: '',
-                skill: '',
-                mod: 0,
-            },
-            alt_mod: 0,
-            dice_pool_mod: []
-        }, partialActionRollData) as ActionRollData;
-    }
-
-    /**
-     * Build a full limit value field for use in document data
-     * 
-     * @param partialLimitField Inject any limit property
-     */
-    static limitField(partialLimitField: Partial<LimitField> = {}): LimitField {
-        return foundry.utils.mergeObject({
-            value: 0,
-            base: 0,
-            attribute: '',
-            label: '',
-            hidden: false,
-            mod: []
-        }, partialLimitField) as LimitField;
-    }
-
-    /**
-     * Build a skill field for use in document data
-     * 
-     * @param partialSkillData Inject any skill property
-     */
-    static skillData(partialSkillData: Partial<SkillField> = {}): SkillField {
-        return foundry.utils.mergeObject({
-            name: SKILL_DEFAULT_NAME,
-            base: 0,
-            value: 0,
-            hidden: false,
-            canDefault: false,
-            label: '',
-            bonus: [],
-            specs: [],
-            mod: [],
-            attribute: ''
-        }, partialSkillData) as SkillField;
+    static createData<K extends keyof typeof schemaMap>(
+        key: K,
+        createData: schemaCreateData[K] = {}
+    ): schemaInitializedData[K] {
+        const schema = schemaMap[key] as DataSchema;
+        return new SchemaField(schema).getInitialValue(createData) as schemaInitializedData[K];
     }
 
     /**
@@ -270,21 +132,6 @@ export class DataDefaults {
             mod: [],
             label: ''
         }, partialValueData) as ValueField;
-    }
-
-    /**
-     * Build a value field holding any value for use anywhere necessary
-     * Differs from valueData as it's not only allowing number type values.
-     * @param partialGenericValueData Inject any value property
-     */
-    static genericValueData(partialGenericValueData: Partial<GenericValueField> = {}) {
-        return foundry.utils.mergeObject({
-            base: 0,
-            value: 0,
-            temp: 0,
-            mod: [],
-            label: ''
-        }, partialGenericValueData) as GenericValueField;
     }
 
     /**

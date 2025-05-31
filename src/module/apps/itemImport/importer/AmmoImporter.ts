@@ -118,7 +118,6 @@ export class AmmoImporter extends DataImporter<Shadowrun.AmmoItemData, Shadowrun
             ammo.folder = folder.id;
         }
 
-        // @ts-expect-error
         return await Item.create(ammoDatas) as Item;
     }
 }

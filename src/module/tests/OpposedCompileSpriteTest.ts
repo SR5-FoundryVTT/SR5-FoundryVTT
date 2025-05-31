@@ -17,7 +17,7 @@ interface OpposedCompileSpriteTestData extends OpposedTestData {
  * The technomancer is the active actor and the sprite the opposed actor.
  */
 export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTestData> {
-    public override against: CompileSpriteTest
+    declare public override against!: CompileSpriteTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Due to compilation, the active actor for this test will be created during execution.
@@ -131,7 +131,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
 
         const updateData = {
             // 'system.services': this.deriveSpriteServices(),
-            'system.technomancerUuid': technomancer.uuid
+            system: { technomancerUuid: technomancer.uuid }
         }
 
         this._addOwnershipToUpdateData(updateData);

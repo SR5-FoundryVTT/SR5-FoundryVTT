@@ -8,6 +8,8 @@ import { PartsList } from "../../parts/PartsList";
 import { SR5 } from "../../config";
 import { DataDefaults } from "../../data/DataDefaults";
 import { Translation } from "../../utils/strings";
+import { DamageType } from "src/module/types/item/ActionModel";
+import { ModifiableValueLinkedType } from "src/module/types/template/BaseModel";
 
 export class ActionFlow {
     /**
@@ -17,9 +19,9 @@ export class ActionFlow {
      * @param actor The actor to use should a dynamic calculation be needed.
      * @param item
      */
-    static calcDamageData(damage: Shadowrun.DamageData, actor?: SR5Actor, item?: SR5Item): Shadowrun.DamageData {
+    static calcDamageData(damage: DamageType, actor?: SR5Actor, item?: SR5Item): DamageType {
         // Avoid manipulation on original data, which might come from database values.
-        damage = foundry.utils.duplicate(damage);
+        damage = foundry.utils.duplicate(damage) as DamageType;
 
         if (!actor) return damage;
 
@@ -36,7 +38,7 @@ export class ActionFlow {
         return damage;
     }
 
-    static _applyModifiableValue(value: Shadowrun.ModifiableValueLinked, actor: SR5Actor) {
+    static _applyModifiableValue(value: ModifiableValueLinkedType, actor: SR5Actor) {
         const attribute = actor.findAttribute(value.attribute);
         if (!attribute) return;
 
@@ -88,7 +90,7 @@ export class ActionFlow {
      * 
      * @returns true, when the user configured damage contains any parts.
      */
-    static hasDamage(damage: Shadowrun.DamageData): boolean {
+    static hasDamage(damage: DamageType): boolean {
         if (damage.base !== 0) return true;
         if (damage.attribute) return true;
         if (damage.type) return true;
@@ -111,7 +113,7 @@ export class ActionFlow {
     static sortedActiveSkills(actor?: SR5Actor, skillNames?: string[]) {
         // CASE - Return default skills whenn no local actor skills are used.
         //        The major use case is the sidebar item creation, where no actor is available.
-        if (!actor || (actor as SR5Actor).isType('ic')) {
+        if (!actor || actor.isType('ic')) {
             // Inject this items custom skill into the global skill list.
             const globalSkills = foundry.utils.deepClone(SR5.activeSkills);
             skillNames?.forEach(skillName => { ActionFlow._injectMissingCustomSkill(globalSkills, skillName) });

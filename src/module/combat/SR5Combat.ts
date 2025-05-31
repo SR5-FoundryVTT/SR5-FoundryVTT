@@ -501,7 +501,7 @@ export class SR5Combat extends Combat {
  *
  *  During initiative roll modify the initiative result depending on the current combats initiative pass.
  */
-export function _combatantGetInitiativeFormula() {
+export function _combatantGetInitiativeFormula(this: any) {
     const combat = this.parent;
     return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }

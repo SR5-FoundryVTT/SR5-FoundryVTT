@@ -1,3 +1,7 @@
+import { DescriptionPartData } from "../template/DescriptionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { ActionPartData } from "./ActionModel";
+
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 const CombatSpellData = ()=> ({
@@ -54,6 +58,9 @@ const RitualSpellData = () => ({
 });
 
 const SpellData = {
+    ...DescriptionPartData(),
+    ...ImportFlags(),
+    ...ActionPartData(),
     type: new StringField({
         required: true,
         initial: '',
