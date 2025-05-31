@@ -959,20 +959,7 @@
             }
         },
         "character": {
-            "templates": [
-                "common",
-                "skills",
-                "attributes",
-                "matrix",
-                "limits",
-                "armor",
-                "magic",
-                "technomancer",
-                "movement",
-                "condition_monitors",
-                "physical_combat_values",
-                "grunt"
-            ],
+            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "technomancer", "movement", "condition_monitors", "physical_combat_values", "grunt", "importFlags"],
             "ethnicity": "",
             "age": "",
             "sex": "",
@@ -1004,18 +991,7 @@
             "situation_modifiers": {}
         },
         "spirit": {
-            "templates": [
-                "common",
-                "skills",
-                "attributes",
-                "limits",
-                "armor",
-                "magic",
-                "movement",
-                "condition_monitors",
-                "physical_combat_values",
-                "grunt"
-            ],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt", "importFlags"],
             "summonerUuid": "",
             "services": 0,
             "bound": false,
@@ -1040,19 +1016,7 @@
             }
         },
         "critter": {
-            "templates": [
-                "common",
-                "skills",
-                "attributes",
-                "limits",
-                "armor",
-                "magic",
-                "matrix",
-                "movement",
-                "condition_monitors",
-                "physical_combat_values",
-                "grunt"
-            ],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "grunt", "importFlags"],
             "is_npc": true,
             "visibilityChecks": {
                 "astral": {
@@ -1064,13 +1028,7 @@
             }
         },
         "sprite": {
-            "templates": [
-                "common",
-                "skills",
-                "attributes",
-                "limits",
-                "matrix"
-            ],
+            "templates": ["common", "skills", "attributes", "limits", "matrix", "importFlags"],
             "services": 0,
             "registered": false,
             "level": 0,
@@ -1084,16 +1042,7 @@
             }
         },
         "vehicle": {
-            "templates": [
-                "common",
-                "skills",
-                "attributes",
-                "limits",
-                "armor",
-                "matrix",
-                "movement",
-                "physical_combat_values"
-            ],
+            "templates": [ "common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values", "importFlags" ],
             "vehicleType": "ground",
             "controlMode": "autopilot",
             "environment": "speed",
@@ -1182,13 +1131,7 @@
             }
         },
         "ic": {
-            "templates": [
-                "common",
-                "skills",
-                "attributes",
-                "limits",
-                "matrix"
-            ],
+            "templates": ["common",  "skills", "attributes", "limits", "matrix", "importFlags"],
             "track": {},
             "icType": "",
             "host": {
