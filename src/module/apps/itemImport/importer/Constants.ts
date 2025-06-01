@@ -1,6 +1,42 @@
 import { SR5 } from '../../../config';
 
 export class Constants {
+    
+    public static readonly MAP_COMPENDIUM_KEY = {
+        // Actors
+        'Critter':          { pack: 'world.sr5critter',         type: 'Actor' }, // Critters, Spirits and Sprites
+        'Drone':            { pack: 'world.sr5drone',           type: 'Actor' }, // Vehicles and Drones
+
+        // Items 
+        'Gear':             { pack: 'world.sr5gear',            type: 'Item' }, // Armor + General Gear
+        'Trait':            { pack: 'world.sr5trait',           type: 'Item' }, // Bioware + Cyberware + Quality + Powers
+        'Magic':            { pack: 'world.sr5magic',           type: 'Item' }, // Spells, rituals, complex forms
+        'Modification':     { pack: 'world.sr5modification',    type: 'Item' }, // Armor/Vehicle/weapon mods + ammo
+        'Weapon':           { pack: 'world.sr5weapon',          type: 'Item' }, // Weapons
+    } as const;
+
+    public static readonly MAP_TRANSLATION_TYPE: { [key: string]: string } = {
+        'adept_power': 'power',
+        'ammo': 'gear',
+        'armor': 'armor',
+        'bioware': 'bioware',
+        'complex_form': 'complexform',
+        'critter_power': 'power',
+        'cyberware': 'cyberware',
+        'device': 'gear',
+        'echo': 'echo',
+        'equipment': 'gear',
+        'modification': 'mod',
+        'program': 'gear',
+        'quality': 'quality',
+        'spell': 'spell',
+        'spirit': 'metatype',
+        'sprite': 'metatype',
+        'sprite_power': 'power',
+        'vehicle': 'vehicle',
+        'weapon': 'weapon'
+    } as const;
+
     public static readonly MAP_CATEGORY_TO_SKILL = {
         'Assault Cannons': 'heavy_weapons',
         'Assault Rifles': 'automatics',
@@ -10,13 +46,13 @@ export class Constants {
         'Clubs': 'clubs',
         'Crossbows': 'archery',
         'Exotic Melee Weapons': 'exotic_melee',
-        'Exotic Ranged Weapons': 'exotic_ranged',
-        'Flamethrowers': 'exotic_ranged',
+        'Exotic Ranged Weapons': 'exotic_range',
+        'Flamethrowers': 'exotic_range',
         'Grenade Launchers': 'heavy_weapons',
         'Heavy Machine Guns': 'heavy_weapons',
         'Heavy Pistols': 'pistols',
         'Holdouts': 'pistols',
-        'Laser Weapons': 'exotic_ranged',
+        'Laser Weapons': 'exotic_range',
         'Light Machine Guns': 'heavy_weapons',
         'Light Pistols': 'pistols',
         'Machine Pistols': 'automatics',
@@ -28,7 +64,8 @@ export class Constants {
         'Submachine Guns': 'automatics',
         'Tasers': 'pistols',
         'Unarmed': 'unarmed_combat',
-    };
+    } as const;
+
     public static readonly MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY: {
         [key: string]: Exclude<keyof typeof SR5.weaponRangeCategories, "manual">;
     } = {
@@ -62,11 +99,4 @@ export class Constants {
         'Harpoon Gun (Underwater)': 'harpoonGunUnderwater',
         'Flamethrowers': 'flamethrower',
     } as const;
-
-    public static readonly ROOT_IMPORT_FOLDER_NAME = 'SR5e';
-
-    public static readonly MAP_CHUMMER_PROGRAMM_CATEGORY = {
-        'Hacking Programs': 'hacking_program',
-        'Common Programs': 'common_program'
-    }
 }

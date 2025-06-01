@@ -82,6 +82,12 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     sourceIsUuid: boolean
 
     isUsingRangeCategory: boolean
+
+    // Allow users to view what values is calculated and what isn´t
+    calculatedEssence: boolean
+    calculatedCost: boolean
+    calculatedAvailability: boolean
+    ratingForCalculation: boolean
 }
 
 /**
@@ -125,6 +131,12 @@ export class SR5ItemSheet extends ItemSheet {
         const itemData = this.item.system;
 
         const linkedActor = await this.item.getLinkedActor();
+        
+        // Calculated values for derived data.
+        data.calculatedEssence = itemData.technology?.calculated.essence.adjusted ?? false;
+        data.calculatedCost = data.calculatedEssence ? true : itemData.technology?.calculated.cost.adjusted ?? false;
+        data.calculatedAvailability = data.calculatedEssence ? true : itemData.technology?.calculated.availability.adjusted ?? false;
+        data.ratingForCalculation = data.calculatedEssence || data.calculatedCost || data.calculatedAvailability;
 
         if ('action' in itemData && itemData.action) {
             try {
@@ -677,7 +689,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     async _onClipEquip(clipType: AmmunitionType['clip_type']) {
         if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
-        
+
         const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
         await this.item.update({
             system: {

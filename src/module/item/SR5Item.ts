@@ -47,6 +47,8 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
 import { ActionResultType, ActionRollType } from '../types/item/ActionModel';
+import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
+import { WarePrep } from './prep/WarePrep';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -213,10 +215,13 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
 
+        // Prepare technology data for all item types sharing it.
         const technology = this.getTechnologyData();
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
-            TechnologyPrep.prepareConceal(technology, equippedMods);
+            TechnologyPrep.prepareConceal(technology, equippedMods);            
+            TechnologyPrep.prepareAvailability(this, technology);
+            TechnologyPrep.prepareCost(this, technology);
         }
 
         const action = this.getAction();
@@ -236,6 +241,8 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
             AdeptPowerPrep.prepareBaseData(this.system);
         else if (this.isType('sin'))
             SinPrep.prepareBaseData(this.system);
+        else if (this.asType('bioware', 'cyberware'))
+            WarePrep.prepareBaseData(this.system);
     }
 
     async postItemCard() {
@@ -813,6 +820,10 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
             'program', 'sin', 'bioware', 'cyberware', 'weapon',
         ] as const;
         return this.asType(...systemTechnologyItems)?.system.technology;
+    }
+
+    parseAvailibility(avail: string) {
+        return ItemAvailabilityFlow.parseAvailibility(avail)
     }
 
     getNetworkController(): string | undefined {
