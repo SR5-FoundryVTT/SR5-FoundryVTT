@@ -9,7 +9,7 @@
         }
     ],
     "url": "#{URL}#",
-    "version": "0.26.0",
+    "version": "0.25.1",
     "compatibility": {
         "minimum": "13",
         "verified": "13.344",
@@ -81,6 +81,18 @@
             },
             "type": "Macro",
             "system": "shadowrun5e"
+        }
+    ],
+    "packFolders": [
+        {
+            "name": "Shadowrun 5e",
+            "color": "#cc0000",
+            "sorting": "m",
+            "packs": [
+                "system-macros",
+                "general-actions",
+                "matrix-actions"
+            ]
         }
     ],
     "relationships": [

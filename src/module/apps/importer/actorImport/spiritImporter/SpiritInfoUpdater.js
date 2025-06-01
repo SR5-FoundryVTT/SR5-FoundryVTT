@@ -39,6 +39,7 @@ export class SpiritInfoUpdater {
             'air',
             'aircraft',
             'airwave',
+            'ally',
             'automotive',
             'beasts',
             'ceramic',
@@ -47,6 +48,7 @@ export class SpiritInfoUpdater {
             'fire',
             'guardian',
             'guidance',
+            'homunculus',
             'man',
             'metal',
             'plant',
@@ -54,6 +56,7 @@ export class SpiritInfoUpdater {
             'task',
             'train',
             'water',
+            'watcher',
             'toxic_air',
             'toxic_beasts',
             'toxic_earth',
@@ -66,8 +69,15 @@ export class SpiritInfoUpdater {
             'shade',
             'succubus',
             'wraith',
+
+            //shedim
             'shedim',
+            'hopper',
+            'blade_summoned',
+            'horror_show',
+            'unbreakable',
             'master_shedim',
+
             // insect
             'caretaker',
             'nymph',
@@ -92,20 +102,33 @@ export class SpiritInfoUpdater {
              "corpselight",
              "croki",
              "duende",
+             "ejerian",
              "elvar",
              "erinyes",
-             "greenman",
+             "green_man",
              "imp",
              "jarl",
              "kappa",
              "kokopelli",
              "morbi",
-             "nocnitasa",
+             "nocnitsa",
              "phantom",
              "preta",
              "stabber",
              "tungak",
-             "vucub",
+             "vucub_caquix",
+            
+            // Aetherology
+             'gum_toad',
+             'crawler',
+             'ghasts',
+             'vryghots',
+             'gremlin',
+             'anansi',
+             'tsuchigumo_warrior',
+
+             // Horror Terrors
+             'corps_cadavre',
         ]
 
         let specialMapping = new Map([
