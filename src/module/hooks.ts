@@ -464,14 +464,6 @@ ___________________
 
         const situationModifiersControl = SituationModifiersApplication.getControl();
         controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
-                button: true,
-                onClick: () => new OverwatchScoreTracker().render(true)
-            };
-            controls.tokens.tools[overwatchScoreTrackControl.name] = overwatchScoreTrackControl;
-        }
-
-        const situationModifiersControl = SituationModifiersApplication.getControl();
-        controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
     }
 
     /**
