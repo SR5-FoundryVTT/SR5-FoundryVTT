@@ -156,7 +156,11 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
 
         // Modifier management parts
-        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
+        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
+
+        // Chat Messages
+        'systems/shadowrun5e/dist/templates/chat/parts/teamworkParticipant.html'
+
     ];
 
     return loadTemplates(templatePaths);

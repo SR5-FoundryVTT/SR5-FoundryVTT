@@ -8,6 +8,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
+import { JournalEnrichers } from '../journal/enricher';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -688,7 +689,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     async _onClipEquip(clipType: string) {
         if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
-        
+
         const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
         await this.item.update({
             'system.ammo.clip_type': clipType,

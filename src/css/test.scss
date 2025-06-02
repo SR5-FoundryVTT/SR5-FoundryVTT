@@ -1,5 +1,5 @@
 /**
- * CSS for Success Test Dialog styling.
+ * CSS for Success Test & Teamwork Dialog styling.
  */
 @import 'config';
 
@@ -9,12 +9,8 @@
   }
 
   .form-group {
-    /**
-     * Lazy hack to allow for a two segment elemnt style, with the right ones text 
-     * being flush to the end.
-     */
     .form-group-element-2 {
-      flex: 2
+      flex: 2;
     }
 
     .form-group-element-1-right {
@@ -23,7 +19,6 @@
     }
   }
 
-
   .dialog-content-common {
     h2 {
       border: none;
@@ -31,5 +26,200 @@
       margin: 0;
       text-underline: none;
     }
+  }
+
+  /* Nur im Teamwork-Dialog */
+  &#teamwork-dialog {
+
+    /* Geschlossene Selects unverändert lassen */
+
+    /* Dropdown-Listen im Dark-Theme */
+    select.form-control,
+    select {
+
+      & option,
+      & optgroup {
+        background-color: var(--color-input-bg) !important;
+        color: var(--color-input-text) !important;
+      }
+
+      & option {
+        background-color: #4d4d4d !important;
+      }
+
+      & option:checked {
+        background-color: #767676 !important;
+      }
+
+      & option:hover {
+        background-color: #5e5e5e !important;
+      }
+
+      & optgroup {
+        background-color: #3b3b3b !important;
+        font-weight: bold;
+        padding: .25em .5em !important;
+      }
+
+      & option.group-label {
+        background-color: #3b3b3b !important;
+      }
+    }
+
+    .dialog-content-teamwork.grid-two-col {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 1em;
+      row-gap: .5em;
+      align-items: center;
+
+      label {
+        justify-self: start;
+      }
+
+      /* Inputs & Selects in rechter Spalte */
+      .form-control,
+      input[type="number"],
+      input[type="text"] {
+        width: 100%;
+        max-width: 20em;
+        box-sizing: border-box;
+        text-align: right;
+      }
+    }
+
+    /* Weiße Schrift in Textinputs */
+    .dialog-content-teamwork {
+
+      input[name="filter"],
+      input[name="threshold"] {
+        color: #ffffff !important;
+      }
+
+      /* Limit-Text als Input */
+      input[name="limit"] {
+        background-color: var(--color-input-bg) !important;
+        color: #ffffff !important;
+      }
+
+      /* datalist-Optionen */
+      datalist#sr5-teamwork-limit-options option {
+        background-color: #4d4d4d !important;
+        color: #ffffff !important;
+      }
+
+      /* Fallback-Select für Limits */
+      select[name="limit"],
+      select[name="limitSelect"] {
+        background-color: var(--color-input-bg) !important;
+        color: var(--color-input-text) !important;
+      }
+
+      /* Layout der Limit-Zeile */
+      .limit-controls {
+        display: grid;
+        grid-template-columns: 6ch auto;
+        column-gap: .5em;
+        align-items: center;
+
+        .limit-number {
+          width: 6ch;
+          min-width: 6ch;
+          max-width: 6ch;
+          text-align: center;
+          box-sizing: border-box;
+          background: var(--color-input-bg) !important;
+          color: var(--color-input-text) !important;
+        }
+
+        .limit-select {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+/* -- Teilnehmer‐Kachel -- */
+.teamwork-participant {
+  border: 1px solid var(--color-border-dark);
+  border-radius: 4px;
+  margin-bottom: .5em;
+  background: var(--color-dialog-bg);
+  color: var(--color-input-text);
+  overflow: hidden;
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: .5em 1em;
+    font-weight: bold;
+    display: block;
+    width: 100%;
+    /* Optional: Deine gewünschte Font-Size */
+    font-size: var(--font-size-12);
+  }
+
+  .participant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .participant-actor {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .participant-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none !important;
+    flex-shrink: 0;
+  }
+
+  .participant-name {
+    font-weight: normal;
+  }
+
+  .participant-hits {
+    white-space: nowrap;
+    font-weight: normal;
+  }
+
+  .different-skills {
+    padding: .5em 1em;
+    background: var(--color-toolbar-bg);
+    border-top: 1px solid var(--color-border-dark);
+  }
+
+  &[open] .different-skills {
+    animation: expand .2s ease-out forwards;
+  }
+}
+
+/* Glitch‐Nachricht */
+.glitch-message {
+  color: #ff4d4d;
+  font-style: italic;
+
+  &.critical {
+    font-weight: bold;
+  }
+}
+
+@keyframes expand {
+  from {
+    opacity: 0;
+    transform: scaleY(.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
   }
 }
