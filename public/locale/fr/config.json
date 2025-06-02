@@ -808,8 +808,6 @@
             "body": "Structure",
             "cosmetic": "Apparence",
             "electromagnetic": "Électronique",
-            "enhancement": "Enhancement",
-            "exotic": "Exotic",
             "power_train": "Groupe motopropulseur",
             "protection": "Blindage",
             "weapons": "Armes"

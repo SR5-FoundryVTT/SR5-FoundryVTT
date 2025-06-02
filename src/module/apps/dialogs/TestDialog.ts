@@ -85,7 +85,7 @@ export class TestDialog extends FormDialog {
         //@ts-expect-error //TODO: default to general roll mode user setting
         data.rollMode = data.test.data.options?.rollMode;
         data.rollModes = CONFIG.Dice.rollModes;
-        data.default = 'roll';
+        data.default = 'roll'; // TODO: Where is this even used and what's it for again?
 
         // Add in general SR5 config to allow access to general values.
         data.config = SR5;

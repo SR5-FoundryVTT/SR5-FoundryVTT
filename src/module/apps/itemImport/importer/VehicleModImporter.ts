@@ -29,7 +29,7 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
         const jsonDatas = jsonObject['mods']['mod'];
         this.iconList = await this.getIconFiles();
         const parserType = 'modification';
-        const enhancement  = ["Acceleration", "Armor", "Handling", "Sensor", "Speed"];
+        const validCategory = ['Body', 'Cosmetic', 'Electromagnetic', 'Powertrain', 'Protection', 'Weapons'];
 
         for (let i = 0; i < jsonDatas.length; i++) {
             const jsonData = jsonDatas[i];
@@ -45,8 +45,7 @@ export class VehicleModImporter extends DataImporter<Shadowrun.ModificationItemD
             const categoryName = ImportHelper.StringValue(jsonData, 'category');
 
             // Get the item's folder information
-            const folderName = categoryName === undefined         ? "" :
-                               enhancement.includes(categoryName) ? categoryName : "Other";
+            const folderName = validCategory.includes(categoryName) ? categoryName : "Other";
 
             const folder = await ImportHelper.GetFolderAtPath("Item", `${Constants.ROOT_IMPORT_FOLDER_NAME}/Vehicle-Mods/${folderName}`, true);
             //@ts-expect-error TODO: Foundry Where is my foundry base data?

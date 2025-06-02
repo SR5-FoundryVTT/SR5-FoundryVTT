@@ -190,10 +190,10 @@ export class TeamworkFlow {
     }
 
     static async chatLogListeners(chatLog: ChatLog, html) {
-        // setup chat listener messages for each message as some need the message context instead of chatlog context.
-        html.find('.chat-message').each(async (index, element) => {
-            element = $(element);
-            const id = element.data('messageId');
+         // setup chat listener messages for each message as some need the message context instead of chatlog context.
+         // @ts-expect-error TODO: querySelectorAll?
+         $(html).find('.chat-message').each(async (index, element) => {
+            const id = $(element).data('messageId');
             const message = game.messages?.get(id);
             if (!message) return;
 
@@ -202,11 +202,81 @@ export class TeamworkFlow {
     }
 
     static async chatMessageListeners(message: ChatMessage, html) {
-        if (!html.find('.sr5-teamwork-addparticipant'))
-            return;
+        html = $(html);
+        if( !html?.find('.sr5-teamwork-addparticipant') ) return;
 
-        html.find('.sr5-teamwork-addparticipant').on('click', _ => this.addParticipant(message));
-        html.find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
+        $(html).find('.sr5-teamwork-addparticipant').on('click', _ => this.addParticipant(message));
+        $(html).find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
+    }
+
+
+
+    static async initiateTeamworkTest(testAttributes: TestAttributes) {
+        const user = game.user;
+        if (!user || !game.actors || !testAttributes) return;
+
+        const selectedActor = await JournalEnrichers.findActor();
+
+        if(!selectedActor) return ui.notifications?.error("Kein valider Akteur gefunden.");;
+
+        const dialogData = await new TeamWorkDialog({
+            actors: this.actorList ?? [selectedActor],
+            actor: selectedActor,
+            skill: this.constructSkillEntry({ id: testAttributes.skill }, selectedActor),
+            attribute: this.constructAttributeEntry(testAttributes.attribute),
+            threshold: Number(testAttributes.threshold) || undefined,
+            allowOtherSkills: Boolean(testAttributes.allowOtherSkills) ?? false,
+            limit: this.constructLimitEntry(testAttributes.limit),
+            request: true,
+            lockedSkill: false
+        }).select();
+
+        console.log("initiateTeamworkTest dialogData", dialogData)
+
+        if (dialogData.cancelled) return;
+
+        // Setze initiales Flag-Objekt
+        const teamworkData = {
+            actor: dialogData.actor,
+            skill: dialogData.skill,
+            attribute: dialogData.attribute,
+            threshold: dialogData.threshold,
+            limit: dialogData.limit,
+            allowOtherSkills: dialogData.allowOtherSkills,
+            showAllowOtherSkills: dialogData.showAllowOtherSkills,
+            participants: [],
+            criticalGlitched: false,
+            additionalDice: {
+                value: 0,
+                max: dialogData.actor.getSkill(dialogData.skill.id).base ?? 0
+            },
+            additionalLimit: 0,
+            specialization: dialogData.specialization
+        };
+
+        console.log("initiateTeamworkTest teamworkData", teamworkData)
+
+        const templateContext = {
+            ...teamworkData,
+            limit: (SR5.limits as Record<LimitKey, string>)[dialogData.limit] ?? undefined,
+            attribute: (SR5.attributes as Record<AttributeKey, string>)[dialogData.attribute] ?? undefined
+        };
+
+        console.log("initiateTeamworkTest templateContext", templateContext)
+
+        // Rendern und ChatMessage anlegen
+        const content = await renderTemplate("systems/shadowrun5e/dist/templates/chat/teamworkRequest.html", templateContext);
+        const msg = await ChatMessage.create({
+            user: user.id,
+            speaker: ChatMessage.getSpeaker(),
+            content
+        });
+
+        if (!msg) {
+            return ui.notifications?.error("Teamwork-Nachricht nicht gefunden");
+        }
+
+        await msg.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData);
     }
 
 

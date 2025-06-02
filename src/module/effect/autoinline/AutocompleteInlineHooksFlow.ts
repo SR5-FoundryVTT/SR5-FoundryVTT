@@ -34,7 +34,7 @@ export const AutocompleteInlineHooksFlow =  {
         const config = {
             packageName: "shadowrun5e",
             sheetClasses: [{
-                name: "ActiveEffectConfig",
+                name: "SR5ActiveEffectConfig",
                 fieldConfigs: [
                     { selector: `.tab[data-tab="effects"] .autocomplete-key-actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
                     { selector: `.tab[data-tab="effects"] .autocomplete-key-targeted_actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
