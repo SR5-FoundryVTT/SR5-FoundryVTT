@@ -1,7 +1,6 @@
-import { BaseItem } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents.mjs';
-import { SR5Item } from "../../../item/SR5Item";
+import { SystemActor } from "src/module/actor/SR5Actor";
+import { SR5Item, SystemItem } from "../../../item/SR5Item";
 import { Constants } from '../importer/Constants';
-import { TranslationHelper as TH } from './TranslationHelper';
 type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
 
 export type OneOrMany<T> = T | T[];
@@ -52,7 +51,7 @@ export class ImportHelper {
     public static async findItem(
         compKey: CompendiumKey,
         name: OneOrMany<string>,
-        types?: OneOrMany<BaseItem['data']['type']>
+        types?: OneOrMany<Item.SubType>
     ): Promise<SR5Item[]> {
         if (Array.isArray(name) ? name.length === 0 : !name) return [];
 
@@ -62,7 +61,7 @@ export class ImportHelper {
         return pack.getDocuments({
             name__in: this.getArray(name),
             ...(types ? { type__in: this.getArray(types) } : {})
-        });
+        }) as Promise<SR5Item[]>;
     }
 
     /**
@@ -84,14 +83,12 @@ export class ImportHelper {
             const folderName = game.i18n.localize("SR5.Compendiums.Root");
             let currentFolder = game.folders?.find(
                 (folder) => folder.name === folderName
-                //@ts-expect-error
                 && folder.type === "Compendium"
             );
 
             if (!currentFolder) {
                 currentFolder = await Folder.create({
                     name: folderName,
-                    //@ts-expect-error
                     type: "Compendium",
                     color: "#00cc00"
                 });
@@ -156,8 +153,7 @@ export class ImportHelper {
     private static async FindOrCreateFolder(ctype: CompendiumKey, name: string, parent: Folder | null = null): Promise<Folder> {
         const compendium = await this.GetCompendium(ctype);
 
-        //@ts-expect-error
-        const folder = await compendium.folders?.find((folder: Folder) =>
+        const folder = compendium.folders?.find((folder: Folder) =>
             folder.name === name && folder.folder === parent
         );
 

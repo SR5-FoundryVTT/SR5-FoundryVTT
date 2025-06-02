@@ -1,7 +1,7 @@
 import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MatrixActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CharacterLimits, CommonModifiers } from "./CommonModel";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-export const CritterData = {
+export const CritterData = () => ({
     ...CommonData(),
     ...MagicActorData(),
     ...TwoTrackActorData(),
@@ -17,12 +17,11 @@ export const CritterData = {
         // ...Modifiers,
         ...CommonModifiers(),
     }, { required: true }),
-}
+});
 
-
-export class Critter extends foundry.abstract.TypeDataModel<typeof CritterData, Actor.Implementation> {
+export class Critter extends foundry.abstract.TypeDataModel<ReturnType<typeof CritterData>, Actor.Implementation> {
     static override defineSchema() {
-        return CritterData;
+        return CritterData();
     }
 }
 

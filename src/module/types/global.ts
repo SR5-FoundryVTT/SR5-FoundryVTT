@@ -74,7 +74,6 @@ declare module "fvtt-types/configuration" {
 
     interface DataModelConfig {
         Actor: {
-            base: typeof Character;
             character: typeof Character;
             critter: typeof Critter;
             ic: typeof IC;
@@ -131,6 +130,7 @@ declare module "fvtt-types/configuration" {
             shadowrun5e: {
                 turnsSinceLastAttack?: number;
                 overwatchScore?: number;
+                embeddedItems: Item.Source[];
             }
         };
         ChatMessage: {
@@ -154,7 +154,7 @@ declare module "fvtt-types/configuration" {
                 lastSpellForce?: Shadowrun.SpellForceData;
                 lastComplexFormLevel?: Shadowrun.ComplexFormLevelData;
                 lastFireRange?: Shadowrun.FireRangeData;
-                embeddedItems?: any[];
+                embeddedItems?: Item.Source[];
             };
         };
         Macro: {

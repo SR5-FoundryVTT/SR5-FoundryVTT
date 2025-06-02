@@ -1,17 +1,86 @@
 import FireModeData = Shadowrun.FireModeData;
 import DataSchema = foundry.data.fields.DataSchema;
 const { SchemaField } = foundry.data.fields;
-import { ActionRollData, DamageData, MinimalActionData } from "../types/item/ActionModel";
+import { Action, ActionRollData, DamageData, MinimalActionData } from "../types/item/ActionModel";
 import { AttributeField } from "../types/template/AttributesModel";
 import { ArmorData } from "../types/template/ArmorModel";
 import { DescriptionData } from "../types/template/DescriptionModel";
 import { LimitField } from "../types/template/LimitsModel";
-import { RangeData } from "../types/item/WeaponModel";
+import { RangeData, Weapon } from "../types/item/WeaponModel";
 import { SkillField } from "../types/template/SkillsModel";
-import { SourceEntityField } from "../types/item/HostModel";
+import { Host, SourceEntityField } from "../types/item/HostModel";
 import { TechnologyData } from "../types/template/TechnologyModel";
 import { Track } from "../types/template/ConditionMonitorsModel";
 import { ValueField } from "../types/template/BaseModel";
+
+import { Character } from "../types/actor/CharacterModel";
+import { CritterData } from "../types/actor/CritterModel";
+import { IC } from "../types/actor/ICModel";
+import { Spirit } from "../types/actor/SpiritModel";
+import { Sprite } from "../types/actor/SpriteModel";
+import { Vehicle } from "../types/actor/VehicleModel";
+import { AdeptPower } from "../types/item/AdeptPowerModel";
+import { Ammo } from "../types/item/AmmoModel";
+import { Bioware } from "../types/item/BiowareModel";
+import { CallInAction } from "../types/item/CallInActionModel";
+import { ComplexForm } from "../types/item/ComplexFormModel";
+import { Contact } from "../types/item/ContactModel";
+import { CritterPower } from "../types/item/CritterPowerModel";
+import { Cyberware } from "../types/item/CyberwareModel";
+import { Device } from "../types/item/DeviceModel";
+import { Echo } from "../types/item/EchoModel";
+import { Equipment } from "../types/item/EquipmentModel";
+import { Lifestyle } from "../types/item/LifeStyleModel";
+import { Metamagic } from "../types/item/MetamagicModel";
+import { Modification } from "../types/item/ModificationModel";
+import { Program } from "../types/item/ProgramModel";
+import { Quality } from "../types/item/QualityModel";
+import { Sin } from "../types/item/SinModel";
+import { Spell } from "../types/item/SpellModel";
+import { SpritePower } from "../types/item/SpritePowerModel";
+
+const systemMap = {
+    // character: Character.schema.fields,
+    critter: CritterData(),
+    // ic: IC.schema.fields,
+    // spirit: Spirit.schema.fields,
+    // sprite: Sprite.schema.fields,
+    // vehicle: Vehicle.schema.fields,
+
+    // action: Action,
+    // adept_power: AdeptPower,
+    // ammo: Ammo,
+    armor: ArmorData(),
+    // bioware: Bioware,
+    // call_in_action: CallInAction,
+    // complex_form: ComplexForm,
+    // contact: Contact,
+    // critter_power: CritterPower,
+    // cyberware: Cyberware,
+    // device: Device,
+    // echo: Echo,
+    // equipment: Equipment,
+    // host: Host,
+    // lifestyle: Lifestyle,
+    // metamagic: Metamagic,
+    // modification: Modification,
+    // program: Program,
+    // quality: Quality,
+    // sin: Sin,
+    // spell: Spell,
+    // sprite_power: SpritePower,
+    // weapon: Weapon,
+} as const;
+
+export type SystemEntityType = keyof typeof systemMap;
+
+type systemCreateData = {
+    [K in SystemEntityType]: foundry.data.fields.SchemaField.CreateData<typeof systemMap[K]>;
+};
+
+type systemInitializedData = {
+    [K in SystemEntityType]: foundry.data.fields.SchemaField.InitializedData<typeof systemMap[K]>;
+};
 
 const schemaMap = {
     action_roll: ActionRollData(),
@@ -53,6 +122,14 @@ interface MinimalItemData {
  * 
  */
 export class DataDefaults {
+
+    static baseData<EntityType extends SystemEntityType>(
+        entity: EntityType,
+        createData: systemCreateData[EntityType] = {}
+    ): systemInitializedData[EntityType] {
+        return systemMap[entity].getInitialValue(createData) as systemInitializedData[EntityType];
+    }
+
     /**
      * Return a base item data structure with minimal necessary FoundryVTT ItemDataModel fields.
      * 

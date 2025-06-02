@@ -16,17 +16,16 @@ export const ArmorPartData = () => ({
     }, { required: true })
 });
 
-const ArmorData = {
+export const ArmorData = () => ({
     ...ArmorPartData(),
     ...DescriptionPartData(),
     ...ImportFlags(),
     ...TechnologyPartData(),
-};
+});
 
-
-export class Armor extends foundry.abstract.TypeDataModel<typeof ArmorData, Item.Implementation> {
+export class Armor extends foundry.abstract.TypeDataModel<ReturnType<typeof ArmorData>, Item.Implementation> {
     static override defineSchema() {
-        return ArmorData;
+        return ArmorData();
     }
 }
 

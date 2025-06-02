@@ -2,14 +2,12 @@ import { Parser } from '../Parser';
 import { Armor } from '../../schema/ArmorSchema'
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import ArmorItemData = Shadowrun.ArmorItemData;
-import ArmorData = Shadowrun.ArmorData;
 
-export class ArmorParser extends Parser<ArmorItemData> {
-    protected override parseType: string = 'armor';
+export class ArmorParser extends Parser<'armor'> {
+    protected override parseType: 'armor' = 'armor';
 
-    protected override getSystem(jsonData: Armor): ArmorData {
-        const system = this.getBaseSystem();
+    protected override getSystem(jsonData: Armor): Item.SystemOfType<'armor'> {
+        const system = this.getBaseSystem() as Item.SystemOfType<'armor'>;
 
         system.armor.value = Number(jsonData.armor._TEXT) || 0;
         system.armor.mod = jsonData.armor._TEXT.includes('+');
