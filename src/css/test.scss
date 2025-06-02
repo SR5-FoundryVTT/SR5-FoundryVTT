@@ -36,16 +36,34 @@
     /* Dropdown-Listen im Dark-Theme */
     select.form-control,
     select {
+
       & option,
       & optgroup {
         background-color: var(--color-input-bg) !important;
         color: var(--color-input-text) !important;
       }
-      & option               { background-color: #4d4d4d !important; }
-      & option:checked       { background-color: #767676 !important; }
-      & option:hover         { background-color: #5e5e5e !important; }
-      & optgroup             { background-color: #3b3b3b !important; font-weight: bold; padding: .25em .5em !important; }
-      & option.group-label   { background-color: #3b3b3b !important; }
+
+      & option {
+        background-color: #4d4d4d !important;
+      }
+
+      & option:checked {
+        background-color: #767676 !important;
+      }
+
+      & option:hover {
+        background-color: #5e5e5e !important;
+      }
+
+      & optgroup {
+        background-color: #3b3b3b !important;
+        font-weight: bold;
+        padding: .25em .5em !important;
+      }
+
+      & option.group-label {
+        background-color: #3b3b3b !important;
+      }
     }
 
     .dialog-content-teamwork.grid-two-col {
@@ -55,7 +73,9 @@
       row-gap: .5em;
       align-items: center;
 
-      label { justify-self: start; }
+      label {
+        justify-self: start;
+      }
 
       /* Inputs & Selects in rechter Spalte */
       .form-control,
@@ -70,9 +90,9 @@
 
     /* Weiße Schrift in Textinputs */
     .dialog-content-teamwork {
+
       input[name="filter"],
-      input[name="threshold"],
-      input[name="limitNumber"] {
+      input[name="threshold"] {
         color: #ffffff !important;
       }
 
@@ -103,12 +123,15 @@
         align-items: center;
 
         .limit-number {
-          width: 6ch; min-width: 6ch; max-width: 6ch;
+          width: 6ch;
+          min-width: 6ch;
+          max-width: 6ch;
           text-align: center;
           box-sizing: border-box;
           background: var(--color-input-bg) !important;
           color: var(--color-input-text) !important;
         }
+
         .limit-select {
           width: 100%;
         }
@@ -131,9 +154,41 @@
     cursor: pointer;
     padding: .5em 1em;
     font-weight: bold;
+    display: block;
+    width: 100%;
+    /* Optional: Deine gewünschte Font-Size */
+    font-size: var(--font-size-12);
+  }
+
+  .participant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .participant-actor {
     display: flex;
     align-items: center;
-    &::-webkit-details-marker { display: none; }
+    gap: 0.5em;
+  }
+
+  .participant-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none !important;
+    flex-shrink: 0;
+  }
+
+  .participant-name {
+    font-weight: normal;
+  }
+
+  .participant-hits {
+    white-space: nowrap;
+    font-weight: normal;
   }
 
   .different-skills {
@@ -151,10 +206,20 @@
 .glitch-message {
   color: #ff4d4d;
   font-style: italic;
-  &.critical { font-weight: bold; }
+
+  &.critical {
+    font-weight: bold;
+  }
 }
 
 @keyframes expand {
-  from { opacity: 0; transform: scaleY(.95); }
-  to   { opacity: 1; transform: scaleY(1); }
+  from {
+    opacity: 0;
+    transform: scaleY(.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
 }

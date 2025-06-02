@@ -344,7 +344,7 @@
         "Teamwork": {
             "Title": "Teamwork Test",
             "Filter": {
-                "Actor": "Filter Actor",
+                "Actor": "Filter Actors",
                 "Placeholder": "Actor Name"
             },
             "AllowOtherSkills": "Allow other Skills"

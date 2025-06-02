@@ -1,8 +1,13 @@
 <details class="teamwork-participant">
   <summary>
-    <span {{#if glitched}}class="glitch-message {{#ife criticalGlitched true}}critical{{/ife}}"
-      {{/if}}><strong>{{name}}</strong>: {{netHits}}</span>
-  </summary>
+  <div class="participant-header">
+    <div class="participant-actor">
+      <img src="{{actor.img}}" alt="{{actor.name}}" class="participant-avatar"/>
+      <span class="participant-name">{{actor.name}}</span>
+    </div>
+    <span class="participant-hits">{{netHits}} {{localize "SR5.Hits"}}</span>
+  </div>
+</summary>
   {{#if (or differentSkill differentAttribute differentLimit glitched)}}
   <div class="different-skills">
     {{#if glitched}}

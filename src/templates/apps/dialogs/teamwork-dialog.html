@@ -33,42 +33,32 @@
     </select>
 
     <!-- Attribut-Auswahl -->
-<!-- Attribut-Auswahl -->
-<label>{{localize "SR5.Attribute"}}</label>
-<select class="form-control" name="selectedAttribute" {{#if lockedSkill}}disabled{{/if}}>
-  {{#each attributes as |attribute|}}
-    <option value="{{attribute.name}}"
-            {{#ife attribute.name ../selectedAttribute.name}}selected{{/ife}}>
-      {{localize attribute.label}}
-    </option>
-  {{/each}}
-</select>
-
-<!-- Limit -->
-<label>{{localize "SR5.Limit"}}</label>
-<div class="limit-controls" {{#if lockedSkill}}style="opacity:0.5;pointer-events:none"{{/if}}>
-  <input type="number"
-         name="selectedLimit.base"
-         data-dtype="Number"
-         inputmode="numeric"
-         pattern="\d*"
-         min="0"
-         placeholder="0"
-         value="{{selectedLimit.base}}"
-         {{#if lockedSkill}}disabled{{/if}} />
-
-  <select name="selectedLimit.name"
-          class="limit-select form-control"
-          {{#if lockedSkill}}disabled{{/if}}>
-    <option value="" {{#ife "" ../selectedLimit.name}}selected{{/ife}}></option>
-    {{#each limits as |limit|}}
-      <option value="{{limit.name}}"
-              {{#ife limit.name ../selectedLimit.name}}selected{{/ife}}>
-        {{localize limit.label}}
+    <!-- Attribut-Auswahl -->
+    <label>{{localize "SR5.Attribute"}}</label>
+    <select class="form-control" name="selectedAttribute" {{#if lockedSkill}}disabled{{/if}}>
+      {{#each attributes as |attribute|}}
+      <option value="{{attribute.name}}" {{#ife attribute.name ../selectedAttribute.name}}selected{{/ife}}>
+        {{attribute.label}}
       </option>
-    {{/each}}
-  </select>
-</div>
+      {{/each}}
+    </select>
+
+    <!-- Limit -->
+    <label>{{localize "SR5.Limit"}}</label>
+    <div class="limit-controls" {{#if lockedSkill}}style="opacity:0.5;pointer-events:none" {{/if}}>
+      <input class="limit-number" type="number" name="selectedLimit.base" data-dtype="Number" inputmode="numeric" pattern="\d*" min="0"
+        placeholder="0" value="{{selectedLimit.base}}" {{#if lockedSkill}}disabled{{/if}} />
+
+      <select name="selectedLimit.name" class="limit-select form-control" {{#if lockedSkill}}disabled{{/if}}>
+        <option value="" {{#ife "" ../selectedLimit.name}}selected{{/ife}}></option>
+
+        {{#each limits as |limit|}}
+        <option value="{{limit.name}}" {{#ife limit.name ../selectedLimit.name}}selected{{/ife}}>
+          {{limit.label}}
+        </option>
+        {{/each}}
+      </select>
+    </div>
 
 
 

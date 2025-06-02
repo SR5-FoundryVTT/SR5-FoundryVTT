@@ -11,24 +11,22 @@ import { DataDefaults } from '../../data/DataDefaults';
 import { TestCreator } from '../../tests/TestCreator';
 import { SR5Roll } from '../../rolls/SR5Roll';
 import { SR5 } from '../../config';
+import { isNumberObject } from 'util/types';
 
-export type AttributeKey = keyof typeof SR5.attributes;
-export type LimitKey = keyof typeof SR5.limits;
+export type AttributeKey = keyof typeof SR5.attributes | '';
+export type LimitKey = keyof typeof SR5.limits | '';
 
-export interface TeamworkMessageData {
-    /** Liste aller wählbaren Akteure */
+export interface TeamworkData {
     actor: SR5Actor;
-    /** Aktuell ausgewählter Skill */
     skill: SkillEntry;
-    /** Aktuell ausgewähltes Attribut */
-    attribute?: AttributeKey;
-    /** Vorgeschlagener Schwellenwert */
+    attribute?: AttributeEntry;
     threshold?: number;
-    limit?: string;
-    /** Checkbox: auch andere Skills erlauben */
+    limit?: LimitEntry;
     allowOtherSkills: boolean;
-    /** Soll die Checkbox angezeigt werden? */
     showAllowOtherSkills: boolean;
+}
+
+export interface TeamworkMessageData extends TeamworkData {
     additionalDice: Shadowrun.ValueMaxPair<number>;
     additionalLimit: number;
     criticalGlitched: boolean;
@@ -49,8 +47,8 @@ interface ParticipantEntry {
 export interface SkillEntry {
     id: string;
     label: string;
-    attribute: AttributeKey;   
-    limit: LimitKey;                    
+    attribute: AttributeKey;
+    limit: LimitKey;
 }
 
 export interface AttributeEntry {
@@ -83,24 +81,16 @@ export class TeamworkFlow {
 
         // Active
         const activeSkills = Object.entries(active)
-            .map(([id, s]) => ({
-                id,
-                label: game.i18n.localize(s.label as Translation) ?? s.name,
-                attribute: s.attribute as AttributeKey,
-                limit: attrs[s.attribute]?.limit as LimitKey ?? ""
-            }))
+            .map((id) => this.constructSkillEntry({ id }, actor))
+            .filter((entry): entry is SkillEntry => Boolean(entry?.id))
             .sort(sortBy);
         if (activeSkills.length) groups.push({ group: "Active Skills", skills: activeSkills });
 
         // Language
         // Language Skills
         const languageSkills: SkillEntry[] = Object.entries(language.value ?? {})
-            .map(([id, skill]) => ({
-                id,
-                label: game.i18n.localize(skill.label as Translation) ?? skill.name,
-                attribute: skill.attribute as AttributeKey,
-                limit: attrs[skill.attribute]?.limit as LimitKey ?? ""
-            }))
+            .map((id) => this.constructSkillEntry({ id }, actor))
+            .filter((entry): entry is SkillEntry => Boolean(entry?.id))
             .sort(sortBy);
 
         if (languageSkills.length) {
@@ -110,14 +100,9 @@ export class TeamworkFlow {
 
         // Knowledge‐Gruppen
         for (const [catKey, catList] of Object.entries(knowledge) as [keyof Shadowrun.KnowledgeSkills, Shadowrun.KnowledgeSkillList][]) {
-            const entries = catList.value ?? {};
-            const list = Object.entries(entries)
-                .map(([id, s]) => ({
-                    id,
-                    label: game.i18n.localize(s.label as Translation) ?? s.name,
-                    attribute: s.attribute as AttributeKey,
-                    limit: attrs[s.attribute]?.limit as LimitKey ?? ""
-                }))
+            const list: SkillEntry[] = Object.keys(catList.value ?? {})
+                .map((id) => this.constructSkillEntry({ id }, actor))
+                .filter((entry): entry is SkillEntry => Boolean(entry?.id))
                 .sort(sortBy);
             if (list.length) groups.push({ group: `Knowledge (${catKey})`, skills: list });
         }
@@ -133,6 +118,75 @@ export class TeamworkFlow {
                 label: game.i18n.localize(field.label as Translation)
             }))
             .sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    static constructLimitEntry(data?: string | number): LimitEntry {
+        if (data && !isNaN(+data!)) {
+            return {
+                name: "",
+                label: "",
+                base: +data
+            } as LimitEntry;
+        } else if (typeof data === "string" && data in SR5.limits) {
+            return {
+                name: data as LimitKey,
+                label: SR5.limits[data]
+            }
+        }
+
+        return { name: "", label: "" };
+    }
+
+    static constructAttributeEntry(data?: string): AttributeEntry {
+        if (typeof data === "string" && data in SR5.limits) {
+            return {
+                name: data as AttributeKey,
+                label: SR5.limits[data]
+            }
+        }
+
+        return { name: "", label: "" };
+    }
+
+    static constructSkillEntry(data: Partial<SkillEntry>, actor?: SR5Actor): SkillEntry {
+        const id = data.id ?? "";
+        if (actor && id) {
+            const skill = actor.getSkill(id);
+            if (skill) return {
+                id: skill.id,
+                label: game.i18n.localize(skill.label as Translation) ?? skill.name,
+                attribute: skill.attribute as AttributeKey,
+                limit: actor.getAttributes()[skill.attribute]?.limit as LimitKey ?? ""
+            }
+        }
+
+        return {
+            id,
+            label: id && id in SR5.activeSkills
+                ? game.i18n.localize(SR5.activeSkills[id] as Translation)
+                : data.label
+                    ? game.i18n.localize(data.label as Translation)
+                    : "",
+            attribute: data.attribute ?? "",
+            limit: data.limit ?? ""
+        }
+    }
+
+    static get limitList(): { name: LimitKey; label: string }[] {
+        return Object.entries(SR5.limits)
+            .map(([key, label]) => ({
+                name: key as LimitKey,
+                label: game.i18n.localize(label as Translation)
+            }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    static get actorList(): SR5Actor[] | undefined {
+        const user = game.user;
+        if (!user || !game.actors) return;
+        return game.actors?.filter(actor =>
+            actor.testUserPermission(user, "OWNER")
+        )
     }
 
     static async chatLogListeners(chatLog: ChatLog, html) {
@@ -162,21 +216,22 @@ export class TeamworkFlow {
         if (!user || !game.actors || !testAttributes) return;
 
         const selectedActor = await JournalEnrichers.findActor();
-        const actors: SR5Actor[] = game.actors.filter(actor =>
-            actor.testUserPermission(user, "OWNER")
-        ) ?? [selectedActor];
+
+        if(!selectedActor) return ui.notifications?.error("Kein valider Akteur gefunden.");;
 
         const dialogData = await new TeamWorkDialog({
-            actors,
-            selectedActor,
-            selectedSkill: testAttributes.skill,
-            selectedAttribute: testAttributes.attribute,
+            actors: this.actorList ?? [selectedActor],
+            actor: selectedActor,
+            skill: this.constructSkillEntry({ id: testAttributes.skill }, selectedActor),
+            attribute: this.constructAttributeEntry(testAttributes.attribute),
             threshold: Number(testAttributes.threshold) || undefined,
             allowOtherSkills: Boolean(testAttributes.allowOtherSkills) ?? false,
-            limit: testAttributes.limit,
+            limit: this.constructLimitEntry(testAttributes.limit),
             request: true,
             lockedSkill: false
         }).select();
+
+        console.log("initiateTeamworkTest dialogData", dialogData)
 
         if (dialogData.cancelled) return;
 
@@ -199,11 +254,15 @@ export class TeamworkFlow {
             specialization: dialogData.specialization
         };
 
+        console.log("initiateTeamworkTest teamworkData", teamworkData)
+
         const templateContext = {
             ...teamworkData,
-            limit: (SR5.limits as Record<string, string>)[dialogData.limit] ?? undefined,
-            attribute: (SR5.attributes as Record<string, string>)[dialogData.attribute] ?? undefined
+            limit: (SR5.limits as Record<LimitKey, string>)[dialogData.limit] ?? undefined,
+            attribute: (SR5.attributes as Record<AttributeKey, string>)[dialogData.attribute] ?? undefined
         };
+
+        console.log("initiateTeamworkTest templateContext", templateContext)
 
         // Rendern und ChatMessage anlegen
         const content = await renderTemplate("systems/shadowrun5e/dist/templates/chat/teamworkRequest.html", templateContext);
@@ -240,15 +299,17 @@ export class TeamworkFlow {
 
         const selection = await new TeamWorkDialog({
             actors,
-            selectedActor,
-            selectedSkill: teamworkData.skill.id,
-            selectedAttribute: teamworkData.attribute,
+            actor: selectedActor,
+            skill: teamworkData.skill,
+            attribute: teamworkData.attribute,
             threshold: teamworkData.threshold,
             allowOtherSkills: teamworkData.allowOtherSkills,
             limit: teamworkData.limit,
             request: false,
             lockedSkill: !teamworkData.allowOtherSkills
         }).select();
+
+        console.log("AddParticipant-Selection", selection)
 
         if (!selection) return;
 
@@ -317,15 +378,13 @@ export class TeamworkFlow {
         // 1.) Flag auslesen
         const teamworkData = (await message.getFlag(SYSTEM_NAME, FLAGS.Test)) as TeamworkMessageData;
 
-        console.log(teamworkData, results);
-
         // 2.) Neue Teilnehmer-Info anhängen
         const netHits = results.data.values.netHits.value;
         teamworkData.participants.push({
             actor: actor,
             netHits,
             glitched: results.rolls[0].glitched,
-            criticalGlitched: teamworkData.criticalGlitched,
+            criticalGlitched: results.rolls[0].criticalGlitched,
             differentSkill: results.data.action.skill !== teamworkData.skill.id ? actor.getSkill(results.data.action.skill) : undefined,
             differentAttribute: results.data.action.attribute !== teamworkData.attribute ? (SR5.attributes as Record<AttributeKey, string>)[results.data.action.attribute] : undefined,
             differentLimit: typeof teamworkData.limit === "string"

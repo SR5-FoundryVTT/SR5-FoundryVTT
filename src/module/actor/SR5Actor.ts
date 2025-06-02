@@ -537,7 +537,6 @@ export class SR5Actor extends Actor {
     }
 
     getLimit(name: string): Shadowrun.LimitField {
-        console.log("Limitname", name)
         const limits = this.getLimits();
         return limits[name];
     }
@@ -723,7 +722,6 @@ export class SR5Actor extends Actor {
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
     getSkill(id: string, options = { byLabel: false }): Shadowrun.SkillField | undefined {
-        console.log(id)
         if (options.byLabel)
             return this.getSkillByLabel(id);
 
@@ -757,13 +755,11 @@ export class SR5Actor extends Actor {
      * @return The first skill found with a matching translation or name.
      */
     getSkillByLabel(searchedFor: string): Shadowrun.SkillField | undefined {
-        console.log("   ↪ getSkillByLabel(): looking for exact label/name:", searchedFor);
         if (!searchedFor) return;
 
         const possibleMatch = (skill: Shadowrun.SkillField): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
 
         const skills = this.getSkills();
-        console.log("   ↪ getSkillByLabel(): full skills object:", skills);
 
         for (const [id, skill] of Object.entries(skills.language.value)) {
             if (searchedFor === possibleMatch(skill))
@@ -783,11 +779,9 @@ export class SR5Actor extends Actor {
 
         for (const [id, skill] of Object.entries(skills.active)) {
             const label = possibleMatch(skill);
-            console.log(`     • language[${id}] =`, label);
             if (searchedFor === possibleMatch(skill))
                 return { ...skill, id };
         }
-        console.warn("   ↪ getSkillByLabel(): no match found for", searchedFor);
     }
 
     /**
