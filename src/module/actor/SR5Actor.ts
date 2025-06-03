@@ -1464,7 +1464,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         value = Math.max(value, 0);
 
         // Use artificial damage to be consistent across other damage application Actor methods.
-        const damage = DataDefaults.createData({
+        const damage = DataDefaults.createData('damage', {
             type: {base: 'matrix', value: 'matrix'},
             base: value,
             value: value
