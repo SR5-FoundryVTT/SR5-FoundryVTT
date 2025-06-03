@@ -1,18 +1,14 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
-import BlastData = Shadowrun.BlastData;
-import WeaponItemData = Shadowrun.WeaponItemData;
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { Weapon } from '../../schema/WeaponsSchema';
+import { BlastType } from 'src/module/types/item/WeaponModel';
 
 export class ThrownParser extends WeaponParserBase {
-    public GetBlast(system: WeaponItemData['system'], jsonData: Weapon): BlastData {
-        let blastData: BlastData = {
-            radius: 0,
-            dropoff: 0,
-        };
+    public GetBlast(system: Item.SystemOfType<'weapon'>, jsonData: Weapon): BlastType {
+        const blastData: BlastType = { radius: 0, dropoff: 0 };
 
-        let blastCode = jsonData.damage._TEXT;
+        const blastCode = jsonData.damage._TEXT;
 
         let radiusMatch = blastCode.match(/([0-9]+m)/)?.[0];
         if (radiusMatch) {
@@ -34,7 +30,7 @@ export class ThrownParser extends WeaponParserBase {
         return blastData;
     }
 
-    protected override getSystem(jsonData: Weapon): WeaponItemData['system'] {
+    protected override getSystem(jsonData: Weapon): Item.SystemOfType<'weapon'> {
         const system = super.getSystem(jsonData);
 
         const rangeCategory = jsonData.range?._TEXT || jsonData.category._TEXT;

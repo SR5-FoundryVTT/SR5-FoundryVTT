@@ -5,8 +5,8 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import Ware = Shadowrun.WareItemData;
 
-export class WareParser extends Parser<Ware> {
-    protected override parseType: string;
+export class WareParser extends Parser<'bioware' | 'cyberware'> {
+    protected override parseType: 'bioware' | 'cyberware';
     protected categories: (BiowareSchema | CyberwareSchema)['categories']['category'];
     
     constructor(
@@ -16,8 +16,8 @@ export class WareParser extends Parser<Ware> {
         super(); this.parseType = parseType; this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Bioware | Cyberware): Ware['system'] {
-        const system = this.getBaseSystem();
+    protected override getSystem(jsonData: Bioware | Cyberware): Item.SystemOfType<'bioware' | 'cyberware'> {
+        const system = this.getBaseSystem() as Item.SystemOfType<'bioware' | 'cyberware'>;
 
         const essence = (jsonData.ess._TEXT || '0').match(/[0-9]\.?[0-9]*/g);
         if (essence)

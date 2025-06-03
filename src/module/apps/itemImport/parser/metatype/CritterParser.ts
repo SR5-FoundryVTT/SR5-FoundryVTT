@@ -3,10 +3,10 @@ import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
-import CharacterActorData = Shadowrun.CharacterActorData;
+import { DataDefaults } from "src/module/data/DataDefaults";
 
-export class CritterParser extends MetatypeParserBase<CharacterActorData> {
-    protected override parseType: string = 'character';
+export class CritterParser extends MetatypeParserBase<'character'> {
+    protected parseType = 'character' as const;
 
     private normalizeSkillName(rawName: string): string {
         let name = rawName
@@ -26,7 +26,7 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
         return name;
     }
 
-    private setSkills(system: CharacterActorData['system'], jsonData: Metatype): void {
+    private setSkills(system: Actor.SystemOfType<'character'>, jsonData: Metatype): void {
         const skills = jsonData.skills;
         if (!skills) return;
 
@@ -68,6 +68,7 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
                 const skillValue = +skill.$.rating;
                 const skillCategory = skill.$.category.toLowerCase();
 
+                //TODO fix this:
                 system.skills.knowledge[skillCategory].value[name] = (() => {
                     const skillField: any = { name: skill._TEXT, base: skillValue };
                     _mergeWithMissingSkillFields(skillField);
@@ -77,8 +78,8 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
         }
     }
 
-    protected override getSystem(jsonData: Metatype): CharacterActorData['system'] {
-        const system = this.getBaseSystem();
+    protected override getSystem(jsonData: Metatype): Actor.SystemOfType<'character'> {
+        const system = this.getBaseSystem() as Actor.SystemOfType<'character'>;
 
         system.attributes["body"].base = Number(jsonData.bodmin._TEXT) || 0;
         system.attributes["agility"].base = Number(jsonData.agimin._TEXT) || 0;
@@ -102,12 +103,12 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
 
         if (jsonData.run) {
             const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => Number(v) || 0);
-            system.movement.run = { value, mult, base } as Shadowrun.Movement['run'];
+            system.movement.run = DataDefaults.createData('movement_field', { value, mult, base });
         }
 
         if (jsonData.walk) {
             const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => Number(v) || 0);
-            system.movement.walk = { value, mult, base } as Shadowrun.Movement['walk'];
+            system.movement.walk = DataDefaults.createData('movement_field', { value, mult, base });
         }
         system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0]) || 0;
 
@@ -119,7 +120,7 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
         return system;
     }
 
-    protected override async getItems(jsonData: Metatype): Promise<Shadowrun.ShadowrunItemData[]> {
+    protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
         const optionalpowers = jsonData.optionalpowers || undefined;
         const qualities = jsonData.qualities || undefined;
 

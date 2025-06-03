@@ -3,7 +3,7 @@ import { DescriptionPartData } from "../template/DescriptionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 import { ActionPartData } from "./ActionModel";
 
-const ComplexFormData = {
+export const ComplexFormData = () => ({
     ...DescriptionPartData(),
     ...ImportFlags(),
     ...ActionPartData(),
@@ -15,13 +15,13 @@ const ComplexFormData = {
     }),
     duration: new StringField({ required: true, initial: '' }),
     fade: new NumberField({ required: true, initial: 0 }),
-}
+});
 
 
-export class ComplexForm extends foundry.abstract.TypeDataModel<typeof ComplexFormData, Item.Implementation> {
+export class ComplexForm extends foundry.abstract.TypeDataModel<ReturnType<typeof ComplexFormData>, Item.Implementation> {
     static override defineSchema() {
-        return ComplexFormData;
+        return ComplexFormData();
     }
 }
 
-console.log("ComplexFormData", ComplexFormData, new ComplexForm());
+console.log("ComplexFormData", ComplexFormData(), new ComplexForm());

@@ -2,18 +2,17 @@ import { Parser } from "../Parser";
 import { Gear,GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
-import DeviceItemData = Shadowrun.DeviceItemData;
 
-export class DeviceParser extends Parser<DeviceItemData> {
-    protected override parseType: string = 'device';
+export class DeviceParser extends Parser<'device'> {
+    protected parseType = 'device' as const;
     protected categories: GearSchema['categories']['category'];
 
     constructor(categories: GearSchema['categories']['category']) {
         super(); this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Gear): DeviceItemData['system'] {
-        const system =  this.getBaseSystem();
+    protected override getSystem(jsonData: Gear): Item.SystemOfType<'device'> {
+        const system = this.getBaseSystem() as Item.SystemOfType<'device'>;
 
         const category = jsonData.category._TEXT;
         system.category = category === 'Cyberdecks' ? 'cyberdeck'

@@ -11,13 +11,13 @@ export class WeaponModImporter extends DataImporter {
     }
 
     async Parse(jsonObject: WeaponsSchema): Promise<void> {
-        return WeaponModImporter.ParseItems<Accessory, Shadowrun.ModificationItemData>(
+        return WeaponModImporter.ParseItems<Accessory>(
             jsonObject.accessories.accessory,
             {
                 compendiumKey: "Modification",
                 parser: new WeaponModParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Weapon Mod"
             }

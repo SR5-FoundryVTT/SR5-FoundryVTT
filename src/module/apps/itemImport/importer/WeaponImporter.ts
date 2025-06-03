@@ -20,7 +20,7 @@ export class WeaponImporter extends DataImporter {
             this.categories = categories;
         }
 
-        public async Parse(jsonData: Weapon): Promise<WeaponItemData> {
+        public async Parse(jsonData: Weapon): Promise<Item.CreateData> {
             const rangedParser = new RangedParser(this.categories);
             const meleeParser = new MeleeParser(this.categories);
             const thrownParser = new ThrownParser(this.categories);
@@ -30,18 +30,18 @@ export class WeaponImporter extends DataImporter {
                                  : category === 'melee' ? meleeParser
                                                         : thrownParser;
 
-            return await selectedParser.Parse(jsonData);
+            return await selectedParser.Parse(jsonData) as Item.CreateData;
         }
     };
 
     async Parse(jsonObject: WeaponsSchema): Promise<void> {
-        return WeaponImporter.ParseItems<Weapon, WeaponItemData>(
+        return WeaponImporter.ParseItems<Weapon>(
             jsonObject.weapons.weapon,
             {
                 compendiumKey: "Weapon",
                 parser: new WeaponImporter.parserWrap(jsonObject.categories.category),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Weapon"
             }

@@ -2,23 +2,22 @@ import { Parser } from "../Parser";
 import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
-import ProgramItemData = Shadowrun.ProgramItemData;
 
-export class ProgramParser extends Parser<ProgramItemData> {
-    protected override parseType: string = 'program';
+export class ProgramParser extends Parser<'program'> {
+    protected parseType = 'program' as const;
     protected categories: GearSchema['categories']['category'];
 
     constructor(categories: GearSchema['categories']['category']) {
         super(); this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Gear): ProgramItemData['system'] {
+    protected override getSystem(jsonData: Gear): Item.SystemOfType<'program'> {
         const programCategories = {
             'Hacking Programs': 'hacking_program',
             'Common Programs': 'common_program'
         } as const;
 
-        const system = this.getBaseSystem();
+        const system = this.getBaseSystem() as Item.SystemOfType<'program'>;
 
         system.type = programCategories[jsonData.category._TEXT];
 

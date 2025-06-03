@@ -2,20 +2,19 @@ import { Metatype } from "../../schema/MetatypeSchema";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import SpriteActorData = Shadowrun.SpriteActorData;
 
-export class SpriteParser extends MetatypeParserBase<SpriteActorData> {
-    protected override parseType: string = 'sprite';
+export class SpriteParser extends MetatypeParserBase<'sprite'> {
+    protected parseType = 'sprite' as const;
 
-    protected override getSystem(jsonData: Metatype): SpriteActorData['system'] {
-        const system = this.getBaseSystem();
+    protected override getSystem(jsonData: Metatype): Actor.SystemOfType<'sprite'> {
+        const system = this.getBaseSystem() as Actor.SystemOfType<'sprite'>;
 
         system.spriteType = jsonData.name._TEXT.split(" ")[0].toLowerCase();
 
         return system;
     }
 
-    protected override async getItems(jsonData: Metatype): Promise<Shadowrun.ShadowrunItemData[]> {
+    protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
         const optionalpowers = jsonData.bonus?.optionalpowers;
         const allPowers = [...IH.getArray(jsonData.powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
         const translationMap: Record<string, string> = {};

@@ -4,7 +4,7 @@ import { ImportFlags } from "../template/ImportFlagsModel";
 import { TechnologyPartData } from "../template/TechnologyModel";
 import { BlastData } from "./WeaponModel";
 
-const AmmoData = {
+export const AmmoData = () => ({
     ...DescriptionPartData(),
     ...TechnologyPartData(),
     ...ImportFlags(),
@@ -25,12 +25,12 @@ const AmmoData = {
     replaceDamage: new BooleanField({ required: true, initial: false }),
     blast: new SchemaField(BlastData(), { required: true }),
     accuracy: new NumberField({ required: true, initial: 0 }),
-}
+});
 
-export class Ammo extends foundry.abstract.TypeDataModel<typeof AmmoData, Item.Implementation> {
+export class Ammo extends foundry.abstract.TypeDataModel<ReturnType<typeof AmmoData>, Item.Implementation> {
     static override defineSchema() {
-        return AmmoData;
+        return AmmoData();
     }
 }
 
-console.log("AmmoData", AmmoData, new Ammo());
+console.log("AmmoData", AmmoData(), new Ammo());

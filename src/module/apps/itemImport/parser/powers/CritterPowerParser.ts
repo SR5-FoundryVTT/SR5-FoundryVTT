@@ -2,17 +2,15 @@ import { Parser } from '../Parser';
 import { Power } from '../../schema/CritterpowersSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import CritterPowerCategory = Shadowrun.CritterPowerCategory;
-import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 
-export class CritterPowerParser extends Parser<CritterPowerItemData> {
-    protected override parseType: string = 'critter_power';
+export class CritterPowerParser extends Parser<'critter_power'> {
+    protected parseType = 'critter_power' as const;
 
-    protected override getSystem(jsonData: Power): CritterPowerItemData['system'] {
-        const system = this.getBaseSystem();
+    protected override getSystem(jsonData: Power): Item.SystemOfType<'critter_power'> {
+        const system = this.getBaseSystem() as Item.SystemOfType<'critter_power'>;
 
         const category = jsonData.category._TEXT.toLowerCase();
-        system.category = (category.includes("infected") ? "infected" : category) as CritterPowerCategory;
+        system.category = (category.includes("infected") ? "infected" : category) as Item.SystemOfType<'critter_power'>['category'];
 
         system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : "";
 

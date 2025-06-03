@@ -4,21 +4,19 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 import SpiritActorData = Shadowrun.SpiritActorData;
 
-export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
-    protected override parseType: string = 'spirit';
+export class SpiritParser extends MetatypeParserBase<'spirit'> {
+    protected parseType = 'spirit' as const;
 
-    protected override getSystem(jsonData: Metatype): SpiritActorData['system'] {
-        const system = this.getBaseSystem();
-
-        system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
+    protected override getSystem(jsonData: Metatype): Actor.SystemOfType<'spirit'> {
+        const system = this.getBaseSystem() as Actor.SystemOfType<'spirit'>;
 
         switch (jsonData.category?._TEXT) {
             case "Insect Spirits":
-                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as Shadowrun.SpiritType;
+                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase();
                 break;
 
             case "Toxic Spirits": {
-                const specialMapping = new Map<string, Shadowrun.SpiritType>([
+                const specialMapping = new Map<string, string>([
                     ['Noxious Spirit', 'toxic_air'], ['Abomination Spirit', 'toxic_beasts'],
                     ['Barren Spirit', 'toxic_earth'], ['Nuclear Spirit', 'toxic_fire'],
                     ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
@@ -52,12 +50,12 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
 
         if (jsonData.run) {
             const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => +v || 0);
-            system.movement.run = { value, mult, base } as Shadowrun.Movement['run'];
+            system.movement.run = DataDefaults.createData('movement_field', { value, mult, base })
         }
 
         if (jsonData.walk) {
             const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => +v || 0);
-            system.movement.walk = { value, mult, base } as Shadowrun.Movement['walk'];
+            system.movement.walk = DataDefaults.createData('movement_field', { value, mult, base })
         }
         system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
         system.is_npc = true;
@@ -65,7 +63,7 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
         return system;
     }
 
-    protected override async getItems(jsonData: Metatype): Promise<Shadowrun.ShadowrunItemData[]> {
+    protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
         const { name, powers } = jsonData;
         const qualities = jsonData.qualities || undefined;
         const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers;

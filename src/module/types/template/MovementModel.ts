@@ -1,7 +1,7 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 import { ModifiableValue } from "./BaseModel";
 
-const MovementField = () => ({
+export const MovementField = () => ({
     ...ModifiableValue(),
     value: new NumberField({ required: true, initial: 0 }),
     mult: new NumberField({ required: true, initial: 0 }),

@@ -1,9 +1,8 @@
 import { Spell } from '../../schema/SpellsSchema';
 import { SpellParserBase } from './SpellParserBase';
-import SpellItemData = Shadowrun.SpellItemData;
 
 export class IllusionSpellParser extends SpellParserBase {
-    protected override getSystem(jsonData: Spell): SpellItemData['system'] {
+    protected override getSystem(jsonData: Spell): Item.SystemOfType<'spell'> {
         const system = super.getSystem(jsonData);
 
         if (system.type === 'mana') {

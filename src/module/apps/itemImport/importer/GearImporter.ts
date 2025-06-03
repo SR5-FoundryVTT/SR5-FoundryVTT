@@ -22,7 +22,7 @@ export class GearImporter extends DataImporter {
             this.categories = categories;
         }
 
-        public async Parse(jsonData: Gear): Promise<gearTypes> {
+        public async Parse(jsonData: Gear): Promise<Item.CreateData> {
             const ammoParser = new AmmoParser(this.categories);
             const deviceParser = new DeviceParser(this.categories);
             const programParser = new ProgramParser(this.categories);
@@ -37,19 +37,19 @@ export class GearImporter extends DataImporter {
                                  : programTypes.includes(category) ? programParser
                                                                    : equipmentParser;
 
-            return await selectedParser.Parse(jsonData);
+            return await selectedParser.Parse(jsonData) as Item.CreateData;
         }
     };
 
     async Parse(jsonObject: GearSchema): Promise<void> {
-        return GearImporter.ParseItems<Gear, gearTypes>(
+        return GearImporter.ParseItems<Gear>(
             jsonObject.gears.gear,
             {
                 compendiumKey: "Gear",
                 parser: new GearImporter.parserWrap(jsonObject.categories.category),
                 filter: jsonData => jsonData.id._TEXT !== 'd63eb841-7b15-4539-9026-b90a4924aeeb',
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Gear"
             }

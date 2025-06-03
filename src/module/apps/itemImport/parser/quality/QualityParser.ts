@@ -2,13 +2,12 @@ import { Parser } from '../Parser';
 import { Quality } from '../../schema/QualitiesSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import QualityItemData = Shadowrun.QualityItemData;
 
-export class QualityParser extends Parser<QualityItemData> {
-    protected override parseType: string = 'quality';
+export class QualityParser extends Parser<'quality'> {
+    protected parseType = 'quality' as const;
 
-    protected override getSystem(jsonData: Quality): QualityItemData['system'] {
-        const system = this.getBaseSystem();
+    protected override getSystem(jsonData: Quality): Item.SystemOfType<'quality'> {
+        const system = this.getBaseSystem() as Item.SystemOfType<'quality'>;
 
         system.type = jsonData.category._TEXT === 'Positive' ? 'positive' : 'negative';
         system.karma = Number(jsonData.karma._TEXT) || 0;

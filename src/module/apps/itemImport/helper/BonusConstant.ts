@@ -1,4 +1,3 @@
-import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 import { BonusSchema } from '../schema/BonusSchema';
 
 import EffectTagsData = Shadowrun.EffectTagsData;
@@ -6,14 +5,10 @@ import EffectChangeData = Shadowrun.EffectChangeData;
 import EffectOptionsData = Shadowrun.EffectOptionsData;
 import EffectDurationData = Shadowrun.EffectDurationData;
 
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-
-export type ShadowrunSheetData = (
-    ShadowrunItemData | ShadowrunActorData
+export type CreateData = (
+    Actor.CreateData | Item.CreateData
 ) & {
     effects?: EffectOptionsData[];
-    flags?: { shadowrun5e: { embeddedItems: ItemDataSource[] } };
 };
 
 export type ActiveEffectMode = typeof CONST.ACTIVE_EFFECT_MODES[keyof typeof CONST.ACTIVE_EFFECT_MODES];

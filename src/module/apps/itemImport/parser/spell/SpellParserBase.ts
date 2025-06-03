@@ -5,13 +5,15 @@ import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import SpellCateogry = Shadowrun.SpellCateogry;
 import SpellItemData = Shadowrun.SpellItemData;
 
-export class SpellParserBase extends Parser<SpellItemData> {
-    protected override parseType: string = 'spell';
+export class SpellParserBase extends Parser<'spell'> {
+    protected parseType = 'spell' as const;
 
-    protected override getSystem(jsonData: Spell): SpellItemData['system'] {
-        const system = this.getBaseSystem(
-            {action: {type: 'varies', attribute: 'magic', skill: 'spellcasting'}} as Shadowrun.SpellData
-        );
+    protected override getSystem(jsonData: Spell): Item.SystemOfType<'spell'> {
+        const system = this.getBaseSystem() as Item.SystemOfType<'spell'>;
+
+        system.action.type = 'varies';
+        system.action.attribute = 'magic';
+        system.action.skill = 'spellcasting';
 
         system.category = jsonData.category._TEXT.toLowerCase() as SpellCateogry;
 

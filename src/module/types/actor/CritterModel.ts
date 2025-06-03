@@ -25,4 +25,4 @@ export class Critter extends foundry.abstract.TypeDataModel<ReturnType<typeof Cr
     }
 }
 
-console.log("CritterData", CritterData, new Critter());
+console.log("CritterData", CritterData(), new Critter());

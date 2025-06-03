@@ -28,7 +28,7 @@ export const RangeData = () => ({
     long: new NumberField({ required: true, nullable: false, initial: 0 }),
     extreme: new NumberField({ required: true, nullable: false, initial: 0 }),
     category: new StringField({ required: true, initial: '' }),
-    attribute: new StringField({ required: false, initial: '' }),
+    // attribute: new StringField({ required: false, initial: '' }),
 });
 
 const FiringModeData = () => ({
@@ -81,5 +81,7 @@ export class Weapon extends foundry.abstract.TypeDataModel<typeof WeaponData, It
 
 console.log("WeaponData", WeaponData, new Weapon());
 
+export type RangeType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangeData>>;
+export type BlastType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BlastData>>;
 export type AmmunitionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof AmmunitionData>>;
 export type RangeWeaponType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangeWeaponData>>;

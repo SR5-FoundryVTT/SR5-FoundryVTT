@@ -2,18 +2,17 @@ import { Parser } from "../Parser";
 import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
-import AmmoItemData = Shadowrun.AmmoItemData;
 
-export class AmmoParser extends Parser<AmmoItemData> {
-    protected override parseType: string = 'ammo';
+export class AmmoParser extends Parser<'ammo'> {
+    protected parseType = 'ammo' as const;
     protected categories: GearSchema['categories']['category'];
 
     constructor(categories: GearSchema['categories']['category']) {
         super(); this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Gear): AmmoItemData['system'] {
-        const system = this.getBaseSystem();
+    protected override getSystem(jsonData: Gear): Item.SystemOfType<'ammo'> {
+        const system = this.getBaseSystem() as Item.SystemOfType<'ammo'>;
 
         const bonusData = jsonData.weaponbonus;
         if (bonusData) {
@@ -32,8 +31,9 @@ export class AmmoParser extends Parser<AmmoItemData> {
         return system;
     }
 
-    public override async Parse(jsonData: Gear): Promise<AmmoItemData> {
-        const item = await super.Parse(jsonData);
+    public override async Parse(jsonData: Gear): Promise<Item.CreateData> {
+        const item = await super.Parse(jsonData) as Item.CreateData;
+        const system = item.system as Item.SystemOfType<'ammo'>;
 
         // TODO: This can be improved by using the stored english name in item.system.importFlags.name
         if (jsonData.addweapon?._TEXT) {
@@ -42,12 +42,12 @@ export class AmmoParser extends Parser<AmmoItemData> {
             const [foundWeapon] = await IH.findItem('Weapon', weaponTranslation, 'weapon') ?? [];
 
             if (foundWeapon && "action" in foundWeapon.system) {
-                const weaponData = foundWeapon.system as Shadowrun.WeaponData;
-                item.system.damageType = weaponData.action.damage.type.base;
-                item.system.element = weaponData.action.damage.element.base;
-                item.system.damage = weaponData.action.damage.value;
-                item.system.ap = weaponData.action.damage.ap.value;
-                item.system.blast = weaponData.thrown.blast;
+                const weaponData = foundWeapon.system as unknown as Item.SystemOfType<'weapon'>;
+                system.damageType = weaponData.action.damage.type.base;
+                system.element = weaponData.action.damage.element.base;
+                system.damage = weaponData.action.damage.value;
+                system.ap = weaponData.action.damage.ap.value;
+                system.blast = weaponData.thrown.blast;
             } else if (!foundWeapon) {
                 console.log(`[Weapon Missing (Ammo)]\nAmmo: ${item.name}\nWeapon: ${weaponName}`);
             }

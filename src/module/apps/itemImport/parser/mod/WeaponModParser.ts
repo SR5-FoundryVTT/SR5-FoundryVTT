@@ -5,15 +5,15 @@ import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import ModificationItemData = Shadowrun.ModificationItemData;
 import MountType = Shadowrun.MountType;
 
-export class WeaponModParser extends Parser<ModificationItemData> {
-    protected override parseType: string = 'modification';
+export class WeaponModParser extends Parser<'modification'> {
+    protected parseType = 'modification' as const;
 
-    protected override getSystem(jsonData: Accessory): ModificationItemData['system'] {
-        const system = this.getBaseSystem();
+    protected override getSystem(jsonData: Accessory): Item.SystemOfType<'modification'> {
+        const system = this.getBaseSystem() as Item.SystemOfType<'modification'>;
 
         system.type = 'weapon';
 
-        system.mount_point = jsonData.mount ? (jsonData.mount._TEXT.toLowerCase() as MountType) : "";
+        system.mount_point = jsonData.mount ? (jsonData.mount._TEXT.toLowerCase() as Item.SystemOfType<'modification'>['mount_point']) : "";
 
         system.rc = Number(jsonData.rc?._TEXT) || 0;
         system.accuracy = Number(jsonData.accuracy?._TEXT) || 0;

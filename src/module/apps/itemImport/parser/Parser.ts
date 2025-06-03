@@ -29,11 +29,9 @@ export type ParseData =
     Power | Enhancement | Quality | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
 
 type CombinedSystemOfType<T extends string> =
-  T extends Actor.SubType ? Actor.SystemOfType<T> :
-  T extends Item.SubType ? Item.SystemOfType<T> :
-  never;
-
-type EntityType = (Actor.CreateData & {system: Actor.SystemOfType<SystemActor>}) | (Item.CreateData & {system: Item.SystemOfType<SystemItem>});
+    T extends Actor.SubType ? Actor.SystemOfType<T> :
+    T extends Item.SubType ? Item.SystemOfType<T> :
+    never;
 
 export abstract class Parser<Type extends SystemEntityType> {
     protected abstract parseType: Type;
@@ -47,7 +45,7 @@ export abstract class Parser<Type extends SystemEntityType> {
     protected async getItems(jsonData: ParseData): Promise<Item.Source[]> { return []; }
     protected getSystem(jsonData: ParseData): CombinedSystemOfType<Type> { return this.getBaseSystem(); }
 
-    public async Parse(jsonData: ParseData): Promise<EntityType> {
+    public async Parse(jsonData: ParseData): Promise<Actor.CreateData | Item.CreateData> {
         const itemPromise = this.getItems(jsonData);
         let bonusPromise: Promise<void> | undefined;
 
@@ -58,32 +56,32 @@ export abstract class Parser<Type extends SystemEntityType> {
         const entity = {
             name: TH.getTranslation(name, options),
             type: this.parseType,
-            system: this.getSystem(jsonData),
-        } as unknown as EntityType;
+            folder: await this.getFolder(jsonData),
+        } as Actor.CreateData | Item.CreateData;
 
-        entity.folder = await this.getFolder(jsonData);
+        entity.system = this.getSystem(jsonData);
+        const system = entity.system as CombinedSystemOfType<Type>;
 
         // Add technology
-        if (entity.system && 'technology' in entity.system && entity.system.technology)
-            this.setTechnology(entity.system.technology, jsonData);
+        if (system && 'technology' in system && system.technology)
+            this.setTechnology(system.technology, jsonData);
 
         // Add Icon
         if (DataImporter.setIcons)
-            this.setIcons(entity, jsonData);
+            this.setIcons(entity, system, jsonData);
 
         if ('bonus' in jsonData && jsonData.bonus)
-            bonusPromise = BH.addBonus(entity, jsonData.bonus);
+            bonusPromise = BH.addBonus(entity as any, jsonData.bonus);
 
         const page = jsonData.page._TEXT;
         const source = jsonData.source._TEXT;
         entity.system.description = DataDefaults.createData('description', {source: `${source} ${TH.getAltPage(name, page, options)}`});
 
         // Runtime branching
-        if (this.isActor()) {
+        if (this.isActor())
             (entity as Actor.CreateData).items = await itemPromise;
-        } else {
+        else
             (entity as Item.CreateData).flags = { shadowrun5e: { embeddedItems: await itemPromise } };
-        }
 
         await bonusPromise;
 
@@ -97,24 +95,24 @@ export abstract class Parser<Type extends SystemEntityType> {
         technology.conceal.base = 'conceal' in jsonData && jsonData.conceal ? Number(jsonData.conceal._TEXT) || 0 : 0;
     }
 
-    protected setIcons(entity: EntityType, jsonData: ParseData) {
+    protected setIcons(entity: Actor.CreateData | Item.CreateData, system: CombinedSystemOfType<Type>, jsonData: ParseData) {
         // Why don't we have importFlags as base in actors?
-        if ('importFlags' in entity.system && entity.system.importFlags) {
-            entity.system.importFlags.name = IH.formatAsSlug(jsonData.name._TEXT);
-            entity.system.importFlags.type = this.parseType;
-            entity.system.importFlags.subType = '';
-            entity.system.importFlags.isFreshImport = true;
+        if ('importFlags' in system && system.importFlags) {
+            system.importFlags.name = IH.formatAsSlug(jsonData.name._TEXT);
+            system.importFlags.type = this.parseType;
+            system.importFlags.subType = '';
+            system.importFlags.isFreshImport = true;
 
             const subType = 'category' in jsonData ? IH.formatAsSlug(jsonData.category?._TEXT || '') : '';
             if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType as string]).includes(subType))
-                entity.system.importFlags.subType = subType;
+                system.importFlags.subType = subType;
 
             const entitySystem = entity.system as Shadowrun.ShadowrunItemDataData | Shadowrun.ShadowrunActorDataData;
-            entity.img = IconAssign.iconAssign(entity.system.importFlags, DataImporter.iconList, entitySystem);
+            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entitySystem);
         }
     }
 
-    protected getBaseSystem(systemData: Parameters<typeof DataDefaults.baseData<Type>>[1] = {}): CombinedSystemOfType<Type> {
-        return DataDefaults.baseData<Type>(this.parseType, systemData) as unknown as CombinedSystemOfType<Type>;
+    protected getBaseSystem(systemData: Parameters<typeof DataDefaults.baseSystemData<Type>>[1] = {}): CombinedSystemOfType<Type> {
+        return DataDefaults.baseSystemData<Type>(this.parseType, systemData);
     };
 }

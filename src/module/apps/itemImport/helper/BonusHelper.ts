@@ -1,33 +1,33 @@
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
-import { SR5ActiveEffect } from '../../../effect/SR5ActiveEffect'
-import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 import * as BC from "./BonusConstant";
 
 import EffectTagsData = Shadowrun.EffectTagsData;
 import EffectChangeData = Shadowrun.EffectChangeData;
 import EffectOptionsData = Shadowrun.EffectOptionsData;
 import EffectDurationData = Shadowrun.EffectDurationData;
-import { SR5Item } from "../../../item/SR5Item";
-import { CharacterSheetData } from "../../../actor/sheets/SR5CharacterSheet";
+import { SystemActor } from "src/module/actor/SR5Actor";
+import { SystemItem } from "src/module/item/SR5Item";
 
 export class BonusHelper {
     private static isTrue(value: "" | { _TEXT: string }): boolean {
         return value === "" || value._TEXT === "True";
     }
 
-    private static normalizeValue(sheet: BC.ShadowrunSheetData, value: string | number): string | number {
+    private static normalizeValue(sheet: BC.CreateData, value: string | number): string | number {
         if (typeof value === 'number')
             return value;
 
         if (value.includes("Rating")) {
             let path = "";
 
-            if ('rating' in sheet.system)
+            const system = sheet.system as Actor.SystemOfType<SystemActor> | Item.SystemOfType<SystemItem>;
+
+            if ('rating' in system)
                 path = "(@system.rating)";
-            else if ('technology' in sheet.system && 'rating' in sheet.system.technology)
+            else if ('technology' in system && system.technology && 'rating' in system.technology)
                 path = "(@system.technology.rating)";
-            else if ('level' in sheet.system)
+            else if ('level' in system)
                 path = "(@system.level)";
 
             if (!path)
@@ -58,14 +58,14 @@ export class BonusHelper {
     }
 
     private static createEffect(
-        sheet: BC.ShadowrunSheetData,
+        sheet: BC.CreateData,
         overrides: Partial<EffectOptionsData>,
         changes: BC.EffectChangeParameter[],
         flags?: Partial<EffectTagsData>
     ): void {
         const defaultEffect = {
-            name: sheet.name,
-            img: sheet.img,
+            name: sheet.name as string,
+            img: sheet.img as string,
             transfer: true,
         };
 
@@ -91,11 +91,11 @@ export class BonusHelper {
         sheet.effects?.push(effect);
     }
 
-    public static async addBonus(sheet: BC.ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
+    public static async addBonus(sheet: BC.CreateData, bonus: BonusSchema) : Promise<void> {
         await this.addEffects(sheet, bonus);
     }
 
-    private static async addEffects(sheet: BC.ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
+    private static async addEffects(sheet: BC.CreateData, bonus: BonusSchema) : Promise<void> {
         sheet.effects ??= [];
 
         for (const [key, effect] of Object.entries(BC.BonusConstant.simpleEffects)) {

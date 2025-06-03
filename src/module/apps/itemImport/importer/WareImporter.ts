@@ -19,13 +19,13 @@ export class WareImporter extends DataImporter {
         const jsonDatas = 'biowares' in jsonObject ? jsonObject.biowares.bioware
                                                    : jsonObject.cyberwares.cyberware;
 
-        return WareImporter.ParseItems<WareTypes, WareItemData>(
+        return WareImporter.ParseItems<WareTypes>(
             jsonDatas,
             {
                 compendiumKey: "Trait",
                 parser: new WareParser(key, jsonObject.categories.category),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: `Failed Parsing ${key.capitalize()}`
             }

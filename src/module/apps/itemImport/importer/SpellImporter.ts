@@ -15,7 +15,7 @@ export class SpellImporter extends DataImporter{
     }
 
     static parserWrap = class {
-        public async Parse(jsonData: Spell): Promise<Shadowrun.SpellItemData> {
+        public async Parse(jsonData: Spell): Promise<Item.CreateData> {
             const spellParserBase = new SpellParserBase();
             const combatSpellParser = new CombatSpellParser();
             const illusionSpellParser = new IllusionSpellParser();
@@ -29,18 +29,18 @@ export class SpellImporter extends DataImporter{
                                  : category === 'Manipulation'  ? manipulationSpellParser
                                                                 : spellParserBase;
 
-            return await selectedParser.Parse(jsonData);
+            return await selectedParser.Parse(jsonData) as Item.CreateData;
         }
     };
 
     async Parse(jsonObject: SpellsSchema): Promise<void> {
-        return SpellImporter.ParseItems<Spell, Shadowrun.SpellItemData>(
+        return SpellImporter.ParseItems<Spell>(
             jsonObject.spells.spell,
             {
                 compendiumKey: "Magic",
                 parser: new SpellImporter.parserWrap(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Spell"
             }

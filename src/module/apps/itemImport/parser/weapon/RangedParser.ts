@@ -1,6 +1,5 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
-import WeaponItemData = Shadowrun.WeaponItemData;
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { Weapon } from '../../schema/WeaponsSchema';
 
@@ -11,7 +10,7 @@ export class RangedParser extends WeaponParserBase {
         return match ? parseInt(match) : 0;
     }
 
-    protected override getSystem(jsonData: Weapon): WeaponItemData['system'] {
+    protected override getSystem(jsonData: Weapon): Item.SystemOfType<'weapon'> {
         const system = super.getSystem(jsonData);
 
         // Some new weapons don't have any rc defined in XML.

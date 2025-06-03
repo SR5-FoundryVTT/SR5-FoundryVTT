@@ -1,23 +1,21 @@
-import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 import { Parser } from '../Parser';
 import { SR5Item } from '../../../../item/SR5Item';
 import { Vehicle } from '../../schema/VehiclesSchema';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
-import VehicleActorData = Shadowrun.VehicleActorData;
 
-export class VehicleParser extends Parser<VehicleActorData> {
-    protected override parseType: string = 'vehicle';
+export class VehicleParser extends Parser<'vehicle'> {
+    protected parseType = 'vehicle' as const;
 
     private getVehicleItems(
         vehicleName: string,
         items: SR5Item[],
         itemsData: NotEmpty<Vehicle['mods']>['mod' | 'name'] | NotEmpty<Vehicle['gears']>['gear'] | NotEmpty<Vehicle['weapons']>['weapon'],
         translationMap: Record<string, string>
-    ): ItemDataSource[] {
+    ): Item.Source[] {
         const itemMap = new Map(items.map(i => [i.name, i]));
 
-        const result: ItemDataSource[] = [];
+        const result: Item.Source[] = [];
 
         for (const item of IH.getArray(itemsData)) {
             const name = ('name' in item ? item.name?._TEXT : item._TEXT) || '';
@@ -30,29 +28,30 @@ export class VehicleParser extends Parser<VehicleActorData> {
             }
 
             const itemBase = foundItem.toObject();
+            const system = itemBase.system as Item.SystemOfType<'modification' | 'equipment' | 'weapon'>;
 
-            if ('technology' in itemBase.system)
-                itemBase.system.technology.equipped = true;
+            if ('technology' in system)
+                system.technology.equipped = true;
 
             if ('$' in item && item.$?.select)
                 itemBase.name += `(${item.$.select})`;
 
             if ('$' in item && item.$?.rating) {
                 const rating = +item.$.rating;
-                if ('rating' in itemBase.system)
-                    itemBase.system.rating = rating;
-                else if ('technology' in itemBase.system)
-                    itemBase.system.technology.rating = rating;
+                if ('rating' in system)
+                    system.rating = rating;
+                else if ('technology' in system)
+                    system.technology.rating = rating;
             }
 
-            result.push(itemBase);
+            result.push(itemBase as Item.Source);
         }
 
         return result;
     }
 
-    protected override getSystem(jsonData: Vehicle): VehicleActorData['system'] {    
-        const system = this.getBaseSystem();
+    protected override getSystem(jsonData: Vehicle): Actor.SystemOfType<'vehicle'> {
+        const system = this.getBaseSystem() as Actor.SystemOfType<'vehicle'>;
     
         function parseSeparatedValues(value: string): { base: number; offRoad: number } {
             const [base, offRoad] = value.split("/").map(v => +v || 0);
@@ -83,7 +82,7 @@ export class VehicleParser extends Parser<VehicleActorData> {
         return system;
     }
 
-    protected override async getItems(jsonData: Vehicle): Promise<Shadowrun.ShadowrunItemData[]> {
+    protected override async getItems(jsonData: Vehicle): Promise<Item.Source[]> {
         const mods = jsonData.mods || {};
 
         const allModName = [

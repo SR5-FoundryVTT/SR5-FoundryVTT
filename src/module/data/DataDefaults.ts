@@ -3,7 +3,6 @@ import DataSchema = foundry.data.fields.DataSchema;
 const { SchemaField } = foundry.data.fields;
 import { Action, ActionRollData, DamageData, MinimalActionData } from "../types/item/ActionModel";
 import { AttributeField } from "../types/template/AttributesModel";
-import { ArmorData } from "../types/template/ArmorModel";
 import { DescriptionData } from "../types/template/DescriptionModel";
 import { LimitField } from "../types/template/LimitsModel";
 import { RangeData, Weapon } from "../types/item/WeaponModel";
@@ -14,13 +13,15 @@ import { Track } from "../types/template/ConditionMonitorsModel";
 import { ValueField } from "../types/template/BaseModel";
 
 import { Character } from "../types/actor/CharacterModel";
-import { CritterData } from "../types/actor/CritterModel";
+import { Critter } from "../types/actor/CritterModel";
 import { IC } from "../types/actor/ICModel";
 import { Spirit } from "../types/actor/SpiritModel";
 import { Sprite } from "../types/actor/SpriteModel";
 import { Vehicle } from "../types/actor/VehicleModel";
+
 import { AdeptPower } from "../types/item/AdeptPowerModel";
 import { Ammo } from "../types/item/AmmoModel";
+import { Armor, ArmorData } from "../types/template/ArmorModel";
 import { Bioware } from "../types/item/BiowareModel";
 import { CallInAction } from "../types/item/CallInActionModel";
 import { ComplexForm } from "../types/item/ComplexFormModel";
@@ -33,6 +34,7 @@ import { Equipment } from "../types/item/EquipmentModel";
 import { Lifestyle } from "../types/item/LifeStyleModel";
 import { Metamagic } from "../types/item/MetamagicModel";
 import { Modification } from "../types/item/ModificationModel";
+import { MovementField } from "../types/template/MovementModel";
 import { Program } from "../types/item/ProgramModel";
 import { Quality } from "../types/item/QualityModel";
 import { Sin } from "../types/item/SinModel";
@@ -40,47 +42,39 @@ import { Spell } from "../types/item/SpellModel";
 import { SpritePower } from "../types/item/SpritePowerModel";
 
 const systemMap = {
-    // character: Character.schema.fields,
-    critter: CritterData(),
-    // ic: IC.schema.fields,
-    // spirit: Spirit.schema.fields,
-    // sprite: Sprite.schema.fields,
-    // vehicle: Vehicle.schema.fields,
+    character: Character,
+    critter: Critter,
+    ic: IC,
+    spirit: Spirit,
+    sprite: Sprite,
+    vehicle: Vehicle,
 
-    // action: Action,
-    // adept_power: AdeptPower,
-    // ammo: Ammo,
-    armor: ArmorData(),
-    // bioware: Bioware,
-    // call_in_action: CallInAction,
-    // complex_form: ComplexForm,
-    // contact: Contact,
-    // critter_power: CritterPower,
-    // cyberware: Cyberware,
-    // device: Device,
-    // echo: Echo,
-    // equipment: Equipment,
-    // host: Host,
-    // lifestyle: Lifestyle,
-    // metamagic: Metamagic,
-    // modification: Modification,
-    // program: Program,
-    // quality: Quality,
-    // sin: Sin,
-    // spell: Spell,
-    // sprite_power: SpritePower,
-    // weapon: Weapon,
+    action: Action,
+    adept_power: AdeptPower,
+    ammo: Ammo,
+    armor: Armor,
+    bioware: Bioware,
+    call_in_action: CallInAction,
+    complex_form: ComplexForm,
+    contact: Contact,
+    critter_power: CritterPower,
+    cyberware: Cyberware,
+    device: Device,
+    echo: Echo,
+    equipment: Equipment,
+    host: Host,
+    lifestyle: Lifestyle,
+    metamagic: Metamagic,
+    modification: Modification,
+    program: Program,
+    quality: Quality,
+    sin: Sin,
+    spell: Spell,
+    sprite_power: SpritePower,
+    weapon: Weapon,
 } as const;
 
 export type SystemEntityType = keyof typeof systemMap;
-
-type systemCreateData = {
-    [K in SystemEntityType]: foundry.data.fields.SchemaField.CreateData<typeof systemMap[K]>;
-};
-
-type systemInitializedData = {
-    [K in SystemEntityType]: foundry.data.fields.SchemaField.InitializedData<typeof systemMap[K]>;
-};
 
 const schemaMap = {
     action_roll: ActionRollData(),
@@ -90,6 +84,7 @@ const schemaMap = {
     description: DescriptionData(),
     limit_field: LimitField(),
     minimal_action: MinimalActionData(),
+    movement_field: MovementField(),
     range: RangeData(),
     skill_field: SkillField(),
     source_entity_field: SourceEntityField(),
@@ -113,6 +108,12 @@ interface MinimalItemData {
     type: string
 }
 
+type CombinedSystemOfType<T extends string> =
+    T extends Actor.SubType ? Actor.SystemOfType<T> :
+    T extends Item.SubType ? Item.SystemOfType<T> :
+    never;
+
+
 /**
  * Data Defaults are used for partial template data that can't easily be gotten by instead
  * using game.model.Item.<type>.<whatver> or game.mode.Actor.<type>.<whatever>
@@ -123,11 +124,11 @@ interface MinimalItemData {
  */
 export class DataDefaults {
 
-    static baseData<EntityType extends SystemEntityType>(
+    static baseSystemData<EntityType extends SystemEntityType>(
         entity: EntityType,
-        createData: systemCreateData[EntityType] = {}
-    ): systemInitializedData[EntityType] {
-        return systemMap[entity].getInitialValue(createData) as systemInitializedData[EntityType];
+        createData: object = {}
+    ): CombinedSystemOfType<EntityType> {
+        return new (systemMap[entity] as any)(createData) as CombinedSystemOfType<EntityType>;
     }
 
     /**
@@ -180,6 +181,7 @@ export class DataDefaults {
      * @param partialFireModeData Inject any fire mode property
      */
     static fireModeData(partialFireModeData: Partial<FireModeData> = {}): FireModeData {
+        //@ts-expect-error - Partial data is allowed
         return foundry.utils.mergeObject({
             value: 0,
             label: '',
