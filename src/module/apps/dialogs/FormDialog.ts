@@ -130,7 +130,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         return '';
     }
 
-    async select(): Promise<object> {
+    async select(): Promise<any> {
         await this.render(true);
 
         if (this._selectionPromise === undefined || this.selection === undefined) {

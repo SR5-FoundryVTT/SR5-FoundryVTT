@@ -113,7 +113,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         Helpers.calcTotal(this.data.incomingDamage.ap);
 
         // Remove user override and resulting incoming damage as base.
-        this.data.modifiedDamage = foundry.utils.duplicate(this.data.incomingDamage);
+        this.data.modifiedDamage = foundry.utils.duplicate(this.data.incomingDamage) as DamageType;
         this.data.modifiedDamage.base = this.data.incomingDamage.value;
         this.data.modifiedDamage.mod = [];
         delete this.data.modifiedDamage.override;

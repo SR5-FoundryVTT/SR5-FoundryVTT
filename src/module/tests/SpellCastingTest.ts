@@ -3,10 +3,9 @@ import {SpellcastingRules} from "../rules/SpellcastingRules";
 import {PartsList} from "../parts/PartsList";
 import {DataDefaults} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
-import { DamageType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DeepPartial } from "fvtt-types/utils";
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -50,7 +49,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         return false;
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
         return {
             skill: 'spellcasting',
             attribute: 'magic'

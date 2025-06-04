@@ -2,13 +2,13 @@ import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { ComplexFormTest, ComplexFormTestData } from "./ComplexFormTest";
 import { Helpers } from "../helpers";
 import { FadeRules } from "../rules/FadeRules";
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { DataDefaults } from "../data/DataDefaults";
-import { DamageType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DeepPartial } from "fvtt-types/utils";
 
 export interface FadeTestData extends SuccessTestData {
     incomingFade: DamageType
@@ -44,10 +44,8 @@ export class FadeTest extends SuccessTest<FadeTestData> {
         return 'systems/shadowrun5e/dist/templates/rolls/fade-test-message.html';
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
-        return {
-            'attribute2': 'resonance'
-        };
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { attribute2: 'resonance' };
     }
     
     static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor<'character'>) {

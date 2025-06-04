@@ -5,6 +5,7 @@ import {PartsList} from "../parts/PartsList";
 import {FadeRules} from "../rules/FadeRules";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DeepPartial } from "fvtt-types/utils";
 export interface ComplexFormTestData extends SuccessTestData {
     level: number;
     fade: number;
@@ -43,11 +44,8 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         return false;
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionType> {
-        return {
-            skill: 'software',
-            attribute: 'resonance'
-        };
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { skill: 'software', attribute: 'resonance' };
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {

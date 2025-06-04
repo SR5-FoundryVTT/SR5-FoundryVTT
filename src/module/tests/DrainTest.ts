@@ -2,16 +2,16 @@ import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellCastingTestData} from "./SpellCastingTest";
 import {DrainRules} from "../rules/DrainRules";
 import {Helpers} from "../helpers";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import GenericValueField = Shadowrun.GenericValueField;
 import { Translation } from '../utils/strings';
 import { DataDefaults } from "../data/DataDefaults";
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DeepPartial } from "fvtt-types/utils";
 
 export interface DrainTestData extends SuccessTestData {
-    incomingDrain: DamageData
-    modifiedDrain: DamageData
+    incomingDrain: DamageType
+    modifiedDrain: DamageType
 
     against: SpellCastingTestData
 }
@@ -49,7 +49,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.html';
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
         return {
             'attribute2': 'willpower'
         };
@@ -95,7 +95,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         Helpers.calcValue<typeof this.data.incomingDrain.type.base>(this.data.incomingDrain.type as GenericValueField);
 
         // Copy to get all values changed by user (override) but also remove all.
-        this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain);
+        this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain) as DamageType;
         this.data.modifiedDrain.base = Helpers.calcTotal(this.data.incomingDrain, {min: 0});
         delete this.data.modifiedDrain.override;
     }

@@ -19,6 +19,7 @@ import {SR5} from "../config";
 import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
 import { ActionRollType, MinimalActionType } from "../types/item/ActionModel";
+import { DeepPartial } from "fvtt-types/utils";
 
 /**
  * Any test implementation can either be created by calling it's constructor directly or by using the TestCreator.
@@ -601,7 +602,7 @@ export const TestCreator = {
      * @param defaultActions List of partial actions, as defined by test implementations.
      * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
      */
-    _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: Partial<MinimalActionType>[]): ActionRollType {
+    _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: DeepPartial<MinimalActionType>[]): ActionRollType {
         // This action might be taken from ItemData, causing changes to be reflected upstream.
         const resultAction = foundry.utils.duplicate(sourceAction);
 

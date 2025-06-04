@@ -486,7 +486,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return this.system.limits;
     }
 
-    getLimit(this: SR5Actor, name: string): Shadowrun.LimitField {
+    getLimit(this: SR5Actor, name: string): LimitFieldType {
         const limits = this.getLimits();
         return limits[name];
     }

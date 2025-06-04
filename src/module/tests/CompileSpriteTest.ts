@@ -1,8 +1,9 @@
+import { DeepPartial } from "fvtt-types/utils";
 import { SR5 } from "../config";
 import { DataDefaults } from "../data/DataDefaults";
 import { PartsList } from "../parts/PartsList";
 import { CompilationRules } from "../rules/CompilationRules";
-import { DamageType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
 import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 
 
@@ -84,11 +85,8 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
      * Limit 'level' is a dynamic test value, so it's missing here as it can't be taken from actor values
      * but will be injected during test dialog preparations.
      */
-    static override _getDefaultTestAction(): Partial<Shadowrun.MinimalActionData> {
-        return {
-            skill: 'compiling',
-            attribute: 'resonance'
-        }
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { skill: 'compiling', attribute: 'resonance' };
     }
 
     /**

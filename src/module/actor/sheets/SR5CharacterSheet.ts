@@ -107,8 +107,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(type)}`,
             type: 'call_in_action',
-            'system.actor_type': actor_type
-        };
+            system: { actor_type }
+        } as Item.CreateData;
 
         await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
     }

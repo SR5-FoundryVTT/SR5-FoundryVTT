@@ -4,7 +4,8 @@ import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { PartsList } from '../parts/PartsList';
 import { SpellcastingRules } from '../rules/SpellcastingRules';
 import { ConjuringRules } from '../rules/ConjuringRules';
-import { DamageType } from '../types/item/ActionModel';
+import { DamageType, MinimalActionType } from '../types/item/ActionModel';
+import { DeepPartial } from 'fvtt-types/utils';
 
 
 interface SummonSpiritTestData extends SuccessTestData {
@@ -15,7 +16,7 @@ interface SummonSpiritTestData extends SuccessTestData {
     force: number
     // Drain value as described on SR5#300
     drain: number
-    drainDamage: Shadowrun.DamageData
+    drainDamage: DamageType
 
     // Reagent value as described on SR5#317 'Summoning'
     reagent: number
@@ -74,11 +75,8 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
      * 
      * Limit 'force' is a dynamic test value, so it's missing here as it can't be taken from actor values.
      */
-    static override _getDefaultTestAction(): Partial<Shadowrun.MinimalActionData> {
-        return {
-            skill: 'summoning',
-            attribute: 'magic'
-        }
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { skill: 'summoning', attribute: 'magic' }
     }
 
     /**

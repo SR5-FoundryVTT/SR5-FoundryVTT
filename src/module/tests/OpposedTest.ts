@@ -4,11 +4,12 @@ import {TestCreator} from "./TestCreator";
 import {SR5Item} from "../item/SR5Item";
 import {PartsList} from "../parts/PartsList";
 import { Helpers } from "../helpers";
+import { ValueFieldType } from "../types/template/BaseModel";
 
 
 export interface OpposedTestValues extends SuccessTestValues {
     // The calculated overall netHits of the active vs opposed test pair.
-    againstNetHits: Shadowrun.ValueField
+    againstNetHits: ValueFieldType;
 }
 
 export interface OpposedTestData extends
@@ -130,7 +131,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         if (againstData.sourceItemUuid) {
             const item = await fromUuid(againstData.sourceItemUuid) as SR5Item;
             if (item) {
-                const itemAction = await this._getDocumentTestAction(item, actor);
+                const itemAction = this._getDocumentTestAction(item, actor);
                 action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
             }
         }

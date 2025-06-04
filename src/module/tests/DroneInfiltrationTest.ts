@@ -1,15 +1,17 @@
+import { DeepPartial } from "fvtt-types/utils";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
+import { MinimalActionType } from "../types/item/ActionModel";
 import {SuccessTest} from "./SuccessTest";
 
 export class DroneInfiltrationTest extends SuccessTest {
-    static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor) {
+    static override _getDocumentTestAction(item: SR5Item, actor: SR5Actor): DeepPartial<MinimalActionType> {
         // Both item and actor are needed to determine what to roll.
         if (!item || !actor) return {};
 
         const vehicleData = actor.asType('vehicle');
         if (!vehicleData) {
-            await ui.notifications?.error(game.i18n.localize('SR5.Errors.TestExpectsVehicleOnly'))
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.TestExpectsVehicleOnly'))
             return {};
         }
 
@@ -31,7 +33,7 @@ export class DroneInfiltrationTest extends SuccessTest {
             }
 
             default:
-                return actor.skillActionData('perception');
+                return actor.skillActionData('perception')!;
         }
     }
 

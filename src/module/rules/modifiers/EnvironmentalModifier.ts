@@ -25,7 +25,7 @@ export class EnvironmentalModifier extends SituationModifier {
      * @param values Active modifier values to be matched to level values
      * @returns A count per level of modifiers on that level
      */
-    activeLevels(values: Number[]): Record<string, number> {
+    activeLevels(values: number[]): Record<string, number> {
         return {
             light: values.reduce((count: number, value: number) => (value === this.levels.light ? count + 1 : count), 0) as number,
             moderate: values.reduce((count: number, value: number) => (value === this.levels.moderate ? count + 1 : count), 0) as number,

@@ -7,6 +7,7 @@ import {CombatSpellRules} from "../rules/CombatSpellRules";
 import {TestCreator} from "./TestCreator";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { MinimalActionType } from "../types/item/ActionModel";
+import { DeepPartial } from "fvtt-types/utils";
 
 export interface CombatSpellDefenseTestData extends DefenseTestData {
     against: SpellCastingTestData
@@ -21,8 +22,8 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
      * @param item A spell item.
      * @param actor The actor to defend with.
      */
-    static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<MinimalActionType> {
-        const action = DataDefaults.createData('minimal_action', await super._getDocumentTestAction(item, actor)) as unknown as MinimalActionType;
+    static override _getDocumentTestAction(item: SR5Item, actor: SR5Actor): DeepPartial<MinimalActionType> {
+        const action = DataDefaults.createData('minimal_action', super._getDocumentTestAction(item, actor));
 
         const spellData = item.asType('spell');
         if (!spellData) return action;

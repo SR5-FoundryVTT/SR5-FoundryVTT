@@ -10,12 +10,7 @@ import {PartsList} from "../parts/PartsList";
 import {TestDialog} from "../apps/dialogs/TestDialog";
 import {SR5} from "../config";
 import {ActionFlow} from "../item/flows/ActionFlow";
-import ValueField = Shadowrun.ValueField;
-import DamageData = Shadowrun.DamageData;
-import OpposedTestData = Shadowrun.OpposedTestData;
 import ModifierTypes = Shadowrun.ModifierTypes;
-import ActionRollData = Shadowrun.ActionRollData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ResultActionData = Shadowrun.ResultActionData;
 import { TestCreator } from "./TestCreator";
 import Template from "../template";
@@ -26,7 +21,9 @@ import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
-import { ActionResultType } from '../types/item/ActionModel';
+import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType } from '../types/item/ActionModel';
+import { ValueFieldType } from '../types/template/BaseModel';
+import { DeepPartial } from "fvtt-types/utils";
 
 export interface TestDocuments {
     actor?: SR5Actor
@@ -35,14 +32,14 @@ export interface TestDocuments {
 }
 
 export interface TestValues {
-    [name: string]: ValueField | DamageData
+    [name: string]: ValueFieldType | DamageType
 }
 
 export interface SuccessTestValues extends TestValues {
-    hits: ValueField
-    netHits: ValueField
-    glitches: ValueField
-    extendedHits: ValueField
+    hits: ValueFieldType
+    netHits: ValueFieldType
+    glitches: ValueFieldType
+    extendedHits: ValueFieldType
 }
 
 export interface IconWithTooltip {
@@ -60,13 +57,13 @@ export interface TestData {
     type?: string
 
     // Shadowrun 5 related test values.
-    pool: ValueField
-    threshold: ValueField
-    limit: ValueField
+    pool: ValueFieldType
+    threshold: ValueFieldType
+    limit: ValueFieldType
 
     // Hits as reported by an external dice roll.
-    manualHits: ValueField
-    manualGlitches: ValueField
+    manualHits: ValueFieldType
+    manualGlitches: ValueFieldType
 
     hitsIcon?: IconWithTooltip
     autoSuccess?: boolean
@@ -74,12 +71,12 @@ export interface TestData {
     // Internal test values.
     values: TestValues
 
-    damage: DamageData
+    damage: DamageType
 
     // A list of modifier descriptions to be used for this test.
     // These are designed to work with SR5Actor.getModifier()
     // modifiers: Record<ModifierTypes, TestModifier>
-    modifiers: ValueField
+    modifiers: ValueFieldType
 
     // A list of test categories to be used for this test.
     // Check typing documentation for more information.
@@ -95,7 +92,7 @@ export interface TestData {
     extendedRoll: boolean
 
     // The source action this test is derived from.
-    action: ActionRollData
+    action: ActionRollType
 
     // Documents the test might has been derived from.
     sourceItemUuid?: string
@@ -112,7 +109,7 @@ export interface TestData {
 }
 
 export interface SuccessTestData extends TestData {
-    opposed: OpposedTestData
+    opposed: OpposedTestType
     values: SuccessTestValues
     // Scene Token Ids marked as targets of this test.
     targetActorsUuid: string[]
@@ -277,7 +274,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * This should be used for whenever a Test doesn't modifiers specified externally.
      */
-    _prepareModifiersData(modifiers?: ValueField) {
+    _prepareModifiersData(modifiers?: ValueFieldType): ValueFieldType {
         return modifiers || DataDefaults.createData('value_field', { label: 'SR5.Labels.Action.Modifiers' });
     }
 
@@ -347,7 +344,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Get a possible globally defined default action set for this test class.
      */
-    static _getDefaultTestAction(): Partial<MinimalActionData> {
+    static _getDefaultTestAction(): DeepPartial<MinimalActionType> {
         return {};
     }
 
@@ -360,11 +357,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param item The item holding the action configuration.
      * @param actor The actor used for value calculation.
      */
-    static async _getDocumentTestAction(item: SR5Item, actor: SR5Actor): Promise<Partial<MinimalActionData>> {
+    static _getDocumentTestAction(item: SR5Item, actor: SR5Actor): DeepPartial<MinimalActionType> {
         return {};
     }
 
-    static async _prepareActionTestData(action: ActionRollData, actor: SR5Actor, data) {
+    static async _prepareActionTestData(action: ActionRollType, actor: SR5Actor, data) {
         return TestCreator._prepareTestDataWithAction(action, actor, data);
     }
 
@@ -604,7 +601,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * We use the 'Note on Rounding' on SR5#48 as a guideline.
      */
     roundBaseValueParts() {
-        const roundAllMods = (value: Shadowrun.ValueField) => {
+        const roundAllMods = (value: ValueFieldType) => {
             value.base = Math.ceil(value.base);
             if (value.override) value.override.value = Math.ceil(value.override.value);
             value.mod.forEach(mod => mod.value = Math.ceil(mod.value));
@@ -812,14 +809,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Helper to get the pool value for this success test.
      */
-    get pool(): ValueField {
+    get pool(): ValueFieldType {
         return this.data.pool;
     }
 
     /**
      * Helper to get the total limit value for this success test.
      */
-    get limit(): ValueField {
+    get limit(): ValueFieldType {
         return this.data.limit;
     }
 
@@ -845,7 +842,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Helper to get the total threshold value for this success test.
      */
-    get threshold(): ValueField {
+    get threshold(): ValueFieldType {
         return this.data.threshold;
     }
 
@@ -867,9 +864,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Helper to get the net hits value for this success test with a possible threshold.
      */
-    calculateNetHits(): ValueField {
+    calculateNetHits(): ValueFieldType {
         // An extended test will use summed up extended hit, while a normal test will use its own hits.
-        const hits = this.extended ? this.extendedHits : this.hits;
+        const hits = this.extended ? this.extendedHits() : this.hits;
 
         // Maybe lower hits by threshold to get the actual net hits.
         const base = this.hasThreshold ?
@@ -886,14 +883,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return netHits;
     }
 
-    get netHits(): ValueField {
+    get netHits(): ValueFieldType {
         return this.data.values.netHits;
     }
 
     /**
      * Helper to get the hits value for this success test with a possible limit.
      */
-    calculateHits(): ValueField {
+    calculateHits(): ValueFieldType {
         // Use manual or automated roll for hits.
         const rollHits = this.usingManualRoll ?
             this.manualHits.value :
@@ -910,20 +907,20 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.hits;
     }
 
-    get hits(): ValueField {
+    get hits(): ValueFieldType {
         return this.data.values.hits;
     }
 
-    get extendedHits(): ValueField {
+    extendedHits(): ValueFieldType {
         // Return a default value field, for when no extended hits have been derived yet (or ever).
         return this.data.values.extendedHits || DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
     }
 
-    get manualHits(): ValueField {
+    get manualHits(): ValueFieldType {
         return this.data.manualHits;
     }
 
-    get manualGlitches(): ValueField {
+    get manualGlitches(): ValueFieldType {
         return this.data.manualGlitches;
     }
 
@@ -962,7 +959,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Helper to get the glitches values for this success test.
      */
-    calculateGlitches(): ValueField {
+    calculateGlitches(): ValueFieldType {
         // When using a manual roll, don't derive glitches from automated rolls.
         const rollGlitches = this.usingManualRoll ?
             this.manualGlitches.value :
@@ -980,10 +977,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Gather hits across multiple extended test executions.
      */
-    calculateExtendedHits(): ValueField {
+    calculateExtendedHits(): ValueFieldType {
         if (!this.extended) return DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
 
-        const extendedHits = this.extendedHits;
+        const extendedHits = this.extendedHits();
         extendedHits.mod = PartsList.AddPart(extendedHits.mod, 'SR5.Hits', this.hits.value);
 
         Helpers.calcTotal(extendedHits, { min: 0 });
@@ -1014,7 +1011,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return true;
     }
 
-    get glitches(): ValueField {
+    get glitches(): ValueFieldType {
         return this.data.values.glitches;
     }
 
@@ -1039,7 +1036,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get success(): boolean {
         // Extended tests use the sum of all extended hits.
-        const hits = this.extended ? this.extendedHits : this.hits;
+        const hits = this.extended ? this.extendedHits() : this.hits;
         return TestRules.success(hits.value, this.threshold.value);
     }
 
@@ -1052,7 +1049,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Allow extended tests without a threshold and avoid 'failure' confusion.
         if (this.extended && this.threshold.value === 0) return true;
         // When extendedHits have been collected, check against threshold.
-        if (this.extendedHits.value > 0 && this.threshold.value > 0) return this.extendedHits.value < this.threshold.value;
+        if (this.extendedHits().value > 0 && this.threshold.value > 0) return this.extendedHits().value < this.threshold.value;
         // Otherwise fall back to 'whatever is not a success.
         return !this.success;
     }
@@ -1572,7 +1569,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         Helpers.calcTotal(data.pool, { min: 0 });
 
-        if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
+        if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits().value)) {
             return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
         }
 
@@ -1616,7 +1613,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async rollDiceSoNice() {
         if (!game.user || !game.users) return;
 
-        const dice3d = game.modules.get("dice-so-nice")?.api;
+        const dice3d = (game.modules.get("dice-so-nice") as any)?.api;
         if (!dice3d) return;
 
         console.debug('Shadowrun5e | Initiating DiceSoNice throw');

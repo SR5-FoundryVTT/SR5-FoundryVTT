@@ -6,9 +6,10 @@ import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
+import { DamageType } from '../types/item/ActionModel';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
-    damage: Shadowrun.DamageData
+    damage: DamageType
     fireModes: Shadowrun.FireModeData[]
     fireMode: Shadowrun.FireModeData
     // index of selected fireMode in fireModes
