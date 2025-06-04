@@ -2,7 +2,7 @@ import { Metatype } from "../../schema/MetatypeSchema";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
-import SpiritActorData = Shadowrun.SpiritActorData;
+import { DataDefaults } from "src/module/data/DataDefaults";
 
 export class SpiritParser extends MetatypeParserBase<'spirit'> {
     protected parseType = 'spirit' as const;

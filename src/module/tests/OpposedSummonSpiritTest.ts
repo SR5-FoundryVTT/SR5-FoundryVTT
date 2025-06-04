@@ -19,7 +19,7 @@ interface OpposedSummonSpiritTestData extends OpposedTestData {
  * The summoner is the active actor and the spirit is the opposed actor.
  */
 export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTestData> {
-    public override against: SummonSpiritTest
+    declare against: SummonSpiritTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Due to summoning, the active actor for this test will be created during execution.

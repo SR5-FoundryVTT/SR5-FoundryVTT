@@ -1,10 +1,10 @@
 import {SR} from "../constants";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
-import DamageData = Shadowrun.DamageData;
 import ValueField = Shadowrun.ValueField;
 import {SoakRules} from "./SoakRules";
 import {SR5Actor} from "../actor/SR5Actor";
+import { DamageType } from "../types/item/ActionModel";
 
 export class CombatRules {
     static iniOrderCanDoAnotherPass(scores: number[]): boolean {
@@ -103,7 +103,7 @@ export class CombatRules {
      * @param damage Incoming damage to be modified
      * @return A new damage object for modified damage.
      */
-    static modifyDamageAfterHit(defender: SR5Actor, attackerHits: number, defenderHits: number, damage: DamageData): DamageData {
+    static modifyDamageAfterHit(defender: SR5Actor, attackerHits: number, defenderHits: number, damage: DamageType): DamageType {
         let modified = foundry.utils.duplicate(damage);
 
         // netHits should never be below zero...
@@ -128,7 +128,7 @@ export class CombatRules {
      * @param defenderHits The attackers hits. Should be a positive number.
      * @param actor The active defender
      */
-    static isBlockedByVehicleArmor(incomingDamage: DamageData, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
+    static isBlockedByVehicleArmor(incomingDamage: DamageType, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
         if(!actor.isType('vehicle')) {
             return false;
         }
@@ -143,7 +143,7 @@ export class CombatRules {
      * @param defenderHits The attackers hits. Should be a positive number.
      * @param actor The active defender
      */
-    static isBlockedByHardenedArmor(incomingDamage: DamageData, attackerHits: number = 0, defenderHits: number = 0, actor: SR5Actor): boolean {
+    static isBlockedByHardenedArmor(incomingDamage: DamageType, attackerHits: number = 0, defenderHits: number = 0, actor: SR5Actor): boolean {
         const armor = actor.getArmor(incomingDamage);
 
         if(!armor.hardened) {
@@ -161,7 +161,7 @@ export class CombatRules {
      * @param defenderHits The attackers hits. Should be a positive number.
      * @param actor The active defender
      */
-    static isDamageLessThanArmor(incomingDamage: DamageData, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
+    static isDamageLessThanArmor(incomingDamage: DamageType, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
         const modifiedDamage = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage);
 
         const modifiedAv = actor.getArmor(incomingDamage).value;
@@ -175,7 +175,7 @@ export class CombatRules {
      * @param incomingDamage The incoming damage
      * @param actor The active defender
      */
-    static doesNoPhysicalDamageToVehicle(incomingDamage: DamageData, actor: SR5Actor): boolean {
+    static doesNoPhysicalDamageToVehicle(incomingDamage: DamageType, actor: SR5Actor): boolean {
         return actor.isType('vehicle') && incomingDamage.type.value === 'stun' && incomingDamage.element.value !== "electricity";
     }
 
@@ -186,7 +186,7 @@ export class CombatRules {
      * 
      * @param damage The incoming weapon damage of the attack, unaltered.
      */
-    static modifyDamageAfterSuppressionHit(damage: DamageData): DamageData {
+    static modifyDamageAfterSuppressionHit(damage: DamageType): DamageType {
         return foundry.utils.duplicate(damage);
     }
 
@@ -196,7 +196,7 @@ export class CombatRules {
      * @param isHitWithNoDamage Optional parameter used for physical defense tests when attack hits but will deal no damage
      * @return A new damage object for modified damage.
      */
-    static modifyDamageAfterMiss(damage: DamageData, isHitWithNoDamage?: boolean): DamageData {
+    static modifyDamageAfterMiss(damage: DamageType, isHitWithNoDamage?: boolean): DamageType {
         const modifiedDamage = foundry.utils.duplicate(damage);
 
         // Keep base and modification intact, only overwriting the result.
@@ -222,7 +222,7 @@ export class CombatRules {
      * @param hits The resisting tests hits
      * @return A new damage object for modified damage.
      */
-    static modifyDamageAfterResist(actor: SR5Actor, damage: DamageData, hits: number): DamageData {
+    static modifyDamageAfterResist(actor: SR5Actor, damage: DamageType, hits: number): DamageType {
         if (hits < 0) hits = 0;
 
         // modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
@@ -240,7 +240,7 @@ export class CombatRules {
      * @param damage The damage containing the armor penetration to be applied.
      * @returns A new armor value for modified armor
      */
-    static modifyArmorAfterHit(armor: ValueField, damage: DamageData): ValueField {
+    static modifyArmorAfterHit(armor: ValueField, damage: DamageType): ValueField {
         const modifiedArmor = foundry.utils.duplicate(armor);
 
         // ignore ap without effect
@@ -259,10 +259,10 @@ export class CombatRules {
      * @param actor The actor affected by the damage
      * @returns The updated damage data
      */
-    static modifyDamageTypeAfterHit(damage: DamageData, actor : SR5Actor) : DamageData {
+    static modifyDamageTypeAfterHit(damage: DamageType, actor : SR5Actor) : DamageType {
         // Careful, order of damage conversion is very important
         // Electricity stun damage is considered physical for vehicles
-        let updatedDamage = foundry.utils.duplicate(damage) as DamageData;
+        let updatedDamage = foundry.utils.duplicate(damage) as DamageType;
         if (actor.isType('vehicle') && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
             updatedDamage.type.value = 'physical';
         }

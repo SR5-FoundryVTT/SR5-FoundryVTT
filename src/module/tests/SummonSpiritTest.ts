@@ -4,6 +4,7 @@ import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { PartsList } from '../parts/PartsList';
 import { SpellcastingRules } from '../rules/SpellcastingRules';
 import { ConjuringRules } from '../rules/ConjuringRules';
+import { DamageType } from '../types/item/ActionModel';
 
 
 interface SummonSpiritTestData extends SuccessTestData {
@@ -183,7 +184,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         this.data.drainDamage = this.calcDrainDamage(opposingHits);
     }
 
-    calcDrainDamage(opposingHits: number): Shadowrun.DamageData {
+    calcDrainDamage(opposingHits: number): DamageType {
         if (!this.actor) return DataDefaults.createData('damage');
 
         const magic = this.actor.getAttribute('magic').value;

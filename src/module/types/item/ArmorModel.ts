@@ -29,4 +29,6 @@ export class Armor extends foundry.abstract.TypeDataModel<ReturnType<typeof Armo
     }
 }
 
-console.log("ArmorData", ArmorData, new Armor());
+export type ArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ArmorData>>;
+
+console.log("ArmorData", ArmorData(), new Armor());

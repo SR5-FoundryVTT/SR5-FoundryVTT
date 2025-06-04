@@ -3,7 +3,7 @@ import { ModifiableValue } from "./BaseModel";
 
 const RangeTemplateData = () => ({
     ...ModifiableValue(),
-    distance: new NumberField({ required: true, initial: 0 }),
+    distance: new NumberField({ required: true, nullable: false, initial: 0 }),
     label: new StringField({ required: false, initial: '' }),
 });
 
@@ -21,3 +21,5 @@ export const TargetRangeTemplateData = () => ({
     unit: new StringField({ required: true, initial: '' }),
     range: new SchemaField(RangeTemplateData()),
 });
+
+export type RangesTemplateType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangesTemplateData>>;

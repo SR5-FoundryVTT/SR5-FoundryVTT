@@ -3,14 +3,13 @@ import {DataDefaults} from "../data/DataDefaults";
 import {ComplexFormRules} from "../rules/ComplexFormRules";
 import {PartsList} from "../parts/PartsList";
 import {FadeRules} from "../rules/FadeRules";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
 export interface ComplexFormTestData extends SuccessTestData {
-    level: number
-    fade: number
+    level: number;
+    fade: number;
 
-    fadeDamage: DamageData
+    fadeDamage: DamageType;
 }
 
 /**
@@ -44,7 +43,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         return false;
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionType> {
         return {
             skill: 'software',
             attribute: 'resonance'
@@ -119,6 +118,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         const resonance = this.actor.getAttribute('resonance').value;
 
         this.data.fadeDamage = FadeRules.calcFadeDamage(fade, this.hits.value, resonance);
+        return;
     }
 
     override async processResults() {

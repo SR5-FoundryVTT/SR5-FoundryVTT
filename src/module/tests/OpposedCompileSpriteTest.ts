@@ -17,7 +17,7 @@ interface OpposedCompileSpriteTestData extends OpposedTestData {
  * The technomancer is the active actor and the sprite the opposed actor.
  */
 export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTestData> {
-    declare public override against!: CompileSpriteTest;
+    declare public against: CompileSpriteTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Due to compilation, the active actor for this test will be created during execution.

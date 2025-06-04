@@ -12,6 +12,20 @@ export const TechnologyData = () => ({
     condition_monitor: new SchemaField(ConditionData()),
     wireless: new BooleanField({ required: false, initial: false }),
     networkController: new StringField({ required: false, initial: '' }),
+    calculated: new SchemaField({
+        essence: new SchemaField({
+            value: new NumberField({ required: true, nullable: false, initial: 0 }),
+            adjusted: new BooleanField({ initial: false })
+        }, { required: true }),
+        availability: new SchemaField({
+            value: new StringField({ required: true, initial: '' }),
+            adjusted: new BooleanField({ initial: false })
+        }, { required: true }),
+        cost: new SchemaField({
+            value: new NumberField({ required: true, nullable: false, initial: 0 }),
+            adjusted: new BooleanField({ initial: false })
+        }, { required: true })
+    }, { required: true })
 });
 
 export type TechnologyType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof TechnologyData>>;

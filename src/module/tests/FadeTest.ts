@@ -2,23 +2,23 @@ import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { ComplexFormTest, ComplexFormTestData } from "./ComplexFormTest";
 import { Helpers } from "../helpers";
 import { FadeRules } from "../rules/FadeRules";
-import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { DataDefaults } from "../data/DataDefaults";
+import { DamageType } from "../types/item/ActionModel";
 
 export interface FadeTestData extends SuccessTestData {
-    incomingFade: DamageData
-    modifiedFade: DamageData
+    incomingFade: DamageType
+    modifiedFade: DamageType
 
     against: ComplexFormTestData
 }
 
 export class FadeTest extends SuccessTest<FadeTestData> {
-    against: ComplexFormTest
+    declare against: ComplexFormTest;
 
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);

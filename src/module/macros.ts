@@ -7,9 +7,9 @@ import { SR5Item } from './item/SR5Item';
  * @returns {Promise}
  */
 import {Helpers} from "./helpers";
-import SkillField = Shadowrun.SkillField;
 import {SR5Actor} from "./actor/SR5Actor";
 import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
+import { SkillFieldType } from './types/template/SkillsModel';
 
 /**
  * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.
@@ -69,7 +69,7 @@ export function rollItemMacro(itemName) {
  * @param data A data object for skill macros.
  * @param slot The hotbar slot to use.
  */
-export async function createSkillMacro(data: {skillId: string, skill: SkillField}, slot) {
+export async function createSkillMacro(data: {skillId: string, skill: SkillFieldType}, slot) {
     if (!game.macros || !game.user) return;
 
     const {skillId, skill} = data;

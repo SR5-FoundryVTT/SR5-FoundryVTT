@@ -1,11 +1,11 @@
 /**
  * Handle all rules related to Shadowrun 5 magic drain.
  */
-import DamageData = Shadowrun.DamageData;
 import {DataDefaults} from "../data/DataDefaults";
 import {Helpers} from "../helpers";
-import DamageType = Shadowrun.DamageType;
 import {PartsList} from "../parts/PartsList";
+import { DamageType } from "../types/item/ActionModel";
+type DamageTypeType = Item.SystemOfType<'action'>['action']['damage']['type']['base'];
 
 export class DrainRules {
     /**
@@ -16,7 +16,7 @@ export class DrainRules {
      * @param magic The magic attribute level of the caster
      * @param hits Spellcasting test hits
      */
-    static calcDrainDamage(drain: number, force: number, magic: number, hits: number): DamageData {
+    static calcDrainDamage(drain: number, force: number, magic: number, hits: number): DamageType {
         if (force < 0) force = 1;
         if (magic < 0) magic = 1;
         if (hits < 0) hits = 0;
@@ -34,7 +34,7 @@ export class DrainRules {
      * @param hits The spell casting test hits AFTER limit
      * @param magic The magic attribute level of the caster
      */
-    static calcDrainDamageType(hits: number, magic: number): DamageType {
+    static calcDrainDamageType(hits: number, magic: number): DamageTypeType {
         if (hits < 0) hits = 0;
         if (magic < 0) magic = 1;
         return hits > magic ? 'physical' : 'stun';
@@ -46,10 +46,10 @@ export class DrainRules {
      * @param drainDamage The base drain damage after force / drain has been chosen.
      * @param hits The spell casting test hits
      */
-    static modifyDrainDamage(drainDamage: DamageData, hits: number) {
+    static modifyDrainDamage(drainDamage: DamageType, hits: number) {
         if (hits < 0) hits = 0;
 
-        drainDamage = foundry.utils.duplicate(drainDamage);
+        drainDamage = foundry.utils.duplicate(drainDamage) as DamageType;
 
         PartsList.AddUniquePart(drainDamage.mod, 'SR5.Hits', -hits);
         Helpers.calcTotal(drainDamage, {min: 0});

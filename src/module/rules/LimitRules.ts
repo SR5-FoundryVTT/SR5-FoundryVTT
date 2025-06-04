@@ -1,7 +1,7 @@
 import { SR5 } from '../config';
 import { DataDefaults } from './../data/DataDefaults';
-import AttributeField = Shadowrun.AttributeField;
-import LimitField = Shadowrun.LimitField;
+import { LimitFieldType } from '../types/template/LimitsModel';
+import { AttributeFieldType } from '../types/template/AttributesModel';
 
 
 /**
@@ -19,7 +19,7 @@ export const LimitRules = {
      * 
      * @returns The astral limit as a modified source value.
      */
-    calculateAstralLimit(astral: LimitField, mental: LimitField, social: LimitField): LimitField {
+    calculateAstralLimit(astral: LimitFieldType, mental: LimitFieldType, social: LimitFieldType): LimitFieldType {
         astral.base = Math.max(mental.value, social.value);
         astral.label = SR5.limits.astral;
 
@@ -35,7 +35,7 @@ export const LimitRules = {
      * @params magic The magic attribute to use.
      * @returns A magic limit field based on the magic attribute
      */
-    calculateMagicLimit(magic: AttributeField): LimitField {
+    calculateMagicLimit(magic: AttributeFieldType): LimitFieldType {
         return DataDefaults.createData('limit_field', {
             base: magic.value,
             label: magic.label
@@ -47,7 +47,7 @@ export const LimitRules = {
      * @param initiation The rank of initiation.
      * @returns A hidden limit as to not show it on the sheet limits.
      */
-    calculateInitiationSubmersionLimit(initiation: number): LimitField {
+    calculateInitiationSubmersionLimit(initiation: number): LimitFieldType {
         return DataDefaults.createData('limit_field', {
             base: initiation,
             value: initiation,

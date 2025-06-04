@@ -1,12 +1,11 @@
-import DamageData = Shadowrun.DamageData;
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import {CombatRules} from "./CombatRules";
 import CombatSpellType = Shadowrun.CombatSpellType;
 import SpellType = Shadowrun.SpellType;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import {DataDefaults} from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
 
 export class CombatSpellRules {
     /**
@@ -16,8 +15,8 @@ export class CombatSpellRules {
      *
      * @param damage The DamageData so far.
      */
-    static calculateDirectDamage(damage: DamageData): DamageData {
-        return foundry.utils.duplicate(damage);
+    static calculateDirectDamage(damage: DamageType): DamageType {
+        return foundry.utils.duplicate(damage) as DamageType;
     }
 
     /**
@@ -28,8 +27,8 @@ export class CombatSpellRules {
      * @param damage The DamageData so far.
      * @param force The force used during combat spell.
      */
-    static calculateIndirectDamage(damage: DamageData, force: number): DamageData {
-        damage = foundry.utils.duplicate(damage);
+    static calculateIndirectDamage(damage: DamageType, force: number): DamageType {
+        damage = foundry.utils.duplicate(damage) as DamageType;
 
         const ap = -force;
         damage.ap.mod = PartsList.AddUniquePart(damage.ap.mod, 'SR5.Force', ap);
@@ -50,15 +49,15 @@ export class CombatSpellRules {
      * @param attackerHits The attackers hits achieved
      * @param defenderHits The defenders hits achieved
      */
-    static modifyDirectDamageAfterHit(defender: SR5Actor, damage: DamageData, attackerHits: number, defenderHits: number): DamageData {
+    static modifyDirectDamageAfterHit(defender: SR5Actor, damage: DamageType, attackerHits: number, defenderHits: number): DamageType {
         return CombatRules.modifyDamageAfterHit(defender, attackerHits, defenderHits, damage);
     }
 
-    static modifyIndirectDamageAfterHit(defender: SR5Actor, damage: DamageData, attackerHits: number, defenderHits): DamageData {
+    static modifyIndirectDamageAfterHit(defender: SR5Actor, damage: DamageType, attackerHits: number, defenderHits): DamageType {
         return CombatRules.modifyDamageAfterHit(defender, attackerHits, defenderHits, damage);
     }
 
-    static modifyDamageAfterMiss(damage: DamageData): DamageData {
+    static modifyDamageAfterMiss(damage: DamageType): DamageType {
         return CombatRules.modifyDamageAfterMiss(damage);
     }
 
@@ -81,7 +80,7 @@ export class CombatSpellRules {
      * @param force Used force value during original spellcasting
      * @returns A modified damage resulting
      */
-    static calculateBaseDamage(type: CombatSpellType, damage: DamageData, force: number): DamageData {
+    static calculateBaseDamage(type: CombatSpellType, damage: DamageType, force: number): DamageType {
         switch (type) {
             case 'indirect':
                 return CombatSpellRules.calculateIndirectDamage(damage, force);
@@ -89,7 +88,7 @@ export class CombatSpellRules {
                 return CombatSpellRules.calculateDirectDamage(damage);
         }
 
-        return foundry.utils.duplicate(damage);
+        return foundry.utils.duplicate(damage) as DamageType;
     }
 
     /**
@@ -102,7 +101,7 @@ export class CombatSpellRules {
      * @param attackerHits Hits achieved by the spell attack aster.
      * @param defenderHits Hits achieved by the defender against the spell attack.
      */
-    static modifyDamageAfterHit(defender: SR5Actor, spellType: SpellType, combatType: CombatSpellType, damage: DamageData, attackerHits: number, defenderHits: number): DamageData {
+    static modifyDamageAfterHit(defender: SR5Actor, spellType: SpellType, combatType: CombatSpellType, damage: DamageType, attackerHits: number, defenderHits: number): DamageType {
 
         if (spellType === 'mana' && combatType === 'direct') {
             return CombatSpellRules.modifyDirectDamageAfterHit(
@@ -126,7 +125,7 @@ export class CombatSpellRules {
                 defenderHits);
         }
 
-        return foundry.utils.duplicate(damage);
+        return foundry.utils.duplicate(damage) as DamageType;
     }
 
     /**
@@ -135,7 +134,7 @@ export class CombatSpellRules {
      * @param spellType The general spell type.
      * @param combatType The combat spell type.
      */
-    static defenseTestAction(spellType: SpellType, combatType: CombatSpellType): MinimalActionData {
+    static defenseTestAction(spellType: SpellType, combatType: CombatSpellType): MinimalActionType {
         if (spellType === '' || combatType === '')
             console.warn(`Shadowrun5e | The given spell or combat spell types are empty and won't form a complete defense test action`);
 

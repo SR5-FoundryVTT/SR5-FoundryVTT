@@ -6,13 +6,14 @@ import { DataDefaults } from '../data/DataDefaults';
 import { PartsList } from '../parts/PartsList';
 import { DocumentSituationModifiers } from './DocumentSituationModifiers';
 import { SuccessTest, SuccessTestData } from '../tests/SuccessTest';
-import RangeData = Shadowrun.RangeData;
-import WeaponItemData = Shadowrun.WeaponItemData;
 import { SR5Item } from '../item/SR5Item';
+import { DamageType } from '../types/item/ActionModel';
+import { RangeType } from '../types/item/WeaponModel';
+import { RangesTemplateType } from '../types/template/WeaponModel';
 
 export interface WeaponRangeTestDataFragment {
-    damage: Shadowrun.DamageData
-    ranges: Shadowrun.RangesTemplateData
+    damage: DamageType
+    ranges: RangesTemplateType
     range: number
     targetRanges: Shadowrun.TargetRangeTemplateData[]
     // index of selected target range in targetRanges
@@ -39,7 +40,7 @@ export class WeaponRangeTestBehavior {
      * In case of selected targets, test will be overwritten.
      *
      */
-    private static prepareWeaponRanges(test: WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeData) {
+    private static prepareWeaponRanges(test: WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeType) {
         // Don't let missing weapon ranges break test.
         const weapon = test.item?.asType('weapon');
         if (!weapon) return;
@@ -47,7 +48,7 @@ export class WeaponRangeTestBehavior {
         // Transform weapon ranges to something usable
         const ranges = rangesAccessor(weapon);
         const {range_modifiers} = SR.combat.environmental;
-        const newRanges = {} as Shadowrun.RangesTemplateData;
+        const newRanges = {} as RangesTemplateType;
 
         for (const key of ["short", "medium", "long", "extreme"] as const) {
             const rangeValue = ranges[key];
@@ -111,9 +112,10 @@ export class WeaponRangeTestBehavior {
         // Provide test context to allow effects to limit application.
         modifiers.environmental.apply({test});
         test.data.range = modifiers.environmental.applied.active.range || test.data.targetRanges[0].range.modifier;
+        return;
     }
 
-    static prepareDocumentData(test:WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeData){
+    static prepareDocumentData(test:WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeType){
         WeaponRangeTestBehavior.prepareWeaponRanges(test, rangesAccessor);
         WeaponRangeTestBehavior.prepareTargetRanges(test);
     }

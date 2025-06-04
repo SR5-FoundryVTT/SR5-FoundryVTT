@@ -24,7 +24,7 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
 
 
 export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
-    public override item: SR5Item;
+    declare item: SR5Item;
 
     override _prepareData(data, options): RangedAttackTestData {
         data = super._prepareData(data, options);

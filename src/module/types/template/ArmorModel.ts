@@ -15,13 +15,4 @@ export const ArmorData = () => ({
     acid: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
-export class Armor extends foundry.abstract.TypeDataModel<ReturnType<typeof ArmorData>, Item.Implementation> {
-    static override defineSchema() {
-        return ArmorData();
-    }
-}
-
-export type ArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ArmorData>>;
 export type BaseArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BaseArmorData>>;
-
-console.log("ArmorData", ArmorData(), new Armor());

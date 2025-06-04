@@ -39,11 +39,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
                 parsedSkill.base = skillValue;
                 if (skill?.$?.spec) parsedSkill.specs.push(skill.$.spec);
             } else if (name === 'flight') {
-                system.skills.active[name] = (() => {
-                    const skillField: any = { attribute: "agility", group: "Athletics", base: skillValue };
-                    _mergeWithMissingSkillFields(skillField);
-                    return skillField;
-                })() as Shadowrun.SkillField;
+                system.skills.active[name] = DataDefaults.createData('skill_field', { attribute: "agility", base: skillValue });
             } else {
                 console.log(`[Skill Missing] Actor: ${jsonData.name._TEXT}\nSkill: ${name}`);
             }

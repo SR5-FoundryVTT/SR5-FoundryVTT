@@ -6,6 +6,7 @@ import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import { DamageType } from "../types/item/ActionModel";
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -13,7 +14,7 @@ export interface SpellCastingTestData extends SuccessTestData {
     drain: number
     reckless: boolean
 
-    drainDamage: DamageData
+    drainDamage: DamageType
 }
 
 
@@ -129,13 +130,14 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      * Derive the actual drain damage from spellcasting values.
      */
     calcDrainDamage() {
-        if (!this.actor) return DataDefaults.createData();
+        if (!this.actor) return DataDefaults.createData('damage');
 
         const force = Number(this.data.force);
         const drain = Number(this.data.drain);
         const magic = this.actor.getAttribute('magic').value;
 
         this.data.drainDamage = DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
+        return;
     }
 
     override async processResults() {

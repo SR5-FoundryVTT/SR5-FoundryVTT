@@ -1,5 +1,4 @@
 import { DamageType } from "./types/item/ActionModel";
-import SkillField = Shadowrun.SkillField;
 import GenericValueField = Shadowrun.GenericValueField;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
@@ -15,6 +14,8 @@ import { Translation } from './utils/strings';
 import { ModifiableValueType } from "./types/template/BaseModel";
 import { AttributeFieldType } from "./types/template/AttributesModel";
 import { SkillFieldType, SkillsType } from "./types/template/SkillsModel";
+import { ModifiedDamageType } from "./types/rolls/ActorRollsModel";
+import { RangesTemplateType } from "./types/template/WeaponModel";
 
 type OneOrMany<T> = T | T[];
 
@@ -534,7 +535,7 @@ export class Helpers {
         return Helpers.getSelectedActorsOrCharacter();
     }
 
-    static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateData {
+    static createRangeDescription(label: Translation, distance: number, modifier: number): RangesTemplateType {
         const localizedLabel = game.i18n.localize(label);
         return {label: localizedLabel, distance, modifier}
     }
@@ -665,7 +666,7 @@ export class Helpers {
      * @param hits Positive or negative hits to change the damage value with.
      * @param modificationLabel The translatable label for the modification
      */
-    static modifyDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageData {
+    static modifyDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageType {
         const modified = foundry.utils.duplicate(incoming) as DamageType;
         modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
@@ -681,7 +682,7 @@ export class Helpers {
      * @param hits Positive hits to reduce the damage value with! Should the hits amount be negative, use modifyDamageByHits.
      * @param modificationLabel The translatable label for the modification
      */
-    static reduceDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageData {
+    static reduceDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageType {
         if (hits < 0) hits = 0;
         return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
@@ -693,13 +694,18 @@ export class Helpers {
     }
 
     /**
-     * This can be used to create an SkillField into the Skills data path during the Skill creation process.
+     * Creates a data entry for a skill field with a random ID.
      *
-     * @param skillDataPath Could be 'data.skills.active' or 'data.skill.language.value' or more
-     * @param skillField A SkillField with whatever values. You could use DataDefaults.skillData to create one.
-     * @param idLength How long should the id (GUID) be?
+     * @param skillDataPath The data path where the skill should be added (e.g., 'data.skills.active').
+     * @param skillField The skill field data to insert.
+     * @param idLength The length of the generated random ID.
+     * @returns An object containing the generated ID and the update data, or undefined if the path is invalid.
      */
-    static getRandomIdSkillFieldDataEntry(skillDataPath: string, skillField: SkillField, idLength: number = DEFAULT_ID_LENGTH): { id: string, updateSkillData: { [skillDataPath: string]: { [id: string]: SkillField } } } | undefined {
+    static getRandomIdSkillFieldDataEntry(
+        skillDataPath: string,
+        skillField: SkillFieldType,
+        idLength: number = DEFAULT_ID_LENGTH
+    ): { id: string, updateSkillData: { [skillDataPath: string]: { [id: string]: SkillFieldType } } } | undefined {
         if (!skillDataPath || skillDataPath.length === 0) return undefined;
 
         const id = randomID(idLength);
@@ -830,7 +836,7 @@ export class Helpers {
      * @param skill
      * @returns Either a translation or a name.
      */
-    static getSkillLabelOrName(skill: SkillField): string {
+    static getSkillLabelOrName(skill: SkillFieldType): string {
         // Custom skills don't have labels, use their name instead.
         return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name || '';
     }

@@ -1955,7 +1955,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         console.debug('Toggling all importFlags on owned items to ->', onOff, event);
         for (const item of allItems) {
             if (item.system.importFlags) {
-                await item.update({ 'system.importFlags.isFreshImport': onOff });
+                await item.update({ system: { importFlags: { isFreshImport: onOff } } });
             }
         }
     }

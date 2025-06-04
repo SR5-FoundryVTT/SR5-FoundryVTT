@@ -13,7 +13,7 @@ export interface CombatSpellDefenseTestData extends DefenseTestData {
 }
 
 export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestData> {
-    declare against: SpellCastingTest
+    declare against: SpellCastingTest;
 
     /**
      * A combat spell defense test changes it's behaviour based on the spell it's defending against.

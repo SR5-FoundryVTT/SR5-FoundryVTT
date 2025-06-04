@@ -2,6 +2,7 @@ import { DataDefaults } from "../data/DataDefaults";
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { PartsList } from '../parts/PartsList';
 import { RitualRules } from '../rules/RitualRules';
+import { DamageType } from "../types/item/ActionModel";
 
 
 interface RitualSpellcastingTestData extends SuccessTestData {
@@ -10,7 +11,7 @@ interface RitualSpellcastingTestData extends SuccessTestData {
     force: number
     // Drain value as described on SR5#300
     drain: number
-    drainDamage: Shadowrun.DamageData
+    drainDamage: DamageType
 
     // Reagent value as described on SR5#296 'Give the offering'
     reagents: number
@@ -172,11 +173,12 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
      * NOTE: This will be called by the opposing test via a follow up test action.
      */
     calcDrain(opposingHits: number) {
-        if (!this.actor) return DataDefaults.createData();
+        if (!this.actor) return DataDefaults.createData('damage');
 
         this.data.drain = RitualRules.drainValue(opposingHits, this.data.reagents, this.data.force);
         this.data.drainDamage = RitualRules.calcDrainDamage(opposingHits, this.data.drain, this.actor.getAttribute('magic').value);
         this.data.drainReady = true;
+        return;
     }
 
     /**

@@ -14,7 +14,7 @@ interface CompileSpriteTestData extends SuccessTestData {
     // Testing values as described on SR5#254
     level: number
     fade: number
-    fadeDamage: Shadowrun.DamageData
+    fadeDamage: DamageType
 
     // Determine if compilation concluded and fade will apply
     fadeReady: boolean

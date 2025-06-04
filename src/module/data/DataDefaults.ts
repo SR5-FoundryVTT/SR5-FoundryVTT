@@ -21,7 +21,7 @@ import { Vehicle } from "../types/actor/VehicleModel";
 
 import { AdeptPower } from "../types/item/AdeptPowerModel";
 import { Ammo } from "../types/item/AmmoModel";
-import { Armor, ArmorData } from "../types/template/ArmorModel";
+import { Armor, ArmorData } from "../types/item/ArmorModel";
 import { Bioware } from "../types/item/BiowareModel";
 import { CallInAction } from "../types/item/CallInActionModel";
 import { ComplexForm } from "../types/item/ComplexFormModel";

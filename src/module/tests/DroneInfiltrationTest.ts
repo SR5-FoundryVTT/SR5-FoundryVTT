@@ -1,11 +1,13 @@
+import { SR5Actor } from "../actor/SR5Actor";
+import { SR5Item } from "../item/SR5Item";
 import {SuccessTest} from "./SuccessTest";
 
 export class DroneInfiltrationTest extends SuccessTest {
-    static override async _getDocumentTestAction(item, actor) {
+    static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor) {
         // Both item and actor are needed to determine what to roll.
         if (!item || !actor) return {};
 
-        const vehicleData = actor.asVehicle();
+        const vehicleData = actor.asType('vehicle');
         if (!vehicleData) {
             await ui.notifications?.error(game.i18n.localize('SR5.Errors.TestExpectsVehicleOnly'))
             return {};

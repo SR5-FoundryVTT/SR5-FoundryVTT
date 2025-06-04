@@ -589,7 +589,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     describe('AdvanceEffects apply modification based on test categories', () => {
         it('Should apply modifier to a single category only', async () => {
             const actor = await testActor.create({ type: 'character' });
-            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { applyTo: 'test_all', selection_categories: '[{"value":"Social Actions","id":"social"}]' } },
                 changes: [{ key: 'data.pool', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]

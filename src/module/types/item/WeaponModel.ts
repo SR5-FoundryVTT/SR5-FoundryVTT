@@ -28,7 +28,7 @@ export const RangeData = () => ({
     long: new NumberField({ required: true, nullable: false, initial: 0 }),
     extreme: new NumberField({ required: true, nullable: false, initial: 0 }),
     category: new StringField({ required: true, initial: '' }),
-    // attribute: new StringField({ required: false, initial: '' }),
+    attribute: new StringField({ required: false, initial: '' }),
 });
 
 const FiringModeData = () => ({
@@ -50,7 +50,7 @@ const MeleeWeaponData = () => ({
 });
 
 const ThrownWeaponData = () => ({
-    range: new SchemaField(RangeData(), { required: true }),
+    ranges: new SchemaField(RangeData(), { required: true }),
     blast: new SchemaField(BlastData(), { required: true }),
 });
 

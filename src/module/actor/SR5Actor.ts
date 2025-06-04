@@ -30,7 +30,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import AEChangeData = ActiveEffect.ChangeData;
 import { ActionRollType, DamageType } from '../types/item/ActionModel';
 import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/AttributesModel';
-import { VehicleStatsType, VehicleStatType } from '../types/actor/VehicleModel';
+import { VehicleStatsType } from '../types/actor/VehicleModel';
 import { LimitFieldType } from '../types/template/LimitsModel';
 import { SkillFieldType } from '../types/template/SkillsModel';
 import { ConditionType } from '../types/template/ConditionModel';

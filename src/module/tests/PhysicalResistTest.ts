@@ -5,19 +5,18 @@ import {CombatRules} from "../rules/CombatRules";
 import {Helpers} from "../helpers";
 import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
 import {SoakFlow} from "../actor/flows/SoakFlow";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
 
 
 export interface PhysicalResistTestData extends SuccessTestData {
     // The original test this resistance is taking its data from.
     following: PhysicalDefenseTestData
     // The damage BEFORE this test is done.
-    incomingDamage: DamageData
+    incomingDamage: DamageType
     // The damage AFTER this test is done.
-    modifiedDamage: DamageData
+    modifiedDamage: DamageType
     // Determine if an actor should be knockedDown after a defense.
     knockedDown: boolean
 }
@@ -74,7 +73,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         return false;
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionType> {
         return {
             'attribute': 'body',
             'armor': true

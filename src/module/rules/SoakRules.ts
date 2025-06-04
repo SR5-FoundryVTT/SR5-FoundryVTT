@@ -1,8 +1,7 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { Helpers } from '../helpers';
-import DamageData = Shadowrun.DamageData;
-import ModifiedDamageData = Shadowrun.ModifiedDamageData;
-import CharacterActorData = Shadowrun.CharacterData;
+import { DamageType } from '../types/item/ActionModel';
+import { ModifiedDamageType } from '../types/rolls/ActorRollsModel';
 
 /**
  * Soaking rules for actors
@@ -19,7 +18,7 @@ export class SoakRules {
      * @param hits The number of hits on the soak tests
      * @returns The updated damage data
      */
-    static reduceDamage(actor: SR5Actor, damageData: DamageData, hits: number): ModifiedDamageData {
+    static reduceDamage(actor: SR5Actor, damageData: DamageType, hits: number): ModifiedDamageType {
 
         // Vehicles are immune to stun damage (electricity stun damage is handled in a different place)
         // Note: This also takes care of the vehicle immunity, since physical damage that does not exceed armor
@@ -38,8 +37,8 @@ export class SoakRules {
      * @param actor The actor affected by the damage
      * @returns The updated damage data
      */
-    static modifyPhysicalDamageForArmor(damage: DamageData, actor: SR5Actor): DamageData {
-        const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
+    static modifyPhysicalDamageForArmor(damage: DamageType, actor: SR5Actor): DamageType {
+        const updatedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         if (damage.type.value === 'physical') {
             // Physical damage is only transformed for some actors
@@ -66,11 +65,11 @@ export class SoakRules {
      * @param actor The actor affected by the damage
      * @returns The updated damage data
      */
-    static modifyMatrixDamageForBiofeedback(damage: DamageData, actor : SR5Actor): DamageData {
-        const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
+    static modifyMatrixDamageForBiofeedback(damage: DamageType, actor : SR5Actor): DamageType {
+        const updatedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         if (damage.type.value === 'matrix') {
-            const actorData = actor.system as CharacterActorData;
+            const actorData = actor.system as Actor.SystemOfType<'character'>;
 
             // Only characters can receive biofeedback damage at the moment.
             // TODO Technomancer and Sprites special rules?

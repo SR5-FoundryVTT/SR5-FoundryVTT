@@ -1,9 +1,9 @@
 import {SR5Actor} from "../SR5Actor";
 import {SR5Item} from '../../item/SR5Item';
-import DamageData = Shadowrun.DamageData;
+import { DamageType } from "src/module/types/item/ActionModel";
 
 export class SoakFlow {
-    knocksDown(damage: DamageData, actor: SR5Actor) {
+    knocksDown(damage: DamageType, actor: SR5Actor) {
         // TODO: SR5 195 Called Shot Knock Down (Melee Only), requires attacker STR and actually announcing that called shot.
         const gelRoundsEffect = this.isDamageFromGelRounds(damage) ? -2 : 0;  // SR5 434
         const impactDispersionEffect = this.isDamageFromImpactDispersion(damage) ? -2 : 0  // FA 52
@@ -17,7 +17,7 @@ export class SoakFlow {
         return knockedDown;
     }
 
-    isDamageFromGelRounds(damage: DamageData) {
+    isDamageFromGelRounds(damage: DamageType) {
         if (damage.source && damage.source.actorId && damage.source.itemId) {
             const attacker = game.actors?.find(actor => actor.id == damage.source?.actorId);
             if (attacker) {
@@ -32,7 +32,7 @@ export class SoakFlow {
         return false;
     }
 
-    isDamageFromImpactDispersion(damage: DamageData) {
+    isDamageFromImpactDispersion(damage: DamageType) {
         // TODO: FA 52. Ammo currently cannot have mods, so not sure how to implement Alter Ballistics idiomatically.
         return false;
     }

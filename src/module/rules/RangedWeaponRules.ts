@@ -2,8 +2,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR } from "../constants";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
-import RangesTemplateData = Shadowrun.RangesTemplateData;
-import RangeTemplateData = Shadowrun.RangeTemplateData;
+import { RangesTemplateType } from "../types/template/WeaponModel";
 
 /**
  * Shadowrun5e rules applying to ranged weapons in general.
@@ -21,7 +20,7 @@ export const RangedWeaponRules = {
      * @param ranges Configured weapon ranges in meters taken from the weapon item configuration.
      * @returns The matching weapon range for the given distance.
      */
-    getRangeForTargetDistance(distance: number, ranges: RangesTemplateData): RangeTemplateData {
+    getRangeForTargetDistance(distance: number, ranges: RangesTemplateType): RangesTemplateType {
         // Assume ranges to be in ASC order and to define their max range.
         // Should no range be found, assume distance to be out of range.
         const rangeKey = Object.keys(ranges).find(range => distance <= ranges[range].distance);

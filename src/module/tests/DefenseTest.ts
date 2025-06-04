@@ -1,14 +1,14 @@
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
-import DamageData = Shadowrun.DamageData;
 import {DataDefaults} from "../data/DataDefaults";
 import { Translation } from '../utils/strings';
+import { DamageType } from "../types/item/ActionModel";
 
 
 export interface DefenseTestData extends OpposedTestData {
     // Damage value of the attack
-    incomingDamage: DamageData
+    incomingDamage: DamageType
     // Modified damage value of the attack after this defense (success or failure)
-    modifiedDamage: DamageData
+    modifiedDamage: DamageType
 
     // Should this defense test cause an initiative modifier to be applied, use this value
     // It's also used for display in chat.
