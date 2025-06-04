@@ -1,5 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
-import { ArmorData } from "../template/ArmorModel";
+import { ActorArmorData } from "../template/ArmorModel";
 import { Attributes, AttributeField } from "../template/AttributesModel";
 import { ModifiableValue } from "../template/BaseModel";
 import { ConditionData } from "../template/ConditionModel";
@@ -138,7 +138,7 @@ export const VisibilityChecks = () => ({
 });
 
 export const ArmorActorData = () => ({
-    armor: new SchemaField(ArmorData(), { required: true }),
+    armor: new SchemaField(ActorArmorData(), { required: true }),
 });
 
 export const WoundType = () => ({

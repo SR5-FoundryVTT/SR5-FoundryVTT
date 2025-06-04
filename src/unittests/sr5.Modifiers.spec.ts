@@ -1,5 +1,3 @@
-import { BackgroundCountModifier } from './../module/rules/modifiers/BackgroundCountModifier';
-import { NoiseModifier } from './../module/rules/modifiers/NoiseModifier';
 import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
 
 import {DocumentSituationModifiers} from "../module/rules/DocumentSituationModifiers";
@@ -200,6 +198,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers({}).source, defaultSourceModifiers);
                 assert.deepEqual(new DocumentSituationModifiers(undefined).source, defaultSourceModifiers);
+                //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers(null).source, defaultSourceModifiers);
                 //@ts-expect-error
                 assert.deepEqual(new DocumentSituationModifiers(0).source, defaultSourceModifiers);

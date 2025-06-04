@@ -51,7 +51,7 @@ export class SituationModifier {
     // The original source modifier data. This shouldn't be altered.
     source: SourceModifierData
     // The applied modifier data, originating from the original source data.
-    applied: Modifier | undefined;
+    applied: Modifier = { active: {}, total: 0 };
 
     // The effects flow for this modifier.
     effects: SituationModifierEffectsFlow<this>;

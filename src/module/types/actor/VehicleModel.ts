@@ -37,7 +37,7 @@ const VehicleData = {
     ...MovementActorData(),
     ...ImportFlags(),
     ...PhysicalTrackActorData(),
-    value: new SchemaField(PhysicalCombatValues(), { required: true }),
+    values: new SchemaField(PhysicalCombatValues(), { required: true }),
     vehicleType: new StringField({
         required: true,
         initial: "ground",

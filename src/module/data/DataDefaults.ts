@@ -21,7 +21,7 @@ import { Vehicle } from "../types/actor/VehicleModel";
 
 import { AdeptPower } from "../types/item/AdeptPowerModel";
 import { Ammo } from "../types/item/AmmoModel";
-import { Armor, ArmorData } from "../types/item/ArmorModel";
+import { Armor } from "../types/item/ArmorModel";
 import { Bioware } from "../types/item/BiowareModel";
 import { CallInAction } from "../types/item/CallInActionModel";
 import { ComplexForm } from "../types/item/ComplexFormModel";
@@ -40,6 +40,8 @@ import { Quality } from "../types/item/QualityModel";
 import { Sin } from "../types/item/SinModel";
 import { Spell } from "../types/item/SpellModel";
 import { SpritePower } from "../types/item/SpritePowerModel";
+
+import { ActorArmorData } from "../types/template/ArmorModel";
 
 const systemMap = {
     character: Character,
@@ -78,7 +80,7 @@ export type SystemEntityType = keyof typeof systemMap;
 
 const schemaMap = {
     action_roll: ActionRollData(),
-    armor: ArmorData(),
+    armor: ActorArmorData(),
     attribute_field: AttributeField(),
     damage: DamageData(),
     description: DescriptionData(),

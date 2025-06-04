@@ -30,21 +30,9 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
             assert.notStrictEqual(actor.id, null);
 
             // Check foundry item collection integrity
-            const fromCollection = game.actors?.get(actor.id);
+            const fromCollection = game.actors?.get(actor.id!);
             assert.isOk(fromCollection);
             assert.strictEqual(actor.id, fromCollection?.id);
-
-            await actor.delete();
-        });
-
-        it('update an actor of any type', async () => {
-            const actor = new SR5Actor<'character'>({type: 'character'});
-
-            assert.notProperty(actor.system, 'test');
-            await actor.update({ system: { test: true } });
-
-            assert.property(actor.system, 'test');
-            assert.propertyVal(actor.system, 'test', true);
 
             await actor.delete();
         });

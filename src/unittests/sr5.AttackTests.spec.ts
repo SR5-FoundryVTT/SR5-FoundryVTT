@@ -6,9 +6,9 @@ import { SR5Actor } from '../module/actor/SR5Actor';
 import { SR5Item } from '../module/item/SR5Item';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { CombatRules } from '../module/rules/CombatRules';
-import DamageType = Shadowrun.DamageType;
-import DamageElement = Shadowrun.DamageElement;
-import DamageData = Shadowrun.DamageData;
+import { DamageType } from 'src/module/types/item/ActionModel';
+type DamageTypeType = Item.SystemOfType<'action'>['action']['damage']['type']['base'];
+type DamageElementType = Item.SystemOfType<'action'>['action']['damage']['element']['base'];
 
 export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
     const {describe, it, before, after} = context;
@@ -209,16 +209,11 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             return new SR5Actor<'vehicle'>({ type: 'vehicle', system: { armor } });
         }
 
-        const getDamage = (damageValue: number, {
-            type = "physical",
-            ap = 0,
-            element,
-        }: {
-            type?: DamageType,
-            ap?: number,
-            element?: DamageElement
-        } = {}): DamageData => {
-            return DataDefaults.createData('damage',{
+        const getDamage = (
+            damageValue: number,
+            { type = "physical", ap = 0, element }: { type?: DamageTypeType, ap?: number, element?: DamageElementType} = {}
+        ): DamageType => {
+            return DataDefaults.createData('damage', {
                 type: {
                     value: type,
                     base: type,

@@ -77,7 +77,7 @@ export const ActionRollData = () => ({
     categories: new ArrayField(new StringField({ required: true, initial: '' })),
     spec: new BooleanField({ required: true, initial: false }),
     mod_description: new StringField({ required: true, initial: '' }),
-    threshlold: new SchemaField(BaseValuePair()),
+    threshold: new SchemaField(BaseValuePair()),
     extended: new BooleanField({ required: true, initial: false }),
     modifiers: new ArrayField(new StringField({ required: true, initial: '' })),
     damage: new SchemaField(DamageData()),

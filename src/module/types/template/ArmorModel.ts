@@ -7,7 +7,7 @@ const BaseArmorData = () => ({
     label: new StringField({ required: true, initial: '' }),
 });
 
-export const ArmorData = () => ({
+export const ActorArmorData = () => ({
     ...BaseArmorData(),
     fire: new NumberField({ required: true, nullable: false, initial: 0 }),
     electric: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -16,3 +16,4 @@ export const ArmorData = () => ({
 });
 
 export type BaseArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BaseArmorData>>;
+export type ActorArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActorArmorData>>;
