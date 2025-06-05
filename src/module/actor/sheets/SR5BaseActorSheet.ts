@@ -111,7 +111,7 @@ export interface SR5BaseSheetDelays {
  * This class should not be used directly but be extended for each actor type.
  *
  */
-export class SR5BaseActorSheet extends ActorSheet {
+export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     // What document description is shown on sheet. Allow displaying multiple descriptions at the same time.
     _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.

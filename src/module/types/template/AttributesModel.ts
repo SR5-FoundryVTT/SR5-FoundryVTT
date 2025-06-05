@@ -6,7 +6,7 @@ export const AttributeField = () => ({
     hidden: new BooleanField({ required: true, initial: false }),
     label: new StringField({ required: true, initial: '' }),
     limit: new StringField({ required: false, initial: '' }),
-    temp: new NumberField({ required: false, initial: 0 }),
+    temp: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 const EdgeAttributeField = () => ({

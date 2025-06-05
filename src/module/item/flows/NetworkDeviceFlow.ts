@@ -3,7 +3,6 @@ import {SR5Item} from "../SR5Item";
 import {SocketMessage} from "../../sockets";
 import {FLAGS} from "../../constants";
 import SocketAddNetworkControllerMessageData = Shadowrun.SocketAddNetworkControllerMessageData;
-import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 
 export class NetworkDeviceFlow {
     /**
@@ -173,12 +172,12 @@ export class NetworkDeviceFlow {
 
     private static async _setDevicesOnController(controller: SR5Item, deviceLinks: string[]) {
         if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
-        await controller.update({'system.networkDevices': deviceLinks});
+        await controller.update({ system: { networkDevices: deviceLinks } });
     }
 
     private static async _removeAllDevicesFromController(controller: SR5Item) {
         if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
-        await controller.update({'system.networkDevices': []});
+        await controller.update({ system: { networkDevices: [] } });
     }
 
     /**
@@ -254,7 +253,7 @@ export class NetworkDeviceFlow {
      * @param data
      * @param id
      */
-    static async handleOnDeleteItem(item: SR5Item, data: ShadowrunItemDataData, id: string) {
+    static async handleOnDeleteItem(item: SR5Item, data: SR5Item['system'], id: string) {
         console.debug(`Shadowrun 5e | Checking for network on deleted item ${item.name}`, item);
         // A deleted controller must be removed from all its devices.
         if (item.canBeNetworkController) return await NetworkDeviceFlow._removeControllerFromAllDevices(item);

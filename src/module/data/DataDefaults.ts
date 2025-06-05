@@ -141,21 +141,20 @@ export class DataDefaults {
      * @param systemData Whatever partial item system data you want to inject into general model system data.
      * @returns A minimum viable item data structure to use with Item#create
      */
-    static baseEntityData<EntityData, EntitySystemData>(
-        entityType: keyof Game["model"],
-        itemData: MinimalItemData,
-        systemData: Partial<EntitySystemData>={}
-    ) {
-        const name = itemData.name ?? 'Unnamed';
-        const type = itemData.type;
-
+    static baseEntityData<Type extends SystemEntityType>(
+        entityType: Type,
+        createData: Actor.CreateData | Item.CreateData = {},
+        systemData: object = {}
+    ): Actor.CreateData | Item.CreateData {
+        const type = createData.type;
         try {
             // foundry.utils.duplicate source to avoid keeping reference to model data.
-            const modelSystemData = foundry.utils.duplicate(game.model[entityType][type]);
-            return {
-                name, type,
-                system: foundry.utils.mergeObject(modelSystemData, systemData)
-            } as EntityData;
+            const modelSystemData = {
+                name: 'Unnamed',
+                ...createData
+            } as Actor.CreateData | Item.CreateData;
+            modelSystemData.system = DataDefaults.baseSystemData(entityType, systemData);
+            return modelSystemData;
         } catch (error) {
             throw new Error(`FoundryVTT doesn't have item type: ${type} registered in ${entityType}`);
         }

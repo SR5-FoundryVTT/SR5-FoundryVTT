@@ -57,7 +57,7 @@ export class InitiativePrep {
         initiative.astral.dice.value = Helpers.calcTotal(initiative.astral.dice, {min: 0, max: 5});
     }
 
-    static prepareMatrixInit(system: Actor.SystemOfType<'character' | 'critter'>) {
+    static prepareMatrixInit(system: Actor.SystemOfType<'character' | 'critter' | 'vehicle'>) {
         const { initiative, attributes, modifiers, matrix } = system;
         if (matrix) {
 

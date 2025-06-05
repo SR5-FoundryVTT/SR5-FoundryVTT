@@ -58,11 +58,13 @@ export class InventoryFlow {
         if (this.actor.defaultInventory.name === name) return;
 
         const updateData = {
-            'system.inventories': {
-                [name]: {
-                    name,
-                    label: name,
-                    itemIds: []
+            system: {
+                inventories: {
+                    [name]: {
+                        name,
+                        label: name,
+                        itemIds: []
+                    }
                 }
             }
         };
@@ -167,9 +169,11 @@ export class InventoryFlow {
         inventory.label = newName;
 
         const updateData = {
-            'system.inventories': {
-                [`-=${current}`]: null,
-                [newName]: inventory
+            system: {
+                inventories: {
+                    [`-=${current}`]: null,
+                    [newName]: inventory
+                }
             }
         };
 

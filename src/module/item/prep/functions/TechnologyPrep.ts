@@ -54,7 +54,7 @@ export const TechnologyPrep = {
      * @param item The item for additional data
      * @param technology The system technology section to be altered
      */
-    prepareAvailability(item: SR5Item, technology: Shadowrun.TechnologyData) {
+    prepareAvailability(item: SR5Item, technology: TechnologyType) {
         const availability = String(technology.availability ?? 0);
 
         const {adjusted, value} = ItemAvailabilityFlow.prepareAvailabilityValue(availability, technology.calculated.availability.adjusted, item.getRating());
@@ -69,7 +69,7 @@ export const TechnologyPrep = {
      * @param item The item for additional data
      * @param technology The system technology section to be altered
      */
-    prepareCost(item: SR5Item, technology: Shadowrun.TechnologyData) {
+    prepareCost(item: SR5Item, technology: TechnologyType) {
         const baseCost = Number(technology.cost ?? 0);
         const rating = item.getRating();
 

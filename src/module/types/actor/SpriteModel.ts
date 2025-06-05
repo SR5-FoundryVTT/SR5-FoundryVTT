@@ -4,8 +4,8 @@ import { CommonData, MatrixActorData, CommonModifiers } from "./CommonModel";
 const SpriteData = {
     ...CommonData(),
     ...MatrixActorData(),
-    level: new NumberField({ required: true, initial: 0 }),
-    services: new NumberField({ required: true, initial: 0 }),
+    level: new NumberField({ required: true, nullable: false, initial: 0 }),
+    services: new NumberField({ required: true, nullable: false, initial: 0 }),
     registered: new BooleanField({ required: true, initial: false }),
     spriteType: new StringField({
         required: true,

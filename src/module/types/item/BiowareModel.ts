@@ -11,13 +11,12 @@ const BiowareData = {
     ...ActionPartData(),
     ...ImportFlags(),
     ...ArmorPartData(),
-    essence: new NumberField({ required: true, initial: 0 }),
-    capacity: new NumberField({ required: true, initial: 0 }),
+    essence: new NumberField({ required: true, nullable: false, initial: 0 }),
+    capacity: new NumberField({ required: true, nullable: false, initial: 0 }),
     grade: new StringField({
         required: true,
-        initial: '',
-        blank: true,
-        choices: ['alpha', 'beta', 'delta', 'gamma', ''],
+        initial: 'standard',
+        choices: ['alpha', 'beta', 'delta', 'gamma', 'standard'],
     }),
 }
 

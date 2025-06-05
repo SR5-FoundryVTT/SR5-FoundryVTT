@@ -1,6 +1,5 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
-import { group } from "console";
-import { BaseValuePair, ModifiableValue, KeyValuePair } from "./BaseModel";
+import { ModifiableValue, KeyValuePair } from "./BaseModel";
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 

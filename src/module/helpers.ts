@@ -1,7 +1,5 @@
 import { DamageType } from "./types/item/ActionModel";
 import GenericValueField = Shadowrun.GenericValueField;
-import RangeTemplateData = Shadowrun.RangeTemplateData;
-import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import TargetedDocument = Shadowrun.TargetedDocument;
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
@@ -15,7 +13,7 @@ import { ModifiableValueType } from "./types/template/BaseModel";
 import { AttributeFieldType } from "./types/template/AttributesModel";
 import { SkillFieldType, SkillsType } from "./types/template/SkillsModel";
 import { ModifiedDamageType } from "./types/rolls/ActorRollsModel";
-import { RangesTemplateType } from "./types/template/WeaponModel";
+import { RangeTemplateType, RangesTemplateType } from "./types/template/WeaponModel";
 
 type OneOrMany<T> = T | T[];
 
@@ -535,7 +533,7 @@ export class Helpers {
         return Helpers.getSelectedActorsOrCharacter();
     }
 
-    static createRangeDescription(label: Translation, distance: number, modifier: number): RangesTemplateType {
+    static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateType {
         const localizedLabel = game.i18n.localize(label);
         return {label: localizedLabel, distance, modifier}
     }

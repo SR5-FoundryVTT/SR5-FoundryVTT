@@ -8,7 +8,7 @@ import { ItemCostFlow } from "../flows/ItemCostFlow";
  * Prepare item data for Cyberware and Bioware items.
  */
 export const WarePrep = {
-    prepareBaseData(system: Shadowrun.WareData) {
+    prepareBaseData(system: Item.SystemOfType<'bioware' | 'cyberware'>) {
         WarePrep.prepareGrade(system);
     },
 
@@ -18,7 +18,7 @@ export const WarePrep = {
      * @param item The item for additional data
      * @param technology The system technology section to be altered
      */
-    prepareGrade(system: Shadowrun.WareData) {
+    prepareGrade(system: Item.SystemOfType<'bioware' | 'cyberware'>) {
         const rating = system.technology.rating || 0;
         const grade = system.grade;
 

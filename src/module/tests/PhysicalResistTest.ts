@@ -39,12 +39,12 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
         // Is this test part of a followup test chain? defense => resist
         if (data.following) {
-            data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.createData('damage'));
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+            data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.createData('damage')) as DamageType;
+            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
         // This test is part of either a standalone resist or created with its own data (i.e. edge reroll).
         } else {
             data.incomingDamage = data.incomingDamage ?? DataDefaults.createData('damage');
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
         }
 
         const armor = this.actor?.getArmor();

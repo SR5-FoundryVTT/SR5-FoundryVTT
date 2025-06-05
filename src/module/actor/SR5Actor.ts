@@ -741,7 +741,11 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The id of the created knowledge skill.
      */
-    async addKnowledgeSkill(this: SR5Actor, category: keyof Shadowrun.KnowledgeSkills, skill: Partial<Shadowrun.SkillField>={name: SKILL_DEFAULT_NAME}): Promise<string|undefined> {
+    async addKnowledgeSkill(
+        this: SR5Actor,
+        category: keyof Shadowrun.KnowledgeSkills,
+        skill: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }
+    ): Promise<string|undefined> {
         if (!this.system.skills.knowledge.hasOwnProperty(category)) {
             console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
             return;
@@ -762,7 +766,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param skillData Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The new active skill id.
      */
-    async addActiveSkill(skillData: Partial<Shadowrun.SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
+    async addActiveSkill(skillData: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }): Promise<string | undefined> {
         const skill = DataDefaults.createData('skill_field', skillData);
 
         const activeSkillsPath = 'system.skills.active';

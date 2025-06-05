@@ -203,7 +203,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      * - as of foundry v0.7.4, actor data isn't prepared by the time we prepare items
      * - this caused issues with Actions that have a Limit or Damage attribute and so those were moved
      */
-    override prepareData() {
+    override prepareData(this: SR5Item) {
         super.prepareData();
         this.prepareNestedItems();
 
@@ -242,7 +242,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         else if (this.isType('sin'))
             SinPrep.prepareBaseData(this.system);
         else if (this.asType('bioware', 'cyberware'))
-            WarePrep.prepareBaseData(this.system);
+            WarePrep.prepareBaseData(this.system as Item.SystemOfType<'bioware' | 'cyberware'>);
     }
 
     async postItemCard() {
@@ -280,6 +280,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         const test = await TestCreator.fromItem(this, this.actor, { showDialog });
         if (!test) return;
         await test.execute();
+        return;
     }
 
     /**
