@@ -38,7 +38,7 @@ export default class Template extends MeasuredTemplate {
     /**
      * The initially active CanvasLayer to re-activate after the workflow is complete.
      */
-    #initialLayer: CanvasLayer;
+    #initialLayer: CanvasLayer | undefined;
 
     /* -------------------------------------------- */
 

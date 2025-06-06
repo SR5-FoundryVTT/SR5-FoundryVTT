@@ -11,12 +11,6 @@ interface ShadowrunRollData {
     [key: string]: number | boolean | ModList<number>;
 }
 
-interface ShadowrunChatMessageData {
-    title?: String
-    content?: String
-    roll?: SR5Roll
-}
-
 
 /**
  * Apply Shadowrun 5 rules to a FoundryVTT Roll.

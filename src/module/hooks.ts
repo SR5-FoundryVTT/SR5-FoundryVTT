@@ -370,7 +370,7 @@ ___________________
         });
 
 
-        Items.unregisterSheet('core', ItemSheet);
+        Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet);
         Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {
             label: "SR5.SheetItem",
             makeDefault: true
@@ -528,7 +528,7 @@ ___________________
         }
     }
 
-    static async removeDeletedItemsFromNetworks(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
+    static async removeDeletedItemsFromNetworks(item: SR5Item, data: SR5Item['system'], id: string) {
         await NetworkDeviceFlow.handleOnDeleteItem(item, data, id);
     }
 

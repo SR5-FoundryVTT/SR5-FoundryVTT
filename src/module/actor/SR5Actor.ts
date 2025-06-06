@@ -31,7 +31,7 @@ import AEChangeData = ActiveEffect.ChangeData;
 import { ActionRollType, DamageType } from '../types/item/ActionModel';
 import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/AttributesModel';
 import { VehicleStatsType } from '../types/actor/VehicleModel';
-import { LimitFieldType } from '../types/template/LimitsModel';
+import { LimitFieldType, LimitsType } from '../types/template/LimitsModel';
 import { SkillFieldType } from '../types/template/SkillsModel';
 import { ConditionType } from '../types/template/ConditionModel';
 import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitorsModel';
@@ -472,7 +472,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param name An attribute or other stats name.
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
-    getAttribute(this:SR5Actor, name: string): Shadowrun.AttributeField {
+    getAttribute(this:SR5Actor, name: string): AttributeFieldType {
         // First check vehicle stats, as they don't always exist.
         const stats = this.getVehicleStats();
         if (stats && stats[name]) return stats[name];
@@ -482,7 +482,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return attributes[name];
     }
 
-    getLimits(this: SR5Actor): Shadowrun.Limits {
+    getLimits(this: SR5Actor): LimitsType {
         return this.system.limits;
     }
 
@@ -554,10 +554,10 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return this.system.skills.active;
     }
 
-    getNetworkController(): string | undefined {
+    getNetworkController(): `Actor.${string}` | `Item.${string}` | `Token.${string}` | undefined {
         if(!this.isType('vehicle')) return;
 
-        return this.system.networkController;
+        return this.system.networkController as `Actor.${string}` | `Item.${string}` | `Token.${string}`;
     }
 
     async setNetworkController(networkController: string|undefined): Promise<void> {

@@ -26,12 +26,12 @@ export class Import extends Application {
         branch: "2df4c99143df4e46a5be64f122096c3d9c0efdf7",
     } as const;
 
-    private currentParsedFile: string;
+    private currentParsedFile: string = "";
     private dataFiles: File[] = [];
     private parsedFiles: string[] = [];
     private supportedDataFiles: string[] = [];
 
-    private langDataFile: File;
+    private langDataFile: File | undefined;
     private selectedLanguage: string = "";
 
     private icons: boolean = true;

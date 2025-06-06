@@ -51,6 +51,7 @@ export class ActionResultFlow {
         for (const target of targets) {
             await active.setMarks(target, marks);
         }
+        return;
     }
 
     /**

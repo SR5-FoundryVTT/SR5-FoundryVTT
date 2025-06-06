@@ -15,7 +15,7 @@ export class NetworkDeviceFlow {
     }
 
     //Pass-through to resolveLink for cases in which we know it will return an item and not an actor
-    static async resolveItemLink(link: string) {
+    static async resolveItemLink(link: `Actor.${string}` | `Item.${string}` | `Token.${string}`) {
         return await this.resolveLink(link) as SR5Item|undefined;
     }
 
@@ -24,10 +24,10 @@ export class NetworkDeviceFlow {
      *
      * @param link
      */
-    static async resolveLink(link: string) {
+    static async resolveLink(link: `Actor.${string}` | `Item.${string}` | `Token.${string}`): Promise<SR5Item | SR5Actor | undefined> {
         if (!link) return;
 
-        return await fromUuid(link) as SR5Item|SR5Actor|undefined;
+        return await fromUuid(link) as SR5Item | SR5Actor | undefined;
     }
 
     static async emitAddNetworkControllerSocketMessage(controller: SR5Item, networkDeviceLink: string) {

@@ -6,7 +6,6 @@ import { SR5Item } from "../../item/SR5Item";
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
 import { SocketMessage } from "../../sockets";
 import { FLAGS } from "../../constants";
-import { ActiveEffectData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs";
 
 /**
  * Handle the SR5ActiveEffects flow for a SuccessTest.
@@ -155,9 +154,9 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         if (actor === undefined || this.test.item === undefined) return;
 
-        const effectsData: ActiveEffectData[] = [];
+        const effectsData: SR5ActiveEffect[] = [];
         for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
-            const effectData = effect.toObject() as unknown as ActiveEffectData;
+            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {
@@ -169,7 +168,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         }
 
         for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
-            const effectData = effect.toObject() as unknown as ActiveEffectData;
+            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {
@@ -190,12 +189,11 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param actor The actor to create the effects on.
      * @param effectsData The effects data to be applied;
      */
-    static async _createTargetedEffectsAsGM(actor: SR5Actor, effectsData: ActiveEffectData[]) {
+    static async _createTargetedEffectsAsGM(actor: SR5Actor, effectsData: ActiveEffect.CreateData[]) {
         const alias = game.user?.name;
         const linkedTokens = actor.getActiveTokens(true) || [];
         const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
 
-        // @ts-expect-error
         const effects = await actor.createEmbeddedDocuments('ActiveEffect', effectsData) as SR5ActiveEffect[];
 
         const templateData = {
@@ -220,7 +218,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param actor The actor to create the effects on.
      * @param effectsData The effects data to be applied;
      */
-    async _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: ActiveEffectData[]) {
+    async _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: SR5ActiveEffect[]) {
         await SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, { actorUuid: actor.uuid, effectsData });
     }
 

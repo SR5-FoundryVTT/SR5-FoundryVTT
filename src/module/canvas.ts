@@ -12,7 +12,7 @@ interface DistanceOptions {
  * @param options 
  * @returns 
  */
-const measureDistances = function (segments, options: DistanceOptions = {}) {
+const measureDistances = function (this: any, segments, options: DistanceOptions = {}) {
     if (!options.gridSpaces) return BaseGrid.prototype.measureDistances.call(this, segments, options);
 
     // Track the total number of diagonals

@@ -14,6 +14,7 @@ import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 import { SR5 } from '../../config';
 import { SR } from '../../constants';
+import { SkillFieldType, SkillsType } from 'src/module/types/template/SkillsModel';
 
 
 export class SpiritPrep {
@@ -100,7 +101,7 @@ export class SpiritPrep {
      * @param skills The list of active skills of the sprite.
      * @returns A prepared SkillField without levels.
      */
-    static prepareActiveSkill(skillId: string, skills: Shadowrun.Skills): Shadowrun.SkillField {
+    static prepareActiveSkill(skillId: string, skills: SkillsType): SkillFieldType {
         if (skills[skillId]) return skills[skillId];
 
         const label = SR5.activeSkills[skillId];

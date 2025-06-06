@@ -1,10 +1,7 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
-import { SYSTEM_NAME } from "../constants";
 import { SR5Item } from "../item/SR5Item";
-import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
-import { EffectChangeData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents/_types.mjs";
-import { AnyDocument } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/data/abstract/client-document.mjs";
+import { tagifyFlagsToIds } from "../utils/sheets";
 
 
 
@@ -39,7 +36,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
-    public get source(): AnyDocument | Record<string, unknown> | null {
+    public get source() {
         return this.origin ? fromUuidSync(this.origin) : null;
     }
 
@@ -74,6 +71,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     public renderSourceSheet() {
         if (this.source instanceof SR5Actor || this.source instanceof SR5Item)
             return this.source?.sheet?.render(true);
+        return;
     }
 
     async toggleDisabled() {
@@ -85,7 +83,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     //@ts-expect-error // TODO: foundry-vtt-types
-    protected _applyCustom(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
+    protected _applyCustom(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
         return this._applyModify(actor, change, current, delta, changes);
     }
 
@@ -95,7 +93,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    protected _applyModify(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
+    protected _applyModify(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
         const value = foundry.utils.getProperty(actor, change.key);
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
@@ -136,7 +134,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @protected
      */
     //@ts-expect-error // TODO: foundry-vtt-types
-    protected _applyOverride(actor: SR5Actor, change: EffectChangeData, current, delta, changes) {
+    protected _applyOverride(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             const value = foundry.utils.getProperty(actor, change.key);
@@ -270,7 +268,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param object 
      * @param change 
      */
-    override apply(object: any, change) {
+    override apply(actor: SR5Actor, change: ActiveEffect.ChangeData) {
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
@@ -278,12 +276,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
 
         // Foundry can be used to apply to actors.
-        if (object instanceof SR5Actor) {
-            return super.apply(object, change);
-        }
-
-        // Custom handling to apply to other object types.
-        this._applyToObject(object, change);
+        return super.apply(actor, change);
     }
 
     /**
@@ -296,9 +289,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      * document of the effect before the resolved value would be applied onto the target document / object.
      * 
      * @param source Any object style value, either a Foundry document or a plain object
-     * @param change A singular EffectChangeData object
+     * @param change A singular ActiveEffect.ChangeData object
      */
-    static resolveDynamicChangeValue(source: any, change: EffectChangeData) {
+    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData) {
         // Dynamic value present?
         if (foundry.utils.getType(change.value) !== 'string') return;
         if (change.value.length === 0) return;
@@ -393,7 +386,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
     /**
      * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
-   * Cast a raw EffectChangeData change string to an Array of an inner type.
+   * Cast a raw ActiveEffect.ChangeData change string to an Array of an inner type.
    * @param {string} raw      The raw string value
    * @param {string} type     The target data type of inner array elements
    * @returns {Array<*>}      The parsed delta cast as a typed array
@@ -411,7 +404,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
-    * Cast a raw EffectChangeData change string to the desired data type.
+    * Cast a raw ActiveEffect.ChangeData change string to the desired data type.
     * @param {string} raw      The raw string value
     * @param {string} type     The target data type that the raw value should be cast to match
     * @returns {*}             The parsed delta cast to the target data type

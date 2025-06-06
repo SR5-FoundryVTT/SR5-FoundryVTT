@@ -32,7 +32,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         const data = await super.getData(options);
 
         if (this.document.isType('spirit') && this.document.system.summonerUuid)
-            data['summoner'] = await fromUuid(this.document.system.summonerUuid);
+            data['summoner'] = await fromUuid(this.document.system.summonerUuid as any);
 
         return data;
     }

@@ -11,6 +11,7 @@ import {SR5} from "../../config";
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import { RangedWeaponRules } from '../../rules/RangedWeaponRules';
 import { SR } from '../../constants';
+import { ModifiableValueType } from 'src/module/types/template/BaseModel';
 
 
 export class VehiclePrep {
@@ -181,10 +182,10 @@ export class VehiclePrep {
         // algorithm to determine speed, CRB pg 202 table.
         // Allow ActiveEffects to apply to movement directly.
         movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
-        movement.walk.value = Helpers.calcTotal(movement.walk, {min: 0});
+        movement.walk.value = Helpers.calcTotal(movement.walk as ModifiableValueType, {min: 0});
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = Helpers.calcTotal(movement.run, {min: 0});
+        movement.run.value = Helpers.calcTotal(movement.run as ModifiableValueType, {min: 0});
     }
 
     static prepareMeatspaceInit(system: Actor.SystemOfType<'vehicle'>) {

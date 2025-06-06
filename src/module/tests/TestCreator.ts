@@ -18,7 +18,7 @@ import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {SR5} from "../config";
 import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
-import { ActionRollType, MinimalActionType } from "../types/item/ActionModel";
+import { ActionRollType, DamageType, MinimalActionType } from "../types/item/ActionModel";
 import { DeepPartial } from "fvtt-types/utils";
 
 /**
@@ -527,7 +527,7 @@ export const TestCreator = {
         // Prepare general damage values...
         // ...a test without damage, shouldn't contain any damage information.
         if (ActionFlow.hasDamage(action.damage)) {
-            data.damage = foundry.utils.duplicate(action.damage);
+            data.damage = foundry.utils.duplicate(action.damage) as DamageType;
         }
 
         // Prepare opposed and resist tests...
@@ -602,9 +602,9 @@ export const TestCreator = {
      * @param defaultActions List of partial actions, as defined by test implementations.
      * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
      */
-    _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: DeepPartial<MinimalActionType>[]): ActionRollType {
+    _mergeMinimalActionDataInOrder: function(sourceAction: ActionRollType, ...defaultActions: DeepPartial<MinimalActionType>[]): ActionRollType {
         // This action might be taken from ItemData, causing changes to be reflected upstream.
-        const resultAction = foundry.utils.duplicate(sourceAction);
+        const resultAction = foundry.utils.duplicate(sourceAction) as ActionRollType;
 
         // Check if overwriting default 
         for (const defaultAction of defaultActions) {
@@ -633,7 +633,7 @@ export const TestCreator = {
      * @param key The action key to take the value from
      * @returns true for when the original action value should be kept, false if it's to be overwritten.
      */
-    _keepItemActionValue(action: ActionRollType, defaultAction: Partial<MinimalActionType>, key: string): boolean {
+    _keepItemActionValue(action: ActionRollType, defaultAction: DeepPartial<MinimalActionType>, key: string): boolean {
         if (!defaultAction.hasOwnProperty(key)) return true;
 
         // Avoid user confusion. A user might change one value of a logical value grouping (skill+attribute)

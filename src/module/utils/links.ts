@@ -125,7 +125,7 @@ export class LinksHelpers {
                 ui.notifications?.error(`The document has no associated sheet.`);
             }
         } catch (error) {
-            ui.notifications?.error(`Error opening the sheet for UUID: ${resolvedUuid.uuid}`, error);
+            ui.notifications?.error(`Error opening the sheet for UUID: ${resolvedUuid.uuid}`, error as any);
         }
     }
 

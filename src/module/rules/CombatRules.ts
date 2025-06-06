@@ -5,6 +5,7 @@ import ValueField = Shadowrun.ValueField;
 import {SoakRules} from "./SoakRules";
 import {SR5Actor} from "../actor/SR5Actor";
 import { DamageType } from "../types/item/ActionModel";
+import { ValueFieldType } from "../types/template/BaseModel";
 
 export class CombatRules {
     static iniOrderCanDoAnotherPass(scores: number[]): boolean {
@@ -104,7 +105,7 @@ export class CombatRules {
      * @return A new damage object for modified damage.
      */
     static modifyDamageAfterHit(defender: SR5Actor, attackerHits: number, defenderHits: number, damage: DamageType): DamageType {
-        let modified = foundry.utils.duplicate(damage);
+        let modified = foundry.utils.duplicate(damage) as DamageType;
 
         // netHits should never be below zero...
         if (attackerHits < 0) attackerHits = 0;
@@ -187,7 +188,7 @@ export class CombatRules {
      * @param damage The incoming weapon damage of the attack, unaltered.
      */
     static modifyDamageAfterSuppressionHit(damage: DamageType): DamageType {
-        return foundry.utils.duplicate(damage);
+        return foundry.utils.duplicate(damage) as DamageType;
     }
 
     /**
@@ -197,14 +198,14 @@ export class CombatRules {
      * @return A new damage object for modified damage.
      */
     static modifyDamageAfterMiss(damage: DamageType, isHitWithNoDamage?: boolean): DamageType {
-        const modifiedDamage = foundry.utils.duplicate(damage);
+        const modifiedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         // Keep base and modification intact, only overwriting the result.
         modifiedDamage.override = {name: 'SR5.TestResults.Success', value: 0};
         Helpers.calcTotal(modifiedDamage, {min: 0});
         modifiedDamage.ap.override = {name: 'SR5.TestResults.Success', value: 0};
         Helpers.calcTotal(modifiedDamage.ap);
-        modifiedDamage.type.value = '';
+        modifiedDamage.type.value = 'physical';
 
         // If attack hits but deals no damage, keep the element of the attack for any side effects.
         if(!isHitWithNoDamage) {
@@ -240,8 +241,8 @@ export class CombatRules {
      * @param damage The damage containing the armor penetration to be applied.
      * @returns A new armor value for modified armor
      */
-    static modifyArmorAfterHit(armor: ValueField, damage: DamageType): ValueField {
-        const modifiedArmor = foundry.utils.duplicate(armor);
+    static modifyArmorAfterHit(armor: ValueFieldType, damage: DamageType): ValueFieldType {
+        const modifiedArmor = foundry.utils.duplicate(armor) as ValueFieldType;
 
         // ignore ap without effect
         if (damage.ap.value <= 0) return modifiedArmor;
