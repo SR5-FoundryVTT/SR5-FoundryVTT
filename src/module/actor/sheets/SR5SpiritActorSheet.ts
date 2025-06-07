@@ -1,6 +1,6 @@
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
-import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
+import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 
 
 export class SR5SpiritActorSheet extends SR5BaseActorSheet {
@@ -46,20 +46,28 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
 
         html.find('.summoner-remove').on('click', this._onRemoveSummoner.bind(this));
     }
-    
+
+    /**
+     * Spirit actors have additional drop cases to handle.
+     */
+    // @ts-expect-error TODO: foundry-vtt-types _onDrop returns void but should return array of documents.
     override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
-        if (!event.dataTransfer) return;
-        // Keep upstream document created for actions base on it.
-        const documents = await super._onDrop(event);
+        if (!event.dataTransfer) return [];
 
+        // First, spirit specific behavior.
         const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
 
-        await this._addSummonerOnDrop(dropData);
+        // Handle summoner drops, ignore other actor drop options as spirits don't handle them.
+        if (dropData.type === 'Actor') {
+            await this._addSummonerOnDrop(dropData);
+            return [];
+        }
 
-        return documents;
+        // Then, handle the rest of the actor drop cases.
+        return super._onDrop(event);
     }
 
     /**

@@ -495,6 +495,7 @@ ___________________
 
         const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
         $(html).find('.directory-footer').append(button);
+
         button.on('click', (event) => {
             new Import().render(true);
         });
