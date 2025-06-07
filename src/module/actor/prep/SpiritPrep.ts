@@ -244,14 +244,14 @@ export class SpiritPrep {
                 overrides.attributes.reaction = 3;
                 overrides.attributes.strength = 2;
                 overrides.init = 1;
-                overrides.skills.push('assensing', 'astral_combat', 'blades', 'clubs', 'counter_spelling', 'exotic_range', 'perception', 'unarmed_combat');
+                overrides.skills.push('assensing', 'astral_combat', 'blades', 'clubs', 'counterspelling', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
             case 'guidance':
                 overrides.attributes.body = 3;
                 overrides.attributes.agility = -1;
                 overrides.attributes.reaction = 2;
                 overrides.attributes.strength = 1;
-                overrides.skills.push('arcana', 'assensing', 'astral_combat', 'counter_spelling', 'perception', 'unarmed_combat');
+                overrides.skills.push('arcana', 'assensing', 'astral_combat', 'counterspelling', 'perception', 'unarmed_combat');
                 break;
             case 'homunculus':
                 delete overrides.attributes.body;
