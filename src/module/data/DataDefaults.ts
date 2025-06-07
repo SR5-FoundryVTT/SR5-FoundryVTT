@@ -150,8 +150,7 @@ export class DataDefaults {
         try {
             // foundry.utils.duplicate source to avoid keeping reference to model data.
             const modelSystemData = {
-                name: 'Unnamed',
-                ...createData
+                name: 'Unnamed', type, ...createData
             } as Actor.CreateData | Item.CreateData;
             modelSystemData.system = DataDefaults.baseSystemData(entityType, systemData);
             return modelSystemData;

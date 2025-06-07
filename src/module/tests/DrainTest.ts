@@ -8,6 +8,8 @@ import { Translation } from '../utils/strings';
 import { DataDefaults } from "../data/DataDefaults";
 import { DamageType, MinimalActionType } from "../types/item/ActionModel";
 import { DeepPartial } from "fvtt-types/utils";
+import { SR5Item } from "../item/SR5Item";
+import { SR5Actor } from "../actor/SR5Actor";
 
 export interface DrainTestData extends SuccessTestData {
     incomingDrain: DamageType
@@ -70,8 +72,8 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         return ['global', 'drain']
     }
 
-    static override async _getDocumentTestAction(item, actor) {
-        const documentAction = await super._getDocumentTestAction(item, actor);
+    static override _getDocumentTestAction(item: SR5Item, actor: SR5Actor): DeepPartial<MinimalActionType> {
+        const documentAction = super._getDocumentTestAction(item, actor);
 
         if (!actor.isAwakened) {
             console.error(`Shadowrun 5e | A ${this.name} expected an awakened actor but got this`, actor);
@@ -79,7 +81,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         }
 
         // Get magic school attribute.
-        const attribute = actor.system.magic.attribute;
+        const attribute = actor.system.magic!.attribute;
         foundry.utils.mergeObject(documentAction, {attribute});
 
         // Return the school attribute based on actor configuration.

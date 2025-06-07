@@ -1,9 +1,7 @@
+const { DOCUMENT_OWNERSHIP_LEVELS } = foundry.CONST;
 import { SR5Actor } from "../actor/SR5Actor";
 
-export default class Sr5Tour extends Tour {
-    //the type of actor that should be created for the tour
-    actorType: String;
-
+export default class Sr5Tour extends foundry.nue.Tour {
     //the tab for the tour
     tab?: String
 
@@ -19,7 +17,7 @@ export default class Sr5Tour extends Tour {
                 name: "Tour " + this.id,
                 type: 'character',
                 ownership: {
-                    default: 3
+                    default: DOCUMENT_OWNERSHIP_LEVELS.OWNER
                 }
             });
         }

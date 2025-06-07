@@ -673,7 +673,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Populate the actor document.
         if (!this.actor && this.data.sourceActorUuid) {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
-            const document = await fromUuid(this.data.sourceActorUuid) || undefined;
+            const document = await fromUuid(this.data.sourceActorUuid as any) || undefined;
             this.actor = document instanceof TokenDocument ?
                 (document.actor ?? undefined) :
                 (document as SR5Actor | undefined);
@@ -686,7 +686,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Populate targeted token documents.
         if (this.targets.length === 0 && this.data.targetActorsUuid) {
             this.targets = [];
-            for (const uuid of this.data.targetActorsUuid) {
+            for (const uuid of this.data.targetActorsUuid as `Actor.${string}`[]) {
                 const document = await fromUuid(uuid);
                 if (!document) continue;
 

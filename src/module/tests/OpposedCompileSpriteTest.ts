@@ -104,7 +104,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      */
     override async cleanupAfterExecutionCancel() {
         if (!this.data.compiledSpriteUuid) return;
-        const actor = await fromUuid(this.data.compiledSpriteUuid);
+        const actor = await fromUuid(this.data.compiledSpriteUuid as any) as SR5Actor;
         await actor?.delete();
         delete this.actor;
     }

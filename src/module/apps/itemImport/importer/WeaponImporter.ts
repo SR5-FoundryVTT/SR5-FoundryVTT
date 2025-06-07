@@ -26,9 +26,9 @@ export class WeaponImporter extends DataImporter {
             const thrownParser = new ThrownParser(this.categories);
 
             const category = WeaponParserBase.GetWeaponType(jsonData);
-            const selectedParser = category === 'range' ? rangedParser
-                                 : category === 'melee' ? meleeParser
-                                                        : thrownParser;
+            const selectedParser = category === 'ranged' ? rangedParser
+                                 : category === 'melee'  ? meleeParser
+                                                         : thrownParser;
 
             return await selectedParser.Parse(jsonData) as Item.CreateData;
         }

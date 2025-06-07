@@ -346,16 +346,16 @@ export class Import extends Application {
             console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
         });
 
-        html.find("input[type='file'].langDataFileDrop").on('change', async (event: JQuery.ChangeEvent<HTMLInputElement>) => {
-            Array.from(event.target.files).forEach((file: File) => {
+        html.find("input[type='file'].langDataFileDrop").on('change', async (event: JQuery.TriggeredEvent) => {
+            Array.from(event.target.files as File[]).forEach(file => {
                 if (this.isLangDataFile(file))
                     this.langDataFile = file;
             });
             await this.render();
         });
 
-        html.find("input[type='file'].filedatadrop").on('change', async (event: JQuery.ChangeEvent<HTMLInputElement>) => {
-            Array.from(event.target.files).forEach((file: File) => {
+        html.find("input[type='file'].filedatadrop").on('change', async (event: JQuery.TriggeredEvent) => {
+            Array.from(event.target.files as File[]).forEach(file => {
                 if (this.isDataFile(file)) {
                     // Allow user to overwrite an already added file, they have their reasons.
                     const existingIdx = this.dataFiles.findIndex((dataFile) => dataFile.name === file.name);
@@ -405,18 +405,17 @@ export class Import extends Application {
             await this.render();
         });
 
-        html.find('.bookOption').on('click', (event: JQuery.ClickEvent<HTMLInputElement>) => {
-            const checkbox = event.currentTarget;
+        html.find('.bookOption').on('click', (event: JQuery.TriggeredEvent) => {
+            const checkbox = event.currentTarget as HTMLInputElement;
             const bookCode = checkbox.dataset.book;
             const isChecked = checkbox.checked;
 
             const book = this.shadowrunBooks.find(b => b.code === bookCode);
-            if (book)
-                book.value = isChecked;
+            if (book) book.value = isChecked;
         });
 
-        html.find('#languageSelect').on('change', (event: JQuery.ChangeEvent<HTMLSelectElement>) => {
-            this.selectedLanguage = event.currentTarget.value;
+        html.find('#languageSelect').on('change', (event: JQuery.TriggeredEvent) => {
+            this.selectedLanguage = (event.currentTarget as HTMLSelectElement).value;
         });
 
         html.find('.bookSelectAllBtn').on('click', async () => {

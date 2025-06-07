@@ -63,7 +63,7 @@ export class LinksHelpers {
         const uuid = resolvedUuid.uuid.split('#')[0];
         const anchor = resolvedUuid.uuid.split('#')[1];
 
-        const document = await fromUuid(uuid);
+        const document = await fromUuid(uuid as any);
         
         return { document, resolvedUuid, anchor }
     }

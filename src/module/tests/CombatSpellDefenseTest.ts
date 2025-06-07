@@ -6,7 +6,7 @@ import {DataDefaults} from "../data/DataDefaults";
 import {CombatSpellRules} from "../rules/CombatSpellRules";
 import {TestCreator} from "./TestCreator";
 import ModifierTypes = Shadowrun.ModifierTypes;
-import { MinimalActionType } from "../types/item/ActionModel";
+import { ActionRollType, MinimalActionType } from "../types/item/ActionModel";
 import { DeepPartial } from "fvtt-types/utils";
 
 export interface CombatSpellDefenseTestData extends DefenseTestData {
@@ -29,7 +29,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
         if (!spellData) return action;
 
         const itemAction = CombatSpellRules.defenseTestAction(spellData.system.type, spellData.system.combat.type);
-        return TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
+        return TestCreator._mergeMinimalActionDataInOrder(action as ActionRollType, itemAction);
     }
 
     override prepareBaseValues() {

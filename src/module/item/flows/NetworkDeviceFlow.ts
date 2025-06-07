@@ -123,7 +123,7 @@ export class NetworkDeviceFlow {
      * @param controller
      * @param deviceLink
      */
-    static async removeDeviceLinkFromNetwork(controller: SR5Item, deviceLink: string) {
+    static async removeDeviceLinkFromNetwork(controller: SR5Item, deviceLink: `Actor.${string}` | `Item.${string}` | `Token.${string}`) {
         console.log(`Shadowrun 5e | Removing device with uuid ${deviceLink} from network`);
         const controllerData = controller.asType('host', 'device');
         const device = await NetworkDeviceFlow.resolveLink(deviceLink);
@@ -187,7 +187,7 @@ export class NetworkDeviceFlow {
      */
     private static async _removeDeviceFromController(device: SR5Item|SR5Actor){
         if (!device.canBeNetworkDevice) return console.error('Shadowrun 5e | Given device cant be part of a network', device);
-        const networkController = device.getNetworkController();
+        const networkController = device.getNetworkController() as `Actor.${string}` | `Item.${string}` | `Token.${string}`;
         if (!networkController) return;
 
         // Controller might not exist anymore.
@@ -209,7 +209,7 @@ export class NetworkDeviceFlow {
         const controllerData = controller.asType('host', 'device');
         if (!controllerData) return;
 
-        const networkDevices = controllerData.system.networkDevices;
+        const networkDevices = controllerData.system.networkDevices as (`Actor.${string}` | `Item.${string}` | `Token.${string}`)[];
 
         // Remove controller from all its connected devices.
         if (networkDevices) {
@@ -236,7 +236,7 @@ export class NetworkDeviceFlow {
         const controllerData = controller.asType('host', 'device');
         if (!controllerData) return devices;
 
-        for (const link of controllerData.system.networkDevices) {
+        for (const link of controllerData.system.networkDevices as (`Actor.${string}` | `Item.${string}` | `Token.${string}`)[]) {
             const device = await NetworkDeviceFlow.resolveLink(link);
             if (device)  devices.push(device);
             else console.warn(`Shadowrun5e | Controller ${controller.name} has a network device ${link} that doesn't exist anymore`);
