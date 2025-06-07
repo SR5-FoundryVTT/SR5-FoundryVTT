@@ -21,7 +21,7 @@ export abstract class VersionMigration {
     static readonly NO_VERSION = '0';
 
     private m_Abort: boolean = false;
-    private m_AbortReason: string;
+    private m_AbortReason: string = '';
 
     /**
      * The allowed version this migrator should be able to operate on.

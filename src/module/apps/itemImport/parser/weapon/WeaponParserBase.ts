@@ -193,6 +193,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         return {
             ...SR5.weaponRangeCategories[systemRangeCategory].ranges,
             category: systemRangeCategory,
+            attribute: 'agility',
         };
     }
 

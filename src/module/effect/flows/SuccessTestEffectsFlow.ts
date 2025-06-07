@@ -112,7 +112,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         // Check for test limits used.
         const limits = effect.selectionLimits;
-        const limit = this.test.data.action.limit.attribute;
+        const limit = this.test.data.action.limit.attribute!;
         if (limits.length > 0 && !limits.includes(limit)) return true;
 
         return false;
@@ -189,7 +189,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param actor The actor to create the effects on.
      * @param effectsData The effects data to be applied;
      */
-    static async _createTargetedEffectsAsGM(actor: SR5Actor, effectsData: ActiveEffect.CreateData[]) {
+    static async _createTargetedEffectsAsGM(actor: SR5Actor, effectsData: SR5ActiveEffect[]) {
         const alias = game.user?.name;
         const linkedTokens = actor.getActiveTokens(true) || [];
         const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;

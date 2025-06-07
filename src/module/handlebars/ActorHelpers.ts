@@ -35,7 +35,7 @@ export const registerActorHelpers = () => {
         for (const item of items) {
             if (item.system.modification_category === modificationCategory) {
                 // If item's technology exists and quantity has been defined, use the item's quantity. Else use 1.
-                const quantity = (item.system.technology !== undefined) && (item.system.technology.quantity !== '') ? item.system.technology.quantity : 1;
+                const quantity = item.system.technology?.quantity || 1;
                 slotSum += (item.system.slots || 0) * quantity;
             }
         }

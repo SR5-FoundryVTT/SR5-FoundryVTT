@@ -130,8 +130,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     // Store the currently selected inventory.
     selectedInventory: string;
 
-    constructor(...args) {
-        super(...args);
+    constructor(object: SR5Actor, options?: Partial<ActorSheet.Options> | undefined) {
+        super(object, options);
 
         // Preselect default inventory.
         this.selectedInventory = this.actor.defaultInventory.name;
@@ -883,7 +883,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
 
     _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
-        //@ts-expect-error Since we're field checking, we can ignore typing...
         const { matrix } = sheetData.system;
         if (matrix) {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
@@ -1156,7 +1155,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
-        if (this.actor.isType('ic') && this.actor.hasHost()) {
+        if (this.actor.hasHost()) {
             ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
             return;
         }
@@ -1176,7 +1175,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
-        if (this.actor.isType('ic') && this.actor.hasHost()) {
+        if (this.actor.hasHost()) {
             ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
             return;
         }
@@ -1195,7 +1194,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     async _onMarksDelete(event) {
         event.stopPropagation();
 
-        if (this.actor.isType('ic') && this.actor.hasHost()) {
+        if (this.actor.hasHost()) {
             ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
             return;
         }
@@ -1212,7 +1211,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     async _onMarksClearAll(event) {
         event.stopPropagation();
 
-        if (this.actor.isType('ic') && this.actor.hasHost()) {
+        if (this.actor.hasHost()) {
             ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
             return;
         }

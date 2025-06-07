@@ -53,7 +53,7 @@ import { WarePrep } from './prep/WarePrep';
 ActionResultFlow; // DON'T TOUCH!
 
 export type SystemTechnologyItem = 'ammo' | 'armor' | 'device' | 'equipment' | 'modification' | 'program' | 'sin' | 'bioware' | 'cyberware' | 'weapon';
-export type SystemItem = SystemTechnologyItem | 'adept_power' | 'action' | 'call_in_action' | 'complex_form' | 'contact' | 'critter_power' | 'echo' | 'host' | 'lifestyle' | 'quality' | 'sprite_power' | 'spell';
+export type SystemItem = SystemTechnologyItem | 'adept_power' | 'action' | 'call_in_action' | 'complex_form' | 'contact' | 'critter_power' | 'echo' | 'host' | 'lifestyle' | 'quality' | 'sprite_power' | 'spell' | 'ritual';
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -1302,7 +1302,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         if (controllerData.system.networkDevices[index] === undefined) return;
         const networkDeviceLink = controllerData.system.networkDevices[index];
         const controller = this;
-        return await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, networkDeviceLink);
+        return await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, networkDeviceLink as any);
     }
 
     async removeAllNetworkDevices() {
@@ -1325,7 +1325,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
                 ...Helpers.getMarkIdDocuments(markId),
                 marks,
                 markId
-            }))
+            }));
     }
 
     /**
@@ -1336,7 +1336,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         if (!technologyData) return;
         if (!technologyData.networkController) return;
 
-        return await NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
+        return await NetworkDeviceFlow.resolveLink(technologyData.networkController as any) as SR5Item;
     }
 
     /**

@@ -481,7 +481,7 @@ export class Helpers {
             if (character && character instanceof SR5Actor) actors.push(character);
         }
 
-        return actors as SR5Actor[];
+        return actors;
     }
 
     /**
@@ -495,7 +495,7 @@ export class Helpers {
     static async getTestTargetActors(testData: SuccessTestData): Promise<SR5Actor[]> {
         const actors: SR5Actor[] = [];
         for (const uuid of testData.targetActorsUuid) {
-            const tokenOrActor = await fromUuid(uuid);
+            const tokenOrActor = await fromUuid(uuid as any);
             // Assume given target to be an actor.
             let actor = tokenOrActor;
 
@@ -1000,7 +1000,7 @@ export class Helpers {
      */
     static async renderDocumentSheet(uuid: string, resolveTokenToActor = true) {
         if (!uuid) return;
-        let document = await fromUuid(uuid);
+        let document = await fromUuid(uuid as any);
         if (!document) return;
         if (document instanceof TokenDocument && resolveTokenToActor && document.actor)
             document = document.actor;

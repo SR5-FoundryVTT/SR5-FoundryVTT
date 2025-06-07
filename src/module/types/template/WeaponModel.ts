@@ -1,9 +1,8 @@
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { ModifiableValue } from "./BaseModel";
 
 const RangeTemplateData = () => ({
     distance: new NumberField({ required: true, nullable: false, initial: 0 }),
-    modifier: new NumberField({ required: false, nullable: false, initial: 0 }),
+    modifier: new NumberField({ required: true, nullable: false, initial: 0 }),
     label: new StringField({ required: false, initial: '' }),
 });
 
@@ -17,10 +16,11 @@ export const RangesTemplateData = () => ({
 export const TargetRangeTemplateData = () => ({
     tokenUuid: new StringField({ required: true, initial: '' }),
     name: new StringField({ required: true, initial: '' }),
-    distance: new NumberField({ required: true, initial: 0 }),
+    distance: new NumberField({ required: true, nullable: false, initial: 0 }),
     unit: new StringField({ required: true, initial: '' }),
     range: new SchemaField(RangeTemplateData()),
 });
 
 export type RangeTemplateType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangeTemplateData>>;
 export type RangesTemplateType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangesTemplateData>>;
+export type TargetRangeTemplateType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof TargetRangeTemplateData>>;

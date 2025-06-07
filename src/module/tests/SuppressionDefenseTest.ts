@@ -7,7 +7,7 @@ import { DeepPartial } from "fvtt-types/utils";
 export class SuppressionDefenseTest extends PhysicalDefenseTest<PhysicalDefenseTestData> {
 
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
-        return { attribute: 'reaction', attribute2: 'edge' };
+        return { attribute: 'reaction' as any, attribute2: 'edge' };
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {

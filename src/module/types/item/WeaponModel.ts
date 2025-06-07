@@ -1,9 +1,9 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 import { ValueMaxPair, ModifiableValue } from "../template/BaseModel";
 import { DescriptionPartData } from "../template/DescriptionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 import { TechnologyPartData } from "../template/TechnologyModel";
 import { ActionPartData } from "./ActionModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 export const BlastData = () => ({
     radius: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -28,7 +28,7 @@ export const RangeData = () => ({
     long: new NumberField({ required: true, nullable: false, initial: 0 }),
     extreme: new NumberField({ required: true, nullable: false, initial: 0 }),
     category: new StringField({ required: true, initial: '' }),
-    attribute: new StringField({ required: false, initial: '' }),
+    attribute: new StringField({ required: true, initial: '' }),
 });
 
 const FiringModeData = () => ({

@@ -34,6 +34,7 @@ import { Metamagic } from './item/MetamagicModel';
 import { Modification } from './item/ModificationModel';
 import { Program } from './item/ProgramModel';
 import { Quality } from './item/QualityModel';
+import { Ritual } from "./item/RitualModel";
 import { Sin } from './item/SinModel';
 import { Spell } from './item/SpellModel';
 import { SpritePower } from './item/SpritePowerModel';
@@ -104,6 +105,7 @@ declare module "fvtt-types/configuration" {
             modification: typeof Modification;
             program: typeof Program;
             quality: typeof Quality;
+            ritual: typeof Ritual;
             sin: typeof Sin;
             spell: typeof Spell;
             sprite_power: typeof SpritePower;

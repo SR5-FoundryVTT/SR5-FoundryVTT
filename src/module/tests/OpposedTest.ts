@@ -5,6 +5,7 @@ import {SR5Item} from "../item/SR5Item";
 import {PartsList} from "../parts/PartsList";
 import { Helpers } from "../helpers";
 import { ValueFieldType } from "../types/template/BaseModel";
+import { SR5Actor } from "../actor/SR5Actor";
 
 
 export interface OpposedTestValues extends SuccessTestValues {
@@ -80,7 +81,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         return againstNetHits;
     }
 
-    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
+    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor: SR5Actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;

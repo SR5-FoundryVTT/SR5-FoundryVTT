@@ -116,7 +116,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                             attribute: 'reaction',
                             attribute2: 'intuition',
                             skill: '',
-                            mod: 0,
                             description: ''
                         }
                     }

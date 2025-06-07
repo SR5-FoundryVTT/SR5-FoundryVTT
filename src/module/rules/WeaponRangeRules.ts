@@ -9,13 +9,13 @@ import { SuccessTest, SuccessTestData } from '../tests/SuccessTest';
 import { SR5Item } from '../item/SR5Item';
 import { DamageType } from '../types/item/ActionModel';
 import { RangeType } from '../types/item/WeaponModel';
-import { RangesTemplateType } from '../types/template/WeaponModel';
+import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/WeaponModel';
 
 export interface WeaponRangeTestDataFragment {
     damage: DamageType
     ranges: RangesTemplateType
     range: number
-    targetRanges: Shadowrun.TargetRangeTemplateData[]
+    targetRanges: TargetRangeTemplateType[]
     // index of selected target range in targetRanges
     targetRangesSelected: number
 }

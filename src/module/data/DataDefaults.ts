@@ -1,6 +1,5 @@
 import FireModeData = Shadowrun.FireModeData;
 import DataSchema = foundry.data.fields.DataSchema;
-const { SchemaField } = foundry.data.fields;
 import { Action, ActionRollData, DamageData, MinimalActionData } from "../types/item/ActionModel";
 import { AttributeField } from "../types/template/AttributesModel";
 import { DescriptionData } from "../types/template/DescriptionModel";
@@ -37,11 +36,13 @@ import { Modification } from "../types/item/ModificationModel";
 import { MovementField } from "../types/template/MovementModel";
 import { Program } from "../types/item/ProgramModel";
 import { Quality } from "../types/item/QualityModel";
+import { Ritual } from "../types/item/RitualModel";
 import { Sin } from "../types/item/SinModel";
 import { Spell } from "../types/item/SpellModel";
 import { SpritePower } from "../types/item/SpritePowerModel";
 
 import { ActorArmorData } from "../types/template/ArmorModel";
+const { SchemaField } = foundry.data.fields;
 
 const systemMap = {
     character: Character,
@@ -70,6 +71,7 @@ const systemMap = {
     modification: Modification,
     program: Program,
     quality: Quality,
+    ritual: Ritual,
     sin: Sin,
     spell: Spell,
     sprite_power: SpritePower,
@@ -79,36 +81,29 @@ const systemMap = {
 export type SystemEntityType = keyof typeof systemMap;
 
 const schemaMap = {
-    action_roll: ActionRollData(),
-    armor: ActorArmorData(),
-    attribute_field: AttributeField(),
-    damage: DamageData(),
-    description: DescriptionData(),
-    limit_field: LimitField(),
-    minimal_action: MinimalActionData(),
-    movement_field: MovementField(),
-    range: RangeData(),
-    skill_field: SkillField(),
-    source_entity_field: SourceEntityField(),
-    technology: TechnologyData(),
-    track: Track(),
-    value_field: ValueField(),
+    action_roll: ActionRollData,
+    armor: ActorArmorData,
+    attribute_field: AttributeField,
+    damage: DamageData,
+    description: DescriptionData,
+    limit_field: LimitField,
+    minimal_action: MinimalActionData,
+    movement_field: MovementField,
+    range: RangeData,
+    skill_field: SkillField,
+    source_entity_field: SourceEntityField,
+    technology: TechnologyData,
+    track: Track,
+    value_field: ValueField,
 } as const;
 
 type schemaCreateData = {
-    [K in keyof typeof schemaMap]: foundry.data.fields.SchemaField.CreateData<typeof schemaMap[K]>;
+    [K in keyof typeof schemaMap]: foundry.data.fields.SchemaField.CreateData<ReturnType<typeof schemaMap[K]>>;
 };
 
 type schemaInitializedData = {
-    [K in keyof typeof schemaMap]: foundry.data.fields.SchemaField.InitializedData<typeof schemaMap[K]>;
+    [K in keyof typeof schemaMap]: foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof schemaMap[K]>>;
 };
-
-interface MinimalItemData {
-    // Whatever name you want to give but not ''.
-    name?: string;
-    // Whatever item type you want to have.
-    type: string
-}
 
 type CombinedSystemOfType<T extends string> =
     T extends Actor.SubType ? Actor.SystemOfType<T> :
@@ -171,7 +166,7 @@ export class DataDefaults {
         key: K,
         createData: schemaCreateData[K] = {}
     ): schemaInitializedData[K] {
-        const schema = schemaMap[key] as DataSchema;
+        const schema = schemaMap[key]() as DataSchema;
         return new SchemaField(schema).getInitialValue(createData) as schemaInitializedData[K];
     }
 

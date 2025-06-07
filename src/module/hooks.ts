@@ -77,8 +77,10 @@ import { IC } from './types/actor/ICModel';
 import { Spirit } from './types/actor/SpiritModel';
 import { Sprite } from './types/actor/SpriteModel';
 import { Vehicle } from './types/actor/VehicleModel';
+
 import { Action } from './types/item/ActionModel';
 import { AdeptPower } from './types/item/AdeptPowerModel';
+import { Ammo } from './types/item/AmmoModel';
 import { Armor } from './types/item/ArmorModel';
 import { Bioware } from './types/item/BiowareModel';
 import { CallInAction } from './types/item/CallInActionModel';
@@ -95,11 +97,11 @@ import { Metamagic } from './types/item/MetamagicModel';
 import { Modification } from './types/item/ModificationModel';
 import { Program } from './types/item/ProgramModel';
 import { Quality } from './types/item/QualityModel';
+import { Ritual } from './types/item/RitualModel';
 import { Sin } from './types/item/SinModel';
 import { Spell } from './types/item/SpellModel';
 import { SpritePower } from './types/item/SpritePowerModel';
 import { Weapon } from './types/item/WeaponModel';
-import { Ammo } from './types/item/AmmoModel';
 
 
 
@@ -325,6 +327,7 @@ ___________________
         CONFIG.Item.dataModels["modification"] = Modification;
         CONFIG.Item.dataModels["program"] = Program;
         CONFIG.Item.dataModels["quality"] = Quality;
+        CONFIG.Item.dataModels["ritual"] = Ritual;
         CONFIG.Item.dataModels["sin"] = Sin;
         CONFIG.Item.dataModels["spell"] = Spell;
         CONFIG.Item.dataModels["sprite_power"] = SpritePower;
@@ -342,7 +345,7 @@ ___________________
 
         // Register sheets for collection documents.
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
-        Actors.unregisterSheet('core', ActorSheet);
+        Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet, {});
         Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
@@ -370,7 +373,7 @@ ___________________
         });
 
 
-        Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet);
+        Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet, {});
         Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {
             label: "SR5.SheetItem",
             makeDefault: true
@@ -508,13 +511,13 @@ ___________________
 
         if (item.isType('host')) {
             // Collect actors from sidebar and active scene to update / rerender
-            let connectedIC = [
+            const connectedIC = [
                 // All sidebar actors should also include tokens with linked actors.
-                ...game.actors.filter((actor: SR5Actor) => actor.isType('ic') && actor.hasHost()) as SR5Actor[],
+                ...(game.actors as SR5Actor[]).filter(actor => actor.hasHost()),
                 // All token actors that aren't linked.
                 ...canvas.scene!.tokens.filter(token => {
                     const actor = token.actor;
-                    return !token.actorLink && !!actor && actor.isType('ic') && actor.hasHost();
+                    return !token.actorLink && actor?.hasHost();
                 }).map(t => t.actor)
             ];
 

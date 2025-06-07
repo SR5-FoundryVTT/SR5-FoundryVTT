@@ -1,8 +1,12 @@
-import { Attributes } from "../template/AttributesModel";
-import { AwakendLimits } from "../template/LimitsModel";
+import { AttributeField, Attributes } from "../template/AttributesModel";
 import { CharacterModifiers } from "./CharacterModel";
-import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CommonModifiers, CharacterLimits } from "./CommonModel";
+import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CharacterLimits } from "./CommonModel";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+
+const SpiritAttributes = () => ({
+    ...Attributes(),
+    force: new SchemaField(AttributeField(), { required: true }),
+});
 
 const SpiritData = {
     ...CommonData(),
@@ -14,14 +18,11 @@ const SpiritData = {
     ...NPCActorData(),
     summonerUuid: new StringField({ required: true, initial: "" }),
     values: new SchemaField(PhysicalCombatValues(), { required: true }),
-    spiritType: new StringField({
-        required: true,
-        initial: "",
-    }),
+    spiritType: new StringField({ required: true, initial: "" }),
     force: new NumberField({ required: true, nullable: false, initial: 0 }),
     limits: new SchemaField(CharacterLimits(), { required: true }),
     services: new NumberField({ required: true, nullable: false, initial: 0 }),
-    attributes: new SchemaField(Attributes(), { required: true }),
+    attributes: new SchemaField(SpiritAttributes(), { required: true }),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,

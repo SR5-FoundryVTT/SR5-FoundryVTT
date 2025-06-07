@@ -1,7 +1,7 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/BaseModel";
 import { DescriptionPartData } from "../template/DescriptionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 const ActionResultData = () => ({
     success: new SchemaField({
@@ -15,7 +15,7 @@ export const MinimalActionData = () => ({
     skill: new StringField({ required: true, initial: '' }),
     attribute: new StringField({ required: true, initial: '' }),
     attribute2: new StringField({ required: true, initial: '' }),
-    mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+    mod: ModList(),
     armor: new BooleanField({ required: true, initial: false }),
     limit: new SchemaField(ModifiableValueLinked())
 });
@@ -24,14 +24,16 @@ export const DamageData = () => ({
     ...ModifiableValueLinked(),
     type: new SchemaField({
         base: new StringField({
+            blank: true,
             required: true,
             initial: 'physical',
-            choices: ["physical", "matrix", "stun"]
+            choices: ["physical", "matrix", "stun", ""]
         }),
         value: new StringField({
+            blank: true,
             required: true,
             initial: 'physical',
-            choices: ["physical", "matrix", "stun"]
+            choices: ["physical", "matrix", "stun", ""]
         }),
     }),
     element: new SchemaField({

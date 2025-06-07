@@ -290,7 +290,7 @@ export const TestCreator = {
      */
     fromOpposedTestResistTest: async function(opposed: OpposedTest, options?: TestOptions): Promise<SuccessTest | void> {
         // Don't change the data's source.
-        const opposedData = foundry.utils.duplicate(opposed.data);
+        const opposedData = foundry.utils.duplicate(opposed.data) as OpposedTestData;
 
         if (!opposedData?.against?.opposed?.resist?.test) return console.error(`Shadowrun 5e | Given test doesn't define an opposed resist test`, opposed);
         if (!opposed.actor) return console.error(`Shadowrun 5e | A ${opposed.title} can't operate without a populated actor given`);

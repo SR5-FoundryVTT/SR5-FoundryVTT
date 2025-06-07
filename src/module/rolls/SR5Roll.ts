@@ -3,7 +3,7 @@ import ModList = Shadowrun.ModList;
 
 // TODO: Data for casting actor / item (uuid)
 // TODO: maybe copy of the action data from the casting item / actor
-interface ShadowrunRollData {
+type ShadowrunRollData = {
     limit: number;
     threshold: number;
     parts: ModList<number>; // TODO: Is this useful?
@@ -20,9 +20,7 @@ interface ShadowrunRollData {
  *
  * TODO: A chat message should contain all data needed to cast resulting actions.
  */
-export class SR5Roll extends Roll {
-    override data: ShadowrunRollData
-
+export class SR5Roll extends Roll<ShadowrunRollData> {
     // toJSON(): any {
     //     // TODO: Check if data includes custom ShadowrunRollData
     //     const data = super.toJSON();

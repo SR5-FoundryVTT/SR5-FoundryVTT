@@ -1,4 +1,3 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 import { ActorArmorData } from "../template/ArmorModel";
 import { Attributes, AttributeField } from "../template/AttributesModel";
 import { ModifiableValue } from "../template/BaseModel";
@@ -8,6 +7,7 @@ import { DescriptionPartData } from "../template/DescriptionModel";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/LimitsModel";
 import { Movement } from "../template/MovementModel";
 import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/SkillsModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
     active: Skills(),
@@ -39,12 +39,9 @@ export const Initiative = () => ({
 });
 
 export const MagicData = () => ({
-    attribute: new StringField({
-        required: true,
-        initial: "magic",
-    }),
-    projecting: new BooleanField({ required: true, initial: false, }),
-    initiation: new NumberField({ required: true, initial: 0, }),
+    attribute: new StringField({ required: true, initial: "magic" }),
+    projecting: new BooleanField({ required: true, initial: false }),
+    initiation: new NumberField({ required: true, nullable: false, initial: 0, }),
 });
 
 export const DeviceAttribute = () => ({
@@ -67,11 +64,7 @@ export const MatrixAttributes = () => ({
 
 export const MatrixAttributeField = () => ({
     ...AttributeField(),
-    device_att: new StringField({
-        required: true,
-        initial: "att1",
-        choices: ["att1", "att2", "att3", "att4"],
-    }),
+    device_att: new StringField({ required: true, initial: "" }),
 });
 
 export const MatrixTrackActorData = () => ({

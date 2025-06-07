@@ -5,11 +5,12 @@ import {MeleeAttackData} from "./MeleeAttackTest";
 import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import { SR5Combat } from "../combat/SR5Combat";
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { FLAGS, SYSTEM_NAME } from "../constants";
 import { Translation } from '../utils/strings';
 import { ActiveDefenseRules } from "../rules/ActiveDefenseRules";
+import { DeepPartial } from "fvtt-types/utils";
+import { MinimalActionType } from "../types/item/ActionModel";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
@@ -45,11 +46,8 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
-        return {
-            'attribute': 'reaction',
-            'attribute2': 'intuition'
-        };
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { attribute: 'reaction', attribute2: 'intuition' };
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {

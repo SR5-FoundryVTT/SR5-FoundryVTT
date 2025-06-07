@@ -254,7 +254,7 @@ export class DocumentSituationModifiers {
     static async clearAllOn(document: ModifiableDocumentTypes) {
         if (document instanceof SR5Actor) {
             // Overwrite all selections with default values.
-            await document.update({'system.-=situation_modifiers': null}, {render: false});
+            await document.update({ system: {'-=situation_modifiers': null} }, {render: false});
             await document.update({ system: { situation_modifiers: DocumentSituationModifiers._defaultModifiers } });
         } else {
             await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);

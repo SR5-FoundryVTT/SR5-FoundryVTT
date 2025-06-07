@@ -107,7 +107,7 @@ export class TeamworkTest {
      */
     static async rollTeamworkTest(message: ChatMessage) {
         const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
-        const actor = game.actors?.get(message.speaker.actor) as SR5Actor;
+        const actor = game.actors?.get(message.speaker.actor!) as SR5Actor;
         
         actor?.rollTeamworkTest(teamworkData.skill, teamworkData)
     }

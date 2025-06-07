@@ -52,8 +52,8 @@ export const ModifiableValueLinked = () => ({
 
 export const ValueField = () => ({
     ...ModifiableValue(),
-    label: new StringField({ required: false, initial: '' }),
-    manualMod: new StringField({ required: false, initial: '' }),
+    label: new StringField({ required: true, initial: '' }),
+    manualMod: new StringField({ required: true, initial: '' }),
 });
 
 export const KeyValuePair = () => ({

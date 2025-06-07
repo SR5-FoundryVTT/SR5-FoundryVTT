@@ -102,4 +102,4 @@ export class Spell extends foundry.abstract.TypeDataModel<typeof SpellData, Item
     }
 }
 
-console.log("SpellPartData", SpellData, new Spell());
+console.log("SpellData", SpellData, new Spell());
