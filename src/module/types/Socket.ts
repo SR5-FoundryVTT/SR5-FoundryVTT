@@ -8,8 +8,8 @@ declare namespace Shadowrun {
 
     export interface SocketAddNetworkControllerMessageData extends SocketMessageData {
         data: {
-            controllerLink: string,
-            networkDeviceLink: string
+            controllerLink: `Actor.${string}` | `Item.${string}` | `Token.${string}`,
+            networkDeviceLink: `Actor.${string}` | `Item.${string}` | `Token.${string}`
         }
     }
 

@@ -3,14 +3,14 @@ import {DataDefaults} from "../data/DataDefaults";
 import {ComplexFormRules} from "../rules/ComplexFormRules";
 import {PartsList} from "../parts/PartsList";
 import {FadeRules} from "../rules/FadeRules";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DeepPartial } from "fvtt-types/utils";
 export interface ComplexFormTestData extends SuccessTestData {
-    level: number
-    fade: number
+    level: number;
+    fade: number;
 
-    fadeDamage: DamageData
+    fadeDamage: DamageType;
 }
 
 /**
@@ -24,7 +24,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         // Restore previous values or set defaults.
         data.level =  data.level || 0;
         data.fade = data.face || 0;
-        data.fadeDamage = data.fadeDamage || DataDefaults.damageData();
+        data.fadeDamage = data.fadeDamage || DataDefaults.createData('damage');
 
         return data;
     }
@@ -44,11 +44,8 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         return false;
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
-        return {
-            skill: 'software',
-            attribute: 'resonance'
-        };
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { skill: 'software', attribute: 'resonance' };
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
@@ -113,12 +110,13 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
     }
 
     calculateFadeDamage() {
-        if (!this.actor) return DataDefaults.valueData();
+        if (!this.actor) return DataDefaults.createData('value_field');
 
         const fade = Number(this.data.fade);
         const resonance = this.actor.getAttribute('resonance').value;
 
         this.data.fadeDamage = FadeRules.calcFadeDamage(fade, this.hits.value, resonance);
+        return;
     }
 
     override async processResults() {

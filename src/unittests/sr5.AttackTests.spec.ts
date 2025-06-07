@@ -6,12 +6,13 @@ import { SR5Actor } from '../module/actor/SR5Actor';
 import { SR5Item } from '../module/item/SR5Item';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { CombatRules } from '../module/rules/CombatRules';
-import DamageType = Shadowrun.DamageType;
-import DamageElement = Shadowrun.DamageElement;
-import DamageData = Shadowrun.DamageData;
+import { DamageType } from 'src/module/types/item/ActionModel';
+type DamageTypeType = Item.SystemOfType<'action'>['action']['damage']['type']['base'];
+type DamageElementType = Item.SystemOfType<'action'>['action']['damage']['element']['base'];
 
 export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     before(async () => {})
     after(async () => {})
@@ -194,7 +195,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                         hardened,
                         mod: null, // Without this, the system defaults to an empty array for mod and thinks this is an armor accessory, therefore not applying hardened armor rules
                     },
-                    technology: DataDefaults.technologyData({
+                    technology: DataDefaults.createData('technology', {
                         equipped: true,
                     })
                 }
@@ -204,27 +205,15 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
         }
 
         const getVehicleWithArmor = async (armorValue: number): Promise<SR5Actor> => {
-            const armor = DataDefaults.actorArmor({
-                value: armorValue,
-                base: armorValue,
-            });
-            return await testActor.create({
-                type: 'vehicle', system: {
-                    armor,
-                },
-            }) as SR5Actor;
+            const armor = DataDefaults.createData('armor', { value: armorValue, base: armorValue });
+            return new SR5Actor<'vehicle'>({ type: 'vehicle', system: { armor } });
         }
 
-        const getDamage = (damageValue: number, {
-            type = "physical",
-            ap = 0,
-            element,
-        }: {
-            type?: DamageType,
-            ap?: number,
-            element?: DamageElement
-        } = {}): DamageData => {
-            return DataDefaults.damageData({
+        const getDamage = (
+            damageValue: number,
+            { type = "physical", ap = 0, element }: { type?: DamageTypeType, ap?: number, element?: DamageElementType} = {}
+        ): DamageType => {
+            return DataDefaults.createData('damage', {
                 type: {
                     value: type,
                     base: type,

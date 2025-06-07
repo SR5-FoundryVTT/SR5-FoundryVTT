@@ -1,49 +1,43 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
-import BlastData = Shadowrun.BlastData;
-import WeaponItemData = Shadowrun.WeaponItemData;
 import { DataDefaults } from '../../../../data/DataDefaults';
+import { Weapon } from '../../schema/WeaponsSchema';
+import { BlastType } from 'src/module/types/item/WeaponModel';
 
 export class ThrownParser extends WeaponParserBase {
-    public GetBlast(jsonData: object, item: WeaponItemData): BlastData {
-        let blastData: BlastData = {
-            radius: 0,
-            dropoff: 0,
-        };
+    public GetBlast(system: Item.SystemOfType<'weapon'>, jsonData: Weapon): BlastType {
+        const blastData: BlastType = { radius: 0, dropoff: 0 };
 
-        let blastCode = ImportHelper.StringValue(jsonData, 'damage');
+        const blastCode = jsonData.damage._TEXT;
 
         let radiusMatch = blastCode.match(/([0-9]+m)/)?.[0];
-        if (radiusMatch !== undefined) {
+        if (radiusMatch) {
             radiusMatch = radiusMatch.match(/[0-9]+/)?.[0];
-            if (radiusMatch !== undefined) {
+            if (radiusMatch)
                 blastData.radius = parseInt(radiusMatch);
-            }
         }
 
         let dropoffMatch = blastCode.match(/(-[0-9]+\/m)/)?.[0];
-        if (dropoffMatch !== undefined) {
+        if (dropoffMatch) {
             dropoffMatch = dropoffMatch.match(/-[0-9]+/)?.[0];
-            if (dropoffMatch !== undefined) {
+            if (dropoffMatch)
                 blastData.dropoff = parseInt(dropoffMatch);
-            }
         }
 
-        if (blastData.dropoff && !blastData.radius) {
-            blastData.radius = -(item.system.action.damage.base / blastData.dropoff);
-        }
+        if (blastData.dropoff && !blastData.radius)
+            blastData.radius = -(system.action.damage.base / blastData.dropoff);
 
         return blastData;
     }
 
-    override Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
-        item = super.Parse(jsonData, item, jsonTranslation);
+    protected override getSystem(jsonData: Weapon): Item.SystemOfType<'weapon'> {
+        const system = super.getSystem(jsonData);
 
-        const rangeCategory = ImportHelper.StringValue(jsonData, jsonData.hasOwnProperty('range') ? 'range' : 'category');
-        item.system.thrown.ranges = DataDefaults.weaponRangeData(this.GetRangeDataFromImportedCategory(rangeCategory));
+        const rangeCategory = jsonData.range?._TEXT || jsonData.category._TEXT;
+        system.thrown.ranges = DataDefaults.createData('range', this.GetRangeDataFromImportedCategory(rangeCategory));
 
-        item.system.thrown.blast = this.GetBlast(jsonData, item);
+        system.thrown.blast = this.GetBlast(system, jsonData);
 
-        return item;
+        return system;
     }
 }

@@ -14,6 +14,7 @@ declare namespace Shadowrun {
         ArmorActorData,
         WoundsActorData,
         MovementActorData,
+        ImportFlags,
         NPCActorData {
             // FoundryVTT uuid of the summoning actors spirit.
             // If no summoner is set, uuid will be empty.

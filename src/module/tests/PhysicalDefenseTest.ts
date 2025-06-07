@@ -5,11 +5,12 @@ import {MeleeAttackData} from "./MeleeAttackTest";
 import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import { SR5Combat } from "../combat/SR5Combat";
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { FLAGS, SYSTEM_NAME } from "../constants";
 import { Translation } from '../utils/strings';
 import { ActiveDefenseRules } from "../rules/ActiveDefenseRules";
+import { DeepPartial } from "fvtt-types/utils";
+import { MinimalActionType } from "../types/item/ActionModel";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
@@ -45,11 +46,8 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
-        return {
-            'attribute': 'reaction',
-            'attribute2': 'intuition'
-        };
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { attribute: 'reaction', attribute2: 'intuition' };
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
@@ -84,7 +82,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
 
     prepareMeleeReach() {
         if (!this.against.item) return;
-        this.data.isMeleeAttack = this.against.item.isMeleeWeapon;
+        this.data.isMeleeAttack = this.against.item.isMeleeWeapon();
         if (!this.data.isMeleeAttack) return;
 
         if (!this.actor) return;
@@ -93,7 +91,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         // NOTE: ... this should be a choice of the player
         // TODO: This is a legacy selection approach as there wasn't a way to access to used item in the original attack test.
         //       Instead this might be replaced with a direct reference with this.against.item.system.defenseReach?
-        const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((weapon) => weapon.isMeleeWeapon);
+        const equippedMeleeWeapons = this.actor.getEquippedWeapons().filter((weapon) => weapon.isMeleeWeapon());
         equippedMeleeWeapons.forEach(weapon => {
             this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());
         });
@@ -145,7 +143,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
      */
     applyPoolRangedFireModModifier() {
         if (!this.against.item) return;
-        if (!this.against.item.isRangedWeapon) return;
+        if (!this.against.item.isRangedWeapon()) return;
 
         const fireMode = this.against.item.getLastFireMode();
 
@@ -229,12 +227,14 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         if (this.actor && this.data.iniMod && game.combat) {
             const combat: SR5Combat = game.combat as unknown as SR5Combat;
             const combatant = combat.getActorCombatant(this.actor);
-            if (!combatant || !combatant.initiative) return true;
-            
-            if (combatant && combatant.initiative + this.data.iniMod < 0) {
+            if (!combatant) return true;
+
+            if (combatant.initiative && combatant.initiative + this.data.iniMod < 0) {
                 ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
                 return false;
             }
+
+            return true;
         }
 
         return super.canConsumeDocumentResources();

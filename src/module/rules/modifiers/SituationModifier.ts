@@ -45,15 +45,13 @@ export type ModifierTypes = Partial<keyof typeof SR5['modifierTypes']>;
  * all types for a document.
  */
 export class SituationModifier {
-    type: Shadowrun.SituationModifierType;
+    type: Shadowrun.SituationModifierType | undefined;
     // A reference to the modifiers this handler is used within.
     modifiers?: DocumentSituationModifiers
     // The original source modifier data. This shouldn't be altered.
     source: SourceModifierData
     // The applied modifier data, originating from the original source data.
-    applied: Modifier
-
-    globalActivesApplied: boolean;
+    applied: Modifier = { active: {}, total: 0 };
 
     // The effects flow for this modifier.
     effects: SituationModifierEffectsFlow<this>;
@@ -124,7 +122,6 @@ export class SituationModifier {
      * Determine if the source data has an active modifier set for this situational modifier.
      */
     get hasActive(): boolean {
-        //@ts-expect-error TODO: foundry-vtt-types v10
         return !foundry.utils.isEmpty(this.source.active);
     }
 
@@ -277,7 +274,8 @@ export class SituationModifier {
      * @param sources The sources list, as used within #apply
      */
     _addSceneSourceDataFromActor(actor: SR5Actor, sources: SourceModifierData[]) {
-        const scene = actor.getToken()?.parent;
+        const token = actor.getToken();
+        const scene = token?.scene;
 
         if (!scene) return;
         const sceneSource = this._getDocumentsSourceData(scene);

@@ -19,7 +19,7 @@ export const getArray = (value) => {
  *  @param chummerEntry The chummer entry (the item)
  */
 export const parseDescription = (chummerEntry) => {
-    const parsedDescription = DataDefaults.descriptionData();
+    const parsedDescription = DataDefaults.createData('description');
 
     if (chummerEntry.source && chummerEntry.page) {
         parsedDescription.source = `${chummerEntry.source} ${chummerEntry.page}`
@@ -41,7 +41,7 @@ export const parseDescription = (chummerEntry) => {
  *  @param chummerEntry The chummer entry (the item)
  */
 export const parseTechnology = (chummerEntry) => {
-    const parsedTechnology = DataDefaults.technologyData();
+    const parsedTechnology = DataDefaults.createData('technology');
 
     if (chummerEntry.rating) {
         parsedTechnology.rating = chummerEntry.rating;

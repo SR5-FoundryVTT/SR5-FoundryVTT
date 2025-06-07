@@ -1,5 +1,6 @@
 import { DataDefaults } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
+import { DamageType } from "../types/item/ActionModel";
 
 /**
  * Rules around Compiling Sprites in SR5.
@@ -22,7 +23,7 @@ export const CompilationRules = {
      * @param resonance Resonance attribute value.
      * @returns damage type
      */
-    calcFadeDamageType: (level: number, resonance: number): Shadowrun.DamageType => {
+    calcFadeDamageType: (level: number, resonance: number): DamageType['type']['value'] => {
         if (level < 0) level = 0;
         if (resonance < 0) resonance = 1;
 
@@ -35,11 +36,11 @@ export const CompilationRules = {
      * @param resonance Resonance attribute value.
      * @returns Configured fade damage
      */
-    calcFadeDamage: (spriteHits: number, level: number, resonance: number): Shadowrun.DamageData => {
+    calcFadeDamage: (spriteHits: number, level: number, resonance: number): DamageType => {
         if (spriteHits < 1) spriteHits = 0;
         if (resonance < 0) resonance = 1;
 
-        const damage = DataDefaults.damageData();
+        const damage = DataDefaults.createData('damage');
         damage.base = CompilationRules.compilationFadeValue(spriteHits);
         damage.type.base = damage.type.value = CompilationRules.calcFadeDamageType(level, resonance);
 

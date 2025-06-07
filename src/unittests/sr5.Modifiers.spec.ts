@@ -1,5 +1,3 @@
-import { BackgroundCountModifier } from './../module/rules/modifiers/BackgroundCountModifier';
-import { NoiseModifier } from './../module/rules/modifiers/NoiseModifier';
 import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
 
 import {DocumentSituationModifiers} from "../module/rules/DocumentSituationModifiers";
@@ -10,7 +8,8 @@ import { SR5Actor } from '../module/actor/SR5Actor';
 import { SR5Item } from '../module/item/SR5Item';
 
 export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     let testActor;
     let testItem;

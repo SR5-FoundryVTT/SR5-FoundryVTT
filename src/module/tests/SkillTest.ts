@@ -47,7 +47,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
     override _prepareData(data: any, options: TestOptions) {
         data = super._prepareData(data, options);
 
-        data.action = data.action || DataDefaults.actionRollData();
+        data.action = data.action || DataDefaults.createData('action_roll');
 
         // Preselect based on action.
         data.attribute = data.action.attribute;

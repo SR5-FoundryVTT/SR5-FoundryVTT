@@ -1,10 +1,9 @@
-import CharacterActorData = Shadowrun.CharacterData;
 import {METATYPEMODIFIER, SR} from "../../../constants";
 import {PartsList} from "../../../parts/PartsList";
 import {AttributesPrep} from "./AttributesPrep";
 
 export class NPCPrep {
-    static prepareNPCData(system: CharacterActorData) {
+    static prepareNPCData(system: Actor.SystemOfType<'character'>) {
         // Apply to NPC and none NPC to remove lingering modifiers after actor has been removed it's npc status.
         NPCPrep.applyMetatypeModifiers(system);
     }
@@ -13,7 +12,7 @@ export class NPCPrep {
      * Apply modifiers that result from an NPCs metatype.
      * This method also should still run on any none NPC to remove eventually lingering NPC metatype modifiers.
      */
-    static applyMetatypeModifiers(system: CharacterActorData) {
+    static applyMetatypeModifiers(system: Actor.SystemOfType<'character'>) {
         // Extract needed data.
         const {attributes, metatype} = system;
         // Fallback to empty object if no metatype modifiers exist.

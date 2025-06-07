@@ -19,7 +19,7 @@ export class RecoilModifier extends SituationModifier  {
     override _calcActiveTotal(options: SituationalModifierApplyOptions): number {
         if (!this.modifiers || !this.modifiers.documentIsActor) return 0;
 
-        if (!options.test || options.test.type !== 'RangedAttackTest') return (this.modifiers.document as SR5Actor)?.recoil ?? 0;
+        if (!options.test || options.test.type !== 'RangedAttackTest') return (this.modifiers.document as SR5Actor)?.recoil() ?? 0;
 
         // A recoil modifier in test context.
         const rangedAttack = options.test as RangedAttackTest;
@@ -31,6 +31,6 @@ export class RecoilModifier extends SituationModifier  {
             return 0;
         }
 
-        return FireModeRules.recoilModifierAfterAttack(fireMode, testItem.totalRecoilCompensation, testActor.recoil, testItem.ammoLeft);
+        return FireModeRules.recoilModifierAfterAttack(fireMode, testItem.totalRecoilCompensation, testActor.recoil(), testItem.ammoLeft);
     }
 }

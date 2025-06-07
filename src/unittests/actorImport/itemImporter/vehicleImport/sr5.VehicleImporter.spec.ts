@@ -26,13 +26,13 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Vehicle Parser', () => {
         it('parses vehicles', async () => {
-            const actor = await testActor.create({ type: 'character' });
+            const actor = new SR5Actor<'vehicle'>({ type: 'character' });
 
             const parsedVehicles = await vehicleParser.parseVehicles(
                 actor,
                 { vehicles: { vehicle: [chummerDrone, chummerVehicle] } },
                 { vehicles: true },
-            );
+            ) as SR5Actor<'vehicle'>[];
 
             if (!parsedVehicles) {
                 assert.fail('Vehicle Parser failed to create vehicles!');
@@ -43,13 +43,17 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
             // Prepare derived data, used to populate system.vehicle_stats.seats.hidden
             parsedVehicles.forEach((vehicle) => vehicle.prepareDerivedData());
 
-            const drone = parsedVehicles[0].asVehicle()!;
-            const vehicle = parsedVehicles[1].asVehicle()!;
+            const drone = parsedVehicles[0];
+            const vehicle = parsedVehicles[1];
 
             assert.deepEqual(drone.system.vehicle_stats.seats.value, 0);
             assert.deepEqual(drone.system.vehicle_stats.seats.hidden, true);
             assert.deepEqual(vehicle.system.vehicle_stats.seats.value, 3);
             assert.deepEqual(vehicle.system.vehicle_stats.seats.hidden, false);
+
+            await actor.delete();
+            await drone.delete();
+            await vehicle.delete();
         });
     });
 };

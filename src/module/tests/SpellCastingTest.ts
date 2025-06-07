@@ -3,9 +3,9 @@ import {SpellcastingRules} from "../rules/SpellcastingRules";
 import {PartsList} from "../parts/PartsList";
 import {DataDefaults} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DeepPartial } from "fvtt-types/utils";
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -13,7 +13,7 @@ export interface SpellCastingTestData extends SuccessTestData {
     drain: number
     reckless: boolean
 
-    drainDamage: DamageData
+    drainDamage: DamageType
 }
 
 
@@ -29,7 +29,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         data.force = data.force || 0;
         data.drain = data.drain || 0;
         data.reckless = data.reckless || false;
-        data.drainDamage = data.drainDamage || DataDefaults.damageData();
+        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
 
         return data;
     }
@@ -49,7 +49,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         return false;
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
         return {
             skill: 'spellcasting',
             attribute: 'magic'
@@ -60,7 +60,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      * Spellcasting test category directly depends on the spell cast.
      */
     override get testCategories(): Shadowrun.ActionCategories[] {
-        const spell = this.item?.asSpell;
+        const spell = this.item?.asType('spell');
         if (!spell) return [];
 
         switch (spell.system.category) {
@@ -129,13 +129,14 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      * Derive the actual drain damage from spellcasting values.
      */
     calcDrainDamage() {
-        if (!this.actor) return DataDefaults.damageData();
+        if (!this.actor) return DataDefaults.createData('damage');
 
         const force = Number(this.data.force);
         const drain = Number(this.data.drain);
         const magic = this.actor.getAttribute('magic').value;
 
         this.data.drainDamage = DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
+        return;
     }
 
     override async processResults() {

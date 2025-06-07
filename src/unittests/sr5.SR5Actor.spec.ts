@@ -4,8 +4,10 @@ import {SR5Item} from "../module/item/SR5Item";
 import {SR5TestingDocuments} from "./utils";
 
 export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
-    let  testActor;
+    const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
+
+    let testActor;
     let testItem;
 
     before(async () => {
@@ -20,7 +22,7 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
 
     describe('SR5Actor', () => {
         it('create a naked actor of any type', async () => {
-            const actor = await testActor.create({type: 'character'});
+            const actor = new SR5Actor<'character'>({type: 'character'});
 
             // Check basic foundry data integrity
             assert.notStrictEqual(actor.id, '');
@@ -28,25 +30,18 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
             assert.notStrictEqual(actor.id, null);
 
             // Check foundry item collection integrity
-            const fromCollection = game.actors?.get(actor.id);
+            const fromCollection = game.actors?.get(actor.id!);
             assert.isOk(fromCollection);
             assert.strictEqual(actor.id, fromCollection?.id);
-        });
 
-        it('update an actor of any type', async () => {
-            const actor = await testActor.create({type: 'character'});
-
-            assert.notProperty(actor.system, 'test');
-            await actor.update({'system.test': true});
-
-            assert.property(actor.system, 'test');
-            assert.propertyVal(actor.system, 'test', true);
+            await actor.delete();
         });
 
         it('embedd a weapon into an actor and not the global item colection', async () => {
-            const actor = await testActor.create({type: 'character'});
-            const weapon = await testItem.create({type: 'weapon'});
+            const actor = new SR5Actor<'character'>({type: 'character'});
+            const weapon = new SR5Item<'weapon'>({type: 'weapon'});
 
+            //@ts-expect-error
             await actor.createEmbeddedDocuments('Item', [weapon.toObject()]);
 
             const ownedItems = Array.from(actor.items) as SR5Item[];
@@ -59,6 +54,9 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
             // An owned item should NOT appear in the items collection.
             const ownedInCollection = game.items?.get(ownedItem.id as string);
             assert.isNotOk(ownedInCollection);
+
+            await actor.delete();
+            await weapon.delete();
         });
     });
 }

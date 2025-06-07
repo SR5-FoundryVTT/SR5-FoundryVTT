@@ -71,6 +71,38 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 
+import { Character } from './types/actor/CharacterModel';
+import { Critter } from './types/actor/CritterModel';
+import { IC } from './types/actor/ICModel';
+import { Spirit } from './types/actor/SpiritModel';
+import { Sprite } from './types/actor/SpriteModel';
+import { Vehicle } from './types/actor/VehicleModel';
+
+import { Action } from './types/item/ActionModel';
+import { AdeptPower } from './types/item/AdeptPowerModel';
+import { Ammo } from './types/item/AmmoModel';
+import { Armor } from './types/item/ArmorModel';
+import { Bioware } from './types/item/BiowareModel';
+import { CallInAction } from './types/item/CallInActionModel';
+import { ComplexForm } from './types/item/ComplexFormModel';
+import { Contact } from './types/item/ContactModel';
+import { CritterPower } from './types/item/CritterPowerModel';
+import { Cyberware } from './types/item/CyberwareModel';
+import { Device } from './types/item/DeviceModel';
+import { Echo } from './types/item/EchoModel';
+import { Equipment } from './types/item/EquipmentModel';
+import { Host } from './types/item/HostModel';
+import { Lifestyle } from './types/item/LifeStyleModel';
+import { Metamagic } from './types/item/MetamagicModel';
+import { Modification } from './types/item/ModificationModel';
+import { Program } from './types/item/ProgramModel';
+import { Quality } from './types/item/QualityModel';
+import { Ritual } from './types/item/RitualModel';
+import { Sin } from './types/item/SinModel';
+import { Spell } from './types/item/SpellModel';
+import { SpritePower } from './types/item/SpritePowerModel';
+import { Weapon } from './types/item/WeaponModel';
+
 
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
@@ -89,8 +121,7 @@ export class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
-        Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory);
-        Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
+        Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory);
         // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
@@ -118,6 +149,7 @@ ___________________
 `);
         // Create a shadowrun5e namespace within the game global
         game['shadowrun5e'] = {
+            canvas: {},
             /**
              * System level Document implementations.
              */
@@ -256,7 +288,6 @@ ___________________
         CONFIG.Combat.documentClass = SR5Combat;
         CONFIG.ChatMessage.documentClass = SR5ChatMessage;
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
-        //@ts-expect-error TODO: foundry-vtt-types v11
         // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
         // Setting to true, will duplicate item effects on actors. Only effects on actors will be traversed.
         CONFIG.ActiveEffect.legacyTransferral = false;
@@ -271,19 +302,50 @@ ___________________
         // Register general SR5Roll for JSON serialization support.
         CONFIG.Dice.rolls.push(SR5Roll);
         // @ts-expect-error // Register the SR5Roll dnd5e style.
-        CONFIG.Dice.SR5oll = SR5Roll;
+        CONFIG.Roll = SR5Roll;
 
         // Add Shadowrun configuration onto general Foundry config for module access.
         // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
+        CONFIG.Item.dataModels["action"] = Action;
+        CONFIG.Item.dataModels["ammo"] = Ammo;
+        CONFIG.Item.dataModels["armor"] = Armor;
+        CONFIG.Item.dataModels["adept_power"] = AdeptPower;
+        CONFIG.Item.dataModels["bioware"] = Bioware;
+        CONFIG.Item.dataModels["call_in_action"] = CallInAction;
+        CONFIG.Item.dataModels["complex_form"] = ComplexForm;
+        CONFIG.Item.dataModels["contact"] = Contact;
+        CONFIG.Item.dataModels["critter_power"] = CritterPower;
+        CONFIG.Item.dataModels["cyberware"] = Cyberware;
+        CONFIG.Item.dataModels["device"] = Device;
+        CONFIG.Item.dataModels["echo"] = Echo;
+        CONFIG.Item.dataModels["equipment"] = Equipment;
+        CONFIG.Item.dataModels["host"] = Host;
+        CONFIG.Item.dataModels["lifestyle"] = Lifestyle;
+        CONFIG.Item.dataModels["metamagic"] = Metamagic;
+        CONFIG.Item.dataModels["modification"] = Modification;
+        CONFIG.Item.dataModels["program"] = Program;
+        CONFIG.Item.dataModels["quality"] = Quality;
+        CONFIG.Item.dataModels["ritual"] = Ritual;
+        CONFIG.Item.dataModels["sin"] = Sin;
+        CONFIG.Item.dataModels["spell"] = Spell;
+        CONFIG.Item.dataModels["sprite_power"] = SpritePower;
+        CONFIG.Item.dataModels["weapon"] = Weapon;
+    
+        CONFIG.Actor.dataModels["character"] = Character;
+        CONFIG.Actor.dataModels["critter"] = Critter;
+        CONFIG.Actor.dataModels["ic"] = IC;
+        CONFIG.Actor.dataModels["spirit"] = Spirit;
+        CONFIG.Actor.dataModels["sprite"] = Sprite;
+        CONFIG.Actor.dataModels["vehicle"] = Vehicle;
 
         registerSystemSettings();
         registerSystemKeybindings();
 
         // Register sheets for collection documents.
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
-        Actors.unregisterSheet('core', ActorSheet);
+        Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet, {});
         Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
@@ -311,7 +373,7 @@ ___________________
         });
 
 
-        Items.unregisterSheet('core', ItemSheet);
+        Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet, {});
         Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {
             label: "SR5.SheetItem",
             makeDefault: true
@@ -379,7 +441,7 @@ ___________________
      * @param slot
      * @return false when callback has been handled, otherwise let Foundry default handling kick in
      */
-    static hotbarDrop(bar, dropData, slot) {
+    static hotbarDrop(bar, dropData, slot): boolean {
         switch (dropData.type) {
             case 'Item':
                 createItemMacro(dropData, slot);
@@ -388,6 +450,7 @@ ___________________
                 createSkillMacro(dropData.data, slot);
                 return false;
         }
+        return true;
     }
 
     static getSceneControlButtons(controls) {
@@ -418,49 +481,21 @@ ___________________
     }
 
     /**
-     * Extend rendering of Sidebar tab 'ActorDirectory' by
-     * - the Chummer Actor Import button
-     * @param app Foundry ActorDirectory app instance
-     * @param html HTML element of the app
-     */
-    static renderActorDirectory(app: Application, html: HTMLElement) {
-        if(!game.user?.isGM) {
-            return 
-        }
-
-        // Already exists, no need to add again.
-        const existing = $(html).find('#chummer-actor-import');
-        if (existing.length > 0) {
-            return;
-        }
-        
-        const button = $('<button id="chummer-actor-import" class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('footer').append(button);
-        button.on('click', (event) => {
-            new Import().render(true);
-        });
-    }
-
-    /**
-     * Extend rendering of Sidebar tab 'ItemDirectory' by
-     * - the Chummer Item Import button
+     * Extend rendering of Sidebar tab 'CompendiumDirectory' by
+     * - the Chummer Compendium Import button
      * 
-     * @param app Foundry ItemDirectory app instance
+     * @param app Foundry CompendiumDirectory app instance
      * @param html HTML element of the app
+     * @returns 
      */
-    static renderItemDirectory(app: Application, html: HTMLElement) {
-        if(!game.user?.isGM){
-            return 
-        }
-
-        // Already exists, no need to add again.
-        const existing = $(html).find('#chummer-item-import');
-        if (existing.length > 0) {
+    static renderCompendiumDirectory(app: Application, html: HTMLElement) {
+        if (!game.user?.isGM) {
             return;
         }
-        
-        const button = $('<button id="chummer-item-import" class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('footer').append(button);
+
+        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
+        $(html).find('.directory-footer').append(button);
+
         button.on('click', (event) => {
             new Import().render(true);
         });
@@ -475,18 +510,20 @@ ___________________
     static async updateIcConnectedToHostItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
         if (!canvas.ready || !game.actors) return;
 
-        if (item.isHost) {
+        if (item.isType('host')) {
             // Collect actors from sidebar and active scene to update / rerender
-            let connectedIC = [
+            const connectedIC = [
                 // All sidebar actors should also include tokens with linked actors.
-                ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
+                ...(game.actors as SR5Actor[]).filter(actor => actor.hasHost()),
                 // All token actors that aren't linked.
-                // @ts-expect-error // TODO: foundry-vtt-types v10
-                ...canvas.scene.tokens.filter(token => !token.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
+                ...canvas.scene!.tokens.filter(token => {
+                    const actor = token.actor;
+                    return !token.actorLink && actor?.hasHost();
+                }).map(t => t.actor)
             ];
 
             // Update host data on the ic actor.
-            const host = item.asHost;
+            const host = item.asType('host');
             if (!host) return;
             for (const ic of connectedIC) {
                 if (!ic) continue;
@@ -495,7 +532,7 @@ ___________________
         }
     }
 
-    static async removeDeletedItemsFromNetworks(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
+    static async removeDeletedItemsFromNetworks(item: SR5Item, data: SR5Item['system'], id: string) {
         await NetworkDeviceFlow.handleOnDeleteItem(item, data, id);
     }
 

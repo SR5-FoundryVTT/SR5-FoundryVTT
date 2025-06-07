@@ -1,11 +1,8 @@
-import MatrixActorData = Shadowrun.MatrixActorData;
 import { Helpers } from '../../../helpers';
 import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { PartsList } from '../../../parts/PartsList';
-import {SR5} from "../../../config";
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
-import CommonData = Shadowrun.CommonData;
-import {AttributesPrep} from "./AttributesPrep";
+import { SR5 } from "../../../config";
+import { AttributesPrep } from "./AttributesPrep";
 
 export class MatrixPrep {
     /**
@@ -13,7 +10,7 @@ export class MatrixPrep {
      * - if an item is equipped, it will use that data
      * - if it isn't and player is technomancer, it will use that data
      */
-    static prepareMatrix(system: ActorTypesData & MatrixActorData, items: SR5ItemDataWrapper[]) {
+    static prepareMatrix(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5ItemDataWrapper[]) {
         const { matrix, attributes, modifiers } = system;
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
@@ -41,7 +38,7 @@ export class MatrixPrep {
 
             const conditionMonitor = device.getConditionMonitor();
 
-            matrix.condition_monitor.max = conditionMonitor.max + Number(modifiers.matrix_track);
+            matrix.condition_monitor.max = conditionMonitor.max + modifiers.matrix_track;
             matrix.condition_monitor.value = conditionMonitor.value;
             matrix.rating = device.getRating();
             matrix.is_cyberdeck = device.isCyberdeck();
@@ -77,7 +74,7 @@ export class MatrixPrep {
      * Add Matrix Attributes to Limits and Attributes
      * @param system
      */
-    static prepareMatrixToLimitsAndAttributes(system: CommonData & MatrixActorData) {
+    static prepareMatrixToLimitsAndAttributes(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'sprite' | 'vehicle'>) {
         const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries
@@ -114,20 +111,7 @@ export class MatrixPrep {
         });
     }
 
-    static prepareMentalAttributesForDevice(system: CommonData & MatrixActorData, rating?: number) {
-        const { matrix, attributes } = system;
-        rating = rating ?? matrix.rating;
-        const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];
-
-        mentalAttributes.forEach((attLabel) => {
-            if (attributes[attLabel] !== undefined) {
-                attributes[attLabel].base = rating ?? 0; // TypeScript got confused otherwise...
-                Helpers.calcTotal(attributes[attLabel]);
-            }
-        });
-    }
-
-    static prepareMatrixAttributesForDevice(system: CommonData & MatrixActorData, rating?: number) {
+    static prepareMatrixAttributesForDevice(system: Actor.SystemOfType<'vehicle'>, rating?: number) {
         const { matrix } = system;
         rating = rating ?? matrix.rating;
         const matrixAttributes = ['firewall', 'data_processing'];
@@ -139,12 +123,4 @@ export class MatrixPrep {
         });
     }
 
-    /**
-     * Prepare the mental attributes for a sheet that just has a device rating
-     * @param system
-     */
-    static prepareAttributesForDevice(system: CommonData & MatrixActorData, rating: number = 0) {
-        MatrixPrep.prepareMentalAttributesForDevice(system, rating);
-        MatrixPrep.prepareMatrixAttributesForDevice(system, rating);
-    }
 }

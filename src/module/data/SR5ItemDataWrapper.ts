@@ -1,7 +1,6 @@
 import { DataWrapper } from './DataWrapper';
 import ConditionData = Shadowrun.ConditionData;
 import ModList = Shadowrun.ModList;
-import ActionRollData = Shadowrun.ActionRollData;
 import SpellData = Shadowrun.SpellData;
 import TechnologyData = Shadowrun.TechnologyData;
 import CritterPowerRange = Shadowrun.CritterPowerRange;
@@ -14,9 +13,6 @@ import ActionResultData = Shadowrun.ActionResultData;
 import AmmunitionData = Shadowrun.AmmunitionData;
 import WeaponData = Shadowrun.WeaponData;
 import DeviceData = Shadowrun.DeviceData;
-import AmmoData = Shadowrun.AmmoData;
-import SpritePowerData = Shadowrun.SpritePowerData;
-import CritterPowerData = Shadowrun.CritterPowerData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
@@ -24,10 +20,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
     getData(): ShadowrunItemDataData {
         return this.data.system as ShadowrunItemDataData;
-    }
-
-    isAreaOfEffect(): boolean {
-        return this.isGrenade() || this.isAoESpell() || this.isAoEAmmo();
     }
 
     /** Should only be used to check for actual armor item type.
@@ -57,10 +49,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getArmorValue() > 0;
     }
 
-    isGrenade(): boolean {
-        return this.isThrownWeapon() && (this.getData().thrown?.blast.radius ?? 0) > 0;
-    }
-
     isThrownWeapon(): boolean {
         if (!this.isWeapon()) return false;
         const weaponData = this.getData() as WeaponData;
@@ -75,18 +63,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data.type === 'modification';
     }
 
-    isWeaponModification(): boolean {
-        if (!this.isModification()) return false;
-        const modification = this.data as ModificationItemData;
-        return modification.system.type === 'weapon';
-    }
-
-    isArmorModification(): boolean {
-        if (!this.isModification()) return false;
-        const modification = this.data as ModificationItemData;
-        return modification.system.type === 'armor';
-    }
-
     isVehicleModification(): boolean {
         if (!this.isModification()) return false;
         const modification = this.data as ModificationItemData;
@@ -98,25 +74,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         const modification = this.data as ModificationItemData;
         return modification.system.type === 'drone';
     }
-
-    isProgram(): boolean {
-        return this.data.type === 'program';
-    }
-
-    isQuality(): boolean {
-        return this.data.type === 'quality';
-    }
-
-    isAmmo(): boolean {
-        return this.data.type === 'ammo';
-    }
-
-    isAoEAmmo(): boolean {
-        if (!this.isAmmo()) return false;
-        const ammoData = this.getData() as AmmoData;
-        return (ammoData.blast.radius ?? 0) > 0;
-    }
-
     isCyberware(): boolean {
         return this.data.type === 'cyberware';
     }
@@ -244,14 +201,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.isAction() && this.getData().result.success.matrix.placeMarks;
     }
 
-    isSin(): boolean {
-        return this.data.type === 'sin';
-    }
-
-    isLifestyle(): boolean {
-        return this.data.type === 'lifestyle';
-    }
-
     getId(): string {
         // @ts-expect-error // TODO: Foundry Where is my foundry base data?
         return this.data._id;
@@ -305,7 +254,8 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
      * @returns A decimal as essence modifier
      */
     getEssenceLoss(): number {
-        const loss = Number(this.getData()?.essence) ?? 0;
+        const lossRaw = Number(this.getData()?.technology?.calculated.essence.adjusted ? this.getData()?.technology?.calculated.essence.value : this.getData()?.essence);
+        const loss = isNaN(lossRaw) ? 0 : lossRaw;
         const quantity = Number(this.getData()?.technology?.quantity) ?? 1;
 
         return loss * quantity
@@ -358,10 +308,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
     isAction(): boolean {
         return this.data.type === 'action';
-    }
-
-    getAction(): ActionRollData|undefined {
-        return this.getData().action;
     }
 
     getActionDicePoolMod(): number | undefined {
@@ -435,6 +381,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getTechnology(): TechnologyData|undefined {
         if ("technology" in this.data.system)
             return this.data.system.technology;
+        return;
     }
 
     getRange(): CritterPowerRange|SpellRange|RangeWeaponData|undefined {
@@ -448,6 +395,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
         if (this.data.type === 'weapon')
             return this.data.system.range as RangeWeaponData;
+        return;
     }
 
     getModificationCategory(): string {

@@ -1,7 +1,7 @@
-import SkillField = Shadowrun.SkillField;
 import {PartsList} from "../parts/PartsList";
 import {SR5} from "../config";
 import {SR} from "../constants";
+import { SkillFieldType } from "../types/template/SkillsModel";
 
 export class SkillRules {
 
@@ -14,7 +14,7 @@ export class SkillRules {
      * @param skill Any legacy or custom skill
      * @returns true, if a roll for the given skill must default.
      */
-    static mustDefaultToRoll(skill: SkillField): boolean {
+    static mustDefaultToRoll(skill: SkillFieldType): boolean {
         return skill.value === 0;
     }
     /**
@@ -23,7 +23,7 @@ export class SkillRules {
      * @param skill Check for this skills ability to be defaulted.
      * @return true will allow for a SuccessTest / role to proceed.
      */
-    static allowDefaultingRoll(skill: SkillField): boolean {
+    static allowDefaultingRoll(skill: SkillFieldType): boolean {
         // Check for skill defaulting at the base, since modifiers or bonus can cause a positive pool, while
         // still defaulting.
         return skill.canDefault;
@@ -35,7 +35,7 @@ export class SkillRules {
      * @param skill Check for this skills ability to be rolled.
      * @return true will allow for a SuccessTest / role to proceed.
      */
-    static allowRoll(skill: SkillField): boolean {
+    static allowRoll(skill: SkillFieldType): boolean {
         return !SkillRules.mustDefaultToRoll(skill) || SkillRules.allowDefaultingRoll(skill);
     }
 
@@ -53,7 +53,7 @@ export class SkillRules {
      * @param options
      * @param options.specialization If true will add the default specialization bonus onto the level.
      */
-    static level(skill: SkillField, options = {specialization: false}): number {
+    static level(skill: SkillFieldType, options = {specialization: false}): number {
         if (this.mustDefaultToRoll(skill)) {
             return SkillRules.defaultingModifier;
         }

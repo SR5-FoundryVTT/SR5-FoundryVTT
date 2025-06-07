@@ -13,16 +13,15 @@ import { ChummerImportForm } from '../../apps/chummer-import-form';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
-import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
-import SpellCategory = Shadowrun.SpellCateogry;
-import SpellData = Shadowrun.SpellData;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
+import { InventoryType } from 'src/module/types/actor/CommonModel';
+import { SkillsType } from 'src/module/types/template/SkillsModel';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -112,7 +111,7 @@ export interface SR5BaseSheetDelays {
  * This class should not be used directly but be extended for each actor type.
  *
  */
-export class SR5BaseActorSheet extends ActorSheet {
+export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     // What document description is shown on sheet. Allow displaying multiple descriptions at the same time.
     _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.
@@ -125,15 +124,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         skills: null
     }
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
-    _scroll: string;
+    _scroll!: string;
     _inventoryOpenClose: Record<string, boolean> = {};
 
     // Store the currently selected inventory.
     selectedInventory: string;
 
-    constructor(...args) {
-        // @ts-expect-error // Since we don't need any actual data, don't define args to avoid breaking changes.
-        super(...args);
+    constructor(object: SR5Actor, options?: Partial<ActorSheet.Options> | undefined) {
+        super(object, options);
 
         // Preselect default inventory.
         this.selectedInventory = this.actor.defaultInventory.name;
@@ -218,13 +216,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
         let data = super.getData() as any;
-        const actorData = this.actor.toObject(false);
+        const actorData = (this.actor as SR5Actor).toObject(false);
 
         data = {
             ...data,
-            // @ts-expect-error TODO: foundry-vtt-types v10
             data: actorData.system,
-            // @ts-expect-error TODO: foundry-vtt-types v10
             system: actorData.system
         }
 
@@ -253,13 +249,14 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.contentVisibility = this._prepareContentVisibility(data);
 
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
-            // secrets: this.actor.isOwner,
-            // rollData: this.actor.getRollData.bind(this.actor),
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            relativeTo: this.actor
-        });
+        //@ts-expect-error
+        if ('description' in actorData.system)
+            //@ts-expect-error
+            data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
+                // secrets: this.actor.isOwner,
+                // rollData: this.actor.getRollData.bind(this.actor),
+                relativeTo: this.actor
+            });
 
         data.bindings = this._prepareKeybindings();
 
@@ -492,8 +489,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
-    // @ts-expect-error
-    async _onDrop(event: DragEvent) {
+    override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -519,10 +515,10 @@ export class SR5BaseActorSheet extends ActorSheet {
                 const actor = await fromUuid(data.uuid) as SR5Actor;
                 const itemData = {
                     name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
-                    type: 'contact',
-                    'system.linkedActor': actor.uuid
+                    type: 'contact' as Item.SubType,
+                    system: {linkedActor: actor.uuid }
                 };
-                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
+                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
             }
         }
         // Keep upstream document created for actions base on it.
@@ -542,7 +538,6 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Enhance Foundry state restore on rerender by more user interaction state.
-     * @override
      */
     override async _render(...args) {
         const focus = this._saveInputCursorPosition();
@@ -649,12 +644,12 @@ export class SR5BaseActorSheet extends ActorSheet {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type: type,
         };
-        const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
+        const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
         if (!items) return;
 
         // Add the item to the selected inventory.
         if (this.selectedInventory !== this.actor.defaultInventory.name)
-            await this.actor.inventory.addItems(this.selectedInventory, items);
+            await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
     }
 
     async _onItemEdit(event) {
@@ -888,7 +883,6 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
-        //@ts-expect-error Since we're field checking, we can ignore typing...
         const { matrix } = sheetData.system;
         if (matrix) {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
@@ -899,7 +893,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 }
             };
 
-            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
+            (['firewall', 'data_processing', 'sleaze', 'attack'] as MatrixAttribute[]).forEach(att => cleanupAttribute(att));
         }
     }
 
@@ -933,7 +927,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._addInventoryTypes(inventoriesSheet[this.actor.defaultInventory.name]);
 
         Object.values(this.actor.system.inventories).forEach(inventory => {
-            const { name, label, itemIds } = inventory
+            const { name, label, itemIds } = inventory;
 
             // Avoid re-adding default inventories.
             if (!inventoriesSheet.hasOwnProperty(name)) {
@@ -1087,7 +1081,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
-        // @ts-expect-error
+        //@ts-expect-error
         sheetItem.properties = chatData.properties;
 
         return sheetItem as unknown as SheetItemData;
@@ -1149,10 +1143,10 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param sheetData An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
     _prepareActorTypeFields(sheetData: SR5ActorSheetData) {
-        sheetData.isCharacter = this.actor.isCharacter();
-        sheetData.isSpirit = this.actor.isSpirit();
-        sheetData.isCritter = this.actor.isCritter();
-        sheetData.isVehicle = this.actor.isVehicle();
+        sheetData.isCharacter = this.actor.isType('character');
+        sheetData.isSpirit = this.actor.isType('spirit');
+        sheetData.isCritter = this.actor.isType('critter');
+        sheetData.isVehicle = this.actor.isType('vehicle');
         sheetData.hasSkills = this.actor.hasSkills;
         sheetData.canAlterSpecial = this.actor.canAlterSpecial;
         sheetData.hasFullDefense = this.actor.hasFullDefense;
@@ -1161,8 +1155,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1180,8 +1175,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1198,8 +1194,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksDelete(event) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1214,8 +1211,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksClearAll(event) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const userConsented = await Helpers.confirmDeletion();
@@ -1233,7 +1231,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._filterActiveSkills(sheetData);
     }
 
-    _filterSkills(data: SR5ActorSheetData, skills: Skills = {}) {
+    _filterSkills(data: SR5ActorSheetData, skills: SkillsType = {}) : SkillsType {
         const filteredSkills = {};
         for (let [key, skill] of Object.entries(skills)) {
             // Don't show hidden skills.
@@ -1335,7 +1333,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._delays.skills = setTimeout(() => {
             this._filters.skills = event.currentTarget.value;
             this.render();
-            //@ts-expect-error TODO: foundry-vtt-types v10. Add to typing.
         }, game.shadowrun5e.inputDelay);
     }
 
@@ -1559,11 +1556,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         const quantity = parseInt(event.currentTarget.value);
 
         // Inform users about issues with templating or programming.
-        if (item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
+        if (!item?.system || !('technology' in item?.system) || item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
             return console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item);
         }
 
-        await item.update({ 'system.technology.quantity': quantity });
+        await item.update({ system: { technology: { quantity } } });
     }
 
     /**
@@ -1574,7 +1571,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const item = this.actor.items.get(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
-            await item.update({ 'system.technology.rating': rtg });
+            await item.update({ system: { technology: { rating: rtg } } });
         }
     }
 
@@ -1588,12 +1585,12 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!item) return;
 
         // Handle the equipped state.
-        if (item.isDevice) {
+        if (item.isType('device')) {
             await this.document.equipOnlyOneItemOfType(item);
         } else {
             await this.actor.updateEmbeddedDocuments('Item', [{
-                '_id': iid,
-                'system.technology.equipped': !item.isEquipped(),
+                _id: iid,
+                system: { technology: { equipped: !item.isEquipped() } }
             }]);
         }
 
@@ -1608,23 +1605,21 @@ export class SR5BaseActorSheet extends ActorSheet {
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
         if (!item) return;
-        if (!item.isCritterPower && !item.isSpritePower) return;
+        if (!item.isType('critter_power') && !item.isType('sprite_power')) return;
 
         switch (item.system.optional) {
             case 'standard':
                 return;
             case 'enabled_option':
                 await this.actor.updateEmbeddedDocuments('Item', [{
-                    '_id': iid,
-                    'system.optional': 'disabled_option',
-                    'system.enabled': false,
+                    _id: iid,
+                    system: { optional: 'disabled_option', enabled: false }
                 }]);
                 break;
             case 'disabled_option':
                 await this.actor.updateEmbeddedDocuments('Item', [{
-                    '_id': iid,
-                    'system.optional': 'enabled_option',
-                    'system.enabled': true,
+                    _id: iid,
+                    system: { optional: 'enabled_option', enabled: true }
                 }]);
                 break;
         }
@@ -1686,8 +1681,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
 
         // Disallow editing of default inventory.
-        if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory))
-            return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+        if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+            return;
+        }
 
 
         $('.selection-inventory').hide();
@@ -1829,7 +1826,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMatrixAttributeSelected(event) {
         if (!("matrix" in this.actor.system)) return;
 
-        let iid = this.actor.system.matrix.device;
+        let iid = this.actor.system.matrix!.device;
         let item = this.actor.items.get(iid);
         if (!item) {
             console.error('could not find item');
@@ -1886,7 +1883,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 $(checkmark).removeClass('fa-check-circle');
             }
         };
-        html.find('label.checkbox').each(function () {
+        html.find('label.checkbox').each(function (this: any) {
             setContent(this);
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
@@ -1922,9 +1919,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     _hideSituationModifier(category: Shadowrun.SituationModifierType): boolean {
         switch (category) {
             case 'background_count':
-                return !this.actor.isAwakened;
+                return !this.actor.isAwakened();
             case 'environmental':
-                return this.actor.isSprite();
+                return this.actor.isType('sprite');
             // Defense modifier is already shown in general modifier section.
             case 'defense':
                 return true;
@@ -1954,7 +1951,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         console.debug('Toggling all importFlags on owned items to ->', onOff, event);
         for (const item of allItems) {
             if (item.system.importFlags) {
-                await item.update({ 'system.importFlags.isFreshImport': onOff });
+                await item.update({ system: { importFlags: { isFreshImport: onOff } } });
             }
         }
     }
