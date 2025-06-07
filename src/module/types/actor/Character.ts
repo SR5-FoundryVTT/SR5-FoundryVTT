@@ -16,6 +16,7 @@ declare namespace Shadowrun {
         WoundsActorData,
         MovementActorData,
         TechnomancerActorData,
+        ImportFlags,
         NPCActorData {
             attributes: CharacterAttributes
             values: PhysicalCombatValues

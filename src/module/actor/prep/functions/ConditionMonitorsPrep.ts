@@ -9,7 +9,7 @@ export class ConditionMonitorsPrep {
         const { track, attributes, modifiers } = system;
 
         track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
-        track.stun.max = track.stun.base + Number(modifiers.stun_track);
+        track.stun.max = Math.max(1, track.stun.base + Number(modifiers.stun_track));
         track.stun.label = SR5.damageTypes.stun;
         track.stun.disabled = false;
     }
@@ -18,7 +18,7 @@ export class ConditionMonitorsPrep {
         const { track, attributes, modifiers } = system;
 
         track.physical.base = 8 + Math.ceil(attributes.body.value / 2);
-        track.physical.max = track.physical.base + Number(modifiers.physical_track);
+        track.physical.max = Math.max(1, track.physical.base + Number(modifiers.physical_track));
         track.physical.overflow.max = attributes.body.value + Number(modifiers.physical_overflow_track);
         track.physical.label = SR5.damageTypes.physical;
         track.physical.disabled = false;
@@ -39,7 +39,7 @@ export class ConditionMonitorsPrep {
             attributes.body;
 
         track.physical.base = 8 + Math.ceil(attribute.value / 2);
-        track.physical.max = track.physical.base + Number(modifiers.physical_track);
+        track.physical.max = Math.max(1, track.physical.base + Number(modifiers.physical_track));
         track.physical.overflow.max = attributes.body.value;
         track.physical.label = "SR5.ConditionMonitor";
         track.physical.disabled = false;

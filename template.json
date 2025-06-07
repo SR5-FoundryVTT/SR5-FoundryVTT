@@ -920,8 +920,8 @@
                 },
                 "visibilityChecks": {
                     "astral": {
-                        "hasAura" : false,
-                        "astralActive" : false,
+                        "hasAura": false,
+                        "astralActive": false,
                         "affectedBySpell": false
                     },
                     "meat": {
@@ -959,7 +959,7 @@
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "technomancer", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "technomancer", "movement", "condition_monitors", "physical_combat_values", "grunt", "importFlags"],
             "ethnicity": "",
             "age": "",
             "sex": "",
@@ -976,10 +976,10 @@
             "rent": {
                 "cost": 0,
                 "locations": []
-            },            
+            },
             "visibilityChecks": {
                 "astral": {
-                    "hasAura" : true
+                    "hasAura": true
                 },
                 "meat": {
                     "hasHeat": true
@@ -987,11 +987,11 @@
                 "matrix": {
                     "hasIcon": true
                 }
-            }, 
+            },
             "situation_modifiers": {}
         },
         "spirit": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt", "importFlags"],
             "summonerUuid": "",
             "services": 0,
             "bound": false,
@@ -1010,17 +1010,17 @@
             },
             "visibilityChecks": {
                 "astral": {
-                    "hasAura" : true,
-                    "astralActive" : true
+                    "hasAura": true,
+                    "astralActive": true
                 }
             }
         },
         "critter": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "grunt"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "grunt", "importFlags"],
             "is_npc": true,
             "visibilityChecks": {
                 "astral": {
-                    "hasAura" : true
+                    "hasAura": true
                 },
                 "meat": {
                     "hasHeat": true
@@ -1028,7 +1028,7 @@
             }
         },
         "sprite": {
-            "templates": ["common", "skills", "attributes", "limits", "matrix"],
+            "templates": ["common", "skills", "attributes", "limits", "matrix", "importFlags"],
             "services": 0,
             "registered": false,
             "level": 0,
@@ -1042,7 +1042,7 @@
             }
         },
         "vehicle": {
-            "templates": [ "common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values" ],
+            "templates": [ "common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values", "importFlags" ],
             "vehicleType": "ground",
             "controlMode": "autopilot",
             "environment": "speed",
@@ -1056,7 +1056,7 @@
                 "power_train": 0,
                 "protection": 0,
                 "weapons": 0
-            },   
+            },
             "modPoints": 0,
             "vehicle_stats": {
                 "pilot": {
@@ -1131,7 +1131,7 @@
             }
         },
         "ic": {
-            "templates": ["common",  "skills", "attributes", "limits", "matrix"],
+            "templates": ["common",  "skills", "attributes", "limits", "matrix", "importFlags"],
             "track": {},
             "icType": "",
             "host": {
@@ -1268,6 +1268,20 @@
                     "rating": 1,
                     "availability": "",
                     "quantity": 1,
+                    "calculated": {
+                        "cost": {
+                            "adjusted": false,
+                            "value": 0
+                        },
+                        "availability": {
+                            "adjusted": false,
+                            "value": ""
+                        },
+                        "essence": {
+                            "adjusted": false,
+                            "value": 0
+                        }
+                    },
                     "cost": 0,
                     "equipped": false,
                     "conceal": {
@@ -1422,10 +1436,19 @@
             }
         },
         "armor": {
-            "templates": ["description", "armor", "technology", "importFlags"]
+            "templates": [
+                "description",
+                "armor",
+                "technology",
+                "importFlags"
+            ]
         },
         "ammo": {
-            "templates": ["description", "technology", "importFlags"],
+            "templates": [
+                "description",
+                "technology",
+                "importFlags"
+            ],
             "element": "",
             "ap": 0,
             "damage": 0,
@@ -1437,7 +1460,11 @@
             }
         },
         "modification": {
-            "templates": ["description", "technology", "importFlags"],
+            "templates": [
+                "description",
+                "technology",
+                "importFlags"
+            ],
             "type": "",
             "mount_point": "",
             "dice_pool": 0,
@@ -1446,7 +1473,11 @@
             "conceal": 0
         },
         "spell": {
-            "templates": ["description", "action", "importFlags"],
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ],
             "drain": 0,
             "category": "",
             "type": "",
@@ -1474,7 +1505,9 @@
                 "test": "SpellCastingTest",
                 "opposed": {
                     "test": "",
-                    "resist": {"test": ""}
+                    "resist": {
+                        "test": ""
+                    }
                 },
                 "followed": {
                     "test": "DrainTest"
@@ -1482,7 +1515,11 @@
             }
         },
         "ritual": {
-            "templates": ["description", "action", "importFlags"],
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ],
             "type": "",
             "descriptors": "",
             "action": {
@@ -1497,7 +1534,11 @@
             }
         },
         "call_in_action": {
-            "templates": ["description", "action", "importFlags"],
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ],
             "action": {
                 "test": "",
                 "type": "complex"
@@ -1515,19 +1556,31 @@
             }
         },
         "critter_power": {
-            "templates": ["description", "action", "armor", "powers", "importFlags"],
+            "templates": [
+                "description",
+                "action",
+                "armor",
+                "powers",
+                "importFlags"
+            ],
             "rating": 0,
             "powerType": "",
             "range": ""
         },
         "complex_form": {
-            "templates": ["description", "action", "importFlags"],
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ],
             "target": "",
             "duration": "",
             "fade": 0,
             "action": {
                 "test": "ComplexFormTest",
-                "categories": ["complex_form"],
+                "categories": [
+                    "complex_form"
+                ],
                 "opposed": {
                     "test": "OpposedTest"
                 },
@@ -1537,7 +1590,13 @@
             }
         },
         "weapon": {
-            "templates": ["description", "action", "technology", "weapon", "importFlags"],
+            "templates": [
+                "description",
+                "action",
+                "technology",
+                "weapon",
+                "importFlags"
+            ],
             "action": {
                 "test": "",
                 "opposed": {
@@ -1549,38 +1608,72 @@
             }
         },
         "bioware": {
-            "templates": ["description", "technology", "action", "armor", "importFlags"],
+            "templates": [
+                "description",
+                "technology",
+                "action",
+                "armor",
+                "importFlags"
+            ],
             "essence": 0,
             "grade": "standard",
             "capacity": 0
         },
         "cyberware": {
-            "templates": ["description", "technology", "action", "armor", "importFlags"],
+            "templates": [
+                "description",
+                "technology",
+                "action",
+                "armor",
+                "importFlags"
+            ],
             "essence": 0,
             "grade": "standard",
             "capacity": 0
         },
         "adept_power": {
-            "templates": ["description", "action", "armor", "importFlags"],
+            "templates": [
+                "description",
+                "action",
+                "armor",
+                "importFlags"
+            ],
             "pp": 0,
             "type": "",
             "drain": false,
             "level": 0
         },
         "quality": {
-            "templates": ["description", "action", "importFlags"],
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ],
             "type": "positive",
             "rating": 0,
             "karma": 0
         },
         "action": {
-            "templates": ["description", "action", "action_result", "importFlags"]
+            "templates": [
+                "description",
+                "action",
+                "action_result",
+                "importFlags"
+            ]
         },
         "sprite_power": {
-            "templates": ["description", "action", "powers", "importFlags"]
+            "templates": [
+                "description",
+                "action",
+                "powers",
+                "importFlags"
+            ]
         },
         "contact": {
-            "templates": ["description", "importFlags"],
+            "templates": [
+                "description",
+                "importFlags"
+            ],
             "type": "",
             "connection": 0,
             "loyalty": 0,
@@ -1590,11 +1683,18 @@
             "linkedActor": ""
         },
         "sin": {
-            "templates": ["description", "technology", "importFlags"],
+            "templates": [
+                "description",
+                "technology",
+                "importFlags"
+            ],
             "licenses": []
         },
         "lifestyle": {
-            "templates": ["description", "importFlags"],
+            "templates": [
+                "description",
+                "importFlags"
+            ],
             "type": "",
             "comforts": 0,
             "security": 0,
@@ -1605,26 +1705,51 @@
             "mods": []
         },
         "device": {
-            "templates": ["description", "technology", "matrix", "importFlags"]
+            "templates": [
+                "description",
+                "technology",
+                "matrix",
+                "importFlags"
+            ]
         },
         "program": {
-            "templates": ["description", "technology", "importFlags"],
+            "templates": [
+                "description",
+                "technology",
+                "importFlags"
+            ],
             "type": "common_program"
         },
         "equipment": {
-            "templates": ["description", "action", "technology", "importFlags"]
+            "templates": [
+                "description",
+                "action",
+                "technology",
+                "importFlags"
+            ]
         },
         "host": {
-            "templates": ["description", "matrix", "importFlags"],
+            "templates": [
+                "description",
+                "matrix",
+                "importFlags"
+            ],
             "marks": {},
             "rating": 0,
             "ic": []
         },
         "metamagic": {
-            "templates": ["description", "action", "importFlags"]
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ]
         },
-        "echo" : {
-            "templates": ["description", "importFlags"]
+        "echo": {
+            "templates": [
+                "description",
+                "importFlags"
+            ]
         }
     }
 }

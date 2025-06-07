@@ -1,13 +1,14 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
 import WeaponItemData = Shadowrun.WeaponItemData;
+import { Weapon } from '../../schema/WeaponsSchema';
 
 export class MeleeParser extends WeaponParserBase {
-    override Parse(jsonData: object, item: WeaponItemData, jsonTranslation?: object): WeaponItemData {
-        item = super.Parse(jsonData, item, jsonTranslation);
+    protected override getSystem(jsonData: Weapon): WeaponItemData['system'] {
+        const system = super.getSystem(jsonData);
 
-        item.system.melee.reach = ImportHelper.IntValue(jsonData, 'reach');
+        system.melee.reach = Number(jsonData.reach._TEXT);
 
-        return item;
+        return system;
     }
 }
