@@ -20,7 +20,13 @@ export const WarePrep = {
      */
     prepareGrade(system: Item.SystemOfType<'bioware' | 'cyberware'>) {
         const rating = system.technology.rating || 0;
-        const grade = system.grade;
+        let grade = system.grade;
+
+        // Old versions could contain malformed grade values. Leave automated grade calculation to newer version. (<0.27.0)
+        if (!SR.gradeModifiers[grade]) {
+            console.warn(`Grade "${grade}" is not defined in SR.gradeModifiers. Using standard values.`);
+            grade = 'standard';
+        }
 
         if (grade === 'standard') {
             system.technology.calculated.essence.value = system.essence;
