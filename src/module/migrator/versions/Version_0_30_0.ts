@@ -20,6 +20,11 @@ export class Version_0_30_0 extends VersionMigration {
         return "0.30.0";
     }
 
+    // We need to migrate all token actors as well.
+    protected override async ShouldMigrateSceneData(scene: Scene) {
+        return true;
+    }
+
     protected override async ShouldMigrateItemData(item: SR5Item) {
         return item.isHost || item.isDevice || item.isMatrixDevice;
     }
