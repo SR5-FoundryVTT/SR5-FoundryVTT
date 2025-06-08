@@ -10,7 +10,7 @@ import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
 
 /**
- * General handling around handling everything matrix related.
+ * General handling around everything matrix related.
  */
 export const MatrixFlow = {
     /**
@@ -230,8 +230,8 @@ export const MatrixFlow = {
      */
     getMatrixActions(actor: SR5Actor): SR5Item[] {
         const actions = actor.itemsForType.get('action');
+        // Normaly all item types should exist, though during actor creation this might not be the case.
         if (!actions) {
-            console.error('Shadowrun 5e | itemForTypes should always carry an entry for all item types', actor);
             return [];
         }
         return actions.filter((action: SR5Item) => action.hasActionCategory('matrix'));
