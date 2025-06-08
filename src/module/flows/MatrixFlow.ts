@@ -346,7 +346,7 @@ export const MatrixFlow = {
                 const target = token.actor;
 
                 // Validate Foundry VTT visibility.
-                if (target?.id === actor.id) continue;
+                if (target.uuid === actor.uuid) continue;
                 if (game.user?.isGM && token.hidden) continue;
 
                 // Validate Shadowrun5e visibility.
