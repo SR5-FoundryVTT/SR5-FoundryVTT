@@ -516,6 +516,9 @@ export class SR5Actor extends Actor {
         const targetToken = persona.getToken();
         if (!deckerToken || !targetToken) return false;
 
+        // Compare host networks.
+        if (persona.network?.isHost && persona.network.id !== this.network?.id) return false;
+
         // TODO: Compare distance with tokens that have been percieved through a matrix perception.
         const distance = Helpers.measureTokenDistance(deckerToken, targetToken);
         if (distance > 100) return false;
