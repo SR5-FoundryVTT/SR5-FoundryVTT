@@ -878,7 +878,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
             || (this.isType('ammo') && this.system.blast.radius > 0);
     }
 
-    isGrenade(): this is SR5Item<'weapon'>  & { system: { category: 'thrown' } } {
+    isGrenade(): this is SR5Item<'weapon'> & { system: { category: 'thrown' } } {
         return this.isThrownWeapon() && (this.system.thrown?.blast.radius ?? 0) > 0;
     }
 
@@ -1322,7 +1322,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => ({
-                ...Helpers.getMarkIdDocuments(markId),
+                ...Helpers.getMarkIdDocuments(markId) as Shadowrun.TargetedDocument,
                 marks,
                 markId
             }));

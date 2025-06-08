@@ -1,4 +1,4 @@
-export interface FormDialogData extends Dialog.Data<JQuery> {
+export interface FormDialogData extends Dialog.Data<HTMLElement | JQuery> {
 	templateData: object;
 	templatePath: string;
 	onAfterClose?: Function;
@@ -15,7 +15,7 @@ export interface FormDialogOptions extends Dialog.Options {
  * It will look for form elements and apply value changes to the local data property according to the name attribute
  * of the form element. This works the same as it does with general FoundryVTT Applications.
  */
-export class FormDialog extends Dialog<FormDialogOptions> {
+export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     selection: object;
     selectedButton!: string;
     form!: HTMLFormElement;

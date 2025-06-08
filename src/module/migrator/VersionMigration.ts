@@ -126,7 +126,8 @@ export abstract class VersionMigration {
                 await actor.updateEmbeddedDocuments('Item', embeddedItems);
             }
 
-            if (updateData !== null ) {
+            if (updateData !== null) {
+                //@ts-expect-error what does it do?
                 await entity.update(updateSystem, { enforceTypes: false });
             }
         }
@@ -408,11 +409,11 @@ export abstract class VersionMigration {
                     }
 
                     if (updateData.items) {
-                        await document.updateEmbeddedDocuments('Item', updateData.items);
+                        await (document as SR5Actor).updateEmbeddedDocuments('Item', updateData.items);
                     }
 
                     if (updateData.effects) {
-                        await document.updateEmbeddedDocuments('ActiveEffect', updateData.effects);
+                        await (document as SR5Actor).updateEmbeddedDocuments('ActiveEffect', updateData.effects);
                     }
 
                     if (updateData.data) {

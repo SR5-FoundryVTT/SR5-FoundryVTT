@@ -187,6 +187,7 @@ export const CommonModifiers = () => ({
     soak: new NumberField({ required: true, initial: 0 }),
     recoil: new NumberField({ required: true, initial: 0 }),
     matrix_track: new NumberField({ required: true, nullable: false, initial: 0 }),
+    reach: new NumberField({ required: true, nullable: false, initial: 0 }),
     stun_track: new NumberField({ required: true, nullable: false, initial: 0 }),
     physical_track: new NumberField({ required: true, nullable: false, initial: 0 }),
     physical_overflow_track: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -208,6 +209,10 @@ const InventoryData = () => ({
     label: new StringField({ required: true, initial: "" }),
 });
 
+const ActiveData = () => ({
+    active: new ObjectField({ required: true, initial: {} }),
+});
+
 export const CommonData = () => ({
     ...DescriptionPartData(),
     attributes: new SchemaField(Attributes(), { required: true }),
@@ -217,7 +222,11 @@ export const CommonData = () => ({
     initiative: new SchemaField(Initiative(), { required: true }),
     // modifiers: new SchemaField(Modifiers, { required: true }),
     //todo fix
-    situation_modifiers: new ObjectField({ required: true, initial: {} }),
+    situation_modifiers: new SchemaField({
+        environmental: new SchemaField(ActiveData(), { required: true }),
+        noise: new SchemaField(ActiveData(), { required: true }),
+        background_count: new SchemaField(ActiveData(), { required: true }),
+    }, {required: true }),
     values: new SchemaField(CommonValues(), { required: true }),
     inventories: new TypedObjectField(new SchemaField(InventoryData()), { required: true }),
     visibilityChecks: new SchemaField(VisibilityChecks(), { required: true }),

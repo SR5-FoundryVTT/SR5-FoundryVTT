@@ -82,9 +82,9 @@ export class DocumentSituationModifiers {
     // The source data stored on the document.
     source: SituationModifiersSourceData;
     // The applied data from the document and it's apply chain.
-    applied: SituationModifiersData;
+    applied!: SituationModifiersData;
     // Handlers for the different modifier categories.
-    _modifiers: {
+    _modifiers!: {
         noise: NoiseModifier,
         background_count: BackgroundCountModifier,
         environmental: EnvironmentalModifier,
@@ -254,6 +254,7 @@ export class DocumentSituationModifiers {
     static async clearAllOn(document: ModifiableDocumentTypes) {
         if (document instanceof SR5Actor) {
             // Overwrite all selections with default values.
+            //@ts-expect-error Does fvtt support -= operator?
             await document.update({ system: {'-=situation_modifiers': null} }, {render: false});
             await document.update({ system: { situation_modifiers: DocumentSituationModifiers._defaultModifiers } });
         } else {

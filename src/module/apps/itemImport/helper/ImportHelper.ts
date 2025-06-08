@@ -1,5 +1,4 @@
-import { SystemActor } from "src/module/actor/SR5Actor";
-import { SR5Item, SystemItem } from "../../../item/SR5Item";
+import { SR5Item } from "../../../item/SR5Item";
 import { Constants } from '../importer/Constants';
 type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
 

@@ -385,8 +385,8 @@ ___________________
         });
 
         // Register configs for embedded documents.
-        DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', ActiveEffectConfig);
-        DocumentSheetConfig.registerSheet(ActiveEffect, SYSTEM_NAME, SR5ActiveEffectConfig, {
+        foundry.applications.apps.DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', foundry.applications.sheets.ActiveEffectConfig);
+        foundry.applications.apps.DocumentSheetConfig.registerSheet(ActiveEffect, SYSTEM_NAME, SR5ActiveEffectConfig, {
             makeDefault: true
         })
 
@@ -514,13 +514,13 @@ ___________________
             // Collect actors from sidebar and active scene to update / rerender
             const connectedIC = [
                 // All sidebar actors should also include tokens with linked actors.
-                ...(game.actors as SR5Actor[]).filter(actor => actor.hasHost()),
+                ...game.actors.filter(actor => (actor as SR5Actor).hasHost()),
                 // All token actors that aren't linked.
                 ...canvas.scene!.tokens.filter(token => {
                     const actor = token.actor;
-                    return !token.actorLink && actor?.hasHost();
+                    return !token.actorLink && !!actor && actor.hasHost();
                 }).map(t => t.actor)
-            ];
+            ] as SR5Actor<'ic'>[];
 
             // Update host data on the ic actor.
             const host = item.asType('host');

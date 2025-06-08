@@ -20,7 +20,7 @@ import { SR5Item } from "../../item/SR5Item";
  * or this allInventories, which will let it appear on all inventories.
  */
 export class InventoryFlow {
-    actor: SR5Actor;
+    actor!: SR5Actor;
 
     constructor(actor: SR5Actor) {
         // Check for sub-type actors.

@@ -142,9 +142,9 @@ export class VehiclePrep {
         limits.mental.base = Helpers.calcTotal(vehicle_stats.sensor);
 
         // add sensor, handling, and speed as limits
-        limits.sensor = { ...vehicle_stats.sensor, hidden: true };
-        limits.handling = { ...(isOffRoad ? vehicle_stats.off_road_handling : vehicle_stats.handling), hidden: true };
-        limits.speed = { ...(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed), hidden: true };
+        limits.sensor = { ...vehicle_stats.sensor, hidden: true, attribute: 'sensor' };
+        limits.handling = { ...(isOffRoad ? vehicle_stats.off_road_handling : vehicle_stats.handling), hidden: true, attribute: 'handling' };
+        limits.speed = { ...(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed), hidden: true, attribute: 'speed' };
     }
 
     /**

@@ -99,8 +99,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
                 disabled: false,
                 label: 'Test Effect',
                 changes: [
-                    { key: 'system.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
-                    { key: 'system.attributes.body', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
+                    { key: 'system.attributes.body.mod', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.attributes.body', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
                 ]
             }]);
             const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });

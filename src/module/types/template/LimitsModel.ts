@@ -3,7 +3,7 @@ import { BaseValuePair, ModifiableValue } from "./BaseModel";
 
 export const LimitField = () => ({
     ...ModifiableValue(),
-    attribute: new StringField({ required: true, initial: '' }), // Does it use it?
+    attribute: new StringField({ required: false, initial: '' }), // Does it use it?
     label: new StringField({ required: true, initial: '' }),
     hidden: new BooleanField({ required: true, initial: false }),
 });

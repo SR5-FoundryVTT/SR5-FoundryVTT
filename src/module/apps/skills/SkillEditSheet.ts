@@ -217,7 +217,7 @@ export class SkillEditSheet extends DocumentSheet {
     }
 
     override getData(): SkillEditFormData {
-        const data = super.getData();
+        const data = super.getData() as any;
 
         // skill property will hold a direct skill reference
         data['skill'] = foundry.utils.getProperty(data.data, this._updateString());

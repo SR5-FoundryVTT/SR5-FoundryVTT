@@ -100,7 +100,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
 
         // Remove last used limit and its modifiers and replace with new selection.
         const useSelection = this.data.limitSelection !== this.data.action.limit.attribute;
-        const selectedLimit = useSelection ? this.data.limitSelection : this.data.action.limit.attribute;
+        const selectedLimit = useSelection ? this.data.limitSelection : this.data.action.limit.attribute!;
         const usedLimit = this.actor.getLimit(selectedLimit);
         const lastUsedLimit = this.actor.getLimit(this.lastUsedLimit);
 

@@ -2,7 +2,8 @@ import { DataDefaults } from "../data/DataDefaults";
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { PartsList } from '../parts/PartsList';
 import { RitualRules } from '../rules/RitualRules';
-import { DamageType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DeepPartial } from "fvtt-types/utils";
 
 
 interface RitualSpellcastingTestData extends SuccessTestData {
@@ -64,11 +65,8 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
     /**
      *
      */
-    static override _getDefaultTestAction(): Partial<Shadowrun.MinimalActionData> {
-        return {
-            skill: 'ritual_spellcasting',
-            attribute: 'magic'
-        }
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { skill: 'ritual_spellcasting', attribute: 'magic' }
     }
 
     override async prepareDocumentData() {

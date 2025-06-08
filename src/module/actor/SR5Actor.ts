@@ -424,7 +424,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     getFullDefenseAttribute(this: SR5Actor): AttributeFieldType | undefined {
         if (this.isType('vehicle')) {
             return this.findVehicleStat('pilot');
-        } else if (this.isType('character')) {
+        // no idea why `isType` is not working here.
+        } else if (this.asType('character')) {
             let att = this.system.full_defense_attribute;
             if (!att) att = 'willpower';
             return this.findAttribute(att);
@@ -1496,7 +1497,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         // Emerged actors use a personal device like condition monitor.
         if (this.isMatrixActor) {
-            return await this.update({ system: { matrix: { condition_monitor: track } } });
+            return await (this as SR5Actor).update({ system: { matrix: { condition_monitor: track } } });
         }
         return;
     }

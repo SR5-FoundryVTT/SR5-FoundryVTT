@@ -480,6 +480,7 @@ export const registerItemLineHelpers = () => {
                 ];
             case 'armor':
             case 'ammo':
+            //@ts-expect-error
             case 'modification':
                 if (wrapper.isVehicleModification()) {
                     return [
@@ -674,6 +675,7 @@ export const registerItemLineHelpers = () => {
             /**
              * Call In Actions differ depending on called in actor type.
              */
+            //@ts-expect-error
             case 'call_in_action':
                 if (item.system.actor_type === 'spirit') {
                     const summoningData = item.system as Shadowrun.CallInActionData;
