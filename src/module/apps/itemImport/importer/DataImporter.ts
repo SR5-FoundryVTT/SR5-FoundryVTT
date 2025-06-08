@@ -4,6 +4,7 @@ import { ParseData } from "../parser/Parser";
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+const xml2js = require('xml2js');
 
 /**
  * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.

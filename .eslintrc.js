@@ -75,7 +75,7 @@ module.exports = {
         "no-useless-escape": "error",
         "@typescript-eslint/method-signature-style": "error",
         "prefer-promise-reject-errors": "error",
-        "@typescript-eslint/no-var-requires": "error",
+        "@typescript-eslint/no-var-requires": "off", // We use require() for xml2js
         "one-var": "error",
         "import/no-duplicates": "error",
         "no-empty": "error",
