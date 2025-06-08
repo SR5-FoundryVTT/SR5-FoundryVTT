@@ -1,0 +1,26 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='networks'}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Grids')
+}}
+{{#each grids}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=this.img
+        name=this.name
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.uuid
+}}
+{{/each}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Hosts')
+}}
+{{#each hosts}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+        img=this.img
+        name=this.name
+        itemNameCssClass='Roll show-matrix-placement'
+        hasRoll=true
+        itemId=this.uuid
+}}
+{{/each}}
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

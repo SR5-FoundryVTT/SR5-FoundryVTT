@@ -29,7 +29,6 @@ export function iconAssign(
     const defaultImg = "icons/svg/item-bag.svg";
     const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/dist/icons/importer/";
     const imgExtensionOptions = ['.svg', '.webp', '.png', '.jpg', '.jpeg', '.avif'];
-    const imgName = importFlags.name;
     const imgType = importFlags.type;
     const imgSubType = importFlags.subType;
     const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides) as boolean;

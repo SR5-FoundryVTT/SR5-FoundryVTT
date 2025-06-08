@@ -17,7 +17,7 @@ export class GearImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        private categories: GearSchema['categories']['category'];
+        private readonly categories: GearSchema['categories']['category'];
         constructor(categories: GearSchema['categories']['category']) {
             this.categories = categories;
         }
@@ -42,7 +42,7 @@ export class GearImporter extends DataImporter {
     };
 
     async Parse(jsonObject: GearSchema): Promise<void> {
-        return GearImporter.ParseItems<Gear, gearTypes>(
+        return await GearImporter.ParseItems<Gear, gearTypes>(
             jsonObject.gears.gear,
             {
                 compendiumKey: "Gear",

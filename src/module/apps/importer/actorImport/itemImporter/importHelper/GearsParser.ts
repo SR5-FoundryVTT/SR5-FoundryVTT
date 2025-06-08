@@ -11,7 +11,7 @@ export class GearsParser {
      * @param chummerGears Array of chummer gear entries
      */
     async parseGears(chummerGears : any, assignIcons : boolean) : Promise<any> {
-        let items : any[] = [];
+        const items : any[] = [];
         const iconList = await IconAssign.getIconFiles();
 
         chummerGears.forEach(async (chummerGear) => {
@@ -24,7 +24,7 @@ export class GearsParser {
                 const itemData = this.parseGearEntry(chummerGear);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                if (assignIcons) {itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
 
                 items.push(itemData);
             }

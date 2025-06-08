@@ -18,7 +18,7 @@ import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 
 export class WeaponParserBase extends Parser<WeaponItemData> {
     protected override parseType: string = 'weapon';
-    private categories: WeaponsSchema['categories']['category'];
+    private readonly categories: WeaponsSchema['categories']['category'];
 
     constructor(categories: WeaponsSchema['categories']['category']) {
         super(); this.categories = categories;
@@ -66,7 +66,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
             if (Constants.MAP_CATEGORY_TO_SKILL[jsonSkill])
                 return Constants.MAP_CATEGORY_TO_SKILL[jsonSkill];
 
-            return jsonSkill.replace(/[\s\-]/g, '_').toLowerCase();
+            return jsonSkill.replace(/[\s-]/g, '_').toLowerCase();
         } else {
             const category = weaponJson.category._TEXT;
             if (Constants.MAP_CATEGORY_TO_SKILL[category])
@@ -78,7 +78,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
     }
 
     public static GetWeaponType(weaponJson: Weapon): WeaponCategory {
-        let type = weaponJson.type._TEXT;
+        const type = weaponJson.type._TEXT;
         //melee is the least specific, all melee entries are accurate
         if (type === 'Melee') {
             return 'melee';
@@ -207,7 +207,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
         const root = match?.$?.type?.capitalize?.() ?? 'Other';
 
         return ['Gun', 'Melee', 'Other'].includes(root)
-            ? IH.getFolder('Weapon', root, folderName)
-            : IH.getFolder('Weapon', folderName);
+            ? await IH.getFolder('Weapon', root, folderName)
+            : await IH.getFolder('Weapon', folderName);
     }
 }

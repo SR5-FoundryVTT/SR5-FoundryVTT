@@ -11,7 +11,7 @@ export class VehicleModImporter extends DataImporter {
     }
 
     async Parse(jsonObject: VehiclesSchema): Promise<void> {
-        return VehicleModImporter.ParseItems<Mod, Shadowrun.ModificationItemData>(
+        return await VehicleModImporter.ParseItems<Mod, Shadowrun.ModificationItemData>(
             jsonObject.mods.mod,
             {
                 compendiumKey: "Modification",

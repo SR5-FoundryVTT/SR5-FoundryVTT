@@ -3,9 +3,6 @@ import ModList = Shadowrun.ModList;
 import {Helpers} from "../helpers";
 import {SafeString} from "handlebars";
 import DamageData = Shadowrun.DamageData;
-import ModListEntry = Shadowrun.ModListEntry;
-import {SR5Actor} from "../actor/SR5Actor";
-import {FLAGS, SYSTEM_NAME} from "../constants";
 
 export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
@@ -17,7 +14,7 @@ export const registerRollAndLabelHelpers = () => {
 
     Handlebars.registerHelper('damageCode', function(damage: DamageData): SafeString {
         const typeCode = Handlebars.helpers.damageAbbreviation(damage.type.value);
-        let code = `${damage.value}${typeCode}`;
+        const code = `${damage.value}${typeCode}`;
         return new Handlebars.SafeString(code);
     });
 
@@ -65,6 +62,6 @@ export const registerRollAndLabelHelpers = () => {
         return value > 0 ?  `+${value}`: `${value}`;
     });
 
-    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName);
-    Handlebars.registerHelper('speakerImg', Helpers.getChatSpeakerImg);
+    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName.bind(this));
+    Handlebars.registerHelper('speakerImg', Helpers.getChatSpeakerImg.bind(this));
 };

@@ -7,20 +7,20 @@ import AugmentedRealityVisionDetectionMode from './augmentedReality/arDetectionM
 export default class VisionConfigurator {
     static configureAstralPerception() {
         //todo: v10 foundry-vtt-types 
-        //@ts-expect-error
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         CONFIG.Canvas.detectionModes.astralPerception = new AstralPerceptionDetectionMode({
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
-            //@ts-expect-error
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             type: DetectionMode.DETECTION_TYPES.SIGHT,
           });
   
-        //@ts-expect-error
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         CONFIG.Canvas.visionModes.astralPerception = new VisionMode({
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
             canvas: {
-                //@ts-expect-error
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 shader: ColorAdjustmentsSamplerShader,
                 uniforms: {
                     saturation: 5,
@@ -28,11 +28,11 @@ export default class VisionConfigurator {
                 },
             },
             lighting: {
-                //@ts-expect-error
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 background: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
-                //@ts-expect-error
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 illumination: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
-                //@ts-expect-error
+                //@ts-expect-error // TODO: foundry-vtt-types v10
                 coloration: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
             },
             vision: {
@@ -44,33 +44,32 @@ export default class VisionConfigurator {
 
     static configureThermographicVision() {
         //todo: v10 foundry-vtt-types 
-        //@ts-expect-error
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         CONFIG.Canvas.detectionModes.thermographic = new ThermographicVisionDetectionMode({
             id: 'thermographic',
             label: 'SR5.Vision.ThermographicVision',
-            //@ts-expect-error
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             type: DetectionMode.DETECTION_TYPES.SIGHT,
           });
     }
 
     static configureLowlight() {
         //todo: v10 foundry-vtt-types 
-        //@ts-expect-error
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         CONFIG.Canvas.detectionModes.lowlight = new LowlightVisionDetectionMode({
             id: 'lowlight',
             label: 'SR5.Vision.LowLight',
-            //@ts-expect-error
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             type: DetectionMode.DETECTION_TYPES.SIGHT,
           });
     }
 
     static configureAR() {
-        //todo: v10 foundry-vtt-types 
-        //@ts-expect-error
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         CONFIG.Canvas.detectionModes.augmentedReality = new AugmentedRealityVisionDetectionMode({
             id: 'augmentedReality',
             label: 'SR5.Vision.AugmentedReality',
-            //@ts-expect-error
+            //@ts-expect-error // TODO: foundry-vtt-types v10
             type: DetectionMode.DETECTION_TYPES.SIGHT,
           });
     }

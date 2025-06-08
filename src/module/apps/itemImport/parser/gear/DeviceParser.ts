@@ -48,6 +48,6 @@ export class DeviceParser extends Parser<DeviceItemData> {
         const rootFolder = TH.getTranslation('Electronics', {type: 'category'});
         const folderName = TH.getTranslation(categoryData, {type: 'category'});
 
-        return IH.getFolder('Gear', rootFolder, folderName);
+        return await IH.getFolder('Gear', rootFolder, folderName);
     }
 }

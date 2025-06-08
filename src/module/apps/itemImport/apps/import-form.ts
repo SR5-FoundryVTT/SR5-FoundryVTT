@@ -19,7 +19,7 @@ import * as IconAssign from  '../../iconAssigner/iconAssign';
 
 export class Import extends Application {
     // Update Schemas in util/generate_schemas.py
-    private githubConfig = {
+    private readonly githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
         version: "v5.225.898",
@@ -41,7 +41,7 @@ export class Import extends Application {
     private showAdvanced: boolean = false;
     private showImportOptions: boolean = false;
 
-    private shadowrunBooks = [
+    private readonly shadowrunBooks = [
         { name: "Aetherology", code: "AET", default: true, value: true },
         { name: "Assassin's Primer", code: "AP", default: true, value: true },
         { name: "Better Than Bad", code: "BTB", default: true, value: true },
@@ -255,7 +255,7 @@ export class Import extends Application {
         getTextForFile: (param: any) => Promise<{ text: string; name: string; } | null>
     ) {
         if (deleteCompendiums)
-            for (const [_, compendium] of Object.entries(Constants.MAP_COMPENDIUM_KEY))
+            for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_KEY))
                 await game.packs?.get(compendium.pack)?.deleteCompendium();
 
         this.parsedFiles = [];

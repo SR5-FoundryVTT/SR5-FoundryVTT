@@ -56,6 +56,6 @@ export class SpellParserBase extends Parser<SpellItemData> {
     protected override async getFolder(jsonData: Spell): Promise<Folder> {
         const folderName = TH.getTranslation(jsonData.category._TEXT, {type: 'category'});
 
-        return IH.getFolder("Magic", folderName);
+        return await IH.getFolder("Magic", folderName);
     }
 }

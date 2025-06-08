@@ -11,7 +11,7 @@ export class ComplexFormImporter extends DataImporter {
     }
 
     async Parse(jsonObject: ComplexformsSchema): Promise<void> {
-        return ComplexFormImporter.ParseItems<Complexform, Shadowrun.ComplexFormItemData>(
+        return await ComplexFormImporter.ParseItems<Complexform, Shadowrun.ComplexFormItemData>(
             jsonObject.complexforms.complexform,
             {
                 compendiumKey: "Magic",

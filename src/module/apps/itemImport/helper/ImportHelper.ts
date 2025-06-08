@@ -1,7 +1,6 @@
 import { BaseItem } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents.mjs';
 import { SR5Item } from "../../../item/SR5Item";
 import { Constants } from '../importer/Constants';
-import { TranslationHelper as TH } from './TranslationHelper';
 type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
 
 export type OneOrMany<T> = T | T[];
@@ -15,7 +14,7 @@ export type NotEmpty<T> = T extends object ? NonNullable<T> : never;
  */
 export class ImportHelper {
     public static readonly CHAR_KEY = '_TEXT';
-    private static folders: Record<string, Promise<Folder>> = {};
+    private static readonly folders: Record<string, Promise<Folder>> = {};
 
     /**
      * Ensures the provided value is returned as an array.
@@ -59,7 +58,7 @@ export class ImportHelper {
         type ItemType = CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
         const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY[compKey].pack) as ItemType;
 
-        return pack.getDocuments({
+        return await pack.getDocuments({
             name__in: this.getArray(name),
             ...(types ? { type__in: this.getArray(types) } : {})
         });
@@ -186,6 +185,6 @@ export class ImportHelper {
         if (folder3)
             folder = this.folders[path] ??= this.FindOrCreateFolder(ctype, folder3, await folder);
 
-        return folder;
+        return await folder;
     }
 }

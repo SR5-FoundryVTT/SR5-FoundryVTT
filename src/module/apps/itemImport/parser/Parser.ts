@@ -52,7 +52,7 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
             system: this.getSystem(jsonData),
         } as TResult;
 
-        //@ts-expect-error
+        //@ts-expect-error TODO: foundry-vtt-types v9
         entity.folder = await this.getFolder(jsonData);
 
         // Add technology
@@ -72,14 +72,14 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
 
         // Runtime branching
         if (this.isActor()) {
-            //@ts-expect-error
+            //@ts-expect-error TODO: foundry-vtt-types v9
             entity.items = await itemPromise;
         } else {
-            //@ts-expect-error
+            //@ts-expect-error TODO: foundry-vtt-types v9
             entity.flags ??= {};
-            //@ts-expect-error
+            //@ts-expect-error TODO: foundry-vtt-types v9
             entity.flags.shadowrun5e ??= {};
-            //@ts-expect-error
+            //@ts-expect-error TODO: foundry-vtt-types v9
             entity.flags.shadowrun5e.embeddedItems = await itemPromise;
         }
 
@@ -98,6 +98,7 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
     protected setIcons(entity: TResult, jsonData: ParseData) {
         // Why don't we have importFlags as base in actors?
         if ('importFlags' in entity.system || this.isActor()) {
+            //@ts-expect-error TODO: fvtt-types v13
             entity.system.importFlags = {
                 name: IH.formatAsSlug(jsonData.name._TEXT),
                 type: this.parseType,
@@ -107,9 +108,11 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
 
             const subType = 'category' in jsonData ? IH.formatAsSlug(jsonData.category?._TEXT || '') : '';
             if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType]).includes(subType))
+                //@ts-expect-error TODO: fvtt-types v13
                 entity.system.importFlags.subType = subType;
 
             const entitySystem = entity.system as Shadowrun.ShadowrunItemDataData | Shadowrun.ShadowrunActorDataData;
+            //@ts-expect-error TODO: foundry-vtt-types v9
             entity.img = IconAssign.iconAssign(entity.system.importFlags, DataImporter.iconList, entitySystem);
         }
     }

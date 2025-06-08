@@ -46,7 +46,7 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
             default:
                 system.spiritType = jsonData.name._TEXT
                     .replace(" Spirit", "").replace("Spirit of ", "")
-                    .replace(" (Demon)", "").replace(/[\s\-]/g, "_")
+                    .replace(" (Demon)", "").replace(/[\s-]/g, "_")
                     .split("/")[0].toLowerCase();
         }
 
@@ -100,6 +100,6 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
         const folderName = TH.getTranslation(category, {type: 'category'});
         const specFolder = category === 'Insect Spirits' ? jsonData.name._TEXT.match(/\(([^)]+)\)/)?.[1] : undefined;
 
-        return IH.getFolder('Critter', rootFolder, folderName, specFolder);
+        return await IH.getFolder('Critter', rootFolder, folderName, specFolder);
     }
 }

@@ -29,6 +29,6 @@ export class WeaponModParser extends Parser<ModificationItemData> {
         if (folderName.includes("/")) 
             folderName = "Multiple Points";
 
-        return IH.getFolder('Modification', rootFolder, folderName);
+        return await IH.getFolder('Modification', rootFolder, folderName);
     }
 }

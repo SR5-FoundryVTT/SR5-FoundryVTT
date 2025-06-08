@@ -10,7 +10,7 @@ export class VehicleImporter extends DataImporter {
     }
 
     async Parse(jsonObject: VehiclesSchema): Promise<void> {
-        return VehicleImporter.ParseItems<Vehicle, Shadowrun.VehicleActorData>(
+        return await VehicleImporter.ParseItems<Vehicle, Shadowrun.VehicleActorData>(
             jsonObject.vehicles.vehicle,
             {
                 compendiumKey: "Drone",
