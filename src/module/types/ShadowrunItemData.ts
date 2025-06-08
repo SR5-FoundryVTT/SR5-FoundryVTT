@@ -228,6 +228,7 @@ declare namespace Shadowrun {
     export interface CallInActionItemData {
         type: 'call_in_action';
         name: string;
+        img: string;
         data: CallInActionData;
         system: CallInActionData;
     }
