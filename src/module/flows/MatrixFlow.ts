@@ -321,7 +321,9 @@ export const MatrixFlow = {
         // Collect all grid connected documents without scene tokens.
         for (const grid of MatrixNetworkFlow.getGrids({ players: true })) {
             for (const slave of grid.slaves) {
-                if (slave.getToken()) continue;
+                // Skip actor tokens as they're collected separately.
+                if (slave instanceof SR5Actor && slave.getToken()) continue;
+
                 const type = ActorMarksFlow.getDocumentType(document);
 
                 targets.push({
@@ -335,6 +337,7 @@ export const MatrixFlow = {
             }
         }
 
+        // Collect matrix visible scene tokens.
         if (canvas.scene?.tokens) {
             // Collect all scene tokens.
             for (const token of canvas.scene?.tokens) {
