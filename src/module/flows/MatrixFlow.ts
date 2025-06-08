@@ -285,6 +285,9 @@ export const MatrixFlow = {
             // For persona slaves get their possible token.
             const token = slave.getToken ? slave.getToken() : null;
 
+            // Remove the actor itself from the list of targets.
+            if (slave.uuid === actor.uuid) continue;
+
             targets.push({
                 name: slave.name,
                 type,
@@ -345,8 +348,10 @@ export const MatrixFlow = {
                 if (!token.actor) continue;
                 const target = token.actor;
 
-                // Validate Foundry VTT visibility.
+                /// Remove the actor itself from the list of targets.
                 if (target.uuid === actor.uuid) continue;
+
+                // Validate Foundry VTT visibility.
                 if (game.user?.isGM && token.hidden) continue;
 
                 // Validate Shadowrun5e visibility.
