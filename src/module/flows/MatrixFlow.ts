@@ -244,6 +244,10 @@ export const MatrixFlow = {
      * @returns Any possible matrix traget visible to the actor.
      */
     getMatrixTargets(actor: SR5Actor) {
+        if (!MatrixFlow.canSeeMatrixTargets(actor)) {
+            return { targets: [], personas: [], ics: [], devices: [] } 
+        }
+
         // Prepare all targets based on network connection.
         const network = actor.network;
         let targets = network?.isHost ?
@@ -403,5 +407,28 @@ export const MatrixFlow = {
      */
     allGrids() {
         return game.items?.filter(item => item.isGrid) ?? [];
+    },
+
+    /**
+     * Check if the given actor can see matrix targets.
+     * 
+     * This includes both a general check and if an actor that could see matrix targets
+     * actually can see matrix targets.
+     *
+     * @param actor Any type of actor with any type of item set.
+     * @returns true, if the actor should be able to see matrix targets.
+     */
+    canSeeMatrixTargets(actor: SR5Actor) {
+        // Only matrix active actors.
+        if (!(actor.isMatrixActor || actor.isIC())) return false;
+
+        // Only non-technomancers with an active main-device.
+        if (actor.isCharacter() && !actor.isEmerged && !actor.getMatrixDevice()) return false;
+
+        // Characters could be offline, though it's not supported yet.
+        // Technomancers could be offline, though it's not supported yet.
+
+        // Vehicles and IC are always online.
+        return true;
     }
 };
