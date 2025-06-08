@@ -15,6 +15,6 @@ export class AdeptPowerParser extends Parser<AdeptPowerItemData> {
     }
 
     protected override async getFolder(jsonData: Power): Promise<Folder> {
-        return IH.getFolder('Trait', "Adept Powers");
+        return await IH.getFolder('Trait', "Adept Powers");
     }
 }

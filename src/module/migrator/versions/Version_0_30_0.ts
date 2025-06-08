@@ -97,7 +97,6 @@ export class Version_0_30_0 extends VersionMigration {
     protected async MigrateMatrixDeviceData(item: SR5Item, updateData: UpdateData): Promise<UpdateData> {
         updateData.data['technology.-=networkController'] = null;
 
-        // @ts-expect-error networkController is not part of the types anymore.
         const uuid = item.system?.technology?.networkController ?? '';
         const controller = await fromUuid(uuid) as SR5Item;
         if (!controller) return updateData;

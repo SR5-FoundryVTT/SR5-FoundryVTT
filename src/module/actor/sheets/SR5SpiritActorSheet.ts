@@ -70,7 +70,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         }
 
         // Then, handle the rest of the actor drop cases.
-        return super._onDrop(event);
+        return await super._onDrop(event);
     }
 
     /**

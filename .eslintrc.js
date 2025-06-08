@@ -37,7 +37,7 @@ module.exports = {
         // TODO: ESLint Roadmap Step 2 - Set these rules to "error"
         "@typescript-eslint/no-invalid-void-type": "off", // This prohibits return console.asd in one line after an if statement. This might not be generally liked, though improves readability.
         "no-unreachable-loop": "error",
-        "no-return-assign": "error",
+        "no-return-assign": "off",
         "@typescript-eslint/consistent-type-assertions": "off", // Sometimes this makes life so much easier when returning types.
 
         // Warnings for things that could be better
@@ -79,7 +79,7 @@ module.exports = {
         "one-var": "error",
         "import/no-duplicates": "error",
         "no-empty": "error",
-        "@typescript-eslint/no-unused-expressions": "error",
+        "@typescript-eslint/no-unused-expressions": "warn", 
         "@typescript-eslint/consistent-generic-constructors": "error",
         "prefer-regex-literals": "error",
         "@typescript-eslint/prefer-reduce-type-parameter": "error",

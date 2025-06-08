@@ -21,6 +21,6 @@ export class ArmorParser extends Parser<ArmorItemData> {
         const rootFolder = TH.getTranslation("Armor", { type: 'category' });
         const category = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
 
-        return IH.getFolder('Gear', rootFolder, category);
+        return await IH.getFolder('Gear', rootFolder, category);
     }
 }

@@ -11,7 +11,7 @@ export class WeaponModImporter extends DataImporter {
     }
 
     async Parse(jsonObject: WeaponsSchema): Promise<void> {
-        return WeaponModImporter.ParseItems<Accessory, Shadowrun.ModificationItemData>(
+        return await WeaponModImporter.ParseItems<Accessory, Shadowrun.ModificationItemData>(
             jsonObject.accessories.accessory,
             {
                 compendiumKey: "Modification",

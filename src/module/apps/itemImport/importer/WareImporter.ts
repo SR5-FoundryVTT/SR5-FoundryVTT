@@ -10,8 +10,8 @@ export class WareImporter extends DataImporter {
     public files = ['bioware.xml', 'cyberware.xml'];
 
     CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware') ||
-               jsonObject.hasOwnProperty('cyberwares') && jsonObject['cyberwares'].hasOwnProperty('cyberware');
+        return (jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware')) ||
+               (jsonObject.hasOwnProperty('cyberwares') && jsonObject['cyberwares'].hasOwnProperty('cyberware'));
     }
 
     async Parse(jsonObject: BiowareSchema | CyberwareSchema): Promise<void> {
@@ -19,7 +19,7 @@ export class WareImporter extends DataImporter {
         const jsonDatas = 'biowares' in jsonObject ? jsonObject.biowares.bioware
                                                    : jsonObject.cyberwares.cyberware;
 
-        return WareImporter.ParseItems<WareTypes, WareItemData>(
+        return await WareImporter.ParseItems<WareTypes, WareItemData>(
             jsonDatas,
             {
                 compendiumKey: "Trait",

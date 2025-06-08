@@ -11,7 +11,7 @@ export class QualityImporter extends DataImporter {
     }
 
     async Parse(jsonObject: QualitiesSchema): Promise<void> {
-        return QualityImporter.ParseItems<Quality, Shadowrun.QualityItemData>(
+        return await QualityImporter.ParseItems<Quality, Shadowrun.QualityItemData>(
             jsonObject.qualities.quality,
             {
                 compendiumKey: "Trait",

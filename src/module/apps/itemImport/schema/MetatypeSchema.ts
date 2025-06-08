@@ -1,7 +1,6 @@
 // AUTO‑GENERATED — DO NOT EDIT
 
 import { BonusSchema } from './BonusSchema';
-import { ConditionsSchema } from './ConditionsSchema';
 import { Empty, Many, OneOrMany } from './Types';
 
 export interface Metatype {

@@ -11,7 +11,7 @@ export class EchoesImporter extends DataImporter {
     }
 
     async Parse(jsonObject: EchoesSchema): Promise<void> {
-        return EchoesImporter.ParseItems<Echo, Shadowrun.EchoItemData>(
+        return await EchoesImporter.ParseItems<Echo, Shadowrun.EchoItemData>(
             jsonObject.echoes.echo,
             {
                 compendiumKey: "Trait",

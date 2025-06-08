@@ -34,6 +34,6 @@ export class SpriteParser extends MetatypeParserBase<SpriteActorData> {
     protected override async getFolder(jsonData: Metatype): Promise<Folder> {
         const folderName = TH.getTranslation('Sprite', {type: 'category'});
 
-        return  IH.getFolder('Critter', folderName);
+        return await IH.getFolder('Critter', folderName);
     }
 }

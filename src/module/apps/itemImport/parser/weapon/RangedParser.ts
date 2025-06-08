@@ -1,4 +1,3 @@
-import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
 import WeaponItemData = Shadowrun.WeaponItemData;
 import { DataDefaults } from '../../../../data/DataDefaults';

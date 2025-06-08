@@ -603,7 +603,7 @@ export class Helpers {
     static getChatSpeakerImg(document: Shadowrun.TestTargetDocument): string {
         if (!document) return '';
 
-        if (document instanceof SR5Item) return document.img as string;
+        if (document instanceof SR5Item) return document.img;
 
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = document instanceof TokenDocument ? document : document.getToken();

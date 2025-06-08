@@ -53,7 +53,7 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
             const groups = IH.getArray(skills.group).reduce((acc, item) => {
                 acc[item._TEXT] = +(item.$?.rating ?? 0);
                 return acc;
-            }, {} as Record<string, number>);
+            }, {});
 
             Object.entries(system.skills.active).forEach(([_, skill]) => {
                 if ('group' in skill && typeof skill.group === 'string' && Object.keys(groups).includes(skill.group)) {
@@ -171,6 +171,6 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
         const rootFolder = TH.getTranslation("Critter", {type: 'category'});
         const folderName = TH.getTranslation(category, {type: 'category'});
 
-        return IH.getFolder('Critter', rootFolder, folderName);
+        return await IH.getFolder('Critter', rootFolder, folderName);
     }
 }

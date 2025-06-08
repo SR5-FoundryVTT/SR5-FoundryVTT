@@ -89,7 +89,7 @@ export abstract class DataImporter {
         inputs: TInput[],
         options: {
             compendiumKey: keyof typeof Constants.MAP_COMPENDIUM_KEY;
-            parser: { Parse(data: TInput): Promise<TOutput> };
+            parser: { Parse: (data: TInput) => Promise<TOutput> };
             filter?: (input: TInput) => boolean;
             injectActionTests?: (item: TOutput) => void;
             errorPrefix?: string;
@@ -114,7 +114,7 @@ export abstract class DataImporter {
         };
 
         const compendium = Constants.MAP_COMPENDIUM_KEY[compendiumKey];
-        //@ts-expect-error
+        //@ts-expect-error TODO: foundry-vtt-types v9
         await (compendium.type === 'Actor' ? Actor : Item).create(items, { pack: compendium.pack });
     }
 }
