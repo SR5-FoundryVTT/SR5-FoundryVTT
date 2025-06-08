@@ -6,6 +6,7 @@ declare namespace Shadowrun {
     export interface ICData extends
         CommonData,
         MatrixActorData,
+        ImportFlags,
         MatrixTrackActorData {
             icType: ICType,
             host: {

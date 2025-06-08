@@ -238,5 +238,14 @@ export const SR = {
                 }
             }
         }
+    },    
+    gradeModifiers: {
+        standard: { essence: 1, avail: 0, cost: 1 },
+        alpha: { essence: 0.8, avail: 2, cost: 1.2 },
+        beta: { essence: 0.7, avail: 4, cost: 1.5 },
+        delta: { essence: 0.5, avail: 8, cost: 2.5 },
+        gamma: { essence: 0.4, avail: 12, cost: 5 },
+        grey: {essence: 0.75, avail: 0, cost: 1.3},
+        used: { essence: 1.25, avail: -4, cost: 0.75 },
     }
 }

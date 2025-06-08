@@ -1,71 +1,41 @@
 import { DataImporter } from './DataImporter';
-import { ImportHelper } from '../helper/ImportHelper';
-import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
+import { SpritePowerParser } from '../parser/powers/SpritePowerParser';
+import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
 
-export class CritterPowerImporter extends DataImporter<Shadowrun.CritterPowerItemData, Shadowrun.CritterPowerData> {
+type CritterPowerType = Shadowrun.CritterPowerItemData | Shadowrun.SpritePowerItemData;
+
+export class CritterPowerImporter extends DataImporter {
     public files = ['critterpowers.xml'];
-
-    public override unsupportedCategories = [
-        'Emergent',
-    ];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
     }
 
-    ExtractTranslation() {
-        if (!DataImporter.jsoni18n) {
-            return;
+    static parserWrap = class {
+        public async Parse(jsonData: Power): Promise<CritterPowerType> {
+            const critterPowerParser = new CritterPowerParser();
+            const spritePowerParser = new SpritePowerParser();
+
+            const isSpritePower = jsonData.category._TEXT !== "Emergent";
+            const selectedParser = isSpritePower ? critterPowerParser : spritePowerParser;
+
+            return await selectedParser.Parse(jsonData);
         }
+    };
 
-        const jsonCritterPoweri18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
-        this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonCritterPoweri18n);
-        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonCritterPoweri18n, 'powers', 'power');
-    }
-
-
-    async Parse(chummerPowers: object, setIcons: boolean): Promise<Item> {
-        const parser = new CritterPowerParserBase();
-
-        chummerPowers['categories']['category'] = chummerPowers['categories']['category'].filter(
-            (power) => !["Emergent", "Toxic Critter Powers"].includes(power._TEXT)
-        ).concat({ _TEXT: "Other" });
-        const folders = await ImportHelper.MakeCategoryFolders("Item", chummerPowers, game.i18n.localize('TYPES.Item.critter_power'), this.categoryTranslations);
-
-        const items: Shadowrun.CritterPowerItemData[] = [];
-        const chummerCritterPowers = this.filterObjects(chummerPowers['powers']['power']);
-        this.iconList = await this.getIconFiles();
-        const parserType = 'critter_power';
-
-        for (const chummerCritterPower of chummerCritterPowers) {
-
-            // Check to ensure the data entry is supported
-            if (DataImporter.unsupportedEntry(chummerCritterPower)) {
-                continue;
+    async Parse(jsonObject: CritterpowersSchema): Promise<void> {
+        return CritterPowerImporter.ParseItems<Power, CritterPowerType>(
+            jsonObject.powers.power,
+            {
+                compendiumKey: "Trait",
+                parser: new CritterPowerImporter.parserWrap(),
+                injectActionTests: item => {
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                },
+                errorPrefix: "Failed Parsing Critter Power"
             }
-
-            // Create the item
-            const item = parser.Parse(chummerCritterPower, this.GetDefaultData({type: parserType, entityType: "Item"}), this.itemTranslations);
-            // @ts-expect-error TODO: foundry-vtt-type v10
-            item.folder = folders[item.system.category]?.id || folders["other"].id;
-
-            // Import Flags
-            item.system.importFlags = this.genImportFlags(item.name, item.type, item.system.powerType);
-
-            // Default icon
-            if (setIcons) {item.img = await this.iconAssign(item.system.importFlags, item.system, this.iconList)};
-
-            // Translate name if needed
-            item.name = ImportHelper.MapNameToTranslation(this.itemTranslations, item.name);
-
-            // Add relevant action tests
-            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
-
-            items.push(item);
-        }
-
-        // @ts-expect-error // TODO: TYPE: Remove this.
-        return await Item.create(items);
-    }
+        );
+    }    
 }

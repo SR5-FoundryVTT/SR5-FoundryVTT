@@ -335,7 +335,7 @@ export class DataDefaults {
             rating: '',
             availability: '',
             quantity: 1,
-            cost: 0,
+            cost: '',
             equipped: false,
             conceal: {
                 base: 0,

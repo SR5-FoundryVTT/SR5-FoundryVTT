@@ -94,27 +94,45 @@
     }
     .technology {
         @include systemFonts;
-
         min-width: 12em;
         padding-top: 10px;
         padding-left: 10px;
-
+      
         > * {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: space-between;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: space-between;
         }
-        .unit {
-            font-size: 10px;
-            top: 5px;
-            left: 2px;
-        }
-
+      
         label {
-            color: $yellow;
+          color: $yellow;
         }
-
-    }
+      
+        .tech-adjustable-label {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+      
+        .tech-adjustable-input {
+          flex: 1;
+          position: relative;
+      
+          input.display {
+            width: 100%;
+          }
+      
+          .unit {
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            pointer-events: none;
+          }
+        }
+      }      
     .description {
         padding: 2px;
         padding-left: 10px;

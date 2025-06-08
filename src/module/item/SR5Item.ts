@@ -63,6 +63,10 @@ import { ItemRollDataFlow } from './flows/ItemRollDataFlow';
 import { RollDataOptions } from './Types';
 import { MatrixFlow } from '../flows/MatrixFlow';
 import { SetMarksOptions } from '../storage/MarksStorage';
+import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
+import { WarePrep } from './prep/WarePrep';
+
+ActionResultFlow; // DON'T TOUCH!
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -240,6 +244,7 @@ export class SR5Item extends Item {
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
 
+        // Prepare technology data for all item types sharing it.
         const technology = this.getTechnologyData();
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
@@ -247,6 +252,9 @@ export class SR5Item extends Item {
             TechnologyPrep.prepareAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
             TechnologyPrep.prepareMatrixAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
             TechnologyPrep.prepareMentalAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
+            TechnologyPrep.prepareConceal(technology, equippedMods);            
+            TechnologyPrep.prepareAvailability(this, technology);
+            TechnologyPrep.prepareCost(this, technology);
         }
 
         const action = this.getAction();
@@ -260,7 +268,7 @@ export class SR5Item extends Item {
         }
 
         // Switch item data preparation between types...
-        // ... this is ongoing work to clean up SR5item.prepareData
+        // ... this work only begun to clean up SR5item.prepareData
         switch (this.type) {
             case 'host':
                 HostPrep.prepareBaseData(this.system as Shadowrun.HostData);
@@ -271,6 +279,10 @@ export class SR5Item extends Item {
             case 'sin':
                 SinPrep.prepareBaseData(this.system as unknown as Shadowrun.SinData);
                 break;
+            case 'cyberware':
+            case 'bioware':
+                WarePrep.prepareBaseData(this.system as unknown as Shadowrun.WareData);
+                break
         }
     }
 
@@ -1037,6 +1049,14 @@ export class SR5Item extends Item {
 
     getMasterUuid(): string|undefined {
         return this.getTechnologyData()?.master;
+    }
+
+    parseAvailibility(avail: string) {
+        return ItemAvailabilityFlow.parseAvailibility(avail)
+    }
+
+    getNetworkController(): string | undefined {
+        return this.getTechnologyData()?.networkController;
     }
 
     async setMasterUuid(masterUuid: string|undefined): Promise<void> {

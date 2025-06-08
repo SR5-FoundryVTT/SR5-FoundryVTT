@@ -16,10 +16,15 @@
                 class="display attribute-input"
                 type="text"
                 size="4"
-                name="system.essence"
-                value="{{system.essence}}"
                 data-dtype="Number"
                 placeholder="0"
+                {{#if calculatedEssence}}
+                value="{{system.technology.calculated.essence.value}}"
+                readonly
+                {{else}}
+                name="system.essence"
+                value="{{system.essence}}"
+                {{/if}}
             />
         </div>
         {{/hasprop}} {{#hasprop system 'capacity'}}
@@ -46,7 +51,8 @@
                 name="system.technology.rating"
                 value="{{system.technology.rating}}"
                 data-dtype="Number"
-                placeholder="0"
+                placeholder="0"                
+                {{#if ratingForCalculation}}readonly{{/if}}
             />
         </div>
         <div class="flexrow nowrap">
@@ -64,7 +70,7 @@
         </div>
         {{#unless hideConceal}}
         <div class="flexrow nowrap">
-            <label>{{localize "SR5.Conceal"}}</label>
+            <label>{{localize "SR5.Conceal"}}</label>            
             <input
                 class="display"
                 type="text"
@@ -77,31 +83,61 @@
         </div>
         {{/unless}}
         <div class="flexrow nowrap">
-            <label>{{localize "SR5.Cost"}}</label>
-            <div class="input">
-                <input
-                    class="display"
-                    type="text"
-                    name="system.technology.cost"
-                    value="{{system.technology.cost}}"
-                    data-dtype="Number"
-                    placeholder="100"
-                />
-                <span class="unit">
-                    <i class="fas fa-yen-sign"></i>
-                </span>
+            <div class="tech-adjustable-label">
+              <label>{{localize "SR5.Cost"}}</label>
+              <input
+                class="checkbox"
+                type="checkbox"
+                name="system.technology.calculated.cost.adjusted"
+                {{checked system.technology.calculated.cost.adjusted}}
+                data-tooltip="{{localize 'SR5.Tooltips.Item.CostAdjustment'}}"
+                {{#if calculatedEssence}}disabled{{/if}}
+              />
             </div>
-        </div>
-        <div class="flexrow nowrap">
-            <label>{{localize "SR5.Availability"}}</label>
-            <input
+            <div class="tech-adjustable-input">
+              <input
                 class="display"
                 type="text"
+                data-dtype="Number"
+                placeholder="100"
+                {{#if calculatedCost}}
+                value="{{system.technology.calculated.cost.value}}"
+                readonly
+                {{else}}
+                name="system.technology.cost"
+                value="{{system.technology.cost}}"
+                {{/if}}
+              />
+              <span class="unit"><i class="fas fa-yen-sign"></i></span>
+            </div>
+          </div>
+          <div class="flexrow nowrap">
+            <div class="tech-adjustable-label">
+              <label>{{localize "SR5.Availability"}}</label>
+              <input
+                class="checkbox"
+                type="checkbox"
+                name="system.technology.calculated.availability.adjusted"
+                {{checked system.technology.calculated.availability.adjusted}}
+                data-tooltip="{{localize 'SR5.Tooltips.Item.AvailabilityAdjustment'}}"
+                {{#if calculatedEssence}}disabled{{/if}}
+              />
+            </div>
+            <div class="tech-adjustable-input">
+              <input
+                class="display"
+                type="text"
+                placeholder="2R"
+                {{#if calculatedAvailability}}
+                value="{{system.technology.calculated.availability.value}}"
+                readonly
+               {{else}}
                 name="system.technology.availability"
                 value="{{system.technology.availability}}"
-                placeholder="2R"
-            />
-        </div>
+                {{/if}}
+              />
+            </div>
+          </div>
         {{#unless hideConditionMonitor}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.ConditionMonitor"}}</label>
