@@ -95,6 +95,12 @@ export class MatrixNetworkFlow {
             return false;
         }
 
+        // Validate IC to master relationships.
+        if (slave instanceof SR5Actor && master.isGrid && slave.isIC()) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantConnectICToGrid'));
+            return false;
+        }
+
         return true;
     }
 

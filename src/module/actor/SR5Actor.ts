@@ -38,6 +38,7 @@ import { SuccessTest } from '../tests/SuccessTest';
 import { MatrixFlow } from '../flows/MatrixFlow';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { OverwatchStorage } from '../storage/OverwatchStorage';
+import { MatrixICFlow } from './flows/MatrixICFlow';
 
 
 /**
@@ -746,14 +747,30 @@ export class SR5Actor extends Actor {
      * @param network Must be an item of matching type
      */
     async connectNetwork(network: SR5Item) {
+        // General connection handling.
         await MatrixNetworkFlow.addSlave(network, this);
+
+        // Actor type specific connection handling.
+        switch (this.type) {
+            case 'ic':
+                await MatrixICFlow.connectToHost(network, this);
+                break;
+        }
     }
 
     /**
      * Disconnect this actor from a host / grid
      */
     async disconnectNetwork() {
+        // General disconnection handling.
         await MatrixNetworkFlow.disconnectNetwork(this);
+
+        // Actor type specific disconnection handling.
+        switch (this.type) {
+            case 'ic':
+                await MatrixICFlow.disconnectFromHost(this);
+                break;
+        }
     }
 
     /**
@@ -1789,36 +1806,6 @@ export class SR5Actor extends Actor {
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver) return;
         return driver;
-    }
-
-    async _updateICHostData(host: SR5Item) {
-        const hostData = host.asHost;
-        if (!hostData) return;
-
-        const updateData = {
-            id: host.uuid,
-            rating: hostData.system.rating,
-            atts: foundry.utils.duplicate(hostData.system.atts)
-        }
-
-        // Some host data isn't stored on the IC actor (marks) and won't cause an automatic render.
-        await this.update({ 'system.host': updateData }, { render: false });
-        await this.sheet?.render();
-    }
-
-    /**
-     * Remove a connect Host item from an ic type actor.
-     */
-    async removeICHost() {
-        if (!this.isIC()) return;
-
-        const updateData = {
-            id: null,
-            rating: 0,
-            atts: null
-        }
-
-        await this.update({ 'system.host': updateData });
     }
 
     /**

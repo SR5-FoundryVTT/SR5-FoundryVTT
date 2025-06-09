@@ -79,6 +79,7 @@ import { MatrixHooks } from './tests/hooks/MatrixHooks';
 import { DataStorage } from './data/DataStorage';
 import { SRStorage } from './storage/storage';
 import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
+import { MatrixICFlow } from './actor/flows/MatrixICFlow';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -451,29 +452,18 @@ ___________________
     }
 
     /**
-     * On each
-     * @param item
-     * @param data
-     * @param id
+     * Handle all updateItem calls for all item types.
+     * 
+     * @param item The item updates.
+     * @param data The update data given.
+     * @param id The items id.
      */
     static async updateIcConnectedToHostItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
-        if (!canvas.ready || !game.actors) return;
-
-        if (item.isHost) {
-            // Collect actors from sidebar and active scene to update / rerender
-            const connectedIC = [
-                // All sidebar actors should also include tokens with linked actors.
-                ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
-                // All token actors that aren't linked.
-                // @ts-expect-error // TODO: foundry-vtt-types v10
-                ...canvas.scene.tokens.filter(token => !token.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
-            ];
-
-            // Update host data on the ic actor.
-            for (const ic of connectedIC) {
-                if (!ic) continue;
-                await ic._updateICHostData(item);
-            }
+        // Trigger type specific behaviour.
+        switch (item.type) {
+            case 'host':
+                await MatrixICFlow.handleUpdateItemHost(item);
+                break;
         }
     }
 

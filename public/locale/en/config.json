@@ -229,13 +229,13 @@
     "SR5.CollapseAll": "Collapse All",
     "SR5.CommonProgram": "Common Program",
     "SR5.Compendiums": {
-        "Root": "SR5e Imports",
         "Critter": "Critters & Spirits & Sprites",
         "Drone": "Drones & Vehicles",
         "Gear": "Gears",
-        "Trait": "Traits",
         "Magic": "Spell & Complex Forms",
         "Modification": "Modifications",
+        "Root": "SR5e Imports",
+        "Trait": "Traits",
         "Weapon": "Weapons"
     },
     "SR5.Compilation": {
@@ -442,6 +442,7 @@
     "SR5.Equipment": "Equipment",
     "SR5.Equipped": "Equipped",
     "SR5.Errors": {
+        "CantConnectICToGrid": "IC actors can't be connected to a grid network",
         "CantConnectToPAN": "Given document can't be added to PAN network",
         "CantConnectToWAN": "Given document can't be added to WAN network",
         "CantEditAppliedItemEffects": "You can't edit an active effect that's been applied by an item.",
@@ -1140,8 +1141,8 @@
             "Caretaker": "Insect Caretaker",
             "Ceramic": "Ceramic",
             "Chindi": "Chindi",
-            "Corpse": "Corpse",
             "CorpsCadavre": "Corps Cadavre",
+            "Corpse": "Corpse",
             "Crawler": "Crawler (Demon)",
             "Croki": "Croki",
             "Detritus": "Detritus",
@@ -1199,8 +1200,8 @@
             "Unbreakable": "Unbreakable",
             "Vrygoths": "Vrygoths",
             "VucubCaquix": "Vucub Caquix",
-            "Water": "Water",
             "Watcher": "Watcher",
+            "Water": "Water",
             "Worker": "Insect Worker",
             "Wraith": "Wraith"
         }
@@ -1353,10 +1354,10 @@
             "ActionCategories": "Select action categories to use instead of the test's default categories. Using Active Effects you can use categories to modify test values",
             "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",
             "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
-            "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
             "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
-            "DisabledForPreparedActor": "Disabled due to use of prepared actor",
-            "CostAdjustment": "Adjust actual cost based on the item rating"
+            "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
+            "CostAdjustment": "Adjust actual cost based on the item rating",
+            "DisabledForPreparedActor": "Disabled due to use of prepared actor"
         },
         "Modifiers": {
             "armor": "Modifies total armor value",
