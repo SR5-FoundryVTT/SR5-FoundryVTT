@@ -30,7 +30,7 @@ import { ActiveEffectConfigV1 } from "./ActiveEffectConfigV1";
  * situational modifiers and others still can behave differently.
  */
 export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
-    override object: SR5ActiveEffect;
+    declare object: SR5ActiveEffect;
     // @ts-expect-error Foundry v13 This is not type issue, but a type override for legacy Application v1 support...
     override document: SR5ActiveEffect;
 

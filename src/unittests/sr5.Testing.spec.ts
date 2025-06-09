@@ -1,4 +1,3 @@
-import {SR5TestingDocuments} from "./utils";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
 import {TestCreator} from "../module/tests/TestCreator";
@@ -8,18 +7,8 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
     const {describe, it, before, after} = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    before(async () => {})
+    after(async () => {})
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {

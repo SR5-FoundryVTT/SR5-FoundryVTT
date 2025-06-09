@@ -733,7 +733,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Test categories must be ready before active effects are applied as they rely on this data to be present.
      */
     prepareTestCategories() {
-        this.data.categories = this.data.action.categories.length !== 0 ? this.data.action.categories : this.testCategories;
+        this.data.categories = 
+            this.data.action.categories.length > 0
+            ? this.data.action.categories as Shadowrun.ActionCategories[]
+            : this.testCategories;
     }
 
     /**
@@ -1265,6 +1268,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const formula = `${dice}d6`;
         const roll = new SR5Roll(formula);
         this.rolls.push(roll);
+        return;
     }
 
     /**

@@ -1,5 +1,6 @@
 import { CommonModifiers, MatrixModifiers, CommonData, MatrixActorData, TwoTrackActorData, ArmorActorData, MagicActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CharacterLimits } from "./CommonModel";
 import { Attributes, AttributeField } from "../template/AttributesModel";
+import { ValueMaxPair } from "../template/BaseModel";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const TechnomancerActorData = () => ({
@@ -62,6 +63,7 @@ const CharacterData = {
     metatype: new StringField({ required: true, initial: "" }),
     full_defense_attribute: new StringField({ required: true, initial: "" }),
     is_critter: new BooleanField({ required: true, initial: false }),
+    karma: new SchemaField(ValueMaxPair(), { required: true }),
     limits: new SchemaField(CharacterLimits(), { required: true }),
     modifiers: new SchemaField({
         //todo

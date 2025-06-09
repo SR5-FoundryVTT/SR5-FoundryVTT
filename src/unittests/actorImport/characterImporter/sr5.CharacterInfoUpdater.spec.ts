@@ -1,18 +1,14 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CharacterImporter } from '../../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
-import { SR5TestingDocuments } from '../../utils';
 import { SR5Actor } from '../../../module/actor/SR5Actor';
 
 export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, beforeEach, after } = context;
 
-    let testActorFactory;
     let importOptions = {};
     let chummerFile;
 
-    before(async () => {
-        testActorFactory = new SR5TestingDocuments(SR5Actor);
-    });
+    before(async () => {});
 
     beforeEach(async () => {
         chummerFile = {
@@ -22,9 +18,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
         };
     });
 
-    after(async () => {
-        await testActorFactory.teardown();
-    });
+    after(async () => {});
 
     describe('Chummer Character Info Updater handles alias correctly', () => {
         it('Imports name', async () => {

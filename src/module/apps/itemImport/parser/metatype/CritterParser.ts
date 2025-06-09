@@ -94,8 +94,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         else if (system.attributes['resonance'].base)
             system.special = 'resonance';
 
-        // @ts-expect-error
-        system.karma.value = +(jsonData.karma?._TEXT ?? 0);
+        system.karma.value = Number(jsonData.karma?._TEXT || 0);
 
         if (jsonData.run) {
             const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => Number(v) || 0);

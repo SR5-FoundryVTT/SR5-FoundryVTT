@@ -99,7 +99,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         // Copy to get all values changed by user (override) but also remove all.
         this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain) as DamageType;
         this.data.modifiedDrain.base = Helpers.calcTotal(this.data.incomingDrain, {min: 0});
-        delete this.data.modifiedDrain.override;
+        this.data.modifiedDrain.override = undefined;
     }
 
     /**

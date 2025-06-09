@@ -54,13 +54,13 @@ export class ImportHelper {
     ): Promise<SR5Item[]> {
         if (Array.isArray(name) ? name.length === 0 : !name) return [];
 
-        type ItemType = CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
+        type ItemType = CompendiumCollection<'Actor' | 'Item'>;
         const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY[compKey].pack) as ItemType;
 
-        return pack.getDocuments({
+        return await pack.getDocuments({
             name__in: this.getArray(name),
             ...(types ? { type__in: this.getArray(types) } : {})
-        }) as Promise<SR5Item[]>;
+        }) as SR5Item[];
     }
 
     /**
@@ -70,9 +70,9 @@ export class ImportHelper {
      * @returns A promise that resolves with the compendium collection.
      * @throws If the compendium key is invalid or improperly formatted.
      */
-    public static async GetCompendium(ctype: CompendiumKey): Promise<CompendiumCollection<CompendiumCollection.Metadata>> {
+    public static async GetCompendium(ctype: CompendiumKey): Promise<CompendiumCollection<'Actor' | 'Item'>> {
         const { pack, type } = Constants.MAP_COMPENDIUM_KEY[ctype];
-        let compendium = game.packs.get(pack);
+        let compendium = game.packs.get(pack) as CompendiumCollection<'Actor' | 'Item'>;
 
         // Create the compendium if it doesn't exist
         if (!compendium) {
@@ -97,15 +97,7 @@ export class ImportHelper {
             compendium = await CompendiumCollection.createCompendium({
                 name: packName,
                 label: game.i18n.localize(`SR5.Compendiums.${ctype}`),
-                type: type,
-                package: scope,
-                private: false,
-                path: `packs/${packName}`,
-                ownership: {
-                    PLAYER: "OBSERVER",
-                    TRUSTED: "OBSERVER",
-                    ASSISTANT: "OWNER"
-                }
+                type: type
             });
 
             // Manually assign compendium to the folder via settings

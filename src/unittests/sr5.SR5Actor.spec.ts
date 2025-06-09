@@ -1,24 +1,13 @@
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
-import {SR5Actor} from "../module/actor/SR5Actor";
-import {SR5Item} from "../module/item/SR5Item";
-import {SR5TestingDocuments} from "./utils";
+import { SR5Actor } from "../module/actor/SR5Actor";
+import { SR5Item } from "../module/item/SR5Item";
 
 export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
     const {describe, it, before, after} = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    before(async () => {})
+    after(async () => {})
 
     describe('SR5Actor', () => {
         it('create a naked actor of any type', async () => {
@@ -41,10 +30,9 @@ export const shadowrunSR5Actor = (context: QuenchBatchContext) => {
             const actor = new SR5Actor<'character'>({type: 'character'});
             const weapon = new SR5Item<'weapon'>({type: 'weapon'});
 
-            //@ts-expect-error
             await actor.createEmbeddedDocuments('Item', [weapon.toObject()]);
 
-            const ownedItems = Array.from(actor.items) as SR5Item[];
+            const ownedItems = Array.from(actor.items);
             assert.isNotEmpty(ownedItems);
             assert.lengthOf(ownedItems, 1);
 

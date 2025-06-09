@@ -1,6 +1,5 @@
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { SR5Item } from "../module/item/SR5Item";
-import { SR5TestingDocuments } from "./utils";
 import { TechnologyPrep } from "../module/item/prep/functions/TechnologyPrep";
 import { ActionPrep } from "../module/item/prep/functions/ActionPrep";
 import { SR5Actor } from "../module/actor/SR5Actor";
@@ -13,18 +12,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
     const {describe, it, before, after} = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let testItem: SR5TestingDocuments<SR5Item>;
-    let testActor: SR5TestingDocuments<SR5Actor>;
-
-    before(async () => {
-        testItem = new SR5TestingDocuments(SR5Item);
-        testActor = new SR5TestingDocuments(SR5Actor);
-    })
-
-    after(async () => {
-        await testItem.teardown();
-        await testActor.teardown();
-    });
+    before(async () => {})
+    after(async () => {});
 
     describe('TechnologyData preparation', () => {
         it('Calculate the correct device item condition monitor', async () => {

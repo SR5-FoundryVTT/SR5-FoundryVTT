@@ -1,24 +1,12 @@
-import { SR5Item } from '../module/item/SR5Item';
 import { SR5Actor } from './../module/actor/SR5Actor';
-import { SR5TestingDocuments } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
     const { describe, it, before, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    before(async () => {})
+    after(async () => {})
     
     describe('VehicleDataPrep', () => {
         it('Matrix condition monitor track calculation with modifiers', async () => {

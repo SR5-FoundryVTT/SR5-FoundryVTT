@@ -378,7 +378,7 @@ export abstract class VersionMigration {
      * Migrate a compendium pack
      * @param pack
      */
-    public async MigrateCompendiumPack(pack: CompendiumCollection<CompendiumCollection.Metadata>) {
+    public async MigrateCompendiumPack(pack: CompendiumCollection<'Actor'|'Item'|'Scene'>) {
         if (!['Actor', 'Item', 'Scene'].includes(pack.metadata.type)) return;
 
         // Begin by requesting server-side data model migration and get the migrated content

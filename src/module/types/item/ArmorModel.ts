@@ -6,12 +6,13 @@ import { TechnologyPartData } from "../template/TechnologyModel";
 export const ArmorPartData = () => ({
     armor: new SchemaField({
         mod: new BooleanField({ required: true, initial: false }),
-        value: new NumberField({ required: true, initial: 0 }),
-        acid: new NumberField({ required: true, initial: 0 }),
-        cold: new NumberField({ required: true, initial: 0 }),
-        fire: new NumberField({ required: true, initial: 0 }),
-        electricity: new NumberField({ required: true, initial: 0 }),
-        radiation: new NumberField({ required: true, initial: 0 }),
+        base: new NumberField({ required: true, nullable: false, initial: 0 }),
+        value: new NumberField({ required: true, nullable: false, initial: 0 }),
+        acid: new NumberField({ required: true, nullable: false, initial: 0 }),
+        cold: new NumberField({ required: true, nullable: false, initial: 0 }),
+        fire: new NumberField({ required: true, nullable: false, initial: 0 }),
+        electricity: new NumberField({ required: true, nullable: false, initial: 0 }),
+        radiation: new NumberField({ required: true, nullable: false, initial: 0 }),
         hardened: new BooleanField({ required: true, initial: false }),
     }, { required: true })
 });

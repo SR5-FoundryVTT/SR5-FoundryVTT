@@ -192,6 +192,7 @@ export const CommonModifiers = () => ({
     physical_track: new NumberField({ required: true, nullable: false, initial: 0 }),
     physical_overflow_track: new NumberField({ required: true, nullable: false, initial: 0 }),
     multi_defense: new NumberField({ required: true, nullable: false, initial: 0 }),
+    global: new NumberField({ required: true, nullable: false, initial: 0 }),
     wound_tolerance: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 

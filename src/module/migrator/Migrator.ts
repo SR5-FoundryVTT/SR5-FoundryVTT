@@ -136,7 +136,10 @@ export class Migrator {
      */
     private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
         // Migrate World Compendium Packs
-        const packs = game.packs?.filter((pack) => pack.metadata.packageType === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
+        const packs = game.packs?.filter((pack) =>
+            pack.metadata.packageType === 'world' &&
+            ['Actor', 'Item', 'Scene'].includes(pack.metadata.type)
+        ) as CompendiumCollection<'Actor' | 'Item' | 'Scene'>[];
 
         if (!packs) return;
 

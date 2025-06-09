@@ -1,7 +1,8 @@
-import {FLAGS, SYSTEM_NAME} from './constants';
+import { EmptyObject } from 'fvtt-types/utils';
+import { FLAGS, SYSTEM_NAME } from './constants';
 const { BaseGrid, SquareGrid } = foundry.grid;
 
-interface DistanceOptions {
+type DistanceOptions = {
     gridSpaces?: boolean
 }
 
@@ -13,7 +14,7 @@ interface DistanceOptions {
  * @returns 
  */
 const measureDistances = function (this: any, segments, options: DistanceOptions = {}) {
-    if (!options.gridSpaces) return BaseGrid.prototype.measureDistances.call(this, segments, options);
+    if (!options.gridSpaces) return BaseGrid.prototype.measureDistances.call(this, segments, options as EmptyObject);
 
     // Track the total number of diagonals
     let nDiagonal = 0;

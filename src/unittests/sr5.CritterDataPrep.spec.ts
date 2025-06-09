@@ -1,24 +1,12 @@
-import { SR5Item } from '../module/item/SR5Item';
 import { SR5Actor } from './../module/actor/SR5Actor';
-import { SR5TestingDocuments } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunSR5CritterDataPrep = (context: QuenchBatchContext) => {
     const { describe, it, before, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    before(async () => {})
+    after(async () => {})
 
     describe('CritterDataPrep', () => {
         it('Critter character recoil compensation', async () => {

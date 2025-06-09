@@ -1,24 +1,12 @@
-import { SR5Item } from '../module/item/SR5Item';
 import { SR5Actor } from './../module/actor/SR5Actor';
-import { SR5TestingDocuments } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
     const { describe, it, before, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    before(async () => {})
+    after(async () => {})
 
     describe('ICDataPrep', () => {
         it('Matrix condition monitor track calculation with modifiers', async () => {
@@ -39,6 +27,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(ic.system.visibilityChecks.meat.hasHeat, false);
             assert.strictEqual(ic.system.visibilityChecks.matrix.hasIcon, true);
             assert.strictEqual(ic.system.visibilityChecks.matrix.runningSilent, false);
+
             await ic.delete();
         });
 

@@ -1,6 +1,5 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CharacterImporter } from '../../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
-import { SR5TestingDocuments } from '../../utils';
 import { SR5Actor } from '../../../module/actor/SR5Actor';
 import { SR5Item } from '../../../module/item/SR5Item';
 
@@ -8,7 +7,6 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
     const { describe, it, before, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
     let importOptions = {};
     let chummerFile = {
         characters: {
@@ -16,16 +14,10 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         },
     };
 
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-    });
-    after(async () => {
-        await testActor.teardown();
-    });
+    before(async () => {});
+    after(async () => {});
 
     describe('Chummer Character Importer', () => {
-        let testItem = new SR5TestingDocuments(SR5Item);
-
         it('Does nothing when no character found', async () => {
             const item = new SR5Item<'weapon'>({ type: 'weapon' });
             const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
@@ -97,7 +89,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             item.createEmbeddedDocuments('ActiveEffect', [{
                 origin: item.uuid,
                 disabled: false,
-                label: 'Test Effect',
+                name: 'Test Effect',
                 changes: [
                     { key: 'system.attributes.body.mod', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
                     { key: 'system.attributes.body', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }

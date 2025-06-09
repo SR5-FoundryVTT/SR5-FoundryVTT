@@ -67,6 +67,7 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             console.debug('Shadowrun 5e | ... applying modifier handler', this.modifier, handler, test);
             handler(this.modifier, test);
         }
+        return false;
     }
 
     /**

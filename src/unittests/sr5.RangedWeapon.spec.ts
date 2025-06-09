@@ -1,5 +1,4 @@
 import { SR5Actor } from './../module/actor/SR5Actor';
-import { SR5TestingDocuments } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5Item } from '../module/item/SR5Item';
 
@@ -13,23 +12,14 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
     const {describe, it, before, after} = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    before(async () => {})
+    after(async () => {})
 
     const getWeaponWithEquippedAmmo = async (weaponAmmo: number, weaponAmmoMax: number, ammoQuantity: number) => {
-        const actor = await testActor.create({type: 'character', name: 'Test Character'});
+        const actor = new SR5Actor<'character'>({type: 'character', name: 'Test Character'});
+        //@ts-expect-error
         const items = actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}]);
-        const item = items[0] as SR5Item<'weapon'>;
+        const item = items![0] as SR5Item<'weapon'>;
         // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}) as SR5Item;
         //@ts-expect-error
         const ammoItem = new SR5Item<'ammo'>({type: 'ammo', name: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}}, {parent: item});
@@ -58,19 +48,20 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
         });
 
         it('Reload weapon causes reduction in available clips', async () => {
-            const actor = await testActor.create({type: 'character', name: 'Test Character'});
+            const actor = new SR5Actor<'character'>({type: 'character', name: 'Test Character'});
+            // @ts-expect-error
             const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}, spare_clips: {value: 1, max: 1}}}}]);
-            const item = items[0] as SR5Item<'weapon'>;
-            // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}, spare_clips: {value: 1, max: 1}}}}) as SR5Item;
+            const item = items![0] as SR5Item<'weapon'>;
             assert.strictEqual(item.system.ammo.spare_clips.value, 1);
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo.spare_clips.value, 0);
         });
 
         it('Reloads weapon fully when no ammo is used', async () => {
-            const actor = await testActor.create({type: 'character', name: 'Test Character'});
+            const actor = new SR5Actor<'character'>({type: 'character', name: 'Test Character'});
+            // @ts-expect-error
             const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}]);
-            const item = items[0] as SR5Item<'weapon'>;
+            const item = items![0] as SR5Item<'weapon'>;
             // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}) as SR5Item;
             assert.strictEqual(item.system.ammo.current.value, 0);
             await item.reloadAmmo(true);

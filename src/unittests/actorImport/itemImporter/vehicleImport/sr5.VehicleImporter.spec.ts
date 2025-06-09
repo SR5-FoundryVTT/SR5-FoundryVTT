@@ -2,27 +2,15 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import VehicleParser from '../../../../module/apps/importer/actorImport/itemImporter/vehicleImport/VehicleParser';
 import * as chummerDrone from './drone.json';
 import * as chummerVehicle from './vehicle.json';
-import { SR5TestingDocuments } from '../../../utils';
 import { SR5Actor } from '../../../../module/actor/SR5Actor';
-import { SR5Item } from '../../../../module/item/SR5Item';
 
 export const vehicleImporterTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
 
-    let vehicleParser = new VehicleParser();
+    const vehicleParser = new VehicleParser();
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    });
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    });
+    before(async () => {});
+    after(async () => {});
 
     describe('Vehicle Parser', () => {
         it('parses vehicles', async () => {
@@ -39,7 +27,7 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
                 return;
             }
             // Register vehicle actors with testing data, so they get cleaned up during teardown
-            parsedVehicles.forEach(testActor.register.bind(testActor));
+            // parsedVehicles.forEach(testActor.register.bind(testActor));
             // Prepare derived data, used to populate system.vehicle_stats.seats.hidden
             parsedVehicles.forEach((vehicle) => vehicle.prepareDerivedData());
 

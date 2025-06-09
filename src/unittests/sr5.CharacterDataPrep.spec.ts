@@ -1,26 +1,14 @@
-import { SR5TestingDocuments } from "./utils";
 import { SR5Actor } from "../module/actor/SR5Actor";
-import { SR5Item } from "../module/item/SR5Item";
 import { SR } from "../module/constants";
-import CharacterActorData = Shadowrun.CharacterActorData;
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
 export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
     const { describe, it, before, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
+    before(async () => {})
 
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    after(async () => {})
 
     describe('CharacterDataPrep', () => {
         it('default attribute values', async () => {
@@ -91,7 +79,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.track.physical.max, 11); // 8 + round_up(6 / 2)
             assert.strictEqual(character.system.track.physical.overflow.max, 6); // body value
 
-            character.delete();
+            await character.delete();
         });
 
         it('Matrix condition monitor track calculation with modifiers', async () => {
@@ -110,6 +98,8 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             }]);
 
             assert.equal(character.system.matrix.condition_monitor.max, 10); // 9 + 1
+
+            await character.delete();
         });
 
         it('initiative calculation', async () => {
@@ -189,11 +179,11 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.initiative.matrix.dice.value, 5);
             assert.strictEqual(character.system.initiative.astral.dice.value, 5);
 
-            character.delete();
+            await character.delete();
         });
 
         it('limit calculation', async () => {
-            const character = await testActor.create({ type: 'character', system: {
+            const character = new SR5Actor<'character'>({ type: 'character', system: {
                 attributes: {
                     reaction: {base: 1}, 
                     intuition: {base: 1}, 
@@ -228,14 +218,16 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.limits.physical.value, 8);
             assert.strictEqual(character.system.limits.mental.value, 8);
             assert.strictEqual(character.system.limits.social.value, 8);
+
+            await character.delete();
         });
 
         it('movement calculation', async () => {
-            const character = await testActor.create({ type: 'character', system: {
+            const character = new SR5Actor<'character'>({ type: 'character', system: {
                 attributes: {
                     agility: {base: 1}}}
                 }
-            ) as SR5Actor<'character'>;
+            );
 
             assert.strictEqual(character.system.movement.walk.value, 2); // AGI * 2
             assert.strictEqual(character.system.movement.run.value, 4);  // AGI * 4
@@ -244,29 +236,33 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(character.system.movement.walk.value, 12);
             assert.strictEqual(character.system.movement.run.value, 24);
+
+            await character.delete();
         });
 
         it('skill calculation', async () => {
-            const character = await testActor.create({
+            const character = new SR5Actor<'character'>({
                 type: 'character',
                 system: {
                     skills: {
                         active: {
                             arcana: {
                                 base: 6,
-                                bonus: [{ key: 'Test', value: 1 }],
+                                bonus: [{ key: 'Test', value: "1" }],
                                 specs: ['Test']
                             }
                         }
                     }
                 }
-            }) as SR5Actor<'character'>;
+            });
 
             assert.strictEqual(character.system.skills.active.arcana.value, 7);
+
+            await character.delete();
         });
 
         it('damage application to wounds', async () => {
-            const character = await testActor.create({ type: 'character' }) as SR5Actor<'character'>;
+            const character = new SR5Actor<'character'>({ type: 'character' });
 
             assert.strictEqual(character.system.track.stun.value, 0);
             assert.strictEqual(character.system.track.stun.wounds, 0);
@@ -290,10 +286,12 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.track.physical.wounds, 1);
 
             assert.strictEqual(character.system.wounds.value, 2);
+
+            await character.delete();
         });
 
         it('damage application with low pain/wound tolerance', async () => {
-            const character = await testActor.create({
+            const character = new SR5Actor<'character'>({
                 type: 'character',
                 system: {
                     track: {
@@ -304,16 +302,18 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                         wound_tolerance: -1
                     }
                 }
-            }) as SR5Actor<'character'>;
+            });
 
             assert.strictEqual(character.system.track.stun.value, 6);
             assert.strictEqual(character.system.track.stun.wounds, 3); // would normally be 2
             assert.strictEqual(character.system.track.physical.value, 6);
             assert.strictEqual(character.system.track.physical.wounds, 3);
+
+            await character.delete();
         });
 
         it('damage application with high pain tolerance / damage compensators', async () => {
-            const character = await testActor.create({
+            const character = new SR5Actor<'character'>({
                 type: 'character',
                 system: {
                     track: {
@@ -325,16 +325,18 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                         pain_tolerance_physical: 6
                     }
                 }
-            }) as SR5Actor<'character'>;
+            });
 
             assert.strictEqual(character.system.track.stun.value, 9);
             assert.strictEqual(character.system.track.stun.wounds, 2); // would normally be 3
             assert.strictEqual(character.system.track.physical.value, 9);
             assert.strictEqual(character.system.track.physical.wounds, 1); // would normally be 3
+
+            await character.delete();
         });
 
         it('damage application with high AND low pain to lerance / damage compensators', async () => {
-            const character = await testActor.create({
+            const character = new SR5Actor<'character'>({
                 type: 'character',
                 system: {
                     track: {
@@ -347,7 +349,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                         wound_tolerance: -1
                     }
                 }
-            }) as SR5Actor<'character'>;
+            });
 
             /**
              * Wound tolerance should alter the amount of boxes of damage per wound
@@ -357,8 +359,10 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.track.stun.wounds, 3);
             assert.strictEqual(character.system.track.physical.value, 9);
             assert.strictEqual(character.system.track.physical.wounds, 1);
+
+            await character.delete();
         });
-        it('Character recoil compensation', () => {
+        it('Character recoil compensation', async () => {
             let character = new SR5Actor<'character'>({ name: 'Testing', type: 'character', system: { attributes: { strength: { base: 5 } } } });
             if (!character) return assert.fail();
 
@@ -368,21 +372,25 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             if (!character) return assert.fail();
 
             assert.strictEqual(character.system.values.recoil_compensation.value, 2); // SR5#175: 1 / 3 = 0,3 (rounded up) = 1 => 1 + 1
+
+            await character.delete();
         });
 
         it('A NPC Grunt should only have physical track', async () => {
-            const character = await testActor.create({
+            const character = new SR5Actor<'character'>({
                 type: 'character',
                 system: {
                     is_npc: true,
                     npc: { is_grunt: true },
                     attributes: { willpower: { base: 6 } }
                 }
-            }) as SR5Actor<'character'>;
+            });
             
             assert.strictEqual(character.system.track.stun.value, 0);
             assert.strictEqual(character.system.track.stun.disabled, true);
             assert.strictEqual(character.system.track.physical.disabled, false);
+
+            await character.delete();
         });
     });
 };
