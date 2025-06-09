@@ -1966,7 +1966,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     static chatMessageContextOptions(html, options) {
         const pushTheLimit = async (li) => {
-            const messageId = li.data().messageId;
+            const messageId = $(li).data().messageId;
             const test = await TestCreator.fromMessage(messageId);
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 
@@ -1974,7 +1974,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         const secondChance = async (li) => {
-            const messageId = li.data().messageId;
+            const messageId = $(li).data().messageId;
             const test = await TestCreator.fromMessage(messageId);
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 
