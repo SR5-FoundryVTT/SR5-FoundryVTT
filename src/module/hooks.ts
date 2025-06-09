@@ -126,7 +126,7 @@ export class HooksManager {
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
-        Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
+        Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions);
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners);
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
