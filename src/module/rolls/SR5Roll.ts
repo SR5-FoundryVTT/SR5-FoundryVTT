@@ -3,7 +3,7 @@ import ModList = Shadowrun.ModList;
 
 // TODO: Data for casting actor / item (uuid)
 // TODO: maybe copy of the action data from the casting item / actor
-type ShadowrunRollData = {
+export type ShadowrunRollData = {
     limit: number;
     threshold: number;
     parts: ModList<number>; // TODO: Is this useful?

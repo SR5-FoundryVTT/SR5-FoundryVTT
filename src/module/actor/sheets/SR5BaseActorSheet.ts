@@ -875,7 +875,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const attributes = sheetData.system.attributes;
         for (let [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
-                if (attribute.temp === 0) delete attribute.temp;
+                if (attribute.temp === 0)
+                    //@ts-expect-error fvtt-types doesn't know about non-required field.
+                    attribute.temp = undefined;
             }
         }
     }
@@ -887,7 +889,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 const att = matrix[attribute];
                 if (att) {
                     if (!att.mod) att.mod = [];
-                    if (att.temp === 0) delete att.temp;
+                    if (att.temp === 0)
+                        //@ts-expect-error fvtt-types doesn't know about non-required field.
+                        att.temp = undefined;
                 }
             };
 
@@ -924,7 +928,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         };
         this._addInventoryTypes(inventoriesSheet[this.actor.defaultInventory.name]);
 
-        Object.values(this.actor.system.inventories).forEach(inventory => {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        Object.values(this.actor.system.inventories as {[x: string]: InventoryType}).forEach(inventory => {
             const { name, label, itemIds } = inventory;
 
             // Avoid re-adding default inventories.
@@ -1900,12 +1905,14 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         modifiers.applyAll();
         if (!modifiers) return [];
 
-        return Object.entries(modifiers._modifiers).map(([category, modifier]: [Shadowrun.SituationModifierType, SituationModifier]) => {
-            const hidden = this._hideSituationModifier(category);
+        return Object.entries(modifiers._modifiers).map(
+            ([category, modifier]: [string, SituationModifier]) => {
+                const hidden = this._hideSituationModifier(category as Shadowrun.SituationModifierType);
 
-            const label = SR5.modifierTypes[category];
-            return { category, value: modifier.total, hidden, label };
-        });
+                const label = SR5.modifierTypes[category];
+                return { category, value: modifier.total, hidden, label };
+            }
+        );
     }
 
     /**

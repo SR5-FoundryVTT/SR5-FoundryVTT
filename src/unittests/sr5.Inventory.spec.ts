@@ -1,3 +1,4 @@
+import { InventoryType } from 'src/module/types/actor/CommonModel';
 import { SR5Actor } from '../module/actor/SR5Actor';
 import { SR5Item } from '../module/item/SR5Item';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
@@ -45,10 +46,13 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
             await actor.inventory.addItems('test', item);
             const itemIds = item.map((item) => item.id);
-            assert.deepEqual(actor.system.inventories.test.itemIds, itemIds);
+
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+            const inventories = actor.system.inventories as {[x: string]: InventoryType};
+            assert.deepEqual(inventories.test.itemIds, itemIds);
 
             await actor.inventory.removeItem(item[0]);
-            assert.deepEqual(actor.system.inventories.test.itemIds, []);
+            assert.deepEqual(inventories.test.itemIds, []);
             await actor.delete();
         });
 

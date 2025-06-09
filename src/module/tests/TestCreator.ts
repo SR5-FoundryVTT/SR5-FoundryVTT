@@ -177,7 +177,7 @@ export const TestCreator = {
         testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
         if (!testData || !testData.rolls) return;
 
-        const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll as any));
+        const rolls = testData.rolls.map(roll => SR5Roll.fromData(roll as any));
         const documents = {rolls};
 
         // Allow callers to overwrite previous test options, otherwise fall back.

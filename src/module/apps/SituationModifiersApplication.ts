@@ -7,7 +7,7 @@ import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
 
 
-interface SituationalModifiersTemplateData extends FormApplication.Data<{}> {
+interface SituationalModifiersTemplateData extends foundry.appv1.api.FormApplication.FormApplicationData<FormApplication.Options, {}> {
     targetType: string
     targetName: string
     modifiers: DocumentSituationModifiers
@@ -304,15 +304,16 @@ export class SituationModifiersApplication extends FormApplication {
         // Update all modifiers before displaying.
         this.modifiers.applyAll();
 
+        // please help
         return {
             ...await super.getData(options),
-            
+
             targetType: this._targetTypeLabel,
             targetName: this.target.name || 'Unknown target',
 
             modifiers: this.modifiers,
             environmentalLevels: this.modifiers.environmental.levels
-        }
+        } as any;
     }
 
     override activateListeners(html: JQuery<HTMLElement>): void {

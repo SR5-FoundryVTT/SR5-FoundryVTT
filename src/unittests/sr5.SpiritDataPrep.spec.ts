@@ -1,3 +1,4 @@
+import { SkillFieldType } from 'src/module/types/template/SkillsModel';
 import { SR5Actor } from './../module/actor/SR5Actor';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
@@ -39,7 +40,10 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(spirit.system.initiative.meatspace.base.base, 4); // force * 2 + override;
 
-            assert.strictEqual(spirit.system.skills.active.assensing.base, 0);
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+            const active = spirit.system.skills.active as {[x: string]: SkillFieldType};
+
+            assert.strictEqual(active.assensing.base, 0);
 
             await spirit.update({ system: { force: 6 } });
 
@@ -51,8 +55,8 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(spirit.system.initiative.meatspace.base.base, 16);
 
-            assert.strictEqual(spirit.system.skills.active.assensing.base, 6);
-            assert.strictEqual(spirit.system.skills.active.arcana.base, 0); // not for this spirit type.
+            assert.strictEqual(active.assensing.base, 6);
+            assert.strictEqual(active.arcana.base, 0); // not for this spirit type.
 
             await spirit.delete();
         });

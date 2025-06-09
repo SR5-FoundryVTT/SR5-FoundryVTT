@@ -14,8 +14,8 @@ export const AmmoData = () => ({
         blank: true,
         choices: ['', 'fire', 'cold', 'acid', 'electricity', 'radiation'],
     }),
-    ap: new NumberField({ required: true, initial: 0 }),
-    damage: new NumberField({ required: true, initial: 0 }),
+    ap: new NumberField({ required: true, nullable: false, initial: 0 }),
+    damage: new NumberField({ required: true, nullable: false, initial: 0 }),
     damageType: new StringField({
         required: true,
         initial: '',
@@ -24,7 +24,7 @@ export const AmmoData = () => ({
     }),
     replaceDamage: new BooleanField({ required: true, initial: false }),
     blast: new SchemaField(BlastData(), { required: true }),
-    accuracy: new NumberField({ required: true, initial: 0 }),
+    accuracy: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 export class Ammo extends foundry.abstract.TypeDataModel<ReturnType<typeof AmmoData>, Item.Implementation> {

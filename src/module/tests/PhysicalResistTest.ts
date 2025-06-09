@@ -116,10 +116,12 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         this.data.modifiedDamage = foundry.utils.duplicate(this.data.incomingDamage) as DamageType;
         this.data.modifiedDamage.base = this.data.incomingDamage.value;
         this.data.modifiedDamage.mod = [];
-        delete this.data.modifiedDamage.override;
+        //@ts-expect-error fvtt-types doesn't know about non-required field.
+        this.data.modifiedDamage.override = undefined;
         this.data.modifiedDamage.ap.base = this.data.incomingDamage.ap.value;
         this.data.modifiedDamage.ap.mod = [];
-        delete this.data.modifiedDamage.ap.override;
+        //@ts-expect-error fvtt-types doesn't know about non-required field.
+        this.data.modifiedDamage.ap.override = undefined;
 
         Helpers.calcTotal(this.data.modifiedDamage);
         Helpers.calcTotal(this.data.modifiedDamage.ap);

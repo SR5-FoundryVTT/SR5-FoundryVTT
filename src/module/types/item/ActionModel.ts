@@ -15,7 +15,7 @@ export const MinimalActionData = () => ({
     skill: new StringField({ required: true, initial: '' }),
     attribute: new StringField({ required: true, initial: '' }),
     attribute2: new StringField({ required: true, initial: '' }),
-    mod: ModList(),
+    mod: new NumberField({ required: true, nullable: false, initial: 0 }),
     armor: new BooleanField({ required: true, initial: false }),
     limit: new SchemaField(ModifiableValueLinked())
 });
@@ -62,7 +62,7 @@ export const DamageData = () => ({
 export const OpposedTestData = () => ({
     type: new StringField({ required: true, initial: '' }),
     description: new StringField({ required: true, initial: '' }),
-    mod: ModList(), // Does it use it?
+    mod: new NumberField({ required: true, nullable: false, initial: 0 }), // Does it use it?
     skill: new StringField({ required: true, initial: '' }), // Does it use it?
     attribute: new StringField({ required: true, initial: '' }), // Does it use it?
     attribute2: new StringField({ required: true, initial: '' }), // Does it use it?

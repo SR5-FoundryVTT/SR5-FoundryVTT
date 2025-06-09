@@ -19,9 +19,6 @@ import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
 import ConditionData = Shadowrun.ConditionData;
 import AmmoData = Shadowrun.AmmoData;
-import RangeWeaponData = Shadowrun.RangeWeaponData;
-import SpellRange = Shadowrun.SpellRange;
-import CritterPowerRange = Shadowrun.CritterPowerRange;
 import ActionTestLabel = Shadowrun.ActionTestLabel;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import RollEvent = Shadowrun.RollEvent;
@@ -111,9 +108,10 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return this.actor.actorOwner;
     }
 
+    //TODO remove it
     private get wrapper(): SR5ItemDataWrapper {
         // we need to cast here to unknown first to make ts happy
-        return new SR5ItemDataWrapper(this);
+        return new SR5ItemDataWrapper(this as any);
     }
 
     // Flag Functions
@@ -1147,7 +1145,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         data._id = this.id;
 
         // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
-        await this.parent.updateNestedItems(data);
+        await (this.parent as SR5Item).updateNestedItems(data);
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
         // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all

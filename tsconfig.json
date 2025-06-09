@@ -42,6 +42,6 @@
     "noImplicitOverride": true /* Ensure overriding members in derived classes are marked with an override modifier. */,
 
     /* Completeness */
-    "skipLibCheck": false
+    "skipLibCheck": true
   }
 }

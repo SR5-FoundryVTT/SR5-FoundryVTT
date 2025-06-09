@@ -154,25 +154,25 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         if (actor === undefined || this.test.item === undefined) return;
 
-        const effectsData: SR5ActiveEffect[] = [];
-        for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
-            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
+            const effectsData: SR5ActiveEffect[] = [];
+            for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
+                const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
-            // Transform all dynamic values to static values.
-            effectData.changes = effectData.changes.map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change);
-                return change;
-            });
+                // Transform all dynamic values to static values.
+                effectData.changes = effectData.changes.map(change => {
+                    SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as ActiveEffect.ChangeData);
+                    return change;
+                });
 
-            effectsData.push(effectData);
-        }
+                effectsData.push(effectData);
+            }
 
         for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
             const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change);
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as ActiveEffect.ChangeData);
                 return change;
             });
 
@@ -194,7 +194,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         const linkedTokens = actor.getActiveTokens(true) || [];
         const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
 
-        const effects = await actor.createEmbeddedDocuments('ActiveEffect', effectsData) as SR5ActiveEffect[];
+        const effects = await actor.createEmbeddedDocuments('ActiveEffect', effectsData as unknown as ActiveEffect.CreateData[]) as SR5ActiveEffect[];
 
         const templateData = {
             effects,

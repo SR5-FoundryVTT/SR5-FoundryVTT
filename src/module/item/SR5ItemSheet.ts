@@ -140,15 +140,25 @@ export class SR5ItemSheet extends ItemSheet {
 
         if ('action' in itemData && itemData.action) {
             try {
-                const action = itemData.action as any;
-                if (itemData.action.mod.length === 0) delete action.mod;
-                if (action.limit === 0) delete action.limit;
+                const action = itemData.action;
+                if (itemData.action.mod === 0)
+                    //@ts-expect-error fvtt-types doesn't know about non-required field.
+                    action.mod = undefined;
+                if (action.limit.base === 0)
+                    //@ts-expect-error fvtt-types doesn't know about non-required field.
+                    action.limit = undefined;
                 if (action.damage) {
-                    if (action.damage.mod === 0) delete action.damage.mod;
-                    if (action.damage.ap.mod === 0) delete action.damage.ap.mod;
+                    if (action.damage.mod.length === 0) 
+                        //@ts-expect-error fvtt-types doesn't know about non-required field.
+                        action.damage.mod = undefined;
+                    if (action.damage.ap.mod.length === 0)
+                        //@ts-expect-error fvtt-types doesn't know about non-required field.
+                        action.damage.ap.mod = undefined;
                 }
                 if (action.limit) {
-                    if (action.limit.mod === 0) delete action.limit.mod;
+                    if (action.limit.mod.length === 0)
+                        //@ts-expect-error fvtt-types doesn't know about non-required field.
+                        action.limit.mod = undefined;
                 }
             } catch (e) {
                 console.error(e);

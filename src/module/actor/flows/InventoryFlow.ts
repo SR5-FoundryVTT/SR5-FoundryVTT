@@ -3,6 +3,7 @@ import { Helpers } from "../../helpers";
 import InventoryData = Shadowrun.InventoryData;
 import InventoriesData = Shadowrun.InventoriesData;
 import { SR5Item } from "../../item/SR5Item";
+import { InventoryType } from "src/module/types/actor/CommonModel";
 
 /**
  * Handle all inventory related actions on an SR5Actor'.
@@ -232,7 +233,8 @@ export class InventoryFlow {
         // Collect affected inventories.
         const inventories: InventoryData[] = name ?
             [this.actor.system.inventories[name]] :
-            Object.values(this.actor.system.inventories).filter(({ itemIds }) => itemIds.includes(item.id as string));
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+            Object.values(this.actor.system.inventories as {[x: string]: InventoryType}).filter(({ itemIds }) => itemIds.includes(item.id as string));
 
         // No inventory found means, it's in the default inventory and no removal is needed.
         if (inventories.length === 0) return;

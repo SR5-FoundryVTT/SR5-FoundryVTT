@@ -110,7 +110,6 @@ export class DocumentSituationModifiers {
 
         // Map all modifier types to their respectiv implementation.
         this._prepareModifiers();
-        
     }
 
     /**

@@ -10,6 +10,7 @@ import { DataDefaults } from "../../data/DataDefaults";
 import { Translation } from "../../utils/strings";
 import { DamageType } from "src/module/types/item/ActionModel";
 import { ModifiableValueLinkedType } from "src/module/types/template/BaseModel";
+import { SkillFieldType } from "src/module/types/template/SkillsModel";
 
 export class ActionFlow {
     /**
@@ -126,7 +127,8 @@ export class ActionFlow {
 
         // Convert skill data to a value label mapping.
         const skills: Record<string, Translation> = {};
-        for (const [id, skill] of Object.entries(activeSkills)) {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (const [id, skill] of Object.entries(activeSkills as {[x: string]: SkillFieldType})) {
             const key = skill.name || id;
             const label = skill.label || skill.name;
             skills[key] = label as Translation;

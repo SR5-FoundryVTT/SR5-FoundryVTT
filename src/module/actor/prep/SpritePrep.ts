@@ -7,6 +7,7 @@ import { MatrixPrep } from './functions/MatrixPrep';
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
+import { SkillFieldType } from 'src/module/types/template/SkillsModel';
 
 
 /**
@@ -80,7 +81,8 @@ export class SpritePrep {
 
         // apply skill levels
         // clear skills that we don't have
-        for (const [skillId, skill] of Object.entries(skills.active)) {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (const [skillId, skill] of Object.entries(skills.active as {[x: string]: SkillFieldType})) {
             skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
         }
     }

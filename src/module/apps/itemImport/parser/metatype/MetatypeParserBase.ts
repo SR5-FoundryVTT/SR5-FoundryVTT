@@ -24,7 +24,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'critter
             }
 
             const itemBase = foundItem.toObject();
-            const system = itemBase.system as Item.SystemOfType<'bioware' | 'complex_form' | 'quality' | 'spell' | 'critter_power'>;
+            const system = itemBase.system as Item.SystemOfType<'bioware' | 'cyberware' | 'complex_form' | 'quality' | 'spell' | 'adept_power' | 'critter_power' | 'weapon' | 'equipment'>;
 
             if (item.$?.select)
                 itemBase.name += ` (${item.$.select})`;
@@ -35,6 +35,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'critter
             if (item.$?.rating) {
                 const rating = Number(item.$.rating);
                 if ('rating' in system)
+                    //@ts-expect-error this should be ok.
                     system.rating = rating;
                 else if ('technology' in system && system.technology)
                     system.technology.rating = rating;

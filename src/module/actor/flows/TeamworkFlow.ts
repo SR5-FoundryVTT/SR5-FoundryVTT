@@ -133,10 +133,10 @@ export class TeamworkTest {
             return;
         }
 
-        const message = fromUuidSync(socketMessage.data.messageUuid);
+        // todo type this properly
+        const message = fromUuidSync(socketMessage.data.messageUuid) as any;
 
         message?.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData);
         message?.update({content: socketMessage.data.content});
     }
-
 }

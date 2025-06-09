@@ -38,6 +38,11 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
     }
 
+    // TODO check what it does, somehow it is needed to override the submit method.
+    public override _getSubmitData(updateData={}): Record<string, any> {
+        return super._getSubmitData(updateData);
+    }
+
     override async getData(options?: Application.RenderOptions): Promise<any> {
         const data = await super.getData(options) as any;
 

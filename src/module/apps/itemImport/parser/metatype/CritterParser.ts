@@ -4,6 +4,7 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 import { DataDefaults } from "src/module/data/DataDefaults";
+import { SkillFieldType } from "src/module/types/template/SkillsModel";
 
 export class CritterParser extends MetatypeParserBase<'character'> {
     protected parseType = 'character' as const;
@@ -51,7 +52,8 @@ export class CritterParser extends MetatypeParserBase<'character'> {
                 return acc;
             }, {} as Record<string, number>);
 
-            Object.entries(system.skills.active).forEach(([_, skill]) => {
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.s
+            Object.entries(system.skills.active as {[x: string]: SkillFieldType}).forEach(([_, skill]) => {
                 if ('group' in skill && typeof skill.group === 'string' && Object.keys(groups).includes(skill.group)) {
                     skill.base = (skill.base ?? 0) + groups[skill.group];
                 }

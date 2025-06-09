@@ -330,7 +330,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         if (!skillName) return;
 
         // Handle legacy skills (name is id)
-        const skills = this.getActiveSkills();
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        const skills = this.getActiveSkills() as {[x: string]: SkillFieldType};
         const skill = skills[skillName];
         if (skill) return skill;
 
@@ -693,7 +694,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         const skills = this.getSkills();
 
-        for (const [id, skill] of Object.entries(skills.language.value)) {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (const [id, skill] of Object.entries(skills.language.value as {[x: string]: SkillFieldType})) {
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
         }
@@ -709,7 +711,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
             }
         }
 
-        for (const [id, skill] of Object.entries(skills.active)) {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (const [id, skill] of Object.entries(skills.active as {[x: string]: SkillFieldType})) {
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
         }
@@ -900,7 +903,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const updateData = {};
 
         const skills = this.getActiveSkills();
-        for (const [id, skill] of Object.entries(skills)) {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (const [id, skill] of Object.entries(skills as {[x: string]: SkillFieldType})) {
             if (skill.hidden === true) {
                 skill.hidden = false;
                 updateData[`system.skills.active.${id}`] = skill;
@@ -1299,7 +1303,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
 
         // Only actors that can have a wound modifier, will have a delta.
-        if (iniAdjustment < 0 && game.combat) game.combat.adjustActorInitiative(this, iniAdjustment);
+        if (iniAdjustment < 0 && game.combat) (game.combat as SR5Combat).adjustActorInitiative(this, iniAdjustment);
     }
 
     /**

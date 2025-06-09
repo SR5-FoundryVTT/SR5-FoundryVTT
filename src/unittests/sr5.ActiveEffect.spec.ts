@@ -7,6 +7,7 @@ import { DataDefaults } from "../module/data/DataDefaults";
 import { SkillTest } from "../module/tests/SkillTest";
 import { Helpers } from "../module/helpers";
 import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
+import { SkillFieldType } from "src/module/types/template/SkillsModel";
 
 export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     const { describe, it, before, after } = context;
@@ -92,9 +93,11 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // A ValueField value outside of value calculation should still work
             // Skill automatics normally can default, wich we overwrite here.
-            assert.deepEqual(actor.system.skills.active.automatics.mod, []);
-            assert.strictEqual(actor.system.skills.active.automatics.override, undefined);
-            assert.strictEqual(actor.system.skills.active.automatics.canDefault, false);
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+            const active = actor.system.skills.active as {[x: string]: SkillFieldType};
+            assert.deepEqual(active.automatics.mod, []);
+            assert.strictEqual(active.automatics.override, undefined);
+            assert.strictEqual(active.automatics.canDefault, false);
 
             await actor.delete();
         });

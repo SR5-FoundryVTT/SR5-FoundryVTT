@@ -78,6 +78,7 @@ export default class Template extends MeasuredTemplate {
 
         // Use overwritten MeasuredTemplate class to create a new instance.
         const cls = CONFIG.MeasuredTemplate.documentClass;
+        //@ts-expect-error please help
         const template = new cls(templateData, { parent: canvas.scene });
         const object = new this(template);
 

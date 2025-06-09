@@ -1,3 +1,4 @@
+import { SkillFieldType } from "src/module/types/template/SkillsModel";
 import { SR5Actor } from "../module/actor/SR5Actor";
 import { SR } from "../module/constants";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
@@ -256,7 +257,9 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 }
             });
 
-            assert.strictEqual(character.system.skills.active.arcana.value, 7);
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+            const active = character.system.skills.active as {[x: string]: SkillFieldType};
+            assert.strictEqual(active.arcana.value, 7);
 
             await character.delete();
         });

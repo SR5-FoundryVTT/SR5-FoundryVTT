@@ -1,7 +1,7 @@
+import { SR5 } from "../../../config";
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
-import {SR5} from "../../../config";
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import { SkillFieldType } from 'src/module/types/template/SkillsModel';
 
 export class SkillsPrep {
     /**
@@ -60,17 +60,20 @@ export class SkillsPrep {
         };
 
         // setup active skills
-        for (const skill of Object.values(active)) {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (const skill of Object.values(active as {[x: string]: SkillFieldType})) {
             if (!skill.hidden) {
                 prepareSkill(skill);
             }
         }
 
-        const entries = Object.entries(system.skills.language.value);
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        const entries = Object.entries(system.skills.language.value as {[x: string]: SkillFieldType});
         // remove entries which are deleted TODO figure out how to delete these from the data
         entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete system.skills.language.value[key]);
-
-        for (let skill of Object.values(language.value)) {
+        
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (let skill of Object.values(language.value as {[x: string]: SkillFieldType})) {
             prepareSkill(skill);
             skill.attribute = 'intuition';
         }
@@ -81,8 +84,9 @@ export class SkillsPrep {
             if(!group?.value) {
                 continue;
             }
-            
-            const entries = Object.entries(group.value);    
+
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+            const entries = Object.entries(group.value as {[x: string]: SkillFieldType});    
             // remove entries which are deleted TODO figure out how to delete these from the data
             group.value = entries
                 .filter(([, val]) => !val._delete)
@@ -96,8 +100,8 @@ export class SkillsPrep {
                 }, {});
         }
 
-        // skill labels
-        for (let [skillKey, skillValue] of Object.entries(active)) {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (let [skillKey, skillValue] of Object.entries(active as {[x: string]: SkillFieldType})) {
             skillValue.label = SR5.activeSkills[skillKey];
         }
     }
