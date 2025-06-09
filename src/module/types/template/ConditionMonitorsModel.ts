@@ -1,5 +1,5 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 import { ValueMaxPair, ModifiableValue } from "./BaseModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 const Living = () => ({
     wounds: new NumberField({ required: true, initial: 0 }),

@@ -1,7 +1,7 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { DescriptionPartData } from "../template/DescriptionModel";
-import { ImportFlags } from "../template/ImportFlagsModel";
 import { ActionPartData } from "./ActionModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 export const ComplexFormData = () => ({
     ...DescriptionPartData(),

@@ -1,8 +1,8 @@
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
-import { DescriptionPartData } from "../template/DescriptionModel";
+import { BlastData } from "./WeaponModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 import { TechnologyPartData } from "../template/TechnologyModel";
-import { BlastData } from "./WeaponModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const AmmoData = () => ({
     ...DescriptionPartData(),

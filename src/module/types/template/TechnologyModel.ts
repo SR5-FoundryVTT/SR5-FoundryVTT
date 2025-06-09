@@ -1,6 +1,6 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 import { ModifiableValue } from "./BaseModel";
 import { ConditionData } from "./ConditionModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 export const TechnologyData = () => ({
     rating: new NumberField({ required: true, nullable: false, initial: 0 }),

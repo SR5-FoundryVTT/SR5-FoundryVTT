@@ -1,7 +1,7 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
-import { DescriptionPartData } from "../template/DescriptionModel";
 import { ActionPartData } from "./ActionModel";
 import { DevicePartData } from "./DeviceModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const SourceEntityField = () => ({
     id: new StringField({ required: true, initial: '' }),

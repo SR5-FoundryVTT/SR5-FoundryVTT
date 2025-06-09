@@ -1,9 +1,9 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 import { CommonData, ArmorActorData, MatrixActorData, MovementActorData, PhysicalTrackActorData, PhysicalCombatValues, CommonModifiers } from "./CommonModel";
 import { Attributes, AttributeField } from "../template/AttributesModel";
 import { ModifiableValue } from "../template/BaseModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 import { VehicleLimits } from "../template/LimitsModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 const VehicleAttributes = () => ({
     ...Attributes(),

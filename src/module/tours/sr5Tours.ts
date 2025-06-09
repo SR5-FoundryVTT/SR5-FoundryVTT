@@ -1,5 +1,5 @@
-const { DOCUMENT_OWNERSHIP_LEVELS } = foundry.CONST;
 import { SR5Actor } from "../actor/SR5Actor";
+const { DOCUMENT_OWNERSHIP_LEVELS } = foundry.CONST;
 
 export default class Sr5Tour extends foundry.nue.Tour {
     //the tab for the tour

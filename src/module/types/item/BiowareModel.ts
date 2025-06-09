@@ -1,9 +1,9 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-import { DescriptionPartData } from "../template/DescriptionModel";
+import { ArmorPartData } from "./ArmorModel";
+import { ActionPartData } from "./ActionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 import { TechnologyPartData } from "../template/TechnologyModel";
-import { ActionPartData } from "./ActionModel";
-import { ArmorPartData } from "./ArmorModel";
+import { DescriptionPartData } from "../template/DescriptionModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 const BiowareData = {
     ...DescriptionPartData(),
