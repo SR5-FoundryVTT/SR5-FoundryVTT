@@ -20,7 +20,7 @@ import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
-import { InventoryType } from 'src/module/types/actor/CommonModel';
+import { InventoryType } from 'src/module/types/actor/Common';
 import { SkillsType } from 'src/module/types/template/SkillsModel';
 
 /**
@@ -29,7 +29,7 @@ import { SkillsType } from 'src/module/types/template/SkillsModel';
 export interface SheetItemData {
     type: string,
     name: string,
-    system: Shadowrun.ShadowrunItemDataData
+    system: SR5Item['system'],
     properties: any,
     description: any
 }
@@ -908,7 +908,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         // All custom and default actor inventories.
         const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
-        const itemIdInventory: Record<string, Shadowrun.InventoryData> = {};
+        const itemIdInventory: { [x: string]: InventoryType } = {};
 
         // All inventories for showing all items, but not as default
         // Add first, for it to appear on top.

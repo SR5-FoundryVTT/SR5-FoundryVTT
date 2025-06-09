@@ -1,8 +1,5 @@
-import MagicActorData = Shadowrun.MagicActorData;
-import MatrixActorData = Shadowrun.MatrixActorData;
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 import { SystemActor } from '../../SR5Actor';
 
 export class InitiativePrep {

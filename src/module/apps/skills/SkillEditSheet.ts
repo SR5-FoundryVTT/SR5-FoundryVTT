@@ -1,11 +1,9 @@
-import SkillEditFormData = Shadowrun.SkillEditFormData;
-import {SR5Actor} from "../../actor/SR5Actor";
-import {SR5} from "../../config";
+import { SR5 } from "../../config";
+import { SR5Actor } from "../../actor/SR5Actor";
 import { LinksHelpers } from "../../utils/links";
-import { parseDropData } from "../../utils/sheets";
 import { Translation } from '../../utils/strings';
+import { parseDropData } from "../../utils/sheets";
 
-const DocumentSheetV2 = foundry.applications.api.DocumentSheetV2;
 
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
@@ -216,7 +214,7 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
-    override getData(): SkillEditFormData {
+    override getData() {
         const data = super.getData() as any;
 
         // skill property will hold a direct skill reference
@@ -225,6 +223,6 @@ export class SkillEditSheet extends DocumentSheet {
         data['editable_canDefault'] = true;
         data['editable_attribute'] = true;
         data['attributes'] = this._getSkillAttributesForSelect();
-        return data as unknown as SkillEditFormData;
+        return data;
     }
 }

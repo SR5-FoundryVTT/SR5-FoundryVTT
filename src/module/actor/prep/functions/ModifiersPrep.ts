@@ -18,7 +18,7 @@ export class ModifiersPrep {
     /**
      * Modifiers that appear on all actor types.
      */
-    static get commonModifiers(): (keyof Shadowrun.CommonModifiers)[] {
+    static get commonModifiers() {
         return [
             'defense', 
             'defense_dodge',
@@ -33,7 +33,7 @@ export class ModifiersPrep {
     /**
      * Modifiers that appear on all character actors.
      */
-    static get characterModifiers(): (keyof Shadowrun.CharacterModifiers)[] {
+    static get characterModifiers() {
         return [
             'drain',
             'armor',
@@ -67,7 +67,7 @@ export class ModifiersPrep {
     /**
      * Modifiers that appear on all matrix actor types.
      */
-    static get matrixModifiers(): (keyof Shadowrun.MatrixModifiers)[] {
+    static get matrixModifiers() {
         return [
             'matrix_initiative',
             'matrix_initiative_dice',

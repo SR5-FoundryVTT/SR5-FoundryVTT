@@ -8,12 +8,12 @@ import { SR5Token } from "../token/SR5Token";
 
 import { Translation } from '../utils/strings';
 
-import { Character } from "./actor/CharacterModel";
-import { Critter } from "./actor/CritterModel";
-import { IC } from "./actor/ICModel";
-import { Spirit } from "./actor/SpiritModel";
-import { Sprite } from "./actor/SpriteModel";
-import { Vehicle } from "./actor/VehicleModel";
+import { Character } from "./actor/Character";
+import { Critter } from "./actor/Critter";
+import { IC } from "./actor/IC";
+import { Spirit } from "./actor/Spirit";
+import { Sprite } from "./actor/Sprite";
+import { Vehicle } from "./actor/Vehicle";
 
 import { Action } from './item/ActionModel';
 import { AdeptPower } from './item/AdeptPowerModel';

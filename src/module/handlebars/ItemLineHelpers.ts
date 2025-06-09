@@ -1,10 +1,10 @@
 import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import { SR5 } from "../config";
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
+import { SR5Item } from '../item/SR5Item';
 
 /**
  * Typing around the legacy item list helper.
@@ -412,8 +412,8 @@ export const registerItemLineHelpers = () => {
      *                   ItemRightSide does. This is due to ItemRightSide showing content, while ItemHeaderRightSide
      *                   showing dscriptors for that content.
      */
-    Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData): ItemListRightSide[] {
-        const wrapper = new SR5ItemDataWrapper(item);
+    Handlebars.registerHelper('ItemRightSide', function (item: SR5Item): ItemListRightSide[] {
+        const wrapper = new SR5ItemDataWrapper(item as any);
         const qtyInput = {
             input: {
                 type: 'number',
@@ -423,11 +423,11 @@ export const registerItemLineHelpers = () => {
         };
 
         switch (item.type) {
-            case 'action':
-
+            case 'action': {
+                const system = item.system as Item.SystemOfType<'action'>;
                 // Only show a limit, when one is defined. Either by name or attribute
-                const limitAttribute = item.system.action.limit.attribute;
-                const limitBase = Number(item.system.action.limit.base);
+                const limitAttribute = system.action.limit.attribute;
+                const limitBase = Number(system.action.limit.base);
                 // Transform into text values, either numerical or localized.
                 const textLimitParts: string[] = [];
                 if (!isNaN(limitBase) && limitBase > 0) {
@@ -442,7 +442,7 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             // Instead of 'complex' only show C. This might break in some languages. At that point, you can call me lazy.
-                            text: item.system.action.type ? game.i18n.localize(SR5.actionTypes[item.system.action.type] ?? '')[0] : ''
+                            text: system.action.type ? game.i18n.localize(SR5.actionTypes[system.action.type] ?? '')[0] : ''
                         },
                     },
                     {
@@ -478,6 +478,7 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            }
             case 'armor':
             case 'ammo':
             //@ts-expect-error
@@ -514,9 +515,10 @@ export const registerItemLineHelpers = () => {
             case 'cyberware':
             case 'bioware':
                 return [qtyInput];
-            case 'weapon':
+            case 'weapon': {
+                const system = item.system as Item.SystemOfType<'weapon'>;
                 // Both Ranged and Melee Weapons can have ammo.
-                if (wrapper.isRangedWeapon() || (wrapper.isMeleeWeapon() && item.system.ammo?.current.max > 0)) {
+                if (wrapper.isRangedWeapon() || (wrapper.isMeleeWeapon() && system.ammo?.current.max > 0)) {
                     const count = wrapper.getAmmo()?.current.value ?? 0;
                     const max = wrapper.getAmmo()?.current.max ?? 0;
                     const partialReloadRounds = wrapper.getAmmo()?.partial_reload_value ?? -1;
@@ -570,7 +572,7 @@ export const registerItemLineHelpers = () => {
                 } else {
                     return [qtyInput];
                 }
-
+            }
             case 'quality':
                 return [
                     {
@@ -602,7 +604,7 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.spellRanges[item.system.range ?? '']),
+                            text: game.i18n.localize(SR5.spellRanges[(item.system as Item.SystemOfType<'spell'>).range ?? '']),
                         },
                     },
                     {
@@ -625,7 +627,7 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.critterPower.ranges[item.system.range ?? ''])
+                            text: game.i18n.localize(SR5.critterPower.ranges[(item.system as Item.SystemOfType<'critter_power'>).range ?? ''])
                         }
                     },
                     {
@@ -678,7 +680,7 @@ export const registerItemLineHelpers = () => {
             //@ts-expect-error
             case 'call_in_action':
                 if (item.system.actor_type === 'spirit') {
-                    const summoningData = item.system as Shadowrun.CallInActionData;
+                    const summoningData = item.system as Item.SystemOfType<'call_in_action'>;
                     const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
 
                     return [
@@ -696,7 +698,7 @@ export const registerItemLineHelpers = () => {
                 }
 
                 if (item.system.actor_type === 'sprite') {
-                    const compilationData = item.system as Shadowrun.CallInActionData;
+                    const compilationData = item.system as Item.SystemOfType<'call_in_action'>;
                     const spriteTypeLabel = SR5.spriteTypes[compilationData.sprite.type] ?? '';
 
                     return [
@@ -718,8 +720,8 @@ export const registerItemLineHelpers = () => {
         }
     });
 
-    Handlebars.registerHelper('ItemIcons', function (item: ShadowrunItemData) {
-        const wrapper = new SR5ItemDataWrapper(item);
+    Handlebars.registerHelper('ItemIcons', function (item: SR5Item) {
+        const wrapper = new SR5ItemDataWrapper(item as any);
 
         const editIcon = {
             icon: 'fas fa-edit item-edit',
@@ -794,8 +796,8 @@ export const registerItemLineHelpers = () => {
         ];
     });
 
-    Handlebars.registerHelper('InventoryItemIcons', function (item: ShadowrunItemData) {
-        const wrapper = new SR5ItemDataWrapper(item);
+    Handlebars.registerHelper('InventoryItemIcons', function (item: SR5Item) {
+        const wrapper = new SR5ItemDataWrapper(item as any);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
             title: game.i18n.localize('SR5.MoveItemInventory')

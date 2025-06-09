@@ -1,7 +1,4 @@
 import { MonitorRules } from './../../../rules/MonitorRules';
-import TwoTrackActorData = Shadowrun.TwoTrackActorData;
-import WoundsActorData = Shadowrun.WoundsActorData;
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class WoundsPrep {
     static prepareWounds(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {

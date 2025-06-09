@@ -11,7 +11,7 @@ export const UpdateActionFlow = {
      * @param changeData The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onUpdateAlterActionData(changeData: Partial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+    onUpdateAlterActionData(changeData: Item.UpdateData, item: SR5Item) {
         UpdateActionFlow.onSkillUpdateAlterAttribute(changeData, item);
         UpdateActionFlow.onSkillUpdateAlterAttribute2(changeData, item);
     },
@@ -24,7 +24,7 @@ export const UpdateActionFlow = {
      * @param changeData  The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onSkillUpdateAlterAttribute(changeData: Partial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+    onSkillUpdateAlterAttribute(changeData: Item.UpdateData, item: SR5Item) {
         // Only change to connected attribute when no attribute has already been chosen.
         if (!('action' in item.system) || item.system.action?.attribute !== '') return;
         const skillIdOrLabel = foundry.utils.getProperty(changeData, 'system.action.skill');
@@ -56,7 +56,7 @@ export const UpdateActionFlow = {
      * @param changeData The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onSkillUpdateAlterAttribute2(changeData: Partial<Shadowrun.ShadowrunItemData>, item: SR5Item) {
+    onSkillUpdateAlterAttribute2(changeData: Item.UpdateData, item: SR5Item) {
         if (!foundry.utils.getProperty(changeData, 'system.action.skill')) return;
 
         changeData['system.action.attribute2'] = '';
@@ -79,7 +79,7 @@ export const UpdateActionFlow = {
      * @param applyData An object to carry the altering data changes
      * @param item Optional item reference. This can't be given during the Chummer Item Import flow.
      */
-    injectActionTestsIntoChangeData(type: string, changeData: Item.CreateData, applyData, item?: SR5Item) {
+    injectActionTestsIntoChangeData(type: string, changeData: Item.UpdateData, applyData, item?: SR5Item) {
         if (!changeData) return;
 
         const typeHandler = {
@@ -99,7 +99,7 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectWeaponTestIntoChangeData(type: string, changeData: Item.CreateData & {system: Item.SystemOfType<'weapon'>}, applyData) {
+    injectWeaponTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'weapon'>}, applyData) {
         // Abort when category isn't part of this change.
         if (changeData?.system?.category === undefined) return;
         
@@ -122,7 +122,7 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectSpellTestIntoChangeData(type: string, changeData: Item.CreateData & {system: Item.SystemOfType<'spell'>}, applyData) {
+    injectSpellTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'spell'>}, applyData) {
         // Abort when category isn't part of this change.
         if (changeData?.system?.category === undefined) return;
         
@@ -147,7 +147,7 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectComplexFormTestIntoChangeData(type: string, changeData: Item.CreateData & {system: Item.SystemOfType<'complex_form'>}, applyData) {
+    injectComplexFormTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'complex_form'>}, applyData) {
         const test = SR5.activeTests[type];
 
         foundry.utils.setProperty(applyData, 'system.action.test', test);
@@ -157,7 +157,7 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectCallInActionTestIntoChangeData(type: string, changeData: Item.CreateData & {system: Item.SystemOfType<'call_in_action'>}, applyData) {
+    injectCallInActionTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'call_in_action'>}, applyData) {
         if (changeData.system?.actor_type === undefined) return;
 
         if (changeData.system.actor_type === 'spirit') {

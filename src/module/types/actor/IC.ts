@@ -1,31 +1,40 @@
-/// <reference path="../Shadowrun.ts" />
+import { AttributeField, Attributes } from "../template/AttributesModel";
+import { CommonData, MatrixActorData, MatrixTrackActorData, MatrixAttributes, CommonModifiers, MatrixModifiers } from "./Common";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-declare namespace Shadowrun {
-    export type ICType = keyof typeof SR5CONFIG.ic.types
+const ICAttributes = () => ({
+    ...Attributes(),
+    rating: new SchemaField(AttributeField(), { required: true }),
+    attack: new SchemaField(AttributeField(), { required: true }),
+    sleaze: new SchemaField(AttributeField(), { required: true }),
+    data_processing: new SchemaField(AttributeField(), { required: true }),
+    firewall: new SchemaField(AttributeField(), { required: true }),
+});
 
-    export interface ICData extends
-        CommonData,
-        MatrixActorData,
-        ImportFlags,
-        MatrixTrackActorData {
-            icType: ICType,
-            host: {
-                // The hosts rating for this IC. If no host is connected, this can still be used.
-                rating: number,
-                // The document id of a connected host.
-                id: string,
-                // The hosts matrix attribute selection.
-                atts: MatrixAttributes
-            },
-            attributes: ICAttributes
-            modifiers: Modifiers & CommonModifiers & MatrixModifiers
-    }    
+const ICData = {
+    ...CommonData(),
+    ...MatrixActorData(),
+    ...MatrixTrackActorData(),
+    icType: new StringField({ required: true, initial: "" }),
+    host: new SchemaField({
+        rating: new NumberField({ required: true, nullable: false, initial: 0 }),
+        id: new StringField({ required: true, initial: "" }),
+        atts: new SchemaField(MatrixAttributes(), { required: true }),
+    }, { required: true }),
+    attributes: new SchemaField(ICAttributes(), { required: true }),
+    modifiers: new SchemaField({
+        //todo
+        // ...Modifiers,
+        ...CommonModifiers(),
+        ...MatrixModifiers(),
+    }, { required: true }),
+}
 
-    interface ICAttributes extends Attributes {
-        rating: AttributeField
-        attack: AttributeField
-        sleaze: AttributeField
-        data_processing: AttributeField
-        firewall: AttributeField
+
+export class IC extends foundry.abstract.TypeDataModel<typeof ICData, Actor.Implementation> {
+    static override defineSchema() {
+        return ICData;
     }
 }
+
+console.log("ICData", ICData, new IC());

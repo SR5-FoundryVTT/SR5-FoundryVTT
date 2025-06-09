@@ -1,4 +1,4 @@
-import { InventoryType } from 'src/module/types/actor/CommonModel';
+import { InventoryType } from 'src/module/types/actor/Common';
 import { SR5Actor } from '../module/actor/SR5Actor';
 import { SR5Item } from '../module/item/SR5Item';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';

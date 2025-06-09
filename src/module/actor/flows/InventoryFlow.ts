@@ -1,9 +1,7 @@
 import { SR5Actor } from "../SR5Actor";
 import { Helpers } from "../../helpers";
-import InventoryData = Shadowrun.InventoryData;
-import InventoriesData = Shadowrun.InventoriesData;
 import { SR5Item } from "../../item/SR5Item";
-import { InventoryType } from "src/module/types/actor/CommonModel";
+import { InventoryType } from "src/module/types/actor/Common";
 
 /**
  * Handle all inventory related actions on an SR5Actor'.
@@ -130,14 +128,14 @@ export class InventoryFlow {
      *
      * @param name The inventory name to return.
      */
-    getOne(name): InventoryData | undefined {
+    getOne(name: string): InventoryType | undefined {
         return this.actor.system.inventories[name];
     }
 
     /**
      * Helper to get all inventories.
      */
-    getAll(): InventoriesData {
+    getAll(): { [x: string]: InventoryType } {
         return this.actor.system.inventories;
     }
 
@@ -231,7 +229,7 @@ export class InventoryFlow {
         if (this.actor.defaultInventory.name === name) return;
 
         // Collect affected inventories.
-        const inventories: InventoryData[] = name ?
+        const inventories: InventoryType[] = name ?
             [this.actor.system.inventories[name]] :
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
             Object.values(this.actor.system.inventories as {[x: string]: InventoryType}).filter(({ itemIds }) => itemIds.includes(item.id as string));

@@ -11,12 +11,12 @@ import { TechnologyData } from "../types/template/TechnologyModel";
 import { Track } from "../types/template/ConditionMonitorsModel";
 import { ValueField } from "../types/template/BaseModel";
 
-import { Character } from "../types/actor/CharacterModel";
-import { Critter } from "../types/actor/CritterModel";
-import { IC } from "../types/actor/ICModel";
-import { Spirit } from "../types/actor/SpiritModel";
-import { Sprite } from "../types/actor/SpriteModel";
-import { Vehicle } from "../types/actor/VehicleModel";
+import { Character } from "../types/actor/Character";
+import { Critter } from "../types/actor/Critter";
+import { IC } from "../types/actor/IC";
+import { Spirit } from "../types/actor/Spirit";
+import { Sprite } from "../types/actor/Sprite";
+import { Vehicle } from "../types/actor/Vehicle";
 
 import { AdeptPower } from "../types/item/AdeptPowerModel";
 import { Ammo } from "../types/item/AmmoModel";

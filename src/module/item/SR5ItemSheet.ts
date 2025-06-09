@@ -17,7 +17,7 @@ interface FoundryItemSheetData {
     // Item type
     type: string
     // Legacy Item Document Data
-    data: Shadowrun.ShadowrunItemData
+    data: SR5Item
     // Item Document System Data
     system: SR5Item['system']
     // A descriptive document  reference

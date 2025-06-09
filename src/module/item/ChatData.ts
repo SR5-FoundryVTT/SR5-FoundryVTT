@@ -199,7 +199,7 @@ export const ChatData = {
         if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.technology.calculated.essence.value}`);
     },
 
-    device: (system: DeviceData, labels, props) => {
+    device: (system: Item.SystemOfType<'device'>, labels, props) => {
         if (system.technology && system.technology.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
         // Show ALL matrix ratings for these devices
         if (system.category === 'cyberdeck' || system.category === 'rcc') {

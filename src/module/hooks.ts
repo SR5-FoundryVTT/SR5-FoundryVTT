@@ -71,12 +71,12 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 
-import { Character } from './types/actor/CharacterModel';
-import { Critter } from './types/actor/CritterModel';
-import { IC } from './types/actor/ICModel';
-import { Spirit } from './types/actor/SpiritModel';
-import { Sprite } from './types/actor/SpriteModel';
-import { Vehicle } from './types/actor/VehicleModel';
+import { Character } from './types/actor/Character';
+import { Critter } from './types/actor/Critter';
+import { IC } from './types/actor/IC';
+import { Spirit } from './types/actor/Spirit';
+import { Sprite } from './types/actor/Sprite';
+import { Vehicle } from './types/actor/Vehicle';
 
 import { Action } from './types/item/ActionModel';
 import { AdeptPower } from './types/item/AdeptPowerModel';
@@ -507,7 +507,7 @@ ___________________
      * @param data
      * @param id
      */
-    static async updateIcConnectedToHostItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
+    static async updateIcConnectedToHostItem(item: SR5Item, data: SR5Item['system'], id: string) {
         if (!canvas.ready || !game.actors) return;
 
         if (item.isType('host')) {

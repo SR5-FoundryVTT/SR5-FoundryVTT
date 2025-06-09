@@ -290,7 +290,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
         // This if statement should cover all types of devices, meaning the "getRating" calls above are always overwritten
         if (this.isCyberdeck() || this.isRCC() || this.isCommlink()) {
-            const atts = this.getData().atts;
+            const atts = this.getData().atts as Record<string, any>;
             if (atts) {
                 for (let [key, att] of Object.entries(atts)) {
                     matrix[att.att].value = att.value;

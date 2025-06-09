@@ -1,4 +1,4 @@
-import { MatrixAttributes } from "../actor/CommonModel";
+import { MatrixAttributes } from "../actor/Common";
 import { ImportFlags } from "../template/ImportFlagsModel";
 import { TechnologyPartData } from "../template/TechnologyModel";
 import { DescriptionPartData } from "../template/DescriptionModel";

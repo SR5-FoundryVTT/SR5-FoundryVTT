@@ -4,7 +4,6 @@ import {AttributesPrep} from "./functions/AttributesPrep";
 import {PartsList} from "../../parts/PartsList";
 import {SR5} from "../../config";
 import {MatrixPrep} from "./functions/MatrixPrep";
-import ICData = Shadowrun.ICData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import {DataDefaults} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
@@ -167,5 +166,4 @@ export class ICPrep {
             AttributesPrep.prepareAttribute(id, attribute);
         }
     }
-
 }

@@ -6,7 +6,7 @@ declare namespace Shadowrun {
         ImportFlags,
         DescriptionPartData {
             rating: number,
-            marks: MatrixMarks,
+            marks: any, // MatrixMarks
             ic: SourceEntityField[]
 
             // Disable host attribute calculation

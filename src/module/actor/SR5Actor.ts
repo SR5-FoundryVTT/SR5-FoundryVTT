@@ -30,12 +30,13 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import AEChangeData = ActiveEffect.ChangeData;
 import { ActionRollType, DamageType } from '../types/item/ActionModel';
 import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/AttributesModel';
-import { VehicleStatsType } from '../types/actor/VehicleModel';
+import { VehicleStatsType } from '../types/actor/Vehicle';
 import { LimitFieldType, LimitsType } from '../types/template/LimitsModel';
 import { SkillFieldType } from '../types/template/SkillsModel';
 import { ConditionType } from '../types/template/ConditionModel';
 import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitorsModel';
 import { BaseArmorType } from '../types/template/ArmorModel';
+import { InventoryType, MatrixType } from '../types/actor/Common';
 
 export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' | 'sprite';
 
@@ -56,14 +57,17 @@ export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' 
  */
 export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<SubType> {
     // This is the default inventory name and label for when no other inventory has been created.
-    defaultInventory: Shadowrun.InventoryData = {
+    defaultInventory: InventoryType = {
         name: 'Carried',
+        type: '',
         label: 'SR5.Labels.Inventory.Carried',
-        itemIds: []
+        itemIds: [],
+        showAll: true
     }
     // This is a dummy inventory
-    allInventories: Shadowrun.InventoryData = {
+    allInventories: InventoryType = {
         name: 'All',
+        type: '',
         label: 'SR5.Labels.Inventory.All',
         itemIds: [],
         showAll: true
@@ -221,7 +225,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         super.prepareDerivedData();
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
-        const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item as unknown as Shadowrun.ShadowrunItemData));
+        const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item as any));
         if (this.isType('character'))
             CharacterPrep.prepareDerivedData(this.system, itemDataWrappers);
         else if (this.isType('critter'))
@@ -1861,10 +1865,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return 'matrix' in this.system;
     }
 
-    get matrixData(): Shadowrun.MatrixData | undefined {
-        if (!this.isMatrixActor) return;
-        // @ts-expect-error
-        return this.system.matrix as Shadowrun.MatrixData;
+    matrixData(this: SR5Actor): MatrixType | undefined {
+        return this.system.matrix;
     }
 
     /**
@@ -1907,7 +1909,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const item = options?.item;
 
         const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        const matrixData = this.matrixData;
+        const matrixData = this.matrixData();
 
         if (!matrixData) return;
 
@@ -1921,7 +1923,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * Remove ALL marks placed by this actor
      */
     async clearMarks() {
-        const matrixData = this.matrixData;
+        const matrixData = this.matrixData();
         if (!matrixData) return;
 
         // Delete all markId properties from ActorData
@@ -1945,10 +1947,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         await this.update({ system: { matrix: { marks: updateData } } });
     }
 
-    getAllMarks(): Shadowrun.MatrixMarks | undefined {
-        const matrixData = this.matrixData;
-        if (!matrixData) return;
-        return matrixData.marks;
+    getAllMarks(this: SR5Actor): MatrixType['marks'] | undefined {
+        return this.matrixData()?.marks;
     }
 
     /**
@@ -1980,7 +1980,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     }
 
     getMarksById(markId: string): number {
-        return this.matrixData?.marks[markId] || 0;
+        return this.matrixData()?.marks[markId] || 0;
     }
 
     /**
@@ -2000,19 +2000,18 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return this;
     }
 
-    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
-        const marks = this.matrixController.getAllMarks();
+    getAllMarkedDocuments(this: SR5Actor): Shadowrun.MarkedDocument[] {
+        const marks = (this.matrixController as SR5Actor).getAllMarks();
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
-        // @ts-expect-error
-        return Object.entries(marks)
+        // TypedObjectField is not set in foundry-vtt-types v13 yet
+        return Object.entries(marks as Record<string, number>)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
-            .map(([markId, marks]) => ({
-                ...Helpers.getMarkIdDocuments(markId),
-                marks,
-                markId
-            }))
+            .map(([markId, marks]) => {
+                const markIdDocuments = Helpers.getMarkIdDocuments(markId)!;
+                return {...markIdDocuments, marks, markId};
+            })
     }
 
     /**

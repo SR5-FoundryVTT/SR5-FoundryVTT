@@ -21,8 +21,8 @@ import { Accessory, Weapon } from "../schema/WeaponsSchema";
 
 import { TechnologyType } from "src/module/types/template/TechnologyModel";
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
-import { SystemActor } from "src/module/actor/SR5Actor";
-import { SystemItem } from "src/module/item/SR5Item";
+import { SR5Actor } from "src/module/actor/SR5Actor";
+import { SR5Item } from "src/module/item/SR5Item";
 
 export type ParseData =
     Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
@@ -107,8 +107,7 @@ export abstract class Parser<Type extends SystemEntityType> {
             if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType as string]).includes(subType))
                 system.importFlags.subType = subType;
 
-            const entitySystem = entity.system as Shadowrun.ShadowrunItemDataData | Shadowrun.ShadowrunActorDataData;
-            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entitySystem);
+            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entity.system as SR5Item['system'] | SR5Actor['system']);
         }
     }
 

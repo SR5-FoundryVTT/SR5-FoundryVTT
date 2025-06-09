@@ -20,7 +20,6 @@ import FireRangeData = Shadowrun.FireRangeData;
 import ConditionData = Shadowrun.ConditionData;
 import AmmoData = Shadowrun.AmmoData;
 import ActionTestLabel = Shadowrun.ActionTestLabel;
-import MatrixMarks = Shadowrun.MatrixMarks;
 import RollEvent = Shadowrun.RollEvent;
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
@@ -46,11 +45,12 @@ import { UpdateActionFlow } from './flows/UpdateActionFlow';
 import { ActionResultType, ActionRollType } from '../types/item/ActionModel';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
+import { MatrixType } from '../types/actor/Common';
 
 ActionResultFlow; // DON'T TOUCH!
 
 export type SystemTechnologyItem = 'ammo' | 'armor' | 'device' | 'equipment' | 'modification' | 'program' | 'sin' | 'bioware' | 'cyberware' | 'weapon';
-export type SystemItem = SystemTechnologyItem | 'adept_power' | 'action' | 'call_in_action' | 'complex_form' | 'contact' | 'critter_power' | 'echo' | 'host' | 'lifestyle' | 'quality' | 'sprite_power' | 'spell' | 'ritual';
+export type SystemItem = SystemTechnologyItem | 'adept_power' | 'action' | 'call_in_action' | 'complex_form' | 'contact' | 'critter_power' | 'echo' | 'host' | 'lifestyle' | 'metamagic' | 'quality' | 'sprite_power' | 'spell' | 'ritual';
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -1207,10 +1207,8 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return host ? host.system.marks[markId] : 0;
     }
 
-    getAllMarks(): MatrixMarks | undefined {
-        const host = this.asType('host');
-        if (!host) return;
-        return host.system.marks;
+    getAllMarks(this: SR5Item): MatrixType['marks'] | undefined {
+        return this.system?.marks;
     }
 
     /**
@@ -1317,13 +1315,12 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
-        return Object.entries(marks)
+        return Object.entries(marks as Record<string, number>)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
-            .map(([markId, marks]) => ({
-                ...Helpers.getMarkIdDocuments(markId) as Shadowrun.TargetedDocument,
-                marks,
-                markId
-            }));
+            .map(([markId, marks]) => {
+                const markIdDocuments = Helpers.getMarkIdDocuments(markId)!;
+                return {...markIdDocuments, marks, markId};
+            })
     }
 
     /**
@@ -1384,7 +1381,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-    override async _preUpdate(changed, options, user: User) {
+    override async _preUpdate(changed: Item.UpdateData, options: Item.Database.PreUpdateOptions, user: User) {
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff !== false && options.recursive !== false) {

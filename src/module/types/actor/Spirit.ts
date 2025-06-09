@@ -1,31 +1,41 @@
-/// <reference path="../Shadowrun.ts" />
+import { SR5 } from "src/module/config";
+import { CharacterModifiers } from "./Character";
+import { AttributeField, Attributes } from "../template/AttributesModel";
+import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CharacterLimits } from "./Common";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-declare namespace Shadowrun {
-    export type SpiritType = keyof typeof SR5CONFIG.spiritTypes
+const SpiritAttributes = () => ({
+    ...Attributes(),
+    force: new SchemaField(AttributeField(), { required: true }),
+});
 
-    type SpiritAttributes = Attributes & {
-        force: AttributeField
-    }
-    
-    export interface SpiritData extends
-        CommonData,
-        MagicActorData,
-        TwoTrackActorData,
-        ArmorActorData,
-        WoundsActorData,
-        MovementActorData,
-        ImportFlags,
-        NPCActorData {
-            // FoundryVTT uuid of the summoning actors spirit.
-            // If no summoner is set, uuid will be empty.
-            summonerUuid: string
+const SpiritData = {
+    ...CommonData(),
+    ...MagicActorData(),
+    ...TwoTrackActorData(),
+    ...ArmorActorData(),
+    ...WoundsActorData(),
+    ...MovementActorData(),
+    ...NPCActorData(),
+    summonerUuid: new StringField({ required: true, initial: "" }),
+    values: new SchemaField(PhysicalCombatValues(), { required: true }),
+    spiritType: new StringField({ required: true, initial: "", }), // list all types?
+    force: new NumberField({ required: true, nullable: false, initial: 0 }),
+    limits: new SchemaField(CharacterLimits(), { required: true }),
+    services: new NumberField({ required: true, nullable: false, initial: 0 }),
+    attributes: new SchemaField(SpiritAttributes(), { required: true }),
+    modifiers: new SchemaField({
+        //todo
+        // ...Modifiers,
+        ...CharacterModifiers(),
+    }, { required: true }),
+}
 
-            values: PhysicalCombatValues
-            spiritType: SpiritType
-            force: number
-            limits: AwakendLimits
-            services: number
-            attributes: SpiritAttributes
-            modifiers: Modifiers & CommonModifiers
+
+export class Spirit extends foundry.abstract.TypeDataModel<typeof SpiritData, Actor.Implementation> {
+    static override defineSchema() {
+        return SpiritData;
     }
 }
+
+console.log("SpiritData", SpiritData, new Spirit());

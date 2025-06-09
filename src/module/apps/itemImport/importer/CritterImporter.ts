@@ -5,7 +5,6 @@ import { SpriteParser } from '../parser/metatype/SpriteParser';
 import { CritterParser } from '../parser/metatype/CritterParser';
 import { MetatypeSchema, Metatype } from "../schema/MetatypeSchema";
 
-type CrittersDataTypes = Shadowrun.CharacterActorData | Shadowrun.SpiritActorData | Shadowrun.SpriteActorData;
 
 export class CritterImporter extends DataImporter {
     public files = ['critters.xml'];

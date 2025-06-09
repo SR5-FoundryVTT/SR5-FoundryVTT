@@ -1,5 +1,7 @@
+import { SR5Item } from "src/module/item/SR5Item";
 import { SR5 } from "../../config";
 import { FLAGS, SYSTEM_NAME } from './../../constants';
+import { SR5Actor } from "src/module/actor/SR5Actor";
 
 export async function getIconFiles(): Promise<string[]> {
 
@@ -23,7 +25,7 @@ export async function getIconFiles(): Promise<string[]> {
 export function iconAssign(
     importFlags: Shadowrun.ImportFlagData,
     iconList: string[],
-    system?: Shadowrun.ShadowrunItemDataData | Shadowrun.ShadowrunActorDataData
+    system?: SR5Item['system'] | SR5Actor['system'],
 ): string {
 
     const defaultImg = "icons/svg/item-bag.svg";
@@ -55,7 +57,7 @@ export function iconAssign(
             break;
 
         case 'weapon':
-            const weaponSystem = system as Shadowrun.WeaponItemData['system'];
+            const weaponSystem = system as Item.SystemOfType<'weapon'>;
             fileNamePriority = [
                 imgFolder + override,
                 imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType,

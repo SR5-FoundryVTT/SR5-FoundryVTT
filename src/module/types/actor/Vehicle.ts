@@ -1,61 +1,81 @@
-/// <reference path="../Shadowrun.ts" />
+import { CommonData, ArmorActorData, MatrixActorData, MovementActorData, PhysicalTrackActorData, PhysicalCombatValues, CommonModifiers } from "./Common";
+import { Attributes, AttributeField } from "../template/AttributesModel";
+import { ModifiableValue } from "../template/BaseModel";
+import { ImportFlags } from "../template/ImportFlagsModel";
+import { VehicleLimits } from "../template/LimitsModel";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-declare namespace Shadowrun {
-    export type VehicleTypes = 'air' | 'aerospace' | 'ground' | 'water' | 'walker' | 'exotic'
+const VehicleAttributes = () => ({
+    ...Attributes(),
+    pilot: new SchemaField(AttributeField(), { required: true }),
+});
 
-    export type VehicleControlModeTypes = 'manual' | 'remote' | 'rigger' | 'autopilot'
+const VehicleStats = () => ({
+    pilot: new SchemaField(AttributeField(), { required: true }),
+    handling: new SchemaField(AttributeField(), { required: true }),
+    off_road_handling: new SchemaField(AttributeField(), { required: true }),
+    speed: new SchemaField(AttributeField(), { required: true }),
+    off_road_speed: new SchemaField(AttributeField(), { required: true }),
+    acceleration: new SchemaField(AttributeField(), { required: true }),
+    sensor: new SchemaField(AttributeField(), { required: true }),
+    seats: new SchemaField(AttributeField(), { required: true }),
+});
 
-    export type VehicleStat =
-        ModifiableValue &
-        LabelField &
-        ManualModField &
-        CanHideFiled
+const VehicleModCategories = () => ({
+    body: new NumberField({ required: true, nullable: false, initial: 0 }),
+    power_train: new NumberField({ required: true, nullable: false, initial: 0 }),
+    protection: new NumberField({ required: true, nullable: false, initial: 0 }),
+    electromagnetic: new NumberField({ required: true, nullable: false, initial: 0 }),
+    cosmetic: new NumberField({ required: true, nullable: false, initial: 0 }),
+    weapons: new NumberField({ required: true, nullable: false, initial: 0 }),
+});
 
-    export type VehicleEnvironment = 'speed' | 'handling'
+const VehicleData = {
+    ...CommonData(),
+    ...ArmorActorData(),
+    ...MatrixActorData(),
+    ...MovementActorData(),
+    ...ImportFlags(),
+    ...PhysicalTrackActorData(),
+    values: new SchemaField(PhysicalCombatValues(), { required: true }),
+    vehicleType: new StringField({
+        required: true,
+        initial: "ground",
+        choices: ["air", "aerospace", "ground", "water", "walker", "exotic"],
+    }),
+    controlMode: new StringField({
+        required: true,
+        initial: "manual",
+        choices: ["manual", "remote", "rigger", "autopilot"],
+    }),
+    isDrone: new BooleanField({ required: true, initial: false }),
+    isOffRoad: new BooleanField({ required: true, initial: false }),
+    driver: new StringField({ required: true, initial: "" }),
+    environment: new StringField({
+        required: true,
+        initial: "speed",
+        choices: ["speed", "handling"],
+    }),
+    vehicle_stats: new SchemaField(VehicleStats(), { required: true }),
+    attributes: new SchemaField(VehicleAttributes(), { required: true }),
+    networkController: new StringField({ required: true, initial: "" }),
+    modifiers: new SchemaField({
+        //todo
+        // ...Modifiers,
+        ...CommonModifiers(),
+    }, { required: true }),
+    modificationCategories: new SchemaField(VehicleModCategories(), { required: true }), // is it used?
+    modPoints: new NumberField({ required: true, initial: 0 }),
+    limits: new SchemaField(VehicleLimits(), { required: true }),
+}
 
-    type VehicleAttributes = Attributes & {
-        pilot: AttributeField
-    }
 
-    export interface VehicleData extends
-        CommonData,
-        ArmorActorData,
-        MatrixActorData,
-        MovementActorData,
-        ImportFlags,
-        PhysicalTrackActorData {
-            values: PhysicalCombatValues
-            vehicleType: VehicleTypes
-            controlMode: VehicleControlModeTypes
-            isDrone: boolean
-            isOffRoad: boolean
-            driver: string
-            environment: VehicleEnvironment
-            vehicle_stats: VehicleStats
-            attributes: VehicleAttributes
-            networkController: string
-            modifiers: Modifiers & CommonModifiers
-            modificationCategories: VehicleModCategories
-            modPoints: number
-        }
-
-    export interface VehicleStats {
-        pilot: VehicleStat
-        handling: VehicleStat
-        off_road_handling: VehicleStat
-        speed: VehicleStat
-        off_road_speed: VehicleStat
-        acceleration: VehicleStat
-        sensor: VehicleStat
-        seats: VehicleStat
-    }
-
-    export interface VehicleModCategories {
-        body: number
-        power_tain: number
-        protection: number
-        electromagnetic: number
-        cosmetic: number
-        weapons: number
+export class Vehicle extends foundry.abstract.TypeDataModel<typeof VehicleData, Actor.Implementation> {
+    static override defineSchema() {
+        return VehicleData;
     }
 }
+
+console.log("VehicleData", VehicleData, new Vehicle());
+
+export type VehicleStatsType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof VehicleStats>>;

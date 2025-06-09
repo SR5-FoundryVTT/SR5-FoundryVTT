@@ -13,7 +13,7 @@ declare namespace Shadowrun {
 
     export interface DevicePartData {
         category: DeviceCategory
-        atts: MatrixAttributes
+        atts: any // MatrixAttributes
         networkDevices: string[]
     }
 
