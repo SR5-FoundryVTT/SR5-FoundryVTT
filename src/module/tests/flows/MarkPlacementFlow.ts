@@ -116,6 +116,41 @@ export const MarkPlacementFlow = {
         if (test.icon instanceof SR5Item && !test.icon.isHost) test.data.placeOnMainIcon = false;
         // Grid items don´t show any devices for now.
         if (test.icon instanceof SR5Item && test.icon.isGrid) test.data.placeOnMainIcon = true;
+        // Cross grid placement between source and target.
+        if (test.source instanceof SR5Actor && test.icon instanceof SR5Actor) MarkPlacementFlow._crossGridConnectionForActors(test);
+        if (test.source instanceof SR5Actor && test.icon instanceof SR5Item) MarkPlacementFlow._crossGridConnectionForActorAndItem(test);
+    },
+
+    /**
+     * Compare actor grid networks.
+     * @param test The test placing any mark.
+     */
+    _crossGridConnectionForActors(test: MarkPlacementTests) {
+        const sourceActor = test.source as SR5Actor;
+        const sourceNetwork = sourceActor.network;
+        if (!sourceNetwork?.isGrid) return;
+
+        const targetActor = test.icon as SR5Actor;
+        const targetNetwork = targetActor.network;
+        if (!targetNetwork?.isGrid) return;
+
+        test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
+    },
+
+    /**
+     * Compare actor and item grid networks.
+     * @param test The test placing any mark.
+     */
+    _crossGridConnectionForActorAndItem(test: MarkPlacementTests) {
+        const sourceActor = test.source as SR5Actor;
+        const sourceNetwork = sourceActor.network;
+        if (!sourceNetwork?.isGrid) return;
+
+        const targetActor = test.icon as SR5Actor;
+        const targetNetwork = targetActor.master;
+        if (!targetNetwork?.isGrid) return;
+
+        test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
     },
 
     /**
