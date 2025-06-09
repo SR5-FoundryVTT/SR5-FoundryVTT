@@ -66,11 +66,6 @@ import { SetMarksOptions } from '../storage/MarksStorage';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
 
-// Removing this will break character sheets... try and put it back, if that is still the case
-// It seems to be an issue with import orders and how esbuild puts global imports causing
-import { ActionResultFlow } from './flows/ActionResultFlow';
-ActionResultFlow; // DON'T TOUCH!
-
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
  *
