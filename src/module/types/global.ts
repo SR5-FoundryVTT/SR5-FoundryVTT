@@ -29,7 +29,7 @@ import { Device } from './item/Device';
 import { Echo } from './item/Echo';
 import { Equipment } from './item/Equipment';
 import { Host } from './item/Host';
-import { Lifestyle } from './item/LifeStyle';
+import { Lifestyle } from './item/Lifestyle';
 import { Metamagic } from './item/Metamagic';
 import { Modification } from './item/Modification';
 import { Program } from './item/Program';

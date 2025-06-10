@@ -92,7 +92,7 @@ import { Device } from './types/item/Device';
 import { Echo } from './types/item/Echo';
 import { Equipment } from './types/item/Equipment';
 import { Host } from './types/item/Host';
-import { Lifestyle } from './types/item/LifeStyle';
+import { Lifestyle } from './types/item/Lifestyle';
 import { Metamagic } from './types/item/Metamagic';
 import { Modification } from './types/item/Modification';
 import { Program } from './types/item/Program';

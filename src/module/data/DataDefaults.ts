@@ -31,7 +31,7 @@ import { Cyberware } from "../types/item/Cyberware";
 import { Device } from "../types/item/Device";
 import { Echo } from "../types/item/Echo";
 import { Equipment } from "../types/item/Equipment";
-import { Lifestyle } from "../types/item/LifeStyle";
+import { Lifestyle } from "../types/item/Lifestyle";
 import { Metamagic } from "../types/item/Metamagic";
 import { Modification } from "../types/item/Modification";
 import { MovementField } from "../types/template/Movement";
