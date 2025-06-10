@@ -1,7 +1,7 @@
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {DataDefaults} from "../data/DataDefaults";
 import { Translation } from '../utils/strings';
-import { DamageType } from "../types/item/ActionModel";
+import { DamageType } from "../types/item/Action";
 
 
 export interface DefenseTestData extends OpposedTestData {

@@ -1,11 +1,10 @@
 import {SR} from "../constants";
 import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
-import ValueField = Shadowrun.ValueField;
 import {SoakRules} from "./SoakRules";
 import {SR5Actor} from "../actor/SR5Actor";
-import { DamageType } from "../types/item/ActionModel";
-import { ValueFieldType } from "../types/template/BaseModel";
+import { DamageType } from "../types/item/Action";
+import { ValueFieldType } from "../types/template/Base";
 
 export class CombatRules {
     static iniOrderCanDoAnotherPass(scores: number[]): boolean {

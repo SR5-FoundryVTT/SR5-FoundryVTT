@@ -1,6 +1,6 @@
 import {FormDialog, FormDialogData} from "./FormDialog";
 import {SR5Actor} from "../../actor/SR5Actor";
-import { DamageType } from "src/module/types/item/ActionModel";
+import { DamageType } from "src/module/types/item/Action";
 
 export class DamageApplicationDialog extends FormDialog {
 

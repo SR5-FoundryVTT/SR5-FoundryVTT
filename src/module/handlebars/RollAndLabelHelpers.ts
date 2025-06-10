@@ -2,7 +2,7 @@ import { PartsList } from '../parts/PartsList';
 import ModList = Shadowrun.ModList;
 import {Helpers} from "../helpers";
 import {SafeString} from "handlebars";
-import { DamageType } from '../types/item/ActionModel';
+import { DamageType } from '../types/item/Action';
 
 export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {

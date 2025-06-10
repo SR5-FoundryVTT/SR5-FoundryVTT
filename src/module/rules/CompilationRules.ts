@@ -1,6 +1,6 @@
 import { DataDefaults } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
-import { DamageType } from "../types/item/ActionModel";
+import { DamageType } from "../types/item/Action";
 
 /**
  * Rules around Compiling Sprites in SR5.

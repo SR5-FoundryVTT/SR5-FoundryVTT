@@ -9,7 +9,7 @@ import { SR5Item } from './item/SR5Item';
 import {Helpers} from "./helpers";
 import {SR5Actor} from "./actor/SR5Actor";
 import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
-import { SkillFieldType } from './types/template/SkillsModel';
+import { SkillFieldType } from './types/template/Skills';
 
 /**
  * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.

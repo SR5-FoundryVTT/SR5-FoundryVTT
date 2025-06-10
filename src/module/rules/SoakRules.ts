@@ -1,7 +1,7 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { Helpers } from '../helpers';
-import { DamageType } from '../types/item/ActionModel';
-import { ModifiedDamageType } from '../types/rolls/ActorRollsModel';
+import { DamageType } from '../types/item/Action';
+import { ModifiedDamageType } from '../types/rolls/ActorRolls';
 
 /**
  * Soaking rules for actors

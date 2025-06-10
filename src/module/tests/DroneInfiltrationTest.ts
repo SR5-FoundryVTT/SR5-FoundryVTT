@@ -1,7 +1,7 @@
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
-import { MinimalActionType } from "../types/item/ActionModel";
+import { MinimalActionType } from "../types/item/Action";
 import {SuccessTest} from "./SuccessTest";
 
 export class DroneInfiltrationTest extends SuccessTest {

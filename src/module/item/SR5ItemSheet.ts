@@ -7,7 +7,7 @@ import { createTagify, parseDropData } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
-import { AmmunitionType, RangeType } from '../types/item/WeaponModel';
+import { AmmunitionType, RangeType } from '../types/item/Weapon';
 
 /**
  * FoundryVTT ItemSheetData typing

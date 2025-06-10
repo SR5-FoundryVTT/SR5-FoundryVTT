@@ -4,7 +4,7 @@ import {ComplexFormRules} from "../rules/ComplexFormRules";
 import {PartsList} from "../parts/PartsList";
 import {FadeRules} from "../rules/FadeRules";
 import ModifierTypes = Shadowrun.ModifierTypes;
-import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 export interface ComplexFormTestData extends SuccessTestData {
     level: number;

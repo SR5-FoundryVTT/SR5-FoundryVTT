@@ -6,7 +6,7 @@ import {DataDefaults} from "../data/DataDefaults";
 import {CombatSpellRules} from "../rules/CombatSpellRules";
 import {TestCreator} from "./TestCreator";
 import ModifierTypes = Shadowrun.ModifierTypes;
-import { ActionRollType, MinimalActionType } from "../types/item/ActionModel";
+import { ActionRollType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 
 export interface CombatSpellDefenseTestData extends DefenseTestData {

@@ -19,7 +19,7 @@ declare namespace Shadowrun {
         // The ranged weapon mode to be used with
         mode: 'single_shot' | 'semi_auto' | 'burst_fire' | 'full_auto';
         // What action must be spent
-        action: ActionType
+        action: 'free' | 'simple' | 'complex';
     }
 
     export type SpellForceData = {

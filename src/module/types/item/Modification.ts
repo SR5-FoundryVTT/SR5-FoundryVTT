@@ -1,28 +1,41 @@
-/// <reference path="../Shadowrun.ts" />
-declare namespace Shadowrun {
-    export interface ModificationData extends
-        ModificationPartType,
-        DescriptionPartData,
-        ImportFlags,
-        TechnologyPartData {
+import { ImportFlags } from "../template/ImportFlags";
+import { TechnologyPartData } from "../template/Technology";
+import { DescriptionPartData } from "../template/Description";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-    }
-
-    /**
-     * Fields to modify matching parent item fields with during item preparation
-     */
-    export interface ModificationPartType {
-        type: 'weapon' | 'armor' | 'vehicle' | 'drone' | ''
-        mount_point: MountType
-        modification_category: ModificationCategoryType
-        dice_pool: number
-        accuracy: number
-        rc: number
-        conceal: number
-        slots: number
-    }
-
-    export type MountType = 'barrel' | 'stock' | 'top' | 'side' | 'internal' | '';
-
-    export type ModificationCategoryType = 'body' | 'cosmetic' | 'electromagnetic' | 'power_train' | 'protection' | 'weapons' | '';
+const ModificationData = {
+    ...DescriptionPartData(),
+    ...TechnologyPartData(),
+    ...ImportFlags(),
+    type: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['weapon', 'armor', 'vehicle', 'drone', '']
+    }),
+    mount_point: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['barrel', 'stock', 'top', 'side', 'internal', '']
+    }),
+    modification_category: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons', '']
+    }),
+    dice_pool: new NumberField({ required: true, nullable: false, initial: 0 }),
+    accuracy: new NumberField({ required: true, nullable: false, initial: 0 }),
+    rc: new NumberField({ required: true, nullable: false, initial: 0 }),
+    conceal: new NumberField({ required: true, nullable: false, initial: 0 }),
+    slots: new NumberField({ required: true, nullable: false, initial: 0 }),
 }
+
+export class Modification extends foundry.abstract.TypeDataModel<typeof ModificationData, Item.Implementation> {
+    static override defineSchema() {
+        return ModificationData;
+    }
+}
+
+console.log("ModificationData", ModificationData, new Modification());

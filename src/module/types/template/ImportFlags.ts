@@ -1,12 +1,15 @@
-declare namespace Shadowrun {
-    export interface ImportFlags {
-        importFlags: ImportFlagData;
-    }
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-    export interface ImportFlagData {
-        name: string;
-        type: string;
-        subType: string;
-        isFreshImport: boolean;
-    }
-}
+const ImportFlagData = () => ({
+    name: new StringField({ required: true, initial: '' }),
+    type: new StringField({ required: true, initial: '' }),
+    subType: new StringField({ required: true, initial: '' }),
+    isImported: new BooleanField({ required: true, initial: false }),
+    isFreshImport: new BooleanField({ required: true, initial: false }),
+});
+
+export const ImportFlags = () => ({
+    importFlags: new SchemaField(ImportFlagData())
+});
+
+export type ImportFlagType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ImportFlagData>>;

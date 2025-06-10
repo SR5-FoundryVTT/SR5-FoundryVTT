@@ -1,5 +1,4 @@
-import { DamageType } from "./types/item/ActionModel";
-import GenericValueField = Shadowrun.GenericValueField;
+import { DamageType } from "./types/item/Action";
 import TargetedDocument = Shadowrun.TargetedDocument;
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
@@ -9,11 +8,11 @@ import { SR5Item } from './item/SR5Item';
 import { PartsList } from './parts/PartsList';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
-import { ModifiableValueType } from "./types/template/BaseModel";
-import { AttributeFieldType } from "./types/template/AttributesModel";
-import { SkillFieldType, SkillsType } from "./types/template/SkillsModel";
-import { ModifiedDamageType } from "./types/rolls/ActorRollsModel";
-import { RangeTemplateType, RangesTemplateType } from "./types/template/WeaponModel";
+import { ModifiableValueType } from "./types/template/Base";
+import { AttributeFieldType } from "./types/template/Attributes";
+import { SkillFieldType, SkillsType } from "./types/template/Skills";
+import { ModifiedDamageType } from "./types/rolls/ActorRolls";
+import { RangeTemplateType } from "./types/template/Weapon";
 
 type OneOrMany<T> = T | T[];
 
@@ -69,7 +68,7 @@ export class Helpers {
         return value.value;
     }
 
-    static calcValue<ValueType>(value: GenericValueField): any {
+    static calcValue(value: DamageType): any {
         if (value.mod === undefined) value.mod = [];
 
         if (value.override) {

@@ -1,23 +1,35 @@
-/// <reference path="../Shadowrun.ts" />
-declare namespace Shadowrun {
-    export interface ArmorData extends
-        ArmorPartData,
-        DescriptionPartData,
-        ImportFlags,
-        TechnologyPartData {
+import { ImportFlags } from "../template/ImportFlags";
+import { TechnologyPartData } from "../template/Technology";
+import { DescriptionPartData } from "../template/Description";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-    }
+export const ArmorPartData = () => ({
+    armor: new SchemaField({
+        base: new NumberField({ required: true, nullable: false, initial: 0 }),
+        mod: new BooleanField({ required: true, initial: false }),
+        value: new NumberField({ required: true, nullable: false, initial: 0 }),
+        acid: new NumberField({ required: true, nullable: false, initial: 0 }),
+        cold: new NumberField({ required: true, nullable: false, initial: 0 }),
+        fire: new NumberField({ required: true, nullable: false, initial: 0 }),
+        electricity: new NumberField({ required: true, nullable: false, initial: 0 }),
+        radiation: new NumberField({ required: true, nullable: false, initial: 0 }),
+        hardened: new BooleanField({ required: true, initial: false }),
+    }, { required: true })
+});
 
-    export interface ArmorPartData {
-        armor: {
-            mod: boolean;
-            value: number;
-            acid: number;
-            cold: number;
-            fire: number;
-            electricity: number;
-            radiation: number;
-            hardened: boolean;
-        };
+export const ArmorData = () => ({
+    ...ArmorPartData(),
+    ...DescriptionPartData(),
+    ...ImportFlags(),
+    ...TechnologyPartData(),
+});
+
+export class Armor extends foundry.abstract.TypeDataModel<ReturnType<typeof ArmorData>, Item.Implementation> {
+    static override defineSchema() {
+        return ArmorData();
     }
 }
+
+export type ArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ArmorData>>;
+
+console.log("ArmorData", ArmorData(), new Armor());

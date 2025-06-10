@@ -21,8 +21,8 @@ import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
-import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/ActionModel';
-import { ValueFieldType } from '../types/template/BaseModel';
+import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
+import { ValueFieldType } from '../types/template/Base';
 import { DeepPartial } from "fvtt-types/utils";
 
 export interface TestDocuments {

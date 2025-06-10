@@ -2,7 +2,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR } from "../constants";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
-import { RangeTemplateType, RangesTemplateType } from "../types/template/WeaponModel";
+import { RangeTemplateType, RangesTemplateType } from "../types/template/Weapon";
 
 /**
  * Shadowrun5e rules applying to ranged weapons in general.

@@ -1,12 +1,12 @@
-import { ActorArmorData } from "../template/ArmorModel";
-import { Attributes, AttributeField } from "../template/AttributesModel";
-import { ModifiableValue } from "../template/BaseModel";
-import { ConditionData } from "../template/ConditionModel";
-import { MatrixTracks, PhysicalTrack, StunTrack, Tracks } from "../template/ConditionMonitorsModel";
-import { DescriptionPartData } from "../template/DescriptionModel";
-import { Limits, AwakendLimits, MatrixLimits } from "../template/LimitsModel";
-import { Movement } from "../template/MovementModel";
-import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/SkillsModel";
+import { ActorArmorData } from "../template/Armor";
+import { Attributes, AttributeField } from "../template/Attributes";
+import { ModifiableValue } from "../template/Base";
+import { ConditionData } from "../template/Condition";
+import { MatrixTracks, PhysicalTrack, StunTrack, Tracks } from "../template/ConditionMonitors";
+import { DescriptionPartData } from "../template/Description";
+import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
+import { Movement } from "../template/Movement";
+import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({

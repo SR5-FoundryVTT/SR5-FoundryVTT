@@ -1,18 +1,24 @@
-declare namespace Shadowrun {
-    export interface ContactData extends
-        ContactPartData,
-        ImportFlags,
-        DescriptionPartData {
+import { ImportFlags } from "../template/ImportFlags";
+import { DescriptionPartData } from "../template/Description";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-    }
+const ContactData = {
+    ...DescriptionPartData(),
+    ...ImportFlags(),
+    type: new StringField({ required: true, initial: '' }),
+    connection: new NumberField({ required: true, initial: 0 }),
+    loyalty: new NumberField({ required: true, initial: 0 }),
+    family: new BooleanField({ required: true, initial: false }),
+    blackmail: new BooleanField({ required: true, initial: false }),
+    group: new BooleanField({ required: true, initial: false }),
+    linkedActor: new StringField({ required: true, initial: '' }),
+}
 
-    export interface ContactPartData {
-        type: string;
-        connection: number;
-        loyalty: number;
-        family: boolean;
-        blackmail: boolean;
-        group: boolean;
-        linkedActor: string;
+
+export class Contact extends foundry.abstract.TypeDataModel<typeof ContactData, Item.Implementation> {
+    static override defineSchema() {
+        return ContactData;
     }
 }
+console.log("ContactData", ContactData, new Contact());
+

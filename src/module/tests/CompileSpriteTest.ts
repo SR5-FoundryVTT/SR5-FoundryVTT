@@ -3,7 +3,7 @@ import { SR5 } from "../config";
 import { DataDefaults } from "../data/DataDefaults";
 import { PartsList } from "../parts/PartsList";
 import { CompilationRules } from "../rules/CompilationRules";
-import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/Action";
 import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 
 

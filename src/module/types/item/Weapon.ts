@@ -1,96 +1,88 @@
-/// <reference path="../Shadowrun.ts" />
-declare namespace Shadowrun {
-    /**
-     * A valid weapon with all associated fields. Weapons still have all possible fields, but some
-     * may be ignored based on the value of @category.
-     */
-    export interface WeaponData extends
-        WeaponPartData,
-        ActionPartData,
-        TechnologyPartData,
-        ImportFlags,
-        DescriptionPartData {
+import { ValueMaxPair, ModifiableValue } from "../template/Base";
+import { DescriptionPartData } from "../template/Description";
+import { ImportFlags } from "../template/ImportFlags";
+import { TechnologyPartData } from "../template/Technology";
+import { ActionPartData } from "./Action";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-    }
+export const BlastData = () => ({
+    radius: new NumberField({ required: true, nullable: false, initial: 0 }),
+    dropoff: new NumberField({ required: true, nullable: false, initial: 0 }),
+});
 
-    export interface WeaponPartData {
-        category: WeaponCategory;
-        subcategory: string;
-        ammo: AmmunitionData;
-        range: RangeWeaponData;
-        melee: MeleeWeaponData;
-        thrown: ThrownWeaponData;
-    }
+const AmmunitionData = () => ({
+    spare_clips: new SchemaField(ValueMaxPair(), { required: true }),
+    current: new SchemaField(ValueMaxPair(), { required: true }),
+    clip_type: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['removable_clip', 'break_action', 'belt_fed', 'internal_magazin', 'muzzle_loader', 'cylinder', 'drum', 'bow', ''],
+    }),
+    partial_reload_value: new NumberField({ required: true, nullable: false, initial: 0 }),
+});
 
-    /**
-     * Weapon categories.
-     */
-    export type WeaponCategory = 'range' | 'melee' | 'thrown' | '';
+export const RangeData = () => ({
+    short: new NumberField({ required: true, nullable: false, initial: 0 }),
+    medium: new NumberField({ required: true, nullable: false, initial: 0 }),
+    long: new NumberField({ required: true, nullable: false, initial: 0 }),
+    extreme: new NumberField({ required: true, nullable: false, initial: 0 }),
+    category: new StringField({ required: true, initial: '' }), // I believe we don't use this, we could use the value from the RangeWeaponData
+    attribute: new StringField({ required: true, initial: '' }),
+});
 
-    /**
-     * Ammunition data for a weapon.
-     */
-    export interface AmmunitionData {
-        spare_clips: ValueMaxPair<number>;
-        current: ValueMaxPair<number>;
-        clip_type: 'removable_clip' | 'break_action' | 'belt_fed' | 'internal_magazin' | 'muzzle_loader' | 'cylinder' | 'drum' | 'bow' | '';
-        partial_reload_value: number;
-    }
+const FiringModeData = () => ({
+    single_shot: new BooleanField({ required: true, initial: false }),
+    semi_auto: new BooleanField({ required: true, initial: false }),
+    burst_fire: new BooleanField({ required: true, initial: false }),
+    full_auto: new BooleanField({ required: true, initial: false }),
+});
 
-    /**
-     * Ranged weapon specific data.
-     */
-    export interface RangeWeaponData {
-        category: '';
-        ranges: RangeData;
-        rc: ModifiableValue;
-        modes: FiringModeData;
-    }
-    /**
-     * Weapon ranges data.
-     */
-    export interface RangeData  {
-        short: number;
-        medium: number;
-        long: number;
-        extreme: number;
-        category: keyof typeof SR5CONFIG.weaponRangeCategories;
-        attribute?: ActorAttribute;
-    }
-    /**
-     * Selection of what ranged weapon modes are available
-     */
-    export interface FiringModeData  {
-        single_shot: boolean;
-        semi_auto: boolean;
-        burst_fire: boolean;
-        full_auto: boolean;
-    }
+const RangeWeaponData = () => ({
+    category: new StringField({ required: true, initial: '' }),
+    ranges: new SchemaField(RangeData(), { required: true }),
+    rc: new SchemaField(ModifiableValue(), { required: true }),
+    modes: new SchemaField(FiringModeData(), { required: true }),
+});
 
-    /**
-     * Possible firing modes for a ranged weapon.
-     */
-    export type RangedWeaponMode = keyof FiringModeData;
+const MeleeWeaponData = () => ({
+    reach: new NumberField({ required: true, nullable: false, initial: 0 }),
+});
 
-    /**
-     * Melee weapon specific data.
-     */
-    export interface MeleeWeaponData  {
-        reach: number;
-    }
+const ThrownWeaponData = () => ({
+    ranges: new SchemaField(RangeData(), { required: true }),
+    blast: new SchemaField(BlastData(), { required: true }),
+});
 
-    /**
-     * Thrown weapon specific data.
-     */
-    export interface ThrownWeaponData  {
-        ranges: RangeData;
-        blast: BlastData;
-    }
-    /**
-     * Blast data.
-     */
-    export interface BlastData  {
-        radius: number;
-        dropoff: number;
+const WeaponData = {
+    ...DescriptionPartData(),
+    ...TechnologyPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
+    category: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['melee', 'ranged', 'thrown', ''],
+    }),
+    subcategory: new StringField({ required: true, initial: '' }),
+    ammo: new SchemaField(AmmunitionData(), { required: true }),
+    range: new SchemaField(RangeWeaponData(), { required: true }),
+    melee: new SchemaField(MeleeWeaponData(), { required: true }),
+    thrown: new SchemaField(ThrownWeaponData(), { required: true }),
+}
+
+
+export class Weapon extends foundry.abstract.TypeDataModel<typeof WeaponData, Item.Implementation> {
+    static override defineSchema() {
+        return WeaponData;
     }
 }
+
+console.log("WeaponData", WeaponData, new Weapon());
+
+export type RangeType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangeData>>;
+export type BlastType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BlastData>>;
+export type FiringModeType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof FiringModeData>>;
+export type AmmunitionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof AmmunitionData>>;
+export type RangeWeaponType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangeWeaponData>>;

@@ -7,7 +7,7 @@ import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
 import {SoakFlow} from "../actor/flows/SoakFlow";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
-import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/Action";
 
 
 export interface PhysicalResistTestData extends SuccessTestData {

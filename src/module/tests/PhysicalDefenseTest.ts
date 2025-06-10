@@ -10,7 +10,7 @@ import { FLAGS, SYSTEM_NAME } from "../constants";
 import { Translation } from '../utils/strings';
 import { ActiveDefenseRules } from "../rules/ActiveDefenseRules";
 import { DeepPartial } from "fvtt-types/utils";
-import { MinimalActionType } from "../types/item/ActionModel";
+import { MinimalActionType } from "../types/item/Action";
 import { SR5Item } from "../item/SR5Item";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {

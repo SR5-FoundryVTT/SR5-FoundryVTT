@@ -1,4 +1,4 @@
-import { ActionRollType } from 'src/module/types/item/ActionModel';
+import { ActionRollType } from 'src/module/types/item/Action';
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import { SR5Item } from './../../SR5Item';

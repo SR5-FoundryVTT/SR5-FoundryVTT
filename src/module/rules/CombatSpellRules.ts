@@ -3,7 +3,7 @@ import {CombatRules} from "./CombatRules";
 import { SR5Actor } from "../actor/SR5Actor";
 import {PartsList} from "../parts/PartsList";
 import {DataDefaults} from "../data/DataDefaults";
-import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/Action";
 
 type SpellType = Item.SystemOfType<'spell'>['type'];
 type CombatSpellType = Item.SystemOfType<'spell'>['combat']['type'];

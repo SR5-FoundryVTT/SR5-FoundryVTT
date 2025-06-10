@@ -18,7 +18,7 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
-import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/SkillsModel';
+import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.

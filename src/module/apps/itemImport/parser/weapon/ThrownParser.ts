@@ -2,7 +2,7 @@ import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { Weapon } from '../../schema/WeaponsSchema';
-import { BlastType } from 'src/module/types/item/WeaponModel';
+import { BlastType } from 'src/module/types/item/Weapon';
 
 export class ThrownParser extends WeaponParserBase {
     public GetBlast(system: Item.SystemOfType<'weapon'>, jsonData: Weapon): BlastType {

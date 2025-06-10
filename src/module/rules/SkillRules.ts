@@ -1,7 +1,7 @@
 import {PartsList} from "../parts/PartsList";
 import {SR5} from "../config";
 import {SR} from "../constants";
-import { SkillFieldType } from "../types/template/SkillsModel";
+import { SkillFieldType } from "../types/template/Skills";
 
 export class SkillRules {
 

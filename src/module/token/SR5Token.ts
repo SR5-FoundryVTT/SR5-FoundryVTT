@@ -1,5 +1,5 @@
 import {FLAGS, SYSTEM_NAME} from "../constants";
-import { TrackType } from "../types/template/ConditionMonitorsModel";
+import { TrackType } from "../types/template/ConditionMonitors";
 
 export class SR5Token extends Token {
     override _drawBar(number: number, bar: PIXI.Graphics, data: NonNullable<ReturnType<TokenDocument['getBarAttribute']>>): boolean{

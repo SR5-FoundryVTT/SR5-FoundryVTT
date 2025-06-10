@@ -1,7 +1,7 @@
 import { SkillRules } from "../../rules/SkillRules";
 import { PartsList } from "../../parts/PartsList";
 import { FLAGS, SYSTEM_NAME } from "../../constants";
-import { SkillFieldType } from "src/module/types/template/SkillsModel";
+import { SkillFieldType } from "src/module/types/template/Skills";
 
 export class SkillFlow {
     /**

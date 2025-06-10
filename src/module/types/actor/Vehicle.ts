@@ -1,8 +1,8 @@
 import { CommonData, ArmorActorData, MatrixActorData, MovementActorData, PhysicalTrackActorData, PhysicalCombatValues, CommonModifiers } from "./Common";
-import { Attributes, AttributeField } from "../template/AttributesModel";
-import { ModifiableValue } from "../template/BaseModel";
-import { ImportFlags } from "../template/ImportFlagsModel";
-import { VehicleLimits } from "../template/LimitsModel";
+import { Attributes, AttributeField } from "../template/Attributes";
+import { ModifiableValue } from "../template/Base";
+import { ImportFlags } from "../template/ImportFlags";
+import { VehicleLimits } from "../template/Limits";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 const VehicleAttributes = () => ({

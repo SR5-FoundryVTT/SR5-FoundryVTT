@@ -3,7 +3,7 @@ import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SkillCategories = Shadowrun.SkillCategories;
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
-import { SkillFieldType } from '../types/template/SkillsModel';
+import { SkillFieldType } from '../types/template/Skills';
 
 export const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('SkillHeaderIcons', function (category: SkillCategories) {

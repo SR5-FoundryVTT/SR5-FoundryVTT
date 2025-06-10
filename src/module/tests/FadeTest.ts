@@ -7,7 +7,7 @@ import { Translation } from '../utils/strings';
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { DataDefaults } from "../data/DataDefaults";
-import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 
 export interface FadeTestData extends SuccessTestData {

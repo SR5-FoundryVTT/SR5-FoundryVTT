@@ -1,7 +1,7 @@
 import { SR5 } from '../config';
 import { DataDefaults } from './../data/DataDefaults';
-import { LimitFieldType } from '../types/template/LimitsModel';
-import { AttributeFieldType } from '../types/template/AttributesModel';
+import { LimitFieldType } from '../types/template/Limits';
+import { AttributeFieldType } from '../types/template/Attributes';
 
 
 /**

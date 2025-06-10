@@ -7,9 +7,9 @@ import { PartsList } from '../parts/PartsList';
 import { DocumentSituationModifiers } from './DocumentSituationModifiers';
 import { SuccessTest, SuccessTestData } from '../tests/SuccessTest';
 import { SR5Item } from '../item/SR5Item';
-import { DamageType } from '../types/item/ActionModel';
-import { RangeType } from '../types/item/WeaponModel';
-import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/WeaponModel';
+import { DamageType } from '../types/item/Action';
+import { RangeType } from '../types/item/Weapon';
+import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
 
 export interface WeaponRangeTestDataFragment {
     damage: DamageType

@@ -2,7 +2,7 @@ import { SR5Item } from "src/module/item/SR5Item";
 import { SR5 } from "../../config";
 import { FLAGS, SYSTEM_NAME } from './../../constants';
 import { SR5Actor } from "src/module/actor/SR5Actor";
-import { ImportFlagType } from "src/module/types/template/ImportFlagsModel";
+import { ImportFlagType } from "src/module/types/template/ImportFlags";
 
 export async function getIconFiles(): Promise<string[]> {
 

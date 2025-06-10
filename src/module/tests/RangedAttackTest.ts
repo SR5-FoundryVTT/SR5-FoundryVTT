@@ -6,8 +6,8 @@ import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
-import { DamageType } from '../types/item/ActionModel';
-import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/WeaponModel';
+import { DamageType } from '../types/item/Action';
+import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType

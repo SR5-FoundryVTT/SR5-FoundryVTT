@@ -6,7 +6,7 @@ import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
-import { SkillFieldType } from 'src/module/types/template/SkillsModel';
+import { SkillFieldType } from 'src/module/types/template/Skills';
 import { SR5Item } from 'src/module/item/SR5Item';
 
 /**

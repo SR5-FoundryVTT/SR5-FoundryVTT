@@ -1,42 +1,43 @@
-/// <reference path="../Shadowrun.ts" />
-declare namespace Shadowrun {
-    export type Skills = {
-        [id: string]: SkillField;
-    };
+import { ModifiableValue, KeyValuePair } from "./Base";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 
-    export type SkillField = BaseValuePair<number> &
-        NameField &
-        CanHideFiled &
-        ModifiableValue &
-        LabelField &
-        HasBonus &
-        HasAttribute &
-        RemovableField & {
-            specs: string[];
-            canDefault: boolean
+export type SkillCategories = 'active' | 'language' | 'knowledge';
 
-            // Optional fields not defined within template.json.
-            // Use to identify a skill when fetched by its label
-            id?: string
-            // A pdf-pager <pdf> <page> code to open the rulebook to the skill's description
-            link?: string
-        };
+export const SkillField = () => ({
+    ...ModifiableValue(),
+    name: new StringField({ required: true, initial: '' }),
+    hidden: new BooleanField({ required: true, initial: false }),
+    label: new StringField({ required: true, initial: '' }),
+    bonus: new ArrayField(new SchemaField(KeyValuePair())),
+    attribute: new StringField({ required: true, initial: '' }),
+    _delete: new BooleanField({ required: true, initial: false }), // Does it use it?
+    specs: new ArrayField(new StringField({ required: true, initial: '' })),
+    canDefault: new BooleanField({ required: true, initial: false }),
+    id: new StringField({ required: true, initial: '' }),
+    link: new StringField({ required: true, initial: '' }),
+});
 
-    export type HasAttribute = {
-        attribute: ActorAttribute;
-    };
+export const Skills = () => new TypedObjectField(new SchemaField(SkillField()), { required: true, initial: {} });
 
-    export type KnowledgeSkillCategory = keyof KnowledgeSkills;
+export const KnowledgeSkillList = () => ({
+    attribute: new StringField({
+        required: true,
+        initial: 'charisma',
+        choices: ["willpower", "logic", "intuition", "charisma"]
+    }),
+    value: Skills(),
+});
 
-    export type KnowledgeSkills = {
-        street: KnowledgeSkillList;
-        academic: KnowledgeSkillList;
-        professional: KnowledgeSkillList;
-        interests: KnowledgeSkillList;
-    };
+export const KnowledgeSkills = () => ({
+    street: new SchemaField(KnowledgeSkillList()),
+    academic: new SchemaField(KnowledgeSkillList()),
+    professional: new SchemaField(KnowledgeSkillList()),
+    interests: new SchemaField(KnowledgeSkillList()),
+});
 
-    export type KnowledgeSkillList = {
-        attribute: MentalAttribute;
-        value: Skills;
-    };
-}
+// Not yet implemented in fvtt-types curently
+export type SkillsType = Record<string, SkillFieldType>;
+export type SkillFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof SkillField>>;
+export type KnowledgeSkillsType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof KnowledgeSkills>>;
+
+export type KnowledgeSkillCategory = keyof ReturnType<typeof KnowledgeSkills>;

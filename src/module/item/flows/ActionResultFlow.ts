@@ -1,7 +1,7 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { MatrixRules } from "../../rules/MatrixRules";
 import { SuccessTest } from "../../tests/SuccessTest";
-import { ResultActionType } from "src/module/types/item/ActionModel";
+import { ResultActionType } from "src/module/types/item/Action";
 import { PhysicalDefenseTest } from "../../tests/PhysicalDefenseTest";
 
 type ResultActions = ResultActionType['action'];

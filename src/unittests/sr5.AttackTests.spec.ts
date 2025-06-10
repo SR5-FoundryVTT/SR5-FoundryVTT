@@ -5,7 +5,7 @@ import { SR5Actor } from '../module/actor/SR5Actor';
 import { SR5Item } from '../module/item/SR5Item';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { CombatRules } from '../module/rules/CombatRules';
-import { DamageType } from 'src/module/types/item/ActionModel';
+import { DamageType } from 'src/module/types/item/Action';
 type DamageTypeType = Item.SystemOfType<'action'>['action']['damage']['type']['base'];
 type DamageElementType = Item.SystemOfType<'action'>['action']['damage']['element']['base'];
 

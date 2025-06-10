@@ -1,6 +1,6 @@
 import { SR5 } from "src/module/config";
 import { CharacterModifiers } from "./Character";
-import { AttributeField, Attributes } from "../template/AttributesModel";
+import { AttributeField, Attributes } from "../template/Attributes";
 import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CharacterLimits } from "./Common";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 

@@ -1,6 +1,6 @@
-import { DescriptionPartData } from "../template/DescriptionModel";
-import { ImportFlags } from "../template/ImportFlagsModel";
-import { ActionPartData } from "./ActionModel";
+import { DescriptionPartData } from "../template/Description";
+import { ImportFlags } from "../template/ImportFlags";
+import { ActionPartData } from "./Action";
 
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 

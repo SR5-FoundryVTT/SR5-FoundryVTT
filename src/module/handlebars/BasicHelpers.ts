@@ -3,7 +3,7 @@ import { SafeString } from "handlebars";
 import { SYSTEM_NAME } from "../constants";
 import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
-import { SkillFieldType } from '../types/template/SkillsModel';
+import { SkillFieldType } from '../types/template/Skills';
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {

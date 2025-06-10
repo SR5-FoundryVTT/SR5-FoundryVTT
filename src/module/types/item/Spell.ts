@@ -1,57 +1,105 @@
-declare namespace Shadowrun {
-    export interface SpellData extends
-        SpellPartData,
-        DescriptionPartData,
-        ImportFlags,
-        ActionPartData {
+import { DescriptionPartData } from "../template/Description";
+import { ImportFlags } from "../template/ImportFlags";
+import { ActionPartData } from "./Action";
 
-    }
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-    export interface CombatSpellData {
-        type: CombatSpellType;
-    }
-    export interface DetectionSpellData {
-        type: DetectionSpellType;
-        passive: boolean;
-        extended: boolean;
-    }
-    export interface IllusionSpellData {
-        type: IllusionSpellType;
-        sense: IllusionSpellSense;
-    }
-    export interface ManipulationSpellData {
-        damaging: boolean;
-        mental: boolean;
-        environmental: boolean;
-        physical: boolean;
-    }
-    export interface RitualSpellData {
-        ritual: {
-            type: string;
-        }
-    }
-    export interface SpellPartData {
-        type: SpellType;
-        category: SpellCateogry;
-        drain: number;
-        range: SpellRange;
-        duration: SpellDuration;
-        extended: boolean;
+const CombatSpellData = ()=> ({
+    type: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['direct', 'indirect', '']
+    }),
+});
 
-        combat: CombatSpellData;
-        detection: DetectionSpellData;
-        illusion: IllusionSpellData;
-        manipulation: ManipulationSpellData;
-        ritual: RitualSpellData;
-    }
+const DetectionSpellData = () => ({
+    type: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['directional', 'psychic', 'area', '']
+    }),
+    passive: new BooleanField({ required: true, initial: false }),
+    extended: new BooleanField({ required: true, initial: false }),
+});
 
-    export type CombatSpellType = 'direct' | 'indirect' | '';
-    export type DetectionSpellType = 'directional' | 'psychic' | 'area' | '';
-    export type IllusionSpellType = 'obvious' | 'realistic' | '';
-    export type IllusionSpellSense = 'single-sense' | 'multi-sense' | '';
-    export type SpellCateogry = 'combat' | 'detection' | 'health' | 'illusion' | 'manipulation' | 'ritual' | '';
-    export type SpellType = 'physical' | 'mana' | '';
-    export type SpellRange = 'touch' | 'los' | 'los_a' | '';
-    export type SpellDuration = 'instant' | 'sustained' | 'permanent' | '';
-    export type RitualType = 'anchored' | 'material_link' | 'minion' | 'spell' | 'spotter' | '';
+const IllusionSpellData = () => ({
+    type: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['obvious', 'realistic', '']
+    }),
+    sense: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['single-sense', 'multi-sense', '']
+    }),
+});
+
+const ManipulationSpellData = () => ({
+    damaging: new BooleanField({ required: true, initial: false }),
+    mental: new BooleanField({ required: true, initial: false }),
+    environmental: new BooleanField({ required: true, initial: false }),
+    physical: new BooleanField({ required: true, initial: false }),
+});
+
+const RitualSpellData = () => ({
+    ritual: new SchemaField({
+        type: new StringField({
+            required: true,
+            initial: '',
+            blank: true,
+            choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter', '']
+        }),
+    }, { required: true }),
+});
+
+const SpellData = {
+    ...DescriptionPartData(),
+    ...ImportFlags(),
+    ...ActionPartData(),
+    type: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['physical', 'mana', '']
+    }),
+    category: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['combat', 'detection', 'health', 'illusion', 'manipulation', 'ritual', '']
+    }),
+    drain: new NumberField({ required: true, initial: 0 }),
+    range: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['touch', 'los', 'los_a', '']
+    }),
+    duration: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: ['instant', 'sustained', 'permanent', '']
+    }),
+
+    extended: new BooleanField({ required: true, initial: false }),
+    combat: new SchemaField(CombatSpellData(), { required: true }),
+    detection: new SchemaField(DetectionSpellData(), { required: true }),
+    illusion: new SchemaField(IllusionSpellData(), { required: true }),
+    manipulation: new SchemaField(ManipulationSpellData(), { required: true }),
+    ritual: new SchemaField(RitualSpellData(), { required: true }),
 }
+
+
+export class Spell extends foundry.abstract.TypeDataModel<typeof SpellData, Item.Implementation> {
+    static override defineSchema() {
+        return SpellData;
+    }
+}
+
+console.log("SpellData", SpellData, new Spell());

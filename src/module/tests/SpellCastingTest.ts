@@ -4,7 +4,7 @@ import {PartsList} from "../parts/PartsList";
 import {DataDefaults} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import ModifierTypes = Shadowrun.ModifierTypes;
-import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from "../item/SR5Item";
 

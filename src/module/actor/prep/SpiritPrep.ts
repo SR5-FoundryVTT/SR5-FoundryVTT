@@ -13,9 +13,9 @@ import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 import { SR5 } from '../../config';
 import { SR } from '../../constants';
-import { SkillFieldType, SkillsType } from 'src/module/types/template/SkillsModel';
+import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import { SR5Item } from 'src/module/item/SR5Item';
-import { AttributesType } from 'src/module/types/template/AttributesModel';
+import { AttributesType } from 'src/module/types/template/Attributes';
 
 
 export class SpiritPrep {

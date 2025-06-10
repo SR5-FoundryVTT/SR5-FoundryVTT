@@ -27,16 +27,16 @@ import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import AEChangeData = ActiveEffect.ChangeData;
-import { ActionRollType, DamageType } from '../types/item/ActionModel';
-import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/AttributesModel';
+import { ActionRollType, DamageType } from '../types/item/Action';
+import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/Attributes';
 import { VehicleStatsType } from '../types/actor/Vehicle';
-import { LimitFieldType, LimitsType } from '../types/template/LimitsModel';
-import { KnowledgeSkillCategory, SkillFieldType } from '../types/template/SkillsModel';
-import { ConditionType } from '../types/template/ConditionModel';
-import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitorsModel';
-import { BaseArmorType } from '../types/template/ArmorModel';
+import { LimitFieldType, LimitsType } from '../types/template/Limits';
+import { KnowledgeSkillCategory, SkillFieldType } from '../types/template/Skills';
+import { ConditionType } from '../types/template/Condition';
+import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitors';
+import { BaseArmorType } from '../types/template/Armor';
 import { InventoryType, MatrixType } from '../types/actor/Common';
-import { SkillRollOptions } from '../types/rolls/ActorRollsModel';
+import { SkillRollOptions } from '../types/rolls/ActorRolls';
 
 export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' | 'sprite';
 

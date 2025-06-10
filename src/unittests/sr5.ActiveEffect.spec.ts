@@ -7,7 +7,7 @@ import { DataDefaults } from "../module/data/DataDefaults";
 import { SkillTest } from "../module/tests/SkillTest";
 import { Helpers } from "../module/helpers";
 import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
-import { SkillFieldType } from "src/module/types/template/SkillsModel";
+import { SkillFieldType } from "src/module/types/template/Skills";
 
 export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     const { describe, it, before, after } = context;

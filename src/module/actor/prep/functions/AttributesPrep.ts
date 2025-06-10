@@ -4,8 +4,8 @@ import {SR5} from "../../../config";
 import { PartsList } from '../../../parts/PartsList';
 import { ItemPrep } from './ItemPrep';
 import { SystemActor } from '../../SR5Actor';
-import { AttributeFieldType } from 'src/module/types/template/AttributesModel';
-import { ModifiableValueType } from 'src/module/types/template/BaseModel';
+import { AttributeFieldType } from 'src/module/types/template/Attributes';
+import { ModifiableValueType } from 'src/module/types/template/Base';
 import { SR5Item } from 'src/module/item/SR5Item';
 
 export class AttributesPrep {

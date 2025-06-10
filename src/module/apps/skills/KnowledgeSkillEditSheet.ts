@@ -1,4 +1,4 @@
-import { KnowledgeSkillCategory } from 'src/module/types/template/SkillsModel';
+import { KnowledgeSkillCategory } from 'src/module/types/template/Skills';
 import { LanguageSkillEditSheet } from './LanguageSkillEditSheet';
 
 export class KnowledgeSkillEditSheet extends LanguageSkillEditSheet {

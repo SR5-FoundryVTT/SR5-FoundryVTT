@@ -1,12 +1,15 @@
-/// <reference path="../Shadowrun.ts" />
-declare namespace Shadowrun {
+import { DamageType } from "../item/Action"
+import { BaseValuePairType } from "../template/Base";
 
-    type SkillRollOptions = ActorRollOptions & {
-        // A specialization should be used.
-        specialization?: boolean
-        // Skills should be searched not by id but their label.
-        byLabel?: boolean
-        threshold?: BaseValuePair<number>
-    };
-
+export type ModifiedDamageType = {
+    incoming: DamageType;
+    modified: DamageType;
 }
+
+export type SkillRollOptions = Shadowrun.ActorRollOptions & {
+    // A specialization should be used.
+    specialization?: boolean
+    // Skills should be searched not by id but their label.
+    byLabel?: boolean
+    threshold?: BaseValuePairType
+};

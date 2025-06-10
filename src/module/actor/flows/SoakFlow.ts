@@ -1,6 +1,6 @@
 import {SR5Actor} from "../SR5Actor";
 import {SR5Item} from '../../item/SR5Item';
-import { DamageType } from "src/module/types/item/ActionModel";
+import { DamageType } from "src/module/types/item/Action";
 
 export class SoakFlow {
     knocksDown(damage: DamageType, actor: SR5Actor) {

@@ -10,7 +10,7 @@ import { PartsList } from '../../parts/PartsList';
 import { SR5 } from "../../config";
 import { RangedWeaponRules } from '../../rules/RangedWeaponRules';
 import { SR } from '../../constants';
-import { ModifiableValueType } from 'src/module/types/template/BaseModel';
+import { ModifiableValueType } from 'src/module/types/template/Base';
 import { SR5Item } from 'src/module/item/SR5Item';
 
 

@@ -4,7 +4,7 @@ import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { PartsList } from '../parts/PartsList';
 import { SpellcastingRules } from '../rules/SpellcastingRules';
 import { ConjuringRules } from '../rules/ConjuringRules';
-import { DamageType, MinimalActionType } from '../types/item/ActionModel';
+import { DamageType, MinimalActionType } from '../types/item/Action';
 import { DeepPartial } from 'fvtt-types/utils';
 
 

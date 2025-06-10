@@ -7,9 +7,9 @@ import { Helpers } from "../../helpers";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { PartsList } from "../../parts/PartsList";
 import { Translation } from "../../utils/strings";
-import { DamageType } from "src/module/types/item/ActionModel";
-import { SkillFieldType } from "src/module/types/template/SkillsModel";
-import { ModifiableValueLinkedType } from "src/module/types/template/BaseModel";
+import { DamageType } from "src/module/types/item/Action";
+import { SkillFieldType } from "src/module/types/template/Skills";
+import { ModifiableValueLinkedType } from "src/module/types/template/Base";
 
 export class ActionFlow {
     /**

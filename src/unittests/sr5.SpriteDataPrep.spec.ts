@@ -1,4 +1,4 @@
-import { SkillFieldType } from 'src/module/types/template/SkillsModel';
+import { SkillFieldType } from 'src/module/types/template/Skills';
 import { SR5Actor } from './../module/actor/SR5Actor';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 

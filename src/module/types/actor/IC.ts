@@ -1,4 +1,4 @@
-import { AttributeField, Attributes } from "../template/AttributesModel";
+import { AttributeField, Attributes } from "../template/Attributes";
 import { CommonData, MatrixActorData, MatrixTrackActorData, MatrixAttributes, CommonModifiers, MatrixModifiers } from "./Common";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 

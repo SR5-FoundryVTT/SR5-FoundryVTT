@@ -1,5 +1,5 @@
 import { SR5 } from "../config";
-import { FiringModeType } from "../types/item/WeaponModel";
+import { FiringModeType } from "../types/item/Weapon";
 import FireModeData = Shadowrun.FireModeData;
 
 

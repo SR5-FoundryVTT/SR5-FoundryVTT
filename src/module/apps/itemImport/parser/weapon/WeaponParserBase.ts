@@ -5,8 +5,8 @@ import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { Weapon, WeaponsSchema } from '../../schema/WeaponsSchema';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import { RangeType } from 'src/module/types/item/WeaponModel';
-import { DamageType } from 'src/module/types/item/ActionModel';
+import { RangeType } from 'src/module/types/item/Weapon';
+import { DamageType } from 'src/module/types/item/Action';
 
 import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 type DamageTypeType = Item.SystemOfType<'weapon'>['action']['damage']['type']['base'];

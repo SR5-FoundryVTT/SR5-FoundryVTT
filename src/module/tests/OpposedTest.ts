@@ -1,10 +1,10 @@
-import {SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments, TestOptions} from "./SuccessTest";
-import {DataDefaults} from "../data/DataDefaults";
-import {TestCreator} from "./TestCreator";
-import {SR5Item} from "../item/SR5Item";
-import {PartsList} from "../parts/PartsList";
+import { SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments, TestOptions } from "./SuccessTest";
+import { DataDefaults } from "../data/DataDefaults";
+import { TestCreator } from "./TestCreator";
+import { SR5Item } from "../item/SR5Item";
+import { PartsList } from "../parts/PartsList";
 import { Helpers } from "../helpers";
-import { ValueFieldType } from "../types/template/BaseModel";
+import { ValueFieldType } from "../types/template/Base";
 import { SR5Actor } from "../actor/SR5Actor";
 
 
@@ -179,7 +179,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     /**
      * Derived net hits of the active vs opposed test pair.
      */
-    get againstNetHits(): Shadowrun.ValueField {
+    get againstNetHits(): ValueFieldType {
         return this.data.values.againstNetHits;
     }
 

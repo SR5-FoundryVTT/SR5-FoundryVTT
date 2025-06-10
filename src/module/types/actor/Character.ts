@@ -1,6 +1,6 @@
 import { CommonModifiers, MatrixModifiers, CommonData, MatrixActorData, TwoTrackActorData, ArmorActorData, MagicActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CharacterLimits } from "./Common";
-import { Attributes, AttributeField } from "../template/AttributesModel";
-import { ValueMaxPair } from "../template/BaseModel";
+import { Attributes, AttributeField } from "../template/Attributes";
+import { ValueMaxPair } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const TechnomancerActorData = () => ({

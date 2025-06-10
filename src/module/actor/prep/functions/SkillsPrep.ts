@@ -1,7 +1,7 @@
 import { SR5 } from "../../../config";
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
-import { SkillFieldType } from 'src/module/types/template/SkillsModel';
+import { SkillFieldType } from 'src/module/types/template/Skills';
 
 export class SkillsPrep {
     /**

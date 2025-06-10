@@ -36,11 +36,11 @@ import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
  */
 import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
-import { ActionResultType, ActionRollType } from '../types/item/ActionModel';
+import { ActionResultType, ActionRollType } from '../types/item/Action';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
 import { MatrixType } from '../types/actor/Common';
-import { ConditionType } from '../types/template/ConditionModel';
+import { ConditionType } from '../types/template/Condition';
 
 ActionResultFlow; // DON'T TOUCH!
 

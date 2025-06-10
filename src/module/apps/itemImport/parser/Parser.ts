@@ -19,7 +19,7 @@ import { Spell } from "../schema/SpellsSchema";
 import { Vehicle, Mod as VehicleMod, Weaponmount } from "../schema/VehiclesSchema";
 import { Accessory, Weapon } from "../schema/WeaponsSchema";
 
-import { TechnologyType } from "src/module/types/template/TechnologyModel";
+import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { SR5Item } from "src/module/item/SR5Item";

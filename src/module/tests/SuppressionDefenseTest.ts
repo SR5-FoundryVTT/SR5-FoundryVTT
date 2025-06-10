@@ -1,6 +1,6 @@
 import { CombatRules } from "../rules/CombatRules";
 import { PhysicalDefenseTest, PhysicalDefenseTestData } from "./PhysicalDefenseTest";
-import { MinimalActionType } from "../types/item/ActionModel";
+import { MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 
 

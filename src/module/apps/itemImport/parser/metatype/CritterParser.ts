@@ -4,7 +4,7 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 import { DataDefaults } from "src/module/data/DataDefaults";
-import { SkillFieldType } from "src/module/types/template/SkillsModel";
+import { SkillFieldType } from "src/module/types/template/Skills";
 
 export class CritterParser extends MetatypeParserBase<'character'> {
     protected parseType = 'character' as const;

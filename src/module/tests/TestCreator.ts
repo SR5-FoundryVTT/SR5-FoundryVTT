@@ -18,7 +18,7 @@ import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {SR5} from "../config";
 import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
-import { ActionRollType, DamageType, MinimalActionType } from "../types/item/ActionModel";
+import { ActionRollType, DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 
 /**

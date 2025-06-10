@@ -1,9 +1,9 @@
 import {DamageApplicationDialog} from "../../apps/dialogs/DamageApplicationDialog";
 import {SR5Actor} from "../SR5Actor";
-import DamageElement = Shadowrun.DamageElement;
 import { Helpers } from '../../helpers';
 import { TestCreator } from '../../tests/TestCreator';
-import { DamageType } from "src/module/types/item/ActionModel";
+import { DamageType } from "src/module/types/item/Action";
+type DamageElement = Item.SystemOfType<'weapon'>['action']['damage']['element']['base'];
 
 export class DamageApplicationFlow {
 
