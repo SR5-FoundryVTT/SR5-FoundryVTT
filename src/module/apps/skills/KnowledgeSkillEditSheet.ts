@@ -1,5 +1,5 @@
+import { KnowledgeSkillCategory } from 'src/module/types/template/SkillsModel';
 import { LanguageSkillEditSheet } from './LanguageSkillEditSheet';
-import KnowledgeSkillCategory = Shadowrun.KnowledgeSkillCategory;
 
 export class KnowledgeSkillEditSheet extends LanguageSkillEditSheet {
     category: KnowledgeSkillCategory;
@@ -7,6 +7,7 @@ export class KnowledgeSkillEditSheet extends LanguageSkillEditSheet {
         super(actor, options, skillId);
         this.category = category;
     }
+
     override _updateString() {
         return `system.skills.knowledge.${this.category}.value.${this.skillId}`;
     }

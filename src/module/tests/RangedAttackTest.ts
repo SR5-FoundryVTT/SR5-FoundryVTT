@@ -7,6 +7,7 @@ import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 import { DamageType } from '../types/item/ActionModel';
+import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/WeaponModel';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
@@ -14,9 +15,9 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
     fireMode: Shadowrun.FireModeData
     // index of selected fireMode in fireModes
     fireModeSelected: number
-    ranges: Shadowrun.RangesTemplateData
+    ranges: RangesTemplateType
     range: number
-    targetRanges: Shadowrun.TargetRangeTemplateData[]
+    targetRanges: TargetRangeTemplateType[]
     // index of selected target range in targetRanges
     targetRangesSelected: number
     // Distance to target in meters.

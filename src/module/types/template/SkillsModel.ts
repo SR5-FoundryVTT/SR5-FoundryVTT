@@ -35,6 +35,9 @@ export const KnowledgeSkills = () => ({
     interests: new SchemaField(KnowledgeSkillList()),
 });
 
-export type SkillFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof SkillField>>;
 // Not yet implemented in fvtt-types curently
 export type SkillsType = Record<string, SkillFieldType>;
+export type SkillFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof SkillField>>;
+export type KnowledgeSkillsType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof KnowledgeSkills>>;
+
+export type KnowledgeSkillCategory = keyof ReturnType<typeof KnowledgeSkills>;

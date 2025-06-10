@@ -11,3 +11,5 @@ const ImportFlagData = () => ({
 export const ImportFlags = () => ({
     importFlags: new SchemaField(ImportFlagData())
 });
+
+export type ImportFlagType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ImportFlagData>>;

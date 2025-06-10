@@ -17,7 +17,7 @@ declare namespace Shadowrun {
         // Does this firemode cause suppresssion?
         suppression: boolean
         // The ranged weapon mode to be used with
-        mode: RangedWeaponMode
+        mode: 'single_shot' | 'semi_auto' | 'burst_fire' | 'full_auto';
         // What action must be spent
         action: ActionType
     }
@@ -33,14 +33,5 @@ declare namespace Shadowrun {
 
     export type FireRangeData = {
         value: number;
-    };
-
-    export type ReachData = {
-        attacker: {
-            value: number;
-        };
-        defender?: {
-            value: number;
-        };
     };
 }

@@ -135,7 +135,15 @@ declare namespace Shadowrun {
     };
 
     // ME :)
-    
+
+    export type SkillCategories = 'active'|'language'|'knowledge';
+
+    export type RollEvent = PointerEvent & { shiftKey?: boolean; altKey?: boolean; ctrlKey?: boolean };
+
+    export type ActorRollOptions = {
+        event?: RollEvent
+    };
+
     /**
      * A list of pack names defined within the system.
      *

@@ -71,7 +71,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
                     const skillField: any = { name: skill._TEXT, base: skillValue };
                     _mergeWithMissingSkillFields(skillField);
                     return skillField;
-                })() as Shadowrun.SkillField;
+                })() as SkillFieldType;
             });
         }
     }

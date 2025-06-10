@@ -2,6 +2,7 @@ import { SR5Item } from "src/module/item/SR5Item";
 import { SR5 } from "../../config";
 import { FLAGS, SYSTEM_NAME } from './../../constants';
 import { SR5Actor } from "src/module/actor/SR5Actor";
+import { ImportFlagType } from "src/module/types/template/ImportFlagsModel";
 
 export async function getIconFiles(): Promise<string[]> {
 
@@ -23,7 +24,7 @@ export async function getIconFiles(): Promise<string[]> {
 }
 
 export function iconAssign(
-    importFlags: Shadowrun.ImportFlagData,
+    importFlags: ImportFlagType,
     iconList: string[],
     system?: SR5Item['system'] | SR5Actor['system'],
 ): string {

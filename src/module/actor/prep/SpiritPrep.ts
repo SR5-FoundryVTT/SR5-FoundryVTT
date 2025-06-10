@@ -15,6 +15,7 @@ import { SR5 } from '../../config';
 import { SR } from '../../constants';
 import { SkillFieldType, SkillsType } from 'src/module/types/template/SkillsModel';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { AttributesType } from 'src/module/types/template/AttributesModel';
 
 
 export class SpiritPrep {
@@ -53,16 +54,16 @@ export class SpiritPrep {
         CharacterPrep.prepareRecoilCompensation(system);
     }
 
-    static prepareSpiritSpecial(data: Actor.SystemOfType<'spirit'>) {
+    static prepareSpiritSpecial(system: Actor.SystemOfType<'spirit'>) {
         // Spirits will always be awakened.
-        data.special = 'magic';
+        system.special = 'magic';
     }
 
-    static prepareSpiritBaseData(data: Actor.SystemOfType<'spirit'>) {
-        const overrides = this.getSpiritStatModifiers(data.spiritType);
+    static prepareSpiritBaseData(system: Actor.SystemOfType<'spirit'>) {
+        const overrides = this.getSpiritStatModifiers(system.spiritType);
 
         if (overrides) {
-            const { attributes, skills, initiative, force, modifiers } = data;
+            const { attributes, skills, initiative, force, modifiers } = system;
 
             // set the base of attributes to the provided force
             for (const [attId, value] of Object.entries(overrides.attributes)) {
@@ -110,8 +111,8 @@ export class SpiritPrep {
         return DataDefaults.createData('skill_field', { label, attribute, canDefault: false })
     }
 
-    static prepareSpiritArmor(data: Actor.SystemOfType<'spirit'>) {
-        const { armor, attributes } = data;
+    static prepareSpiritArmor(system: Actor.SystemOfType<'spirit'>) {
+        const { armor, attributes } = system;
         armor.base = (attributes.essence.value ?? 0) * 2;
         armor.value = Helpers.calcTotal(armor);
         armor.hardened = true;
@@ -136,7 +137,7 @@ export class SpiritPrep {
                 charisma: 0,
                 magic: 0,
                 essence: 0,
-            } as Partial<Record<keyof Shadowrun.Attributes, number>>,
+            } as Partial<Record<keyof AttributesType, number>>,
             // modifiers for after the Force x init_mult + (init_dice)d6 calculation
             init: 0,
             astral_init: 0,

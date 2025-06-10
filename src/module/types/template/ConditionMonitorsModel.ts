@@ -2,8 +2,8 @@ import { ValueMaxPair, ModifiableValue } from "./BaseModel";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 const Living = () => ({
-    wounds: new NumberField({ required: true, initial: 0 }),
-    pain_tolerance: new NumberField({ required: true, initial: 0 }),
+    wounds: new NumberField({ required: true, nullable: false, initial: 0 }),
+    pain_tolerance: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 const Overflow = () => ({
@@ -13,8 +13,8 @@ const Overflow = () => ({
 export const Track = () => ({
     ...ValueMaxPair(),
     ...ModifiableValue(),
-    base: new NumberField({ required: true, initial: 0 }), // Does if use it?
-    label: new StringField({ required: true, blank: true, initial: '' }),
+    base: new NumberField({ required: true, nullable: false, initial: 0 }), // Does if use it?
+    label: new StringField({ required: true, initial: '' }),
     disabled: new BooleanField({ required: false, initial: false })
 });
 

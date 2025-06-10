@@ -1,9 +1,9 @@
 import { Helpers } from '../helpers';
-import {SafeString} from "handlebars";
-import SkillField = Shadowrun.SkillField;
-import {SR5Actor} from "../actor/SR5Actor";
-import {SYSTEM_NAME} from "../constants";
+import { SafeString } from "handlebars";
+import { SYSTEM_NAME } from "../constants";
+import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
+import { SkillFieldType } from '../types/template/SkillsModel';
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
@@ -18,7 +18,7 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
-    Handlebars.registerHelper('localizeSkill', function (skill: SkillField): string {
+    Handlebars.registerHelper('localizeSkill', function (skill: SkillFieldType): string {
         return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
         // NOTE: Below is code to append a shortened attribute name to the skill name. It's been removed for readability.
         //       But still might useful for someone.

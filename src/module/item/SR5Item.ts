@@ -10,13 +10,10 @@ import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
 import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
 import { HostDataPreparation } from "./prep/HostPrep";
-import ModList = Shadowrun.ModList;
-import AttackData = Shadowrun.AttackData;
 import FireModeData = Shadowrun.FireModeData;
 import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
-import ConditionData = Shadowrun.ConditionData;
 import RollEvent = Shadowrun.RollEvent;
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
@@ -373,6 +370,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return equippedAmmos[0];
     }
 
+    // a bit misleading, need to check
     getEquippedMods(): SR5Item<'modification'>[] {
         return this.items.filter((item) => item.isWeaponModification() && item.isEquipped()) as SR5Item<'modification'>[];
     }
@@ -551,19 +549,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         if (this.isType('sin')) {
             const licenses = this.system.licenses.splice(index, 1);
             await this.update({ system: { licenses } });
-        }
-    }
-
-    async rollOpposedTest(target: SR5Actor, attack: AttackData, event): Promise<void> {
-        console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
-    }
-
-    async rollTestType(type: string, attack: AttackData, event, target: SR5Actor) {
-        if (type === 'opposed') {
-            await this.rollOpposedTest(target, attack, event);
-        }
-        if (type === 'action') {
-            await this.castAction(event);
         }
     }
 

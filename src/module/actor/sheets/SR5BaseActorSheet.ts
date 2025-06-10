@@ -12,15 +12,13 @@ import { MoveInventoryDialog } from "../../apps/dialogs/MoveInventoryDialog";
 import { ChummerImportForm } from '../../apps/chummer-import-form';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import SkillField = Shadowrun.SkillField;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
-import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
-import { SkillsType } from 'src/module/types/template/SkillsModel';
+import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/SkillsModel';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -1260,15 +1258,15 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         return this._showGeneralSkill(key, skill);
     }
 
-    _showGeneralSkill(skillId, skill: SkillField) {
+    _showGeneralSkill(skillId, skill: SkillFieldType) {
         return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
     }
 
-    _showMagicSkills(skillId, skill: SkillField, sheetData: SR5ActorSheetData) {
+    _showMagicSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
         return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic' && this._isSkillFiltered(skillId, skill);
     }
 
-    _showResonanceSkills(skillId, skill: SkillField, sheetData: SR5ActorSheetData) {
+    _showResonanceSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
         return this._isSkillResonance(skill) && sheetData.system.special === 'resonance' && this._isSkillFiltered(skillId, skill);
     }
 
@@ -1454,7 +1452,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = Helpers.listHeaderId(event) as keyof KnowledgeSkills;
+        const category = Helpers.listHeaderId(event) as KnowledgeSkillCategory;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
@@ -1467,7 +1465,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const [skillId, category] = Helpers.listItemId(event).split('.') as [string, keyof KnowledgeSkills];
+        const [skillId, category] = Helpers.listItemId(event).split('.') as [string, KnowledgeSkillCategory];
         await this.actor.removeKnowledgeSkill(skillId, category);
     }
 

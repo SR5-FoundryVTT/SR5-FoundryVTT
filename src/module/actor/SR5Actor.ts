@@ -31,11 +31,12 @@ import { ActionRollType, DamageType } from '../types/item/ActionModel';
 import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/AttributesModel';
 import { VehicleStatsType } from '../types/actor/Vehicle';
 import { LimitFieldType, LimitsType } from '../types/template/LimitsModel';
-import { SkillFieldType } from '../types/template/SkillsModel';
+import { KnowledgeSkillCategory, SkillFieldType } from '../types/template/SkillsModel';
 import { ConditionType } from '../types/template/ConditionModel';
 import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitorsModel';
 import { BaseArmorType } from '../types/template/ArmorModel';
 import { InventoryType, MatrixType } from '../types/actor/Common';
+import { SkillRollOptions } from '../types/rolls/ActorRollsModel';
 
 export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' | 'sprite';
 
@@ -749,7 +750,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     async addKnowledgeSkill(
         this: SR5Actor,
-        category: keyof Shadowrun.KnowledgeSkills,
+        category: KnowledgeSkillCategory,
         skill: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }
     ): Promise<string|undefined> {
         if (!this.system.skills.knowledge.hasOwnProperty(category)) {
@@ -833,7 +834,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param skillId What skill id to delete.
      * @param category The matching knowledge skill category for skillId
      */
-    async removeKnowledgeSkill(skillId: string, category: keyof Shadowrun.KnowledgeSkills) {
+    async removeKnowledgeSkill(skillId: string, category: KnowledgeSkillCategory) {
         const updateData = Helpers.getDeleteKeyUpdateData(`system.skills.knowledge.${category}.value`, skillId);
         await this.update(updateData);
     }
@@ -1010,7 +1011,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async rollSkill(skillId: string, options: Shadowrun.SkillRollOptions={}) {
+    async rollSkill(skillId: string, options: SkillRollOptions={}) {
         console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
 
         const action = this.skillActionData(skillId, options);
@@ -1051,7 +1052,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async startTeamworkTest(skillId: string, options: Shadowrun.SkillRollOptions={}) {
+    async startTeamworkTest(skillId: string, options: SkillRollOptions={}) {
         console.info(`Shadowrun5e | Starting teamwork test for ${skillId}`);
 
         // Prepare message content.
@@ -1099,7 +1100,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-        async rollTeamworkTest(skillId: string, teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions={}) {
+        async rollTeamworkTest(skillId: string, teamworkData: TeamworkMessageData, options: SkillRollOptions={}) {
             console.info(`Shadowrun5e | Rolling teamwork test for ${skillId}`);
     
             const action = this.skillActionData(skillId, options);
@@ -1159,7 +1160,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param skillId Any skill, no matter if active, knowledge or language
      * @param options
      */
-    skillActionData(skillId: string, options: Shadowrun.SkillRollOptions = {}): ActionRollType | undefined {
+    skillActionData(skillId: string, options: SkillRollOptions = {}): ActionRollType | undefined {
         const byLabel = options.byLabel || false;
         const skill = this.getSkill(skillId, {byLabel});
         if (!skill) {
