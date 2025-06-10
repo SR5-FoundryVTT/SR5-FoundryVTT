@@ -5,8 +5,8 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 
 export const ArmorPartData = () => ({
     armor: new SchemaField({
-        mod: new BooleanField({ required: true, initial: false }),
         base: new NumberField({ required: true, nullable: false, initial: 0 }),
+        mod: new BooleanField({ required: true, initial: false }),
         value: new NumberField({ required: true, nullable: false, initial: 0 }),
         acid: new NumberField({ required: true, nullable: false, initial: 0 }),
         cold: new NumberField({ required: true, nullable: false, initial: 0 }),

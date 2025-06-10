@@ -3,7 +3,6 @@ import { Bioware, BiowareSchema } from '../../schema/BiowareSchema';
 import { Cyberware, CyberwareSchema } from '../../schema/CyberwareSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import Ware = Shadowrun.WareItemData;
 
 export class WareParser extends Parser<'bioware' | 'cyberware'> {
     protected override parseType: 'bioware' | 'cyberware';

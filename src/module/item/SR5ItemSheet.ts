@@ -7,8 +7,7 @@ import { createTagify, parseDropData } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
-import RangeData = Shadowrun.RangeData;
-import { AmmunitionType } from '../types/item/WeaponModel';
+import { AmmunitionType, RangeType } from '../types/item/WeaponModel';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -48,11 +47,11 @@ export interface SR5BaseItemSheetData extends FoundryItemSheetData {
  */
 interface SR5ItemSheetData extends SR5BaseItemSheetData {
     // Nested item typing for different sheets
-    ammunition: Shadowrun.AmmoItemData[]
-    weaponMods: Shadowrun.ModificationItemData[]
-    armorMods: Shadowrun.ModificationItemData[]
-    vehicleMods: Shadowrun.ModificationItemData[]
-    droneMods: Shadowrun.ModificationItemData[]
+    ammunition: SR5Item<'ammo'>[]
+    weaponMods: SR5Item<'modification'>[]
+    armorMods: SR5Item<'modification'>[]
+    vehicleMods: SR5Item<'modification'>[]
+    droneMods: SR5Item<'modification'>[]
 
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
@@ -181,39 +180,42 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Reduce nested items into typed lists.
          */
-        const itemTypes = this.item.items.reduce(
-            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
-                const itemData = nestedItem.toObject();
-                // itemData.descriptionHTML = await TextEditor.enrichHTML(itemData.system.description.value);
-
-                //@ts-expect-error
-                if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData); // TODO: foundry-vtt-types v10
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'vehicle') sheetItemData[3].push(itemData);
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'drone') sheetItemData[4].push(itemData);
-
-                return sheetItemData;
+        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = this.item.items.reduce(
+            (acc, item: SR5Item) => {
+                const data = item.toObject() as unknown as SR5Item;
+                if (item.type === 'ammo') acc[0].push(data as SR5Item<'ammo'>);
+                else if (item.type === 'modification') {
+                    const type = item.system?.type;
+                    if (type === 'weapon') acc[1].push(data as SR5Item<'modification'>);
+                    else if (type === 'armor') acc[2].push(data as SR5Item<'modification'>);
+                    else if (type === 'vehicle') acc[3].push(data as SR5Item<'modification'>);
+                    else if (type === 'drone') acc[4].push(data as SR5Item<'modification'>);
+                }
+                return acc;
             },
-            [[], [], [], [], []],
+            [[], [], [], [], []] as [
+                SR5Item<'ammo'>[],
+                SR5Item<'modification'>[],
+                SR5Item<'modification'>[],
+                SR5Item<'modification'>[],
+                SR5Item<'modification'>[]
+            ]
         );
 
-        for (const itemType of itemTypes) {
-            for (const item of itemType) {
-                item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value);
-            }
-        }
+        // Enrich descriptions
+        await Promise.all(
+            [ammunition, weaponMods, armorMods, vehicleMods, droneMods].flat().map(
+                item => TextEditor.enrichHTML(item.system.description.value).then(html => item.descriptionHTML = html)
+            )
+        );
 
-        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = itemTypes;
+        // Assign to template data
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
         data['vehicleMods'] = vehicleMods;
         data['droneMods'] = droneMods;
+
         data['activeSkills'] = this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
@@ -572,11 +574,12 @@ export class SR5ItemSheet extends ItemSheet {
                 },
             });
         } else {
-            const ranges: Omit<RangeData, 'category'> = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
+            const ranges: Omit<RangeType, 'category' | 'attribute'> = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
 
             await this.item.update({
                 [key]: {
                     ...ranges,
+                    //@ts-expect-error it should be right
                     attribute: ranges.attribute || null, //Clear attribute if necessary
                     category: selectedRangeCategory,
                 },

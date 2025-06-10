@@ -1,8 +1,6 @@
 import { Parser } from '../Parser';
 import { Mod } from '../../schema/VehiclesSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import ModificationItemData = Shadowrun.ModificationItemData;
-import ModificationCategoryType = Shadowrun.ModificationCategoryType;
 
 export class VehicleModParser extends Parser<'modification'> {
     protected parseType = 'modification' as const;

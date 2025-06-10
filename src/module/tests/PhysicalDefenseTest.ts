@@ -11,6 +11,7 @@ import { Translation } from '../utils/strings';
 import { ActiveDefenseRules } from "../rules/ActiveDefenseRules";
 import { DeepPartial } from "fvtt-types/utils";
 import { MinimalActionType } from "../types/item/ActionModel";
+import { SR5Item } from "../item/SR5Item";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
@@ -74,7 +75,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         const weapon = this.against.item;
         if (weapon === undefined) return;
         
-        this.data.activeDefenses = ActiveDefenseRules.availableActiveDefenses(weapon, actor);
+        this.data.activeDefenses = ActiveDefenseRules.availableActiveDefenses(weapon as SR5Item<'weapon'>, actor);
 
         // Filter available active defenses by available ini score.
         this._filterActiveDefenses();

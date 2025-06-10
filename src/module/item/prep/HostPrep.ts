@@ -1,4 +1,3 @@
-import HostData = Shadowrun.HostData;
 import {MatrixRules} from "../../rules/MatrixRules";
 
 export function HostDataPreparation(system: Item.SystemOfType<'host'>) {

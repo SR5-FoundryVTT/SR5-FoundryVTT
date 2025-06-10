@@ -3,7 +3,6 @@ import { WareParser } from '../parser/ware/WareParser';
 import { Bioware, BiowareSchema } from '../schema/BiowareSchema';
 import { Cyberware, CyberwareSchema } from '../schema/CyberwareSchema';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
-import WareItemData = Shadowrun.WareItemData;
 type WareTypes = Bioware | Cyberware;
 
 export class WareImporter extends DataImporter {

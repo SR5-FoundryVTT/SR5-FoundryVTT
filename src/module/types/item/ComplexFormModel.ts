@@ -14,7 +14,7 @@ export const ComplexFormData = () => ({
         choices: ['persona', 'device', 'file', 'self', 'sprite', 'other', ''],
     }),
     duration: new StringField({ required: true, initial: '' }),
-    fade: new NumberField({ required: true, initial: 0 }),
+    fade: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 

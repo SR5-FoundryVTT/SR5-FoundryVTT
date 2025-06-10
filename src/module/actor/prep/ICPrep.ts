@@ -7,7 +7,6 @@ import {MatrixPrep} from "./functions/MatrixPrep";
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import {DataDefaults} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
-import DeviceAttribute = Shadowrun.DeviceAttribute;
 import {SkillsPrep} from "./functions/SkillsPrep";
 
 
@@ -104,8 +103,7 @@ export class ICPrep {
     static prepareHostAttributes(system: Actor.SystemOfType<'ic'>) {
         if (!system.host.id || !system.host.atts) return;
 
-        Object.keys(system.host.atts).forEach(deviceAttribute => {
-            const attribute: DeviceAttribute = system.host.atts[deviceAttribute];
+        Object.entries(system.host.atts).forEach(([deviceAttribute, attribute]) => {
             system.matrix[attribute.att].base = attribute.value;
             system.matrix[attribute.att].device_att = deviceAttribute;
         });

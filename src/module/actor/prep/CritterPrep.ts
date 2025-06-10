@@ -27,7 +27,7 @@ export class CritterPrep {
 
         SkillsPrep.prepareSkills(system);
 
-        ItemPrep.prepareArmor(system, items);
+        ItemPrep.prepareArmor(system, items as any);
 
         MatrixPrep.prepareMatrix(system, items);
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system);

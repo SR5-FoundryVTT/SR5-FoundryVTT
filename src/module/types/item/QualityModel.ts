@@ -13,8 +13,8 @@ const QualityData = {
         blank: true,
         choices: ['positive', 'negative', '']
     }),
-    karma: new NumberField({ required: true, initial: 0 }),
-    rating: new NumberField({ required: true, initial: 0 }),
+    karma: new NumberField({ required: true, nullable: false, initial: 0 }),
+    rating: new NumberField({ required: true, nullable: false, initial: 0 }),
 }
 
 

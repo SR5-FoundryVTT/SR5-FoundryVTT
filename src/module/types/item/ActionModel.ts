@@ -3,6 +3,16 @@ import { DescriptionPartData } from "../template/DescriptionModel";
 import { ImportFlags } from "../template/ImportFlagsModel";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
+const ResultActionData = () => ({
+    action: new StringField({
+        required: true,
+        initial: 'placeMarks',
+        choices: ['modifyCombatantInit', 'placeMarks']
+    }),
+    label: new StringField({ required: true, initial: '' }),
+    value: new StringField({ required: true, initial: '' })
+});
+
 const ActionResultData = () => ({
     success: new SchemaField({
         matrix: new SchemaField({
@@ -56,7 +66,7 @@ export const DamageData = () => ({
         itemId: new StringField({ required: true, initial: '' }),
         itemName: new StringField({ required: true, initial: '' }),
         itemType: new StringField({ required: true, initial: '' }),
-    }, { required: true }),
+    }, { required: false }),
 });
 
 export const OpposedTestData = () => ({
@@ -120,4 +130,5 @@ export type DamageType = foundry.data.fields.SchemaField.InitializedData<ReturnT
 export type ActionRollType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionRollData>>;
 export type OpposedTestType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof OpposedTestData>>;
 export type ActionResultType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionResultData>>;
+export type ResultActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ResultActionData>>;
 export type MinimalActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MinimalActionData>>;

@@ -15,40 +15,13 @@ import WeaponData = Shadowrun.WeaponData;
 import DeviceData = Shadowrun.DeviceData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
-    getType() {
-        return this.data.type;
-    }
     getData(): ShadowrunItemDataData {
         return this.data.system as ShadowrunItemDataData;
-    }
-
-    /** Should only be used to check for actual armor item type.
-     * NOTE: Should you only care about a possible armor value use couldHaveArmor instead.
-     */
-    isArmor(): boolean {
-        return this.data.type === 'armor';
     }
 
     /** Will give an indicator if an item provides an armor value, without locking into only the Armor item type.
      * NOTE: Should you only care about the armor item type use isArmor instead.
      */
-    couldHaveArmor(): boolean {
-        const armor = this.getData().armor;
-        return this.isArmor() || armor !== undefined;
-    }
-
-    hasArmorBase(): boolean {
-        return this.hasArmor() && !this.getData().armor?.mod;
-    }
-
-    hasArmorAccessory(): boolean {
-        return this.hasArmor() && (this.getData().armor?.mod ?? false);
-    }
-
-    hasArmor(): boolean {
-        return this.getArmorValue() > 0;
-    }
-
     isThrownWeapon(): boolean {
         if (!this.isWeapon()) return false;
         const weaponData = this.getData() as WeaponData;
@@ -74,17 +47,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         const modification = this.data as ModificationItemData;
         return modification.system.type === 'drone';
     }
-    isCyberware(): boolean {
-        return this.data.type === 'cyberware';
-    }
-
-    isBioware(): boolean {
-        return this.data.type === 'bioware';
-    }
-
-    isBodyware(): boolean {
-        return this.isCyberware() || this.isBioware();
-    }
 
     isCombatSpell(): boolean {
         if (!this.isSpell()) return false;
@@ -97,25 +59,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData()?.combat?.type === 'direct';
     }
 
-    isIndirectCombatSpell(): boolean {
-        if (!this.isCombatSpell()) return false;
-        return this.getData()?.combat?.type === 'indirect';
-    }
-
-    isManaSpell(): boolean {
-        if (!this.isSpell()) return false;
-        // Cast as partial spell data due to conflicting .type between differing item types.
-        const spellData = this.getData() as Partial<SpellData>;
-        return spellData.type === 'mana';
-    }
-
-    isPhysicalSpell(): boolean {
-        if (!this.isSpell()) return false;
-        // Cast as partial spell data due to conflicting .type between differing item types.
-        const spellData = this.getData() as Partial<SpellData>;
-        return spellData.type === 'physical';
-    }
-
     isRangedWeapon(): boolean {
         if (!this.isWeapon()) return false;
         const weaponData = this.getData() as WeaponData;
@@ -126,20 +69,8 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data.type === 'spell';
     }
 
-    isAoESpell(): boolean {
-        return this.isSpell() && this.getData().range === 'los_a';
-    }
-
     isSpritePower(): boolean {
         return this.data.type === 'sprite_power';
-    }
-
-    isComplexForm(): boolean {
-        return this.data.type === 'complex_form';
-    }
-
-    isContact(): boolean {
-        return this.data.type === 'contact';
     }
 
     isCritterPower(): boolean {
@@ -150,14 +81,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         if (!this.isWeapon()) return false;
         const weaponData = this.getData() as WeaponData;
         return weaponData.category === 'melee';
-    }
-
-    isDevice(): boolean {
-        return this.data.type === 'device';
-    }
-
-    isEquipment(): boolean {
-        return this.data.type === 'equipment';
     }
 
     isEquipped(): boolean {
@@ -172,42 +95,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     canBeDisabled(): boolean {
         if(!this.isCritterPower && !this.isSpritePower) return false;
         return (this.getData().optional || 'standard') !== 'standard'
-    }
-
-    isWireless(): boolean {
-        return this.getData().technology?.wireless || false;
-    }
-
-    isCyberdeck(): boolean {
-        if (!this.isDevice()) return false;
-        const deviceData = this.getData() as DeviceData;
-        return deviceData.category === 'cyberdeck';
-    }
-
-    isRCC(): boolean {
-        if (!this.isDevice()) return false;
-        const deviceData = this.getData() as DeviceData;
-        return deviceData.category === 'rcc';
-    }
-
-    isCommlink(): boolean {
-        if (!this.isDevice()) return false;
-        const deviceData = this.getData() as DeviceData;
-        return deviceData.category === 'commlink';
-    }
-
-    isMatrixAction(): boolean {
-        // @ts-expect-error
-        return this.isAction() && this.getData().result.success.matrix.placeMarks;
-    }
-
-    getId(): string {
-        // @ts-expect-error // TODO: Foundry Where is my foundry base data?
-        return this.data._id;
-    }
-
-    get hasSource(): boolean {
-        return !!this.getData().description?.source;
     }
 
     getSource(): string {
@@ -239,83 +126,16 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData().linkedActor;
     }
 
-    getName(): string {
-        return this.data.name;
-    }
-
-    /**
-     * Essence loss of an item is flat value and depends on the quantity of that item
-     * 
-     * Using quantity allows for two approaches:
-     * - Add an item twice while still having book essence values
-     * - Add an item with quantity 2 while also having book essence values
-     * Both are valid.
-     * 
-     * @returns A decimal as essence modifier
-     */
-    getEssenceLoss(): number {
-        const lossRaw = Number(this.getData()?.technology?.calculated.essence.adjusted ? this.getData()?.technology?.calculated.essence.value : this.getData()?.essence);
-        const loss = isNaN(lossRaw) ? 0 : lossRaw;
-        const quantity = Number(this.getData()?.technology?.quantity) ?? 1;
-
-        return loss * quantity
-    }
-
     getAmmo(): AmmunitionData|undefined {
         return this.getData().ammo;
-    }
-
-    getASDF() {
-        if (!this.isDevice()) return undefined;
-
-        // matrix attributes are set up as an object
-        const matrix = {
-            attack: {
-                value: 0,
-                device_att: '',
-            },
-            sleaze: {
-                value: 0,
-                device_att: '',
-            },
-            data_processing: {
-                value: this.getRating(),
-                device_att: '',
-            },
-            firewall: {
-                value: this.getRating(),
-                device_att: '',
-            },
-        };
-
-        // This if statement should cover all types of devices, meaning the "getRating" calls above are always overwritten
-        if (this.isCyberdeck() || this.isRCC() || this.isCommlink()) {
-            const atts = this.getData().atts as Record<string, any>;
-            if (atts) {
-                for (let [key, att] of Object.entries(atts)) {
-                    matrix[att.att].value = att.value;
-                    matrix[att.att].device_att = key;
-                }
-            }
-        }
-
-        return matrix;
     }
 
     getQuantity(): number | undefined {
         return this.getData()?.technology?.quantity || 1;
     }
 
-    isAction(): boolean {
-        return this.data.type === 'action';
-    }
-
     getActionDicePoolMod(): number | undefined {
         return this.getData().action?.mod;
-    }
-
-    getLimitAttribute(): string | undefined {
-        return this.getData().action?.limit?.attribute;
     }
 
     getActionSkill(): string | undefined {
@@ -328,19 +148,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
     getActionAttribute2(): string | undefined {
         return this.getData().action?.attribute2;
-    }
-
-    getActionLimit(): number | undefined {
-        return this.getData().action?.limit?.value;
-    }
-
-    getModifierList(): ModList<number> {
-        return this.getData().action?.dice_pool_mod || [];
-    }
-
-    getActionSpecialization(): string | undefined {
-        if (this.getData().action?.spec) return 'SR5.Specialization';
-        return undefined;
     }
 
     getDrain(): number {
@@ -361,27 +168,10 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return false;
     }
 
-    getFade(): number {
-        return this.getData().fade || 0;
-    }
-
     getRecoilCompensation(): number {
         if (!this.isRangedWeapon()) return 0;
         const base = this.getData()?.range?.rc.value ?? '0';
         return Number(base);
-    }
-
-    getReach(): number {
-        if (this.isMeleeWeapon()) {
-            return this.getData().melee?.reach ?? 0;
-        }
-        return 0;
-    }
-
-    getTechnology(): TechnologyData|undefined {
-        if ("technology" in this.data.system)
-            return this.data.system.technology;
-        return;
     }
 
     getRange(): CritterPowerRange|SpellRange|RangeWeaponData|undefined {
@@ -406,16 +196,4 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData().slots ?? 0;
     }
 
-    hasDefenseTest(): boolean {
-        return this.getData().action?.opposed?.type === 'defense';
-    }
-
-    hasAmmo(): boolean {
-        return !!this.getAmmo();
-    }
-
-    getActionResult(): ActionResultData {
-        // @ts-expect-error
-        return this.getData().result;
-    }
 }

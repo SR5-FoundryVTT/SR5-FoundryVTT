@@ -69,7 +69,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         if (!this.item) return;
 
         const lastUsedLevel = this.item.getLastComplexFormLevel();
-        const suggestedLevel = ComplexFormRules.calculateMinimalLevel(this.item.getFade());
+        const suggestedLevel = ComplexFormRules.calculateMinimalLevel(this.item.system.fade || 0);
         this.data.level = lastUsedLevel.value || suggestedLevel;
     }
 
@@ -105,7 +105,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
 
     calculateFadeValue() {
         const level = Number(this.data.level);
-        const fade = Number(this.item?.getFade() || 0);
+        const fade = Number(this.item?.system.fade || 0);
         this.data.fade = ComplexFormRules.calculateFade(level, fade);
     }
 

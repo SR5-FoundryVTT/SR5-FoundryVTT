@@ -45,12 +45,13 @@ declare namespace Shadowrun {
     export type ShadowrunTechnologyItemData =
         AmmoItemData |
         ArmorItemData |
+        BiowareItemData |
+        CyberwareData |
         DeviceItemData |
         EquipmentItemData |
         ModificationItemData |
         ProgramItemData |
         SinItemData |
-        WareItemData |
         WeaponItemData;
 
     /**

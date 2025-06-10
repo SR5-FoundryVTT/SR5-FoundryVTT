@@ -2,8 +2,6 @@ import { Parser } from '../Parser';
 import { Accessory } from '../../schema/WeaponsSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import ModificationItemData = Shadowrun.ModificationItemData;
-import MountType = Shadowrun.MountType;
 
 export class WeaponModParser extends Parser<'modification'> {
     protected parseType = 'modification' as const;

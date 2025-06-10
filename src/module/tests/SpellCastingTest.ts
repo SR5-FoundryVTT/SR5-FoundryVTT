@@ -6,6 +6,7 @@ import {DrainRules} from "../rules/DrainRules";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { DamageType, MinimalActionType } from "../types/item/ActionModel";
 import { DeepPartial } from "fvtt-types/utils";
+import { SR5Item } from "../item/SR5Item";
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -22,6 +23,7 @@ export interface SpellCastingTestData extends SuccessTestData {
  *
  */
 export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
+    public override item: SR5Item<'spell'> | undefined = undefined;
 
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
@@ -93,7 +95,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         if (!this.item) return;
 
         const lastUsedForce = this.item.getLastSpellForce();
-        const suggestedForce = SpellcastingRules.calculateMinimalForce(this.item.getDrain);
+        const suggestedForce = SpellcastingRules.calculateMinimalForce(this.item.system.drain || 0);
         this.data.force = lastUsedForce.value || suggestedForce;
     }
 
@@ -120,7 +122,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      */
     calculateDrainValue() {
         const force = Number(this.data.force);
-        const drain = Number(this.item?.getDrain);
+        const drain = Number(this.item?.system.drain || 0);
         const reckless = this.data.reckless;
         this.data.drain = SpellcastingRules.calculateDrain(force, drain, reckless);
     }

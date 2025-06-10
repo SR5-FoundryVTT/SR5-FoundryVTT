@@ -1,6 +1,6 @@
-import FireModeData = Shadowrun.FireModeData;
-import FiringModeData = Shadowrun.FiringModeData;
 import { SR5 } from "../config";
+import { FiringModeType } from "../types/item/WeaponModel";
+import FireModeData = Shadowrun.FireModeData;
 
 
 export const FireModeRules = {
@@ -89,7 +89,7 @@ export const FireModeRules = {
      * 
      * @returns A list of firemodes sorted by weapon mode and rounds necessary.
      */
-    availableFireModes: function (rangedWeaponModes: FiringModeData, ammoLeft?: number): FireModeData[] {
+    availableFireModes: function (rangedWeaponModes: FiringModeType, ammoLeft?: number): FireModeData[] {
         // Reduce all fire modes to what's available on weapon
         // TODO: rounds check
         return SR5.fireModes

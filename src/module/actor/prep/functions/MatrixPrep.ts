@@ -3,6 +3,7 @@ import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { PartsList } from '../../../parts/PartsList';
 import { SR5 } from "../../../config";
 import { AttributesPrep } from "./AttributesPrep";
+import { SR5Item } from 'src/module/item/SR5Item';
 
 export class MatrixPrep {
     /**
@@ -10,7 +11,7 @@ export class MatrixPrep {
      * - if an item is equipped, it will use that data
      * - if it isn't and player is technomancer, it will use that data
      */
-    static prepareMatrix(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5ItemDataWrapper[]) {
+    static prepareMatrix(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5Item[]) {
         const { matrix, attributes, modifiers } = system;
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
@@ -31,19 +32,19 @@ export class MatrixPrep {
         matrix.condition_monitor.label = 'SR5.ConditionMonitor';
 
         // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
-        const device = items.find((item) => item.isEquipped() && item.isDevice());
+        const device = items.find((item) => item.isEquipped() && item.isType('device')) as SR5Item<'device'>;
 
         if (device) {
-            matrix.device = device.getId();
+            matrix.device = device._id!;
 
             const conditionMonitor = device.getConditionMonitor();
 
             matrix.condition_monitor.max = conditionMonitor.max + modifiers.matrix_track;
             matrix.condition_monitor.value = conditionMonitor.value;
             matrix.rating = device.getRating();
-            matrix.is_cyberdeck = device.isCyberdeck();
-            matrix.name = device.getName();
-            matrix.item = device.getData();
+            matrix.is_cyberdeck = device.system.category === 'cyberdeck';
+            matrix.name = device.name;
+            matrix.item = device;
             const deviceAtts = device.getASDF();
             if (deviceAtts) {
                 // setup the actual matrix attributes for the actor

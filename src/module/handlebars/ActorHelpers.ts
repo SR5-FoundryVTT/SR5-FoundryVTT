@@ -1,7 +1,7 @@
 import { MonitorRules } from './../rules/MonitorRules';
 import { SR5Item } from './../item/SR5Item';
 import { SR5Actor } from './../actor/SR5Actor';
-import ModificationCategoryType = Shadowrun.ModificationCategoryType;
+type ModificationCategoryType = Item.SystemOfType<'modification'>['modification_category'];
 
 export const registerActorHelpers = () => {
     /** 
@@ -28,7 +28,7 @@ export const registerActorHelpers = () => {
     * @param items The items to be considered
     * @param modificationCategory The modification category 
     */
-    Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item<'modification'>], modificationCategory: ModificationCategoryType): number => {        
+    Handlebars.registerHelper('calcModificationCategorySlots', (items: SR5Item<'modification'>[], modificationCategory: ModificationCategoryType): number => {
         if (!Array.isArray(items) || !items.length) { return 0 }        
         let slotSum = 0;
         

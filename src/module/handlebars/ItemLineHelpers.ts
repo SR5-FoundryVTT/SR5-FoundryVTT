@@ -746,21 +746,10 @@ export const registerItemLineHelpers = () => {
 
         const icons = [pdfIcon, editIcon, removeIcon];
 
-        switch (wrapper.getType()) {
-            case 'program':
-            case 'armor':
-            case 'device':
-            case 'equipment':
-            case 'cyberware':
-            case 'bioware':
-            case 'weapon':
-                icons.unshift(equipIcon);
-                break;
-            case 'critter_power':
-            case 'sprite_power':
-                if(wrapper.canBeDisabled()) icons.unshift(enableIcon);
-                break;
-        }
+        if (item.asType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon'))
+            icons.unshift(equipIcon);
+        else if (item.asType('critter_power', 'sprite_power') && wrapper.canBeDisabled())
+            icons.unshift(enableIcon);
 
         return icons;
     });
@@ -821,16 +810,8 @@ export const registerItemLineHelpers = () => {
 
         const icons = [pdfIcon, moveIcon, editIcon, removeIcon];
 
-        switch (wrapper.getType()) {
-            case 'program':
-            case 'armor':
-            case 'device':
-            case 'equipment':
-            case 'cyberware':
-            case 'bioware':
-            case 'weapon':
-                icons.unshift(equipIcon);
-        }
+        if (item.asType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon'))
+            icons.unshift(equipIcon);
 
         return icons;
     });

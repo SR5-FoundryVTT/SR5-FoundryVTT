@@ -2,8 +2,7 @@ import { Spell } from '../../schema/SpellsSchema';
 import { Parser } from '../Parser';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import SpellCateogry = Shadowrun.SpellCateogry;
-import SpellItemData = Shadowrun.SpellItemData;
+type SpellCateogry = Item.SystemOfType<'spell'>['category'];
 
 export class SpellParserBase extends Parser<'spell'> {
     protected parseType = 'spell' as const;

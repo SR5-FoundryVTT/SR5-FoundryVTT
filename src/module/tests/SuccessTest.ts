@@ -1,27 +1,27 @@
-import { TestDialogListener } from '../apps/dialogs/TestDialog';
-import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
-import {SR5Actor} from "../actor/SR5Actor";
-import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from "../constants";
-import {DataDefaults} from "../data/DataDefaults";
-import {Helpers} from "../helpers";
-import {SR5Item} from "../item/SR5Item";
-import {SR5Roll} from "../rolls/SR5Roll";
-import {PartsList} from "../parts/PartsList";
-import {TestDialog} from "../apps/dialogs/TestDialog";
-import {SR5} from "../config";
-import {ActionFlow} from "../item/flows/ActionFlow";
-import ModifierTypes = Shadowrun.ModifierTypes;
-import ResultActionData = Shadowrun.ResultActionData;
-import { TestCreator } from "./TestCreator";
+import { SR5 } from "../config";
 import Template from "../template";
+import { Helpers } from "../helpers";
+import { SR5Item } from "../item/SR5Item";
+import { SR5Roll } from "../rolls/SR5Roll";
+import { TestCreator } from "./TestCreator";
+import { SR5Actor } from "../actor/SR5Actor";
 import { TestRules } from "../rules/TestRules";
+import { PartsList } from "../parts/PartsList";
+import { DataDefaults } from "../data/DataDefaults";
+import { ActionFlow } from "../item/flows/ActionFlow";
+import { TestDialog } from "../apps/dialogs/TestDialog";
+import { TestDialogListener } from '../apps/dialogs/TestDialog';
+import { CORE_NAME, FLAGS, SR, SYSTEM_NAME } from "../constants";
+import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
+
+import ModifierTypes = Shadowrun.ModifierTypes;
 
 import { ActionResultFlow } from "../item/flows/ActionResultFlow";
 import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
-import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType } from '../types/item/ActionModel';
+import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/ActionModel';
 import { ValueFieldType } from '../types/template/BaseModel';
 import { DeepPartial } from "fvtt-types/utils";
 
@@ -1764,7 +1764,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Prepare followup actions a test allows. These are actions
      * meant to be taken following completion of this test.
      */
-    _prepareFollowupActionsTemplateData(): Shadowrun.FollowupAction[] {
+    _prepareFollowupActionsTemplateData() {
         const testCls = TestCreator._getTestClass(this.data.action.followed.test);
         if (!testCls) return [];
         return [{ label: testCls.label }]
@@ -1773,8 +1773,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Prepare result action buttons
      */
-    _prepareResultActionsTemplateData(): ResultActionData[] {
-        const actions: ResultActionData[] = [];
+    _prepareResultActionsTemplateData(): ResultActionType[] {
+        const actions: ResultActionType[] = [];
         const actionResultData = this.results;
         if (!actionResultData) return actions;
 

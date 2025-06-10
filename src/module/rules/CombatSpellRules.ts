@@ -1,11 +1,12 @@
-import {PartsList} from "../parts/PartsList";
 import {Helpers} from "../helpers";
 import {CombatRules} from "./CombatRules";
-import CombatSpellType = Shadowrun.CombatSpellType;
-import SpellType = Shadowrun.SpellType;
-import {DataDefaults} from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
+import {PartsList} from "../parts/PartsList";
+import {DataDefaults} from "../data/DataDefaults";
 import { DamageType, MinimalActionType } from "../types/item/ActionModel";
+
+type SpellType = Item.SystemOfType<'spell'>['type'];
+type CombatSpellType = Item.SystemOfType<'spell'>['combat']['type'];
 
 export class CombatSpellRules {
     /**

@@ -18,8 +18,6 @@ import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
 import ConditionData = Shadowrun.ConditionData;
-import AmmoData = Shadowrun.AmmoData;
-import ActionTestLabel = Shadowrun.ActionTestLabel;
 import RollEvent = Shadowrun.RollEvent;
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
@@ -76,6 +74,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
 
     // Item Sheet labels for quick info on an item dropdown.
     labels: {} = {};
+    descriptionHTML: string | undefined;
 
     /**
      * Return the owner of this item, which can either be
@@ -387,8 +386,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     get hasExplosiveAmmo(): boolean {
         const ammo = this.getEquippedAmmo();
         if (!ammo) return false;
-        const system = ammo.system as AmmoData;
-        return system.blast.radius > 0;
+        return ammo.system.blast.radius > 0;
     }
 
     /**
@@ -611,7 +609,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return targets;
     }
 
-    getActionTests(): ActionTestLabel[] {
+    getActionTests() {
         if (!this.hasRoll) return []
 
         return [{
@@ -853,11 +851,11 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return DEFAULT_ROLL_NAME;
     }
 
-    isType<ST extends SystemItem = SystemItem>(type: ST): this is SR5Item<ST> {
+    isType<ST extends SystemItem = SystemItem>(this: SR5Item, type: ST): this is SR5Item<ST> {
         return this.type === type;
     }
 
-    asType<ST extends readonly SystemItem[]>(...types: ST): SR5Item<ST[number]> | undefined {
+    asType<ST extends readonly SystemItem[]>(this: SR5Item, ...types: ST): SR5Item<ST[number]> | undefined {
         return types.some((t) => this.isType(t)) ? this : undefined;
     }
 
@@ -900,18 +898,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return this.wrapper.isDirectCombatSpell();
     }
 
-    get isIndirectCombatSpell(): boolean {
-        return this.wrapper.isIndirectCombatSpell();
-    }
-
-    get isManaSpell(): boolean {
-        return this.wrapper.isManaSpell();
-    }
-
-    get isPhysicalSpell(): boolean {
-        return this.wrapper.isPhysicalSpell();
-    }
-
     get isUsingRangeCategory(): boolean {
         return this.wrapper.isUsingRangeCategory();
     }
@@ -937,32 +923,66 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return undefined;
     }
 
+    /**
+     * Calculate the total essence loss for bioware or cyberware items.
+     * Uses the adjusted essence value if available, otherwise falls back to the base essence.
+     * Multiplies by the quantity of the item.
+     *
+     * @returns The total essence loss as a number.
+     */
+    getEssenceLoss(this: SR5Item<'bioware' | 'cyberware'>): number {
+        const tech = this.system.technology;
+        const quantity = Number(tech?.quantity) || 1;
+
+        // Prefer adjusted essence if present, otherwise use base essence
+        let essenceLoss = 0;
+        if (tech?.calculated?.essence?.adjusted) {
+            essenceLoss = Number(tech.calculated.essence.value);
+        } else if (this.system.essence) {
+            essenceLoss = Number(this.system.essence);
+        }
+
+        if (isNaN(essenceLoss)) essenceLoss = 0;
+        return essenceLoss * quantity;
+    }
+
+    getASDF(this: SR5Item<'device'>) {
+        // matrix attributes are set up as an object
+        const matrix = {
+            attack: {
+                value: 0,
+                device_att: '',
+            },
+            sleaze: {
+                value: 0,
+                device_att: '',
+            },
+            data_processing: {
+                value: this.getRating(),
+                device_att: '',
+            },
+            firewall: {
+                value: this.getRating(),
+                device_att: '',
+            },
+        };
+
+        // This if statement should cover all types of devices, meaning the "getRating" calls above are always overwritten
+        if (['cyberdeck', 'rcc', 'commlink'].includes(this.system.category)) {
+            const atts = this.system.atts as Record<string, any>;
+            if (atts) {
+                for (let [key, att] of Object.entries(atts)) {
+                    matrix[att.att].value = att.value;
+                    matrix[att.att].device_att = key;
+                }
+            }
+        }
+
+        return matrix;
+    }
+
     isEquipped(): boolean {
         return this.wrapper.isEquipped();
-    }
-
-    isEnabled(): boolean {
-        return this.wrapper.isEnabled();
-    }
-
-    isWireless(): boolean {
-        return this.wrapper.isWireless();
-    }
-
-    isCyberdeck(): boolean {
-        return this.wrapper.isCyberdeck();
-    }
-
-    isRCC(): boolean {
-        return this.wrapper.isRCC();
-    }
-
-    isCommlink(): boolean {
-        return this.wrapper.isCommlink();
-    }
-
-    isMatrixAction(): boolean {
-        return this.wrapper.isMatrixAction();
     }
 
     getSource(): string {
@@ -986,42 +1006,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
 
     getArmorElements(): { [key: string]: number } {
         return this.wrapper.getArmorElements();
-    }
-
-    getEssenceLoss(): number {
-        return this.wrapper.getEssenceLoss();
-    }
-
-    getASDF() {
-        return this.wrapper.getASDF();
-    }
-
-    getActionSkill(): string | undefined {
-        return this.wrapper.getActionSkill();
-    }
-
-    getActionAttribute(): string | undefined {
-        return this.wrapper.getActionAttribute();
-    }
-
-    getActionAttribute2(): string | undefined {
-        return this.wrapper.getActionAttribute2();
-    }
-
-    getModifierList(): ModList<number> {
-        return this.wrapper.getModifierList();
-    }
-
-    getActionSpecialization(): string | undefined {
-        return this.wrapper.getActionSpecialization();
-    }
-
-    get getDrain(): number {
-        return this.wrapper.getDrain();
-    }
-
-    getFade(): number {
-        return this.wrapper.getFade();
     }
 
     /**

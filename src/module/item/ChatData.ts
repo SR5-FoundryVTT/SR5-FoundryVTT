@@ -1,9 +1,7 @@
 
-import { Helpers } from '../helpers';
-import DeviceData = Shadowrun.DeviceData;
-import { SR5Item } from './SR5Item';
-import AmmoData = Shadowrun.AmmoData;
 import { SR5 } from "../config";
+import { SR5Item } from './SR5Item';
+import { Helpers } from '../helpers';
 import { Translation } from '../utils/strings';
 
 /**
@@ -18,7 +16,7 @@ import { Translation } from '../utils/strings';
  * - actor sheets
  */
 export const ChatData = {
-    call_in_action: (system: Shadowrun.CallInActionData, labels, props) => {
+    call_in_action: (system: Item.SystemOfType<'call_in_action'>, labels, props) => {
         switch (system.actor_type) {
             case 'sprite':
                 if (system.sprite.type) props.push(`${game.i18n.localize("SR5.Compilation.SpriteType")} ${game.i18n.localize(SR5.spriteTypes[system.sprite.type])}`);
@@ -302,7 +300,7 @@ export const ChatData = {
         const equippedAmmo = item.getEquippedAmmo();
         if (equippedAmmo && system.ammo && system.ammo.current?.max) {
             if (equippedAmmo) {
-                const ammoData = equippedAmmo.system as AmmoData;
+                const ammoData = equippedAmmo.system;
                 const { current, spare_clips } = system.ammo;
                 if (equippedAmmo.name) props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
                 if (ammoData.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${ammoData.blast.radius}m`);

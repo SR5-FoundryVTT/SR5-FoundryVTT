@@ -14,7 +14,6 @@ import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
-import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
@@ -1841,7 +1840,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         let deviceAtt = event.currentTarget.value;
 
         // get current matrix attribute on the device
-        const deviceData = item.system as DeviceData;
+        const deviceData = item.system as Item.SystemOfType<'device'>;
         let oldVal = deviceData.atts[deviceAtt].att;
         let data = {
             _id: iid,

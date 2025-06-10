@@ -1,16 +1,15 @@
 /**
  * Handle all things related to the action template (template.json)
  */
-import { SR5Actor } from "../../actor/SR5Actor";
-import { Helpers } from "../../helpers";
-import { SR5Item } from "../SR5Item";
-import { PartsList } from "../../parts/PartsList";
 import { SR5 } from "../../config";
-import { DataDefaults } from "../../data/DataDefaults";
+import { SR5Item } from "../SR5Item";
+import { Helpers } from "../../helpers";
+import { SR5Actor } from "../../actor/SR5Actor";
+import { PartsList } from "../../parts/PartsList";
 import { Translation } from "../../utils/strings";
 import { DamageType } from "src/module/types/item/ActionModel";
-import { ModifiableValueLinkedType } from "src/module/types/template/BaseModel";
 import { SkillFieldType } from "src/module/types/template/SkillsModel";
+import { ModifiableValueLinkedType } from "src/module/types/template/BaseModel";
 
 export class ActionFlow {
     /**
@@ -75,7 +74,7 @@ export class ActionFlow {
      * @param actor The actor used to determine damage
      * @param item The item from which damage's been determined from.
      */
-    static _damageSource(actor: SR5Actor, item: SR5Item): Shadowrun.DamageSource {
+    static _damageSource(actor: SR5Actor, item: SR5Item): DamageType['source'] {
         return {
             actorId: actor.id || '',
             itemId: item.id || '',

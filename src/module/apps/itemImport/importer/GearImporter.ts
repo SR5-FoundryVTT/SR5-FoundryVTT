@@ -6,9 +6,6 @@ import { ProgramParser } from '../parser/gear/ProgramParser';
 import { EquipmentParser } from '../parser/gear/EquipmentParser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
-type gearTypes = Shadowrun.EquipmentItemData | Shadowrun.AmmoItemData |
-                 Shadowrun.DeviceItemData | Shadowrun.ProgramItemData;
-
 export class GearImporter extends DataImporter {
     public files = ['gear.xml'];
 

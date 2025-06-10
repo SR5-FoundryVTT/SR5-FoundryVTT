@@ -5,7 +5,6 @@ import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { WeaponsSchema, Weapon } from '../schema/WeaponsSchema';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
-import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class WeaponImporter extends DataImporter {
     public files = ['weapons.xml'];

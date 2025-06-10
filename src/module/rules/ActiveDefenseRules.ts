@@ -13,7 +13,7 @@ export const ActiveDefenseRules = {
      * @param weapon The equipped weapon used for the attack.
      * @param actor The actor performing the attack.
      */
-    availableActiveDefenses: (weapon: SR5Item, actor: SR5Actor): ActiveDefenseData => {
+    availableActiveDefenses: (weapon: SR5Item<'weapon'>, actor: SR5Actor): ActiveDefenseData => {
         // General purpose active defenses. ()
         const activeDefenses: ActiveDefenseData  = {
             full_defense: {
@@ -39,7 +39,7 @@ export const ActiveDefenseRules = {
         activeDefenses['parry'] = {
             label: 'SR5.Parry',
             weapon: weapon.name || '',
-            value: actor.findActiveSkill(weapon.getActionSkill())?.value,
+            value: actor.findActiveSkill(weapon.system.action.skill)?.value,
             initMod: -5,
         };
 

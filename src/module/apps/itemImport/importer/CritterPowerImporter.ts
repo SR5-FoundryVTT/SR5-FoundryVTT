@@ -4,8 +4,6 @@ import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
 import { SpritePowerParser } from '../parser/powers/SpritePowerParser';
 import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
 
-type CritterPowerType = Shadowrun.CritterPowerItemData | Shadowrun.SpritePowerItemData;
-
 export class CritterPowerImporter extends DataImporter {
     public files = ['critterpowers.xml'];
 
