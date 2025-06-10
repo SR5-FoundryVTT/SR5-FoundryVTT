@@ -1,4 +1,3 @@
-import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import { SR5 } from "../config";
 import MarkedDocument = Shadowrun.MarkedDocument;
 import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
@@ -413,11 +412,10 @@ export const registerItemLineHelpers = () => {
      *                   showing dscriptors for that content.
      */
     Handlebars.registerHelper('ItemRightSide', function (item: SR5Item): ItemListRightSide[] {
-        const wrapper = new SR5ItemDataWrapper(item as any);
         const qtyInput = {
             input: {
                 type: 'number',
-                value: wrapper.getQuantity(),
+                value: item.system.technology?.quantity ?? 1,
                 cssClass: 'item-qty',
             },
         };
@@ -448,20 +446,20 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             // Either use the legacy skill localization OR just the skill name/id instead.
-                            text: game.i18n.localize(SR5.activeSkills[wrapper.getActionSkill() ?? ''] ?? wrapper.getActionSkill()),
+                            text: game.i18n.localize(SR5.activeSkills[system.action.skill ?? ''] ?? system.action.skill),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(SR5.attributes[wrapper.getActionAttribute() ?? '']),
+                            text: game.i18n.localize(SR5.attributes[system.action.attribute ?? '']),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
                             // Legacy actions could have both skill and attribute2 set, which would show both information, when it shouldn't.
-                            text: wrapper.getActionSkill() ? '' : game.i18n.localize(SR5.attributes[wrapper.getActionAttribute2() ?? '']),
+                            text: system.action.skill ? '' : game.i18n.localize(SR5.attributes[system.action.attribute2 ?? '']),
                             cssClass: 'six',
                         },
                     },
@@ -473,7 +471,7 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: wrapper.getActionDicePoolMod(),
+                            text: system.action.mod,
                             cssClass: 'six',
                         },
                     },
@@ -481,30 +479,31 @@ export const registerItemLineHelpers = () => {
             }
             case 'armor':
             case 'ammo':
+                return [qtyInput];
             //@ts-expect-error
             case 'modification':
-                if (wrapper.isVehicleModification()) {
+                if (item.isType('modification') && item.system.type === 'vehicle') {
                     return [
                         {
                             text: {
-                                text: game.i18n.localize(SR5.modificationCategories[wrapper.getModificationCategory() ?? ''])
+                                text: game.i18n.localize(SR5.modificationCategories[item.system.modification_category])
                             },
 
                         },
                         {
                             text: {
-                                text: wrapper.getModificationCategorySlots() ?? ''
+                                text: item.system.slots || ''
                             },
                         },
                         qtyInput,
                     ];
                 };
 
-                if (wrapper.isDroneModification()) {
+                if (item.isType('modification') && item.system.type === 'drone') {
                     return [
                         {
                             text: {
-                                text: wrapper.getModificationCategorySlots() ?? ''
+                                text: item.system.slots || ''
                             },
                         },
                         qtyInput,
@@ -518,10 +517,10 @@ export const registerItemLineHelpers = () => {
             case 'weapon': {
                 const system = item.system as Item.SystemOfType<'weapon'>;
                 // Both Ranged and Melee Weapons can have ammo.
-                if (wrapper.isRangedWeapon() || (wrapper.isMeleeWeapon() && system.ammo?.current.max > 0)) {
-                    const count = wrapper.getAmmo()?.current.value ?? 0;
-                    const max = wrapper.getAmmo()?.current.max ?? 0;
-                    const partialReloadRounds = wrapper.getAmmo()?.partial_reload_value ?? -1;
+                if (system.category === 'ranged' || (system.category === 'melee' && system.ammo?.current.max > 0)) {
+                    const count = system.ammo?.current.value ?? 0;
+                    const max = system.ammo?.current.max ?? 0;
+                    const partialReloadRounds = system.ammo?.partial_reload_value ?? -1;
 
                     const reloadLinks: ItemListRightSide[] = [];
 
@@ -614,7 +613,7 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: wrapper.getDrain(),
+                            text: Number(item.system.drain),
                         },
                     },
                 ];
@@ -664,9 +663,9 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         button: {
-                            cssClass: `item-equip-toggle ${wrapper.isEquipped() ? 'light' : ''}`,
+                            cssClass: `item-equip-toggle ${item.isEquipped() ? 'light' : ''}`,
                             short: true,
-                            text: wrapper.isEquipped() ? game.i18n.localize('SR5.Loaded') : game.i18n.localize('SR5.Load') + ' >>',
+                            text: item.isEquipped() ? game.i18n.localize('SR5.Loaded') : game.i18n.localize('SR5.Load') + ' >>',
                         },
                     },
                 ];
@@ -721,8 +720,6 @@ export const registerItemLineHelpers = () => {
     });
 
     Handlebars.registerHelper('ItemIcons', function (item: SR5Item) {
-        const wrapper = new SR5ItemDataWrapper(item as any);
-
         const editIcon = {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
@@ -732,11 +729,11 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.DeleteItem'),
         };
         const equipIcon = {
-            icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
+            icon: `${item.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
         const enableIcon = {
-            icon: `${wrapper.isEnabled() ? 'fas fa-check-circle' : 'far fa-circle'} item-enable-toggle`,
+            icon: `${item.system.enabled ? 'fas fa-check-circle' : 'far fa-circle'} item-enable-toggle`,
             title: game.i18n.localize('SR5.ToggleEquip'),
         }
         const pdfIcon = {
@@ -746,9 +743,9 @@ export const registerItemLineHelpers = () => {
 
         const icons = [pdfIcon, editIcon, removeIcon];
 
-        if (item.asType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon'))
+        if (item.isType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon'))
             icons.unshift(equipIcon);
-        else if (item.asType('critter_power', 'sprite_power') && wrapper.canBeDisabled())
+        else if (item.isType('critter_power', 'sprite_power') && item.system.optional !== 'standard')
             icons.unshift(enableIcon);
 
         return icons;
@@ -786,7 +783,6 @@ export const registerItemLineHelpers = () => {
     });
 
     Handlebars.registerHelper('InventoryItemIcons', function (item: SR5Item) {
-        const wrapper = new SR5ItemDataWrapper(item as any);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
             title: game.i18n.localize('SR5.MoveItemInventory')
@@ -800,7 +796,7 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.DeleteItem'),
         };
         const equipIcon = {
-            icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
+            icon: `${item.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
         const pdfIcon = {
@@ -810,7 +806,7 @@ export const registerItemLineHelpers = () => {
 
         const icons = [pdfIcon, moveIcon, editIcon, removeIcon];
 
-        if (item.asType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon'))
+        if (item.isType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon'))
             icons.unshift(equipIcon);
 
         return icons;

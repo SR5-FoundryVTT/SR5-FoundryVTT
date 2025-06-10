@@ -7,11 +7,11 @@ import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
-import {SR5} from "../../config";
-import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
+import { SR5 } from "../../config";
 import { RangedWeaponRules } from '../../rules/RangedWeaponRules';
 import { SR } from '../../constants';
 import { ModifiableValueType } from 'src/module/types/template/BaseModel';
+import { SR5Item } from 'src/module/item/SR5Item';
 
 
 export class VehiclePrep {
@@ -24,7 +24,7 @@ export class VehiclePrep {
         ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[]) {
         VehiclePrep.prepareVehicleStats(system);
         VehiclePrep.prepareDeviceAttributes(system);
         VehiclePrep.prepareLimits(system);

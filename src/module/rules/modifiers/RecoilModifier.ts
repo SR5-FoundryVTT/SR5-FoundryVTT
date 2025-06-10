@@ -31,6 +31,6 @@ export class RecoilModifier extends SituationModifier  {
             return 0;
         }
 
-        return FireModeRules.recoilModifierAfterAttack(fireMode, testItem.totalRecoilCompensation, testActor.recoil(), testItem.ammoLeft);
+        return FireModeRules.recoilModifierAfterAttack(fireMode, testItem.totalRecoilCompensation, testActor.recoil(), testItem.ammoLeft());
     }
 }

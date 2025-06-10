@@ -1,5 +1,4 @@
 import { Helpers } from '../../../helpers';
-import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { PartsList } from '../../../parts/PartsList';
 import { SR5 } from "../../../config";
 import { AttributesPrep } from "./AttributesPrep";

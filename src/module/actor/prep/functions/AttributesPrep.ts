@@ -2,11 +2,11 @@ import { Helpers } from '../../../helpers';
 import {SR} from "../../../constants";
 import {SR5} from "../../../config";
 import { PartsList } from '../../../parts/PartsList';
-import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { ItemPrep } from './ItemPrep';
 import { SystemActor } from '../../SR5Actor';
 import { AttributeFieldType } from 'src/module/types/template/AttributesModel';
 import { ModifiableValueType } from 'src/module/types/template/BaseModel';
+import { SR5Item } from 'src/module/item/SR5Item';
 
 export class AttributesPrep {
     /**
@@ -70,7 +70,7 @@ export class AttributesPrep {
      * @param system A system actor having an essence attribute
      * @param items The items that might cause an essence loss.
      */
-    static prepareEssence(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5ItemDataWrapper[]) {
+    static prepareEssence(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5Item[]) {
         // The essence base is fixed. Changes should be made through the attribute.temp field.
         system.attributes.essence.base = SR.attributes.defaults.essence;
 

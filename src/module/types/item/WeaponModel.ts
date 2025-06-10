@@ -27,7 +27,7 @@ export const RangeData = () => ({
     medium: new NumberField({ required: true, nullable: false, initial: 0 }),
     long: new NumberField({ required: true, nullable: false, initial: 0 }),
     extreme: new NumberField({ required: true, nullable: false, initial: 0 }),
-    category: new StringField({ required: true, initial: '' }),
+    category: new StringField({ required: true, initial: '' }), // I believe we don't use this, we could use the value from the RangeWeaponData
     attribute: new StringField({ required: true, initial: '' }),
 });
 

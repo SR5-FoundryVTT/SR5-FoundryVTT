@@ -39,8 +39,8 @@ export const RangedWeaponRules = {
      * @param item 
      * @returns total amount of recoil compensation to be used when attacking with this item.
      */
-    recoilCompensation(item: SR5Item): number {
-        let compensation = item.recoilCompensation;
+    recoilCompensation(item: SR5Item<'weapon'>): number {
+        let compensation = item.isRangedWeapon() ? item.system.range.rc.value : 0;
         if (item.actor) {
             compensation += item.actor.recoilCompensation();
         }
@@ -89,7 +89,7 @@ export const RangedWeaponRules = {
      * @returns The recoil compensation part a humanoid will add to the total recoil compensation.
      */
     humanoidRecoilCompensation(actor: SR5Actor): number {
-        const noBody = actor.asType('vehicle', 'ic', 'sprite');
+        const noBody = actor.isType('vehicle', 'ic', 'sprite');
         if (noBody) return 0;
 
         const strength = actor.getAttribute('strength');

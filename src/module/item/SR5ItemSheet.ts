@@ -251,12 +251,19 @@ export class SR5ItemSheet extends ItemSheet {
         data.sourceIsURL = this.item.sourceIsUrl;
         data.sourceIsPDF = this.item.sourceIsPDF;
         data.sourceIsUuid = this.item.sourceIsUuid
-
-        data.isUsingRangeCategory = this.item.isUsingRangeCategory;
+        
+        data.isUsingRangeCategory = false;
+        if (this.item.isType('weapon')) {
+            if (this.item.isRangedWeapon()) {
+                const category = this.item.system.range.ranges.category;
+                data.isUsingRangeCategory = !!category && category !== 'manual';
+            } else if (this.item.isThrownWeapon()) {
+                const category = this.item.system.thrown.ranges.category;
+                data.isUsingRangeCategory = !!category && category !== 'manual';
+            }
+        }
 
         data.rollModes = CONFIG.Dice.rollModes;
-
-
 
         return {
             ...data,

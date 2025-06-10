@@ -152,7 +152,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         this._selectFireMode(this.data.fireModeSelected);
         
         // Alter fire mode by ammunition constraints.
-        this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft);
+        this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft());
 
         WeaponRangeTestBehavior.prepareBaseValues(this);
 

@@ -10,10 +10,10 @@ import { MovementPrep } from './functions/MovementPrep';
 import { WoundsPrep } from './functions/WoundsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { NPCPrep } from './functions/NPCPrep';
-import { SR5ItemDataWrapper } from "../../data/SR5ItemDataWrapper";
 import { Helpers } from '../../helpers';
 import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
+import { SR5Item } from 'src/module/item/SR5Item';
 
 export class CharacterPrep {
     static prepareBaseData(system: Actor.SystemOfType<'character'>) {
@@ -35,7 +35,7 @@ export class CharacterPrep {
      * @param system
      * @param items
      */
-    static prepareDerivedData(system: Actor.SystemOfType<'character'>, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'character'>, items: SR5Item[]) {
         AttributesPrep.prepareAttributes(system);
         AttributesPrep.prepareEssence(system, items);
 
@@ -44,7 +44,7 @@ export class CharacterPrep {
 
         SkillsPrep.prepareSkills(system);
 
-        ItemPrep.prepareArmor(system, items as any);
+        ItemPrep.prepareArmor(system, items);
 
         MatrixPrep.prepareMatrix(system, items);
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system);

@@ -7,7 +7,6 @@ import {DataDefaults} from '../data/DataDefaults';
 import {SkillFlow} from "./flows/SkillFlow";
 import {SR5} from "../config";
 import {CharacterPrep} from "./prep/CharacterPrep";
-import {SR5ItemDataWrapper} from "../data/SR5ItemDataWrapper";
 import {CritterPrep} from "./prep/CritterPrep";
 import {SpiritPrep} from "./prep/SpiritPrep";
 import {SpritePrep} from "./prep/SpritePrep";
@@ -224,20 +223,20 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     override prepareDerivedData() {
         super.prepareDerivedData();
 
+        const items = this.items as unknown as SR5Item[];
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
-        const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item as any));
         if (this.isType('character'))
-            CharacterPrep.prepareDerivedData(this.system, itemDataWrappers);
+            CharacterPrep.prepareDerivedData(this.system, items);
         else if (this.isType('critter'))
-            CritterPrep.prepareDerivedData(this.system, itemDataWrappers);
+            CritterPrep.prepareDerivedData(this.system, items);
         else if (this.isType('spirit'))
-            SpiritPrep.prepareDerivedData(this.system, itemDataWrappers);
+            SpiritPrep.prepareDerivedData(this.system, items);
         else if (this.isType('sprite'))
-            SpritePrep.prepareDerivedData(this.system, itemDataWrappers);
+            SpritePrep.prepareDerivedData(this.system, items);
         else if (this.isType('vehicle'))
-            VehiclePrep.prepareDerivedData(this.system, itemDataWrappers);
+            VehiclePrep.prepareDerivedData(this.system, items);
         else if (this.isType('ic'))
-            ICPrep.prepareDerivedData(this.system, itemDataWrappers);
+            ICPrep.prepareDerivedData(this.system, items);
     }
 
     /**
@@ -429,8 +428,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     getFullDefenseAttribute(this: SR5Actor): AttributeFieldType | undefined {
         if (this.isType('vehicle')) {
             return this.findVehicleStat('pilot');
-        // no idea why `isType` is not working here.
-        } else if (this.asType('character')) {
+        } else if (this.isType('character')) {
             let att = this.system.full_defense_attribute;
             if (!att) att = 'willpower';
             return this.findAttribute(att);
@@ -504,8 +502,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
      *  Please check SR5ActorType for reference.
      */
-    isType<ST extends SystemActor = SystemActor>(type: ST): this is SR5Actor<ST> {
-        return this.type === type;
+    isType<ST extends readonly SystemActor[]>(this: SR5Actor, ...types: ST): this is SR5Actor<ST[number]> {
+        return types.includes(this.type as ST[number]);
     }
 
     asType<ST extends readonly SystemActor[]>(this: SR5Actor, ...types: ST): SR5Actor<ST[number]> | undefined {
@@ -517,7 +515,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @returns true in case of possible natural recovery.
      */
     get hasNaturalRecovery(): boolean {
-        return this.isType('character') || this.isType('critter');
+        return this.isType('character', 'critter');
     }
 
     getVehicleTypeSkillName(): string | undefined {
@@ -1433,7 +1431,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         if (device) {
             await this._addDamageToDeviceTrack(rest, device);
         }
-        if (this.isType('ic') || this.isType('sprite')) {
+        if (this.isType('ic', 'sprite')) {
             await this._addDamageToTrack(rest, track);
         }
         return undefined;
@@ -2090,7 +2088,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @returns true, if the actor can interact with the physical plane
      */
     get hasPhysicalBody(): Boolean {
-        return Boolean(this.asType('character', 'critter', 'spirit', 'vehicle'));
+        return this.isType('character', 'critter', 'spirit', 'vehicle');
     }
 
     /**
@@ -2101,16 +2099,16 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         
         const updateData: Record<string, any> = {};
 
-        if (this.isType('character') || this.isType('critter') || this.isType('spirit') || this.isType('vehicle')) {
+        if (this.isType('character', 'critter', 'spirit', 'vehicle')) {
             updateData['system.track.physical.value'] = 0;
             updateData['system.track.physical.overflow.value'] = 0;
         }
 
-        if (this.isType('character') || this.isType('critter') || this.isType('spirit')) {
+        if (this.isType('character', 'critter', 'spirit')) {
             updateData['system.track.stun.value'] = 0;
         }
 
-        if (this.isType('character') || this.isType('critter')) {
+        if (this.isType('character', 'critter')) {
             updateData['system.attributes.edge.uses'] = this.getEdge().value;
         }
 

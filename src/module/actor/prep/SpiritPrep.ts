@@ -7,7 +7,6 @@ import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
 import { Helpers } from '../../helpers';
 import { PartsList } from "../../parts/PartsList";
-import { SR5ItemDataWrapper } from "../../data/SR5ItemDataWrapper";
 import { SkillFlow } from "../flows/SkillFlow";
 import { CharacterPrep } from './CharacterPrep';
 import { GruntPrep } from './functions/GruntPrep';
@@ -15,6 +14,7 @@ import { DataDefaults } from '../../data/DataDefaults';
 import { SR5 } from '../../config';
 import { SR } from '../../constants';
 import { SkillFieldType, SkillsType } from 'src/module/types/template/SkillsModel';
+import { SR5Item } from 'src/module/item/SR5Item';
 
 
 export class SpiritPrep {
@@ -28,7 +28,7 @@ export class SpiritPrep {
         ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
         SpiritPrep.prepareSpiritBaseData(system);
 
         // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.

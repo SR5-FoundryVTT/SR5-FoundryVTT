@@ -4,10 +4,10 @@ import {AttributesPrep} from "./functions/AttributesPrep";
 import {PartsList} from "../../parts/PartsList";
 import {SR5} from "../../config";
 import {MatrixPrep} from "./functions/MatrixPrep";
-import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import {DataDefaults} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
 import {SkillsPrep} from "./functions/SkillsPrep";
+import { SR5Item } from "src/module/item/SR5Item";
 
 
 export class ICPrep {
@@ -22,7 +22,7 @@ export class ICPrep {
         ICPrep.addHostAttributes(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'ic'>, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'ic'>, items: SR5Item[]) {
         ICPrep.prepareMatrixAttributes(system);
 
         SkillsPrep.prepareSkills(system);

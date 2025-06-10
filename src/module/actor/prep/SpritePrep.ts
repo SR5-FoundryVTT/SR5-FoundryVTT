@@ -6,9 +6,8 @@ import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
-import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import { SkillFieldType } from 'src/module/types/template/SkillsModel';
-
+import { SR5Item } from 'src/module/item/SR5Item';
 
 /**
  * Prepare a Sprite Type of Actor
@@ -23,7 +22,7 @@ export class SpritePrep {
         ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5Item[]) {
         SpritePrep.prepareSpriteMatrixAttributes(system);
         SpritePrep.prepareSpriteAttributes(system);
         SpritePrep.prepareSpriteSkills(system);

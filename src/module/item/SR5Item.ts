@@ -3,7 +3,6 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
 import { DataDefaults } from "../data/DataDefaults";
-import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
 import { MatrixRules } from "../rules/MatrixRules";
@@ -44,6 +43,7 @@ import { ActionResultType, ActionRollType } from '../types/item/ActionModel';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
 import { MatrixType } from '../types/actor/Common';
+import { ConditionType } from '../types/template/ConditionModel';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -105,12 +105,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         //       check what is set in the items options.actor during it's construction.
         //@ts-expect-error
         return this.actor.actorOwner;
-    }
-
-    //TODO remove it
-    private get wrapper(): SR5ItemDataWrapper {
-        // we need to cast here to unknown first to make ts happy
-        return new SR5ItemDataWrapper(this as any);
     }
 
     // Flag Functions
@@ -404,17 +398,14 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      * @returns Either the weapon has no ammo at all or not enough.
      */
     hasAmmo(rounds: number = 0): boolean {
-        return this.ammoLeft >= rounds;
+        return this.ammoLeft() >= rounds;
     }
 
     /**
      * Amount of ammunition this weapon has currently available
      */
-    get ammoLeft(): number {
-        const ammo = this.wrapper.getAmmo();
-        if (!ammo) return 0;
-
-        return ammo.current.value;
+    ammoLeft(this: SR5Item): number {
+        return this.system.ammo?.current.value || 0;
     }
 
     /**
@@ -838,7 +829,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         if (this.isMeleeWeapon()) {
             return game.i18n.localize('SR5.MeleeWeaponAttack');
         }
-        if (this.isCombatSpell) {
+        if (this.isCombatSpell()) {
             return game.i18n.localize('SR5.Spell.Attack');
         }
         if (this.isType('spell')) {
@@ -851,8 +842,8 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return DEFAULT_ROLL_NAME;
     }
 
-    isType<ST extends SystemItem = SystemItem>(this: SR5Item, type: ST): this is SR5Item<ST> {
-        return this.type === type;
+    isType<ST extends readonly SystemItem[]>(this: SR5Item, ...types: ST): this is SR5Item<ST[number]> {
+        return types.includes(this.type as ST[number]);
     }
 
     asType<ST extends readonly SystemItem[]>(this: SR5Item, ...types: ST): SR5Item<ST[number]> | undefined {
@@ -890,16 +881,8 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return this.isType('weapon') && this.system.category === 'melee';
     }
 
-    get isCombatSpell(): boolean {
-        return this.wrapper.isCombatSpell();
-    }
-
-    get isDirectCombatSpell(): boolean {
-        return this.wrapper.isDirectCombatSpell();
-    }
-
-    get isUsingRangeCategory(): boolean {
-        return this.wrapper.isUsingRangeCategory();
+    isCombatSpell(): this is SR5Item<'spell'> & { system: { category: 'combat' } } {
+        return this.isType('spell') && this.system.category === 'combat';
     }
 
     get isSummoning(): boolean {
@@ -914,8 +897,8 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     * Retrieve the actor document linked to this item.
     * e.g.: Contact items provide linked actors
     */
-    async getLinkedActor(): Promise<SR5Actor | undefined> {
-        const uuid = this.wrapper.getLinkedActorUuid();
+    async getLinkedActor(this: SR5Item): Promise<SR5Actor | undefined> {
+        const uuid = this.system.linkedActor;
 
         if (uuid && this.isType('contact') && foundry.utils.parseUuid(uuid).documentType === 'Actor')
             return await fromUuid(uuid) as SR5Actor;
@@ -981,12 +964,12 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return matrix;
     }
 
-    isEquipped(): boolean {
-        return this.wrapper.isEquipped();
+    isEquipped(this: SR5Item): boolean {
+        return this.system.technology?.equipped ?? false;
     }
 
-    getSource(): string {
-        return this.wrapper.getSource();
+    getSource(this: SR5Item): string {
+        return this.system.description?.source ?? '';
     }
 
     setSource(source: string) {
@@ -996,16 +979,17 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         this.render(true);
     }
 
-    getConditionMonitor(): ConditionData {
-        return this.wrapper.getConditionMonitor();
+    getConditionMonitor(this: SR5Item): ConditionType {
+        return this.system.technology?.condition_monitor || DataDefaults.createData('condition_monitor');
     }
 
-    getRating(): number {
-        return this.wrapper.getRating();
+    getRating(this: SR5Item): number {
+        return this.system.technology?.rating || 0;
     }
 
-    getArmorElements(): { [key: string]: number } {
-        return this.wrapper.getArmorElements();
+    getArmorElements(this: SR5Item<'armor'>): { [key: string]: number } {
+        const { fire, electricity, cold, acid, radiation } = this.system.armor;
+        return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0, radiation: radiation ?? 0 };
     }
 
     /**
@@ -1014,14 +998,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     get unhandledRecoil(): number {
         if (!this.isRangedWeapon()) return 0;
         return Math.max(this.actor.recoil() - this.totalRecoilCompensation, 0);
-    }
-
-    /**
-     * Amount of recoil compensation configured via weapon system data.
-     */
-    get recoilCompensation(): number {
-        if (!this.isRangedWeapon()) return 0;
-        return this.wrapper.getRecoilCompensation();
     }
 
     /**
@@ -1228,10 +1204,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      * TODO: Allow partial deletion based on target / item
      */
     async clearMarks() {
-        if (!this.isType('host')) return;
-
         const host = this.asType('host');
-
         if (!host) return;
 
         // Delete all markId properties from ActorData
@@ -1322,7 +1295,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      * Return all network device items within a possible PAN or WAN.
      */
     async networkDevices() {
-        const controller = this.asType('device') || this.asType('host');;
+        const controller = this.asType('device', 'host');;
         if (!controller) return [];
 
         return NetworkDeviceFlow.getNetworkDevices(this);

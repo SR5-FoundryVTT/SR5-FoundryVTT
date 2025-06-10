@@ -5,6 +5,7 @@ import { AttributeField } from "../types/template/AttributesModel";
 import { DescriptionData } from "../types/template/DescriptionModel";
 import { LimitField } from "../types/template/LimitsModel";
 import { RangeData, Weapon } from "../types/item/WeaponModel";
+import { ConditionData } from "../types/template/ConditionModel";
 import { SkillField } from "../types/template/SkillsModel";
 import { Host, SourceEntityField } from "../types/item/HostModel";
 import { TechnologyData } from "../types/template/TechnologyModel";
@@ -84,6 +85,7 @@ const schemaMap = {
     action_roll: ActionRollData,
     armor: ActorArmorData,
     attribute_field: AttributeField,
+    condition_monitor: ConditionData,
     damage: DamageData,
     description: DescriptionData,
     limit_field: LimitField,
