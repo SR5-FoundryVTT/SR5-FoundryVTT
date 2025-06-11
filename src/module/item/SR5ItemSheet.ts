@@ -92,7 +92,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-export class SR5ItemSheet extends ItemSheet {
+export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
     private _shownDesc: any[] = [];
     private _scroll: string | undefined;
 

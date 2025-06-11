@@ -1,7 +1,5 @@
-
 import ThermographicVisionFilter from './thermographicFilter';
 
-//todo: v10 foundry-vtt-types 
 export default class ThermographicVisionDetectionMode extends DetectionMode {
     static override getDetectionFilter() {
         return (this._detectionFilter ??= ThermographicVisionFilter.create());

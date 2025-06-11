@@ -1,5 +1,5 @@
 //todo: v10 foundry-vtt-types 
-export default class AugmentedRealityVisionBackgroundVisionShader extends AmplificationBackgroundVisionShader {
+export default class AugmentedRealityVisionBackgroundVisionShader extends foundry.canvas.rendering.shaders.AmplificationBackgroundVisionShader {
     static COLOR_TINT = [0.15, 0.15, 0.88];
   
     static override defaultUniforms = {
@@ -7,4 +7,3 @@ export default class AugmentedRealityVisionBackgroundVisionShader extends Amplif
         colorTint: this.COLOR_TINT,
     };
 }
-  

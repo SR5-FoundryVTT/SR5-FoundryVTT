@@ -1,5 +1,5 @@
 //todo: v10 foundry-vtt-types 
-export default class AugmentedRealityVisionFilter extends AbstractBaseFilter {
+export default class AugmentedRealityVisionFilter extends foundry.canvas.rendering.filters.AbstractBaseFilter {
     static override defaultUniforms = {
         luminanceThreshold: 0.5,
         alphaThreshold: 0.1,
