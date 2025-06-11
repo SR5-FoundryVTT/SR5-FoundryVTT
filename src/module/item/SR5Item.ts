@@ -95,7 +95,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
 
     // Flag Functions
     getLastFireMode(): FireModeData {
-        return this.flags[game.system.id]?.lastFireMode || DataDefaults.fireModeData();
+        return this.flags[game.system.id]?.lastFireMode || DataDefaults.createData('fire_mode');
     }
     async setLastFireMode(fireMode: FireModeData) {
         return this.flags[game.system.id]!.lastFireMode = fireMode;
