@@ -4,7 +4,6 @@ import {MeleeRules} from "../rules/MeleeRules";
 import {MeleeAttackData} from "./MeleeAttackTest";
 import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
-import { SR5Combat } from "../combat/SR5Combat";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { FLAGS, SYSTEM_NAME } from "../constants";
 import { Translation } from '../utils/strings';
@@ -163,7 +162,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
 
 
     // Order is important in this array to determine which label is shown, determined by the first test whose function returns a truthy value
-    private noDamageConditions: PhysicalDefenseNoDamageCondition[] = [
+    private readonly noDamageConditions: PhysicalDefenseNoDamageCondition[] = [
         {
             test: () => this.actor !== undefined && CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor),
             label: "SR5.TestResults.AttackDoesNoPhysicalDamageToVehicle",
@@ -226,8 +225,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
     override canConsumeDocumentResources() {
         // Check if the actor is in active combat situation and has enough initiative score left.
         if (this.actor && this.data.iniMod && game.combat) {
-            const combat: SR5Combat = game.combat as unknown as SR5Combat;
-            const combatant = combat.getActorCombatant(this.actor);
+            const combatant = game.combat.getActorCombatant(this.actor);
             if (!combatant) return true;
 
             if (combatant.initiative && combatant.initiative + this.data.iniMod < 0) {

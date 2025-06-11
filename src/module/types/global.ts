@@ -51,6 +51,10 @@ declare module "fvtt-types/configuration" {
         Sheet: typeof FormApplication;
     }
 
+    interface ConfiguredCombat<SubType extends Combat.SubType> {
+        document: SR5Combat<SubType>;
+    }
+
     interface ObjectClassConfig {
         token: typeof SR5Token;
     }
@@ -70,8 +74,6 @@ declare module "fvtt-types/configuration" {
         };
         action_manager?: any;
     }
-
-    interface CONFIG {}
 
     interface DataModelConfig {
         Actor: {

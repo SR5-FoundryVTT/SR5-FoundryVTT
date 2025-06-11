@@ -1306,7 +1306,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
 
         // Only actors that can have a wound modifier, will have a delta.
-        if (iniAdjustment < 0 && game.combat) (game.combat as SR5Combat).adjustActorInitiative(this, iniAdjustment);
+        if (iniAdjustment < 0 && game.combat) await game.combat.adjustActorInitiative(this, iniAdjustment);
     }
 
     /**
@@ -1422,20 +1422,16 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     async addMatrixDamage(damage: DamageType) {
         if (damage.type.value !== 'matrix') return;
 
-
         const device = this.getMatrixDevice();
         const track = this.getMatrixTrack();
-        if (!track) return damage;
+        if (!track) return;
 
-        const {overflow, rest} = this._calcDamageOverflow(damage, track);
+        const { rest } = this._calcDamageOverflow(damage, track);
 
-        if (device) {
+        if (device)
             await this._addDamageToDeviceTrack(rest, device);
-        }
-        if (this.isType('ic', 'sprite')) {
+        if (this.isType('ic', 'sprite'))
             await this._addDamageToTrack(rest, track);
-        }
-        return undefined;
     }
 
     /**
@@ -1494,19 +1490,16 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         // If a matrix device is used, damage that instead of the actor.
         const device = this.getMatrixDevice();
         if (device) {
-            return await device.update({ system: { technology: { condition_monitor: track } } });
+            await device.update({ system: { technology: { condition_monitor: track } } })
         }
-
         // IC actors use a matrix track.
-        if (this.isType('ic')) {
-            return await this.update({ system: { track: { matrix: track } } });
+        else if (this.isType('ic')) {
+            await this.update({ system: { track: { matrix: track } } })
         }
-
         // Emerged actors use a personal device like condition monitor.
-        if (this.isMatrixActor) {
-            return await (this as SR5Actor).update({ system: { matrix: { condition_monitor: track } } });
+        else if (this.isMatrixActor) {
+            await (this as SR5Actor).update({ system: { matrix: { condition_monitor: track } } });
         }
-        return;
     }
 
     /** Calculate damage overflow only based on max and current track values.
@@ -1578,7 +1571,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         if (defeated.unconscious || defeated.dying || defeated.dead) {
             await this.combatant?.update({defeated: true});
         } else {
-            return await this.combatant?.update({ defeated: false });
+            await this.combatant?.update({ defeated: false });
+            return;
         }
 
         let newStatus = 'unconscious';
@@ -1603,7 +1597,6 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         // Set effect as active, as we've already made sure it isn't.
         // Otherwise Foundry would toggle on/off, even though we're still dead.
         await token.object.toggleEffect(effect || CONFIG.controlIcons.defeated, { overlay: true, active: true });
-        return;
     }
 
     /**
@@ -1655,7 +1648,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         // No change needed for nothing to change.
         if (modifier === 0) return;
 
-        const combat: SR5Combat = game.combat as unknown as SR5Combat;
+        const combat = game.combat!;
         const combatant = combat.getActorCombatant(this);
 
         // Token might not be part of active combat.
@@ -1676,13 +1669,13 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     get combatActive(): boolean {
         if (!game.combat) return false;
-        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
+        const combatant = game.combat.getActorCombatant(this);
         return !!(combatant && typeof combatant.initiative === "number");
     }
 
     get combatant(): Combatant | null {
-        if (!this.combatActive) return null;
-        return (game.combat as SR5Combat).getActorCombatant(this);
+        if (!this.combatActive || !game.combat) return null;
+        return game.combat.getActorCombatant(this);
     }
 
     /**
@@ -1692,9 +1685,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     get combatInitiativeScore(): number {
         if (!game.combat) return 0;
-        const combatant = (game.combat as SR5Combat).getActorCombatant(this);
-        if (!combatant || !combatant.initiative) return 0;
-        return combatant.initiative;
+        const combatant = game.combat.getActorCombatant(this);
+        return combatant?.initiative ?? 0;
     }
 
     getVehicleStats(): VehicleStatsType | undefined {
@@ -2088,7 +2080,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * 
      * @returns true, if the actor can interact with the physical plane
      */
-    get hasPhysicalBody(): Boolean {
+    get hasPhysicalBody(): boolean {
         return this.isType('character', 'critter', 'spirit', 'vehicle');
     }
 

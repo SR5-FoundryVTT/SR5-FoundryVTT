@@ -12,7 +12,7 @@ import SocketMessageData = Shadowrun.SocketMessageData;
  *       stepping over other actors that already had their action phase in the current initiative pass.
  *       @PDF SR5#160 'Changing Initiative'
  */
-export class SR5Combat extends Combat {
+export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends Combat<SubType> {
     // Overwrite foundry-vtt-types v9 combatTrackerSettings type definitions.
     override get settings() {
         return super.settings as { resource: string, skipDefeated: boolean };
@@ -49,10 +49,8 @@ export class SR5Combat extends Combat {
                 icon: '<i class="fas fa-caret-down"></i>',
                 callback: async (li) => {
                     const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
-                    if (combatant) {
-                        const combat: SR5Combat = game.combat as unknown as SR5Combat;
-                        await combat.adjustInitiative(combatant, -1);
-                    }
+                    if (combatant)
+                        await game.combat?.adjustInitiative(combatant, -1);
                 },
             },
             {
@@ -60,10 +58,8 @@ export class SR5Combat extends Combat {
                 icon: '<i class="fas fa-angle-down"></i>',
                 callback: async (li) => {
                     const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
-                    if (combatant) {
-                        const combat: SR5Combat = game.combat as unknown as SR5Combat;
-                        await combat.adjustInitiative(combatant, -5);
-                    }
+                    if (combatant)
+                        await game.combat?.adjustInitiative(combatant, -5);
                 },
             },
             {
@@ -71,10 +67,8 @@ export class SR5Combat extends Combat {
                 icon: '<i class="fas fa-angle-double-down"></i>',
                 callback: async (li) => {
                     const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
-                    if (combatant) {
-                        const combat: SR5Combat = game.combat as unknown as SR5Combat;
-                        await combat.adjustInitiative(combatant, -10);
-                    }
+                    if (combatant)
+                        await game.combat?.adjustInitiative(combatant, -10);
                 },
             },
         );

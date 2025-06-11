@@ -74,17 +74,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     descriptionHTML: string | undefined;
 
     /**
-     * Return the owner of this item, which can either be
-     * - an actor instance (Foundry default)
-     * - an item instance (shadowrun custom) for embedded items
-     *
-     * If you need the actual actor owner, no matter how deep into item embedding, this current item is use SR5item.actorOwner
-     */
-    override get actor(): SR5Actor {
-        return super.actor as unknown as SR5Actor;
-    }
-
-    /**
      * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
      * embeddedItems, as they have their .actor property set to the item they're embedded into.
      *
@@ -136,7 +125,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     getNestedItems(): any[] {
         let items = this.flags[game.system.id]?.embeddedItems;
 
-        items = items ? items : [];
+        items ??= [];
 
         // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
         if (items && !Array.isArray(items)) {
@@ -450,7 +439,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         // Don't adhere to clip sizes, only reload from the point of capacity left.
         const missingBullets = Math.max(0, weapon.system.ammo.current.max - remainingBullets);
         // This checks how many rounds are required for a partial reload.
-        const partialReloadBulletsNeeded = Math.min(weapon.system.ammo.current.max - remainingBullets, RangedWeaponRules.partialReload(weapon.system.ammo.clip_type, this.actor.getAttribute('agility').value));
+        const partialReloadBulletsNeeded = Math.min(weapon.system.ammo.current.max - remainingBullets, RangedWeaponRules.partialReload(weapon.system.ammo.clip_type, this.actor?.getAttribute('agility').value));
         // If there aren't ANY ammo items, just use weapon max as to not enforce ammo onto users without.
         const availableBullets = ammoItems > 0 ? Number(ammo.system.technology?.quantity) : weapon.system.ammo.current.max;
 
@@ -981,7 +970,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      * Amount of current recoil left after recoil compensation.
      */
     get unhandledRecoil(): number {
-        if (!this.isRangedWeapon()) return 0;
+        if (!this.isRangedWeapon() || !this.actor) return 0;
         return Math.max(this.actor.recoil() - this.totalRecoilCompensation, 0);
     }
 
