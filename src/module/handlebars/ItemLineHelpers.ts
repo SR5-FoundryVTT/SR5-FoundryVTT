@@ -411,7 +411,8 @@ export const registerItemLineHelpers = () => {
      *                   ItemRightSide does. This is due to ItemRightSide showing content, while ItemHeaderRightSide
      *                   showing dscriptors for that content.
      */
-    Handlebars.registerHelper('ItemRightSide', function (item: SR5Item): ItemListRightSide[] {
+    Handlebars.registerHelper('ItemRightSide', function (itemStored: Item.Stored): ItemListRightSide[] {
+        const item = new SR5Item(itemStored as SR5Item);
         const qtyInput = {
             input: {
                 type: 'number',
@@ -719,7 +720,8 @@ export const registerItemLineHelpers = () => {
         }
     });
 
-    Handlebars.registerHelper('ItemIcons', function (item: SR5Item) {
+    Handlebars.registerHelper('ItemIcons', function (itemStored: Item.Stored) {
+        const item = new SR5Item(itemStored as SR5Item);
         const editIcon = {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
@@ -782,7 +784,8 @@ export const registerItemLineHelpers = () => {
         ];
     });
 
-    Handlebars.registerHelper('InventoryItemIcons', function (item: SR5Item) {
+    Handlebars.registerHelper('InventoryItemIcons', function (itemStored: Item.Stored) {
+        const item = new SR5Item(itemStored as SR5Item);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
             title: game.i18n.localize('SR5.MoveItemInventory')
