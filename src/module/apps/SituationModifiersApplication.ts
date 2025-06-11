@@ -236,7 +236,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
  * - environmental
  * - ...
  */
-export class SituationModifiersApplication extends FormApplication {
+export class SituationModifiersApplication extends foundry.appv1.api.FormApplication {
     // Static Handlers contain the class references used for both static method calls and to setup the instance handlers.
     static _staticHandlers: typeof ModifiersHandler[] = [
         MatrixModifiersHandler, 
@@ -304,16 +304,18 @@ export class SituationModifiersApplication extends FormApplication {
         // Update all modifiers before displaying.
         this.modifiers.applyAll();
 
+        const baseData = await super.getData(options);
+
         // please help
         return {
-            ...await super.getData(options),
+            ...(baseData as foundry.appv1.api.FormApplication.FormApplicationData<FormApplication.Options, {}>),
 
             targetType: this._targetTypeLabel,
             targetName: this.target.name || 'Unknown target',
 
             modifiers: this.modifiers,
             environmentalLevels: this.modifiers.environmental.levels
-        } as any;
+        };
     }
 
     override activateListeners(html: JQuery<HTMLElement>): void {
@@ -450,7 +452,7 @@ export class SituationModifiersApplication extends FormApplication {
         container.append(column);
 
         // Connect SR-FoundryVTT tokenHUD elements to FoundryVTT tokenHUD column structure.
-        html.find('.col.right').after(container);
+        $(html).find('.col.right').after(container);
 
         // Hand DOM element over and let ModifierHandlers add their TokenHUDElements.
         SituationModifiersApplication._staticHandlers.forEach(handler => handler.addTokenHUDElements(column, data._id, actor, modifiers));
