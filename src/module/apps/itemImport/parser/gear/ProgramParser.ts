@@ -11,13 +11,13 @@ export class ProgramParser extends Parser<'program'> {
         super(); this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Gear): Item.SystemOfType<'program'> {
+    protected override getSystem(jsonData: Gear) {
         const programCategories = {
             'Hacking Programs': 'hacking_program',
             'Common Programs': 'common_program'
         } as const;
 
-        const system = this.getBaseSystem() as Item.SystemOfType<'program'>;
+        const system = this.getBaseSystem();
 
         system.type = programCategories[jsonData.category._TEXT];
 

@@ -6,8 +6,8 @@ import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 export class QualityParser extends Parser<'quality'> {
     protected parseType = 'quality' as const;
 
-    protected override getSystem(jsonData: Quality): Item.SystemOfType<'quality'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'quality'>;
+    protected override getSystem(jsonData: Quality) {
+        const system = this.getBaseSystem();
 
         system.type = jsonData.category._TEXT === 'Positive' ? 'positive' : 'negative';
         system.karma = Number(jsonData.karma._TEXT) || 0;

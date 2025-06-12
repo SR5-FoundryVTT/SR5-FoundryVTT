@@ -15,8 +15,8 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
         super(); this.parseType = parseType; this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Bioware | Cyberware): Item.SystemOfType<'bioware' | 'cyberware'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'bioware' | 'cyberware'>;
+    protected override getSystem(jsonData: Bioware | Cyberware) {
+        const system = this.getBaseSystem();
 
         const essence = (jsonData.ess._TEXT || '0').match(/[0-9]\.?[0-9]*/g);
         if (essence)

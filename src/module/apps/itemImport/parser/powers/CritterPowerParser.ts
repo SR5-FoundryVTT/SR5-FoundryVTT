@@ -6,11 +6,11 @@ import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 export class CritterPowerParser extends Parser<'critter_power'> {
     protected parseType = 'critter_power' as const;
 
-    protected override getSystem(jsonData: Power): Item.SystemOfType<'critter_power'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'critter_power'>;
+    protected override getSystem(jsonData: Power) {
+        const system = this.getBaseSystem();
 
         const category = jsonData.category._TEXT.toLowerCase();
-        system.category = (category.includes("infected") ? "infected" : category) as Item.SystemOfType<'critter_power'>['category'];
+        system.category = (category.includes("infected") ? "infected" : category);
 
         system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : "";
 

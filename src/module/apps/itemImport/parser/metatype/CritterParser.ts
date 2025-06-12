@@ -5,6 +5,7 @@ import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/Ski
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 import { DataDefaults } from "src/module/data/DataDefaults";
 import { SkillFieldType } from "src/module/types/template/Skills";
+import { SystemType } from "../Parser";
 
 export class CritterParser extends MetatypeParserBase<'character'> {
     protected parseType = 'character' as const;
@@ -27,7 +28,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         return name;
     }
 
-    private setSkills(system: Actor.SystemOfType<'character'>, jsonData: Metatype): void {
+    private setSkills(system: SystemType<'character'>, jsonData: Metatype): void {
         const skills = jsonData.skills;
         if (!skills) return;
 
@@ -76,8 +77,8 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         }
     }
 
-    protected override getSystem(jsonData: Metatype): Actor.SystemOfType<'character'> {
-        const system = this.getBaseSystem() as Actor.SystemOfType<'character'>;
+    protected override getSystem(jsonData: Metatype) {
+        const system = this.getBaseSystem();
 
         system.attributes["body"].base = Number(jsonData.bodmin._TEXT) || 0;
         system.attributes["agility"].base = Number(jsonData.agimin._TEXT) || 0;

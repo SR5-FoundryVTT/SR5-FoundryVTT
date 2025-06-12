@@ -6,8 +6,8 @@ import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 export class SpriteParser extends MetatypeParserBase<'sprite'> {
     protected parseType = 'sprite' as const;
 
-    protected override getSystem(jsonData: Metatype): Actor.SystemOfType<'sprite'> {
-        const system = this.getBaseSystem() as Actor.SystemOfType<'sprite'>;
+    protected override getSystem(jsonData: Metatype) {
+        const system = this.getBaseSystem();
 
         system.spriteType = jsonData.name._TEXT.split(" ")[0].toLowerCase();
 

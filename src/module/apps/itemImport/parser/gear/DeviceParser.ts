@@ -11,8 +11,8 @@ export class DeviceParser extends Parser<'device'> {
         super(); this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Gear): Item.SystemOfType<'device'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'device'>;
+    protected override getSystem(jsonData: Gear) {
+        const system = this.getBaseSystem();
 
         const category = jsonData.category._TEXT;
         system.category = category === 'Cyberdecks' ? 'cyberdeck'

@@ -1,12 +1,12 @@
-import { Parser } from '../Parser';
+import { Parser, SystemType } from '../Parser';
 import { Complexform } from '../../schema/ComplexformsSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 
 export class ComplexFormParser extends Parser<'complex_form'> {
     protected parseType = 'complex_form' as const;
 
-    protected override getSystem(jsonData: Complexform): Item.SystemOfType<'complex_form'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'complex_form'>;
+    protected override getSystem(jsonData: Complexform) {
+        const system = this.getBaseSystem();
 
         system.action.type = 'complex';
         system.action.attribute = 'resonance';
@@ -32,7 +32,7 @@ export class ComplexFormParser extends Parser<'complex_form'> {
             case 'Persona':
             case 'Self':
             case 'Sprite':
-                system.target = target.toLowerCase() as Item.SystemOfType<'complex_form'>['target'];
+                system.target = target.toLowerCase() as SystemType<'complex_form'>['target'];
                 break;
             default:
                 system.target = 'other';

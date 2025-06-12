@@ -1,4 +1,4 @@
-import { Parser } from '../Parser';
+import { Parser, SystemType } from '../Parser';
 import { SR5Item } from '../../../../item/SR5Item';
 import { Vehicle } from '../../schema/VehiclesSchema';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
@@ -28,7 +28,7 @@ export class VehicleParser extends Parser<'vehicle'> {
             }
 
             const itemBase = foundItem.toObject();
-            const system = itemBase.system as Item.SystemOfType<'modification' | 'equipment' | 'weapon'>;
+            const system = itemBase.system as SystemType<'modification' | 'equipment' | 'weapon'>;
 
             if ('technology' in system)
                 system.technology.equipped = true;
@@ -50,8 +50,8 @@ export class VehicleParser extends Parser<'vehicle'> {
         return result;
     }
 
-    protected override getSystem(jsonData: Vehicle): Actor.SystemOfType<'vehicle'> {
-        const system = this.getBaseSystem() as Actor.SystemOfType<'vehicle'>;
+    protected override getSystem(jsonData: Vehicle) {
+        const system = this.getBaseSystem();
     
         function parseSeparatedValues(value: string): { base: number; offRoad: number } {
             const [base, offRoad] = value.split("/").map(v => +v || 0);

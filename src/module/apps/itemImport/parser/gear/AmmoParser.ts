@@ -1,4 +1,4 @@
-import { Parser } from "../Parser";
+import { Parser, SystemType } from "../Parser";
 import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
@@ -11,8 +11,8 @@ export class AmmoParser extends Parser<'ammo'> {
         super(); this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Gear): Item.SystemOfType<'ammo'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'ammo'>;
+    protected override getSystem(jsonData: Gear) {
+        const system = this.getBaseSystem();
 
         const bonusData = jsonData.weaponbonus;
         if (bonusData) {
@@ -33,7 +33,7 @@ export class AmmoParser extends Parser<'ammo'> {
 
     public override async Parse(jsonData: Gear): Promise<Item.CreateData> {
         const item = await super.Parse(jsonData) as Item.CreateData;
-        const system = item.system as Item.SystemOfType<'ammo'>;
+        const system = item.system as SystemType<'ammo'>;
 
         // TODO: This can be improved by using the stored english name in item.system.importFlags.name
         if (jsonData.addweapon?._TEXT) {
@@ -42,7 +42,7 @@ export class AmmoParser extends Parser<'ammo'> {
             const [foundWeapon] = await IH.findItem('Weapon', weaponTranslation, 'weapon') ?? [];
 
             if (foundWeapon && "action" in foundWeapon.system) {
-                const weaponData = foundWeapon.system as unknown as Item.SystemOfType<'weapon'>;
+                const weaponData = foundWeapon.system as SystemType<'weapon'>;
                 system.damageType = weaponData.action.damage.type.base;
                 system.element = weaponData.action.damage.element.base;
                 system.damage = weaponData.action.damage.value;

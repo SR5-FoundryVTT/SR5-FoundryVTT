@@ -1,16 +1,16 @@
-import { Parser } from '../Parser';
 import { SR5 } from '../../../../config';
+import { Parser, SystemType } from '../Parser';
 import { Constants } from '../../importer/Constants';
+import { RangeType } from 'src/module/types/item/Weapon';
+import { DamageType } from 'src/module/types/item/Action';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { Weapon, WeaponsSchema } from '../../schema/WeaponsSchema';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import { RangeType } from 'src/module/types/item/Weapon';
-import { DamageType } from 'src/module/types/item/Action';
 
 import PhysicalAttribute = Shadowrun.PhysicalAttribute;
-type DamageTypeType = Item.SystemOfType<'weapon'>['action']['damage']['type']['base'];
-type DamageElement = Item.SystemOfType<'weapon'>['action']['damage']['element']['base'];
+type DamageTypeType = SystemType<'weapon'>['action']['damage']['type']['base'];
+type DamageElement = SystemType<'weapon'>['action']['damage']['element']['base'];
 
 export class WeaponParserBase extends Parser<'weapon'> {
     protected parseType = 'weapon' as const;
@@ -44,7 +44,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
             }
 
             const accessoryBase = foundItem.toObject();
-            const system = accessoryBase.system as Item.SystemOfType<'modification'>;
+            const system = accessoryBase.system as SystemType<'modification'>;
             system.technology.equipped = true;
 
             const ratingText = accessory.rating?._TEXT;
@@ -74,7 +74,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         }
     }
 
-    public static GetWeaponType(weaponJson: Weapon): Item.SystemOfType<'weapon'>['category'] {
+    public static GetWeaponType(weaponJson: Weapon): SystemType<'weapon'>['category'] {
         let type = weaponJson.type._TEXT;
         //melee is the least specific, all melee entries are accurate
         if (type === 'Melee') {
@@ -89,8 +89,8 @@ export class WeaponParserBase extends Parser<'weapon'> {
         }
     }
 
-    protected override getSystem(jsonData: Weapon): Item.SystemOfType<'weapon'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'weapon'>;
+    protected override getSystem(jsonData: Weapon) {
+        const system = this.getBaseSystem();
 
         system.action.type = 'varies';
         system.action.attribute = 'agility';

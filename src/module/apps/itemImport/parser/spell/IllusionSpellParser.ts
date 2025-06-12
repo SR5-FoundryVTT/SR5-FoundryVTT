@@ -2,7 +2,7 @@ import { Spell } from '../../schema/SpellsSchema';
 import { SpellParserBase } from './SpellParserBase';
 
 export class IllusionSpellParser extends SpellParserBase {
-    protected override getSystem(jsonData: Spell): Item.SystemOfType<'spell'> {
+    protected override getSystem(jsonData: Spell) {
         const system = super.getSystem(jsonData);
 
         if (system.type === 'mana') {

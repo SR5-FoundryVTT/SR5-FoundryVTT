@@ -114,9 +114,11 @@ export abstract class DataImporter {
         };
 
         const compendium = Constants.MAP_COMPENDIUM_KEY[compendiumKey];
+        let t;
         if (compendium.type === 'Actor')
-            await Actor.create(items as Actor.CreateData[], { pack: compendium.pack });
+            t = await Actor.create(items as Actor.CreateData[], { pack: compendium.pack });
         else
-            await Item.create(items as Item.CreateData[], { pack: compendium.pack });
+            t = await Item.create(items as Item.CreateData[], { pack: compendium.pack });
+        console.log(`Created ${t.length} items in compendium (${compendiumKey})`);
     }
 }

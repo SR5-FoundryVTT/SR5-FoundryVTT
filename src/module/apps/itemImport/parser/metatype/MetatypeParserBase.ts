@@ -1,4 +1,4 @@
-import { Parser } from '../Parser';
+import { Parser, SystemType } from '../Parser';
 import { SR5Item } from '../../../../item/SR5Item';
 import { ImportHelper as IH, OneOrMany } from '../../helper/ImportHelper';
 
@@ -24,7 +24,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'critter
             }
 
             const itemBase = foundItem.toObject();
-            const system = itemBase.system as Item.SystemOfType<'bioware' | 'cyberware' | 'complex_form' | 'quality' | 'spell' | 'adept_power' | 'critter_power' | 'weapon' | 'equipment'>;
+            const system = itemBase.system as SystemType<'bioware' | 'cyberware' | 'complex_form' | 'quality' | 'spell' | 'adept_power' | 'critter_power' | 'weapon' | 'equipment'>;
 
             if (item.$?.select)
                 itemBase.name += ` (${item.$.select})`;
@@ -36,7 +36,6 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'critter
                 //todo this could be 'F'
                 const rating = Number(item.$.rating) || 0;
                 if ('rating' in system)
-                    //@ts-expect-error this should be ok.
                     system.rating = rating;
                 else if ('technology' in system && system.technology)
                     system.technology.rating = rating;

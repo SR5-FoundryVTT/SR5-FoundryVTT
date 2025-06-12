@@ -20,7 +20,7 @@ import { Vehicle, Mod as VehicleMod, Weaponmount } from "../schema/VehiclesSchem
 import { Accessory, Weapon } from "../schema/WeaponsSchema";
 
 import { TechnologyType } from "src/module/types/template/Technology";
-import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
+import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { SR5Item } from "src/module/item/SR5Item";
 
@@ -28,10 +28,7 @@ export type ParseData =
     Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
     Power | Enhancement | Quality | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
 
-type CombinedSystemOfType<T extends string> =
-    T extends Actor.SubType ? Actor.SystemOfType<T> :
-    T extends Item.SubType ? Item.SystemOfType<T> :
-    never;
+export type SystemType<T extends SystemEntityType> = ReturnType<Parser<T>["getBaseSystem"]>;
 
 export abstract class Parser<Type extends SystemEntityType> {
     protected abstract parseType: Type;
@@ -43,7 +40,7 @@ export abstract class Parser<Type extends SystemEntityType> {
 
     protected abstract getFolder(jsonData: ParseData): Promise<Folder>;
     protected async getItems(jsonData: ParseData): Promise<Item.Source[]> { return []; }
-    protected getSystem(jsonData: ParseData): CombinedSystemOfType<Type> { return this.getBaseSystem(); }
+    protected getSystem(jsonData: ParseData) { return this.getBaseSystem(); }
 
     public async Parse(jsonData: ParseData): Promise<Actor.CreateData | Item.CreateData> {
         const itemPromise = this.getItems(jsonData);
@@ -53,14 +50,14 @@ export abstract class Parser<Type extends SystemEntityType> {
         const typeOption = Constants.MAP_TRANSLATION_TYPE[this.parseType] as TranslationType;
         const options = {id: jsonData.id._TEXT, type: typeOption};
 
-        const entity = {
+        const entity: Actor.CreateData | Item.CreateData = {
             name: TH.getTranslation(name, options),
-            type: this.parseType,
+            type: this.parseType as any,
             folder: await this.getFolder(jsonData),
-        } as Actor.CreateData | Item.CreateData;
+            system: this.getSystem(jsonData),
+        };
 
-        entity.system = this.getSystem(jsonData);
-        const system = entity.system as CombinedSystemOfType<Type>;
+        const system = entity.system! as SystemType<Type>;
 
         // Add technology
         if (system && 'technology' in system && system.technology)
@@ -75,7 +72,7 @@ export abstract class Parser<Type extends SystemEntityType> {
 
         const page = jsonData.page._TEXT;
         const source = jsonData.source._TEXT;
-        entity.system.description = DataDefaults.createData('description', {source: `${source} ${TH.getAltPage(name, page, options)}`});
+        system.description = DataDefaults.createData('description', {source: `${source} ${TH.getAltPage(name, page, options)}`});
 
         // Runtime branching
         if (this.isActor())
@@ -85,6 +82,8 @@ export abstract class Parser<Type extends SystemEntityType> {
 
         await bonusPromise;
 
+        //@ts-expect-error this is a workaround for the fact that the system is not an object but a class instance
+        entity.system = entity.system!.toObject();
         return entity;
     }
 
@@ -95,7 +94,7 @@ export abstract class Parser<Type extends SystemEntityType> {
         technology.conceal.base = 'conceal' in jsonData && jsonData.conceal ? Number(jsonData.conceal._TEXT) || 0 : 0;
     }
 
-    protected setIcons(entity: Actor.CreateData | Item.CreateData, system: CombinedSystemOfType<Type>, jsonData: ParseData) {
+    protected setIcons(entity: Actor.CreateData | Item.CreateData, system: SystemType<Type>, jsonData: ParseData) {
         // Why don't we have importFlags as base in actors?
         if ('importFlags' in system && system.importFlags) {
             system.importFlags.name = IH.formatAsSlug(jsonData.name._TEXT);
@@ -111,7 +110,7 @@ export abstract class Parser<Type extends SystemEntityType> {
         }
     }
 
-    protected getBaseSystem(systemData: Parameters<typeof DataDefaults.baseSystemData<Type>>[1] = {}): CombinedSystemOfType<Type> {
-        return DataDefaults.baseSystemData<Type>(this.parseType, systemData);
+    protected getBaseSystem(createData: SystemConstructorArgs<Type> = {}) {
+        return DataDefaults.baseSystemData<Type>(this.parseType, createData);
     };
 }

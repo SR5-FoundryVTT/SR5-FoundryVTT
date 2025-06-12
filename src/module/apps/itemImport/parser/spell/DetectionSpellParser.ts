@@ -2,7 +2,7 @@ import { Spell } from '../../schema/SpellsSchema';
 import { SpellParserBase } from './SpellParserBase';
 
 export class DetectionSpellParser extends SpellParserBase {
-    protected override getSystem(jsonData: Spell): Item.SystemOfType<'spell'> {
+    protected override getSystem(jsonData: Spell) {
         const system = super.getSystem(jsonData);
 
         const descriptor = jsonData.descriptor ? jsonData.descriptor._TEXT : '';

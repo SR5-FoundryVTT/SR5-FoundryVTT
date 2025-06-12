@@ -1,11 +1,11 @@
-import { ImportHelper } from '../../helper/ImportHelper';
-import { WeaponParserBase } from './WeaponParserBase';
-import { DataDefaults } from '../../../../data/DataDefaults';
+import { SystemType } from '../Parser';
 import { Weapon } from '../../schema/WeaponsSchema';
+import { WeaponParserBase } from './WeaponParserBase';
 import { BlastType } from 'src/module/types/item/Weapon';
+import { DataDefaults } from '../../../../data/DataDefaults';
 
 export class ThrownParser extends WeaponParserBase {
-    public GetBlast(system: Item.SystemOfType<'weapon'>, jsonData: Weapon): BlastType {
+    public GetBlast(system: SystemType<'weapon'>, jsonData: Weapon): BlastType {
         const blastData: BlastType = { radius: 0, dropoff: 0 };
 
         const blastCode = jsonData.damage._TEXT;
@@ -30,7 +30,7 @@ export class ThrownParser extends WeaponParserBase {
         return blastData;
     }
 
-    protected override getSystem(jsonData: Weapon): Item.SystemOfType<'weapon'> {
+    protected override getSystem(jsonData: Weapon) {
         const system = super.getSystem(jsonData);
 
         const rangeCategory = jsonData.range?._TEXT || jsonData.category._TEXT;

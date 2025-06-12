@@ -6,8 +6,6 @@ import EffectTagsData = Shadowrun.EffectTagsData;
 import EffectChangeData = Shadowrun.EffectChangeData;
 import EffectOptionsData = Shadowrun.EffectOptionsData;
 import EffectDurationData = Shadowrun.EffectDurationData;
-import { SystemActor } from "src/module/actor/SR5Actor";
-import { SystemItem } from "src/module/item/SR5Item";
 
 export class BonusHelper {
     private static isTrue(value: "" | { _TEXT: string }): boolean {
@@ -21,7 +19,7 @@ export class BonusHelper {
         if (value.includes("Rating")) {
             let path = "";
 
-            const system = sheet.system as Actor.SystemOfType<SystemActor> | Item.SystemOfType<SystemItem>;
+            const system = sheet.system!;
 
             if ('rating' in system)
                 path = "(@system.rating)";

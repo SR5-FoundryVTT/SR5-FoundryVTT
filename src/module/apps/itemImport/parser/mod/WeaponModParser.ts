@@ -6,12 +6,13 @@ import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 export class WeaponModParser extends Parser<'modification'> {
     protected parseType = 'modification' as const;
 
-    protected override getSystem(jsonData: Accessory): Item.SystemOfType<'modification'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'modification'>;
+    protected override getSystem(jsonData: Accessory) {
+        const system = this.getBaseSystem();
 
         system.type = 'weapon';
 
-        system.mount_point = jsonData.mount ? (jsonData.mount._TEXT.toLowerCase() as Item.SystemOfType<'modification'>['mount_point']) : "";
+        //@ts-expect-error to fix
+        system.mount_point = jsonData.mount ? (jsonData.mount._TEXT.toLowerCase()) : "";
 
         system.rc = Number(jsonData.rc?._TEXT) || 0;
         system.accuracy = Number(jsonData.accuracy?._TEXT) || 0;

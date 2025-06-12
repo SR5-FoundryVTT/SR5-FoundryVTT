@@ -1,20 +1,19 @@
+import { Parser, SystemType } from '../Parser';
 import { Spell } from '../../schema/SpellsSchema';
-import { Parser } from '../Parser';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-type SpellCateogry = Item.SystemOfType<'spell'>['category'];
 
 export class SpellParserBase extends Parser<'spell'> {
     protected parseType = 'spell' as const;
 
-    protected override getSystem(jsonData: Spell): Item.SystemOfType<'spell'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'spell'>;
+    protected override getSystem(jsonData: Spell) {
+        const system = this.getBaseSystem();
 
         system.action.type = 'varies';
         system.action.attribute = 'magic';
         system.action.skill = 'spellcasting';
 
-        system.category = jsonData.category._TEXT.toLowerCase() as SpellCateogry;
+        system.category = jsonData.category._TEXT.toLowerCase() as SystemType<'spell'>['category'];
 
         const damage = jsonData.damage._TEXT;
         if (damage === 'P') {

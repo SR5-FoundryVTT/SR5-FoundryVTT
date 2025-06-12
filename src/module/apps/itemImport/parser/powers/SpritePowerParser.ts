@@ -5,8 +5,8 @@ import { ImportHelper as IH } from "../../helper/ImportHelper";
 export class SpritePowerParser extends Parser<'sprite_power'> {
     protected parseType = 'sprite_power' as const;
 
-    protected override getSystem(jsonData: Power): Item.SystemOfType<'sprite_power'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'sprite_power'>;
+    protected override getSystem(jsonData: Power) {
+        const system = this.getBaseSystem();
 
         system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : '';
         system.action.type = jsonData.action ? jsonData.action._TEXT.toLowerCase() : '';

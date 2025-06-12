@@ -10,7 +10,7 @@ export class RangedParser extends WeaponParserBase {
         return match ? parseInt(match) : 0;
     }
 
-    protected override getSystem(jsonData: Weapon): Item.SystemOfType<'weapon'> {
+    protected override getSystem(jsonData: Weapon) {
         const system = super.getSystem(jsonData);
 
         // Some new weapons don't have any rc defined in XML.

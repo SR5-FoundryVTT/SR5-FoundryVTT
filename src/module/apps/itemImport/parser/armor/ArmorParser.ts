@@ -6,8 +6,8 @@ import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 export class ArmorParser extends Parser<'armor'> {
     protected parseType = 'armor' as const;
 
-    protected override getSystem(jsonData: Armor): Item.SystemOfType<'armor'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'armor'>;
+    protected override getSystem(jsonData: Armor) {
+        const system = this.getBaseSystem();
 
         system.armor.value = Number(jsonData.armor._TEXT) || 0;
         system.armor.mod = jsonData.armor._TEXT.includes('+');

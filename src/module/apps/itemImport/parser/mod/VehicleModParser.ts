@@ -1,12 +1,12 @@
-import { Parser } from '../Parser';
+import { Parser, SystemType } from '../Parser';
 import { Mod } from '../../schema/VehiclesSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 
 export class VehicleModParser extends Parser<'modification'> {
     protected parseType = 'modification' as const;
 
-    protected override getSystem(jsonData: Mod): Item.SystemOfType<'modification'> {
-        const system = this.getBaseSystem() as Item.SystemOfType<'modification'>;
+    protected override getSystem(jsonData: Mod) {
+        const system = this.getBaseSystem();
 
         system.type = 'vehicle';
 
@@ -16,7 +16,7 @@ export class VehicleModParser extends Parser<'modification'> {
             categoryName === undefined      ? "" :
             categoryName === "Powertrain"   ? "power_train"
                                             : categoryName.toLowerCase()
-        ) as Item.SystemOfType<'modification'>['modification_category'];
+        ) as SystemType<'modification'>['modification_category'];
 
         const slots = jsonData.slots._TEXT.match(/[0-9]\.?[0-9]*/g);
         if (slots)

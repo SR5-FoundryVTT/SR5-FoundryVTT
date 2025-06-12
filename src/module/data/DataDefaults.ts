@@ -81,6 +81,7 @@ const systemMap = {
 } as const;
 
 export type SystemEntityType = keyof typeof systemMap;
+export type SystemConstructorArgs<T extends SystemEntityType> = ConstructorParameters<typeof systemMap[T]>[0];
 
 const schemaMap = {
     action_roll: ActionRollData,
@@ -108,11 +109,6 @@ type schemaCreateData = {
 type schemaInitializedData = {
     [K in keyof typeof schemaMap]: foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof schemaMap[K]>>;
 };
-
-type CombinedSystemOfType<T extends string> =
-    T extends Actor.SubType ? Actor.SystemOfType<T> :
-    T extends Item.SubType ? Item.SystemOfType<T> :
-    never;
 
 
 /**
@@ -155,9 +151,11 @@ export class DataDefaults {
      */
     static baseSystemData<EntityType extends SystemEntityType>(
         entity: EntityType,
-        createData: object = {}
-    ): CombinedSystemOfType<EntityType> {
-        return new (systemMap[entity] as any)(createData) as CombinedSystemOfType<EntityType>;
+        createData: SystemConstructorArgs<EntityType> = {}
+    ): InstanceType<typeof systemMap[EntityType]> {
+        // this method is too complex for the compiler to infer types correctly
+        const SystemClass = systemMap[entity as any] as typeof systemMap[EntityType];
+        return new (SystemClass as any)(createData) as InstanceType<typeof systemMap[EntityType]>;
     }
 
     /**
@@ -171,15 +169,16 @@ export class DataDefaults {
     static baseEntityData<Type extends SystemEntityType>(
         entityType: Type,
         createData: Actor.CreateData | Item.CreateData = {},
-        systemData: object = {}
+        systemData: SystemConstructorArgs<Type> = {}
     ): Actor.CreateData | Item.CreateData {
         const type = createData.type;
         try {
             // foundry.utils.duplicate source to avoid keeping reference to model data.
-            const modelSystemData = {
-                name: 'Unnamed', type, ...createData
-            } as Actor.CreateData | Item.CreateData;
-            modelSystemData.system = DataDefaults.baseSystemData(entityType, systemData);
+            const modelSystemData: Actor.CreateData | Item.CreateData = {
+                name: 'Unnamed', type: type as any, ...createData,
+                system: DataDefaults.baseSystemData<Type>(entityType, systemData)
+            };
+            // modelSystemData.system = 
             return modelSystemData;
         } catch (error) {
             throw new Error(`FoundryVTT doesn't have item type: ${type} registered in ${entityType}`);

@@ -7,8 +7,8 @@ import { DataDefaults } from "src/module/data/DataDefaults";
 export class SpiritParser extends MetatypeParserBase<'spirit'> {
     protected parseType = 'spirit' as const;
 
-    protected override getSystem(jsonData: Metatype): Actor.SystemOfType<'spirit'> {
-        const system = this.getBaseSystem() as Actor.SystemOfType<'spirit'>;
+    protected override getSystem(jsonData: Metatype) {
+        const system = this.getBaseSystem();
 
         switch (jsonData.category?._TEXT) {
             case "Insect Spirits":
