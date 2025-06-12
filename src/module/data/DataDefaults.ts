@@ -82,6 +82,7 @@ const systemMap = {
 
 export type SystemEntityType = keyof typeof systemMap;
 export type SystemConstructorArgs<T extends SystemEntityType> = ConstructorParameters<typeof systemMap[T]>[0];
+export type SystemByType<T extends SystemEntityType> = InstanceType<typeof systemMap[T]>;
 
 const schemaMap = {
     action_roll: ActionRollData,
@@ -152,10 +153,10 @@ export class DataDefaults {
     static baseSystemData<EntityType extends SystemEntityType>(
         entity: EntityType,
         createData: SystemConstructorArgs<EntityType> = {}
-    ): InstanceType<typeof systemMap[EntityType]> {
+    ): SystemByType<EntityType> {
         // this method is too complex for the compiler to infer types correctly
         const SystemClass = systemMap[entity as any] as typeof systemMap[EntityType];
-        return new (SystemClass as any)(createData) as InstanceType<typeof systemMap[EntityType]>;
+        return new (SystemClass as any)(createData) as SystemByType<EntityType>;
     }
 
     /**

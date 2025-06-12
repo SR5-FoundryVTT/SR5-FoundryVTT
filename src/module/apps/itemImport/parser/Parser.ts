@@ -20,7 +20,7 @@ import { Vehicle, Mod as VehicleMod, Weaponmount } from "../schema/VehiclesSchem
 import { Accessory, Weapon } from "../schema/WeaponsSchema";
 
 import { TechnologyType } from "src/module/types/template/Technology";
-import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
+import { DataDefaults, SystemByType, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { SR5Item } from "src/module/item/SR5Item";
 
@@ -40,7 +40,7 @@ export abstract class Parser<Type extends SystemEntityType> {
 
     protected abstract getFolder(jsonData: ParseData): Promise<Folder>;
     protected async getItems(jsonData: ParseData): Promise<Item.Source[]> { return []; }
-    protected getSystem(jsonData: ParseData) { return this.getBaseSystem(); }
+    protected getSystem(jsonData: ParseData): SystemByType<Type> { return this.getBaseSystem(); }
 
     public async Parse(jsonData: ParseData): Promise<Actor.CreateData | Item.CreateData> {
         const itemPromise = this.getItems(jsonData);
@@ -82,8 +82,6 @@ export abstract class Parser<Type extends SystemEntityType> {
 
         await bonusPromise;
 
-        //@ts-expect-error this is a workaround for the fact that the system should not be a class instance when creating an item or actor
-        entity.system = entity.system!.toObject();
         return entity;
     }
 
@@ -110,7 +108,8 @@ export abstract class Parser<Type extends SystemEntityType> {
         }
     }
 
-    protected getBaseSystem(createData: SystemConstructorArgs<Type> = {}) {
-        return DataDefaults.baseSystemData<Type>(this.parseType, createData);
+    protected getBaseSystem(createData: SystemConstructorArgs<Type> = {}): SystemByType<Type> {
+        // We are going to use it as the class to get the TS errors for mismatched types
+        return DataDefaults.baseSystemData<Type>(this.parseType, createData).toObject() as SystemByType<Type>;
     };
 }
