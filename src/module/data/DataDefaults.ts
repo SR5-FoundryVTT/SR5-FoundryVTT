@@ -3,7 +3,7 @@ import { AttributeField } from "../types/template/Attributes";
 import { ValueField } from "../types/template/Base";
 import { ConditionData } from "../types/template/Condition";
 import { DescriptionData } from "../types/template/Description";
-import { FireModeData } from "../types/flags/ItemFlagsModel";
+import { FireModeData } from "../types/flags/ItemFlags";
 import { Host, SourceEntityField } from "../types/item/Host";
 import { LimitField } from "../types/template/Limits";
 import { SkillField } from "../types/template/Skills";

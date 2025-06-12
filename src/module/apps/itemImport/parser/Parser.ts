@@ -82,7 +82,7 @@ export abstract class Parser<Type extends SystemEntityType> {
 
         await bonusPromise;
 
-        //@ts-expect-error this is a workaround for the fact that the system is not an object but a class instance
+        //@ts-expect-error this is a workaround for the fact that the system should not be a class instance when creating an item or actor
         entity.system = entity.system!.toObject();
         return entity;
     }

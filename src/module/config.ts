@@ -1229,7 +1229,7 @@ export const SR5 = {
         action: 'complex',
         mode: 'full_auto'
     }
-    ] as Shadowrun.FireModeData[],
+    ],
 
     /**
      * Active/AdvancedEffect apply To types and their labels.

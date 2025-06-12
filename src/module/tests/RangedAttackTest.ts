@@ -8,11 +8,12 @@ import { TestCreator } from './TestCreator';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 import { DamageType } from '../types/item/Action';
 import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
+import { FireModeType } from '../types/flags/ItemFlags';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
-    fireModes: Shadowrun.FireModeData[]
-    fireMode: Shadowrun.FireModeData
+    fireModes: FireModeType[]
+    fireMode: FireModeType
     // index of selected fireMode in fireModes
     fireModeSelected: number
     ranges: RangesTemplateType

@@ -1,6 +1,6 @@
 import { SR5 } from "../config";
 import { FiringModeType } from "../types/item/Weapon";
-import FireModeData = Shadowrun.FireModeData;
+import { FireModeType } from "../types/flags/ItemFlags";
 
 
 export const FireModeRules = {
@@ -15,7 +15,7 @@ export const FireModeRules = {
      *
      * @returns a negative defense modifier value
      */
-    fireModeDefenseModifier: function(fireMode: FireModeData, ammoLeft: number=0): number {
+    fireModeDefenseModifier: function(fireMode: FireModeType, ammoLeft: number=0): number {
         // For negative rounds use a sane default.
         const rounds = fireMode.value < 0 ? fireMode.value * -1 : fireMode.value;
         // Due to legecy value, sometimes a string numerical sneaks in...
@@ -45,7 +45,7 @@ export const FireModeRules = {
      * @return compensation Amount of compensation left.
      * @return new recoil modifier.
      */
-    recoilModifierAfterAttack: function(fireMode: FireModeData, compensation: number, recoil: number=0, ammoLeft: number = 0): number {
+    recoilModifierAfterAttack: function(fireMode: FireModeType, compensation: number, recoil: number=0, ammoLeft: number = 0): number {
         // Sanitze negative fire mode values by pretending not to shoot.
         if (fireMode.value < 0) return 0;
         // Sanitaze negative ammo values by pretending to have just enough.
@@ -64,7 +64,7 @@ export const FireModeRules = {
      * @param ammoLeft Ammunition left in the weapon
      * @returns A positive number or zero, if no additional recoil will be caused.
      */
-    additionalRecoil: function(fireMode: FireModeData, ammoLeft: number): number {
+    additionalRecoil: function(fireMode: FireModeType, ammoLeft: number): number {
         return fireMode.recoil ? Math.min(fireMode.value, ammoLeft) : 0;
     },
 
@@ -89,7 +89,7 @@ export const FireModeRules = {
      * 
      * @returns A list of firemodes sorted by weapon mode and rounds necessary.
      */
-    availableFireModes: function (rangedWeaponModes: FiringModeType, ammoLeft?: number): FireModeData[] {
+    availableFireModes: function (rangedWeaponModes: FiringModeType, ammoLeft?: number): FireModeType[] {
         // Reduce all fire modes to what's available on weapon
         // TODO: rounds check
         return SR5.fireModes

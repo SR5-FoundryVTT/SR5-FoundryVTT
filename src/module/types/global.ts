@@ -39,6 +39,7 @@ import { Sin } from './item/Sin';
 import { Spell } from './item/Spell';
 import { SpritePower } from './item/SpritePower';
 import { Weapon } from './item/Weapon';
+import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from "./flags/ItemFlags";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -154,10 +155,10 @@ declare module "fvtt-types/configuration" {
         };
         Item: {
             shadowrun5e: {
-                lastFireMode?: Shadowrun.FireModeData;
-                lastSpellForce?: Shadowrun.SpellForceData;
-                lastComplexFormLevel?: Shadowrun.ComplexFormLevelData;
-                lastFireRange?: Shadowrun.FireRangeData;
+                lastFireMode?: FireModeType;
+                lastSpellForce?: SpellForceType;
+                lastComplexFormLevel?: ComplexFormLevelType;
+                lastFireRange?: FireRangeType;
                 embeddedItems?: Item.Source[];
             };
         };

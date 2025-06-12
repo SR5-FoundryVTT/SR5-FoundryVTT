@@ -10,10 +10,6 @@ import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
 import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
 import { HostDataPreparation } from "./prep/HostPrep";
-import FireModeData = Shadowrun.FireModeData;
-import SpellForceData = Shadowrun.SpellForceData;
-import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
-import FireRangeData = Shadowrun.FireRangeData;
 import RollEvent = Shadowrun.RollEvent;
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
@@ -41,6 +37,7 @@ import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
 import { MatrixType } from '../types/actor/Common';
 import { ConditionType } from '../types/template/Condition';
+import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from '../types/flags/ItemFlags';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -94,28 +91,28 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     }
 
     // Flag Functions
-    getLastFireMode(): FireModeData {
+    getLastFireMode(): FireModeType {
         return this.flags[game.system.id]?.lastFireMode || DataDefaults.createData('fire_mode');
     }
-    async setLastFireMode(fireMode: FireModeData) {
+    async setLastFireMode(fireMode: FireModeType  ) {
         return this.flags[game.system.id]!.lastFireMode = fireMode;
     }
-    getLastSpellForce(): SpellForceData {
+    getLastSpellForce(): SpellForceType {
         return this.flags[game.system.id]?.lastSpellForce || { value: 0 };
     }
-    async setLastSpellForce(force: SpellForceData) {
+    async setLastSpellForce(force: SpellForceType) {
         return this.flags[game.system.id]!.lastSpellForce = force;
     }
-    getLastComplexFormLevel(): ComplexFormLevelData {
+    getLastComplexFormLevel(): ComplexFormLevelType {
         return this.flags[game.system.id]?.lastComplexFormLevel || { value: 0 };
     }
-    async setLastComplexFormLevel(level: ComplexFormLevelData) {
+    async setLastComplexFormLevel(level: ComplexFormLevelType) {
         return this.flags[game.system.id]!.lastComplexFormLevel = level;
     }
-    getLastFireRangeMod(): FireRangeData {
+    getLastFireRangeMod(): FireRangeType {
         return this.flags[game.system.id]?.lastFireRange || { value: 0 };
     }
-    async setLastFireRangeMod(environmentalMod: FireRangeData) {
+    async setLastFireRangeMod(environmentalMod: FireRangeType) {
         return this.flags[game.system.id]!.lastFireRange = environmentalMod;
     }
 

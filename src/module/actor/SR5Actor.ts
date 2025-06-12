@@ -1,25 +1,25 @@
-import {Helpers} from '../helpers';
-import {SR5Item} from '../item/SR5Item';
-import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
-import {PartsList} from '../parts/PartsList';
-import {SR5Combat} from "../combat/SR5Combat";
-import {DataDefaults} from '../data/DataDefaults';
-import {SkillFlow} from "./flows/SkillFlow";
-import {SR5} from "../config";
-import {CharacterPrep} from "./prep/CharacterPrep";
-import {CritterPrep} from "./prep/CritterPrep";
-import {SpiritPrep} from "./prep/SpiritPrep";
-import {SpritePrep} from "./prep/SpritePrep";
-import {VehiclePrep} from "./prep/VehiclePrep";
-import {DocumentSituationModifiers} from "../rules/DocumentSituationModifiers";
-import {SkillRules} from "../rules/SkillRules";
-import {MatrixRules} from "../rules/MatrixRules";
-import {ICPrep} from "./prep/ICPrep";
-import {InventoryFlow} from "./flows/InventoryFlow";
-import {ModifierFlow} from "./flows/ModifierFlow";
-import {TestCreator} from "../tests/TestCreator";
-import {AttributeOnlyTest} from "../tests/AttributeOnlyTest";
-import {RecoveryRules} from "../rules/RecoveryRules";
+import { Helpers } from '../helpers';
+import { SR5Item } from '../item/SR5Item';
+import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
+import { PartsList } from '../parts/PartsList';
+import { SR5Combat } from "../combat/SR5Combat";
+import { DataDefaults } from '../data/DataDefaults';
+import { SkillFlow } from "./flows/SkillFlow";
+import { SR5 } from "../config";
+import { CharacterPrep } from "./prep/CharacterPrep";
+import { CritterPrep } from "./prep/CritterPrep";
+import { SpiritPrep } from "./prep/SpiritPrep";
+import { SpritePrep } from "./prep/SpritePrep";
+import { VehiclePrep } from "./prep/VehiclePrep";
+import { DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
+import { SkillRules } from "../rules/SkillRules";
+import { MatrixRules } from "../rules/MatrixRules";
+import { ICPrep } from "./prep/ICPrep";
+import { InventoryFlow } from "./flows/InventoryFlow";
+import { ModifierFlow } from "./flows/ModifierFlow";
+import { TestCreator } from "../tests/TestCreator";
+import { AttributeOnlyTest } from "../tests/AttributeOnlyTest";
+import { RecoveryRules } from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
@@ -37,6 +37,7 @@ import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitor
 import { BaseArmorType } from '../types/template/Armor';
 import { InventoryType, MatrixType } from '../types/actor/Common';
 import { SkillRollOptions } from '../types/rolls/ActorRolls';
+import { FireModeType } from '../types/flags/ItemFlags';
 
 export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' | 'sprite';
 
@@ -2047,7 +2048,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * 
      * @param fireMode Ranged Weapon firemode used to attack with.
      */
-    async addProgressiveRecoil(fireMode: Shadowrun.FireModeData) {
+    async addProgressiveRecoil(fireMode: FireModeType) {
         const automateProgressiveRecoil = game.settings.get(SYSTEM_NAME, FLAGS.AutomateProgressiveRecoil);
         if (!automateProgressiveRecoil) return;
 
