@@ -33,7 +33,8 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'critter
                 system.optional = 'disabled_option';
 
             if (item.$?.rating) {
-                const rating = Number(item.$.rating);
+                //todo this could be 'F'
+                const rating = Number(item.$.rating) || 0;
                 if ('rating' in system)
                     //@ts-expect-error this should be ok.
                     system.rating = rating;

@@ -94,7 +94,7 @@ export class ImportHelper {
             }
 
             // Create the compendium pack
-            compendium = await CompendiumCollection.createCompendium({
+            compendium = await foundry.documents.collections.CompendiumCollection.createCompendium({
                 name: packName,
                 label: game.i18n.localize(`SR5.Compendiums.${ctype}`),
                 type: type
