@@ -22,7 +22,7 @@ export const AwakendLimits = () => ({
 
 export const MatrixLimits = () => ({
     attack: new SchemaField(LimitField()),
-    stealth: new SchemaField(LimitField()),
+    sleaze: new SchemaField(LimitField()),
     firewall: new SchemaField(LimitField()),
     data_processing: new SchemaField(LimitField()),
 });
