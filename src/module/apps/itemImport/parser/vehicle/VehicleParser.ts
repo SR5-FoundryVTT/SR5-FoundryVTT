@@ -37,7 +37,8 @@ export class VehicleParser extends Parser<'vehicle'> {
                 itemBase.name += `(${item.$.select})`;
 
             if ('$' in item && item.$?.rating) {
-                const rating = +item.$.rating;
+                const rating = Number(item.$.rating) || 0;
+                // probably, it does not exist `system.rating` for any item
                 if ('rating' in system)
                     system.rating = rating;
                 else if ('technology' in system)

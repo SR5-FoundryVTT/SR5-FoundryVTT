@@ -77,7 +77,7 @@ export const CategoryVisibility = () => ({
 
 export const NPCData = () => ({
     is_grunt: new BooleanField({ required: true, initial: false }),
-    professional_rating: new NumberField({ required: true, initial: 0 }),
+    professional_rating: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 export const MatrixData = () => ({
@@ -179,13 +179,13 @@ export const CharacterLimits = () => ({
 
 export const CommonModifiers = () => ({
     defense: new NumberField({ required: true, initial: 0 }),
-    defense_dodge: new NumberField({ required: true, initial: 0 }),
-    defense_parry: new NumberField({ required: true, initial: 0 }),
-    defense_block: new NumberField({ required: true, initial: 0 }),
-    defense_melee: new NumberField({ required: true, initial: 0 }),
-    defense_ranged: new NumberField({ required: true, initial: 0 }),
-    soak: new NumberField({ required: true, initial: 0 }),
-    recoil: new NumberField({ required: true, initial: 0 }),
+    defense_dodge: new NumberField({ required: true, nullable: false, initial: 0 }),
+    defense_parry: new NumberField({ required: true, nullable: false, initial: 0 }),
+    defense_block: new NumberField({ required: true, nullable: false, initial: 0 }),
+    defense_melee: new NumberField({ required: true, nullable: false, initial: 0 }),
+    defense_ranged: new NumberField({ required: true, nullable: false, initial: 0 }),
+    soak: new NumberField({ required: true, nullable: false, initial: 0 }),
+    recoil: new NumberField({ required: true, nullable: false, initial: 0 }),
     matrix_track: new NumberField({ required: true, nullable: false, initial: 0 }),
     reach: new NumberField({ required: true, nullable: false, initial: 0 }),
     stun_track: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -197,9 +197,9 @@ export const CommonModifiers = () => ({
 });
 
 export const MatrixModifiers = () => ({
-    matrix_initiative: new NumberField({ required: true, initial: 0 }),
-    matrix_initiative_dice: new NumberField({ required: true, initial: 0 }),
-    matrix_track: new NumberField({ required: true, initial: 0 }),
+    matrix_initiative: new NumberField({ required: true, nullable: false, initial: 0 }),
+    matrix_initiative_dice: new NumberField({ required: true, nullable: false, initial: 0 }),
+    matrix_track: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 const InventoryData = () => ({

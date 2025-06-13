@@ -153,10 +153,10 @@ export class DataDefaults {
     static baseSystemData<EntityType extends SystemEntityType>(
         entity: EntityType,
         createData: SystemConstructorArgs<EntityType> = {}
-    ): SystemByType<EntityType> {
+    ): ReturnType<SystemByType<EntityType>['toObject']> {
         // this method is too complex for the compiler to infer types correctly
         const SystemClass = systemMap[entity as any] as typeof systemMap[EntityType];
-        return new (SystemClass as any)(createData) as SystemByType<EntityType>;
+        return new (SystemClass as any)(createData).toObject();
     }
 
     /**
