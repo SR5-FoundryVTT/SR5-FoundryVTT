@@ -15,6 +15,10 @@ export class SpellParserBase extends Parser<'spell'> {
 
         system.category = jsonData.category._TEXT.toLowerCase() as SystemType<'spell'>['category'];
 
+        // Remove trailing 's' from category if it exists
+        if (system.category.endsWith('s'))
+            system.category = system.category.slice(0, -1) as SystemType<'spell'>['category'];
+
         const damage = jsonData.damage._TEXT;
         if (damage === 'P') {
             system.action.damage.type.base = 'physical';

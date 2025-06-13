@@ -71,7 +71,7 @@ const SpellData = {
         required: true,
         initial: '',
         blank: true,
-        choices: ['combat', 'detection', 'health', 'illusion', 'manipulation', 'ritual', '']
+        choices: ['combat', 'detection', 'enchantment', 'health', 'illusion', 'manipulation', 'ritual', ''] // what to do with enchantment (from chummer)?
     }),
     drain: new NumberField({ required: true, initial: 0 }),
     range: new StringField({

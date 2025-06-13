@@ -17,7 +17,7 @@ const ModificationData = {
         required: true,
         initial: '',
         blank: true,
-        choices: ['barrel', 'stock', 'top', 'side', 'internal', '']
+        choices: ['barrel', 'stock', 'top', 'side', 'internal', 'under', '']
     }),
     modification_category: new StringField({
         required: true,

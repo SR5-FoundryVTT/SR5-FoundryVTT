@@ -27,20 +27,21 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
             }
 
             case "Ritual":
-                const attrMap = {
-                    body: "bodmin",     agility: "agimin",  reaction: "reamin",
-                    strength: "strmin", charisma: "chamin", intuition: "intmin",
-                    logic: "logmin",    willpower: "wilmin"
-                } as const;
-
-                for (const [attr, key] of Object.entries(attrMap)) {
-                    system.attributes[attr].base = +jsonData[key]._TEXT;
-                }
+                system.attributes.body.base = Number(jsonData.bodmin._TEXT) || 0;
+                system.attributes.agility.base = Number(jsonData.agimin._TEXT) || 0;
+                system.attributes.reaction.base = Number(jsonData.reamin._TEXT) || 0;
+                system.attributes.strength.base = Number(jsonData.strmin._TEXT) || 0;
+                system.attributes.charisma.base = Number(jsonData.chamin._TEXT) || 0;
+                system.attributes.intuition.base = Number(jsonData.intmin._TEXT) || 0;
+                system.attributes.logic.base = Number(jsonData.logmin._TEXT) || 0;
+                system.attributes.willpower.base = Number(jsonData.wilmin._TEXT) || 0;
+                system.attributes.edge.base = Number(jsonData.edgmin._TEXT) || 0;
+                system.attributes.magic.base = Number(jsonData.magmin?._TEXT) || 0;
+                system.attributes.resonance.base = Number(jsonData.resmin?._TEXT) || 0;
 
                 system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
                     ? jsonData.name._TEXT.replace(" ", "_").toLowerCase() : "homunculus";
                 break;
-
             default:
                 system.spiritType = jsonData.name._TEXT
                     .replace(" Spirit", "").replace("Spirit of ", "")

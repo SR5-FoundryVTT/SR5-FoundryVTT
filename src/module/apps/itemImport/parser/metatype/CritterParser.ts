@@ -74,21 +74,21 @@ export class CritterParser extends MetatypeParserBase<'character'> {
     protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();
 
-        system.attributes["body"].base = Number(jsonData.bodmin._TEXT) || 0;
-        system.attributes["agility"].base = Number(jsonData.agimin._TEXT) || 0;
-        system.attributes["reaction"].base = Number(jsonData.reamin._TEXT) || 0;
-        system.attributes["strength"].base = Number(jsonData.strmin._TEXT) || 0;
-        system.attributes["charisma"].base = Number(jsonData.chamin._TEXT) || 0;
-        system.attributes["intuition"].base = Number(jsonData.intmin._TEXT) || 0;
-        system.attributes["logic"].base = Number(jsonData.logmin._TEXT) || 0;
-        system.attributes["willpower"].base = Number(jsonData.wilmin._TEXT) || 0;
-        system.attributes["edge"].base = Number(jsonData.edgmin._TEXT) || 0;
-        system.attributes["magic"].base = Number(jsonData.magmin?._TEXT) || 0;
-        system.attributes["resonance"].base = Number(jsonData.resmin?._TEXT) || 0;
+        system.attributes.body.base = Number(jsonData.bodmin._TEXT) || 0;
+        system.attributes.agility.base = Number(jsonData.agimin._TEXT) || 0;
+        system.attributes.reaction.base = Number(jsonData.reamin._TEXT) || 0;
+        system.attributes.strength.base = Number(jsonData.strmin._TEXT) || 0;
+        system.attributes.charisma.base = Number(jsonData.chamin._TEXT) || 0;
+        system.attributes.intuition.base = Number(jsonData.intmin._TEXT) || 0;
+        system.attributes.logic.base = Number(jsonData.logmin._TEXT) || 0;
+        system.attributes.willpower.base = Number(jsonData.wilmin._TEXT) || 0;
+        system.attributes.edge.base = Number(jsonData.edgmin._TEXT) || 0;
+        system.attributes.magic.base = Number(jsonData.magmin?._TEXT) || 0;
+        system.attributes.resonance.base = Number(jsonData.resmin?._TEXT) || 0;
 
-        if (system.attributes['magic'].base)
+        if (system.attributes.magic.base)
             system.special = 'magic';
-        else if (system.attributes['resonance'].base)
+        else if (system.attributes.resonance.base)
             system.special = 'resonance';
 
         system.karma.value = Number(jsonData.karma?._TEXT || 0);

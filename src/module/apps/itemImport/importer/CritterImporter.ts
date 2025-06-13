@@ -14,7 +14,7 @@ export class CritterImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        private isSpirit(jsonData: Metatype): Boolean {
+        private isSpirit(jsonData: Metatype): boolean {
             const attributeKeys = [
                 "bodmin", "agimin", "reamin",
                 "strmin", "chamin", "intmin",

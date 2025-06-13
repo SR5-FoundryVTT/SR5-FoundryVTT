@@ -7,15 +7,14 @@ export class VehicleModParser extends Parser<'modification'> {
 
     protected override getSystem(jsonData: Mod) {
         const system = this.getBaseSystem();
-
         system.type = 'vehicle';
 
-        const categoryName = jsonData.category._TEXT;
+        const allowedCategories = ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons', ''];
+        const rawCategory = jsonData.category._TEXT?.toLowerCase() ?? '';
+        const category = rawCategory === 'powertrain' ? 'power_train' : rawCategory;
 
         system.modification_category = (
-            categoryName === undefined      ? "" :
-            categoryName === "Powertrain"   ? "power_train"
-                                            : categoryName.toLowerCase()
+            allowedCategories.includes(category) ? category : ''
         ) as SystemType<'modification'>['modification_category'];
 
         const slots = jsonData.slots._TEXT.match(/[0-9]\.?[0-9]*/g);
