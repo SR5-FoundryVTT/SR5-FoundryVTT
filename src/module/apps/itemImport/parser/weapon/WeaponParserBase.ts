@@ -13,8 +13,8 @@ type DamageTypeType = SystemType<'weapon'>['action']['damage']['type']['base'];
 type DamageElement = SystemType<'weapon'>['action']['damage']['element']['base'];
 
 export class WeaponParserBase extends Parser<'weapon'> {
-    protected parseType = 'weapon' as const;
-    private categories: WeaponsSchema['categories']['category'];
+    protected readonly parseType = 'weapon';
+    private readonly categories: WeaponsSchema['categories']['category'];
 
     constructor(categories: WeaponsSchema['categories']['category']) {
         super(); this.categories = categories;

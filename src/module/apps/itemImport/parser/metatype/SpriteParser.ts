@@ -4,7 +4,7 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 export class SpriteParser extends MetatypeParserBase<'sprite'> {
-    protected parseType = 'sprite' as const;
+    protected readonly parseType = 'sprite';
 
     protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();

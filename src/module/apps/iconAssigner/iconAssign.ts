@@ -26,11 +26,11 @@ export async function getIconFiles(): Promise<string[]> {
 export function iconAssign(
     importFlags: ImportFlagType,
     iconList: string[],
-    system?: SR5Item['system'] | SR5Actor['system'],
+    system?: Actor.SystemOfType<Actor.SubType> | Item.SystemOfType<Item.SubType>,
 ): string {
 
     const defaultImg = "icons/svg/item-bag.svg";
-    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/dist/icons/importer/";
+    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) || "systems/shadowrun5e/dist/icons/importer/";
     const imgExtensionOptions = ['.svg', '.webp', '.png', '.jpg', '.jpeg', '.avif'];
     const imgName = importFlags.name;
     const imgType = importFlags.type;
@@ -57,7 +57,7 @@ export function iconAssign(
 
             break;
 
-        case 'weapon':
+        case 'weapon': {
             const weaponSystem = system as Item.SystemOfType<'weapon'>;
             fileNamePriority = [
                 imgFolder + override,
@@ -68,7 +68,7 @@ export function iconAssign(
                 imgFolder + imgType
             ]
             break;
-
+        }
         default:
             break;
     }

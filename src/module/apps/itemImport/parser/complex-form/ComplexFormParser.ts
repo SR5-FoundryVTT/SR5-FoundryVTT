@@ -3,7 +3,7 @@ import { Complexform } from '../../schema/ComplexformsSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 
 export class ComplexFormParser extends Parser<'complex_form'> {
-    protected parseType = 'complex_form' as const;
+    protected readonly parseType = 'complex_form';
 
     protected override getSystem(jsonData: Complexform) {
         const system = this.getBaseSystem();

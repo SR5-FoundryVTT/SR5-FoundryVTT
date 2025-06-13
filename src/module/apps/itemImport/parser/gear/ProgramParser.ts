@@ -4,8 +4,8 @@ import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
 
 export class ProgramParser extends Parser<'program'> {
-    protected parseType = 'program' as const;
-    protected categories: GearSchema['categories']['category'];
+    protected readonly parseType = 'program';
+    protected readonly categories: GearSchema['categories']['category'];
 
     constructor(categories: GearSchema['categories']['category']) {
         super(); this.categories = categories;

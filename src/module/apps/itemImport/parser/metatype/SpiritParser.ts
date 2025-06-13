@@ -5,7 +5,7 @@ import { TranslationHelper as TH, TranslationType } from '../../helper/Translati
 import { DataDefaults } from "src/module/data/DataDefaults";
 
 export class SpiritParser extends MetatypeParserBase<'spirit'> {
-    protected parseType = 'spirit' as const;
+    protected readonly parseType = 'spirit';
 
     protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();

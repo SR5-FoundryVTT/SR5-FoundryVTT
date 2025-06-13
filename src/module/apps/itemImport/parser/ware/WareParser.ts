@@ -5,9 +5,9 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 export class WareParser extends Parser<'bioware' | 'cyberware'> {
-    protected override parseType: 'bioware' | 'cyberware';
+    protected readonly parseType: 'bioware' | 'cyberware';
     protected categories: (BiowareSchema | CyberwareSchema)['categories']['category'];
-    
+
     constructor(
         parseType: 'bioware' | 'cyberware',
         categories: (BiowareSchema | CyberwareSchema)['categories']['category']

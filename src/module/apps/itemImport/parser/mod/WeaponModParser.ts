@@ -4,7 +4,7 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 export class WeaponModParser extends Parser<'modification'> {
-    protected parseType = 'modification' as const;
+    protected readonly parseType = 'modification';
 
     protected override getSystem(jsonData: Accessory) {
         const system = this.getBaseSystem();

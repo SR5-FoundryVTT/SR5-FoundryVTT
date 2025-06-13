@@ -3,7 +3,7 @@ import { Power } from "../../schema/CritterpowersSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 
 export class SpritePowerParser extends Parser<'sprite_power'> {
-    protected parseType = 'sprite_power' as const;
+    protected readonly parseType = 'sprite_power';
 
     protected override getSystem(jsonData: Power) {
         const system = this.getBaseSystem();

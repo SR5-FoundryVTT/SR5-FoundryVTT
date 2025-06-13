@@ -4,7 +4,7 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 export class SpellParserBase extends Parser<'spell'> {
-    protected parseType = 'spell' as const;
+    protected readonly parseType = 'spell';
 
     protected override getSystem(jsonData: Spell) {
         const system = this.getBaseSystem();

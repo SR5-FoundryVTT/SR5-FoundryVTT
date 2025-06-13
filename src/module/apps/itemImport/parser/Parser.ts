@@ -21,8 +21,6 @@ import { Accessory, Weapon } from "../schema/WeaponsSchema";
 
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
-import { SR5Actor } from "src/module/actor/SR5Actor";
-import { SR5Item } from "src/module/item/SR5Item";
 
 export type ParseData =
     Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
@@ -30,8 +28,8 @@ export type ParseData =
 
 export type SystemType<T extends SystemEntityType> = ReturnType<Parser<T>["getBaseSystem"]>;
 
-export abstract class Parser<Type extends SystemEntityType> {
-    protected abstract parseType: Type;
+export abstract class Parser<SubType extends SystemEntityType> {
+    protected abstract readonly parseType: SubType;
     protected folders: Record<string, Promise<Folder>> = {};
 
     private isActor(): boolean {
@@ -57,7 +55,7 @@ export abstract class Parser<Type extends SystemEntityType> {
             system: this.getSystem(jsonData),
         };
 
-        const system = entity.system! as SystemType<Type>;
+        const system = entity.system! as SystemType<SubType>;
 
         // Add technology
         if (system && 'technology' in system && system.technology)
@@ -92,7 +90,7 @@ export abstract class Parser<Type extends SystemEntityType> {
         technology.conceal.base = 'conceal' in jsonData && jsonData.conceal ? Number(jsonData.conceal._TEXT) || 0 : 0;
     }
 
-    protected setIcons(entity: Actor.CreateData | Item.CreateData, system: SystemType<Type>, jsonData: ParseData) {
+    protected setIcons(entity: Actor.CreateData | Item.CreateData, system: SystemType<SubType>, jsonData: ParseData) {
         // Why don't we have importFlags as base in actors?
         if ('importFlags' in system && system.importFlags) {
             system.importFlags.name = IH.formatAsSlug(jsonData.name._TEXT);
@@ -104,11 +102,11 @@ export abstract class Parser<Type extends SystemEntityType> {
             if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType as string]).includes(subType))
                 system.importFlags.subType = subType;
 
-            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entity.system as SR5Item['system'] | SR5Actor['system']);
+            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entity.system!);
         }
     }
 
-    protected getBaseSystem(createData: SystemConstructorArgs<Type> = {}) {
-        return DataDefaults.baseSystemData<Type>(this.parseType, createData);
+    protected getBaseSystem(createData: SystemConstructorArgs<SubType> = {}) {
+        return DataDefaults.baseSystemData<SubType>(this.parseType, createData);
     };
 }

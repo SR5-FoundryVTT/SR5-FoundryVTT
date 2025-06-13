@@ -4,7 +4,7 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 export class QualityParser extends Parser<'quality'> {
-    protected parseType = 'quality' as const;
+    protected readonly parseType = 'quality';
 
     protected override getSystem(jsonData: Quality) {
         const system = this.getBaseSystem();

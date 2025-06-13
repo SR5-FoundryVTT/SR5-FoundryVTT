@@ -3,7 +3,7 @@ import { Power } from '../../schema/PowersSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 
 export class AdeptPowerParser extends Parser<'adept_power'> {
-    protected parseType = 'adept_power' as const;
+    protected readonly parseType = 'adept_power';
 
     protected override getSystem(jsonData: Power) {
         const system = this.getBaseSystem();

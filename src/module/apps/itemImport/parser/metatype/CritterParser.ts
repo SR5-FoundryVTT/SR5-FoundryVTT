@@ -8,7 +8,7 @@ import { SkillFieldType } from "src/module/types/template/Skills";
 import { SystemType } from "../Parser";
 
 export class CritterParser extends MetatypeParserBase<'character'> {
-    protected parseType = 'character' as const;
+    protected readonly parseType = 'character';
 
     private normalizeSkillName(rawName: string): string {
         let name = rawName

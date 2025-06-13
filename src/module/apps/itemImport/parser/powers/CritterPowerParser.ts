@@ -4,7 +4,7 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 export class CritterPowerParser extends Parser<'critter_power'> {
-    protected parseType = 'critter_power' as const;
+    protected readonly parseType = 'critter_power';
 
     protected override getSystem(jsonData: Power) {
         const system = this.getBaseSystem();

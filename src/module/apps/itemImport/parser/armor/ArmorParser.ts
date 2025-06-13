@@ -4,7 +4,7 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 export class ArmorParser extends Parser<'armor'> {
-    protected parseType = 'armor' as const;
+    protected readonly parseType = 'armor';
 
     protected override getSystem(jsonData: Armor) {
         const system = this.getBaseSystem();

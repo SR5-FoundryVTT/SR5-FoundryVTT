@@ -5,7 +5,7 @@ import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 
 export class VehicleParser extends Parser<'vehicle'> {
-    protected parseType = 'vehicle' as const;
+    protected readonly parseType = 'vehicle';
 
     private getVehicleItems(
         vehicleName: string,

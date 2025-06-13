@@ -3,7 +3,7 @@ import { Mod } from '../../schema/VehiclesSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 
 export class VehicleModParser extends Parser<'modification'> {
-    protected parseType = 'modification' as const;
+    protected readonly parseType = 'modification';
 
     protected override getSystem(jsonData: Mod) {
         const system = this.getBaseSystem();
