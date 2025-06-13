@@ -553,7 +553,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     describe('Advanced effects modify problematic test implementations', () => {
         it('TEST modify damage on RangedAttackTest', async () => {
             const actor = new SR5Actor<'character'>({ type: 'character' });
-            const weapon = new SR5Item<'weapon'>({ type: 'weapon', system: { category: 'ranged' } });
+            const weapon = new SR5Item<'weapon'>({ type: 'weapon', system: { category: 'range' } });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { applyTo: 'test_all' } },

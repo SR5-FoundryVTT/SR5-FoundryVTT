@@ -63,7 +63,7 @@ const WeaponData = {
         required: true,
         initial: '',
         blank: true,
-        choices: ['melee', 'ranged', 'thrown', ''],
+        choices: ['melee', 'range', 'thrown', ''],
     }),
     subcategory: new StringField({ required: true, initial: '' }),
     ammo: new SchemaField(AmmunitionData(), { required: true }),

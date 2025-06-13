@@ -818,7 +818,7 @@ export const SR5 = {
      * Define here what kind of active test is to be used for the different weapon categories as a main action test.
      */
     weaponCategoryActiveTests: {
-        'ranged': 'RangedAttackTest',
+        'range': 'RangedAttackTest',
         'melee': 'MeleeAttackTest',
         'thrown': 'ThrownAttackTest'
     },
@@ -1466,7 +1466,7 @@ export const SR5 = {
         weapon: {
             // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'
             'melee': '',
-            'ranged': '',
+            'range': '',
             'thrown': '',
             'assault-cannons': '',
             'assault-rifles': '',

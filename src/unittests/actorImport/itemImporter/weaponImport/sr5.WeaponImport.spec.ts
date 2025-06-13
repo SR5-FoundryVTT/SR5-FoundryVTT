@@ -13,7 +13,7 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
         name_english: 'Ruger Super Warhawk',
         category: 'Heavy Pistols',
         category_english: 'Heavy Pistols',
-        type: 'Ranged',
+        type: 'Range',
         reach: '0',
         accuracy: '5 (8)',
         accuracy_noammo: '5 (8)',

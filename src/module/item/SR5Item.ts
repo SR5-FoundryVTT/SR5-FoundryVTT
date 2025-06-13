@@ -844,8 +844,8 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return this.isType('weapon') && this.system.category === 'thrown';
     }
 
-    isRangedWeapon(): this is SR5Item<'weapon'> & { system: { category: 'ranged' } } {
-        return this.isType('weapon') && this.system.category === 'ranged';
+    isRangedWeapon(): this is SR5Item<'weapon'> & { system: { category: 'range' } } {
+        return this.isType('weapon') && this.system.category === 'range';
     }
 
     isMeleeWeapon(): this is SR5Item<'weapon'> & { system: { category: 'melee' } } {

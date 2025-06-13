@@ -70,7 +70,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
                 return Constants.MAP_CATEGORY_TO_SKILL[category];
 
             const type = weaponJson.type._TEXT.toLowerCase();
-            return type === 'ranged' ? 'exotic_range' : 'exotic_melee';
+            return type === 'range' ? 'exotic_range' : 'exotic_melee';
         }
     }
 
@@ -85,7 +85,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
             if (skillCategory === 'Throwing Weapons') return 'thrown';
 
             // ranged is everything else
-            return 'ranged';
+            return 'range';
         }
     }
 

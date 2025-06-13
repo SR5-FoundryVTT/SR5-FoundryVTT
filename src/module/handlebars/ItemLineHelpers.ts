@@ -518,7 +518,7 @@ export const registerItemLineHelpers = () => {
             case 'weapon': {
                 const system = item.system as Item.SystemOfType<'weapon'>;
                 // Both Ranged and Melee Weapons can have ammo.
-                if (system.category === 'ranged' || (system.category === 'melee' && system.ammo?.current.max > 0)) {
+                if (system.category === 'range' || (system.category === 'melee' && system.ammo?.current.max > 0)) {
                     const count = system.ammo?.current.value ?? 0;
                     const max = system.ammo?.current.max ?? 0;
                     const partialReloadRounds = system.ammo?.partial_reload_value ?? -1;

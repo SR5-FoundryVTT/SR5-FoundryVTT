@@ -17,7 +17,6 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
 
     const getWeaponWithEquippedAmmo = async (weaponAmmo: number, weaponAmmoMax: number, ammoQuantity: number) => {
         const actor = new SR5Actor<'character'>({type: 'character', name: 'Test Character'});
-        //@ts-expect-error
         const items = actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}]);
         const item = items![0] as SR5Item<'weapon'>;
         // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}) as SR5Item;
@@ -49,7 +48,6 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
 
         it('Reload weapon causes reduction in available clips', async () => {
             const actor = new SR5Actor<'character'>({type: 'character', name: 'Test Character'});
-            // @ts-expect-error
             const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}, spare_clips: {value: 1, max: 1}}}}]);
             const item = items![0] as SR5Item<'weapon'>;
             assert.strictEqual(item.system.ammo.spare_clips.value, 1);
@@ -59,7 +57,6 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
 
         it('Reloads weapon fully when no ammo is used', async () => {
             const actor = new SR5Actor<'character'>({type: 'character', name: 'Test Character'});
-            // @ts-expect-error
             const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}]);
             const item = items![0] as SR5Item<'weapon'>;
             // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}) as SR5Item;
