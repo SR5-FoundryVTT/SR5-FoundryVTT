@@ -11,7 +11,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 
 export const CharacterSkills = () => ({
     active: Skills(),
-    language: new SchemaField(KnowledgeSkillList(), { required: true }),
+    language: new SchemaField(KnowledgeSkillList('intuition'), { required: true }),
     knowledge: new SchemaField(KnowledgeSkills(), { required: true }),
 });
 

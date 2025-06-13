@@ -520,7 +520,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return this.isType('character', 'critter');
     }
 
-    getVehicleTypeSkillName(): string | undefined {
+    getVehicleTypeSkillName() {
         if (!("vehicleType" in this.system)) return;
 
         switch (this.system.vehicleType) {

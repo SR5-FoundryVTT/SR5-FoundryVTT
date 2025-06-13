@@ -19,7 +19,7 @@ export class BonusConstant {
     public static skillGroupTable: Record<string, string[]> = {
         "Acting": ["con", "impersonation", "performance"],
         "Athletics": ["gymnastics", "running", "swimming", "flight"],
-        "Biotech": ["cybertechnology", "first_aid", "medicine"],
+        "Biotech": ["biotechnology", "cybertechnology", "first_aid", "medicine"],
         "Close Combat": ["blades", "clubs", "unarmed_combat"],
         "Conjuring": ["banishing", "binding", "summoning"],
         "Cracking": ["cybercombat", "electronic_warfare", "hacking"],

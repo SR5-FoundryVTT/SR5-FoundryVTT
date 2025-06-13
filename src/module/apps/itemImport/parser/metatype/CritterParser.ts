@@ -54,7 +54,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.s
             Object.entries(system.skills.active as {[x: string]: SkillFieldType}).forEach(([_, skill]) => {
-                if ('group' in skill && typeof skill.group === 'string' && Object.keys(groups).includes(skill.group)) {
+                if (Object.keys(groups).includes(skill.group)) {
                     skill.base = (skill.base ?? 0) + groups[skill.group];
                 }
             });
