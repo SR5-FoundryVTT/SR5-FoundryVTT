@@ -1,3 +1,4 @@
+import { DataDefaults } from "src/module/data/DataDefaults";
 import { SR5 } from "../../../config";
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
@@ -17,14 +18,18 @@ export class SkillsPrep {
         const { language, active, knowledge } = system.skills;
 
         // Active skills aren't grouped and can be prepared skill by skill.
-        Object.values(active).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+        // Foundry Vtt types currently do not support the `TypedObjectField` type, so we need to cast it.
+        Object.values(active as Record<string, SkillFieldType>)
+            .forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
 
         // Language skills aren't group, but might lack the value property.
-        if (language.value) Object.values(language.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+        if (language.value)
+            Object.values(language.value as Record<string, SkillFieldType>).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
 
         // Knowledge skills are groupd and might also lack the value property.
         Object.values(knowledge).forEach((group) => {
-            if (group.value) Object.values(group.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+            if (group.value)
+                Object.values(group.value as Record<string, SkillFieldType>).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
         });
     }
 
@@ -101,33 +106,8 @@ export class SkillsPrep {
         }
 
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (let [skillKey, skillValue] of Object.entries(active as {[x: string]: SkillFieldType})) {
+        for (const [skillKey, skillValue] of Object.entries(active as {[x: string]: SkillFieldType})) {
             skillValue.label = SR5.activeSkills[skillKey];
         }
     }
-}
-
-/** Just a quick, semi hacky way of setting up a complete skill data structure, while still allowing
- *  fields to be added at need.
- *
- * @param givenSkill
- * @return merge default skill fields with fields of the given field, only adding new fields in the process.
- */
-export const _mergeWithMissingSkillFields = (givenSkill) => {
-    // Only the absolute most necessary fields, not datatype complete to SkillField
-    const template = {
-        name: "",
-        base: 0,
-        value: 0,
-        attribute: "",
-        mod: [],
-        specs: [],
-        hidden: false
-    };
-
-    // Use mergeObject to reserve original object instance in case replacing it
-    // causes problems down the line with active skills taken from a preexisting
-    // data structure.
-    // overwrite false to prohibit existing values to be overwritten with empty values.
-    foundry.utils.mergeObject(givenSkill, template, {overwrite: false});
 }

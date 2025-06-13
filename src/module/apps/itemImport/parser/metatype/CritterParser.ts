@@ -1,7 +1,6 @@
 import { Metatype } from "../../schema/MetatypeSchema";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 import { DataDefaults } from "src/module/data/DataDefaults";
 import { SkillFieldType } from "src/module/types/template/Skills";
@@ -64,15 +63,10 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         if (skills.knowledge) {
             IH.getArray(skills.knowledge).forEach((skill) => {
                 const name = this.normalizeSkillName(skill._TEXT);
-                const skillValue = +skill.$.rating;
+                const skillValue = Number(skill.$.rating) || 0;
                 const skillCategory = skill.$.category.toLowerCase();
 
-                //TODO fix this:
-                system.skills.knowledge[skillCategory].value[name] = (() => {
-                    const skillField: any = { name: skill._TEXT, base: skillValue };
-                    _mergeWithMissingSkillFields(skillField);
-                    return skillField;
-                })() as SkillFieldType;
+                system.skills.knowledge[skillCategory].value[name] = DataDefaults.createData('skill_field', { name: skill._TEXT, base: skillValue });
             });
         }
     }
