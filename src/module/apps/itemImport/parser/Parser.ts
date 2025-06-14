@@ -102,7 +102,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
             if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType as string]).includes(subType))
                 system.importFlags.subType = subType;
 
-            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entity.system!);
+            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entity.system as any);
         }
     }
 
