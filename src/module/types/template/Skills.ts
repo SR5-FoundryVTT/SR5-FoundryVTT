@@ -131,7 +131,7 @@ export const KnowledgeSkillList = (initialAttribute: string) => ({
         initial: initialAttribute,
         choices: ["willpower", "logic", "intuition", "charisma"]
     }),
-    value: Skills(),
+    value: new TypedObjectField(new SchemaField(SkillField()), {required: true, initial: {}}),
 });
 
 export const KnowledgeSkills = () => ({
