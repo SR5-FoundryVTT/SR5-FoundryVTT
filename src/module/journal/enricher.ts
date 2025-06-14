@@ -84,8 +84,8 @@ export class JournalEnrichers {
         return rollEntity;
     }
 
-    static async chatlogRequestHooks(html: JQuery<HTMLElement>) {
-        const elements = html.find('.chat-message').toArray();
+    static async chatlogRequestHooks(html) {
+        const elements = $(html).find('.chat-message').toArray();
 
         for (const element of elements) {
             const id = $(element).data('messageId');
