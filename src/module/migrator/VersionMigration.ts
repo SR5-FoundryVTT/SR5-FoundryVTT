@@ -119,17 +119,16 @@ export abstract class VersionMigration {
         for (const [entity, { updateData, embeddedItems }] of documentUpdates) {
             
             // v9 -> v10 workaround, should be removed when safe.
-            const updateSystem = updateData?.data ? {system: updateData.data} : updateData;
+            const updateSystem = updateData?.data ? { system: updateData.data } : updateData;
 
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
                 await actor.updateEmbeddedDocuments('Item', embeddedItems);
             }
 
-            if (updateData !== null) {
+            if (updateData)
                 //@ts-expect-error what does it do?
                 await entity.update(updateSystem, { enforceTypes: false });
-            }
         }
     }
 

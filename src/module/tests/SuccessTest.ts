@@ -1917,16 +1917,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         item.castAction(event);
     }
 
-    static async chatLogListeners(chatLog: ChatLog, html, data) {
+    static async chatLogListeners(chatLog: ChatLog, html: HTMLElement | JQuery, data: unknown) {
         // setup chat listener messages for each message as some need the message context instead of ChatLog context.
-        // @ts-expect-error Leaving this for somone that cares.
-        $(html).find('.chat-message').each(async (index, element) => {
+        const elements = $(html).find('.chat-message').toArray();
+
+        for (const element of elements) {
             const id = $(element).data('messageId');
             const message = game.messages?.get(id);
-            if (!message) return;
-
-            await this.chatMessageListeners(message, element, message.toObject())
-        });
+            if (!message) continue;
+            await this.chatMessageListeners(message, element, message.toObject());
+        }
     }
 
     /**

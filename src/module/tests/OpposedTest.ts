@@ -81,7 +81,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         return againstNetHits;
     }
 
-    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor: SR5Actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
+    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;
@@ -137,7 +137,6 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
             }
         }
 
-        //@ts-expect-error
         return await this._prepareActionTestData(action, actor, data);
     }
 

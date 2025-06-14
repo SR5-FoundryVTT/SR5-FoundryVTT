@@ -86,7 +86,7 @@ export class LinksHelpers {
      */
     static openSourcePDF(source: string | undefined) {
         // Check for pdfpager module hook: https://github.com/farling42/fvtt-pdf-pager
-        if (!ui['pdfpager']) {
+        if (!('pdfpager' in ui)) {
             ui.notifications?.warn('SR5.DIALOG.MissingModuleContent', { localize: true });
             return;
         }
@@ -98,8 +98,7 @@ export class LinksHelpers {
 
         const [code, page] = source.split(' ');
 
-        //@ts-expect-error 
-        ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
+        (ui.pdfpager as any).openPDFByCode(code, { page: parseInt(page) });
     }
 
     /**

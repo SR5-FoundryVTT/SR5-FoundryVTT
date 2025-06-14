@@ -16,7 +16,7 @@ import { Translation } from '../utils/strings';
  * - actor sheets
  */
 export const ChatData = {
-    call_in_action: (system: Item.SystemOfType<'call_in_action'>, labels, props) => {
+    call_in_action: (system: Item.SystemOfType<'call_in_action'>, labels, props: string[]) => {
         switch (system.actor_type) {
             case 'sprite':
                 if (system.sprite.type) props.push(`${game.i18n.localize("SR5.Compilation.SpriteType")} ${game.i18n.localize(SR5.spriteTypes[system.sprite.type])}`);

@@ -82,8 +82,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         return this.update({ disabled });
     }
 
-    //@ts-expect-error // TODO: foundry-vtt-types
-    protected _applyCustom(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
+    protected override _applyCustom(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
         return this._applyModify(actor, change, current, delta, changes);
     }
 

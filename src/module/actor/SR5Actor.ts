@@ -1338,13 +1338,10 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param track What track should be healed?
      * @param healing How many boxes of healing should be done?
      */
-    async healDamage(track: DamageType['type']['value'], healing: number) {
+    async healDamage(this: SR5Actor, track: DamageType['type']['value'], healing: number) {
         console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
 
-        // @ts-expect-error
-        if (!this.system?.track.hasOwnProperty(track)) return
-
-        // @ts-expect-error
+        if (!this.system?.track?.[track]) return;
         const current = Math.max(this.system.track[track].value - healing, 0);
 
         await this.update({[`system.track.${track}.value`]: current});
@@ -2011,16 +2008,16 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * 
      * @returns A positive number or zero.
      */
-    get previousAttacks(): number {
-        //@ts-expect-error TODO: foundry-vtt-types v10
+    previousAttacks(this: SR5Actor): number {
         return Math.max(this.system.modifiers.multi_defense * -1, 0);
     }
+
     /**
      * Apply a new consecutive defense multiplier based on the amount of attacks given
      * 
      * @param previousAttacks Attacks within a combat turn. If left out, will guess based on current modifier.
      */
-    async calculateNextDefenseMultiModifier(previousAttacks: number=this.previousAttacks) {
+    async calculateNextDefenseMultiModifier(previousAttacks: number = this.previousAttacks()) {
         console.debug('Shadowrun 5e | Applying consecutive defense modifier for. Last amount of attacks: ', previousAttacks);
 
         const automateDefenseMod = game.settings.get(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier);

@@ -67,8 +67,7 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
         this.applyFormData();
 
         super.submit(button);
-        // @ts-expect-error
-        await this.afterSubmit("jQuery" in this.options ? this.element : this.element [0]);
+        await this.afterSubmit("jQuery" in this.options ? this.element : $(this.element[0]));
     }
 
     async afterSubmit(html: JQuery) {
@@ -98,8 +97,7 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
         foundry.utils.mergeObject(this.data.templateData, data);
     }
 
-    //@ts-expect-error
-    getData() {
+    override getData() {
         // Dialog.getData expects buttons to be set.
         this.data.buttons = this.data.buttons || this.buttons;
         this._amendButtonsWithName(this.data.buttons);

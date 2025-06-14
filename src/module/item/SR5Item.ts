@@ -275,7 +275,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         if (!system.description.value) system.description.value = '';
         system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions });
 
-        const props = [];
+        const props: string[] = [];
         // Add additional chat data fields depending on item type.
         const chatDataForItemType = ChatData[this.type];
         if (chatDataForItemType) chatDataForItemType(system, labels, props, this);
@@ -592,8 +592,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      * Create an item in this item
      * @param itemData
      * @param options
-     * 
-     * //@ts-expect-error TODO: foundry-vtt-types v10 Rework method...
      */
     async createNestedItem(itemData, options = {}) {
         if (!Array.isArray(itemData)) itemData = [itemData];
@@ -943,9 +941,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return this.system.description?.source ?? '';
     }
 
-    setSource(source: string) {
-        //@ts-expect-error
-        if (!this.system.description) this.system.description = { chat: '', source: '', value: '' };
+    setSource(this: SR5Item, source: string) {
         this.update({ system: { description: { source } } });
         this.render(true);
     }
@@ -1036,7 +1032,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
             type: 'Actor',
             pack,
             // Custom fields for IC
-            // @ts-expect-error foundry-vtt
+            // @ts-expect-error foundry-vtt help?
             system: { icType: icData.system.icType },
         });
         host.system.ic.push(sourceEntity);

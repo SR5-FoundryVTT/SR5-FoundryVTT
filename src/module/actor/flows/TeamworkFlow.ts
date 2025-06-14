@@ -14,15 +14,15 @@ export interface TeamworkMessageData {
 export class TeamworkTest {
     
     static async chatLogListeners(chatLog: ChatLog, html) {
-         // setup chat listener messages for each message as some need the message context instead of chatlog context.
-         // @ts-expect-error TODO: querySelectorAll?
-         $(html).find('.chat-message').each(async (index, element) => {
+        const elements = $(html).find('.chat-message').toArray();
+
+        for (const element of elements) {
             const id = $(element).data('messageId');
             const message = game.messages?.get(id);
-            if (!message) return;
+            if (!message) continue;
 
-            await this.chatMessageListeners(message, element)
-        });
+            await this.chatMessageListeners(message, element);
+        }
     }
 
     static async chatMessageListeners(message: ChatMessage, html) {

@@ -581,13 +581,13 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
                 },
             });
         } else {
-            const ranges: Omit<RangeType, 'category' | 'attribute'> = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
+            type RangesType = Omit<RangeType, 'category' | 'attribute'> & { attribute?: string };
+            const ranges: RangesType = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
 
             await this.item.update({
                 [key]: {
                     ...ranges,
-                    //@ts-expect-error it should be right
-                    attribute: ranges.attribute || null, //Clear attribute if necessary
+                    attribute: ranges.attribute || null,
                     category: selectedRangeCategory,
                 },
             });
