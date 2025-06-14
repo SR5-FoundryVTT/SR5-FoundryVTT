@@ -1,19 +1,30 @@
-/// <reference path="../Shadowrun.ts" />
+import { CommonData, MatrixActorData, CommonModifiers } from "./Common";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-declare namespace Shadowrun {
-    export type SpriteType = keyof typeof SR5CONFIG.spriteTypes;
+const SpriteData = {
+    ...CommonData(),
+    ...MatrixActorData(),
+    level: new NumberField({ required: true, nullable: false, initial: 0 }),
+    services: new NumberField({ required: true, nullable: false, initial: 0 }),
+    registered: new BooleanField({ required: true, initial: false }),
+    spriteType: new StringField({
+        required: true,
+        initial: "",
+    }),
+    modifiers: new SchemaField({
+        //todo
+        // ...Modifiers,
+        ...CommonModifiers(),
+    }, { required: true }),
 
-    export interface SpriteData extends
-        CommonData,
-        ImportFlags,
-        MatrixActorData {
-            level: number;
-            services: number;
-            registered: boolean;
-            spriteType: SpriteType;
-            modifiers: Modifiers & CommonModifiers;
+    technomancerUuid: new StringField({ required: true, initial: "" }),
+}
 
-            // FoundryVTT uuid of the compiling technomancer of this sprite.
-            technomancerUuid: string;
+
+export class Sprite extends foundry.abstract.TypeDataModel<typeof SpriteData, Actor.Implementation> {
+    static override defineSchema() {
+        return SpriteData;
     }
 }
+
+console.log("SpriteData", SpriteData, new Sprite());

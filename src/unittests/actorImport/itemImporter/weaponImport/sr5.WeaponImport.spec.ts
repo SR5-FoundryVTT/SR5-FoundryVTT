@@ -2,7 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { WeaponParser } from '../../../../module/apps/importer/actorImport/itemImporter/weaponImport/WeaponParser';
 
 export const weaponParserTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, assert, before, beforeEach, after } = context;
 
     let chummerCharacter;
     let chummerRangedWeapon = {
@@ -13,7 +13,7 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
         name_english: 'Ruger Super Warhawk',
         category: 'Heavy Pistols',
         category_english: 'Heavy Pistols',
-        type: 'Ranged',
+        type: 'Range',
         reach: '0',
         accuracy: '5 (8)',
         accuracy_noammo: '5 (8)',

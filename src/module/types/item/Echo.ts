@@ -1,11 +1,17 @@
-declare namespace Shadowrun {
-    export interface EchoData extends
-        EchoPartData,
-        ImportFlags,
-        DescriptionPartData {
+import { ImportFlags } from "../template/ImportFlags";
+import { DescriptionPartData } from "../template/Description";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-    }
+const EchoData = {
+    ...DescriptionPartData(),
+    ...ImportFlags()
+};
 
-    export interface EchoPartData {
+
+export class Echo extends foundry.abstract.TypeDataModel<typeof EchoData, Item.Implementation> {
+    static override defineSchema() {
+        return EchoData;
     }
 }
+
+console.log("EchoData", EchoData, new Echo());

@@ -47,7 +47,6 @@ export class LinksHelpers {
         if (!candidate) return false;
 
         try {
-            // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
             return !!foundry.utils.parseUuid(candidate).collection;
           } catch (error) {
             return false;
@@ -59,13 +58,12 @@ export class LinksHelpers {
      * @param source 
      */
     static async resolveUuid(source: string) {
-        // @ts-expect-error // parseUuid is not defined in the @league-of-foundry-developers/foundry-vtt-types package
         const resolvedUuid = foundry.utils.parseUuid(source);
 
         const uuid = resolvedUuid.uuid.split('#')[0];
         const anchor = resolvedUuid.uuid.split('#')[1];
 
-        const document = await fromUuid(uuid);
+        const document = await fromUuid(uuid as any);
         
         return { document, resolvedUuid, anchor }
     }
@@ -88,7 +86,7 @@ export class LinksHelpers {
      */
     static openSourcePDF(source: string | undefined) {
         // Check for pdfpager module hook: https://github.com/farling42/fvtt-pdf-pager
-        if (!ui['pdfpager']) {
+        if (!('pdfpager' in ui)) {
             ui.notifications?.warn('SR5.DIALOG.MissingModuleContent', { localize: true });
             return;
         }
@@ -100,8 +98,7 @@ export class LinksHelpers {
 
         const [code, page] = source.split(' ');
 
-        //@ts-expect-error 
-        ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
+        (ui.pdfpager as any).openPDFByCode(code, { page: parseInt(page) });
     }
 
     /**
@@ -121,14 +118,13 @@ export class LinksHelpers {
         try {
             if (document instanceof SR5Item || document instanceof SR5Actor || document instanceof JournalEntry) {
                 document.sheet?.render(true);
-                // @ts-expect-error TODO: foundry-vtt-types v10
             } else if (document instanceof JournalEntryPage) {
-                document.parent.sheet.render(true, { pageId: document.id, anchor: anchor ?? undefined });
+                document.parent?.sheet?.render(true);
             } else {
                 ui.notifications?.error(`The document has no associated sheet.`);
             }
         } catch (error) {
-            ui.notifications?.error(`Error opening the sheet for UUID: ${resolvedUuid.uuid}`, error);
+            ui.notifications?.error(`Error opening the sheet for UUID: ${resolvedUuid.uuid}`, error as any);
         }
     }
 

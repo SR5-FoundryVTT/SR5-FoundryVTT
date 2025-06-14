@@ -1,4 +1,4 @@
-import {_mergeWithMissingSkillFields} from "../../../../actor/prep/functions/SkillsPrep";
+import { DataDefaults } from "src/module/data/DataDefaults";
 import { InitiationParser } from "../itemImporter/magicImport/InitiationParser";
 import { SubmersionParser } from "../itemImporter/technoImport/SubmersionParser";
 
@@ -277,7 +277,7 @@ export class CharacterInfoUpdater {
             }
 
             // Precaution to later only deal with complete SkillField data models.
-            _mergeWithMissingSkillFields(parsedSkill);
+            DataDefaults.createData('skill_field', parsedSkill);
         }
     }
 
@@ -302,7 +302,7 @@ export class CharacterInfoUpdater {
             }
     
             // Precaution to later only deal with complete SkillField data models.
-            _mergeWithMissingSkillFields(parsedSkill);
+            DataDefaults.createData('skill_field', parsedSkill);
         }
     }
 
@@ -349,7 +349,7 @@ export class CharacterInfoUpdater {
             }
 
             // Precaution to later only deal with complete SkillField data models.
-            _mergeWithMissingSkillFields(parsedSkill);
+            DataDefaults.createData('skill_field', parsedSkill);
         }
     }
 }

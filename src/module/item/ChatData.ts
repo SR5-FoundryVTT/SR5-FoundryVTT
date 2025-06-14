@@ -1,9 +1,7 @@
 
-import { Helpers } from '../helpers';
-import DeviceData = Shadowrun.DeviceData;
-import { SR5Item } from './SR5Item';
-import AmmoData = Shadowrun.AmmoData;
 import { SR5 } from "../config";
+import { SR5Item } from './SR5Item';
+import { Helpers } from '../helpers';
 import { Translation } from '../utils/strings';
 
 /**
@@ -18,7 +16,7 @@ import { Translation } from '../utils/strings';
  * - actor sheets
  */
 export const ChatData = {
-    call_in_action: (system: Shadowrun.CallInActionData, labels, props) => {
+    call_in_action: (system: Item.SystemOfType<'call_in_action'>, labels, props: string[]) => {
         switch (system.actor_type) {
             case 'sprite':
                 if (system.sprite.type) props.push(`${game.i18n.localize("SR5.Compilation.SpriteType")} ${game.i18n.localize(SR5.spriteTypes[system.sprite.type])}`);
@@ -199,7 +197,7 @@ export const ChatData = {
         if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.technology.calculated.essence.value}`);
     },
 
-    device: (system: DeviceData, labels, props) => {
+    device: (system: Item.SystemOfType<'device'>, labels, props) => {
         if (system.technology && system.technology.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
         // Show ALL matrix ratings for these devices
         if (system.category === 'cyberdeck' || system.category === 'rcc') {
@@ -302,7 +300,7 @@ export const ChatData = {
         const equippedAmmo = item.getEquippedAmmo();
         if (equippedAmmo && system.ammo && system.ammo.current?.max) {
             if (equippedAmmo) {
-                const ammoData = equippedAmmo.system as AmmoData;
+                const ammoData = equippedAmmo.system;
                 const { current, spare_clips } = system.ammo;
                 if (equippedAmmo.name) props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
                 if (ammoData.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${ammoData.blast.radius}m`);

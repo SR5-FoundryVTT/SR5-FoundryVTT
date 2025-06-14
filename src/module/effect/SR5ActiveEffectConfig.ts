@@ -30,7 +30,7 @@ import { ActiveEffectConfigV1 } from "./ActiveEffectConfigV1";
  * situational modifiers and others still can behave differently.
  */
 export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
-    override object: SR5ActiveEffect;
+    declare object: SR5ActiveEffect;
     // @ts-expect-error Foundry v13 This is not type issue, but a type override for legacy Application v1 support...
     override document: SR5ActiveEffect;
 
@@ -38,7 +38,12 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
     }
 
-    override async getData(options?: Application.RenderOptions): Promise<ActiveEffectConfig.Data> {
+    // TODO check what it does, somehow it is needed to override the submit method.
+    public override _getSubmitData(updateData={}): Record<string, any> {
+        return super._getSubmitData(updateData);
+    }
+
+    override async getData(options?: Application.RenderOptions): Promise<any> {
         const data = await super.getData(options) as any;
 
         data.modes = this.applyModifyLabelToCustomMode(data.modes);
@@ -50,7 +55,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         data.applyToOptions = this.prepareApplyToOptions();
         data.hasChanges = this.prepareEffectHasChanges();
-        data.isv11 = game.version.startsWith('11.');
+        data.isv11 = game.release.generation === 11;
 
         return data;
     }
@@ -157,7 +162,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const inputElement = html.find('input#test-selection').get(0) as HTMLInputElement;
 
         // Tagify expects this format for localized tags.
-        // @ts-expect-error TODO: I've been lazy and need proper typing of class SuccessTest
         const values = Object.values(game.shadowrun5e.tests).map(((test: any) => ({
             label: test.label, id: test.name
         })));

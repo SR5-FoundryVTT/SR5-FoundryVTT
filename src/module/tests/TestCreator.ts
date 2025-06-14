@@ -18,6 +18,8 @@ import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {SR5} from "../config";
 import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
+import { ActionRollType, DamageType, MinimalActionType } from "../types/item/Action";
+import { DeepPartial } from "fvtt-types/utils";
 
 /**
  * Any test implementation can either be created by calling it's constructor directly or by using the TestCreator.
@@ -77,7 +79,6 @@ export const TestCreator = {
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
         }
 
-        // @ts-expect-error // Check for test class registration.
         if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
             console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
             return;
@@ -97,13 +98,12 @@ export const TestCreator = {
      * @param actor The actor to use for retrieving source values defined within the action.
      * @param options See TestOptions documentation.
      */
-    fromAction: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, options?: TestOptions): Promise<SuccessTest | undefined> {
+    fromAction: async function(action: ActionRollType, actor: SR5Actor, options?: TestOptions): Promise<SuccessTest | undefined> {
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
         }
 
-        // @ts-expect-error // Check for test class registration.
         if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
             console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
             return;
@@ -177,7 +177,7 @@ export const TestCreator = {
         testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
         if (!testData || !testData.rolls) return;
 
-        const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll as any));
+        const rolls = testData.rolls.map(roll => SR5Roll.fromData(roll as any));
         const documents = {rolls};
 
         // Allow callers to overwrite previous test options, otherwise fall back.
@@ -226,11 +226,16 @@ export const TestCreator = {
             return;
         }
 
-        // filter out actors current user shouldn't be able to test with.
+        // Filter out actors the current user shouldn't be able to test with.
         actors = actors.filter(actor => actor.isOwner);
-        // Fallback to player character.
-        if (actors.length === 0 && game.user.character) {
-            actors.push(game.user.character);
+
+        // Fallback to player-assigned character.
+        if (actors.length === 0) {
+            const characterId = game.user?.getFlag("core" as any, "character");
+            if (typeof characterId === "string") {
+                const character = game.actors.get(characterId) as SR5Actor | undefined;
+                if (character?.isOwner) actors.push(character);
+            }
         }
 
         if (actors.length === 0) {
@@ -250,6 +255,7 @@ export const TestCreator = {
             // Await test chain resolution for each actor, to avoid dialog spam.
             await test.execute();
         }
+        return;
     },
 
     /**
@@ -284,7 +290,7 @@ export const TestCreator = {
      */
     fromOpposedTestResistTest: async function(opposed: OpposedTest, options?: TestOptions): Promise<SuccessTest | void> {
         // Don't change the data's source.
-        const opposedData = foundry.utils.duplicate(opposed.data);
+        const opposedData = foundry.utils.duplicate(opposed.data) as OpposedTestData;
 
         if (!opposedData?.against?.opposed?.resist?.test) return console.error(`Shadowrun 5e | Given test doesn't define an opposed resist test`, opposed);
         if (!opposed.actor) return console.error(`Shadowrun 5e | A ${opposed.title} can't operate without a populated actor given`);
@@ -322,7 +328,7 @@ export const TestCreator = {
 
         // Allow different elements of this to override action data.
         const action = TestCreator._mergeMinimalActionDataInOrder(
-            DataDefaults.actionRollData({test: testCls.name}),
+            DataDefaults.createData('action_roll', {test: testCls.name}),
             await testCls._getDocumentTestAction(test.item, test.actor),
             testCls._getDefaultTestAction());
 
@@ -357,12 +363,10 @@ export const TestCreator = {
      */
     _getTestClass: function(testName: string): any | undefined {
         if (!testName) return;
-        //@ts-expect-error
-        if (!game.shadowrun5e.tests.hasOwnProperty(testName)) { //@ts-expect-error
+        if (!game.shadowrun5e.tests.hasOwnProperty(testName)) {
             console.error(`Shadowrun 5e | Tried getting a Test Class ${testName}, which isn't registered in: `, game.shadowrun5e.tests);
             return;
-        } 
-        //@ts-expect-error
+        }
         return game.shadowrun5e.tests[testName];
     },
 
@@ -378,7 +382,7 @@ export const TestCreator = {
         const data = TestCreator._minimalTestData();
 
         // Get user defined action configuration.
-        let action = item.getAction();
+        let action = item.getAction() as ActionRollType;
         if (!action || !actor) {
             return data;
         }
@@ -386,7 +390,8 @@ export const TestCreator = {
         action = TestCreator._mergeMinimalActionDataInOrder(
             action,
             await testCls._getDocumentTestAction(item, actor),
-            testCls._getDefaultTestAction());
+            testCls._getDefaultTestAction()
+        );
 
         return await TestCreator._prepareTestDataWithAction(action, actor, data);
     },
@@ -419,7 +424,7 @@ export const TestCreator = {
         data.targetActorsUuid = [];
 
         // Setup the original item actions minimal action resist configuration as a complete item action.
-        let action = DataDefaults.actionRollData({
+        let action = DataDefaults.createData('action_roll', {
             ...opposedData.against.opposed.resist
         });
         // Provide default action information.
@@ -440,7 +445,7 @@ export const TestCreator = {
      * @param actor Actor to use for retrieving source values and execute test with.
      * @param data Any test implementations resulting basic test data.
      */
-    _prepareTestDataWithAction: async function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData) {
+    _prepareTestDataWithAction: async function(action: ActionRollType, actor: SR5Actor, data: SuccessTestData) {
         // Action values might be needed later to redo the same test.
         data.action = action;
 
@@ -522,7 +527,7 @@ export const TestCreator = {
         // Prepare general damage values...
         // ...a test without damage, shouldn't contain any damage information.
         if (ActionFlow.hasDamage(action.damage)) {
-            data.damage = foundry.utils.duplicate(action.damage);
+            data.damage = foundry.utils.duplicate(action.damage) as DamageType;
         }
 
         // Prepare opposed and resist tests...
@@ -571,13 +576,13 @@ export const TestCreator = {
      */
     _minimalTestData: function(): any {
         return {
-            pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
-            limit: DataDefaults.valueData({label: 'SR5.Limit'}),
-            threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
-            damage: DataDefaults.damageData(),
-            modifiers: DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'}),
+            pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
+            limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
+            threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),
+            damage: DataDefaults.createData('damage'),
+            modifiers: DataDefaults.createData('value_field', {label: 'SR5.Labels.Action.Modifiers'}),
             values: {},
-            action: DataDefaults.actionRollData(),
+            action: DataDefaults.createData('action_roll'),
             opposed: {}
         };
     },
@@ -597,9 +602,9 @@ export const TestCreator = {
      * @param defaultActions List of partial actions, as defined by test implementations.
      * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
      */
-    _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: Partial<Shadowrun.MinimalActionData>[]): Shadowrun.ActionRollData {
+    _mergeMinimalActionDataInOrder: function(sourceAction: ActionRollType, ...defaultActions: DeepPartial<MinimalActionType>[]): ActionRollType {
         // This action might be taken from ItemData, causing changes to be reflected upstream.
-        const resultAction = foundry.utils.duplicate(sourceAction);
+        const resultAction = foundry.utils.duplicate(sourceAction) as ActionRollType;
 
         // Check if overwriting default 
         for (const defaultAction of defaultActions) {
@@ -607,7 +612,7 @@ export const TestCreator = {
 
             // Iterate over complete MinimalActionData to avoid tests providing other ActionRollData fields they're not
             // supposed to override.
-            for (const key of Object.keys(DataDefaults.minimalActionData())) {
+            for (const key of Object.keys(DataDefaults.createData('minimal_action'))) {
                 if (TestCreator._keepItemActionValue(sourceAction, defaultAction, key)) continue;
 
                 resultAction[key] = defaultAction[key];
@@ -628,7 +633,7 @@ export const TestCreator = {
      * @param key The action key to take the value from
      * @returns true for when the original action value should be kept, false if it's to be overwritten.
      */
-    _keepItemActionValue(action: Shadowrun.ActionRollData, defaultAction: Partial<Shadowrun.MinimalActionData>, key: string): boolean {
+    _keepItemActionValue(action: ActionRollType, defaultAction: DeepPartial<MinimalActionType>, key: string): boolean {
         if (!defaultAction.hasOwnProperty(key)) return true;
 
         // Avoid user confusion. A user might change one value of a logical value grouping (skill+attribute)
@@ -654,7 +659,7 @@ export const TestCreator = {
      * @param key A key of action configuration within action parameter
      * @returns false, when the value behind key is a default value. true, when it's a custom value.
      */
-    _actionHasNoneDefaultValue(action: Shadowrun.ActionRollData, key: string): boolean {
+    _actionHasNoneDefaultValue(action: ActionRollType, key: string): boolean {
         if (!action.hasOwnProperty(key)) return false;
 
         // NOTE: A more complete comparison would take a default ActionRollData object and compare the sub-key against it.

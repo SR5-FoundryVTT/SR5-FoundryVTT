@@ -43,7 +43,6 @@ export class Version0_16_0 extends VersionMigration {
         }
 
         // Migrate magic character actors with wrong templates for initiation (initiation = {})
-        // @ts-expect-error
         if (actor.system.magic && actor.system.magic.hasOwnProperty('initiation') && isNaN(actor.system.magic.initiation)) {
             updateData.data['magic.initiation'] = 0;
         }

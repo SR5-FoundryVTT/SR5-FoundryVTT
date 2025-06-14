@@ -1,7 +1,8 @@
+import { DataDefaults } from "src/module/data/DataDefaults";
+import { SR5 } from "../../../config";
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
-import {SR5} from "../../../config";
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import { SkillFieldType } from 'src/module/types/template/Skills';
 
 export class SkillsPrep {
     /**
@@ -13,25 +14,29 @@ export class SkillsPrep {
      * NOTE: Foundry also calls the prepareData multiple times with incomplete source data, causing some value properties to be missing.
      * @param system 
      */
-    static prepareSkillData(system: ActorTypesData) {
+    static prepareSkillData(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { language, active, knowledge } = system.skills;
 
         // Active skills aren't grouped and can be prepared skill by skill.
-        Object.values(active).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+        // Foundry Vtt types currently do not support the `TypedObjectField` type, so we need to cast it.
+        Object.values(active as Record<string, SkillFieldType>)
+            .forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
 
         // Language skills aren't group, but might lack the value property.
-        if (language.value) Object.values(language.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+        if (language.value)
+            Object.values(language.value as Record<string, SkillFieldType>).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
 
         // Knowledge skills are groupd and might also lack the value property.
         Object.values(knowledge).forEach((group) => {
-            if (group.value) Object.values(group.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+            if (group.value)
+                Object.values(group.value as Record<string, SkillFieldType>).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
         });
     }
 
     /**
      * Prepare actor data for skills
      */
-    static prepareSkills(system: ActorTypesData) {
+    static prepareSkills(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { language, active, knowledge } = system.skills;
         if (language) {
             if (!language.value) {
@@ -60,17 +65,20 @@ export class SkillsPrep {
         };
 
         // setup active skills
-        for (const skill of Object.values(active)) {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (const skill of Object.values(active as {[x: string]: SkillFieldType})) {
             if (!skill.hidden) {
                 prepareSkill(skill);
             }
         }
 
-        const entries = Object.entries(system.skills.language.value);
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        const entries = Object.entries(system.skills.language.value as {[x: string]: SkillFieldType});
         // remove entries which are deleted TODO figure out how to delete these from the data
         entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete system.skills.language.value[key]);
-
-        for (let skill of Object.values(language.value)) {
+        
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (let skill of Object.values(language.value as {[x: string]: SkillFieldType})) {
             prepareSkill(skill);
             skill.attribute = 'intuition';
         }
@@ -81,8 +89,9 @@ export class SkillsPrep {
             if(!group?.value) {
                 continue;
             }
-            
-            const entries = Object.entries(group.value);    
+
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+            const entries = Object.entries(group.value as {[x: string]: SkillFieldType});    
             // remove entries which are deleted TODO figure out how to delete these from the data
             group.value = entries
                 .filter(([, val]) => !val._delete)
@@ -96,34 +105,9 @@ export class SkillsPrep {
                 }, {});
         }
 
-        // skill labels
-        for (let [skillKey, skillValue] of Object.entries(active)) {
+        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+        for (const [skillKey, skillValue] of Object.entries(active as {[x: string]: SkillFieldType})) {
             skillValue.label = SR5.activeSkills[skillKey];
         }
     }
-}
-
-/** Just a quick, semi hacky way of setting up a complete skill data structure, while still allowing
- *  fields to be added at need.
- *
- * @param givenSkill
- * @return merge default skill fields with fields of the given field, only adding new fields in the process.
- */
-export const _mergeWithMissingSkillFields = (givenSkill) => {
-    // Only the absolute most necessary fields, not datatype complete to SkillField
-    const template = {
-        name: "",
-        base: 0,
-        value: 0,
-        attribute: "",
-        mod: [],
-        specs: [],
-        hidden: false
-    };
-
-    // Use mergeObject to reserve original object instance in case replacing it
-    // causes problems down the line with active skills taken from a preexisting
-    // data structure.
-    // overwrite false to prohibit existing values to be overwritten with empty values.
-    foundry.utils.mergeObject(givenSkill, template, {overwrite: false});
 }

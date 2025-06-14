@@ -59,7 +59,7 @@ module.exports = {
         "no-prototype-builtins": "warn",
         "@typescript-eslint/unbound-method": "warn",
         "no-useless-return": "warn",
-        "@typescript-eslint/return-await": "warn",
+        "@typescript-eslint/return-await": "off",
         "@typescript-eslint/prefer-includes": "warn",
         "no-unneeded-ternary": "warn",
         "@typescript-eslint/no-unnecessary-type-assertion": "warn",

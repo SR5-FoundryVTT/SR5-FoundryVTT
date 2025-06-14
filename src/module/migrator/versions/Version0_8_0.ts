@@ -47,7 +47,7 @@ export class Version0_8_0 extends VersionMigration {
             data?: object
         } = {};
 
-        UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item.toObject(), item.toObject());
+        UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item.toObject() as any, item.toObject());
 
         return updateData;
     }
@@ -62,7 +62,6 @@ export class Version0_8_0 extends VersionMigration {
 
         updateData = await this.IterateActorItems(actor, updateData);
 
-        // @ts-expect-error//@ts-expect-error // TODO: foundry-vtt-types v10
         if (updateData.data && foundry.utils.isEmpty(updateData.data)) delete updateData.data;
         if (updateData.items?.length === 0) delete updateData.items;
 

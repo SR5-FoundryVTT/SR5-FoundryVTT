@@ -9,11 +9,47 @@
         }
     ],
     "url": "#{URL}#",
-    "version": "0.27.0",
+    "version": "0.28.0",
     "compatibility": {
         "minimum": "13",
         "verified": "13.345",
         "maximum": "13"
+    },
+    "documentTypes": {
+        "Actor": {
+            "character": {},
+            "critter": {},
+            "ic": {},
+            "spirit": {},
+            "sprite": {},
+            "vehicle": {}
+        },
+        "Item": {
+            "action": {},
+            "ammo": {},
+            "armor": {},
+            "adept_power": {},
+            "bioware": {},
+            "call_in_action": {},
+            "complex_form": {},
+            "contact": {},
+            "critter_power": {},
+            "cyberware": {},
+            "device": {},
+            "echo": {},
+            "equipment": {},
+            "host": {},
+            "lifestyle": {},
+            "metamagic": {},
+            "modification": {},
+            "program": {},
+            "quality": {},
+            "ritual": {},
+            "sin": {},
+            "spell": {},
+            "sprite_power": {},
+            "weapon": {}
+        }
     },
     "scripts": [],
     "esmodules": ["dist/bundle.js"],
