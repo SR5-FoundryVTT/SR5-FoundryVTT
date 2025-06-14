@@ -27,7 +27,7 @@ export const MinimalActionData = () => ({
     attribute2: new StringField({ required: true, initial: '' }),
     mod: new NumberField({ required: true, nullable: false, initial: 0 }),
     armor: new BooleanField({ required: true, initial: false }),
-    limit: new SchemaField(ModifiableValueLinked())
+    limit: new SchemaField(ModifiableValueLinked(), { required: true }),
 });
 
 export const DamageData = () => ({
