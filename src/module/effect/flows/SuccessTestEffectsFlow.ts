@@ -48,7 +48,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             // Collect all changes of effect left.
             changes.push(...effect.changes.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
-                // Make sure FoundryVTT key migration doesn't affect us here.
+                // Foundry changes data. references in changes to system. But tests use data.
                 c.key = c.key.replace('system.', 'data.');
                 c.effect = effect;
                 c.priority = c.priority ?? (c.mode * 10);

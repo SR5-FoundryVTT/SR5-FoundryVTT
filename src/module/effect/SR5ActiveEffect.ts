@@ -267,6 +267,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param object 
      * @param change 
      */
+    // @ts-expect-error TODO: fvtt-types v13
     override apply(actor: SR5Actor, change: ActiveEffect.ChangeData) {
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
@@ -274,6 +275,15 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
 
+        // Add item error case, as FoundryVTT ActiveEffect.apply() is not meant to be used on items.
+        if (actor instanceof SR5Item) throw new Error("SR5ActiveEffect.apply() cannot be used on SR5Item objects.");
+
+        // Other cases should be directly applied to the data, without actor / schema handling.
+        // This is used when applying effects to non-Actor objects, like tests.
+        if (!(actor instanceof SR5Actor)) {
+            this._applyToObject(actor, change);
+            return [];
+        }
         // Foundry can be used to apply to actors.
         return super.apply(actor, change);
     }
