@@ -94,26 +94,26 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     getLastFireMode(): FireModeType {
         return this.flags[game.system.id]?.lastFireMode || DataDefaults.createData('fire_mode');
     }
-    async setLastFireMode(fireMode: FireModeType  ) {
-        return this.flags[game.system.id]!.lastFireMode = fireMode;
+    async setLastFireMode(fireMode: FireModeType) {
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
     }
     getLastSpellForce(): SpellForceType {
-        return this.flags[game.system.id]?.lastSpellForce || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastSpellForce) || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceType) {
-        return this.flags[game.system.id]!.lastSpellForce = force;
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
     }
     getLastComplexFormLevel(): ComplexFormLevelType {
-        return this.flags[game.system.id]?.lastComplexFormLevel || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel) || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelType) {
-        return this.flags[game.system.id]!.lastComplexFormLevel = level;
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
     }
     getLastFireRangeMod(): FireRangeType {
-        return this.flags[game.system.id]?.lastFireRange || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireRange) || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeType) {
-        return this.flags[game.system.id]!.lastFireRange = environmentalMod;
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
     }
 
     /**
