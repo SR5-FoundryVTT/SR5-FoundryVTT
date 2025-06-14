@@ -19,6 +19,7 @@ import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
 import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
+import { DescriptionType } from 'src/module/types/template/Description';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -27,8 +28,8 @@ export interface SheetItemData {
     type: string,
     name: string,
     system: SR5Item['system'],
-    properties: any,
-    description: any
+    properties: string[],
+    description: DescriptionType
 }
 
 export interface InventorySheetDataByType {
@@ -1084,7 +1085,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         //@ts-expect-error
         sheetItem.properties = chatData.properties;
 
-        return sheetItem as unknown as SheetItemData;
+        return sheetItem;
     }
 
     /**
@@ -1539,7 +1540,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * @param item
      */
     _addDragSupportToListItemTemplatePartial(i, item) {
-        if (item.dataset && item.dataset.itemId) {
+        if (item.dataset?.itemId) {
             item.setAttribute('draggable', true);
             item.addEventListener('dragstart', this._onDragStart.bind(this), false);
         }

@@ -9,3 +9,5 @@ export const DescriptionData = () => ({
 export const DescriptionPartData = () => ({
     description: new SchemaField(DescriptionData(), { required: true }),
 });
+
+export type DescriptionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof DescriptionData>>;
