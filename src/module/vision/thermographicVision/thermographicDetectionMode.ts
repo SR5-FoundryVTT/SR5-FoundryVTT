@@ -1,6 +1,6 @@
 import ThermographicVisionFilter from './thermographicFilter';
 
-export default class ThermographicVisionDetectionMode extends DetectionMode {
+export default class ThermographicVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
     static override getDetectionFilter() {
         return (this._detectionFilter ??= ThermographicVisionFilter.create());
     }

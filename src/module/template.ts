@@ -21,7 +21,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  * - cancel template preview on right click
  * 
  */
-export default class Template extends MeasuredTemplate {
+export default class Template extends foundry.canvas.placeables.MeasuredTemplate {
     // The source item of this template.
     // NOTE: This is never really used.
     item?: SR5Item;

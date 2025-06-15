@@ -1,7 +1,7 @@
 
 import AstralVisionFilter from './astralPerceptionFilter';
 
-export default class AstralPerceptionDetectionMode extends DetectionMode {
+export default class AstralPerceptionDetectionMode extends foundry.canvas.perception.DetectionMode {
     static override getDetectionFilter() {
         return (this._detectionFilter ??= AstralVisionFilter.create());
     }

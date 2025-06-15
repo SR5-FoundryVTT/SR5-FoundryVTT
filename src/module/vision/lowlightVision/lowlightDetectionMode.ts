@@ -3,7 +3,7 @@
 
 import LowLightVisionFilter from "./lowlightFilter";
 
-export default class LowlightVisionDetectionMode extends DetectionMode {
+export default class LowlightVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
 
     static override getDetectionFilter() {
         return this._detectionFilter ??= LowLightVisionFilter.create();

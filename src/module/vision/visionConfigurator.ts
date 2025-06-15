@@ -9,23 +9,23 @@ export default class VisionConfigurator {
         CONFIG.Canvas.detectionModes.astralPerception = new AstralPerceptionDetectionMode({
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
-            type: DetectionMode.DETECTION_TYPES.SIGHT,
+            type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
   
-        CONFIG.Canvas.visionModes.astralPerception = new VisionMode({
+        CONFIG.Canvas.visionModes.astralPerception = new foundry.canvas.perception.VisionMode({
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
             canvas: {
-                shader: ColorAdjustmentsSamplerShader,
+                shader: foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader,
                 uniforms: {
                     saturation: 5,
                     tint: AstralPerceptionBackgroundVisionShader.COLOR_TINT,
                 },
             },
             lighting: {
-                background: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
-                illumination: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
-                coloration: { visibility: VisionMode.LIGHTING_VISIBILITY.DISABLED },
+                background: { visibility: foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY.DISABLED },
+                illumination: { visibility: foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY.DISABLED },
+                coloration: { visibility: foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY.DISABLED },
             },
             vision: {
                 darkness: { adaptive: false },
@@ -38,7 +38,7 @@ export default class VisionConfigurator {
         CONFIG.Canvas.detectionModes.thermographic = new ThermographicVisionDetectionMode({
             id: 'thermographic',
             label: 'SR5.Vision.ThermographicVision',
-            type: DetectionMode.DETECTION_TYPES.SIGHT,
+            type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
     }
 
@@ -46,7 +46,7 @@ export default class VisionConfigurator {
         CONFIG.Canvas.detectionModes.lowlight = new LowlightVisionDetectionMode({
             id: 'lowlight',
             label: 'SR5.Vision.LowLight',
-            type: DetectionMode.DETECTION_TYPES.SIGHT,
+            type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
     }
 
@@ -54,7 +54,7 @@ export default class VisionConfigurator {
         CONFIG.Canvas.detectionModes.augmentedReality = new AugmentedRealityVisionDetectionMode({
             id: 'augmentedReality',
             label: 'SR5.Vision.AugmentedReality',
-            type: DetectionMode.DETECTION_TYPES.SIGHT,
+            type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
     }
 }

@@ -345,40 +345,40 @@ ___________________
 
         // Register sheets for collection documents.
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
-        Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet, {});
-        Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
+        foundry.documents.collections.Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet);
+        foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['critter', 'character']
         });
-        Actors.registerSheet(SYSTEM_NAME, SR5ICActorSheet, {
+        foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5ICActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['ic']
         });
-        Actors.registerSheet(SYSTEM_NAME, SR5VehicleActorSheet, {
+        foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5VehicleActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['vehicle']
         });
-        Actors.registerSheet(SYSTEM_NAME, SR5SpiritActorSheet, {
+        foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5SpiritActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['spirit']
         });
-        Actors.registerSheet(SYSTEM_NAME, SR5SpriteActorSheet, {
+        foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5SpriteActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['sprite']
         });
 
 
-        Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet, {});
-        Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {
+        foundry.documents.collections.Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet, {});
+        foundry.documents.collections.Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {
             label: "SR5.SheetItem",
             makeDefault: true
         });
-        Items.registerSheet(SYSTEM_NAME, SR5CallInActionSheet, {
+        foundry.documents.collections.Items.registerSheet(SYSTEM_NAME, SR5CallInActionSheet, {
             label: "SR5.SheetItem",
             makeDefault: true,
             types: ['call_in_action']

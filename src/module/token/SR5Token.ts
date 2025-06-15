@@ -1,7 +1,7 @@
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import { TrackType } from "../types/template/ConditionMonitors";
 
-export class SR5Token extends Token {
+export class SR5Token extends foundry.canvas.placeables.Token {
     override _drawBar(number: number, bar: PIXI.Graphics, data: NonNullable<ReturnType<TokenDocument['getBarAttribute']>>): boolean{
         const tokenHealthBars = game.settings.get(SYSTEM_NAME, FLAGS.TokenHealthBars);
         // FoundryVTT draws resource bars as full/good when the value is the
