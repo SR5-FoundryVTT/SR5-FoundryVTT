@@ -1,7 +1,7 @@
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { Helpers } from "../../helpers";
-import { SR5Item } from "../../item/SR5Item";
+import { SR5Item, SystemItem } from "../../item/SR5Item";
 import { onManageActiveEffect, onManageItemActiveEffect, prepareSortedItemEffects, prepareSortedEffects } from "../../effects";
 import { SR5 } from "../../config";
 import { SkillEditSheet } from "../../apps/skills/SkillEditSheet";
@@ -20,6 +20,7 @@ import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
 import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import { DescriptionType } from 'src/module/types/template/Description';
+import { ChatData } from 'src/module/item/ChatData';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -1076,14 +1077,15 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param item: The item to transform into a 'sheet item'
      */
-    async _prepareSheetItem(item: SR5Item): Promise<SheetItemData> {
+    async _prepareSheetItem<SI extends SystemItem>(item: SR5Item<SI>): Promise<SheetItemData> {
         // Copy derived schema data instead of source data (false)
         const sheetItem = item.toObject(false) as unknown as SheetItemData;
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
-        //@ts-expect-error
-        sheetItem.properties = chatData.properties;
+
+        // Add additional chat data fields depending on item type.
+        sheetItem.properties = ChatData[item.type as SI](item, item.labels).filter(Boolean);
 
         return sheetItem;
     }

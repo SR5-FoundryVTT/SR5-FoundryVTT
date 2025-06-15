@@ -7,7 +7,6 @@ import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
 import { MatrixRules } from "../rules/MatrixRules";
 import { TestCreator } from "../tests/TestCreator";
-import { ChatData } from './ChatData';
 import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
 import { HostDataPreparation } from "./prep/HostPrep";
 import RollEvent = Shadowrun.RollEvent;
@@ -67,7 +66,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     items: SR5Item[] = [];
 
     // Item Sheet labels for quick info on an item dropdown.
-    labels: {} = {};
+    labels: { roll?: string; opposedRoll?: string } = {};
     descriptionHTML: string | undefined;
 
     /**
@@ -274,14 +273,6 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
         if (!system.description.value) system.description.value = '';
         system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions });
-
-        const props: string[] = [];
-        // Add additional chat data fields depending on item type.
-        const chatDataForItemType = ChatData[this.type];
-        if (chatDataForItemType) chatDataForItemType(system, labels, props, this);
-
-        //@ts-expect-error TODO: foundry-vtt-types v10
-        system.properties = props.filter((p) => !!p);
 
         return system;
     }
