@@ -373,7 +373,7 @@ ___________________
         });
 
 
-        foundry.documents.collections.Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet, {});
+        foundry.documents.collections.Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet);
         foundry.documents.collections.Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {
             label: "SR5.SheetItem",
             makeDefault: true
@@ -385,7 +385,7 @@ ___________________
         });
 
         // Register configs for embedded documents.
-        foundry.applications.apps.DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', foundry.applications.sheets.ActiveEffectConfig, {});
+        foundry.applications.apps.DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', foundry.applications.sheets.ActiveEffectConfig);
         foundry.applications.apps.DocumentSheetConfig.registerSheet(ActiveEffect, SYSTEM_NAME, SR5ActiveEffectConfig, {
             makeDefault: true
         })
