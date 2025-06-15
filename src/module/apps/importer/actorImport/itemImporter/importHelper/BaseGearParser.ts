@@ -22,15 +22,15 @@ export class BaseGearParser implements GearParser {
         const parserType = 'equipment';
         parsedGear.name = chummerGear.name;
         if (chummerGear.extra)
-        {
             parsedGear.name += ` (${chummerGear.extra})`;
-        }
 
-        parsedGear.system.technology = parseTechnology(chummerGear);
-        parsedGear.system.description = parseDescription(chummerGear);
+        const system = parsedGear.system as Item.SystemOfType<'equipment'>;
+
+        system.technology = parseTechnology(chummerGear);
+        system.description = parseDescription(chummerGear);
 
         // Assign import flags
-        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name), parserType);
+        system.importFlags = genImportFlags(formatAsSlug(chummerGear.name), parserType);
 
         return parsedGear;
     }
@@ -42,6 +42,6 @@ export class BaseGearParser implements GearParser {
     }
 
     private getDefaultData() {
-        return DataDefaults.baseEntityData<Shadowrun.EquipmentItemData, Shadowrun.EquipmentData>("Item", {type: 'equipment'});
+        return DataDefaults.baseEntityData("equipment");
     }
 }

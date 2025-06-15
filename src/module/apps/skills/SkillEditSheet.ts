@@ -1,9 +1,9 @@
-import SkillEditFormData = Shadowrun.SkillEditFormData;
-import {SR5Actor} from "../../actor/SR5Actor";
-import {SR5} from "../../config";
+import { SR5 } from "../../config";
+import { SR5Actor } from "../../actor/SR5Actor";
 import { LinksHelpers } from "../../utils/links";
-import { parseDropData } from "../../utils/sheets";
 import { Translation } from '../../utils/strings';
+import { parseDropData } from "../../utils/sheets";
+
 
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
@@ -100,10 +100,7 @@ export class SkillEditSheet extends DocumentSheet {
         if (event.currentTarget.name === 'skill.base') updateData[this._updateString()].base = base;
     }
 
-
-    /** @override */
-    // @ts-expect-error // SkillEditSheet vs DocumentSheet typing, I don't quite get it...
-    async _updateObject(event, formData) {
+    override async _updateObject(event, formData) {
         // Without an actual input field used, avoid a unneeded update...
         // ...the update would happen due to how _onUpdateObject works.
         if (event.currentTarget) {
@@ -217,17 +214,15 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
-    // @ts-expect-error // Missing DocumentSheetData typing
-    getData(): SkillEditFormData {
-        const data = super.getData();
+    override getData() {
+        const data = super.getData() as any;
 
-        //@ts-expect-error TODO: foundry-vtt-types v10'
         // skill property will hold a direct skill reference
         data['skill'] = foundry.utils.getProperty(data.data, this._updateString());
         data['editable_name'] = this._allowSkillNameEditing();
         data['editable_canDefault'] = true;
         data['editable_attribute'] = true;
         data['attributes'] = this._getSkillAttributesForSelect();
-        return data as unknown as SkillEditFormData;
+        return data;
     }
 }

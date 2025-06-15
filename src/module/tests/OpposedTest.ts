@@ -1,14 +1,16 @@
-import {SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments, TestOptions} from "./SuccessTest";
-import {DataDefaults} from "../data/DataDefaults";
-import {TestCreator} from "./TestCreator";
-import {SR5Item} from "../item/SR5Item";
-import {PartsList} from "../parts/PartsList";
+import { SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments, TestOptions } from "./SuccessTest";
+import { DataDefaults } from "../data/DataDefaults";
+import { TestCreator } from "./TestCreator";
+import { SR5Item } from "../item/SR5Item";
+import { PartsList } from "../parts/PartsList";
 import { Helpers } from "../helpers";
+import { ValueFieldType } from "../types/template/Base";
+import { SR5Actor } from "../actor/SR5Actor";
 
 
 export interface OpposedTestValues extends SuccessTestValues {
     // The calculated overall netHits of the active vs opposed test pair.
-    againstNetHits: Shadowrun.ValueField
+    againstNetHits: ValueFieldType;
 }
 
 export interface OpposedTestData extends
@@ -46,7 +48,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         delete data.targetActorsUuid;
 
         data.values = data.values || {};
-        data.values.againstNetHits = DataDefaults.valueData({label: 'SR5.NetHits'});
+        data.values.againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits'});
 
         return data;
     }
@@ -74,12 +76,12 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      */
     calculateAgainstNetHits() {
         const base = Math.max(this.against.hits.value - this.hits.value, 0);
-        const againstNetHits = DataDefaults.valueData({label: 'SR5.NetHits', base});
+        const againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits', base});
         againstNetHits.value = Helpers.calcTotal(againstNetHits, {min: 0});
         return againstNetHits;
     }
 
-    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor, previousMessageId: string): Promise<OpposedTestData | undefined> {
+    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;
@@ -99,9 +101,9 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
             previousMessageId,
 
-            pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
-            limit: DataDefaults.valueData({label: 'SR5.Limit'}),
-            threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
+            pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
+            limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
+            threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),
             //@ts-expect-error
             values: {},
 
@@ -116,7 +118,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
         // Casting an opposed action doesn't give as complete ActionData from the original.
         // Therefore we must create an empty dummy action.
-        let action = DataDefaults.actionRollData();
+        let action = DataDefaults.createData('action_roll');
 
         // Allow the OpposedTest to overwrite action data using its class default action.
         action = TestCreator._mergeMinimalActionDataInOrder(action,
@@ -130,12 +132,11 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         if (againstData.sourceItemUuid) {
             const item = await fromUuid(againstData.sourceItemUuid) as SR5Item;
             if (item) {
-                const itemAction = await this._getDocumentTestAction(item, actor);
+                const itemAction = this._getDocumentTestAction(item, actor);
                 action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
             }
         }
 
-        //@ts-expect-error
         return await this._prepareActionTestData(action, actor, data);
     }
 
@@ -177,7 +178,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     /**
      * Derived net hits of the active vs opposed test pair.
      */
-    get againstNetHits(): Shadowrun.ValueField {
+    get againstNetHits(): ValueFieldType {
         return this.data.values.againstNetHits;
     }
 

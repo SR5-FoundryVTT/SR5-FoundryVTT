@@ -1,48 +1,50 @@
-/// <reference path="../Shadowrun.ts" />
-declare namespace Shadowrun {
-    export type Tracks = {
-        physical: PhysicalTrack;
-        stun: StunTrack;
-    };
+import { ValueMaxPair, ModifiableValue } from "./Base";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-    export type MatrixTracks = {
-        matrix: MatrickTrack
-    }
+const Living = () => ({
+    wounds: new NumberField({ required: true, nullable: false, initial: 0 }),
+    pain_tolerance: new NumberField({ required: true, nullable: false, initial: 0 }),
+});
 
-    /**
-     * Individual tracks with additional fields depending on track use case and rules
-     */
-    export type PhysicalTrack = OverflowTrackType & Living;
-    export type StunTrack = TrackType & Living;
-    export type MatrickTrack = TrackType;
+const Overflow = () => ({
+    overflow: new SchemaField(ValueMaxPair()),
+});
 
-    /**
-     * These kinds of tracks are the basis for all other tracks.
-     */
-    export type TrackType = 
-        ValueMaxPair<number> &
-        LabelField &
-        DisableField &
-        ModifiableValue
-    /**
-     * A basic track including overflow handling.
-     */
-    export type OverflowTrackType = TrackType & Overflow;
+export const Track = () => ({
+    ...ValueMaxPair(),
+    ...ModifiableValue(),
+    base: new NumberField({ required: true, nullable: false, initial: 0 }), // Does if use it?
+    label: new StringField({ required: true, initial: '' }),
+    disabled: new BooleanField({ required: false, initial: false })
+});
 
-    /**
-     * Add overflow fields to a TrackType
-     */
-    export type Overflow = {
-        overflow: ValueMaxPair<number>;
-    };
+export const OverflowTrack = () => ({
+    ...Track(),
+    ...Overflow(),
+});
 
-    /**
-     * Add wound / pain / living fields to a TrackType
-     */
-    export type Living = {
-        // Amount of wounds for this track, will be used to calculate wound modifier.
-        wounds: number
-        // Pain tolerance for this track, will be used to calculate ignored damage for wound modifier.
-        pain_tolerance: number
-    }
-}
+export const PhysicalTrack = () => ({
+    ...OverflowTrack(),
+    ...Living(),
+});
+
+export const StunTrack = () => ({
+    ...Track(),
+    ...Living(),
+});
+
+export const MatrickTrack = () => ({
+    ...Track()
+});
+
+export const MatrixTracks = () => ({
+    matrix: new SchemaField(MatrickTrack())
+});
+
+export const Tracks = () => ({
+    stun: new SchemaField(StunTrack()),
+    physical: new SchemaField(PhysicalTrack()),
+});
+
+export type TrackType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof Track>>;
+export type OverflowTrackType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof OverflowTrack>>;

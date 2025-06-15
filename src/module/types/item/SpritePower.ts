@@ -1,15 +1,22 @@
-/// <reference path="../Shadowrun.ts" />
-declare namespace Shadowrun {
-    export interface SpritePowerData extends
-        SpritePowerPartData,
-        ActionPartData,
-        ImportFlags,
-        DescriptionPartData {
-    }
+import { ActionPartData } from "./Action";
+import { ImportFlags } from "../template/ImportFlags";
+import { DescriptionPartData } from "../template/Description";
+const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
-    export interface SpritePowerPartData {
-        duration: keyof typeof SR5CONFIG.spritePower.durations;
-        optional: keyof typeof SR5CONFIG.spritePower.optional;
-        enabled: boolean
+const SpritePowerData = {
+    ...DescriptionPartData(),
+    ...ActionPartData(),
+    ...ImportFlags(),
+    duration: new StringField({ required: true, initial: '' }),
+    optional: new StringField({ required: true, initial: '' }),
+    enabled: new BooleanField({ required: true, initial: false }),
+}
+
+
+export class SpritePower extends foundry.abstract.TypeDataModel<typeof SpritePowerData, Item.Implementation> {
+    static override defineSchema() {
+        return SpritePowerData;
     }
 }
+
+console.log("SpritePowerData", SpritePowerData, new SpritePower());

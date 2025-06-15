@@ -21,7 +21,6 @@ export class ChangelogApplication extends Application {
 
     // Let the async operation happen in background.
     private static setRenderForCurrentVersion() {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         game.user?.setFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion, game.system.version);
     }
 
@@ -29,7 +28,6 @@ export class ChangelogApplication extends Application {
         if (!game.user?.isGM || !game.user?.isTrusted) return false;
 
         const shownForVersion = game.user?.getFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion);
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         return shownForVersion !== game.system.version;
     }
 }
