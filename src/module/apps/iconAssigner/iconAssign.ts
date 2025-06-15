@@ -26,7 +26,7 @@ export async function getIconFiles(): Promise<string[]> {
 export function iconAssign(
     importFlags: ImportFlagType,
     iconList: string[],
-    system?: Actor.SystemOfType<Actor.SubType> | Item.SystemOfType<Item.SubType>,
+    system?: (Actor.CreateData | Item.CreateData)['system'],
 ): string {
 
     const defaultImg = "icons/svg/item-bag.svg";
