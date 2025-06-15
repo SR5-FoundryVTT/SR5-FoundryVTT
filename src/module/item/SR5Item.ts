@@ -267,19 +267,16 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
      * @returns 
      */
     async getChatData(htmlOptions = {}) {
-        const system = foundry.utils.duplicate(this.system) as Item.SystemOfType<SystemItem>;
-        const { labels } = this;
-        if (!system.description) system.description = { chat: '', source: '', value: '' };
-        // TextEditor.enrichHTML will return null as a string, making later handling difficult.
-        if (!system.description.value) system.description.value = '';
-        system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions });
+        const system = foundry.utils.duplicate(this.system) as SR5Item['system'];
+
+        system.description.value = await foundry.applications.ux.TextEditor.implementation.enrichHTML(system.description.value, { ...htmlOptions });
 
         return system;
     }
 
     getActionTestName(): string {
         const testName = this.getRollName();
-        return testName ? testName : game.i18n.localize('SR5.Action');
+        return testName || game.i18n.localize('SR5.Action');
     }
 
     /**

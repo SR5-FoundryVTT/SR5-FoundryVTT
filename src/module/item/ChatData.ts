@@ -15,10 +15,10 @@ import { SR5Item, SystemItem } from './SR5Item';
  * These info boxes will be shown in a few places, most notibly the chat message but also
  * - actor sheets
  */
-export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['labels']) => string[] } = {
-    action: (item: SR5Item<'action'>, labels: SR5Item['labels']) => {
+export const ChatData: { [K in SystemItem]: (item: SR5Item<K>) => string[] } = {
+    action: (item: SR5Item<'action'>) => {
         const props: string[] = [];
-        const system = item.system;
+        const { system, labels } = item;
 
         if (system.action) {
             const labelStringList: string[] = [];
@@ -108,15 +108,15 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         return props;
     },
 
-    adept_power: (item: SR5Item<'adept_power'>, labels: SR5Item['labels']) => {
+    adept_power: (item: SR5Item<'adept_power'>) => {
         const system = item.system;
-        const props = [...ChatData.action(item as any, labels)];
+        const props = [...ChatData.action(item as any)];
         props.push(`${game.i18n.localize('SR5.PP')} ${system.pp}`);
         props.push(Helpers.label(game.i18n.localize(SR5.adeptPower.types[system.type])));
         return props;
     },
 
-    ammo: (item: SR5Item<'ammo'>, labels: SR5Item['labels']) => {
+    ammo: (item: SR5Item<'ammo'>) => {
         const system = item.system;
         const props: string[] = [];
         if (system.damageType) props.push(`${game.i18n.localize("SR5.DamageType")} ${game.i18n.localize(SR5.damageTypes[system.damageType])}`);
@@ -128,7 +128,7 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         return props;
     },
 
-    armor: (item: SR5Item<'armor'>, labels: SR5Item['labels']) => {
+    armor: (item: SR5Item<'armor'>) => {
         const system = item.system;
         const props: string[] = [];
         if (system.armor) {
@@ -142,14 +142,14 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         return props;
     },
 
-    bioware: (item: SR5Item<'bioware'>, labels: SR5Item['labels']) => {
+    bioware: (item: SR5Item<'bioware'>) => {
         const system = item.system;
-        const props: string[] = [...ChatData.action(item as any, labels), ...ChatData.armor(item as any, labels)];
+        const props: string[] = [...ChatData.action(item as any), ...ChatData.armor(item as any)];
         if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.technology.calculated.essence.value}`);
         return props;
     },
 
-    call_in_action: (item: SR5Item<'call_in_action'>, labels: SR5Item['labels']) => {
+    call_in_action: (item: SR5Item<'call_in_action'>) => {
         const props: string[] = [];
         const system = item.system;
         if (system.actor_type === 'sprite') {
@@ -162,7 +162,7 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         return props;
     },
 
-    contact: (item: SR5Item<'contact'>, labels: SR5Item['labels']) => {
+    contact: (item: SR5Item<'contact'>) => {
         const props: string[] = [];
         const system = item.system;
         props.push(system.type);
@@ -177,18 +177,18 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         return props;
     },
 
-    critter_power: (item: SR5Item<'critter_power'>, labels: SR5Item['labels']) => {
+    critter_power: (item: SR5Item<'critter_power'>) => {
         const props: string[] = [];
         const system = item.system;
         props.push(game.i18n.localize(SR5.critterPower.types[system.powerType]));
         props.push(game.i18n.localize(SR5.critterPower.durations[system.duration]));
         props.push(game.i18n.localize(SR5.critterPower.ranges[system.range]));
         if (system.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
-        return [...props, ...ChatData.action(item as any, labels)];
+        return [...props, ...ChatData.action(item as any)];
     },
 
-    complex_form: (item: SR5Item<'complex_form'>, labels: SR5Item['labels']) => {
-        const props = ChatData.action(item as any, labels);
+    complex_form: (item: SR5Item<'complex_form'>) => {
+        const props = ChatData.action(item as any);
 
         const system = item.system;
         props.push(game.i18n.localize(SR5.matrixTargets[system.target]));
@@ -202,14 +202,14 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         return props;
     },
 
-    cyberware: (item: SR5Item<'cyberware'>, labels: SR5Item['labels']) => {
+    cyberware: (item: SR5Item<'cyberware'>) => {
         const system = item.system;
-        const props = [...ChatData.action(item as any, labels), ...ChatData.armor(item as any, labels)];
+        const props = [...ChatData.action(item as any), ...ChatData.armor(item as any)];
         if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.technology.calculated.essence.value}`);
         return props;
     },
 
-    device: (item: SR5Item<'device'>, labels: SR5Item['labels']) => {
+    device: (item: SR5Item<'device'>) => {
         const system = item.system;
         const props: string[] = [];
         if (system.technology?.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
@@ -229,18 +229,18 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         return props;
     },
 
-    echo: (item: SR5Item<'echo'>, labels: SR5Item['labels']) => { return []; },
+    echo: (item: SR5Item<'echo'>) => { return []; },
 
-    equipment: (item: SR5Item<'equipment'>, labels: SR5Item['labels']) => {
-        const props = ChatData.action(item as any, labels);
+    equipment: (item: SR5Item<'equipment'>) => {
+        const props = ChatData.action(item as any);
         const system = item.system;
         if (system.technology?.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
         return props;
     },
 
-    host: (item: SR5Item<'host'>, labels: SR5Item['labels']) => { return []; },
+    host: (item: SR5Item<'host'>) => { return []; },
 
-    lifestyle: (item: SR5Item<'lifestyle'>, labels: SR5Item['labels']) => {
+    lifestyle: (item: SR5Item<'lifestyle'>) => {
         const system = item.system;
         const props: string[] = [];
         props.push(game.i18n.localize(SR5.lifestyleTypes[system.type]));
@@ -252,32 +252,32 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         return props;
     },
 
-    metamagic: (item: SR5Item<'metamagic'>, labels: SR5Item['labels']) => { return []; },
+    metamagic: (item: SR5Item<'metamagic'>) => { return []; },
 
-    modification: (item: SR5Item<'modification'>, labels: SR5Item['labels']) => { return []; },
+    modification: (item: SR5Item<'modification'>) => { return []; },
     
-    program: (item: SR5Item<'program'>, labels: SR5Item['labels']) => {
+    program: (item: SR5Item<'program'>) => {
         return [game.i18n.localize(SR5.programTypes[item.system.type])];
     },
 
-    quality: (item: SR5Item<'quality'>, labels: SR5Item['labels']) => {
+    quality: (item: SR5Item<'quality'>) => {
         const system = item.system;
-        const props = ChatData.action(item as any, labels);
+        const props = ChatData.action(item as any);
         props.push(Helpers.label(game.i18n.localize(SR5.qualityTypes[system.type])));
         if (system.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
         return props;
     },
 
-    ritual: (item: SR5Item<'ritual'>, labels: SR5Item['labels']) => {
+    ritual: (item: SR5Item<'ritual'>) => {
         const system = item.system;
         const props: string[] = [];
         props.push(game.i18n.localize(SR5.spellTypes[system.type]));
         props.push(system.descriptors);
 
-        return [...props, ...ChatData.action(item as any, labels)];
+        return [...props, ...ChatData.action(item as any)];
     },
 
-    sin: (item: SR5Item<'sin'>, labels: SR5Item['labels']) => {
+    sin: (item: SR5Item<'sin'>) => {
         const system = item.system;
         const props: string[] = [];
         // Avoid displaying rating null (empty input field) and rating 0.
@@ -289,7 +289,7 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
     },
 
     // add properties for spell data, follow order in book
-    spell: (item: SR5Item<'spell'>, labels: SR5Item['labels']) => {
+    spell: (item: SR5Item<'spell'>) => {
         const system = item.system;
         const props: string[] = [];
         // first category and type
@@ -316,7 +316,7 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         props.push(game.i18n.localize(SR5.spellRanges[system.range]));
 
         // add action data
-        props.push(...ChatData.action(item as any, labels));
+        props.push(...ChatData.action(item as any));
 
         // add duration data
         props.push(game.i18n.localize(SR5.durations[system.duration]));
@@ -327,18 +327,18 @@ export const ChatData: { [K in SystemItem]: (item: SR5Item<K>, labels: SR5Item['
         else if (drain < 0) props.push(game.i18n.format('SR5.QuickInfo.DrainForce', {sign: '', drain}));
         else props.push(game.i18n.format('SR5.QuickInfo.DrainForce', {sign: '', drain: ''}));
 
-        labels.roll = 'Cast';
+        item.labels.roll = 'Cast';
         return props;
     },
 
-    sprite_power: (item: SR5Item<'sprite_power'>, labels: SR5Item['labels']) => {
+    sprite_power: (item: SR5Item<'sprite_power'>) => {
         // add action data
-        return ChatData.action(item as any, labels);
+        return ChatData.action(item as any);
     },
 
-    weapon: (item: SR5Item<'weapon'>, labels: SR5Item['labels']) => {
+    weapon: (item: SR5Item<'weapon'>) => {
         const system = item.system;
-        const props = ChatData.action(item as any, labels);
+        const props = ChatData.action(item as any);
         for (let i = 0; i < props.length; i++) {
             const prop = props[i];
             if (prop.includes('Limit')) {

@@ -1085,7 +1085,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         sheetItem.description = chatData.description;
 
         // Add additional chat data fields depending on item type.
-        sheetItem.properties = ChatData[item.type as SI](item, item.labels).filter(Boolean);
+        sheetItem.properties = ChatData[item.type as SI](item).filter(Boolean);
 
         return sheetItem;
     }
