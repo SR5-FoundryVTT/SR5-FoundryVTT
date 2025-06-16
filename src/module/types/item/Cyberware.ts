@@ -1,5 +1,5 @@
 import { ArmorPartData } from "./Armor";
-import { ActionPartData } from "./Action";
+import { Action, ActionPartData } from "./Action";
 import { ImportFlags } from "../template/ImportFlags";
 import { TechnologyPartData } from "../template/Technology";
 import { DescriptionPartData } from "../template/Description";
@@ -16,7 +16,7 @@ const CyberwareData = {
     grade: new StringField({
         required: true,
         initial: 'standard',
-        choices: ['alpha', 'beta', 'delta', 'gamma', 'standard'],
+        choices: ['alpha', 'beta', 'delta', 'gamma', 'standard', 'used'],
     }),
 }
 
@@ -24,6 +24,16 @@ const CyberwareData = {
 export class Cyberware extends foundry.abstract.TypeDataModel<typeof CyberwareData, Item.Implementation> {
     static override defineSchema() {
         return CyberwareData;
+    }
+
+    static override migrateData(source) {
+        Action.migrateData(source);
+
+        const result = source as foundry.data.fields.SchemaField.InitializedData<typeof CyberwareData>;
+        if (!(CyberwareData.grade.choices as string[]).includes(source.grade))
+            result.grade = 'standard';
+
+        return super.migrateData(source);
     }
 }
 

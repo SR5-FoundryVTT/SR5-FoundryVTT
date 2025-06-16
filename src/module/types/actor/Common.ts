@@ -237,3 +237,4 @@ export const CommonData = () => ({
 export type MatrixType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixData>>;
 export type InventoryType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof InventoryData>>;
 export type InventoriesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof CommonData>>['inventories'];
+

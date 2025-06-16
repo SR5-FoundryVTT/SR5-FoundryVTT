@@ -1,5 +1,5 @@
 import { ArmorPartData } from "./Armor";
-import { ActionPartData } from "./Action";
+import { Action, ActionPartData } from "./Action";
 import { ImportFlags } from "../template/ImportFlags";
 import { TechnologyPartData } from "../template/Technology";
 import { DescriptionPartData } from "../template/Description";
@@ -16,7 +16,7 @@ const BiowareData = {
     grade: new StringField({
         required: true,
         initial: 'standard',
-        choices: ['alpha', 'beta', 'delta', 'gamma', 'standard'],
+        choices: ['alpha', 'beta', 'delta', 'gamma', 'standard', 'used'],
     }),
 }
 
@@ -24,6 +24,16 @@ const BiowareData = {
 export class Bioware extends foundry.abstract.TypeDataModel<typeof BiowareData, Item.Implementation> {
     static override defineSchema() {
         return BiowareData;
+    }
+
+    static override migrateData(source) {
+        Action.migrateData(source);
+
+        const result = source as foundry.data.fields.SchemaField.InitializedData<typeof BiowareData>;
+        if (!(BiowareData.grade.choices as string[]).includes(source.grade))
+            result.grade = 'standard';
+
+        return super.migrateData(source);
     }
 }
 

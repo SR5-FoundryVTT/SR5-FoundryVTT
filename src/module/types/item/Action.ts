@@ -117,18 +117,24 @@ const ActionData = {
     result: new SchemaField(ActionResultData()),
 };
 
-
-export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, Item.Implementation> {
-    static override defineSchema() {
-        return ActionData;
-    }
-};
-
-console.log("ActionData", ActionData, new Action());
-
 export type DamageType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof DamageData>>;
 export type ActionRollType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionRollData>>;
 export type OpposedTestType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof OpposedTestData>>;
 export type ActionResultType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionResultData>>;
 export type ResultActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ResultActionData>>;
 export type MinimalActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MinimalActionData>>;
+
+export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, Item.Implementation> {
+    static override defineSchema() {
+        return ActionData;
+    }
+
+    static override migrateData(source) {
+        const result = source as foundry.data.fields.SchemaField.InitializedData<typeof ActionData>;
+        if (source.action.damage.base_formula_operator === '+')
+            result.action.damage.base_formula_operator = 'add';
+        return super.migrateData(source);
+    }
+};
+
+console.log("ActionData", ActionData, new Action());
