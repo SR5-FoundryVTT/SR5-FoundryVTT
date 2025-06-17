@@ -31,8 +31,10 @@ import { ActiveEffectConfigV1 } from "./ActiveEffectConfigV1";
  */
 export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
     declare object: SR5ActiveEffect;
-    // @ts-expect-error Foundry v13 This is not type issue, but a type override for legacy Application v1 support...
-    override document: SR5ActiveEffect;
+
+    public override get document(): SR5ActiveEffect {
+        return super.document as SR5ActiveEffect;
+    }
 
     override get template(): string {
         return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
