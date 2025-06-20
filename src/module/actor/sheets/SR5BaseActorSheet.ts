@@ -486,7 +486,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param event
      */
-    override async _onDrop(event: DragEvent) {
+    override async _onDrop(event: DragEvent): Promise<unknown> {
         event.preventDefault();
         event.stopPropagation();
 
@@ -519,7 +519,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             }
         }
         // Keep upstream document created for actions base on it.
-        const documents = await super._onDrop(event);
+        const documents = await (super._onDrop(event) as unknown as Promise<unknown>);
 
         // Handle specific system drop events.
         // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));

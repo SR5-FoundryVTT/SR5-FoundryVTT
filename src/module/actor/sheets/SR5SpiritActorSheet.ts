@@ -50,7 +50,6 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     /**
      * Spirit actors have additional drop cases to handle.
      */
-    // @ts-expect-error TODO: foundry-vtt-types _onDrop returns void but should return array of documents.
     override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();

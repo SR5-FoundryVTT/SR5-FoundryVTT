@@ -38,7 +38,7 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
     /**
      * Sprites have support for dropping actors onto them.
      */
-    override async _onDrop(event: DragEvent): Promise<void> {
+    override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
