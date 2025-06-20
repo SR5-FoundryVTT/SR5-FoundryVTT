@@ -434,7 +434,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
      * Add buttons to both show and open global modifiers currently applied to this token when showing the
      * tokenHUD.
      */
-    static onRenderTokenHUD(app: TokenHUD, html: JQuery, data: any) {
+    static onRenderTokenHUD(app: foundry.applications.hud.TokenHUD, html: JQuery, data: any) {
         if (!data._id) return;
 
         // Generate general structure for ModifierHandlers to connect to.

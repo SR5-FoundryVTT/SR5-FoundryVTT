@@ -1,6 +1,4 @@
-import { group } from "console";
 import { ModifiableValue, KeyValuePair } from "./Base";
-import { track } from "node_modules/fvtt-types/src/foundry/common/prosemirror/schema/other.mjs";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
@@ -35,8 +33,8 @@ export const Skills = () => new TypedObjectField(
             automatics: skill({ name: 'automatics', attribute: 'agility', group: 'Firearms' }),
             blades: skill({ name: 'blades', attribute: 'agility', group: 'Close Combat' }),
             clubs: skill({ name: 'clubs', attribute: 'agility', group: 'Close Combat' }),
-            exotic_melee: skill({ name: 'exotic_melee', attribute: 'agility', group: 'Close Combat', canDefault: false }),
-            exotic_range: skill({ name: 'exotic_range', attribute: 'agility', group: 'Firearms', canDefault: false }),
+            exotic_melee: skill({ name: 'exotic_melee', attribute: 'agility', group: 'Close Combat', canDefault: false }), // how to deal with exotic melee weapons?
+            exotic_range: skill({ name: 'exotic_range', attribute: 'agility', group: 'Firearms', canDefault: false }), // how to deal with exotic ranged weapons?
             heavy_weapons: skill({ name: 'heavy_weapons', attribute: 'agility', group: 'Firearms' }),
             longarms: skill({ name: 'longarms', attribute: 'agility', group: 'Firearms' }),
             pistols: skill({ name: 'pistols', attribute: 'agility', group: 'Firearms' }),
@@ -118,7 +116,7 @@ export const Skills = () => new TypedObjectField(
             pilot_walker: skill({ name: 'pilot_walker', attribute: 'reaction', canDefault: false }),
             pilot_ground_craft: skill({ name: 'pilot_ground_craft', attribute: 'reaction' }),
             pilot_water_craft: skill({ name: 'pilot_water_craft', attribute: 'reaction' }),
-            pilot_exotic_vehicle: skill({ name: 'pilot_exotic_vehicle', attribute: 'reaction', canDefault: false }),
+            pilot_exotic_vehicle: skill({ name: 'pilot_exotic_vehicle', attribute: 'reaction', canDefault: false }), // how to deal with exotic vehicles?
         }
     }
 );

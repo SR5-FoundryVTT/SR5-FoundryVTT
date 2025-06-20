@@ -1,3 +1,4 @@
+import { Quench } from "@ethaks/fvtt-quench";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5ChatMessage } from "../chatMessage/SR5ChatMessage";
@@ -181,9 +182,21 @@ declare module "fvtt-types/configuration" {
         };
     }
 
-    type RecursivePartial<T> = {
-        [P in keyof T]?: RecursivePartial<T[P]>;
-    };
+    namespace Hooks {
+        interface HookConfig {
+            SR5_CastItemAction: (arg0: SR5Item) => void;
+            SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
+            getSceneControlButtons: (arg0: any) => void;
+            getCombatTrackerEntryContext: (arg0: any, arg1: any) => void;
+            renderCompendiumDirectory: (arg0: foundry.appv1.api.Application, arg1: HTMLElement) => void;
+            renderTokenHUD: (arg0: foundry.applications.hud.TokenHUD, arg1: JQuery, arg2: any) => void;
+            updateItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
+            deleteItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
+            getChatMessageContextOptions: (args0: any, args1: any) => void;
+            quenchReady: (args0: Quench) => void;
+            renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
+        }
+    }
 
     namespace ActiveEffect {
         interface ChangeData {

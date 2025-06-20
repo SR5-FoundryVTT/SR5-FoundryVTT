@@ -488,7 +488,7 @@ ___________________
      * @param html HTML element of the app
      * @returns 
      */
-    static renderCompendiumDirectory(app: Application, html: HTMLElement) {
+    static renderCompendiumDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
         if (!game.user?.isGM) {
             return;
         }
