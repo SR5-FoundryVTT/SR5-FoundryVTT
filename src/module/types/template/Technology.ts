@@ -7,10 +7,10 @@ export const TechnologyData = () => ({
     availability: new StringField({ required: true, initial: '' }),
     quantity: new NumberField({ required: true, nullable: false, initial: 0 }),
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
-    equipped: new BooleanField({ initial: false }),
+    equipped: new BooleanField({ required: true, initial: false }),
     conceal: new SchemaField(ModifiableValue()),
     condition_monitor: new SchemaField(ConditionData()),
-    wireless: new BooleanField({ required: false, initial: false }),
+    wireless: new BooleanField({ required: true, initial: true }),
     networkController: new StringField({ required: false, initial: '' }),
     calculated: new SchemaField({
         essence: new SchemaField({

@@ -10,9 +10,10 @@ const BaseArmorData = () => ({
 export const ActorArmorData = () => ({
     ...BaseArmorData(),
     fire: new NumberField({ required: true, nullable: false, initial: 0 }),
-    electric: new NumberField({ required: true, nullable: false, initial: 0 }),
+    electricity: new NumberField({ required: true, nullable: false, initial: 0 }),
     cold: new NumberField({ required: true, nullable: false, initial: 0 }),
     acid: new NumberField({ required: true, nullable: false, initial: 0 }),
+    radiation: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 export type BaseArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BaseArmorData>>;

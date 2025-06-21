@@ -36,13 +36,13 @@ export const DamageData = () => ({
         base: new StringField({
             blank: true,
             required: true,
-            initial: 'physical',
+            initial: '',
             choices: ["physical", "matrix", "stun", ""]
         }),
         value: new StringField({
             blank: true,
             required: true,
-            initial: 'physical',
+            initial: '',
             choices: ["physical", "matrix", "stun", ""]
         }),
     }),
@@ -72,19 +72,25 @@ export const DamageData = () => ({
 export const OpposedTestData = () => ({
     type: new StringField({ required: true, initial: '' }),
     description: new StringField({ required: true, initial: '' }),
-    mod: new NumberField({ required: true, nullable: false, initial: 0 }), // Does it use it?
-    skill: new StringField({ required: true, initial: '' }), // Does it use it?
-    attribute: new StringField({ required: true, initial: '' }), // Does it use it?
-    attribute2: new StringField({ required: true, initial: '' }), // Does it use it?
-    test: new StringField({ required: true, initial: '' }), // Does it use it?
-    resist: new SchemaField({ // Does it use it?
+    mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+    skill: new StringField({ required: true, initial: '' }),
+    attribute: new StringField({ required: true, initial: '' }),
+    attribute2: new StringField({ required: true, initial: '' }),
+    armor: new BooleanField({ required: true, initial: false }),
+    test: new StringField({ required: true, initial: '' }),
+    resist: new SchemaField({
+        skill: new StringField({ required: true, initial: '' }),
+        mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+        attribute: new StringField({ required: true, initial: '' }),
+        attribute2: new StringField({ required: true, initial: '' }),
+        armor: new BooleanField({ required: true, initial: false }),
         test: new StringField({ required: true, initial: '' }),
     }),
 });
 
 export const ActionRollData = () => ({
     ...MinimalActionData(),
-    test: new StringField({ required: true, initial: '' }),
+    test: new StringField({ required: true, initial: 'SuccessTest' }),
     type: new StringField({ required: true, initial: '' }),
     categories: new ArrayField(new StringField({ required: true, initial: '' })),
     spec: new BooleanField({ required: true, initial: false }),
@@ -100,10 +106,11 @@ export const ActionRollData = () => ({
         skill: new StringField({ required: true, initial: '' }), // Does it use it?
         attribute: new StringField({ required: true, initial: '' }), // Does it use it?
         attribute2: new StringField({ required: true, initial: '' }), // Does it use it?
+        armor: new BooleanField({ required: true, initial: false }),
     }),
     alt_mod: new NumberField({ required: true, initial: 0 }),
     dice_pool_mod: ModList(),
-    rool_mode: new StringField({ required: true, initial: '' }),
+    roll_mode: new StringField({ required: true, initial: '' }),
 });
 
 export const ActionPartData = () => ({

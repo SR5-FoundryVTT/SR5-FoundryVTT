@@ -7,9 +7,9 @@ const SpritePowerData = {
     ...DescriptionPartData(),
     ...ActionPartData(),
     ...ImportFlags(),
-    duration: new StringField({ required: true, initial: '' }),
-    optional: new StringField({ required: true, initial: '' }),
-    enabled: new BooleanField({ required: true, initial: false }),
+    duration: new StringField({ required: true, initial: 'always' }),
+    optional: new StringField({ required: true, initial: 'standard' }),
+    enabled: new BooleanField({ required: true, initial: true }),
 }
 
 

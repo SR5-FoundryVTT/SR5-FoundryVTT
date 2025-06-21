@@ -9,9 +9,8 @@ const QualityData = {
     ...ImportFlags(),
     type: new StringField({
         required: true,
-        initial: '',
-        blank: true,
-        choices: ['positive', 'negative', '']
+        initial: 'positive',
+        choices: ['positive', 'negative', 'lifemodule']
     }),
     karma: new NumberField({ required: true, nullable: false, initial: 0 }),
     rating: new NumberField({ required: true, nullable: false, initial: 0 }),

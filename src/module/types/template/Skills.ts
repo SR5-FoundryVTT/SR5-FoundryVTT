@@ -12,7 +12,7 @@ export const SkillField = () => ({
     attribute: new StringField({ required: true, initial: '' }),
     _delete: new BooleanField({ required: true, initial: false }), // Does it use it?
     specs: new ArrayField(new StringField({ required: true, initial: '' })),
-    canDefault: new BooleanField({ required: true, initial: false }),
+    canDefault: new BooleanField({ required: true, initial: true }),
     id: new StringField({ required: true, initial: '' }),
     link: new StringField({ required: true, initial: '' }),
     group: new StringField({ required: true, initial: '' }),
@@ -33,8 +33,8 @@ export const Skills = () => new TypedObjectField(
             automatics: skill({ name: 'automatics', attribute: 'agility', group: 'Firearms' }),
             blades: skill({ name: 'blades', attribute: 'agility', group: 'Close Combat' }),
             clubs: skill({ name: 'clubs', attribute: 'agility', group: 'Close Combat' }),
-            exotic_melee: skill({ name: 'exotic_melee', attribute: 'agility', group: 'Close Combat', canDefault: false }), // how to deal with exotic melee weapons?
-            exotic_range: skill({ name: 'exotic_range', attribute: 'agility', group: 'Firearms', canDefault: false }), // how to deal with exotic ranged weapons?
+            exotic_melee: skill({ name: 'exotic_melee', attribute: 'agility', canDefault: false }), // how to deal with exotic melee weapons?
+            exotic_range: skill({ name: 'exotic_range', attribute: 'agility', canDefault: false }), // how to deal with exotic ranged weapons?
             heavy_weapons: skill({ name: 'heavy_weapons', attribute: 'agility', group: 'Firearms' }),
             longarms: skill({ name: 'longarms', attribute: 'agility', group: 'Firearms' }),
             pistols: skill({ name: 'pistols', attribute: 'agility', group: 'Firearms' }),

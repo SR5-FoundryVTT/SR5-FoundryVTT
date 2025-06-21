@@ -7,7 +7,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 export const DevicePartData = () => ({
     category: new StringField({
         required: true,
-        initial: '',
+        initial: 'commlink',
         blank: true,
         choices: ['commlink', 'cyberdeck', 'rcc', 'host', ''],
     }),

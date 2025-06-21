@@ -19,7 +19,7 @@ const AmmunitionData = () => ({
         blank: true,
         choices: ['removable_clip', 'break_action', 'belt_fed', 'internal_magazin', 'muzzle_loader', 'cylinder', 'drum', 'bow', ''],
     }),
-    partial_reload_value: new NumberField({ required: true, nullable: false, initial: 0 }),
+    partial_reload_value: new NumberField({ required: true, nullable: false, initial: -1 }),
 });
 
 export const RangeData = () => ({
@@ -27,7 +27,7 @@ export const RangeData = () => ({
     medium: new NumberField({ required: true, nullable: false, initial: 0 }),
     long: new NumberField({ required: true, nullable: false, initial: 0 }),
     extreme: new NumberField({ required: true, nullable: false, initial: 0 }),
-    category: new StringField({ required: true, initial: '' }), // I believe we don't use this, we could use the value from the RangeWeaponData
+    category: new StringField({ required: true, initial: 'manual' }), // I believe we don't use this, we could use the value from the RangeWeaponData
     attribute: new StringField({ required: true, initial: '' }),
 });
 
@@ -39,7 +39,7 @@ const FiringModeData = () => ({
 });
 
 const RangeWeaponData = () => ({
-    category: new StringField({ required: true, initial: '' }),
+    category: new StringField({ required: true, initial: 'manual' }),
     ranges: new SchemaField(RangeData(), { required: true }),
     rc: new SchemaField(ModifiableValue(), { required: true }),
     modes: new SchemaField(FiringModeData(), { required: true }),

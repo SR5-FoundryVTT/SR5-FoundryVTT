@@ -9,9 +9,8 @@ const ProgramData = {
     ...ImportFlags(),
     type: new StringField({
         required: true,
-        initial: '',
-        blank: true,
-        choices: ['common_program', 'hacking_program', '']
+        initial: 'common_program',
+        choices: ['common_program', 'hacking_program', 'agent']
     }),
 }
 

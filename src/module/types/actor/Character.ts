@@ -6,7 +6,8 @@ const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fie
 
 const TechnomancerActorData = () => ({
     technomancer: new SchemaField({
-        attribute: new StringField({ required: true, initial: "" }),
+        // fade attribute
+        attribute: new StringField({ required: true, initial: "willpower" }),
         submersion: new NumberField({ required: true, initial: 0 }),
     }, { required: true }),
 });
@@ -63,10 +64,15 @@ const CharacterData = {
     attributes: new SchemaField(CharacterAttributes(), { required: true }),
     values: new SchemaField(PhysicalCombatValues(), { required: true }),
     metatype: new StringField({ required: true, initial: "" }),
-    full_defense_attribute: new StringField({ required: true, initial: "" }),
+    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
     is_critter: new BooleanField({ required: true, initial: false }),
-    karma: new SchemaField(ValueMaxPair(), { required: true }),
     limits: new SchemaField(CharacterLimits(), { required: true }),
+    // karama.value => current career karma
+    // karama.max => max career karma
+    karma: new SchemaField(ValueMaxPair(), { required: true }),
+    nuyen: new NumberField({ required: true, nullable: false, initial: 0 }),
+    public_awareness: new NumberField({ required: true, nullable: false, initial: 0 }),
+    street_cred: new NumberField({ required: true, nullable: false, initial: 0 }),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,

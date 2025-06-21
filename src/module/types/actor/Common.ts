@@ -35,11 +35,12 @@ export const Initiative = () => ({
     matrix: new SchemaField(InitiativeType(), { required: true }),
     current: new SchemaField(InitiativeType(), { required: true }),
     edge: new BooleanField({ required: true, initial: false }),
-    perception: new StringField({ required: true, initial: "" }),
+    perception: new StringField({ required: true, initial: "meatspace" }),
 });
 
 export const MagicData = () => ({
-    attribute: new StringField({ required: true, initial: "magic" }),
+    // Drain attribute
+    attribute: new StringField({ required: true, initial: "logic" }),
     projecting: new BooleanField({ required: true, initial: false }),
     initiation: new NumberField({ required: true, nullable: false, initial: 0, }),
 });
@@ -82,6 +83,7 @@ export const NPCData = () => ({
 
 export const MatrixData = () => ({
     dice: new SchemaField(ModifiableValue(), { required: true }),
+    // TODO: taMiF check if it's used
     base: new SchemaField(ModifiableValue(), { required: true }),
 
     attack: new SchemaField(MatrixAttributeField(), { required: true }),
@@ -92,6 +94,7 @@ export const MatrixData = () => ({
     condition_monitor: new SchemaField(ConditionData(), { required: true }),
     rating: new NumberField({ required: true, nullable: false, initial: 0 }),
     name: new StringField({ required: true, initial: "" }),
+    // TODO: tamIf check if it's used
     device: new StringField({ required: true, initial: "" }),
     is_cyberdeck: new BooleanField({ required: true, initial: false }),
     hot_sim: new BooleanField({ required: true, initial: false }),
@@ -134,6 +137,7 @@ export const ArmorActorData = () => ({
     armor: new SchemaField(ActorArmorData(), { required: true }),
 });
 
+// TODO: ModifiableField
 export const WoundType = () => ({
     value: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
@@ -219,7 +223,7 @@ export const CommonData = () => ({
     attributes: new SchemaField(Attributes(), { required: true }),
     limits: new SchemaField(Limits(), { required: true }),
     skills: new SchemaField(CharacterSkills(), { required: true }),
-    special: new StringField({ required: true, blank: true, choices: ['magic', 'resonance', 'mundane', ''], initial: '' }),
+    special: new StringField({ required: true, blank: true, choices: ['magic', 'resonance', 'mundane', ''], initial: 'mundane' }),
     initiative: new SchemaField(Initiative(), { required: true }),
     // modifiers: new SchemaField(Modifiers, { required: true }),
     //todo fix

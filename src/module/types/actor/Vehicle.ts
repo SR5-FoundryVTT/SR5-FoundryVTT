@@ -67,6 +67,7 @@ const VehicleData = {
     modificationCategories: new SchemaField(VehicleModCategories(), { required: true }), // is it used?
     modPoints: new NumberField({ required: true, initial: 0 }),
     limits: new SchemaField(VehicleLimits(), { required: true }),
+    full_defense_attribute: new StringField({ required: true, initial: "intuition" }),
 }
 
 

@@ -17,6 +17,7 @@ const SpiritData = {
     ...WoundsActorData(),
     ...MovementActorData(),
     ...NPCActorData(),
+    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
     summonerUuid: new StringField({ required: true, initial: "" }),
     values: new SchemaField(PhysicalCombatValues(), { required: true }),
     spiritType: new StringField({ required: true, initial: "", }), // list all types?
@@ -24,6 +25,7 @@ const SpiritData = {
     limits: new SchemaField(CharacterLimits(), { required: true }),
     services: new NumberField({ required: true, nullable: false, initial: 0 }),
     attributes: new SchemaField(SpiritAttributes(), { required: true }),
+    bound: new BooleanField({ required: true, initial: false }),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,
