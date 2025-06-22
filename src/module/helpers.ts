@@ -32,17 +32,15 @@ export class Helpers {
      * @param options min will a apply a minimum value, max will apply a maximum value.
      */
     static calcTotal(value: ModifiableValueType, options?: CalcTotalOptions): number {
-        if (value.mod === undefined) value.mod = [];
-
         const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (!isNaN(value.temp as number) && Number(value.temp) !== 0) {
+        if (!isNaN(value.temp) && Number(value.temp) !== 0) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
         // On some values base might be undefined...
         // Check for undefined, as some Values might be none numerical / boolean.
-        value.base = value.base !== undefined ? Number(value.base) : 0;
+        value.base = value.base || 0;
 
         // If the given value has an override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {
@@ -51,17 +49,8 @@ export class Helpers {
             return value.value;
         }
 
-        // Base on type change calculation behavior.
-        switch (foundry.utils.getType(value.base)) {
-            case 'number':
-                value.value = Helpers.roundTo(parts.total + value.base, options?.roundDecimals);
-                value.value = Helpers.applyValueRange(value.value, options);
-                break;
-            // boolean / string values should be applied
-            default:
-                value.value = parts.last === undefined ? value.base : parts.last;
-                break;
-        }
+        value.value = Helpers.roundTo(parts.total + value.base, options?.roundDecimals);
+        value.value = Helpers.applyValueRange(value.value, options);
 
         value.mod = parts.list;
 
@@ -69,8 +58,6 @@ export class Helpers {
     }
 
     static calcValue(value: DamageType): any {
-        if (value.mod === undefined) value.mod = [];
-
         if (value.override) {
             value.value = value.override.value;
 
@@ -118,8 +105,7 @@ export class Helpers {
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
     static onSetFlag(data) {
-        if (typeof data !== 'object') return data;
-        if (data === undefined || data === null) return data;
+        if (!data || typeof data !== 'object') return data;
         const newData = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5.', 'SR5_DOT_');
@@ -130,8 +116,7 @@ export class Helpers {
 
     // replace 'SR5_DOT_' with 'SR5.' on keys
     static onGetFlag(data) {
-        if (typeof data !== 'object') return data;
-        if (data === undefined || data === null) return data;
+        if (!data || typeof data !== 'object') return data;
         const newData = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5_DOT_', 'SR5.');
@@ -278,7 +263,7 @@ export class Helpers {
             }
             Object.entries(obj)
                 .filter(([, value]) => typeof value === 'object')
-                .forEach(([key, value]) => Helpers.addLabels(value, key));
+                .forEach(([key, value]) => { Helpers.addLabels(value, key); });
         }
     }
 
@@ -338,7 +323,7 @@ export class Helpers {
     }
 
     static getUserTargets(user?: User | null): Token[] {
-        user = user ? user : game.user;
+        user = user || game.user;
 
         if (!user) return []
 
@@ -346,7 +331,7 @@ export class Helpers {
     }
 
     static userHasTargets(user?: User | null): boolean {
-        user = user ? user : game.user;
+        user = user || game.user;
 
         if (!user) return false;
 
@@ -561,9 +546,9 @@ export class Helpers {
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        if (useTokenNameForChatOutput && token) return token.name as string;
+        if (useTokenNameForChatOutput && token) return token.name;
 
-        return actor.name as string;
+        return actor.name;
     }
 
     /**
@@ -591,7 +576,7 @@ export class Helpers {
         element: DamageType['element']['value'] = '',
         sourceItem?: SR5Item
     ): DamageType {
-        const damage = DataDefaults.createData('damage') as DamageType;
+        const damage = DataDefaults.createData('damage');
         damage.base = value;
         damage.value = value;
         damage.type.base = type;
@@ -601,12 +586,12 @@ export class Helpers {
         damage.element.base = element;
         damage.element.value = element;
 
-        if (sourceItem && sourceItem.actor) {
+        if (sourceItem?.actor) {
             damage.source = {
                 actorId: sourceItem.actor.id as string,
                 itemType: sourceItem.type,
                 itemId: sourceItem.id as string,
-                itemName: sourceItem.name as string
+                itemName: sourceItem.name
             };
         }
 
@@ -702,7 +687,7 @@ export class Helpers {
         skillDataPath: string,
         skillField: SkillFieldType,
         idLength: number = DEFAULT_ID_LENGTH
-    ): { id: string, updateSkillData: { [skillDataPath: string]: { [id: string]: SkillFieldType } } } | undefined {
+    ): { id: string, updateSkillData: Record<string, Record<string, SkillFieldType>> } | undefined {
         if (!skillDataPath || skillDataPath.length === 0) return undefined;
 
         const id = randomID(idLength);
@@ -720,7 +705,7 @@ export class Helpers {
      * @param value Whatever needs to be stored.
      *
      */
-    static getUpdateDataEntry(path: string, value: any): { [path: string]: any } {
+    static getUpdateDataEntry(path: string, value: any): Record<string, any> {
         return {[path]: value};
     }
 
@@ -733,7 +718,7 @@ export class Helpers {
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
      *         remove the Pistols key from the 'data.skills.active' path within Entity.system.skills.active.
      */
-    static getDeleteKeyUpdateData(path: string, key: string): { [path: string]: { [key: string]: null } } {
+    static getDeleteKeyUpdateData(path: string, key: string): Record<string, Record<string, null>> {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
         return {[path]: {[`-=${key}`]: null}};
@@ -967,7 +952,7 @@ export class Helpers {
         if (!pack) return undefined;
 
         // TODO: Use predefined ids instead of names...
-        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(new RegExp(' ', 'g'), '_') === actionName.toLowerCase());
+        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(/ /g, '_') === actionName.toLowerCase());
         if (!packEntry) return undefined;
 
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
@@ -1028,13 +1013,13 @@ export class Helpers {
      * @returns an actor
      */
     static async chooseFromAvailableActors() {
-        let availableActors =  game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
+        const availableActors = game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
 
-        if(availableActors.length == 0) {
+        if(availableActors.length === 0) {
             return undefined;
         }
 
-        if(availableActors.length == 1) {
+        if(availableActors.length === 1) {
             return availableActors[0]
         } else {
             let allActors = ''
@@ -1047,7 +1032,7 @@ export class Helpers {
                 ${allActors}
                 </select>`;
     
-            let choosenActor = await Dialog.prompt({
+            const choosenActor = await foundry.appv1.api.Dialog.prompt({
                 title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
                 content: dialog_content,
                 callback: (html) => html.find('select').val()
