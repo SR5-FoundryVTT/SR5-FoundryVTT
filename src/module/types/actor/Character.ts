@@ -2,8 +2,6 @@ import { CommonModifiers, MatrixModifiers, CommonData, MatrixActorData, TwoTrack
 import { Attributes, AttributeField } from "../template/Attributes";
 import { ValueMaxPair } from "../template/Base";
 import { ImportFlags } from "../template/ImportFlags";
-import { fields } from "node_modules/fvtt-types/src/foundry/common/data/_module.mjs";
-import { Schema } from "node_modules/fvtt-types/src/foundry/common/prosemirror/_module.mjs";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const TechnomancerActorData = () => ({
