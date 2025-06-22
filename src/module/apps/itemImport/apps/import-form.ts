@@ -19,11 +19,11 @@ import * as IconAssign from  '../../iconAssigner/iconAssign';
 
 export class Import extends Application {
     // Update Schemas in util/generate_schemas.py
-    private githubConfig = {
+    private readonly githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
-        version: "v5.225.898",
-        branch: "2df4c99143df4e46a5be64f122096c3d9c0efdf7",
+        version: "v5.225.921",
+        branch: "d800ca7a7e8effcb1b80ba83ba3a94e3c344cbf1",
     } as const;
 
     private currentParsedFile: string;
@@ -41,7 +41,7 @@ export class Import extends Application {
     private showAdvanced: boolean = false;
     private showImportOptions: boolean = false;
 
-    private shadowrunBooks = [
+    private readonly shadowrunBooks = [
         { name: "Aetherology", code: "AET", default: true, value: true },
         { name: "Assassin's Primer", code: "AP", default: true, value: true },
         { name: "Better Than Bad", code: "BTB", default: true, value: true },

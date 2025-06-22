@@ -84,11 +84,9 @@ export class VehicleParser extends Parser<VehicleActorData> {
     }
 
     protected override async getItems(jsonData: Vehicle): Promise<Shadowrun.ShadowrunItemData[]> {
-        const mods = jsonData.mods || {};
-
         const allModName = [
-            ...IH.getArray(mods.name).map(m => m._TEXT),
-            ...IH.getArray(mods.mod).map(m => m.name._TEXT),
+            ...IH.getArray(jsonData.mods?.name).map(m => m._TEXT),
+            ...IH.getArray(jsonData.mods?.mod).map(m => m.name._TEXT),
         ].filter(Boolean);
 
         const allGearName = IH.getArray(jsonData.gears?.gear).map(v => v?._TEXT || v?.name?._TEXT || '');
@@ -107,12 +105,13 @@ export class VehicleParser extends Parser<VehicleActorData> {
 
         const name = jsonData.name._TEXT;
         return [
-            ...this.getVehicleItems(name, modItem, mods.mod, translationMap),
-            ...this.getVehicleItems(name, modItem, mods.name, translationMap),
+            ...this.getVehicleItems(name, modItem, jsonData.mods?.mod, translationMap),
+            ...this.getVehicleItems(name, modItem, jsonData.mods?.name, translationMap),
             ...this.getVehicleItems(name, gearItem, jsonData.gears?.gear, translationMap),
             ...this.getVehicleItems(name, weaponItem, jsonData.weapons?.weapon, translationMap),
         ];
     }
+
     protected override async getFolder(jsonData: Vehicle): Promise<Folder> {
         const category = jsonData.category._TEXT;
         const isDrone = category.startsWith("Drones:");
