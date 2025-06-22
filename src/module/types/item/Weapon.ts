@@ -2,7 +2,7 @@ import { ValueMaxPair, ModifiableValue } from "../template/Base";
 import { DescriptionPartData } from "../template/Description";
 import { ImportFlags } from "../template/ImportFlags";
 import { TechnologyPartData } from "../template/Technology";
-import { ActionPartData } from "./Action";
+import { Action, ActionPartData } from "./Action";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
 
 export const BlastData = () => ({
@@ -76,6 +76,15 @@ const WeaponData = {
 export class Weapon extends foundry.abstract.TypeDataModel<typeof WeaponData, Item.Implementation> {
     static override defineSchema() {
         return WeaponData;
+    }
+
+    static override migrateData(source) {
+        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
+            return super.migrateData(source);
+
+        Action.migrateData(source);
+
+        return super.migrateData(source);
     }
 }
 

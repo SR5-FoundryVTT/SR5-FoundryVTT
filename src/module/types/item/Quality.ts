@@ -1,4 +1,4 @@
-import { ActionPartData } from "./Action";
+import { Action, ActionPartData } from "./Action";
 import { ImportFlags } from "../template/ImportFlags";
 import { DescriptionPartData } from "../template/Description";
 const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
@@ -20,6 +20,21 @@ const QualityData = {
 export class Quality extends foundry.abstract.TypeDataModel<typeof QualityData, Item.Implementation> {
     static override defineSchema() {
         return QualityData;
+    }
+
+    static override migrateData(source) {
+        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
+            return super.migrateData(source);
+
+        Action.migrateData(source);
+
+        const result = source as Quality['_source'];
+
+        // Reset broken legacy data.
+        if (!(QualityData.type.choices as string[]).includes(source.type))
+            result.type = 'positive';
+
+        return super.migrateData(source);
     }
 }
 

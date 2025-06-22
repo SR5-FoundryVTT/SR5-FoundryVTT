@@ -33,8 +33,14 @@ export class Cyberware extends foundry.abstract.TypeDataModel<typeof CyberwareDa
         Action.migrateData(source);
 
         const result = source as Cyberware['_source'];
+
+        // Reset broken legacy data.
         if (!(CyberwareData.grade.choices as string[]).includes(source.grade))
             result.grade = 'standard';
+
+        if (isNaN(source.essence)) {
+            result.essence = 0; // Default essence value if not set
+        }
 
         return super.migrateData(source);
     }

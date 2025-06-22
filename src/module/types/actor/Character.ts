@@ -2,6 +2,8 @@ import { CommonModifiers, MatrixModifiers, CommonData, MatrixActorData, TwoTrack
 import { Attributes, AttributeField } from "../template/Attributes";
 import { ValueMaxPair } from "../template/Base";
 import { ImportFlags } from "../template/ImportFlags";
+import { fields } from "node_modules/fvtt-types/src/foundry/common/data/_module.mjs";
+import { Schema } from "node_modules/fvtt-types/src/foundry/common/prosemirror/_module.mjs";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const TechnomancerActorData = () => ({
@@ -84,6 +86,20 @@ const CharacterData = {
 export class Character extends foundry.abstract.TypeDataModel<typeof CharacterData, Actor.Implementation> {
     static override defineSchema() {
         return CharacterData;
+    }
+
+    static override migrateData(source) {
+        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
+            return super.migrateData(source);
+
+        const result = source as Character['_source'];
+
+        // Reset broken legacy data.
+        if (isNaN(source.attributes.essence.value)) {
+            result.attributes.essence.value = 6; // Default essence value if not set, but is reculated during datePrep anyway
+        }
+
+        return super.migrateData(source);
     }
 }
 
