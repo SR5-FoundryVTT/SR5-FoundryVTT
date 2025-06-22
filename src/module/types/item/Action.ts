@@ -98,7 +98,7 @@ export const ActionRollData = () => ({
     threshold: new SchemaField(BaseValuePair()),
     extended: new BooleanField({ required: true, initial: false }),
     modifiers: new ArrayField(new StringField({ required: true, initial: '' })),
-    damage: new SchemaField(DamageData()),
+    damage: new SchemaField(DamageData(), { required: true }),
     opposed: new SchemaField(OpposedTestData()),
     followed: new SchemaField({
         test: new StringField({ required: true, initial: '' }),

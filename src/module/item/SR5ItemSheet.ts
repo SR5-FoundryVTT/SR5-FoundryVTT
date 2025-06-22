@@ -205,7 +205,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         // Enrich descriptions
         await Promise.all(
             [ammunition, weaponMods, armorMods, vehicleMods, droneMods].flat().map(
-                item => TextEditor.enrichHTML(item.system.description.value).then(html => item.descriptionHTML = html)
+                item => foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description.value).then(html => item.descriptionHTML = html)
             )
         );
 
@@ -279,7 +279,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      * @returns Enriched HTML result
      */
     async enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): Promise<string> {
-        return await TextEditor.enrichHTML(editorValue, options);
+        return await foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
     }
 
     /**

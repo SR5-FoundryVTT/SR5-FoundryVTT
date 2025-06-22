@@ -249,7 +249,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         data.contentVisibility = this._prepareContentVisibility(data);
 
         if ('description' in actorData.system)
-            data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
+            data.biographyHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(actorData.system.description.value, {
                 // secrets: this.actor.isOwner,
                 // rollData: this.actor.getRollData.bind(this.actor),
                 relativeTo: this.actor
