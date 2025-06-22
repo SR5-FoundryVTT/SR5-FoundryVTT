@@ -7,7 +7,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 const RitualData = {
     ...DescriptionPartData(),
     ...ImportFlags(),
-    ...ActionPartData(),
+    ...ActionPartData({test: 'RitualSpellcastingTest', opposedTest: 'OpposedRitualTest', followedTest: 'DrainTest'}),
     type: new StringField({ required: true, initial: '' }),
     descriptors: new StringField({ required: true, initial: '' }),
 };

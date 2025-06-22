@@ -69,28 +69,19 @@ export const DamageData = () => ({
     }, { required: false }),
 });
 
-export const OpposedTestData = () => ({
-    type: new StringField({ required: true, initial: '' }),
-    description: new StringField({ required: true, initial: '' }),
-    mod: new NumberField({ required: true, nullable: false, initial: 0 }),
-    skill: new StringField({ required: true, initial: '' }),
-    attribute: new StringField({ required: true, initial: '' }),
-    attribute2: new StringField({ required: true, initial: '' }),
-    armor: new BooleanField({ required: true, initial: false }),
-    test: new StringField({ required: true, initial: '' }),
-    resist: new SchemaField({
-        skill: new StringField({ required: true, initial: '' }),
-        mod: new NumberField({ required: true, nullable: false, initial: 0 }),
-        attribute: new StringField({ required: true, initial: '' }),
-        attribute2: new StringField({ required: true, initial: '' }),
-        armor: new BooleanField({ required: true, initial: false }),
-        test: new StringField({ required: true, initial: '' }),
-    }),
-});
-
-export const ActionRollData = () => ({
+export const ActionRollData = ({
+    test = 'SuccessTest',
+    opposedTest = '',
+    resistTest = '',
+    followedTest = ''
+}: {
+    test?: string;
+    opposedTest?: string;
+    resistTest?: string;
+    followedTest?: string;
+} = {}) => ({
     ...MinimalActionData(),
-    test: new StringField({ required: true, initial: 'SuccessTest' }),
+    test: new StringField({ required: true, initial: test }),
     type: new StringField({ required: true, initial: '' }),
     categories: new ArrayField(new StringField({ required: true, initial: '' })),
     spec: new BooleanField({ required: true, initial: false }),
@@ -99,13 +90,30 @@ export const ActionRollData = () => ({
     extended: new BooleanField({ required: true, initial: false }),
     modifiers: new ArrayField(new StringField({ required: true, initial: '' })),
     damage: new SchemaField(DamageData(), { required: true }),
-    opposed: new SchemaField(OpposedTestData()),
-    followed: new SchemaField({
+    opposed: new SchemaField({
+        type: new StringField({ required: true, initial: opposedTest }),
+        description: new StringField({ required: true, initial: '' }),
+        mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+        skill: new StringField({ required: true, initial: '' }),
+        attribute: new StringField({ required: true, initial: '' }),
+        attribute2: new StringField({ required: true, initial: '' }),
+        armor: new BooleanField({ required: true, initial: false }),
         test: new StringField({ required: true, initial: '' }),
-        mod: new NumberField({ required: true, nullable: false, initial: 0 }), // Does it use it?
-        skill: new StringField({ required: true, initial: '' }), // Does it use it?
-        attribute: new StringField({ required: true, initial: '' }), // Does it use it?
-        attribute2: new StringField({ required: true, initial: '' }), // Does it use it?
+        resist: new SchemaField({
+            skill: new StringField({ required: true, initial: resistTest }),
+            mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+            attribute: new StringField({ required: true, initial: '' }),
+            attribute2: new StringField({ required: true, initial: '' }),
+            armor: new BooleanField({ required: true, initial: false }),
+            test: new StringField({ required: true, initial: '' }),
+        }),
+    }),
+    followed: new SchemaField({
+        test: new StringField({ required: true, initial: followedTest }),
+        mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+        skill: new StringField({ required: true, initial: '' }),
+        attribute: new StringField({ required: true, initial: '' }),
+        attribute2: new StringField({ required: true, initial: '' }),
         armor: new BooleanField({ required: true, initial: false }),
     }),
     alt_mod: new NumberField({ required: true, initial: 0 }),
@@ -113,8 +121,18 @@ export const ActionRollData = () => ({
     roll_mode: new StringField({ required: true, initial: '' }),
 });
 
-export const ActionPartData = () => ({
-    action: new SchemaField(ActionRollData()),
+export const ActionPartData = ({
+    test = 'SuccessTest',
+    opposedTest = '',
+    resistTest = '',
+    followedTest = ''
+}: {
+    test?: string;
+    opposedTest?: string;
+    resistTest?: string;
+    followedTest?: string;
+} = {}) => ({
+    action: new SchemaField(ActionRollData({test, opposedTest, resistTest, followedTest}), { required: true }),
 });
 
 const ActionData = {
@@ -126,7 +144,7 @@ const ActionData = {
 
 export type DamageType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof DamageData>>;
 export type ActionRollType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionRollData>>;
-export type OpposedTestType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof OpposedTestData>>;
+export type OpposedTestType = ActionRollType['opposed'];
 export type ActionResultType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionResultData>>;
 export type ResultActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ResultActionData>>;
 export type MinimalActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MinimalActionData>>;
@@ -137,7 +155,10 @@ export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, It
     }
 
     static override migrateData(source) {
-        const result = source as foundry.data.fields.SchemaField.InitializedData<typeof ActionData>;
+        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
+            return super.migrateData(source);
+
+        const result = source as Action['_source'];
         if (source.action.damage.base_formula_operator === '+')
             result.action.damage.base_formula_operator = 'add';
         return super.migrateData(source);

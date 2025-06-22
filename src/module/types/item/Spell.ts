@@ -60,7 +60,7 @@ const RitualSpellData = () => ({
 const SpellData = {
     ...DescriptionPartData(),
     ...ImportFlags(),
-    ...ActionPartData(),
+    ...ActionPartData({test: 'SpellCastingTest', followedTest: 'DrainTest'}),
     type: new StringField({
         required: true,
         initial: '',

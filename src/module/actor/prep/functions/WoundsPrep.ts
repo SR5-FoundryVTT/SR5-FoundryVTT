@@ -1,4 +1,5 @@
 import { MonitorRules } from './../../../rules/MonitorRules';
+import { Helpers } from 'src/module/helpers';
 
 export class WoundsPrep {
     static prepareWounds(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
@@ -21,8 +22,7 @@ export class WoundsPrep {
         track.physical.wounds = physicalWounds;
 
         // The actor as a whole derives these wounds for wound modifier calculation
-        system.wounds = {
-            value: stunWounds + physicalWounds,
-        };
+        system.wounds.base = stunWounds + physicalWounds;
+        system.wounds.value = Helpers.calcTotal(system.wounds);
     }
 }

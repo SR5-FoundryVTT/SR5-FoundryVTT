@@ -6,7 +6,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 export const ComplexFormData = () => ({
     ...DescriptionPartData(),
     ...ImportFlags(),
-    ...ActionPartData(),
+    ...ActionPartData({test: 'ComplexFormTest', opposedTest: 'OpposedTest', followedTest: 'FadeTest'}),
     target: new StringField({
         required: true,
         initial: '',

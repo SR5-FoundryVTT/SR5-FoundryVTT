@@ -23,7 +23,7 @@ const CallInActionData = {
     ...CompilationData(),
     ...SummoningData(),
     ...DescriptionPartData(),
-    ...ActionPartData(),
+    ...ActionPartData({ test: '' }), // TODO: set type to `complex` (check if it's true)
     ...ImportFlags(),
     actor_type: new StringField({
         required: true,

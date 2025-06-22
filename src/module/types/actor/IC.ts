@@ -23,8 +23,6 @@ const ICData = {
     }, { required: true }),
     attributes: new SchemaField(ICAttributes(), { required: true }),
     modifiers: new SchemaField({
-        //todo
-        // ...Modifiers,
         ...CommonModifiers(),
         ...MatrixModifiers(),
     }, { required: true }),

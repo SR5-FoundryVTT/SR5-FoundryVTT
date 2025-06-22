@@ -45,22 +45,22 @@ export const MagicData = () => ({
     initiation: new NumberField({ required: true, nullable: false, initial: 0, }),
 });
 
-export const DeviceAttribute = () => ({
+export const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing' | 'firewall') => ({
     value: new NumberField({ required: true, initial: 0 }),
     att: new StringField({
         required: true,
         blank: true,
-        initial: '',
+        initial: initialAtt,
         choices: ['', 'attack', 'sleaze', 'data_processing', 'firewall'],
     }),
     editable: new BooleanField({ required: true, initial: false }),
 });
 
 export const MatrixAttributes = () => ({
-    att1: new SchemaField(DeviceAttribute(), { required: true }),
-    att2: new SchemaField(DeviceAttribute(), { required: true }),
-    att3: new SchemaField(DeviceAttribute(), { required: true }),
-    att4: new SchemaField(DeviceAttribute(), { required: true }),
+    att1: new SchemaField(DeviceAttribute('attack'), { required: true }),
+    att2: new SchemaField(DeviceAttribute('sleaze'), { required: true }),
+    att3: new SchemaField(DeviceAttribute('data_processing'), { required: true }),
+    att4: new SchemaField(DeviceAttribute('firewall'), { required: true }),
 });
 
 export const MatrixAttributeField = () => ({
@@ -113,17 +113,17 @@ export const PhysicalCombatValues = () => ({
 });
 
 export const MeatSpaceVisibility = () => ({
-    hasHeat: new BooleanField({ required: true, initial: false }),
+    hasHeat: new BooleanField({ required: true, initial: true }),
 });
 
 export const AstralVisibility = () => ({
-    hasAura: new BooleanField({ required: true, initial: false }),
+    hasAura: new BooleanField({ required: true, initial: true }),
     astralActive: new BooleanField({ required: true, initial: false }),
     affectedBySpell: new BooleanField({ required: true, initial: false }),
 });
 
 export const MatrixVisibility =  () => ({
-    hasIcon: new BooleanField({ required: true, initial: false }),
+    hasIcon: new BooleanField({ required: true, initial: true }),
     runningSilent: new BooleanField({ required: true, initial: false }),
 });
 
@@ -137,13 +137,8 @@ export const ArmorActorData = () => ({
     armor: new SchemaField(ActorArmorData(), { required: true }),
 });
 
-// TODO: ModifiableField
-export const WoundType = () => ({
-    value: new NumberField({ required: true, nullable: false, initial: 0 }),
-});
-
 export const WoundsActorData = () => ({
-    wounds: new SchemaField(WoundType(), { required: true }),
+    wounds: new SchemaField(ModifiableValue(), { required: true }),
 });
 
 export const PhysicalTrackActorData = () => ({
@@ -223,17 +218,21 @@ export const CommonData = () => ({
     attributes: new SchemaField(Attributes(), { required: true }),
     limits: new SchemaField(Limits(), { required: true }),
     skills: new SchemaField(CharacterSkills(), { required: true }),
-    special: new StringField({ required: true, blank: true, choices: ['magic', 'resonance', 'mundane', ''], initial: 'mundane' }),
+    special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane'], initial: 'mundane' }),
     initiative: new SchemaField(Initiative(), { required: true }),
-    // modifiers: new SchemaField(Modifiers, { required: true }),
-    //todo fix
     situation_modifiers: new SchemaField({
         environmental: new SchemaField(ActiveData(), { required: true }),
         noise: new SchemaField(ActiveData(), { required: true }),
         background_count: new SchemaField(ActiveData(), { required: true }),
     }, {required: true }),
-    values: new SchemaField(CommonValues(), { required: true }),
-    inventories: new TypedObjectField(new SchemaField(InventoryData()), { required: true }),
+    values: new TypedObjectField(new SchemaField(ModifiableValue()), { required: true }),
+    inventories: new TypedObjectField(
+        new SchemaField(InventoryData()),
+        {
+            required: true,
+            initial: { "All": { name: "All", type: "all", itemIds: [], showAll: true, label: "All" } }
+        }
+    ),
     visibilityChecks: new SchemaField(VisibilityChecks(), { required: true }),
     category_visibility: new SchemaField(CategoryVisibility(), { required: true }),
 });

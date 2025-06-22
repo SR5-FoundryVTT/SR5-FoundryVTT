@@ -57,7 +57,7 @@ const ThrownWeaponData = () => ({
 const WeaponData = {
     ...DescriptionPartData(),
     ...TechnologyPartData(),
-    ...ActionPartData(),
+    ...ActionPartData({test: '', opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'}),
     ...ImportFlags(),
     category: new StringField({
         required: true,

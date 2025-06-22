@@ -27,9 +27,12 @@ export class Cyberware extends foundry.abstract.TypeDataModel<typeof CyberwareDa
     }
 
     static override migrateData(source) {
+        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
+            return super.migrateData(source);
+
         Action.migrateData(source);
 
-        const result = source as foundry.data.fields.SchemaField.InitializedData<typeof CyberwareData>;
+        const result = source as Cyberware['_source'];
         if (!(CyberwareData.grade.choices as string[]).includes(source.grade))
             result.grade = 'standard';
 
