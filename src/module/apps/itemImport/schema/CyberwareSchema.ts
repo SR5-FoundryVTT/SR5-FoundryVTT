@@ -21,9 +21,6 @@ export interface Cyberware {
     bannedgrades?: {
         grade: Many<{ _TEXT: string; }>;
     };
-    bannedwaregrades?: {
-        grade: Many<{ _TEXT: string; }>;
-    };
     blocksmounts?: { _TEXT: string; };
     bonus?: BonusSchema;
     capacity: { _TEXT: string; };
