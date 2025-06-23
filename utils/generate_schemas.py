@@ -14,7 +14,7 @@ from typing import DefaultDict, Dict, Set, Tuple, List, Union
 #URL constants
 OWNER = "chummer5a"
 REPO = "chummer5a"
-BRANCH = "d800ca7a7e8effcb1b80ba83ba3a94e3c344cbf1" #v5.255.921
+BRANCH = "d800ca7a7e8effcb1b80ba83ba3a94e3c344cbf1" #v5.255.922
 
 OUT_DIR = Path("../src/module/apps/itemImport/schema")
 FILES = [
