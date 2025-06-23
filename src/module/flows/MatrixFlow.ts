@@ -245,7 +245,7 @@ export const MatrixFlow = {
      */
     getMatrixTargets(actor: SR5Actor) {
         if (!actor.hasPersona) {
-            return { targets: [], personas: [], ics: [], devices: [] } 
+            return { targets: [] } 
         }
 
         // Prepare all targets based on network connection.
@@ -256,14 +256,15 @@ export const MatrixFlow = {
 
         // Filter types of target for clear separation.
         targets = targets.filter(target => !target.document || target.document.visible);
-        const actors = targets.filter(target => target.document instanceof SR5Actor);
-        const items = targets.filter(target => target.document instanceof SR5Item);
 
-        const personas = actors.filter(target => target.document.hasPersona);
-        const ics = actors.filter(target => target.document.isIC());
-        const devices = items.filter(target => !target.document);
+        // const actors = targets.filter(target => target.document instanceof SR5Actor);
+        // const items = targets.filter(target => target.document instanceof SR5Item);
 
-        return { targets, personas, ics, devices };
+        // const personas = actors.filter(target => target.document.hasPersona);
+        // const ics = actors.filter(target => target.document.isIC());
+        // const devices = items.filter(target => !target.document);
+
+        return { targets };
     },
 
     /**
@@ -298,18 +299,20 @@ export const MatrixFlow = {
             });
         }
 
-        for (const ic of host.getIC()) {
-            const type = ActorMarksFlow.getDocumentType(ic);
+        // NOTE: This is disabled, as currently adding host to an IC will add them to the general network.
+        //       This here connects to the separate store of 'ic' that used to be available on hosts.
+        // for (const ic of host.getIC()) {
+        //     const type = ActorMarksFlow.getDocumentType(ic);
 
-            targets.push({
-                name: ic.name,
-                type,
-                document: ic,
-                token: ic.getToken(),
-                runningSilent: ic.isRunningSilent,
-                network: host.name || ''
-            });
-        }
+        //     targets.push({
+        //         name: ic.name,
+        //         type,
+        //         document: ic,
+        //         token: ic.getToken(),
+        //         runningSilent: ic.isRunningSilent,
+        //         network: host.name || ''
+        //     });
+        // }
 
         return targets;
     },
@@ -327,7 +330,7 @@ export const MatrixFlow = {
                 // Skip actor tokens as they're collected separately.
                 if (slave instanceof SR5Actor && slave.getToken()) continue;
 
-                const type = ActorMarksFlow.getDocumentType(document);
+                const type = ActorMarksFlow.getDocumentType(slave);
 
                 targets.push({
                     name: slave.name,

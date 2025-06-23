@@ -108,11 +108,12 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         data.showMatrixMarkedDocuments = this.showMatrixHackingTarget === 'marked';
         data.showMatrixTargets = this.showMatrixHackingTarget === 'targets';
 
-        data.markedDocuments = await this.actor.getAllMarkedDocuments();
-
         if (data.showMatrixTargets) {
             const {targets} = MatrixFlow.getMatrixTargets(this.actor);
             data.matrixTargets = targets;
+        }
+        else if (data.showMatrixMarkedDocuments) {
+            data.markedDocuments = await this.actor.getAllMarkedDocuments();
         }
 
         return data;

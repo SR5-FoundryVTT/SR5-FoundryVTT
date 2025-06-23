@@ -191,13 +191,11 @@ export const ActorMarksFlow = {
      * @returns A translation key to be translated.
      */
     getDocumentType(document: Shadowrun.NetworkDevice): Translation {
-        // Determine special cases and default to persona.
-        if (document instanceof SR5Item && document.isMatrixDevice) return 'SR5.Device';
-        // if (document instanceof SR5Item && document.type === 'grid') return 'SR5.ItemTypes.Grid';
         if (document instanceof SR5Item && document.type === 'host') return 'SR5.ItemTypes.Host';
+        if (document instanceof SR5Item && document.type === 'grid') return 'SR5.ItemTypes.Grid';
+        if (document instanceof SR5Item) return 'SR5.Device';
 
         if (document instanceof SR5Actor && document.type === 'ic') return 'SR5.ActorTypes.IC';
-        if (document instanceof SR5Actor && document.type === 'sprite') return 'SR5.ActorTypes.Sprite';
 
         return 'SR5.Labels.ActorSheet.Persona'
     },
