@@ -107,19 +107,29 @@ input[type='text'].display {
     }
 }
 
+.sheet.journal-entry .journal-entry-pages {
+    margin: 14px 8px 16px 16px;
+}
+.journal-entry .journal-header {
+    height: 80px;
+    width: 100%;
+    margin: auto;
+    z-index: 2;
+}
 .journal-sheet .journal-header .title {
-  background: 
-    $nameplate-background,
-    url("assets/page.webp") repeat;
-  background-repeat: no-repeat, repeat;
-  background-size: 100% 41px, auto; // first layer = 60px tall
-  background-position: center, top;
-  font-family: 'klavika-medium';
-  text-align: left !important;
-  text-indent: 5px;
-  color: white;
-  border-width: 0;
-  height: 80px;
+    background: 
+        $nameplate-background,
+        url("assets/page.webp") repeat;
+    background-repeat: no-repeat, repeat;
+    background-size: 100% 41px, auto; // first layer = 60px tall
+    background-position: center, top;
+    border-radius: 0;
+    font-family: 'klavika-medium';
+    text-align: left !important;
+    text-indent: 5px;
+    color: white;
+    border-width: 0;
+    height: 80px;
 }
 
 
@@ -231,4 +241,9 @@ input[type='text'].display {
 .fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
 {
     color: $pdfColor;
+}
+.window-resizable-handle {
+    .fa-solid {
+        transform: rotate(45deg)
+    }
 }
