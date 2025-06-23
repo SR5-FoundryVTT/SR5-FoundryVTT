@@ -108,14 +108,21 @@ input[type='text'].display {
 }
 
 .journal-sheet .journal-header .title {
-    background: url('assets/journal-banner.webp') repeat;
-    font-family: 'klavika-medium';
-    text-align: left !important;
-    text-indent: 5px;
-    color: white;
-    border-width: 0;
-    height: 80px;
+  background: 
+    $nameplate-background,
+    url("assets/page.webp") repeat;
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 41px, auto; // first layer = 60px tall
+  background-position: center, top;
+  font-family: 'klavika-medium';
+  text-align: left !important;
+  text-indent: 5px;
+  color: white;
+  border-width: 0;
+  height: 80px;
 }
+
+
 
 .journal-sheet h3 {
     font-family: 'klavika-medium';

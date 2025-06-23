@@ -24,15 +24,13 @@
             flex: 1;
             height: 60px;
             font-size: var(--font-size-18);
-
             .display {
-                background: url("assets/item-banner.webp") repeat;
+                background: $nameplate-background;
                 border: none;
                 font-family: 'klavika-medium';
-                height: 60px;
-                padding-bottom: 1em;
+                height: 31px;
+                margin-top: 15px;
                 padding-left: 7px;
-                padding-top: 1em;
                 text-align: left;
             }
         }
