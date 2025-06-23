@@ -398,9 +398,9 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     getArmor(damage?: DamageType): BaseArmorType {
         // Prepare base armor data.
-        const armor = ("armor" in this.system ? 
-            foundry.utils.duplicate(this.system.armor) : 
-            DataDefaults.createData('armor')) as unknown as BaseArmorType;
+        const armor = !("armor" in this.system) ? 
+            DataDefaults.createData('armor') :
+            (foundry.utils.duplicate(this.system.armor) as BaseArmorType);
         // Prepare damage to apply to armor.
         damage = damage || DataDefaults.createData('damage');
 
@@ -481,7 +481,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     getAttribute(this:SR5Actor, name: string): AttributeFieldType {
         // First check vehicle stats, as they don't always exist.
         const stats = this.getVehicleStats();
-        if (stats && stats[name]) return stats[name];
+        if (stats?.[name]) return stats[name];
 
         // Second check general attributes.
         const attributes = this.getAttributes();

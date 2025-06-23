@@ -1,6 +1,7 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
+import { ModifiableValueType } from "../types/template/Base";
 import { tagifyFlagsToIds } from "../utils/sheets";
 
 
@@ -89,16 +90,14 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Apply a modification to a ModifiableValue.
      * Both direct key matches to the whole value and indirect matches to a value property are supported.
-     *
-     * @protected
      */
     protected _applyModify(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
-        const value = foundry.utils.getProperty(actor, change.key);
         // Check direct key.
-        if (this._isKeyModifiableValue(actor, change.key)) {
+        const value = this.getModifiableValue(actor, change.key);
+        if (value) {
             value.mod.push({ name: this.name, value: Number(change.value) });
 
-            return null;
+            return;
         }
 
         // Check indirect key.
@@ -107,18 +106,18 @@ export class SR5ActiveEffect extends ActiveEffect {
         const indirectKey = nodes.join('.');
 
         // Don't apply any changes if it's also not a indirect match.
-        if (this._isKeyModifiableValue(actor, indirectKey)) {
-            const value = foundry.utils.getProperty(actor, indirectKey);
-            value.mod.push({ name: this.name, value: Number(change.value) });
+        const modValue = this.getModifiableValue(actor, indirectKey);
+        if (modValue) {
+            modValue.mod.push({ name: this.name, value: Number(change.value) });
 
-            return null;
+            return;
         }
 
         // Don't apply any changes if there is NO matching value.
-        if (value === undefined) return null;
+        if (value === undefined) return;
 
         // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
-        return super._applyAdd(actor, change, current, delta, changes);
+        super._applyAdd(actor, change, current, delta, changes);
     }
 
     /**
@@ -129,35 +128,28 @@ export class SR5ActiveEffect extends ActiveEffect {
      * 
      * To complicate things, there are some use cases when overwriting an actual property of a ValueField
      * is needed. The SR5 uneducated quality needs to override the canDefault field of a skill.
-     *
-     * @protected
      */
-    //@ts-expect-error // TODO: foundry-vtt-types
-    protected _applyOverride(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
+    protected override _applyOverride(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
         // Check direct key.
-        if (this._isKeyModifiableValue(actor, change.key)) {
-            const value = foundry.utils.getProperty(actor, change.key);
-            value.override = { name: this.name, value: Number(change.value) };
-            value.value = change.value;
+        const modValue = this.getModifiableValue(actor, change.key);
+        if (modValue) {
+            modValue.override = { name: this.name, value: Number(change.value) };
+            modValue.value = Number(change.value);
 
-            return null;
+            return;
         }
 
-        return super._applyOverride(actor, change, current, delta, changes);
+        super._applyOverride(actor, change, current, delta, changes);
     }
 
-    _isKeyModifiableValue(actor: SR5Actor, key: string): boolean {
+    getModifiableValue(actor: SR5Actor, key: string): ModifiableValueType | null {
         const possibleValue = foundry.utils.getProperty(actor, key);
         const possibleValueType = foundry.utils.getType(possibleValue);
 
-        return possibleValue && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, this.minValueKeys);
-    }
+        if (possibleValue != null && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, ['value', 'mod']))
+            return possibleValue as ModifiableValueType;
 
-    /**
-     * Match against these keys, as the exact ModifiableValue layout might be different from time to time.
-     */
-    get minValueKeys(): string[] {
-        return ['value', 'mod'];
+        return null;
     }
 
     /**

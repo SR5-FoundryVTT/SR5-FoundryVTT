@@ -177,7 +177,7 @@ export const CharacterLimits = () => ({
 });
 
 export const CommonModifiers = () => ({
-    defense: new NumberField({ required: true, initial: 0 }),
+    defense: new NumberField({ required: true, nullable: false, initial: 0 }),
     defense_dodge: new NumberField({ required: true, nullable: false, initial: 0 }),
     defense_parry: new NumberField({ required: true, nullable: false, initial: 0 }),
     defense_block: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -230,7 +230,7 @@ export const CommonData = () => ({
         new SchemaField(InventoryData()),
         {
             required: true,
-            initial: { "All": { name: "All", type: "all", itemIds: [], showAll: true, label: "All" } }
+            initial: { "All": { name: "All", type: "all", itemIds: [], showAll: true, label: "SR5.Labels.Inventory.All" } }
         }
     ),
     visibilityChecks: new SchemaField(VisibilityChecks(), { required: true }),

@@ -874,9 +874,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const attributes = sheetData.system.attributes;
         for (let [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
-                if (attribute.temp === 0)
-                    //@ts-expect-error fvtt-types doesn't know about non-required field.
-                    attribute.temp = undefined;
+                // TODO: 123499/taMiF What can we do with temp?
+                // if (attribute.temp === 0)
+                //     attribute.temp = null;
             }
         }
     }
@@ -888,9 +888,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 const att = matrix[attribute];
                 if (att) {
                     if (!att.mod) att.mod = [];
-                    if (att.temp === 0)
-                        //@ts-expect-error fvtt-types doesn't know about non-required field.
-                        att.temp = undefined;
+                    // TODO: 123499/taMiF What can we do with temp?
+                    // if (att.temp === 0)
+                    //     att.temp = null;
                 }
             };
 
