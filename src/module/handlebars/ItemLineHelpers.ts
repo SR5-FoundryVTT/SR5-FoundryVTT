@@ -2,6 +2,8 @@ import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
 import {SR5} from "../config";
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
+import { SR5Item } from '../item/SR5Item';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 
 /**
  * Typing around the legacy item list helper.
@@ -1023,4 +1025,36 @@ export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('EmptyIcons', () => {
         return [{}];
     })
+
+    /**
+     * Only used for the Item NetworksTab
+     */
+    Handlebars.registerHelper('NetworksHeaderRightSide', () => {
+        return [{
+            text: {
+                text: game.i18n.localize('SR5.Labels.Sheet.Type'),
+            },
+        }]
+    });
+    /**
+     * Only used for the Item NetworksTab
+     */
+    Handlebars.registerHelper('NetworksItemRightSide', (item: SR5Item) => {
+        const type = ActorMarksFlow.getDocumentType(item);
+        return [{
+            text: {
+                text: game.i18n.localize(type),
+            },
+        }]
+    });
+    /**
+     * Only used for the Item NetworksTab
+     */
+    Handlebars.registerHelper('NetworksItemIcons', () => {
+        return [{
+            icon: 'fas fa-trash item-delete',
+            cssClass: 'sin-remove-network',
+            title: game.i18n.localize('SR5.DeleteItem'),
+        }]
+    });
 };

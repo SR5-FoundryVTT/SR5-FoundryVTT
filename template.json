@@ -1747,7 +1747,8 @@
                 "technology",
                 "importFlags"
             ],
-            "licenses": []
+            "licenses": [],
+            "networks": []
         },
         "lifestyle": {
             "templates": [

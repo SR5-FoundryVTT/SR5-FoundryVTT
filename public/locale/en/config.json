@@ -750,7 +750,6 @@
     "SR5.MatrixTargetAcquisitionApplication": {
         "Icons": "Icons",
         "MarkPlacementAction": "Matrix Action",
-        "Networks": "Networks",
         "Title": "Matrix Target Acquisition"
     },
     "SR5.MeleeWeaponAttack": "Melee Weapon Attack",
@@ -854,6 +853,7 @@
     "SR5.Name": "Name",
     "SR5.NetHits": "Net Hits",
     "SR5.Network": "Network",
+    "SR5.Networks": "Networks",
     "SR5.New": "New",
     "SR5.NoCover": "No Cover",
     "SR5.NoSelectableToken": "Actor has no selectable token on canvas",

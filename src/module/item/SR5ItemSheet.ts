@@ -9,6 +9,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { MatrixRules } from '../rules/MatrixRules';
+import { SINFlow } from './flows/SINFlow';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -224,6 +225,10 @@ export class SR5ItemSheet extends ItemSheet {
             data['markedDocuments'] = await this.item.getAllMarkedDocuments();
         }
 
+        if (this.item.isSin) {
+            data['networks'] = await SINFlow.getNetworks(this.item);
+        }
+
         if (this.item.canBeMaster) {
             data.slaves = this.item.slaves;
             // Prepare PAN counter (1/3) for simple use in handlebar
@@ -357,6 +362,8 @@ export class SR5ItemSheet extends ItemSheet {
          */
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
+        html.find('.sin-remove-network').on('click', this._onRemoveNetwork.bind(this));
+
 
         html.find('.network-clear').on('click', this._onRemoveAllSlaves.bind(this));
         html.find('.network-device-remove').on('click', this._onRemoveSlave.bind(this));
@@ -525,6 +532,15 @@ export class SR5ItemSheet extends ItemSheet {
 
             return await this.updateLinkedActor(actor);
         }
+
+        // Add networks to SINs.
+        if (this.item.isSin && data.type === 'Item') {
+            const item = await fromUuid(data.uuid) as SR5Item;
+            if (!item) return;
+            if (!item.isGrid && !item.isHost) return;
+
+            await this.item.addNewNetwork(item);
+        }
     }
 
     _eventId(event) {
@@ -615,6 +631,20 @@ export class SR5ItemSheet extends ItemSheet {
         event.preventDefault();
         const index = event.currentTarget.dataset.index;
         if (index >= 0) await this.item.removeLicense(index);
+    }
+
+    /**
+     * User wants to remove a network from a SIN item.
+     */
+    async _onRemoveNetwork(event) {
+        event.preventDefault();
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
+
+        await SINFlow.removeNetwork(this.item, uuid);
     }
 
     async _onWeaponModRemove(event) {

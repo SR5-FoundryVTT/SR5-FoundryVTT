@@ -1,0 +1,16 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='networks'}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Networks')
+        rightSide=(NetworksHeaderRightSide)
+}}
+{{#each networks}}
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+    img=this.img
+    name=this.name
+    itemUuid=this.uuid
+    description=item.description.value
+    rightSide=(NetworksItemRightSide this)
+    icons=(NetworksItemIcons)
+}}
+{{/each}}
+{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

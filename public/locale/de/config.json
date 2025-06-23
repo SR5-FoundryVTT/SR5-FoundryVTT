@@ -729,7 +729,6 @@
     "SR5.MatrixTargetAcquisitionApplication": {
         "Icons": "Icons",
         "MarkPlacementAction": "Matrix Handlung",
-        "Networks": "Netzwerke",
         "Title": "Matrix Zielerfassung"
     },
     "SR5.MeleeWeaponAttack": "Nahkampfangriff",
@@ -833,6 +832,7 @@
     "SR5.Name": "Name",
     "SR5.NetHits": "Nettoerfolge",
     "SR5.Network": "Netzwerk",
+    "SR5.Networks": "Netzwerke",
     "SR5.New": "Neu:",
     "SR5.NoCover": "Keine Deckung",
     "SR5.NoSelectableToken": "Charakter hat kein auswählbares Token auf der Karte",

@@ -618,6 +618,20 @@ export class SR5Item extends Item {
         await this.update({ 'system.licenses': licenses });
     }
 
+    /**
+     * This method is used to add a new network to a SIN item.
+     * 
+     * @param item The network item to add to this SIN.
+     */
+    async addNewNetwork(item: SR5Item) {
+        const sin = this.asSin;
+        if (!sin) return;
+        if (!item.isGrid && !item.isHost) return;
+
+        sin.system.networks.push(item.uuid);
+        await this.update({'system.networks': sin.system.networks});
+    }
+
     get isSin(): boolean {
         return this.wrapper.isSin();
     }

@@ -8,7 +8,10 @@ declare namespace Shadowrun {
     }
 
     export interface SinPartData {
-        licenses: LicenseData[];
+        licenses: LicenseData[]
+        // List of networks this SIN has access to
+        // Stored as list of uuids
+        networks: string[]
     }
 
     export interface LicenseData {

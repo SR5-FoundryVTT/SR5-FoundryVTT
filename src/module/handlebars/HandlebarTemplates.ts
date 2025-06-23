@@ -34,6 +34,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/tabs/DescriptionTab.hbs',
         'systems/shadowrun5e/dist/templates/item/tabs/ActionTab.hbs',
         'systems/shadowrun5e/dist/templates/item/tabs/MiscellaneousTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/NetworksTab.hbs',
 
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
