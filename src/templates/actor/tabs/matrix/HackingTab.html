@@ -2,32 +2,29 @@
 <div class="inventory">
     <div class="flexrow align-start">
         <div>
-            <label>
-                {{#if network}}
-                    {{localize "SR5.Labels.ActorSheet.Network"}}: {{network.name}}
-                    <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                        <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
-                    </a>
+            {{#if network}}
+                {{localize "SR5.Labels.ActorSheet.Network"}}: {{network.name}}
+                <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                    <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                </a>
+            {{else}}
+                {{!When no network is connected, allow the GM only to freely select one }}
+                {{#if user.isGM}}
+                    <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
                 {{else}}
-                    {{!When no network is connected, allow the GM only to freely select one }}
-                    {{#if user.isGM}}
-                        <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
-                    {{else}}
-                        {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
-                    {{/if}}
+                    {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
                 {{/if}}
-            </label>
+            {{/if}}
         </div>
-        <div><button class="show-matrix-target-acquisition">{{localize "SR5.Labels.Sheet.TargetAcquisition"}}</button></div>
-        <div><button class="reboot-persona-device">{{localize "SR5.Labels.Sheet.RebootDevice"}}</button></div>
         <div>
-            <select name="system.matrix.markPlacementAction" data-tooltip="SR5.Tooltips.Actor.PlaceMark">
-                {{#select system.matrix.markPlacementAction}}
-                {{#each config.matrixMarkPlacementActions}}
-                <option value="{{@key}}">{{localize this}}</option>
-                {{/each}}
-                {{/select}}
-            </select>
+            <a class="show-matrix-target-acquisition">
+                Mark Icon <i class="item-icon fas fa-network-wired"></i>
+            </a>
+        </div>
+        <div>
+            <a class="reboot-persona-device">
+                Reboot <i class="item-icon fas fa-power-off"></i>
+            </a>
         </div>
     </div>
     <div class="split-container">

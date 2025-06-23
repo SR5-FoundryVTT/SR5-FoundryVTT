@@ -748,6 +748,9 @@
     "SR5.MatrixAttrSleaze": "Sleaze",
     "SR5.MatrixTarget": "Matrix Target",
     "SR5.MatrixTargetAcquisitionApplication": {
+        "Icons": "Icons",
+        "MarkPlacementAction": "Matrix Action",
+        "Networks": "Networks",
         "Title": "Matrix Target Acquisition"
     },
     "SR5.MeleeWeaponAttack": "Melee Weapon Attack",

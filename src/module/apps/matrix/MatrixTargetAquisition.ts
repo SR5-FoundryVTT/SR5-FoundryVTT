@@ -1,4 +1,5 @@
 import { SR5Actor } from "../../actor/SR5Actor";
+import { SR5 } from "../../config";
 import { MatrixFlow } from "../../flows/MatrixFlow";
 import { Helpers } from "../../helpers";
 import { SR5Item } from "../../item/SR5Item";
@@ -8,7 +9,6 @@ import { TestCreator } from "../../tests/TestCreator";
 
 // Overall Sheet Data for this application.
 interface MatrixTargetAcquisitionSheetData {
-    placementActions: string[]
     targets: Shadowrun.MatrixTargetDocument[]
     personas: Shadowrun.MatrixTargetDocument[]
     ics: Shadowrun.MatrixTargetDocument[]
@@ -18,6 +18,10 @@ interface MatrixTargetAcquisitionSheetData {
     network: SR5Item|null
     hostNetwork: boolean
     gridNetwork: boolean
+    config: typeof SR5
+    // Currently selected mark placement action.
+    // Used for select option
+    markPlacementAction: string
 }
 
 type MatrixPlacementTests = BruteForceTest | HackOnTheFlyTest;
@@ -31,11 +35,14 @@ type MatrixPlacementTests = BruteForceTest | HackOnTheFlyTest;
 export class MatrixTargetAcquisitionApplication extends Application {
     // The matrix user to be used for target acquisition.
     public actor: SR5Actor;
+    markPlacementAction: string;
 
     constructor(actor: SR5Actor) {
         super();
 
         this.actor = actor;
+        const character = this.actor.asCharacter();
+        this.markPlacementAction = character?.system.matrix.markPlacementAction ?? 'Brute Force';
     }
 
     override get template() {
@@ -65,10 +72,15 @@ export class MatrixTargetAcquisitionApplication extends Application {
         super.activateListeners(html);
 
         html.find('.show-matrix-placement').on('click', this.handleMarkPlacement.bind(this));
+        html.find('#mark-placement-action').on('click', this.handlePlacementAction.bind(this));
     }
 
     override async getData(options?: Partial<ApplicationOptions> | undefined): Promise<MatrixTargetAcquisitionSheetData> {
         const data = await super.getData(options) as MatrixTargetAcquisitionSheetData;
+
+        data.config = SR5;
+
+        const character = this.actor.asCharacter();
 
         // Allow template to switch between network types.
         const network = this.actor.network;
@@ -99,8 +111,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
         data.ics = actors.filter(target => target.document.isIC());
         data.devices = items.filter(target => !target.document);
 
-        // TODO: Needed and used? Replaced by actor system data entry for it?
-        data.placementActions = ['brute_force', 'hack_on_the_fly'];
+        data.markPlacementAction = character?.system.matrix.markPlacementAction ?? 'brute_force';
 
         return data;
     }
@@ -123,21 +134,35 @@ export class MatrixTargetAcquisitionApplication extends Application {
             return;
         }
 
-        // Get default mark placement action.
-        const character = this.actor.asCharacter();
-        if (!character) return;
-        const markPlacementAction = character.system.matrix.markPlacementAction;
-        if (!markPlacementAction) return;
+        if (!this.markPlacementAction) {
+            console.error('Shadowrun 5e | No mark placement action selected.');
+            return;
+        };
 
         // Get test for that action.
-        const test = await TestCreator.fromPackAction('matrix-actions', markPlacementAction, this.actor) as MatrixPlacementTests;
+        const test = await TestCreator.fromPackAction('matrix-actions', this.markPlacementAction, this.actor) as MatrixPlacementTests;
         if (!test) return;
 
+        await this.actor.update({'system.matrix.markPlacementAction': this.markPlacementAction });
         this.close();
 
         // Prepare test for placing a mark on the target.
         // test.data.iconUuid = targetUuid;
         test.addTarget(target);
         await test.execute();
+    }
+
+    /**
+     * Trigger changes when selecting a different placment action.
+     * 
+     * This app is not a document sheet, so we store the value temporarily in the application instance.
+     * 
+     * @param event Triggered 
+     */
+    async handlePlacementAction(event) {
+        event.stopPropagation();
+
+        const select = event.currentTarget as HTMLSelectElement;
+        this.markPlacementAction = select.value;
     }
 }

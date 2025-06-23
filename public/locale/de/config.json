@@ -727,6 +727,9 @@
     "SR5.MatrixAttrSleaze": "Schleicher",
     "SR5.MatrixTarget": "Matrixziel",
     "SR5.MatrixTargetAcquisitionApplication": {
+        "Icons": "Icons",
+        "MarkPlacementAction": "Matrix Handlung",
+        "Networks": "Netzwerke",
         "Title": "Matrix Zielerfassung"
     },
     "SR5.MeleeWeaponAttack": "Nahkampfangriff",

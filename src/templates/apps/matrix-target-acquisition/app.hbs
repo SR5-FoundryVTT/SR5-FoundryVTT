@@ -1,16 +1,26 @@
 {{#if hostNetwork}}
-<div class="list-header">
-{{localize 'TYPES.Item.host'}}: {{this.network.name}}
+<div>
+        <label>{{localize 'TYPES.Item.host'}}</label>: {{this.network.name}}
 </div>
 {{/if}}
 {{#if gridNetwork}}
-<div class="list-header">
-{{localize 'TYPES.Item.grid'}}: {{this.network.name}}
+<div>
+        <label>{{localize 'TYPES.Item.grid'}}</label>: {{this.network.name}}
 </div>
 {{/if}}
+<div>
+        <label for="mark-placement-action">{{localize "SR5.MatrixTargetAcquisitionApplication.MarkPlacementAction"}}</label>
+        <select id="mark-placement-action" data-tooltip="SR5.Tooltips.Actor.PlaceMark">
+        {{#select markPlacementAction}}
+        {{#each config.matrixMarkPlacementActions}}
+        <option value="{{@key}}">{{localize this}}</option>
+        {{/each}}
+        {{/select}}
+        </select>
+</div>
 <nav class="tabs" data-group="primary">
-        <a class="item" data-tab="targets">{{localize "SR5.Targets"}}</a>
-        <a class="item" data-tab="networks">{{localize "SR5.Networks"}}</a>
+        <a class="item" data-tab="targets">{{localize "SR5.MatrixTargetAcquisitionApplication.Icons"}}</a>
+        <a class="item" data-tab="networks">{{localize "SR5.MatrixTargetAcquisitionApplication.Networks"}}</a>
 </nav>
 <section class="sheetbody tabsbody" data-group="primary">
         {{> "systems/shadowrun5e/dist/templates/apps/matrix-target-acquisition/tabs/targets.hbs"}}

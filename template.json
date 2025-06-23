@@ -998,7 +998,7 @@
             },
             "situation_modifiers": {},
             "matrix": {
-                "markPlacementAction": ""
+                "markPlacementAction": "Brute Force"
             }
         },
         "spirit": {
