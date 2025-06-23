@@ -57,14 +57,14 @@ export interface Metatype {
     };
     movement?: { _TEXT: string; };
     name: { _TEXT: string; };
-    optionalpowers?: Empty | {
-        optionalpower?: OneOrMany<{ _TEXT: string; $?: { select: string; }; }>;
+    optionalpowers?: {
+        optionalpower: OneOrMany<{ _TEXT: string; $?: { select: string; }; }>;
     };
     page: { _TEXT: string; };
     powers?: {
         power: OneOrMany<{ _TEXT: string; $?: { rating?: string; select?: string; }; }>;
     };
-    qualities?: Empty | {
+    qualities?: {
         negative?: {
             quality: OneOrMany<{ _TEXT: string; $?: { removable?: string; select?: string; }; }>;
         };
@@ -89,7 +89,7 @@ export interface Metatype {
     run?: { _TEXT: string; $?: { alt: string; }; };
     skills?: {
         group?: OneOrMany<{ _TEXT: string; $: { rating: string; }; }>;
-        knowledge?: { _TEXT: string; $: { category: string; rating: string; }; };
+        knowledge?: { _TEXT: string; $: { attribute: string; category: string; rating: string; }; };
         skill: Many<{ _TEXT: string; $: { rating: string; select?: string; spec?: string; }; }>;
     };
     source: { _TEXT: string; };
