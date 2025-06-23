@@ -918,6 +918,9 @@ export const registerItemLineHelpers = () => {
         return [incrementIcon, decrementIcon];
     });
 
+    /**
+     * Only used for the Matrix HackingTab Mark List
+     */
     Handlebars.registerHelper('MarkListHeaderRightSide', () => {
         return [
             {
@@ -935,6 +938,24 @@ export const registerItemLineHelpers = () => {
                     text: game.i18n.localize('SR5.Qty'),
                 },
             }]
+    });
+
+    /**
+     * Only used for the Matrix HackingTab Target List
+     */
+    Handlebars.registerHelper('TargetListHeaderRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Labels.Sheet.Type'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Labels.ActorSheet.Network'),
+                },
+            }
+        ]
     });
 
     Handlebars.registerHelper('MarkListHeaderIcons', () => {

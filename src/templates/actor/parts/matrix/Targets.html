@@ -2,7 +2,7 @@
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
             name=(localize 'SR5.Labels.Sheet.TargetAcquisition')
             itemId='target'
-            rightSide=(MarkListHeaderRightSide)
+            rightSide=(TargetListHeaderRightSide)
             icons=(TargetListHeaderIcons)
             itemCssClass='switch-matrix-hacking-target'
     }}
@@ -23,7 +23,6 @@
                 <div class="item-text">
                     {{this.network}}
                 </div>
-                <div class="item-text"></div>
                 <div class="item-text"></div>
             </div>
         </div>
