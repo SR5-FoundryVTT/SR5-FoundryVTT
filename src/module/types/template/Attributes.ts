@@ -1,12 +1,11 @@
-import { BaseValuePair, ModifiableValue } from "./Base";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ModifiableValue } from "./Base";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const AttributeField = () => ({
     ...ModifiableValue(),
     hidden: new BooleanField({ required: true, initial: false }),
     label: new StringField({ required: true, initial: '' }),
     limit: new StringField({ required: false, initial: '' }),
-    temp: new NumberField({ required: true, nullable: false, initial: 0 })
 });
 
 const EdgeAttributeField = () => ({

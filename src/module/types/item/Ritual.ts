@@ -1,13 +1,20 @@
-import { DescriptionPartData } from "../template/Description";
-import { ImportFlags } from "../template/ImportFlags";
-import { ActionPartData } from "./Action";
-
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DescriptionData } from "../template/Description";
+import { ImportFlagData } from "../template/ImportFlags";
+import { ActionRollData } from "./Action";
+const { SchemaField, StringField } = foundry.data.fields;
 
 const RitualData = {
-    ...DescriptionPartData(),
-    ...ImportFlags(),
-    ...ActionPartData({test: 'RitualSpellcastingTest', opposedTest: 'OpposedRitualTest', followedTest: 'DrainTest'}),
+    action: new SchemaField(
+        ActionRollData({
+            test: 'RitualSpellcastingTest',
+            opposedTest: 'OpposedRitualTest',
+            followedTest: 'DrainTest'
+        }),
+        { required: true }
+    ),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+
     type: new StringField({ required: true, initial: '' }),
     descriptors: new StringField({ required: true, initial: '' }),
 };

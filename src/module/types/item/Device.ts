@@ -1,8 +1,8 @@
 import { MatrixAttributes } from "../actor/Common";
-import { ImportFlags } from "../template/ImportFlags";
-import { TechnologyPartData } from "../template/Technology";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { TechnologyData } from "../template/Technology";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+const { SchemaField, ArrayField, StringField } = foundry.data.fields;
 
 export const DevicePartData = () => ({
     category: new StringField({
@@ -17,11 +17,10 @@ export const DevicePartData = () => ({
 
 const DeviceData = {
     ...DevicePartData(),
-    ...DescriptionPartData(),
-    ...TechnologyPartData(),
-    ...ImportFlags(),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    technology: new SchemaField(TechnologyData(), { required: true }),
 };
-
 
 export class Device extends foundry.abstract.TypeDataModel<typeof DeviceData, Item.Implementation> {
     static override defineSchema() {

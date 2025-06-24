@@ -1,7 +1,7 @@
 import { DevicePartData } from "./Device";
-import { DescriptionPartData } from "../template/Description";
-import { ImportFlags } from "../template/ImportFlags";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
+import { DescriptionData } from "../template/Description";
+import { ImportFlagData } from "../template/ImportFlags";
+const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const SourceEntityField = () => ({
     id: new StringField({ required: true, initial: '' }),
@@ -13,8 +13,9 @@ export const SourceEntityField = () => ({
 
 const HostData = {
     ...DevicePartData(),
-    ...DescriptionPartData(),
-    ...ImportFlags(),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+
     rating: new NumberField({ required: true, nullable: false, initial: 1 }),
     marks: new TypedObjectField(new NumberField({ required: true, nullable: false, initial: 0 }), { required: true }),
     ic: new ArrayField(new SchemaField(SourceEntityField()), { required: true }),

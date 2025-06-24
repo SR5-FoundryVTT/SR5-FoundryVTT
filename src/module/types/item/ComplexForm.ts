@@ -1,12 +1,13 @@
-import { ActionPartData } from "./Action";
-import { ImportFlags } from "../template/ImportFlags";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ActionRollData } from "./Action";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 export const ComplexFormData = () => ({
-    ...DescriptionPartData(),
-    ...ImportFlags(),
-    ...ActionPartData({test: 'ComplexFormTest', opposedTest: 'OpposedTest', followedTest: 'FadeTest'}),
+    action: new SchemaField(ActionRollData({test: 'ComplexFormTest', opposedTest: 'OpposedTest', followedTest: 'FadeTest'}), { required: true }),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+
     target: new StringField({
         required: true,
         initial: '',

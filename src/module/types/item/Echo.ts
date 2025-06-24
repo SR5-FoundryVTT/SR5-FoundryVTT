@@ -1,12 +1,11 @@
-import { ImportFlags } from "../template/ImportFlags";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+const { SchemaField } = foundry.data.fields;
 
 const EchoData = {
-    ...DescriptionPartData(),
-    ...ImportFlags()
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
 };
-
 
 export class Echo extends foundry.abstract.TypeDataModel<typeof EchoData, Item.Implementation> {
     static override defineSchema() {

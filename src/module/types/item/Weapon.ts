@@ -1,9 +1,9 @@
+import { Action, ActionRollData } from "./Action";
+import { TechnologyData } from "../template/Technology";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
 import { ValueMaxPair, ModifiableValue } from "../template/Base";
-import { DescriptionPartData } from "../template/Description";
-import { ImportFlags } from "../template/ImportFlags";
-import { TechnologyPartData } from "../template/Technology";
-import { Action, ActionPartData } from "./Action";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const BlastData = () => ({
     radius: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -55,10 +55,11 @@ const ThrownWeaponData = () => ({
 });
 
 const WeaponData = {
-    ...DescriptionPartData(),
-    ...TechnologyPartData(),
-    ...ActionPartData({test: '', opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'}),
-    ...ImportFlags(),
+    action: new SchemaField(ActionRollData({test: '', opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'}), { required: true }),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    technology: new SchemaField(TechnologyData(), { required: true }),
+
     category: new StringField({
         required: true,
         initial: '',

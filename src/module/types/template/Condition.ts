@@ -1,5 +1,5 @@
 import { ValueMaxPair } from "./Base";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { StringField } = foundry.data.fields;
 
 export const ConditionData = () => ({
     ...ValueMaxPair(),

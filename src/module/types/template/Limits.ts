@@ -1,5 +1,5 @@
-import { BaseValuePair, ModifiableValue } from "./Base";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ModifiableValue } from "./Base";
+const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
 export const LimitField = () => ({
     ...ModifiableValue(),

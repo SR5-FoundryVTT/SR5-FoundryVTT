@@ -1,5 +1,5 @@
 import { ModifiableValue } from "./Base";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const BaseArmorData = () => ({
     ...ModifiableValue(),

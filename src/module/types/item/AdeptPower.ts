@@ -1,20 +1,20 @@
-import { ArmorPartData } from "./Armor";
-import { ActionPartData } from "./Action";
-import { ImportFlags } from "../template/ImportFlags";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ArmorValueData } from "./Armor";
+import { ActionRollData } from "./Action";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const AdeptPowerData = {
-    ...DescriptionPartData(),
-    ...ActionPartData(),
-    ...ImportFlags(),
-    ...ArmorPartData(),
+    action: new SchemaField(ActionRollData(), { required: true }),
+    armor: new SchemaField(ArmorValueData(), { required: true }),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+
     pp: new NumberField({ required: true, initial: 0 }),
     type: new StringField({ required: true, initial: ''}),
     drain: new BooleanField({ required: true, initial: false }),
     level: new NumberField({ required: true, initial: 0 }),
 }
-
 
 export class AdeptPower extends foundry.abstract.TypeDataModel<typeof AdeptPowerData, Item.Implementation> {
     static override defineSchema() {

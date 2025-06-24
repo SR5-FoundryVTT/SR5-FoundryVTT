@@ -1,4 +1,4 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, ArrayField, StringField } = foundry.data.fields;
 
 export const PhysicalAttribute = new StringField({
     choices: ['body', 'agility', 'reaction', 'strength'],

@@ -65,8 +65,8 @@ declare module "fvtt-types/configuration" {
         ready: true;
     }
 
-    interface System {
-        id: "shadowrun5e";
+    interface SystemNameConfig {
+        name: "shadowrun5e";
     }
 
     interface ReadyGame {

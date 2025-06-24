@@ -1,12 +1,13 @@
-import { ImportFlags } from "../template/ImportFlags";
-import { TechnologyPartData } from "../template/Technology";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { DescriptionData } from "../template/Description";
+import { ImportFlagData } from "../template/ImportFlags";
+import { TechnologyData } from "../template/Technology";
+const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const ModificationData = {
-    ...DescriptionPartData(),
-    ...TechnologyPartData(),
-    ...ImportFlags(),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    technology: new SchemaField(TechnologyData(), { required: true }),
+
     type: new StringField({
         required: true,
         initial: '',

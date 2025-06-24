@@ -1,5 +1,5 @@
 import { ModifiableValue } from "./Base";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField } = foundry.data.fields;
 
 export const MovementField = () => ({
     ...ModifiableValue(),

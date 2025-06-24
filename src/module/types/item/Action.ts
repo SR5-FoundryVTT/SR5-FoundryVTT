@@ -1,7 +1,7 @@
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
-import { DescriptionPartData } from "../template/Description";
-import { ImportFlags } from "../template/ImportFlags";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foundry.data.fields;
 
 const ResultActionData = () => ({
     action: new StringField({
@@ -69,17 +69,19 @@ export const DamageData = () => ({
     }, { required: false }),
 });
 
-export const ActionRollData = ({
-    test = 'SuccessTest',
-    opposedTest = '',
-    resistTest = '',
-    followedTest = ''
-}: {
-    test?: string;
-    opposedTest?: string;
-    resistTest?: string;
-    followedTest?: string;
-} = {}) => ({
+export const ActionRollData = (
+    {
+        test = 'SuccessTest',
+        opposedTest = '',
+        resistTest = '',
+        followedTest = ''
+    }: {
+        test?: string;
+        opposedTest?: string;
+        resistTest?: string;
+        followedTest?: string;
+    } = {}
+) => ({
     ...MinimalActionData(),
     test: new StringField({ required: true, initial: test }),
     type: new StringField({ required: true, initial: '' }),
@@ -121,24 +123,12 @@ export const ActionRollData = ({
     roll_mode: new StringField({ required: true, initial: '' }),
 });
 
-export const ActionPartData = ({
-    test = 'SuccessTest',
-    opposedTest = '',
-    resistTest = '',
-    followedTest = ''
-}: {
-    test?: string;
-    opposedTest?: string;
-    resistTest?: string;
-    followedTest?: string;
-} = {}) => ({
-    action: new SchemaField(ActionRollData({test, opposedTest, resistTest, followedTest}), { required: true }),
-});
 
 const ActionData = {
-    ...ActionPartData(),
-    ...ImportFlags(),
-    ...DescriptionPartData(),
+    action: new SchemaField(ActionRollData(), { required: true }),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+
     result: new SchemaField(ActionResultData()),
 };
 

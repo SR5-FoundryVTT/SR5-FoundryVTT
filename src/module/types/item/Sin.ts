@@ -1,7 +1,7 @@
-import { ImportFlags } from "../template/ImportFlags";
-import { TechnologyPartData } from "../template/Technology";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ImportFlagData } from "../template/ImportFlags";
+import { TechnologyData } from "../template/Technology";
+import { DescriptionData } from "../template/Description";
+const { HTMLField, SchemaField, ArrayField, StringField } = foundry.data.fields;
 
 const LicenseData = () => ({
     name: new StringField({ required: true, initial: '' }),
@@ -10,12 +10,12 @@ const LicenseData = () => ({
 });
 
 const SinData = {
-    ...DescriptionPartData(),
-    ...TechnologyPartData(),
-    ...ImportFlags(),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    technology: new SchemaField(TechnologyData(), { required: true }),
+
     licenses: new ArrayField(new SchemaField(LicenseData()), { required: true, initial: [] }),
 }
-
 
 export class Sin extends foundry.abstract.TypeDataModel<typeof SinData, Item.Implementation> {
     static override defineSchema() {

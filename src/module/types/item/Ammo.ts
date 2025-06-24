@@ -1,13 +1,14 @@
 import { BlastData } from "./Weapon";
-import { ImportFlags } from "../template/ImportFlags";
-import { TechnologyPartData } from "../template/Technology";
-import { DescriptionPartData } from "../template/Description";
+import { ImportFlagData } from "../template/ImportFlags";
+import { TechnologyData } from "../template/Technology";
+import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const AmmoData = () => ({
-    ...DescriptionPartData(),
-    ...TechnologyPartData(),
-    ...ImportFlags(),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    technology: new SchemaField(TechnologyData(), { required: true }),
+
     element: new StringField({
         required: true,
         initial: '',

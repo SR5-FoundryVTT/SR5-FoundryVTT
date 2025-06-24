@@ -1,4 +1,4 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const FireModeData = () => ({
     value: new NumberField({ required: true, nullable: false, initial: 0 }),

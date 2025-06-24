@@ -1,4 +1,4 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const RangeTemplateData = () => ({
     distance: new NumberField({ required: true, nullable: false, initial: 0 }),

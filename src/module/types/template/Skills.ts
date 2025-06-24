@@ -1,5 +1,5 @@
 import { ModifiableValue, KeyValuePair } from "./Base";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
+const { SchemaField, BooleanField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 

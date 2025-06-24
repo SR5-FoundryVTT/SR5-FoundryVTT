@@ -1,16 +1,17 @@
-import { ArmorPartData } from "./Armor";
-import { Action, ActionPartData } from "./Action";
-import { ImportFlags } from "../template/ImportFlags";
-import { TechnologyPartData } from "../template/Technology";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ArmorValueData } from "./Armor";
+import { Action, ActionRollData } from "./Action";
+import { TechnologyData } from "../template/Technology";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const BiowareData = {
-    ...DescriptionPartData(),
-    ...TechnologyPartData(),
-    ...ActionPartData(),
-    ...ImportFlags(),
-    ...ArmorPartData(),
+    action: new SchemaField(ActionRollData(), { required: true }),
+    armor: new SchemaField(ArmorValueData(), { required: true }),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    technology: new SchemaField(TechnologyData(), { required: true }),
+
     essence: new NumberField({ required: true, nullable: false, initial: 0 }),
     capacity: new NumberField({ required: true, nullable: false, initial: 0 }),
     grade: new StringField({
@@ -19,7 +20,6 @@ const BiowareData = {
         choices: ['alpha', 'beta', 'delta', 'gamma', 'standard', 'used'],
     }),
 }
-
 
 export class Bioware extends foundry.abstract.TypeDataModel<typeof BiowareData, Item.Implementation> {
     static override defineSchema() {

@@ -1,6 +1,6 @@
 import { ModifiableValue } from "./Base";
 import { ConditionData } from "./Condition";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const TechnologyData = () => ({
     rating: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -29,7 +29,3 @@ export const TechnologyData = () => ({
 });
 
 export type TechnologyType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof TechnologyData>>;
-
-export const TechnologyPartData = () => ({
-    technology: new SchemaField(TechnologyData())
-});

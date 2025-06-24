@@ -1,27 +1,25 @@
-import { ImportFlags } from "../template/ImportFlags";
-import { TechnologyPartData } from "../template/Technology";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { TechnologyData } from "../template/Technology";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+const { SchemaField, NumberField, BooleanField } = foundry.data.fields;
 
-export const ArmorPartData = () => ({
-    armor: new SchemaField({
-        base: new NumberField({ required: true, nullable: false, initial: 0 }),
-        mod: new BooleanField({ required: true, initial: false }),
-        value: new NumberField({ required: true, nullable: false, initial: 0 }),
-        acid: new NumberField({ required: true, nullable: false, initial: 0 }),
-        cold: new NumberField({ required: true, nullable: false, initial: 0 }),
-        fire: new NumberField({ required: true, nullable: false, initial: 0 }),
-        electricity: new NumberField({ required: true, nullable: false, initial: 0 }),
-        radiation: new NumberField({ required: true, nullable: false, initial: 0 }),
-        hardened: new BooleanField({ required: true, initial: false }),
-    }, { required: true })
+export const ArmorValueData = () => ({
+    base: new NumberField({ required: true, nullable: false, initial: 0 }),
+    mod: new BooleanField({ required: true, initial: false }),
+    value: new NumberField({ required: true, nullable: false, initial: 0 }),
+    acid: new NumberField({ required: true, nullable: false, initial: 0 }),
+    cold: new NumberField({ required: true, nullable: false, initial: 0 }),
+    fire: new NumberField({ required: true, nullable: false, initial: 0 }),
+    electricity: new NumberField({ required: true, nullable: false, initial: 0 }),
+    radiation: new NumberField({ required: true, nullable: false, initial: 0 }),
+    hardened: new BooleanField({ required: true, initial: false }),
 });
 
 export const ArmorData = () => ({
-    ...ArmorPartData(),
-    ...DescriptionPartData(),
-    ...ImportFlags(),
-    ...TechnologyPartData(),
+    armor: new SchemaField(ArmorValueData(), { required: true }),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    technology: new SchemaField(TechnologyData(), { required: true }),
 });
 
 export class Armor extends foundry.abstract.TypeDataModel<ReturnType<typeof ArmorData>, Item.Implementation> {

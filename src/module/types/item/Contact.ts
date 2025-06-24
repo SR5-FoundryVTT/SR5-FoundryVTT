@@ -1,10 +1,11 @@
-import { ImportFlags } from "../template/ImportFlags";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const ContactData = {
-    ...DescriptionPartData(),
-    ...ImportFlags(),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+
     type: new StringField({ required: true, initial: '' }),
     connection: new NumberField({ required: true, initial: 0 }),
     loyalty: new NumberField({ required: true, initial: 0 }),
@@ -20,5 +21,5 @@ export class Contact extends foundry.abstract.TypeDataModel<typeof ContactData, 
         return ContactData;
     }
 }
-console.log("ContactData", ContactData, new Contact());
 
+console.log("ContactData", ContactData, new Contact());

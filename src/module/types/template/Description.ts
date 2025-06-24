@@ -1,4 +1,4 @@
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { HTMLField, SchemaField, StringField } = foundry.data.fields;
 
 export const DescriptionData = () => ({
     value: new HTMLField({ required: true, initial: '' }),

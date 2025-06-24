@@ -1,10 +1,11 @@
-import { ImportFlags } from "../template/ImportFlags";
-import { DescriptionPartData } from "../template/Description";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const LifestyleData = {
-    ...DescriptionPartData(),
-    ...ImportFlags(),
+    description: new SchemaField(DescriptionData(), { required: true }),
+    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+
     type: new StringField({ required: true, initial: '' }),
     comforts: new NumberField({ required: true, initial: 0 }),
     security: new NumberField({ required: true, initial: 0 }),
@@ -12,10 +13,7 @@ const LifestyleData = {
     guests: new NumberField({ required: true, initial: 0 }),
     permanent: new BooleanField({ required: true, initial: false }),
     cost: new NumberField({ required: true, initial: 0 }),
-    // todo what the hell is this?
-    // mods: new ArrayField({ required: true, initial: [] }),
 }
-
 
 export class Lifestyle extends foundry.abstract.TypeDataModel<typeof LifestyleData, Item.Implementation> {
     static override defineSchema() {
