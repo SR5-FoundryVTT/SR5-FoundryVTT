@@ -125,13 +125,13 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
 
         // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
         if (items && !Array.isArray(items)) {
-            items = Helpers.convertIndexedObjectToArray(items);
+            items = Helpers.convertIndexedObjectToArray(items) as Item.Source[];
         }
 
         // Manually map wrongly converted array fields...
         items = items.map(item => {
             if (item.effects && !Array.isArray(item.effects)) {
-                item.effects = Helpers.convertIndexedObjectToArray(item.effects);
+                item.effects = Helpers.convertIndexedObjectToArray(item.effects) as Item.Source['effects'];
             }
             return item;
         });
