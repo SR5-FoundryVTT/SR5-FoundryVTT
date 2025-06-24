@@ -5,10 +5,10 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField } = foundry.data.fields;
 
 const EquipmentData = {
-    action: new SchemaField(ActionRollData(), { required: true }),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
-    technology: new SchemaField(TechnologyData(), { required: true }),
+    action: new SchemaField(ActionRollData()),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
+    technology: new SchemaField(TechnologyData()),
 }
 
 export class Equipment extends foundry.abstract.TypeDataModel<typeof EquipmentData, Item.Implementation> {

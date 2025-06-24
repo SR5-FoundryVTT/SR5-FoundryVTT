@@ -4,80 +4,71 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpellData = {
-    action: new SchemaField(ActionRollData({test: 'SpellCastingTest', followedTest: 'DrainTest'}), { required: true }),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    action: new SchemaField(ActionRollData({test: 'SpellCastingTest', followedTest: 'DrainTest'})),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
     type: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['physical', 'mana', '']
     }),
     category: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['combat', 'detection', 'enchantment', 'health', 'illusion', 'manipulation', 'ritual', ''] // what to do with enchantment (from chummer)?
     }),
     drain: new NumberField({ required: true, nullable: false, initial: 0 }),
     range: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['touch', 'los', 'los_a', '']
     }),
     duration: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['instant', 'sustained', 'permanent', '']
     }),
 
     extended: new BooleanField({ initial: false }),
     combat: new SchemaField({
         type: new StringField({
-            required: true,
-            initial: '',
             blank: true,
+            required: true,
             choices: ['direct', 'indirect', '']
         }),
     }),
     detection: new SchemaField({
         type: new StringField({
-            required: true,
-            initial: '',
             blank: true,
+            required: true,
             choices: ['directional', 'psychic', 'area', '']
         }),
-        passive: new BooleanField({ required: true, initial: false }),
-        extended: new BooleanField({ required: true, initial: false }), // do we need this?
+        passive: new BooleanField(),
+        extended: new BooleanField(), // do we need this?
     }),
     illusion: new SchemaField({
         type: new StringField({
-            required: true,
-            initial: '',
             blank: true,
+            required: true,
             choices: ['obvious', 'realistic', '']
         }),
         sense: new StringField({
-            required: true,
-            initial: '',
             blank: true,
+            required: true,
             choices: ['single-sense', 'multi-sense', '']
         }),
     }),
     manipulation: new SchemaField({
-        damaging: new BooleanField({ required: true, initial: false }),
-        mental: new BooleanField({ required: true, initial: false }),
-        environmental: new BooleanField({ required: true, initial: false }),
-        physical: new BooleanField({ required: true, initial: false }),
+        damaging: new BooleanField(),
+        mental: new BooleanField(),
+        environmental: new BooleanField(),
+        physical: new BooleanField(),
     }),
     ritual: new SchemaField({
         type: new StringField({
-            required: true,
-            initial: '',
             blank: true,
+            required: true,
             choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter', '']
         }),
     }),

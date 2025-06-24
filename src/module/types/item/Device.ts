@@ -6,20 +6,20 @@ const { SchemaField, ArrayField, StringField } = foundry.data.fields;
 
 export const DevicePartData = () => ({
     category: new StringField({
+        blank: true,
         required: true,
         initial: 'commlink',
-        blank: true,
         choices: ['commlink', 'cyberdeck', 'rcc', 'host', ''],
     }),
-    atts: new SchemaField(MatrixAttributes(), { required: true }),
-    networkDevices: new ArrayField(new StringField({ required: true, initial: '' })),
+    atts: new SchemaField(MatrixAttributes()),
+    networkDevices: new ArrayField(new StringField({ required: true })),
 });
 
 const DeviceData = {
     ...DevicePartData(),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
-    technology: new SchemaField(TechnologyData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
+    technology: new SchemaField(TechnologyData()),
 };
 
 export class Device extends foundry.abstract.TypeDataModel<typeof DeviceData, Item.Implementation> {

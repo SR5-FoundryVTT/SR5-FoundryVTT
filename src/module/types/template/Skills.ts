@@ -5,17 +5,17 @@ export type SkillCategories = 'active' | 'language' | 'knowledge';
 
 export const SkillField = () => ({
     ...ModifiableValue(),
-    name: new StringField({ required: true, initial: '' }),
-    hidden: new BooleanField({ required: true, initial: false }),
-    label: new StringField({ required: true, initial: '' }),
+    name: new StringField({ required: true }),
+    hidden: new BooleanField(),
+    label: new StringField({ required: true }),
     bonus: new ArrayField(new SchemaField(KeyValuePair())),
-    attribute: new StringField({ required: true, initial: '' }),
-    _delete: new BooleanField({ required: true, initial: false }), // Does it use it?
-    specs: new ArrayField(new StringField({ required: true, initial: '' })),
-    canDefault: new BooleanField({ required: true, initial: true }),
-    id: new StringField({ required: true, initial: '' }),
-    link: new StringField({ required: true, initial: '' }),
-    group: new StringField({ required: true, initial: '' }),
+    attribute: new StringField({ required: true }),
+    _delete: new BooleanField(), // Does it use it?
+    specs: new ArrayField(new StringField({ required: true })),
+    canDefault: new BooleanField({ initial: true }),
+    id: new StringField({ required: true }),
+    link: new StringField({ required: true }),
+    group: new StringField({ required: true }),
 });
 
 function skill(createData: foundry.data.fields.SchemaField.CreateData<ReturnType<typeof SkillField>> = {}): SkillFieldType {

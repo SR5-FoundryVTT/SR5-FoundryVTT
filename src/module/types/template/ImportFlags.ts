@@ -1,11 +1,11 @@
 const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
 export const ImportFlagData = () => ({
-    name: new StringField({ required: true, initial: '' }),
-    type: new StringField({ required: true, initial: '' }),
-    subType: new StringField({ required: true, initial: '' }),
-    isImported: new BooleanField({ required: true, initial: false }),
-    isFreshImport: new BooleanField({ required: true, initial: false }),
+    name: new StringField({ required: true }),
+    type: new StringField({ required: true }),
+    subType: new StringField({ required: true }),
+    isImported: new BooleanField(),
+    isFreshImport: new BooleanField(),
 });
 
 export const ImportFlags = () => ({

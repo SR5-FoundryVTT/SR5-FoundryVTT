@@ -10,8 +10,8 @@ export const CritterData = () => ({
     ...MatrixActorData(),
     ...MovementActorData(),
     ...NPCActorData(),
-    values: new SchemaField(PhysicalCombatValues(), { required: true }),
-    limits: new SchemaField(CharacterLimits(), { required: true }),
+    values: new SchemaField(PhysicalCombatValues()),
+    limits: new SchemaField(CharacterLimits()),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,

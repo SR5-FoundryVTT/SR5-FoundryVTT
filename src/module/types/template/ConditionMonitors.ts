@@ -1,5 +1,5 @@
 import { ValueMaxPair, ModifiableValue } from "./Base";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const Living = () => ({
     wounds: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -14,7 +14,7 @@ export const Track = () => ({
     ...ValueMaxPair(),
     ...ModifiableValue(),
     base: new NumberField({ required: true, nullable: false, initial: 0 }), // Does if use it?
-    label: new StringField({ required: true, initial: '' }),
+    label: new StringField({ required: true }),
     disabled: new BooleanField({ required: false, initial: false })
 });
 

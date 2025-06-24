@@ -3,7 +3,7 @@ const { SchemaField, NumberField, StringField } = foundry.data.fields;
 const RangeTemplateData = () => ({
     distance: new NumberField({ required: true, nullable: false, initial: 0 }),
     modifier: new NumberField({ required: true, nullable: false, initial: 0 }),
-    label: new StringField({ required: false, initial: '' }),
+    label: new StringField({ required: false }),
 });
 
 export const RangesTemplateData = () => ({
@@ -14,10 +14,10 @@ export const RangesTemplateData = () => ({
 });
 
 export const TargetRangeTemplateData = () => ({
-    tokenUuid: new StringField({ required: true, initial: '' }),
-    name: new StringField({ required: true, initial: '' }),
+    tokenUuid: new StringField({ required: true }),
+    name: new StringField({ required: true }),
     distance: new NumberField({ required: true, nullable: false, initial: 0 }),
-    unit: new StringField({ required: true, initial: '' }),
+    unit: new StringField({ required: true }),
     range: new SchemaField(RangeTemplateData()),
 });
 

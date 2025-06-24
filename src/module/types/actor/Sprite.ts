@@ -7,7 +7,7 @@ const SpriteData = {
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
     level: new NumberField({ required: true, nullable: false, initial: 0 }),
     services: new NumberField({ required: true, nullable: false, initial: 0 }),
-    registered: new BooleanField({ required: true, initial: false }),
+    registered: new BooleanField(),
     special: new StringField({ required: true, blank: true, choices: ['magic', 'resonance', 'mundane', ''], initial: 'resonance' }),
     spriteType: new StringField({
         required: true,
@@ -19,7 +19,7 @@ const SpriteData = {
         ...CommonModifiers(),
     }, { required: true }),
 
-    technomancerUuid: new StringField({ required: true, initial: "" }),
+    technomancerUuid: new StringField({ required: true }),
 }
 
 

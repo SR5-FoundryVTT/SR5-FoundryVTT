@@ -4,9 +4,9 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const QualityData = {
-    action: new SchemaField(ActionRollData(), { required: true }),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    action: new SchemaField(ActionRollData()),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
     type: new StringField({
         required: true,

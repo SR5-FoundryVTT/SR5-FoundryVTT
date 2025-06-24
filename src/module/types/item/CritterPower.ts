@@ -5,19 +5,19 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const CritterPowerData = {
-    action: new SchemaField(ActionRollData(), { required: true }),
-    armor: new SchemaField(ArmorValueData(), { required: true }),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    action: new SchemaField(ActionRollData()),
+    armor: new SchemaField(ArmorValueData()),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
-    category: new StringField({ required: true, initial: '' }),
-    powerType: new StringField({ required: true, initial: '' }),
-    range: new StringField({ required: true, initial: '' }),
-    duration: new StringField({ required: true, initial: '' }),
+    category: new StringField({ required: true }),
+    powerType: new StringField({ required: true }),
+    range: new StringField({ required: true }),
+    duration: new StringField({ required: true }),
     karma: new NumberField({ required: true, nullable: false, initial: 0 }),
     rating: new NumberField({ required: true, nullable: false, initial: 0 }),
-    optional: new StringField({ required: true, initial: '' }),
-    enabled: new BooleanField({ required: true, initial: true }),
+    optional: new StringField({ required: true }),
+    enabled: new BooleanField({ initial: true }),
 }
 
 // export type CritterPowerCategory = 'mundane' | 'paranormal' | 'weakness' | 'emergent' | 'drake' | 'shapeshifter' | 'free_spirit' | 'paranormal_infected' | 'echoes' | '';

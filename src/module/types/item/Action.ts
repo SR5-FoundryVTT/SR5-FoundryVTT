@@ -9,25 +9,25 @@ const ResultActionData = () => ({
         initial: 'placeMarks',
         choices: ['modifyCombatantInit', 'placeMarks']
     }),
-    label: new StringField({ required: true, initial: '' }),
-    value: new StringField({ required: true, initial: '' })
+    label: new StringField({ required: true }),
+    value: new StringField({ required: true })
 });
 
 const ActionResultData = () => ({
     success: new SchemaField({
         matrix: new SchemaField({
-            placeMarks: new BooleanField({ required: true, initial: false }),
+            placeMarks: new BooleanField(),
         }),
     })
 });
 
 export const MinimalActionData = () => ({
-    skill: new StringField({ required: true, initial: '' }),
-    attribute: new StringField({ required: true, initial: '' }),
-    attribute2: new StringField({ required: true, initial: '' }),
+    attribute: new StringField({ required: true }),
+    attribute2: new StringField({ required: true }),
+    armor: new BooleanField(),
+    limit: new SchemaField(ModifiableValueLinked()),
     mod: new NumberField({ required: true, nullable: false, initial: 0 }),
-    armor: new BooleanField({ required: true, initial: false }),
-    limit: new SchemaField(ModifiableValueLinked(), { required: true }),
+    skill: new StringField({ required: true }),
 });
 
 export const DamageData = () => ({
@@ -36,36 +36,32 @@ export const DamageData = () => ({
         base: new StringField({
             blank: true,
             required: true,
-            initial: '',
             choices: ["physical", "matrix", "stun", ""]
         }),
         value: new StringField({
             blank: true,
             required: true,
-            initial: '',
             choices: ["physical", "matrix", "stun", ""]
         }),
     }),
     element: new SchemaField({
         base: new StringField({
-            required: true,
-            initial: '',
             blank: true,
+            required: true,
             choices: ["fire", "cold", "acid", "electricity", "radiation", '']
         }),
         value: new StringField({
-            required: true,
-            initial: '',
             blank: true,
+            required: true,
             choices: ["fire", "cold", "acid", "electricity", "radiation", '']
         }),
     }),
     ap: new SchemaField(ModifiableValueLinked()),
     source: new SchemaField({
-        actorId: new StringField({ required: true, initial: '' }),
-        itemId: new StringField({ required: true, initial: '' }),
-        itemName: new StringField({ required: true, initial: '' }),
-        itemType: new StringField({ required: true, initial: '' }),
+        actorId: new StringField({ required: true }),
+        itemId: new StringField({ required: true }),
+        itemName: new StringField({ required: true }),
+        itemType: new StringField({ required: true }),
     }, { required: false }),
 });
 
@@ -84,50 +80,50 @@ export const ActionRollData = (
 ) => ({
     ...MinimalActionData(),
     test: new StringField({ required: true, initial: test }),
-    type: new StringField({ required: true, initial: '' }),
-    categories: new ArrayField(new StringField({ required: true, initial: '' })),
-    spec: new BooleanField({ required: true, initial: false }),
-    mod_description: new StringField({ required: true, initial: '' }),
+    type: new StringField({ required: true }),
+    categories: new ArrayField(new StringField({ required: true })),
+    spec: new BooleanField(),
+    mod_description: new StringField({ required: true }),
     threshold: new SchemaField(BaseValuePair()),
-    extended: new BooleanField({ required: true, initial: false }),
-    modifiers: new ArrayField(new StringField({ required: true, initial: '' })),
-    damage: new SchemaField(DamageData(), { required: true }),
+    extended: new BooleanField({ initial: false }),
+    modifiers: new ArrayField(new StringField({ required: true })),
+    damage: new SchemaField(DamageData()),
     opposed: new SchemaField({
         test: new StringField({ required: true, initial: opposedTest }),
-        type: new StringField({ required: true, initial: '' }),
-        description: new StringField({ required: true, initial: '' }),
+        type: new StringField({ required: true }),
+        description: new StringField({ required: true }),
         mod: new NumberField({ required: true, nullable: false, initial: 0 }),
-        skill: new StringField({ required: true, initial: '' }),
-        attribute: new StringField({ required: true, initial: '' }),
-        attribute2: new StringField({ required: true, initial: '' }),
-        armor: new BooleanField({ required: true, initial: false }),
+        skill: new StringField({ required: true }),
+        attribute: new StringField({ required: true }),
+        attribute2: new StringField({ required: true }),
+        armor: new BooleanField(),
         resist: new SchemaField({
             test: new StringField({ required: true, initial: resistTest }),
-            skill: new StringField({ required: true, initial: '' }),
+            skill: new StringField({ required: true }),
             mod: new NumberField({ required: true, nullable: false, initial: 0 }),
-            attribute: new StringField({ required: true, initial: '' }),
-            attribute2: new StringField({ required: true, initial: '' }),
-            armor: new BooleanField({ required: true, initial: false }),
+            attribute: new StringField({ required: true }),
+            attribute2: new StringField({ required: true }),
+            armor: new BooleanField(),
         }),
     }),
     followed: new SchemaField({
         test: new StringField({ required: true, initial: followedTest }),
         mod: new NumberField({ required: true, nullable: false, initial: 0 }),
-        skill: new StringField({ required: true, initial: '' }),
-        attribute: new StringField({ required: true, initial: '' }),
-        attribute2: new StringField({ required: true, initial: '' }),
-        armor: new BooleanField({ required: true, initial: false }),
+        skill: new StringField({ required: true }),
+        attribute: new StringField({ required: true }),
+        attribute2: new StringField({ required: true }),
+        armor: new BooleanField(),
     }),
-    alt_mod: new NumberField({ required: true, initial: 0 }),
+    alt_mod: new NumberField({ required: true, nullable: false, initial: 0 }),
     dice_pool_mod: ModList(),
-    roll_mode: new StringField({ required: true, initial: '' }),
+    roll_mode: new StringField({ required: true }),
 });
 
 
 const ActionData = {
-    action: new SchemaField(ActionRollData(), { required: true }),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    action: new SchemaField(ActionRollData()),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
     result: new SchemaField(ActionResultData()),
 };

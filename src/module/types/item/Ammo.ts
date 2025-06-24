@@ -5,26 +5,24 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const AmmoData = () => ({
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
-    technology: new SchemaField(TechnologyData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
+    technology: new SchemaField(TechnologyData()),
 
     element: new StringField({
-        required: true,
-        initial: '',
         blank: true,
-        choices: ['', 'fire', 'cold', 'acid', 'electricity', 'radiation'],
+        required: true,
+        choices: ['fire', 'cold', 'acid', 'electricity', 'radiation', ''],
     }),
     ap: new NumberField({ required: true, nullable: false, initial: 0 }),
     damage: new NumberField({ required: true, nullable: false, initial: 0 }),
     damageType: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['physical', 'stun', 'matrix', ''],
     }),
-    replaceDamage: new BooleanField({ required: true, initial: false }),
-    blast: new SchemaField(BlastData(), { required: true }),
+    replaceDamage: new BooleanField(),
+    blast: new SchemaField(BlastData()),
     accuracy: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 

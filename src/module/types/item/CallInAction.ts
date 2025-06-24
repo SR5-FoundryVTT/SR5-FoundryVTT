@@ -4,25 +4,24 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const CallInActionData = {
-    action: new SchemaField(ActionRollData({ test: '' }), { required: true }),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    action: new SchemaField(ActionRollData({ test: '' })),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
     actor_type: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['spirit', 'sprite', ''],
     }),
     spirit: new SchemaField({
-        type: new StringField({ required: true, initial: '' }),
+        type: new StringField({ required: true }),
         force: new NumberField({ required: true, nullable: false, initial: 0 }),
-        uuid: new StringField({ required: true, initial: '' }),
+        uuid: new StringField({ required: true }),
     }, { required: true }),
     sprite: new SchemaField({
-        type: new StringField({ required: true, initial: '' }),
+        type: new StringField({ required: true }),
         level: new NumberField({ required: true, nullable: false, initial: 0 }),
-        uuid: new StringField({ required: true, initial: '' }),
+        uuid: new StringField({ required: true }),
     }, { required: true }),
 }
 

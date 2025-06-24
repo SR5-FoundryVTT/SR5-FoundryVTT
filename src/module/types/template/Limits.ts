@@ -3,15 +3,15 @@ const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
 export const LimitField = () => ({
     ...ModifiableValue(),
-    attribute: new StringField({ required: false, initial: '' }), // Does it use it?
-    label: new StringField({ required: true, initial: '' }),
-    hidden: new BooleanField({ required: true, initial: false }),
+    attribute: new StringField({ required: false }), // Does it use it?
+    label: new StringField({ required: true }),
+    hidden: new BooleanField(),
 });
 
 export const Limits = () => ({
-    social: new SchemaField(LimitField(), { required: true }),
-    mental: new SchemaField(LimitField(), { required: true }),
-    physical: new SchemaField(LimitField(), { required: true }),
+    social: new SchemaField(LimitField()),
+    mental: new SchemaField(LimitField()),
+    physical: new SchemaField(LimitField()),
 });
 
 export const AwakendLimits = () => ({
@@ -29,11 +29,11 @@ export const MatrixLimits = () => ({
 
 export const VehicleLimits = () => ({
     ...Limits(),
-    sensor: new SchemaField(LimitField(), { required: true }),
-    pilot: new SchemaField(LimitField(), { required: true }),
-    handling: new SchemaField(LimitField(), { required: true }),
-    speed: new SchemaField(LimitField(), { required: true }),
-    acceleration: new SchemaField(LimitField(), { required: true }),
+    sensor: new SchemaField(LimitField()),
+    pilot: new SchemaField(LimitField()),
+    handling: new SchemaField(LimitField()),
+    speed: new SchemaField(LimitField()),
+    acceleration: new SchemaField(LimitField()),
 });
 
 export type LimitsType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof Limits>>;

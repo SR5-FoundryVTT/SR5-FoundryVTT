@@ -3,16 +3,16 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const LifestyleData = {
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
-    type: new StringField({ required: true, initial: '' }),
-    comforts: new NumberField({ required: true, initial: 0 }),
-    security: new NumberField({ required: true, initial: 0 }),
-    neighborhood: new NumberField({ required: true, initial: 0 }),
-    guests: new NumberField({ required: true, initial: 0 }),
-    permanent: new BooleanField({ required: true, initial: false }),
-    cost: new NumberField({ required: true, initial: 0 }),
+    type: new StringField({ required: true }),
+    comforts: new NumberField({ required: true, nullable: false, initial: 0 }),
+    security: new NumberField({ required: true, nullable: false, initial: 0 }),
+    neighborhood: new NumberField({ required: true, nullable: false, initial: 0 }),
+    guests: new NumberField({ required: true, nullable: false, initial: 0 }),
+    permanent: new BooleanField(),
+    cost: new NumberField({ required: true, nullable: false, initial: 0 }),
 }
 
 export class Lifestyle extends foundry.abstract.TypeDataModel<typeof LifestyleData, Item.Implementation> {

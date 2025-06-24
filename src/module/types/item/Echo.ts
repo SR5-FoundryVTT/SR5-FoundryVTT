@@ -3,8 +3,8 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField } = foundry.data.fields;
 
 const EchoData = {
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 };
 
 export class Echo extends foundry.abstract.TypeDataModel<typeof EchoData, Item.Implementation> {

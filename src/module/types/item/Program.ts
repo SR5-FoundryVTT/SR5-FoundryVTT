@@ -4,9 +4,9 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, StringField } = foundry.data.fields;
 
 const ProgramData = {
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
-    technology: new SchemaField(TechnologyData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
+    technology: new SchemaField(TechnologyData()),
 
     type: new StringField({
         required: true,

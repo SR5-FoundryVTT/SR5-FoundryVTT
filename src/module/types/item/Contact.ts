@@ -3,16 +3,16 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const ContactData = {
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
-    type: new StringField({ required: true, initial: '' }),
-    connection: new NumberField({ required: true, initial: 0 }),
-    loyalty: new NumberField({ required: true, initial: 0 }),
-    family: new BooleanField({ required: true, initial: false }),
-    blackmail: new BooleanField({ required: true, initial: false }),
-    group: new BooleanField({ required: true, initial: false }),
-    linkedActor: new StringField({ required: true, initial: '' }),
+    type: new StringField({ required: true }),
+    connection: new NumberField({ required: true, nullable: false, initial: 0 }),
+    loyalty: new NumberField({ required: true,  nullable: false, initial: 0 }),
+    family: new BooleanField(),
+    blackmail: new BooleanField(),
+    group: new BooleanField(),
+    linkedActor: new StringField({ required: true }),
 }
 
 

@@ -14,8 +14,8 @@ const TechnomancerActorData = () => ({
 
 const CharacterAttributes = () => ({
     ...Attributes(),
-    initiation: new SchemaField(AttributeField(), { required: true }),
-    submersion: new SchemaField(AttributeField(), { required: true }),
+    initiation: new SchemaField(AttributeField()),
+    submersion: new SchemaField(AttributeField()),
 });
 
 export const CharacterModifiers = () => ({
@@ -61,15 +61,15 @@ const CharacterData = {
     ...TechnomancerActorData(),
     ...NPCActorData(),
     ...ImportFlags(),
-    attributes: new SchemaField(CharacterAttributes(), { required: true }),
-    values: new SchemaField(PhysicalCombatValues(), { required: true }),
-    metatype: new StringField({ required: true, initial: "" }),
+    attributes: new SchemaField(CharacterAttributes()),
+    values: new SchemaField(PhysicalCombatValues()),
+    metatype: new StringField({ required: true }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
-    is_critter: new BooleanField({ required: true, initial: false }),
-    limits: new SchemaField(CharacterLimits(), { required: true }),
+    is_critter: new BooleanField(),
+    limits: new SchemaField(CharacterLimits()),
     // karama.value => current career karma
     // karama.max => max career karma
-    karma: new SchemaField(ValueMaxPair(), { required: true }),
+    karma: new SchemaField(ValueMaxPair()),
     nuyen: new NumberField({ required: true, nullable: false, initial: 0 }),
     public_awareness: new NumberField({ required: true, nullable: false, initial: 0 }),
     street_cred: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -77,7 +77,7 @@ const CharacterData = {
         //todo
         // ...Modifiers,
         ...CharacterModifiers(),
-    }, { required: true }),
+    }),
 }
 
 

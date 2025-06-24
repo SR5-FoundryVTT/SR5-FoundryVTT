@@ -3,8 +3,8 @@ const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const BaseArmorData = () => ({
     ...ModifiableValue(),
-    hardened: new BooleanField({ required: true, initial: false }),
-    label: new StringField({ required: true, initial: '' }),
+    hardened: new BooleanField(),
+    label: new StringField({ required: true }),
 });
 
 export const ActorArmorData = () => ({

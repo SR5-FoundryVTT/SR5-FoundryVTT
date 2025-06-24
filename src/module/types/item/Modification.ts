@@ -4,26 +4,23 @@ import { TechnologyData } from "../template/Technology";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const ModificationData = {
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
-    technology: new SchemaField(TechnologyData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
+    technology: new SchemaField(TechnologyData()),
 
     type: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['weapon', 'armor', 'vehicle', 'drone', '']
     }),
     mount_point: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['barrel', 'stock', 'top', 'side', 'internal', 'under', '']
     }),
     modification_category: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons', '']
     }),
     dice_pool: new NumberField({ required: true, nullable: false, initial: 0 }),

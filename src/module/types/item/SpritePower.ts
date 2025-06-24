@@ -4,13 +4,13 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
 const SpritePowerData = {
-    action: new SchemaField(ActionRollData(), { required: true }),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    action: new SchemaField(ActionRollData()),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
     duration: new StringField({ required: true, initial: 'always' }),
     optional: new StringField({ required: true, initial: 'standard' }),
-    enabled: new BooleanField({ required: true, initial: true }),
+    enabled: new BooleanField({ initial: true }),
 }
 
 export class SpritePower extends foundry.abstract.TypeDataModel<typeof SpritePowerData, Item.Implementation> {

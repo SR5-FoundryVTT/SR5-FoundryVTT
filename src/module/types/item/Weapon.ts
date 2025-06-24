@@ -11,12 +11,11 @@ export const BlastData = () => ({
 });
 
 const AmmunitionData = () => ({
-    spare_clips: new SchemaField(ValueMaxPair(), { required: true }),
-    current: new SchemaField(ValueMaxPair(), { required: true }),
+    spare_clips: new SchemaField(ValueMaxPair()),
+    current: new SchemaField(ValueMaxPair()),
     clip_type: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['removable_clip', 'break_action', 'belt_fed', 'internal_magazin', 'muzzle_loader', 'cylinder', 'drum', 'bow', ''],
     }),
     partial_reload_value: new NumberField({ required: true, nullable: false, initial: -1 }),
@@ -28,21 +27,21 @@ export const RangeData = () => ({
     long: new NumberField({ required: true, nullable: false, initial: 0 }),
     extreme: new NumberField({ required: true, nullable: false, initial: 0 }),
     category: new StringField({ required: true, initial: 'manual' }), // I believe we don't use this, we could use the value from the RangeWeaponData
-    attribute: new StringField({ required: true, initial: '' }),
+    attribute: new StringField({ required: true }),
 });
 
 const FiringModeData = () => ({
-    single_shot: new BooleanField({ required: true, initial: false }),
-    semi_auto: new BooleanField({ required: true, initial: false }),
-    burst_fire: new BooleanField({ required: true, initial: false }),
-    full_auto: new BooleanField({ required: true, initial: false }),
+    single_shot: new BooleanField(),
+    semi_auto: new BooleanField(),
+    burst_fire: new BooleanField(),
+    full_auto: new BooleanField(),
 });
 
 const RangeWeaponData = () => ({
     category: new StringField({ required: true, initial: 'manual' }),
-    ranges: new SchemaField(RangeData(), { required: true }),
-    rc: new SchemaField(ModifiableValue(), { required: true }),
-    modes: new SchemaField(FiringModeData(), { required: true }),
+    ranges: new SchemaField(RangeData()),
+    rc: new SchemaField(ModifiableValue()),
+    modes: new SchemaField(FiringModeData()),
 });
 
 const MeleeWeaponData = () => ({
@@ -50,27 +49,26 @@ const MeleeWeaponData = () => ({
 });
 
 const ThrownWeaponData = () => ({
-    ranges: new SchemaField(RangeData(), { required: true }),
-    blast: new SchemaField(BlastData(), { required: true }),
+    ranges: new SchemaField(RangeData()),
+    blast: new SchemaField(BlastData()),
 });
 
 const WeaponData = {
-    action: new SchemaField(ActionRollData({test: '', opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'}), { required: true }),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
-    technology: new SchemaField(TechnologyData(), { required: true }),
+    action: new SchemaField(ActionRollData({test: '', opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'})),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
+    technology: new SchemaField(TechnologyData()),
 
     category: new StringField({
-        required: true,
-        initial: '',
         blank: true,
+        required: true,
         choices: ['melee', 'range', 'thrown', ''],
     }),
-    subcategory: new StringField({ required: true, initial: '' }),
-    ammo: new SchemaField(AmmunitionData(), { required: true }),
-    range: new SchemaField(RangeWeaponData(), { required: true }),
-    melee: new SchemaField(MeleeWeaponData(), { required: true }),
-    thrown: new SchemaField(ThrownWeaponData(), { required: true }),
+    subcategory: new StringField({ required: true }),
+    ammo: new SchemaField(AmmunitionData()),
+    range: new SchemaField(RangeWeaponData()),
+    melee: new SchemaField(MeleeWeaponData()),
+    thrown: new SchemaField(ThrownWeaponData()),
 }
 
 

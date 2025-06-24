@@ -6,7 +6,7 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 
 const SpiritAttributes = () => ({
     ...Attributes(),
-    force: new SchemaField(AttributeField(), { required: true }),
+    force: new SchemaField(AttributeField()),
 });
 
 const SpiritData = {
@@ -18,14 +18,14 @@ const SpiritData = {
     ...MovementActorData(),
     ...NPCActorData(),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
-    summonerUuid: new StringField({ required: true, initial: "" }),
-    values: new SchemaField(PhysicalCombatValues(), { required: true }),
-    spiritType: new StringField({ required: true, initial: "", }), // list all types?
+    summonerUuid: new StringField({ required: true }),
+    values: new SchemaField(PhysicalCombatValues()),
+    spiritType: new StringField({ required: true, }), // list all types?
     force: new NumberField({ required: true, nullable: false, initial: 0 }),
-    limits: new SchemaField(CharacterLimits(), { required: true }),
+    limits: new SchemaField(CharacterLimits()),
     services: new NumberField({ required: true, nullable: false, initial: 0 }),
-    attributes: new SchemaField(SpiritAttributes(), { required: true }),
-    bound: new BooleanField({ required: true, initial: false }),
+    attributes: new SchemaField(SpiritAttributes()),
+    bound: new BooleanField(),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,

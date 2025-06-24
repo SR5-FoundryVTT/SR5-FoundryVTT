@@ -4,17 +4,17 @@ import { DescriptionData } from "../template/Description";
 const { HTMLField, SchemaField, ArrayField, StringField } = foundry.data.fields;
 
 const LicenseData = () => ({
-    name: new StringField({ required: true, initial: '' }),
-    rtg: new StringField({ required: true, initial: '' }),
-    description: new HTMLField({ required: true, initial: '' }),
+    name: new StringField({ required: true }),
+    rtg: new StringField({ required: true }),
+    description: new HTMLField(),
 });
 
 const SinData = {
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
-    technology: new SchemaField(TechnologyData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
+    technology: new SchemaField(TechnologyData()),
 
-    licenses: new ArrayField(new SchemaField(LicenseData()), { required: true, initial: [] }),
+    licenses: new ArrayField(new SchemaField(LicenseData())),
 }
 
 export class Sin extends foundry.abstract.TypeDataModel<typeof SinData, Item.Implementation> {

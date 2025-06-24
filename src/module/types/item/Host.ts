@@ -4,22 +4,22 @@ import { ImportFlagData } from "../template/ImportFlags";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const SourceEntityField = () => ({
-    id: new StringField({ required: true, initial: '' }),
-    name: new StringField({ required: true, initial: '' }),
+    id: new StringField({ required: true }),
+    name: new StringField({ required: true }),
     pack: new StringField({ required: true, nullable: true, initial: null }),
     type: new StringField({ required: true, initial: 'Actor', choices: ['Actor', 'Item'] }),
-    data: new ObjectField({ required: false, initial: {} }),
+    data: new ObjectField({ required: false }),
 });
 
 const HostData = {
     ...DevicePartData(),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
     rating: new NumberField({ required: true, nullable: false, initial: 1 }),
     marks: new TypedObjectField(new NumberField({ required: true, nullable: false, initial: 0 }), { required: true }),
     ic: new ArrayField(new SchemaField(SourceEntityField()), { required: true }),
-    customAttributes: new BooleanField({ required: true, initial: false }),
+    customAttributes: new BooleanField(),
 }
 
 export class Host extends foundry.abstract.TypeDataModel<typeof HostData, Item.Implementation> {

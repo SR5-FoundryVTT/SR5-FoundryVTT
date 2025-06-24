@@ -10,13 +10,12 @@ const RitualData = {
             opposedTest: 'OpposedRitualTest',
             followedTest: 'DrainTest'
         }),
-        { required: true }
     ),
-    description: new SchemaField(DescriptionData(), { required: true }),
-    importFlags: new SchemaField(ImportFlagData(), { required: true }),
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
-    type: new StringField({ required: true, initial: '' }),
-    descriptors: new StringField({ required: true, initial: '' }),
+    type: new StringField({ required: true }),
+    descriptors: new StringField({ required: true }),
 };
 
 export class Ritual extends foundry.abstract.TypeDataModel<typeof RitualData, Item.Implementation> {

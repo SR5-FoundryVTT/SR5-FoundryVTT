@@ -27,7 +27,7 @@ export const ValueMaxPair = () => ({
 });
 
 export const ModListEntry = () => ({
-    name: new StringField({ required: true, initial: '' }),
+    name: new StringField({ required: true }),
     value: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
@@ -42,7 +42,7 @@ export const ModifiableValue = () => ({
 
 export const ModifiableValueLinked = () => ({
     ...ModifiableValue(),
-    attribute: new StringField({ required: false, initial: '' }),
+    attribute: new StringField({ required: false }),
     base_formula_operator: new StringField({
         required: false,
         initial: 'add',
@@ -52,13 +52,13 @@ export const ModifiableValueLinked = () => ({
 
 export const ValueField = () => ({
     ...ModifiableValue(),
-    label: new StringField({ required: true, initial: '' }),
-    manualMod: new StringField({ required: true, initial: '' }),
+    label: new StringField({ required: true }),
+    manualMod: new StringField({ required: true }),
 });
 
 export const KeyValuePair = () => ({
-    key: new StringField({ required: true, initial: '' }),
-    value: new StringField({ required: true, initial: '' }),
+    key: new StringField({ required: true }),
+    value: new StringField({ required: true }),
 });
 
 export type ValueFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ValueField>>;

@@ -4,24 +4,24 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 
 const ICAttributes = () => ({
     ...Attributes(),
-    rating: new SchemaField(AttributeField(), { required: true }),
-    attack: new SchemaField(AttributeField(), { required: true }),
-    sleaze: new SchemaField(AttributeField(), { required: true }),
-    data_processing: new SchemaField(AttributeField(), { required: true }),
-    firewall: new SchemaField(AttributeField(), { required: true }),
+    rating: new SchemaField(AttributeField()),
+    attack: new SchemaField(AttributeField()),
+    sleaze: new SchemaField(AttributeField()),
+    data_processing: new SchemaField(AttributeField()),
+    firewall: new SchemaField(AttributeField()),
 });
 
 const ICData = {
     ...CommonData(),
     ...MatrixActorData(),
     ...MatrixTrackActorData(),
-    icType: new StringField({ required: true, initial: "" }),
+    icType: new StringField({ required: true }),
     host: new SchemaField({
         rating: new NumberField({ required: true, nullable: false, initial: 0 }),
-        id: new StringField({ required: true, initial: "" }),
-        atts: new SchemaField(MatrixAttributes(), { required: true }),
+        id: new StringField({ required: true }),
+        atts: new SchemaField(MatrixAttributes()),
     }, { required: true }),
-    attributes: new SchemaField(ICAttributes(), { required: true }),
+    attributes: new SchemaField(ICAttributes()),
     modifiers: new SchemaField({
         ...CommonModifiers(),
         ...MatrixModifiers(),

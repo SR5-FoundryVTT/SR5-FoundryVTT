@@ -7,18 +7,18 @@ const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, 
 
 const VehicleAttributes = () => ({
     ...Attributes(),
-    pilot: new SchemaField(AttributeField(), { required: true }),
+    pilot: new SchemaField(AttributeField()),
 });
 
 const VehicleStats = () => ({
-    pilot: new SchemaField(AttributeField(), { required: true }),
-    handling: new SchemaField(AttributeField(), { required: true }),
-    off_road_handling: new SchemaField(AttributeField(), { required: true }),
-    speed: new SchemaField(AttributeField(), { required: true }),
-    off_road_speed: new SchemaField(AttributeField(), { required: true }),
-    acceleration: new SchemaField(AttributeField(), { required: true }),
-    sensor: new SchemaField(AttributeField(), { required: true }),
-    seats: new SchemaField(AttributeField(), { required: true }),
+    pilot: new SchemaField(AttributeField()),
+    handling: new SchemaField(AttributeField()),
+    off_road_handling: new SchemaField(AttributeField()),
+    speed: new SchemaField(AttributeField()),
+    off_road_speed: new SchemaField(AttributeField()),
+    acceleration: new SchemaField(AttributeField()),
+    sensor: new SchemaField(AttributeField()),
+    seats: new SchemaField(AttributeField()),
 });
 
 const VehicleModCategories = () => ({
@@ -37,7 +37,7 @@ const VehicleData = {
     ...MovementActorData(),
     ...ImportFlags(),
     ...PhysicalTrackActorData(),
-    values: new SchemaField(PhysicalCombatValues(), { required: true }),
+    values: new SchemaField(PhysicalCombatValues()),
     vehicleType: new StringField({
         required: true,
         initial: "ground",
@@ -48,25 +48,25 @@ const VehicleData = {
         initial: "manual",
         choices: ["manual", "remote", "rigger", "autopilot"],
     }),
-    isDrone: new BooleanField({ required: true, initial: false }),
-    isOffRoad: new BooleanField({ required: true, initial: false }),
-    driver: new StringField({ required: true, initial: "" }),
+    isDrone: new BooleanField(),
+    isOffRoad: new BooleanField(),
+    driver: new StringField({ required: true }),
     environment: new StringField({
         required: true,
         initial: "speed",
         choices: ["speed", "handling"],
     }),
-    vehicle_stats: new SchemaField(VehicleStats(), { required: true }),
-    attributes: new SchemaField(VehicleAttributes(), { required: true }),
-    networkController: new StringField({ required: true, initial: "" }),
+    vehicle_stats: new SchemaField(VehicleStats()),
+    attributes: new SchemaField(VehicleAttributes()),
+    networkController: new StringField({ required: true }),
     modifiers: new SchemaField({
         //todo
         // ...Modifiers,
         ...CommonModifiers(),
     }, { required: true }),
-    modificationCategories: new SchemaField(VehicleModCategories(), { required: true }), // is it used?
+    modificationCategories: new SchemaField(VehicleModCategories()), // is it used?
     modPoints: new NumberField({ required: true, initial: 0 }),
-    limits: new SchemaField(VehicleLimits(), { required: true }),
+    limits: new SchemaField(VehicleLimits()),
     full_defense_attribute: new StringField({ required: true, initial: "intuition" }),
 }
 
