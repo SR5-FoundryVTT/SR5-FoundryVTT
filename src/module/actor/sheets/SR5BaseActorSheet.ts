@@ -2056,7 +2056,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onConnectToMatrixNetwork(event) {
         event.stopPropagation();
 
-        const dialog = new SelectMatrixNetworkDialog();
+        const dialog = new SelectMatrixNetworkDialog(this.document);
         const network = await dialog.select();
         if (dialog.canceled) return;
 

@@ -276,4 +276,31 @@ export class MatrixNetworkFlow {
         if (options.players) return networks.filter(network => network.matrixIconVisibleToPlayer);
         return networks;
     }
+
+    /**
+     * Collect networks to select based on GRIDs on character.
+     * 
+     * @param character Collect networks based on this character.
+     */
+    static getNetworksForCharacter(character: SR5Actor) {
+        const networks: SR5Item[] = [];
+
+        // Use collect list of SINs on character to retrieve all networks character has access to.
+        for (const sin of character.itemTypes.sin) {
+            if (!sin.system.networks) continue;
+            for (const uuid of sin.system.networks) {
+                const network = fromUuidSync(uuid) as SR5Item | undefined;
+                if (!network) {
+                    console.error(`Shadowrun 5e | Network with uuid ${uuid} in character ${character.name} SIN items not found anymore.`);
+                    continue;
+                }
+
+                networks.push(network);
+            }
+        }
+
+        // TODO: Add public GRIDs
+
+        return networks;
+    }
 }

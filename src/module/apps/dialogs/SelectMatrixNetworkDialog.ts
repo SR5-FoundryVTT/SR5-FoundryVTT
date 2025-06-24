@@ -1,15 +1,17 @@
 import { Helpers } from "../../helpers";
 import { MatrixNetworkFlow } from "../../item/flows/MatrixNetworkFlow";
+import { SR5Item } from "../../item/SR5Item";
 import { FormDialog, FormDialogData } from "./FormDialog";
+import { SR5Actor } from '../../actor/SR5Actor';
 
 /**
  * Present users with a list of matrix networks to select a single one from.
  */
 export class SelectMatrixNetworkDialog extends FormDialog {
-    constructor(options?) {
-        const dialogData = SelectMatrixNetworkDialog.getDialogData() as unknown as FormDialogData;
-
+    constructor(character: SR5Actor, options?) {
+        const dialogData = SelectMatrixNetworkDialog.getDialogData(character) as unknown as FormDialogData;
         super(dialogData, options);
+
     }
 
     static override get defaultOptions() {
@@ -20,8 +22,8 @@ export class SelectMatrixNetworkDialog extends FormDialog {
         return options;
     }
 
-    static getDialogData() {
-        const networks = SelectMatrixNetworkDialog.selectableNetworks();
+    static getDialogData(character: SR5Actor) {
+        const networks = SelectMatrixNetworkDialog.selectableNetworks(character);
 
         return {
             title: game.i18n.localize('SR5.SelectMatrixNetworkDialog.Title'),
@@ -46,8 +48,13 @@ export class SelectMatrixNetworkDialog extends FormDialog {
     /**
      * Load a sorted list of matrix networks.
      */
-    static selectableNetworks() {
-        const networks = MatrixNetworkFlow.getNetworks();
+    static selectableNetworks(character: SR5Actor) {
+        let networks: SR5Item[] = [];
+        if (game.user?.isGM) {
+            networks = MatrixNetworkFlow.getNetworks();
+        } else {
+            networks = MatrixNetworkFlow.getNetworksForCharacter(character);
+        }
         return networks.sort(Helpers.sortByName.bind(this));
     }
 }

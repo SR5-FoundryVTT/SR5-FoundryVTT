@@ -8,12 +8,8 @@
                     <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
                 </a>
             {{else}}
-                {{!When no network is connected, allow the GM only to freely select one }}
-                {{#if user.isGM}}
-                    <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
-                {{else}}
-                    {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
-                {{/if}}
+                {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
             {{/if}}
         </div>
         <div>
