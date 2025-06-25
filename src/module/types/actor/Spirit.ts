@@ -43,7 +43,7 @@ const SpiritData = {
     bound: new BooleanField(),
 
     // === Visibility ===
-    visibilityChecks: new SchemaField(VisibilityChecks("matrix", "meatspace")),
+    visibilityChecks: new SchemaField(VisibilityChecks("astral")),
 
     // === Modifiers ===
     modifiers: new SchemaField(CreateModifiers(

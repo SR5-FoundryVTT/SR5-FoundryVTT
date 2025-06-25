@@ -4,6 +4,7 @@ import { CommonData, CreateModifiers } from "./Common";
 import { MatrixAttributes, MatrixData } from "../template/Matrix";
 import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
+import { MatrixLimits } from "../template/Limits";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 // === Main Schema ===
@@ -18,7 +19,7 @@ const ICData = {
     host: new SchemaField({
         rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
         id: new StringField({ required: true }),
-        atts: new SchemaField(MatrixAttributes()),
+        atts: new SchemaField(MatrixAttributes(false)),
     }),
 
     // === Attributes ===
@@ -26,6 +27,7 @@ const ICData = {
         ...Attributes(),
         rating: new SchemaField(AttributeField()),
     }),
+    limits: new SchemaField(MatrixLimits()),
 
     // === Condition & Monitoring ===
     track: new SchemaField(Tracks('matrix')),

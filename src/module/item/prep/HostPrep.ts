@@ -9,7 +9,7 @@ export function HostDataPreparation(system: Item.SystemOfType<'host'>) {
 export class HostPrep {
     static setDeviceCategory(system: Item.SystemOfType<'host'>) {
         // Host matrix 'devices' are always hosts and never commlink / cyberdecks.
-        system.category = 'host';
+        // system.category = 'host';
     }
 
     /**

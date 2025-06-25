@@ -56,7 +56,7 @@ export class SpiritPrep {
 
     static prepareSpiritSpecial(system: Actor.SystemOfType<'spirit'>) {
         // Spirits will always be awakened.
-        system.special = 'magic';
+        // system.special = 'magic';
     }
 
     static prepareSpiritBaseData(system: Actor.SystemOfType<'spirit'>) {

@@ -3,7 +3,7 @@ import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
-export const ComplexFormData = () => ({
+const ComplexFormData = () => ({
     action: new SchemaField(ActionRollData({test: 'ComplexFormTest', opposedTest: 'OpposedTest', followedTest: 'FadeTest'})),
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData()),

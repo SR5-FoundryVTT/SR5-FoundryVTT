@@ -42,7 +42,7 @@ export class SpritePrep {
 
     static prepareSpriteSpecial(system: Actor.SystemOfType<'sprite'>) {
         // Sprites are always awakened
-        system.special = 'resonance';
+        // system.special = 'resonance';
     }
 
     static prepareSpriteAttributes(system: Actor.SystemOfType<'sprite'>) {

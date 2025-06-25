@@ -4,7 +4,7 @@ import { ConditionData } from "./Condition";
 
 const { SchemaField, NumberField, BooleanField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 
-const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing' | 'firewall') => ({
+const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing' | 'firewall', editable: boolean) => ({
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     att: new StringField({
         blank: true,
@@ -12,14 +12,14 @@ const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing
         initial: initialAtt,
         choices: ['', 'attack', 'sleaze', 'data_processing', 'firewall'],
     }),
-    editable: new BooleanField(),
+    editable: new BooleanField({ initial: editable }),
 });
 
-export const MatrixAttributes = () => ({
-    att1: new SchemaField(DeviceAttribute('attack')),
-    att2: new SchemaField(DeviceAttribute('sleaze')),
-    att3: new SchemaField(DeviceAttribute('data_processing')),
-    att4: new SchemaField(DeviceAttribute('firewall')),
+export const MatrixAttributes = (editable: boolean) => ({
+    att1: new SchemaField(DeviceAttribute('attack', editable)),
+    att2: new SchemaField(DeviceAttribute('sleaze', editable)),
+    att3: new SchemaField(DeviceAttribute('data_processing', editable)),
+    att4: new SchemaField(DeviceAttribute('firewall', editable)),
 });
 
 export const MatrixAttributeField = () => ({

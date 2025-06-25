@@ -1,6 +1,6 @@
-import { DevicePartData } from "./Device";
 import { DescriptionData } from "../template/Description";
 import { ImportFlagData } from "../template/ImportFlags";
+import { MatrixAttributes } from "../template/Matrix";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const SourceEntityField = () => ({
@@ -12,7 +12,6 @@ export const SourceEntityField = () => ({
 });
 
 const HostData = {
-    ...DevicePartData(),
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData()),
 
@@ -20,6 +19,10 @@ const HostData = {
     marks: new TypedObjectField(new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 })),
     ic: new ArrayField(new SchemaField(SourceEntityField())),
     customAttributes: new BooleanField(),
+
+    category: new StringField({ required: true, initial: 'host', readonly: true }),
+    atts: new SchemaField(MatrixAttributes(true)),
+    networkDevices: new ArrayField(new StringField({ required: true })),
 }
 
 export class Host extends foundry.abstract.TypeDataModel<typeof HostData, Item.Implementation> {

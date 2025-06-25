@@ -29,7 +29,7 @@ export class ICPrep {
         ICPrep.prepareHostAttributes(system);
         ICPrep.prepareMeatAttributes(system);
 
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(system as any);
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
 
         ICPrep.prepareMatrix(system);
         ICPrep.prepareMatrixTrack(system);
