@@ -10,10 +10,10 @@ const AdeptPowerData = {
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData()),
 
-    pp: new NumberField({ required: true, nullable: false, initial: 0 }),
+    pp: new NumberField({ required: true, nullable: false, initial: 0, min: 0 }),
     type: new StringField({ required: true }),
     drain: new BooleanField(),
-    level: new NumberField({ required: true, nullable: false, initial: 0 }),
+    level: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 }
 
 export class AdeptPower extends foundry.abstract.TypeDataModel<typeof AdeptPowerData, Item.Implementation> {

@@ -18,7 +18,7 @@ const SpellData = {
         required: true,
         choices: ['combat', 'detection', 'enchantment', 'health', 'illusion', 'manipulation', 'ritual', ''] // what to do with enchantment (from chummer)?
     }),
-    drain: new NumberField({ required: true, nullable: false, initial: 0 }),
+    drain: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     range: new StringField({
         blank: true,
         required: true,

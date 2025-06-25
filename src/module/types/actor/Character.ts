@@ -47,7 +47,7 @@ const CharacterData = {
     matrix: new SchemaField(MatrixData()),
     technomancer: new SchemaField({
         attribute: new StringField({ required: true, initial: "willpower" }), // fade attribute
-        submersion: new NumberField({ required: true, nullable: false, initial: 0 }),
+        submersion: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     }),
 
     // === Economy & Reputation ===

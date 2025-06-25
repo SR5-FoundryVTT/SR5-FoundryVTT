@@ -10,7 +10,7 @@ const LifestyleData = {
     comforts: new NumberField({ required: true, nullable: false, initial: 0 }),
     security: new NumberField({ required: true, nullable: false, initial: 0 }),
     neighborhood: new NumberField({ required: true, nullable: false, initial: 0 }),
-    guests: new NumberField({ required: true, nullable: false, initial: 0 }),
+    guests: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     permanent: new BooleanField(),
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
 }

@@ -16,9 +16,9 @@ const HostData = {
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData()),
 
-    rating: new NumberField({ required: true, nullable: false, initial: 1 }),
-    marks: new TypedObjectField(new NumberField({ required: true, nullable: false, initial: 0 }), { required: true }),
-    ic: new ArrayField(new SchemaField(SourceEntityField()), { required: true }),
+    rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
+    marks: new TypedObjectField(new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 })),
+    ic: new ArrayField(new SchemaField(SourceEntityField())),
     customAttributes: new BooleanField(),
 }
 

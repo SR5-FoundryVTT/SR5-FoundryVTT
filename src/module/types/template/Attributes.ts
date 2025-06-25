@@ -10,8 +10,8 @@ export const AttributeField = () => ({
 
 const EdgeAttributeField = () => ({
     ...AttributeField(),
-    uses: new NumberField({ required: true, nullable: false, initial: 0 }),
-    max: new NumberField({ required: true, nullable: false, initial: 0 }),
+    uses: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    max: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
 
 export const Attributes = () => ({

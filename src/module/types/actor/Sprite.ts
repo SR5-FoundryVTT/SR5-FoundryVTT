@@ -19,8 +19,8 @@ const SpriteData = {
     matrix: new SchemaField(MatrixData()),
 
     // === Summoning & Binding ===
-    level: new NumberField({ required: true, nullable: false, initial: 0 }),
-    services: new NumberField({ required: true, nullable: false, initial: 0 }),
+    level: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    services: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     registered: new BooleanField(),
     technomancerUuid: new StringField({ required: true }),
 

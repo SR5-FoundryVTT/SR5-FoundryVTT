@@ -2,8 +2,8 @@ import { ValueMaxPair, ModifiableValue } from "./Base";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const Living = () => ({
-    wounds: new NumberField({ required: true, nullable: false, initial: 0 }),
-    pain_tolerance: new NumberField({ required: true, nullable: false, initial: 0 }),
+    wounds: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    pain_tolerance: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
 export const Track = () => ({

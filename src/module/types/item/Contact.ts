@@ -7,8 +7,8 @@ const ContactData = {
     importFlags: new SchemaField(ImportFlagData()),
 
     type: new StringField({ required: true }),
-    connection: new NumberField({ required: true, nullable: false, initial: 0 }),
-    loyalty: new NumberField({ required: true,  nullable: false, initial: 0 }),
+    connection: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    loyalty: new NumberField({ required: true,  nullable: false, integer: true, initial: 0, min: 0 }),
     family: new BooleanField(),
     blackmail: new BooleanField(),
     group: new BooleanField(),

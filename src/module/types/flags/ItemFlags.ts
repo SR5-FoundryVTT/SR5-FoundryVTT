@@ -1,9 +1,9 @@
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const FireModeData = () => ({
-    value: new NumberField({ required: true, nullable: false, initial: 0 }),
+    value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     label: new StringField({ required: true }),
-    defense: new NumberField({ required: true, nullable: false, initial: 0 }),
+    defense: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     recoil: new BooleanField(),
     suppression: new BooleanField(),
     mode: new StringField({

@@ -3,9 +3,9 @@ import { ConditionData } from "./Condition";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const TechnologyData = () => ({
-    rating: new NumberField({ required: true, nullable: false, initial: 0 }),
+    rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     availability: new StringField({ required: true }),
-    quantity: new NumberField({ required: true, nullable: false, initial: 0 }),
+    quantity: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
     equipped: new BooleanField(),
     conceal: new SchemaField(ModifiableValue()),

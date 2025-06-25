@@ -13,7 +13,7 @@ const BiowareData = {
     technology: new SchemaField(TechnologyData()),
 
     essence: new NumberField({ required: true, nullable: false, initial: 0 }),
-    capacity: new NumberField({ required: true, nullable: false, initial: 0 }),
+    capacity: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     grade: new StringField({
         required: true,
         initial: 'standard',

@@ -6,8 +6,8 @@ import { ValueMaxPair, ModifiableValue } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const BlastData = () => ({
-    radius: new NumberField({ required: true, nullable: false, initial: 0 }),
-    dropoff: new NumberField({ required: true, nullable: false, initial: 0 }),
+    radius: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    dropoff: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
 
 const AmmunitionData = () => ({
@@ -18,14 +18,14 @@ const AmmunitionData = () => ({
         required: true,
         choices: ['removable_clip', 'break_action', 'belt_fed', 'internal_magazin', 'muzzle_loader', 'cylinder', 'drum', 'bow', ''],
     }),
-    partial_reload_value: new NumberField({ required: true, nullable: false, initial: -1 }),
+    partial_reload_value: new NumberField({ required: true, nullable: false, integer: true, initial: -1 }),
 });
 
 export const RangeData = () => ({
-    short: new NumberField({ required: true, nullable: false, initial: 0 }),
-    medium: new NumberField({ required: true, nullable: false, initial: 0 }),
-    long: new NumberField({ required: true, nullable: false, initial: 0 }),
-    extreme: new NumberField({ required: true, nullable: false, initial: 0 }),
+    short: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    medium: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    long: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    extreme: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     category: new StringField({ required: true, initial: 'manual' }), // I believe we don't use this, we could use the value from the RangeWeaponData
     attribute: new StringField({ required: true }),
 });
@@ -45,7 +45,7 @@ const RangeWeaponData = () => ({
 });
 
 const MeleeWeaponData = () => ({
-    reach: new NumberField({ required: true, nullable: false, initial: 0 }),
+    reach: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
 
 const ThrownWeaponData = () => ({

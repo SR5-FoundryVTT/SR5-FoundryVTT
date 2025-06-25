@@ -4,8 +4,8 @@ import { ConditionData } from "./Condition";
 
 const { SchemaField, NumberField, BooleanField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
 
-export const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing' | 'firewall') => ({
-    value: new NumberField({ required: true, initial: 0 }),
+const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing' | 'firewall') => ({
+    value: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     att: new StringField({
         blank: true,
         required: true,
@@ -38,7 +38,7 @@ export const MatrixData = () => ({
     firewall: new SchemaField(MatrixAttributeField()),
 
     condition_monitor: new SchemaField(ConditionData()),
-    rating: new NumberField({ required: true, nullable: false, initial: 0 }),
+    rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     name: new StringField({ required: true }),
     // TODO: tamIf check if it's used
     device: new StringField({ required: true }),
@@ -46,7 +46,7 @@ export const MatrixData = () => ({
     hot_sim: new BooleanField(),
     running_silent: new BooleanField(),
     item: new AnyField({ required: false }),
-    marks: new TypedObjectField(new NumberField({ required: true, nullable: false, initial: 0 })),
+    marks: new TypedObjectField(new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 })),
 });
 
 export type MatrixType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixData>>;

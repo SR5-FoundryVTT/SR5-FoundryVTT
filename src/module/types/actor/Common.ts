@@ -15,7 +15,7 @@ export const CharacterSkills = () => ({
 export const MagicData = () => ({
     attribute: new StringField({ required: true, initial: "logic" }), // Drain attribute
     projecting: new BooleanField(),
-    initiation: new NumberField({ required: true, nullable: false, initial: 0 }),
+    initiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
 
 export const PhysicalCombatValues = () => ({

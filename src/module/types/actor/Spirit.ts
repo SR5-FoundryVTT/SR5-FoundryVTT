@@ -23,7 +23,7 @@ const SpiritData = {
     }),
     limits: new SchemaField({ ...Limits(), ...AwakendLimits() }),
     values: new SchemaField(PhysicalCombatValues()),
-    force: new NumberField({ required: true, nullable: false, initial: 0 }),
+    force: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 
     // === Magic ===
     magic: new SchemaField(MagicData()),
@@ -39,7 +39,7 @@ const SpiritData = {
 
     // === Summoning ===
     summonerUuid: new StringField({ required: true }),
-    services: new NumberField({ required: true, nullable: false, initial: 0 }),
+    services: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     bound: new BooleanField(),
 
     // === Visibility ===

@@ -14,7 +14,7 @@ const QualityData = {
         choices: ['positive', 'negative', 'lifemodule']
     }),
     karma: new NumberField({ required: true, nullable: false, initial: 0 }),
-    rating: new NumberField({ required: true, nullable: false, initial: 0 }),
+    rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 }
 
 export class Quality extends foundry.abstract.TypeDataModel<typeof QualityData, Item.Implementation> {

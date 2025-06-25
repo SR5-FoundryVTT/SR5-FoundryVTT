@@ -26,7 +26,7 @@ export const MinimalActionData = () => ({
     attribute2: new StringField({ required: true }),
     armor: new BooleanField(),
     limit: new SchemaField(ModifiableValueLinked()),
-    mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+    mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     skill: new StringField({ required: true }),
 });
 
@@ -92,7 +92,7 @@ export const ActionRollData = (
         test: new StringField({ required: true, initial: opposedTest }),
         type: new StringField({ required: true }),
         description: new StringField({ required: true }),
-        mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+        mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
         skill: new StringField({ required: true }),
         attribute: new StringField({ required: true }),
         attribute2: new StringField({ required: true }),
@@ -100,7 +100,7 @@ export const ActionRollData = (
         resist: new SchemaField({
             test: new StringField({ required: true, initial: resistTest }),
             skill: new StringField({ required: true }),
-            mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+            mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
             attribute: new StringField({ required: true }),
             attribute2: new StringField({ required: true }),
             armor: new BooleanField(),
@@ -108,13 +108,13 @@ export const ActionRollData = (
     }),
     followed: new SchemaField({
         test: new StringField({ required: true, initial: followedTest }),
-        mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+        mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
         skill: new StringField({ required: true }),
         attribute: new StringField({ required: true }),
         attribute2: new StringField({ required: true }),
         armor: new BooleanField(),
     }),
-    alt_mod: new NumberField({ required: true, nullable: false, initial: 0 }),
+    alt_mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     dice_pool_mod: ModList(),
     roll_mode: new StringField({ required: true }),
 });

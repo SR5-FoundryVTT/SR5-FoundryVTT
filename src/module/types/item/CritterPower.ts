@@ -14,8 +14,8 @@ const CritterPowerData = {
     powerType: new StringField({ required: true }),
     range: new StringField({ required: true }),
     duration: new StringField({ required: true }),
-    karma: new NumberField({ required: true, nullable: false, initial: 0 }),
-    rating: new NumberField({ required: true, nullable: false, initial: 0 }),
+    karma: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     optional: new StringField({ required: true }),
     enabled: new BooleanField({ initial: true }),
 }

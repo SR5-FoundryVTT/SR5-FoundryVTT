@@ -49,14 +49,14 @@ const VehicleData = {
     values: new SchemaField(PhysicalCombatValues()),
     limits: new SchemaField(VehicleLimits()),
     vehicle_stats: new SchemaField(VehicleStats()),
-    modPoints: new NumberField({ required: true, initial: 0 }),
+    modPoints: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     modificationCategories: new SchemaField({
-        body: new NumberField({ required: true, nullable: false, initial: 0 }),
-        power_train: new NumberField({ required: true, nullable: false, initial: 0 }),
-        protection: new NumberField({ required: true, nullable: false, initial: 0 }),
-        electromagnetic: new NumberField({ required: true, nullable: false, initial: 0 }),
-        cosmetic: new NumberField({ required: true, nullable: false, initial: 0 }),
-        weapons: new NumberField({ required: true, nullable: false, initial: 0 }),
+        body: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        power_train: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        protection: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        electromagnetic: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        cosmetic: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        weapons: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     }),
 
     // === Matrix & Initiative ===
