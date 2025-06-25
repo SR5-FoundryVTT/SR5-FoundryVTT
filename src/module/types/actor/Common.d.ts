@@ -24,7 +24,7 @@ declare namespace Shadowrun {
         initiation: number
     }
 
-    export interface MatrixData {
+    export type MatrixData = MatrixDeviceData & {
         dice: BaseValuePair<number> & ModifiableValue
         base: BaseValuePair<number> & ModifiableValue
 
@@ -50,17 +50,10 @@ declare namespace Shadowrun {
         marks: MatrixMarks
     }
 
+    // TODO: taMiF/marks This could be a union type, which seem to be prefered in online discurse
     enum MatrixNetworkTypes {
         HOST = "host",
         GRID = "grid"
-    }
-
-    export interface MatrixNetworkData {
-        network: {
-            // empty string or uuid of used network (host/grid) NOT PAN
-            uuid: string
-            type: MatrixNetworkTypes
-        }
     }
 
     // A interchangeable list of device attributes.

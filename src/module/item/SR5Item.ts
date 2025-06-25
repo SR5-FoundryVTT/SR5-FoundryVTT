@@ -756,8 +756,7 @@ export class SR5Item extends Item {
      * Should this matrix item be visible to a player?
      */
     get matrixIconVisibleToPlayer(): boolean {
-        // @ts-expect-error No propper typing
-        return this.system?.matrix?.visible === true;
+        return this.system.matrix?.visible === true;
     }
 
     /**

@@ -57,7 +57,8 @@ export const FLAGS = {
     UseDamageCondition: 'UseDamageCondition',
     GlobalDataStorage: 'GlobalDataStorage',
     GeneralActionsPack: 'GeneralActionsPack',
-    MatrixActionsPack: 'MatrixActionsPack'
+    MatrixActionsPack: 'MatrixActionsPack',
+    UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

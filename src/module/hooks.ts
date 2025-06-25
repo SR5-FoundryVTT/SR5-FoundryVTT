@@ -80,6 +80,7 @@ import { DataStorage } from './data/DataStorage';
 import { SRStorage } from './storage/storage';
 import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
 import { MatrixICFlow } from './actor/flows/MatrixICFlow';
+import { SocketMessage } from './sockets';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -496,7 +497,8 @@ ___________________
             [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage.bind(SR5Combat)],
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(SuccessTestEffectsFlow)],
             [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(TeamworkTest)],
-            [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)]
+            [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)],
+            [FLAGS.UpdateDocumentsAsGM]: [SocketMessage.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {

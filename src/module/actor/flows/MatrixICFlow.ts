@@ -34,6 +34,8 @@ export const MatrixICFlow = {
      * 
      * This means we have to cleanup some data on the IC actor.
      * 
+     * NOTE: It is assumed that only GMs update IC actors...
+     * 
      * @param ic The disconnected IC actor.
      */
     async disconnectFromHost(ic: SR5Actor) {

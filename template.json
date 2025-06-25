@@ -38,6 +38,11 @@
                     }
                 }
             },
+            "matrixNetwork": {
+                "matrix": {
+                    "updatedConnections": 0
+                }
+            },
             "limits": {
                 "limits": {
                     "physical": {
@@ -958,6 +963,7 @@
                 "skills",
                 "attributes",
                 "matrix",
+                "matrixNetwork",
                 "limits",
                 "armor",
                 "magic",
@@ -1341,6 +1347,9 @@
                     },
                     "wireless": true,
                     "master": ""
+                },
+                "matrix": {
+                    "updatedConnections": 0
                 }
             },
             "action": {
@@ -1489,7 +1498,8 @@
             },
             "matrixNetwork": {
                 "matrix": {
-                    "visible": true
+                    "visible": true,
+                    "updatedConnections": 0
                 }
             }
         },

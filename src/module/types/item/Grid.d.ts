@@ -4,5 +4,9 @@ declare namespace Shadowrun {
     export interface GridData extends
         DevicePartData,
         DescriptionPartData,
-        MatrixNetworkData {}
+        GridMatrixData {}
+
+    interface GridMatrixData {
+        matrix: MatrixMasterData;
+    }
 }

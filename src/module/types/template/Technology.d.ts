@@ -2,6 +2,7 @@ declare namespace Shadowrun {
     export type TechnologyPartData = {
         attributes: AttributesData
         technology: TechnologyData
+        matrix: MatrixTechnologyData
     };
     export type TechnologyData = {
         rating: NumberOrEmpty
@@ -40,4 +41,7 @@ declare namespace Shadowrun {
         };
     };
 
+    export type MatrixTechnologyData = {
+        matrix: MatrixDeviceData
+    }
 }

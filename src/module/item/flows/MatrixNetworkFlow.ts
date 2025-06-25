@@ -2,12 +2,17 @@ import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from "../SR5Item";
 import { NetworkStorage } from "../../storage/NetworkStorage";
 import { Helpers } from "../../helpers";
+import { SocketMessage } from "../../sockets";
+import { FLAGS } from "../../constants";
 
 /**
  * This flow handles everything involving how matrix devices are connected to network and what
  * device is the master of such a network.
  *
  * It doesn't include rule handling, nor does it handle other matrix functionality.
+ * 
+ * In general connection details are stored using DataStorage, allowing us to avoid syncing issues with
+ * master / slave documents both having uuid references to each other.
  */
 export class MatrixNetworkFlow {
     /**
@@ -64,9 +69,7 @@ export class MatrixNetworkFlow {
 
         console.debug(`Shadowrun5e | Added document ${slave?.name} to the master ${master?.name}`, master, slave);
 
-        // Since no document update occures, we have to trigger a re-render.
-        slave.sheet?.render();
-        master.sheet?.render();
+        await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
     }
 
     /**
@@ -115,15 +118,17 @@ export class MatrixNetworkFlow {
         if (!slave) return;
         if (!slave.canBeSlave) return;
 
-        // Retrieve master to update it's sheet.
-        const master = MatrixNetworkFlow.getMaster(slave);
-
-        // We clean this device from all networks, to clean up any issues.
+        // We remove slave from network, even if master shouldn't exist anymore.
         await NetworkStorage.removeFromNetworks(slave);
 
-        // Since no document update occures, we have to trigger a re-render.
-        master?.sheet?.render();
-        slave.sheet?.render();
+        // Retrieve master to update it's sheet.
+        const master = MatrixNetworkFlow.getMaster(slave);
+        if (!master) {
+            console.error(`Shadowrun 5e | Could not find master for device ${slave.name}`);
+            return;
+        }
+
+        await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
     }
 
     /**
@@ -139,9 +144,7 @@ export class MatrixNetworkFlow {
 
         await NetworkStorage.removeSlave(master, slave);
 
-        // Since no document update occures, we have to trigger a re-render.
-        slave.sheet?.render();
-        master.sheet?.render();
+        await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
     }
 
     /**
@@ -158,9 +161,11 @@ export class MatrixNetworkFlow {
         const slaves = NetworkStorage.getSlaves(master);
         await NetworkStorage.removeSlaves(master);
 
-        // Since no document update occures, we have to trigger a re-render.
-        master.sheet?.render();
-        slaves.forEach(slave => slave.sheet?.render());
+        // Since no document update occured, we have to trigger a update for cross session sheet re-render.
+        await master.update({'system.matrix.updatedConnections': Date.now()});
+        for (const slave of slaves) {
+            await slave.update({'system.matrix.updatedConnections': Date.now()});
+        }
     }
 
     /**
@@ -212,9 +217,7 @@ export class MatrixNetworkFlow {
         const master = MatrixNetworkFlow.getMaster(slave);
         await NetworkStorage.removeFromNetworks(slave);
 
-        // Since documents arent updated, re-render related sheets.
-        slave.sheet?.render();
-        master?.sheet?.render();
+        await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
     }
 
     /**
@@ -302,5 +305,40 @@ export class MatrixNetworkFlow {
         // TODO: Add public GRIDs
 
         return networks;
+    }
+
+    /**
+     * Helper function to update both a master and slave connection. 
+     * We have to do this, as the network connection is stored in DataStorage, which doesn't update the documents involved,
+     * and therefore not causing a sheet.render. Instead we cause an otherwise unnecessary document update to trigger a sheet.render 
+     * across all active user sessions using that document sheet.
+     * 
+     * @param master The network master to update.
+     * @param slave The network slave to update.
+     */
+    static async _triggerUpdateForNetworkConnectionChange(master: SR5Item | undefined | null, slave: Shadowrun.NetworkDevice | undefined | null) {
+        const updateData = {'system.matrix.updatedConnections': Date.now()};
+
+        // Players will trigger this workflow as well and likely can't update one of the documents.
+        if (game.user?.isGM) {
+            if (slave) await slave.update(updateData);
+            if (master) await master.update(updateData);
+        }
+        else {
+            const documentsData: {uuid: string, updateData: any}[] = [];
+            if (slave) documentsData.push({uuid: slave.uuid, updateData});
+            if (master) documentsData.push({uuid: master.uuid, updateData});
+            if (documentsData) await this._triggerUpdatesAsGM(documentsData);
+        }
+    }
+
+    /**
+     * 
+     * 
+     * @param document 
+     * @param updateData 
+     */
+    static async _triggerUpdatesAsGM(documentsData: {uuid: string, updateData: any}[]) {
+        await SocketMessage.emitForGM(FLAGS.UpdateDocumentsAsGM, documentsData);
     }
 }

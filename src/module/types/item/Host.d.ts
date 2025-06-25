@@ -5,7 +5,7 @@ declare namespace Shadowrun {
         DevicePartData,
         ImportFlags,
         DescriptionPartData,
-        MatrixNetworkData {
+        HostMatrixData {
             attributes: AttributesData
             rating: number,
             marks: MatrixMarks,
@@ -14,5 +14,9 @@ declare namespace Shadowrun {
 
             // Disable host attribute calculation
             customAttributes: boolean
+    }
+
+    interface HostMatrixData {
+        matrix: MatrixMasterData
     }
 }

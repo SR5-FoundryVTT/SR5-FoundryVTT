@@ -78,7 +78,7 @@ declare namespace Shadowrun {
         matrix: MatrixData & {
             // Stores the matix action used to place marks.
             // Intention is for users not to have to select the action every time.
-            markPlacementAction: 'Brute Force' | 'Hack on the Fly';
+            markPlacementAction: 'Brute Force' | 'Hack on the Fly'
         }
     }
 
