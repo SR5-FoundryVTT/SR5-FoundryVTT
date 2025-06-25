@@ -36,5 +36,4 @@ export const VehicleLimits = () => ({
     acceleration: new SchemaField(LimitField()),
 });
 
-export type LimitsType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof Limits>>;
 export type LimitFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof LimitField>>;

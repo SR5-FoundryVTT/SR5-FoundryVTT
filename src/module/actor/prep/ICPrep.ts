@@ -13,7 +13,6 @@ import { SR5Item } from "src/module/item/SR5Item";
 export class ICPrep {
     static prepareBaseData(system: Actor.SystemOfType<'ic'>) {
         ModifiersPrep.clearAttributeMods(system);
-        ModifiersPrep.clearLimitMods(system);
         SkillsPrep.prepareSkillData(system);
 
         ICPrep.addMissingTracks(system);
@@ -30,7 +29,7 @@ export class ICPrep {
         ICPrep.prepareHostAttributes(system);
         ICPrep.prepareMeatAttributes(system);
 
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(system as any);
 
         ICPrep.prepareMatrix(system);
         ICPrep.prepareMatrixTrack(system);
@@ -59,8 +58,8 @@ export class ICPrep {
      * @param system
      */
     static prepareModifiers(system: Actor.SystemOfType<'ic'>) {
-        let modifiers = ModifiersPrep.commonModifiers as string[];
-        modifiers = modifiers.concat(ModifiersPrep.matrixModifiers as string[]);
+        let modifiers = ModifiersPrep.commonModifiers;
+        modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
         ModifiersPrep.setupModifiers(system, modifiers);
     }
 

@@ -592,7 +592,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareBaseValues();
             test.calculateBaseValues();
 
-            assert.strictEqual(test.limit.value, actor.getLimit('social').value + 3);
+            assert.strictEqual(test.limit.value, actor.getLimit('social')!.value + 3);
             assert.strictEqual(test.pool.value, 3);
 
             // Simulate change of selection
@@ -604,7 +604,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareBaseValues();
             test.calculateBaseValues();
 
-            assert.strictEqual(test.limit.value, actor.getLimit('physical').value + 3);
+            assert.strictEqual(test.limit.value, actor.getLimit('physical')!.value + 3);
 
             await actor.delete();
         });

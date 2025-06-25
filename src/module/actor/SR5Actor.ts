@@ -30,14 +30,15 @@ import AEChangeData = ActiveEffect.ChangeData;
 import { ActionRollType, DamageType } from '../types/item/Action';
 import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/Attributes';
 import { VehicleStatsType } from '../types/actor/Vehicle';
-import { LimitFieldType, LimitsType } from '../types/template/Limits';
+import { LimitFieldType } from '../types/template/Limits';
 import { KnowledgeSkillCategory, SkillFieldType } from '../types/template/Skills';
 import { ConditionType } from '../types/template/Condition';
 import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitors';
-import { BaseArmorType } from '../types/template/Armor';
-import { InventoryType, MatrixType } from '../types/actor/Common';
+import { ActorArmorType } from '../types/template/Armor';
+import { InventoryType } from '../types/actor/Common';
 import { SkillRollOptions } from '../types/rolls/ActorRolls';
 import { FireModeType } from '../types/flags/ItemFlags';
+import { MatrixType } from '../types/template/Matrix';
 
 export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' | 'sprite';
 
@@ -363,8 +364,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     }
 
     findLimit(this: SR5Actor, limitName?: string): LimitFieldType | undefined {
-        if (!limitName) return undefined;
-        return this.system.limits[limitName];
+        if (!limitName || !('limits' in this.system)) return undefined;
+        return this.system.limits?.[limitName];
     }
 
     getWoundModifier(this: SR5Actor): number {
@@ -396,11 +397,11 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @param damage If given will be applied to the armor to get modified armor.
      * @returns Armor or modified armor.
      */
-    getArmor(damage?: DamageType): BaseArmorType {
+    getArmor(damage?: DamageType): ActorArmorType {
         // Prepare base armor data.
         const armor = !("armor" in this.system) ? 
             DataDefaults.createData('armor') :
-            (foundry.utils.duplicate(this.system.armor) as BaseArmorType);
+            (foundry.utils.duplicate(this.system.armor) as ActorArmorType);
         // Prepare damage to apply to armor.
         damage = damage || DataDefaults.createData('damage');
 
@@ -446,7 +447,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * Amount of recoil compensation this actor has available (without the weapon used).
      */
     recoilCompensation(this: SR5Actor): number {
-        return "recoil_compensation" in this.system.values ? this.system.values.recoil_compensation.value : 0;
+        return this.system.values && "recoil_compensation" in this.system.values ? this.system.values.recoil_compensation.value : 0;
     }
 
     /**
@@ -462,7 +463,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * Amount of progressive recoil this actor has accrued.
      */
     recoil(this: SR5Actor): number {
-        return "recoil" in this.system.values ? this.system.values.recoil.value : 0;
+        return this.system.values && "recoil" in this.system.values ? this.system.values.recoil.value : 0;
     }
 
     getAttributes(this: SR5Actor): AttributesType {
@@ -488,13 +489,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return attributes[name];
     }
 
-    getLimits(this: SR5Actor): LimitsType {
-        return this.system.limits;
-    }
-
-    getLimit(this: SR5Actor, name: string): LimitFieldType {
-        const limits = this.getLimits();
-        return limits[name];
+    getLimit(this: SR5Actor, name: string): LimitFieldType | undefined {
+        return this.system.limits?.[name];
     }
 
     isGrunt(this: SR5Actor): boolean {
@@ -1620,12 +1616,12 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         }
     }
 
-    getModifiedArmor(damage: DamageType): BaseArmorType {
+    getModifiedArmor(damage: DamageType): ActorArmorType {
         if (!damage.ap?.value) {
             return this.getArmor();
         }
 
-        const modified = foundry.utils.duplicate(this.getArmor()) as BaseArmorType;
+        const modified = foundry.utils.duplicate(this.getArmor()) as ActorArmorType;
         if (modified) {
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
             modified.value = Helpers.calcTotal(modified, {min: 0});
@@ -2009,7 +2005,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      * @returns A positive number or zero.
      */
     previousAttacks(this: SR5Actor): number {
-        return Math.max(this.system.modifiers.multi_defense * -1, 0);
+        return Math.max('multi_defense' in this.system.modifiers ? this.system.modifiers.multi_defense * -1 : 0, 0);
     }
 
     /**
@@ -2034,7 +2030,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const automateDefenseMod = game.settings.get(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier);
         if (!automateDefenseMod || !this.combatActive) return;
 
-        if (this.system.modifiers.multi_defense === 0) return;
+        if (!('multi_defense' in this.system.modifiers) || this.system.modifiers.multi_defense === 0) return;
 
         console.debug('Shadowrun 5e | Removing consecutive defense modifier.', this);
         await this.update({ system: { modifiers: { multi_defense: 0 } } });

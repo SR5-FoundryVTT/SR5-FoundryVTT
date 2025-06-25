@@ -8,6 +8,9 @@ export class SoakFlow {
         const gelRoundsEffect = this.isDamageFromGelRounds(damage) ? -2 : 0;  // SR5 434
         const impactDispersionEffect = this.isDamageFromImpactDispersion(damage) ? -2 : 0  // FA 52
         const limit = actor.getLimit('physical');
+
+        if (!limit) return false;
+
         const effectiveLimit = limit.value + gelRoundsEffect + impactDispersionEffect
         // SR5 194
         const knockedDown = damage.value > effectiveLimit || damage.value >= 10;
@@ -18,14 +21,14 @@ export class SoakFlow {
     }
 
     isDamageFromGelRounds(damage: DamageType) {
-        if (damage.source && damage.source.actorId && damage.source.itemId) {
-            const attacker = game.actors?.find(actor => actor.id == damage.source?.actorId);
+        if (damage.source?.actorId && damage.source.itemId) {
+            const attacker = game.actors?.find(actor => actor.id === damage.source?.actorId);
             if (attacker) {
-                const item = attacker.items.find(item => item.id == damage.source?.itemId) as SR5Item;
+                const item = attacker.items.find(item => item.id === damage.source?.itemId) as SR5Item;
                 if (item) {
                     return item.items
                         .filter(mod => mod.getTechnologyData()?.equipped)
-                        .filter(tech => tech.name == game.i18n.localize("SR5.AmmoGelRounds")).length > 0;
+                        .filter(tech => tech.name === game.i18n.localize("SR5.AmmoGelRounds")).length > 0;
                 }
             }
         }

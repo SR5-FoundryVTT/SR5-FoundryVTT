@@ -16,7 +16,7 @@ export class LimitsPrep {
         if ('astral' in limits)
             limits.astral.hidden = special !== 'magic';
 
-        for (let [name, limit] of Object.entries(limits)) {
+        for (const [name, limit] of Object.entries(limits)) {
             Helpers.calcTotal(limit);
             limit.label = SR5.limits[name];
         }

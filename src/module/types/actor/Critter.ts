@@ -1,22 +1,78 @@
-import { CommonData, MagicActorData, TwoTrackActorData, ArmorActorData, WoundsActorData, MatrixActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CharacterLimits, CommonModifiers } from "./Common";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
+import { ActorArmorData } from "../template/Armor";
+import { Attributes } from "../template/Attributes";
+import { ModifiableValue, ValueMaxPair } from "../template/Base";
+import { Tracks } from "../template/ConditionMonitors";
+import { Initiative } from "../template/Initiative";
+import { MatrixData } from "../template/Matrix";
+import { Movement } from "../template/Movement";
+import { VisibilityChecks } from "../template/Visibility";
+import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData } from "./Common";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const CritterData = () => ({
     ...CommonData(),
-    ...MagicActorData(),
-    ...TwoTrackActorData(),
-    ...ArmorActorData(),
-    ...WoundsActorData(),
-    ...MatrixActorData(),
-    ...MovementActorData(),
-    ...NPCActorData(),
-    values: new SchemaField(PhysicalCombatValues()),
+    
+    // === Core Identity ===
+    metatype: new StringField({ required: true }),
+    is_critter: new BooleanField(),
+    is_npc: new BooleanField(),
+    npc: new SchemaField({ is_grunt: new BooleanField() }),
+    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane'], initial: 'mundane' }),
+
+    // === Attributes & Limits ===
+    attributes: new SchemaField(Attributes()),
     limits: new SchemaField(CharacterLimits()),
-    modifiers: new SchemaField({
-        //todo
-        // ...Modifiers,
-        ...CommonModifiers(),
-    }, { required: true }),
+
+    // === Combat ===
+    armor: new SchemaField(ActorArmorData()),
+    initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
+    values: new SchemaField(PhysicalCombatValues()),
+    wounds: new SchemaField(ModifiableValue()),
+
+    visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
+
+    // === Condition & Movement ===
+    track: new SchemaField(Tracks('matrix', 'physical', 'stun')),
+    movement: new SchemaField(Movement()),
+
+    // === Magic & Matrix ===
+    magic: new SchemaField(MagicData()),
+    matrix: new SchemaField(MatrixData()),
+    technomancer: new SchemaField({
+        attribute: new StringField({ required: true, initial: "willpower" }), // fade attribute
+        submersion: new NumberField({ required: true, nullable: false, initial: 0 }),
+    }),
+
+    // === Economy & Reputation ===
+    karma: new SchemaField(ValueMaxPair()),
+    nuyen: new NumberField({ required: true, nullable: false, initial: 0 }),
+    notoriety: new NumberField({ required: true, nullable: false, initial: 0 }),
+    public_awareness: new NumberField({ required: true, nullable: false, initial: 0 }),
+    street_cred: new NumberField({ required: true, nullable: false, initial: 0 }),
+
+    // === Modifiers ===
+    modifiers: new SchemaField(CreateModifiers(
+        // Limits
+        "physical_limit", "astral_limit", "social_limit", "mental_limit",
+        // Initiative
+        "astral_initiative", "astral_initiative_dice",
+        "matrix_initiative", "matrix_initiative_dice",
+        "meat_initiative", "meat_initiative_dice",
+        // Tracks
+        "stun_track", "matrix_track", "physical_track", "physical_overflow_track",
+        // Movement
+        "walk", "run",
+        // Tolerance
+        "wound_tolerance", "pain_tolerance_stun", "pain_tolerance_physical",
+        // Combat/Defense
+        "armor", "multi_defense", "reach", "defense", "defense_dodge", "defense_parry",
+        "defense_block", "defense_melee", "defense_ranged", "soak", "recoil",
+        // Magic/Matrix
+        "drain", "fade", "essence",
+        // Miscellaneous
+        "composure", "lift_carry", "judge_intentions", "memory", "global"
+    )),
 });
 
 export class Critter extends foundry.abstract.TypeDataModel<ReturnType<typeof CritterData>, Actor.Implementation> {

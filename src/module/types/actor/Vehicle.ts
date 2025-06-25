@@ -1,14 +1,13 @@
-import { CommonData, ArmorActorData, MatrixActorData, MovementActorData, PhysicalTrackActorData, PhysicalCombatValues, CommonModifiers } from "./Common";
+import { CommonData, PhysicalCombatValues, CreateModifiers } from "./Common";
 import { Attributes, AttributeField } from "../template/Attributes";
-import { ModifiableValue } from "../template/Base";
-import { ImportFlags } from "../template/ImportFlags";
 import { VehicleLimits } from "../template/Limits";
-const { DataField, HTMLField, SchemaField, SetField, NumberField, BooleanField, ObjectField, ArrayField, AnyField, StringField } = foundry.data.fields;
-
-const VehicleAttributes = () => ({
-    ...Attributes(),
-    pilot: new SchemaField(AttributeField()),
-});
+import { Movement } from "../template/Movement";
+import { Tracks } from "../template/ConditionMonitors";
+import { ActorArmorData } from "../template/Armor";
+import { Initiative } from "../template/Initiative";
+import { MatrixData } from "../template/Matrix";
+import { VisibilityChecks } from "../template/Visibility";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const VehicleStats = () => ({
     pilot: new SchemaField(AttributeField()),
@@ -21,23 +20,12 @@ const VehicleStats = () => ({
     seats: new SchemaField(AttributeField()),
 });
 
-const VehicleModCategories = () => ({
-    body: new NumberField({ required: true, nullable: false, initial: 0 }),
-    power_train: new NumberField({ required: true, nullable: false, initial: 0 }),
-    protection: new NumberField({ required: true, nullable: false, initial: 0 }),
-    electromagnetic: new NumberField({ required: true, nullable: false, initial: 0 }),
-    cosmetic: new NumberField({ required: true, nullable: false, initial: 0 }),
-    weapons: new NumberField({ required: true, nullable: false, initial: 0 }),
-});
-
 const VehicleData = {
+    // === Common Base ===
     ...CommonData(),
-    ...ArmorActorData(),
-    ...MatrixActorData(),
-    ...MovementActorData(),
-    ...ImportFlags(),
-    ...PhysicalTrackActorData(),
-    values: new SchemaField(PhysicalCombatValues()),
+
+    // === Identity & Classification ===
+    special: new StringField({ required: true, initial: "mundane", readonly: true }),
     vehicleType: new StringField({
         required: true,
         initial: "ground",
@@ -48,28 +36,69 @@ const VehicleData = {
         initial: "manual",
         choices: ["manual", "remote", "rigger", "autopilot"],
     }),
-    isDrone: new BooleanField(),
-    isOffRoad: new BooleanField(),
-    driver: new StringField({ required: true }),
     environment: new StringField({
         required: true,
         initial: "speed",
         choices: ["speed", "handling"],
     }),
-    vehicle_stats: new SchemaField(VehicleStats()),
-    attributes: new SchemaField(VehicleAttributes()),
-    networkController: new StringField({ required: true }),
-    modifiers: new SchemaField({
-        //todo
-        // ...Modifiers,
-        ...CommonModifiers(),
-    }, { required: true }),
-    modificationCategories: new SchemaField(VehicleModCategories()), // is it used?
-    modPoints: new NumberField({ required: true, initial: 0 }),
-    limits: new SchemaField(VehicleLimits()),
-    full_defense_attribute: new StringField({ required: true, initial: "intuition" }),
-}
+    isDrone: new BooleanField(),
+    isOffRoad: new BooleanField(),
 
+    // === Core Stats & Attributes ===
+    attributes: new SchemaField(Attributes()),
+    values: new SchemaField(PhysicalCombatValues()),
+    limits: new SchemaField(VehicleLimits()),
+    vehicle_stats: new SchemaField(VehicleStats()),
+    modPoints: new NumberField({ required: true, initial: 0 }),
+    modificationCategories: new SchemaField({
+        body: new NumberField({ required: true, nullable: false, initial: 0 }),
+        power_train: new NumberField({ required: true, nullable: false, initial: 0 }),
+        protection: new NumberField({ required: true, nullable: false, initial: 0 }),
+        electromagnetic: new NumberField({ required: true, nullable: false, initial: 0 }),
+        cosmetic: new NumberField({ required: true, nullable: false, initial: 0 }),
+        weapons: new NumberField({ required: true, nullable: false, initial: 0 }),
+    }),
+
+    // === Matrix & Initiative ===
+    matrix: new SchemaField(MatrixData()),
+    initiative: new SchemaField(Initiative('meatspace', 'matrix')),
+    full_defense_attribute: new StringField({ required: true, initial: "intuition" }),
+    visibilityChecks: new SchemaField(VisibilityChecks("matrix", "meatspace")),
+
+    // === Driver & Networking ===
+    driver: new StringField({ required: true }),
+    networkController: new StringField({ required: true }),
+
+    // === Condition & Movement ===
+    track: new SchemaField(Tracks('physical')),
+    movement: new SchemaField(Movement()),
+
+    // === Protection ===
+    armor: new SchemaField(ActorArmorData()),
+
+    // === Modifiers ===
+    modifiers: new SchemaField(CreateModifiers(
+        // Limits
+        "physical_limit", "astral_limit", "social_limit", "mental_limit",
+        // Initiative
+        "astral_initiative", "astral_initiative_dice",
+        "matrix_initiative", "matrix_initiative_dice",
+        "meat_initiative", "meat_initiative_dice",
+        // Tracks
+        "stun_track", "matrix_track", "physical_track", "physical_overflow_track",
+        // Movement
+        "walk", "run",
+        // Tolerance
+        "wound_tolerance", "pain_tolerance_stun", "pain_tolerance_physical",
+        // Combat/Defense
+        "armor", "multi_defense", "reach", "defense", "defense_dodge", "defense_parry",
+        "defense_block", "defense_melee", "defense_ranged", "soak", "recoil",
+        // Magic/Matrix
+        "drain", "fade", "essence",
+        // Miscellaneous
+        "composure", "lift_carry", "judge_intentions", "memory", "global"
+    )),
+};
 
 export class Vehicle extends foundry.abstract.TypeDataModel<typeof VehicleData, Actor.Implementation> {
     static override defineSchema() {

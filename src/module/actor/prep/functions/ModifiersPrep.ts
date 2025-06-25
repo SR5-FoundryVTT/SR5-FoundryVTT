@@ -8,7 +8,7 @@ export class ModifiersPrep {
      *       Therefore adding a modifier to an actor DataModel happens here and during Actor#prepareData
      */
     static prepareModifiers(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'sprite' | 'vehicle'>) {
-        let modifiers = ModifiersPrep.commonModifiers as string[];
+        let modifiers = ModifiersPrep.commonModifiers;
         modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
         modifiers = modifiers.concat(ModifiersPrep.characterModifiers);
 
@@ -111,7 +111,7 @@ export class ModifiersPrep {
         armor.mod = [];
     }
 
-    static clearLimitMods(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
+    static clearLimitMods(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'sprite' | 'vehicle'>) {
         const {limits} = system;
         for (const [name, limit] of Object.entries(limits)) {
             if (!SR5.limits.hasOwnProperty(name) || !limit) return;

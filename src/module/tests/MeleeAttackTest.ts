@@ -44,7 +44,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
         if (!this.item || !this.item.isMeleeWeapon()) return;
 
         this.data.reach = this.item.getReach();
-        this.data.reach += this.actor?.system.modifiers.reach || 0;
+        this.data.reach += this.actor && 'reach' in this.actor.system.modifiers ? this.actor?.system.modifiers.reach : 0;
 
         await super.prepareDocumentData();
     }

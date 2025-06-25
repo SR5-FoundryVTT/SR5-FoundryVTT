@@ -74,7 +74,7 @@ export class MatrixPrep {
      * Add Matrix Attributes to Limits and Attributes
      * @param system
      */
-    static prepareMatrixToLimitsAndAttributes(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'sprite' | 'vehicle'>) {
+    static prepareMatrixToLimitsAndAttributes(system: Actor.SystemOfType<'character' | 'critter' | 'sprite' | 'vehicle'>) {
         const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries

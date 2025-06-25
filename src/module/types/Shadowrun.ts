@@ -6,6 +6,8 @@ declare namespace Shadowrun {
     export type SpecialAttribute = 'edge' | 'essence' | 'magic' | 'resonance';
     export type MatrixAttribute = 'attack' | 'sleaze' | 'data_processing' | 'firewall';
 
+    export type SpaceTypes = 'meatspace' | 'astral' | 'matrix';
+
     /**
      * Any valid attribute that an actor can have.
      */

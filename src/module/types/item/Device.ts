@@ -1,7 +1,7 @@
-import { MatrixAttributes } from "../actor/Common";
 import { TechnologyData } from "../template/Technology";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
+import { MatrixAttributes } from "../template/Matrix";
 const { SchemaField, ArrayField, StringField } = foundry.data.fields;
 
 export const DevicePartData = () => ({

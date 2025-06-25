@@ -1,16 +1,13 @@
-import { CommonModifiers, MatrixModifiers, CommonData, MatrixActorData, TwoTrackActorData, ArmorActorData, MagicActorData, WoundsActorData, MovementActorData, NPCActorData, PhysicalCombatValues, CharacterLimits } from "./Common";
+import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData } from "./Common";
 import { Attributes, AttributeField } from "../template/Attributes";
-import { ValueMaxPair } from "../template/Base";
-import { ImportFlags } from "../template/ImportFlags";
+import { ModifiableValue, ValueMaxPair } from "../template/Base";
+import { Tracks } from "../template/ConditionMonitors";
+import { ActorArmorData } from "../template/Armor";
+import { Movement } from "../template/Movement";
+import { Initiative } from "../template/Initiative";
+import { MatrixData } from "../template/Matrix";
+import { VisibilityChecks } from "../template/Visibility";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
-
-const TechnomancerActorData = () => ({
-    technomancer: new SchemaField({
-        // fade attribute
-        attribute: new StringField({ required: true, initial: "willpower" }),
-        submersion: new NumberField({ required: true, initial: 0 }),
-    }, { required: true }),
-});
 
 const CharacterAttributes = () => ({
     ...Attributes(),
@@ -18,68 +15,71 @@ const CharacterAttributes = () => ({
     submersion: new SchemaField(AttributeField()),
 });
 
-export const CharacterModifiers = () => ({
-    ...CommonModifiers(),
-    ...MatrixModifiers(),
-    drain: new NumberField({ required: true, nullable: false, initial: 0 }),
-    armor: new NumberField({ required: true, nullable: false, initial: 0 }),
-    physical_limit: new NumberField({ required: true, nullable: false, initial: 0 }),
-    astral_limit: new NumberField({ required: true, nullable: false, initial: 0 }),
-    social_limit: new NumberField({ required: true, nullable: false, initial: 0 }),
-    mental_limit: new NumberField({ required: true, nullable: false, initial: 0 }),
-    stun_track: new NumberField({ required: true, nullable: false, initial: 0 }),
-    matrix_track: new NumberField({ required: true, nullable: false, initial: 0 }),
-    physical_track: new NumberField({ required: true, nullable: false, initial: 0 }),
-    physical_overflow_track: new NumberField({ required: true, nullable: false, initial: 0 }),
-    meat_initiative: new NumberField({ required: true, nullable: false, initial: 0 }),
-    meat_initiative_dice: new NumberField({ required: true, nullable: false, initial: 0 }),
-    astral_initiative: new NumberField({ required: true, nullable: false, initial: 0 }),
-    astral_initiative_dice: new NumberField({ required: true, nullable: false, initial: 0 }),
-    composure: new NumberField({ required: true, nullable: false, initial: 0 }),
-    lift_carry: new NumberField({ required: true, nullable: false, initial: 0 }),
-    judge_intentions: new NumberField({ required: true, nullable: false, initial: 0 }),
-    memory: new NumberField({ required: true, nullable: false, initial: 0 }),
-    walk: new NumberField({ required: true, nullable: false, initial: 0 }),
-    run: new NumberField({ required: true, nullable: false, initial: 0 }),
-    wound_tolerance: new NumberField({ required: true, nullable: false, initial: 0 }),
-    pain_tolerance_stun: new NumberField({ required: true, nullable: false, initial: 0 }),
-    pain_tolerance_physical: new NumberField({ required: true, nullable: false, initial: 0 }),
-    essence: new NumberField({ required: true, nullable: false, initial: 0 }),
-    fade: new NumberField({ required: true, nullable: false, initial: 0 }),
-    multi_defense: new NumberField({ required: true, nullable: false, initial: 0 }),
-    reach: new NumberField({ required: true, nullable: false, initial: 0 }),
-});
-
 const CharacterData = {
     ...CommonData(),
-    ...MatrixActorData(),
-    ...TwoTrackActorData(),
-    ...ArmorActorData(),
-    ...MagicActorData(),
-    ...WoundsActorData(),
-    ...MovementActorData(),
-    ...TechnomancerActorData(),
-    ...NPCActorData(),
-    ...ImportFlags(),
-    attributes: new SchemaField(CharacterAttributes()),
-    values: new SchemaField(PhysicalCombatValues()),
+
+    // === Core Identity ===
     metatype: new StringField({ required: true }),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
     is_critter: new BooleanField(),
+    is_npc: new BooleanField(),
+    npc: new SchemaField({ is_grunt: new BooleanField() }),
+    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane'], initial: 'mundane' }),
+
+    // === Attributes & Limits ===
+    attributes: new SchemaField(CharacterAttributes()),
     limits: new SchemaField(CharacterLimits()),
-    // karama.value => current career karma
-    // karama.max => max career karma
+
+    // === Combat ===
+    armor: new SchemaField(ActorArmorData()),
+    initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
+    values: new SchemaField(PhysicalCombatValues()),
+    wounds: new SchemaField(ModifiableValue()),
+
+    visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
+
+    // === Condition & Movement ===
+    track: new SchemaField(Tracks('matrix', 'physical', 'stun')),
+    movement: new SchemaField(Movement()),
+
+    // === Magic & Matrix ===
+    magic: new SchemaField(MagicData()),
+    matrix: new SchemaField(MatrixData()),
+    technomancer: new SchemaField({
+        attribute: new StringField({ required: true, initial: "willpower" }), // fade attribute
+        submersion: new NumberField({ required: true, nullable: false, initial: 0 }),
+    }),
+
+    // === Economy & Reputation ===
     karma: new SchemaField(ValueMaxPair()),
     nuyen: new NumberField({ required: true, nullable: false, initial: 0 }),
+    notoriety: new NumberField({ required: true, nullable: false, initial: 0 }),
     public_awareness: new NumberField({ required: true, nullable: false, initial: 0 }),
     street_cred: new NumberField({ required: true, nullable: false, initial: 0 }),
-    modifiers: new SchemaField({
-        //todo
-        // ...Modifiers,
-        ...CharacterModifiers(),
-    }),
-}
 
+    // === Modifiers ===
+    modifiers: new SchemaField(CreateModifiers(
+        // Limits
+        "physical_limit", "astral_limit", "social_limit", "mental_limit",
+        // Initiative
+        "astral_initiative", "astral_initiative_dice",
+        "matrix_initiative", "matrix_initiative_dice",
+        "meat_initiative", "meat_initiative_dice",
+        // Tracks
+        "stun_track", "matrix_track", "physical_track", "physical_overflow_track",
+        // Movement
+        "walk", "run",
+        // Tolerance
+        "wound_tolerance", "pain_tolerance_stun", "pain_tolerance_physical",
+        // Combat/Defense
+        "armor", "multi_defense", "reach", "defense", "defense_dodge", "defense_parry",
+        "defense_block", "defense_melee", "defense_ranged", "soak", "recoil",
+        // Magic/Matrix
+        "drain", "fade", "essence",
+        // Miscellaneous
+        "composure", "lift_carry", "judge_intentions", "memory", "global"
+    )),
+};
 
 export class Character extends foundry.abstract.TypeDataModel<typeof CharacterData, Actor.Implementation> {
     static override defineSchema() {

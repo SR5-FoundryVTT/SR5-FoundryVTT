@@ -42,7 +42,7 @@ export class InitiativePrep {
         initiative.meatspace.dice.value = Helpers.calcTotal(initiative.meatspace.dice, {min: 0, max: 5});
     }
 
-    static prepareAstralInit(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>) {
+    static prepareAstralInit(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
         const { initiative, attributes, modifiers } = system;
 
         initiative.astral.base.base = attributes.intuition.value * 2;

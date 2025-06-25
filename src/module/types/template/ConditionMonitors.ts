@@ -6,45 +6,47 @@ const Living = () => ({
     pain_tolerance: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
-const Overflow = () => ({
-    overflow: new SchemaField(ValueMaxPair()),
-});
-
 export const Track = () => ({
     ...ValueMaxPair(),
     ...ModifiableValue(),
-    base: new NumberField({ required: true, nullable: false, initial: 0 }), // Does if use it?
     label: new StringField({ required: true }),
-    disabled: new BooleanField({ required: false, initial: false })
+    disabled: new BooleanField() // does it used?
 });
 
-export const OverflowTrack = () => ({
+const OverflowTrack = () => ({
     ...Track(),
-    ...Overflow(),
+    overflow: new SchemaField(ValueMaxPair()),
 });
 
-export const PhysicalTrack = () => ({
-    ...OverflowTrack(),
-    ...Living(),
-});
+type TrackTypes = 'matrix' | 'physical' | 'stun';
+export const Tracks = <
+    T extends TrackTypes[] = ['matrix', 'physical', 'stun']
+>(...types: T) => {
+    const stunTrack = {
+        stun: new SchemaField({ ...Track(), ...Living() })
+    };
 
-export const StunTrack = () => ({
-    ...Track(),
-    ...Living(),
-});
+    const physicalTrack = {
+        physical: new SchemaField({ ...OverflowTrack(), ...Living() })
+    };
 
-export const MatrickTrack = () => ({
-    ...Track()
-});
+    const matrixTrack = {
+        matrix: new SchemaField(Track())
+    };
 
-export const MatrixTracks = () => ({
-    matrix: new SchemaField(MatrickTrack())
-});
-
-export const Tracks = () => ({
-    stun: new SchemaField(StunTrack()),
-    physical: new SchemaField(PhysicalTrack()),
-});
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return {
+        ...( types.includes('matrix') ? matrixTrack : {} ),
+        ...( types.includes('physical') ? physicalTrack : {} ),
+        ...( types.includes('stun') ? stunTrack : {} ),
+    } as (
+        T extends readonly any[] ?
+            ('matrix' extends T[number] ? typeof matrixTrack : unknown) &
+            ('physical' extends T[number] ? typeof physicalTrack : unknown) &
+            ('stun' extends T[number] ? typeof stunTrack : unknown)
+        : never
+    );
+};
 
 export type TrackType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof Track>>;
 export type OverflowTrackType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof OverflowTrack>>;

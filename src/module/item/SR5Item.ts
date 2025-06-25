@@ -34,9 +34,9 @@ import { UpdateActionFlow } from './flows/UpdateActionFlow';
 import { ActionResultType, ActionRollType } from '../types/item/Action';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
-import { MatrixType } from '../types/actor/Common';
 import { ConditionType } from '../types/template/Condition';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from '../types/flags/ItemFlags';
+import { MatrixType } from '../types/template/Matrix';
 
 ActionResultFlow; // DON'T TOUCH!
 

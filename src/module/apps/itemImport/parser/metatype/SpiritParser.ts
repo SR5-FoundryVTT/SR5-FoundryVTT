@@ -59,7 +59,6 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
             system.movement.walk = DataDefaults.createData('movement_field', { value, mult, base })
         }
         system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
-        system.is_npc = true;
 
         return system;
     }

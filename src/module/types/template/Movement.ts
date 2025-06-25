@@ -3,9 +3,7 @@ const { SchemaField, NumberField } = foundry.data.fields;
 
 export const MovementField = () => ({
     ...ModifiableValue(),
-    value: new NumberField({ required: true, nullable: false, initial: 0 }),
     mult: new NumberField({ required: true, nullable: false, initial: 0 }),
-    base: new NumberField({ required: true, nullable: false, initial: 0 }),
 });
 
 export const Movement = () => ({
