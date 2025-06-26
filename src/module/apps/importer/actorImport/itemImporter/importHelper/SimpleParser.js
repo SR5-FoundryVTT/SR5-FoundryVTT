@@ -11,7 +11,7 @@ export default class SimpleParser {
                 const itemData = this.parseItem(toParse, parserType);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
 
                 parsed.push(itemData);
             } catch (e) {

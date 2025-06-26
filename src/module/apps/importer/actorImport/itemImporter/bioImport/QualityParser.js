@@ -13,7 +13,7 @@ export class QualityParser {
                 const itemData = this.parseQuality(chummerQuality);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
 
                 parsedQualities.push(itemData);
             } catch (e) {
