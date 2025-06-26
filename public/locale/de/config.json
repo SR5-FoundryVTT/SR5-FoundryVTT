@@ -478,6 +478,7 @@
     "SR5.GlitchCritical": "Kritischer Patzer!",
     "SR5.Glitches": "Patzer:",
     "SR5.GoodCover": "Gute Deckung",
+    "SR5.Grids": "Gitter",
     "SR5.HackingProgram": "Hackingprogramm",
     "SR5.Help": "Hilfe",
     "SR5.Hits": "Erfolge",
@@ -594,7 +595,6 @@
     "SR5.KnowledgeSkillInterests": "Hobbywissen",
     "SR5.KnowledgeSkillProfessional": "Berufswissen",
     "SR5.KnowledgeSkillStreet": "Straßenwissen",
-    "SR5.Grids": "Gitter",
     "SR5.Labels": {
         "Action": {
             "ActiveTest": "Probe",
@@ -613,7 +613,6 @@
         },
         "ActorSheet": {
             "AddNetwork": "Netzwerk direkt hinzufügen",
-            "MarkNetwork": "Markiere Netzwerk",
             "CreateInventory": "Erstelle Inventar-Ort",
             "CritterPowers": "Critterkräfte",
             "DeviceRating": "Gerätestufe",
@@ -624,6 +623,8 @@
             "EnabledOptionSpritePowers": "Optionale Sprite Kräfte - Aktiv",
             "Hacking": "Hacking",
             "ICConfiguration": "IC-Konfiguration",
+            "Icons": "Icons",
+            "MarkNetwork": "Markiere Netzwerk",
             "Matrix": "Matrix",
             "Network": "Netz",
             "NoNetwork": "Kein Netz",
@@ -727,12 +728,12 @@
     "SR5.MatrixAttrDataProc": "Datenverarb.",
     "SR5.MatrixAttrFirewall": "Firewall",
     "SR5.MatrixAttrSleaze": "Schleicher",
-    "SR5.MatrixTarget": "Matrixziel",
     "SR5.MatrixNetworkHackingApplication": {
         "Icons": "Icons",
         "MarkPlacementAction": "Matrix Handlung",
         "Title": "Zu Netzwerk verbinden"
     },
+    "SR5.MatrixTarget": "Matrixziel",
     "SR5.MeleeWeaponAttack": "Nahkampfangriff",
     "SR5.MentalLimit": "Geistiges Limit",
     "SR5.Metamagic": "Metamagie",

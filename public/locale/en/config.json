@@ -639,6 +639,7 @@
             "EnabledOptionSpritePowers": "Optional Sprite Powers - Enabled",
             "Hacking": "Hacking",
             "ICConfiguration": "IC Configuration",
+            "Icons": "Icons",
             "MarkNetwork": "Mark Network",
             "Matrix": "Matrix",
             "Network": "Network",
@@ -682,7 +683,6 @@
             "PAN": "PAN",
             "RebootDevice": "Reboot",
             "SubtractOne": "Subtract One",
-            "TargetAcquisition": "Target Acquisition",
             "Type": "Type",
             "Visible": "Visible",
             "WAN": "WAN"
