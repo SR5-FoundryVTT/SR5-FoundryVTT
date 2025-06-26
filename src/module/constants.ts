@@ -59,6 +59,7 @@ export const FLAGS = {
     GeneralActionsPack: 'GeneralActionsPack',
     MatrixActionsPack: 'MatrixActionsPack',
     UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
+    MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

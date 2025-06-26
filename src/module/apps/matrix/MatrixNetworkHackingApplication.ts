@@ -2,6 +2,7 @@ import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5 } from "../../config";
 import { MatrixFlow } from "../../flows/MatrixFlow";
 import { Helpers } from "../../helpers";
+import { MatrixNetworkFlow } from "../../item/flows/MatrixNetworkFlow";
 import { SR5Item } from "../../item/SR5Item";
 import { BruteForceTest } from "../../tests/BruteForceTest";
 import { HackOnTheFlyTest } from "../../tests/HackOnTheFlyTest";
@@ -73,6 +74,7 @@ export class MatrixNetworkHackingApplication extends Application {
 
         html.find('.show-matrix-placement').on('click', this.handleMarkPlacement.bind(this));
         html.find('#mark-placement-action').on('click', this.handlePlacementAction.bind(this));
+        html.find('.matrix-network-invite').on('click', this.handleMarkInvite.bind(this));
     }
 
     override async getData(options?: Partial<ApplicationOptions> | undefined): Promise<MatrixNetworkHackingSheetData> {
@@ -132,12 +134,31 @@ export class MatrixNetworkHackingApplication extends Application {
      * 
      * This app is not a document sheet, so we store the value temporarily in the application instance.
      * 
-     * @param event Triggered 
+     * @param event User triggered event.
      */
     async handlePlacementAction(event) {
+        event.preventDefault();
         event.stopPropagation();
 
         const select = event.currentTarget as HTMLSelectElement;
         this.markPlacementAction = select.value;
+    }
+
+    /**
+     * User asks network for an voluntary mark.
+     * 
+     * @param event User triggered event.
+     */
+    async handleMarkInvite(event) { 
+        event.preventDefault();
+        event.stopPropagation();
+
+        const uuid = Helpers.listItemUuid(event);
+        if(!uuid) return;
+
+        const network = fromUuidSync(uuid) as SR5Item | null;
+        if (!network) return;
+
+        MatrixNetworkFlow.AskForNetworkMarkInvite(this.actor, network);
     }
 }

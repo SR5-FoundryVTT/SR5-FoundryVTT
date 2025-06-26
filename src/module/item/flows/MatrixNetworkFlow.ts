@@ -3,7 +3,7 @@ import { SR5Item } from "../SR5Item";
 import { NetworkStorage } from "../../storage/NetworkStorage";
 import { Helpers } from "../../helpers";
 import { SocketMessage } from "../../sockets";
-import { FLAGS } from "../../constants";
+import { FLAGS, SYSTEM_NAME } from "../../constants";
 
 /**
  * This flow handles everything involving how matrix devices are connected to network and what
@@ -334,12 +334,88 @@ export class MatrixNetworkFlow {
     }
 
     /**
+     * Trigger update using GM session for documents to connect / disconnect network devices.
      * 
-     * 
-     * @param document 
-     * @param updateData 
+     * @param documentsData A list of objects containing the uuid and update data for each.
      */
     static async _triggerUpdatesAsGM(documentsData: {uuid: string, updateData: any}[]) {
         await SocketMessage.emitForGM(FLAGS.UpdateDocumentsAsGM, documentsData);
+    }
+
+    /**
+     * Trigger a ChatMessage informing everyone about player intention to invite placing mark for a network connection.
+     * 
+     * This will allow the GM to accept this invitation.
+     */
+    static async AskForNetworkMarkInvite(actor: SR5Actor, target: Shadowrun.NetworkDevice) {
+        if (!actor || !target) {
+            console.error('Shadowrun 5e | No actor or target given for network mark invite.');
+            return;
+        }
+
+        const content = await renderTemplate('systems/shadowrun5e/dist/templates/chat/matrix-network-mark-invite.hbs', {
+            target
+        });
+
+        const messageData = {
+            content,
+            speaker: ChatMessage.getSpeaker({actor}),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            flags: {
+                [`${SYSTEM_NAME}.${FLAGS.MatrixNetworkMarkInvite}`]: {
+                    actorUuid: actor.uuid,
+                    targetUuid: target.uuid,
+                }
+            }
+        };
+
+        await ChatMessage.create(messageData);
+    }
+
+    /**
+     * After GM accepts the Matrix Network Mark Invite via Chat message, this will place the mark and acknowledge the invite.
+     *
+     * @param event User clicking on button in chat message.
+     */
+    static async acknowledgeMarkInvite(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const element = event.currentTarget.closest('.chat-message');
+        const messageId = element.dataset.messageId;
+        const message = game.messages?.get(messageId);
+        if (!message) return;
+
+        const {actorUuid, targetUuid} = message.getFlag(SYSTEM_NAME, FLAGS.MatrixNetworkMarkInvite) as {actorUuid: string, targetUuid: string};
+
+        const actor = await fromUuid(actorUuid) as SR5Actor | undefined;
+        const network = await fromUuid(targetUuid) as SR5Item | undefined;
+
+        if (!actor || !network) {
+            console.error('Shadowrun 5e | Could not resolve actor or network for mark invite', actorUuid, targetUuid);
+            return;
+        }
+
+        const marks = actor.getMarksPlaced(network.uuid);
+        if (marks > 0) {
+            ui.notifications.warn(game.i18n.format('SR5.Warnings.AlreadyJoinedNetwork', {name: actor.name}));
+        }
+
+        // Only mark, don't connect. Not all players want to immediately connect to the network.
+        await actor.setMarks(network, 1);
+
+        // Inform Players about accepted mark invite.
+        const messageData = {
+            content: game.i18n.format('SR5.Messages.MarkInvitation.InviteAccepted', {networkName: network.name, userName: actor.name}),
+            speaker: ChatMessage.getSpeaker({actor}),
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER
+        };
+
+        await ChatMessage.create(messageData);
+
+    }
+
+    static async chatMessageListeners(message: ChatMessage, html, data) {
+        $(html).find('.button[data-action="matrix-network-mark-invite"]').on('click', MatrixNetworkFlow.acknowledgeMarkInvite.bind(this));
     }
 }

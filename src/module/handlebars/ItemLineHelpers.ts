@@ -1001,27 +1001,6 @@ export const registerItemLineHelpers = () => {
         }];
     })
 
-    /**
-     * Used for Matrix Target Acquisition App to render right side columns
-     */
-    Handlebars.registerHelper('NetworkTargetsHeaderRightSide', () => {
-        return [{
-            text: {
-                text: game.i18n.localize('SR5.Network')
-            }
-        }]
-    });
-
-    /**
-     * Used for Matrix Target Acquisition App to render right side columns
-     */
-    Handlebars.registerHelper('NetworkTargetsRightSide', (target: Shadowrun.MatrixTargetDocument) => {
-        return [{
-            text: {
-                text: target.network
-            }
-        }]
-    });
     Handlebars.registerHelper('EmptyIcons', () => {
         return [{}];
     })
@@ -1055,6 +1034,17 @@ export const registerItemLineHelpers = () => {
             icon: 'fas fa-trash item-delete',
             cssClass: 'sin-remove-network',
             title: game.i18n.localize('SR5.DeleteItem'),
+        }]
+    });
+
+    /**
+     * Application - Matrix Network Hacking
+     */
+    Handlebars.registerHelper('MatrixNetworksItemIcons', () => {
+        return [{
+            icon: 'fas fa-door-open',
+            cssClass: 'matrix-network-invite',
+            title: game.i18n.localize('SR5.MatrixNetworkHackingApplication.Invite'),
         }]
     });
 };

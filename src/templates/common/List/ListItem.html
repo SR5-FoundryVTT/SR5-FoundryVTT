@@ -1,4 +1,3 @@
-{{log itemUuid}}
 <div class="{{#if itemHeader}}list-header{{else}}list-item{{/if}} {{itemCssClass}}" {{#if itemUuid}}data-uuid="{{itemUuid}}"{{/if}} {{#if itemId}}data-item-id="{{itemId}}" data-item-type="{{itemType}}"{{/if}} {{#each itemData}}data-{{@key}}="{{this}}"{{/each}}>
     <div class="list-item-content">
         <div class="item-left">

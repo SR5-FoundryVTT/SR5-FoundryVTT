@@ -523,6 +523,7 @@ ___________________
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
         await TeamworkTest.chatMessageListeners(message, html);
         await JournalEnrichers.messageRequestHooks(html);
+        await MatrixNetworkFlow.chatMessageListeners(message, html, data);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
@@ -530,7 +531,7 @@ ___________________
         await OpposedTest.chatLogListeners(chatLog, html, data);
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
         await TeamworkTest.chatLogListeners(chatLog, html);
-        await JournalEnrichers.chatlogRequestHooks(html)
+        await JournalEnrichers.chatlogRequestHooks(html);
     }
 
     static configureVision() {

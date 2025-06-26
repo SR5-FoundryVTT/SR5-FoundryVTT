@@ -730,12 +730,20 @@
     "SR5.MatrixAttrSleaze": "Schleicher",
     "SR5.MatrixNetworkHackingApplication": {
         "Icons": "Icons",
+        "Invite": "Bitte um Einladung",
         "MarkPlacementAction": "Matrix Handlung",
         "Title": "Zu Netzwerk verbinden"
     },
     "SR5.MatrixTarget": "Matrixziel",
     "SR5.MeleeWeaponAttack": "Nahkampfangriff",
     "SR5.MentalLimit": "Geistiges Limit",
+    "SR5.Messages": {
+        "MarkInvitation": {
+            "AcceptInvite": "Akzeptieren",
+            "AskForInvite": "Bittet um eine Marke als Einladung für:",
+            "InviteAccepted": "Trete {networkName} jederzeit bei, {userName}!"
+        }
+    },
     "SR5.Metamagic": "Metamagie",
     "SR5.Metamagics": "Metamagie",
     "SR5.Metatype": "Metatyp",
@@ -1499,6 +1507,7 @@
     "SR5.WalkingSpeed": "Gehen",
     "SR5.Warnings": {
         "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
+        "AlreadyJoinedNetwork": "{name} ist bereits mit dem Host/Gitter verbunden",
         "BulkImportPerformanceWarning": "Wenn du eine große Anzahl von Items importiert hast, kann Foundry langsam laufen, bis du deinen Browser aktualisierst. Es wird empfohlen, jetzt zu aktualisieren.",
         "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
         "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",

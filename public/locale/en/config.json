@@ -750,12 +750,20 @@
     "SR5.MatrixAttrSleaze": "Sleaze",
     "SR5.MatrixNetworkHackingApplication": {
         "Icons": "Icons",
+        "Invite": "Ask for invite",
         "MarkPlacementAction": "Matrix Action",
         "Title": "Connect to Network"
     },
     "SR5.MatrixTarget": "Matrix Target",
     "SR5.MeleeWeaponAttack": "Melee Weapon Attack",
     "SR5.MentalLimit": "Mental Limit",
+    "SR5.Messages": {
+        "MarkInvitation": {
+            "AcceptInvite": "Accept",
+            "AskForInvite": "Asks for an mark invitation for:",
+            "InviteAccepted": "Feel free to join {networkName}, {userName}!"
+        }
+    },
     "SR5.Metamagic": "Metamagic",
     "SR5.Metamagics": "Metamagics",
     "SR5.Metatype": "Metatype",
@@ -1522,6 +1530,7 @@
     "SR5.WalkingSpeed": "Walking",
     "SR5.Warnings": {
         "AlreadyExistingInventory": "An inventory with this name already exists",
+        "AlreadyJoinedNetwork": "{name} already joined this network",
         "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now.",
         "CantEditDefaultInventory": "The default inventory can't be renamed",
         "CantExtendTest": "Test type can't be extended.",
