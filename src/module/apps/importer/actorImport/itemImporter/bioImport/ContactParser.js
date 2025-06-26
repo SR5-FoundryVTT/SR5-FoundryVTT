@@ -14,7 +14,7 @@ export class ContactParser {
                 const itemData = this.parseContact(chummerContact);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, itemData.system, iconList)};
+                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
 
                 parsedContacts.push(itemData);
             } catch (e) {
