@@ -321,8 +321,9 @@ export class MatrixNetworkFlow {
 
         // Players will trigger this workflow as well and likely can't update one of the documents.
         if (game.user?.isGM) {
-            if (slave) await slave.update(updateData);
-            if (master) await master.update(updateData);
+            // Duplicate data, as update will inject id and type fields into it after the first call...
+            if (slave) await slave.update(foundry.utils.duplicate(updateData));
+            if (master) await master.update(foundry.utils.duplicate(updateData));
         }
         else {
             const documentsData: {uuid: string, updateData: any}[] = [];
