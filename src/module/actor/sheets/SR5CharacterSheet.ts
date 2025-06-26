@@ -1,4 +1,4 @@
-import { MatrixTargetAcquisitionApplication } from './../../apps/matrix/MatrixTargetAquisition';
+import { MatrixNetworkHackingApplication } from '../../apps/matrix/MatrixNetworkHackingApplication';
 import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
@@ -122,7 +122,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
     override async activateListeners(html: any) {
         super.activateListeners(html);
 
-        html.find('.show-matrix-target-acquisition').click(this._onShowMatrixTargetAcquisition.bind(this));
+        html.find('.show-matrix-network-hacking').click(this._onShowMatrixNetworkHacking.bind(this));
         html.find('.reboot-persona-device').click(this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
 
@@ -169,11 +169,11 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
     }
 
     /**
-     * Handle the user request to show the matrix target acquisition application.
+     * Handle user requesting to show the matrix network hacking application.
      * @param event Any pointer event
      */
-    async _onShowMatrixTargetAcquisition(event: Event) {
-        const app = new MatrixTargetAcquisitionApplication(this.document);
+    async _onShowMatrixNetworkHacking(event: Event) {
+        const app = new MatrixNetworkHackingApplication(this.document);
         app.render(true);
     }
 

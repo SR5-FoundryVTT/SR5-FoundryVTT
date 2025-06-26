@@ -594,6 +594,7 @@
     "SR5.KnowledgeSkillInterests": "Hobbywissen",
     "SR5.KnowledgeSkillProfessional": "Berufswissen",
     "SR5.KnowledgeSkillStreet": "Straßenwissen",
+    "SR5.Grids": "Gitter",
     "SR5.Labels": {
         "Action": {
             "ActiveTest": "Probe",
@@ -612,6 +613,7 @@
         },
         "ActorSheet": {
             "AddNetwork": "Netzwerk direkt hinzufügen",
+            "MarkNetwork": "Markiere Netzwerk",
             "CreateInventory": "Erstelle Inventar-Ort",
             "CritterPowers": "Critterkräfte",
             "DeviceRating": "Gerätestufe",
@@ -726,10 +728,10 @@
     "SR5.MatrixAttrFirewall": "Firewall",
     "SR5.MatrixAttrSleaze": "Schleicher",
     "SR5.MatrixTarget": "Matrixziel",
-    "SR5.MatrixTargetAcquisitionApplication": {
+    "SR5.MatrixNetworkHackingApplication": {
         "Icons": "Icons",
         "MarkPlacementAction": "Matrix Handlung",
-        "Title": "Matrix Zielerfassung"
+        "Title": "Zu Netzwerk verbinden"
     },
     "SR5.MeleeWeaponAttack": "Nahkampfangriff",
     "SR5.MentalLimit": "Geistiges Limit",

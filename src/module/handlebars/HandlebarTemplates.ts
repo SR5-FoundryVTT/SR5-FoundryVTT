@@ -171,9 +171,8 @@ export const preloadHandlebarsTemplates = async () => {
         // Modifier management parts
         'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
 
-        // Matrix Target Acquisition
-        'systems/shadowrun5e/dist/templates/apps/matrix-target-acquisition/tabs/targets.hbs',
-        'systems/shadowrun5e/dist/templates/apps/matrix-target-acquisition/tabs/networks.hbs',
+        // Application - Matrix Network Hacking
+        'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs',
     ];
 
     return await loadTemplates(templatePaths);

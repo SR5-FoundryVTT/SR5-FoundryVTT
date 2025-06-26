@@ -8,7 +8,7 @@ import { HackOnTheFlyTest } from "../../tests/HackOnTheFlyTest";
 import { TestCreator } from "../../tests/TestCreator";
 
 // Overall Sheet Data for this application.
-interface MatrixTargetAcquisitionSheetData {
+interface MatrixNetworkHackingSheetData {
     targets: Shadowrun.MatrixTargetDocument[]
     personas: Shadowrun.MatrixTargetDocument[]
     ics: Shadowrun.MatrixTargetDocument[]
@@ -28,13 +28,13 @@ type MatrixPlacementTests = BruteForceTest | HackOnTheFlyTest;
 
 
 /**
- * This application collects matrix items from tokens and actors visible to the matrix user based on shadowrun rules.
+ * This application collects all visible matrix networks for players to connect.
  * 
- * TODO: matrixItems and marks are collected but not used. Either remove or use them.
  */
-export class MatrixTargetAcquisitionApplication extends Application {
-    // The matrix user to be used for target acquisition.
+export class MatrixNetworkHackingApplication extends Application {
+    // Actor used to retrieve the matrix persona.
     public actor: SR5Actor;
+    // Action used to place mark.
     markPlacementAction: string;
 
     constructor(actor: SR5Actor) {
@@ -46,15 +46,15 @@ export class MatrixTargetAcquisitionApplication extends Application {
     }
 
     override get template() {
-        return 'systems/shadowrun5e/dist/templates/apps/matrix-target-acquisition/app.hbs';
+        return 'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/app.hbs';
     }
 
     static override get defaultOptions() {
         const options = super.defaultOptions;
 
         options.classes = ['sr5']
-        options.id = 'matrix-target-acquisition';
-        options.title = game.i18n.localize('SR5.MatrixTargetAcquisitionApplication.Title');
+        options.id = 'matrix-net-acquisition';
+        options.title = game.i18n.localize('SR5.MatrixNetworkHackingApplication.Title');
 
         options.height = 'auto';
         options.resizable = true;
@@ -62,7 +62,7 @@ export class MatrixTargetAcquisitionApplication extends Application {
         options.tabs = [{
             navSelector: '.tabs[data-group="primary"]',
             contentSelector: '.tabsbody[data-group="primary"]',
-            initial: 'targets'
+            initial: 'networks'
         }]
 
         return options;
@@ -75,41 +75,16 @@ export class MatrixTargetAcquisitionApplication extends Application {
         html.find('#mark-placement-action').on('click', this.handlePlacementAction.bind(this));
     }
 
-    override async getData(options?: Partial<ApplicationOptions> | undefined): Promise<MatrixTargetAcquisitionSheetData> {
-        const data = await super.getData(options) as MatrixTargetAcquisitionSheetData;
+    override async getData(options?: Partial<ApplicationOptions> | undefined): Promise<MatrixNetworkHackingSheetData> {
+        const data = await super.getData(options) as MatrixNetworkHackingSheetData;
 
         data.config = SR5;
 
         const character = this.actor.asCharacter();
 
-        // Allow template to switch between network types.
-        const network = this.actor.network;
-        data.hostNetwork = network?.isHost ?? false;
-        data.gridNetwork = network?.isGrid ?? false;
-        data.network = network;
-
         // Prepare available networks for selection.
         data.grids = MatrixFlow.visibleGrids();
         data.hosts = MatrixFlow.visibelHosts();
-
-        // Have an empty target list as fallback for failing network target collection.
-        data.targets = [];
-
-        // Collect target data based on network type.
-        data.targets = network?.isHost ? 
-            MatrixFlow.prepareHostTargets(this.actor) :
-            MatrixFlow.prepareGridTargets(this.actor);
-
-        // Filter out invisible tokens.
-        data.targets = data.targets.filter(target => !target.document || target.document.visible)
-
-        const actors = data.targets.filter(target => target.document instanceof SR5Actor);
-        const items = data.targets.filter(target => target.document instanceof SR5Item);
-
-        // Filter personas from ic for better UI separation.
-        data.personas = actors.filter(target => target.document.hasPersona);
-        data.ics = actors.filter(target => target.document.isIC());
-        data.devices = items.filter(target => !target.document);
 
         data.markPlacementAction = character?.system.matrix.markPlacementAction ?? 'brute_force';
 

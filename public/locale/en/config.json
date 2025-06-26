@@ -492,6 +492,7 @@
     "SR5.GlitchCritical": "Critical Glitch!",
     "SR5.Glitches": "Glitches:",
     "SR5.GoodCover": "Good Cover",
+    "SR5.Grids": "Grids",
     "SR5.HackingProgram": "Hacking Program",
     "SR5.Help": "Help",
     "SR5.Hits": "Hits",
@@ -638,6 +639,7 @@
             "EnabledOptionSpritePowers": "Optional Sprite Powers - Enabled",
             "Hacking": "Hacking",
             "ICConfiguration": "IC Configuration",
+            "MarkNetwork": "Mark Network",
             "Matrix": "Matrix",
             "Network": "Network",
             "NoNetwork": "No Network",
@@ -746,12 +748,12 @@
     "SR5.MatrixAttrDataProc": "Data Proc.",
     "SR5.MatrixAttrFirewall": "Firewall",
     "SR5.MatrixAttrSleaze": "Sleaze",
-    "SR5.MatrixTarget": "Matrix Target",
-    "SR5.MatrixTargetAcquisitionApplication": {
+    "SR5.MatrixNetworkHackingApplication": {
         "Icons": "Icons",
         "MarkPlacementAction": "Matrix Action",
-        "Title": "Matrix Target Acquisition"
+        "Title": "Connect to Network"
     },
+    "SR5.MatrixTarget": "Matrix Target",
     "SR5.MeleeWeaponAttack": "Melee Weapon Attack",
     "SR5.MentalLimit": "Mental Limit",
     "SR5.Metamagic": "Metamagic",

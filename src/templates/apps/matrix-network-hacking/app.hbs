@@ -1,0 +1,16 @@
+<div>
+        <label for="mark-placement-action">{{localize "SR5.MatrixNetworkHackingApplication.MarkPlacementAction"}}</label>
+        <select id="mark-placement-action" data-tooltip="SR5.Tooltips.Actor.PlaceMark">
+        {{#select markPlacementAction}}
+        {{#each config.matrixMarkPlacementActions}}
+        <option value="{{@key}}">{{localize this}}</option>
+        {{/each}}
+        {{/select}}
+        </select>
+</div>
+<nav class="tabs" data-group="primary">
+        <a class="item" data-tab="networks">{{localize "SR5.Networks"}}</a>
+</nav>
+<section class="sheetbody tabsbody" data-group="primary">
+        {{> "systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs"}}
+</section>
