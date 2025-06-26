@@ -25,19 +25,6 @@ export class Bioware extends foundry.abstract.TypeDataModel<typeof BiowareData, 
     static override defineSchema() {
         return BiowareData;
     }
-
-    static override migrateData(source) {
-        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
-            return super.migrateData(source);
-
-        Action.migrateData(source);
-
-        const result = source as Bioware['_source'];
-        if (!(BiowareData.grade.choices as string[]).includes(source.grade))
-            result.grade = 'standard';
-
-        return super.migrateData(source);
-    }
 }
 
 console.log("BiowareData", BiowareData, new Bioware());

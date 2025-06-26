@@ -3,6 +3,7 @@ import {Version0_8_0} from "./versions/Version0_8_0";
 import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
+import { Version0_28_0 } from './versions/Version0_28_0';
 
 type VersionDefinition = {
     versionNumber: string;
@@ -15,6 +16,7 @@ export class Migrator {
         { versionNumber: Version0_18_0.TargetVersion, migration: new Version0_18_0() },
         { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() },
         { versionNumber: Version0_27_0.TargetVersion, migration: new Version0_27_0() },
+        { versionNumber: Version0_28_0.TargetVersion, migration: new Version0_28_0() },
     ];
 
     /**
@@ -34,11 +36,11 @@ export class Migrator {
 
     public static async InitWorldForMigration() {
         console.log('Shadowrun 5e | Initializing an empty world for future migrations');
-        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, game.system.version);
+        await game.settings.set(game.system.id, VersionMigration.KEY_DATA_VERSION, game.system.version);
     }
 
     public static async BeginMigration() {
-        let currentVersion = game.settings.get(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION) as string;
+        let currentVersion = game.settings.get(game.system.id, VersionMigration.KEY_DATA_VERSION);
         if (currentVersion === undefined || currentVersion === null) {
             currentVersion = VersionMigration.NO_VERSION;
         }
@@ -91,8 +93,8 @@ export class Migrator {
             if (!consent) return;
         }
 
-        await this.migrateWorld(game, migrations);
-        await this.migrateCompendium(game, migrations);
+        await this.migrateWorld(migrations);
+        await this.migrateCompendium(migrations);
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.SuccessTitle');
         const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.SuccessHeader');
@@ -121,11 +123,11 @@ export class Migrator {
      * @param game
      * @param migrations
      */
-    private static async migrateWorld(game: Game, migrations: VersionDefinition[]) {
+    private static async migrateWorld(migrations: VersionDefinition[]) {
         // Run the migrations in order
         for (const { migration } of migrations) {
             // Migrate after user accepted.
-            await migration.Migrate(game);
+            await migration.Migrate();
         }
     }
 
@@ -134,7 +136,7 @@ export class Migrator {
      * @param game Game that will be migrated
      * @param migrations Instances of the version migration
      */
-    private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
+    private static async migrateCompendium(migrations: VersionDefinition[]) {
         // Migrate World Compendium Packs
         const packs = game.packs?.filter((pack) =>
             pack.metadata.packageType === 'world' &&

@@ -78,19 +78,6 @@ export class Spell extends foundry.abstract.TypeDataModel<typeof SpellData, Item
     static override defineSchema() {
         return SpellData;
     }
-
-    static override migrateData(source) {
-        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
-            return super.migrateData(source);
-
-        const result = source as Spell['_source'];
-
-        // Reset broken legacy data.
-        if (source.category === 'rituals')
-            result.category = 'ritual';
-
-        return super.migrateData(source);
-    }
 }
 
 console.log("SpellData", SpellData, new Spell());

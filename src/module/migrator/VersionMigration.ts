@@ -61,45 +61,45 @@ export abstract class VersionMigration {
      * Begin migration for the specified game.
      * @param game The world that should be migrated.
      */
-    public async Migrate(game: Game) {
-        ui.notifications?.info(`${game.i18n!.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
-        ui.notifications?.warn(game.i18n!.localize('SR5.MIGRATION.DoNotCloseNotification'), {
+    public async Migrate() {
+        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
+        ui.notifications?.warn(game.i18n.localize('SR5.MIGRATION.DoNotCloseNotification'), {
             permanent: true,
         });
 
         // Map of entities to update, store until later to reduce chance of partial updates
         // which may result in impossible game states.
-        const entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate> = new Map();
+        const entityUpdates = new Map<SystemMigrationDocuments, DocumentUpdate>();
 
         // Migrate World Items
-        await this.PreMigrateItemData(game, entityUpdates);
+        await this.PreMigrateItemData(entityUpdates);
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
         }
-        await this.IterateItems(game, entityUpdates);
-        await this.PostMigrateItemData(game, entityUpdates);
+        await this.IterateItems(entityUpdates);
+        await this.PostMigrateItemData(entityUpdates);
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
         }
 
         // Migrate World Actors
-        await this.PreMigrateActorData(game, entityUpdates);
+        await this.PreMigrateActorData(entityUpdates);
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
         }
-        await this.IterateActors(game, entityUpdates);
-        await this.PostMigrateActorData(game, entityUpdates);
+        await this.IterateActors(entityUpdates);
+        await this.PostMigrateActorData(entityUpdates);
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
         }
 
         // Migrate Actor Tokens
-        await this.PreMigrateSceneData(game, entityUpdates);
+        await this.PreMigrateSceneData(entityUpdates);
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
         }
-        await this.IterateScenes(game, entityUpdates);
-        await this.PostMigrateSceneData(game, entityUpdates);
+        await this.IterateScenes(entityUpdates);
+        await this.PostMigrateSceneData(entityUpdates);
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
         }
@@ -108,7 +108,7 @@ export abstract class VersionMigration {
         await this.Apply(entityUpdates);
 
         await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
-        ui.notifications?.info(`${game.i18n!.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
+        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
     /**
@@ -137,8 +137,8 @@ export abstract class VersionMigration {
      * @param game
      * @param entityUpdates
      */
-    protected async IterateScenes(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        for (const scene of game.scenes!.contents) {
+    protected async IterateScenes(entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+        for (const scene of game.scenes.contents) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
                     continue;
@@ -193,8 +193,8 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async IterateItems(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        for (const item of game.items!.contents) {
+    protected async IterateItems(entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+        for (const item of game.items.contents) {
             try {
                 if (!(await this.ShouldMigrateItemData(item as SR5Item))) {
                     continue;
@@ -224,8 +224,8 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async IterateActors(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        for (const actor of game.actors!.contents) {
+    protected async IterateActors(entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
+        for (const actor of game.actors.contents) {
             try {
                 if (!(await this.ShouldMigrateActorData(actor as SR5Actor))) {
                     continue;
@@ -307,13 +307,13 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PreMigrateSceneData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PreMigrateSceneData(entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PostMigrateSceneData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PostMigrateSceneData(entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
 
     /**
      * Check if an item requires updates.
@@ -336,13 +336,13 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PreMigrateItemData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PreMigrateItemData(entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PostMigrateItemData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PostMigrateItemData(entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
 
     /**
      * Check if an actor requires updates.
@@ -365,13 +365,13 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PreMigrateActorData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PreMigrateActorData(entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
     /**
      * Do something right after actor data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of document updates.
      */
-    protected async PostMigrateActorData(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
+    protected async PostMigrateActorData(entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>): Promise<void> {}
 
     /**
      * Migrate a compendium pack
@@ -385,7 +385,7 @@ export abstract class VersionMigration {
         const documents = await pack.getDocuments();
 
         // Iterate over compendium entries - applying fine-tuned migration functions
-        for (let document of documents) {
+        for (const document of documents) {
             try {
                 let updateData: any = null;
                 if (pack.metadata.type === 'Item') {
@@ -397,7 +397,7 @@ export abstract class VersionMigration {
 
                     if (updateData.data) {
                         expandObject(updateData.data);
-                        document.update({system: updateData.data});
+                        await document.update({system: updateData.data});
                     }
 
                 } else if (pack.metadata.type === 'Actor') {

@@ -25,25 +25,6 @@ export class Cyberware extends foundry.abstract.TypeDataModel<typeof CyberwareDa
     static override defineSchema() {
         return CyberwareData;
     }
-
-    static override migrateData(source) {
-        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
-            return super.migrateData(source);
-
-        Action.migrateData(source);
-
-        const result = source as Cyberware['_source'];
-
-        // Reset broken legacy data.
-        if (!(CyberwareData.grade.choices as string[]).includes(source.grade))
-            result.grade = 'standard';
-
-        if (isNaN(source.essence)) {
-            result.essence = 0; // Default essence value if not set
-        }
-
-        return super.migrateData(source);
-    }
 }
 
 console.log("CyberwareData", CyberwareData, new Cyberware());

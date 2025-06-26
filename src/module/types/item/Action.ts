@@ -139,19 +139,6 @@ export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, It
     static override defineSchema() {
         return ActionData;
     }
-
-    static override migrateData(source) {
-        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
-            return super.migrateData(source);
-
-        const result = source as Action['_source'];
-
-        // Reset broken legacy data.
-        if (source.action.damage.base_formula_operator === '+')
-            result.action.damage.base_formula_operator = 'add';
-        
-        return super.migrateData(source);
-    }
 };
 
 console.log("ActionData", ActionData, new Action());

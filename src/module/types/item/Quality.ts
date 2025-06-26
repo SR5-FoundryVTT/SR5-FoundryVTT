@@ -21,21 +21,6 @@ export class Quality extends foundry.abstract.TypeDataModel<typeof QualityData, 
     static override defineSchema() {
         return QualityData;
     }
-
-    static override migrateData(source) {
-        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
-            return super.migrateData(source);
-
-        Action.migrateData(source);
-
-        const result = source as Quality['_source'];
-
-        // Reset broken legacy data.
-        if (!(QualityData.type.choices as string[]).includes(source.type))
-            result.type = 'positive';
-
-        return super.migrateData(source);
-    }
 }
 
 console.log("QualityData", QualityData, new Quality());

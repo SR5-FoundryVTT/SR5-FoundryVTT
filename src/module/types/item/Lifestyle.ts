@@ -19,20 +19,6 @@ export class Lifestyle extends foundry.abstract.TypeDataModel<typeof LifestyleDa
     static override defineSchema() {
         return LifestyleData;
     }
-
-    static override migrateData(source) {
-        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
-            return super.migrateData(source);
-
-        const result = source as Lifestyle['_source'];
-
-        // Reset broken legacy data.
-        if (isNaN(source.cost)) {
-            result.cost = 0; // Default cost value if not set
-        }
-
-        return super.migrateData(source);
-    }
 }
 
 console.log("LifestyleData", LifestyleData, new Lifestyle());
