@@ -75,11 +75,13 @@ export class Version0_28_0 extends VersionMigration {
 
         for (const document of documents) {
             if (document instanceof SR5Actor) {
-                await document.update(document.toObject() as any, { diff: false, recursive: false });
+                if (document.invalid)
+                    await document.update(document.toObject() as any, { diff: false, recursive: false });
 
                 await this.updateInvalidByIds(document.items);
             } else if (document instanceof SR5Item) {
-                await document.update(document.toObject() as any, { diff: false, recursive: false });
+                if (document.invalid)
+                    await document.update(document.toObject() as any, { diff: false, recursive: false });
 
                 await this.updateIfInvalid(document.items);
                 await this.updateIfInvalid(document.flags?.shadowrun5e?.embeddedItems || []);
