@@ -352,16 +352,14 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         const sourceKey = valueElement.attr('name') as string;
         const appliedKey = sourceKey.includes('source') ? sourceKey.replace('source', 'applied') : sourceKey;
 
-        const currentValue = foundry.utils.getProperty(this, appliedKey) ?? 0;
+        const currentValue = foundry.utils.getProperty(this, appliedKey) as number ?? 0;
         if (isNaN(currentValue)) 
             return console.error('Shadowrun5e | Expected data property is not a number', sourceKey, currentValue);
-            
-        const value = currentValue + delta;
 
         const formData = {
-            [sourceKey]: value
+            [sourceKey]: Number(currentValue) + delta
         }
-        
+
         // Update source data and update display information.
         await this._updateObject(event, formData);
         this.modifiers.applyAll();

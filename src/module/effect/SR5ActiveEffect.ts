@@ -314,20 +314,20 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     _applyToObject(object, change) {
         // Determine the data type of the target field
-        const current = foundry.utils.getProperty(object, change.key) ?? null;
+        const current = foundry.utils.getProperty(object, change.key);
         // let target = current;
         // if ( current === null ) {
         //   const model = game.model.Actor[test.type] || {};
         //   target = foundry.utils.getProperty(model, change.key) ?? null;
         // }
 
-        const target = foundry.utils.getProperty(object, change.key) ?? null;
-        let targetType = foundry.utils.getType(target);
+        const target = foundry.utils.getProperty(object, change.key);
+        const targetType = foundry.utils.getType(target);
 
         // Cast the effect change value to the correct type
         let delta;
         try {
-            if (targetType === "Array") {
+            if (Array.isArray(target)) {
                 const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
                 delta = this.__castArray(change.value, innerType);
             }

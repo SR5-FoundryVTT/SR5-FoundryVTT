@@ -27,8 +27,8 @@ export const UpdateActionFlow = {
     onSkillUpdateAlterAttribute(changeData: Item.UpdateData, item: SR5Item) {
         // Only change to connected attribute when no attribute has already been chosen.
         if (!('action' in item.system) || item.system.action?.attribute !== '') return;
-        const skillIdOrLabel = foundry.utils.getProperty(changeData, 'system.action.skill');
-        if (skillIdOrLabel === undefined || skillIdOrLabel === '') return;
+        const skillIdOrLabel = foundry.utils.getProperty(changeData, 'system.action.skill') as string;
+        if (!skillIdOrLabel) return;
 
         // CASE - Sidebar item not owned by actor.
         if (item.actor === null) {
