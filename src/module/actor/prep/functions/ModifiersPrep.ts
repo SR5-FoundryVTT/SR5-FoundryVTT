@@ -84,15 +84,14 @@ export class ModifiersPrep {
         modifiers.sort();
         modifiers.unshift('global');
 
-        // Clear existing keys while preserving the original object reference
-        for (const key of Object.keys(system.modifiers)) {
-            delete system.modifiers[key];
+        // Prepare sorted modifiers and merge with existing values when set.
+        // Unset modifier values will be null or not exist at all.
+        const sorted = {};
+        for (const modifier of modifiers) {
+            sorted[modifier] = Number(system.modifiers[modifier]) || 0;
         }
 
-        // Repopulate in sorted order
-        for (const modifier of modifiers) {
-            system.modifiers[modifier] = Number(system.modifiers[modifier]) || 0;
-        }
+        system.modifiers = sorted as any;
     }
 
     static clearAttributeMods(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
