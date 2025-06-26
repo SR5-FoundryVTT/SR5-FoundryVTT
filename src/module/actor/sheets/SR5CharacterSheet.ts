@@ -30,7 +30,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
     // We accept this selection to not be persistant across Foundry sessions.
     selectedMatrixTarget: string|undefined;
     // Stores if the hacking tab should show marked documents or new targets.
-    showMatrixHackingTarget: 'marked'|'targets' = 'marked';
+    showMatrixHackingTarget: 'marked'|'targets' = 'targets';
 
     static override get defaultOptions() {
         const defaultOptions = super.defaultOptions;

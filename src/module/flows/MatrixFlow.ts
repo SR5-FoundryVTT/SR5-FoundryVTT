@@ -250,12 +250,12 @@ export const MatrixFlow = {
 
         // Prepare all targets based on network connection.
         const network = actor.network;
-        let targets = network?.isHost ?
+        const targets = network?.isHost ?
             MatrixFlow.prepareHostTargets(actor) :
             MatrixFlow.prepareGridTargets(actor);
 
         // Filter types of target for clear separation.
-        targets = targets.filter(target => !target.document || target.document.visible);
+        // targets = targets.filter(target => !target.document);
 
         // const actors = targets.filter(target => target.document instanceof SR5Actor);
         // const items = targets.filter(target => target.document instanceof SR5Item);
@@ -299,21 +299,6 @@ export const MatrixFlow = {
             });
         }
 
-        // NOTE: This is disabled, as currently adding host to an IC will add them to the general network.
-        //       This here connects to the separate store of 'ic' that used to be available on hosts.
-        // for (const ic of host.getIC()) {
-        //     const type = ActorMarksFlow.getDocumentType(ic);
-
-        //     targets.push({
-        //         name: ic.name,
-        //         type,
-        //         document: ic,
-        //         token: ic.getToken(),
-        //         runningSilent: ic.isRunningSilent,
-        //         network: host.name || ''
-        //     });
-        // }
-
         return targets;
     },
 
@@ -325,6 +310,7 @@ export const MatrixFlow = {
         const targets: Shadowrun.MatrixTargetDocument[] = [];
 
         // Collect all grid connected documents without scene tokens.
+        // Scene Tokens will be collected separately.
         for (const grid of MatrixNetworkFlow.getGrids({ players: true })) {
             for (const slave of grid.slaves) {
                 // Skip actor tokens as they're collected separately.
@@ -343,7 +329,7 @@ export const MatrixFlow = {
             }
         }
 
-        // Collect matrix visible scene tokens.
+        // Collect all scene tokens, which might also include personas outside any grid.
         if (canvas.scene?.tokens) {
             // Collect all scene tokens.
             for (const token of canvas.scene?.tokens) {
@@ -355,11 +341,13 @@ export const MatrixFlow = {
                 if (target.uuid === actor.uuid) continue;
 
                 // Validate Foundry VTT visibility.
-                if (game.user?.isGM && token.hidden) continue;
+                if (!game.user?.isGM && token.hidden) continue;
 
-                // Validate Shadowrun5e visibility.
+                // TODO: taMiF/marks this will filter out targets without persona but active icons.
                 if (!target.hasPersona) continue;
+                // Filter out IC as they can't be targeted outside their host.
                 if (target.isIC()) continue;
+                // Filter out persona based on matrix rules.
                 if (!actor.matrixPersonaIsVisible(target)) continue;
 
                 const type = ActorMarksFlow.getDocumentType(document);
