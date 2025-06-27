@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { TechnologyData } from "../template/Technology";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
@@ -22,7 +23,7 @@ export const ArmorData = () => ({
     technology: new SchemaField(TechnologyData()),
 });
 
-export class Armor extends foundry.abstract.TypeDataModel<ReturnType<typeof ArmorData>, Item.Implementation> {
+export class Armor extends ItemBase<ReturnType<typeof ArmorData>> {
     static override defineSchema() {
         return ArmorData();
     }

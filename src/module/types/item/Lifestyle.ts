@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
@@ -15,7 +16,7 @@ const LifestyleData = {
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
 }
 
-export class Lifestyle extends foundry.abstract.TypeDataModel<typeof LifestyleData, Item.Implementation> {
+export class Lifestyle extends ItemBase<typeof LifestyleData> {
     static override defineSchema() {
         return LifestyleData;
     }

@@ -1,6 +1,7 @@
-import { DescriptionData } from "../template/Description";
-import { ImportFlagData } from "../template/ImportFlags";
+import { ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
 const { SchemaField, StringField } = foundry.data.fields;
 
 const RitualData = {
@@ -18,7 +19,7 @@ const RitualData = {
     descriptors: new StringField({ required: true }),
 };
 
-export class Ritual extends foundry.abstract.TypeDataModel<typeof RitualData, Item.Implementation> {
+export class Ritual extends ItemBase<typeof RitualData> {
     static override defineSchema() {
         return RitualData;
     }

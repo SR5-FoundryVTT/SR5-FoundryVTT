@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { ArmorValueData } from "./Armor";
 import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
@@ -22,7 +23,7 @@ const CritterPowerData = {
 
 // export type CritterPowerCategory = 'mundane' | 'paranormal' | 'weakness' | 'emergent' | 'drake' | 'shapeshifter' | 'free_spirit' | 'paranormal_infected' | 'echoes' | '';
 
-export class CritterPower extends foundry.abstract.TypeDataModel<typeof CritterPowerData, Item.Implementation> {
+export class CritterPower extends ItemBase<typeof CritterPowerData> {
     static override defineSchema() {
         return CritterPowerData;
     }

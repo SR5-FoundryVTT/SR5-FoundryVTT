@@ -2,6 +2,7 @@ import { ArmorValueData } from "./Armor";
 import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
+import { ItemBase } from "./BaseItem";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const AdeptPowerData = {
@@ -16,7 +17,7 @@ const AdeptPowerData = {
     level: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 }
 
-export class AdeptPower extends foundry.abstract.TypeDataModel<typeof AdeptPowerData, Item.Implementation> {
+export class AdeptPower extends ItemBase<typeof AdeptPowerData> {
     static override defineSchema() {
         return AdeptPowerData;
     }

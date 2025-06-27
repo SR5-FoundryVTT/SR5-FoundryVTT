@@ -3,7 +3,7 @@ import { Helpers } from "../../../helpers";
 import { PartsList } from "../../../parts/PartsList";
 import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
 import { ItemCostFlow } from "../../flows/ItemCostFlow";
-import { TechnologyType, TechnologyData } from "src/module/types/template/Technology";
+import { TechnologyType } from "src/module/types/template/Technology";
 
 /**
  * Item data preparation around the 'technology' template.json item template.

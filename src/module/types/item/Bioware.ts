@@ -1,5 +1,6 @@
+import { ItemBase } from "./BaseItem";
 import { ArmorValueData } from "./Armor";
-import { Action, ActionRollData } from "./Action";
+import { ActionRollData } from "./Action";
 import { TechnologyData } from "../template/Technology";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
@@ -21,7 +22,7 @@ const BiowareData = {
     }),
 }
 
-export class Bioware extends foundry.abstract.TypeDataModel<typeof BiowareData, Item.Implementation> {
+export class Bioware extends ItemBase<typeof BiowareData> {
     static override defineSchema() {
         return BiowareData;
     }

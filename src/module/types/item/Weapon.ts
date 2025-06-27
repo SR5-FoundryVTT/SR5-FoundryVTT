@@ -1,4 +1,5 @@
-import { Action, ActionRollData } from "./Action";
+import { ItemBase } from "./BaseItem";
+import { ActionRollData } from "./Action";
 import { TechnologyData } from "../template/Technology";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
@@ -71,19 +72,9 @@ const WeaponData = {
     thrown: new SchemaField(ThrownWeaponData()),
 }
 
-
-export class Weapon extends foundry.abstract.TypeDataModel<typeof WeaponData, Item.Implementation> {
+export class Weapon extends ItemBase<typeof WeaponData> {
     static override defineSchema() {
         return WeaponData;
-    }
-
-    static override migrateData(source) {
-        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
-            return super.migrateData(source);
-
-        Action.migrateData(source);
-
-        return super.migrateData(source);
     }
 }
 

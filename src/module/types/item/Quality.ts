@@ -1,4 +1,5 @@
-import { Action, ActionRollData } from "./Action";
+import { ItemBase } from "./BaseItem";
+import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
@@ -17,7 +18,7 @@ const QualityData = {
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 }
 
-export class Quality extends foundry.abstract.TypeDataModel<typeof QualityData, Item.Implementation> {
+export class Quality extends ItemBase<typeof QualityData> {
     static override defineSchema() {
         return QualityData;
     }

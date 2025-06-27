@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
@@ -135,7 +136,7 @@ export type ActionResultType = foundry.data.fields.SchemaField.InitializedData<R
 export type ResultActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ResultActionData>>;
 export type MinimalActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MinimalActionData>>;
 
-export class Action extends foundry.abstract.TypeDataModel<typeof ActionData, Item.Implementation> {
+export class Action extends ItemBase<typeof ActionData> {
     static override defineSchema() {
         return ActionData;
     }

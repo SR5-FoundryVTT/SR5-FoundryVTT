@@ -1,4 +1,5 @@
 import { BlastData } from "./Weapon";
+import { ItemBase } from "./BaseItem";
 import { ImportFlagData } from "../template/ImportFlags";
 import { TechnologyData } from "../template/Technology";
 import { DescriptionData } from "../template/Description";
@@ -26,7 +27,7 @@ export const AmmoData = () => ({
     accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
-export class Ammo extends foundry.abstract.TypeDataModel<ReturnType<typeof AmmoData>, Item.Implementation> {
+export class Ammo extends ItemBase<ReturnType<typeof AmmoData>> {
     static override defineSchema() {
         return AmmoData();
     }

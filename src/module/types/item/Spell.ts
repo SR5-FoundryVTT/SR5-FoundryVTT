@@ -1,6 +1,7 @@
 import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
+import { ItemBase } from "./BaseItem";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpellData = {
@@ -74,7 +75,7 @@ const SpellData = {
     }),
 }
 
-export class Spell extends foundry.abstract.TypeDataModel<typeof SpellData, Item.Implementation> {
+export class Spell extends ItemBase<typeof SpellData> {
     static override defineSchema() {
         return SpellData;
     }

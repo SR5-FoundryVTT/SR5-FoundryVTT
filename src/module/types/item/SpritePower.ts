@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
@@ -13,7 +14,7 @@ const SpritePowerData = {
     enabled: new BooleanField({ initial: true }),
 }
 
-export class SpritePower extends foundry.abstract.TypeDataModel<typeof SpritePowerData, Item.Implementation> {
+export class SpritePower extends ItemBase<typeof SpritePowerData> {
     static override defineSchema() {
         return SpritePowerData;
     }

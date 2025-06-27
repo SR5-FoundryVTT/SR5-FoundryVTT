@@ -1,5 +1,6 @@
-import { ImportFlagData } from "../template/ImportFlags";
+import { ItemBase } from "./BaseItem";
 import { TechnologyData } from "../template/Technology";
+import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 const { SchemaField, StringField } = foundry.data.fields;
 
@@ -15,7 +16,7 @@ const ProgramData = {
     }),
 }
 
-export class Program extends foundry.abstract.TypeDataModel<typeof ProgramData, Item.Implementation> {
+export class Program extends ItemBase<typeof ProgramData> {
     static override defineSchema() {
         return ProgramData;
     }

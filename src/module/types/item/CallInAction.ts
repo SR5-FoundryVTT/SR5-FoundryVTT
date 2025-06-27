@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
@@ -26,7 +27,7 @@ const CallInActionData = {
 }
 
 
-export class CallInAction extends foundry.abstract.TypeDataModel<typeof CallInActionData, Item.Implementation> {
+export class CallInAction extends ItemBase<typeof CallInActionData> {
     static override defineSchema() {
         return CallInActionData;
     }

@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
@@ -15,8 +16,7 @@ const ContactData = {
     linkedActor: new StringField({ required: true }),
 }
 
-
-export class Contact extends foundry.abstract.TypeDataModel<typeof ContactData, Item.Implementation> {
+export class Contact extends ItemBase<typeof ContactData> {
     static override defineSchema() {
         return ContactData;
     }

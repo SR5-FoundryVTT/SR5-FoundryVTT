@@ -1,6 +1,7 @@
-import { DescriptionData } from "../template/Description";
-import { ImportFlagData } from "../template/ImportFlags";
 import { MatrixAttributes } from "../template/Matrix";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+import { ItemBase } from "./BaseItem";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const SourceEntityField = () => ({
@@ -25,7 +26,7 @@ const HostData = {
     networkDevices: new ArrayField(new StringField({ required: true })),
 }
 
-export class Host extends foundry.abstract.TypeDataModel<typeof HostData, Item.Implementation> {
+export class Host extends ItemBase<typeof HostData> {
     static override defineSchema() {
         return HostData;
     }

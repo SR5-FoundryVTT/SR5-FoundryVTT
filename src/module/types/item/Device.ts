@@ -1,7 +1,8 @@
+import { ItemBase } from "./BaseItem";
+import { MatrixAttributes } from "../template/Matrix";
 import { TechnologyData } from "../template/Technology";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
-import { MatrixAttributes } from "../template/Matrix";
 const { SchemaField, ArrayField, StringField } = foundry.data.fields;
 
 const DeviceData = {
@@ -18,7 +19,7 @@ const DeviceData = {
     networkDevices: new ArrayField(new StringField({ required: true })),
 };
 
-export class Device extends foundry.abstract.TypeDataModel<typeof DeviceData, Item.Implementation> {
+export class Device extends ItemBase<typeof DeviceData> {
     static override defineSchema() {
         return DeviceData;
     }

@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
@@ -18,7 +19,7 @@ const ComplexFormData = () => ({
 });
 
 
-export class ComplexForm extends foundry.abstract.TypeDataModel<ReturnType<typeof ComplexFormData>, Item.Implementation> {
+export class ComplexForm extends ItemBase<ReturnType<typeof ComplexFormData>> {
     static override defineSchema() {
         return ComplexFormData();
     }

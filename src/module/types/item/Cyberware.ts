@@ -1,5 +1,6 @@
+import { ItemBase } from "./BaseItem";
 import { ArmorValueData } from "./Armor";
-import { Action, ActionRollData } from "./Action";
+import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
 import { TechnologyData } from "../template/Technology";
 import { DescriptionData } from "../template/Description";
@@ -21,7 +22,7 @@ const CyberwareData = {
     }),
 }
 
-export class Cyberware extends foundry.abstract.TypeDataModel<typeof CyberwareData, Item.Implementation> {
+export class Cyberware extends ItemBase<typeof CyberwareData> {
     static override defineSchema() {
         return CyberwareData;
     }

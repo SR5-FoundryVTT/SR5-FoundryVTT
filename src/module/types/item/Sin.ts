@@ -1,5 +1,6 @@
-import { ImportFlagData } from "../template/ImportFlags";
+import { ItemBase } from "./BaseItem";
 import { TechnologyData } from "../template/Technology";
+import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 const { HTMLField, SchemaField, ArrayField, StringField } = foundry.data.fields;
 
@@ -17,7 +18,7 @@ const SinData = {
     licenses: new ArrayField(new SchemaField(LicenseData())),
 }
 
-export class Sin extends foundry.abstract.TypeDataModel<typeof SinData, Item.Implementation> {
+export class Sin extends ItemBase<typeof SinData> {
     static override defineSchema() {
         return SinData;
     }

@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
@@ -9,7 +10,7 @@ const MetamagicData = {
     importFlags: new SchemaField(ImportFlagData()),
 }
 
-export class Metamagic extends foundry.abstract.TypeDataModel<typeof MetamagicData, Item.Implementation> {
+export class Metamagic extends ItemBase<typeof MetamagicData> {
     static override defineSchema() {
         return MetamagicData;
     }

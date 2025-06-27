@@ -1,3 +1,4 @@
+import { ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
 import { ImportFlagData } from "../template/ImportFlags";
 import { TechnologyData } from "../template/Technology";
@@ -11,7 +12,7 @@ const EquipmentData = {
     technology: new SchemaField(TechnologyData()),
 }
 
-export class Equipment extends foundry.abstract.TypeDataModel<typeof EquipmentData, Item.Implementation> {
+export class Equipment extends ItemBase<typeof EquipmentData> {
     static override defineSchema() {
         return EquipmentData;
     }

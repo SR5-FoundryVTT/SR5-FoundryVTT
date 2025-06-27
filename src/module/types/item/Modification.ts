@@ -1,6 +1,7 @@
-import { DescriptionData } from "../template/Description";
-import { ImportFlagData } from "../template/ImportFlags";
+import { ItemBase } from "./BaseItem";
 import { TechnologyData } from "../template/Technology";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const ModificationData = {
@@ -30,7 +31,7 @@ const ModificationData = {
     slots: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 }
 
-export class Modification extends foundry.abstract.TypeDataModel<typeof ModificationData, Item.Implementation> {
+export class Modification extends ItemBase<typeof ModificationData> {
     static override defineSchema() {
         return ModificationData;
     }
