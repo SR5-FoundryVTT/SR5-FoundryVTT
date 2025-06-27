@@ -41,7 +41,6 @@ import { MatrixType } from '../types/template/Matrix';
 ActionResultFlow; // DON'T TOUCH!
 
 export type SystemTechnologyItem = 'ammo' | 'armor' | 'device' | 'equipment' | 'modification' | 'program' | 'sin' | 'bioware' | 'cyberware' | 'weapon';
-export type SystemItem = SystemTechnologyItem | 'adept_power' | 'action' | 'call_in_action' | 'complex_form' | 'contact' | 'critter_power' | 'echo' | 'host' | 'lifestyle' | 'metamagic' | 'quality' | 'sprite_power' | 'spell' | 'ritual';
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -60,7 +59,7 @@ export type SystemItem = SystemTechnologyItem | 'adept_power' | 'action' | 'call
  *
  *       Be wary of SR5Item.actor for this reason!
  */
-export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubType> {
+export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSubTypes> extends Item<SubType> {
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
     // to allow for embedded items in items in actors.
     items: SR5Item[] = [];
@@ -759,7 +758,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return action.extended;
     }
 
-    getTechnologyData(): Item.SystemOfType<SystemTechnologyItem>['technology'] | undefined {
+    getTechnologyData(): SR5Item['system']['technology'] {
         const systemTechnologyItems = [
             'ammo', 'armor', 'device', 'equipment', 'modification',
             'program', 'sin', 'bioware', 'cyberware', 'weapon',
@@ -793,17 +792,17 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
             return game.i18n.localize('SR5.Spell.Cast');
         }
         if (this.hasRoll) {
-            return this.name as string;
+            return this.name;
         }
 
         return DEFAULT_ROLL_NAME;
     }
 
-    isType<ST extends readonly SystemItem[]>(this: SR5Item, ...types: ST): this is SR5Item<ST[number]> {
+    isType<ST extends readonly Item.ConfiguredSubTypes[]>(this: SR5Item, ...types: ST): this is SR5Item<ST[number]> {
         return types.includes(this.type as ST[number]);
     }
 
-    asType<ST extends readonly SystemItem[]>(this: SR5Item, ...types: ST): SR5Item<ST[number]> | undefined {
+    asType<ST extends readonly Item.ConfiguredSubTypes[]>(this: SR5Item, ...types: ST): SR5Item<ST[number]> | undefined {
         return types.some((t) => this.isType(t)) ? this : undefined;
     }
 
@@ -911,7 +910,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         if (['cyberdeck', 'rcc', 'commlink'].includes(this.system.category)) {
             const atts = this.system.atts as Record<string, any>;
             if (atts) {
-                for (let [key, att] of Object.entries(atts)) {
+                for (const [key, att] of Object.entries(atts)) {
                     matrix[att.att].value = att.value;
                     matrix[att.att].device_att = key;
                 }
@@ -942,7 +941,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return this.system.technology?.rating || 0;
     }
 
-    getArmorElements(this: SR5Item<'armor'>): { [key: string]: number } {
+    getArmorElements(this: SR5Item<'armor'>): Record<string, number> {
         const { fire, electricity, cold, acid, radiation } = this.system.armor;
         return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0, radiation: radiation ?? 0 };
     }
@@ -983,7 +982,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         return 0;
     }
 
-    getCondition(): Item.SystemOfType<SystemTechnologyItem>['technology']['condition_monitor'] | undefined {
+    getCondition(): NonNullable<SR5Item['system']['technology']>['condition_monitor'] | undefined {
         return this.getTechnologyData()?.condition_monitor;
     }
 
@@ -1016,7 +1015,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         // Add IC to the hosts IC order
         const sourceEntity = DataDefaults.createData('source_entity_field', {
             id: actor.id as string,
-            name: actor.name as string,
+            name: actor.name,
             type: 'Actor',
             pack,
             // Custom fields for IC
@@ -1209,8 +1208,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
         // Convert the index to a device link.
         if (controllerData.system.networkDevices[index] === undefined) return;
         const networkDeviceLink = controllerData.system.networkDevices[index];
-        const controller = this;
-        return await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, networkDeviceLink as any);
+        await NetworkDeviceFlow.removeDeviceLinkFromNetwork(this, networkDeviceLink as any);
     }
 
     async removeAllNetworkDevices() {
@@ -1296,7 +1294,7 @@ export class SR5Item<SubType extends SystemItem = SystemItem> extends Item<SubTy
     override async _preUpdate(changed: Item.UpdateData, options: Item.Database.PreUpdateOptions, user: User) {
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
-        if (options.diff !== false && options.recursive !== false) {
+        if (options.diff && options.recursive) {
             // Change used action test implementation when necessary.
             UpdateActionFlow.injectActionTestsIntoChangeData(this.type, changed, changed, this);
             UpdateActionFlow.onUpdateAlterActionData(changed, this);

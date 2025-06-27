@@ -1,13 +1,13 @@
+import { SR5Actor } from '../../SR5Actor';
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
-import { SystemActor } from '../../SR5Actor';
 
 export class InitiativePrep {
     /**
      * Current initiative is the selected initiative to be used within FoundryVTT Combat.
      *
      */
-    static prepareCurrentInitiative(system: Actor.SystemOfType<SystemActor>) {
+    static prepareCurrentInitiative(system: SR5Actor['system']) {
         const { initiative } = system;
 
         if (initiative.perception === 'matrix') initiative.current = initiative.matrix;

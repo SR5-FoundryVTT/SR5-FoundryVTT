@@ -1,8 +1,8 @@
 
 import { SR5 } from "../config";
+import { SR5Item } from './SR5Item';
 import { Helpers } from '../helpers';
 import { Translation } from '../utils/strings';
-import { SR5Item, SystemItem } from './SR5Item';
 
 /**
  * ChatData returns little info boxes for each item type.
@@ -15,7 +15,7 @@ import { SR5Item, SystemItem } from './SR5Item';
  * These info boxes will be shown in a few places, most notibly the chat message but also
  * - actor sheets
  */
-export const ChatData: { [K in SystemItem]: (item: SR5Item<K>) => string[] } = {
+export const ChatData: { [K in Item.ConfiguredSubTypes]: (item: SR5Item<K>) => string[] } = {
     action: (item: SR5Item<'action'>) => {
         const props: string[] = [];
         const { system, labels } = item;

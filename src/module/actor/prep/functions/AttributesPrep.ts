@@ -3,7 +3,7 @@ import {SR} from "../../../constants";
 import {SR5} from "../../../config";
 import { PartsList } from '../../../parts/PartsList';
 import { ItemPrep } from './ItemPrep';
-import { SystemActor } from '../../SR5Actor';
+import { SR5Actor } from '../../SR5Actor';
 import { AttributeFieldType } from 'src/module/types/template/Attributes';
 import { ModifiableValueType } from 'src/module/types/template/Base';
 import { SR5Item } from 'src/module/item/SR5Item';
@@ -12,7 +12,7 @@ export class AttributesPrep {
     /**
      * Prepare actor data for attributes
      */
-    static prepareAttributes(system: Actor.SystemOfType<SystemActor>, ranges?: Record<string, {min: number, max?: number}>) {
+    static prepareAttributes(system: SR5Actor['system'], ranges?: Record<string, {min: number, max?: number}>) {
         const {attributes} = system;
 
         // always have special attributes set to hidden
@@ -22,7 +22,7 @@ export class AttributesPrep {
         attributes.essence.hidden = true;
 
         // set the value for the attributes
-        for (let [name, attribute] of Object.entries(attributes)) {
+        for (const [name, attribute] of Object.entries(attributes)) {
             // don't manage the attribute if it is using the old method of edge tracking
             // needed to be able to migrate things correctly
             if (name === 'edge' && attribute['uses'] === undefined) return;

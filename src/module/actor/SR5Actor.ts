@@ -2,7 +2,6 @@ import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
 import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
 import { PartsList } from '../parts/PartsList';
-import { SR5Combat } from "../combat/SR5Combat";
 import { DataDefaults } from '../data/DataDefaults';
 import { SkillFlow } from "./flows/SkillFlow";
 import { SR5 } from "../config";
@@ -40,8 +39,6 @@ import { SkillRollOptions } from '../types/rolls/ActorRolls';
 import { FireModeType } from '../types/flags/ItemFlags';
 import { MatrixType } from '../types/template/Matrix';
 
-export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' | 'sprite';
-
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
  *
@@ -57,7 +54,7 @@ export type SystemActor = 'character' | 'critter' | 'ic' | 'spirit' | 'vehicle' 
  * </code></pre>
  *
  */
-export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<SubType> {
+export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.ConfiguredSubTypes> extends Actor<SubType> {
     // This is the default inventory name and label for when no other inventory has been created.
     defaultInventory: InventoryType = {
         name: 'Carried',
@@ -337,7 +334,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         // Handle legacy skills (name is id)
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        const skills = this.getActiveSkills() as {[x: string]: SkillFieldType};
+        const skills = this.getActiveSkills() as Record<string, SkillFieldType>;
         const skill = skills[skillName];
         if (skill) return skill;
 
@@ -500,11 +497,11 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
      *  Please check SR5ActorType for reference.
      */
-    isType<ST extends readonly SystemActor[]>(this: SR5Actor, ...types: ST): this is SR5Actor<ST[number]> {
+    isType<ST extends readonly Actor.ConfiguredSubTypes[]>(this: SR5Actor, ...types: ST): this is SR5Actor<ST[number]> {
         return types.includes(this.type as ST[number]);
     }
 
-    asType<ST extends readonly SystemActor[]>(this: SR5Actor, ...types: ST): SR5Actor<ST[number]> | undefined {
+    asType<ST extends readonly Actor.ConfiguredSubTypes[]>(this: SR5Actor, ...types: ST): SR5Actor<ST[number]> | undefined {
         return types.some((t) => this.isType(t)) ? this : undefined;
     }
 
@@ -548,11 +545,11 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         return this.getSkills() !== undefined;
     }
 
-    getSkills(this: SR5Actor): Actor.SystemOfType<SystemActor>['skills'] {
+    getSkills(this: SR5Actor): SR5Actor['system']['skills'] {
         return this.system.skills;
     }
 
-    getActiveSkills(this: SR5Actor): Actor.SystemOfType<SystemActor>['skills']['active'] {
+    getActiveSkills(this: SR5Actor): SR5Actor['system']['skills']['active'] {
         return this.system.skills.active;
     }
 
@@ -565,10 +562,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     async setNetworkController(networkController: string|undefined): Promise<void> {
         if(!this.isType('vehicle')) return;
 
-        if ('networkController' in this.system) {
-            this.system.networkController;
-            await this.update({ system: { networkController }});
-        }
+        await this.update({ system: { networkController }});
     }
 
     get canBeNetworkDevice(): boolean {
@@ -624,7 +618,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
      */
     getPool(skillId: string, options = {specialization: false, byLabel: false}): number {
         const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
-        if (!skill || !skill.attribute) return 0;
+        if (!skill?.attribute) return 0;
         if (!SkillFlow.allowRoll(skill)) return 0;
 
         const attribute = this.getAttribute(skill.attribute);
@@ -695,7 +689,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const skills = this.getSkills();
 
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [id, skill] of Object.entries(skills.language.value as {[x: string]: SkillFieldType})) {
+        for (const [id, skill] of Object.entries(skills.language.value as Record<string, SkillFieldType>)) {
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
         }
@@ -712,7 +706,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         }
 
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [id, skill] of Object.entries(skills.active as {[x: string]: SkillFieldType})) {
+        for (const [id, skill] of Object.entries(skills.active as Record<string, SkillFieldType>)) {
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
         }
@@ -904,8 +898,8 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
 
         const skills = this.getActiveSkills();
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [id, skill] of Object.entries(skills as {[x: string]: SkillFieldType})) {
-            if (skill.hidden === true) {
+        for (const [id, skill] of Object.entries(skills as Record<string, SkillFieldType>)) {
+            if (skill.hidden) {
                 skill.hidden = false;
                 updateData[`system.skills.active.${id}`] = skill;
             }
@@ -1102,7 +1096,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
     
             const action = this.skillActionData(skillId, options);
             if (!action) return;
-            if(teamworkData.criticalGlitch != true) {
+            if(!teamworkData.criticalGlitch) {
                 action.limit.mod.push({name: "Teamwork", value: teamworkData.additionalLimit})
             }
 
@@ -1646,7 +1640,7 @@ export class SR5Actor<SubType extends SystemActor = SystemActor> extends Actor<S
         const combatant = combat.getActorCombatant(this);
 
         // Token might not be part of active combat.
-        if (!combatant || !combatant.initiative) return;
+        if (!combatant?.initiative) return;
 
         // While not prohibiting, inform user about missing resource.
         if (combatant.initiative + modifier < 0) {

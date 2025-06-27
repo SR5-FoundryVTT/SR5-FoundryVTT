@@ -1,6 +1,6 @@
 import { Quench } from "@ethaks/fvtt-quench";
-import { SR5Item, SystemItem } from "../item/SR5Item";
-import { SR5Actor, SystemActor } from "../actor/SR5Actor";
+import { SR5Item } from "../item/SR5Item";
+import { SR5Actor } from "../actor/SR5Actor";
 import { SR5ChatMessage } from "../chatMessage/SR5ChatMessage";
 import { SR5Combat } from "../combat/SR5Combat";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
@@ -45,10 +45,10 @@ import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } fro
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
         ActiveEffect: typeof SR5ActiveEffect;
-        Actor: typeof SR5Actor<SystemActor>;
+        Actor: typeof SR5Actor<Actor.ConfiguredSubTypes>;
         ChatMessage: typeof SR5ChatMessage;
         Combat: typeof SR5Combat<Combat.SubType>;
-        Item: typeof SR5Item<SystemItem>;
+        Item: typeof SR5Item<Item.ConfiguredSubTypes>;
         Roll: typeof SR5Roll;
         Sheet: typeof FormApplication;
     }
