@@ -40,8 +40,6 @@ import { MatrixType } from '../types/template/Matrix';
 
 ActionResultFlow; // DON'T TOUCH!
 
-export type SystemTechnologyItem = 'ammo' | 'armor' | 'device' | 'equipment' | 'modification' | 'program' | 'sin' | 'bioware' | 'cyberware' | 'weapon';
-
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
  *
