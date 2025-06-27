@@ -59,7 +59,8 @@ export const FLAGS = {
     GeneralActionsPack: 'GeneralActionsPack',
     MatrixActionsPack: 'MatrixActionsPack',
     UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
-    MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite'
+    MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
+    CompendiaSettingsMenu: 'CompendiaSettingsMenu'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

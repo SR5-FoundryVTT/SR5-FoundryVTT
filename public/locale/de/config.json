@@ -228,6 +228,11 @@
     "SR5.Collapse": "Einklappen",
     "SR5.CollapseAll": "Alles einklappen",
     "SR5.CommonProgram": "Standardprogramm",
+    "SR5.CompendiaSettings": {
+        "Description": "Diese Kompendien werden für das System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.$",
+        "Label": "Kompendien",
+        "Title": "System Kompendien"
+    },
     "SR5.Compilation": {
         "DropSprite": "Sprite ablegen",
         "FixedSprite": "Sprite vorb.",

@@ -2,6 +2,7 @@
 
 import { VersionMigration } from './migrator/VersionMigration';
 import { FLAGS, SYSTEM_NAME } from './constants';
+import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
 export const registerSystemSettings = () => {
     /**
@@ -257,14 +258,27 @@ export const registerSystemSettings = () => {
     });
 
     /**
+     * Select compendia to use for system porpuses like different action packs
+     */
+    game.settings.registerMenu(SYSTEM_NAME, FLAGS.CompendiaSettingsMenu, {
+        name: 'SR5.CompendiaSettings.Title',
+        hint: 'SR5.CompendiaSettings.Description',
+        label: 'SR5.CompendiaSettings.Label',
+        icon: 'fas fa-book',
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        type: SR5CompendiaSettings,
+        restricted: true, // Don't show to non GMs
+    });
+
+    /**
      * Override the default general actions pack
      */
     game.settings.register(SYSTEM_NAME, FLAGS.GeneralActionsPack, {
         name: 'SETTINGS.GeneralActionsPackName',
         hint: 'SETTINGS.GeneralActionsPackDescription',
         scope: 'world',
-        config: true,
-        type: String
+        config: false,
+        type: String,
     });
 
     /**
@@ -274,7 +288,7 @@ export const registerSystemSettings = () => {
         name: 'SETTINGS.MatrixActionsPackName',
         hint: 'SETTINGS.MatrixActionsPackDescription',
         scope: 'world',
-        config: true,
+        config: false,
         type: String
     });
 };
