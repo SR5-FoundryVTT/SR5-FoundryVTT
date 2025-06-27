@@ -5,11 +5,12 @@ declare namespace Shadowrun {
     export type MentalAttribute = 'logic' | 'intuition' | 'charisma' | 'willpower';
     export type SpecialAttribute = 'edge' | 'essence' | 'magic' | 'resonance';
     export type MatrixAttribute = 'attack' | 'sleaze' | 'data_processing' | 'firewall';
+    export type MiscAttribute = 'pilot' | 'force' | 'initiation' | 'submersion' | 'rating';
 
     /**
      * Any valid attribute that an actor can have.
      */
-    export type ActorAttribute = PhysicalAttribute | MentalAttribute | SpecialAttribute | MatrixAttribute | '';
+    export type ActorAttribute = PhysicalAttribute | MentalAttribute | SpecialAttribute | MatrixAttribute | MiscAttribute |'';
     
     export type Limit = | 'physical' | 'social' | 'mental' | 'astral' | 'attack' | 'sleaze' | 'data_processing' | 'firewall' | 'speed' | 'sensor' | 'handling' | 'magic' | 'initiation' | '';
 
