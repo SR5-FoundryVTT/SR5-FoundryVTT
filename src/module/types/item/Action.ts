@@ -58,8 +58,12 @@ declare namespace Shadowrun {
     /**
      * Action limit data.
      */
-    export interface LimitData extends ModifiableValueLinked {}
-    export type FormulaOperator = 'add'|'subtract'|'multiply'|'divide';
+    export type LimitAttribute = ActorAttribute | Limit;
+    
+    export interface LimitData extends Omit<ModifiableValueLinked, 'attribute'> {
+        attribute: LimitAttribute;
+    }
+    export type FormulaOperator = 'add' | 'subtract' | 'multiply' | 'divide';
 
     /**
      * Info about the embedded source item that caused the damage
@@ -125,7 +129,7 @@ declare namespace Shadowrun {
      *
      * Mainly here to prohibit using missing packs in code.
      */
-    export type PackName = 'Matrix Actions'|'General Actions';
+    export type PackName = 'Matrix Actions' | 'General Actions';
     /**
      * A list of action names defined in any system pack.
      *
@@ -150,7 +154,7 @@ declare namespace Shadowrun {
     /*
      * A test label for item action chat message casting button creation
      */
-    export type ActionTestLabel =  {
+    export type ActionTestLabel = {
         label: string;
         uuid: string;
     }
@@ -171,7 +175,7 @@ declare namespace Shadowrun {
      * It can also be used for ActiveEffects to target a group of tests, if skill or test implementations used
      * are to specific.
      */
-    type ActionCategories = 
+    type ActionCategories =
         '' | // Empty values are allowed to allow users not having to set an action category.
         'addiction_mental' | // resisting against mental addiction
         'addiction_physical' | // resisting against physical addiction

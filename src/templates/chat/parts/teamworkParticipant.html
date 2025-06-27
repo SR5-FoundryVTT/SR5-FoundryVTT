@@ -1,0 +1,28 @@
+<details class="teamwork-participant">
+  <summary>
+  <div class="participant-header">
+    <div class="participant-actor">
+      <img src="{{actor.img}}" alt="{{actor.name}}" class="participant-avatar"/>
+      <span class="participant-name">{{actor.name}}</span>
+    </div>
+    <span class="participant-hits">{{netHits}} {{localize "SR5.Hits"}}</span>
+  </div>
+</summary>
+  {{#if (or differentSkill differentAttribute differentLimit glitched)}}
+  <div class="different-skills">
+    {{#if glitched}}
+    {{#ife criticalGlitched true}}
+    {{localize "SR5.GlitchCritical"}}
+    {{else}}
+    {{localize "SR5.Glitch"}}
+    {{/ife}}
+    {{/if}}
+    {{#if differentSkill}}<span>{{localize "SR5.Skill.Teamwork.DifferentSkill"}}: {{localizeSkill
+      differentSkill}}</span>{{/if}}
+    {{#if differentAttribute}}<span>{{localize "SR5.Skill.Teamwork.DifferentAttribute"}}: {{localize
+      differentAttribute}}</span>{{/if}}
+    {{#if differentLimit}}<span>{{localize "SR5.Skill.Teamwork.DifferentLimit"}}: {{localize
+      differentLimit}}</span>{{/if}}
+  </div>
+  {{/if}}
+</details>

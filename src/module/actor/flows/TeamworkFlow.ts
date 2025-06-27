@@ -1,18 +1,194 @@
+import { ParserSelector } from './../../apps/importer/actorImport/itemImporter/importHelper/ParserSelector';
 import { SR5Actor } from '../SR5Actor';
-import {FLAGS, SYSTEM_NAME} from '../../constants';
+import { FLAGS, SYSTEM_NAME } from '../../constants';
 import { SocketMessage } from "../../sockets";
 import { SuccessTest } from '../../tests/SuccessTest';
 import { Helpers } from '../../helpers'
+import { Translation } from '../../utils/strings';
+import { TeamWorkDialog } from '../../apps/dialogs/TeamworkDialog';
+import { JournalEnrichers, TestAttributes } from '../../journal/enricher';
+import { DataDefaults } from '../../data/DataDefaults';
+import { TestCreator } from '../../tests/TestCreator';
+import { SR5Roll } from '../../rolls/SR5Roll';
+import { SR5 } from '../../config';
+import { isNumberObject } from 'util/types';
 
-export interface TeamworkMessageData {
-    skill: string,
-    additionalDice: number,
-    additionalLimit: number,
-    criticalGlitch: boolean
+export type AttributeKey = keyof typeof SR5.attributes | '';
+export type LimitKey = keyof typeof SR5.limits | '';
+
+export interface TeamworkData {
+    actor: SR5Actor;
+    skill: SkillEntry;
+    attribute?: AttributeEntry;
+    threshold?: number;
+    limit?: LimitEntry;
+    allowOtherSkills: boolean;
+    showAllowOtherSkills: boolean;
 }
- 
-export class TeamworkTest {
-    
+
+export interface TeamworkMessageData extends TeamworkData {
+    additionalDice: Shadowrun.ValueMaxPair<number>;
+    additionalLimit: number;
+    criticalGlitched: boolean;
+    specialization: boolean;
+    participants: ParticipantEntry[];
+}
+
+interface ParticipantEntry {
+    actor: SR5Actor;
+    netHits: number;
+    glitched: boolean;
+    criticalGlitched: boolean;
+    differentSkill: Shadowrun.SkillField | undefined,
+    differentAttribute: AttributeEntry | undefined,
+    differentLimit: LimitEntry | undefined
+}
+
+export interface SkillEntry {
+    id: string;
+    label: string;
+    attribute: AttributeKey;
+    limit: LimitKey;
+}
+
+export interface AttributeEntry {
+    name: AttributeKey;
+    label: string;
+}
+
+export interface LimitEntry {
+    name: LimitKey;
+    label: string;
+    base?: number;
+}
+
+export interface SkillGroup {
+    group: string;
+    skills: SkillEntry[];
+}
+
+export class TeamworkFlow {
+
+    /** Gruppierte und sortierte Skill‐Listen für den Dialog und die Flows */
+    static buildSkillGroups(actor?: SR5Actor): SkillGroup[] {
+        if (!actor) return [];
+        const { active, language, knowledge } = actor.getSkills();
+        const attrs = actor.getAttributes();
+        const sortBy = (a: SkillEntry, b: SkillEntry) =>
+            a.label.localeCompare(b.label);
+
+        const groups: SkillGroup[] = [];
+
+        // Active
+        const activeSkills = Object.entries(active)
+            .map((id) => this.constructSkillEntry({ id }, actor))
+            .filter((entry): entry is SkillEntry => Boolean(entry?.id))
+            .sort(sortBy);
+        if (activeSkills.length) groups.push({ group: "Active Skills", skills: activeSkills });
+
+        // Language
+        // Language Skills
+        const languageSkills: SkillEntry[] = Object.entries(language.value ?? {})
+            .map((id) => this.constructSkillEntry({ id }, actor))
+            .filter((entry): entry is SkillEntry => Boolean(entry?.id))
+            .sort(sortBy);
+
+        if (languageSkills.length) {
+            groups.push({ group: "Language Skills", skills: languageSkills });
+        }
+
+
+        // Knowledge‐Gruppen
+        for (const [catKey, catList] of Object.entries(knowledge) as [keyof Shadowrun.KnowledgeSkills, Shadowrun.KnowledgeSkillList][]) {
+            const list: SkillEntry[] = Object.keys(catList.value ?? {})
+                .map((id) => this.constructSkillEntry({ id }, actor))
+                .filter((entry): entry is SkillEntry => Boolean(entry?.id))
+                .sort(sortBy);
+            if (list.length) groups.push({ group: `Knowledge (${catKey})`, skills: list });
+        }
+
+        return groups;
+    }
+
+    /** Flache Liste aller Attribute für den Dialog */
+    static buildAttributeList(actor: SR5Actor): { name: AttributeKey; label: string }[] {
+        return Object.entries(actor.getAttributes())
+            .map(([key, field]) => ({
+                name: key as AttributeKey,
+                label: game.i18n.localize(field.label as Translation)
+            }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    static constructLimitEntry(data?: string | number): LimitEntry {
+        if (data && !isNaN(+data!)) {
+            return {
+                name: "",
+                label: "",
+                base: +data
+            } as LimitEntry;
+        } else if (typeof data === "string" && data in SR5.limits) {
+            return {
+                name: data as LimitKey,
+                label: SR5.limits[data]
+            }
+        }
+
+        return { name: "", label: "" };
+    }
+
+    static constructAttributeEntry(data?: string): AttributeEntry {
+        if (typeof data === "string" && data in SR5.limits) {
+            return {
+                name: data as AttributeKey,
+                label: SR5.limits[data]
+            }
+        }
+
+        return { name: "", label: "" };
+    }
+
+    static constructSkillEntry(data: Partial<SkillEntry>, actor?: SR5Actor): SkillEntry {
+        const id = data.id ?? "";
+        if (actor && id) {
+            const skill = actor.getSkill(id);
+            if (skill) return {
+                id: skill.id,
+                label: game.i18n.localize(skill.label as Translation) ?? skill.name,
+                attribute: skill.attribute as AttributeKey,
+                limit: actor.getAttributes()[skill.attribute]?.limit as LimitKey ?? ""
+            }
+        }
+
+        return {
+            id,
+            label: id && id in SR5.activeSkills
+                ? game.i18n.localize(SR5.activeSkills[id] as Translation)
+                : data.label
+                    ? game.i18n.localize(data.label as Translation)
+                    : "",
+            attribute: data.attribute ?? "",
+            limit: data.limit ?? ""
+        }
+    }
+
+    static get limitList(): { name: LimitKey; label: string }[] {
+        return Object.entries(SR5.limits)
+            .map(([key, label]) => ({
+                name: key as LimitKey,
+                label: game.i18n.localize(label as Translation)
+            }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    static get actorList(): SR5Actor[] | undefined {
+        const user = game.user;
+        if (!user || !game.actors) return;
+        return game.actors?.filter(actor =>
+            actor.testUserPermission(user, "OWNER")
+        )
+    }
+
     static async chatLogListeners(chatLog: ChatLog, html) {
          // setup chat listener messages for each message as some need the message context instead of chatlog context.
          // @ts-expect-error TODO: querySelectorAll?
@@ -33,6 +209,146 @@ export class TeamworkTest {
         $(html).find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
     }
 
+
+
+    static async initiateTeamworkTest(testAttributes: TestAttributes) {
+        const user = game.user;
+        if (!user || !game.actors || !testAttributes) return;
+
+        const selectedActor = await JournalEnrichers.findActor();
+
+        if(!selectedActor) return ui.notifications?.error("Kein valider Akteur gefunden.");;
+
+        const dialogData = await new TeamWorkDialog({
+            actors: this.actorList ?? [selectedActor],
+            actor: selectedActor,
+            skill: this.constructSkillEntry({ id: testAttributes.skill }, selectedActor),
+            attribute: this.constructAttributeEntry(testAttributes.attribute),
+            threshold: Number(testAttributes.threshold) || undefined,
+            allowOtherSkills: Boolean(testAttributes.allowOtherSkills) ?? false,
+            limit: this.constructLimitEntry(testAttributes.limit),
+            request: true,
+            lockedSkill: false
+        }).select();
+
+        console.log("initiateTeamworkTest dialogData", dialogData)
+
+        if (dialogData.cancelled) return;
+
+        // Setze initiales Flag-Objekt
+        const teamworkData = {
+            actor: dialogData.actor,
+            skill: dialogData.skill,
+            attribute: dialogData.attribute,
+            threshold: dialogData.threshold,
+            limit: dialogData.limit,
+            allowOtherSkills: dialogData.allowOtherSkills,
+            showAllowOtherSkills: dialogData.showAllowOtherSkills,
+            participants: [],
+            criticalGlitched: false,
+            additionalDice: {
+                value: 0,
+                max: dialogData.actor.getSkill(dialogData.skill.id).base ?? 0
+            },
+            additionalLimit: 0,
+            specialization: dialogData.specialization
+        };
+
+        console.log("initiateTeamworkTest teamworkData", teamworkData)
+
+        const templateContext = {
+            ...teamworkData,
+            limit: (SR5.limits as Record<LimitKey, string>)[dialogData.limit] ?? undefined,
+            attribute: (SR5.attributes as Record<AttributeKey, string>)[dialogData.attribute] ?? undefined
+        };
+
+        console.log("initiateTeamworkTest templateContext", templateContext)
+
+        // Rendern und ChatMessage anlegen
+        const content = await renderTemplate("systems/shadowrun5e/dist/templates/chat/teamworkRequest.html", templateContext);
+        const msg = await ChatMessage.create({
+            user: user.id,
+            speaker: ChatMessage.getSpeaker(),
+            content
+        });
+
+        if (!msg) {
+            return ui.notifications?.error("Teamwork-Nachricht nicht gefunden");
+        }
+
+        await msg.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData);
+    }
+
+
+
+    static async initiateTeamworkTest(testAttributes: TestAttributes) {
+        const user = game.user;
+        if (!user || !game.actors || !testAttributes) return;
+
+        const selectedActor = await JournalEnrichers.findActor();
+
+        if(!selectedActor) return ui.notifications?.error("Kein valider Akteur gefunden.");;
+
+        const dialogData = await new TeamWorkDialog({
+            actors: this.actorList ?? [selectedActor],
+            actor: selectedActor,
+            skill: this.constructSkillEntry({ id: testAttributes.skill }, selectedActor),
+            attribute: this.constructAttributeEntry(testAttributes.attribute),
+            threshold: Number(testAttributes.threshold) || undefined,
+            allowOtherSkills: Boolean(testAttributes.allowOtherSkills) ?? false,
+            limit: this.constructLimitEntry(testAttributes.limit),
+            request: true,
+            lockedSkill: false
+        }).select();
+
+        console.log("initiateTeamworkTest dialogData", dialogData)
+
+        if (dialogData.cancelled) return;
+
+        // Setze initiales Flag-Objekt
+        const teamworkData = {
+            actor: dialogData.actor,
+            skill: dialogData.skill,
+            attribute: dialogData.attribute,
+            threshold: dialogData.threshold,
+            limit: dialogData.limit,
+            allowOtherSkills: dialogData.allowOtherSkills,
+            showAllowOtherSkills: dialogData.showAllowOtherSkills,
+            participants: [],
+            criticalGlitched: false,
+            additionalDice: {
+                value: 0,
+                max: dialogData.actor.getSkill(dialogData.skill.id).base ?? 0
+            },
+            additionalLimit: 0,
+            specialization: dialogData.specialization
+        };
+
+        console.log("initiateTeamworkTest teamworkData", teamworkData)
+
+        const templateContext = {
+            ...teamworkData,
+            limit: (SR5.limits as Record<LimitKey, string>)[dialogData.limit] ?? undefined,
+            attribute: (SR5.attributes as Record<AttributeKey, string>)[dialogData.attribute] ?? undefined
+        };
+
+        console.log("initiateTeamworkTest templateContext", templateContext)
+
+        // Rendern und ChatMessage anlegen
+        const content = await renderTemplate("systems/shadowrun5e/dist/templates/chat/teamworkRequest.html", templateContext);
+        const msg = await ChatMessage.create({
+            user: user.id,
+            speaker: ChatMessage.getSpeaker(),
+            content
+        });
+
+        if (!msg) {
+            return ui.notifications?.error("Teamwork-Nachricht nicht gefunden");
+        }
+
+        await msg.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData);
+    }
+
     /**
      * This method prompts the user to roll the skill chosen in the teamwork test from a chosen actor @see Helpers.chooseFromAvailableActors
      * The result is forwarded to @see addResultsToMessage to add text and flag data to the original message
@@ -41,63 +357,137 @@ export class TeamworkTest {
      * @returns 
      */
     static async addParticipant(message: ChatMessage) {
-        let actor = await Helpers.chooseFromAvailableActors()
+        const user = game.user;
+        if (!user || !game.actors || !message) return;
 
-        if(actor == undefined) {
-            //in a normal running game this should not happen
-            ui.notifications?.error('SR5.Errors.NoAvailableActorFound', {localize: true});
-            return
+        const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData;
+
+        const selectedActor = await JournalEnrichers.findActor();
+        const actors: SR5Actor[] = game.actors.filter(actor =>
+            actor.testUserPermission(user, "OWNER")
+        ) ?? [selectedActor];
+
+        const selection = await new TeamWorkDialog({
+            actors,
+            actor: selectedActor,
+            skill: teamworkData.skill,
+            attribute: teamworkData.attribute,
+            threshold: teamworkData.threshold,
+            allowOtherSkills: teamworkData.allowOtherSkills,
+            limit: teamworkData.limit,
+            request: false,
+            lockedSkill: !teamworkData.allowOtherSkills
+        }).select();
+
+        console.log("AddParticipant-Selection", selection)
+
+        if (!selection) return;
+
+        const actor: SR5Actor = selection.actor;
+
+        // 1) Basis-ActionData holen
+        const skillAction: Shadowrun.ActionRollData | undefined = actor.skillActionData(selection.skill.id, { specialization: selection.specialization });
+        if (!skillAction) {
+            return;
         }
 
-        let teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
-        let results = await actor?.rollSkill(teamworkData.skill) as SuccessTest;
-        if(results.rolls.length > 0) {
-            this.addResultsToMessage(message, actor, results, teamworkData)
+        // 2) Attribut überschreiben, falls der User ein anderes gewählt hat
+        const attribute = JournalEnrichers.getAttributeKeyByLabel(selection.attribute ?? "");
+        if (attribute !== '') {
+            skillAction.attribute = attribute;
+        }
+
+        // 3) Threshold eintragen
+        const threshold = selection.threshold ?? 0;
+        skillAction.threshold = { value: threshold, base: threshold };
+
+
+        // 4) Limit setzen: Zahl vs. Attribut-Limit
+        const limit = selection.limit;
+        if (typeof limit === "number") {
+            // fester Wert: nur value/base anpassen, attribute bleibt wie in skillActionData
+            skillAction.limit.value = limit;
+            skillAction.limit.base = limit;
+        } else if (typeof limit === "string" && limit !== "") {
+            // Attribut‐Limit
+            const actual = actor.getLimit(limit).base ?? 0;
+            skillAction.limit.value = actual;
+            skillAction.limit.base = actual;
+            skillAction.limit.attribute = limit as Shadowrun.LimitAttribute;
+        }
+
+        // 5) Test erstellen & ausführen
+        try {
+            const test = await TestCreator.fromAction(skillAction, actor);
+            if (!test) return;
+            test.data.title = teamworkData.skill.label;
+            const results = await test.execute() as SuccessTest;
+
+            // 6) Ergebnis in die ursprüngliche Message einhängen
+            await TeamworkFlow.addResultsToMessage(
+                message,
+                actor,
+                results
+            );
+        } catch (err) {
+            //TODO: Lokalisierung
+            console.error("Fehler im Teilnehmer-Wurf:", err);
+            ui.notifications?.error("Fehler im Teilnehmer-Wurf:", err);
         }
     }
+
 
     /**
      * This method analyses the roll result and adds the text and flag data to the original message
      * @param message to add text too
      * @param actor that made the roll
      * @param results of the roll
-     * @param teamworkData flag data to add too
      */
-    static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest, teamworkData: TeamworkMessageData) {
-        //wrap the old content to presever it, this is necessary for pre-render hooks
-        const wrapper = document.createElement("dív");
-        //@ts-expect-error v11 type
-        wrapper.innerHTML = message.content;
+    static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest) {
 
-        let participantsRoot = wrapper.getElementsByClassName("sr5-teamwork-participants")[0];
+        // 1.) Flag auslesen
+        const teamworkData = (await message.getFlag(SYSTEM_NAME, FLAGS.Test)) as TeamworkMessageData;
 
-        let roll = results.rolls[0];
-        let netHits = results.data.values.netHits.value
-        console.log(results)
-        let participant = document.createElement('div');
-        participant.innerHTML += actor.name + ": " + netHits;
+        // 2.) Neue Teilnehmer-Info anhängen
+        const netHits = results.data.values.netHits.value;
+        teamworkData.participants.push({
+            actor: actor,
+            netHits,
+            glitched: results.rolls[0].glitched,
+            criticalGlitched: results.rolls[0].criticalGlitched,
+            differentSkill: results.data.action.skill !== teamworkData.skill.id ? actor.getSkill(results.data.action.skill) : undefined,
+            differentAttribute: results.data.action.attribute !== teamworkData.attribute ? (SR5.attributes as Record<AttributeKey, string>)[results.data.action.attribute] : undefined,
+            differentLimit: typeof teamworkData.limit === "string"
+                ? (results.data.action.limit.attribute !== teamworkData.limit
+                    ? (SR5.limits as Record<LimitKey, string>)[results.data.action.limit.attribute]
+                    : undefined)
+                : (typeof teamworkData.limit === "number" && results.data.action.limit.base !== teamworkData.limit
+                    ? `${results.data.action.limit.base}`
+                    : undefined)
+        });
 
-        if(roll.glitched == true) {
-            participant.innerHTML += " " + game.i18n.localize('SR5.Skill.Teamwork.Glitched')
-        }
+        // 3.) Content komplett neu rendern
+        const content = await renderTemplate(
+            "systems/shadowrun5e/dist/templates/chat/teamworkRequest.html",
+            teamworkData
+        );
 
-        teamworkData.additionalDice = (teamworkData.additionalDice ?? 0) + netHits;
-        if(roll.total != 0 && roll.glitched != true) {
-            teamworkData.additionalLimit = (teamworkData.additionalLimit ?? 0) + 1;
-        }
+        // 5. Aktualisiere teamworkData
+        teamworkData.additionalDice.value = (teamworkData.additionalDice.value ?? 0) + netHits;
+        teamworkData.additionalLimit = (teamworkData.additionalLimit ?? 0) + (results.rolls[0].total > 0 && !results.rolls[0].glitched ? 1 : 0);
+        teamworkData.criticalGlitched = teamworkData.criticalGlitched || (results.rolls[0].criticalGlitched);
 
-        if(roll.total === 0 && roll.glitched) {
-            teamworkData.criticalGlitch = true;
-        }
-
-        participantsRoot.appendChild(participant)
-
-        if(game.user?.isGM) {
-            message.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData)
-            message.update({content: wrapper.innerHTML})
-        }
-        else {
-            this._sendUpdateSocketMessage(message, wrapper.innerHTML, teamworkData)
+        // 4.) ChatMessage updaten — Content + Flag
+        try {
+            if (game.user?.isGM) {
+                await message.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData);
+                await message.update({ content });
+            }
+            else {
+                await this._sendUpdateSocketMessage(message, content, teamworkData)
+            }
+        } catch (err) {
+            ui.notifications?.error(`Teamwork: ${err}`);
         }
 
     }
@@ -107,11 +497,13 @@ export class TeamworkTest {
      * @param message 
      */
     static async rollTeamworkTest(message: ChatMessage) {
-        let teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
-        //@ts-expect-error v11 type
-        let actor = game.actors?.get(message.speaker.actor)
-        
-        actor?.rollTeamworkTest(teamworkData.skill, teamworkData)
+        const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData;
+
+        const actor = game.actors?.get((teamworkData.actor as any)._id);
+
+        if (!actor) return;
+
+        await actor.rollTeamworkTest(teamworkData);
     }
 
     /**
@@ -138,7 +530,135 @@ export class TeamworkTest {
         const message = fromUuidSync(socketMessage.data.messageUuid);
 
         message?.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData)
-        message?.update({content: socketMessage.data.content})
+        message?.update({ content: socketMessage.data.content })
     }
+
+    /**
+ * Baut die flache Skill-Liste für einen Actor im gewünschten Format.
+ */
+    // static buildSkillsList(actor?: SR5Actor): SkillGroup[] {
+
+    //     if (!actor) return [];
+
+    //     const { active, language, knowledge } = actor.getSkills();
+    //     const sortBy = (a: SkillEntry, b: SkillEntry) => a.label.localeCompare(b.label);
+
+    //     const groups: SkillGroup[] = [];
+
+    //     const activeSkills: SkillGroup = {
+    //         group: "Active Skills",
+    //         skills: Object.entries(active)
+    //             .map(([id, skill]) => {
+    //                 const attribute = skill.attribute as Shadowrun.ActorAttribute;
+    //                 const limit = actor.getAttributes()[attribute]?.limit ?? '';
+    //                 return {
+    //                     id,
+    //                     label: skill.label ?? skill.name,
+    //                     attribute: attribute,
+    //                     defaultLimit: limit
+    //                 };
+    //             })
+    //             .sort(sortBy)
+    //     };
+    //     if (activeSkills.skills.length) groups.push(activeSkills);
+
+    //     const languageSkills: SkillGroup = {
+    //         group: "Language Skills",
+    //         skills: Object.entries(language.value)
+    //             .map(([id, skill]) => {
+    //                 const attribute = skill.attribute as Shadowrun.ActorAttribute;
+    //                 const limit = actor.getAttributes()[attribute]?.limit ?? '';
+    //                 return {
+    //                     id,
+    //                     label: skill.label ?? skill.name,
+    //                     attribute: attribute,
+    //                     defaultLimit: limit
+    //                 };
+    //             })
+    //             .sort(sortBy)
+    //     };
+    //     if (languageSkills.skills.length) groups.push(languageSkills);
+
+    //     // Knowledge Skills per category
+    //     const streetSkills: SkillGroup = {
+    //         group: "Knowledge (Street) Skills",
+    //         skills: Object.entries(knowledge.street.value)
+    //             .map(([id, skill]) => {
+    //                 const attribute = skill.attribute as Shadowrun.ActorAttribute;
+    //                 const limit = actor.getAttributes()[attribute]?.limit ?? '';
+    //                 return {
+    //                     id,
+    //                     label: skill.label ?? skill.name,
+    //                     attribute: attribute,
+    //                     defaultLimit: limit
+    //                 };
+    //             })
+    //             .sort(sortBy)
+    //     };
+    //     if (streetSkills.skills.length) groups.push(streetSkills);
+
+    //     const academicSkills: SkillGroup = {
+    //         group: "Knowledge (Academic) Skills",
+    //         skills: Object.entries(knowledge.academic.value)
+    //             .map(([id, skill]) => {
+    //                 const attribute = skill.attribute as Shadowrun.ActorAttribute;
+    //                 const limit = actor.getAttributes()[attribute]?.limit ?? '';
+    //                 return {
+    //                     id,
+    //                     label: skill.label ?? skill.name,
+    //                     attribute: attribute,
+    //                     defaultLimit: limit
+    //                 };
+    //             })
+    //             .sort(sortBy)
+    //     };
+    //     if (academicSkills.skills.length) groups.push(academicSkills);
+
+    //     const professionalSkills: SkillGroup = {
+    //         group: "Knowledge (Professional) Skills",
+    //         skills: Object.entries(knowledge.professional.value)
+    //             .map(([id, skill]) => {
+    //                 const attribute = skill.attribute as Shadowrun.ActorAttribute;
+    //                 const limit = actor.getAttributes()[attribute]?.limit ?? '';
+    //                 return {
+    //                     id,
+    //                     label: skill.label ?? skill.name,
+    //                     attribute: attribute,
+    //                     defaultLimit: limit
+    //                 };
+    //             })
+    //             .sort(sortBy)
+    //     };
+    //     if (professionalSkills.skills.length) groups.push(professionalSkills);
+
+    //     const interestsSkills: SkillGroup = {
+    //         group: "Knowledge (Interests) Skills",
+    //         skills: Object.entries(knowledge.interests.value)
+    //             .map(([id, skill]) => {
+    //                 const attribute = skill.attribute as Shadowrun.ActorAttribute;
+    //                 const limit = actor.getAttributes()[attribute]?.limit ?? '';
+    //                 return {
+    //                     id,
+    //                     label: skill.label ?? skill.name,
+    //                     attribute: attribute,
+    //                     defaultLimit: limit
+    //                 };
+    //             })
+    //             .sort(sortBy)
+    //     };
+    //     if (interestsSkills.skills.length) groups.push(interestsSkills);
+
+    //     // Combine all lists into one sorted array
+    //     return groups;
+    // }
+
+    // static buildAttributesList(actor: SR5Actor): { name: Shadowrun.ActorAttribute; label: string }[] {
+    //     const attrs = actor.getAttributes(); // Shadowrun.Attributes
+    //     return Object.entries(attrs)
+    //         .map(([attrName, attrField]) => ({
+    //             name: attrName as Shadowrun.ActorAttribute,
+    //             label: game.i18n.localize(attrField.label as Translation)
+    //         }));
+    // }
 
 }
