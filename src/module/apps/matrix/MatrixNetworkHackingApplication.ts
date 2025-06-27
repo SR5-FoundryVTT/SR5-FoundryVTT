@@ -20,9 +20,6 @@ interface MatrixNetworkHackingSheetData {
     hostNetwork: boolean
     gridNetwork: boolean
     config: typeof SR5
-    // Currently selected mark placement action.
-    // Used for select option
-    markPlacementAction: string
 }
 
 type MatrixPlacementTests = BruteForceTest | HackOnTheFlyTest;
@@ -35,15 +32,14 @@ type MatrixPlacementTests = BruteForceTest | HackOnTheFlyTest;
 export class MatrixNetworkHackingApplication extends Application {
     // Actor used to retrieve the matrix persona.
     public actor: SR5Actor;
-    // Action used to place mark.
-    markPlacementAction: string;
 
+    /**
+     * @param actor Actor to place marks with.
+     */
     constructor(actor: SR5Actor) {
         super();
 
         this.actor = actor;
-        const character = this.actor.asCharacter();
-        this.markPlacementAction = character?.system.matrix.markPlacementAction ?? 'Brute Force';
     }
 
     override get template() {
@@ -72,9 +68,9 @@ export class MatrixNetworkHackingApplication extends Application {
     override activateListeners(html: JQuery<HTMLElement>): void {
         super.activateListeners(html);
 
-        html.find('.show-matrix-placement').on('click', this.handleMarkPlacement.bind(this));
-        html.find('#mark-placement-action').on('click', this.handlePlacementAction.bind(this));
         html.find('.matrix-network-invite').on('click', this.handleMarkInvite.bind(this));
+        html.find('.matrix-network-bruteforce').on('click', this.handleBruteForce.bind(this));
+        html.find('.matrix-network-hackonthefly').on('click', this.handleHackOnTheFly.bind(this));
     }
 
     override async getData(options?: Partial<ApplicationOptions> | undefined): Promise<MatrixNetworkHackingSheetData> {
@@ -82,45 +78,27 @@ export class MatrixNetworkHackingApplication extends Application {
 
         data.config = SR5;
 
-        const character = this.actor.asCharacter();
-
         // Prepare available networks for selection.
         data.grids = MatrixFlow.visibleGrids();
         data.hosts = MatrixFlow.visibelHosts();
-
-        data.markPlacementAction = character?.system.matrix.markPlacementAction ?? 'brute_force';
 
         return data;
     }
 
     /**
-     * Trigger Mark Placement for selected target document.
-     *
-     * @param event A event triggered from within a Handble ListItem
+     * Execute the chosen mark placement action test.
      */
-    async handleMarkPlacement(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const targetUuid = Helpers.listItemId(event);
-        if (!targetUuid) return;
-
+    async executeMarkPlacementActionTest(targetUuid: string, action: string) {
         const target = await fromUuid(targetUuid) as Shadowrun.NetworkDevice;
         if (!target) {
             console.error('Shadowrun 5e | Could not find target with uuid', targetUuid);
             return;
         }
 
-        if (!this.markPlacementAction) {
-            console.error('Shadowrun 5e | No mark placement action selected.');
-            return;
-        };
-
         // Get test for that action.
-        const test = await TestCreator.fromPackAction('matrix-actions', this.markPlacementAction, this.actor) as MatrixPlacementTests;
+        const test = await TestCreator.fromPackAction('matrix-actions', action, this.actor) as MatrixPlacementTests;
         if (!test) return;
 
-        await this.actor.update({'system.matrix.markPlacementAction': this.markPlacementAction });
         this.close();
 
         // Prepare test for placing a mark on the target.
@@ -130,18 +108,35 @@ export class MatrixNetworkHackingApplication extends Application {
     }
 
     /**
-     * Trigger changes when selecting a different placment action.
+     * User triggered placing mark by Brute Force. Execute the matching test action.
      * 
-     * This app is not a document sheet, so we store the value temporarily in the application instance.
-     * 
-     * @param event User triggered event.
+     * @param event User clicked on something.
      */
-    async handlePlacementAction(event) {
+    async handleBruteForce(event) {
         event.preventDefault();
         event.stopPropagation();
 
-        const select = event.currentTarget as HTMLSelectElement;
-        this.markPlacementAction = select.value;
+        const targetUuid = Helpers.listItemUuid(event);
+        if (!targetUuid) return;
+        const action = "Brute Force";
+
+        await this.executeMarkPlacementActionTest(targetUuid, action);
+    }
+
+    /**
+     * User triggered placing mark by Hack on The Fly. Execute the matching test action.
+     * 
+     * @param event User clicked on something.
+     */
+    async handleHackOnTheFly(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const targetUuid = Helpers.listItemUuid(event);
+        if (!targetUuid) return;
+        const action = "Hack on The Fly";
+
+        await this.executeMarkPlacementActionTest(targetUuid, action);
     }
 
     /**

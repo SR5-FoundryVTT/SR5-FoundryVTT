@@ -751,7 +751,6 @@
     "SR5.MatrixNetworkHackingApplication": {
         "Icons": "Icons",
         "Invite": "Ask for invite",
-        "MarkPlacementAction": "Matrix Action",
         "Title": "Connect to Network"
     },
     "SR5.MatrixTarget": "Matrix Target",

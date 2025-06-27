@@ -9,7 +9,7 @@ declare namespace Shadowrun {
 
     export interface CharacterData extends
         CommonData,
-        MatrixCharacterData,
+        MatrixActorData,
         TwoTrackActorData,
         ArmorActorData,
         MagicActorData,
@@ -71,15 +71,7 @@ declare namespace Shadowrun {
     }
 
     export type MatrixActorData = {
-        matrix: MatrixData;
-    }
-
-    export type MatrixCharacterData = {
-        matrix: MatrixData & {
-            // Stores the matix action used to place marks.
-            // Intention is for users not to have to select the action every time.
-            markPlacementAction: 'Brute Force' | 'Hack on the Fly'
-        }
+        matrix: MatrixData
     }
 
     export type NPCActorData = {

@@ -1045,6 +1045,16 @@ export const registerItemLineHelpers = () => {
             icon: 'fas fa-door-open',
             cssClass: 'matrix-network-invite',
             title: game.i18n.localize('SR5.MatrixNetworkHackingApplication.Invite'),
+        },
+        {
+            icon: 'fas fa-explosion',
+            cssClass: 'matrix-network-bruteforce',
+            title: game.i18n.localize('SR5.Labels.Actions.BruteForce'),
+        },
+        {
+            icon: 'fas fa-microchip',
+            cssClass: 'matrix-network-hackonthefly',
+            title: game.i18n.localize('SR5.Labels.Actions.HackontheFly'),
         }]
     });
 };

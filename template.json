@@ -1002,10 +1002,7 @@
                     "hasIcon": true
                 }
             },
-            "situation_modifiers": {},
-            "matrix": {
-                "markPlacementAction": "Brute Force"
-            }
+            "situation_modifiers": {}
         },
         "spirit": {
             "templates": [
