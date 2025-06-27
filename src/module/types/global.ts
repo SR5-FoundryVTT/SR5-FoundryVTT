@@ -47,7 +47,7 @@ declare module "fvtt-types/configuration" {
         ActiveEffect: typeof SR5ActiveEffect;
         Actor: typeof SR5Actor<SystemActor>;
         ChatMessage: typeof SR5ChatMessage;
-        Combat: typeof SR5Combat;
+        Combat: typeof SR5Combat<Combat.SubType>;
         Item: typeof SR5Item<SystemItem>;
         Roll: typeof SR5Roll;
         Sheet: typeof FormApplication;
