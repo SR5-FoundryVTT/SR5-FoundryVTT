@@ -1551,6 +1551,7 @@
         "InvalidSummoningForce": "Force value chosen doesn't adhere to the rules",
         "NegativeLimitValue": "Limit values must positive numbers",
         "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
+        "OnlyGMCanDoThis": "Only a GM user can do this",
         "RitualInvalidForce": "Ritual force is invalid or greater then your lodges rating.",
         "RitualNotConcluded": "Ritual incomplete. Wait for ritual to oppose spellcasting to determine drain.",
         "RitualNotEnoughReagents": "Not enough reagents offered.",

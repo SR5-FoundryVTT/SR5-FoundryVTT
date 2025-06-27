@@ -381,6 +381,15 @@ export class MatrixNetworkFlow {
         event.preventDefault();
         event.stopPropagation();
 
+        // Disallow players to accept, even if they have permissions.
+        // This is doneto avoid permission checks on all involved documents.
+        if (!game.user?.isGM) {
+            ui.notifications.warn('SR5.Warnings.OnlyGMCanDoThis', {localize: true});
+            return;
+        }
+
+
+        // Collect necessary data from chat message.
         const element = event.currentTarget.closest('.chat-message');
         const messageId = element.dataset.messageId;
         const message = game.messages?.get(messageId);
@@ -396,13 +405,16 @@ export class MatrixNetworkFlow {
             return;
         }
 
+
+        // Do nothing, if enough marks are already placed.
         const marks = actor.getMarksPlaced(network.uuid);
         if (marks > 0) {
             ui.notifications.warn(game.i18n.format('SR5.Warnings.AlreadyJoinedNetwork', {name: actor.name}));
+            return;
         }
-
         // Only mark, don't connect. Not all players want to immediately connect to the network.
         await actor.setMarks(network, 1);
+
 
         // Inform Players about accepted mark invite.
         const messageData = {
@@ -410,9 +422,7 @@ export class MatrixNetworkFlow {
             speaker: ChatMessage.getSpeaker({actor}),
             type: CONST.CHAT_MESSAGE_TYPES.OTHER
         };
-
         await ChatMessage.create(messageData);
-
     }
 
     static async chatMessageListeners(message: ChatMessage, html, data) {

@@ -1528,6 +1528,7 @@
         "InvalidSummoningForce": "Gewählte Kraft hält sich nicht an die Regeln",
         "NegativeLimitValue": "Limit-Werte müssen über Null liegen",
         "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer.",
+        "OnlyGMCanDoThis": "Only a GM user can do this",
         "RitualInvalidForce": "Ritual-Kraft ist zu klein oder größer als die des Refugiums",
         "RitualNotConcluded": "Ritual unvollständig. Warte auf Gegenprobe des Rituals, um Entzug zu bestimmen.",
         "RitualNotEnoughReagents": "nicht genug Reagenzien geopfert.",
