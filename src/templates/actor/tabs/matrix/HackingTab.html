@@ -34,15 +34,17 @@
         </div>
         <div>
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-            name=(localize 'SR5.Actions')
+                name=(localize 'SR5.Actions')
+                rightSide=(MatrixActionsHeaderRightSide)
             }}
             <div class="scroll-area scroll-area-matrix-hacking matrix-hacking-actions">
                 {{#each matrixActions}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                name=this.name
-                itemId=this.uuid
-                itemType="matrix-action"
-                hasRoll="true"
+                    name=this.name
+                    itemId=this.uuid
+                    itemType="matrix-action"
+                    hasRoll="true"
+                    rightSide=(MatrixActionsItemRightSide this)
                 }}
                 {{/each}}
             </div>

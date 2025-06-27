@@ -644,6 +644,7 @@
             "Matrix": "Matrix",
             "Network": "Network",
             "NoNetwork": "No Network",
+            "OwnerAbrv": "O",
             "Persona": "Persona",
             "PersonalInventory": "On Person",
             "ResetActorForNewRun": "New Run Reset",

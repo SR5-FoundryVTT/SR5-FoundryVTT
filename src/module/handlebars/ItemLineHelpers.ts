@@ -1057,4 +1057,36 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.Labels.Actions.HackontheFly'),
         }]
     });
+
+    /**
+     * Section - Character Matrix Actions.
+     */
+    Handlebars.registerHelper('MatrixActionsHeaderRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Qty'),
+                },
+            }
+        ];
+    });
+    /**
+     * Section - Character Matrix Actions.
+     * @param action The matrix action used to render a single item line.
+     */
+    Handlebars.registerHelper('MatrixActionsItemRightSide', (action: SR5Item) => {
+        
+        // Either show owner only, a mark quantity or nothing, if 0 marks are needed.
+        let needed: string|number = action.system.action?.category.matrix.marks ?? 0;
+        needed = needed > 0 ? needed : '';
+        const owner = action.system.action?.category.matrix.owner ? game.i18n.localize('SR5.Labels.ActorSheet.OwnerAbrv') : '';
+
+        return [
+            {
+                text: {
+                    text: owner || needed
+                },
+            }
+        ];
+    });
 };

@@ -628,6 +628,7 @@
             "Matrix": "Matrix",
             "Network": "Netz",
             "NoNetwork": "Kein Netz",
+            "OwnerAbrv": "B",
             "Persona": "Persona",
             "PersonalInventory": "Am Körper",
             "ResetActorForNewRun": "Reset für neuen Run",
