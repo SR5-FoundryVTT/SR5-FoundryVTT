@@ -1,25 +1,23 @@
-import { DescriptionData } from "../template/Description";
-import { ImportFlagData } from "../template/ImportFlags";
-import { TechnologyData } from "../template/Technology";
-import { ActionRollData } from "./Action";
-import { ArmorValueData } from "./Armor";
-const { SchemaField } = foundry.data.fields;
+import { DescriptionType } from "../template/Description";
+import { ImportFlagType } from "../template/ImportFlags";
+import { TechnologyType } from "../template/Technology";
+import { ActionRollType } from "./Action";
+import { ArmorValueType } from "./Armor";
 type AnyMutableObject = Record<string, unknown>;
 type DataSchema = foundry.data.fields.DataSchema;
 
 
-const BaseData = () => ({
+type BaseType = {
     // Description and ImportFlags are common to all items
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    description: DescriptionType,
+    importFlags: ImportFlagType,
 
     // Technology, Action and Armor are reused in many items
     // but not all items have them, so they are optional
-    armor: new SchemaField(ArmorValueData()),
-    action: new SchemaField(ActionRollData()),
-    technology: new SchemaField(TechnologyData()),
-});
-type BaseType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BaseData>>;
+    armor: ArmorValueType,
+    action: ActionRollType,
+    technology: TechnologyType,
+};
 
 /**
  * A reusable abstract base class for item data models that provides common schema fields

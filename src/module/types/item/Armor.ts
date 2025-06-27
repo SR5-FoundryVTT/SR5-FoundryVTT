@@ -30,5 +30,6 @@ export class Armor extends ItemBase<ReturnType<typeof ArmorData>> {
 }
 
 export type ArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ArmorData>>;
+export type ArmorValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ArmorValueData>>;
 
 console.log("ArmorData", ArmorData(), new Armor());
