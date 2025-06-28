@@ -38,6 +38,6 @@ export const ActionFollowupFlow = {
         await test.populateDocuments();
 
         // NOTE: Async but at the functions end.
-        test.executeFollowUpTest();
+        void test.executeFollowUpTest();
     }
 };

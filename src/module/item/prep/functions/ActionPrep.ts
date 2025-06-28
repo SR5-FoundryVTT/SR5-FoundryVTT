@@ -45,7 +45,7 @@ export const ActionPrep = {
         action.damage.source = {
             actorId: item.actor.id as string,
             itemId: item.id as string,
-            itemName: item.name as string,
+            itemName: item.name,
             itemType: item.type
         };
     },
@@ -70,15 +70,15 @@ export const ActionPrep = {
 
         // Some ammunition want to replace the weapons damage, others modify it.
         if (ammoData.replaceDamage) {
-            action.damage.override = { name: equippedAmmo.name as string, value: Number(ammoData.damage) };
+            action.damage.override = { name: equippedAmmo.name, value: Number(ammoData.damage) };
         } else {
-            action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
+            action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
         }
 
         // add mods to ap from ammo
-        action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
+        action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, ammoData.ap);
 
-        if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name as string, ammoData.accuracy);
+        if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name, ammoData.accuracy);
 
         // override element
         if (ammoData.element) {
@@ -114,8 +114,8 @@ export const ActionPrep = {
             const modification = mod.asType('modification');
             if (!modification) return;
 
-            if (modification.system.accuracy) limitParts.addUniquePart(mod.name as string, modification.system.accuracy);
-            if (modification.system.dice_pool) dpParts.addUniquePart(mod.name as string, modification.system.dice_pool);
+            if (modification.system.accuracy) limitParts.addUniquePart(mod.name, modification.system.accuracy);
+            if (modification.system.dice_pool) dpParts.addUniquePart(mod.name, modification.system.dice_pool);
         });
 
         // Apply collected modifications.

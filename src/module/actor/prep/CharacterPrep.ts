@@ -20,7 +20,6 @@ export class CharacterPrep {
         CharacterPrep.addSpecialAttributes(system);
         SkillsPrep.prepareSkillData(system);
 
-        ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);

@@ -25,9 +25,8 @@ export class ActionFlow {
 
         if (!actor) return damage;
 
-        if (item) {
+        if (item)
             damage.source = ActionFlow._damageSource(actor, item);
-        }
 
         this._applyModifiableValue(damage, actor);
         damage.value = Helpers.calcTotal(damage, { min: 0 });
@@ -58,13 +57,14 @@ export class ActionFlow {
             case "multiply":
                 PartsList.AddUniquePart(value.mod, 'SR5.Value', (value.base * attribute.value) - value.base);
                 break;
-            case "divide":
+            case "divide": {
                 // Remove base from value by modifying.
                 PartsList.AddUniquePart(value.mod, 'SR5.BaseValue', value.base * -1);
                 // Add division result as modifier on zero.
                 const denominator = attribute.value === 0 ? 1 : attribute.value;
                 PartsList.AddUniquePart(value.mod, 'SR5.Value', Math.floor(value.base / denominator));
                 break;
+            }
         }
     }
 
@@ -127,7 +127,7 @@ export class ActionFlow {
         // Convert skill data to a value label mapping.
         const skills: Record<string, Translation> = {};
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [id, skill] of Object.entries(activeSkills as {[x: string]: SkillFieldType})) {
+        for (const [id, skill] of Object.entries(activeSkills as Record<string, SkillFieldType>)) {
             const key = skill.name || id;
             const label = skill.label || skill.name;
             skills[key] = label as Translation;

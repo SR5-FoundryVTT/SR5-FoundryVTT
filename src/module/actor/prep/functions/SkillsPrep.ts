@@ -39,17 +39,6 @@ export class SkillsPrep {
     static prepareSkills(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { language, active, knowledge } = system.skills;
         if (language) {
-            if (!language.value) {
-                language.value = {};
-            }
-
-            // language.value is defined as an array in template.json
-            // However what we actually want here is an object, so we set it manually
-            // The same is done for the other knowledge skillgroups 'value' properties below
-            if (Array.isArray(language.value) && language.value.length == 0) {
-                language.value = {};
-            }
-
             language.attribute = 'intuition';
         }
 
@@ -57,7 +46,7 @@ export class SkillsPrep {
         const prepareSkill = (skill) => {
             if (!skill.base) skill.base = 0;
             if (skill.bonus?.length) {
-                for (let bonus of skill.bonus) {
+                for (const bonus of skill.bonus) {
                     skill.mod = PartsList.AddUniquePart(skill.mod, bonus.key, Number(bonus.value));
                 }
             }
@@ -66,32 +55,32 @@ export class SkillsPrep {
 
         // setup active skills
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const skill of Object.values(active as {[x: string]: SkillFieldType})) {
+        for (const skill of Object.values(active as Record<string, SkillFieldType>)) {
             if (!skill.hidden) {
                 prepareSkill(skill);
             }
         }
 
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        const entries = Object.entries(system.skills.language.value as {[x: string]: SkillFieldType});
+        const entries = Object.entries(system.skills.language.value as Record<string, SkillFieldType>);
         // remove entries which are deleted TODO figure out how to delete these from the data
         entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete system.skills.language.value[key]);
         
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (let skill of Object.values(language.value as {[x: string]: SkillFieldType})) {
+        for (const skill of Object.values(language.value as Record<string, SkillFieldType>)) {
             prepareSkill(skill);
             skill.attribute = 'intuition';
         }
 
         // setup knowledge skills
-        for (let [, group] of Object.entries(knowledge)) {
+        for (const [, group] of Object.entries(knowledge)) {
 
             if(!group?.value) {
                 continue;
             }
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            const entries = Object.entries(group.value as {[x: string]: SkillFieldType});    
+            const entries = Object.entries(group.value as Record<string, SkillFieldType>);    
             // remove entries which are deleted TODO figure out how to delete these from the data
             group.value = entries
                 .filter(([, val]) => !val._delete)
@@ -106,7 +95,7 @@ export class SkillsPrep {
         }
 
         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [skillKey, skillValue] of Object.entries(active as {[x: string]: SkillFieldType})) {
+        for (const [skillKey, skillValue] of Object.entries(active as Record<string, SkillFieldType>)) {
             skillValue.label = SR5.activeSkills[skillKey];
         }
     }

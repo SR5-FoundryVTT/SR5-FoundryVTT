@@ -18,7 +18,6 @@ export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
         SkillsPrep.prepareSkillData(system);
 
-        ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
@@ -56,7 +55,7 @@ export class VehiclePrep {
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, isOffRoad, isDrone } = system;
         // set the value for the stats
-        for (let [key, stat] of Object.entries(vehicle_stats)) {
+        for (const [key, stat] of Object.entries(vehicle_stats)) {
             // this turns the Object model into the list mod
             if (typeof stat.mod === 'object') {
                 stat.mod = new PartsList(stat.mod).list;
@@ -177,7 +176,7 @@ export class VehiclePrep {
     static prepareMovement(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, movement, isOffRoad } = system;
 
-        let speedTotal = Helpers.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
+        const speedTotal = Helpers.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
 
         // algorithm to determine speed, CRB pg 202 table.
         // Allow ActiveEffects to apply to movement directly.

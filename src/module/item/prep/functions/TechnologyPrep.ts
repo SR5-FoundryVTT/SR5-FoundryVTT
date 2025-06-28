@@ -16,12 +16,6 @@ export const TechnologyPrep = {
      * @param technology The system technology section to be altered
      */
     prepareConditionMonitor(technology: TechnologyType) {        
-        // taMiF: This seems to be legacy code to avoid a migration.
-        //        Leave it in, as it doesn't hurt for now.
-        if (technology.condition_monitor === undefined) {
-            technology.condition_monitor = { value: 0, max: 0, label: '' };
-        }
-
         const rating = technology.rating;
         technology.condition_monitor.max = 8 + Math.ceil(rating / 2);
     },
@@ -34,14 +28,10 @@ export const TechnologyPrep = {
      * @param equippedMods Those item mods that are equipped.
      */
     prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[]) {
-        // Calculate conceal data.
-        if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: [], override: {name: '', value: 0}, temp: 0};
-
         const concealParts = new PartsList<number>();
         equippedMods.forEach((mod) => {
-            if (mod.system.conceal && mod.system.conceal > 0) {
-                concealParts.addUniquePart(mod.name as string, mod.system.conceal);
-            }
+            if (mod.system.conceal > 0)
+                concealParts.addUniquePart(mod.name, mod.system.conceal);
         });
 
         technology.conceal.mod = concealParts.list;

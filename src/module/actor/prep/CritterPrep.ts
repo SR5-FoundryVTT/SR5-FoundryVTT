@@ -14,7 +14,6 @@ import { SR5Item } from 'src/module/item/SR5Item';
 
 export class CritterPrep {
     static prepareBaseData(system: Actor.SystemOfType<'critter'>) {
-        ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);

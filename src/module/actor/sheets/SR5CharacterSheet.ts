@@ -2,7 +2,6 @@ import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import { Helpers } from "../../helpers";
-import { SR5 } from "../../config";
 
 
 export interface CharacterSheetData extends SR5ActorSheetData {
@@ -24,7 +23,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -99,16 +98,16 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const typeToActorType = {
             'summoning': 'spirit',
             'compilation': 'sprite'
-        }
+        } as const;
         const actor_type = typeToActorType[type];
         if (!actor_type) return console.error('Shadowrun 5e | Call In Action Unknown actor type during creation');
 
         // TODO: Add translation for item names...
-        const itemData = {
+        const itemData: Item.CreateData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(type)}`,
             type: 'call_in_action',
             system: { actor_type }
-        } as Item.CreateData;
+        };
 
         await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
     }

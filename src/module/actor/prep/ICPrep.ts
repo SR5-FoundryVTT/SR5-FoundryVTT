@@ -15,8 +15,6 @@ export class ICPrep {
         ModifiersPrep.clearAttributeMods(system);
         SkillsPrep.prepareSkillData(system);
 
-        ICPrep.addMissingTracks(system);
-        ICPrep.prepareModifiers(system);
         ICPrep.hideMeatAttributes(system);
         ICPrep.addHostAttributes(system);
     }
@@ -38,31 +36,6 @@ export class ICPrep {
         InitiativePrep.prepareCurrentInitiative(system);
     }
 
-    /**
-     * On initial actor creation the matrix track will be missing.
-     *
-     * This is intentional as not to pollute template.json with actor type specific data.
-     *
-     */
-    static addMissingTracks(system: Actor.SystemOfType<'ic'>) {
-        // Newly created actors SHOULD have this by template.
-        // Legacy actors MIGHT not have it, therefore make sure it's there.
-        const track = system.track || {};
-
-        if (!track.matrix) track.matrix = DataDefaults.createData('track');
-        system.track = track;
-    }
-
-    /**
-     * Add IC modifiers only to the misc tab.
-     * @param system
-     */
-    static prepareModifiers(system: Actor.SystemOfType<'ic'>) {
-        let modifiers = ModifiersPrep.commonModifiers;
-        modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
-        ModifiersPrep.setupModifiers(system, modifiers);
-    }
-
     static prepareMatrix(system: Actor.SystemOfType<'ic'>) {
         system.matrix.rating = MatrixRules.getICDeviceRating(system.host.rating);
     }
@@ -72,10 +45,10 @@ export class ICPrep {
 
         // Prepare internal matrix condition monitor values
         // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
-        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating as number);
+        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating);
 
         // Prepare user visible matrix track values
-        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating as number);
+        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating);
         track.matrix.mod = PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
@@ -83,7 +56,6 @@ export class ICPrep {
 
     static prepareMatrixInit(system: Actor.SystemOfType<'ic'>) {
         const { initiative, modifiers, host } = system;
-
 
         // Set current initiative to matrix
         initiative.perception = 'matrix';
@@ -100,7 +72,7 @@ export class ICPrep {
      * For connected hosts overwrite matrix attributes with the hosts attributes, otherwise leave as is.
      */
     static prepareHostAttributes(system: Actor.SystemOfType<'ic'>) {
-        if (!system.host.id || !system.host.atts) return;
+        if (!system.host.id) return;
 
         Object.entries(system.host.atts).forEach(([deviceAttribute, attribute]) => {
             system.matrix[attribute.att].base = attribute.value;

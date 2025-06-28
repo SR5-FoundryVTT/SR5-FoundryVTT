@@ -859,20 +859,34 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param sheetData ActorSheetData as created within getData method
      */
-    _prepareActorModifiers(sheetData: SR5ActorSheetData) {
+    _prepareActorModifiers(sheetData: SR5ActorSheetData) {        
+        // TODO: 123499/taMiF What can we do with modifiers?
+        // for (const [key, value] of Object.entries(modifiers)) {
+        //     if (value === 0) modifiers[key] = '';
+        // }
+
         // Empty zero value modifiers for display purposes.
         const { modifiers } = sheetData.system;
-        for (let [key, value] of Object.entries(modifiers)) {
-            if (value === 0) modifiers[key] = '';
+
+        const modifierList = Object.keys(modifiers);
+        modifierList.sort();
+        // shift global to the front of the list
+        modifierList.splice(modifierList.indexOf("global"), 1);
+        modifierList.unshift('global');
+
+        const sorted = {};
+        for (const modifier of modifierList) {
+            sorted[modifier] = Number(modifiers[modifier]) || 0;
         }
 
-        sheetData.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
+        sheetData.system.modifiers = sorted as any;
+        sheetData.woundTolerance = 3 + modifiers.wound_tolerance;
     }
 
     _prepareActorAttributes(sheetData: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
         const attributes = sheetData.system.attributes;
-        for (let [, attribute] of Object.entries(attributes)) {
+        for (const [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
                 // TODO: 123499/taMiF What can we do with temp?
                 // if (attribute.temp === 0)

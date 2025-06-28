@@ -22,13 +22,8 @@ export class AttributesPrep {
         attributes.essence.hidden = true;
 
         // set the value for the attributes
-        for (const [name, attribute] of Object.entries(attributes)) {
-            // don't manage the attribute if it is using the old method of edge tracking
-            // needed to be able to migrate things correctly
-            if (name === 'edge' && attribute['uses'] === undefined) return;
-
+        for (const [name, attribute] of Object.entries(attributes))
             AttributesPrep.prepareAttribute(name, attribute, ranges)
-        }
     }
 
     /**
@@ -61,7 +56,7 @@ export class AttributesPrep {
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = ranges ? ranges[name] : SR.attributes.ranges[name];
-        Helpers.calcTotal(attribute as ModifiableValueType, range);
+        Helpers.calcTotal(attribute, range);
     }
 
     /**
