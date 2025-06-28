@@ -13,7 +13,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
 
     describe('SR5Items', () => {
         it('create a naked item of any type', async () => {
-            const item = new SR5Item<'action'>({type: 'action'});
+            const item = await SR5Item.create({type: 'action', name: 'QUENCH'}) as SR5Item<'action'>;
 
             // Check basic foundry data integrity
             assert.notStrictEqual(item.id, '');
@@ -29,8 +29,8 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
         });
 
         it('embedd a ammo into a weapon and not the global item collection', async () => {
-            const weapon = new SR5Item<'weapon'>({type: 'weapon'});
-            const ammo = new SR5Item<'ammo'>({type: 'ammo'});
+            const weapon = await SR5Item.create({type: 'weapon', name: 'QUENCH', system: {category: 'range'}}) as SR5Item<'weapon'>;
+            const ammo = new SR5Item<'ammo'>({type: 'ammo', name: 'QUENCH'});
 
             await weapon.createNestedItem(ammo.toObject());
 
@@ -46,12 +46,12 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.strictEqual(embeddedAmmoInCollection, undefined);
 
             await weapon.delete();
-            await ammo.delete();
         });
 
         describe('Testing related data injection', () => {
+            // TODO: taMiF => these seem to have trouble with not injecting into changedata in _preUpdate but with applying diffs to system
             it('Correctly add defense tests to spells', async () => {
-                const item = new SR5Item<'spell'>({type: 'spell'});
+                const item = await SR5Item.create({type: 'spell', name: 'QUENCH'}) as SR5Item<'spell'>;
 
                 await item.update({ system: { category: 'combat' } });
                 assert.equal(item.system.action.test, 'SpellCastingTest');
@@ -68,7 +68,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 await item.delete();
             });
             it('Correctly add default tests to melee weapons', async () => {
-                const item = new SR5Item<'weapon'>({type: 'weapon'});
+                const item = new SR5Item<'weapon'>({type: 'weapon', name: 'QUENCH'});
 
                 await item.update({ system: { category: 'melee' } });
                 assert.equal(item.system.action.test, 'MeleeAttackTest');

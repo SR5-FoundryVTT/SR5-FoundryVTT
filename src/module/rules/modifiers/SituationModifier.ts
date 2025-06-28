@@ -51,7 +51,10 @@ export class SituationModifier {
     // The original source modifier data. This shouldn't be altered.
     source: SourceModifierData
     // The applied modifier data, originating from the original source data.
-    applied: Modifier = { active: {}, total: 0 };
+    // @ts-expect-error Applied can by undefined, though it will be set before use.
+    //                  Defining it as unapplied, trickles type issues all over the place...
+    //                  It also needs in a falsible state, so the #apply method functions correctly.
+    applied: Modifier;
 
     // The effects flow for this modifier.
     effects: SituationModifierEffectsFlow<this>;

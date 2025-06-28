@@ -140,10 +140,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
      * Set the embedded item data
      * @param items
      */
-    setNestedItems(items: any[]) {
+    async setNestedItems(items: any[]) {
         // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
         // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
-        this.flags[game.system.id].embeddedItems = items;
+        await this.setFlag(SYSTEM_NAME, FLAGS.EmbeddedItems, items);
     }
 
     async clearNestedItems() {

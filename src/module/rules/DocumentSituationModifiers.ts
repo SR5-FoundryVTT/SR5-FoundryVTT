@@ -254,6 +254,7 @@ export class DocumentSituationModifiers {
         if (document instanceof SR5Actor) {
             // Overwrite all selections with default values.
             //@ts-expect-error Does fvtt support -= operator?
+            // TODO: taMiF => How to replace a sub system object without merging old and new?
             await document.update({ system: {'-=situation_modifiers': null} }, {render: false});
             await document.update({ system: { situation_modifiers: DocumentSituationModifiers._defaultModifiers } });
         } else {

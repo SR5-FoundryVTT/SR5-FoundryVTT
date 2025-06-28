@@ -16,9 +16,10 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     before(async () => {})
     after(async () => {})
 
+    // TODO: taMiF Effects application of MODIFY (at least) is broken. We might have to fully replace ActiveEffect.apply()
     describe('SR5ActiveEffect', () => {
         it('MODIFY mode: apply system custom mode to main and sub value-keys', async () => {
-            const actor = new SR5Actor<'character'>({ type: 'character' });
+            const actor = await SR5Actor.create({ type: 'character', name: 'QUENCH' }) as SR5Actor<'character'>;
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 origin: actor.uuid,
                 disabled: false,

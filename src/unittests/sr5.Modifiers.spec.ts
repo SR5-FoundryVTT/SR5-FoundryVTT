@@ -194,7 +194,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
             })
 
             it('Store data depending on document type', async () => {
-                const actor = new SR5Actor<'character'>({type: 'character'});
+                const actor = await SR5Actor.create({type: 'character', name: 'Test Actor'}) as SR5Actor<'character'>;
                 let modifiers = actor.getSituationModifiers();
 
                 assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
@@ -204,7 +204,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
 
                 assert.equal(modifiers.source.noise.fixed, 1);
 
-                const scene = new Scene();
+                const scene = await Scene.create({name: 'Test Scene'}) as Scene;
                 modifiers = DocumentSituationModifiers.fromDocument(scene);
 
                 assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
@@ -219,7 +219,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
             })
 
             it('clear documents data to defaults', async () => {
-                const actor = new SR5Actor<'character'>({type: 'character'});
+                const actor = await SR5Actor.create({type: 'character', name: 'Test Actor'}) as SR5Actor<'character'>;
 
                 const modifiers = actor.getSituationModifiers();
                 
