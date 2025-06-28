@@ -1,6 +1,9 @@
 import { DataDefaults } from "src/module/data/DataDefaults";
 import { InitiationParser } from "../itemImporter/magicImport/InitiationParser";
 import { SubmersionParser } from "../itemImporter/technoImport/SubmersionParser";
+import { ActorSchema } from "../ActorSchema";
+import { SR5Actor } from "src/module/actor/SR5Actor";
+import { SkillFieldType } from "src/module/types/template/Skills";
 
 /**
  * Parses all non-item character information from a chummer character object.
@@ -11,52 +14,39 @@ export class CharacterInfoUpdater {
      *  Maps the chummer attribute name to our sr5-foundry attribute name
      *  @param attName name of the chummer attribute
      */
-    parseAttName = (attName) =>  {
-        if (attName.toLowerCase() === 'bod') {
-            return 'body';
-        }
-        if (attName.toLowerCase() === 'agi') {
-            return 'agility';
-        }
-        if (attName.toLowerCase() === 'rea') {
-            return 'reaction';
-        }
-        if (attName.toLowerCase() === 'str') {
-            return 'strength';
-        }
-        if (attName.toLowerCase() === 'cha') {
-            return 'charisma';
-        }
-        if (attName.toLowerCase() === 'int') {
-            return 'intuition';
-        }
-        if (attName.toLowerCase() === 'log') {
-            return 'logic';
-        }
-        if (attName.toLowerCase() === 'wil') {
-            return 'willpower';
-        }
-        if (attName.toLowerCase() === 'edg') {
-            return 'edge';
-        }
-        if (attName.toLowerCase() === 'mag') {
-            return 'magic';
-        }
-        if (attName.toLowerCase() === 'res') {
-            return 'resonance';
-        }
+    /**
+     * Maps Chummer attribute abbreviations to SR5-Foundry attribute names.
+     * @param attName The Chummer attribute abbreviation.
+     * @returns The corresponding SR5-Foundry attribute name, or an empty string if not found.
+     */
+    private parseAttName(attName: string) {
+        const map = {
+            bod: "body",
+            agi: "agility",
+            rea: "reaction",
+            str: "strength",
+            cha: "charisma",
+            int: "intuition",
+            log: "logic",
+            wil: "willpower",
+            edg: "edge",
+            mag: "magic",
+            res: "resonance"
+        } as const;
+        return map[attName.trim().toLowerCase()] ?? "";
     };
 
-    getArray = (value) => {
-        return Array.isArray(value) ? value : [value];
-    };
-
+    private getArray<T>(value: T | T[] | undefined | null): T[] {
+        if (value)
+            return Array.isArray(value) ? value : [value];
+        return [];
+    }
 
     /**
      *  Converts the chummer attribute value to our sr5-foundry attribute value
      *  @param att the chummer attribute
      */
-    parseAttBaseValue = (att) => {
+    private parseAttBaseValue(att: ActorSchema['attributes'][1]['attribute'][number]): number {
         if (att.name.toLowerCase() === 'edg') {
             // The edge attribute value is stored in the "base" field instead of the total field
             // In chummer, the "total" field is used for the amount of edge remaining to a character
@@ -72,7 +62,7 @@ export class CharacterInfoUpdater {
      * @param {*} actorSource The actor data (actor not actor.system) that is used as the basis for the import. Will not be changed.
      * @param {*} chummerChar The chummer character to parse.
      */
-    async update(actorSource, chummerChar) {
+    async update(actorSource: SR5Actor<'character'>, chummerChar: ActorSchema) {
 
         const clonedActorSource = foundry.utils.duplicate(actorSource);
 
@@ -98,54 +88,41 @@ export class CharacterInfoUpdater {
         return clonedActorSource;
     }
 
-    importBasicData(system, chummerChar) {
+    importBasicData(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
 
         try {
             if (chummerChar.metatype) {
                 // Avoid i18n metatype field issues. Chummer metatype aren't lowercase but foundry system metatypes are.
                 system.metatype = chummerChar.metatype_english.toLowerCase();
             }
-            if (chummerChar.sex) {
-                system.sex = chummerChar.sex;
-            }
-            if (chummerChar.age) {
-                system.age = chummerChar.age;
-            }
-            if (chummerChar.height) {
-                system.height = chummerChar.height;
-            }
-            if (chummerChar.weight) {
-                system.weight = chummerChar.weight;
-            }
             if (chummerChar.calculatedstreetcred) {
-                system.street_cred = chummerChar.calculatedstreetcred;
+                system.street_cred = Number(chummerChar.calculatedstreetcred) || 0;
             }
             if (chummerChar.calculatednotoriety) {
-                system.notoriety = chummerChar.calculatednotoriety;
+                system.notoriety = Number(chummerChar.calculatednotoriety) || 0;
             }
             if (chummerChar.calculatedpublicawareness) {
-                system.public_awareness = chummerChar.calculatedpublicawareness;
+                system.public_awareness = Number(chummerChar.calculatedpublicawareness) || 0;
             }
             if (chummerChar.karma) {
-                system.karma.value = chummerChar.karma;
+                system.karma.value = Number(chummerChar.karma) || 0;
             }
             if (chummerChar.totalkarma) {
-                system.karma.max = chummerChar.totalkarma;
+                system.karma.max = Number(chummerChar.totalkarma) || 0;
             }
-            if (chummerChar.technomancer?.toLowerCase() === 'true') {
+            if (chummerChar.technomancer === 'True') {
                 system.special = 'resonance';
                 
                 if(chummerChar.initiationgrade) {
                     new SubmersionParser().parseSubmersions(chummerChar, system)
                }
             }
-            if (
-                chummerChar.magician?.toLowerCase() === 'true' ||
-                chummerChar.adept?.toLowerCase() === 'true'
-            ) {
+            if (chummerChar.magician === 'True' || chummerChar.adept === 'True') {
                 system.special = 'magic';
-                let attr = [];
+                let attr = [] as any[];
+                // @ts-expect-error legacy chummer attribute
                 if (chummerChar.tradition?.drainattribute?.attr) {
+                    // @ts-expect-error legacy chummer attribute
                     attr = chummerChar.tradition.drainattribute.attr;
                 } else if (chummerChar.tradition?.drainattributes) {
                     attr = chummerChar.tradition.drainattributes
@@ -165,7 +142,7 @@ export class CharacterInfoUpdater {
 
             }
             if (chummerChar.totaless) {
-                system.attributes.essence.value = chummerChar.totaless;
+                system.attributes.essence.value = Number(chummerChar.totaless) || 0;
             }
             if (chummerChar.nuyen) {
                 system.nuyen = parseInt(chummerChar.nuyen.replace(',', '').replace('.', ''));
@@ -175,7 +152,7 @@ export class CharacterInfoUpdater {
         }
     }
 
-    async importBio(system, chummerChar) {
+    async importBio(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
         system.description.value = '';
 
         // Adding the option async.true is necessary for the pdf-pager module not to cause an error on import.
@@ -183,23 +160,23 @@ export class CharacterInfoUpdater {
         // Chummer outputs html and wraps every section in <p> tags,
         // so we just concat everything with an additional linebreak in between
         if (chummerChar.description) {
-            system.description.value += await TextEditor.enrichHTML(chummerChar.description + '<br/>', {async: true});
+            system.description.value += await foundry.applications.ux.TextEditor.implementation.enrichHTML(chummerChar.description + '<br/>');
         }
 
         if (chummerChar.background) {
-            system.description.value += await TextEditor.enrichHTML(chummerChar.background + '<br/>', {async: true});
+            system.description.value += await foundry.applications.ux.TextEditor.implementation.enrichHTML(chummerChar.background + '<br/>');
         }
 
         if (chummerChar.concept) {
-            system.description.value += await TextEditor.enrichHTML(chummerChar.concept + '<br/>', {async: true});
+            system.description.value += await foundry.applications.ux.TextEditor.implementation.enrichHTML(chummerChar.concept + '<br/>');
         }
 
         if (chummerChar.notes) {
-            system.description.value += await TextEditor.enrichHTML(chummerChar.notes + '<br/>', {async: true});
+            system.description.value += await foundry.applications.ux.TextEditor.implementation.enrichHTML(chummerChar.notes + '<br/>');
         }
     }
 
-    importAttributes(system, chummerChar) {
+    importAttributes(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
         if(!chummerChar.attributes) {
             return;
         }
@@ -219,37 +196,39 @@ export class CharacterInfoUpdater {
     }
 
     // TODO: These modifiers are very unclear in how they're used here and where they come from.
-    importInitiative(system, chummerChar) {
+    importInitiative(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
         try {
-            system.modifiers.meat_initiative = chummerChar.initbonus;
+            system.modifiers.meat_initiative = Number(chummerChar.initbonus) || 0;
 
             // 'initdice' contains the total amount of initiative dice, not just the bonus.
-            system.modifiers.meat_initiative_dice = chummerChar.initdice - 1;
+            system.modifiers.meat_initiative_dice = (Number(chummerChar.initdice) || 1) - 1;
+            system.modifiers.astral_initiative_dice = (Number(chummerChar.astralinitdice) || 2) - 2;
+            system.modifiers.matrix_initiative_dice = (Number(chummerChar.matrixarinitdice) || 3) - 3;
         } catch (e) {
             console.error(`Error while parsing initiative ${e}`);
         }
     }
 
-    importSkills(system, chummerChar) {
+    importSkills(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
         const chummerSkills = chummerChar.skills?.skill;
 
         try {
-            let languageSkills = chummerSkills?.filter(skill => skill.islanguage && skill.islanguage.toLowerCase() === 'true') ?? []
+            const languageSkills = chummerSkills?.filter(skill => skill.islanguage && skill.islanguage === 'True') ?? []
             this.handleLanguageSkills(system, languageSkills)
     
-            let knowledgeSkills = chummerSkills?.filter(skill => skill.rating > 0 && skill.knowledge && skill.knowledge.toLowerCase() === 'true') ?? []
+            const knowledgeSkills = chummerSkills?.filter(skill => Number(skill.rating) > 0 && skill.knowledge && skill.knowledge === 'True') ?? []
             this.handleKnowledgeSkills(system, knowledgeSkills)
     
-            let activeSkills = chummerSkills?.filter( skill => skill.rating > 0 && !languageSkills.includes(skill) && !knowledgeSkills.includes(skill) ) ?? [];
+            const activeSkills = chummerSkills?.filter(skill => Number(skill.rating) > 0 && !languageSkills.includes(skill) && !knowledgeSkills.includes(skill) ) ?? [];
             this.handleActiveSkills(system, activeSkills)
         } catch (e) {
             console.error(e);
         }
     }
 
-    handleActiveSkills(system, activeSkills) {
+    handleActiveSkills(system: SR5Actor<'character'>['system'], activeSkills: ActorSchema['skills']['skill']) {
 
-        for (let skill of activeSkills) {
+        for (const skill of activeSkills) {
             let name = skill.name_english
                 .toLowerCase()
                 .trim()
@@ -268,7 +247,7 @@ export class CharacterInfoUpdater {
                 name = 'pilot_water_craft';
             }
                 
-            let parsedSkill = system.skills.active[name];
+            const parsedSkill = system.skills.active[name] as SkillFieldType;
 
             parsedSkill.base = parseInt(skill.rating);
 
@@ -281,17 +260,17 @@ export class CharacterInfoUpdater {
         }
     }
 
-    handleLanguageSkills(system, languageSkills) {
+    handleLanguageSkills(system: SR5Actor<'character'>['system'], languageSkills: ActorSchema['skills']['skill']) {
         system.skills.language.value = {}
 
-        for (let skill of languageSkills) {
-            let parsedSkill = {};
+        for (const skill of languageSkills) {
+            const parsedSkill = {name: '', base: 0, specs: [] as any[]};
             const id = randomID(16);
             system.skills.language.value[id] = parsedSkill;
 
             // Transform native rating into max rating.
-            if (skill.isnativelanguage.toLowerCase() === 'true') {
-                skill.rating = 6;
+            if (skill.isnativelanguage === 'True') {
+                skill.rating = '6';
             }
 
             parsedSkill.name = skill.name;
@@ -306,15 +285,15 @@ export class CharacterInfoUpdater {
         }
     }
 
-    handleKnowledgeSkills(system, knowledgeSkills) {
+    handleKnowledgeSkills(system: SR5Actor<'character'>['system'], knowledgeSkills: ActorSchema['skills']['skill']) {
         system.skills.knowledge.academic.value = {}
         system.skills.knowledge.interests.value = {}
         system.skills.knowledge.professional.value = {}
         system.skills.knowledge.street.value = {}
 
-        for (let skill of knowledgeSkills) {
+        for (const skill of knowledgeSkills) {
             const id = randomID(16);
-            let parsedSkill = {};
+            const parsedSkill = {name: '', base: 0, specs: [] as any[]};
     
             
             // Determine the correct knowledge skill category and assign the skill to it
@@ -353,4 +332,3 @@ export class CharacterInfoUpdater {
         }
     }
 }
-

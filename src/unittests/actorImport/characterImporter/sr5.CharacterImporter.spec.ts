@@ -2,15 +2,16 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CharacterImporter } from '../../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
 import { SR5Actor } from '../../../module/actor/SR5Actor';
 import { SR5Item } from '../../../module/item/SR5Item';
+import { ActorFile, ActorSchema } from 'src/module/apps/importer/actorImport/ActorSchema';
 
 export const characterImporterTesting = (context: QuenchBatchContext) => {
     const { describe, it, before, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let importOptions = {};
-    let chummerFile = {
+    const importOptions = {};
+    const chummerFile = {
         characters: {
-            character: {},
+            character: {} as ActorSchema,
         },
     };
 
@@ -24,7 +25,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             await character.createEmbeddedDocuments('Item', [item]);
             assert.lengthOf(character.items, 1);
 
-            await new CharacterImporter().importChummerCharacter(character, {}, importOptions);
+            await new CharacterImporter().importChummerCharacter(character, {} as ActorFile, importOptions);
 
             assert.lengthOf(character.items, 1);
             assert.strictEqual(character.items.contents[0].name, item.name);
@@ -86,7 +87,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
 
         it('Clears all items but effects', async () => {
             let item = new SR5Item<'weapon'>({ type: 'weapon' });
-            item.createEmbeddedDocuments('ActiveEffect', [{
+            void item.createEmbeddedDocuments('ActiveEffect', [{
                 origin: item.uuid,
                 disabled: false,
                 name: 'Test Effect',

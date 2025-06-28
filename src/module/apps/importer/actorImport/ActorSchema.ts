@@ -3,6 +3,12 @@ type MaybeEmpty<T> = T | null;
 type OneOrMany<T> = T | Many<T>;
 type TruthyString = "True" | "False";
 
+export type ActorFile = {
+    characters: {
+        character: ActorSchema | Many<ActorSchema>;
+    };
+}
+
 export type ActorSchema = {
     settings: string;
     buildmethod: string;
@@ -66,15 +72,15 @@ export type ActorSchema = {
         {
             attributecategory_english: MaybeEmpty<string>;
             attribute: Many<{
-                name_english: MaybeEmpty<string>;
-                name: MaybeEmpty<string>;
-                base: MaybeEmpty<string>;
-                total: MaybeEmpty<string>;
-                min: MaybeEmpty<string>;
-                max: MaybeEmpty<string>;
-                aug: MaybeEmpty<string>;
-                bp: MaybeEmpty<string>;
-                metatypecategory: MaybeEmpty<string>;
+                name_english: string;
+                name: string;
+                base: string;
+                total: string;
+                min: string;
+                max: string;
+                aug: string;
+                bp: string;
+                metatypecategory: string;
             }>;
         }
     ];
@@ -221,7 +227,7 @@ export type ActorSchema = {
     manipulationmentalresist: string;
     manipulationphysicalresist: string;
     skills: {
-        skill: OneOrMany<{
+        skill: Many<{
             guid: string;
             suid: string;
             name: string;
@@ -367,7 +373,6 @@ export type ActorSchema = {
             duration_english: string;
             dv: string;
             dv_english: string;
-            useskill: string;
             alchemy: TruthyString;
             limited: TruthyString;
             barehandedadept: TruthyString;
@@ -375,7 +380,7 @@ export type ActorSchema = {
             source: string;
             page: string;
             extra: MaybeEmpty<string>;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     powers: MaybeEmpty<{
