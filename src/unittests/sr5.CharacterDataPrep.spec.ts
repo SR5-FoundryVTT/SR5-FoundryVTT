@@ -381,12 +381,12 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             await character.delete();
         });
         it('Character recoil compensation', async () => {
-            let character = new SR5Actor<'character'>({ name: 'Testing', type: 'character', system: { attributes: { strength: { base: 5 } } } });
+            let character = await SR5Actor.create({ name: 'Testing', type: 'character', system: { attributes: { strength: { base: 5 } } } }) as SR5Actor<'character'>;
             if (!character) return assert.fail();
 
             assert.strictEqual(character.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
 
-            character = new SR5Actor<'character'>({ name: 'Testing', type: 'character', system: { attributes: { strength: { base: 1 } } } });
+            character = await SR5Actor.create({ name: 'Testing', type: 'character', system: { attributes: { strength: { base: 1 } } } }) as SR5Actor<'character'>;
             if (!character) return assert.fail();
 
             assert.strictEqual(character.system.values.recoil_compensation.value, 2); // SR5#175: 1 / 3 = 0,3 (rounded up) = 1 => 1 + 1

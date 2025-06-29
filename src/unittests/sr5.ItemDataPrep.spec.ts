@@ -17,7 +17,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
     describe('TechnologyData preparation', () => {
         it('Calculate the correct device item condition monitor', async () => {
-            const device = new SR5Item<'device'>({type: 'device', name: 'TestDevice'});
+            const device = await SR5Item.create({ type: 'device', name: 'QUENCH' }) as SR5Item<'device'>;
             
             device.system.technology.rating = 4;
             TechnologyPrep.prepareConditionMonitor(device.system.technology);
@@ -27,7 +27,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             await device.delete();
         });
         it('Calculate the correct device item condition monitor for rounded values', async () => {
-            const device = new SR5Item<'device'>({type: 'device', name: 'TestDevice'});
+            const device = await SR5Item.create({ type: 'device', name: 'QUENCH' }) as SR5Item<'device'>;
 
             device.system.technology.rating = 5;
             TechnologyPrep.prepareConditionMonitor(device.system.technology);
@@ -37,7 +37,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             await device.delete();
         });
         it('Calculate a condition monitor for devices with malformed technology data', async () => {
-            const device = new SR5Item<'device'>({type: 'device', name: 'TestDevice'});
+            const device = await SR5Item.create({ type: 'device', name: 'QUENCH' }) as SR5Item<'device'>;
             
             device.system.technology.rating = 4;
             // @ts-expect-error // test-case makes this necessary
@@ -50,7 +50,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Calculate conceal data for a device', async () => {
-            const device = new SR5Item<'device'>({type: 'device', name: 'TestDevice'});
+            const device = await SR5Item.create({ type: 'device', name: 'QUENCH' }) as SR5Item<'device'>;
             const mods: SR5Item<'modification'>[] = [];
 
             // prepareConceal relies on the item name to be unique.
@@ -68,7 +68,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
     describe('ActionRollData preparation', () => {
         it('Check for damage base_formula_operator migration', async () => {
-            const action = new SR5Item<'action'>({type: 'action', name: 'TestAction'});
+            const action = await SR5Item.create({type: 'action', name: 'TestAction'}) as SR5Item<'action'>;
             action.system.action.damage.base_formula_operator = 'add';
 
             ActionPrep.prepareWithMods(action.system.action, []);
@@ -95,7 +95,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Check for weapon modification setting dice pool modifiers', async () => {
-            const weapon = new SR5Item<'weapon'>({type: 'weapon', name: 'Test'});
+            const weapon = await SR5Item.create({type: 'weapon', name: 'Test'}) as SR5Item<'weapon'>;
             // unique names are necessary
             const mods: SR5Item<'modification'>[] = [];
             mods.push(new SR5Item<'modification'>({type: 'modification', name: 'TestModA', system: {type: 'weapon', dice_pool: 2}}));
@@ -109,7 +109,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Check for weapon modification setting limit modifiers', async () => {
-            const weapon = new SR5Item<'weapon'>({type: 'weapon', name: 'Test'});
+            const weapon = await SR5Item.create({type: 'weapon', name: 'QUENCH'}) as SR5Item<'weapon'>;
             // unique names are necessary
             const mods: SR5Item<'modification'>[] = [];
             mods.push(new SR5Item<'modification'>({type: 'modification', name: 'TestModA', system: {type: 'weapon', accuracy: 2}}));
@@ -123,8 +123,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Check for ammo to apply its damage to the weapon', async () => {
-            const weapon = new SR5Item<'weapon'>({type: 'weapon', name: 'Test'});
-            const ammo = new SR5Item<'ammo'>({type: 'ammo', name: 'TestModA', system: {damage: 2}});
+            const weapon = await SR5Item.create({type: 'weapon', name: 'QUENCH'}) as SR5Item<'weapon'>;
+            const ammo = await SR5Item.create({type: 'ammo', name: 'QUENCH', system: {damage: 2}}) as SR5Item<'ammo'>;
             
             ActionPrep.prepareWithAmmo(weapon.system.action, ammo);
             ActionPrep.calculateValues(weapon.system.action);
@@ -133,8 +133,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Check for ammo to modify the weapon armor piercing', async () => {
-            const weapon = new SR5Item<'weapon'>({type: 'weapon', name: 'Test'});
-            const ammo = new SR5Item<'ammo'>({type: 'ammo', name: 'TestModA', system: {ap: -2}});
+            const weapon = await SR5Item.create({type: 'weapon', name: 'QUENCH'}) as SR5Item<'weapon'>;
+            const ammo = await SR5Item.create({type: 'ammo', name: 'QUENCH', system: {ap: -2}}) as SR5Item<'ammo'>;
             
             ActionPrep.prepareWithAmmo(weapon.system.action, ammo);
             ActionPrep.calculateValues(weapon.system.action);
@@ -143,7 +143,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Check for ammo to override the weapon damage info', async () => {
-            const weapon = new SR5Item<'weapon'>({
+            const weapon = await SR5Item.create({
                 type: 'weapon',
                 name: 'Test',
                 system: {
@@ -155,9 +155,9 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
                         }
                     }
                 }
-            });
+            }) as SR5Item<'weapon'>;
 
-            const ammo = new SR5Item<'ammo'>({
+            const ammo = await SR5Item.create({
                 type: 'ammo',
                 name: 'TestModA',
                 system: {
@@ -166,7 +166,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
                     damageType: 'stun',
                     element: 'cold'
                 }
-            });
+            }) as SR5Item<'ammo'>;
 
             ActionPrep.prepareWithAmmo(weapon.system.action, ammo);
             ActionPrep.calculateValues(weapon.system.action);
@@ -182,9 +182,9 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
     describe('RangeData preparation', () => {
         it('Check for weapon modification recoil modifiers', async () => {
-            const weapon = new SR5Item<'weapon'>({type: 'weapon', name: 'Test', system: {range: {rc: {value: 2}}}});
+            const weapon = await SR5Item.create({type: 'weapon', name: 'Test', system: {range: {rc: {value: 2}}}}) as SR5Item<'weapon'>;
             const mods: SR5Item<'modification'>[] = [];
-            mods.push(new SR5Item<'modification'>({type: 'modification', name: 'TestModA', system: {type: 'weapon', rc: 2}}));
+            mods.push(await SR5Item.create({type: 'modification', name: 'TestModA', system: {type: 'weapon', rc: 2}}) as SR5Item<'modification'>);
 
             RangePrep.prepareRecoilCompensation(weapon.system.range, mods);
 

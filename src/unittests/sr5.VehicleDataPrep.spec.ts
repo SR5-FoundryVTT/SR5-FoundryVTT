@@ -22,7 +22,7 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('visibility checks', async () => {
-            const vehicle = new SR5Actor<'vehicle'>({ system: { attributes: { body: { base : 5 } } }, name: 'Testing', type: 'vehicle' });
+            const vehicle = await SR5Actor.create({ system: { attributes: { body: { base : 5 } } }, name: 'Testing', type: 'vehicle' }) as SR5Actor<'vehicle'>;
             assert.strictEqual(vehicle.system.visibilityChecks.astral.hasAura, false);
             assert.strictEqual(vehicle.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(vehicle.system.visibilityChecks.astral.affectedBySpell, false);
@@ -34,7 +34,7 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Recoil compensation', async () => {
-            const vehicle = new SR5Actor<'vehicle'>({ system: { attributes: { body: { base: 5 } } }, name: 'Testing', type: 'vehicle' });
+            const vehicle = await SR5Actor.create({ system: { attributes: { body: { base: 5 } } }, name: 'Testing', type: 'vehicle' }) as SR5Actor<'vehicle'>;
             if (!vehicle) return assert.fail();
 
             assert.strictEqual(vehicle.system.values.recoil_compensation.value, 5); // SR5#175: 5

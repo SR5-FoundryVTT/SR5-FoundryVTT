@@ -68,7 +68,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 await item.delete();
             });
             it('Correctly add default tests to melee weapons', async () => {
-                const item = new SR5Item<'weapon'>({type: 'weapon', name: 'QUENCH'});
+                const item = await SR5Item.create({type: 'weapon', name: 'QUENCH'}) as SR5Item<'weapon'>;
 
                 await item.update({ system: { category: 'melee' } });
                 assert.equal(item.system.action.test, 'MeleeAttackTest');
