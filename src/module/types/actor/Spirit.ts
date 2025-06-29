@@ -1,3 +1,4 @@
+import { ModifiableField } from "../fields/ModifiableField";
 import { ActorArmorData } from "../template/Armor";
 import { AttributeField, Attributes } from "../template/Attributes";
 import { ModifiableValue } from "../template/Base";
@@ -19,7 +20,7 @@ const SpiritData = {
     // === Attributes & Limits ===
     attributes: new SchemaField({
         ...Attributes(),
-        force: new SchemaField(AttributeField())
+        force: new ModifiableField(AttributeField())
     }),
     limits: new SchemaField({ ...Limits(), ...AwakendLimits() }),
     values: new SchemaField(PhysicalCombatValues()),
@@ -29,9 +30,9 @@ const SpiritData = {
     magic: new SchemaField(MagicData()),
 
     // === Combat ===
-    armor: new SchemaField(ActorArmorData()),
+    armor: new ModifiableField(ActorArmorData()),
     initiative: new SchemaField(Initiative('astral', 'meatspace')),
-    wounds: new SchemaField(ModifiableValue()),
+    wounds: new ModifiableField(ModifiableValue()),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'stun')),

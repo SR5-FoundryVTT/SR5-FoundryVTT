@@ -1,3 +1,4 @@
+import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValue, KeyValuePair } from "./Base";
 const { SchemaField, BooleanField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
@@ -19,12 +20,12 @@ export const SkillField = () => ({
 });
 
 function skill(createData: foundry.data.fields.SchemaField.CreateData<ReturnType<typeof SkillField>> = {}): SkillFieldType {
-    const initialValue = new SchemaField(SkillField()).getInitialValue(createData);
+    const initialValue = new ModifiableField(SkillField()).getInitialValue(createData);
     return foundry.utils.mergeObject(initialValue, createData) as SkillFieldType;
 }
 
 export const Skills = () => new TypedObjectField(
-    new SchemaField(SkillField()),
+    new ModifiableField(SkillField()),
     {
         required: true,
         initial: {
@@ -129,7 +130,7 @@ export const KnowledgeSkillList = (initialAttribute: string) => ({
         initial: initialAttribute,
         choices: ["willpower", "logic", "intuition", "charisma"]
     }),
-    value: new TypedObjectField(new SchemaField(SkillField()), {required: true, initial: {}}),
+    value: new TypedObjectField(new ModifiableField(SkillField()), {required: true, initial: {}}),
 });
 
 export const KnowledgeSkills = () => ({

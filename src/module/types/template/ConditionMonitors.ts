@@ -1,3 +1,4 @@
+import { ModifiableField } from "../fields/ModifiableField";
 import { ValueMaxPair, ModifiableValue } from "./Base";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
@@ -10,7 +11,7 @@ export const Track = () => ({
     ...ValueMaxPair(),
     ...ModifiableValue(),
     label: new StringField({ required: true }),
-    disabled: new BooleanField() // does it used?
+    disabled: new BooleanField()
 });
 
 const OverflowTrack = () => ({
@@ -23,15 +24,15 @@ export const Tracks = <
     T extends TrackTypes[] = ['matrix', 'physical', 'stun']
 >(...types: T) => {
     const stunTrack = {
-        stun: new SchemaField({ ...Track(), ...Living() })
+        stun: new ModifiableField({ ...Track(), ...Living() })
     };
 
     const physicalTrack = {
-        physical: new SchemaField({ ...OverflowTrack(), ...Living() })
+        physical: new ModifiableField({ ...OverflowTrack(), ...Living() })
     };
 
     const matrixTrack = {
-        matrix: new SchemaField(Track())
+        matrix: new ModifiableField(Track())
     };
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

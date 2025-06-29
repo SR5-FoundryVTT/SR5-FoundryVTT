@@ -1,3 +1,4 @@
+import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValue } from "../template/Base";
 import { DescriptionData } from "../template/Description";
 import { ImportFlagData } from "../template/ImportFlags";
@@ -19,8 +20,8 @@ export const MagicData = () => ({
 });
 
 export const PhysicalCombatValues = () => ({
-    recoil: new SchemaField(ModifiableValue()),
-    recoil_compensation: new SchemaField(ModifiableValue()),
+    recoil: new ModifiableField(ModifiableValue()),
+    recoil_compensation: new ModifiableField(ModifiableValue()),
 });
 
 export const CharacterLimits = () => ({
@@ -55,7 +56,7 @@ export const CommonData = () => ({
         noise: new SchemaField({ active: new ObjectField({ initial: {} }) }),
         background_count: new SchemaField({ active: new ObjectField({ initial: {} }) }),
     }),
-    // values: new TypedObjectField(new SchemaField(ModifiableValue())),
+    // values: new TypedObjectField(new ModifiableField(ModifiableValue())),
     inventories: new TypedObjectField(
         new SchemaField(InventoryData()),
         { initial: { "All": { name: "All", type: "all", itemIds: [], showAll: true, label: "SR5.Labels.Inventory.All" } } }

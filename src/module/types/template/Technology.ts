@@ -1,5 +1,6 @@
 import { ModifiableValue } from "./Base";
 import { ConditionData } from "./Condition";
+import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const TechnologyData = () => ({
@@ -11,7 +12,7 @@ export const TechnologyData = () => ({
     equipped: new BooleanField(),
 
     // === Condition & Concealment ===
-    conceal: new SchemaField(ModifiableValue()),
+    conceal: new ModifiableField(ModifiableValue()),
     condition_monitor: new SchemaField(ConditionData()),
 
     // === Wireless & Networking ===

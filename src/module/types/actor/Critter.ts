@@ -1,3 +1,4 @@
+import { ModifiableField } from "../fields/ModifiableField";
 import { ActorArmorData } from "../template/Armor";
 import { Attributes } from "../template/Attributes";
 import { ModifiableValue, ValueMaxPair } from "../template/Base";
@@ -25,10 +26,10 @@ export const CritterData = () => ({
     limits: new SchemaField(CharacterLimits()),
 
     // === Combat ===
-    armor: new SchemaField(ActorArmorData()),
+    armor: new ModifiableField(ActorArmorData()),
     initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
     values: new SchemaField(PhysicalCombatValues()),
-    wounds: new SchemaField(ModifiableValue()),
+    wounds: new ModifiableField(ModifiableValue()),
 
     visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
 

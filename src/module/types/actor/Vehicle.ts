@@ -7,17 +7,18 @@ import { ActorArmorData } from "../template/Armor";
 import { Initiative } from "../template/Initiative";
 import { MatrixData } from "../template/Matrix";
 import { VisibilityChecks } from "../template/Visibility";
+import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const VehicleStats = () => ({
-    pilot: new SchemaField(AttributeField()),
-    handling: new SchemaField(AttributeField()),
-    off_road_handling: new SchemaField(AttributeField()),
-    speed: new SchemaField(AttributeField()),
-    off_road_speed: new SchemaField(AttributeField()),
-    acceleration: new SchemaField(AttributeField()),
-    sensor: new SchemaField(AttributeField()),
-    seats: new SchemaField(AttributeField()),
+    pilot: new ModifiableField(AttributeField()),
+    handling: new ModifiableField(AttributeField()),
+    off_road_handling: new ModifiableField(AttributeField()),
+    speed: new ModifiableField(AttributeField()),
+    off_road_speed: new ModifiableField(AttributeField()),
+    acceleration: new ModifiableField(AttributeField()),
+    sensor: new ModifiableField(AttributeField()),
+    seats: new ModifiableField(AttributeField()),
 });
 
 const VehicleData = {
@@ -74,7 +75,7 @@ const VehicleData = {
     movement: new SchemaField(Movement()),
 
     // === Protection ===
-    armor: new SchemaField(ActorArmorData()),
+    armor: new ModifiableField(ActorArmorData()),
 
     // === Modifiers ===
     modifiers: new SchemaField(CreateModifiers(

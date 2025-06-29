@@ -3,6 +3,7 @@ import { ActionRollData } from "./Action";
 import { TechnologyData } from "../template/Technology";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
+import { ModifiableField } from "../fields/ModifiableField";
 import { ValueMaxPair, ModifiableValue } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
@@ -41,7 +42,7 @@ const FiringModeData = () => ({
 export const RangeWeaponData = () => ({
     category: new StringField({ required: true, initial: 'manual' }),
     ranges: new SchemaField(RangeData()),
-    rc: new SchemaField(ModifiableValue()),
+    rc: new ModifiableField(ModifiableValue()),
     modes: new SchemaField(FiringModeData()),
 });
 

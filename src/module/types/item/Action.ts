@@ -2,6 +2,7 @@ import { ItemBase } from "./BaseItem";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
+import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foundry.data.fields;
 
 const ResultActionData = () => ({
@@ -26,7 +27,7 @@ export const MinimalActionData = () => ({
     attribute: new StringField({ required: true }),
     attribute2: new StringField({ required: true }),
     armor: new BooleanField(),
-    limit: new SchemaField(ModifiableValueLinked()),
+    limit: new ModifiableField(ModifiableValueLinked()),
     mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     skill: new StringField({ required: true }),
 });
@@ -57,7 +58,7 @@ export const DamageData = () => ({
             choices: ["fire", "cold", "acid", "electricity", "radiation", '']
         }),
     }),
-    ap: new SchemaField(ModifiableValueLinked()),
+    ap: new ModifiableField(ModifiableValueLinked()),
     source: new SchemaField({
         actorId: new StringField({ required: true }),
         itemId: new StringField({ required: true }),
@@ -88,7 +89,7 @@ export const ActionRollData = (
     threshold: new SchemaField(BaseValuePair()),
     extended: new BooleanField({ initial: false }),
     modifiers: new ArrayField(new StringField({ required: true })),
-    damage: new SchemaField(DamageData()),
+    damage: new ModifiableField(DamageData()),
     opposed: new SchemaField({
         test: new StringField({ required: true, initial: opposedTest }),
         type: new StringField({ required: true }),

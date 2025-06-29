@@ -1,3 +1,4 @@
+import { ModifiableField } from "../fields/ModifiableField";
 import { AttributeField } from "./Attributes";
 import { ModifiableValue } from "./Base";
 import { ConditionData } from "./Condition";
@@ -28,14 +29,14 @@ export const MatrixAttributeField = () => ({
 });
 
 export const MatrixData = () => ({
-    dice: new SchemaField(ModifiableValue()),
+    dice: new ModifiableField(ModifiableValue()),
     // TODO: taMiF check if it's used
-    base: new SchemaField(ModifiableValue()),
+    base: new ModifiableField(ModifiableValue()),
 
-    attack: new SchemaField(MatrixAttributeField()),
-    sleaze: new SchemaField(MatrixAttributeField()),
-    data_processing: new SchemaField(MatrixAttributeField()),
-    firewall: new SchemaField(MatrixAttributeField()),
+    attack: new ModifiableField(MatrixAttributeField()),
+    sleaze: new ModifiableField(MatrixAttributeField()),
+    data_processing: new ModifiableField(MatrixAttributeField()),
+    firewall: new ModifiableField(MatrixAttributeField()),
 
     condition_monitor: new SchemaField(ConditionData()),
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),

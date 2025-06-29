@@ -1,5 +1,6 @@
+import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValue } from "./Base";
-const { SchemaField, BooleanField, StringField } = foundry.data.fields;
+const { BooleanField, StringField } = foundry.data.fields;
 
 export const LimitField = () => ({
     ...ModifiableValue(),
@@ -9,31 +10,31 @@ export const LimitField = () => ({
 });
 
 export const Limits = () => ({
-    social: new SchemaField(LimitField()),
-    mental: new SchemaField(LimitField()),
-    physical: new SchemaField(LimitField()),
+    social: new ModifiableField(LimitField()),
+    mental: new ModifiableField(LimitField()),
+    physical: new ModifiableField(LimitField()),
 });
 
 export const AwakendLimits = () => ({
-    astral: new SchemaField(LimitField()),
-    magic: new SchemaField(LimitField()),
-    initiation: new SchemaField(LimitField()),
+    astral: new ModifiableField(LimitField()),
+    magic: new ModifiableField(LimitField()),
+    initiation: new ModifiableField(LimitField()),
 });
 
 export const MatrixLimits = () => ({
-    attack: new SchemaField(LimitField()),
-    sleaze: new SchemaField(LimitField()),
-    firewall: new SchemaField(LimitField()),
-    data_processing: new SchemaField(LimitField()),
+    attack: new ModifiableField(LimitField()),
+    sleaze: new ModifiableField(LimitField()),
+    firewall: new ModifiableField(LimitField()),
+    data_processing: new ModifiableField(LimitField()),
 });
 
 export const VehicleLimits = () => ({
     ...Limits(),
-    sensor: new SchemaField(LimitField()),
-    pilot: new SchemaField(LimitField()),
-    handling: new SchemaField(LimitField()),
-    speed: new SchemaField(LimitField()),
-    acceleration: new SchemaField(LimitField()),
+    sensor: new ModifiableField(LimitField()),
+    pilot: new ModifiableField(LimitField()),
+    handling: new ModifiableField(LimitField()),
+    speed: new ModifiableField(LimitField()),
+    acceleration: new ModifiableField(LimitField()),
 });
 
 export type LimitFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof LimitField>>;

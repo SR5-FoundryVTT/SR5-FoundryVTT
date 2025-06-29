@@ -5,6 +5,7 @@ import { MatrixAttributes, MatrixData } from "../template/Matrix";
 import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
 import { MatrixLimits } from "../template/Limits";
+import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 // === Main Schema ===
@@ -25,7 +26,7 @@ const ICData = {
     // === Attributes ===
     attributes: new SchemaField({
         ...Attributes(),
-        rating: new SchemaField(AttributeField()),
+        rating: new ModifiableField(AttributeField()),
     }),
     limits: new SchemaField(MatrixLimits()),
 

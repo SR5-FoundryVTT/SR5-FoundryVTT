@@ -7,12 +7,13 @@ import { Movement } from "../template/Movement";
 import { Initiative } from "../template/Initiative";
 import { MatrixData } from "../template/Matrix";
 import { VisibilityChecks } from "../template/Visibility";
+import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const CharacterAttributes = () => ({
     ...Attributes(),
-    initiation: new SchemaField(AttributeField()),
-    submersion: new SchemaField(AttributeField()),
+    initiation: new ModifiableField(AttributeField()),
+    submersion: new ModifiableField(AttributeField()),
 });
 
 const CharacterData = {
@@ -31,10 +32,10 @@ const CharacterData = {
     limits: new SchemaField(CharacterLimits()),
 
     // === Combat ===
-    armor: new SchemaField(ActorArmorData()),
+    armor: new ModifiableField(ActorArmorData()),
     initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
     values: new SchemaField(PhysicalCombatValues()),
-    wounds: new SchemaField(ModifiableValue()),
+    wounds: new ModifiableField(ModifiableValue()),
 
     visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
 
