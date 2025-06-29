@@ -1,17 +1,11 @@
 import {MatrixRules} from "../../rules/MatrixRules";
 
 export function HostDataPreparation(system: Item.SystemOfType<'host'>) {
-    HostPrep.setDeviceCategory(system);
     HostPrep.prepareMatrixAttributes(system);
 }
 
 
 export class HostPrep {
-    static setDeviceCategory(system: Item.SystemOfType<'host'>) {
-        // Host matrix 'devices' are always hosts and never commlink / cyberdecks.
-        system.category = 'host';
-    }
-
     /**
      * Apply host matrix attribute rating.
      * 
