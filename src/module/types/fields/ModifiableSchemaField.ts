@@ -1,6 +1,7 @@
+import DataModel = foundry.abstract.DataModel;
+import DataSchema = foundry.data.fields.DataSchema;
+import SchemaField = foundry.data.fields.SchemaField;
 import { AnyObject, SimpleMerge } from "fvtt-types/utils";
-import DataModel from "node_modules/fvtt-types/src/foundry/common/abstract/data.mjs";
-import { DataSchema, SchemaField } from "node_modules/fvtt-types/src/foundry/common/data/fields.mjs"
 import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
 
 /**
@@ -25,8 +26,7 @@ export class ModifiableSchemaField<
         Fields,
         SimpleMerge<Options, SchemaField.DefaultOptions>
     >
->
-    extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
+> extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
 
     /**
      * When applying a effect change, inject custom application logic for ModifiableValues.
@@ -58,7 +58,8 @@ export class ModifiableSchemaField<
      * @returns 
      */
     protected override _applyChangeOverride(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        if (SR5ActiveEffect.applyOverrideToModifiableValue(change.effect, model, change, value, delta)) return value; // Return value unchanged, as effects don´t alter the output value here but add to it.
+        // Return value unchanged, as effects don´t alter the output value here but add to it.
+        if (SR5ActiveEffect.applyOverrideToModifiableValue(change.effect, model, change, value, delta)) return value;
         return super._applyChangeOverride(value, delta, model, change);
     }
 }

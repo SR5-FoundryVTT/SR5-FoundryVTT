@@ -1,4 +1,4 @@
-import DataModel from "node_modules/fvtt-types/src/foundry/common/abstract/data.mjs";
+import DataModel = foundry.abstract.DataModel;
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
