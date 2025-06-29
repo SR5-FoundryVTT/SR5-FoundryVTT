@@ -6,7 +6,7 @@ import { FLAGS, SYSTEM_NAME } from './constants';
 export const registerSystemSettings = () => {
     /**
      * No actual setting.
-     * 
+     *
      * Instead this is used to store global data outside of FoundryVTT document storage.
      * See DataStorage.ts for more information.
      */
@@ -17,29 +17,6 @@ export const registerSystemSettings = () => {
         config: false,
         type: Object,
         default: {}
-    });
-
-    /**
-     * Register diagonal movement rule setting
-     */
-    game.settings.register(SYSTEM_NAME, FLAGS.DiagonalMovement, {
-        name: 'SETTINGS.DiagonalMovementName',
-        hint: 'SETTINGS.DiagonalMovementDescription',
-        scope: 'world',
-        config: true,
-        type: String,
-        default: 'EUCL',
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        choices: {
-            '1-1-1': 'SETTINGS.IgnoreDiagonal',
-            '1-2-1': 'SETTINGS.EstimateDiagonal',
-            'EUCL': 'SETTINGS.Euclidean',
-        },
-        onChange: (rule) => {
-            // @ts-expect-error canvas grid should not be undefined here...
-            // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
-            canvas.grid.diagonalRule = rule
-        },
     });
 
     /**
@@ -84,7 +61,7 @@ export const registerSystemSettings = () => {
     });
 
     game.settings.register(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills, {
-         name: 'SETTINGS.OnlyAllowRollOnDefaultableSkills',
+        name: 'SETTINGS.OnlyAllowRollOnDefaultableSkills',
         hint: 'SETTINGS.OnlyAllowRollOnDefaultableSkillsDescription',
         scope: 'world',
         config: true,
@@ -102,7 +79,7 @@ export const registerSystemSettings = () => {
     });
 
     game.settings.register(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat, {
-         name: 'SETTINGS.OnlyAutoRollNPCInCombat',
+        name: 'SETTINGS.OnlyAutoRollNPCInCombat',
         hint: 'SETTINGS.OnlyAutoRollNPCInCombatDescription',
         scope: 'world',
         config: true,
@@ -254,5 +231,53 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: true
+    });
+
+    /**
+     * TokenRuler color: Walking
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerColorWalking, {
+        name: 'SETTINGS.TokenRulerColorWalking',
+        hint: 'SETTINGS.TokenRulerColorWalkingDescription',
+        scope: 'world',
+        config: true,
+        // @ts-expect-error not yet in typings
+        type: new foundry.data.fields.ColorField({ initial: '00FF00' }),
+    });
+
+    /**
+     * TokenRuler color: Running
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerColorRunning, {
+        name: 'SETTINGS.TokenRulerColorRunning',
+        hint: 'SETTINGS.TokenRulerColorRunningDescription',
+        scope: 'world',
+        config: true,
+        // @ts-expect-error not yet in typings
+        type: new foundry.data.fields.ColorField({ initial: '0000FF' }),
+    });
+
+    /**
+     * TokenRuler color: Sprinting
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerColorSprinting, {
+        name: 'SETTINGS.TokenRulerColorSprinting',
+        hint: 'SETTINGS.TokenRulerColorSprintingDescription',
+        scope: 'world',
+        config: true,
+        // @ts-expect-error not yet in typings
+        type: new foundry.data.fields.ColorField({ initial: 'FF0000' }),
+    });
+
+    /**
+     * TokenRuler color: Sprinting
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerOpacity, {
+        name: 'SETTINGS.TokenRulerOpacity',
+        hint: 'SETTINGS.TokenRulerOpacityDescription',
+        scope: 'world',
+        config: true,
+        // @ts-expect-error not yet in typings
+        type: new foundry.data.fields.AlphaField({ initial: 0.5 }),
     });
 };
