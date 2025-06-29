@@ -1,22 +1,24 @@
+import DataModel from "node_modules/fvtt-types/src/foundry/common/abstract/data.mjs";
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { ModifiableValueType } from "../types/template/Base";
 import { tagifyFlagsToIds } from "../utils/sheets";
 
-
-
 /**
  * Shadowrun Active Effects implement additional ways of altering document data.
- * 
+ *
  * The main difference to the base implementation is the ability to modify Value structures without the need to define
  * sub-keys. Instead of active effects adding on top of a numerical they'll be included in the mod array of the Value.
- * 
- * Overriding a value is also altered for Values to allow for a more dynamic approach. The original values are still available 
+ *
+ * Overriding a value is also altered for Values to allow for a more dynamic approach. The original values are still available
  * but during calculation the override value will be used instead.
- * 
+ *
  * Effects can also define the type of target data to be applied to. Default effects only apply to actor data, system effects
  * can apply to actors, tests and also only to actors targeted by tests.
+ * 
+ * NOTE: FoundryVTT DataModel is used to apply changes as well. Check custom Field implementations for effect change mode
+ * application.
  */
 export class SR5ActiveEffect extends ActiveEffect {
     /**
@@ -92,32 +94,64 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Both direct key matches to the whole value and indirect matches to a value property are supported.
      */
     protected _applyModify(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
-        // Check direct key.
-        const value = this.getModifiableValue(actor, change.key);
-        if (value) {
-            value.mod.push({ name: this.name, value: Number(change.value) });
+        if (SR5ActiveEffect.applyModifyToModifiableValue(this, actor, change, current, delta, changes)) return;
 
+        // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
+        super._applyAdd(actor, change, current, delta, changes);
+    }
+
+    /**
+     * Apply for the custom (modify) mode but, if possible, apply to a ModifiableValue.
+     * 
+     * This method is designed to handle application and report back if further application is needed.
+     * 
+     * @param effect
+     * @param model
+     * @param change
+     * @param current
+     * @param delta
+     * @param changes
+     * @returns
+     */
+    static applyModifyToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta, changes?) {
+        // Try applying to a ModifiableValue.
+        const value = SR5ActiveEffect.getModifiableValue(model, change.key);
+        if (value) {
+            value.mod.push({ name: effect.name, value: Number(change.value) });
+
+            return true;
+        }
+
+        // Don't apply any changes if there is NO matching value.
+        if (value === undefined) return true;
+
+        // Hand back application to other methods.
+        return false;
+    }
+
+    /**
+     * Try redirecting given change key to a key matching a ModifiableValue instead of it's leafs.
+     * Otherwise, redirect key as is. ChangeData will be altered in place.
+     *
+     * @param model The model used to check value types under key
+     * @param change The change key to redirect.
+     */
+    static redirectToNearModifiableValue(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        // Check if direct key is ModifiableValue
+        let value = SR5ActiveEffect.getModifiableValue(model, change.key);
+        if (value) {
             return;
         }
 
-        // Check indirect key.
+        // Move key up one hierarchy and check again
         const nodes = change.key.split('.');
         nodes.pop();
         const indirectKey = nodes.join('.');
 
-        // Don't apply any changes if it's also not a indirect match.
-        const modValue = this.getModifiableValue(actor, indirectKey);
-        if (modValue) {
-            modValue.mod.push({ name: this.name, value: Number(change.value) });
-
-            return;
+        value = SR5ActiveEffect.getModifiableValue(model, indirectKey);
+        if (value) {
+            change.key = indirectKey;
         }
-
-        // Don't apply any changes if there is NO matching value.
-        if (value === undefined) return;
-
-        // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
-        super._applyAdd(actor, change, current, delta, changes);
     }
 
     /**
@@ -125,25 +159,43 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * To keep the ActiveEffect workflow simple and still allow to override values that aren't a ModifiableValue,
      * check for such values and give the ActorDataPreparation flow some hints.
-     * 
+     *
      * To complicate things, there are some use cases when overwriting an actual property of a ValueField
      * is needed. The SR5 uneducated quality needs to override the canDefault field of a skill.
      */
     protected override _applyOverride(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
-        // Check direct key.
-        const modValue = this.getModifiableValue(actor, change.key);
-        if (modValue) {
-            modValue.override = { name: this.name, value: Number(change.value) };
-            modValue.value = Number(change.value);
-
-            return;
-        }
+        if(SR5ActiveEffect.applyOverrideToModifiableValue(this, actor, change, current, delta)) return;
 
         super._applyOverride(actor, change, current, delta, changes);
     }
 
-    getModifiableValue(actor: SR5Actor, key: string): ModifiableValueType | null {
-        const possibleValue = foundry.utils.getProperty(actor, key);
+    /**
+     * Apply for the override mode but, if possible, apply to a ModifiableValue.
+     * 
+     * This method is designed to handle application and report back if further application is needed.
+     * 
+     * @param effect
+     * @param model
+     * @param change
+     * @param current
+     * @param delta
+     * @param changes
+     * @returns true, if a ModifiableValue was found and the override was applied.
+     */
+    static applyOverrideToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
+        const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
+        if (modValue) {
+            modValue.override = { name: effect.name, value: Number(change.value) };
+            modValue.value = Number(change.value);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    static getModifiableValue(model: DataModel.Any, key: string): ModifiableValueType | null {
+        const possibleValue = foundry.utils.getProperty(model, key);
         const possibleValueType = foundry.utils.getType(possibleValue);
 
         if (possibleValue != null && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, ['value', 'mod']))
@@ -154,7 +206,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Apply to target configured for this effect.
-     * 
+     *
      * @returns Either the configured value or 'actor' as a default.
      */
     get applyTo() {
@@ -163,7 +215,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Some effects should only be applied depending on their parent items wireless status.
-     * 
+     *
      * When this flag is set, the parent item wireless status is taken into account.
      */
     get onlyForWireless(): boolean {
@@ -172,7 +224,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Some effects should only be applied depending on their parent items enabled status.
-     * 
+     *
      * When this flag is set, the parent item enabled status is taken into account.
      */
     get onlyForEquipped(): boolean {
@@ -181,7 +233,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Some modifier effects should only be applied if they're applied for their parent items test.
-     * 
+     *
      * When this flag is set, this effect shouldn't apply always.
      */
     get onlyForItemTest(): boolean {
@@ -191,7 +243,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Determine if this effect has been created using the test effect application flow
      * typically reserved for targeted_actor effects.
-     * 
+     *
      * @returns true, when the effect has been applied by a test.
      */
     get appliedByTest(): boolean {
@@ -231,12 +283,12 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Determine if this effect is meant to be applied to the actor it's existing on.
-     * 
+     *
      * Some effects are meant to be applied to other actors, and those shouldn't apply or show
      * on the actor that will cause them.
-     * 
+     *
      * Especially targeted_actor effects are meant to be applied to another actor acted upon but not the one acting.
-     * 
+     *
      * @return true, when the effect is meant to be applied to the actor it's existing on.
      */
     get appliesToLocalActor(): boolean {
@@ -252,18 +304,20 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Inject features into default FoundryVTT ActiveEffect implementation.
-     * 
+     *
      * - dynamic source properties as change values
      * - apply to non-Actor objects
-     * 
-     * @param object 
-     * @param change 
+     *
+     * @param object
+     * @param change
      */
     override apply(actor: SR5Actor, change: ActiveEffect.ChangeData) {
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
 
+        // Alter change values before applying them.
+        SR5ActiveEffect.redirectToNearModifiableValue(actor, change);
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
 
         // Add item error case, as FoundryVTT ActiveEffect.apply() is not meant to be used on items.
@@ -275,19 +329,21 @@ export class SR5ActiveEffect extends ActiveEffect {
             this._applyToObject(actor, change);
             return {};
         }
-        // Foundry can be used to apply to actors.
+
+        // Foundry default effect application will use DataModle.applyChange.
         return super.apply(actor, change);
     }
 
     /**
-     * Resolve a dynamic change value to the actual numerical value.
-     * 
+     * Resolve a dynamic change value to the actual numerical value. A dynamic change value contains key references
+     * to model properties, which must be resolved before application as literal values.
+     *
      * A dynamic change value follows the same rules as a Foundry roll formula (including dice pools).
-     * 
-     * So a change could have the key of 'system.attributes.body' with the mode Modify and a dynamic value of
-     * '@system.technology.rating * 3'. The dynamic property path would be taken from either the source or parent 
+     *
+     * A change could contain the key of 'system.attributes.body' with the mode Modify and a dynamic value of
+     * '@system.technology.rating * 3'. The dynamic property path would be taken from either the source or parent
      * document of the effect before the resolved value would be applied onto the target document / object.
-     * 
+     *
      * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular ActiveEffect.ChangeData object
      */
@@ -308,9 +364,9 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Handle application for none-Document objects
-     * @param object 
-     * @param change 
-     * @returns 
+     * @param object
+     * @param change
+     * @returns
      */
     _applyToObject(object, change) {
         // Determine the data type of the target field
@@ -367,11 +423,11 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Override Foundry effect data migration to avoid data => system migration.
-     * 
+     *
      * Since the system provides autocomplete-inline-properties as a relationship and
      * has it configured to provide system as the default key, the Foundry migration
      * shouldn't be necessary. The migration hinders effects with apply-to test.
-     * 
+     *
      * All migrations here are taken from FoundryVtt common.js BaseActiveEffect#migrateData
      * for v11.315
      */
