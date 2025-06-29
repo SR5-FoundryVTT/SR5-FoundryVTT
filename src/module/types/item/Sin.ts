@@ -1,7 +1,5 @@
-import { ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./BaseItem";
 import { TechnologyData } from "../template/Technology";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
 const { HTMLField, SchemaField, ArrayField, StringField } = foundry.data.fields;
 
 const LicenseData = () => ({
@@ -11,8 +9,7 @@ const LicenseData = () => ({
 });
 
 const SinData = {
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    ...BaseItemData(),
     technology: new SchemaField(TechnologyData()),
 
     licenses: new ArrayField(new SchemaField(LicenseData())),

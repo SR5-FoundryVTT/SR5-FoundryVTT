@@ -1,10 +1,9 @@
-import { ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
 const { SchemaField, StringField } = foundry.data.fields;
 
 const RitualData = {
+    ...BaseItemData(),
     action: new SchemaField(
         ActionRollData({
             test: 'RitualSpellcastingTest',
@@ -12,8 +11,6 @@ const RitualData = {
             followedTest: 'DrainTest'
         }),
     ),
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
 
     type: new StringField({ required: true }),
     descriptors: new StringField({ required: true }),

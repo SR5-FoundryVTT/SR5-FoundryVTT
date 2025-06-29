@@ -1,13 +1,10 @@
-import { ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
+import { BaseItemData, ItemBase } from "./BaseItem";
 const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
 const SpritePowerData = {
+    ...BaseItemData(),
     action: new SchemaField(ActionRollData()),
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
 
     duration: new StringField({ required: true, initial: 'always' }),
     optional: new StringField({ required: true, initial: 'standard' }),

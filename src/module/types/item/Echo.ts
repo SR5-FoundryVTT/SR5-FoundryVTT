@@ -1,12 +1,6 @@
-import { ItemBase } from "./BaseItem";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
-const { SchemaField } = foundry.data.fields;
+import { BaseItemData, ItemBase } from "./BaseItem";
 
-const EchoData = {
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
-};
+const EchoData = { ...BaseItemData() };
 
 export class Echo extends ItemBase<typeof EchoData> {
     static override defineSchema() {

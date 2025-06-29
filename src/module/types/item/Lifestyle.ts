@@ -1,11 +1,8 @@
-import { ItemBase } from "./BaseItem";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+import { BaseItemData, ItemBase } from "./BaseItem";
+const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const LifestyleData = {
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    ...BaseItemData(),
 
     type: new StringField({ required: true }),
     comforts: new NumberField({ required: true, nullable: false, initial: 0 }),

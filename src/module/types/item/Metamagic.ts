@@ -1,13 +1,10 @@
-import { ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
 const { SchemaField } = foundry.data.fields;
 
 const MetamagicData = {
+    ...BaseItemData(),
     action: new SchemaField(ActionRollData()),
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
 }
 
 export class Metamagic extends ItemBase<typeof MetamagicData> {

@@ -1,13 +1,10 @@
-import { ItemBase } from "./BaseItem";
 import { ActionRollData } from "./Action";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
+import { BaseItemData, ItemBase } from "./BaseItem";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const CallInActionData = {
+    ...BaseItemData(),
     action: new SchemaField(ActionRollData({ test: '' })),
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
 
     actor_type: new StringField({
         blank: true,

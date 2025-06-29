@@ -1,15 +1,12 @@
-import { ItemBase } from "./BaseItem";
 import { ArmorValueData } from "./Armor";
 import { ActionRollData } from "./Action";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
+import { BaseItemData, ItemBase } from "./BaseItem";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const CritterPowerData = {
+    ...BaseItemData(),
     action: new SchemaField(ActionRollData()),
     armor: new SchemaField(ArmorValueData()),
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
 
     category: new StringField({ required: true }),
     powerType: new StringField({ required: true }),

@@ -1,7 +1,5 @@
+import { BaseItemData, ItemBase } from "./BaseItem";
 import { MatrixAttributes } from "../template/Matrix";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
-import { ItemBase } from "./BaseItem";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const SourceEntityField = () => ({
@@ -13,8 +11,7 @@ export const SourceEntityField = () => ({
 });
 
 const HostData = {
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    ...BaseItemData(),
 
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
     marks: new TypedObjectField(new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 })),

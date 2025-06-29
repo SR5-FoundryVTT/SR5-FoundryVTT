@@ -1,12 +1,9 @@
-import { ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./BaseItem";
 import { TechnologyData } from "../template/Technology";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
 const { SchemaField, StringField } = foundry.data.fields;
 
 const ProgramData = {
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    ...BaseItemData(),
     technology: new SchemaField(TechnologyData()),
 
     type: new StringField({

@@ -1,7 +1,5 @@
-import { ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./BaseItem";
 import { TechnologyData } from "../template/Technology";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, BooleanField } = foundry.data.fields;
 
 export const ArmorValueData = () => ({
@@ -17,9 +15,8 @@ export const ArmorValueData = () => ({
 });
 
 export const ArmorData = () => ({
+    ...BaseItemData(),
     armor: new SchemaField(ArmorValueData()),
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
     technology: new SchemaField(TechnologyData()),
 });
 

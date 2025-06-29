@@ -1,13 +1,10 @@
-import { ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./BaseItem";
 import { MatrixAttributes } from "../template/Matrix";
 import { TechnologyData } from "../template/Technology";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
 const { SchemaField, ArrayField, StringField } = foundry.data.fields;
 
 const DeviceData = {
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    ...BaseItemData(),
     technology: new SchemaField(TechnologyData()),
 
     category: new StringField({

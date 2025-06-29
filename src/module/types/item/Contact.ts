@@ -1,11 +1,8 @@
-import { ItemBase } from "./BaseItem";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+import { BaseItemData, ItemBase } from "./BaseItem";
+const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const ContactData = {
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    ...BaseItemData(),
 
     type: new StringField({ required: true }),
     connection: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
@@ -14,7 +11,7 @@ const ContactData = {
     blackmail: new BooleanField(),
     group: new BooleanField(),
     linkedActor: new StringField({ required: true }),
-}
+};
 
 export class Contact extends ItemBase<typeof ContactData> {
     static override defineSchema() {

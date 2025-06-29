@@ -1,13 +1,10 @@
 import { ActionRollData } from "./Action";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
-import { ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./BaseItem";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpellData = {
+    ...BaseItemData(),
     action: new SchemaField(ActionRollData({test: 'SpellCastingTest', followedTest: 'DrainTest'})),
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
 
     type: new StringField({
         blank: true,
@@ -73,7 +70,7 @@ const SpellData = {
             choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter', '']
         }),
     }),
-}
+};
 
 export class Spell extends ItemBase<typeof SpellData> {
     static override defineSchema() {

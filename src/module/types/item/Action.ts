@@ -1,9 +1,8 @@
-import { ItemBase } from "./BaseItem";
-import { ImportFlagData } from "../template/ImportFlags";
-import { DescriptionData } from "../template/Description";
-import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
+import { BaseItemData, ItemBase } from "./BaseItem";
 import { ModifiableField } from "../fields/ModifiableField";
+import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foundry.data.fields;
+type DataSchema = foundry.data.fields.DataSchema;
 
 const ResultActionData = () => ({
     action: new StringField({
@@ -121,11 +120,9 @@ export const ActionRollData = (
     roll_mode: new StringField({ required: true }),
 });
 
-
 const ActionData = {
+    ...BaseItemData(),
     action: new SchemaField(ActionRollData()),
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
 
     result: new SchemaField(ActionResultData()),
 };

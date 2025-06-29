@@ -1,16 +1,13 @@
-import { ItemBase } from "./BaseItem";
 import { ArmorValueData } from "./Armor";
 import { ActionRollData } from "./Action";
-import { ImportFlagData } from "../template/ImportFlags";
+import { BaseItemData, ItemBase } from "./BaseItem";
 import { TechnologyData } from "../template/Technology";
-import { DescriptionData } from "../template/Description";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const CyberwareData = {
+    ...BaseItemData(),
     action: new SchemaField(ActionRollData()),
     armor: new SchemaField(ArmorValueData()),
-    description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
     technology: new SchemaField(TechnologyData()),
 
     essence: new NumberField({ required: true, nullable: false, initial: 0 }),
