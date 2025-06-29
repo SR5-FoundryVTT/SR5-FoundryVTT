@@ -14,10 +14,10 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Vehicle Parser', () => {
         it('parses vehicles', async () => {
-            const actor = new SR5Actor<'character'>({ type: 'character' });
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character' }) as SR5Actor<'character'>;
 
             const parsedVehicles = await vehicleParser.parseVehicles(
-                actor,
+                character,
                 { vehicles: { vehicle: [chummerDrone, chummerVehicle] } } as any,
                 { vehicles: true },
             ) as SR5Actor<'vehicle'>[];
@@ -29,7 +29,7 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
             // Register vehicle actors with testing data, so they get cleaned up during teardown
             // parsedVehicles.forEach(testActor.register.bind(testActor));
             // Prepare derived data, used to populate system.vehicle_stats.seats.hidden
-            parsedVehicles.forEach((vehicle) => vehicle.prepareDerivedData());
+            parsedVehicles.forEach((vehicle) => { vehicle.prepareDerivedData(); });
 
             const drone = parsedVehicles[0];
             const vehicle = parsedVehicles[1];
@@ -39,7 +39,7 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
             assert.deepEqual(vehicle.system.vehicle_stats.seats.value, 3);
             assert.deepEqual(vehicle.system.vehicle_stats.seats.hidden, false);
 
-            await actor.delete();
+            await character.delete();
             await drone.delete();
             await vehicle.delete();
         });

@@ -12,7 +12,8 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {
-            const action = new SR5Item<'action'>({
+            const action = await SR5Item.create({
+                name: 'QUENCH',
                 type: 'action',
                 system: {
                     action: {
@@ -43,15 +44,16 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         }
                     }
                 },
-            });
+            }) as SR5Item<'action'>;
 
-            const actor = new SR5Actor<'character'>({
+            const actor = await SR5Actor.create({
+                name: 'QUENCH',
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                     skills: { active: { automatics: { base: 45 } } }
                 }
-            });
+            }) as SR5Actor<'character'>;
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 
@@ -81,7 +83,8 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('evaluate an opposed roll from a opposed action', async () => {
-            const action = new SR5Item<'action'>({
+            const action = await SR5Item.create({
+                name: 'QUENCH',
                 type: 'action',
                 system: {
                     action: {
@@ -109,14 +112,15 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         }
                     }
                 }
-            });
-            const actor = new SR5Actor<'character'>({
+            }) as SR5Item<'action'>;
+            const actor = await SR5Actor.create({
+                name: 'QUENCH',
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                     skills: { active: { automatics: { base: 45 } } }
                 }
-            });
+            }) as SR5Actor<'character'>;
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 

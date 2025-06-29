@@ -1,15 +1,21 @@
 import { DataDefaults } from "src/module/data/DataDefaults";
 import { BaseGearParser } from "../importHelper/BaseGearParser"
 import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions.js"
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 /**
  * Parses SINs and the attached licenses.
  * Licenses that are not attached to a SIN are not handled.
  */
 export class SinParser extends BaseGearParser {
-    override parse(chummerGear : any) : any {
+    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): Item.CreateData {
         const parserType = 'sin';
-        const parsedGear = DataDefaults.baseEntityData("sin");
+        const parsedGear = {
+            name: chummerGear.name || 'Unnamed',
+            type: parserType,
+            system: DataDefaults.baseSystemData(parserType)
+        } satisfies Item.CreateData;
 
         const system = parsedGear.system;
 

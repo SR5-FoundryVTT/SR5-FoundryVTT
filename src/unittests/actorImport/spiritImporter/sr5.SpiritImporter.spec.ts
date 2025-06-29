@@ -21,8 +21,8 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Chummer Spirit Importer', () => {
         it('Does nothing when no character found', async () => {
-            const item = new SR5Item<'weapon'>({ type: 'weapon' });
-            const character = new SR5Actor<'spirit'>({ type: 'spirit' });
+            const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
             await character.createEmbeddedDocuments('Item', [item]);
 
             assert.lengthOf(character.items, 1);
@@ -34,8 +34,8 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         });
 
         it('Clears all items no actions present', async () => {
-            const item = new SR5Item<'weapon'>({ type: 'weapon' });
-            const character = new SR5Actor<'spirit'>({ type: 'spirit' });
+            const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
             await character.createEmbeddedDocuments('Item', [item]);
             await new SpiritImporter().importChummerCharacter(character, chummerFile, importOptions);
 
@@ -46,8 +46,8 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         });
 
         it('Clears all items but actions', async () => {
-            const item = new SR5Item<'weapon'>({ type: 'action' });
-            const character = new SR5Actor<'spirit'>({ type: 'spirit' });
+            const item = await SR5Item.create({ name: 'QUENCH', type: 'action' }) as SR5Item<'action'>;
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
             await character.createEmbeddedDocuments('Item', [item]);
             await new SpiritImporter().importChummerCharacter(character, chummerFile, importOptions);
 

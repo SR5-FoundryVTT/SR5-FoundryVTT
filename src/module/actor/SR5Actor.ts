@@ -80,9 +80,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
     // Holds all operations related to fetching an actors modifiers.
     modifiers: ModifierFlow;
 
-    // TODO: foundry-vtt-types v10. Allows for {system: ...} to be given without type error
-    constructor(...args: Actor.ConstructorArgs) {
-        super(...args);
+    constructor(data: Actor.CreateData, context?: Actor.ConstructionContext) {
+        super(data, context);
 
         this.inventory = new InventoryFlow(this);
         this.modifiers = new ModifierFlow(this);

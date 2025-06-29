@@ -8,7 +8,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
     describe('SpiritDataPrep', () => {
         it('Spirits are always magical', async () => {
-            const spirit = new SR5Actor<'spirit'>({ type: 'spirit' });
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
 
             assert.strictEqual(spirit.system.special, 'magic');
 
@@ -16,7 +16,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('visibility checks', async () => {
-            const spirit = new SR5Actor<'spirit'>({ type: 'spirit' });
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
             assert.strictEqual(spirit.system.visibilityChecks.astral.astralActive, true);
             assert.strictEqual(spirit.system.visibilityChecks.astral.hasAura, true);
             assert.strictEqual(spirit.system.visibilityChecks.astral.affectedBySpell, false);
@@ -29,7 +29,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
 
         it('Spirit default/overrides by example type', async () => {
-            const spirit = new SR5Actor<'spirit'>({ type: 'spirit', system: { spiritType: 'air' } });
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit', system: { spiritType: 'air' } }) as SR5Actor<'spirit'>;
 
             // Without adequate force there will be negative base values with minimum attribute values.
             assert.strictEqual(spirit.system.attributes.body.base, -2);
@@ -41,7 +41,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(spirit.system.initiative.meatspace.base.base, 4); // force * 2 + override;
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            const active = spirit.system.skills.active as {[x: string]: SkillFieldType};
+            const active = spirit.system.skills.active as Record<string, SkillFieldType>;
 
             assert.strictEqual(active.assensing.base, 0);
 
@@ -62,7 +62,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Spirit recoil compensation', async () => {
-            const spirit = new SR5Actor<'spirit'>({ name: 'Testing', type: 'spirit', system: { attributes: { strength: { base: 5 } } } });
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit', system: { attributes: { strength: { base: 5 } } } }) as SR5Actor<'spirit'>;
             if (!spirit) return assert.fail();
 
             assert.strictEqual(spirit.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
@@ -70,7 +70,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             await spirit.delete();
         });
         it('A NPC Grunt should only have physical track', async () => {
-            const spirit = new SR5Actor<'spirit'>({ type: 'spirit', system: { is_npc: true, npc: { is_grunt: true } } });
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit', system: { is_npc: true, npc: { is_grunt: true } } }) as SR5Actor<'spirit'>;
 
             assert.strictEqual(spirit.system.track.stun.value, 0);
             assert.strictEqual(spirit.system.track.stun.disabled, true);

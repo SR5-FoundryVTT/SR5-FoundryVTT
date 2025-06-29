@@ -155,35 +155,6 @@ export class DataDefaults {
         entity: EntityType,
         createData: SystemConstructorArgs<EntityType> = {}
     ): ReturnType<SystemByType<EntityType>['toObject']> {
-        // this method is too complex for the compiler to infer types correctly
-        const SystemClass = systemMap[entity as any] as typeof systemMap[EntityType];
-        return new (SystemClass as any)(createData).toObject();
-    }
-
-    /**
-     * Return a base item data structure with minimal necessary FoundryVTT ItemDataModel fields.
-     * 
-     * @param name Whatever name you want to give but not ''.
-     * @param type Whatever item type you want to have
-     * @param systemData Whatever partial item system data you want to inject into general model system data.
-     * @returns A minimum viable item data structure to use with Item#create
-     */
-    static baseEntityData<Type extends SystemEntityType>(
-        entityType: Type,
-        createData: Actor.CreateData | Item.CreateData = {},
-        systemData: SystemConstructorArgs<Type> = {}
-    ) {
-        const type = createData.type;
-        try {
-            // foundry.utils.duplicate source to avoid keeping reference to model data.
-            const modelSystemData = {
-                name: 'Unnamed', type: type as any, ...createData,
-                system: DataDefaults.baseSystemData<Type>(entityType, systemData)
-            } satisfies Actor.CreateData | Item.CreateData;
-            // modelSystemData.system = 
-            return modelSystemData;
-        } catch (error) {
-            throw new Error(`FoundryVTT doesn't have item type: ${type} registered in ${entityType}`);
-        }
+        return new (systemMap[entity] as any)(createData).toObject();
     }
 }

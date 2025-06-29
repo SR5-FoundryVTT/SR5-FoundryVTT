@@ -10,7 +10,11 @@ import { Unwrap } from "../ItemsParser";
 export class ProgramParser extends BaseGearParser {
     override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>) : any {
         const parserType = 'program';
-        const parsedGear = DataDefaults.baseEntityData("program");
+        const parsedGear = {
+            name: chummerGear.name || 'Unnamed',
+            type: parserType,
+            system: DataDefaults.baseSystemData(parserType)
+        } satisfies Item.CreateData;
 
         const system = parsedGear.system;
 

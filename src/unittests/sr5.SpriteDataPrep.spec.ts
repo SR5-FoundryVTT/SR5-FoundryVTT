@@ -11,13 +11,13 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
 
     describe('SpriteDataPrep', () => {
         it('Sprites are always resonat', async () => {
-            const sprite = new SR5Actor<'sprite'>({ type: 'sprite' });
+            const sprite = await SR5Actor.create({ name: 'QUENCH', type: 'sprite' }) as SR5Actor<'sprite'>;
             assert.strictEqual(sprite.system.special, 'resonance');
             await sprite.delete();
         });
 
         it('visibility checks', async () => {
-            const sprite = new SR5Actor<'sprite'>({ type: 'sprite' });
+            const sprite = await SR5Actor.create({ name: 'QUENCH', type: 'sprite' }) as SR5Actor<'sprite'>;
             assert.strictEqual(sprite.system.visibilityChecks.astral.hasAura, false);
             assert.strictEqual(sprite.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(sprite.system.visibilityChecks.astral.affectedBySpell, false);
@@ -29,7 +29,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Sprites default/override values by example type', async () => {
-            const sprite = new SR5Actor<'sprite'>({ type: 'sprite', system: { spriteType: 'courier' } });
+            const sprite = await SR5Actor.create({ name: 'QUENCH', type: 'sprite', system: { spriteType: 'courier' } }) as SR5Actor<'sprite'>;
 
             assert.strictEqual(sprite.system.matrix.sleaze.base, 3);
             assert.strictEqual(sprite.system.matrix.data_processing.base, 1);
@@ -39,7 +39,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(sprite.system.initiative.matrix.base.base, 1);
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            const active = sprite.system.skills.active as {[x: string]: SkillFieldType};
+            const active = sprite.system.skills.active as Record<string, SkillFieldType>;
 
             assert.strictEqual(active.hacking.base, 0);
 
@@ -63,7 +63,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
         })
 
         it('Matrix condition monitor track calculation with modifiers', async () => {
-            const sprite = new SR5Actor<'sprite'>({ type: 'sprite' });
+            const sprite = await SR5Actor.create({ name: 'QUENCH', type: 'sprite' }) as SR5Actor<'sprite'>;
             assert.equal(sprite.system.matrix.condition_monitor.max, 8);
 
             await sprite.update({ system: { modifiers: { matrix_track: 1 } } });

@@ -20,9 +20,13 @@ export interface GearParser {
  */
 export class BaseGearParser implements GearParser {
     parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): Item.CreateData {
-        const parsedGear = this.getDefaultData();
         const parserType = 'equipment';
-        parsedGear.name = chummerGear.name;
+        const parsedGear = {
+            name: chummerGear.name || 'Unnamed',
+            type: parserType,
+            system: DataDefaults.baseSystemData(parserType)
+        } satisfies Item.CreateData;
+
         if (chummerGear.extra)
             parsedGear.name += ` (${chummerGear.extra})`;
 
@@ -41,9 +45,5 @@ export class BaseGearParser implements GearParser {
         if (Object.keys(SR5.itemSubTypeIconOverrides[parserType]).includes(subType)) {
             parsedGear.system.importFlags.subType = formatAsSlug(subType);
         }
-    }
-
-    private getDefaultData() {
-        return DataDefaults.baseEntityData("equipment");
     }
 }

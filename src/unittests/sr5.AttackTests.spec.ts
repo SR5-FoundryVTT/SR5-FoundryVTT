@@ -168,7 +168,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
         }: {
             hardened?: boolean
         } = {}): Promise<SR5Actor> => {
-            const characterActor = new SR5Actor<'character'>({ type: 'character' });
+            const characterActor = await SR5Actor.create({ name: 'QUENCH', type: 'character' }) as SR5Actor<'character'>;
             const armor = new SR5Item<'armor'>({
                 type: 'armor',
                 name: 'Test Armor',
@@ -190,7 +190,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         const getVehicleWithArmor = async (armorValue: number): Promise<SR5Actor> => {
             const armor = DataDefaults.createData('armor', { value: armorValue, base: armorValue });
-            return new SR5Actor<'vehicle'>({ type: 'vehicle', system: { armor } });
+            return await SR5Actor.create({ name: 'QUENCH', type: 'vehicle', system: { armor } }) as SR5Actor<'vehicle'>;
         }
 
         const getDamage = (
@@ -315,7 +315,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         describe("doesNoPhysicalDamageToVehicle", () => {
             it("blocks non-physical damage to vehicle", async () => {
-                const vehicle = new SR5Actor<'vehicle'>({ type: 'vehicle' });
+                const vehicle = await SR5Actor.create({ name: 'QUENCH', type: 'vehicle' }) as SR5Actor<'vehicle'>;
                 const damage = getDamage(4, { type: 'stun' });
 
                 const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);
@@ -324,7 +324,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             });
 
             it("does not block physical damage to vehicle", async () => {
-                const vehicle = new SR5Actor<'vehicle'>({ type: 'vehicle' });
+                const vehicle = await SR5Actor.create({ name: 'QUENCH', type: 'vehicle' }) as SR5Actor<'vehicle'>;
                 const damage = getDamage(4, { type: 'physical' });
 
                 const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);
@@ -333,7 +333,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             });
 
             it("does not block electric stun damage to vehicle", async () => {
-                const vehicle = new SR5Actor<'vehicle'>({ type: 'vehicle' });
+                const vehicle = await SR5Actor.create({ name: 'QUENCH', type: 'vehicle' }) as SR5Actor<'vehicle'>;
                 const damage = getDamage(4, { type: 'stun', element: 'electricity' });
 
                 const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);

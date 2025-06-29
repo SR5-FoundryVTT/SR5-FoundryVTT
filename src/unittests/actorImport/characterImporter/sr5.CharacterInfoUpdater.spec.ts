@@ -26,7 +26,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 alias: 'ImportTester',
             };
 
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.name, 'ImportTester');
@@ -36,7 +36,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
         });
 
         it('Sets placeholder when no alias', async () => {
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.name, '[Name not found]');
@@ -169,7 +169,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 ],
             };
 
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.system.attributes.body.value, 3);
@@ -210,7 +210,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 ],
             };
 
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.system.attributes.magic.value, 7);
@@ -242,7 +242,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 ],
             };
 
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.system.attributes.magic.value, 0);

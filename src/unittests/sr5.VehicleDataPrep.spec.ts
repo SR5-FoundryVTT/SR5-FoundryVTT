@@ -10,7 +10,7 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
     
     describe('VehicleDataPrep', () => {
         it('Matrix condition monitor track calculation with modifiers', async () => {
-            const vehicle = new SR5Actor<'vehicle'>({ type: 'vehicle' });
+            const vehicle = await SR5Actor.create({ name: 'QUENCH', type: 'vehicle' }) as SR5Actor<'vehicle'>;
             assert.equal(vehicle.system.matrix.condition_monitor.max, 8);
 
             await vehicle.update({ system: { modifiers: { matrix_track: 1 } } });
@@ -44,13 +44,14 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
 
         it('Attributes based on pilot', async () => {
             // Create temporary actor
-            const vehicle = new SR5Actor<'vehicle'>({
+            const vehicle = await SR5Actor.create({
+                name: 'QUENCH',
                 type: 'vehicle',
                 system: {
                     vehicle_stats: { pilot: { base: 3 } },
                     attributes: { body: { base: 5 } }
                 }
-            });
+            }) as SR5Actor<'vehicle'>;
 
             // Mental Attributes should be pilot. SR5#199
             assert.strictEqual(vehicle.system.attributes.willpower.value, 3);

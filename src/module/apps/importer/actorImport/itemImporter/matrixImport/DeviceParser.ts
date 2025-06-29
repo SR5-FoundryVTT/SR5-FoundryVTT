@@ -11,7 +11,11 @@ export class DeviceParser extends BaseGearParser {
 
     override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): Item.CreateData {
         const parserType = 'device';
-        const parsedGear = DataDefaults.baseEntityData("device");
+        const parsedGear = {
+            name: chummerGear.name || 'Unnamed',
+            type: parserType,
+            system: DataDefaults.baseSystemData(parserType)
+        } satisfies Item.CreateData;
 
         const system = parsedGear.system;
 

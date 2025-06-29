@@ -20,8 +20,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Chummer Character Importer', () => {
         it('Does nothing when no character found', async () => {
-            const item = new SR5Item<'weapon'>({ type: 'weapon' });
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await character.createEmbeddedDocuments('Item', [item]);
             assert.lengthOf(character.items, 1);
 
@@ -36,10 +36,10 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         });
 
         it('Clears all imported items', async () => {
-            const item = new SR5Item<'weapon'>({ type: 'weapon' });
+            const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
             await item.update({ system: { importFlags: { isImported: true } } });
 
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await character.createEmbeddedDocuments('Item', [item]);
 
             assert.lengthOf(character.items, 1);
@@ -53,9 +53,9 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         });
 
         it('Clears all items but not imported ones', async () => {
-            const item = new SR5Item<'weapon'>({ type: 'weapon' });
+            const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
 
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await character.createEmbeddedDocuments('Item', [item]);
 
             assert.lengthOf(character.items, 1);
@@ -69,8 +69,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         });
 
         it('Clears all items but actions', async () => {
-            const item = new SR5Item<'action'>({ type: 'action' });
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const item = await SR5Item.create({ name: 'QUENCH', type: 'action' }) as SR5Item<'action'>;
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await character.createEmbeddedDocuments('Item', [item]);
             
             assert.lengthOf(character.items, 1);
@@ -86,7 +86,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         });
 
         it('Clears all items but effects', async () => {
-            let item = new SR5Item<'weapon'>({ type: 'weapon' });
+            const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
             void item.createEmbeddedDocuments('ActiveEffect', [{
                 origin: item.uuid,
                 disabled: false,
@@ -96,7 +96,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
                     { key: 'system.attributes.body', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
                 ]
             }]);
-            const character = new SR5Actor<'character'>({ type: 'character', system: { metatype: 'human' } });
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { metatype: 'human' } }) as SR5Actor<'character'>;
             await character.createEmbeddedDocuments('Item', [item]);
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 

@@ -21,23 +21,23 @@ export const spiritInfoUpdaterTesting = (context: QuenchBatchContext) => {
         it('Imports name', async () => {
             chummerFile.characters.character.alias = 'ImportTester';
 
-            const character = new SR5Actor<'spirit'>({ type: 'spirit' });
-            await new SpiritImporter().importChummerCharacter(character, chummerFile, importOptions);
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
+            await new SpiritImporter().importChummerCharacter(spirit, chummerFile, importOptions);
 
-            assert.strictEqual(character.name, 'ImportTester');
-            assert.strictEqual(character.prototypeToken.name, 'ImportTester');
+            assert.strictEqual(spirit.name, 'ImportTester');
+            assert.strictEqual(spirit.prototypeToken.name, 'ImportTester');
 
-            await character.delete();
+            await spirit.delete();
         });
 
         it('Sets placeholder when no alias', async () => {
-            const character = new SR5Actor<'spirit'>({ type: 'spirit' });
-            await new SpiritImporter().importChummerCharacter(character, chummerFile, importOptions);
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
+            await new SpiritImporter().importChummerCharacter(spirit, chummerFile, importOptions);
 
-            assert.strictEqual(character.name, '[Name not found]');
-            assert.strictEqual(character.prototypeToken.name, '[Name not found]');
+            assert.strictEqual(spirit.name, '[Name not found]');
+            assert.strictEqual(spirit.prototypeToken.name, '[Name not found]');
 
-            await character.delete();
+            await spirit.delete();
         });
     });
 
@@ -57,30 +57,32 @@ export const spiritInfoUpdaterTesting = (context: QuenchBatchContext) => {
                     },
                 ],
             };
-            const character = new SR5Actor<'spirit'>({ type: 'spirit' });
-            await new SpiritImporter().importChummerCharacter(character, chummerFile, importOptions);
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
+            await new SpiritImporter().importChummerCharacter(spirit, chummerFile, importOptions);
 
-            assert.strictEqual(character.system.force, 3);
+            assert.strictEqual(spirit.system.force, 3);
 
-            await character.delete();
+            await spirit.delete();
         });
     });
 
     describe('Chummer Info Updater handles spirit type correctly', () => {
         it('maps existing spirit type', async () => {
             chummerFile.characters.character.metatype_english = 'Spirit of Fire';
-            const character = new SR5Actor<'spirit'>({ type: 'spirit' });
-            await new SpiritImporter().importChummerCharacter(character, chummerFile, importOptions);
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
+            await new SpiritImporter().importChummerCharacter(spirit, chummerFile, importOptions);
 
-            assert.strictEqual(character.system.spiritType, 'fire');
+            assert.strictEqual(spirit.system.spiritType, 'fire');
+            await spirit.delete();
         });
 
         it('writes nothing when spirit type not found', async () => {
             chummerFile.characters.character.metatype_english = 'Spirit of Bullshit';
-            const character = new SR5Actor<'spirit'>({ type: 'spirit' });
-            await new SpiritImporter().importChummerCharacter(character, chummerFile, importOptions);
+            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>
+            await new SpiritImporter().importChummerCharacter(spirit, chummerFile, importOptions);
 
-            assert.strictEqual(character.system.spiritType, '');
+            assert.strictEqual(spirit.system.spiritType, '');
+            await spirit.delete();
         });
     });
 };

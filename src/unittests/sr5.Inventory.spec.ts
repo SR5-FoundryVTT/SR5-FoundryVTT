@@ -12,7 +12,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
     describe('InventoryFlow testing', () => {
         it('create a new inventory and know of its existance', async () => {
-            const actor = new SR5Actor<'character'>({ type: 'character' });
+            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character' }) as SR5Actor<'character'>;
 
             await actor.inventory.create('test');
 
@@ -31,7 +31,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
         it('remove an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = new SR5Actor<'character'>({ type: 'character', system: { inventories: inventoriesData } });
+            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { inventories: inventoriesData } }) as SR5Actor<'character'>;
 
             await actor.inventory.remove('test');
 
@@ -41,7 +41,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
         it('add and remove an item to and from an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = new SR5Actor<'character'>({ type: 'character', system: { inventories: inventoriesData } });
+            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { inventories: inventoriesData } }) as SR5Actor<'character'>;
             const item = await actor.createEmbeddedDocuments('Item', [{ type: 'weapon', name: 'Test Weapon' }]) as SR5Item<'weapon'>[];
 
             await actor.inventory.addItems('test', item);
@@ -58,7 +58,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
         it('rename an existing inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: ['notAnItemId'] } };
-            const actor = new SR5Actor<'character'>({ type: 'character', system: { inventories: inventoriesData } });
+            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { inventories: inventoriesData } }) as SR5Actor<'character'>;
 
             const before = 'test';
             const after = 'betterTest';
@@ -77,7 +77,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
         });
 
         it('create and rename an inventory including prohibited foundry chars', async () => {
-            const actor = new SR5Actor<'character'>({ type: 'character' });
+            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character' }) as SR5Actor<'character'>;
 
             await actor.inventory.create('Test.');
 

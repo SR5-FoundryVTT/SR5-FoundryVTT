@@ -79,7 +79,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 await item.delete();
             });
             it('Correctly add default tests to range weapons', async () => {
-                const item = new SR5Item<'weapon'>({type: 'weapon'});
+                const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
 
                 await item.update({ system: { category: 'range' } });
                 assert.equal(item.system.action.test, 'RangedAttackTest');
@@ -90,7 +90,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 await item.delete();
             });
             it('Correctly add defense tests to complex forms', async () => {
-                const item = new SR5Item<'complex_form'>({type: 'complex_form'});
+                const item = await SR5Item.create({ name: 'QUENCH', type: 'complex_form' }) as SR5Item<'complex_form'>;
 
                 assert.equal(item.system.action.test, 'ComplexFormTest');
                 assert.equal(item.system.action.followed.test, 'FadeTest');
@@ -100,7 +100,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 await item.delete();
             });
             it('Correctly alter default test for weapon category changes', async () => {
-                const item = new SR5Item<'weapon'>({type: 'weapon'});
+                const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
 
                 await item.update({ system: { category: 'range' } });
                 assert.equal(item.system.action.test, 'RangedAttackTest');
@@ -127,7 +127,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                  * This is testing UpdateActionFlow.injectActionTestsIntoChangeData which is connected to some 
                  * document lifecycle methods.
                  */
-                const item = new SR5Item<'complex_form'>({type: 'complex_form'});
+                const item = await SR5Item.create({ name: 'QUENCH', type: 'complex_form'}) as SR5Item<'complex_form'>;
                 // Should not inject.
                 await item.update({'name': 'Test'}, {recursive: false});
                 assert.equal(item.system.action.skill, ''); // Check if system data still exists

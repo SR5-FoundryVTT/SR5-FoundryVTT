@@ -78,20 +78,20 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Setup damage source data', async () => {
-            const actor = new SR5Actor<'character'>({type: 'character'});
-            const documents = (await actor.createEmbeddedDocuments('Item', [{type: 'action', name: 'TestAction'}]))!;
+            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character' }) as SR5Actor<'character'>;
+            const documents = (await character.createEmbeddedDocuments('Item', [{type: 'action', name: 'TestAction'}]))!;
             const action = documents[0] as SR5Item<'action'>;
 
             ActionPrep.prepareDamageSource(action.system.action, action)
 
             assert.deepEqual(action.system.action?.damage.source, {
-                actorId: actor.id as string,
+                actorId: character.id as string,
                 itemId: action.id as string,
-                itemName: action.name as string,
+                itemName: action.name,
                 itemType: action.type
             })
 
-            await actor.delete();
+            await character.delete();
         });
 
         it('Check for weapon modification setting dice pool modifiers', async () => {

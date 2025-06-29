@@ -9,9 +9,13 @@ import { Unwrap } from "../ItemsParser";
  */
 export class AmmoParser extends BaseGearParser {
 
-    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>) {
+    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): Item.CreateData {
         const parserType = 'ammo';
-        const parsedGear = DataDefaults.baseEntityData("ammo");
+        const parsedGear = {
+            name: chummerGear.name || 'Unnamed',
+            type: parserType,
+            system: DataDefaults.baseSystemData(parserType)
+        } satisfies Item.CreateData;
 
         parsedGear.system.technology = parseTechnology(chummerGear);
         parsedGear.system.description = parseDescription(chummerGear);

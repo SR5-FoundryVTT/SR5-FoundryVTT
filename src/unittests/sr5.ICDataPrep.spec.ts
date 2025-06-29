@@ -10,7 +10,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
 
     describe('ICDataPrep', () => {
         it('Matrix condition monitor track calculation with modifiers', async () => {
-            const ic = new SR5Actor<'ic'>({ type: 'ic' });
+            const ic = await SR5Actor.create({ name: 'QUENCH', type: 'ic' }) as SR5Actor<'ic'>;
             assert.equal(ic.system.matrix.condition_monitor.max, 8);
 
             await ic.update({ system: { modifiers: { matrix_track: 1 } } });
@@ -20,7 +20,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('visibility checks', async () => {
-            const ic = new SR5Actor<'ic'>({ type: 'ic' });
+            const ic = await SR5Actor.create({ name: 'QUENCH', type: 'ic' }) as SR5Actor<'ic'>;
             assert.strictEqual(ic.system.visibilityChecks.astral.hasAura, false);
             assert.strictEqual(ic.system.visibilityChecks.astral.astralActive, false);
             assert.strictEqual(ic.system.visibilityChecks.astral.affectedBySpell, false);
@@ -32,7 +32,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('has meat attributes based on the host rating', async () => {
-            const ic = new SR5Actor<'ic'>({ type: 'ic', system: { host: { rating: 5 } } });
+            const ic = await SR5Actor.create({ name: 'QUENCH', type: 'ic', system: { host: { rating: 5 } } }) as SR5Actor<'ic'>;
 
             assert.strictEqual(ic.system.attributes.agility.value, 5);
             assert.strictEqual(ic.system.attributes.reaction.value, 5);
@@ -47,7 +47,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('has rating attribute based on the host rating', async () => {
-            const ic = new SR5Actor<'ic'>({ type: 'ic', system: { host: { rating: 5 } } });
+            const ic = await SR5Actor.create({ name: 'QUENCH', type: 'ic', system: { host: { rating: 5 } } }) as SR5Actor<'ic'>;
             assert.strictEqual(ic.system.attributes.rating.value, 5);
             await ic.delete();
         });
