@@ -4,6 +4,7 @@ import { DescriptionData } from "../template/Description";
 import { ImportFlagData } from "../template/ImportFlags";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
 import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
+import { SystemData } from "../template/System";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
@@ -46,6 +47,7 @@ const InventoryData = () => ({
 });
 
 export const CommonData = () => ({
+    system: new SchemaField(SystemData()),
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData()),
 
