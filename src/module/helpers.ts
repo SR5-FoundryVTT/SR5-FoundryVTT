@@ -302,7 +302,7 @@ export class Helpers {
         const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(sceneTokenId);
         const token = Helpers.getSceneTokenDocument(sceneId, tokenId);
         if (!token) return null;
-        return token.getActor();
+        return token.actor;
     }
 
     static deconstructSceneTokenId(sceneTokenId: string): [sceneId: string, tokenId: string] {
