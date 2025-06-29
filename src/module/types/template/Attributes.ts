@@ -1,5 +1,5 @@
-import { ModifiableSchemaField } from "../fields/ModifiableSchemaField";
 import { ModifiableValue } from "./Base";
+import { ModifiableField } from "../fields/ModifiableField";
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const AttributeField = () => ({
@@ -16,19 +16,19 @@ const EdgeAttributeField = () => ({
 });
 
 export const Attributes = () => ({
-    body: new ModifiableSchemaField(AttributeField()),
-    agility: new ModifiableSchemaField(AttributeField()),
-    reaction: new ModifiableSchemaField(AttributeField()),
-    strength: new ModifiableSchemaField(AttributeField()),
-    willpower: new ModifiableSchemaField(AttributeField()),
-    logic: new ModifiableSchemaField(AttributeField()),
-    intuition: new ModifiableSchemaField(AttributeField()),
-    charisma: new ModifiableSchemaField(AttributeField()),
-    magic: new ModifiableSchemaField(AttributeField()),
-    resonance: new ModifiableSchemaField(AttributeField()),
-    essence: new ModifiableSchemaField(AttributeField()),
+    body: new ModifiableField(AttributeField()),
+    agility: new ModifiableField(AttributeField()),
+    reaction: new ModifiableField(AttributeField()),
+    strength: new ModifiableField(AttributeField()),
+    willpower: new ModifiableField(AttributeField()),
+    logic: new ModifiableField(AttributeField()),
+    intuition: new ModifiableField(AttributeField()),
+    charisma: new ModifiableField(AttributeField()),
+    magic: new ModifiableField(AttributeField()),
+    resonance: new ModifiableField(AttributeField()),
+    essence: new ModifiableField(AttributeField()),
 
-    edge: new ModifiableSchemaField(EdgeAttributeField()),
+    edge: new ModifiableField(EdgeAttributeField()),
 });
 
 export type AttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof Attributes>>;
