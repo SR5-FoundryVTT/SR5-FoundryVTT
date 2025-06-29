@@ -15,7 +15,7 @@ export class Constants {
         'Weapon':           { pack: 'world.sr5weapon',          type: 'Item' }, // Weapons
     } as const;
 
-    public static readonly MAP_TRANSLATION_TYPE: { [key: string]: string } = {
+    public static readonly MAP_TRANSLATION_TYPE: Record<string, string> = {
         'adept_power': 'power',
         'ammo': 'gear',
         'armor': 'armor',
@@ -66,9 +66,9 @@ export class Constants {
         'Unarmed': 'unarmed_combat',
     } as const;
 
-    public static readonly MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY: {
-        [key: string]: Exclude<keyof typeof SR5.weaponRangeCategories, "manual">;
-    } = {
+    public static readonly MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY:
+        Record<string, Exclude<keyof typeof SR5.weaponRangeCategories, "manual">> =
+    {
         'Tasers': 'taser',
         'Holdouts': 'holdOutPistol',
         'Light Pistols': 'lightPistol',

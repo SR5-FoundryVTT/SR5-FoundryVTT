@@ -1,61 +1,50 @@
+import { DataDefaults } from "src/module/data/DataDefaults";
+import { ActorSchema } from "../../ActorSchema";
 import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
+import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions.js"
+import { Unwrap } from "../ItemsParser";
 
 /**
  * Parses devices (commlinks, decks, and RCCs)
  */
 export class DeviceParser extends BaseGearParser {
 
-    override parse(chummerGear : any) : any {
+    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): Item.CreateData {
         const parserType = 'device';
-        const parsedGear =  super.parse(chummerGear);
-        parsedGear.type = parserType;
-        parsedGear.system.technology.rating = chummerGear.devicerating;
+        const parsedGear = DataDefaults.baseEntityData("device");
 
-        parsedGear.system.atts = {
-            att1:
-            {
-                value: parseInt(chummerGear.attack),
-                att: 'attack'
-            },
+        const system = parsedGear.system;
 
-            att2:
-            {
-                value: parseInt(chummerGear.sleaze),
-                att: 'sleaze'
-            },
+        system.technology = parseTechnology(chummerGear);
+        system.description = parseDescription(chummerGear);
 
-            att3:
-            {
-                value: parseInt(chummerGear.dataprocessing),
-                att: 'data_processing'
-            },
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(chummerGear.name), parserType);
 
-            att4:
-            {
-                value: parseInt(chummerGear.firewall),
-                att: 'firewall'
-            }
-        };
+        parsedGear.system.technology.rating = Number(chummerGear.devicerating) || 0;
 
-        if (chummerGear.category_english === 'Cyberdecks')
-        {
-            parsedGear.system.category = 'cyberdeck';
-        }
+        parsedGear.system.atts.att1.value = Number(chummerGear.attack) || 0;
+        parsedGear.system.atts.att2.value = Number(chummerGear.sleaze) || 0;
+        parsedGear.system.atts.att3.value = Number(chummerGear.dataprocessing) || 0;
+        parsedGear.system.atts.att4.value = Number(chummerGear.firewall) || 0;
+        
+        parsedGear.system.atts.att1.att = 'attack';
+        parsedGear.system.atts.att2.att = 'sleaze';
+        parsedGear.system.atts.att3.att = 'data_processing';
+        parsedGear.system.atts.att4.att = 'firewall';
 
-        if (chummerGear.category_english === 'Commlinks')
-        {
-            parsedGear.system.category = 'commlink';
-        }
+        // Map Chummer gear categories to internal system categories
+        const categoryMap = {
+            'Cyberdecks': 'cyberdeck',
+            'Commlinks': 'commlink',
+            'Rigger Command Consoles': 'rcc',
+             // Chummer has prepaid commlinks set up as Entertainment category
+            'Entertainment': 'commlink',
+        } as const;
 
-        if (chummerGear.category_english === 'Rigger Command Consoles')
-        {
-            parsedGear.system.category = 'rcc';
-        }
-        if (chummerGear.category_english === 'Entertainment')
-        {
-            // Chummer has prepaid commlinks set up as Entertainment category
-            parsedGear.system.category = 'commlink';
+        const mappedCategory = categoryMap[chummerGear.category_english as keyof typeof categoryMap];
+        if (mappedCategory) {
+            parsedGear.system.category = mappedCategory;
         }
 
         // Assign import flags

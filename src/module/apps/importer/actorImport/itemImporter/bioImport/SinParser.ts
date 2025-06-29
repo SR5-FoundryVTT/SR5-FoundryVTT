@@ -1,5 +1,6 @@
+import { DataDefaults } from "src/module/data/DataDefaults";
 import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
+import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions.js"
 
 /**
  * Parses SINs and the attached licenses.
@@ -8,8 +9,15 @@ import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunction
 export class SinParser extends BaseGearParser {
     override parse(chummerGear : any) : any {
         const parserType = 'sin';
-        const parsedGear =  super.parse(chummerGear);
-        parsedGear.type = parserType;
+        const parsedGear = DataDefaults.baseEntityData("sin");
+
+        const system = parsedGear.system;
+
+        system.technology = parseTechnology(chummerGear);
+        system.description = parseDescription(chummerGear);
+
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(chummerGear.name), parserType);
 
         // Create licenses if there are any
         if (chummerGear.children) {

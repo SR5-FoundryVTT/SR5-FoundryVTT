@@ -9,7 +9,7 @@ import { LimitField } from "../types/template/Limits";
 import { SkillField } from "../types/template/Skills";
 import { TechnologyData } from "../types/template/Technology";
 import { Track } from "../types/template/ConditionMonitors";
-import { RangeData, Weapon } from "../types/item/Weapon";
+import { RangeData, RangeWeaponData, Weapon } from "../types/item/Weapon";
 
 import { Character } from "../types/actor/Character";
 import { Critter } from "../types/actor/Critter";
@@ -96,6 +96,7 @@ const schemaMap = {
     minimal_action: MinimalActionData,
     movement_field: MovementField,
     range: RangeData,
+    range_weapon: RangeWeaponData,
     skill_field: SkillField,
     source_entity_field: SourceEntityField,
     technology: TechnologyData,
@@ -171,14 +172,14 @@ export class DataDefaults {
         entityType: Type,
         createData: Actor.CreateData | Item.CreateData = {},
         systemData: SystemConstructorArgs<Type> = {}
-    ): Actor.CreateData | Item.CreateData {
+    ) {
         const type = createData.type;
         try {
             // foundry.utils.duplicate source to avoid keeping reference to model data.
-            const modelSystemData: Actor.CreateData | Item.CreateData = {
+            const modelSystemData = {
                 name: 'Unnamed', type: type as any, ...createData,
                 system: DataDefaults.baseSystemData<Type>(entityType, systemData)
-            };
+            } satisfies Actor.CreateData | Item.CreateData;
             // modelSystemData.system = 
             return modelSystemData;
         } catch (error) {

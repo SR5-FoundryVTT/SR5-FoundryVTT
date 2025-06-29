@@ -14,11 +14,11 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Vehicle Parser', () => {
         it('parses vehicles', async () => {
-            const actor = new SR5Actor<'vehicle'>({ type: 'character' });
+            const actor = new SR5Actor<'character'>({ type: 'character' });
 
             const parsedVehicles = await vehicleParser.parseVehicles(
                 actor,
-                { vehicles: { vehicle: [chummerDrone, chummerVehicle] } },
+                { vehicles: { vehicle: [chummerDrone, chummerVehicle] } } as any,
                 { vehicles: true },
             ) as SR5Actor<'vehicle'>[];
 

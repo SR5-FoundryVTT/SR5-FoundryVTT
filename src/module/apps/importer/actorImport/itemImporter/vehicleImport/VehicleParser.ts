@@ -4,10 +4,12 @@ import { GearsParser } from "../importHelper/GearsParser.js";
 import MountedWeaponParser from "./MountedWeaponParser";
 import VehicleModsParser from "./VehicleModsParser";
 import { SR5Actor } from '../../../../../actor/SR5Actor';
+import { ActorSchema } from "../../ActorSchema.js";
+import { importOptionsType } from "../../characterImporter/CharacterImporter.js";
 
 export default class VehicleParser {
 
-    async parseVehicles(actor, chummerChar, importOptions): Promise<Array<SR5Actor>|undefined> {
+    async parseVehicles(actor: SR5Actor<'character'>, chummerChar: ActorSchema, importOptions: importOptionsType): Promise<Array<SR5Actor>|undefined> {
         if(!importOptions.vehicles) {
             return;
         }
@@ -20,7 +22,7 @@ export default class VehicleParser {
         const vehicles = getArray(chummerChar.vehicles?.vehicle);
 
         return await Promise.all<SR5Actor>(vehicles.map<Promise<SR5Actor>>(async (vehicle) => {
-            const vehicleActor = (await SR5Actor.create({ name: vehicle.name, type: "vehicle" }))!;
+            const vehicleActor = (await SR5Actor.create({ name: vehicle.name, type: "vehicle" }) as SR5Actor<'vehicle'>)!;
 
             const promises : Array<Promise<any>> = [];
             promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));
@@ -28,8 +30,8 @@ export default class VehicleParser {
             promises.push(new MountedWeaponParser().parseWeapons(vehicle, importOptions.assignIcons))
             promises.push(new VehicleModsParser().parseMods(vehicle, importOptions.assignIcons))
 
-            let handling;
-            let off_road_handling;
+            let handling: string | undefined;
+            let off_road_handling: string | undefined;
             if(vehicle.handling.includes("/")) {
                 handling = vehicle.handling.split("/")[0];
                 off_road_handling =  vehicle.handling.split("/")[1]
@@ -52,17 +54,17 @@ export default class VehicleParser {
                 system: {
                     driver: actor.id,
                     vehicle_stats: {
-                        pilot: { base: vehicle.pilot },
-                        handling: { base: handling },
-                        off_road_handling: { base: off_road_handling },
-                        speed: { base: speed },
-                        off_road_speed: { base: off_road_speed },
-                        acceleration: { base: vehicle.accel },
-                        sensor: { base: vehicle.sensor },
-                        seats: { base: vehicle.seats }
+                        pilot: { base: Number(vehicle.pilot) || 0 },
+                        handling: { base: Number(handling) || 0 },
+                        off_road_handling: { base: Number(off_road_handling) || 0 },
+                        speed: { base: Number(speed) || 0 },
+                        off_road_speed: { base: Number(off_road_speed) || 0 },
+                        acceleration: { base: Number(vehicle.accel) || 0 },
+                        sensor: { base: Number(vehicle.sensor) || 0 },
+                        seats: { base: Number(vehicle.seats) || 0 }
                     },
-                    attributes: { body: { base: vehicle.body } },
-                    armor: { base: vehicle.armor },
+                    attributes: { body: { base: Number(vehicle.body) || 0 } },
+                    armor: { base: Number(vehicle.armor) || 0 },
                     isDrone: vehicle.isdrone === "True"
                 },
                 folder: actor.folder?.id

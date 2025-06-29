@@ -38,7 +38,7 @@ const FiringModeData = () => ({
     full_auto: new BooleanField(),
 });
 
-const RangeWeaponData = () => ({
+export const RangeWeaponData = () => ({
     category: new StringField({ required: true, initial: 'manual' }),
     ranges: new SchemaField(RangeData()),
     rc: new SchemaField(ModifiableValue()),

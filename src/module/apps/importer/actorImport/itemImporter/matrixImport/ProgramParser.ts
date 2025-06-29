@@ -1,27 +1,34 @@
+import { DataDefaults } from "src/module/data/DataDefaults";
 import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
+import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions.js"
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 /**
  * Parses common, hacking and agent programs.
  */
 export class ProgramParser extends BaseGearParser {
-    override parse(chummerGear : any) : any {
+    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>) : any {
         const parserType = 'program';
-        const parsedGear =  super.parse(chummerGear);
+        const parsedGear = DataDefaults.baseEntityData("program");
+
+        const system = parsedGear.system;
+
+        system.technology = parseTechnology(chummerGear);
+        system.description = parseDescription(chummerGear);
+
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(chummerGear.name), parserType);
+
+
         parsedGear.type = parserType;
 
         if (chummerGear.category_english === 'Common Programs')
-        {
             parsedGear.system.type = 'common_program'
-        }
         else if (chummerGear.category_english === 'Hacking Programs')
-        {
             parsedGear.system.type = 'hacking_program'
-        }
         else if (chummerGear.category_english === 'Software')
-        {
             parsedGear.system.type = 'agent'
-        }
 
         // Assign import flags
         parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);

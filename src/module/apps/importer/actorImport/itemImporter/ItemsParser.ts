@@ -11,6 +11,12 @@ import { ContactParser } from "./bioImport/ContactParser.js";
 import SimpleParser from "./importHelper/SimpleParser.js";
 import { CritterPowerParser } from "./magicImport/CritterPowerParser.js";
 import { RitualParser } from "./magicImport/RitualParser.js";
+import { ActorSchema } from "../ActorSchema.js";
+
+import { ImportHelper as IH } from "src/module/apps/itemImport/helper/ImportHelper.js";
+import { importOptionsType } from "../characterImporter/CharacterImporter.js";
+
+export type Unwrap<T> = T extends Array<infer U> ? U : T;
 
 /**
  * Parses all items (qualities, weapons, gear, ...) from a chummer character.
@@ -22,9 +28,9 @@ export class ItemsParser {
      * @param {*} chummerChar The chummer char holding the items
      * @param {*} importOptions Additional import option that specify what items will be imported.
      */
-    async parse(chummerChar, importOptions) {
-        const promises = [];
-        Object.freeze(chummerChar)
+    async parse(chummerChar: ActorSchema, importOptions: importOptionsType) {
+        const promises: Promise<any>[] = [];
+        Object.freeze(chummerChar);
 
         if (importOptions.qualities && chummerChar.qualities?.quality) {
             promises.push(new QualityParser().parseQualities(chummerChar, importOptions.assignIcons));
@@ -64,18 +70,18 @@ export class ItemsParser {
             promises.push( new LifestyleParser().parseLifestyles(chummerChar, importOptions.assignIcons));
         }
 
-        if(chummerChar.metamagics?.metamagic) {
-            let metamagics = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("metamagic"))
+        if (importOptions.metamagics && chummerChar.metamagics?.metamagic) {
+            const metamagics = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("metamagic"))
             promises.push(new SimpleParser().parseCollection(metamagics, "metamagic", importOptions.assignIcons));
         }
 
-        if(chummerChar.metamagics?.metamagic) {
-            let echoes = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("echo"))
+        if (importOptions.metamagics && chummerChar.metamagics?.metamagic) {
+            const echoes = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("echo"))
             promises.push(new SimpleParser().parseCollection(echoes, "echo", importOptions.assignIcons));
         }
 
         promises.push(new CritterPowerParser().parseCritterPowers(chummerChar, importOptions.assignIcons))
 
-        return  (await Promise.all(promises)).flat();
+        return (await Promise.all(promises)).flat();
     }
 }

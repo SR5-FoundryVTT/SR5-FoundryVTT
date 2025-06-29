@@ -13,7 +13,7 @@ export type NotEmpty<T> = T extends object ? NonNullable<T> : never;
  */
 export class ImportHelper {
     public static readonly CHAR_KEY = '_TEXT';
-    private static folders: Record<string, Promise<Folder>> = {};
+    private static readonly folders: Record<string, Promise<Folder>> = {};
 
     /**
      * Ensures the provided value is returned as an array.

@@ -35,7 +35,7 @@ export function iconAssign(
     const imgName = importFlags.name;
     const imgType = importFlags.type;
     const imgSubType = importFlags.subType;
-    const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides) as boolean;
+    const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides);
 
     // Get the override, if any
     let override = '';

@@ -1,32 +1,36 @@
 import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
 import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
+import { ActorSchema } from "../../ActorSchema.js";
+import { DataDefaults } from "src/module/data/DataDefaults.js";
+import { Unwrap } from "../ItemsParser.js";
 
 export class PowerParser {
 
-    async parsePowers(chummerChar, assignIcons) {
-        const powers = getArray(chummerChar.powers.power);
-        const parsedPowers = [];
+    async parsePowers(chummerChar: ActorSchema, assignIcons: boolean = false) {
+        const powers = getArray(chummerChar.powers?.power);
+        const parsedPowers: Item.CreateData[] = [];
         const iconList = await IconAssign.getIconFiles();
 
-        powers.forEach(async (chummerPower) => {
+        for (const chummerPower of powers) {
             try {
                 const itemData = this.parsePower(chummerPower);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                if (assignIcons)
+                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                 parsedPowers.push(itemData);
             } catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return parsedPowers;
     }
 
-    parsePower(chummerPower) {
+    parsePower(chummerPower: Unwrap<NonNullable<ActorSchema['powers']>['power']>) {
         const parserType = 'adept_power';
-        const system = {};
+        const system = DataDefaults.baseSystemData('adept_power');
         system.description = parseDescription(chummerPower);
 
         system.level = parseInt(chummerPower.rating);
@@ -34,7 +38,7 @@ export class PowerParser {
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerPower.fullname), parserType);
-        if (chummerPower.name != chummerPower.fullname) {
+        if (chummerPower.name !== chummerPower.fullname) {
             setSubType(system, parserType, formatAsSlug(chummerPower.name));
             if (system.importFlags.subType) {
                 system.importFlags.name = formatAsSlug(chummerPower.extra);

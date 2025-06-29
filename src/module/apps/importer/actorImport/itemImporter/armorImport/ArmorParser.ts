@@ -1,34 +1,39 @@
 import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
 import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
+import { DataDefaults } from "src/module/data/DataDefaults.js";
+import { ActorSchema } from "../../ActorSchema.js";
+import { Unwrap } from "../ItemsParser.js";
 
 export class ArmorParser {
 
-    async parseArmors(chummerChar, assignIcons) {
+    async parseArmors(chummerChar: ActorSchema, assignIcons: boolean = false) {
         const armors = getArray(chummerChar.armors?.armor);
-        const parsedArmors = [];
+        const parsedArmors: Item.CreateData[] = [];
         const iconList = await IconAssign.getIconFiles();
 
-        armors.forEach(async (chummerArmor) => {
+        for (const chummerArmor of armors) {
             try {
                 const itemData = this.parseArmor(chummerArmor);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                if (assignIcons)
+                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                 parsedArmors.push(itemData);
             } catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         const otherArmors = getArray(chummerChar.otherarmors?.otherarmor)
 
-        otherArmors.forEach(async (chummerArmor) => {
+        otherArmors.forEach((chummerArmor) => {
             try {
                 const itemData = this.parseOtherArmor(chummerArmor);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                if (assignIcons) 
+                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                 parsedArmors.push(itemData);
             } catch (e) {
@@ -39,11 +44,9 @@ export class ArmorParser {
         return parsedArmors;
     }
 
-    parseArmor(chummerArmor) {
+    parseArmor(chummerArmor: Unwrap<NonNullable<ActorSchema['armors']>['armor']>) {
         const parserType = 'armor';
-        const system = {
-            armor: {}
-        };
+        const system = DataDefaults.baseSystemData('armor');
         const armor = system.armor;
 
         armor.mod = chummerArmor.armor.includes('+');
@@ -80,19 +83,14 @@ export class ArmorParser {
         return createItemData(chummerArmor.name, parserType, system);
     }
 
-    parseOtherArmor(chummerArmor) {
+    parseOtherArmor(chummerArmor: Unwrap<NonNullable<ActorSchema['otherarmors']>['otherarmor']>) {
         const parserType = 'armor';
-        const system = {
-            armor: {}
-        };
+        const system = DataDefaults.baseSystemData('armor');
         const armor = system.armor;
 
         armor.mod = chummerArmor.armor.includes('+');
-        armor.value = parseInt(chummerArmor.armor);
-
-        system.technology = parseTechnology(chummerArmor);
+        armor.value = Number(chummerArmor.armor) || 0;
         system.technology.equipped = true;
-        system.description = parseDescription(chummerArmor);
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerArmor.objectname_english), parserType);

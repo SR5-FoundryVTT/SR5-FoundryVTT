@@ -1,3 +1,5 @@
+import { object } from "node_modules/fvtt-types/src/foundry/common/prosemirror/schema/other.mjs";
+
 type Many<T> = T[];
 type MaybeEmpty<T> = T | null;
 type OneOrMany<T> = T | Many<T>;
@@ -361,6 +363,7 @@ export type ActorSchema = {
             name_english: string;
             descriptors: string;
             descriptors_english: string;
+            description?: MaybeEmpty<string>;
             category: string;
             category_english: string;
             type: string;
@@ -524,7 +527,7 @@ export type ActorSchema = {
                     source: string;
                     page: string;
                     included: string;
-                    equipped: string;
+                    equipped: TruthyString;
                     wirelesson: string;
                     gears: ActorSchema['gears'];
                     extra: MaybeEmpty<string>;
@@ -654,7 +657,35 @@ export type ActorSchema = {
             availableammo: string;
             currentammo: string;
             currentammo_english: string;
-            clips: MaybeEmpty<string>;
+            clips: MaybeEmpty<{
+                clip: OneOrMany<{
+                    name: string;
+                    english_name: string;
+                    count: string;
+                    location: MaybeEmpty<string>;
+                    id: string;
+                    ammotype: {
+                        weaponbonusdamage: string;
+                        weaponbonusdamage_english: string;
+                        weaponbonusap: string;
+                        weaponbonusap_english: string;
+                        weaponbonusacc: string;
+                        weaponbonusrange: string;
+                        weaponbonuspool: string;
+                        weaponbonussmartlinkpool: string;
+                        flechetteweaponbonusdamage: string;
+                        flechetteweaponbonusdamage_english: string;
+                        flechetteweaponbonusap: string;
+                        flechetteweaponbonusap_english: string;
+                        flechetteweaponbonusacc: string;
+                        flechetteweaponbonusrange: string;
+                        flechetteweaponbonuspool: string;
+                        flechetteweaponbonussmartlinkpool: string;
+                        DV: string;
+                        BonusRange: string;
+                    };
+                }>;    
+            }>;
             dicepool: string;
             dicepool_noammo: string;
             skill: string;
@@ -879,7 +910,7 @@ export type ActorSchema = {
         }>;
     }>;
     vehicles: MaybeEmpty<{
-        vehicles: OneOrMany<{
+        vehicle: OneOrMany<{
             guid: string;
             sourceid: string;
             name: string;
@@ -1069,7 +1100,19 @@ export type ActorSchema = {
             self: string;
         }>;
     }>;
-    otherarmors: ActorSchema['armors'];
+    otherarmors: MaybeEmpty<{
+        otherarmor: OneOrMany<{
+            guid: string;
+            sourcename: string;
+            objectname: string;
+            objectname_english: string;
+            armor: string;
+            improvesource: string;
+            enabled: TruthyString;
+            customname: MaybeEmpty<string>;
+            customgroup: MaybeEmpty<string>;
+        }>;
+    }>;
     calendar: MaybeEmpty<{
         calendar: OneOrMany<{
             guid: string;

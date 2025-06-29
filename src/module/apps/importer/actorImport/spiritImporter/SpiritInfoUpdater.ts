@@ -1,3 +1,6 @@
+import { SR5Actor } from "src/module/actor/SR5Actor";
+import { ActorSchema } from "../ActorSchema";
+
 /**
  * Parses all non-item character information from a chummer character object.
  */
@@ -8,17 +11,16 @@ export class SpiritInfoUpdater {
      * @param {*} actorSource The actor data (actor not actor.system) that is used as the basis for the import. Will not be changed.
      * @param {*} chummerChar The chummer character to parse.
      */
-    async update(actorSource, chummerChar) {
+    async update(actorSource: SR5Actor<'spirit'>, chummerChar: ActorSchema) {
 
         const clonedActorSource = foundry.utils.duplicate(actorSource);
 
         // Name is required, so we need to always set something (even if the chummer field is empty)
-        if (chummerChar.alias) {
+        if (chummerChar.alias)
             clonedActorSource.name = chummerChar.alias;
-        }
-        else {
+        else
             clonedActorSource.name = chummerChar.name ? chummerChar.name : '[Name not found]';
-        }
+
         clonedActorSource.prototypeToken.name = clonedActorSource.name;
 
 
@@ -30,10 +32,10 @@ export class SpiritInfoUpdater {
         return clonedActorSource;
     }
 
-    importSpiritType(system, chummerChar) {
-        let chummerType = chummerChar.metatype_english
+    importSpiritType(system: SR5Actor<'spirit'>['system'], chummerChar: ActorSchema) {
+        const chummerType = chummerChar.metatype_english
 
-        let spiritTypes = [
+        const spiritTypes = [
             'air',
             'aircraft',
             'airwave',
@@ -129,7 +131,7 @@ export class SpiritInfoUpdater {
              'corps_cadavre',
         ]
 
-        let specialMapping = new Map([
+        const specialMapping = new Map([
             ['Noxious Spirit', 'toxic_air'],
             ['Abomination Spirit', 'toxic_beasts'],
             ['Barren Spirit', 'toxic_earth'],
@@ -140,7 +142,7 @@ export class SpiritInfoUpdater {
 
         const type = spiritTypes.find(v => chummerType?.toLowerCase().includes(v)) ?? specialMapping.get(chummerType);
        
-        if(type == undefined) {
+        if(!type) {
             ui.notifications?.error(game.i18n.format("SR5.Import.Spirit.SpiritTypeNotFound"))
             return;
         }

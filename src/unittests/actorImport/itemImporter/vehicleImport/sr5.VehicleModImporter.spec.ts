@@ -6,21 +6,21 @@ export const vehicleModParserTesting = (context: QuenchBatchContext) => {
     const { describe, it, before, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    let parser = new VehicleModsParser();
+    const parser = new VehicleModsParser();
 
     describe('Vehicle Mod Parser', () => {
 
         it('parses mods', async () => {
-            let mods = await parser.parseMods(chummerDrone, false);
+            const mods = (await parser.parseMods(chummerDrone as any)) as (Item.CreateData & {system: Item.SystemOfType<'modification'>})[];
 
             assert.lengthOf(mods, 2);
             
-            let ecm = mods.find(mod => mod.name === "ECM")
+            const ecm = mods.find(mod => mod.name === "ECM")
             assert.isNotNull(ecm)
-            assert.strictEqual(ecm.name, "ECM")
-            assert.strictEqual(ecm.type, "modification")
-            assert.strictEqual(ecm.system.technology.availability, "9V")
-            assert.strictEqual(ecm.system.description.source, "R5 173")
+            assert.strictEqual(ecm!.name, "ECM")
+            assert.strictEqual(ecm!.type, "modification")
+            assert.strictEqual(ecm!.system.technology.availability, "9V")
+            assert.strictEqual(ecm!.system.description.source, "R5 173")
         });
     });
 };

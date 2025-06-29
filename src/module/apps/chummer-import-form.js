@@ -23,18 +23,19 @@ export class ChummerImportForm extends FormApplication {
 
             const chummerFile = JSON.parse($('.chummer-text').val());
             const importOptions = {
-                weapons: $('.weapons').is(':checked'),
+                assignIcons: $('.assignIcons').is(':checked'),
+
                 armor: $('.armor').is(':checked'),
+                contacts: $('.contacts').is(':checked'),
                 cyberware: $('.cyberware').is(':checked'),
                 equipment: $('.gear').is(':checked'),
-                qualities: $('.qualities').is(':checked'),
-                powers: $('.powers').is(':checked'),
-                spells: $('.spells').is(':checked'),
-                contacts: $('.contacts').is(':checked'),
                 lifestyles: $('.lifestyles').is(':checked'),
+                powers: $('.powers').is(':checked'),
+                qualities: $('.qualities').is(':checked'),
+                spells: $('.spells').is(':checked'),
                 vehicles: $('.vehicles').is(':checked'),
-                assignIcons: $('.assignIcons').is(':checked'),
-            }
+                weapons: $('.weapons').is(':checked'),
+            };
 
             let importer;
             switch(this.object.type) {

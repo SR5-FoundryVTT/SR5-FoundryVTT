@@ -1,50 +1,52 @@
 import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
 import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
+import { ActorSchema } from "../../ActorSchema.js";
+import { Unwrap } from "../ItemsParser.js";
+import { DataDefaults } from "src/module/data/DataDefaults.js";
 
 export class ContactParser {
-
-    async parseContacts(chummerChar, assignIcons) {
-
-        const chummerContacts = getArray(chummerChar.contacts.contact);
-        const parsedContacts = [];
+    async parseContacts(chummerChar: ActorSchema, assignIcons: boolean = false) {
+        const chummerContacts = getArray(chummerChar.contacts?.contact);
+        const parsedContacts: Item.CreateData[] = [];
         const iconList = await IconAssign.getIconFiles();
 
-        chummerContacts.forEach(async (chummerContact) => {
+        for (const chummerContact of chummerContacts) {
             try {
                 const itemData = this.parseContact(chummerContact);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                if (assignIcons)
+                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                 parsedContacts.push(itemData);
             } catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return parsedContacts;
     }
 
-    parseContact(chummerContact) {
+    parseContact(chummerContact: Unwrap<NonNullable<ActorSchema['contacts']>['contact']>) {
         const parserType = 'contact';
-        const system = {};
-        system.type = chummerContact.role;
+        const system = DataDefaults.baseSystemData(parserType);
+        system.type = chummerContact.role || '';
 
         // Group contacts are stored in chummer as 'Group(connectionRating)', e.g. 'Group(5)'
         // We handle group contacts as normal contacts until they are supported in the codebase.
         if (chummerContact.connection.toLowerCase().includes('group')) {
-            system.connection = chummerContact.connection
+            system.connection = Number(chummerContact.connection
                 .toLowerCase()
                 .replace('group(', '')
-                .replace(')', '');
+                .replace(')', '')) || 0;
         }
         else {
-            system.connection = chummerContact.connection;
+            system.connection = Number(chummerContact.connection) || 0;
         }
 
-        system.loyalty = chummerContact.loyalty;
-        system.family = (chummerContact.family.toLowerCase() === 'true');
-        system.blackmail = (chummerContact.blackmail.toLowerCase() === 'true');
+        system.loyalty = Number(chummerContact.loyalty) || 0;
+        system.family = (chummerContact.family === 'True');
+        system.blackmail = (chummerContact.blackmail === 'True');
         system.description = parseDescription(chummerContact);
 
         const itemName = chummerContact.name ? chummerContact.name : '[Unnamed connection]';

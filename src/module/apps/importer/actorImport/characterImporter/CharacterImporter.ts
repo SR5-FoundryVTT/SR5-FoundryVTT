@@ -4,6 +4,24 @@ import VehicleParser from "../itemImporter/vehicleImport/VehicleParser";
 import { ActorFile } from "../ActorSchema";
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ImportHelper as IH } from "src/module/apps/itemImport/helper/ImportHelper";
+
+export type importOptionsType = Partial<{
+    assignIcons: boolean;
+
+    armor: boolean;
+    contacts: boolean;
+    cyberware: boolean;
+    equipment: boolean;
+    lifestyles: boolean;
+    metamagics: boolean;
+    powers: boolean;
+    qualities: boolean;
+    rituals: boolean;
+    spells: boolean;
+    vehicles: boolean;
+    weapons: boolean;
+}>;
+
 /**
  * Imports characters from other tools into an existing foundry actor.
  */
@@ -15,7 +33,7 @@ export class CharacterImporter {
      * @param {*} chummerFile The complete chummer file as json object. The first character will be selected for import.
      * @param {*} importOptions Additional import option that specify what parts of the chummer file will be imported.
      */
-    async importChummerCharacter(actor: SR5Actor<'character'>, chummerFile: ActorFile, importOptions) {
+    async importChummerCharacter(actor: SR5Actor<'character'>, chummerFile: ActorFile, importOptions: importOptionsType) {
         console.log('Importing the following character file content:');
         console.log(chummerFile);
 

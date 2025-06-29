@@ -5,7 +5,7 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, beforeEach, after } = context;
 
     let chummerCharacter;
-    let chummerRangedWeapon = {
+    const chummerRangedWeapon = {
         guid: '8a88eb37-cf7b-4c0b-bb73-74f950e33fc8',
         sourceid: '61c59a89-3c51-46b7-880a-933b29394315',
         name: 'Ruger Super Warhawk',
@@ -611,7 +611,7 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
         notes: null,
     };
 
-    let weaponParser = new WeaponParser();
+    const weaponParser = new WeaponParser();
 
     beforeEach(async () => {
         chummerCharacter = {};
@@ -623,7 +623,7 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
                 weapons: null,
             };
 
-            let weapons = await weaponParser.parseWeapons(chummerCharacter);
+            const weapons = await weaponParser.parseWeapons(chummerCharacter);
 
             assert.lengthOf(weapons, 0);
         });
@@ -633,13 +633,13 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
                 weapons: [],
             };
 
-            let weapons = await weaponParser.parseWeapons(chummerCharacter);
+            const weapons = await weaponParser.parseWeapons(chummerCharacter);
 
             assert.lengthOf(weapons, 0);
         });
 
         it('is missing weapons in character', async () => {
-            let weapons = await weaponParser.parseWeapons(chummerCharacter);
+            const weapons = await weaponParser.parseWeapons(chummerCharacter);
 
             assert.lengthOf(weapons, 0);
         });
@@ -650,20 +650,20 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
                     weapon: chummerRangedWeapon,
                 },
             };
-            let weapons = await weaponParser.parseWeapons(chummerCharacter);
+            const weapons = await weaponParser.parseWeapons(chummerCharacter);
 
             assert.lengthOf(weapons, 1);
         });
 
         it('weaponArray with empty array', async () => {
-            let weapons = await weaponParser.parseWeaponArray([]);
+            const weapons = await weaponParser.parseWeaponArray([]);
 
             assert.lengthOf(weapons, 0);
         });
 
         it('weaponArray with one weapon', async () => {
-            let chummerWeapons = [chummerRangedWeapon];
-            let weapons = await weaponParser.parseWeaponArray(chummerWeapons);
+            const chummerWeapons = [chummerRangedWeapon];
+            const weapons = await weaponParser.parseWeaponArray(chummerWeapons as any);
 
             assert.lengthOf(weapons, 1);
         });
@@ -676,10 +676,10 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
                     weapon: chummerRangedWeapon,
                 },
             };
-            let weapons = await weaponParser.parseWeapons(chummerCharacter);
+            const weapons = await weaponParser.parseWeapons(chummerCharacter);
 
             assert.lengthOf(weapons, 1);
-            let weapon = weapons[0];
+            const weapon = weapons[0];
 
             //general info
             assert.strictEqual(weapon.name, 'Ruger Super Warhawk');

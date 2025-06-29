@@ -32,7 +32,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
     protected abstract readonly parseType: SubType;
     protected folders: Record<string, Promise<Folder>> = {};
 
-    private isActor(): boolean {
+    private isActor(): this is Parser<SystemEntityType & Actor.SubType> {
         return Object.keys(game.model.Actor).includes(this.parseType);
     }
 
@@ -48,14 +48,14 @@ export abstract class Parser<SubType extends SystemEntityType> {
         const typeOption = Constants.MAP_TRANSLATION_TYPE[this.parseType] as TranslationType;
         const options = {id: jsonData.id._TEXT, type: typeOption};
 
-        const entity: Actor.CreateData | Item.CreateData = {
+        const entity = {
             name: TH.getTranslation(name, options),
             type: this.parseType as any,
             folder: await this.getFolder(jsonData),
             system: this.getSystem(jsonData),
-        };
+        } satisfies Actor.CreateData | Item.CreateData;
 
-        const system = entity.system! as SystemType<SubType>;
+        const system = entity.system;
 
         // Add technology
         if (system && 'technology' in system && system.technology)

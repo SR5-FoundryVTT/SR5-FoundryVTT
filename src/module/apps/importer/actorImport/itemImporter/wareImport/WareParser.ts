@@ -1,44 +1,48 @@
 import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
 import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
+import { ActorSchema } from "../../ActorSchema.js";
+import { Unwrap } from "../ItemsParser.js";
+import { DataDefaults } from "src/module/data/DataDefaults.js";
 
 export class WareParser {
 
-    async parseWares(chummerChar, assignIcons) {
-        const chummerWares = getArray(chummerChar.cyberwares.cyberware);
-        const parsedWare = [];
+    async parseWares(chummerChar: ActorSchema, assignIcons: boolean = false) {
+        const chummerWares = getArray(chummerChar.cyberwares?.cyberware);
+        const parsedWare: Item.CreateData[] = [];
         const iconList = await IconAssign.getIconFiles();
 
-        await chummerWares.forEach( async (chummerWare) => {
+        for (const chummerWare of chummerWares) {
             try {
                 const itemData = this.parseWare(chummerWare);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                if (assignIcons)
+                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                 parsedWare.push(itemData);
             } catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return parsedWare;
     }
 
-    parseWare(chummerWare) {
+    parseWare(chummerWare: Unwrap<NonNullable<ActorSchema['cyberwares']>['cyberware']>) {
         // set based on if this is cyberware or bioware
-        let parserType = chummerWare.improvementsource.toLowerCase();
+        let parserType = chummerWare.improvementsource.toLowerCase() as 'cyberware' | 'bioware';
         if (!['cyberware', 'bioware'].includes(parserType)) {parserType = 'cyberware'}; //default to cyberware if no match
-        const system = {};
+        const system = DataDefaults.baseSystemData(parserType);
         system.description = parseDescription(chummerWare);
         system.technology = parseTechnology(chummerWare);
 
         // Cyberware and Bioware have no equipped flag in chummer so it cannot be parsed - we consider it as always equipped
         system.technology.equipped = true;
-        system.essence = chummerWare.ess;
-        system.grade = chummerWare.grade;
+        system.essence = Number(chummerWare.ess) || 0;
+        system.grade = chummerWare.grade.toLowerCase() as 'standard' | 'alpha' | 'beta' | 'delta' | 'gamma';
 
         // Bioware has no wireless feature, so disable it by default
-        if (parserType == 'bioware') {
+        if (parserType === 'bioware') {
             system.technology.wireless = false;
         }
 
