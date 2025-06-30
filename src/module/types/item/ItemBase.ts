@@ -27,13 +27,13 @@ export abstract class ItemBase<DS extends ReturnType<typeof BaseItemData>> exten
     }
 
     static migrateWithSchema(source: AnyMutableObject, schema: foundry.data.fields.SchemaField.Any) {
-        for (const [fieldName, field] of Object.entries(schema)) {
+        for (const [fieldName, field] of Object.entries(schema.fields)) {
             const value = source[fieldName];
-            if (!field.validate(value)) {
+            if (!(field as any).validate(value)) {
                 if (field instanceof SchemaField && value && typeof value === "object") {
                     ItemBase.migrateWithSchema(value as AnyMutableObject, field);
                 } else {
-                    source[fieldName] = field.getInitialValue();
+                    source[fieldName] = (field as any).getInitialValue();
                 }
             }
         }
