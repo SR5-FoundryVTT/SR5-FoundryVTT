@@ -22,6 +22,20 @@ export abstract class ItemBase<DS extends ReturnType<typeof BaseItemData>> exten
         if (!source || typeof source !== "object" || Object.keys(source).length === 0)
             return super.migrateData(source);
 
+        ItemBase.migrateWithSchema(source, this.schema);
         return super.migrateData(source);
+    }
+
+    static migrateWithSchema(source: AnyMutableObject, schema: foundry.data.fields.SchemaField.Any) {
+        for (const [fieldName, field] of Object.entries(schema)) {
+            const value = source[fieldName];
+            if (!field.validate(value)) {
+                if (field instanceof SchemaField && value && typeof value === "object") {
+                    ItemBase.migrateWithSchema(value as AnyMutableObject, field);
+                } else {
+                    source[fieldName] = field.getInitialValue();
+                }
+            }
+        }
     }
 }

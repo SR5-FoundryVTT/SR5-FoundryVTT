@@ -6,7 +6,6 @@ import { DescriptionData } from "../template/Description";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
 import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
-import DataSchema = foundry.data.fields.DataSchema;
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
@@ -76,6 +75,20 @@ export abstract class ActorBase<DS extends ReturnType<typeof CommonData>> extend
         if (!source || typeof source !== "object" || Object.keys(source).length === 0)
             return super.migrateData(source);
 
+        ActorBase.migrateWithSchema(source, this.schema);
         return super.migrateData(source);
+    }
+
+    static migrateWithSchema(source: AnyMutableObject, schema: foundry.data.fields.SchemaField.Any) {
+        for (const [fieldName, field] of Object.entries(schema)) {
+            const value = source[fieldName];
+            if (!field.validate(value)) {
+                if (field instanceof SchemaField && value && typeof value === "object") {
+                    ActorBase.migrateWithSchema(value as AnyMutableObject, field);
+                } else {
+                    source[fieldName] = field.getInitialValue();
+                }
+            }
+        }
     }
 }
