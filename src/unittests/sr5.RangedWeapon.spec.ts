@@ -47,22 +47,25 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
         });
 
         it('Reload weapon causes reduction in available clips', async () => {
-            const actor = new SR5Actor<'character'>({type: 'character', name: 'Test Character'});
+            const actor = await SR5Actor.create({type: 'character', name: 'Test Character'}) as SR5Actor<'character'>;
             const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}, spare_clips: {value: 1, max: 1}}}}]);
             const item = items![0] as SR5Item<'weapon'>;
             assert.strictEqual(item.system.ammo.spare_clips.value, 1);
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo.spare_clips.value, 0);
+
+            actor.delete();
         });
 
         it('Reloads weapon fully when no ammo is used', async () => {
-            const actor = new SR5Actor<'character'>({type: 'character', name: 'Test Character'});
+            const actor = await SR5Actor.create({type: 'character', name: 'Test Character'}) as SR5Actor<'character'>;
             const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}]);
             const item = items![0] as SR5Item<'weapon'>;
             // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}) as SR5Item;
             assert.strictEqual(item.system.ammo.current.value, 0);
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo.current.value, item.system.ammo.current.max);
+            actor.delete();
         });
 
         it('Reloads weapon fully when ammo is equipped and reduced ammo', async () => {
@@ -75,6 +78,8 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo.current.value, item.system.ammo.current.max);
             assert.strictEqual(ammo.system.technology?.quantity, 15);
+
+            await item.delete();
         });
 
         it('Does not reload when equipped ammo has no bullets left', async () => {
@@ -87,6 +92,8 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo.current.value, 15);
             assert.strictEqual(ammo.system.technology?.quantity, 0);
+
+            await item.delete();
         });
 
         it('Does partially reload when equipped ammo has some bullets left', async () => {
@@ -99,6 +106,8 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo.current.value, 25);
             assert.strictEqual(ammo.system.technology?.quantity, 0);
+
+            await item.delete();
         });
     });
 }

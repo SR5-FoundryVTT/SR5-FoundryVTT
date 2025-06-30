@@ -54,8 +54,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const mods: SR5Item<'modification'>[] = [];
 
             // prepareConceal relies on the item name to be unique.
-            mods.push(new SR5Item<'modification'>({type: 'modification', name: 'UniqueNameA', system: {conceal: 2}}));
-            mods.push(new SR5Item<'modification'>({type: 'modification', name: 'UniqueNameB', system: {conceal: 4}}));
+            mods.push(await SR5Item.create({type: 'modification', name: 'UniqueNameA', system: {conceal: 2}}) as SR5Item<'modification'>);
+            mods.push(await SR5Item.create({type: 'modification', name: 'UniqueNameB', system: {conceal: 4}}) as SR5Item<'modification'>);
             
             TechnologyPrep.prepareConceal(device.system.technology, mods);
 
@@ -63,6 +63,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.equal(device.system.technology.conceal.mod.length, 2);
 
             await device.delete();
+            await mods[1].delete();
+            await mods[0].delete();
         });
     });
 
@@ -98,28 +100,32 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const weapon = await SR5Item.create({type: 'weapon', name: 'Test'}) as SR5Item<'weapon'>;
             // unique names are necessary
             const mods: SR5Item<'modification'>[] = [];
-            mods.push(new SR5Item<'modification'>({type: 'modification', name: 'TestModA', system: {type: 'weapon', dice_pool: 2}}));
-            mods.push(new SR5Item<'modification'>({type: 'modification', name: 'TestModB', system: {type: 'weapon', dice_pool: 4}}));
+            mods.push(await SR5Item.create({type: 'modification', name: 'TestModA', system: {type: 'weapon', dice_pool: 2}}) as SR5Item<'modification'>);
+            mods.push(await SR5Item.create({type: 'modification', name: 'TestModB', system: {type: 'weapon', dice_pool: 4}}) as SR5Item<'modification'>);
 
             ActionPrep.prepareWithMods(weapon.system.action, mods);
             ActionPrep.calculateValues(weapon.system.action);
 
             assert.strictEqual(weapon.system.action?.dice_pool_mod.length, 2);
             await weapon.delete();
+            await mods[1].delete();
+            await mods[0].delete();
         });
 
         it('Check for weapon modification setting limit modifiers', async () => {
             const weapon = await SR5Item.create({type: 'weapon', name: 'QUENCH'}) as SR5Item<'weapon'>;
             // unique names are necessary
             const mods: SR5Item<'modification'>[] = [];
-            mods.push(new SR5Item<'modification'>({type: 'modification', name: 'TestModA', system: {type: 'weapon', accuracy: 2}}));
-            mods.push(new SR5Item<'modification'>({type: 'modification', name: 'TestModB', system: {type: 'weapon', accuracy: 4}}));
+            mods.push(await SR5Item.create({type: 'modification', name: 'TestModA', system: {type: 'weapon', accuracy: 2}}) as SR5Item<'modification'>);
+            mods.push(await SR5Item.create({type: 'modification', name: 'TestModB', system: {type: 'weapon', accuracy: 4}}) as SR5Item<'modification'>);
 
             ActionPrep.prepareWithMods(weapon.system.action, mods);
             ActionPrep.calculateValues(weapon.system.action);
 
             assert.strictEqual(weapon.system.action?.limit.mod.length, 2);
             await weapon.delete();
+            await mods[1].delete();
+            await mods[0].delete();
         });
 
         it('Check for ammo to apply its damage to the weapon', async () => {
@@ -130,6 +136,9 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             ActionPrep.calculateValues(weapon.system.action);
 
             assert.strictEqual(weapon.system.action?.damage.value, 2);
+
+            await weapon.delete();
+            await ammo.delete();
         });
 
         it('Check for ammo to modify the weapon armor piercing', async () => {
@@ -140,6 +149,9 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             ActionPrep.calculateValues(weapon.system.action);
 
             assert.strictEqual(weapon.system.action?.damage.ap.value, -2);
+
+            await weapon.delete();
+            await ammo.delete();
         });
 
         it('Check for ammo to override the weapon damage info', async () => {
@@ -177,6 +189,9 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.action?.damage.type.value, 'stun');
             assert.strictEqual(weapon.system.action?.damage.element.base, '');
             assert.strictEqual(weapon.system.action?.damage.element.value, 'cold');
+
+            await weapon.delete();
+            await ammo.delete();
         });
     });
 
@@ -193,6 +208,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.range.rc.value, 4);
 
             await weapon.delete();
+            await mods[0].delete();
         });
     });
 }

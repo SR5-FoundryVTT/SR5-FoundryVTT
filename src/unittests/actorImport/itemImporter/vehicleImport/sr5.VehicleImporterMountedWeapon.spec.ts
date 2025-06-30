@@ -12,6 +12,8 @@ export const mountedWeaponParserTesting = (context: QuenchBatchContext) => {
             const weapons = await mountedWeaponParser.parseWeapons(chummerVehicle as any);
 
             assert.lengthOf(weapons, 1);
+
+            for (const weapon of weapons) await weapon.delete();
         });
     });
 };
