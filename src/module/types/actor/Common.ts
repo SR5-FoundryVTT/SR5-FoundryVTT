@@ -82,11 +82,12 @@ export abstract class ActorBase<DS extends ReturnType<typeof CommonData>> extend
     static migrateWithSchema(source: AnyMutableObject, schema: foundry.data.fields.SchemaField.Any) {
         for (const [fieldName, field] of Object.entries(schema.fields)) {
             const value = source[fieldName];
-            if (!(field as any).validate(value)) {
+            const dataField = field as foundry.data.fields.DataField.Any;
+            if (dataField.validate(value) != null) {
                 if (field instanceof SchemaField && value && typeof value === "object") {
                     ActorBase.migrateWithSchema(value as AnyMutableObject, field);
                 } else {
-                    source[fieldName] = (field as any).getInitialValue();
+                    source[fieldName] = dataField.getInitialValue();
                 }
             }
         }
