@@ -8,7 +8,7 @@ export interface Mod {
     ammobonus?: { _TEXT: string; };
     ammobonuspercent?: { _TEXT: string; };
     ammoreplace?: { _TEXT: string; };
-    avail: Empty | { _TEXT: string; };
+    avail: { _TEXT: string; };
     bonus?: BonusSchema;
     capacity?: { _TEXT: string; };
     category: { _TEXT: string; };
@@ -57,7 +57,7 @@ export interface Vehicle {
     handling: { _TEXT: string; };
     hide?: Empty;
     id: { _TEXT: string; };
-    mods?: Empty | {
+    mods?: {
         addslots?: { _TEXT: string; };
         mod?: Many<{
             name: { _TEXT: string; };
@@ -67,7 +67,7 @@ export interface Vehicle {
                 };
             };
         }>;
-        name?: OneOrMany<{ _TEXT: string; $?: { cost?: string; rating?: string; select?: string; }; }>;
+        name: OneOrMany<{ _TEXT: string; $?: { cost?: string; rating?: string; select?: string; }; }>;
     };
     modslots?: { _TEXT: string; };
     name: { _TEXT: string; };

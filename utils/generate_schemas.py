@@ -3,16 +3,20 @@
 from __future__ import annotations
 
 import re
-import time
+import base64
 import requests
 from lxml import etree
 from io import BytesIO
 from pathlib import Path
 from collections import defaultdict, Counter
-from typing import Dict, Set, Tuple, List, Union
+from typing import DefaultDict, Dict, Set, Tuple, List, Union
+
+#URL constants
+OWNER = "chummer5a"
+REPO = "chummer5a"
+BRANCH = "d800ca7a7e8effcb1b80ba83ba3a94e3c344cbf1" #v5.255.922
 
 OUT_DIR = Path("../src/module/apps/itemImport/schema")
-REPO_URL = "https://raw.githubusercontent.com/BM123499/chummer5a/XSD_Remake/Chummer/"
 FILES = [
     'armor.xml', 'bioware.xml', 'complexforms.xml', 'critterpowers.xml',
     'critters.xml', 'cyberware.xml', 'echoes.xml', 'gear.xml', 'metatypes.xml',
@@ -118,7 +122,7 @@ class NodeInfo:
         self.children.update(other.children)
 
 Structure = Dict[str, NodeInfo]
-Multiplicity = Dict[str, Dict[str, Tuple[int, int, int]]]  # parent -> child -> (present, min, max)
+Multiplicity = DefaultDict[str, DefaultDict[str, list[Union[int, float]]]]  # parent -> child -> (present, min, max)
 SecondLevelDefs = Dict[str, str]  # tag -> interface definition
 
 # -------------------------------------------------------------------
@@ -149,7 +153,7 @@ def qname(el: etree._Element) -> str:
 
 def analyse_xml(root: etree._Element) -> tuple[Structure, Multiplicity]:
     struct: Structure = defaultdict(NodeInfo)
-    mult: Dict[str, Dict[str, Tuple[int, int, int]]] = defaultdict(lambda: defaultdict(lambda: [0, float("inf"), 0]))
+    mult: Multiplicity = defaultdict(lambda: defaultdict(lambda: [0, float("inf"), 0]))
 
     def walk(el: etree._Element, p: str = ""):
         if not isinstance(el.tag, str):
@@ -185,14 +189,14 @@ def analyse_xml(root: etree._Element) -> tuple[Structure, Multiplicity]:
             info.empty_count += 1
 
         # Count how many of each child appears under this parent instance
-        child_counter = Counter(qname(c) for c in el if isinstance(c.tag, str))
+        child_counter = Counter(qname(c) for c in el if isinstance(c.tag, str)) # type: ignore
         for child_tag, count in child_counter.items():
             info.children.add(child_tag)
             pres, minp, maxp = mult[cur][child_tag]
             mult[cur][child_tag] = [pres + 1, min(minp, count), max(maxp, count)]
 
         # Also register child names so even if 0 occurrences in one parent, they're tracked
-        for c in el:
+        for c in el: # type: ignore
             walk(c, cur)
 
     walk(root)
@@ -203,7 +207,7 @@ def analyse_xml(root: etree._Element) -> tuple[Structure, Multiplicity]:
             pres, minp, maxp = mult[parent][child]
             if minp == float("inf"):
                 minp = 0
-            mult[parent][child] = (pres, minp, maxp)
+            mult[parent][child] = [pres, minp, maxp]
 
     return struct, mult
 
@@ -323,16 +327,12 @@ def build_type(
 
 #combine structures
 def merge_structs(
-        structs: List[Union[Tuple[str, Structure, Multiplicity], Tuple[Structure, Multiplicity]]],
+        structs: List[Tuple[str, Structure, Multiplicity]],
         baseName: str = "merged"
     ) -> Tuple[Structure, Multiplicity]:
 
     merged_struct: Structure = defaultdict(NodeInfo)
     merged_mult: Multiplicity = defaultdict(lambda: defaultdict(lambda: [0, float("inf"), 0]))
-
-    # Normalize input to 3-tuples with path
-    if len(structs[0]) == 2:
-        structs = [( "__FAKE__", struct, mult ) for struct, mult in structs]  # type: ignore
 
     for path, struct, mult in structs:
         use_prefix = path != "__FAKE__"
@@ -383,7 +383,7 @@ def generate_ts(struct, mult, root_tag: str, file_stem: str, depth: int = 0) -> 
     second_defs: Dict[str, List[Tuple[str, Structure, Multiplicity]]] = {}
     root_type = build_type(root_tag, struct, mult, depth, second_defs)
 
-    lines = [generate_header(EXTRACT_TAGS.values() if depth == 0 else [])]
+    lines = [generate_header(list(EXTRACT_TAGS.values()) if depth == 0 else [])]
 
     if second_defs:
         # Emit second-level interfaces
@@ -403,12 +403,19 @@ def generate_ts(struct, mult, root_tag: str, file_stem: str, depth: int = 0) -> 
     
     return "\n".join(lines) + "\n"
 
-def download_xml_from_github(url: str) -> etree._Element:
-    """Download an XML file from a raw GitHub URL and parse it directly."""
-    response = requests.get(url)
+def download_xml_from_github(path: str) -> etree._Element:
+    api_url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/{path}?ref={BRANCH}"
+    headers = {"Accept": "application/vnd.github.v3+json"}
+    
+    response = requests.get(api_url, headers=headers)
     response.raise_for_status()
-    return etree.parse(BytesIO(response.content)).getroot()
 
+    data = response.json()
+    if "content" not in data or data.get("encoding") != "base64":
+        raise ValueError("Unexpected response format from GitHub API")
+
+    decoded_content = base64.b64decode(data["content"])
+    return etree.parse(BytesIO(decoded_content), etree.XMLParser()).getroot()
 # -------------------------------------------------------------------
 # Main Function
 # -------------------------------------------------------------------
@@ -433,28 +440,25 @@ def main() -> None:
     for xml_name in FILES:
         if xml_name not in files_in_merge:
             xml_stem = xml_name[:-4]
-            xml_url = f"{REPO_URL}data/{xml_name}"
-            root = download_xml_from_github(xml_url)
+            xml_path = f"Chummer/data/{xml_name}"
+            root = download_xml_from_github(xml_path)
             struct, mult = analyse_xml(root)
             ts_code = generate_ts(struct, mult, qname(root), xml_stem)
             (OUT_DIR / f"{xml_stem.capitalize()}Schema.ts").write_text(ts_code, encoding="utf-8")
             print(f"✔  {xml_name} → schema/{xml_stem}.ts")
-        else:
-            xml_url = f"{REPO_URL}{'lang' if 'data' in xml_name else 'data'}/{xml_name}"
-            root = download_xml_from_github(xml_url)
-            xml_cache[xml_name] = analyse_xml(root)
-
-        if xml_name not in files_in_merge:
             # Generalized extraction for specified tags (e.g., bonus, forbidden, required)
             for tag, _ in EXTRACT_TAGS.items():
                 matching_paths = [p for p in struct if p.endswith(f"/{tag}")]
                 for path in matching_paths:
                     EXTRACT_STRUCTURES.setdefault(tag, []).append((path, struct, mult))
-        
+        else:
+            xml_path = f"Chummer/{'lang' if 'data' in xml_name else 'data'}/{xml_name}"
+            root = download_xml_from_github(xml_path)
+            xml_cache[xml_name] = analyse_xml(root)
 
     # handle merged files
     for filenames, out_name in MERGE_GROUPS:
-        merged_struct, merged_mult = merge_structs([xml_cache[f] for f in filenames])
+        merged_struct, merged_mult = merge_structs([("__FAKE__", s, m) for (s, m) in [xml_cache[f] for f in filenames]])
         ts_code = generate_ts(merged_struct, merged_mult, "chummer", out_name, int(out_name == "Language"))
         (OUT_DIR / (out_name + "Schema.ts")).write_text(ts_code, encoding="utf-8")
         print(f"✔  merged {filenames} → schema/{out_name}")

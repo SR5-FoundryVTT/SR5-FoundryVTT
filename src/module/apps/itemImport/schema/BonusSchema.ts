@@ -5,7 +5,7 @@ import { Empty, Many, OneOrMany } from './Types';
 export interface BonusSchema {
     $?: { unique?: string; useselected?: string; };
     accel?: { _TEXT: string; };
-    actiondicepool?: Empty | { $: { category: string; }; };
+    actiondicepool?: { $: { category: string; }; };
     activeskillkarmacost?: Many<{
         condition: { _TEXT: string; };
         max?: { _TEXT: string; };
@@ -56,7 +56,7 @@ export interface BonusSchema {
         spec: { _TEXT: string; };
     };
     addspell?: { _TEXT: string; $: { alchemical: string; }; };
-    addspirit?: OneOrMany<{
+    addspirit?: Empty | OneOrMany<{
         addtoselected?: { _TEXT: string; };
         spirit?: OneOrMany<{ _TEXT: string; }>;
     }>;
@@ -158,14 +158,13 @@ export interface BonusSchema {
         val: { _TEXT: string; };
     }>;
     freequality?: { _TEXT: string; };
-    freespells?: Empty | { $: { attribute?: string; limit?: string; skill?: string; }; };
+    freespells?: { $: { attribute?: string; limit?: string; skill?: string; }; };
     friendsinhighplaces?: Empty;
     handling?: { _TEXT: string; };
     hardwires?: { _TEXT: string; $: { excludecategory?: string; knowledgeskill?: string; }; };
     initiative?: { _TEXT: string; $?: { precedence: string; }; };
     initiativedice?: { _TEXT: string; };
     initiativepass?: { _TEXT: string; $?: { precedence: string; }; };
-    initiativepassadd?: { _TEXT: string; };
     judgeintentions?: { _TEXT: string; };
     judgeintentionsdefense?: { _TEXT: string; };
     judgeintentionsoffense?: { _TEXT: string; };
@@ -192,17 +191,15 @@ export interface BonusSchema {
         limit: { _TEXT: string; };
         value: { _TEXT: string; };
     }>;
-    limitspellcategory?: Empty | { _TEXT: string; $?: { exclude: string; }; };
-    limitspiritcategory?: {
+    limitspellcategory?: Empty | { _TEXT?: string; $?: { exclude: string; }; };
+    limitspiritcategory?: Empty | {
         spirit?: { _TEXT: string; };
     };
     livingpersona?: {
         attack?: { _TEXT: string; };
         dataprocessing?: { _TEXT: string; };
         firewall?: { _TEXT: string; };
-        signal?: { _TEXT: string; };
         sleaze?: { _TEXT: string; };
-        system?: { _TEXT: string; };
     };
     mademan?: Empty;
     magicianswaydiscount?: Empty;
@@ -222,7 +219,7 @@ export interface BonusSchema {
     nativelanguagelimit?: { _TEXT: string; };
     naturalweapon?: {
         accuracy: { _TEXT: string; };
-        ap?: { _TEXT: string; };
+        ap: { _TEXT: string; };
         damage: { _TEXT: string; };
         name: { _TEXT: string; };
         page: { _TEXT: string; };
@@ -297,10 +294,10 @@ export interface BonusSchema {
         }>;
     };
     selectcontact?: Empty;
-    selectcyberware?: {
+    selectcyberware?: Empty | {
         category?: { _TEXT: string; };
     };
-    selectexpertise?: Empty | { $: { limittoskill: string; }; };
+    selectexpertise?: { $: { limittoskill: string; }; };
     selectinherentaiprogram?: Empty;
     selectlimit?: {
         val: { _TEXT: string; };
@@ -323,7 +320,7 @@ export interface BonusSchema {
     };
     selectrestricted?: Empty;
     selectside?: Empty;
-    selectskill?: {
+    selectskill?: Empty | {
         $?: { knowledgeskills?: string; limittoattribute?: string; limittoskill?: string; maximumrating?: string; minimumrating?: string; skillcategory?: string; };
         applytorating?: { _TEXT: string; };
         disablespecializationeffects?: Empty;
@@ -488,10 +485,13 @@ export interface BonusSchema {
     };
     weaponcategorydv?: {
         bonus: { _TEXT: string; };
-        selectskill: Empty | { $: { limittoskill: string; }; };
+        selectcategories?: {
+            category: Many<{ _TEXT: string; }>;
+        };
+        selectskill?: { $: { limittoskill: string; }; };
     };
     weaponskillaccuracy?: {
-        selectskill: Empty | { $: { excludecategory?: string; excludeskill?: string; knowledgeskills?: string; skillcategory?: string; }; };
+        selectskill: { $: { excludecategory?: string; excludeskill?: string; knowledgeskills?: string; skillcategory?: string; }; };
         value: { _TEXT: string; };
     };
     weaponspecificdice?: { _TEXT: string; $: { type: string; }; };

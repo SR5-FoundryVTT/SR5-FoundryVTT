@@ -97,7 +97,7 @@ export class BonusHelper {
         }
 
         if (bonus.conditionmonitor) {
-            const cm  = bonus.conditionmonitor;
+            const cm = bonus.conditionmonitor;
 
             if (cm.overflow) {
                 this.createEffect(
@@ -117,6 +117,30 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, { name: "Override Stun Track" },
                     [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: BC.OVERRIDE }],
+                );
+            }
+
+            if (cm.threshold) {
+                this.createEffect(
+                    sheet, { name: "Pain Tolerance" },
+                    [{ key: "system.modifiers.wound_tolerance", value: cm.threshold._TEXT }],
+                );
+            }
+
+            if (cm.thresholdoffset) {
+                this.createEffect(
+                    sheet, { name: "High Pain Tolerance" },
+                    [{ key: "system.modifiers.pain_tolerance_physical", value: cm.thresholdoffset._TEXT }],
+                );
+            }
+
+            if (cm.sharedthresholdoffset) {
+                this.createEffect(
+                    sheet, { name: "Shared Tolerance" },
+                    [
+                        { key: "system.modifiers.pain_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
+                        { key: "system.modifiers.stun_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
+                    ],
                 );
             }
         }

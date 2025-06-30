@@ -17,7 +17,7 @@ export interface Enhancement {
 export interface Power {
     action?: { _TEXT: string; };
     adeptway?: { _TEXT: string; };
-    adeptwayrequires?: Empty | {
+    adeptwayrequires?: {
         magicianswayforbids?: Empty;
         required?: ConditionsSchema;
     };

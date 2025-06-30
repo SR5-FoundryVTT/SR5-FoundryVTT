@@ -3,6 +3,11 @@
 .sr5.actor {
     min-height: 690px;
     min-width: 870px;
+    .window-content {
+        border: none;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
     .wholesheet {
         height: 100%;
         display: flex;
@@ -11,10 +16,13 @@
     }
     .name {
         @include systemFonts;
-        background: url('assets/name-banner.webp') repeat;
+        background: $nameplate-background;
         font-size: 200%;
         margin-bottom: 0;
         padding-left: 5px;
+        input[type=text].display {
+            background: none;
+        }
     }
     .sheetbody {
         overflow: hidden;
@@ -225,6 +233,37 @@
     // Used to switch between the different hacking targets.
     .switch-matrix-hacking-target {
         @include clickable;
+    }
+
+    &.sheet.window-app {
+    box-shadow: 0 0 10px 0px rgba(235,181,49,0.3);
+
+        & .window-header {
+            border-bottom: none;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+            background-repeat: repeat;
+            background-size: 100% 20px auto;
+            flex: 0 0 20px;
+            padding: 0 3px 0 0;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+
+            & a {
+            display: inline-flex;
+            padding: 6px 0 0 0;
+            font-size: 0px;
+            color: rgb(100, 100, 100);
+
+            & .fa-solid,
+                & .fas {
+                    font-size: 12px;
+                }
+            }
+
+            & .window-title {
+            font-size: 0;
+            }
+        }
     }
 }
 

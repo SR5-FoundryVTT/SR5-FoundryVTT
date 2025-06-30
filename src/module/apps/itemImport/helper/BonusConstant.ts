@@ -68,10 +68,18 @@ export class BonusConstant {
             overrides: { name: "Add Damage Resistance" },
             tags: { selection_tests: '[{"value":"Physical Damage Resist", "id":"PhysicalResistTest"}]' }
         },
+        defensetest: { key: "system.modifiers.defense" },
+        dodge: { key: "system.modifiers.defense" },
         drainresist: {
             key: "data.modifiers.mod",
             overrides: { name: "Add Drain Resistance" },
             tags: { selection_tests: '[{"value":"Drain Test", "id":"DrainTest"}]' }
+        },
+        essencemax: { key: "system.attributes.essence.mod" },
+        fadingresist: {
+            key: "data.modifiers.mod",
+            overrides: { name: "Add Fading Resistance" },
+            tags: { selection_tests: '[{"value":"Fade Test", "id":"FadeTest"}]' }
         },
         handling: { key: "system.vehicle_stats.handling.mod" },
         initiativedice: { key: "system.modifiers.meat_initiative_dice", overrides: { name: "Increase Initiative Dice" } },
