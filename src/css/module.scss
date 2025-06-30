@@ -42,7 +42,6 @@ body #forien-quest-log .quest-log .log-body header {
     background-size: 100% 41px, auto; // first layer = 60px tall
     background-position: center, top;
     border-radius: 0;
-    border: 1px solid blue;
     font-family: $editorFonts;
     text-align: left !important;
     text-indent: 5px;
@@ -63,10 +62,6 @@ body #forien-quest-log .quest-log .table ul li.drag-quest:hover {
     border-color: var(--palette-primary,var(--default-primary-accent,$red));
     box-shadow: 0 0 2px var(--palette-primary,var(--default-primary-accent,$red)) inset; //$red is the var for Red
 }
-// Quest Pause Hover
-//body #forien-quest-log .actions i:hover, .window-app.forien-quest-preview .actions i:hover {
-    //color: $green;
-//}
 
 body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .quest-giver-name h2:hover {
     color: var(--palette-primary,var(--default-primary-accent,$darkred));
@@ -114,11 +109,9 @@ body #forien-quest-log h1, .window-app.forien-quest-preview h1 {
     margin: 0 0 8px;
     padding: 0 0 30px;
     color: #ffffff; 
-    //border-bottom: 2px solid var(--color-underline-header);
 }
 // h1 quest log header
 body #forien-quest-log h1, .window-app.forien-quest-preview h1 {
-    //background: url(assets/journal-banner-small.webp) repeat;
     color: $white;
 }
 
@@ -126,7 +119,6 @@ body #forien-quest-log h1, body .window-app.forien-quest-preview h1 {
     line-height: 1;  /* or whatever line-height value you want */
     text-indent: 10px;
     padding-top: 2px;
-    //background: url(assets/journal-banner-small.webp) repeat;
 }
 
 // h4 Quest Log
@@ -158,8 +150,13 @@ body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .
     align-items: center;
     display: flex;
     justify-content: space-between;
-    background: url(assets/journal-banner-small.webp) repeat;
-    background-size: cover;
+    background: 
+        $nameplate-background,
+        url("assets/page.webp") repeat;
+    background-repeat: no-repeat, repeat;
+    background-size: 100% 41px, auto; // first layer = 60px tall
+    background-position: center, top;
+    border-radius: 0;
 }
 
 body .window-app.forien-quest-preview .quest-body .quest-info .quest-col-right .quest-tasks .toggleState:hover {
