@@ -4,7 +4,7 @@ import { Initiative } from "../template/Initiative";
 import { Limits, MatrixLimits } from "../template/Limits";
 import { MatrixData } from "../template/Matrix";
 import { VisibilityChecks } from "../template/Visibility";
-import { CommonData, CreateModifiers } from "./Common";
+import { ActorBase, CommonData, CreateModifiers } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpriteData = {
@@ -53,7 +53,7 @@ const SpriteData = {
     )),
 };
 
-export class Sprite extends foundry.abstract.TypeDataModel<typeof SpriteData, Actor.Implementation> {
+export class Sprite extends ActorBase<typeof SpriteData> {
     static override defineSchema() {
         return SpriteData;
     }

@@ -1,10 +1,12 @@
-import { ModifiableField } from "../fields/ModifiableField";
+import { SystemData } from "../template/System";
 import { ModifiableValue } from "../template/Base";
-import { DescriptionData } from "../template/Description";
+import { AnyMutableObject } from "fvtt-types/utils";
 import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
 import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
-import { SystemData } from "../template/System";
+import DataSchema = foundry.data.fields.DataSchema;
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
@@ -58,7 +60,6 @@ export const CommonData = () => ({
         noise: new SchemaField({ active: new ObjectField({ initial: {} }) }),
         background_count: new SchemaField({ active: new ObjectField({ initial: {} }) }),
     }),
-    // values: new TypedObjectField(new ModifiableField(ModifiableValue())),
     inventories: new TypedObjectField(
         new SchemaField(InventoryData()),
         { initial: { "All": { name: "All", type: "all", itemIds: [], showAll: true, label: "SR5.Labels.Inventory.All" } } }
@@ -69,3 +70,12 @@ export const CommonData = () => ({
 });
 
 export type InventoryType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof InventoryData>>;
+
+export abstract class ActorBase<DS extends ReturnType<typeof CommonData>> extends foundry.abstract.TypeDataModel<DS, Actor.Implementation> {
+    static override migrateData(source: AnyMutableObject) {
+        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
+            return super.migrateData(source);
+
+        return super.migrateData(source);
+    }
+}

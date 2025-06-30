@@ -1,4 +1,4 @@
-import { BaseItemData, ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foundry.data.fields;

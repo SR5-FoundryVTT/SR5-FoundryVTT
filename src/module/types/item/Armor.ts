@@ -1,4 +1,4 @@
-import { BaseItemData, ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyData } from "../template/Technology";
 const { SchemaField, NumberField, BooleanField } = foundry.data.fields;
 

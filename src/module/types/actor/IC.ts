@@ -1,6 +1,6 @@
 import { Tracks } from "../template/ConditionMonitors";
 import { AttributeField, Attributes } from "../template/Attributes";
-import { CommonData, CreateModifiers } from "./Common";
+import { ActorBase, CommonData, CreateModifiers } from "./Common";
 import { MatrixAttributes, MatrixData } from "../template/Matrix";
 import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
@@ -50,7 +50,7 @@ const ICData = {
     )),
 };
 
-export class IC extends foundry.abstract.TypeDataModel<typeof ICData, Actor.Implementation> {
+export class IC extends ActorBase<typeof ICData> {
     static override defineSchema() {
         return ICData;
     }

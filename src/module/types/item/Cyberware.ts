@@ -1,6 +1,6 @@
 import { ArmorValueData } from "./Armor";
 import { ActionRollData } from "./Action";
-import { BaseItemData, ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyData } from "../template/Technology";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 

@@ -7,7 +7,7 @@ import { Initiative } from "../template/Initiative";
 import { MatrixData } from "../template/Matrix";
 import { Movement } from "../template/Movement";
 import { VisibilityChecks } from "../template/Visibility";
-import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData } from "./Common";
+import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const CritterData = () => ({
@@ -76,7 +76,7 @@ export const CritterData = () => ({
     )),
 });
 
-export class Critter extends foundry.abstract.TypeDataModel<ReturnType<typeof CritterData>, Actor.Implementation> {
+export class Critter extends ActorBase<ReturnType<typeof CritterData>> {
     static override defineSchema() {
         return CritterData();
     }

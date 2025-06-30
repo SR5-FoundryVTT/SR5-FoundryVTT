@@ -1,4 +1,4 @@
-import { BaseItemData, ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./ItemBase";
 import { ActionRollData } from "./Action";
 const { SchemaField } = foundry.data.fields;
 

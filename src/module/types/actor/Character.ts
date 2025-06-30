@@ -1,4 +1,4 @@
-import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData } from "./Common";
+import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData, ActorBase } from "./Common";
 import { Attributes, AttributeField } from "../template/Attributes";
 import { ModifiableValue, ValueMaxPair } from "../template/Base";
 import { Tracks } from "../template/ConditionMonitors";
@@ -82,7 +82,7 @@ const CharacterData = {
     )),
 };
 
-export class Character extends foundry.abstract.TypeDataModel<typeof CharacterData, Actor.Implementation> {
+export class Character extends ActorBase<typeof CharacterData> {
     static override defineSchema() {
         return CharacterData;
     }

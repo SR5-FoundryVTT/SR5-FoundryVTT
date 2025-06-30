@@ -1,4 +1,4 @@
-import { CommonData, PhysicalCombatValues, CreateModifiers } from "./Common";
+import { CommonData, PhysicalCombatValues, CreateModifiers, ActorBase } from "./Common";
 import { Attributes, AttributeField } from "../template/Attributes";
 import { VehicleLimits } from "../template/Limits";
 import { Movement } from "../template/Movement";
@@ -101,7 +101,7 @@ const VehicleData = {
     )),
 };
 
-export class Vehicle extends foundry.abstract.TypeDataModel<typeof VehicleData, Actor.Implementation> {
+export class Vehicle extends ActorBase<typeof VehicleData> {
     static override defineSchema() {
         return VehicleData;
     }

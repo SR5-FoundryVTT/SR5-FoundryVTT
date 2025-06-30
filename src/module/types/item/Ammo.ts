@@ -1,5 +1,5 @@
 import { BlastData } from "./Weapon";
-import { BaseItemData, ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyData } from "../template/Technology";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 

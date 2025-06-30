@@ -1,5 +1,5 @@
 import { ActionRollData } from "./Action";
-import { BaseItemData, ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./ItemBase";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpellData = {

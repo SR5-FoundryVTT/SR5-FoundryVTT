@@ -1,5 +1,5 @@
 import { ActionRollData } from "./Action";
-import { BaseItemData, ItemBase } from "./BaseItem";
+import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyData } from "../template/Technology";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ValueMaxPair, ModifiableValue } from "../template/Base";

@@ -7,7 +7,7 @@ import { Initiative } from "../template/Initiative";
 import { AwakendLimits, Limits } from "../template/Limits";
 import { Movement } from "../template/Movement";
 import { VisibilityChecks } from "../template/Visibility";
-import { CommonData, PhysicalCombatValues, CreateModifiers, MagicData } from "./Common";
+import { CommonData, PhysicalCombatValues, CreateModifiers, MagicData, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpiritData = {
@@ -71,7 +71,7 @@ const SpiritData = {
 };
 
 
-export class Spirit extends foundry.abstract.TypeDataModel<typeof SpiritData, Actor.Implementation> {
+export class Spirit extends ActorBase<typeof SpiritData> {
     static override defineSchema() {
         return SpiritData;
     }
