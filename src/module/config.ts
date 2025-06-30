@@ -1229,7 +1229,7 @@ export const SR5 = {
         action: 'complex',
         mode: 'full_auto'
     }
-    ] as Shadowrun.FireModeData[],
+    ],
 
     /**
      * Active/AdvancedEffect apply To types and their labels.
@@ -1466,7 +1466,7 @@ export const SR5 = {
         weapon: {
             // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'
             'melee': '',
-            'ranged': '',
+            'range': '',
             'thrown': '',
             'assault-cannons': '',
             'assault-rifles': '',

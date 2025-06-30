@@ -1,9 +1,10 @@
-import {MatrixRules} from "../../rules/MatrixRules";
-import {SR5Actor} from "../../actor/SR5Actor";
-import {SuccessTest} from "../../tests/SuccessTest";
+import { SR5Actor } from "../../actor/SR5Actor";
+import { MatrixRules } from "../../rules/MatrixRules";
+import { SuccessTest } from "../../tests/SuccessTest";
+import { ResultActionType } from "src/module/types/item/Action";
 import { PhysicalDefenseTest } from "../../tests/PhysicalDefenseTest";
-import ResultActions = Shadowrun.ResultActions;
 
+type ResultActions = ResultActionType['action'];
 
 /**
  * Whenever any action or test implementation can cause a result that needs
@@ -45,7 +46,8 @@ export class ActionResultFlow {
      */
     static async placeMatrixMarks(active: SR5Actor, targets: Token[], marks: number) {
         if (!MatrixRules.isValidMarksCount(marks)) {
-            return ui.notifications?.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
+            ui.notifications?.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
+            return;
         }
 
         for (const target of targets) {

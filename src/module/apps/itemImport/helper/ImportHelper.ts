@@ -1,7 +1,5 @@
-import { BaseItem } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents.mjs';
 import { SR5Item } from "../../../item/SR5Item";
 import { Constants } from '../importer/Constants';
-import { TranslationHelper as TH } from './TranslationHelper';
 type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
 
 export type OneOrMany<T> = T | T[];
@@ -15,7 +13,7 @@ export type NotEmpty<T> = T extends object ? NonNullable<T> : never;
  */
 export class ImportHelper {
     public static readonly CHAR_KEY = '_TEXT';
-    private static folders: Record<string, Promise<Folder>> = {};
+    private static readonly folders: Record<string, Promise<Folder>> = {};
 
     /**
      * Ensures the provided value is returned as an array.
@@ -52,17 +50,17 @@ export class ImportHelper {
     public static async findItem(
         compKey: CompendiumKey,
         name: OneOrMany<string>,
-        types?: OneOrMany<BaseItem['data']['type']>
+        types?: OneOrMany<Item.SubType>
     ): Promise<SR5Item[]> {
         if (Array.isArray(name) ? name.length === 0 : !name) return [];
 
-        type ItemType = CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
+        type ItemType = CompendiumCollection<'Actor' | 'Item'>;
         const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY[compKey].pack) as ItemType;
 
-        return pack.getDocuments({
+        return await pack.getDocuments({
             name__in: this.getArray(name),
             ...(types ? { type__in: this.getArray(types) } : {})
-        });
+        }) as SR5Item[];
     }
 
     /**
@@ -72,9 +70,9 @@ export class ImportHelper {
      * @returns A promise that resolves with the compendium collection.
      * @throws If the compendium key is invalid or improperly formatted.
      */
-    public static async GetCompendium(ctype: CompendiumKey): Promise<CompendiumCollection<CompendiumCollection.Metadata>> {
+    public static async GetCompendium(ctype: CompendiumKey): Promise<CompendiumCollection<'Actor' | 'Item'>> {
         const { pack, type } = Constants.MAP_COMPENDIUM_KEY[ctype];
-        let compendium = game.packs.get(pack);
+        let compendium = game.packs.get(pack) as CompendiumCollection<'Actor' | 'Item'>;
 
         // Create the compendium if it doesn't exist
         if (!compendium) {
@@ -84,32 +82,22 @@ export class ImportHelper {
             const folderName = game.i18n.localize("SR5.Compendiums.Root");
             let currentFolder = game.folders?.find(
                 (folder) => folder.name === folderName
-                //@ts-expect-error
                 && folder.type === "Compendium"
             );
 
             if (!currentFolder) {
                 currentFolder = await Folder.create({
                     name: folderName,
-                    //@ts-expect-error
                     type: "Compendium",
                     color: "#00cc00"
                 });
             }
 
             // Create the compendium pack
-            compendium = await CompendiumCollection.createCompendium({
+            compendium = await foundry.documents.collections.CompendiumCollection.createCompendium({
                 name: packName,
                 label: game.i18n.localize(`SR5.Compendiums.${ctype}`),
-                type: type,
-                package: scope,
-                private: false,
-                path: `packs/${packName}`,
-                ownership: {
-                    PLAYER: "OBSERVER",
-                    TRUSTED: "OBSERVER",
-                    ASSISTANT: "OWNER"
-                }
+                type: type
             });
 
             // Manually assign compendium to the folder via settings
@@ -156,8 +144,7 @@ export class ImportHelper {
     private static async FindOrCreateFolder(ctype: CompendiumKey, name: string, parent: Folder | null = null): Promise<Folder> {
         const compendium = await this.GetCompendium(ctype);
 
-        //@ts-expect-error
-        const folder = await compendium.folders?.find((folder: Folder) =>
+        const folder = compendium.folders?.find((folder: Folder) =>
             folder.name === name && folder.folder === parent
         );
 

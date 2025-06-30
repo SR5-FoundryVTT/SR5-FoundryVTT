@@ -1,5 +1,8 @@
+import { SR5Item } from "src/module/item/SR5Item";
 import { SR5 } from "../../config";
 import { FLAGS, SYSTEM_NAME } from './../../constants';
+import { SR5Actor } from "src/module/actor/SR5Actor";
+import { ImportFlagType } from "src/module/types/template/ImportFlags";
 
 export async function getIconFiles(): Promise<string[]> {
 
@@ -21,18 +24,18 @@ export async function getIconFiles(): Promise<string[]> {
 }
 
 export function iconAssign(
-    importFlags: Shadowrun.ImportFlagData,
+    importFlags: ImportFlagType,
     iconList: string[],
-    system?: Shadowrun.ShadowrunItemDataData | Shadowrun.ShadowrunActorDataData
+    system?: (Actor.CreateData | Item.CreateData)['system'],
 ): string {
 
     const defaultImg = "icons/svg/item-bag.svg";
-    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/dist/icons/importer/";
+    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) || "systems/shadowrun5e/dist/icons/importer/";
     const imgExtensionOptions = ['.svg', '.webp', '.png', '.jpg', '.jpeg', '.avif'];
     const imgName = importFlags.name;
     const imgType = importFlags.type;
     const imgSubType = importFlags.subType;
-    const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides) as boolean;
+    const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides);
 
     // Get the override, if any
     let override = '';
@@ -54,8 +57,8 @@ export function iconAssign(
 
             break;
 
-        case 'weapon':
-            const weaponSystem = system as Shadowrun.WeaponItemData['system'];
+        case 'weapon': {
+            const weaponSystem = system as Item.SystemOfType<'weapon'>;
             fileNamePriority = [
                 imgFolder + override,
                 imgFolder + imgType + (imgSubType ? '/' : '') + imgSubType,
@@ -65,7 +68,7 @@ export function iconAssign(
                 imgFolder + imgType
             ]
             break;
-
+        }
         default:
             break;
     }

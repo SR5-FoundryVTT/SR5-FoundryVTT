@@ -33,7 +33,7 @@ export class Version0_27_0 extends VersionMigration {
 
         // Rename spirit types to match Chummer formatting
         if (actor.type === 'spirit') {
-            const spiritSystem = actor.system as Shadowrun.SpiritData;
+            const spiritSystem = actor.system as Actor.SystemOfType<'spirit'>;
             if (spiritSystem.spiritType === 'nocnitasa')
                 updateData.data['spiritType'] = 'nocnitsa';
             if (spiritSystem.spiritType === 'greenman')

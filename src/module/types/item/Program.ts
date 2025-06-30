@@ -1,15 +1,22 @@
-declare namespace Shadowrun {
-    export interface ProgramData extends
-        ProgramPartData,
-        DescriptionPartData,
-        ImportFlags,
-        TechnologyPartData {
+import { BaseItemData, ItemBase } from "./ItemBase";
+import { TechnologyData } from "../template/Technology";
+const { SchemaField, StringField } = foundry.data.fields;
 
-    }
+const ProgramData = {
+    ...BaseItemData(),
+    technology: new SchemaField(TechnologyData()),
 
-    export interface ProgramPartData {
-        type: ProgramTypes;
-    }
-
-    export type ProgramTypes = 'common_program' | 'hacking_program' | '';
+    type: new StringField({
+        required: true,
+        initial: 'common_program',
+        choices: ['common_program', 'hacking_program', 'agent']
+    }),
 }
+
+export class Program extends ItemBase<typeof ProgramData> {
+    static override defineSchema() {
+        return ProgramData;
+    }
+}
+
+console.log("ProgramData", ProgramData, new Program());

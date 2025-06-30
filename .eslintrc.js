@@ -28,11 +28,13 @@ module.exports = {
     },
     "plugins": [
         "prettier",
+        "deprecation",
         "@typescript-eslint",
     ],
     parser: '@typescript-eslint/parser',
     "rules": {
         "prettier/prettier": ["off"],
+        "deprecation/deprecation": "warn",
 
         // TODO: ESLint Roadmap Step 2 - Set these rules to "error"
         "@typescript-eslint/no-invalid-void-type": "warn",
@@ -59,7 +61,7 @@ module.exports = {
         "no-prototype-builtins": "warn",
         "@typescript-eslint/unbound-method": "warn",
         "no-useless-return": "warn",
-        "@typescript-eslint/return-await": "warn",
+        "@typescript-eslint/return-await": "off",
         "@typescript-eslint/prefer-includes": "warn",
         "no-unneeded-ternary": "warn",
         "@typescript-eslint/no-unnecessary-type-assertion": "warn",

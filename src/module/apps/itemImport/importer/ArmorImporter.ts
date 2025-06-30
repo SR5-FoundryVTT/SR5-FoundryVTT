@@ -11,13 +11,13 @@ export class ArmorImporter extends DataImporter {
     }
 
     async Parse(jsonObject: ArmorSchema): Promise<void> {
-        return ArmorImporter.ParseItems<Armor, Shadowrun.ArmorItemData>(
+        return ArmorImporter.ParseItems<Armor>(
             jsonObject.armors.armor,
             {
                 compendiumKey: "Gear",
                 parser: new ArmorParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Armor"
             }

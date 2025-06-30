@@ -31,10 +31,9 @@ const createChatData = async (template: string, templateData) => {
         },
         item: templateData.item,
         content: html,
-        rollMode: game.settings.get(CORE_NAME, CORE_FLAGS.RollMode)
+        rollMode: game.settings.get(CORE_NAME, 'rollMode')!
     };
 
-    // @ts-expect-error
     ChatMessage.applyRollMode(chatData, chatData.rollMode);
 
     return chatData;

@@ -1,9 +1,8 @@
 import {FLAGS, SYSTEM_NAME} from "../constants";
-import TrackType = Shadowrun.TrackType;
+import { TrackType } from "../types/template/ConditionMonitors";
 
-export class SR5Token extends Token {
-    // @ts-expect-error Ignore getBarAttribute from Token
-    override _drawBar(number: number, bar: PIXI.Graphics, data: ReturnType<Token['getBarAttribute']>){
+export class SR5Token extends foundry.canvas.placeables.Token {
+    override _drawBar(number: number, bar: PIXI.Graphics, data: NonNullable<ReturnType<TokenDocument['getBarAttribute']>>): boolean{
         const tokenHealthBars = game.settings.get(SYSTEM_NAME, FLAGS.TokenHealthBars);
         // FoundryVTT draws resource bars as full/good when the value is the
         // same as the max and empty/bad at 0 (colored along a gradient).
@@ -14,6 +13,6 @@ export class SR5Token extends Token {
             const track = data as unknown as TrackType;
             track.value = track.max - track.value;
         }
-        super._drawBar(number, bar, data);
+        return super._drawBar(number, bar, data);
     }
 }

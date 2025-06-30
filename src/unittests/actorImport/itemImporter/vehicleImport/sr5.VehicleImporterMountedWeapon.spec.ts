@@ -5,11 +5,11 @@ import * as chummerVehicle from './drone.json';
 export const mountedWeaponParserTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert, before, after } = context;
 
-    let mountedWeaponParser = new MountedWeaponParser();
+    const mountedWeaponParser = new MountedWeaponParser();
 
     describe('Mounted Weapon Parser', () => {
         it('parses weapons', async () => {
-            let weapons = await mountedWeaponParser.parseWeapons(chummerVehicle);
+            const weapons = await mountedWeaponParser.parseWeapons(chummerVehicle as any);
 
             assert.lengthOf(weapons, 1);
         });

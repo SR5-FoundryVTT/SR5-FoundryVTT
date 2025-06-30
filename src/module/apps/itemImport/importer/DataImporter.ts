@@ -2,8 +2,6 @@ import { SR5 } from "../../../config";
 import { Constants } from './Constants';
 import { ParseData } from "../parser/Parser";
 import { ImportHelper as IH } from '../helper/ImportHelper';
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 
 const xml2js = require('xml2js');
 
@@ -87,18 +85,18 @@ export abstract class DataImporter {
      * - If parsing fails, an error notification is displayed with the provided or default error prefix.
      * - Optionally, additional actions can be injected into parsed items using `injectActionTests`.
      */
-    protected static async ParseItems<TInput extends ParseData, TOutput extends (ShadowrunActorData | ShadowrunItemData)>(
+    protected static async ParseItems<TInput extends ParseData>(
         inputs: TInput[],
         options: {
             compendiumKey: keyof typeof Constants.MAP_COMPENDIUM_KEY;
-            parser: { Parse(data: TInput): Promise<TOutput> };
+            parser: { Parse(data: TInput): Promise<(Actor.CreateData | Item.CreateData)> };
             filter?: (input: TInput) => boolean;
-            injectActionTests?: (item: TOutput) => void;
+            injectActionTests?: (item: Item.CreateData) => void;
             errorPrefix?: string;
         }
     ): Promise<void> {
         const { compendiumKey, parser, filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
-        const items: TOutput[] = [];
+        const items: (Actor.CreateData | Item.CreateData)[] = [];
 
         await IH.GetCompendium(compendiumKey);
 
@@ -107,7 +105,7 @@ export abstract class DataImporter {
                 if (!this.supportedBookSource(data) || !filter(data)) continue;
 
                 const item = await parser.Parse(data);
-                injectActionTests?.(item);
+                injectActionTests?.(item as Item.CreateData);
                 items.push(item);
             } catch (error) {
                 console.error(error);
@@ -116,7 +114,9 @@ export abstract class DataImporter {
         };
 
         const compendium = Constants.MAP_COMPENDIUM_KEY[compendiumKey];
-        //@ts-expect-error
-        await (compendium.type === 'Actor' ? Actor : Item).create(items, { pack: compendium.pack });
+        if (compendium.type === 'Actor')
+            await Actor.create(items as Actor.CreateData[], { pack: compendium.pack });
+        else
+            await Item.create(items as Item.CreateData[], { pack: compendium.pack });
     }
 }

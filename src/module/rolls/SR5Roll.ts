@@ -3,17 +3,12 @@ import ModList = Shadowrun.ModList;
 
 // TODO: Data for casting actor / item (uuid)
 // TODO: maybe copy of the action data from the casting item / actor
-interface ShadowrunRollData {
-    limit: number
-    threshold: number
-    parts: ModList<number> // TODO: Is this useful?
-    explodeSixes: boolean
-}
-
-interface ShadowrunChatMessageData {
-    title?: String
-    content?: String
-    roll?: SR5Roll
+export type ShadowrunRollData = {
+    limit: number;
+    threshold: number;
+    parts: ModList<number>; // TODO: Is this useful?
+    explodeSixes: boolean;
+    [key: string]: number | boolean | ModList<number>;
 }
 
 
@@ -25,9 +20,7 @@ interface ShadowrunChatMessageData {
  *
  * TODO: A chat message should contain all data needed to cast resulting actions.
  */
-export class SR5Roll extends Roll {
-    override data: ShadowrunRollData
-
+export class SR5Roll extends Roll<ShadowrunRollData> {
     // toJSON(): any {
     //     // TODO: Check if data includes custom ShadowrunRollData
     //     const data = super.toJSON();
@@ -92,7 +85,7 @@ export class SR5Roll extends Roll {
     get pool(): number {
         // 0.7.x > FoundryVTT
         if (this.terms) {
-            return this.dice[0].number;
+            return this.dice[0].number!;
         }
 
         //@ts-expect-error
