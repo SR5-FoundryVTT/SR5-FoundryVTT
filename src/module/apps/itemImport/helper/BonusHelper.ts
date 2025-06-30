@@ -71,7 +71,7 @@ export class BonusHelper {
             ...defaultEffect,
             ...overrides,
             changes: changes.map(change  => ({
-                key: change.key as string,
+                key: change.key,
                 value: this.normalizeValue(sheet, change.value),
                 mode: change.mode ?? BC.CUSTOM,
                 priority: change.priority ?? change.mode ?? 0
@@ -100,12 +100,12 @@ export class BonusHelper {
             if (bonus[key]) {
                 const value = bonus[key]._TEXT as string;
                 const { overrides, tags, ...change } = effect;
-                this.createEffect( sheet, overrides || {}, [{ ...change, value: value }], tags);
+                this.createEffect( sheet, overrides || {}, [{ ...change, value }], tags);
             }
         }
 
         if (bonus.conditionmonitor) {
-            const cm  = bonus.conditionmonitor;
+            const cm = bonus.conditionmonitor;
 
             if (cm.overflow) {
                 this.createEffect(
@@ -125,6 +125,30 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, { name: "Override Stun Track" },
                     [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: BC.OVERRIDE }],
+                );
+            }
+
+            if (cm.threshold) {
+                this.createEffect(
+                    sheet, { name: "Pain Tolerance" },
+                    [{ key: "system.modifiers.wound_tolerance", value: cm.threshold._TEXT }],
+                );
+            }
+
+            if (cm.thresholdoffset) {
+                this.createEffect(
+                    sheet, { name: "High Pain Tolerance" },
+                    [{ key: "system.modifiers.pain_tolerance_physical", value: cm.thresholdoffset._TEXT }],
+                );
+            }
+
+            if (cm.sharedthresholdoffset) {
+                this.createEffect(
+                    sheet, { name: "Shared Tolerance" },
+                    [
+                        { key: "system.modifiers.pain_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
+                        { key: "system.modifiers.stun_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
+                    ],
                 );
             }
         }
