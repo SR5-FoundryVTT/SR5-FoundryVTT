@@ -1,11 +1,10 @@
-import { SystemData } from "../template/System";
 import { ModifiableValue } from "../template/Base";
-import { AnyMutableObject } from "fvtt-types/utils";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
 import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
+import { SanitizedModel } from "../fields/SanitizedModel";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
@@ -48,7 +47,6 @@ const InventoryData = () => ({
 });
 
 export const CommonData = () => ({
-    system: new SchemaField(SystemData()),
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData()),
 
@@ -70,26 +68,4 @@ export const CommonData = () => ({
 
 export type InventoryType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof InventoryData>>;
 
-export abstract class ActorBase<DS extends ReturnType<typeof CommonData>> extends foundry.abstract.TypeDataModel<DS, Actor.Implementation> {
-    static override migrateData(source: AnyMutableObject) {
-        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
-            return super.migrateData(source);
-
-        ActorBase.migrateWithSchema(source, this.schema);
-        return super.migrateData(source);
-    }
-
-    static migrateWithSchema(source: AnyMutableObject, schema: foundry.data.fields.SchemaField.Any) {
-        for (const [fieldName, field] of Object.entries(schema.fields)) {
-            const value = source[fieldName];
-            const dataField = field as foundry.data.fields.DataField.Any;
-            if (dataField.validate(value) != null) {
-                if (field instanceof SchemaField && value && typeof value === "object") {
-                    ActorBase.migrateWithSchema(value as AnyMutableObject, field);
-                } else {
-                    source[fieldName] = dataField.getInitialValue();
-                }
-            }
-        }
-    }
-}
+export abstract class ActorBase<DS extends ReturnType<typeof CommonData>> extends SanitizedModel<DS, Actor.Implementation> {}

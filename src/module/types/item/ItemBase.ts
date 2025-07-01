@@ -1,13 +1,11 @@
-import { SystemData } from "../template/System";
-import { AnyMutableObject } from "fvtt-types/utils"
 import { ImportFlagData } from "../template/ImportFlags";
+import { SanitizedModel } from "../fields/SanitizedModel";
 import { DescriptionData } from "../template/Description";
 const { SchemaField } = foundry.data.fields;
 
 export const BaseItemData = () => ({
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData()),
-    system: new SchemaField(SystemData()),
 });
 
 /**
@@ -17,26 +15,4 @@ export const BaseItemData = () => ({
  * Subclasses should extend this class to inherit default schema structure and standardized
  * data migration logic for shared item properties across the system.
  */
-export abstract class ItemBase<DS extends ReturnType<typeof BaseItemData>> extends foundry.abstract.TypeDataModel<DS, Item.Implementation> {
-    static override migrateData(source: AnyMutableObject) {
-        if (!source || typeof source !== "object" || Object.keys(source).length === 0)
-            return super.migrateData(source);
-
-        ItemBase.migrateWithSchema(source, this.schema);
-        return super.migrateData(source);
-    }
-
-    static migrateWithSchema(source: AnyMutableObject, schema: foundry.data.fields.SchemaField.Any) {
-        for (const [fieldName, field] of Object.entries(schema.fields)) {
-            const value = source[fieldName];
-            const dataField = field as foundry.data.fields.DataField.Any;
-            if (dataField.validate(value) != null) {
-                if (field instanceof SchemaField && value && typeof value === "object") {
-                    ItemBase.migrateWithSchema(value as AnyMutableObject, field);
-                } else {
-                    source[fieldName] = dataField.getInitialValue();
-                }
-            }
-        }
-    }
-}
+export abstract class ItemBase<DS extends ReturnType<typeof BaseItemData>> extends SanitizedModel<DS, Item.Implementation> {}

@@ -336,8 +336,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
     getEquippedAmmo(): SR5Item<'ammo'> | undefined {
         const equippedAmmos = (this.items || [])
             .filter((item) => item.isType('ammo') && item.isEquipped()) as SR5Item<'ammo'>[];
-
-        // Cast Typing isn't a mistake, so long as isAmmo is filtered.
         return equippedAmmos[0];
     }
 
@@ -414,7 +412,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
         if (!weapon) return;
 
         // Prepare reloading by getting ammunition information.
-        const ammo = this.getEquippedAmmo()!;
+        const ammo = this.getEquippedAmmo();
         const ammoItems = this.items.filter(item => item.isType('ammo')).length;
 
         const remainingBullets = weapon.system.ammo.current.value;
@@ -423,18 +421,18 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
         // This checks how many rounds are required for a partial reload.
         const partialReloadBulletsNeeded = Math.min(weapon.system.ammo.current.max - remainingBullets, RangedWeaponRules.partialReload(weapon.system.ammo.clip_type, this.actor?.getAttribute('agility').value));
         // If there aren't ANY ammo items, just use weapon max as to not enforce ammo onto users without.
-        const availableBullets = ammoItems > 0 ? Number(ammo.system.technology?.quantity) : weapon.system.ammo.current.max;
+        const availableBullets = ammoItems > 0 ? Number(ammo!.system.technology.quantity) : weapon.system.ammo.current.max;
 
         // Validate ammunition and clip availability.
         if (weapon.system.ammo.spare_clips.value === 0 && weapon.system.ammo.spare_clips.max > 0) {
             // Should this ever be enforced, change info to warn.
             ui.notifications?.info("SR5.Warnings.CantReloadWithoutSpareClip", { localize: true });
         }
-        if (ammo && Number(ammo.system.technology?.quantity) === 0) {
+        if (ammo && Number(ammo.system.technology.quantity) === 0) {
             ui.notifications?.warn('SR5.Warnings.CantReloadAtAllDueToAmmo', { localize: true });
             return;
         }
-        if (ammo && Number(ammo.system.technology?.quantity) < missingBullets) {
+        if (ammo && Number(ammo.system.technology.quantity) < missingBullets) {
             if (partialReload && partialReloadBulletsNeeded !== -1 && Number(ammo.system.technology?.quantity) < partialReloadBulletsNeeded) {
                 ui.notifications?.info('SR5.Warnings.CantReloadPartialDueToAmmo', { localize: true });
             } else {
@@ -457,7 +455,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
         });
 
         if (!ammo) return;
-        await ammo.update({ system: { technology: { quantity: Math.max(0, Number(ammo.system.technology?.quantity) - reloadedBullets) } } });
+        await ammo.update({ system: { technology: { quantity: Math.max(0, Number(ammo.system.technology.quantity) - reloadedBullets) } } });
     }
 
     async equipNestedItem(id: string, type: string, options: { unequipOthers?: boolean, toggle?: boolean } = {}) {

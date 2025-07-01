@@ -54,7 +54,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo.spare_clips.value, 0);
 
-            actor.delete();
+            await actor.delete();
         });
 
         it('Reloads weapon fully when no ammo is used', async () => {
@@ -65,7 +65,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             assert.strictEqual(item.system.ammo.current.value, 0);
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo.current.value, item.system.ammo.current.max);
-            actor.delete();
+            await actor.delete();
         });
 
         it('Reloads weapon fully when ammo is equipped and reduced ammo', async () => {
