@@ -27,13 +27,11 @@ export abstract class SanitizedModel<
             const currentPath = [...path, fieldName];
 
             if (!field) {
-                console.warn(`Deleted unknown field: ${currentPath.join(".")} on`, source);
-                // Field not defined in schema — remove it
-                // delete source[fieldName];
+                console.warn(`Unknown field will be inaccessible: ${currentPath.join(".")}`);
                 continue;
             }
 
-            // check if the value is valid
+            // check whether the value is valid
             if (field.validate(value) != null) {
                 if (field instanceof SchemaField && value && typeof value === "object") {
                     // Recursively sanitize nested schema
