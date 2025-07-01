@@ -4,6 +4,10 @@ import { AnyMutableObject, AnyObject, EmptyObject } from "fvtt-types/utils";
 
 const { SchemaField, TypedObjectField } = foundry.data.fields;
 
+function isObject(value: unknown): value is Record<string, unknown> {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
 export abstract class SanitizedModel<
     Schema extends DataSchema,
     Parent extends Document.Any,
@@ -11,18 +15,14 @@ export abstract class SanitizedModel<
     DerivedData extends AnyObject = EmptyObject,
 > extends foundry.abstract.TypeDataModel<Schema, Parent, BaseData, DerivedData> {
     static override migrateData(source: AnyMutableObject) {
-        if (source && typeof source === "object")
-            SanitizedModel._sanitize(source as any, (key) => this.schema.fields[key]);
+        if (isObject(source))
+            SanitizedModel._sanitize(source, (key) => this.schema.fields[key]);
 
         return super.migrateData(source);
     }
 
-    private static isObject(value: unknown): this is Record<string, unknown> {
-        return value != null && typeof value === "object";
-    }
-
     private static _sanitize(
-        source: Record<string, foundry.data.fields.DataField.Any>,
+        source: Record<string, unknown>,
         resolveField: (ket: string) => foundry.data.fields.DataField.Any,
         path: string[] = [],
     ): void {
@@ -37,10 +37,10 @@ export abstract class SanitizedModel<
 
             if (field.validate(value) == null) continue;
 
-            if (field instanceof SchemaField && this.isObject(value)) {
-                SanitizedModel._sanitize(value as any, (subKey) => field.fields[subKey], currentPath);
-            } else if (field instanceof TypedObjectField && this.isObject(value)) {
-                SanitizedModel._sanitize(value as any, () => field.element, currentPath);
+            if (field instanceof SchemaField && isObject(value)) {
+                SanitizedModel._sanitize(value, (subKey) => field.fields[subKey], currentPath);
+            } else if (field instanceof TypedObjectField && isObject(value)) {
+                SanitizedModel._sanitize(value, () => field.element, currentPath);
             } else {
                 console.warn(`Replaced invalid value at ${currentPath.join(".")}:`, value, "→", field.getInitialValue());
                 source[fieldName] = field.getInitialValue();
