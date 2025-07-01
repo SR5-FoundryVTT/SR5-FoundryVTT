@@ -2,10 +2,10 @@ import Document = foundry.abstract.Document;
 import DataSchema = foundry.data.fields.DataSchema;
 import { AnyMutableObject, AnyObject, EmptyObject } from "fvtt-types/utils";
 
-const { SchemaField, TypedObjectField } = foundry.data.fields;
+const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
 function isObject(value: unknown): value is Record<string, unknown> {
-    return value !== null && typeof value === "object" && !Array.isArray(value);
+    return value !== null && typeof value === "object";
 }
 
 export abstract class SanitizedModel<
@@ -37,14 +37,17 @@ export abstract class SanitizedModel<
 
             if (field.validate(value) == null) continue;
 
-            if (field instanceof SchemaField && isObject(value)) {
-                SanitizedModel._sanitize(value, (subKey) => field.fields[subKey], currentPath);
-            } else if (field instanceof TypedObjectField && isObject(value)) {
-                SanitizedModel._sanitize(value, () => field.element, currentPath);
-            } else {
+            if (!isObject(value)) {
                 console.warn(`Replaced invalid value at ${currentPath.join(".")}:`, value, "→", field.getInitialValue());
                 source[fieldName] = field.getInitialValue();
+                continue;
             }
+
+            if (field instanceof SchemaField)
+                SanitizedModel._sanitize(value, (subKey) => field.fields[subKey], currentPath);
+
+            if (field instanceof ArrayField || field instanceof TypedObjectField)
+                SanitizedModel._sanitize(value, () => field.element, currentPath);
         }
     }
 }
