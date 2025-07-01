@@ -135,7 +135,7 @@ export class SkillEditSheet extends DocumentSheet {
         if (!skill) return;
         const { bonus = [] } = skill;
         // add blank line for new bonus
-        updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: 0 }];
+        updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: '' }];
         await this.document.update(updateData);
     }
 
