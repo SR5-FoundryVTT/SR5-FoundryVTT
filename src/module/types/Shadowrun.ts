@@ -61,16 +61,6 @@ declare namespace Shadowrun {
         | 'drone_perception'
         | 'drone_infiltration';
 
-    
-    /**
-     * Copy of FoundryVTT RollMode for messages and rolls.
-     */
-    type FoundryRollMode = 'publicroll' | 'gmroll' | 'blindroll' | 'selfroll'
-    /**
-     * The actual usable values for an action.
-     */
-    type ActionRollMode = FoundryRollMode | ''
-
     /**
      * What kind of action is being performed.
      * 

@@ -118,7 +118,7 @@ export interface SuccessTestData extends TestData {
 export interface TestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     showMessage?: boolean // Show message when defined as true.
-    rollMode?: keyof typeof CONFIG.Dice.rollModes
+    rollMode?: Roll.ConfiguredRollModes
 }
 
 export interface SuccessTestMessageData {
@@ -263,10 +263,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data, options: TestOptions): Shadowrun.FoundryRollMode {
-        if (options.rollMode !== undefined) return options.rollMode;
-        if (data.action && data.action.roll_mode) return data.action.roll_mode;
-        else return game.settings.get(CORE_NAME, 'rollMode') as Shadowrun.FoundryRollMode;
+    _prepareRollMode(data, options: TestOptions): Roll.ConfiguredRollModes {
+        if (options.rollMode != null) return options.rollMode;
+        if (data?.action.roll_mode) return data.action.roll_mode;
+        else return game.settings.get(CORE_NAME, 'rollMode') as Roll.ConfiguredRollModes;
     }
 
     /**
