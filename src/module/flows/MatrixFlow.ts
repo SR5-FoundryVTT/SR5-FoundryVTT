@@ -381,6 +381,36 @@ export const MatrixFlow = {
     },
 
     /**
+     * Collect matrix icons connected to the document given by uuid.
+     * 
+     * TODO: Look into MarkPlacementFlow_prepareActorDevices and merge functionality.
+     * @param uuid 
+     * @returns List of matrix icons connected to the document.
+     */
+    getConnectedMatrixIcons(uuid: string) {
+        const connectedIcons: Shadowrun.MatrixTargetDocument[] = [];
+
+        const mainIcon = fromUuidSync(uuid) as SR5Actor | undefined;
+
+        // Only persona icons should show connected icons.
+        // TODO: Don´t show this for IC, Spirits, Sprite
+        if (!(mainIcon instanceof SR5Actor)) return connectedIcons;
+
+        for (const device of mainIcon.wirelessDevices) {
+            connectedIcons.push({
+                name: device.name ?? '', // TODO: taMiF improve
+                document: device,
+                token: null,
+                runningSilent: device.isRunningSilent,
+                network: mainIcon.network?.name ?? '',
+                type: device.type // TODO: taMIf localize
+            });
+        }
+
+        return connectedIcons;
+    },
+
+    /**
      * Collect visible hosts for selection.
      */
     visibelHosts() {

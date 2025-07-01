@@ -197,7 +197,7 @@ export const ActorMarksFlow = {
 
         if (document instanceof SR5Actor && document.type === 'ic') return 'SR5.ActorTypes.IC';
 
-        return 'SR5.Labels.ActorSheet.Persona'
+        return 'SR5.Labels.ActorSheet.Persona';
     },
 
     /**

@@ -221,12 +221,12 @@
     }
 
     // Use only to indicate interactibility within the HackingTab markslist.
-    .select-document {
+    .select-matrix-target {
         @include clickable;
     }
 
     // Use only to indicate interactibility within the HackingTab markslist.
-    .open-document {
+    .open-matrix-target {
         @include clickable;
     }
 

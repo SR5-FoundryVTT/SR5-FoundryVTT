@@ -6,15 +6,16 @@
             icons=(TargetListHeaderIcons)
             itemCssClass='switch-matrix-hacking-target'
     }}
+    {{!-- Show main icons (personas) visible to this actor --}}
     {{#each matrixTargets}}
     {{!-- Don't use the ListItem Handlebar helper as to avoid it's item drag&drop functionality. --}}
     <div class="list-item">
         <div class="list-item-content">
-            <div class="item-left select-document {{#ife ../selectedMatrixTarget this.document.uuid}}selected-list-item{{/ife}}" data-uuid="{{this.document.uuid}}">
+            <div class="item-left select-matrix-target {{#ife ../selectedMatrixTarget this.document.uuid}}selected-list-item{{/ife}}" data-uuid="{{this.document.uuid}}">
                 <div class="item-img">
                     <img src="{{speakerImg this.document}}" data-tooltip="{{speakerName this.document}}" height="24px" width="24px"/>
                 </div>
-                <div class="item-text item-name"><span class="open-document" data-uuid="{{this.document.uuid}}">{{speakerName this.document}}</span></div>
+                <div class="item-text item-name"><span class="open-matrix-target" data-uuid="{{this.document.uuid}}">{{speakerName this.document}}</span></div>
             </div>
             <div class="item-right">
                 <div class="item-text">
@@ -26,6 +27,19 @@
                 <div class="item-text"></div>
             </div>
         </div>
+        {{! -- Overview of icons connected to the main icon (devices of persona) -- }}
+        {{#ife ../selectedMatrixTarget this.document.uuid}}
+        {{#each ../selectedMatrixTargetIcons}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                img=this.document.img
+                name=this.document.name
+                itemCssClass='subcategory-item'
+                itemImgCssClass='select-matrix-target'
+                itemNameCssClass='open-document'
+                itemUuid=this.document.uuid
+        }}
+        {{/each}}
+        {{/ife}}
     </div>
     {{/each}}
 </div>

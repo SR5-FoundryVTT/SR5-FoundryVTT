@@ -1945,7 +1945,7 @@ export class SR5Actor extends Actor {
      * Retrieve all matrix devices of this actor that are equipped and set to wireless.
      */
     get wirelessDevices(): SR5Item[] {
-        return this.items.filter((item) => item.isMatrixDevice && item.isEquipped() && item.isWireless());
+        return this.items.filter(item => item.isMatrixDevice && item.isEquipped() && item.isWireless());
     }
 
     get matrixData(): Shadowrun.MatrixData | undefined {

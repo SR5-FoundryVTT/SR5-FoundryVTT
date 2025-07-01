@@ -2,7 +2,7 @@
     <div class="list-item-content">
         <div class="item-left">
             {{#if img}}
-                <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">                    
+                <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll {{itemImgCssClass}}">                    
                     <img src="{{img}}" {{#if hasRoll}}data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}" data-tooltip-direction="LEFT"{{/if}} height="24px" width="24px"/>
                 </div>
             {{/if}}

@@ -17,6 +17,8 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
     network: SR5Item | null
     matrixActions: SR5Item[]
     selectedMatrixTarget: string|undefined
+    // Stores icons connected to the selected matrix target.
+    selectedMatrixTargetIcons: Shadowrun.MatrixTargetDocument[];
     // Determine if the hacking tab should show marked documents or new targets.
     showMatrixMarkedDocuments: boolean
     showMatrixTargets: boolean
@@ -108,10 +110,18 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         data.showMatrixMarkedDocuments = this.showMatrixHackingTarget === 'marked';
         data.showMatrixTargets = this.showMatrixHackingTarget === 'targets';
 
+        // When target overview is shown, collect all matrix targets.
         if (data.showMatrixTargets) {
             const {targets} = MatrixFlow.getMatrixTargets(this.actor);
             data.matrixTargets = targets;
+
+            // When a single target has been selected, collect all it's connected icons
+            // TODO: This should be implemented with an additional icon?
+            if (this.selectedMatrixTarget) {
+                data.selectedMatrixTargetIcons = MatrixFlow.getConnectedMatrixIcons(this.selectedMatrixTarget);
+            }
         }
+        // When marked documents overview is shown, collect all marked documents.
         else if (data.showMatrixMarkedDocuments) {
             data.markedDocuments = await this.actor.getAllMarkedDocuments();
         }
@@ -126,8 +136,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         html.find('.reboot-persona-device').click(this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
 
-        html.find('.select-document').on('click', this._onSelectMarkedDocument.bind(this));
-        html.find('.open-document').on('click', this._onOpenMarkedDocument.bind(this));
+        html.find('.select-matrix-target').on('click', this._onSelectMatrixTarget.bind(this));
+        html.find('.open-matrix-target').on('click', this._onOpenMarkedDocument.bind(this));
 
         html.find('.switch-matrix-hacking-target').on('click', this._onSwitchMatrixHackingTarget.bind(this));
         html.find('.targets-refresh').on('click', this._onTargetsRefresh.bind(this));
@@ -285,7 +295,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      *
      * @param event Any interaction event
      */
-    async _onSelectMarkedDocument(event) {
+    async _onSelectMatrixTarget(event) {
         event.stopPropagation();
 
         const uuid = event.currentTarget.dataset.uuid;
