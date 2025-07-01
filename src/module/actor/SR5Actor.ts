@@ -1182,21 +1182,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
         });
     }
 
-    /** Return either the linked token or the token of the synthetic actor.
+    /** 
+     * Return either the linked TokenDocument or that of the synthetic actor.
      *
      * @return Will return null should no token have been placed on scene.
      */
     getToken(): Token | null {
-        // Linked actors can only have one token, which isn't stored within actor data...
-        if (this._isLinkedToToken() && this.hasToken()) {
-            const linked = true;
-            const tokens = this.getActiveTokens(linked) as unknown as Token[];
-            // This assumes for a token to exist and should fail if not.
-            return tokens[0];
-        }
-
-        // Unlinked actors can have multiple active token but each have theirs directly attached...
-        return null;
+        const tokens = this.getActiveTokens(this._isLinkedToToken());
+        if (tokens.length === 0) return null;
+        else return tokens[0];
     }
 
     /**

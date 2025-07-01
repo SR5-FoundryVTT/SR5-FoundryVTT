@@ -690,10 +690,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
                 const document = await fromUuid(uuid);
                 if (!document) continue;
 
-                const token = document instanceof SR5Actor ? document.getToken() : document;
+                const token = document instanceof SR5Actor ? document.getToken()?.document : document;
                 if (!(token instanceof TokenDocument)) continue;
 
-                this.targets.push(token as TokenDocument);
+                this.targets.push(token);
             }
         }
     }
