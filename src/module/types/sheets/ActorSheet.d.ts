@@ -42,6 +42,12 @@ declare namespace Shadowrun {
         runningSilent: boolean
         // The type of matrix icon
         type: Translation
+
+        // These properties are mostly used for optional sheet display.
+        // The icons connected to this target.
+        icons?: MatrixTargetDocument[]
+        // Indicates if this target has been selected as a matrix action target.
+        selected?: boolean
     }
 
     // Use to display Matrix Marks which Foundry Document their placed on.

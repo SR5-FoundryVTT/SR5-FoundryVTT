@@ -111,15 +111,27 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         data.showMatrixTargets = this.showMatrixHackingTarget === 'targets';
 
         // When target overview is shown, collect all matrix targets.
+        // TODO: taMiF this is a bis of a mess and will need to be reusable across both targets and marked docs and different actor types.
         if (data.showMatrixTargets) {
             const {targets} = MatrixFlow.getMatrixTargets(this.actor);
-            data.matrixTargets = targets;
 
-            // When a single target has been selected, collect all it's connected icons
-            // TODO: This should be implemented with an additional icon?
-            if (this.selectedMatrixTarget) {
-                data.selectedMatrixTargetIcons = MatrixFlow.getConnectedMatrixIcons(this.selectedMatrixTarget);
+            for (const target of targets) {
+                
+                // Collect connected icons, if user wants to see them.
+                if (this._connectedIconsOpenClose[target.document.uuid]) {
+                    target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document.uuid);
+
+                    for (const icon of target.icons) {
+                        // Mark icon as selected.
+                        icon.selected = this.selectedMatrixTarget === icon.document.uuid;
+                    }
+                }
+                
+                // Mark target as selected.
+                target.selected = this.selectedMatrixTarget === target.document.uuid;
             }
+
+            data.matrixTargets = targets;
         }
         // When marked documents overview is shown, collect all marked documents.
         else if (data.showMatrixMarkedDocuments) {
@@ -298,7 +310,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
     async _onSelectMatrixTarget(event) {
         event.stopPropagation();
 
-        const uuid = event.currentTarget.dataset.uuid;
+        const uuid = Helpers.listItemUuid(event);
         if (!uuid) return;
 
         // Toggle selection on or off.

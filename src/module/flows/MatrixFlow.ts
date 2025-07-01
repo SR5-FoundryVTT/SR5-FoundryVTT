@@ -387,7 +387,7 @@ export const MatrixFlow = {
      * @param uuid 
      * @returns List of matrix icons connected to the document.
      */
-    getConnectedMatrixIcons(uuid: string) {
+    getConnectedMatrixIconTargets(uuid: string) {
         const connectedIcons: Shadowrun.MatrixTargetDocument[] = [];
 
         const mainIcon = fromUuidSync(uuid) as SR5Actor | undefined;

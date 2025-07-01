@@ -122,7 +122,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
     _scroll: string;
+    // Indicate if specific sections on sheet should be opened or closed.
     _inventoryOpenClose: Record<string, boolean> = {};
+    _connectedIconsOpenClose: Record<string, boolean> = {};
 
     // Store the currently selected inventory.
     selectedInventory: string;
@@ -380,6 +382,8 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Matrix Network
         html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
+        // Matrix Target - Connected Icons Visibility Switch
+        html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
     }
 
     /**
@@ -2035,5 +2039,27 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (dialog.canceled) return;
 
         await this.document.connectNetwork(network);
+    }
+
+    /**
+     * Within the list of avialable matrix targets, toggle visibility of sub-sections for connected icons
+     * for a single matrix target.
+     * 
+     * This is done by clicking on a specific icon by user input and will trigger:
+     * - switching out sheet display
+     * - provide a display of additional matrix icons underneath uuid
+     */
+    async _onToggleConnectedMatrixIcons(event) {
+        event.stopPropagation();
+
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
+
+        // Mark main icon as open or closed.
+        if (this._connectedIconsOpenClose[uuid]) delete this._connectedIconsOpenClose[uuid];
+        else this._connectedIconsOpenClose[uuid] = true;
+
+        // Trigger new icons to be shown or hidden.
+        this.render();
     }
 }

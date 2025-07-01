@@ -1089,4 +1089,14 @@ export const registerItemLineHelpers = () => {
             }
         ];
     });
+
+    /**
+     * Return list of css classes to be used in the list of matrix targets.
+     * @param target The matrix target to render.
+     */
+    Handlebars.registerHelper('MatrixTargetCssClass', (target: Shadowrun.MatrixTargetDocument) => {
+        const classes: string[] = [];
+        if (target.selected) classes.push('selected-list-item');
+        return classes;
+    });
 };
