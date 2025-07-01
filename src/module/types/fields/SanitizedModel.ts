@@ -4,7 +4,7 @@ import { AnyMutableObject, AnyObject, EmptyObject } from "fvtt-types/utils";
 
 const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
-function isObject(value: unknown): value is Record<string, unknown> {
+function isStructured(value: unknown): value is Record<string, unknown> | ArrayLike<unknown> {
     return value !== null && typeof value === "object";
 }
 
@@ -15,14 +15,14 @@ export abstract class SanitizedModel<
     DerivedData extends AnyObject = EmptyObject,
 > extends foundry.abstract.TypeDataModel<Schema, Parent, BaseData, DerivedData> {
     static override migrateData(source: AnyMutableObject) {
-        if (isObject(source))
+        if (isStructured(source))
             SanitizedModel._sanitize(source, (key) => this.schema.fields[key]);
 
         return super.migrateData(source);
     }
 
     private static _sanitize(
-        source: Record<string, unknown>,
+        source: Record<string, unknown> | ArrayLike<unknown>,
         resolveField: (ket: string) => foundry.data.fields.DataField.Any,
         path: string[] = [],
     ): void {
@@ -37,7 +37,7 @@ export abstract class SanitizedModel<
 
             if (field.validate(value) == null) continue;
 
-            if (!isObject(value)) {
+            if (!isStructured(value)) {
                 console.warn(`Replaced invalid value at ${currentPath.join(".")}:`, value, "→", field.getInitialValue());
                 source[fieldName] = field.getInitialValue();
                 continue;
