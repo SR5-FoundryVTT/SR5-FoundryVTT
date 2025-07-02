@@ -31,7 +31,7 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
      * Use the given actors token to get the combatant.
      * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
      */
-    getActorCombatant(actor: SR5Actor): Combatant | null {
+    getActorCombatant(actor: SR5Actor) {
         const token = actor.getToken();
         if (!token) return null;
         return this.getCombatantByToken(token);

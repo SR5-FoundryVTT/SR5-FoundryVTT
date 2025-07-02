@@ -1539,34 +1539,24 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
         const token = this.getToken();
         if (!token || !game.settings.get(SYSTEM_NAME, FLAGS.UseDamageCondition)) return;
 
-        defeated = defeated ?? ConditionRules.determineDefeatedStatus(this);
+        defeated ??= ConditionRules.determineDefeatedStatus(this);
 
         // Remove unapplicable defeated token status.
         await this.removeDefeatedStatus(defeated);
 
         // Apply the appropriate combatant status.
         if (defeated.unconscious || defeated.dying || defeated.dead) {
-            await this.combatant?.update({defeated: true});
+            await this.combatant?.update({ defeated: true });
         } else {
             await this.combatant?.update({ defeated: false });
             return;
         }
-
         const newStatus = defeated.dead ? 'dead' : 'unconscious';
-
-        // Find fitting status and fallback to dead if not found.
-        const status = CONFIG.statusEffects.find(e => e.id === newStatus)!;
-        const effect = status;
+        const effect = CONFIG.statusEffects.find(e => e.id === newStatus);
 
         // Avoid applying defeated status multiple times.
-        const existing = this.effects.reduce((arr, e) => {
-            if ( effect && (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
-                arr.push(e.id!);
-            }
-            return arr;
-        }, [] as string[]);
-
-        if (existing.length) return;
+        if (!effect || this.effects.some(e => e.statuses.size === 1 && e.statuses.has(effect.id)))
+            return;
 
         // Set effect as active, as we've already made sure it isn't.
         await token.toggleEffect(effect, { overlay: true, active: true });
@@ -1646,7 +1636,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
         return !!(combatant && typeof combatant.initiative === "number");
     }
 
-    get combatant(): Combatant | null {
+    get combatant() {
         if (!this.combatActive || !game.combat) return null;
         return game.combat.getActorCombatant(this);
     }
