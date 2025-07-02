@@ -39,7 +39,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(sprite.system.initiative.matrix.base.base, 1);
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            const active = sprite.system.skills.active as Record<string, SkillFieldType>;
+            const active = sprite.system.skills.active;
 
             assert.strictEqual(active.hacking.base, 0);
 

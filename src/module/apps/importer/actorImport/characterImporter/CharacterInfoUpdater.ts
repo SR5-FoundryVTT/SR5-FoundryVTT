@@ -264,7 +264,7 @@ export class CharacterInfoUpdater {
         system.skills.language.value = {}
 
         for (const skill of languageSkills) {
-            const parsedSkill = {name: '', base: 0, specs: [] as any[]};
+            const parsedSkill = DataDefaults.createData('skill_field');
             const id = randomID(16);
             system.skills.language.value[id] = parsedSkill;
 
@@ -293,8 +293,7 @@ export class CharacterInfoUpdater {
 
         for (const skill of knowledgeSkills) {
             const id = randomID(16);
-            const parsedSkill = {name: '', base: 0, specs: [] as any[]};
-    
+            const parsedSkill: SkillFieldType = DataDefaults.createData('skill_field');
             
             // Determine the correct knowledge skill category and assign the skill to it
             let skillCategory;

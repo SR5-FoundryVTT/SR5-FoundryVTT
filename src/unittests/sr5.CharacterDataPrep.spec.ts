@@ -270,7 +270,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             }) as SR5Actor<'character'>;
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            const active = character.system.skills.active as Record<string, SkillFieldType>;
+            const active = character.system.skills.active;
             assert.strictEqual(active.arcana.value, 7);
 
             await character.delete();

@@ -18,18 +18,17 @@ export class SkillsPrep {
         const { language, active, knowledge } = system.skills;
 
         // Active skills aren't grouped and can be prepared skill by skill.
-        // Foundry Vtt types currently do not support the `TypedObjectField` type, so we need to cast it.
-        Object.values(active as Record<string, SkillFieldType>)
+        Object.values(active)
             .forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
 
         // Language skills aren't group, but might lack the value property.
         if (language.value)
-            Object.values(language.value as Record<string, SkillFieldType>).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
+            Object.values(language.value).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
 
         // Knowledge skills are groupd and might also lack the value property.
         Object.values(knowledge).forEach((group) => {
             if (group.value)
-                Object.values(group.value as Record<string, SkillFieldType>).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
+                Object.values(group.value).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
         });
     }
 
@@ -54,20 +53,17 @@ export class SkillsPrep {
         };
 
         // setup active skills
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const skill of Object.values(active as Record<string, SkillFieldType>)) {
+        for (const skill of Object.values(active)) {
             if (!skill.hidden) {
                 prepareSkill(skill);
             }
         }
 
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        const entries = Object.entries(system.skills.language.value as Record<string, SkillFieldType>);
+        const entries = Object.entries(system.skills.language.value);
         // remove entries which are deleted TODO figure out how to delete these from the data
         entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete system.skills.language.value[key]);
         
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const skill of Object.values(language.value as Record<string, SkillFieldType>)) {
+        for (const skill of Object.values(language.value)) {
             prepareSkill(skill);
             skill.attribute = 'intuition';
         }
@@ -79,8 +75,7 @@ export class SkillsPrep {
                 continue;
             }
 
-            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            const entries = Object.entries(group.value as Record<string, SkillFieldType>);    
+            const entries = Object.entries(group.value);
             // remove entries which are deleted TODO figure out how to delete these from the data
             group.value = entries
                 .filter(([, val]) => !val._delete)
@@ -94,8 +89,7 @@ export class SkillsPrep {
                 }, {});
         }
 
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [skillKey, skillValue] of Object.entries(active as Record<string, SkillFieldType>)) {
+        for (const [skillKey, skillValue] of Object.entries(active)) {
             skillValue.label = SR5.activeSkills[skillKey];
         }
     }

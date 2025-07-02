@@ -79,8 +79,7 @@ export class SpritePrep {
 
         // apply skill levels
         // clear skills that we don't have
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [skillId, skill] of Object.entries(skills.active as Record<string, SkillFieldType>)) {
+        for (const [skillId, skill] of Object.entries(skills.active)) {
             skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
         }
     }

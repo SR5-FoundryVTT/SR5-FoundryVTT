@@ -41,7 +41,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(spirit.system.initiative.meatspace.base.base, 4); // force * 2 + override;
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            const active = spirit.system.skills.active as Record<string, SkillFieldType>;
+            const active = spirit.system.skills.active;
 
             assert.strictEqual(active.assensing.base, 0);
 

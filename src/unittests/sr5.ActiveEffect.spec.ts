@@ -95,7 +95,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             // A ValueField value outside of value calculation should still work
             // Skill automatics normally can default, wich we overwrite here.
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            const active = actor.system.skills.active as Record<string, SkillFieldType>;
+            const active = actor.system.skills.active;
             assert.deepEqual(active.automatics.mod, []);
             assert.strictEqual(active.automatics.override, undefined);
             assert.strictEqual(active.automatics.canDefault, false);

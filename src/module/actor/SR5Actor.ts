@@ -332,8 +332,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
         if (!skillName) return;
 
         // Handle legacy skills (name is id)
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        const skills = this.getActiveSkills() as Record<string, SkillFieldType>;
+        const skills = this.getActiveSkills();
         const skill = skills[skillName];
         if (skill) return skill;
 
@@ -687,8 +686,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
 
         const skills = this.getSkills();
 
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [id, skill] of Object.entries(skills.language.value as Record<string, SkillFieldType>)) {
+        for (const [id, skill] of Object.entries(skills.language.value)) {
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
         }
@@ -704,8 +702,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
             }
         }
 
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [id, skill] of Object.entries(skills.active as Record<string, SkillFieldType>)) {
+        for (const [id, skill] of Object.entries(skills.active)) {
             if (searchedFor === possibleMatch(skill))
                 return {...skill, id};
         }
@@ -896,8 +893,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
         const updateData = {};
 
         const skills = this.getActiveSkills();
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [id, skill] of Object.entries(skills as Record<string, SkillFieldType>)) {
+        for (const [id, skill] of Object.entries(skills)) {
             if (skill.hidden) {
                 skill.hidden = false;
                 updateData[`system.skills.active.${id}`] = skill;
@@ -1977,8 +1973,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
-        // TypedObjectField is not set in foundry-vtt-types v13 yet
-        return Object.entries(marks as Record<string, number>)
+        return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => {
                 const markIdDocuments = Helpers.getMarkIdDocuments(markId)!;

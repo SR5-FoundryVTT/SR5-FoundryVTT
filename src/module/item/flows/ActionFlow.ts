@@ -126,8 +126,7 @@ export class ActionFlow {
 
         // Convert skill data to a value label mapping.
         const skills: Record<string, Translation> = {};
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        for (const [id, skill] of Object.entries(activeSkills as Record<string, SkillFieldType>)) {
+        for (const [id, skill] of Object.entries(activeSkills)) {
             const key = skill.name || id;
             const label = skill.label || skill.name;
             skills[key] = label as Translation;

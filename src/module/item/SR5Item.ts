@@ -904,7 +904,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
 
         // This if statement should cover all types of devices, meaning the "getRating" calls above are always overwritten
         if (['cyberdeck', 'rcc', 'commlink'].includes(this.system.category)) {
-            const atts = this.system.atts as Record<string, any>;
+            const atts = this.system.atts;
             if (atts) {
                 for (const [key, att] of Object.entries(atts)) {
                     matrix[att.att].value = att.value;
@@ -1221,7 +1221,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
-        return Object.entries(marks as Record<string, number>)
+        return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => {
                 const markIdDocuments = Helpers.getMarkIdDocuments(markId)!;

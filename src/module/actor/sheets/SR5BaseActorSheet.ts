@@ -921,7 +921,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         // All custom and default actor inventories.
         const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
-        const itemIdInventory: { [x: string]: InventoryType } = {};
+        const itemIdInventory: Record<string, InventoryType> = {};
 
         // All inventories for showing all items, but not as default
         // Add first, for it to appear on top.
@@ -941,8 +941,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         };
         this._addInventoryTypes(inventoriesSheet[this.actor.defaultInventory.name]);
 
-        // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-        Object.values(this.actor.system.inventories as {[x: string]: InventoryType}).forEach(inventory => {
+        Object.values(this.actor.system.inventories).forEach(inventory => {
             const { name, label, itemIds } = inventory;
 
             // Avoid re-adding default inventories.

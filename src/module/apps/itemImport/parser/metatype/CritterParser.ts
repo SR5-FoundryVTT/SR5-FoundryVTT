@@ -47,13 +47,12 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         };
 
         if (skills.group) {
-            const groups = IH.getArray(skills.group).reduce((acc, item) => {
+            const groups = IH.getArray(skills.group).reduce<Record<string, number>>((acc, item) => {
                 acc[item._TEXT] = +(item.$?.rating ?? 0);
                 return acc;
-            }, {} as Record<string, number>);
+            }, {});
 
-            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.s
-            Object.entries(system.skills.active as {[x: string]: SkillFieldType}).forEach(([_, skill]) => {
+            Object.entries(system.skills.active).forEach(([_, skill]) => {
                 if (Object.keys(groups).includes(skill.group)) {
                     skill.base = (skill.base ?? 0) + groups[skill.group];
                 }
