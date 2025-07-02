@@ -3,11 +3,18 @@
         <div class="attribute-name">
             <select name="system.initiative.perception" class="display">
                 {{#select system.initiative.perception}}
-                    <option value="meatspace">{{localize "SR5.InitCatMeatspace"}}</option>
-                    <option value="matrix">{{localize "SR5.InitCatMatrix"}}</option>
+                    {{#if system.initiative.meatspace}}
+                        <option value="meatspace">{{localize "SR5.InitCatMeatspace"}}</option>
+                    {{/if}}
+
                     {{#ife system.special 'magic'}}
                         <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
-                    {{/ife}} {{/select}}
+                    {{/ife}}
+
+                    {{#if system.initiative.matrix}}
+                        <option value="matrix">{{localize "SR5.InitCatMatrix"}}</option>
+                    {{/if}}
+                {{/select}}
             </select>
         </div>
         <div class="attribute-name">
