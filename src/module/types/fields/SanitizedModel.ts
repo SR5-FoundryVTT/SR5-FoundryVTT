@@ -23,7 +23,7 @@ export abstract class SanitizedModel<
 
     private static _sanitize(
         source: Record<string, unknown> | ArrayLike<unknown>,
-        resolveField: (ket: string) => foundry.data.fields.DataField.Any,
+        resolveField: (key: string) => foundry.data.fields.DataField.Any,
         path: string[] = [],
     ): void {
         for (const [fieldName, value] of Object.entries(source)) {
