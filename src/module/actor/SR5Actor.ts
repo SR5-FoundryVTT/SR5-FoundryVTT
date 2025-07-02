@@ -1497,11 +1497,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
     }
 
     getStunTrack(this: SR5Actor): TrackType | undefined {
-        return 'stun' in this.system.track ? this.system.track.stun : undefined;
+        return this.system.track && 'stun' in this.system.track ? this.system.track.stun : undefined;
     }
 
     getPhysicalTrack(this: SR5Actor): OverflowTrackType | undefined {
-        return 'physical' in this.system.track ? this.system.track.physical : undefined;
+        return this.system.track && 'physical' in this.system.track ? this.system.track.physical : undefined;
     }
 
     /**

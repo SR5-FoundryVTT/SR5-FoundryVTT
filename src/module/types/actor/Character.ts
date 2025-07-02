@@ -40,7 +40,7 @@ const CharacterData = {
     visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
 
     // === Condition & Movement ===
-    track: new SchemaField(Tracks('matrix', 'physical', 'stun')),
+    track: new SchemaField(Tracks('physical', 'stun')),
     movement: new SchemaField(Movement()),
 
     // === Magic & Matrix ===

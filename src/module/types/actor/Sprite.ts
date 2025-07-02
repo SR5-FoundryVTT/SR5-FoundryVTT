@@ -25,7 +25,7 @@ const SpriteData = {
     technomancerUuid: new StringField({ required: true }),
 
     // === Condition & Monitoring ===
-    track: new SchemaField(Tracks('matrix')),
+    // track: new SchemaField(Tracks('matrix')),
     initiative: new SchemaField(Initiative('matrix')),
     limits: new SchemaField({ ...Limits(), ...MatrixLimits() }),
 
