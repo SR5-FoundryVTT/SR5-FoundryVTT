@@ -29,7 +29,7 @@ declare namespace Shadowrun {
         // Name of the document or manually entered by user.
         name: string
         // The Foundry Document marked.
-        document: any | null
+        document: Shadowrun.NetworkDevice | null
         // Optional token for those documents having them.
         token: TokenDocument | null
     }

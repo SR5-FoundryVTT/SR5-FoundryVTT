@@ -116,10 +116,9 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             const {targets} = MatrixFlow.getMatrixTargets(this.actor);
 
             for (const target of targets) {
-                
                 // Collect connected icons, if user wants to see them.
                 if (this._connectedIconsOpenClose[target.document.uuid]) {
-                    target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document.uuid);
+                    target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document);
 
                     for (const icon of target.icons) {
                         // Mark icon as selected.
@@ -136,6 +135,20 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         // When marked documents overview is shown, collect all marked documents.
         else if (data.showMatrixMarkedDocuments) {
             data.markedDocuments = await this.actor.getAllMarkedDocuments();
+
+            for (const target of data.markedDocuments) {
+                if (this._connectedIconsOpenClose[target.document.uuid]) {
+                    target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document);
+
+                    for (const icon of target.icons) {
+                        // Mark icon as selected.
+                        icon.selected = this.selectedMatrixTarget === icon.document.uuid;
+                    }
+                }
+
+                // Mark target as selected.
+                target.selected = this.selectedMatrixTarget === target.document.uuid;
+            }
         }
 
         return data;
