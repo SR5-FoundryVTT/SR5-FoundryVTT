@@ -46,7 +46,8 @@ const ICData = {
         "soak",
         "matrix_initiative",
         "matrix_initiative_dice",
-        "matrix_track"
+        "matrix_track",
+        "global"
     )),
 };
 

@@ -15,7 +15,7 @@ export abstract class SanitizedModel<
     DerivedData extends AnyObject = EmptyObject,
 > extends foundry.abstract.TypeDataModel<Schema, Parent, BaseData, DerivedData> {
     static override migrateData(source: AnyMutableObject) {
-        if (isStructured(source))
+        if (isStructured(source) && this.schema.validate(source) != null)
             SanitizedModel._sanitize(source, (key) => this.schema.fields[key]);
 
         return super.migrateData(source);
