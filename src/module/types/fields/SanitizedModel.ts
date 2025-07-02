@@ -15,7 +15,7 @@ export abstract class SanitizedModel<
     DerivedData extends AnyObject = EmptyObject,
 > extends foundry.abstract.TypeDataModel<Schema, Parent, BaseData, DerivedData> {
     static override migrateData(source: AnyMutableObject) {
-        if (isStructured(source) && this.schema.validate(source) != null)
+        if (isStructured(source) && this.schema.validate(source, { partial: true }) != null)
             SanitizedModel._sanitize(source, (key) => this.schema.fields[key]);
 
         return super.migrateData(source);
@@ -30,12 +30,7 @@ export abstract class SanitizedModel<
             const field = resolveField(fieldName);
             const currentPath = [...path, fieldName];
 
-            if (!field) {
-                console.warn(`Unknown field: ${currentPath.join(".")}`);
-                continue;
-            }
-
-            if (field.validate(value) == null) continue;
+            if (field?.validate(value, { partial: true }) == null) continue;
 
             if (!isStructured(value)) {
                 console.warn(`Replaced invalid value at ${currentPath.join(".")}:`, value, "→", field.getInitialValue());
