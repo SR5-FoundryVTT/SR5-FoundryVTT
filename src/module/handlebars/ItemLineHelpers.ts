@@ -1075,7 +1075,6 @@ export const registerItemLineHelpers = () => {
      * @param action The matrix action used to render a single item line.
      */
     Handlebars.registerHelper('MatrixActionsItemRightSide', (action: SR5Item) => {
-        
         // Either show owner only, a mark quantity or nothing, if 0 marks are needed.
         let needed: string|number = action.system.action?.category.matrix.marks ?? 0;
         needed = needed > 0 ? needed : '';
@@ -1098,5 +1097,82 @@ export const registerItemLineHelpers = () => {
         const classes: string[] = [];
         if (target.selected) classes.push('selected-list-item');
         return classes;
+    });
+    Handlebars.registerHelper('MatrixTargetItemIcons', (target: Shadowrun.MatrixTargetDocument) => {
+        const toggleConnectedItemsIcon = target.icons ?
+            {
+                icon: 'fas fa-square-chevron-down',
+                cssClass: 'toggle-connected-matrix-icons'
+            }:
+            {
+                icon: 'fas fa-square-chevron-up',
+                cssClass: 'toggle-connected-matrix-icons'
+            };
+
+        const icons: any = [];
+        if (target.document.hasPersona) icons.push(toggleConnectedItemsIcon);
+        return icons; 
+    });
+    Handlebars.registerHelper('MatrixTargetItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {
+        return [
+            {text: {
+                    text: game.i18n.localize(target.type)
+            }},
+            {text: {
+                    text: target.network
+            }},
+        ];
+    });
+    Handlebars.registerHelper('MatrixMarkedDocumentItemIcons', (target: Shadowrun.MarkedDocument) => {
+        const toggleConnectedItemsIcon = target.icons ?
+            {
+                icon: 'fas fa-square-chevron-down',
+                cssClass: 'toggle-connected-matrix-icons'
+            }:
+            {
+                icon: 'fas fa-square-chevron-up',
+                cssClass: 'toggle-connected-matrix-icons'
+            };
+        const connectNetworkIcon = 
+            {
+                icon: 'fas fa-right-to-bracket',
+                cssClass: 'marks-connect-network'
+            };
+
+        const icons = [
+            {
+                icon: 'fas fa-plus',
+                cssClass: 'marks-add-one'
+            },
+            {
+                icon: 'fas fa-minus', 
+                cssClass: 'marks-remove-one'
+            },
+            {
+                icon: 'fas fa-trash', 
+                cssClass: 'marks-delete'
+            }
+        ];
+        
+        // Handle document type specific icons.
+        if (target.document.isNetwork) icons.unshift(connectNetworkIcon);
+        if (target.document.hasPersona) icons.push(toggleConnectedItemsIcon)
+
+        return icons;
+    });
+    Handlebars.registerHelper('MatrixMarkedDocumentItemRightSide', (target: Shadowrun.MarkedDocument) => {
+        return [
+            {text: {
+                    text: game.i18n.localize(target.type)
+            }},
+            {text: {
+                    text: target.network
+            }},
+            {input: {
+                type: 'number',
+                value: target.marks,
+                cssClass: 'marks-qty',
+            }}
+        ];
     });
 };

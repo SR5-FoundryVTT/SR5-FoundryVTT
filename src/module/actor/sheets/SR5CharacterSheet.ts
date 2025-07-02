@@ -302,7 +302,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
     async _onOpenMarkedDocument(event) {
         event.stopPropagation();
 
-        const uuid = event.currentTarget.dataset.uuid;
+        const uuid = Helpers.listItemUuid(event)
         if (!uuid) return;
 
         // Marked documents can´t live in packs.

@@ -7,51 +7,16 @@
             itemCssClass='switch-matrix-hacking-target'
     }}
     {{#each markedDocuments}}
-    {{!-- Don't use the ListItem Handlebar helper as to avoid it's item drag&drop functionality. --}}
-    <div class="list-item" data-mark-id="{{this.markId}}" data-uuid="{{this.document.uuid}}">
-        <div class="list-item-content">
-            <div class="item-left select-matrix-target {{#ife ../selectedMatrixTarget this.document.uuid}}selected-list-item{{/ife}}">
-                <div class="item-img">
-                    <img src="{{this.document.img}}" data-tooltip="{{this.document.name}}" height="24px" width="24px"/>
-                </div>
-                <div class="item-text item-name"><span class="open-document" data-uuid="{{this.markId}}">{{speakerName this.document}}</span></div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{localize this.type}}
-                </div>
-                <div class="item-text">
-                    {{this.network}}
-                </div>
-                <div class="item-text">
-                    <input class="display marks-qty" size="1" type="text" data-dtype="Number" placeholder="1" value="{{this.marks}}" data-mark-id="{{this.markId}}"/>
-                </div>
-                <div class="item-text item-icons">
-                    {{#if this.document.isNetwork}}
-                    <a class="" data-tooltip="SR5.Tooltips.Actor.ConnectNetwork">
-                        <i class="item-icon fas fa-right-to-bracket marks-connect-network" data-mark-id="{{this.markId}}"></i>
-                    </a>
-                    {{/if}}
-                    <a class="" data-tooltip="SR5.Tooltips.Actor.MarkTarget">
-                        <i class="item-icon fas fa-plus marks-add-one" data-mark-id="{{this.markId}}"></i>
-                    </a>
-                    <a class="" data-tooltip="SR5.Labels.Sheet.SubtractOne">
-                        <i class="item-icon fas fa-minus marks-remove-one" data-mark-id="{{this.markId}}"></i>
-                    </a>
-                    <a class="" data-tooltip="SR5.Del">
-                        <i class="item-icon fas fa-trash marks-delete" data-mark-id="{{this.markId}}"></i>
-                    </a>
-                    <a data-tooltip="SR5.Collapse">
-                        {{#if this.icons}}
-                        <i class="item-icon fas fa-square-chevron-down toggle-connected-matrix-icons"></i>
-                        {{else}}
-                        <i class="item-icon fas fa-square-chevron-up toggle-connected-matrix-icons"></i>
-                        {{/if}}
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+            img=(speakerImg this.document)
+            name=(speakerName this.document)
+            additionalCssClass=(MatrixTargetCssClass this)
+            itemImgCssClass='select-matrix-target'
+            itemNameCssClass='open-matrix-target'
+            itemUuid=this.document.uuid
+            rightSide=(MatrixMarkedDocumentItemRightSide this)
+            icons=(MatrixMarkedDocumentItemIcons this)
+    }}
     {{! -- Overview of icons connected to the main icon (devices of persona) -- }}
     {{#each this.icons}}
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
@@ -60,7 +25,7 @@
             itemCssClass='subcategory-item'
             additionalCssClass=(MatrixTargetCssClass this)
             itemImgCssClass='select-matrix-target'
-            itemNameCssClass='open-document'
+            itemNameCssClass='open-matrix-target'
             itemUuid=this.document.uuid
     }}
     {{/each}}

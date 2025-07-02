@@ -8,34 +8,16 @@
     }}
     {{!-- Show main icons (personas) visible to this actor --}}
     {{#each matrixTargets}}
-    {{!-- Don't use the ListItem Handlebar helper as to avoid it's item drag&drop functionality. --}}
-    <div class="list-item" data-uuid="{{this.document.uuid}}">
-        <div class="list-item-content">
-            <div class="item-left select-matrix-target {{#ife ../selectedMatrixTarget this.document.uuid}}selected-list-item{{/ife}}">
-                <div class="item-img">
-                    <img src="{{speakerImg this.document}}" data-tooltip="{{speakerName this.document}}" height="24px" width="24px"/>
-                </div>
-                <div class="item-text item-name"><span class="open-matrix-target">{{speakerName this.document}}</span></div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{localize this.type}}
-                </div>
-                <div class="item-text">
-                    {{this.network}}
-                </div>
-                <div class="item-text item-icons">
-                    <a data-tooltip="SR5.Collapse">
-                        {{#if this.icons}}
-                        <i class="item-icon fas fa-square-chevron-down toggle-connected-matrix-icons"></i>
-                        {{else}}
-                        <i class="item-icon fas fa-square-chevron-up toggle-connected-matrix-icons"></i>
-                        {{/if}}
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+            img=(speakerImg this.document)
+            name=(speakerName this.document)
+            additionalCssClass=(MatrixTargetCssClass this)
+            itemImgCssClass='select-matrix-target'
+            itemNameCssClass='open-matrix-target'
+            itemUuid=this.document.uuid
+            rightSide=(MatrixTargetItemRightSide this)
+            icons=(MatrixTargetItemIcons this)
+    }}
     {{! -- Overview of icons connected to the main icon (devices of persona) -- }}
     {{#each this.icons}}
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
@@ -44,7 +26,7 @@
             itemCssClass='subcategory-item'
             additionalCssClass=(MatrixTargetCssClass this)
             itemImgCssClass='select-matrix-target'
-            itemNameCssClass='open-document'
+            itemNameCssClass='open-matrix-target'
             itemUuid=this.document.uuid
     }}
     {{/each}}

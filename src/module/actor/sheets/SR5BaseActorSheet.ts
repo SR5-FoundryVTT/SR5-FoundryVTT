@@ -1196,10 +1196,10 @@ export class SR5BaseActorSheet extends ActorSheet {
             return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
-        const markId = event.currentTarget.dataset.markId;
-        if (!markId) return;
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
 
-        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
         if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
@@ -1213,10 +1213,10 @@ export class SR5BaseActorSheet extends ActorSheet {
             return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
-        const markId = event.currentTarget.dataset.markId;
-        if (!markId) return;
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
 
-        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
         if (!markedDocument) return;
 
         await this.actor.setMarks(markedDocument, by);
@@ -1229,13 +1229,13 @@ export class SR5BaseActorSheet extends ActorSheet {
             return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
-        const markId = event.currentTarget.dataset.markId;
-        if (!markId) return;
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.actor.clearMark(markId);
+        await this.actor.clearMark(uuid);
     }
 
     async _onMarksClearAll(event) {
@@ -1259,10 +1259,10 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksConnectToNetwork(event) {
         event.stopPropagation();
 
-        const markId = event.currentTarget.dataset.markId;
-        if (!markId) return;
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
 
-        const target = fromUuidSync(markId) as SR5Item;
+        const target = fromUuidSync(uuid) as SR5Item;
         if (!target || !(target instanceof SR5Item)) return;
 
         await this.actor.connectNetwork(target);
