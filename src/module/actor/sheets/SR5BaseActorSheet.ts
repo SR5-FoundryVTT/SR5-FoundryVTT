@@ -43,9 +43,7 @@ export interface InventorySheetDataByType {
 export interface InventorySheetData {
     name: string,
     label: string,
-    types: {
-        [type: string]: InventorySheetDataByType
-    }
+    types: Record<string, InventorySheetDataByType>
 }
 
 export type InventoriesSheetData = Record<string, InventorySheetData>;
@@ -214,14 +212,10 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     override async getData(options) {
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
-        let data = super.getData() as any;
-        const actorData = (this.actor as SR5Actor).toObject(false);
+        const data = super.getData() as any;
+        data.system = this.actor.toObject(false).system;
 
-        data = {
-            ...data,
-            data: actorData.system,
-            system: actorData.system
-        }
+        data.system.track = Object.fromEntries(Object.entries(data.system.track).reverse());
 
         // Sheet related general purpose fields. These aren't persistent.
         data.config = SR5;
@@ -248,8 +242,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         data.contentVisibility = this._prepareContentVisibility(data);
 
-        if ('description' in actorData.system)
-            data.biographyHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(actorData.system.description.value, {
+        if ('description' in data.system)
+            data.biographyHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(data.system.description.value, {
                 // secrets: this.actor.isOwner,
                 // rollData: this.actor.getRollData.bind(this.actor),
                 relativeTo: this.actor
@@ -267,8 +261,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         Helpers.setupCustomCheckbox(this, html)
 
         // Active Effect management
-        html.find(".effect-control").on('click', event => onManageActiveEffect(event, this.actor));
-        html.find(".item-effect-control").on('click', event => onManageItemActiveEffect(event));
+        html.find(".effect-control").on('click', async event => onManageActiveEffect(event, this.actor));
+        html.find(".item-effect-control").on('click', async event => onManageItemActiveEffect(event));
 
         // Inventory visibility switch
         html.find('.item-toggle').on('click', this._onInventorySectionVisiblitySwitch.bind(this));
@@ -399,7 +393,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             if (inventory.types.hasOwnProperty(type)) continue;
 
             inventory.types[type] = {
-                type: type,
+                type,
                 label: SR5.itemTypes[type],
                 isOpen: this._inventoryOpenClose[type],
                 items: []
@@ -440,7 +434,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 return;
 
             // Knowlege skill data transfer
-            case 'knowledgeskill':
+            case 'knowledgeskill': {
                 // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
                 const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
 
@@ -454,7 +448,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
 
                 return;
-
+            }
             // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
             case 'ActiveEffect':
                 {
@@ -478,7 +472,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             // All default Foundry data transfer.
             default:
                 // Let default Foundry handler deal with default drag cases.
-                return super._onDragStart(event);
+                { super._onDragStart(event); return; }
         }
     }
 
@@ -559,7 +553,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * Use together with _restoreInputCursorPosition during render calls.
      */
     _restoreInputCursorPosition(focus) {
-        if (focus && focus.name) {
+        if (focus?.name) {
             if (!this.form) return;
 
             const element = this.form[focus.name];
@@ -570,7 +564,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 // Set selection range for supported input types.
                 if (['checkbox', 'radio'].includes(element.type)) return;
                 // set the selection range on the focus formed from before (keeps track of cursor in input)
-                element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
+                element.setSelectionRange?.(focus.selectionStart, focus.selectionEnd);
             }
         }
 
@@ -621,8 +615,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
 
     _setInventoryVisibility(isOpen: boolean) {
-        Object.keys(CONFIG.Item.typeLabels)
-            .forEach(type => this._setInventoryTypeVisibility(type, isOpen));
+        Object.keys(CONFIG.Item.typeLabels).forEach(type => { this._setInventoryTypeVisibility(type, isOpen); });
     }
 
     _setInventoryTypeVisibility(type: string, isOpen: boolean) {
@@ -639,7 +632,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         // TODO: Add translation for item names...
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type,
+            type,
         };
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
         if (!items) return;
@@ -689,7 +682,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         event.preventDefault();
 
         // look for roll id data in the current line
-        let rollId = $(event.currentTarget).data()?.rollId;
+        let rollId = $(event.currentTarget).data()?.rollId as string;
         // if that doesn't exist, look for a prent with RollId name
         rollId = rollId ?? $(event.currentTarget).parent('.RollId').data().rollId;
 
@@ -734,7 +727,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 console.log('roll vehicle stat', rollId);
                 break;
 
-            case 'drone':
+            case 'drone': {
                 const droneRoll = split[1];
                 switch (droneRoll) {
                     case 'perception':
@@ -748,7 +741,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                         break;
                 }
                 break;
-            // end drone
+            }
 
             case 'attribute': {
                 const attribute = split[1];
@@ -764,20 +757,21 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 break;
             }
 
-            case 'matrix':
+            case 'matrix': {
                 const matrixRoll = split[1];
                 switch (matrixRoll) {
-                    case 'attribute':
+                    case 'attribute': {
                         const attr = split[2];
                         await this.actor.rollAttribute(attr, options);
                         break;
+                    }
                     case 'device-rating':
                         await this.actor.rollDeviceRating(options);
                         break;
                 }
 
                 break;
-            // end matrix
+            }
         }
     }
 
@@ -908,7 +902,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 }
             };
 
-            (['firewall', 'data_processing', 'sleaze', 'attack'] as MatrixAttribute[]).forEach(att => cleanupAttribute(att));
+            (['firewall', 'data_processing', 'sleaze', 'attack'] as MatrixAttribute[]).forEach(att => { cleanupAttribute(att); });
         }
     }
 
@@ -1249,7 +1243,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     _filterSkills(data: SR5ActorSheetData, skills: SkillsType = {}) : SkillsType {
         const filteredSkills = {};
-        for (let [key, skill] of Object.entries(skills)) {
+        for (const [key, skill] of Object.entries(skills)) {
             // Don't show hidden skills.
             if (skill.hidden) {
                 continue;
@@ -1310,7 +1304,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const searchKey = skill.name === undefined ? key : '';
         // some "specs" were a string from old code I think
         const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
-        let searchString = `${searchKey} ${name} ${specs}`;
+        const searchString = `${searchKey} ${name} ${specs}`;
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
     }
@@ -1357,7 +1351,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const itemId = Helpers.listItemId(event);
         // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
         const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
-        if (!skillId) return console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`);
+        if (!skillId) { console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`); return; }
         return this.actor.rollSkill(skillId, { event });
     }
 
@@ -1375,7 +1369,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         const skill = this.actor.getSkill(skillId);
         if (!skill) {
-            return console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`);
+            console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`); return;
         }
 
         LinksHelpers.openSource(skill.link);
@@ -1386,11 +1380,11 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const skill = Helpers.listItemId(event);
 
         if (!skill) {
-            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`); return;
         }
 
         // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skill);
     }
 
     /** Keep track of each SkillEditSheet instance and close before opening another.
@@ -1413,18 +1407,10 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const [skill, category] = Helpers.listItemId(event).split('.');
 
         if (!skill || !category) {
-            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`);
+            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`); return;
         }
 
-        this._showSkillEditForm(
-            KnowledgeSkillEditSheet,
-            this.actor,
-            {
-                event: event,
-            },
-            skill,
-            category,
-        );
+        void this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, { event }, skill, category);
     }
 
     async _onShowEditLanguageSkill(event) {
@@ -1432,11 +1418,11 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const skill = Helpers.listItemId(event);
 
         if (!skill) {
-            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`); return;
         }
 
         // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event }, skill);
     }
 
     async _closeOpenSkillApp() {
@@ -1494,7 +1480,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const skillId = await this.actor.addActiveSkill();
         if (!skillId) return;
 
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skillId);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skillId);
     }
 
     async _onRemoveActiveSkill(event: Event) {
@@ -1510,7 +1496,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     async _onRollAttribute(event) {
         event.preventDefault();
         const attribute = event.currentTarget.closest('.attribute').dataset.attribute;
-        return this.actor.rollAttribute(attribute, { event: event });
+        return this.actor.rollAttribute(attribute, { event });
     }
 
     /**
@@ -1519,7 +1505,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      */
     async _onRollCellInput(event) {
         event.preventDefault();
-        let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
 
         switch (track) {
             case 'stun':
@@ -1573,7 +1559,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         // Inform users about issues with templating or programming.
         if (!item?.system || !('technology' in item?.system) || item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
-            return console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item);
+            console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item); return;
         }
 
         await item.update({ system: { technology: { quantity } } });
@@ -1702,14 +1688,11 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             return;
         }
 
-
         $('.selection-inventory').hide();
         $('.inline-input-inventory').show();
 
         // Mark action and pre-select.
-        $('#input-inventory')
-            .data('action', action)
-            .select();
+        $('#input-inventory').data('action', action).select();
     }
 
     /**
@@ -1842,29 +1825,29 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     async _onMatrixAttributeSelected(event) {
         if (!("matrix" in this.actor.system)) return;
 
-        let iid = this.actor.system.matrix!.device;
-        let item = this.actor.items.get(iid);
+        const iid = this.actor.system.matrix!.device;
+        const item = this.actor.items.get(iid);
         if (!item) {
             console.error('could not find item');
             return;
         }
         // grab matrix attribute (sleaze, attack, etc.)
-        let att = event.currentTarget.dataset.att;
+        const att = event.currentTarget.dataset.att;
         // grab device attribute (att1, att2, ...)
-        let deviceAtt = event.currentTarget.value;
+        const deviceAtt = event.currentTarget.value;
 
         // get current matrix attribute on the device
         const deviceData = item.system as Item.SystemOfType<'device'>;
-        let oldVal = deviceData.atts[deviceAtt].att;
-        let data = {
+        const oldVal = deviceData.atts[deviceAtt].att;
+        const data = {
             _id: iid,
         };
 
         // go through atts on device, setup matrix attributes on it
         // This logic swaps the two slots when a new one is selected
         for (let i = 1; i <= 4; i++) {
-            let tmp = `att${i}`;
-            let key = `system.atts.att${i}.att`;
+            const tmp = `att${i}`;
+            const key = `system.atts.att${i}.att`;
             if (tmp === deviceAtt) {
                 data[key] = att;
             } else if (deviceData.atts[`att${i}`].att === att) {
@@ -1902,8 +1885,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         html.find('label.checkbox').each(function (this: any) {
             setContent(this);
         });
-        html.find('label.checkbox').click((event) => setContent(event.currentTarget));
-        html.find('.submit-checkbox').change((event) => this._onSubmit(event));
+        html.find('label.checkbox').click((event) => { setContent(event.currentTarget); });
+        html.find('.submit-checkbox').change(async (event) => this._onSubmit(event));
     }
 
     /**
