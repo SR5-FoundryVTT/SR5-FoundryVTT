@@ -215,8 +215,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const data = super.getData() as any;
         data.system = this.actor.toObject(false).system;
 
-        data.system.track = Object.fromEntries(Object.entries(data.system.track).reverse());
-
         // Sheet related general purpose fields. These aren't persistent.
         data.config = SR5;
         data.filters = this._filters;
@@ -785,7 +783,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         const value = Number(event.currentTarget.dataset.value);
         const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
-        const data = {};
+        const data: Actor.UpdateData = {};
 
         if (track === 'stun' || track === 'physical') {
             const property = `system.track.${track}.value`;

@@ -1,0 +1,19 @@
+{{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+        name=(localize track.label)
+        value=track.value
+        max=track.max
+        id=id
+        tolerance=3
+        toleranceBase=track.pain_tolerance
+        disabled=track.disabled
+}}
+{{#if track.overflow}}
+    {{#ife track.value track.max}}
+        {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                name=(localize "SR5.Overflow")
+                value=track.overflow.value
+                max=track.overflow.max
+                id="overflow"
+        }}
+    {{/ife}}
+{{/if}}

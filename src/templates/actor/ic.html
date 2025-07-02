@@ -10,8 +10,10 @@
             </div>
             <div class="attributes smooth">
                 <div class="block">
-                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html' name=(localize system.track.matrix.label)
-                    value=system.track.matrix.value max=system.track.matrix.max id="matrix" }}
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.html'
+                        id='matrix'
+                        track = system.track.matrix
+                    }}
                 </div>
                 <div class="attributes no-border">
                     <div class="attribute row space-around">

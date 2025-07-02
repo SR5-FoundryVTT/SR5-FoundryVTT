@@ -27,6 +27,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.html',
 
         // uncategorized lists
+        'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.html',
         'systems/shadowrun5e/dist/templates/item/parts/import_flag_button.html',
