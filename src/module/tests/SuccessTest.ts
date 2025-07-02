@@ -265,7 +265,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     _prepareRollMode(data, options: TestOptions): Roll.ConfiguredRollModes {
         if (options.rollMode != null) return options.rollMode;
-        if (data?.action.roll_mode) return data.action.roll_mode;
+        if (data?.action?.roll_mode) return data.action.roll_mode;
         else return game.settings.get(CORE_NAME, 'rollMode') as Roll.ConfiguredRollModes;
     }
 
