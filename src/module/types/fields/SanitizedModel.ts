@@ -32,17 +32,15 @@ export abstract class SanitizedModel<
 
             if (field?.validate(value, { partial: true }) == null) continue;
 
-            if (!isStructured(value)) {
-                console.warn(`Replaced invalid value at ${currentPath.join(".")}:`, value, "→", field.getInitialValue());
-                source[fieldName] = field.getInitialValue();
-                continue;
-            }
-
-            if (field instanceof SchemaField)
+            if (field instanceof SchemaField && isStructured(value))
                 SanitizedModel._sanitize(value, (subKey) => field.fields[subKey], currentPath);
-
-            if (field instanceof ArrayField || field instanceof TypedObjectField)
+            else if ((field instanceof ArrayField || field instanceof TypedObjectField) && isStructured(value))
                 SanitizedModel._sanitize(value, () => field.element, currentPath);
+            else {
+                const initialValue = field.getInitialValue();
+                console.warn(`Replaced invalid value at ${currentPath.join(".")}:`, value, "→", initialValue);
+                source[fieldName] = initialValue;
+            }
         }
     }
 }
