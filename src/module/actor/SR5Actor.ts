@@ -1552,28 +1552,24 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
             return;
         }
 
-        let newStatus = 'unconscious';
-        if (defeated.dying) newStatus = 'unconscious';
-        if (defeated.dead) newStatus = 'dead';
+        const newStatus = defeated.dead ? 'dead' : 'unconscious';
 
         // Find fitting status and fallback to dead if not found.
-        const status = CONFIG.statusEffects.find(e => e.id === newStatus);
+        const status = CONFIG.statusEffects.find(e => e.id === newStatus)!;
         const effect = status;
 
         // Avoid applying defeated status multiple times.
         const existing = this.effects.reduce((arr, e) => {
             if ( effect && (e.statuses.size === 1) && e.statuses.has(effect.id) ) {
-                arr.push(e.id as string);
+                arr.push(e.id!);
             }
             return arr;
         }, [] as string[]);
 
         if (existing.length) return;
 
-        // @ts-expect-error
         // Set effect as active, as we've already made sure it isn't.
-        // Otherwise Foundry would toggle on/off, even though we're still dead.
-        await token.object.toggleEffect(effect || CONFIG.controlIcons.defeated, { overlay: true, active: true });
+        await token.toggleEffect(effect, { overlay: true, active: true });
     }
 
     /**
