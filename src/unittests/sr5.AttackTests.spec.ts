@@ -1,20 +1,20 @@
-import { FireModeRules } from '../module/rules/FireModeRules';
-import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5 } from '../module/config';
+import { SR5TestFactory } from './util';
 import { SR5Actor } from '../module/actor/SR5Actor';
-import { SR5Item } from '../module/item/SR5Item';
-import { DataDefaults } from '../module/data/DataDefaults';
+import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CombatRules } from '../module/rules/CombatRules';
 import { DamageType } from 'src/module/types/item/Action';
+import { DataDefaults } from '../module/data/DataDefaults';
+import { FireModeRules } from '../module/rules/FireModeRules';
 type DamageTypeType = Item.SystemOfType<'action'>['action']['damage']['type']['base'];
 type DamageElementType = Item.SystemOfType<'action'>['action']['damage']['element']['base'];
 
 export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
-    const {describe, it, before, after} = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    before(async () => {})
-    after(async () => {})
+    after(async () => { factory.destroy(); });
 
     describe('Fire Mode Rules', () => {
         it('apply defense modifier per fire mode', () => {
@@ -160,18 +160,14 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
     })
 
     describe('CombatRules', () => {
-        before(async () => {});
-        after(async () => {})
-
         const getCharacterWithArmor = async (armorValue: number, {
             hardened = false
         }: {
             hardened?: boolean
         } = {}): Promise<SR5Actor> => {
-            const characterActor = await SR5Actor.create({ name: 'QUENCH', type: 'character' }) as SR5Actor<'character'>;
-            const armor = new SR5Item<'armor'>({
+            const characterActor = await factory.createActor({ type: 'character' });
+            const armor = await factory.createItem({
                 type: 'armor',
-                name: 'Test Armor',
                 system: {
                     armor: {
                         base: armorValue,
@@ -190,7 +186,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         const getVehicleWithArmor = async (armorValue: number): Promise<SR5Actor> => {
             const armor = DataDefaults.createData('armor', { value: armorValue, base: armorValue });
-            return await SR5Actor.create({ name: 'QUENCH', type: 'vehicle', system: { armor } }) as SR5Actor<'vehicle'>;
+            return await factory.createActor({ type: 'vehicle', system: { armor } });
         }
 
         const getDamage = (
@@ -315,7 +311,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         describe("doesNoPhysicalDamageToVehicle", () => {
             it("blocks non-physical damage to vehicle", async () => {
-                const vehicle = await SR5Actor.create({ name: 'QUENCH', type: 'vehicle' }) as SR5Actor<'vehicle'>;
+                const vehicle = await factory.createActor({ type: 'vehicle' });
                 const damage = getDamage(4, { type: 'stun' });
 
                 const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);
@@ -324,7 +320,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             });
 
             it("does not block physical damage to vehicle", async () => {
-                const vehicle = await SR5Actor.create({ name: 'QUENCH', type: 'vehicle' }) as SR5Actor<'vehicle'>;
+                const vehicle = await factory.createActor({ type: 'vehicle' });
                 const damage = getDamage(4, { type: 'physical' });
 
                 const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);
@@ -333,7 +329,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             });
 
             it("does not block electric stun damage to vehicle", async () => {
-                const vehicle = await SR5Actor.create({ name: 'QUENCH', type: 'vehicle' }) as SR5Actor<'vehicle'>;
+                const vehicle = await factory.createActor({ type: 'vehicle' });
                 const damage = getDamage(4, { type: 'stun', element: 'electricity' });
 
                 const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);

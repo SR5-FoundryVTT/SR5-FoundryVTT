@@ -1,20 +1,21 @@
-import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import VehicleParser from '../../../../module/apps/importer/actorImport/itemImporter/vehicleImport/VehicleParser';
 import * as chummerDrone from './drone.json';
 import * as chummerVehicle from './vehicle.json';
+import { SR5TestFactory } from 'src/unittests/util';
+import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5Actor } from '../../../../module/actor/SR5Actor';
+import VehicleParser from '../../../../module/apps/importer/actorImport/itemImporter/vehicleImport/VehicleParser';
 
 export const vehicleImporterTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
-
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
     const vehicleParser = new VehicleParser();
 
-    before(async () => {});
-    after(async () => {});
+    after(async () => { factory.destroy(); });
 
     describe('Vehicle Parser', () => {
         it('parses vehicles', async () => {
-            const character = await SR5Actor.create({ name: 'QUENCH', type: 'character' }) as SR5Actor<'character'>;
+            const character = await factory.createActor({ type: 'character' });
 
             const parsedVehicles = await vehicleParser.parseVehicles(
                 character,
@@ -34,14 +35,12 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
             const drone = parsedVehicles[0];
             const vehicle = parsedVehicles[1];
 
+            factory.actors.push(drone, vehicle);
+
             assert.deepEqual(drone.system.vehicle_stats.seats.value, 0);
             assert.deepEqual(drone.system.vehicle_stats.seats.hidden, true);
             assert.deepEqual(vehicle.system.vehicle_stats.seats.value, 3);
             assert.deepEqual(vehicle.system.vehicle_stats.seats.hidden, false);
-
-            await character.delete();
-            await drone.delete();
-            await vehicle.delete();
         });
     });
 };

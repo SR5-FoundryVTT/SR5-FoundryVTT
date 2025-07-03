@@ -1,18 +1,19 @@
-import { InventoryType } from 'src/module/types/actor/Common';
-import { SR5Actor } from '../module/actor/SR5Actor';
+
+import { SR5TestFactory } from './util';
 import { SR5Item } from '../module/item/SR5Item';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
-    const { describe, it, should, before, after } = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    before(async () => {});
-    after(async () => {});
+    after(async () => { factory.destroy(); });
+
 
     describe('InventoryFlow testing', () => {
         it('create a new inventory and know of its existance', async () => {
-            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character' }) as SR5Actor<'character'>;
+            const actor = await factory.createActor({ type: 'character' });
 
             await actor.inventory.create('test');
 
@@ -26,22 +27,20 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
             });
 
             assert.strictEqual(actor.inventory.exists('test'), true);
-            await actor.delete();
         });
 
         it('remove an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { inventories: inventoriesData } }) as SR5Actor<'character'>;
+            const actor = await factory.createActor({ type: 'character', system: { inventories: inventoriesData } });
 
             await actor.inventory.remove('test');
 
             assert.notExists(actor.system.inventories['test']);
-            await actor.delete();
         });
 
         it('add and remove an item to and from an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { inventories: inventoriesData } }) as SR5Actor<'character'>;
+            const actor = await factory.createActor({ type: 'character', system: { inventories: inventoriesData } });
             const item = await actor.createEmbeddedDocuments('Item', [{ type: 'weapon', name: 'Test Weapon' }]) as SR5Item<'weapon'>[];
 
             await actor.inventory.addItems('test', item);
@@ -53,12 +52,11 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
             await actor.inventory.removeItem(item[0]);
             assert.deepEqual(inventories.test.itemIds, []);
-            await actor.delete();
         });
 
         it('rename an existing inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: ['notAnItemId'] } };
-            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character', system: { inventories: inventoriesData } }) as SR5Actor<'character'>;
+            const actor = await factory.createActor({ type: 'character', system: { inventories: inventoriesData } });
 
             const before = 'test';
             const after = 'betterTest';
@@ -73,11 +71,10 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
                 itemIds: ['notAnItemId'],
                 showAll: true,
             });
-            await actor.delete();
         });
 
         it('create and rename an inventory including prohibited foundry chars', async () => {
-            const actor = await SR5Actor.create({ name: 'QUENCH', type: 'character' }) as SR5Actor<'character'>;
+            const actor = await factory.createActor({ type: 'character' });
 
             await actor.inventory.create('Test.');
 
@@ -113,8 +110,6 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
                 itemIds: [],
                 showAll: true,
             });
-
-            await actor.delete();
         });
     });
 };

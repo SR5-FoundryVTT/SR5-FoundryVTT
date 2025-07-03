@@ -1,35 +1,33 @@
-import { SkillFieldType } from 'src/module/types/template/Skills';
-import { SR5Actor } from './../module/actor/SR5Actor';
+import { SR5TestFactory } from './util';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
-    const { describe, it } = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
+
+    after(async () => { factory.destroy(); });
 
     describe('SpiritDataPrep', () => {
         it('Spirits are always magical', async () => {
-            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
+            const spirit = await factory.createActor({ type: 'spirit' });
 
             assert.strictEqual(spirit.system.special, 'magic');
-
-            await spirit.delete();
         });
 
         it('visibility checks', async () => {
-            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit' }) as SR5Actor<'spirit'>;
+            const spirit = await factory.createActor({ type: 'spirit' });
             assert.strictEqual(spirit.system.visibilityChecks.astral.astralActive, true);
             assert.strictEqual(spirit.system.visibilityChecks.astral.hasAura, true);
             assert.strictEqual(spirit.system.visibilityChecks.astral.affectedBySpell, false);
             assert.strictEqual(spirit.system.visibilityChecks.meat.hasHeat, false);
             assert.strictEqual(spirit.system.visibilityChecks.matrix.hasIcon, false);
             assert.strictEqual(spirit.system.visibilityChecks.matrix.runningSilent, false);
-
-            await spirit.delete();
         });
 
 
         it('Spirit default/overrides by example type', async () => {
-            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit', system: { spiritType: 'air' } }) as SR5Actor<'spirit'>;
+            const spirit = await factory.createActor({ type: 'spirit', system: { spiritType: 'air' } });
 
             // Without adequate force there will be negative base values with minimum attribute values.
             assert.strictEqual(spirit.system.attributes.body.base, -2);
@@ -57,26 +55,20 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(active.assensing.base, 6);
             assert.strictEqual(active.arcana.base, 0); // not for this spirit type.
-
-            await spirit.delete();
         });
 
         it('Spirit recoil compensation', async () => {
-            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit', system: { attributes: { strength: { base: 5 } } } }) as SR5Actor<'spirit'>;
+            const spirit = await factory.createActor({ type: 'spirit', system: { attributes: { strength: { base: 5 } } } });
             if (!spirit) return assert.fail();
 
             assert.strictEqual(spirit.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
-
-            await spirit.delete();
         });
         it('A NPC Grunt should only have physical track', async () => {
-            const spirit = await SR5Actor.create({ name: 'QUENCH', type: 'spirit', system: { is_npc: true, npc: { is_grunt: true } } }) as SR5Actor<'spirit'>;
+            const spirit = await factory.createActor({ type: 'spirit', system: { is_npc: true, npc: { is_grunt: true } } });
 
             assert.strictEqual(spirit.system.track.stun.value, 0);
             assert.strictEqual(spirit.system.track.stun.disabled, true);
             assert.strictEqual(spirit.system.track.physical.disabled, false);
-
-            await spirit.delete();
         });
     });
 };

@@ -3,7 +3,7 @@ import MountedWeaponParser from '../../../../module/apps/importer/actorImport/it
 import * as chummerVehicle from './drone.json';
 
 export const mountedWeaponParserTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, assert } = context;
 
     const mountedWeaponParser = new MountedWeaponParser();
 
@@ -12,8 +12,6 @@ export const mountedWeaponParserTesting = (context: QuenchBatchContext) => {
             const weapons = await mountedWeaponParser.parseWeapons(chummerVehicle as any);
 
             assert.lengthOf(weapons, 1);
-
-            for (const weapon of weapons) await weapon.delete();
         });
     });
 };

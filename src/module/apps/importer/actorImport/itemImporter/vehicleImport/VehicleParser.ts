@@ -22,7 +22,7 @@ export default class VehicleParser {
         const vehicles = getArray(chummerChar.vehicles?.vehicle);
 
         return await Promise.all<SR5Actor>(vehicles.map<Promise<SR5Actor>>(async (vehicle) => {
-            const vehicleActor = (await SR5Actor.create({ name: vehicle.name, type: "vehicle" }) as SR5Actor<'vehicle'>)!;
+            const vehicleActor = (await SR5Actor.create({ name: vehicle.name, type: "vehicle" }) as SR5Actor<'vehicle'>);
 
             const promises : Array<Promise<any>> = [];
             promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));

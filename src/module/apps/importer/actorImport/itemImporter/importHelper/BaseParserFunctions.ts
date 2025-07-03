@@ -99,7 +99,7 @@ export function createItemData<T extends Item.ConfiguredSubTypes>(
         flags: {},
         type,
         system
-    } satisfies Item.CreateData;
+    };
 }
 
 // formatAsSlug and genImportFlags copied from original implementation in bulk importer DataImporter.ts

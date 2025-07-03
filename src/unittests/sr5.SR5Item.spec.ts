@@ -1,19 +1,16 @@
+import { SR5TestFactory } from "./util";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
-import { SR5Item } from "../module/item/SR5Item";
 
 export const shadowrunSR5Item = (context: QuenchBatchContext) => {
-    /**
-     * Setup handling for all items within this test.
-     */
-    const {describe, it, before, after} = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    before(async () => {})
-    after(async () => {})
+    after(async () => { factory.destroy(); });
 
     describe('SR5Items', () => {
         it('create a naked item of any type', async () => {
-            const item = await SR5Item.create({type: 'action', name: 'QUENCH'}) as SR5Item<'action'>;
+            const item = await factory.createItem({type: 'action'});
 
             // Check basic foundry data integrity
             assert.notStrictEqual(item.id, '');
@@ -24,13 +21,11 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             const itemFromCollection = game.items.get(item.id!);
             assert.notStrictEqual(itemFromCollection, null);
             assert.strictEqual(item.id, itemFromCollection?.id);
-
-            await item.delete();
         });
 
         it('embedd a ammo into a weapon and not the global item collection', async () => {
-            const weapon = await SR5Item.create({type: 'weapon', name: 'QUENCH', system: {category: 'range'}}) as SR5Item<'weapon'>;
-            const ammo = new SR5Item<'ammo'>({type: 'ammo', name: 'QUENCH'});
+            const weapon = await factory.createItem({type: 'weapon', system: {category: 'range'}});
+            const ammo = await factory.createItem({type: 'ammo'});
 
             await weapon.createNestedItem(ammo.toObject());
 
@@ -44,14 +39,12 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             // An embedded item should NOT appear in the items collection.
             const embeddedAmmoInCollection = game.items?.get(embeddedAmmoData._id);
             assert.strictEqual(embeddedAmmoInCollection, undefined);
-
-            await weapon.delete();
         });
 
         describe('Testing related data injection', () => {
             // TODO: taMiF => these seem to have trouble with not injecting into changedata in _preUpdate but with applying diffs to system
             it('Correctly add defense tests to spells', async () => {
-                const item = await SR5Item.create({type: 'spell', name: 'QUENCH'}) as SR5Item<'spell'>;
+                const item = await factory.createItem({type: 'spell' });
 
                 await item.update({ system: { category: 'combat' } });
                 assert.equal(item.system.action.test, 'SpellCastingTest');
@@ -64,43 +57,35 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 assert.equal(item.system.action.followed.test, 'DrainTest');
                 assert.equal(item.system.action.opposed.test, 'OpposedTest');
                 assert.equal(item.system.action.opposed.resist.test, '');
-
-                await item.delete();
             });
             it('Correctly add default tests to melee weapons', async () => {
-                const item = await SR5Item.create({type: 'weapon', name: 'QUENCH'}) as SR5Item<'weapon'>;
+                const item = await factory.createItem({type: 'weapon'});
 
                 await item.update({ system: { category: 'melee' } });
                 assert.equal(item.system.action.test, 'MeleeAttackTest');
                 assert.equal(item.system.action.followed.test, '');
                 assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
                 assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
-
-                await item.delete();
             });
             it('Correctly add default tests to range weapons', async () => {
-                const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
+                const item = await factory.createItem({ type: 'weapon' });
 
                 await item.update({ system: { category: 'range' } });
                 assert.equal(item.system.action.test, 'RangedAttackTest');
                 assert.equal(item.system.action.followed.test, '');
                 assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
                 assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
-
-                await item.delete();
             });
             it('Correctly add defense tests to complex forms', async () => {
-                const item = await SR5Item.create({ name: 'QUENCH', type: 'complex_form' }) as SR5Item<'complex_form'>;
+                const item = await factory.createItem({ type: 'complex_form' });
 
                 assert.equal(item.system.action.test, 'ComplexFormTest');
                 assert.equal(item.system.action.followed.test, 'FadeTest');
                 assert.equal(item.system.action.opposed.test, 'OpposedTest');
                 assert.equal(item.system.action.opposed.resist.test, '');
-
-                await item.delete();
             });
             it('Correctly alter default test for weapon category changes', async () => {
-                const item = await SR5Item.create({ name: 'QUENCH', type: 'weapon' }) as SR5Item<'weapon'>;
+                const item = await factory.createItem({  type: 'weapon' });
 
                 await item.update({ system: { category: 'range' } });
                 assert.equal(item.system.action.test, 'RangedAttackTest');
@@ -113,8 +98,6 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 assert.equal(item.system.action.followed.test, '');
                 assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
                 assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
-
-                await item.delete();
             });
             it('Correctly stop injection when mergeOptions recursive or diff are set to false', async () => {
                 /**
@@ -127,7 +110,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                  * This is testing UpdateActionFlow.injectActionTestsIntoChangeData which is connected to some 
                  * document lifecycle methods.
                  */
-                const item = await SR5Item.create({ name: 'QUENCH', type: 'complex_form'}) as SR5Item<'complex_form'>;
+                const item = await factory.createItem({ type: 'complex_form'});
                 // Should not inject.
                 await item.update({'name': 'Test'}, {recursive: false});
                 assert.equal(item.system.action.skill, ''); // Check if system data still exists
@@ -135,8 +118,6 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 assert.equal(item.system.action.skill, ''); // Check if system data still exists
                 await item.update({'name': 'Test'}, {recursive: true});
                 assert.equal(item.system.action.skill, ''); // Check if system data still exists
-
-                await item.delete();
             });
         });
     });

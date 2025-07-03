@@ -1,4 +1,3 @@
-import { rootCertificates } from 'tls';
 import { SR5Roll } from './../module/rolls/SR5Roll';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
@@ -10,8 +9,9 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
  * 
  * @param quench 
  */
-export const shadowrunRolling = (quench: QuenchBatchContext) => {
-    const {describe, it, assert, before, after, expect} = quench;
+export const shadowrunRolling = (context: QuenchBatchContext) => {
+    const { describe, it, expect } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
     describe('SR5Roll', () => {
         it('Amount of dice to bethrown in shadowrun style pool, excluding explosions', async () => {

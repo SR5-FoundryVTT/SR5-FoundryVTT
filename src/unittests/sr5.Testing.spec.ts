@@ -1,19 +1,17 @@
-import {SR5Actor} from "../module/actor/SR5Actor";
-import {SR5Item} from "../module/item/SR5Item";
-import {TestCreator} from "../module/tests/TestCreator";
+import { SR5TestFactory } from "./util";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import { TestCreator } from "../module/tests/TestCreator";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
-    const {describe, it, before, after} = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    before(async () => {})
-    after(async () => {})
+    after(async () => { factory.destroy(); });
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {
-            const action = await SR5Item.create({
-                name: 'QUENCH',
+            const action = await factory.createItem({
                 type: 'action',
                 system: {
                     action: {
@@ -44,16 +42,15 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         }
                     }
                 },
-            }) as SR5Item<'action'>;
+            });
 
-            const actor = await SR5Actor.create({
-                name: 'QUENCH',
+            const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                     skills: { active: { automatics: { base: 45 } } }
                 }
-            }) as SR5Actor<'character'>;
+            });
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 
@@ -70,9 +67,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
                 // TODO: Implement mocking for SR5Roll to test none-random results
             }
-
-            await action.delete();
-            await actor.delete();
         });
 
         it('evaluate a roll from simple pool data', async () => {
@@ -83,8 +77,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('evaluate an opposed roll from a opposed action', async () => {
-            const action = await SR5Item.create({
-                name: 'QUENCH',
+            const action = await factory.createItem({
                 type: 'action',
                 system: {
                     action: {
@@ -112,24 +105,20 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         }
                     }
                 }
-            }) as SR5Item<'action'>;
-            const actor = await SR5Actor.create({
-                name: 'QUENCH',
+            });
+            const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                     skills: { active: { automatics: { base: 45 } } }
                 }
-            }) as SR5Actor<'character'>;
+            });
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 
             if (test) {
                 await test.toMessage();
             }
-
-            await action.delete();
-            await actor.delete();
         });
     });
 

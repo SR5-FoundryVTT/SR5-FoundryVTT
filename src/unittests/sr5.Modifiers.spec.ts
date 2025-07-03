@@ -1,17 +1,15 @@
-import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
-
-import { DocumentSituationModifiers } from "../module/rules/DocumentSituationModifiers";
+import { SR5TestFactory } from './util';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SituationModifier } from "../module/rules/modifiers/SituationModifier";
-import { SR5Actor } from '../module/actor/SR5Actor';
+import { DocumentSituationModifiers } from "../module/rules/DocumentSituationModifiers";
+import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
 
 export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
-    const {describe, it, before, after} = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    before(async () => {})
-
-    after(async () => {})
+    after(async () => { factory.destroy(); });
 
     const defaultSourceModifiers = {
         environmental: {
@@ -194,7 +192,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
             })
 
             it('Store data depending on document type', async () => {
-                const actor = await SR5Actor.create({type: 'character', name: 'Test Actor'}) as SR5Actor<'character'>;
+                const actor = await factory.createActor({type: 'character'});
                 let modifiers = actor.getSituationModifiers();
 
                 assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
@@ -204,7 +202,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
 
                 assert.equal(modifiers.source.noise.fixed, 1);
 
-                const scene = await Scene.create({name: 'Test Scene'}) as Scene;
+                const scene = await factory.createScene({});
                 modifiers = DocumentSituationModifiers.fromDocument(scene);
 
                 assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
@@ -213,13 +211,10 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 await modifiers.updateDocument();
 
                 assert.equal(modifiers.source.noise.fixed, 1);
-
-                await actor.delete();
-                await scene.delete();
             })
 
             it('clear documents data to defaults', async () => {
-                const actor = await SR5Actor.create({type: 'character', name: 'Test Actor'}) as SR5Actor<'character'>;
+                const actor = await factory.createActor({type: 'character'});
 
                 const modifiers = actor.getSituationModifiers();
                 
@@ -229,10 +224,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
 
                 await modifiers.clearAll();
                 assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
-
-                await actor.delete();
             });
         })
     })
 }
-

@@ -46,11 +46,13 @@ export class WeaponParser {
     };
 
     async parseWeapons(chummerChar: ActorSchema | Unwrap<NonNullable<ActorSchema['vehicles']>['vehicle']>, assignIcons: boolean = false) {
-        return this.parseWeaponArray(getArray(chummerChar.weapons!.weapon), assignIcons)
+        if (chummerChar.weapons)
+            return this.parseWeaponArray(getArray(chummerChar.weapons.weapon), assignIcons)
+        return [];
     }
 
     async parseWeaponArray(weapons: Unwrap<NonNullable<ActorSchema['weapons']>['weapon']>[], assignIcons: boolean = false) {
-        const parsedWeapons: any[] = [];
+        const parsedWeapons: ReturnType<WeaponParser['parseWeapon']>[] = [];
         const iconList = await IconAssign.getIconFiles();
         weapons.forEach((chummerWeapon) => {
             try {

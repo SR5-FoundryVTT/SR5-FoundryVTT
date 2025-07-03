@@ -3,7 +3,7 @@ import VehicleModsParser from '../../../../module/apps/importer/actorImport/item
 import * as chummerDrone from './drone.json';
 
 export const vehicleModParserTesting = (context: QuenchBatchContext) => {
-    const { describe, it, before, after } = context;
+    const { describe, it } = context;
     const assert: Chai.AssertStatic = context.assert;
 
     const parser = new VehicleModsParser();

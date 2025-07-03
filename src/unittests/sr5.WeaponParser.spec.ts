@@ -1,8 +1,8 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { WeaponParserBase } from '../module/apps/itemImport/parser/weapon/WeaponParserBase';
+import { DamageType } from 'src/module/types/item/Action';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { Weapon } from '../module/apps/itemImport/schema/WeaponsSchema';
-import { DamageType } from 'src/module/types/item/Action';
+import { WeaponParserBase } from '../module/apps/itemImport/parser/weapon/WeaponParserBase';
 
 class TestWeaponParser extends WeaponParserBase {
     public override GetDamage(jsonData: Weapon): DamageType {
@@ -122,4 +122,3 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
     })
 }
-

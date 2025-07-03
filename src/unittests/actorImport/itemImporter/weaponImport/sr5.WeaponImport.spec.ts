@@ -2,7 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { WeaponParser } from '../../../../module/apps/importer/actorImport/itemImporter/weaponImport/WeaponParser';
 
 export const weaponParserTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, beforeEach, after } = context;
+    const { describe, it, assert, beforeEach } = context;
 
     let chummerCharacter;
     const chummerRangedWeapon = {
