@@ -2,7 +2,6 @@ import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foundry.data.fields;
-type DataSchema = foundry.data.fields.DataSchema;
 
 const ResultActionData = () => ({
     action: new StringField({

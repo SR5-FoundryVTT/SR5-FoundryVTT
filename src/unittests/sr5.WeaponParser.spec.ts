@@ -18,7 +18,7 @@ function mockXmlData(data: object): object {
 
 function getData(damageString: string): Partial<Weapon> {
     return mockXmlData({
-        damage: damageString,
+        damage: damageString, ap: 0
     });
 }
 

@@ -27,6 +27,9 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
                 assert.fail('Vehicle Parser failed to create vehicles!');
                 return;
             }
+
+            factory.actors.push(...parsedVehicles);
+
             // Register vehicle actors with testing data, so they get cleaned up during teardown
             // parsedVehicles.forEach(testActor.register.bind(testActor));
             // Prepare derived data, used to populate system.vehicle_stats.seats.hidden
@@ -34,8 +37,6 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
 
             const drone = parsedVehicles[0];
             const vehicle = parsedVehicles[1];
-
-            factory.actors.push(drone, vehicle);
 
             assert.deepEqual(drone.system.vehicle_stats.seats.value, 0);
             assert.deepEqual(drone.system.vehicle_stats.seats.hidden, true);

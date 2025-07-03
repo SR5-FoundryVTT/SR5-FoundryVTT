@@ -124,12 +124,11 @@ export class WeaponParserBase extends Parser<'weapon'> {
         const strengthDamage = /^\({STR}([+-]?[0-9]*)\)([PSM])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
 
         let damageType: DamageTypeType = 'physical';
-        let damageAttribute: PhysicalAttribute | '' = '';
+        let damageAttribute: PhysicalAttribute | undefined;
         let damageBase: number = 0;
         let damageElement: DamageElement = '';
 
         if(simpleDamage) {
-            damageAttribute = '';
             damageBase = parseInt(simpleDamage[1], 10);
             damageType = this.parseDamageType(simpleDamage[2]);
             damageElement = this.parseDamageElement(simpleDamage[3])
