@@ -1,4 +1,4 @@
-import { SR5TestFactory } from "./util";
+import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 

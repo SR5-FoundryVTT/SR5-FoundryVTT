@@ -1,4 +1,4 @@
-import { SR5TestFactory } from './util';
+import { SR5TestFactory } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SituationModifier } from "../module/rules/modifiers/SituationModifier";
 import { DocumentSituationModifiers } from "../module/rules/DocumentSituationModifiers";

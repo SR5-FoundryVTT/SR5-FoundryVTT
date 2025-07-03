@@ -1,4 +1,4 @@
-import { SR5TestFactory } from './util';
+import { SR5TestFactory } from './utils';
 import { SR5Item } from '../module/item/SR5Item';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 

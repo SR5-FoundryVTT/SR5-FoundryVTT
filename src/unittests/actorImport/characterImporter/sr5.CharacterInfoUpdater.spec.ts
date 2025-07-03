@@ -1,4 +1,4 @@
-import { SR5TestFactory } from 'src/unittests/util';
+import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CharacterImporter } from '../../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
 

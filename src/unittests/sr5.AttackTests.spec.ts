@@ -1,5 +1,5 @@
 import { SR5 } from '../module/config';
-import { SR5TestFactory } from './util';
+import { SR5TestFactory } from './utils';
 import { SR5Actor } from '../module/actor/SR5Actor';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CombatRules } from '../module/rules/CombatRules';

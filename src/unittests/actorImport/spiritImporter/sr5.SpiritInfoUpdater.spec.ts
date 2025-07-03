@@ -1,5 +1,5 @@
 import { emptySpirit } from './spirits';
-import { SR5TestFactory } from 'src/unittests/util.js';
+import { SR5TestFactory } from 'src/unittests/utils.js';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SpiritImporter } from '../../../module/apps/importer/actorImport/spiritImporter/SpiritImporter.js';
 
