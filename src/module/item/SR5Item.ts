@@ -88,7 +88,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
 
     // Flag Functions
     getLastFireMode(): FireModeType {
-        return this.flags[game.system.id]?.lastFireMode || DataDefaults.createData('fire_mode');
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || DataDefaults.createData('fire_mode');
     }
     async setLastFireMode(fireMode: FireModeType) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
@@ -116,7 +116,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
      * Return an Array of the Embedded Item Data
      */
     getNestedItems(): any[] {
-        let items = this.flags[game.system.id]?.embeddedItems;
+        let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
 
         items ??= [];
 
