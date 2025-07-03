@@ -83,6 +83,9 @@ export class HooksManager {
 
         Hooks.once('init', () => {
             HooksManager.init();
+            
+            // Custom Module Integrations
+            // See src/module/integartions for more information.
             if (game.modules.get('routinglib')?.active) {
                 RoutingLibIntegration.init();
             }
@@ -266,22 +269,22 @@ ___________________
 
         CONFIG.Token.objectClass = SR5Token;
         CONFIG.Token.documentClass = SR5TokenDocument;
-        // @ts-expect-error outdated typings
+        // @ts-expect-error TODO: foundry-vtt-types v13
         CONFIG.Token.rulerClass = SR5TokenRuler;
-        // @ts-expect-error not yet in typings
+        // @ts-expect-error TODO: foundry-vtt-types v13
         CONFIG.Token.movement.actions['run'] = {
             label: 'SR5.MovementTypes.Run',
             icon: 'fa-solid fa-person-running',
             canSelect: () => false,
-            // @ts-expect-error not yet in typings
+            // @ts-expect-error TODO: foundry-vtt-types v13
             getAnimationOptions: () => ({ movementSpeed: CONFIG.Token.movement.defaultSpeed * 2 }),
         };
-        // @ts-expect-error not yet in typings
+        // @ts-expect-error TODO: foundry-vtt-types v13
         CONFIG.Token.movement.actions['sprint'] = {
             label: 'SR5.MovementTypes.Sprint',
             icon: 'fa-solid fa-person-running-fast',
             canSelect: () => false,
-            // @ts-expect-error not yet in typings
+            // @ts-expect-error TODO: foundry-vtt-types v13
             getAnimationOptions: () => ({ movementSpeed: CONFIG.Token.movement.defaultSpeed * 3 }),
         };
 

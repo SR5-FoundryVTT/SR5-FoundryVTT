@@ -56,6 +56,17 @@ declare module foundry.documents {
     }
 }
 
+/**
+ * Integration for the routingLib FoundryVTT module:
+ * https://foundryvtt.com/packages/routinglib
+ * 
+ * Integration is inteded to be optional.
+ * 
+ * For documentation of the module see: 
+ * - https://github.com/manuelVo/foundryvtt-routinglib/tree/master#using-routinglib-in-a-module or
+ * - follow module README for an updated link.
+ * 
+ */
 export class RoutingLibIntegration {
     static #routingLibReady = false;
 
