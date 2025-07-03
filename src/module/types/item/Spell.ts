@@ -4,7 +4,7 @@ const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fie
 
 const SpellData = {
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData({test: 'SpellCastingTest', followedTest: 'DrainTest'})),
+    action: new SchemaField(ActionRollData({test: '', followedTest: 'DrainTest'})),
 
     type: new StringField({
         blank: true,
