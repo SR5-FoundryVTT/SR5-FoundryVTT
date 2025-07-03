@@ -29,10 +29,9 @@ export const TechnologyPrep = {
      */
     prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[]) {
         const concealParts = new PartsList<number>();
-        equippedMods.forEach((mod) => {
+        for (const mod of equippedMods)
             if (mod.system.conceal > 0)
                 concealParts.addUniquePart(mod.name, mod.system.conceal);
-        });
 
         technology.conceal.mod = concealParts.list;
         technology.conceal.value = Helpers.calcTotal(technology.conceal);

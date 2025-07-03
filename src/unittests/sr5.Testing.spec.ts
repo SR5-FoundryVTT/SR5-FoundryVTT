@@ -19,7 +19,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         type: 'simple',
                         attribute: 'body',
                         skill: 'automatics',
-                        spec: false,
                         limit: {
                             base: 1,
                             value: 1,
@@ -31,12 +30,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         },
                         damage: {
                             ap: { value: 5, base: 5, mod: [] },
-                            attribute: "",
                             base: 5,
-                            base_formula_operator: "add",
-                            element: { value: '', base: '' },
-                            // itemSource: { actorId: '', itemId: '', itemType: '', itemName: '' },
-                            mod: [],
                             type: { value: 'physical', base: 'physical' },
                             value: 5
                         }

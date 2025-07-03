@@ -31,7 +31,7 @@ export const CritterData = () => ({
     values: new SchemaField(PhysicalCombatValues()),
     wounds: new ModifiableField(ModifiableValue()),
 
-    visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
+    visibilityChecks: new SchemaField(VisibilityChecks('astral', 'meatspace')),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('matrix', 'physical', 'stun')),

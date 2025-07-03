@@ -24,9 +24,10 @@ export const RangePrep = {
         const rangeParts = new PartsList<number>();
 
         // Apply ammo recoil compensation.
-        equippedMods.forEach(mod => {
-            if (mod.system.rc) rangeParts.addPart(mod.name, mod.system.rc);            
-        });
+        for (const mod of equippedMods)
+            if (mod.system.rc)
+                rangeParts.addPart(mod.name, mod.system.rc);
+
         range.rc.mod = rangeParts.list;
         range.rc.value = Helpers.calcTotal(range.rc);
     }

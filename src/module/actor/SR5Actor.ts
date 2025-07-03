@@ -364,7 +364,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
     }
 
     getWoundModifier(this: SR5Actor): number {
-        return -1 * (this.system.wounds?.value ?? 0);
+        if (!this.system.wounds?.value) return 0;
+        return -1 * this.system.wounds.value;
     }
 
     /** Use edge on actors that have an edge attribute.

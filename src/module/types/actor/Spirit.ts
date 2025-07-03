@@ -16,6 +16,8 @@ const SpiritData = {
     spiritType: new StringField({ required: true }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
     special: new StringField({ required: true, initial: "magic", readonly: true }),
+    is_npc: new BooleanField({ initial: true }),
+    npc: new SchemaField({ is_grunt: new BooleanField() }),
 
     // === Attributes & Limits ===
     attributes: new SchemaField({
@@ -44,7 +46,7 @@ const SpiritData = {
     bound: new BooleanField(),
 
     // === Visibility ===
-    visibilityChecks: new SchemaField(VisibilityChecks("astral")),
+    visibilityChecks: new SchemaField(VisibilityChecks("astral", "astralActive")),
 
     // === Modifiers ===
     modifiers: new SchemaField(CreateModifiers(

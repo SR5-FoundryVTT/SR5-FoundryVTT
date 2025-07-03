@@ -47,11 +47,10 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
             const itemIds = item.map((item) => item.id);
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            const inventories = actor.system.inventories;
-            assert.deepEqual(inventories.test.itemIds, itemIds);
+            assert.deepEqual(actor.system.inventories.test.itemIds, itemIds);
 
             await actor.inventory.removeItem(item[0]);
-            assert.deepEqual(inventories.test.itemIds, []);
+            assert.deepEqual(actor.system.inventories.test.itemIds, []);
         });
 
         it('rename an existing inventory', async () => {

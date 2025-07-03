@@ -1,9 +1,10 @@
-import DataModel = foundry.abstract.DataModel;
-import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
-import { ModifiableValueType } from "../types/template/Base";
+import { SYSTEM_NAME } from "../constants";
+import { SR5Actor } from "../actor/SR5Actor";
 import { tagifyFlagsToIds } from "../utils/sheets";
+import { ModifiableValueType } from "../types/template/Base";
+import DataModel = foundry.abstract.DataModel;
 
 /**
  * Shadowrun Active Effects implement additional ways of altering document data.
@@ -210,7 +211,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns Either the configured value or 'actor' as a default.
      */
     get applyTo() {
-        return this.flags[game.system.id]?.applyTo || 'actor';
+        return this.getFlag(SYSTEM_NAME, 'applyTo') || 'actor';
     }
 
     /**
@@ -219,7 +220,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * When this flag is set, the parent item wireless status is taken into account.
      */
     get onlyForWireless(): boolean {
-        return this.flags[game.system.id]?.onlyForEquipped || false;
+        return this.getFlag(SYSTEM_NAME, 'onlyForWireless') || false;
     }
 
     /**
@@ -228,7 +229,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * When this flag is set, the parent item enabled status is taken into account.
      */
     get onlyForEquipped(): boolean {
-        return this.flags[game.system.id]?.onlyForEquipped || false;
+        return this.getFlag(SYSTEM_NAME, 'onlyForEquipped') || false;
     }
 
     /**
@@ -237,7 +238,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * When this flag is set, this effect shouldn't apply always.
      */
     get onlyForItemTest(): boolean {
-        return this.flags[game.system.id]?.onlyForItemTest || false;
+        return this.getFlag(SYSTEM_NAME, 'onlyForItemTest') || false;
     }
 
     /**
@@ -247,7 +248,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns true, when the effect has been applied by a test.
      */
     get appliedByTest(): boolean {
-        return this.flags[game.system.id]?.appliedByTest || false;
+        return this.getFlag(SYSTEM_NAME, 'appliedByTest') || false;
     }
 
     get selectionTests(): string[] {

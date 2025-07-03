@@ -234,7 +234,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.deepEqual(test.pool.mod, [
                 { name: 'Test Effect', value: poolValue },
                 { name: 'SR5.ModifierTypes.Global', value: 0 },
-                { name: 'SR5.ModifierTypes.Wounds', value: 0 }]);
+                { name: 'SR5.ModifierTypes.Wounds', value: 0 }
+            ]);
             assert.equal(test.pool.value, poolValue);
             assert.deepEqual(test.hits.mod, [{ name: 'Test Effect', value: hitsValue }]);
             assert.isAtLeast(test.hits.value, hitsValue);
@@ -271,7 +272,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.deepEqual(test.pool.mod, [
                 { name: 'Test Effect', value: poolValue },
                 { name: 'SR5.ModifierTypes.Global', value: 0 },
-                { name: 'SR5.ModifierTypes.Wounds', value: 0 }]);
+                { name: 'SR5.ModifierTypes.Wounds', value: 0 }
+            ]);
             assert.equal(test.pool.value, poolValue);
             assert.deepEqual(test.hits.mod, [{ name: 'Test Effect', value: hitsValue }]);
             assert.isAtLeast(test.hits.value, hitsValue);
@@ -298,8 +300,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             // Create one item that will carry the correct effect and one carries the wrong effect.
             const items = await actor.createEmbeddedDocuments('Item', [
                 { type: 'action', name: 'Test Action' },
-                { type: 'action', name: 'Test Action 2' }]
-            );
+                { type: 'action', name: 'Test Action 2' }
+            ]);
 
             const item = items!.pop()!;
 
@@ -339,7 +341,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.deepEqual(test.pool.mod, [
                 { name: 'Test Effect Correct Item', value: poolValue },
                 { name: 'SR5.ModifierTypes.Global', value: 0 },
-                { name: 'SR5.ModifierTypes.Wounds', value: 0 }]);
+                { name: 'SR5.ModifierTypes.Wounds', value: 0 }
+            ]);
             assert.equal(test.pool.value, poolValue);
             assert.deepEqual(test.hits.mod, [{ name: 'Test Effect Correct Item', value: hitsValue }]);
             assert.isAtLeast(test.hits.value, hitsValue);
@@ -365,19 +368,19 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('A wireless only effect should not apply for a wireless item', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
-                { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: true } } },
-                { type: 'cyberware', name: 'Wired Item', system: { technology: { wireless: false } } }
+                { type: 'cyberware', name: 'Wired Item', system: { technology: { wireless: false } } },
+                { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: true } } }
             ]);
 
-            const item = items!.pop()!;
+            let item = items!.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForWireless: true } },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            const item2 = items!.pop()!;
-            await item2.createEmbeddedDocuments('ActiveEffect', [{
+            item = items!.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForWireless: true } },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
@@ -394,15 +397,15 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 { type: 'cyberware', name: 'Unequipped Item', system: { technology: { equipped: false } } }
             ]);
 
-            const item = items!.pop()!;
+            let item = items!.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForEquipped: true } },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            const item2 = items!.pop()!;
-            await item2.createEmbeddedDocuments('ActiveEffect', [{
+            item = items!.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForEquipped: true } },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
@@ -419,15 +422,15 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 { type: 'cyberware', name: 'Wired Unequipped Item', system: { technology: { equipped: false, wireless: false } } }
             ]);
 
-            const item = items!.pop()!;
+            let item = items!.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForEquipped: true, onlyForWireless: true } },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            const item2 = items!.pop()!;
-            await item2.createEmbeddedDocuments('ActiveEffect', [{
+            item = items!.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForEquipped: true, onlyForWireless: false } },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]

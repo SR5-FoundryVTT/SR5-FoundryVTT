@@ -36,8 +36,6 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const device = await factory.createItem({ type: 'device'});
             
             device.system.technology.rating = 4;
-            // @ts-expect-error // test-case makes this necessary
-            device.technology.condition_monitor = undefined;
             TechnologyPrep.prepareConditionMonitor(device.system.technology);
 
             assert.equal(device.system.technology.condition_monitor.max, 10);
@@ -48,9 +46,9 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const mods: SR5Item<'modification'>[] = [];
 
             // prepareConceal relies on the item name to be unique.
-            mods.push(await factory.createItem({type: 'modification', system: {conceal: 2}}));
-            mods.push(await factory.createItem({type: 'modification', system: {conceal: 4}}));
-            
+            mods.push(await factory.createItem({name: 'modA', type: 'modification', system: {conceal: 2}}));
+            mods.push(await factory.createItem({name: 'modB', type: 'modification', system: {conceal: 4}}));
+
             TechnologyPrep.prepareConceal(device.system.technology, mods);
 
             assert.equal(device.system.technology.conceal.value, 6);
@@ -87,8 +85,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const weapon = await factory.createItem({type: 'weapon' });
             // unique names are necessary
             const mods: SR5Item<'modification'>[] = [];
-            mods.push(await factory.createItem({type: 'modification', system: {type: 'weapon', dice_pool: 2}}));
-            mods.push(await factory.createItem({type: 'modification', system: {type: 'weapon', dice_pool: 4}}));
+            mods.push(await factory.createItem({name: 'modA', type: 'modification', system: {type: 'weapon', dice_pool: 2}}));
+            mods.push(await factory.createItem({name: 'modB', type: 'modification', system: {type: 'weapon', dice_pool: 4}}));
 
             ActionPrep.prepareWithMods(weapon.system.action, mods);
             ActionPrep.calculateValues(weapon.system.action);
@@ -100,8 +98,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const weapon = await factory.createItem({type: 'weapon' });
             // unique names are necessary
             const mods: SR5Item<'modification'>[] = [];
-            mods.push(await factory.createItem({type: 'modification', system: {type: 'weapon', accuracy: 2}}));
-            mods.push(await factory.createItem({type: 'modification', system: {type: 'weapon', accuracy: 4}}));
+            mods.push(await factory.createItem({name: 'modA', type: 'modification', system: {type: 'weapon', accuracy: 2}}));
+            mods.push(await factory.createItem({name: 'modB', type: 'modification', system: {type: 'weapon', accuracy: 4}}));
 
             ActionPrep.prepareWithMods(weapon.system.action, mods);
             ActionPrep.calculateValues(weapon.system.action);
@@ -167,9 +165,9 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
     describe('RangeData preparation', () => {
         it('Check for weapon modification recoil modifiers', async () => {
-            const weapon = await factory.createItem({type: 'weapon', system: {range: {rc: {value: 2}}}});
+            const weapon = await factory.createItem({type: 'weapon', system: {range: {rc: {base: 2}}}});
             const mods: SR5Item<'modification'>[] = [];
-            mods.push(await factory.createItem({type: 'modification', system: {type: 'weapon', rc: 2}}));
+            mods.push(await factory.createItem({name: 'modA', type: 'modification', system: {type: 'weapon', rc: 2}}));
 
             RangePrep.prepareRecoilCompensation(weapon.system.range, mods);
 

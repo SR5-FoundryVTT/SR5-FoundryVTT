@@ -7,7 +7,7 @@ export class SR5TestFactory {
     readonly scenes: Scene[] = [];
 
     async createActor<T extends Actor.ConfiguredSubTypes>(
-        data: Omit<Actor.CreateData, "name"> & { type: T },
+        data: Omit<Actor.CreateData, "name"> & { name?: string, type: T },
         context?: Actor.ConstructionContext
     ): Promise<SR5Actor<T>> {
         const actor = await SR5Actor.create({ name: `#QUENCH`, ...data }, context) as SR5Actor<T>;
@@ -16,7 +16,7 @@ export class SR5TestFactory {
     }
 
     async createItem<T extends Item.ConfiguredSubTypes>(
-        data: Omit<Item.CreateData, "name"> & { type: T },
+        data: Omit<Item.CreateData, "name"> & { name?: string, type: T },
         context?: Item.ConstructionContext
     ): Promise<SR5Item<T>> {
         const item = await SR5Item.create({ name: `#QUENCH`, ...data }, context) as SR5Item<T>;
@@ -25,7 +25,7 @@ export class SR5TestFactory {
     }
 
     async createScene(
-        data: Omit<Scene.CreateData, "name">,
+        data: Omit<Scene.CreateData, "name"> & { name?: string },
         context?: Scene.ConstructionContext
     ): Promise<Scene> {
         const scene = await Scene.create({ name: `#QUENCH`, ...data }, context) as Scene;

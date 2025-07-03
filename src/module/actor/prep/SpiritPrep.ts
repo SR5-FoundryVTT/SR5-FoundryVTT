@@ -125,6 +125,7 @@ export class SpiritPrep {
 
         const overrides = {
             // value of 0 for attribute makes it equal to the Force
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             attributes: {
                 body: 0,
                 agility: 0,

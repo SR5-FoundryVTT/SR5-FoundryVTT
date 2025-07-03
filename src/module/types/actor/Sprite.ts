@@ -30,7 +30,7 @@ const SpriteData = {
     limits: new SchemaField({ ...Limits(), ...MatrixLimits() }),
 
     // === Visibility ===
-    visibilityChecks: new SchemaField(VisibilityChecks("matrix", "meatspace")),
+    visibilityChecks: new SchemaField(VisibilityChecks("matrix")),
 
     // === Modifiers ===
     modifiers: new SchemaField(CreateModifiers(
