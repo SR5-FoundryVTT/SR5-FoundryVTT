@@ -22,11 +22,14 @@ interface RoutingOptions {
 }
 
 interface RoutingLib {
-    calculatePath: (from: Waypoint, to: Waypoint, options: RoutingOptions) => Promise<RoutingResult>;
-    cancelPathfinding: (pathfindingPromise: Promise<RoutingResult>) => void;
+    calculatePath: (from: Waypoint, to: Waypoint, options: RoutingOptions) => Promise<RoutingLibRoutingResult | null>;
+    cancelPathfinding: (pathfindingPromise: Promise<RoutingLibRoutingResult>) => void;
 }
 
-type RoutingResult = { path: Waypoint[]; cost: number } | null;
+interface RoutingLibRoutingResult {
+    path: Waypoint[];
+    cost: number;
+}
 
 interface GridCoordinate {
     /**
@@ -46,6 +49,7 @@ declare global {
 
     interface BaseGrid {
         getOffset(position: Waypoint): GridCoordinate;
+
         getTopLeftPoint(coordinate: GridCoordinate): Waypoint;
     }
 }
@@ -56,16 +60,22 @@ declare module foundry.documents {
     }
 }
 
+type PathfindingResult = {
+    result: FoundryWaypoint[] | null | undefined;
+    promise: Promise<FoundryWaypoint[] | null>;
+    cancel: () => void;
+};
+
 /**
  * Integration for the routingLib FoundryVTT module:
  * https://foundryvtt.com/packages/routinglib
- * 
+ *
  * Integration is inteded to be optional.
- * 
- * For documentation of the module see: 
+ *
+ * For documentation of the module see:
  * - https://github.com/manuelVo/foundryvtt-routinglib/tree/master#using-routinglib-in-a-module or
  * - follow module README for an updated link.
- * 
+ *
  */
 export class RoutingLibIntegration {
     static #routingLibReady = false;
@@ -84,27 +94,25 @@ export class RoutingLibIntegration {
         });
     }
 
-    static routinglibPathfinding = (
-        waypoints: FoundryWaypoint[],
-        token: SR5Token,
-        movement: Shadowrun.Movement,
-    ) => {
+    static routinglibPathfinding(waypoints: FoundryWaypoint[], token: SR5Token, movement: Shadowrun.Movement): PathfindingResult  {
         const grid = token.scene?.grid ?? foundry.documents.BaseScene.defaultGrid;
 
-        const pathfindingResult: {
-            result?: FoundryWaypoint[] | null;
-            promise?: Promise<FoundryWaypoint[] | null>;
-            cancel?: () => void;
-        } = {
+        const pathfindingResult: Partial<PathfindingResult> = {
             result: undefined,
             promise: undefined,
             cancel: undefined,
         };
 
-        const pathfindingPromises: Promise<RoutingResult>[] = [];
+        const pathfindingPromises: Promise<RoutingLibRoutingResult>[] = [];
 
-        pathfindingResult.promise = new Promise((resolve) => {
-            const maxDistance = movement.run.value * 5;
+        pathfindingResult.cancel = () => {
+            for (const pathfindingPromise of pathfindingPromises) {
+                this.#routinglib!.cancelPathfinding(pathfindingPromise);
+            }
+        }
+
+        pathfindingResult.promise = new Promise<FoundryWaypoint[] | null>((resolve) => {
+            const maxDistance = Math.max(movement.run.value * 5, 20);
             for (let i = 1; i < waypoints.length; i++) {
                 const fromWaypoint = waypoints[i - 1];
                 const { i: fromY, j: fromX } = grid.getOffset(fromWaypoint);
@@ -113,16 +121,25 @@ export class RoutingLibIntegration {
                 const from = { x: fromX, y: fromY };
                 const to = { x: toX, y: toY };
 
-                const routePromise = this.#routinglib!.calculatePath(from, to, { maxDistance, token });
+                const routePromise = this.#routinglib!.calculatePath(from, to, {
+                    maxDistance,
+                    token,
+                }).then(result => {
+                    if (result) {
+                        return result;
+                    } else {
+                        throw new Error('Unable to find route.');
+                    }
+                });
 
                 pathfindingPromises.push(routePromise);
             }
 
-            void Promise.all(pathfindingPromises).then((partialRoutes) => {
-                const routedWaypoints = [waypoints[0]];
-                for (let i = 0; i < partialRoutes.length; i++) {
-                    const route = partialRoutes[i];
-                    if (route) {
+            void Promise.all(pathfindingPromises)
+                .then((partialRoutes) => {
+                    const routedWaypoints: FoundryWaypoint[] = [waypoints[0]];
+                    for (let i = 0; i < partialRoutes.length; i++) {
+                        const route = partialRoutes[i];
                         routedWaypoints.pop();
                         const fromWaypoint = waypoints[i];
                         for (const waypoint of route.path) {
@@ -137,24 +154,23 @@ export class RoutingLibIntegration {
                                 action: fromWaypoint.action,
                                 snapped: true,
                                 checkpoint: true,
-                                explicit: true
+                                explicit: true,
                             });
                         }
-                    } else {
-                        pathfindingResult.result = null;
-                        resolve(null);
                     }
-                }
-                pathfindingResult.result = routedWaypoints;
-                resolve(routedWaypoints);
-            });
+                    return routedWaypoints;
+                })
+                .catch(() => {
+                    pathfindingResult.cancel!()
+                    const findMovementPathResult: PathfindingResult = token.findMovementPath(waypoints, {skipRoutingLib: true});
+                    return findMovementPathResult.promise
+                })
+                .then(value => {
+                    pathfindingResult.result = value;
+                    resolve(value);
+                });
         });
-        pathfindingResult.cancel = () => {
-            for (const pathfindingPromise of pathfindingPromises) {
-                this.#routinglib!.cancelPathfinding(pathfindingPromise);
-            }
-        };
 
-        return pathfindingResult;
+        return pathfindingResult as PathfindingResult;
     };
 }

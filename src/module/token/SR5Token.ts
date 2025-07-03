@@ -22,7 +22,7 @@ export class SR5Token extends Token {
     // @ts-expect-error TODO: foundry-vtt-types v13 (not yet in typings)
     override findMovementPath(waypoints, options) {
         const movement = (this.actor?.system as MovementActorData)?.movement;
-        if (RoutingLibIntegration.routingLibReady && movement) {
+        if (RoutingLibIntegration.routingLibReady && movement && !options.skipRoutingLib) {
             return RoutingLibIntegration.routinglibPathfinding(waypoints, this, movement);
         }
 
