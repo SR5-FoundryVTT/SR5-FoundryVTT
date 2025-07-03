@@ -573,9 +573,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
     /**
      * Create an item in this item
      * @param itemData
-     * @param options
      */
-    async createNestedItem(itemData, options = {}) {
+    async createNestedItem(itemData) {
         if (!Array.isArray(itemData)) itemData = [itemData];
         // weapons accept items
         if (this.type === 'weapon') {
@@ -1064,14 +1063,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
         return this;
     }
 
-    override async update(data: Item.UpdateData | undefined, options?: Item.Database.UpdateOperation): Promise<this> {
+    override async update(data: Item.UpdateData | undefined, options?: Item.Database.UpdateOperation) {
         // Item.item => Embedded item into another item!
-        if (this._isNestedItem) {
+        if (this._isNestedItem)
             return this.updateNestedItem(data);
-        }
 
         // Actor.item => Directly owned item by an actor!
-        return (await super.update(data, options))!;
+        return super.update(data, options);
     }
 
     /**
@@ -1295,6 +1293,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
             UpdateActionFlow.onUpdateAlterActionData(changed, this);
         }
 
-        await super._preUpdate(changed, options, user);
+        return super._preUpdate(changed, options, user);
     }
 }

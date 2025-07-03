@@ -299,6 +299,7 @@ export const ChatData: { [K in Item.ConfiguredSubTypes]: (item: SR5Item<K>) => s
         if (system.category === 'combat') {
             props.push(game.i18n.localize(SR5.combatSpellTypes[system.combat.type]));
         } else if (system.category === 'health') {
+            /* empty */
         } else if (system.category === 'illusion') {
             props.push(game.i18n.localize(SR5.illusionSpellTypes[system.illusion.type]));
             props.push(game.i18n.localize(SR5.illusionSpellSenses[system.illusion.sense]));

@@ -20,9 +20,8 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
         const actor = await factory.createActor({type: 'character'});
         const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}]);
         const item = items![0] as SR5Item<'weapon'>;
-        // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}) as SR5Item;
-        //@ts-expect-error
-        const ammoItem = await factory.createItem({type: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}}, {parent: item});
+
+        const ammoItem = await factory.createItem({type: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}});
         await item.createNestedItem(ammoItem.toObject());
 
         // NOTE: I don't know why ammo is not equipped when created as such... this can be removed, if that is fixed.
@@ -60,7 +59,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({type: 'character'});
             const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}]);
             const item = items![0] as SR5Item<'weapon'>;
-            // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}) as SR5Item;
+
             assert.strictEqual(item.system.ammo.current.value, 0);
             await item.reloadAmmo(true);
             assert.strictEqual(item.system.ammo.current.value, item.system.ammo.current.max);

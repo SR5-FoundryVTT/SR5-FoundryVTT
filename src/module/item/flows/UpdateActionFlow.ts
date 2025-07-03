@@ -102,7 +102,7 @@ export const UpdateActionFlow = {
     injectWeaponTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'weapon'>}, applyData) {
         // Abort when category isn't part of this change.
         if (changeData?.system?.category === undefined) return;
-        
+
         // Remove test when user selects empty category.
         if (changeData.system.category === '') {
             foundry.utils.setProperty(applyData, 'system.action.test', '');
@@ -125,13 +125,13 @@ export const UpdateActionFlow = {
     injectSpellTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'spell'>}, applyData) {
         // Abort when category isn't part of this change.
         if (changeData?.system?.category === undefined) return;
-        
+
         // Remove test when user selects empty category.
         if (changeData.system.category === '') {
             foundry.utils.setProperty(applyData, 'system.action.test', '');
             return;
         } 
-        
+
         // Based on category switch out active, opposed and resist test.
         const test = SR5.activeTests[type];
         const opposedTest = SR5.opposedTests[type][changeData.system.category] || 'OpposedTest';
