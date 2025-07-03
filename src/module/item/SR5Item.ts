@@ -248,8 +248,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
 
         const showDialog = !TestCreator.shouldHideDialog(event);
         const test = await TestCreator.fromItem(this, this.actor, { showDialog });
-        if (!test) return;
-        await test.execute();
+        await test?.execute();
         return;
     }
 

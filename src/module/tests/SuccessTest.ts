@@ -31,9 +31,7 @@ export interface TestDocuments {
     rolls?: SR5Roll[]
 }
 
-export interface TestValues {
-    [name: string]: ValueFieldType | DamageType
-}
+export type TestValues = Record<string, ValueFieldType | DamageType>;
 
 export interface SuccessTestValues extends TestValues {
     hits: ValueFieldType
@@ -427,14 +425,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get code(): string {
         // Add action dynamic value sources as labels.
-        let pool = this.pool.mod.filter(mod => mod.value !== 0).map(mod => `${game.i18n.localize(mod.name as Translation)} ${mod.value}`); // Dev code for pool display. This should be replaced by attribute style value calculation info popup
-        // let pool = this.pool.mod.map(mod => `${game.i18n.localize(mod.name)} (${mod.value})`);
+        const pool = this.pool.mod
+                        .filter(mod => mod.value)
+                        // Dev code for pool display. This should be replaced by attribute style value calculation info popup
+                        .map(mod => `${game.i18n.localize(mod.name as Translation)} ${mod.value}`);
 
         // Threshold and Limit are values that can be overwritten.
-        let threshold = this.threshold.override
+        const threshold = this.threshold.override
             ? [game.i18n.localize(this.threshold.override.name as Translation)]
             : this.threshold.mod.map(mod => game.i18n.localize(mod.name as Translation));
-        let limit = this.limit.override
+        const limit = this.limit.override
             ? [game.i18n.localize(this.limit.override.name as Translation)]
             : this.limit.mod.map(mod => game.i18n.localize(mod.name as Translation));
 
@@ -1690,10 +1690,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             title: this.data.title,
             test: this,
             // Note: While ChatData uses ids, this uses full documents.
-            speaker: {
-                actor: this.actor,
-                token: token
-            },
+            speaker: { token, actor: this.actor },
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
             followupActions: this._prepareFollowupActionsTemplateData(),
@@ -1914,7 +1911,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         if (!item) return console.error("Shadowrun 5e | Item doesn't exist for uuid", uuid);
 
-        item.castAction(event);
+        void item.castAction(event);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html: HTMLElement | JQuery, data: unknown) {
