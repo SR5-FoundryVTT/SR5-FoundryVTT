@@ -362,7 +362,7 @@ export class DocumentSituationModifiers {
         if (document instanceof SR5Actor) {
             // Disable diffing to overwrite the whole object.
             // @ts-expect-error fvtt doesn't support == operator
-            await document.update({ system: { "==situation_modifiers": modifiers } }, { diff: false });
+            await document.update({ system: { "==situation_modifiers": modifiers } });
         } else {
             // Due to active selection merging by Foundry mergeObject, we need to delete first.
             await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
