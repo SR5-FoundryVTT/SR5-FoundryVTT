@@ -26,22 +26,45 @@ declare global {
 }
 
 export class SR5TokenDocument extends TokenDocument {
-    #inPreUpdate = false;
+
+    /**
+     * Used by measureMovementPath to track if a movement is being planned or executed.
+     * @private
+     */
+    #movementInProgress = false;
 
     override async _preUpdate(changed, options, user) {
-        this.#inPreUpdate = true;
+        this.#movementInProgress = true;
         try {
             await super._preUpdate(changed, options, user);
         } finally {
-            this.#inPreUpdate = false;
+            this.#movementInProgress = false;
         }
     }
 
+    /**
+     * This method measures the distance a Token moves through the provided waypoints.
+     * If the token actor implements MovementActorData and the selected movement action is 'walk', it will change the movement
+     * action for each waypoint according to the rules for walking/running/sprinting.
+     *
+     * This method gets called many times, both when the user is measuring and while the token is actually moving.
+     * The bulk of the token movement logic happens in TokenDocument#_preUpdate and specifically in
+     * TokenDocument##preUpdateMovement.
+     * The private property SR5TokenDocument##movementInProgress is used to track if a user is currently measuring and planning
+     * a move or if the move is actually in progress.
+     * While a move is in progress we skip assigning movement actions, because this method gets called with multiple
+     * different sections of the route depending on the progress of the movement.
+     * This makes it impossible to accurately assign the correct movement action, causing the measured route on
+     * screen to rapidly change colors as sections get closer to the token.
+     *
+     * @param waypoints
+     * @param options
+     */
     override measureMovementPath(waypoints: Waypoint[], options = {}) {
         const measurement = super.measureMovementPath(waypoints, options);
 
         const characterMovementData = (this.actor?.system as MovementActorData)?.movement;
-        if (characterMovementData && this.movementAction === 'walk' && !this.#inPreUpdate) {
+        if (characterMovementData && this.movementAction === 'walk' && !this.#movementInProgress) {
             const movementHistory = this.movementHistory;
             let usedMovementCost = 0;
             if (movementHistory?.length) {
