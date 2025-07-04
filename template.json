@@ -1503,7 +1503,7 @@
                 "physical": false
             },
             "action": {
-                "test": "SpellCastingTest",
+                "test": "AlchemicalSpellCastingTest",
                 "opposed": {
                     "test": "",
                     "resist": {

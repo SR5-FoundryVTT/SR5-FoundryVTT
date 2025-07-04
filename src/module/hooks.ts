@@ -2,6 +2,7 @@ import { CompileSpriteTest } from './tests/CompileSpriteTest';
 import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
 import { OpposedRitualTest } from './tests/OpposedRitualTest';
 import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
+import { AlchemicalSpellCastingTest } from './tests/AlchemicalSpellCastingTestData';
 import {SR5} from './config';
 import {Migrator} from './migrator/Migrator';
 import {registerSystemSettings} from './settings';
@@ -161,6 +162,7 @@ ___________________
                 PhysicalDefenseTest,
                 SuppressionDefenseTest,
                 PhysicalResistTest,
+                AlchemicalSpellCastingTest,
                 SpellCastingTest,
                 RitualSpellcastingTest,
                 OpposedRitualTest,
@@ -204,7 +206,8 @@ ___________________
                 DroneInfiltrationTest,
                 SummonSpiritTest,
                 CompileSpriteTest,
-                RitualSpellcastingTest
+                RitualSpellcastingTest,
+                AlchemicalSpellCastingTest,
             },
             /**
              * Subset of tests meant to be used as opposed tests.

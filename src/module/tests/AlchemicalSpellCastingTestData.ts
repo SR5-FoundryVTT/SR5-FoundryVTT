@@ -8,7 +8,7 @@ import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 
 
-export interface SpellCastingTestData extends SuccessTestData {
+export interface AlchemicalSpellCastingTestData extends SuccessTestData {
     force: number
     drain: number
     reckless: boolean
@@ -16,12 +16,11 @@ export interface SpellCastingTestData extends SuccessTestData {
     drainDamage: DamageData
 }
 
-// DTodo:You need to duplicate this first and make it for alchemy, you should probably try and condense this if you can afterwords 
 /**
- * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
+ * Alchemical Spellcasting tests as described on SR5#306 in the spellcasting chapter.
  *
  */
-export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
+export class AlchemicalSpellCastingTest extends SuccessTest<AlchemicalSpellCastingTestData> {
 
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
@@ -35,11 +34,11 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     }
 
     override get _dialogTemplate()  {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/alchemical-spellcasting-test-dialog.html';
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/spellcasting-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/alchemical-spellcasting-test-message.html';
     }
 
     /**

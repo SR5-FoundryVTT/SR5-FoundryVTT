@@ -1222,6 +1222,7 @@
     },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attribute-Only Test",
+        "AlchemicalSpellCastingTest": "Alchemy",
         "CombatSpellDefenseTest": "Combat Spell Defense",
         "CompileSpriteTest": "Compile Sprite",
         "ComplexFormTest": "Threading Complex Form",

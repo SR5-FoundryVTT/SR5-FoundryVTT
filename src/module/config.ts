@@ -828,6 +828,7 @@ export const SR5 = {
      * When casting tests from these item types, use these tests as active tests
      */
     activeTests: {
+        'alchemical_spell': 'AlchemicalSpellCastingTest',
         'spell': 'SpellCastingTest',
         'ritual': 'RitualSpellcastingTest',
         'complex_form': 'ComplexFormTest'
