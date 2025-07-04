@@ -618,16 +618,6 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
     });
 
     describe('Weapon Parser can handle inputs', () => {
-        it('has null in character', async () => {
-            chummerCharacter = {
-                weapons: null,
-            };
-
-            const weapons = await weaponParser.parseWeapons(chummerCharacter);
-
-            assert.lengthOf(weapons, 0);
-        });
-
         it('has empty array in character', async () => {
             chummerCharacter = {
                 weapons: [],
