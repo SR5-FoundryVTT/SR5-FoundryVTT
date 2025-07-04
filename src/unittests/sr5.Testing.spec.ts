@@ -41,7 +41,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
-                    attributes: { body: { base: 5 } },
+                    attributes: { body: { base: 5 }, strength: { base: 1 }, reaction: { base: 1 } },
                     skills: { active: { automatics: { base: 45 } } }
                 }
             });
