@@ -1,10 +1,9 @@
-import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
-import { SR5 } from "../config";
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import MarkedDocument = Shadowrun.MarkedDocument;
-import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
+import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
+import {SR5} from "../config";
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
+import { SR5Item } from '../item/SR5Item';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 
 /**
  * Typing around the legacy item list helper.
@@ -37,8 +36,8 @@ interface ItemListRightSide {
 }
 
 export const registerItemLineHelpers = () => {
-    Handlebars.registerHelper('InventoryHeaderIcons', function (section: InventorySheetDataByType) {
-        var icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
+    Handlebars.registerHelper('InventoryHeaderIcons', function (section: Shadowrun.InventorySheetDataByType) {
+        const icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
 
         icons.push(section.isOpen
             ? {
@@ -412,7 +411,7 @@ export const registerItemLineHelpers = () => {
      *                   ItemRightSide does. This is due to ItemRightSide showing content, while ItemHeaderRightSide
      *                   showing dscriptors for that content.
      */
-    Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData): ItemListRightSide[] {
+    Handlebars.registerHelper('ItemRightSide', function (item: Shadowrun.ShadowrunItemData): ItemListRightSide[] {
         const wrapper = new SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -508,6 +507,7 @@ export const registerItemLineHelpers = () => {
                         qtyInput,
                     ];
                 }
+                break;
             case 'device':
             case 'equipment':
             case 'cyberware':
@@ -676,7 +676,7 @@ export const registerItemLineHelpers = () => {
              */
             case 'call_in_action':
                 if (item.system.actor_type === 'spirit') {
-                    const summoningData = item.system as Shadowrun.CallInActionData;
+                    const summoningData = item.system;
                     const spiritTypeLabel = SR5.spiritTypes[summoningData.spirit.type] ?? '';
 
                     return [
@@ -694,7 +694,7 @@ export const registerItemLineHelpers = () => {
                 }
 
                 if (item.system.actor_type === 'sprite') {
-                    const compilationData = item.system as Shadowrun.CallInActionData;
+                    const compilationData = item.system;
                     const spriteTypeLabel = SR5.spriteTypes[compilationData.sprite.type] ?? '';
 
                     return [
@@ -710,13 +710,15 @@ export const registerItemLineHelpers = () => {
                         }
                     ]
                 }
-
+                break;
             default:
                 return [];
         }
+
+        return [];
     });
 
-    Handlebars.registerHelper('ItemIcons', function (item: ShadowrunItemData) {
+    Handlebars.registerHelper('ItemIcons', function (item: Shadowrun.ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
 
         const editIcon = {
@@ -796,7 +798,7 @@ export const registerItemLineHelpers = () => {
         ];
     });
 
-    Handlebars.registerHelper('InventoryItemIcons', function (item: ShadowrunItemData) {
+    Handlebars.registerHelper('InventoryItemIcons', function (item: Shadowrun.ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
@@ -891,7 +893,7 @@ export const registerItemLineHelpers = () => {
     });
 
     // Allow Matrix Marks to be changed on the spot on a Sheet.
-    Handlebars.registerHelper('MarksRightSide', (marked: MarkedDocument) => {
+    Handlebars.registerHelper('MarksRightSide', (marked: Shadowrun.MarkedDocument) => {
         const quantityInput = {
             input: {
                 type: 'number',
@@ -903,7 +905,7 @@ export const registerItemLineHelpers = () => {
     });
 
     // Matrix Mark interaction on a Sheet.
-    Handlebars.registerHelper('MarksIcons', (marked: MarkedDocument) => {
+    Handlebars.registerHelper('MarksIcons', (marked: Shadowrun.MarkedDocument) => {
         const incrementIcon = {
             icon: 'fas fa-plus marks-add-one',
             title: game.i18n.localize('SR5.Labels.Sheet.AddOne'),
@@ -918,16 +920,19 @@ export const registerItemLineHelpers = () => {
         return [incrementIcon, decrementIcon];
     });
 
+    /**
+     * Only used for the Matrix HackingTab Mark List
+     */
     Handlebars.registerHelper('MarkListHeaderRightSide', () => {
         return [
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Scene'),
+                    text: game.i18n.localize('SR5.Labels.Sheet.Type'),
                 },
             },
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                    text: game.i18n.localize('SR5.Labels.ActorSheet.Network'),
                 },
             },
             {
@@ -935,6 +940,24 @@ export const registerItemLineHelpers = () => {
                     text: game.i18n.localize('SR5.Qty'),
                 },
             }]
+    });
+
+    /**
+     * Only used for the Matrix HackingTab Target List
+     */
+    Handlebars.registerHelper('TargetListHeaderRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Labels.Sheet.Type'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Labels.ActorSheet.Network'),
+                },
+            }
+        ]
     });
 
     Handlebars.registerHelper('MarkListHeaderIcons', () => {
@@ -946,7 +969,16 @@ export const registerItemLineHelpers = () => {
         }];
     });
 
-    Handlebars.registerHelper('NetworkDevicesListRightSide', () => {
+    Handlebars.registerHelper('TargetListHeaderIcons', () => {
+        return [{
+            icon: 'fas fa-refresh',
+            title: game.i18n.localize('SR5.Refresh'),
+            text: game.i18n.localize('SR5.Refresh'),
+            cssClass: 'targets-refresh'
+        }];
+    });
+
+    Handlebars.registerHelper('SlavesListRightSide', () => {
         return [
             {
                 text: {
@@ -960,7 +992,7 @@ export const registerItemLineHelpers = () => {
             }]
     })
 
-    Handlebars.registerHelper('NetworkDevicesListHeaderIcons', () => {
+    Handlebars.registerHelper('SlavesListHeaderIcons', () => {
         return [{
             icon: 'fas fa-trash',
             title: game.i18n.localize('SR5.Labels.Sheet.ClearNetwork'),
@@ -972,4 +1004,175 @@ export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('EmptyIcons', () => {
         return [{}];
     })
+
+    /**
+     * Only used for the Item NetworksTab
+     */
+    Handlebars.registerHelper('NetworksHeaderRightSide', () => {
+        return [{
+            text: {
+                text: game.i18n.localize('SR5.Labels.Sheet.Type'),
+            },
+        }]
+    });
+    /**
+     * Only used for the Item NetworksTab
+     */
+    Handlebars.registerHelper('NetworksItemRightSide', (item: SR5Item) => {
+        const type = ActorMarksFlow.getDocumentType(item);
+        return [{
+            text: {
+                text: game.i18n.localize(type),
+            },
+        }]
+    });
+    /**
+     * Only used for the Item NetworksTab
+     */
+    Handlebars.registerHelper('NetworksItemIcons', () => {
+        return [{
+            icon: 'fas fa-trash item-delete',
+            cssClass: 'sin-remove-network',
+            title: game.i18n.localize('SR5.DeleteItem'),
+        }]
+    });
+
+    /**
+     * Application - Matrix Network Hacking
+     */
+    Handlebars.registerHelper('MatrixNetworksItemIcons', () => {
+        return [{
+            icon: 'fas fa-door-open',
+            cssClass: 'matrix-network-invite',
+            title: game.i18n.localize('SR5.MatrixNetworkHackingApplication.Invite'),
+        },
+        {
+            icon: 'fas fa-explosion',
+            cssClass: 'matrix-network-bruteforce',
+            title: game.i18n.localize('SR5.Labels.Actions.BruteForce'),
+        },
+        {
+            icon: 'fas fa-microchip',
+            cssClass: 'matrix-network-hackonthefly',
+            title: game.i18n.localize('SR5.Labels.Actions.HackontheFly'),
+        }]
+    });
+
+    /**
+     * Section - Character Matrix Actions.
+     */
+    Handlebars.registerHelper('MatrixActionsHeaderRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Qty'),
+                },
+            }
+        ];
+    });
+    /**
+     * Section - Character Matrix Actions.
+     * @param action The matrix action used to render a single item line.
+     */
+    Handlebars.registerHelper('MatrixActionsItemRightSide', (action: SR5Item) => {
+        // Either show owner only, a mark quantity or nothing, if 0 marks are needed.
+        let needed: string|number = action.system.action?.category.matrix.marks ?? 0;
+        needed = needed > 0 ? needed : '';
+        const owner = action.system.action?.category.matrix.owner ? game.i18n.localize('SR5.Labels.ActorSheet.OwnerAbrv') : '';
+
+        return [
+            {
+                text: {
+                    text: owner || needed
+                },
+            }
+        ];
+    });
+
+    /**
+     * Return list of css classes to be used in the list of matrix targets.
+     * @param target The matrix target to render.
+     */
+    Handlebars.registerHelper('MatrixTargetCssClass', (target: Shadowrun.MatrixTargetDocument) => {
+        const classes: string[] = [];
+        if (target.selected) classes.push('selected-list-item');
+        return classes;
+    });
+    Handlebars.registerHelper('MatrixTargetItemIcons', (target: Shadowrun.MatrixTargetDocument) => {
+        const toggleConnectedItemsIcon = target.icons.length > 0 ?
+            {
+                icon: 'fas fa-square-chevron-down',
+                cssClass: 'toggle-connected-matrix-icons'
+            }:
+            {
+                icon: 'fas fa-square-chevron-up',
+                cssClass: 'toggle-connected-matrix-icons'
+            };
+
+        const icons: any = [];
+        if (target.document.hasPersona) icons.push(toggleConnectedItemsIcon);
+        return icons; 
+    });
+    Handlebars.registerHelper('MatrixTargetItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {
+        return [
+            {text: {
+                    text: game.i18n.localize(target.type)
+            }},
+            {text: {
+                    text: target.network
+            }},
+        ];
+    });
+    Handlebars.registerHelper('MatrixMarkedDocumentItemIcons', (target: Shadowrun.MarkedDocument) => {
+        const toggleConnectedItemsIcon = target.icons.length > 0 ?
+            {
+                icon: 'fas fa-square-chevron-down',
+                cssClass: 'toggle-connected-matrix-icons'
+            }:
+            {
+                icon: 'fas fa-square-chevron-up',
+                cssClass: 'toggle-connected-matrix-icons'
+            };
+        const connectNetworkIcon = 
+            {
+                icon: 'fas fa-right-to-bracket',
+                cssClass: 'marks-connect-network'
+            };
+
+        const icons = [
+            {
+                icon: 'fas fa-plus',
+                cssClass: 'marks-add-one'
+            },
+            {
+                icon: 'fas fa-minus', 
+                cssClass: 'marks-remove-one'
+            },
+            {
+                icon: 'fas fa-trash', 
+                cssClass: 'marks-delete'
+            }
+        ];
+        
+        // Handle document type specific icons.
+        if (target.document.isNetwork) icons.unshift(connectNetworkIcon);
+        if (target.document.hasPersona) icons.push(toggleConnectedItemsIcon)
+
+        return icons;
+    });
+    Handlebars.registerHelper('MatrixMarkedDocumentItemRightSide', (target: Shadowrun.MarkedDocument) => {
+        return [
+            {text: {
+                    text: game.i18n.localize(target.type)
+            }},
+            {text: {
+                    text: target.network
+            }},
+            {input: {
+                type: 'number',
+                value: target.marks,
+                cssClass: 'marks-qty',
+            }}
+        ];
+    });
 };

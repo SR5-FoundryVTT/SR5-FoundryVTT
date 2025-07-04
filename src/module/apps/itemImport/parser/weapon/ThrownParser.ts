@@ -1,4 +1,3 @@
-import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
 import BlastData = Shadowrun.BlastData;
 import WeaponItemData = Shadowrun.WeaponItemData;
@@ -7,12 +6,12 @@ import { Weapon } from '../../schema/WeaponsSchema';
 
 export class ThrownParser extends WeaponParserBase {
     public GetBlast(system: WeaponItemData['system'], jsonData: Weapon): BlastData {
-        let blastData: BlastData = {
+        const blastData: BlastData = {
             radius: 0,
             dropoff: 0,
         };
 
-        let blastCode = jsonData.damage._TEXT;
+        const blastCode = jsonData.damage._TEXT;
 
         let radiusMatch = blastCode.match(/([0-9]+m)/)?.[0];
         if (radiusMatch) {

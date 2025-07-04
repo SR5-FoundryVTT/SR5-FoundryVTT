@@ -55,7 +55,12 @@ export const FLAGS = {
     DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
     TeamworkTestFlow: 'TeamworkTestFlow',
     UseDamageCondition: 'UseDamageCondition',
-    GlobalDataStorage: 'GlobalDataStorage'
+    GlobalDataStorage: 'GlobalDataStorage',
+    GeneralActionsPack: 'GeneralActionsPack',
+    MatrixActionsPack: 'MatrixActionsPack',
+    UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
+    MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
+    CompendiaSettingsMenu: 'CompendiaSettingsMenu'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

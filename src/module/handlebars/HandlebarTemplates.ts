@@ -19,12 +19,22 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpritePowersTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ConfigTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/HackingTab.html',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.html',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.html',
+
+        // item tabs
+        'systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/GridDescriptionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/DescriptionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/ActionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/MiscellaneousTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/NetworksTab.hbs',
 
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
@@ -54,6 +64,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/Targets.html',
 
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
@@ -89,14 +100,13 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscVehicle.html',
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscCritter.html',
 
-
+        // item parts
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',
         'systems/shadowrun5e/dist/templates/item/parts/weapon-ammo-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/action.html',
-        'systems/shadowrun5e/dist/templates/item/parts/action_results.html',
         'systems/shadowrun5e/dist/templates/item/parts/modifier.html',
         'systems/shadowrun5e/dist/templates/item/parts/damage.html',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.html',
@@ -116,8 +126,11 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/summoning.html',
         'systems/shadowrun5e/dist/templates/item/parts/compilation.html',
         'systems/shadowrun5e/dist/templates/item/parts/ritual.html',
-
+        'systems/shadowrun5e/dist/templates/item/parts/misc_matrix.hbs',
+        
+        // roll parts
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
+        'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html',
 
         // to wrap the bodies of tabs
@@ -156,8 +169,11 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
 
         // Modifier management parts
-        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
+        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
+
+        // Application - Matrix Network Hacking
+        'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs',
     ];
 
-    return loadTemplates(templatePaths);
+    return await loadTemplates(templatePaths);
 };

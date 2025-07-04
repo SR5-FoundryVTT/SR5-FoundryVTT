@@ -1,0 +1,19 @@
+<form autocomplete="off">
+    <div class="compendia-settings">
+        <h4>{{localize 'SETTINGS.GeneralActionsPackDescription'}}</h4>
+        <h4>{{localize 'SETTINGS.GeneralActionsPackName'}}</h4>
+        <select name="generalActionsPack">
+            {{selectOptions generalActionsPackChoices selected=generalActionsPackName localize=true}}
+        </select>
+        <hr/>
+        <h4>{{localize 'SETTINGS.MatrixActionsPackDescription'}}</h4>
+        <h4>{{localize 'SETTINGS.MatrixActionsPackName'}}</h4>
+        <select name="matrixActionsPack">
+            {{selectOptions matrixActionsPackChoices selected=matrixActionsPackName localize=true}}
+        </select>
+        <hr/>
+        <button type="submit">
+            <i class="fas fa-floppy-disk"></i> {{localize "Save Changes"}}
+        </button>
+    </div>
+</form>

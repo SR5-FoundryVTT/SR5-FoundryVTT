@@ -15,7 +15,7 @@ export class WeaponImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        private categories: WeaponsSchema['categories']['category'];
+        private readonly categories: WeaponsSchema['categories']['category'];
         constructor(categories: WeaponsSchema['categories']['category']) {
             this.categories = categories;
         }
@@ -35,7 +35,7 @@ export class WeaponImporter extends DataImporter {
     };
 
     async Parse(jsonObject: WeaponsSchema): Promise<void> {
-        return WeaponImporter.ParseItems<Weapon, WeaponItemData>(
+        return await WeaponImporter.ParseItems<Weapon, WeaponItemData>(
             jsonObject.weapons.weapon,
             {
                 compendiumKey: "Weapon",

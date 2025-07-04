@@ -1,13 +1,6 @@
 {
     "Actor": {
-        "types": [
-            "character",
-            "spirit",
-            "sprite",
-            "vehicle",
-            "critter",
-            "ic"
-        ],
+        "types": ["character", "spirit", "sprite", "vehicle", "critter", "ic"],
         "templates": {
             "matrix": {
                 "matrix": {
@@ -16,12 +9,13 @@
                         "max": 0
                     },
                     "vr": false,
+                    "link_locked": false,
                     "rating": 0,
                     "is_cyberdeck": false,
                     "name": "",
-                    "silent": false,
+                    "running_silent": false,
                     "hot_sim": false,
-                    "marks": {},
+                    "marks": [],
                     "firewall": {
                         "value": 0,
                         "mod": [],
@@ -42,6 +36,11 @@
                         "mod": [],
                         "base": 0
                     }
+                }
+            },
+            "matrixNetwork": {
+                "matrix": {
+                    "updatedConnections": 0
                 }
             },
             "limits": {
@@ -959,7 +958,22 @@
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "technomancer", "movement", "condition_monitors", "physical_combat_values", "grunt", "importFlags"],
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "matrix",
+                "matrixNetwork",
+                "limits",
+                "armor",
+                "magic",
+                "technomancer",
+                "movement",
+                "condition_monitors",
+                "physical_combat_values",
+                "grunt",
+                "importFlags"
+            ],
             "ethnicity": "",
             "age": "",
             "sex": "",
@@ -991,7 +1005,19 @@
             "situation_modifiers": {}
         },
         "spirit": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors", "physical_combat_values", "grunt", "importFlags"],
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "limits",
+                "armor",
+                "magic",
+                "movement",
+                "condition_monitors",
+                "physical_combat_values",
+                "grunt",
+                "importFlags"
+            ],
             "summonerUuid": "",
             "services": 0,
             "bound": false,
@@ -1016,7 +1042,20 @@
             }
         },
         "critter": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors", "physical_combat_values", "grunt", "importFlags"],
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "limits",
+                "armor",
+                "magic",
+                "matrix",
+                "movement",
+                "condition_monitors",
+                "physical_combat_values",
+                "grunt",
+                "importFlags"
+            ],
             "is_npc": true,
             "visibilityChecks": {
                 "astral": {
@@ -1042,13 +1081,24 @@
             }
         },
         "vehicle": {
-            "templates": [ "common", "skills", "attributes", "limits", "armor", "matrix", "movement", "physical_combat_values", "importFlags" ],
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "limits",
+                "armor",
+                "matrix",
+                "movement",
+                "physical_combat_values",
+                "importFlags"
+            ],
             "vehicleType": "ground",
             "controlMode": "autopilot",
             "environment": "speed",
             "isDrone": false,
             "isOffRoad": false,
             "driver": "",
+            "master": "",
             "modificationCategories": {
                 "body": 0,
                 "cosmetic": 0,
@@ -1135,7 +1185,6 @@
             "track": {},
             "icType": "",
             "host": {
-                "id": null,
                 "rating": 0,
                 "customAttribute": false,
                 "atts": {
@@ -1184,6 +1233,7 @@
             "echo",
             "equipment",
             "host",
+            "grid",
             "lifestyle",
             "metamagic",
             "modification",
@@ -1293,7 +1343,10 @@
                         "max": 9
                     },
                     "wireless": true,
-                    "networkController": null
+                    "master": ""
+                },
+                "matrix": {
+                    "updatedConnections": 0
                 }
             },
             "action": {
@@ -1374,9 +1427,15 @@
             },
             "action_result": {
                 "result": {
-                    "success": {
+                    "success": {}
+                }
+            },
+            "action_matrix": {
+                "action": {
+                    "category": {
                         "matrix": {
-                            "placeMarks": false
+                            "owner": false,
+                            "marks": 0
                         }
                     }
                 }
@@ -1418,7 +1477,7 @@
                         "editable": true
                     }
                 },
-                "networkDevices": []
+                "slaves": []
             },
             "importFlags": {
                 "importFlags": {
@@ -1433,6 +1492,12 @@
                 "duration": "always",
                 "optional": "standard",
                 "enabled": true
+            },
+            "matrixNetwork": {
+                "matrix": {
+                    "visible": true,
+                    "updatedConnections": 0
+                }
             }
         },
         "armor": {
@@ -1658,7 +1723,8 @@
                 "description",
                 "action",
                 "action_result",
-                "importFlags"
+                "importFlags",
+                "action_matrix"
             ]
         },
         "sprite_power": {
@@ -1688,7 +1754,8 @@
                 "technology",
                 "importFlags"
             ],
-            "licenses": []
+            "licenses": [],
+            "networks": []
         },
         "lifestyle": {
             "templates": [
@@ -1710,7 +1777,8 @@
                 "technology",
                 "matrix",
                 "importFlags"
-            ]
+            ],
+            "programs": 0
         },
         "program": {
             "templates": [
@@ -1732,11 +1800,15 @@
             "templates": [
                 "description",
                 "matrix",
+                "matrixNetwork",
                 "importFlags"
             ],
-            "marks": {},
+            "marks": [],
             "rating": 0,
             "ic": []
+        },
+        "grid": {
+            "templates": ["description", "matrix", "matrixNetwork"]
         },
         "metamagic": {
             "templates": [

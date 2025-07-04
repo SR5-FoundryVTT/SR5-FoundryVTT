@@ -11,7 +11,7 @@ export class ArmorImporter extends DataImporter {
     }
 
     async Parse(jsonObject: ArmorSchema): Promise<void> {
-        return ArmorImporter.ParseItems<Armor, Shadowrun.ArmorItemData>(
+        return await ArmorImporter.ParseItems<Armor, Shadowrun.ArmorItemData>(
             jsonObject.armors.armor,
             {
                 compendiumKey: "Gear",

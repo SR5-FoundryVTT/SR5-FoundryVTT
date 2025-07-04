@@ -1,8 +1,6 @@
-//todo: v10 foundry-vtt-types 
-//@ts-expect-error
+//@ts-expect-error // TODO: foundry-vtt-types v10
 export default class ThermographicVisionFilter extends AbstractBaseFilter {
-  //@ts-expect-error
-  static override defaultUniforms = {
+  static defaultUniforms = {
     luminanceThreshold: 0.5,
     alphaThreshold: 0.1,
   };
@@ -11,8 +9,7 @@ export default class ThermographicVisionFilter extends AbstractBaseFilter {
    * fragment shader based on the following snippets:
    * @link https://gitlab.com/peginc/swade/-/blob/develop/src/module/vision/InfravisionFilter.ts?ref_type=heads
    */
-  //@ts-expect-error
-  static override fragmentShader = `
+  static fragmentShader = `
   varying vec2 vTextureCoord;
   uniform sampler2D uSampler;
   uniform float luminanceThreshold;

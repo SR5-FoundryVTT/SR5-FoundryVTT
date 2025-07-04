@@ -1,0 +1,6 @@
+{{#each networks}}
+<div>
+  <input type="radio" id="{{this.uuid}}" name="networks" value="{{this.uuid}}" checked>
+  <label for="{{this.uuid}}">{{this.name}}</label>
+</div>
+{{/each}}

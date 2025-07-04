@@ -1,21 +1,11 @@
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
-import { SR5ActiveEffect } from '../../../effect/SR5ActiveEffect'
-import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 import * as BC from "./BonusConstant";
 
 import EffectTagsData = Shadowrun.EffectTagsData;
-import EffectChangeData = Shadowrun.EffectChangeData;
 import EffectOptionsData = Shadowrun.EffectOptionsData;
-import EffectDurationData = Shadowrun.EffectDurationData;
-import { SR5Item } from "../../../item/SR5Item";
-import { CharacterSheetData } from "../../../actor/sheets/SR5CharacterSheet";
 
 export class BonusHelper {
-    private static isTrue(value: "" | { _TEXT: string }): boolean {
-        return value === "" || value._TEXT === "True";
-    }
-
     private static normalizeValue(sheet: BC.ShadowrunSheetData, value: string | number): string | number {
         if (typeof value === 'number')
             return value;
@@ -164,7 +154,7 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.limit.mod", value: limitModifier.value._TEXT }],
-                    { selection_limits: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`} 
+                    { selection_limits: `[{"value":"${name}","id":"${normalName}"}]`} 
                 );
             }
         }
@@ -184,7 +174,7 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
-                    { selection_attributes: `[{\"value\":\"${name.capitalize()}\",\"id\":\"${name}\"}]`}
+                    { selection_attributes: `[{"value":"${name.capitalize()}","id":"${name}"}]`}
                 );
             }
         }
@@ -198,7 +188,7 @@ export class BonusHelper {
                                 .filter(skillId => !excludedSkill || skillId !== excludedSkill)
                                 .map(skillId => ({ value: skillId.replace("_", " ").capitalize(), id: skillId }))
 
-                if (!skills || !skills.length)
+                if (!skills?.length)
                     console.log("Error skillcategory:", skillCategory.name._TEXT);
                 else
                     this.createEffect(
@@ -235,7 +225,7 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, { name: sheet.name + conditionTag },
                     [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
-                    { selection_skills: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`}
+                    { selection_skills: `[{"value":"${name}","id":"${normalName}"}]`}
                 );
             }
         }

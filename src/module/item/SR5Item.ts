@@ -6,13 +6,11 @@ import { DataDefaults } from "../data/DataDefaults";
 import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
-import { MatrixRules } from "../rules/MatrixRules";
 import { TestCreator } from "../tests/TestCreator";
 import { ChatData } from './ChatData';
-import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
-import { HostDataPreparation } from "./prep/HostPrep";
+import { MatrixNetworkFlow } from "./flows/MatrixNetworkFlow";
+import { HostPrep } from "./prep/HostPrep";
 import ModList = Shadowrun.ModList;
-import AttackData = Shadowrun.AttackData;
 import FireModeData = Shadowrun.FireModeData;
 import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
@@ -49,7 +47,6 @@ import WeaponItemData = Shadowrun.WeaponItemData;
 import HostItemData = Shadowrun.HostItemData;
 import ActionResultData = Shadowrun.ActionResultData;
 import ActionTestLabel = Shadowrun.ActionTestLabel;
-import MatrixMarks = Shadowrun.MatrixMarks;
 import RollEvent = Shadowrun.RollEvent;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import { DocumentModificationOptions } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/document.mjs";
@@ -59,25 +56,15 @@ import { SinPrep } from './prep/SinPrep';
 import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
-
-/**
- * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
- * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of execution within transpiled bundle.js code, 
- * resulting OpposedTest not finding SuccessTest (undefined) when extending it.
- * 
- * ... I'd love to remove this, or even just comment it, but tree-shaking will do it's job.
- * 
- * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
- * 
- * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
- * NOTE: still not fixed with esbuild@0.19.5
- */
-import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { ItemMarksFlow } from './flows/ItemMarksFlow';
+import { ItemRollDataFlow } from './flows/ItemRollDataFlow';
+import { RollDataOptions } from './Types';
+import { MatrixFlow } from '../flows/MatrixFlow';
+import { SetMarksOptions } from '../storage/MarksStorage';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
-
-ActionResultFlow; // DON'T TOUCH!
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -102,7 +89,7 @@ export class SR5Item extends Item {
     items: SR5Item[];
 
     // Item Sheet labels for quick info on an item dropdown.
-    labels: {} = {};
+    labels: Record<string, unknown> = {};
 
     // Add v10 type helper
     system: ShadowrunItemDataData; // TODO: foundry-vtt-types v10
@@ -134,7 +121,7 @@ export class SR5Item extends Item {
         // An embedded item will have an item as an actor, which might have an actor owner.
         // NOTE: This is very likely wrong and should be fixed during embedded item prep / creation. this.actor will only
         //       check what is set in the items options.actor during it's construction.
-        //@ts-expect-error
+        //@ts-expect-error // Typescript doesn't know that this.actor CAN be an item here...
         return this.actor.actorOwner;
     }
 
@@ -148,25 +135,25 @@ export class SR5Item extends Item {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) as FireModeData || DataDefaults.fireModeData();
     }
     async setLastFireMode(fireMode: FireModeData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
+        return await this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
     }
     getLastSpellForce(): SpellForceData {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastSpellForce) as SpellForceData || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
+        return await this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel) as ComplexFormLevelData || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
+        return await this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
     }
     getLastFireRangeMod(): FireRangeData {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastFireRange) as FireRangeData || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
+        return await this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
     }
 
     /**
@@ -175,7 +162,7 @@ export class SR5Item extends Item {
     getNestedItems(): any[] {
         let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems) as any[];
 
-        items = items ? items : [];
+        items = items || [];
 
         // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
         if (items && !Array.isArray(items)) {
@@ -219,6 +206,15 @@ export class SR5Item extends Item {
     }
 
     /**
+     * Determine if this action item has a specific action category configured.
+     */
+    hasActionCategory(category: Shadowrun.ActionCategories) {
+        const action = this.asAction();
+        if (!action) return false;
+        return action.system.action.categories.includes(category);
+    }
+
+    /**
      * Determine if a blast area should be placed using FoundryVTT area templates.
      */
     get hasBlastTemplate(): boolean {
@@ -231,8 +227,12 @@ export class SR5Item extends Item {
      * - this caused issues with Actions that have a Limit or Damage attribute and so those were moved
      */
     override prepareData() {
-        super.prepareData();
         this.prepareNestedItems();
+        super.prepareData();
+    }
+
+    override prepareBaseData(): void {
+        super.prepareBaseData();
 
         // Description labels might have changed since last data prep.
         // NOTE: this here is likely unused and heavily legacy.
@@ -246,6 +246,10 @@ export class SR5Item extends Item {
         const technology = this.getTechnologyData();
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
+            TechnologyPrep.prepareConceal(technology, equippedMods);
+            TechnologyPrep.prepareAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
+            TechnologyPrep.prepareMatrixAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
+            TechnologyPrep.prepareMentalAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
             TechnologyPrep.prepareConceal(technology, equippedMods);            
             TechnologyPrep.prepareAvailability(this, technology);
             TechnologyPrep.prepareCost(this, technology);
@@ -265,7 +269,7 @@ export class SR5Item extends Item {
         // ... this work only begun to clean up SR5item.prepareData
         switch (this.type) {
             case 'host':
-                HostDataPreparation(this.system as Shadowrun.HostData);
+                HostPrep.prepareBaseData(this.system as Shadowrun.HostData);
                 break;
             case 'adept_power':
                 AdeptPowerPrep.prepareBaseData(this.system as unknown as Shadowrun.AdeptPowerData);
@@ -277,6 +281,21 @@ export class SR5Item extends Item {
             case 'bioware':
                 WarePrep.prepareBaseData(this.system as unknown as Shadowrun.WareData);
                 break
+        }
+    }
+
+    override prepareDerivedData(): void {
+        super.prepareDerivedData();
+
+        const technology = this.getTechnologyData();
+        if (technology) {
+            TechnologyPrep.calculateAttributes(this.system.attributes as Shadowrun.AttributesData);
+        }
+
+        switch (this.type) {
+            case 'host':
+                HostPrep.prepareDerivedData(this.system as Shadowrun.HostData);
+                break;
         }
     }
 
@@ -297,13 +316,13 @@ export class SR5Item extends Item {
      * @param event A PointerEvent by user interaction.
      */
     async castAction(event?: RollEvent) {
-        
+
         // Only show the item's description by user intention or by lack of testability.
         let dontRollTest = TestCreator.shouldPostItemDescription(event);
         if (dontRollTest) return await this.postItemCard();
-        
-        // Should be right here so that TestCreator.shouldPostItemDescription(event); can prevent execution beforehand. 
-        if (!Hooks.call('SR5_CastItemAction', this)) return; 
+
+        // Should be right here so that TestCreator.shouldPostItemDescription(event); can prevent execution beforehand.
+        if (!Hooks.call('SR5_CastItemAction', this)) return;
 
         dontRollTest = !this.hasRoll;
 
@@ -320,12 +339,12 @@ export class SR5Item extends Item {
     /**
      * Create display only information for this item. Used on sheets, chat messages and more.
      * Both actor and item sheets.
-     * 
+     *
      * The original naming leans on the dnd5e systems use of it for chat messages.
      * NOTE: This is very legacy, difficult to read and should be improved upon.
-     * 
-     * @param htmlOptions 
-     * @returns 
+     *
+     * @param htmlOptions
+     * @returns
      */
     async getChatData(htmlOptions = {}) {
         const system = foundry.utils.duplicate(this.system);
@@ -333,11 +352,13 @@ export class SR5Item extends Item {
         if (!system.description) system.description = { chat: '', source: '', value: '' };
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
         if (!system.description.value) system.description.value = '';
+        // TODO: foundry-vtt-types v10
+        // eslint-disable-next-line
         system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions });
 
         const props = [];
         // Add additional chat data fields depending on item type.
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const chatDataForItemType = ChatData[this.type];
         if (chatDataForItemType) chatDataForItemType(system, labels, props, this);
 
@@ -350,7 +371,7 @@ export class SR5Item extends Item {
 
     getActionTestName(): string {
         const testName = this.getRollName();
-        return testName ? testName : game.i18n.localize('SR5.Action');
+        return testName || game.i18n.localize('SR5.Action');
     }
 
     /**
@@ -475,14 +496,14 @@ export class SR5Item extends Item {
     async useAmmo(fired) {
         if (this.type !== 'weapon') return;
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10 
+        //@ts-expect-error // TODO: foundry-vtt-types v10
         const value = Math.max(0, this.system.ammo.current.value - fired);
         return await this.update({ 'system.ammo.current.value': value });
     }
 
     /**
      * Can this item (weapon, melee, ranged, whatever) use ammunition?
-     * 
+     *
      * @returns true, for weapons with ammunition.
      */
     get usesAmmo(): boolean {
@@ -494,9 +515,9 @@ export class SR5Item extends Item {
      * - its current clips
      * - its available spare clips (when given)
      * - its equipped ammo
-     * 
+     *
      * This method will only reload the weapon to the max amount of ammo available.
-     * 
+     *
      * TODO: Currently only the minimal amount of bullets is reloaded. For weapons using ejectable clips, this should be full clip capacity.
      */
     async reloadAmmo(partialReload: boolean) {
@@ -569,7 +590,7 @@ export class SR5Item extends Item {
 
     /**
      * Equip one ammo item exclusively.
-     * 
+     *
      * @param id Item id of the to be exclusively equipped ammo item.
      */
     async equipAmmo(id) {
@@ -597,13 +618,26 @@ export class SR5Item extends Item {
         await this.update({ 'system.licenses': licenses });
     }
 
+    /**
+     * This method is used to add a new network to a SIN item.
+     * 
+     * @param item The network item to add to this SIN.
+     */
+    async addNewNetwork(item: SR5Item) {
+        const sin = this.asSin;
+        if (!sin) return;
+        if (!item.isGrid && !item.isHost) return;
+
+        sin.system.networks.push(item.uuid);
+        await this.update({'system.networks': sin.system.networks});
+    }
+
     get isSin(): boolean {
         return this.wrapper.isSin();
     }
 
     get asSin(): SinItemData | undefined {
         if (this.isSin) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as SinItemData;
         }
     }
@@ -614,7 +648,6 @@ export class SR5Item extends Item {
 
     get asLifestyle(): LifestyleItemData | undefined {
         if (this.isLifestyle) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as LifestyleItemData;
         }
     }
@@ -629,7 +662,6 @@ export class SR5Item extends Item {
 
     get asAmmo(): AmmoItemData | undefined {
         if (this.isAmmo) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as AmmoItemData;
         }
     }
@@ -640,7 +672,6 @@ export class SR5Item extends Item {
 
     asModification(): ModificationItemData | undefined {
         if (this.isModification) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as ModificationItemData;
         }
     }
@@ -659,7 +690,6 @@ export class SR5Item extends Item {
 
     get asProgram(): ProgramItemData | undefined {
         if (this.isProgram) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as ProgramItemData;
         }
     }
@@ -670,7 +700,6 @@ export class SR5Item extends Item {
 
     get asQuality(): QualityItemData | undefined {
         if (this.isQuality) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as QualityItemData;
         }
     }
@@ -681,10 +710,8 @@ export class SR5Item extends Item {
 
     asAdeptPower(): AdeptPowerItemData | undefined {
         if (this.isAdeptPower)
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as AdeptPowerItemData;
     }
-
 
     get isHost(): boolean {
         return this.type === 'host';
@@ -692,14 +719,56 @@ export class SR5Item extends Item {
 
     get asHost(): HostItemData | undefined {
         if (this.isHost) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as HostItemData;
         }
     }
 
+    get isGrid(): boolean {
+        return this.type === 'grid';
+    }
+
+    get asGrid(): Shadowrun.GridItemData | undefined {
+        if (this.isGrid) {
+            return this as Shadowrun.GridItemData;
+        }
+    }
+
+    /**
+     * This item is a network, which can be entered by a persona.
+     */
+    get isNetwork(): boolean {
+        return this.isHost || this.isGrid;
+    }
+
+    /**
+     * Determine if this item is part of a WAN / PAN network.
+     *
+     * @returns true, when item is part of any network, false if not.
+     */
+    get isSlave(): boolean {
+        const technology = this.getTechnologyData();
+        if (!technology) return false;
+
+        return !!technology.master;
+    }
+
+    /**
+     * Should this matrix item be visible to a player?
+     */
+    get matrixIconVisibleToPlayer(): boolean {
+        return this.system.matrix?.visible === true;
+    }
+
+    /**
+     * Determine if this items matrix icon is running silent.
+     */
+    get isRunningSilent(): boolean {
+        return false;
+    }
+
     /**
      * SIN Item - remove a single license within this SIN
-     * 
+     *
      * @param index The license list index
      */
     async removeLicense(index) {
@@ -716,21 +785,7 @@ export class SR5Item extends Item {
 
     asAction(): ActionItemData | undefined {
         if (this.isAction()) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
             return this as ActionItemData;
-        }
-    }
-
-    async rollOpposedTest(target: SR5Actor, attack: AttackData, event): Promise<void> {
-        console.error(`Shadowrun5e | ${this.constructor.name}.rollOpposedTest is not supported anymore`);
-    }
-
-    async rollTestType(type: string, attack: AttackData, event, target: SR5Actor) {
-        if (type === 'opposed') {
-            await this.rollOpposedTest(target, attack, event);
-        }
-        if (type === 'action') {
-            await this.castAction(event);
         }
     }
 
@@ -744,7 +799,7 @@ export class SR5Item extends Item {
      * @param html
      */
     static getItemFromMessage(html): SR5Item | undefined {
-        if (!game || !game.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
+        if (!game?.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
 
         const card = html.find('.chat-card');
         let actor;
@@ -760,7 +815,7 @@ export class SR5Item extends Item {
     static getTargets() {
         if (!game.ready || !game.user) return;
         const { character } = game.user;
-        // @ts-expect-error
+        // @ts-expect-error // TODO: foundry-vtt-types v10
         const { controlled } = canvas.tokens;
         const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
         if (character && controlled.length === 0) targets.push(character);
@@ -787,7 +842,7 @@ export class SR5Item extends Item {
      * Create an item in this item
      * @param itemData
      * @param options
-     * 
+     *
      * //@ts-expect-error TODO: foundry-vtt-types v10 Rework method...
      */
     async createNestedItem(itemData, options = {}) {
@@ -923,9 +978,9 @@ export class SR5Item extends Item {
         // we need to clear the items when one is deleted or it won't actually be deleted
         await this.clearNestedItems();
         await this.setNestedItems(items);
-        await this.prepareNestedItems();
-        await this.prepareData();
-        await this.render(false);
+        this.prepareNestedItems();
+        this.prepareData();
+        this.render(false);
         return true;
     }
 
@@ -959,6 +1014,36 @@ export class SR5Item extends Item {
         return !!action.damage.type.base;
     }
 
+    /**
+     * Apply damage to any type of technology item.
+     *
+     * @param damage Damage to be applied.
+     */
+    async addDamage(damage: Shadowrun.DamageData) {
+        switch (damage.type.value) {
+            case 'matrix':
+                return await this.addMatrixDamage(damage);
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Apply matrix damage to a technology item.
+     *
+     * @param damage The matrix damage to be applied.
+     */
+    async addMatrixDamage(damage: Shadowrun.DamageData) {
+        if (damage.type.value !== 'matrix') return;
+
+        const track = this.getConditionMonitor();
+        if (!track) return;
+
+        const toApply = Math.min(track.value + damage.value, track.max);
+
+        await this.update({ 'system.technology.condition_monitor.value': toApply });
+    }
+
     getAction(): ActionRollData | undefined {
         return this.wrapper.getAction();
     }
@@ -973,6 +1058,10 @@ export class SR5Item extends Item {
         return this.wrapper.getTechnology();
     }
 
+    getMasterUuid(): string|undefined {
+        return this.getTechnologyData()?.master;
+    }
+
     parseAvailibility(avail: string) {
         return ItemAvailabilityFlow.parseAvailibility(avail)
     }
@@ -981,8 +1070,8 @@ export class SR5Item extends Item {
         return this.getTechnologyData()?.networkController;
     }
 
-    async setNetworkController(networkController: string | undefined): Promise<void> {
-        await this.update({ 'system.technology.networkController': networkController });
+    async setMasterUuid(masterUuid: string|undefined): Promise<void> {
+        await this.update({ 'system.technology.master': masterUuid });
     }
 
     getRange(): CritterPowerRange | SpellRange | RangeWeaponData | undefined {
@@ -1016,10 +1105,10 @@ export class SR5Item extends Item {
 
     /**
      * An attack with this weapon will create an area of effect / blast.
-     * 
-     * There is a multitude of possibilities as to HOW an item can create an AoE, 
+     *
+     * There is a multitude of possibilities as to HOW an item can create an AoE,
      * both directly connected to the item and / or some of it's nested items.
-     * 
+     *
      */
     get isAreaOfEffect(): boolean {
         return this.wrapper.isAreaOfEffect() || this.hasExplosiveAmmo;
@@ -1031,7 +1120,6 @@ export class SR5Item extends Item {
 
     get asArmor(): ArmorItemData | undefined {
         if (this.isArmor) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as ArmorItemData;
         }
     }
@@ -1058,7 +1146,6 @@ export class SR5Item extends Item {
 
     get asWeapon(): WeaponItemData | undefined {
         if (this.isWeapon) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as WeaponItemData;
         }
     }
@@ -1077,7 +1164,6 @@ export class SR5Item extends Item {
 
     get asCyberware(): CyberwareItemData | undefined {
         if (this.isCyberware) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as CyberwareItemData;
         }
     }
@@ -1112,7 +1198,6 @@ export class SR5Item extends Item {
 
     get asSpell(): SpellItemData | undefined {
         if (this.isSpell) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as SpellItemData;
         }
     }
@@ -1129,12 +1214,12 @@ export class SR5Item extends Item {
     }
 
     get isSummoning(): boolean {
-        //@ts-expect-error
+        //@ts-expect-error bad typing?
         return this.type === 'call_in_action' && this.system.actor_type === 'spirit';
     }
 
     get isCompilation(): boolean {
-        //@ts-expect-error
+        //@ts-expect-error bad typing?
         return this.type === 'call_in_action' && this.system.actor_type === 'sprite';
     }
 
@@ -1144,7 +1229,6 @@ export class SR5Item extends Item {
 
     get asSpritePower(): SpritePowerItemData | undefined {
         if (this.isSpritePower) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as SpritePowerItemData;
         }
     }
@@ -1159,7 +1243,6 @@ export class SR5Item extends Item {
 
     get asComplexForm(): ComplexFormItemData | undefined {
         if (this.isComplexForm) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as ComplexFormItemData;
         }
     }
@@ -1170,12 +1253,11 @@ export class SR5Item extends Item {
 
     get asContact(): ContactItemData | undefined {
         if (this.isContact) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as ContactItemData;
         }
     }
 
-    /**    
+    /**
     * Retrieve the actor document linked to this item.
     * e.g.: Contact items provide linked actors
     */
@@ -1194,7 +1276,6 @@ export class SR5Item extends Item {
 
     get asCritterPower(): CritterPowerItemData | undefined {
         if (this.isCritterPower) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as CritterPowerItemData;
         }
     }
@@ -1205,12 +1286,11 @@ export class SR5Item extends Item {
 
     get asDevice(): DeviceItemData | undefined {
         if (this.isDevice) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as DeviceItemData;
         }
     }
 
-    asController(): HostItemData | DeviceItemData | undefined {
+    asMaster(): HostItemData | DeviceItemData | undefined {
         return this.asHost || this.asDevice || undefined;
     }
 
@@ -1220,7 +1300,6 @@ export class SR5Item extends Item {
 
     get asEquipment(): EquipmentItemData | undefined {
         if (this.isEquipment()) {
-            //@ts-expect-error // TODO: foundry-vtt-types v10
             return this as EquipmentItemData;
         }
     }
@@ -1235,6 +1314,15 @@ export class SR5Item extends Item {
 
     isWireless(): boolean {
         return this.wrapper.isWireless();
+    }
+
+    /**
+     * Determine if this item is an item that can be used in the matrix.
+     *
+     * @returns true, if this item is a matrix item.
+     */
+    get isMatrixItem(): boolean {
+        return this.getTechnologyData() !== undefined
     }
 
     isCyberdeck(): boolean {
@@ -1275,7 +1363,7 @@ export class SR5Item extends Item {
         return this.wrapper.getArmorValue();
     }
 
-    getArmorElements(): { [key: string]: number } {
+    getArmorElements(): Record<string, number> {
         return this.wrapper.getArmorElements();
     }
 
@@ -1333,7 +1421,7 @@ export class SR5Item extends Item {
 
     /**
      * Amount of recoil compensation totally available when using weapon
-     * 
+     *
      * This includes both actor and item recoil compensation.
      */
     get totalRecoilCompensation(): number {
@@ -1343,9 +1431,9 @@ export class SR5Item extends Item {
 
     /**
      * Current TOTAL recoil compensation with current recoil included.
-     * 
+     *
      * This includes both the items and it's parent actors recoil compensation and total progressive recoil.
-     * 
+     *
      * @returns A positive number or zero.
      */
     get currentRecoilCompensation(): number {
@@ -1376,52 +1464,55 @@ export class SR5Item extends Item {
 
     /**
      * A host type item can store IC actors to spawn in order, use this method to add into that.
-     * @param id An IC type actor id to fetch the actor with.
-     * @param pack Optional pack collection to fetch from
+     * @param ic: The IC actor to add to this host item.
      */
-    async addIC(id: string, pack: string | null = null) {
+    async addIC(ic: SR5Actor) {
         const host = this.asHost;
-        if (!host || !id) return;
-
-        // Check if actor exists before adding.
-        const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors?.get(id)) as SR5Actor;
-        if (!actor || !actor.isIC()) {
-            console.error(`Provided actor id ${id} doesn't exist (with pack collection '${pack}') or isn't an IC type`);
-            return;
-        }
-
-        const icData = actor.asIC();
+        if (!host) return;
+        const icData = ic.asIC();
         if (!icData) return;
 
-        // Add IC to the hosts IC order
-        const sourceEntity = DataDefaults.sourceItemData({
-            id: actor.id as string,
-            name: actor.name as string,
-            type: 'Actor',
-            pack,
-            // Custom fields for IC
-            // @ts-expect-error foundry-vtt
-            system: { icType: icData.system.icType },
-        });
-        host.system.ic.push(sourceEntity);
-
-        await this.update({ 'system.ic': host.system.ic });
+        await MatrixNetworkFlow.addSlave(this, ic);
     }
 
     /**
      * A host type item can contain IC in an order. Use this function remove IC at the said position
      * @param index The position in the IC order to be removed
      */
-    async removeIC(index: number) {
-        if (isNaN(index) || index < 0) return;
-
+    async removeIC(ic: SR5Actor) {
         const host = this.asHost;
         if (!host) return;
-        if (host.system.ic.length <= index) return;
+        const icData = ic.asIC();
+        if (!icData) return;
 
-        host.system.ic.splice(index, 1);
+        await MatrixNetworkFlow.removeSlave(this, ic);
+    }
 
-        await this.update({ 'system.ic': host.system.ic });
+    /**
+     * Get all active IC actors of a host
+     */
+    getIC() {
+        const host = this.asHost;
+        if (!host) return [];
+
+        // return host.system.ic.map(uuid => fromUuidSync(uuid)) as SR5Actor[];
+        const slaves = MatrixNetworkFlow.getSlaves(this);
+        // We can´t use isIC as both devices and actors might be returned
+        return slaves.filter(slave => slave.type === 'ic');
+    }
+
+    /**
+     * Retrieve slaved devices but not slaved personas.
+     *
+     * @returns A list of slaved devices.
+     */
+    async getDevices() {
+        const host = this.asHost;
+        if (!host) return [];
+
+        const slaves = MatrixNetworkFlow.getSlaves(this);
+        // TODO: There are more than only devices that can be matrix devices.
+        return slaves.filter(slave => slave.type === 'device') as SR5Item[];
     }
 
     get _isNestedItem(): boolean {
@@ -1440,7 +1531,7 @@ export class SR5Item extends Item {
         data._id = this.id;
 
         // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
-        // @ts-expect-error
+        // @ts-expect-error // We check for parent existance, though TypeScript still sees 'never'? :(
         await this.parent.updateNestedItems(data);
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
@@ -1454,11 +1545,11 @@ export class SR5Item extends Item {
     override async update(data, options?): Promise<this> {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem) {
-            return this.updateNestedItem(data);
+            return await this.updateNestedItem(data);
         }
 
         // Actor.item => Directly owned item by an actor!
-        // @ts-expect-error
+        // @ts-expect-error foundry-vtt-types v10
         return await super.update(data, options);
     }
 
@@ -1468,204 +1559,198 @@ export class SR5Item extends Item {
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks Amount of marks to be placed.
      * @param options Additional options that may be needed.
-     * @param options.scene The scene the targeted actor lives on.
-     * @param options.item
      *
-     * TODO: It might be useful to create a 'MatrixDocument' class sharing matrix methods to avoid duplication between
-     *       SR5Item and SR5Actor.
      */
-    async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: Item, overwrite?: boolean }) {
-        if (!canvas.ready) return;
-
-        if (!this.isHost) {
-            console.error('Only Host item types can place matrix marks!');
-            return;
-        }
-
-        // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene as Scene;
-        const item = options?.item;
-
-        // Build the markId string. If no item has been given, there still will be a third split element.
-        // Use Helpers.deconstructMarkId to get the elements.
-        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        const host = this.asHost;
-
-        if (!host) return;
-
-        const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
-        host.system.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
-
-        await this.update({ 'system.marks': host.system.marks });
-    }
-
-    getMarksById(markId: string): number {
-        const host = this.asHost;
-        return host ? host.system.marks[markId] : 0;
-    }
-
-    getAllMarks(): MatrixMarks | undefined {
-        const host = this.asHost;
-        if (!host) return;
-        return host.system.marks;
+    async setMarks(target: SR5Actor|SR5Item|undefined, marks: number, options?: SetMarksOptions) {
+        await ItemMarksFlow.setMarks(this, target, marks, options);
     }
 
     /**
-     * Receive the marks placed on either the given target as a whole or one it's owned items.
-     *
-     * @param target
-     * @param item
-     * @param options
-     *
-     * TODO: Check with technomancers....
-     *
-     * @return Will always return a number. At least zero, for no marks placed.
+     * Get the marks placed for a single target
+     * @param uuid The id of that target
+     * @returns Amount of marks
      */
-    getMarks(target: SR5Actor, item?: SR5Item, options?: { scene?: Scene }): number {
-        if (!canvas.ready) return 0;
-        if (!this.isHost) return 0;
+    getMarksPlaced(uuid: string): number {
+        return ItemMarksFlow.getMarksPlaced(this, uuid);
+    }
 
-        // Scene is optional.
-        const scene = options?.scene || canvas.scene as Scene;
-        item = item || target.getMatrixDevice();
-
-        const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);
-        const host = this.asHost;
-
-        if (!host) return 0
-
-        return host.system.marks[markId] || 0;
+    /**
+     * Get all marks placed by this item.
+     * @returns The set of marks
+     */
+    get marksData() {
+        return ItemMarksFlow.getMarksData(this);
     }
 
     /**
      * Remove ALL marks placed by this item.
-     *
-     * TODO: Allow partial deletion based on target / item
+     * TODO: Use MarksFlow global storage
      */
     async clearMarks() {
-        if (!this.isHost) return;
-
-        const host = this.asHost;
-
-        if (!host) return;
-
-        // Delete all markId properties from ActorData
-        const updateData = {}
-        for (const markId of Object.keys(host.system.marks)) {
-            updateData[`-=${markId}`] = null;
-        }
-
-        await this.update({ 'system.marks': updateData });
+        await ItemMarksFlow.clearMarks(this);
     }
 
     /**
-     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     * Remove marks placed on one target document.
+     * @param uuid Of the target document.
      */
-    async clearMark(markId: string) {
-        if (!this.isHost) return;
-
-        const updateData = {}
-        updateData[`-=${markId}`] = null;
-
-        await this.update({ 'system.marks': updateData });
+    async clearMark(uuid: string) {
+        await ItemMarksFlow.clearMark(this, uuid);
     }
 
     /**
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
-     * @param target The matrix item to be connected.
+     * @param slave The matrix item to be connected.
      */
-    async addNetworkDevice(target: SR5Item | SR5Actor) {
-        // TODO: Add device to WAN network
-        // TODO: Add IC actor to WAN network
-        // TODO: setup networkController link on networked devices.
-        await NetworkDeviceFlow.addDeviceToNetwork(this, target);
+    async addSlave(slave: Shadowrun.NetworkDevice) {
+        await MatrixNetworkFlow.addSlave(this, slave);
     }
 
     /**
-     * Alias method for addNetworkDevice, both do the same.
-     * @param target
+    * In case this item is a network master, remove the slave from the network.
+    * @param slave The matrix item to be disconnected.
+    */
+    async removeSlave(slave: Shadowrun.NetworkDevice) {
+        await MatrixNetworkFlow.removeSlave(this, slave);
+    }
+
+    async removeAllSlaves() {
+        await MatrixNetworkFlow.removeAllSlaves(this);
+    }
+
+    /**
+     * Return all documents marked by this host and it's IC.
+     *
+     * For other items, fall back to no documents.
+     *
+     * @returns Foundry Documents with marks placed.
      */
-    async addNetworkController(target: SR5Item) {
-        await this.addNetworkDevice(target);
-    }
-
-    async removeNetworkDevice(index: number) {
-        const controllerData = this.asController();
-        if (!controllerData) return;
-
-        // Convert the index to a device link.
-        if (controllerData.system.networkDevices[index] === undefined) return;
-        const networkDeviceLink = controllerData.system.networkDevices[index];
-        const controller = this;
-        return await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, networkDeviceLink);
-    }
-
-    async removeAllNetworkDevices() {
-        const controllerData = this.asController();
-        if (!controllerData) return;
-
-        return await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
-    }
-
-    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
+    async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
         if (!this.isHost) return [];
 
-        const marks = this.getAllMarks();
-        if (!marks) return [];
+        const marksData = this.marksData;
+        if (!marksData) return [];
 
-        // Deconstruct all mark ids into documents.
-        // @ts-expect-error
-        return Object.entries(marks)
-            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
-            .map(([markId, marks]) => ({
-                ...Helpers.getMarkIdDocuments(markId),
-                marks,
-                markId
-            }))
+        return await ActorMarksFlow.getMarkedDocuments(marksData);
     }
 
     /**
-     * Return the network controller item when connected to a PAN or WAN.
+     * Return the network master item when connected to a PAN or WAN.
+     *
+     * @returns The master item or undefined if not connected to a network.
      */
-    async networkController() {
+    get master() {
+        return MatrixNetworkFlow.getMaster(this);
+    }
+
+    /**
+     * Return the persona document for this matrix device.
+     *
+     * @returns
+     */
+    get persona() {
         const technologyData = this.getTechnologyData();
         if (!technologyData) return;
-        if (!technologyData.networkController) return;
 
-        return await NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
+        return this.actorOwner;
     }
 
     /**
      * Return all network device items within a possible PAN or WAN.
      */
-    async networkDevices() {
-        const controller = this.asDevice || this.asHost;
-        if (!controller) return [];
-
-        return NetworkDeviceFlow.getNetworkDevices(this);
+    get slaves() {
+        return MatrixNetworkFlow.getSlaves(this);
     }
 
     /**
      * Only devices can control a network.
      */
-    get canBeNetworkController(): boolean {
-        return this.isDevice || this.isHost;
+    get canBeMaster(): boolean {
+        return this.isDevice || this.isHost || this.isGrid;
     }
 
     /**
      * Assume all items with that are technology (therefore have a rating) are active matrix devices.
      */
-    get canBeNetworkDevice(): boolean {
+    get canBeSlave(): boolean {
+        return this.isMatrixDevice;
+    }
+
+    /**
+     * Determine if this icon can be used as a matrix icon.
+     */
+    get canBeMatrixIcon(): boolean {
+        return this.isMatrixDevice;
+    }
+
+    get isMatrixDevice(): boolean {
         const technologyData = this.getTechnologyData();
         return !!technologyData;
+    }
+
+    /**
+     * Is this matrix device part of an active network?
+     */
+    get hasMaster(): boolean {
+        const technologyData = this.getTechnologyData();
+        if (!technologyData) return false;
+
+        return !!technologyData.master;
     }
 
     /**
      * Disconnect any kind of item from a PAN or WAN.
      */
     async disconnectFromNetwork() {
-        if (this.canBeNetworkController) await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
-        if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
+        if (this.canBeMaster) await MatrixNetworkFlow.removeAllSlaves(this);
+        if (this.canBeSlave) await MatrixNetworkFlow.removeSlaveFromMaster(this);
+    }
+
+    /**
+     * Return the given attribute, no matter its source.
+     *
+     * This might be an actual attribute or another value type used as one during testing.
+     *
+     * @param name An attribute or other stats name.
+     * @returns Either an AttributeField or undefined, if the attribute doesn't exist on this document.
+     */
+    getAttribute(name: string, options: {rollData?: Shadowrun.ShadowrunItemDataData} = {}): Shadowrun.AttributeField | undefined {
+        const rollData = options.rollData || this.getRollData() as Shadowrun.ShadowrunItemDataData;
+        // Attributes for hosts work only within their own attributes.
+        if (this.type === 'host') {
+            const rollData = this.getRollData() as Shadowrun.HostData;
+            return rollData.attributes?.[name];
+        }
+
+        return rollData.attributes?.[name];
+    }
+
+    /**
+     * Change a matrix attribute to a new slot and switch it's place with the previous attribute residing there.
+     *
+     * @param changedSlot 'att1', ... 'att4'
+     * @param changedAttribute 'attack'
+     */
+    async changeMatrixAttributeSlot(changedSlot: string, changedAttribute: Shadowrun.MatrixAttribute) {
+        if (!this.system.atts) return;
+        const updateData = MatrixFlow.changeMatrixAttribute(this.system.atts, changedSlot, changedAttribute);
+        return await this.update(updateData);
+    }
+
+    /**
+     * Transparently build a set of roll data based on this items type and network status.
+     *
+     * This roll data can depend upon other actors and items.
+     *
+     * NOTE: Since getRollData is sync by default, we can't retrieve compendium documents here, resulting in fromUuidSync calls down
+     *       the line.
+     *
+     * TODO: Refactor this method using the Composition Pattern for each story.
+     */
+    override getRollData(options: RollDataOptions={}): any {
+        // Foundry is simply passing down 'system', so we have to duplicate to avoid contamination.
+        const rollData = foundry.utils.duplicate(super.getRollData());
+        return ItemRollDataFlow.getRollData(this, rollData, options);
     }
 
     override async _onCreate(changed, options, user) {
@@ -1676,6 +1761,13 @@ export class SR5Item extends Item {
         // Don't kill DocumentData by applying empty objects. Also performance.
         //@ts-expect-error // TODO: foundry-vtt-types v10
         if (!foundry.utils.isEmpty(applyData)) await this.update(applyData);
+    }
+
+    /**
+     * Reset everything that needs to be reset between two runs.
+     */
+    async restRunData() {
+        await this.clearMarks();
     }
 
     /**

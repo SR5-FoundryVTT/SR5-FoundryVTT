@@ -3,6 +3,7 @@ import {Version0_8_0} from "./versions/Version0_8_0";
 import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
+import { Version_0_30_0 } from './versions/Version_0_30_0';
 
 type VersionDefinition = {
     versionNumber: string;
@@ -15,6 +16,7 @@ export class Migrator {
         { versionNumber: Version0_18_0.TargetVersion, migration: new Version0_18_0() },
         { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() },
         { versionNumber: Version0_27_0.TargetVersion, migration: new Version0_27_0() },
+        { versionNumber: Version_0_30_0.TargetVersion, migration: new Version_0_30_0() },
     ];
 
     /**
@@ -72,7 +74,7 @@ export class Migrator {
             buttons: {
                 ok: {
                     label: localizedWarningBegin,
-                    callback: () => this.migrate(migrations),
+                    callback: async () => await this.migrate(migrations),
                 },
             },
             default: 'ok',

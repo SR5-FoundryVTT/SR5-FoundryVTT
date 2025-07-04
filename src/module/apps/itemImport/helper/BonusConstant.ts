@@ -2,9 +2,7 @@ import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/
 import { BonusSchema } from '../schema/BonusSchema';
 
 import EffectTagsData = Shadowrun.EffectTagsData;
-import EffectChangeData = Shadowrun.EffectChangeData;
 import EffectOptionsData = Shadowrun.EffectOptionsData;
-import EffectDurationData = Shadowrun.EffectDurationData;
 
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
