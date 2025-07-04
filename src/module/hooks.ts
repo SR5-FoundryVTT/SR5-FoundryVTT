@@ -2,20 +2,20 @@ import { CompileSpriteTest } from './tests/CompileSpriteTest';
 import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
 import { OpposedRitualTest } from './tests/OpposedRitualTest';
 import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
-import {SR5} from './config';
-import {Migrator} from './migrator/Migrator';
-import {registerSystemSettings} from './settings';
-import {FLAGS, SYSTEM_NAME, SYSTEM_SOCKET} from './constants';
-import {SR5Actor} from './actor/SR5Actor';
-import {SR5Item} from './item/SR5Item';
-import {SR5ItemSheet} from './item/SR5ItemSheet';
-import {SR5Token} from './token/SR5Token';
+import { SR5 } from './config';
+import { Migrator } from './migrator/Migrator';
+import { registerSystemSettings } from './settings';
+import { FLAGS, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
+import { SR5Actor } from './actor/SR5Actor';
+import { SR5Item } from './item/SR5Item';
+import { SR5ItemSheet } from './item/SR5ItemSheet';
+import { SR5Token } from './token/SR5Token';
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
-import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
-import {HandlebarManager} from './handlebars/HandlebarManager';
+import { _combatantGetInitiativeFormula, SR5Combat } from './combat/SR5Combat';
+import { HandlebarManager } from './handlebars/HandlebarManager';
 
-import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
-import {Import} from './apps/itemImport/apps/import-form';
+import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import { Import } from './apps/itemImport/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
@@ -56,7 +56,6 @@ import { NetworkDeviceFlow } from './item/flows/NetworkDeviceFlow';
 import { registerSystemKeybindings } from './keybindings';
 import { SkillTest } from './tests/SkillTest';
 
-import {canvasInit} from './canvas';
 import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
 import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
@@ -70,8 +69,9 @@ import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
-
-
+import { RoutingLibIntegration } from './integrations/routingLibIntegration';
+import { SR5TokenDocument } from './token/SR5TokenDocument';
+import { SR5TokenRuler } from './token/SR5TokenRuler';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -81,10 +81,17 @@ export class HooksManager {
         console.log('Shadowrun 5e | Registering system hooks');
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
-        Hooks.once('init', HooksManager.init);
+        Hooks.once('init', () => {
+            HooksManager.init();
+            
+            // Custom Module Integrations
+            // See src/module/integartions for more information.
+            if (game.modules.get('routinglib')?.active) {
+                RoutingLibIntegration.init();
+            }
+        });
         Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
 
-        Hooks.on('canvasInit', canvasInit);
         Hooks.on('ready', HooksManager.ready);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
@@ -259,8 +266,27 @@ ___________________
         // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
         // Setting to true, will duplicate item effects on actors. Only effects on actors will be traversed.
         CONFIG.ActiveEffect.legacyTransferral = false;
-        
+
         CONFIG.Token.objectClass = SR5Token;
+        CONFIG.Token.documentClass = SR5TokenDocument;
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        CONFIG.Token.rulerClass = SR5TokenRuler;
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        CONFIG.Token.movement.actions['run'] = {
+            label: 'SR5.MovementTypes.Run',
+            icon: 'fa-solid fa-person-running',
+            canSelect: () => false,
+            // @ts-expect-error TODO: foundry-vtt-types v13
+            getAnimationOptions: () => ({ movementSpeed: CONFIG.Token.movement.defaultSpeed * 2 }),
+        };
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        CONFIG.Token.movement.actions['sprint'] = {
+            label: 'SR5.MovementTypes.Sprint',
+            icon: 'fa-solid fa-person-running-fast',
+            canSelect: () => false,
+            // @ts-expect-error TODO: foundry-vtt-types v13
+            getAnimationOptions: () => ({ movementSpeed: CONFIG.Token.movement.defaultSpeed * 3 }),
+        };
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
@@ -347,7 +373,7 @@ ___________________
                 await Migrator.InitWorldForMigration();
                 return;
             }
-            
+
             // On populated worlds, try migrating
             await Migrator.BeginMigration();
 
@@ -369,7 +395,7 @@ ___________________
 
     /**
      * Handle drop events on the hotbar creating different macros.
-     * 
+     *
      * NOTE: FoundryVTT Hook callbacks won't be resolved when returning a promise.
      *       While this function calls async methods, it's order of operations isn't important.
      *
@@ -391,7 +417,7 @@ ___________________
 
     static getSceneControlButtons(controls) {
         if (game.user?.isGM) {
-            const overwatchScoreTrackControl = { 
+            const overwatchScoreTrackControl = {
                 name: 'overwatch-score-tracker',
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',
                 icon: 'fas fa-network-wired',
@@ -521,6 +547,6 @@ ___________________
     }
 
     static async configureTextEnrichers() {
-       await JournalEnrichers.setEnrichers();
+        await JournalEnrichers.setEnrichers();
     }
 }
