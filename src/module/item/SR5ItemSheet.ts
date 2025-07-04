@@ -180,7 +180,13 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         /**
          * Reduce nested items into typed lists.
          */
-        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = this.item.items.reduce(
+        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = this.item.items.reduce<[
+                SR5Item<'ammo'>[],
+                SR5Item<'modification'>[],
+                SR5Item<'modification'>[],
+                SR5Item<'modification'>[],
+                SR5Item<'modification'>[]
+            ]>(
             (acc, item: SR5Item) => {
                 const data = item.toObject() as unknown as SR5Item;
                 if (item.type === 'ammo') acc[0].push(data as SR5Item<'ammo'>);
@@ -193,19 +199,13 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
                 }
                 return acc;
             },
-            [[], [], [], [], []] as [
-                SR5Item<'ammo'>[],
-                SR5Item<'modification'>[],
-                SR5Item<'modification'>[],
-                SR5Item<'modification'>[],
-                SR5Item<'modification'>[]
-            ]
+            [[], [], [], [], []]
         );
 
         // Enrich descriptions
         await Promise.all(
             [ammunition, weaponMods, armorMods, vehicleMods, droneMods].flat().map(
-                item => foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description.value).then(html => item.descriptionHTML = html)
+                async item => foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description.value).then(html => item.descriptionHTML = html)
             )
         );
 
@@ -418,7 +418,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
     }
 
     _addDragSupportToListItemTemplatePartial(i, item) {
-        if (item.dataset && item.dataset.itemId) {
+        if (item.dataset?.itemId) {
             item.setAttribute('draggable', true);
             item.addEventListener('dragstart', this._onDragStart.bind(this), false);
         }
@@ -510,43 +510,43 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
             // Provide readable error for failing item retrieval assumptions.
             if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
 
-            return await this.item.createNestedItem(item._source);
+            return this.item.createNestedItem(item._source);
         }
 
         // Add items to hosts WAN.
         if (this.item.isType('host') && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid);
-            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-            return await this.item.addIC(actor.id, data.pack);
+            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+            return this.item.addIC(actor.id, data.pack);
         }
 
         // Add items to a network (PAN/WAN).
         if (this.item.canBeNetworkController && data.type === 'Item') {
             const item = await fromUuid(data.uuid) as SR5Item;
 
-            if (!item || !item.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
+            if (!item?.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
 
-            return await this.item.addNetworkDevice(item);
+            return this.item.addNetworkDevice(item);
         }
 
         // Add vehicles to a network (PAN/WAN).
         if (this.item.canBeNetworkController && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid) as SR5Actor;
 
-            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
             if (!actor.isType('vehicle')) {
                 return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
             }
 
-            return await this.item.addNetworkDevice(actor);
+            return this.item.addNetworkDevice(actor);
         }
 
         // link actors in existing contacts
         if (this.item.isType('contact') && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid) as SR5Actor;
 
-            if (!actor || !actor.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
             return this.updateLinkedActor(actor);
         }
@@ -605,7 +605,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
         const oldValue = this.item.system.atts[changedSlot].att;
 
-        let data = {}
+        const data = {}
 
         Object.entries(this.item.system.atts).forEach(([slot, { att }]) => {
             if (slot === changedSlot) {
@@ -620,9 +620,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
     async _onEditItem(event) {
         const item = this.item.getOwnedItem(this._eventId(event));
-        if (item) {
-            item.sheet?.render(true);
-        }
+        return item?.sheet?.render(true);
     }
 
     async _onEntityRemove(event) {
@@ -767,7 +765,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
-        if ('action' in this.item.system === false) return;
+        if (!('action' in this.item.system)) return;
         const inputElement = html.find('input#action-modifier').get(0);
 
         if (!inputElement) {
@@ -809,7 +807,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      * @param html 
      */
     _createActionCategoriesTagify(html) {
-        if ('action' in this.item.system === false) return;
+        if (!('action' in this.item.system)) return;
         const inputElement = html.find('input#action-categories').get(0) as HTMLInputElement;
 
         if (!inputElement) {
@@ -943,7 +941,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         if (!device) return;
 
         if (device instanceof SR5Item || device instanceof SR5Actor)
-            device?.sheet?.render(true);
+            await device?.sheet?.render(true);
     }
 
     async _onControllerRemove(event) {
