@@ -127,7 +127,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         data.system = data.item.system;
         //@ts-expect-error // TODO: remove TODO: foundry-vtt-types v10
         data.data = data.item.system;
-        const itemData = this.item.system;
+        const itemData = this.item.toObject(false).system as SR5Item['system'];
 
         const linkedActor = await this.item.getLinkedActor();
         
