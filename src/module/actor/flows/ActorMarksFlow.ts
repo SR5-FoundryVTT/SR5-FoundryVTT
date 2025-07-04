@@ -147,7 +147,11 @@ export const ActorMarksFlow = {
         const documents: Shadowrun.MarkedDocument[] = [];
 
         for (const {uuid, name, marks} of matrixData) {
-            const document = uuid ? await ActorMarksFlow.getMarkedDocument(uuid) : null;
+            const document = fromUuidSync(uuid ?? '');
+            if (!document) {
+                console.error(`Shadowrun 5e | ActorMarksFlow.getMarkedDocuments: Could not find document for uuid ${uuid}. Consider cleaning all marks.`);
+                continue;   
+            }
             const network = ActorMarksFlow.getDocumentNetwork(document);
             const type = ActorMarksFlow.getDocumentType(document);
             const markId = uuid;
@@ -156,7 +160,7 @@ export const ActorMarksFlow = {
             const token = null;
             const runningSilent = false;
 
-            documents.push({document, token, marks, markId, name, type, network, runningSilent});
+            documents.push({document, token, marks, markId, name, type, network, runningSilent, icons: []});
         }
 
         return documents;
@@ -186,6 +190,7 @@ export const ActorMarksFlow = {
      * Trasnform the given document to a string type for sheet display.
      *
      * NOTE: This function is part of sheet rendering, so we fail silently, to not break sheet rendering.
+     * TODO: This method should live under MatrixFlow.ts or similar.
      * 
      * @param document Any markable document
      * @returns A translation key to be translated.

@@ -5,6 +5,7 @@ import { SR5Item } from '../../item/SR5Item';
 import { FormDialog, FormDialogOptions } from '../../apps/dialogs/FormDialog';
 import { SR5Actor } from '../SR5Actor';
 import { MatrixFlow } from '../../flows/MatrixFlow';
+import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 
 
 export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
@@ -134,21 +135,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         }
         // When marked documents overview is shown, collect all marked documents.
         else if (data.showMatrixMarkedDocuments) {
-            data.markedDocuments = await this.actor.getAllMarkedDocuments();
-
-            for (const target of data.markedDocuments) {
-                if (this._connectedIconsOpenClose[target.document.uuid]) {
-                    target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document);
-
-                    for (const icon of target.icons) {
-                        // Mark icon as selected.
-                        icon.selected = this.selectedMatrixTarget === icon.document.uuid;
-                    }
-                }
-
-                // Mark target as selected.
-                target.selected = this.selectedMatrixTarget === target.document.uuid;
-            }
+            const markedDocuments = await this.actor.getAllMarkedDocuments();
+            data.markedDocuments = this._prepareMarkedDocumentTargets(markedDocuments);
         }
 
         return data;
@@ -355,4 +343,79 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
         this.render();
     }
+
+    /**
+     * Restructure flat list of marked documents into a hierarchical list showing personas on top level and marked
+     * icons below their personas, even if those are unmarked.
+     */
+    _prepareMarkedDocumentTargets(markedDocuments: Shadowrun.MarkedDocument[]) {
+        const targets: Shadowrun.MarkedDocument[] = [];
+
+        // Build general hierarchy of marked documents.
+        for (const target of markedDocuments) {
+            // Mark icon as selected.
+            target.selected = this.selectedMatrixTarget === target.document.uuid;
+            
+            // List marked networks together with personas on top level.
+            if (target.document.isNetwork) {
+                targets.push(target);
+                continue;
+            }
+
+            // Marked personas should be on top level.
+            if (target.document.hasPersona) {
+                targets.push(target);
+                continue;
+            }
+
+            // Put unmarked personas of icons in a persona network on top level.
+            if (target.document.isMatrixDevice && target.document.persona) {
+                const persona = target.document.persona;
+                const personaTarget = targets.find(t => t.document.uuid === persona.uuid);
+
+                // Adjust existing or create new persona target.
+                if (personaTarget) {
+                    personaTarget.icons.push(target);
+                } else {
+                    targets.push({
+                        name: Helpers.getChatSpeakerName(persona),
+                        token: persona.getToken(),
+                        network: persona.network?.name ?? '',
+                        document: persona,
+                        icons: [target],
+                        type: ActorMarksFlow.getDocumentType(persona),
+                        marks: 0,
+                        markId: '',
+                        // As a device is marked, the persona should be visible...
+                        runningSilent: false,
+                        selected: this.selectedMatrixTarget === persona.uuid
+                    });
+                }
+            }
+        }
+
+        // Add additional sub-icons based on user wanting to see them.
+        for (const target of targets) {
+            if (this._connectedIconsOpenClose[target.document.uuid]) {
+                const oldIcons = target.icons;
+                // An already marked icon will again show up when all icons are collected.
+                // So we can simply overwrite all icons here without any filtering.
+                target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document)
+
+                for (const icon of target.icons) {
+                    // Mark icon as selected.
+                    icon.selected = this.selectedMatrixTarget === icon.document.uuid;
+
+                    // Transfer mark information.
+                    const oldIcon = oldIcons.find(i => i.document.uuid === icon.document.uuid);
+                    if (oldIcon) {
+                        icon.marks = oldIcon.marks;
+                        icon.markId = oldIcon.markId;
+                    }
+                }
+            }
+        }
+
+        return targets;
+    }   
 }

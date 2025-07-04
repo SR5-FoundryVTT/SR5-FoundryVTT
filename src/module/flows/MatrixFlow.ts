@@ -1,6 +1,7 @@
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
+import { Helpers } from '../helpers';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
@@ -295,7 +296,8 @@ export const MatrixFlow = {
                 document: slave,
                 token,
                 runningSilent: slave.isRunningSilent,
-                network: host.name || ''
+                network: host.name || '',
+                icons: []
             });
         }
 
@@ -324,7 +326,8 @@ export const MatrixFlow = {
                     token: null,
                     runningSilent: slave.isRunningSilent,
                     network: grid.name || '',
-                    type
+                    type,
+                    icons: []
                 });
             }
         }
@@ -357,7 +360,8 @@ export const MatrixFlow = {
                     token,
                     runningSilent: token.actor.isRunningSilent,
                     network: token.actor.network?.name ?? '',
-                    type
+                    type,
+                    icons: []
                 })
             }
         }
@@ -388,7 +392,7 @@ export const MatrixFlow = {
      * @returns List of matrix icons connected to the document.
      */
     getConnectedMatrixIconTargets(document: SR5Actor) {
-        const connectedIcons: Shadowrun.MatrixTargetDocument[] = [];
+        const connectedIcons: Shadowrun.MarkedDocument[] = [];
 
         // Only persona icons should show connected icons.
         // TODO: Don´t show this for IC, Spirits, Sprite
@@ -396,12 +400,15 @@ export const MatrixFlow = {
 
         for (const device of document.wirelessDevices) {
             connectedIcons.push({
-                name: device.name ?? '', // TODO: taMiF improve
+                name: Helpers.getChatSpeakerName(device),
                 document: device,
                 token: null,
                 runningSilent: device.isRunningSilent,
                 network: document.network?.name ?? '',
-                type: device.type // TODO: taMIf localize
+                type: ActorMarksFlow.getDocumentType(device),
+                icons: [],
+                marks: 0,
+                markId: null,
             });
         }
 

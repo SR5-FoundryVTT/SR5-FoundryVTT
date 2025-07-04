@@ -1099,7 +1099,7 @@ export const registerItemLineHelpers = () => {
         return classes;
     });
     Handlebars.registerHelper('MatrixTargetItemIcons', (target: Shadowrun.MatrixTargetDocument) => {
-        const toggleConnectedItemsIcon = target.icons ?
+        const toggleConnectedItemsIcon = target.icons.length > 0 ?
             {
                 icon: 'fas fa-square-chevron-down',
                 cssClass: 'toggle-connected-matrix-icons'
@@ -1124,7 +1124,7 @@ export const registerItemLineHelpers = () => {
         ];
     });
     Handlebars.registerHelper('MatrixMarkedDocumentItemIcons', (target: Shadowrun.MarkedDocument) => {
-        const toggleConnectedItemsIcon = target.icons ?
+        const toggleConnectedItemsIcon = target.icons.length > 0 ?
             {
                 icon: 'fas fa-square-chevron-down',
                 cssClass: 'toggle-connected-matrix-icons'

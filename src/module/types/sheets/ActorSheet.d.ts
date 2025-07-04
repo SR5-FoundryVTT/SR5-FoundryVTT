@@ -29,7 +29,7 @@ declare namespace Shadowrun {
         // Name of the document or manually entered by user.
         name: string
         // The Foundry Document marked.
-        document: Shadowrun.NetworkDevice | null
+        document: Shadowrun.NetworkDevice
         // Optional token for those documents having them.
         token: TokenDocument | null
     }
@@ -45,7 +45,7 @@ declare namespace Shadowrun {
 
         // These properties are mostly used for optional sheet display.
         // The icons connected to this target.
-        icons?: MatrixTargetDocument[]
+        icons: MarkedDocument[]
         // Indicates if this target has been selected as a matrix action target.
         selected?: boolean
     }
