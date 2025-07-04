@@ -33,6 +33,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'lifestyle',
             'contact',
             'spell',
+            'alchemical_spell',
             'ritual_spells',
             'adept_power',
             'complex_form',

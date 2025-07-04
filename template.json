@@ -1171,6 +1171,7 @@
     "Item": {
         "types": [
             "action",
+            "alchemical_spell",
             "adept_power",
             "ammo",
             "armor",
@@ -1471,6 +1472,48 @@
             "accuracy": 0,
             "rc": 0,
             "conceal": 0
+        },
+        "alchemical_spell": {
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ],
+            "drain": 0,
+            "category": "",
+            "type": "",
+            "range": "",
+            "duration": "",
+            "combat": {
+                "type": ""
+            },
+            "detection": {
+                "passive": false,
+                "type": "",
+                "extended": false
+            },
+            "illusion": {
+                "type": "",
+                "sense": ""
+            },
+            "manipulation": {
+                "damaging": false,
+                "mental": false,
+                "environmental": false,
+                "physical": false
+            },
+            "action": {
+                "test": "SpellCastingTest",
+                "opposed": {
+                    "test": "",
+                    "resist": {
+                        "test": ""
+                    }
+                },
+                "followed": {
+                    "test": "DrainTest"
+                }
+            }
         },
         "spell": {
             "templates": [

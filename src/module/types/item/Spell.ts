@@ -30,6 +30,13 @@ declare namespace Shadowrun {
             type: string;
         }
     }
+    export interface AlchemySpellData {
+        alchemy: {
+            preparation: boolean;
+            trigger: AlchemyTrigger;
+        }
+    }
+    
     export interface SpellPartData {
         type: SpellType;
         category: SpellCateogry;
@@ -43,6 +50,7 @@ declare namespace Shadowrun {
         illusion: IllusionSpellData;
         manipulation: ManipulationSpellData;
         ritual: RitualSpellData;
+        alchemy: AlchemySpellData;
     }
 
     export type CombatSpellType = 'direct' | 'indirect' | '';
@@ -54,4 +62,5 @@ declare namespace Shadowrun {
     export type SpellRange = 'touch' | 'los' | 'los_a' | '';
     export type SpellDuration = 'instant' | 'sustained' | 'permanent' | '';
     export type RitualType = 'anchored' | 'material_link' | 'minion' | 'spell' | 'spotter' | '';
+    export type AlchemyTrigger = 'command' | 'contact' | 'time'
 }

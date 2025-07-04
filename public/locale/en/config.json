@@ -550,6 +550,7 @@
     "SR5.ItemTypes": {
         "Action": "Action",
         "AdeptPower": "Adept Power",
+        "AlchemicalSpell": "Alchemical Spell",
         "Ammo": "Ammo",
         "Armor": "Armor",
         "Bioware": "Bioware",
@@ -608,6 +609,7 @@
             "SpriteType": "Sprite Type"
         },
         "ActorSheet": {
+            "AlchemicalSpells": "Alchemical Spells",
             "CreateInventory": "Create inventory place",
             "CritterPowers": "Critter Powers",
             "DeviceRating": "Device Rating",

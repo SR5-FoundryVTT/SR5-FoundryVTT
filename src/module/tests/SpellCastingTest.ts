@@ -16,7 +16,7 @@ export interface SpellCastingTestData extends SuccessTestData {
     drainDamage: DamageData
 }
 
-
+// DTodo:You need to duplicate this first and make it for alchemy, you should probably try and condense this if you can afterwords 
 /**
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
  *

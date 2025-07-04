@@ -39,6 +39,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         // magic
         'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/AlchemicalSpellList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/MetamagicList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/RitualList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html',

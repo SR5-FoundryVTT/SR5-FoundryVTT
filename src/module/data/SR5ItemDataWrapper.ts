@@ -166,7 +166,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isSpell(): boolean {
-        return this.data.type === 'spell';
+        return this.data.type === 'spell' || this.data.type == 'alchemical_spell';
     }
 
     isAoESpell(): boolean {

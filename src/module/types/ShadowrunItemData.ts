@@ -17,6 +17,7 @@ declare namespace Shadowrun {
     export type ShadowrunItemData =
         | ActionItemData
         | AdeptPowerItemData
+        | AlchemicalSpellItemData
         | AmmoItemData
         | ArmorItemData
         | BiowareItemData
@@ -62,6 +63,7 @@ declare namespace Shadowrun {
     export type ShadowrunItemDataData =
         Partial<ActionData> &
         Partial<AdeptPowerData> &
+        Partial<AlchemicalSpellItemData> &
         Partial<AmmoData> &
         Partial<ArmorData> &
         Partial<BiowareData> &
@@ -98,6 +100,13 @@ declare namespace Shadowrun {
         img: string;
         data: AdeptPowerData;
         system: AdeptPowerData;
+    }
+    export interface AlchemicalSpellItemData {
+        type: 'alchemical_spell';
+        name: string;
+        img: string;
+        data: SpellData;
+        system: SpellData;
     }
     export interface AmmoItemData {
         type: 'ammo';
