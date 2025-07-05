@@ -8,19 +8,13 @@ interface Waypoint {
 
 interface RoutingOptions {
     maxDistance: number;
-    token: Token;
+    token: SR5Token;
 }
 
 interface RoutingLibRoutingResult {
     path: Waypoint[];
     cost: number;
 }
-
-type PathfindingResult = {
-    result: TokenDocument.MeasuredMovementWaypoint[] | null | undefined;
-    promise: Promise<TokenDocument.MeasuredMovementWaypoint[] | null>;
-    cancel: () => void;
-};
 
 export interface RoutingLib {
     calculatePath: (from: Waypoint, to: Waypoint, options: RoutingOptions) => Promise<RoutingLibRoutingResult | null>;
@@ -55,13 +49,13 @@ export class RoutingLibIntegration {
     }
 
     static routinglibPathfinding(
-        waypoints: TokenDocument.MeasuredMovementWaypoint[],
+        waypoints: Token.FindMovementPathWaypoint[],
         token: SR5Token,
         movement: SR5Actor['system']['movement']
-    ): PathfindingResult {
+    ): Token.FindMovementPathJob {
         const grid = token.scene?.grid ?? foundry.documents.BaseScene.defaultGrid;
 
-        const pathfindingResult: Partial<PathfindingResult> = {
+        const pathfindingResult: Partial<Token.FindMovementPathJob> = {
             result: undefined,
             promise: undefined,
             cancel: undefined,
@@ -75,12 +69,16 @@ export class RoutingLibIntegration {
             }
         }
 
-        pathfindingResult.promise = new Promise<TokenDocument.MeasuredMovementWaypoint[] | null>((resolve) => {
+        pathfindingResult.promise = new Promise<TokenDocument.MovementWaypoint[] | null>((resolve) => {
             const maxDistance = Math.max((movement?.run.value || 0) * 5, 20);
             for (let i = 1; i < waypoints.length; i++) {
                 const fromWaypoint = waypoints[i - 1];
-                const { i: fromY, j: fromX } = grid.getOffset(fromWaypoint);
-                const { i: toY, j: toX } = grid.getOffset(waypoints[i]);
+
+                if (fromWaypoint.x === undefined || fromWaypoint.y === undefined || waypoints[i].x === undefined || waypoints[i].y === undefined)
+                    throw new Error('Waypoints must have defined x and y coordinates.');
+
+                const { i: fromY, j: fromX } = grid.getOffset(fromWaypoint as TokenDocument.MovementWaypoint & { x: number, y: number });
+                const { i: toY, j: toX } = grid.getOffset(waypoints[i] as TokenDocument.MovementWaypoint & { x: number, y: number });
 
                 const from = { x: fromX, y: fromY };
                 const to = { x: toX, y: toY };
@@ -118,12 +116,7 @@ export class RoutingLibIntegration {
                                 action: fromWaypoint.action,
                                 snapped: true,
                                 checkpoint: true,
-                                explicit: true,
-                                terrain: null,
-                                intermediate: false,
-                                userId: null,
-                                movementId: '',
-                                cost: 0
+                                explicit: true
                             });
                         }
                     }
@@ -131,15 +124,15 @@ export class RoutingLibIntegration {
                 })
                 .catch(async () => {
                     pathfindingResult.cancel!()
-                    const findMovementPathResult: PathfindingResult = token.findMovementPath(waypoints, {skipRoutingLib: true});
+                    const findMovementPathResult = token.findMovementPath(waypoints, {skipRoutingLib: true});
                     return findMovementPathResult.promise
                 })
                 .then(value => {
-                    pathfindingResult.result = value;
-                    resolve(value);
+                    pathfindingResult.result = value as TokenDocument.MovementWaypoint[] | null;
+                    resolve(value as TokenDocument.MovementWaypoint[] | null);
                 });
         });
 
-        return pathfindingResult as PathfindingResult;
+        return pathfindingResult as Token.FindMovementPathJob;
     };
 }

@@ -17,14 +17,15 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         return super._drawBar(number, bar, data);
     }
 
-    // @ts-expect-error TODO: foundry-vtt-types v13 (not yet in typings)
-    override findMovementPath(waypoints, options) {
+    override findMovementPath(
+        waypoints: Token.FindMovementPathWaypoint[],
+        options?: Token.FindMovementPathOptions & { skipRoutingLib?: boolean; }
+    ) {
         const movement = this.actor?.system.movement;
-        if (RoutingLibIntegration.routingLibReady && movement && !options.skipRoutingLib) {
+        if (RoutingLibIntegration.routingLibReady && movement && !options?.skipRoutingLib) {
             return RoutingLibIntegration.routinglibPathfinding(waypoints, this, movement);
         }
 
-        // @ts-expect-error not yet in typings
         return super.findMovementPath(waypoints, options);
     }
 }
