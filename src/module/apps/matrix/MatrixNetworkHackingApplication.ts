@@ -96,7 +96,8 @@ export class MatrixNetworkHackingApplication extends Application {
         }
 
         // Get test for that action.
-        const test = await TestCreator.fromPackAction('matrix-actions', action, this.actor) as MatrixPlacementTests;
+        const matrixPackName = Helpers.getMatrixActionsPackName();
+        const test = await TestCreator.fromPackAction(matrixPackName, action, this.actor) as MatrixPlacementTests;
         if (!test) return;
 
         this.close();
