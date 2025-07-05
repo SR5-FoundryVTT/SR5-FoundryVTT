@@ -1075,6 +1075,9 @@ export const registerItemLineHelpers = () => {
      * @param action The matrix action used to render a single item line.
      */
     Handlebars.registerHelper('MatrixActionsItemRightSide', (action: SR5Item) => {
+        // TODO: taMiF/marks This was necessary as older template version seem to use system.action.category as a string, which FOundry doesn't override on migration.
+        if (!action.system.action?.category.matrix) return [];
+
         // Either show owner only, a mark quantity or nothing, if 0 marks are needed.
         let needed: string|number = action.system.action?.category.matrix.marks ?? 0;
         needed = needed > 0 ? needed : '';
