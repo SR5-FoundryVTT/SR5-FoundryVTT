@@ -746,10 +746,8 @@ export class SR5Item extends Item {
      * @returns true, when item is part of any network, false if not.
      */
     get isSlave(): boolean {
-        const technology = this.getTechnologyData();
-        if (!technology) return false;
-
-        return !!technology.master;
+        if (!this.isMatrixDevice) return false;
+        return !!this.master;
     }
 
     /**
