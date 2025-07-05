@@ -44,8 +44,8 @@ export default class SR5CompendiaSettings extends FormApplication {
 
         // Transform packs into selectOption choices for localization.
         for (const pack of worldItemPacks) {
-            generalActionsPackChoices[`world.${pack.metadata.name}`] = pack.metadata.label;
-            matrixActionsPackChoices[`world.${pack.metadata.name}`] = pack.metadata.label;
+            generalActionsPackChoices[pack.metadata.name] = pack.metadata.label;
+            matrixActionsPackChoices[pack.metadata.name] = pack.metadata.label;
         }
 
         return {
