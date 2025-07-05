@@ -47,53 +47,58 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 disabled: false,
                 name: 'Test Effect',
                 changes: [{
-                    key: 'system.modifiers.global', // flat value field
+                    key: 'system.nuyen', // literal number field
                     value: '3',
                     mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM
                 }]
             }]);
 
             // change value should only ADD but NOT change .mod or .override
-            assert.strictEqual(actor.system.modifiers.global, 3);
+            assert.strictEqual(actor.system.nuyen, 3);
             // assert.strictEqual(actor.system.modifiers.global.mod, undefined);
             // assert.strictEqual(actor.system.modifiers.global.override, undefined);
         });
 
         it('OVERRIDE mode: apply the system override mode', async () => {
             const actor = await factory.createActor({ type: 'character' });
+
+            // Assert overriden default values.
+            assert.strictEqual(actor.system.skills.active.automatics.canDefault, true);
+
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
                 changes: [
                     { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
-                    { key: 'system.attributes.agility.value', value: '4', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+                    { key: 'system.attributes.agility.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+                    { key: 'system.nuyen', value: '4', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
                     { key: 'system.skills.active.automatics.canDefault', value: 'false', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
                 ]
             }]);
 
-            // Body should be overwritten as a Valuefield.
+            // ModifiableValue should have a custom override value
+            // Case - Direct change key
             assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3 });
             assert.strictEqual(actor.system.attributes.body.base, 0);
             assert.deepEqual(actor.system.attributes.body.mod, []);
             assert.strictEqual(actor.system.attributes.body.value, 3);
-
-            // Foundry default behavior will overwrite the object property directly (4)
-            // Though the system ValueField flow will calculate it to be the attribut min. value again (0)
-            // as base is 0, no mods exist and no value override is set, due to the change targeting a property instead
-            // of the ValueField itself.
-            assert.deepEqual(actor.system.attributes.agility.mod, []);
-            assert.equal(actor.system.attributes.agility.override, undefined);
+            // Case - Indirect change key
+            assert.deepEqual(actor.system.attributes.agility.override, { name: 'Test Effect', value: 3 });
             assert.strictEqual(actor.system.attributes.agility.base, 0);
-            assert.strictEqual(actor.system.attributes.agility.value, 0);
+            assert.deepEqual(actor.system.attributes.agility.mod, []);
+            assert.strictEqual(actor.system.attributes.agility.value, 3);
 
-            // A ValueField value outside of value calculation should still work
+            // Case - ModifableValue with a direct key not part of value calculation (see SR5ActiveEffect.modifiableValueProperties)
             // Skill automatics normally can default, wich we overwrite here.
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
             const active = actor.system.skills.active;
             assert.deepEqual(active.automatics.mod, []);
-            assert.strictEqual(active.automatics.override, undefined);
+            assert.strictEqual(active.automatics.override, null);
             assert.strictEqual(active.automatics.canDefault, false);
+
+            // Default literal value change
+            assert.strictEqual(actor.system.nuyen, 4);
         });
 
         it('OVERRIDE mode: override all existing .mod values', async () => {
