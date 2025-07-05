@@ -38,6 +38,7 @@ export const SR5 = {
         lifestyle: 'SR5.ItemTypes.Lifestyle',
         metamagic: 'SR5.ItemTypes.Metamagic',
         modification: 'SR5.ItemTypes.Modification',
+        preparation: 'SR5.ItemTypes.Preparation',
         program: 'SR5.ItemTypes.Program',
         quality: 'SR5.ItemTypes.Quality',
         ritual: 'SR5.ItemTypes.Ritual',

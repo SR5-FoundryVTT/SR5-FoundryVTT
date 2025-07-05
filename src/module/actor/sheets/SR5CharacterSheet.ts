@@ -65,7 +65,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'cyberware',
             'device',
             'equipment',
-            'modification'
+            'modification',
+            'preparation'
         ];
     }
 

@@ -51,7 +51,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
 
     static override _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
-            skill: 'alchemy',
+            skill: 'spellcasting',
             attribute: 'magic'
         };
     }

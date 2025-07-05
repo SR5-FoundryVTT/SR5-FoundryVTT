@@ -1188,6 +1188,7 @@
             "lifestyle",
             "metamagic",
             "modification",
+            "preparation",
             "program",
             "quality",
             "ritual",
@@ -1504,6 +1505,45 @@
             },
             "action": {
                 "test": "AlchemicalSpellCastingTest",
+                "opposed": {
+                    "test": "OpposedAlchemicalSpellCastingTest"
+                },
+                "followed": {
+                    "test": "DrainTest"
+                }
+            }
+        },
+        "preparation": {
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ],
+            "drain": 0,
+            "category": "",
+            "type": "",
+            "range": "",
+            "duration": "",
+            "combat": {
+                "type": ""
+            },
+            "detection": {
+                "passive": false,
+                "type": "",
+                "extended": false
+            },
+            "illusion": {
+                "type": "",
+                "sense": ""
+            },
+            "manipulation": {
+                "damaging": false,
+                "mental": false,
+                "environmental": false,
+                "physical": false
+            },
+            "action": {
+                "test": "SpellCastingTest",
                 "opposed": {
                     "test": "",
                     "resist": {

@@ -82,6 +82,7 @@ export const UpdateActionFlow = {
 
         const typeHandler = {
             'weapon': UpdateActionFlow.injectWeaponTestIntoChangeData,
+            'alchemical_spell': UpdateActionFlow.injectAlchemicalSpellTestIntoChangeData,
             'spell': UpdateActionFlow.injectSpellTestIntoChangeData,
             'complex_form': UpdateActionFlow.injectComplexFormTestIntoChangeData,
             'call_in_action': UpdateActionFlow.injectCallInActionTestIntoChangeData
@@ -149,6 +150,27 @@ export const UpdateActionFlow = {
         const test = SR5.activeTests[type];
 
         foundry.utils.setProperty(applyData, 'system.action.test', test);
+    },
+
+        /**
+     * See injectActionTestsIntoChangeData for documentation.
+     */
+    injectAlchemicalSpellTestIntoChangeData(type: string, changeData: Partial<Shadowrun.SpellItemData>, applyData) {
+        // Abort when category isn't part of this change.
+        if (changeData?.system?.category === undefined) return;
+        
+        // Remove test when user selects empty category.
+        if (changeData.system.category === '') {
+            foundry.utils.setProperty(applyData, 'system.action.test', '');
+            return;
+        } 
+        
+        // Based on category switch out active, opposed and resist test.
+        const test = SR5.activeTests[type];
+
+        foundry.utils.setProperty(applyData, 'system.action.test', test);
+        foundry.utils.setProperty(applyData, 'system.action.opposed.test', 'OpposedAlchemicalSpellCastingTest');
+        foundry.utils.setProperty(applyData, 'system.action.followed.test', 'DrainTest');
     },
 
 

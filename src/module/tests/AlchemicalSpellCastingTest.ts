@@ -12,8 +12,11 @@ export interface AlchemicalSpellCastingTestData extends SuccessTestData {
     force: number
     drain: number
     reckless: boolean
-
     drainDamage: DamageData
+
+    name: string
+
+    preparationUuid: string
 }
 
 /**
@@ -29,6 +32,7 @@ export class AlchemicalSpellCastingTest extends SuccessTest<AlchemicalSpellCasti
         data.drain = data.drain || 0;
         data.reckless = data.reckless || false;
         data.drainDamage = data.drainDamage || DataDefaults.damageData();
+        data.name = data.name || '';
 
         return data;
     }

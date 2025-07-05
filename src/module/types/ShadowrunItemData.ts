@@ -32,6 +32,7 @@ declare namespace Shadowrun {
         | LifestyleItemData
         | MetamagicItemData
         | ModificationItemData
+        | PreparationItemData
         | ProgramItemData
         | QualityItemData
         | SinItemData
@@ -78,6 +79,7 @@ declare namespace Shadowrun {
         Partial<LifestyleData> &
         Partial<MetamagicData> &
         Partial<ModificationData> &
+        Partial<PreparationItemData> &
         Partial<ProgramData> &
         Partial<QualityData> &
         Partial<SinData> &
@@ -205,6 +207,13 @@ declare namespace Shadowrun {
         img: string;
         data: ModificationData;
         system: ModificationData;
+    }
+    export interface PreparationItemData {
+        type: 'program';
+        name: string;
+        img: string;
+        data: PreparationData;
+        system: PreparationData;
     }
     export interface ProgramItemData {
         type: 'program';

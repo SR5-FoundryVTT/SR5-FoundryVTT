@@ -2,7 +2,7 @@ import { CompileSpriteTest } from './tests/CompileSpriteTest';
 import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
 import { OpposedRitualTest } from './tests/OpposedRitualTest';
 import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
-import { AlchemicalSpellCastingTest } from './tests/AlchemicalSpellCastingTestData';
+import { AlchemicalSpellCastingTest } from './tests/AlchemicalSpellCastingTest';
 import {SR5} from './config';
 import {Migrator} from './migrator/Migrator';
 import {registerSystemSettings} from './settings';
@@ -71,6 +71,7 @@ import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
+import { OpposedAlchemicalSpellCastingTest } from './tests/OpposedAlchemicalSpellCastingTest';
 
 
 
@@ -163,6 +164,7 @@ ___________________
                 SuppressionDefenseTest,
                 PhysicalResistTest,
                 AlchemicalSpellCastingTest,
+                OpposedAlchemicalSpellCastingTest,
                 SpellCastingTest,
                 RitualSpellcastingTest,
                 OpposedRitualTest,
@@ -218,6 +220,7 @@ ___________________
                 OpposedTest,
                 PhysicalDefenseTest,
                 SuppressionDefenseTest,
+                OpposedAlchemicalSpellCastingTest,
                 CombatSpellDefenseTest,
                 OpposedSummonSpiritTest,
                 OpposedCompileSpriteTest,
