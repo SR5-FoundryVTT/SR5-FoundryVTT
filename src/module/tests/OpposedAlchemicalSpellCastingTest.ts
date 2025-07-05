@@ -10,8 +10,7 @@ import { AlchemicalSpellCastingRules } from '../rules/AlchemicalSpellCastingRule
 
 
 interface OpposedAlchemicalSpellCastingTestData extends OpposedTestData {
-    // The created spirit actors FoundryVTT uuid
-    summonedSpiritUuid: string
+
 }
 
 /**
@@ -20,7 +19,8 @@ interface OpposedAlchemicalSpellCastingTestData extends OpposedTestData {
  * The summoner is the active actor and the spirit is the opposed actor.
  */
 export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchemicalSpellCastingTestData> {
-    public override against: AlchemicalSpellCastingTest
+    public override against: AlchemicalSpellCastingTest;
+    public preparation: any;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Due to summoning, the active actor for this test will be created during execution.
@@ -43,8 +43,6 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
     override _prepareData(data: any, options?: any) {
         data = super._prepareData(data, options);
 
-        data.preparationUuid = data.preparationUuid || '';
-
         return data;
     }
 
@@ -64,11 +62,6 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
      * To have an opposing actor, that's not on the map already, create the spirit actor.
      */
     override async populateDocuments() {
-        // DTodo: Need to make sure this document gets cleaned up after a failure
-        await this.createPreparation();
-
-        // this.data.sourceActorUuid = this.data.summonedSpiritUuid || this.against.data.preparedSpiritUuid;
-
         await super.populateDocuments();
     }
 
@@ -81,19 +74,19 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
     }
 
     /**
-     * A failure for the spirit is a success for the summoner.
+     * A failure for the preparation is a success for the alchemist.
      */
     override async processFailure() {
-        await this.updateSummonTestForFollowup();
+        await this.updateAlchemySpellCastingTestForFollowup();
         await this.finalizePreparation();
     }
 
     /**
-     * A success of the spirit is a failure for the summoner.
+     * A success of the preparation is a failure for the alchemist.
      */
     override async processSuccess() {
-        await this.updateSummonTestForFollowup();
-        await this.cleanupAfterExecutionCancel();
+        await this.updateAlchemySpellCastingTestForFollowup();
+        // await this.cleanupAfterExecutionCancel();
     }
 
     override get successLabel(): Translation {
@@ -104,7 +97,7 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
         return 'SR5.TestResults.PreparationSuccess';
     }
 
-    async updateSummonTestForFollowup() {
+    async updateAlchemySpellCastingTestForFollowup() {
         // Finalize the original test values.
         await this.against.saveToMessage();
     }
@@ -124,18 +117,11 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
      * This should be called as the last step in summoning.
      */
     async finalizePreparation() {
-        if (!this.actor) return;
+        if (!this.item) return;
 
-        const summoner = this.against.actor as Actor;        
+        await this.createPreparation();
 
-        const updateData = {
-            'system.potency': this.derivePotency(),
-            'system.alchemistUuid': summoner.uuid
-        }
-
-        this._addOwnershipToUpdateData(updateData);
-
-        await this.actor.update(updateData);
+        await super.populateDocuments();
     }
 
     /**
@@ -161,7 +147,7 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
     }
 
     /**
-     * Based on this tests selection, create a spirit actor
+     * Based on this tests selection, create a preparation item
      */
     async createPreparation() {
         if (!this.against) return;
@@ -169,41 +155,23 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
 
         const summoner = this.against.actor;
 
-        console.log('What all info do we have access to here?', this.item);
         // Create a new preparation item from scratch...
         const preperationSpellName = this?.item?.name || '';
         const name = `${summoner.name} ${preperationSpellName} ${this.derivePotency()}`;
         const force = this.against.data.force;
-        const system = { force };
+        const system = {
+            potency: this.derivePotency(),
+            force: force
+        }
         const itemData = {
             name: name,
-            type: 'preparation'
+            type: 'preparation',
+            system: system
         };
 
-        const item = this.against.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
-        // const actor = await Item.create({ name, type: 'spirit', system, prototypeToken: {actorLink: true} });
-
+        const item = (await this.against.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }))[0];
+        console.log('So what is in this item?', item)
+        this.preparation = item;
         if (!item) return console.error('Shadowrun 5e | Could not create the preparation');
-    }
-
-    /**
-     * Try getting a prepared spirit actor to reuse.
-     * 
-     * @returns 
-     */
-    async getPreparedSpiritActor(): Promise<SR5Actor|null> {
-        return await fromUuid(this.against.data.preparationUuid) as SR5Actor;
-    }
-
-    /**
-     * Cleanup created actors that aren't needed anymore.
-     * 
-     * When user cancels the dialog, the spirits has been created. Remove it.
-     */
-    override async cleanupAfterExecutionCancel() {
-        if (!this.against.data.preparationUuid) return;
-        const item = await fromUuid(this.against.data.preparationUuid);
-        await item?.delete();
-        delete this.actor;
     }
 }
