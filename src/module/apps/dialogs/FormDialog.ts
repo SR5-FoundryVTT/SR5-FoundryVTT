@@ -1,10 +1,10 @@
-export interface FormDialogData extends Dialog.Data{
+export interface FormDialogData extends Dialog.Data<HTMLElement | JQuery> {
 	templateData: object;
 	templatePath: string;
 	onAfterClose?: Function;
 }
 
-export interface FormDialogOptions extends DialogOptions {
+export interface FormDialogOptions extends Dialog.Options {
     // When true, will apply dialog form element inputs to this.data.
     applyFormChangesOnSubmit: boolean | null
 }
@@ -15,15 +15,15 @@ export interface FormDialogOptions extends DialogOptions {
  * It will look for form elements and apply value changes to the local data property according to the name attribute
  * of the form element. This works the same as it does with general FoundryVTT Applications.
  */
-export class FormDialog extends Dialog<FormDialogOptions> {
+export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     selection: object;
-    selectedButton: string;
-    form: HTMLFormElement;
+    selectedButton!: string;
+    form!: HTMLFormElement;
 
     _onAfterClose: Function;
     _selectionPromise: Promise<object>;
-    _selectionResolve: Function;
-    _selectionReject: Function;
+    _selectionResolve!: Function;
+    _selectionReject!: Function;
     _templateData: object;
     _templatePath: string;
 
@@ -67,8 +67,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         this.applyFormData();
 
         super.submit(button);
-        // @ts-expect-error
-        await this.afterSubmit("jQuery" in this.options ? this.element : this.element [0]);
+        await this.afterSubmit("jQuery" in this.options ? this.element : $(this.element[0]));
     }
 
     async afterSubmit(html: JQuery) {
@@ -88,7 +87,6 @@ export class FormDialog extends Dialog<FormDialogOptions> {
 
         if ( !this.form ) throw new Error(`The FormApplication subclass has no registered form element`);
         const fd = new FormDataExtended(this.form, {editors: {}});
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         const data = fd.object;
 
         this._updateData(data);
@@ -99,8 +97,7 @@ export class FormDialog extends Dialog<FormDialogOptions> {
         foundry.utils.mergeObject(this.data.templateData, data);
     }
 
-    //@ts-expect-error
-    getData() {
+    override getData() {
         // Dialog.getData expects buttons to be set.
         this.data.buttons = this.data.buttons || this.buttons;
         this._amendButtonsWithName(this.data.buttons);

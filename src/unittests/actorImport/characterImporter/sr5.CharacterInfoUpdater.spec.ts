@@ -1,18 +1,16 @@
+import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CharacterImporter } from '../../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
-import { SR5TestingDocuments } from '../../utils';
-import { SR5Actor } from '../../../module/actor/SR5Actor';
 
 export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, beforeEach, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
-    let testActorFactory;
     let importOptions = {};
     let chummerFile;
 
-    before(async () => {
-        testActorFactory = new SR5TestingDocuments(SR5Actor);
-    });
+    after(async () => { factory.destroy(); });
 
     beforeEach(async () => {
         chummerFile = {
@@ -22,17 +20,13 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
         };
     });
 
-    after(async () => {
-        await testActorFactory.teardown();
-    });
-
     describe('Chummer Character Info Updater handles alias correctly', () => {
         it('Imports name', async () => {
             chummerFile.characters.character = {
                 alias: 'ImportTester',
             };
 
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.name, 'ImportTester');
@@ -40,7 +34,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
         });
 
         it('Sets placeholder when no alias', async () => {
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.name, '[Name not found]');
@@ -171,7 +165,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 ],
             };
 
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.system.attributes.body.value, 3);
@@ -210,7 +204,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 ],
             };
 
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.system.attributes.magic.value, 7);
@@ -240,7 +234,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
                 ],
             };
 
-            const character = await testActorFactory.create({ 'type': 'character', 'system.metatype': 'human' });
+            const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
 
             assert.strictEqual(character.system.attributes.magic.value, 0);

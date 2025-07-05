@@ -1,3 +1,4 @@
+import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Token } from '../token/SR5Token';
 
 interface Waypoint {
@@ -5,25 +6,9 @@ interface Waypoint {
     y: number;
 }
 
-interface FoundryWaypoint extends Waypoint {
-    shape: number;
-    height: number;
-    width: number;
-    elevation: number;
-    action: string;
-    snapped: boolean;
-    explicit: boolean;
-    checkpoint: boolean;
-}
-
 interface RoutingOptions {
     maxDistance: number;
-    token: Token;
-}
-
-interface RoutingLib {
-    calculatePath: (from: Waypoint, to: Waypoint, options: RoutingOptions) => Promise<RoutingLibRoutingResult | null>;
-    cancelPathfinding: (pathfindingPromise: Promise<RoutingLibRoutingResult>) => void;
+    token: SR5Token;
 }
 
 interface RoutingLibRoutingResult {
@@ -31,40 +16,10 @@ interface RoutingLibRoutingResult {
     cost: number;
 }
 
-interface GridCoordinate {
-    /**
-     * Row index
-     */
-    i: number;
-    /**
-     * Column index
-     */
-    j: number;
+export interface RoutingLib {
+    calculatePath: (from: Waypoint, to: Waypoint, options: RoutingOptions) => Promise<RoutingLibRoutingResult | null>;
+    cancelPathfinding: (pathfindingPromise: Promise<RoutingLibRoutingResult>) => void;
 }
-
-declare global {
-    interface Scene {
-        grid: BaseGrid;
-    }
-
-    interface BaseGrid {
-        getOffset(position: Waypoint): GridCoordinate;
-
-        getTopLeftPoint(coordinate: GridCoordinate): Waypoint;
-    }
-}
-
-declare module foundry.documents {
-    class BaseScene {
-        static defaultGrid: BaseGrid;
-    }
-}
-
-type PathfindingResult = {
-    result: FoundryWaypoint[] | null | undefined;
-    promise: Promise<FoundryWaypoint[] | null>;
-    cancel: () => void;
-};
 
 /**
  * Integration for the routingLib FoundryVTT module:
@@ -89,15 +44,18 @@ export class RoutingLibIntegration {
     static init() {
         Hooks.once('routinglib.ready', () => {
             this.#routingLibReady = true;
-            // @ts-expect-error global variable
             this.#routinglib = routinglib;
         });
     }
 
-    static routinglibPathfinding(waypoints: FoundryWaypoint[], token: SR5Token, movement: Shadowrun.Movement): PathfindingResult  {
+    static routinglibPathfinding(
+        waypoints: Token.FindMovementPathWaypoint[],
+        token: SR5Token,
+        movement: SR5Actor['system']['movement']
+    ): Token.FindMovementPathJob {
         const grid = token.scene?.grid ?? foundry.documents.BaseScene.defaultGrid;
 
-        const pathfindingResult: Partial<PathfindingResult> = {
+        const pathfindingResult: Partial<Token.FindMovementPathJob> = {
             result: undefined,
             promise: undefined,
             cancel: undefined,
@@ -111,12 +69,16 @@ export class RoutingLibIntegration {
             }
         }
 
-        pathfindingResult.promise = new Promise<FoundryWaypoint[] | null>((resolve) => {
-            const maxDistance = Math.max(movement.run.value * 5, 20);
+        pathfindingResult.promise = new Promise<TokenDocument.MovementWaypoint[] | null>((resolve) => {
+            const maxDistance = Math.max((movement?.run.value || 0) * 5, 20);
             for (let i = 1; i < waypoints.length; i++) {
                 const fromWaypoint = waypoints[i - 1];
-                const { i: fromY, j: fromX } = grid.getOffset(fromWaypoint);
-                const { i: toY, j: toX } = grid.getOffset(waypoints[i]);
+
+                if (fromWaypoint.x === undefined || fromWaypoint.y === undefined || waypoints[i].x === undefined || waypoints[i].y === undefined)
+                    throw new Error('Waypoints must have defined x and y coordinates.');
+
+                const { i: fromY, j: fromX } = grid.getOffset(fromWaypoint as TokenDocument.MovementWaypoint & { x: number, y: number });
+                const { i: toY, j: toX } = grid.getOffset(waypoints[i] as TokenDocument.MovementWaypoint & { x: number, y: number });
 
                 const from = { x: fromX, y: fromY };
                 const to = { x: toX, y: toY };
@@ -137,7 +99,7 @@ export class RoutingLibIntegration {
 
             void Promise.all(pathfindingPromises)
                 .then((partialRoutes) => {
-                    const routedWaypoints: FoundryWaypoint[] = [waypoints[0]];
+                    const routedWaypoints = [waypoints[0]];
                     for (let i = 0; i < partialRoutes.length; i++) {
                         const route = partialRoutes[i];
                         routedWaypoints.pop();
@@ -154,23 +116,23 @@ export class RoutingLibIntegration {
                                 action: fromWaypoint.action,
                                 snapped: true,
                                 checkpoint: true,
-                                explicit: true,
+                                explicit: true
                             });
                         }
                     }
                     return routedWaypoints;
                 })
-                .catch(() => {
+                .catch(async () => {
                     pathfindingResult.cancel!()
-                    const findMovementPathResult: PathfindingResult = token.findMovementPath(waypoints, {skipRoutingLib: true});
+                    const findMovementPathResult = token.findMovementPath(waypoints, {skipRoutingLib: true});
                     return findMovementPathResult.promise
                 })
                 .then(value => {
-                    pathfindingResult.result = value;
-                    resolve(value);
+                    pathfindingResult.result = value as TokenDocument.MovementWaypoint[] | null;
+                    resolve(value as TokenDocument.MovementWaypoint[] | null);
                 });
         });
 
-        return pathfindingResult as PathfindingResult;
+        return pathfindingResult as Token.FindMovementPathJob;
     };
 }
