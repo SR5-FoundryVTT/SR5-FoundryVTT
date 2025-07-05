@@ -138,6 +138,10 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param change The change key to redirect.
      */
     static redirectToNearModifiableValue(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        // Only redirect change key for modes using it for custom application.
+        if (change.mode !== CONST.ACTIVE_EFFECT_MODES.CUSTOM && 
+            change.mode !== CONST.ACTIVE_EFFECT_MODES.OVERRIDE) return;
+        
         // Check if direct key is ModifiableValue
         let value = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (value) {
@@ -146,12 +150,31 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Move key up one hierarchy and check again
         const nodes = change.key.split('.');
-        nodes.pop();
+        const property = nodes.pop() ?? '';
         const indirectKey = nodes.join('.');
 
         value = SR5ActiveEffect.getModifiableValue(model, indirectKey);
         if (value) {
-            change.key = indirectKey;
+            // Allow users to change keys that don't affect value calculation
+            // This could be skill.canDefault or similar.
+            const keyIsPartOfValueCalculation = this.modifiableValueProperties.includes(property);
+            if (keyIsPartOfValueCalculation) change.key = indirectKey;
+        }
+    }
+
+    /**
+     * Change change mode from custom (modify) to add, if the change key is NOT a ModifiableValue.
+     * 
+     * @param model The model used to check value types under key
+     * @param change The change key to redirect.
+     */
+    static changeCustomToAddMode(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        // Only redirect change key for custom (modify) mode.
+        if (change.mode !== CONST.ACTIVE_EFFECT_MODES.CUSTOM) return;
+
+        const value = SR5ActiveEffect.getModifiableValue(model, change.key);
+        if (!value) {
+            change.mode = CONST.ACTIVE_EFFECT_MODES.ADD;
         }
     }
 
@@ -199,10 +222,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         const possibleValue = foundry.utils.getProperty(model, key);
         const possibleValueType = foundry.utils.getType(possibleValue);
 
-        if (possibleValue != null && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, ['value', 'mod']))
+        if (possibleValue != null && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, this.modifiableValueProperties))
             return possibleValue as ModifiableValueType;
 
         return null;
+    }
+
+    static get modifiableValueProperties() {
+        return ['base', 'value', 'mod', 'override', 'temp'];
     }
 
     /**
@@ -308,31 +335,41 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * - dynamic source properties as change values
      * - apply to non-Actor objects
+     * 
+     * With DataModel this method has two different paths it can go:
+     * - Foundry documents using a DataModel schema
+     * - Non-Document objects
+     * 
+     * The DataModel handles effect application within they applyChange methods.
+     * The objects are handled by SR5ActiveEffect legacy _applyToObject and _apply methods.
+     * 
+     * This can cause diffeing beahvior between these two for effect application.
      *
-     * @param object
-     * @param change
+     * @param model DataModel or any object to apply the change to
+     * @param change The effect change to apply
      */
-    override apply(actor: SR5Actor, change: ActiveEffect.ChangeData) {
+    override apply(model: DataModel.Any, change: ActiveEffect.ChangeData) {
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
 
         // Alter change values before applying them.
-        SR5ActiveEffect.redirectToNearModifiableValue(actor, change);
+        SR5ActiveEffect.redirectToNearModifiableValue(model, change);
+        SR5ActiveEffect.changeCustomToAddMode(model, change);
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
 
         // Add item error case, as FoundryVTT ActiveEffect.apply() is not meant to be used on items.
-        if (actor instanceof SR5Item) throw new Error("SR5ActiveEffect.apply() cannot be used on SR5Item objects.");
+        if (model instanceof SR5Item) throw new Error("SR5ActiveEffect.apply() cannot be used on SR5Item objects.");
 
         // Other cases should be directly applied to the data, without actor / schema handling.
         // This is used when applying effects to non-Actor objects, like tests.
-        if (!(actor instanceof SR5Actor)) {
-            this._applyToObject(actor, change);
+        if (!(model instanceof SR5Actor)) {
+            this._applyToObject(model, change);
             return {};
         }
 
         // Foundry default effect application will use DataModle.applyChange.
-        return super.apply(actor, change);
+        return super.apply(model, change);
     }
 
     /**
