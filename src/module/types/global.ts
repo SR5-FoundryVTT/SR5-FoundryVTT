@@ -41,6 +41,7 @@ import { Spell } from './item/Spell';
 import { SpritePower } from './item/SpritePower';
 import { Weapon } from './item/Weapon';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from "./flags/ItemFlags";
+import { RoutingLib } from "../integrations/routingLibIntegration";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -184,6 +185,7 @@ declare module "fvtt-types/configuration" {
 
     namespace Hooks {
         interface HookConfig {
+            "routinglib.ready": () => void;
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
             getSceneControlButtons: (arg0: any) => void;
@@ -225,10 +227,17 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.MarkImports": string;
         "shadowrun5e.ImportIconFolder": string;
         "shadowrun5e.UseImportIconOverrides": boolean;
+        "shadowrun5e.TokenRulerColorWalking": foundry.data.fields.ColorField<{ initial: '00FF00' }>;
+        "shadowrun5e.TokenRulerColorRunning": foundry.data.fields.ColorField<{ initial: '0000FF' }>;
+        "shadowrun5e.TokenRulerColorSprinting": foundry.data.fields.ColorField<{ initial: 'FF0000' }>;
+        "shadowrun5e.TokenRulerOpacity": foundry.data.fields.NumberField<{ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 }>;
     }
 }
 
 declare global {
+    // eslint-disable-next-line no-var
+    var routinglib: RoutingLib | null;
+
     /**
      * Retrieve an Entity or Embedded Entity by its Universally Unique Identifier (uuid).
      * @param uuid - The uuid of the Entity or Embedded Entity to retrieve
