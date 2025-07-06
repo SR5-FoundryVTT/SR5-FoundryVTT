@@ -11,11 +11,13 @@ export class SR5TokenDocument extends TokenDocument {
         user: User.Implementation
     ) {
         this.#movementInProgress = true;
+        let result: boolean | void;
         try {
-            return super._preUpdate(changed, options, user);
+            result = await super._preUpdate(changed, options, user);
         } finally {
             this.#movementInProgress = false;
         }
+        return result;
     }
 
     /**

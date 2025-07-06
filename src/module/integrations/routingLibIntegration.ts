@@ -51,7 +51,7 @@ export class RoutingLibIntegration {
     static routinglibPathfinding(
         waypoints: Token.FindMovementPathWaypoint[],
         token: SR5Token,
-        movement: SR5Actor['system']['movement']
+        movement: NonNullable<SR5Actor['system']['movement']>
     ): Token.FindMovementPathJob {
         const grid = token.scene?.grid ?? foundry.documents.BaseScene.defaultGrid;
 
@@ -70,7 +70,7 @@ export class RoutingLibIntegration {
         }
 
         pathfindingResult.promise = new Promise<TokenDocument.MovementWaypoint[] | null>((resolve) => {
-            const maxDistance = Math.max((movement?.run.value || 0) * 5, 20);
+            const maxDistance = Math.max(movement.run.value * 5, 20);
             for (let i = 1; i < waypoints.length; i++) {
                 const fromWaypoint = waypoints[i - 1];
 
