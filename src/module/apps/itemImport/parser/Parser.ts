@@ -51,7 +51,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         const entity = {
             name: TH.getTranslation(name, options),
             type: this.parseType as any,
-            folder: await this.getFolder(jsonData),
+            folder: (await this.getFolder(jsonData)).id,
             system: this.getSystem(jsonData),
         } satisfies Actor.CreateData | Item.CreateData;
 

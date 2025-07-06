@@ -95,9 +95,9 @@ export class ImportHelper {
 
             // Create the compendium pack
             compendium = await foundry.documents.collections.CompendiumCollection.createCompendium({
+                type,
                 name: packName,
-                label: game.i18n.localize(`SR5.Compendiums.${ctype}`),
-                type: type
+                label: game.i18n.localize(`SR5.Compendiums.${ctype}`)
             });
 
             // Manually assign compendium to the folder via settings
@@ -119,10 +119,7 @@ export class ImportHelper {
     public static async NewFolder(ctype: CompendiumKey, name: string, folder: Folder | null = null): Promise<Folder> {
         const { pack, type } = Constants.MAP_COMPENDIUM_KEY[ctype];
 
-        const folderCreated = await Folder.create(
-            { name: name, type: type, folder: folder?.id ?? null },
-            { pack: pack }
-        );
+        const folderCreated = await Folder.create( { name, type, folder: folder?.id ?? null }, { pack } );
 
         if (!folderCreated) throw new Error("Folder creation failed.");
         return folderCreated;
