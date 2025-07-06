@@ -1,9 +1,11 @@
-import {FLAGS, SYSTEM_NAME} from "../constants";
+import { FLAGS, SYSTEM_NAME } from '../constants';
+import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
 import TrackType = Shadowrun.TrackType;
+import MovementActorData = Shadowrun.MovementActorData;
 
 export class SR5Token extends Token {
     // @ts-expect-error Ignore getBarAttribute from Token
-    override _drawBar(number: number, bar: PIXI.Graphics, data: ReturnType<Token['getBarAttribute']>){
+    override _drawBar(number: number, bar: PIXI.Graphics, data: ReturnType<Token['getBarAttribute']>) {
         const tokenHealthBars = game.settings.get(SYSTEM_NAME, FLAGS.TokenHealthBars);
         // FoundryVTT draws resource bars as full/good when the value is the
         // same as the max and empty/bad at 0 (colored along a gradient).
@@ -15,5 +17,16 @@ export class SR5Token extends Token {
             track.value = track.max - track.value;
         }
         super._drawBar(number, bar, data);
+    }
+
+    // @ts-expect-error TODO: foundry-vtt-types v13 (not yet in typings)
+    override findMovementPath(waypoints, options) {
+        const movement = (this.actor?.system as MovementActorData)?.movement;
+        if (RoutingLibIntegration.routingLibReady && movement && !options.skipRoutingLib) {
+            return RoutingLibIntegration.routinglibPathfinding(waypoints, this, movement);
+        }
+
+        // @ts-expect-error not yet in typings
+        return super.findMovementPath(waypoints, options);
     }
 }
