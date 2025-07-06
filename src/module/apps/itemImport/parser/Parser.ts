@@ -53,7 +53,7 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
         } as TResult;
 
         //@ts-expect-error
-        entity.folder = await this.getFolder(jsonData);
+        entity.folder = (await this.getFolder(jsonData)).id;
 
         // Add technology
         if ('technology' in entity.system)
