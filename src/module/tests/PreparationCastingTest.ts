@@ -74,7 +74,7 @@ export class PreparationCastingTest extends SuccessTest<PreparationCastingTestDa
     }
 
     override get testModifiers(): ModifierTypes[] {
-        return ['global', 'wounds', 'background_count'];
+        return ['background_count'];
     }
 
     override async prepareDocumentData() {
@@ -105,7 +105,9 @@ export class PreparationCastingTest extends SuccessTest<PreparationCastingTestDa
         super.calculateBaseValues();
     }
 
-    override async processResults() {
-        await super.processResults();
+    override async afterTestComplete() {
+      const iid = this.item?.id
+      if(iid) await this.actor?.deleteEmbeddedDocuments('Item', [iid]);
+      await super.afterTestComplete();
     }
 }
