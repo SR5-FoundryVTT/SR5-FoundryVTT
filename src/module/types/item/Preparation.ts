@@ -9,7 +9,7 @@ declare namespace Shadowrun {
     
     export interface PreparationPartData {
         type: SpellType;
-        category: SpellCateogry;
+        category: SpellCategory;
         range: SpellRange;
         duration: SpellDuration;
         force: number;

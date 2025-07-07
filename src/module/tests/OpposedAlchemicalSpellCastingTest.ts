@@ -152,6 +152,7 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
     async createPreparation() {
         if (!this.against) return;
         if (!this.against.actor) return;
+        if (!this.against.item) return;
 
         const summoner = this.against.actor;
 
@@ -160,9 +161,18 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
         const force = this.against.data.force;
         const name = `${summoner.name} ${preperationSpellName} - ${game.i18n.localize('SR5.Force')}  ${force}`;
         const system = {
+            category: this.against.item.system.category,
+            drain: this.against.item.system.drain,
+            duration: this.against.item.system.duration,
             potency: this.derivePotency(),
             force: force,
-            trigger: this.against.data.trigger
+            trigger: this.against.data.trigger,
+            type: this.against.item.system.type,
+
+            combat: this.against.item.system.combat,
+            detection: this.against.item.system.detection,
+            illusion: this.against.item.system.illusion,
+            manipulation: this.against.item.system.manipulation
         }
         const itemData = {
             name: name,

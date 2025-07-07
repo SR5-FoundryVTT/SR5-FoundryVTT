@@ -9,11 +9,10 @@ import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import AlchemyTrigger = Shadowrun.AlchemyTrigger;
 
-
 export interface AlchemicalSpellCastingTestData extends SuccessTestData {
-    force: number
     drain: number
     drainDamage: DamageData
+    force: number
     trigger: AlchemyTrigger
 
     name: string
@@ -34,7 +33,7 @@ export class AlchemicalSpellCastingTest extends SuccessTest<AlchemicalSpellCasti
         data.drain = data.drain || 0;
         data.drainDamage = data.drainDamage || DataDefaults.damageData();
         data.name = data.name || '';
-        data.trigger = data.trigger || '';  
+        data.trigger = data.trigger || '';
 
         return data;
     }

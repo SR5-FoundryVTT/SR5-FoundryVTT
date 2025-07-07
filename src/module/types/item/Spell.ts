@@ -33,7 +33,7 @@ declare namespace Shadowrun {
     
     export interface SpellPartData {
         type: SpellType;
-        category: SpellCateogry;
+        category: SpellCategory;
         drain: number;
         range: SpellRange;
         duration: SpellDuration;
@@ -50,7 +50,7 @@ declare namespace Shadowrun {
     export type DetectionSpellType = 'directional' | 'psychic' | 'area' | '';
     export type IllusionSpellType = 'obvious' | 'realistic' | '';
     export type IllusionSpellSense = 'single-sense' | 'multi-sense' | '';
-    export type SpellCateogry = 'combat' | 'detection' | 'health' | 'illusion' | 'manipulation' | 'ritual' | '';
+    export type SpellCategory = 'combat' | 'detection' | 'health' | 'illusion' | 'manipulation' | 'ritual' | '';
     export type SpellType = 'physical' | 'mana' | '';
     export type SpellRange = 'touch' | 'los' | 'los_a' | '';
     export type SpellDuration = 'instant' | 'sustained' | 'permanent' | '';
