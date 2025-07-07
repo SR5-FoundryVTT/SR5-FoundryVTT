@@ -71,6 +71,7 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 import { OpposedAlchemicalSpellCastingTest } from './tests/OpposedAlchemicalSpellCastingTest';
+import { PreparationCastingTest } from './tests/PreparationCastingTest';
 import { RoutingLibIntegration } from './integrations/routingLibIntegration';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
@@ -172,6 +173,7 @@ ___________________
                 PhysicalResistTest,
                 AlchemicalSpellCastingTest,
                 OpposedAlchemicalSpellCastingTest,
+                PreparationCastingTest,
                 SpellCastingTest,
                 RitualSpellcastingTest,
                 OpposedRitualTest,
@@ -217,6 +219,7 @@ ___________________
                 CompileSpriteTest,
                 RitualSpellcastingTest,
                 AlchemicalSpellCastingTest,
+                PreparationCastingTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.

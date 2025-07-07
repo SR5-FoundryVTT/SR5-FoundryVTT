@@ -79,7 +79,7 @@ declare namespace Shadowrun {
         Partial<LifestyleData> &
         Partial<MetamagicData> &
         Partial<ModificationData> &
-        Partial<PreparationItemData> &
+        Partial<PreparationData> &
         Partial<ProgramData> &
         Partial<QualityData> &
         Partial<SinData> &

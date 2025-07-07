@@ -1543,15 +1543,13 @@
                 "physical": false
             },
             "action": {
-                "test": "SpellCastingTest",
+                "test": "PreparationCastingTest",
+                "type": "simple",
                 "opposed": {
                     "test": "",
                     "resist": {
                         "test": ""
                     }
-                },
-                "followed": {
-                    "test": "DrainTest"
                 }
             }
         },

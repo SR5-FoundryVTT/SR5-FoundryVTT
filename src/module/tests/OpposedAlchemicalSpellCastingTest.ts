@@ -157,8 +157,8 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
 
         // Create a new preparation item from scratch...
         const preperationSpellName = this?.item?.name || '';
-        const name = `${summoner.name} ${preperationSpellName} ${this.derivePotency()}`;
         const force = this.against.data.force;
+        const name = `${summoner.name} ${preperationSpellName} - ${game.i18n.localize('SR5.Force')}  ${force}`;
         const system = {
             potency: this.derivePotency(),
             force: force

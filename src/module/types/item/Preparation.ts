@@ -12,6 +12,7 @@ declare namespace Shadowrun {
         category: SpellCateogry;
         range: SpellRange;
         duration: SpellDuration;
+        force: number;
         potency: number;
         trigger: AlchemyTrigger;
 

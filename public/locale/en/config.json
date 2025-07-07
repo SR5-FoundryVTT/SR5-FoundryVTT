@@ -868,6 +868,10 @@
     "SR5.PowerPoints": "PP",
     "SR5.PowerType": "Type",
     "SR5.Powers": "Powers",
+    "SR5.Preparation": {
+        "Preparation": "Preparation",
+        "Potency": "Potency"
+    },
     "SR5.Program": "Program",
     "SR5.ProgramType": "Type",
     "SR5.Programs": "Programs",
@@ -1257,6 +1261,7 @@
         "PhysicalDefenseTest": "Physical Defense",
         "PhysicalResistTest": "Physical Damage Resist",
         "PilotVehicleTest": "Pilot Vehicle Test",
+        "PreparationCastingTest": "Preparation Casting Test",
         "RangedAttackTest": "Ranged Weapon Attack",
         "RitualSpellcastingTest": "Ritual Spellcasting",
         "SkillTest": "Skill Test",
