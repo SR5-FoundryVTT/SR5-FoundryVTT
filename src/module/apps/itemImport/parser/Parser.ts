@@ -3,7 +3,7 @@ import { TranslationHelper as TH, TranslationType } from "../helper/TranslationH
 import * as IconAssign from "../../iconAssigner/iconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 import { BonusHelper as BH } from "../helper/BonusHelper";
-import { Constants } from "../importer/Constants";
+import { CompendiumKey, Constants } from "../importer/Constants";
 
 import { Armor, Mod as ArmorMod } from "../schema/ArmorSchema";
 import { Bioware } from "../schema/BiowareSchema";
@@ -34,11 +34,11 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
         return Object.keys(game.model.Actor).includes(this.parseType);
     }
 
-    protected abstract getFolder(jsonData: ParseData): Promise<Folder>;
+    protected abstract getFolder(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Folder>;
     protected async getItems(jsonData: ParseData): Promise<ShadowrunItemData[]> { return []; }
     protected getSystem(jsonData: ParseData): TResult['system'] { return this.getBaseSystem(); }
 
-    public async Parse(jsonData: ParseData): Promise<TResult> {
+    public async Parse(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<TResult> {
         const itemPromise = this.getItems(jsonData);
         let bonusPromise: Promise<void> | undefined;
 
@@ -53,7 +53,7 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
         } as TResult;
 
         //@ts-expect-error
-        entity.folder = (await this.getFolder(jsonData)).id;
+        entity.folder = (await this.getFolder(jsonData, compendiumKey)).id;
 
         // Add technology
         if ('technology' in entity.system)

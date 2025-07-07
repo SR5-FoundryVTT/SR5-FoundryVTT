@@ -256,7 +256,7 @@ export class Import extends Application {
     ) {
         if (deleteCompendiums)
             for (const [_, compendium] of Object.entries(Constants.MAP_COMPENDIUM_KEY))
-                await game.packs?.get(compendium.pack)?.deleteCompendium();
+                await game.packs?.get(Constants.MAP_COMPENDIUM_CONFIG[compendium].pack)?.deleteCompendium();
 
         this.parsedFiles = [];
 

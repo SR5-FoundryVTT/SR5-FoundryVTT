@@ -3,6 +3,7 @@ import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import SpriteActorData = Shadowrun.SpriteActorData;
+import { CompendiumKey } from "../../importer/Constants";
 
 export class SpriteParser extends MetatypeParserBase<SpriteActorData> {
     protected override parseType: string = 'sprite';
@@ -17,23 +18,23 @@ export class SpriteParser extends MetatypeParserBase<SpriteActorData> {
 
     protected override async getItems(jsonData: Metatype): Promise<Shadowrun.ShadowrunItemData[]> {
         const optionalpowers = jsonData.bonus?.optionalpowers;
-        const allPowers = [...IH.getArray(jsonData.powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
+        const powers = [...IH.getArray(jsonData.powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
         const translationMap: Record<string, string> = {};
 
-        allPowers.forEach(p => translationMap[p] = TH.getTranslation(p, { type: 'power' }));
+        powers.forEach(p => translationMap[p] = TH.getTranslation(p, { type: 'power' }));
 
-        const traits = await IH.findItem('Trait', allPowers.map(p => translationMap[p]));
+        const allPowers = await IH.findItem('Critter_Power', powers.map(p => translationMap[p]));
         const name = jsonData.name._TEXT;
 
         return [
-            ...this.getMetatypeItems(traits, jsonData.powers?.power, { type: 'Power', critter: name }, translationMap),
-            ...this.getMetatypeItems(traits, optionalpowers?.optionalpower, { type: 'Optional Power', critter: name }, translationMap),
+            ...this.getMetatypeItems(allPowers, jsonData.powers?.power, { type: 'Power', critter: name }, translationMap),
+            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: name }, translationMap),
         ];
     }
 
-    protected override async getFolder(jsonData: Metatype): Promise<Folder> {
+    protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const folderName = TH.getTranslation('Sprite', {type: 'category'});
 
-        return  IH.getFolder('Critter', folderName);
+        return  IH.getFolder(compendiumKey, folderName);
     }
 }

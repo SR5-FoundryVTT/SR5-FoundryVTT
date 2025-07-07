@@ -6,6 +6,7 @@ import { WeaponsSchema, Weapon } from '../schema/WeaponsSchema';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import WeaponItemData = Shadowrun.WeaponItemData;
+import { CompendiumKey } from './Constants';
 
 export class WeaponImporter extends DataImporter {
     public files = ['weapons.xml'];
@@ -15,12 +16,12 @@ export class WeaponImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        private categories: WeaponsSchema['categories']['category'];
+        private readonly categories: WeaponsSchema['categories']['category'];
         constructor(categories: WeaponsSchema['categories']['category']) {
             this.categories = categories;
         }
 
-        public async Parse(jsonData: Weapon): Promise<WeaponItemData> {
+        public async Parse(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<WeaponItemData> {
             const rangedParser = new RangedParser(this.categories);
             const meleeParser = new MeleeParser(this.categories);
             const thrownParser = new ThrownParser(this.categories);
@@ -30,7 +31,7 @@ export class WeaponImporter extends DataImporter {
                                  : category === 'melee' ? meleeParser
                                                         : thrownParser;
 
-            return await selectedParser.Parse(jsonData);
+            return await selectedParser.Parse(jsonData, compendiumKey);
         }
     };
 
@@ -38,7 +39,7 @@ export class WeaponImporter extends DataImporter {
         return WeaponImporter.ParseItems<Weapon, WeaponItemData>(
             jsonObject.weapons.weapon,
             {
-                compendiumKey: "Weapon",
+                compendiumKey: () => "Weapon",
                 parser: new WeaponImporter.parserWrap(jsonObject.categories.category),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);

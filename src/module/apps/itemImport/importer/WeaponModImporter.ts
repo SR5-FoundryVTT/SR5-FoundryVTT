@@ -14,7 +14,7 @@ export class WeaponModImporter extends DataImporter {
         return WeaponModImporter.ParseItems<Accessory, Shadowrun.ModificationItemData>(
             jsonObject.accessories.accessory,
             {
-                compendiumKey: "Modification",
+                compendiumKey: () => "Weapon_Mod",
                 parser: new WeaponModParser(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);

@@ -1,7 +1,6 @@
 import { DataImporter } from './DataImporter';
 import { AdeptPowerParser } from '../parser/powers/AdeptPowerParser';
 import { Power, PowersSchema } from '../schema/PowersSchema';
-import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class AdeptPowerImporter extends DataImporter {
     public files = ['powers.xml'];
@@ -14,7 +13,7 @@ export class AdeptPowerImporter extends DataImporter {
         return AdeptPowerImporter.ParseItems<Power, Shadowrun.AdeptPowerItemData>(
             jsonObject.powers.power,
             {
-                compendiumKey: "Trait",
+                compendiumKey: () => "Adept_Power",
                 parser: new AdeptPowerParser(),
                 errorPrefix: "Failed Parsing Complex Form"
             }

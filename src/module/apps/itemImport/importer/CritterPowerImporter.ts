@@ -3,6 +3,7 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
 import { SpritePowerParser } from '../parser/powers/SpritePowerParser';
 import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
+import { CompendiumKey } from './Constants';
 
 type CritterPowerType = Shadowrun.CritterPowerItemData | Shadowrun.SpritePowerItemData;
 
@@ -14,14 +15,14 @@ export class CritterPowerImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        public async Parse(jsonData: Power): Promise<CritterPowerType> {
+        public async Parse(jsonData: Power, compendiumKey: CompendiumKey): Promise<CritterPowerType> {
             const critterPowerParser = new CritterPowerParser();
             const spritePowerParser = new SpritePowerParser();
 
             const isSpritePower = jsonData.category._TEXT !== "Emergent";
             const selectedParser = isSpritePower ? critterPowerParser : spritePowerParser;
 
-            return await selectedParser.Parse(jsonData);
+            return await selectedParser.Parse(jsonData, compendiumKey);
         }
     };
 
@@ -29,7 +30,7 @@ export class CritterPowerImporter extends DataImporter {
         return CritterPowerImporter.ParseItems<Power, CritterPowerType>(
             jsonObject.powers.power,
             {
-                compendiumKey: "Trait",
+                compendiumKey: () => "Critter_Power",
                 parser: new CritterPowerImporter.parserWrap(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);

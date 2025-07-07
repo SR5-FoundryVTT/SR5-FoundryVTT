@@ -1,7 +1,7 @@
 import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 import { Parser } from '../Parser';
 import { SR5 } from '../../../../config';
-import { Constants } from '../../importer/Constants';
+import { CompendiumKey, Constants } from '../../importer/Constants';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { Weapon, WeaponsSchema } from '../../schema/WeaponsSchema';
@@ -33,7 +33,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
         for (const name of accessoriesNames)
             translationMap[name] = TH.getTranslation(name, { type: 'accessory' });
 
-        const foundItems = await IH.findItem('Modification', Object.values(translationMap));
+        const foundItems = await IH.findItem('Weapon_Mod', Object.values(translationMap));
         const itemMap = new Map(foundItems.map(item => [item.name, item]));
 
         const result: ItemDataSource[] = [];
@@ -200,14 +200,14 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
         };
     }
 
-    protected override async getFolder(jsonData: Weapon): Promise<Folder> {
+    protected override async getFolder(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
         const folderName = TH.getTranslation(categoryData, { type: 'category' });
         const match = this.categories.find(c => c._TEXT === categoryData);
         const root = match?.$?.type?.capitalize?.() ?? 'Other';
 
         return ['Gun', 'Melee', 'Other'].includes(root)
-            ? IH.getFolder('Weapon', root, folderName)
-            : IH.getFolder('Weapon', folderName);
+            ? IH.getFolder(compendiumKey, root, folderName)
+            : IH.getFolder(compendiumKey, folderName);
     }
 }
