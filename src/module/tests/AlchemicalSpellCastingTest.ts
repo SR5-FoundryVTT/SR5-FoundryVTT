@@ -1,18 +1,20 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellcastingRules} from "../rules/SpellcastingRules";
+import { AlchemicalSpellCastingRules } from "../rules/AlchemicalSpellCastingRules";
 import {PartsList} from "../parts/PartsList";
 import {DataDefaults} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import AlchemyTrigger = Shadowrun.AlchemyTrigger;
 
 
 export interface AlchemicalSpellCastingTestData extends SuccessTestData {
     force: number
     drain: number
-    reckless: boolean
     drainDamage: DamageData
+    trigger: AlchemyTrigger
 
     name: string
 
@@ -30,9 +32,9 @@ export class AlchemicalSpellCastingTest extends SuccessTest<AlchemicalSpellCasti
 
         data.force = data.force || 0;
         data.drain = data.drain || 0;
-        data.reckless = data.reckless || false;
         data.drainDamage = data.drainDamage || DataDefaults.damageData();
         data.name = data.name || '';
+        data.trigger = data.trigger || '';  
 
         return data;
     }
@@ -96,7 +98,7 @@ export class AlchemicalSpellCastingTest extends SuccessTest<AlchemicalSpellCasti
         if (!this.item) return;
 
         const lastUsedForce = this.item.getLastSpellForce();
-        const suggestedForce = SpellcastingRules.calculateMinimalForce(this.item.getDrain);
+        const suggestedForce = AlchemicalSpellCastingRules.calculateMinimalForce(this.item.getDrain);
         this.data.force = lastUsedForce.value || suggestedForce;
     }
 
@@ -110,7 +112,7 @@ export class AlchemicalSpellCastingTest extends SuccessTest<AlchemicalSpellCasti
         this.data.limit.mod = PartsList.AddUniquePart(
             this.data.limit.mod,
             'SR5.Force',
-            SpellcastingRules.calculateLimit(force));
+            AlchemicalSpellCastingRules.calculateLimit(force));
     }
 
     override calculateBaseValues() {
@@ -124,8 +126,7 @@ export class AlchemicalSpellCastingTest extends SuccessTest<AlchemicalSpellCasti
     calculateDrainValue() {
         const force = Number(this.data.force);
         const drain = Number(this.item?.getDrain);
-        const reckless = this.data.reckless;
-        this.data.drain = SpellcastingRules.calculateDrain(force, drain, reckless);
+        this.data.drain = AlchemicalSpellCastingRules.calculatePreparationDrain(force, drain, this.data.trigger);
     }
 
     /**

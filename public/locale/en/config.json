@@ -869,8 +869,12 @@
     "SR5.PowerType": "Type",
     "SR5.Powers": "Powers",
     "SR5.Preparation": {
+        "Command": "Command",
+        "Contact": "Contact",
         "Preparation": "Preparation",
-        "Potency": "Potency"
+        "Potency": "Potency",
+        "Time": "Time",
+        "Trigger": "Trigger"
     },
     "SR5.Program": "Program",
     "SR5.ProgramType": "Type",
