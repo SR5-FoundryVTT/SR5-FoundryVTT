@@ -6,6 +6,7 @@ import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
+import { stat } from 'fs';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: Shadowrun.DamageData
@@ -29,10 +30,18 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     override _prepareData(data, options): RangedAttackTestData {
         data = super._prepareData(data, options);
 
+        if (data.targetActorsUuid?.length === 1) {
+            const statuses = this.getStatusEffectFromUuid(data.targetActorsUuid[0])
+
+            if (statuses?.has('sr5sprinting'))
+                data.modifiers.mod.push({ name: "Target Sprinting", value: "-4" });
+            else if (statuses?.has('sr5running'))
+                data.modifiers.mod.push({ name: "Target Running", value: "-2" })
+        }
+
         data.fireModes = [];
         data.fireMode = {value: 0, defense: 0, label: ''};
         WeaponRangeTestBehavior.prepareData(this, data);
-
 
         return data;
     }

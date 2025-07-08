@@ -257,17 +257,25 @@ ___________________
         };
 
         CONFIG.statusEffects.push({
-            id: 'running',
+            id: 'sr5running',
             //@ts-expect-error
             name: 'SR5.StatusEffects.Running',
             img: 'systems/shadowrun5e/dist/icons/status-effects/running.svg',
+            changes: [
+                {key: "data.modifiers.mod", mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, value: "-2"},
+            ],
+            flags: { shadowrun5e: { applyTo: 'test_all' } }
         });
 
         CONFIG.statusEffects.push({
-            id: 'sprinting',
+            id: 'sr5sprinting',
             //@ts-expect-error
             name: 'SR5.StatusEffects.Sprinting',
             img: 'systems/shadowrun5e/dist/icons/status-effects/sprinting.svg',
+            changes: [
+                {key: "data.modifiers.mod", mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, value: "-2"},
+            ],
+            flags: { shadowrun5e: { applyTo: 'test_all' } }
         });
 
         // Register document classes

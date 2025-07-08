@@ -1650,6 +1650,17 @@ export class SR5Actor extends Actor {
         return device.getCondition();
     }
 
+    getStatusEffectsId(): Set<string> {
+        const result = new Set<string>();
+        for (const effect of this.effects ?? []) {
+            // @ts-expect-error TODO: foundry-vtt-types v10
+            for (const status of effect.statuses) {
+                result.add(status);
+            }
+        }
+        return result;
+    }
+
     /**
      * Depending on this actors defeated status, apply the correct effect and status.
      * 
