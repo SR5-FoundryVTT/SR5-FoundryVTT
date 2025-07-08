@@ -5,7 +5,8 @@ import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
 import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
 import { SanitizedModel } from "../fields/SanitizedModel";
-const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
+import { SR5Item } from "src/module/item/SR5Item";
+const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField, ForeignDocumentField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
     active: Skills(),
@@ -41,7 +42,7 @@ export const CreateModifiers = <T extends readonly string[]>(...keys: T) => {
 const InventoryData = () => ({
     name: new StringField({ required: true }),
     type: new StringField({ required: true }),
-    itemIds: new ArrayField(new StringField({ required: true })),
+    itemIds: new ArrayField(new ForeignDocumentField(foundry.documents.BaseItem, { required: true })),
     showAll: new BooleanField({ initial: true }),
     label: new StringField({ required: true }),
 });
