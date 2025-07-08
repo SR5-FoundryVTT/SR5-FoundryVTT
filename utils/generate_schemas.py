@@ -16,7 +16,7 @@ OWNER = "chummer5a"
 REPO = "chummer5a"
 BRANCH = "d800ca7a7e8effcb1b80ba83ba3a94e3c344cbf1" #v5.255.922
 
-OUT_DIR = Path("../src/module/apps/itemImport/schema")
+OUT_DIR = (Path(__file__).parent / "../src/module/apps/itemImport/schema").resolve()
 FILES = [
     'armor.xml', 'bioware.xml', 'complexforms.xml', 'critterpowers.xml',
     'critters.xml', 'cyberware.xml', 'echoes.xml', 'gear.xml', 'metatypes.xml',

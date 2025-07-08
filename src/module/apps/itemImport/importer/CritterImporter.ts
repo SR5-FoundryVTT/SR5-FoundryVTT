@@ -4,6 +4,7 @@ import { SpiritParser } from '../parser/metatype/SpiritParser';
 import { SpriteParser } from '../parser/metatype/SpriteParser';
 import { CritterParser } from '../parser/metatype/CritterParser';
 import { MetatypeSchema, Metatype } from "../schema/MetatypeSchema";
+import { CompendiumKey } from './Constants';
 
 type CrittersDataTypes = Shadowrun.CharacterActorData | Shadowrun.SpiritActorData | Shadowrun.SpriteActorData;
 
@@ -14,8 +15,8 @@ export class CritterImporter extends DataImporter {
         return jsonObject.hasOwnProperty('metatypes') && jsonObject['metatypes'].hasOwnProperty('metatype');
     }
 
-    static parserWrap = class {
-        private isSpirit(jsonData: Metatype): Boolean {
+    protected static parserWrap = class {
+        public static isSpirit(jsonData: Metatype): boolean {
             const attributeKeys = [
                 "bodmin", "agimin", "reamin",
                 "strmin", "chamin", "intmin",
@@ -29,7 +30,7 @@ export class CritterImporter extends DataImporter {
             return false;
         }
 
-        public async Parse(jsonData: Metatype): Promise<CrittersDataTypes> {
+        public static async Parse(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<CrittersDataTypes> {
             const critterParser = new CritterParser();
             const spiritParser = new SpiritParser();
             const spriteParser = new SpriteParser();
@@ -37,7 +38,7 @@ export class CritterImporter extends DataImporter {
             const selectedParser = jsonData.category?._TEXT === 'Sprites' ? spriteParser
                                  : this.isSpirit(jsonData) ? spiritParser : critterParser;
 
-            return await selectedParser.Parse(jsonData);
+            return await selectedParser.Parse(jsonData, compendiumKey);
         }
     };
 
@@ -57,8 +58,12 @@ export class CritterImporter extends DataImporter {
         return CritterImporter.ParseItems<Metatype, CrittersDataTypes>(
             [...baseMetatypes, ...metavariants],
             {
-                compendiumKey: 'Critter',
-                parser: new CritterImporter.parserWrap(),
+                compendiumKey: (jsonData: Metatype) => {
+                    if (jsonData.category?._TEXT === 'Sprites') return 'Sprite';
+                    if (CritterImporter.parserWrap.isSpirit(jsonData)) return 'Sprite';
+                    return 'Critter';
+                },
+                parser: CritterImporter.parserWrap,
                 errorPrefix: "Failed Parsing Critter"
             }
         );

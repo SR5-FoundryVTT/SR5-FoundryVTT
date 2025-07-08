@@ -1,7 +1,7 @@
 import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 import { Parser } from '../Parser';
 import { SR5 } from '../../../../config';
-import { Constants } from '../../importer/Constants';
+import { CompendiumKey, Constants } from '../../importer/Constants';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { Weapon, WeaponsSchema } from '../../schema/WeaponsSchema';
@@ -18,11 +18,6 @@ import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 
 export class WeaponParserBase extends Parser<WeaponItemData> {
     protected override parseType: string = 'weapon';
-    private categories: WeaponsSchema['categories']['category'];
-
-    constructor(categories: WeaponsSchema['categories']['category']) {
-        super(); this.categories = categories;
-    }
 
     protected override async getItems(jsonData: Weapon): Promise<ItemDataSource[]> {
         if (!jsonData.accessories?.accessory) return [];
@@ -33,7 +28,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
         for (const name of accessoriesNames)
             translationMap[name] = TH.getTranslation(name, { type: 'accessory' });
 
-        const foundItems = await IH.findItem('Modification', Object.values(translationMap));
+        const foundItems = await IH.findItem('Weapon_Mod', Object.values(translationMap));
         const itemMap = new Map(foundItems.map(item => [item.name, item]));
 
         const result: ItemDataSource[] = [];
@@ -47,7 +42,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
                 continue;
             }
 
-            const accessoryBase = foundItem.toObject() as Shadowrun.ModificationItemData;
+            const accessoryBase = game.items!.fromCompendium(foundItem) as Shadowrun.ModificationItemData;
             accessoryBase.system.technology.equipped = true;
 
             const ratingText = accessory.rating?._TEXT;
@@ -200,14 +195,11 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
         };
     }
 
-    protected override async getFolder(jsonData: Weapon): Promise<Folder> {
+    protected override async getFolder(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
+        const root = WeaponParserBase.GetWeaponType(jsonData).capitalize() ?? "Other";
         const folderName = TH.getTranslation(categoryData, { type: 'category' });
-        const match = this.categories.find(c => c._TEXT === categoryData);
-        const root = match?.$?.type?.capitalize?.() ?? 'Other';
 
-        return ['Gun', 'Melee', 'Other'].includes(root)
-            ? IH.getFolder('Weapon', root, folderName)
-            : IH.getFolder('Weapon', folderName);
+        return IH.getFolder(compendiumKey, root, root === 'Thrown' ? undefined : folderName);
     }
 }

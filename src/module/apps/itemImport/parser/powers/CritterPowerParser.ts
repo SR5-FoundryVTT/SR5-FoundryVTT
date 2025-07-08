@@ -1,4 +1,5 @@
 import { Parser } from '../Parser';
+import { CompendiumKey } from '../../importer/Constants';
 import { Power } from '../../schema/CritterpowersSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
@@ -27,11 +28,11 @@ export class CritterPowerParser extends Parser<CritterPowerItemData> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Power): Promise<Folder> {
+    protected override async getFolder(jsonData: Power, compendiumKey: CompendiumKey): Promise<Folder> {
         const rootFolder = "Critter Powers";
         const category = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
 
-        return IH.getFolder('Trait', rootFolder, category);
+        return IH.getFolder(compendiumKey, rootFolder, category);
     }
 
     protected static readonly rangeMap: Record<string, string> = {

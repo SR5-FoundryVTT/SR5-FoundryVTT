@@ -3,6 +3,7 @@ import { Complexform } from '../../schema/ComplexformsSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import ComplexFormTarget = Shadowrun.ComplexFormTarget;
 import ComplexFormItemData = Shadowrun.ComplexFormItemData;
+import { CompendiumKey } from '../../importer/Constants';
 
 export class ComplexFormParser extends Parser<ComplexFormItemData> {
     protected override parseType: string = 'complex_form';
@@ -42,7 +43,7 @@ export class ComplexFormParser extends Parser<ComplexFormItemData> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Complexform): Promise<Folder> {
-        return IH.getFolder('Magic', "Complex Forms");
+    protected override async getFolder(jsonData: Complexform, compendiumKey: CompendiumKey): Promise<Folder> {
+        return IH.getFolder(compendiumKey, "Complex Forms");
     }
 }

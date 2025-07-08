@@ -14,7 +14,7 @@ export class ArmorImporter extends DataImporter {
         return ArmorImporter.ParseItems<Armor, Shadowrun.ArmorItemData>(
             jsonObject.armors.armor,
             {
-                compendiumKey: "Gear",
+                compendiumKey: () => "Armor",
                 parser: new ArmorParser(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);

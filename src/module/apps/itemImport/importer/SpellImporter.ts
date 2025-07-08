@@ -6,6 +6,7 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellParser } from '../parser/spell/DetectionSpellParser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import { CompendiumKey } from './Constants';
 
 export class SpellImporter extends DataImporter{
     public files = ['spells.xml'];
@@ -15,7 +16,7 @@ export class SpellImporter extends DataImporter{
     }
 
     static parserWrap = class {
-        public async Parse(jsonData: Spell): Promise<Shadowrun.SpellItemData> {
+        public async Parse(jsonData: Spell, compendiumKey: CompendiumKey): Promise<Shadowrun.SpellItemData> {
             const spellParserBase = new SpellParserBase();
             const combatSpellParser = new CombatSpellParser();
             const illusionSpellParser = new IllusionSpellParser();
@@ -29,7 +30,7 @@ export class SpellImporter extends DataImporter{
                                  : category === 'Manipulation'  ? manipulationSpellParser
                                                                 : spellParserBase;
 
-            return await selectedParser.Parse(jsonData);
+            return await selectedParser.Parse(jsonData, compendiumKey);
         }
     };
 
@@ -37,7 +38,7 @@ export class SpellImporter extends DataImporter{
         return SpellImporter.ParseItems<Spell, Shadowrun.SpellItemData>(
             jsonObject.spells.spell,
             {
-                compendiumKey: "Magic",
+                compendiumKey: () => "Spell",
                 parser: new SpellImporter.parserWrap(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
