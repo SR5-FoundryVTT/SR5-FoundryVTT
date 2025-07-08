@@ -167,7 +167,6 @@ export const UpdateActionFlow = {
         
         // Based on category switch out active, opposed and resist test.
         const test = SR5.activeTests[type];
-
         foundry.utils.setProperty(applyData, 'system.action.test', test);
         foundry.utils.setProperty(applyData, 'system.action.opposed.test', 'OpposedAlchemicalSpellCastingTest');
         foundry.utils.setProperty(applyData, 'system.action.followed.test', 'DrainTest');

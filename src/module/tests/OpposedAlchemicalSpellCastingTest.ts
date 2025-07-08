@@ -16,18 +16,13 @@ interface OpposedAlchemicalSpellCastingTestData extends OpposedTestData {
 /**
  * The opposed test of summoning a spirit.
  * 
- * The summoner is the active actor and the spirit is the opposed actor.
+ * The alchemist is the active actor and the spirit is the opposed actor.
  */
 export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchemicalSpellCastingTestData> {
     public override against: AlchemicalSpellCastingTest;
     public preparation: any;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
-        // Due to summoning, the active actor for this test will be created during execution.
-        // The selected or user character aren't the correct choice here.
-        delete documents?.actor;
-        delete data.sourceActorUuid;
-
         super(data, documents, options);       
 
         this._assertCorrectAgainst();
@@ -42,7 +37,6 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
 
     override _prepareData(data: any, options?: any) {
         data = super._prepareData(data, options);
-
         return data;
     }
 
@@ -118,9 +112,7 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
      */
     async finalizePreparation() {
         if (!this.item) return;
-
         await this.createPreparation();
-
         await super.populateDocuments();
     }
 
@@ -132,7 +124,7 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
     _addOwnershipToUpdateData(updateData: object) {
         const alchemist = this.against.actor as Actor;
 
-        // Set permissions for all users using the summoner as main character.
+        // Set permissions for all users using the alchemist as main character.
         const users = game.users?.filter(user => user.character?.uuid === alchemist.uuid);
         if (!users) return;
 
@@ -154,12 +146,11 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
         if (!this.against.actor) return;
         if (!this.against.item) return;
 
-        const summoner = this.against.actor;
-
+        const alchemist = this.against.actor;
         // Create a new preparation item from scratch...
         const preperationSpellName = this?.item?.name || '';
         const force = this.against.data.force;
-        const name = `${summoner.name} ${preperationSpellName} - ${game.i18n.localize('SR5.Force')}  ${force}`;
+        const name = `${alchemist.name} ${preperationSpellName} - ${game.i18n.localize('SR5.Force')}  ${force}`;
         const system = {
             category: this.against.item.system.category,
             drain: this.against.item.system.drain,
@@ -181,7 +172,6 @@ export class OpposedAlchemicalSpellCastingTest extends OpposedTest<OpposedAlchem
         };
 
         const item = (await this.against.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }))[0];
-        console.log('So what is in this item?', item)
         this.preparation = item;
         if (!item) return console.error('Shadowrun 5e | Could not create the preparation');
     }

@@ -14,10 +14,7 @@ export interface AlchemicalSpellCastingTestData extends SuccessTestData {
     drainDamage: DamageData
     force: number
     trigger: AlchemyTrigger
-
     name: string
-
-    preparationUuid: string
 }
 
 /**
@@ -137,13 +134,11 @@ export class AlchemicalSpellCastingTest extends SuccessTest<AlchemicalSpellCasti
         const force = Number(this.data.force);
         const drain = Number(this.data.drain);
         const magic = this.actor.getAttribute('magic').value;
-
         this.data.drainDamage = DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
     }
 
     override async processResults() {
         this.calcDrainDamage();
-
         await super.processResults();
     }
 
