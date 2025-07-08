@@ -1,0 +1,7 @@
+Icons in this folder are sourced from game-icons.net
+The icons and their authors are listed below as required by CC by Attribution 3.0, which can be found here https://creativecommons.org/licenses/by/3.0/.
+
+Icon - Author - Source
+
+Sprinting - Lorc - https://game-icons.net/1x1/lorc/sprint.html
+Running - Lorc - https://game-icons.net/1x1/lorc/run.html

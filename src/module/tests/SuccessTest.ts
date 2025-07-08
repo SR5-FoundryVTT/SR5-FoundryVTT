@@ -1203,6 +1203,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return true;
     }
 
+    public getStatusEffectFromUuid(uuid: string): Set<string> | undefined {
+        const [, sceneId, , tokenId] = uuid.split(".");
+        const actor = game.scenes?.get(sceneId)?.tokens?.get(tokenId)?.actor ?? null;
+
+        return actor?.getStatusEffectsId();
+    }
+
     /**
      * Handle Edge rule 'push the limit', either adding edge before or after casting
      * and exploding sixes for either all dice or only edge dice.

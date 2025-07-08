@@ -1189,6 +1189,10 @@
         },
         "Type": "Type"
     },
+    "SR5.StatusEffects": {
+        "Running": "Running",
+        "Sprinting": "Sprinting"
+    },
     "SR5.Stock": "Stock",
     "SR5.StreetCred": "Street Cred",
     "SR5.StunTrack": "Stun Track",

@@ -12,6 +12,25 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
+        let isTargetProne = false;
+        if (data.targetActorsUuid?.length === 1) {
+            const statuses = this.getStatusEffectFromUuid(data.targetActorsUuid[0]);
+
+            if (statuses?.has('prone'))
+                isTargetProne = true;
+        }
+
+        if (data.sourceActorUuid) {
+            const statuses = this.getStatusEffectFromUuid(data.sourceActorUuid);
+
+            if (statuses?.has('sr5running') || statuses?.has('sr5sprinting'))
+                data.modifiers.mod.push({ name: "Charging", value: "4" })
+
+            const prone = Number(isTargetProne) - Number(statuses?.has('prone') || false);
+            if (prone)
+                data.modifiers.mod.push({ name: `${prone > 0 ? "Target" : "Attacker"} Prone`, value: `${prone}` });
+        }
+
         data.damage = data.damage || DataDefaults.damageData();
 
         return data;

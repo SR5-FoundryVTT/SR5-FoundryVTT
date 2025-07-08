@@ -32,6 +32,12 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
     override _prepareData(data, options?): any {
         data = super._prepareData(data, options);
 
+        if (data.sourceActorUuid) {
+            const statuses = this.getStatusEffectFromUuid(data.sourceActorUuid);
+            if (statuses?.has('prone'))
+                data.modifiers.mod.push({ name: "Prone", value: "-2" });
+        }
+
         data.cover = 0;
         data.activeDefense = '';
         data.activeDefenses = {};
