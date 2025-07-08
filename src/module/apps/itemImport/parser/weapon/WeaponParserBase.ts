@@ -42,7 +42,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
                 continue;
             }
 
-            const accessoryBase = foundItem.toObject() as Shadowrun.ModificationItemData;
+            const accessoryBase = game.items!.fromCompendium(foundItem) as Shadowrun.ModificationItemData;
             accessoryBase.system.technology.equipped = true;
 
             const ratingText = accessory.rating?._TEXT;

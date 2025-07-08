@@ -30,7 +30,7 @@ export class VehicleParser extends Parser<VehicleActorData> {
                 continue;
             }
 
-            const itemBase = foundItem.toObject();
+            const itemBase = game.items!.fromCompendium(foundItem) as ItemDataSource;
 
             if ('technology' in itemBase.system)
                 itemBase.system.technology.equipped = true;
