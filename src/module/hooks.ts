@@ -256,6 +256,20 @@ ___________________
             storage: DataStorage
         };
 
+        CONFIG.statusEffects.push({
+            id: 'running',
+            //@ts-expect-error
+            name: 'SR5.StatusEffects.Running',
+            img: 'systems/shadowrun5e/dist/icons/status-effects/running.svg',
+        });
+
+        CONFIG.statusEffects.push({
+            id: 'sprinting',
+            //@ts-expect-error
+            name: 'SR5.StatusEffects.Sprinting',
+            img: 'systems/shadowrun5e/dist/icons/status-effects/sprinting.svg',
+        });
+
         // Register document classes
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
