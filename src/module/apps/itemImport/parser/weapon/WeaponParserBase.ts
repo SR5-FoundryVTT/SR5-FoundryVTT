@@ -202,12 +202,9 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
 
     protected override async getFolder(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
+        const root = WeaponParserBase.GetWeaponType(jsonData).capitalize() ?? "Other";
         const folderName = TH.getTranslation(categoryData, { type: 'category' });
-        const match = this.categories.find(c => c._TEXT === categoryData);
-        const root = match?.$?.type?.capitalize?.() ?? 'Other';
 
-        return ['Gun', 'Melee', 'Other'].includes(root)
-            ? IH.getFolder(compendiumKey, root, folderName)
-            : IH.getFolder(compendiumKey, folderName);
+        return IH.getFolder(compendiumKey, root, root === 'Thrown' ? undefined : folderName);
     }
 }

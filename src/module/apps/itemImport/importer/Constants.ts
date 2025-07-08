@@ -4,19 +4,20 @@ export type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
 
 export class Constants {
 
-    public static MAP_COMPENDIUM_CONFIG = {
+    public static readonly MAP_COMPENDIUM_CONFIG = {
         // Actors
         'Critter':          { pack: 'world.sr5critter',         type: 'Actor', folder: null, subFolder: null }, // Critters, Spirits and Sprites
         'Drone':            { pack: 'world.sr5drone',           type: 'Actor', folder: null, subFolder: null }, // Vehicles and Drones
 
-        // Items 
+        // Items
         'Gear':             { pack: 'world.sr5gear',            type: 'Item', folder: null, subFolder: null }, // Armor + General Gear
-        'Trait':            { pack: 'world.sr5trait',           type: 'Item', folder: null, subFolder: null }, // Bioware + Cyberware + Quality + Powers
+        'Trait':            { pack: 'world.sr5trait',           type: 'Item', folder: null, subFolder: null }, // Quality + Powers
         'Magic':            { pack: 'world.sr5magic',           type: 'Item', folder: null, subFolder: null }, // Spells, rituals, complex forms
         'Modification':     { pack: 'world.sr5modification',    type: 'Item', folder: null, subFolder: null }, // Armor/Vehicle/weapon mods + ammo
+        'Ware':             { pack: 'world.sr5ware',            type: 'Item', folder: null, subFolder: null }, // Bioware + Cyberware
         'Weapon':           { pack: 'world.sr5weapon',          type: 'Item', folder: null, subFolder: null }, // Weapons
-    } as const satisfies Record<string, { pack: string; type: 'Actor' | 'Item'; folder: string | null, subFolder: string | null }>
-    
+    } as const satisfies Record<string, { pack: string; type: 'Actor' | 'Item'; folder: string | null, subFolder: string | null }>;
+
     public static readonly MAP_COMPENDIUM_KEY = {
         // --- Critters ---
         'Critter':          'Critter',
@@ -26,7 +27,7 @@ export class Constants {
 
         // --- Character Traits ---
         'Quality':          'Trait',
-        'Ware':             'Trait',
+        'Ware':             'Ware',
 
         // --- Vehicles ---
         'Drone':            'Drone',

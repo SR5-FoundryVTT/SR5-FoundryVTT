@@ -65,18 +65,58 @@ export class ImportHelper {
         });
     }
 
-    private static async getCompendiumFolder(name: string, parent?: Folder): Promise<Folder> {
+    /**
+     * Helper method to create a new folder.
+     * @param ctype The compendium key identifying the target compendium.
+     * @param name The name of the folder.
+     * @param folder The parent folder, or `null` if the folder is at the root level.
+     * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
+     */
+    public static async NewFolder(ctype: CompendiumKey, name: string, folder: Folder | null = null): Promise<Folder> {
+        const { pack, type } = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[ctype]];
+
+        const folderCreated = await Folder.create({ name, type, folder: folder?.id ?? null }, { pack });
+
+        if (!folderCreated) throw new Error("Folder creation failed.");
+        return folderCreated;
+    }
+    
+    /**
+     * Finds or creates a folder within a compendium in Foundry VTT.
+     * 
+     * @param ctype - The compendium key identifying the target compendium.
+     * @param name - The name of the folder to find or create.
+     * @param parent - The parent folder, or `null` if the folder is at the root level.
+     * @returns A promise that resolves to the found or newly created folder.
+     * 
+     * @remarks
+     * This function first attempts to locate an existing folder in the specified compendium
+     * that matches the given name and parent. If no such folder exists, it creates a new one.
+     * Note: The `folders` property is not officially typed but is available in Foundry VTT v12.
+     */
+    private static async FindOrCreateFolder(ctype: CompendiumKey, name: string, parent: Folder | null = null): Promise<Folder> {
+        const compendium = await this.GetCompendium(ctype);
+
+        //@ts-expect-error
+        const folder = await compendium.folders?.find((folder: Folder) =>
+            folder.name === name && folder.folder === parent
+        );
+
+        return folder || this.NewFolder(ctype, name, parent);
+    }
+
+    /**
+     * Helper method to create a new folder for the import compendium tab.
+     * @param name The name of the folder.
+     * @param parent The parent folder, or `null` if the folder is at the root level.
+     * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
+     */
+    private static async getCompendiumFolder(name: string, parent: Folder | null = null): Promise<Folder> {
         // @ts-expect-errorx
-        let folder = game.folders?.find(f => f.name === name && f.type === "Compendium" && (!parent || f.folder === parent));
-        if (!folder) {
-            folder = await Folder.create({
-                name,
-                color: "#00cc00",
-                // @ts-expect-error
-                type: "Compendium",
-                folder: parent?.id ?? null
-            });
-        }
+        let folder = game.folders?.find(f => f.name === name && f.type === "Compendium" && f.folder === parent);
+        if (!folder)
+            // @ts-expect-error
+            folder = await Folder.create({ name, color: "#00cc00", folder: parent?.id ?? null, type: "Compendium" });
         return folder!;
     }
 
@@ -126,46 +166,6 @@ export class ImportHelper {
         }
 
         return compendium;
-    }
-
-    /**
-     * Helper method to create a new folder.
-     * @param ctype The compendium key identifying the target compendium.
-     * @param name The name of the folder.
-     * @param folder The parent folder, or `null` if the folder is at the root level.
-     * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
-     */
-    public static async NewFolder(ctype: CompendiumKey, name: string, folder: Folder | null = null): Promise<Folder> {
-        const { pack, type } = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[ctype]];
-
-        const folderCreated = await Folder.create({ name, type, folder: folder?.id ?? null }, { pack });
-
-        if (!folderCreated) throw new Error("Folder creation failed.");
-        return folderCreated;
-    }
-
-    /**
-     * Finds or creates a folder within a compendium in Foundry VTT.
-     * 
-     * @param ctype - The compendium key identifying the target compendium.
-     * @param name - The name of the folder to find or create.
-     * @param parent - The parent folder, or `null` if the folder is at the root level.
-     * @returns A promise that resolves to the found or newly created folder.
-     * 
-     * @remarks
-     * This function first attempts to locate an existing folder in the specified compendium
-     * that matches the given name and parent. If no such folder exists, it creates a new one.
-     * Note: The `folders` property is not officially typed but is available in Foundry VTT v12.
-     */
-    private static async FindOrCreateFolder(ctype: CompendiumKey, name: string, parent: Folder | null = null): Promise<Folder> {
-        const compendium = await this.GetCompendium(ctype);
-
-        //@ts-expect-error
-        const folder = await compendium.folders?.find((folder: Folder) =>
-            folder.name === name && folder.folder === parent
-        );
-
-        return folder || this.NewFolder(ctype, name, parent);
     }
 
     /**

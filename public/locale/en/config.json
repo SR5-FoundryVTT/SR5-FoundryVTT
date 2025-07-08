@@ -234,10 +234,11 @@
     "SR5.Compendiums": {
         "sr5critter": "Critters & Spirits & Sprites",
         "sr5drone": "Drones & Vehicles",
-        "sr5gear": "Gears",
-        "sr5trait": "Traits",
+        "sr5gear": "Armors & Gears",
+        "sr5trait": "Quality & Powers",
         "sr5magic": "Spell & Complex Forms",
         "sr5modification": "Modifications",
+        "sr5ware": "Bioware & Cyberware",
         "sr5weapon": "Weapons",
         "Folders": {
             "Root": "SR5e Imports"
