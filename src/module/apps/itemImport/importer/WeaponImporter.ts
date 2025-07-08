@@ -16,15 +16,10 @@ export class WeaponImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        private readonly categories: WeaponsSchema['categories']['category'];
-        constructor(categories: WeaponsSchema['categories']['category']) {
-            this.categories = categories;
-        }
-
         public async Parse(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<WeaponItemData> {
-            const rangedParser = new RangedParser(this.categories);
-            const meleeParser = new MeleeParser(this.categories);
-            const thrownParser = new ThrownParser(this.categories);
+            const rangedParser = new RangedParser();
+            const meleeParser = new MeleeParser();
+            const thrownParser = new ThrownParser();
 
             const category = WeaponParserBase.GetWeaponType(jsonData);
             const selectedParser = category === 'range' ? rangedParser
@@ -40,7 +35,7 @@ export class WeaponImporter extends DataImporter {
             jsonObject.weapons.weapon,
             {
                 compendiumKey: () => "Weapon",
-                parser: new WeaponImporter.parserWrap(jsonObject.categories.category),
+                parser: new WeaponImporter.parserWrap(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },

@@ -18,11 +18,6 @@ import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 
 export class WeaponParserBase extends Parser<WeaponItemData> {
     protected override parseType: string = 'weapon';
-    private categories: WeaponsSchema['categories']['category'];
-
-    constructor(categories: WeaponsSchema['categories']['category']) {
-        super(); this.categories = categories;
-    }
 
     protected override async getItems(jsonData: Weapon): Promise<ItemDataSource[]> {
         if (!jsonData.accessories?.accessory) return [];
