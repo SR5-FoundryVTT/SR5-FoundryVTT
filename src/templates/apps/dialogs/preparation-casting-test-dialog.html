@@ -1,0 +1,19 @@
+<form>
+    <div class="dialog-content-common">
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.html'}}
+        <hr />
+        <div>
+            <div class="form-group">
+                <label>{{localize "SR5.Force"}}</label>
+                <input disabled name="test.item.system.force" type="number" class="disabled-for-display" value="{{test.item.system.force}}" />
+            </div>
+            <div class="form-group">
+                <label>{{localize "SR5.Preparation.Potency"}}</label>
+                <input disabled name="test.item.system.potency" type="number" class="disabled-for-display" value="{{test.item.system.potency}}" />
+            </div>
+        </div>
+    </div>
+    <div>
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
+    </div>
+</form>

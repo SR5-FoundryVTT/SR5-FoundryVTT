@@ -2,7 +2,7 @@ import { Spell } from '../../schema/SpellsSchema';
 import { Parser } from '../Parser';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import SpellCateogry = Shadowrun.SpellCateogry;
+import SpellCategory = Shadowrun.SpellCategory;
 import SpellItemData = Shadowrun.SpellItemData;
 
 export class SpellParserBase extends Parser<SpellItemData> {
@@ -13,7 +13,7 @@ export class SpellParserBase extends Parser<SpellItemData> {
             {action: {type: 'varies', attribute: 'magic', skill: 'spellcasting'}} as Shadowrun.SpellData
         );
 
-        system.category = jsonData.category._TEXT.toLowerCase() as SpellCateogry;
+        system.category = jsonData.category._TEXT.toLowerCase() as SpellCategory;
 
         const damage = jsonData.damage._TEXT;
         if (damage === 'P') {

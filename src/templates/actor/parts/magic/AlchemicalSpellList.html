@@ -1,0 +1,134 @@
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Labels.ActorSheet.AlchemicalSpells')
+        itemId='alchemical_spell'
+        icons=(ItemHeaderIcons 'alchemical_spell')
+        rightSide=(ItemHeaderRightSide 'alchemical_spell')
+}}
+{{#each alchemical_spells.notfound as |item i|}}
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+            img=item.img
+            name=item.name
+            itemCssClass='subcategory-item'
+            itemId=item._id
+            icons=(ItemIcons item)
+            rightSide=(ItemRightSide item)
+            hasDesc="true"
+            hasRoll="true"
+            description=item.description.value
+    }}
+{{/each}}
+
+{{#if alchemical_spells.combat}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatCombat')
+                itemCssClass='subcategory-header'
+                itemId='combatspells'
+                icons=(EmptyIcons)
+                rightSide=(ItemHeaderRightSide 'alchemical_spell')
+        }}
+        {{#each alchemical_spells.combat as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemCssClass='subcategory-item'
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}
+
+{{#if alchemical_spells.detection}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatDetection')
+                itemCssClass='subcategory-header'
+                itemId='detectionspells'
+                icons=(EmptyIcons)
+                rightSide=(ItemHeaderRightSide 'alchemical_spell')
+        }}
+        {{#each alchemical_spells.detection as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemCssClass='subcategory-item'
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}
+
+{{#if alchemical_spells.health}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatHealth')
+                itemCssClass='subcategory-header'
+                itemId='healthspells'
+                icons=(EmptyIcons)
+                rightSide=(ItemHeaderRightSide 'alchemical_spell')
+        }}
+        {{#each alchemical_spells.health as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemCssClass='subcategory-item'
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}
+
+{{#if alchemical_spells.illusion}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatIllusion')
+                itemCssClass='subcategory-header'
+                itemId='illusionspells'
+                icons=(EmptyIcons)
+                rightSide=(ItemHeaderRightSide 'alchemical_spell')
+        }}
+        {{#each alchemical_spells.illusion as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemCssClass='subcategory-item'
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}
+
+{{#if alchemical_spells.manipulation}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spell.CatManipulation')
+                itemCssClass='subcategory-header'
+                itemId='manipulationspells'
+                icons=(EmptyIcons)
+                rightSide=(ItemHeaderRightSide 'alchemical_spell')
+        }}
+        {{#each alchemical_spells.manipulation as |item i|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        img=item.img
+                        name=item.name
+                        itemCssClass='subcategory-item'
+                        itemId=item._id
+                        icons=(ItemIcons item)
+                        rightSide=(ItemRightSide item)
+                        hasDesc="true"
+                        hasRoll="true"
+                        description=item.description.value
+                }}
+        {{/each}}
+{{/if}}

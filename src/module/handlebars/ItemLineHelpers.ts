@@ -90,6 +90,9 @@ export const registerItemLineHelpers = () => {
             case 'adept_power':
                 addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.AdeptPower' });
                 return [addIcon];
+            case 'alchemical_spell':
+                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.AlchemicalSpell' });
+                return [addIcon];
             case 'action':
                 addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Action' });
                 return [addIcon];
@@ -250,6 +253,29 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             text: game.i18n.localize('SR5.Fade'),
+                        },
+                    },
+                ];
+            case 'alchemical_spell':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Spell.Type'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Spell.Range'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Duration'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Drain'),
                         },
                     },
                 ];
@@ -583,7 +609,29 @@ export const registerItemLineHelpers = () => {
                         },
                     }
                 ];
-
+            case 'alchemical_spell':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(SR5.spellTypes[item.system.type ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(SR5.spellRanges[item.system.range ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(SR5.durations[item.system.duration ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: wrapper.getDrain(),
+                        },
+                    },
+                ];
             case 'adept_power':
                 return [
                     {

@@ -1171,6 +1171,7 @@
     "Item": {
         "types": [
             "action",
+            "alchemical_spell",
             "adept_power",
             "ammo",
             "armor",
@@ -1187,6 +1188,7 @@
             "lifestyle",
             "metamagic",
             "modification",
+            "preparation",
             "program",
             "quality",
             "ritual",
@@ -1471,6 +1473,85 @@
             "accuracy": 0,
             "rc": 0,
             "conceal": 0
+        },
+        "alchemical_spell": {
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ],
+            "drain": 0,
+            "category": "",
+            "type": "",
+            "range": "",
+            "duration": "",
+            "combat": {
+                "type": ""
+            },
+            "detection": {
+                "passive": false,
+                "type": "",
+                "extended": false
+            },
+            "illusion": {
+                "type": "",
+                "sense": ""
+            },
+            "manipulation": {
+                "damaging": false,
+                "mental": false,
+                "environmental": false,
+                "physical": false
+            },
+            "action": {
+                "test": "AlchemicalSpellCastingTest",
+                "opposed": {
+                    "test": "OpposedAlchemicalSpellCastingTest"
+                },
+                "followed": {
+                    "test": "DrainTest"
+                }
+            }
+        },
+        "preparation": {
+            "templates": [
+                "description",
+                "action",
+                "importFlags"
+            ],
+            "drain": 0,
+            "category": "",
+            "type": "",
+            "range": "",
+            "duration": "",
+            "combat": {
+                "type": ""
+            },
+            "detection": {
+                "passive": false,
+                "type": "",
+                "extended": false
+            },
+            "illusion": {
+                "type": "",
+                "sense": ""
+            },
+            "manipulation": {
+                "damaging": false,
+                "mental": false,
+                "environmental": false,
+                "physical": false
+            },
+            "action": {
+                "test": "PreparationCastingTest",
+                "type": "simple",
+                "opposed": {
+                    "test": "",
+                    "resist": {
+                        "test": ""
+                    }
+                }
+            }
         },
         "spell": {
             "templates": [

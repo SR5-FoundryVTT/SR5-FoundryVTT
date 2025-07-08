@@ -1,44 +1,46 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellcastingRules} from "../rules/SpellcastingRules";
+import { AlchemicalSpellCastingRules } from "../rules/AlchemicalSpellCastingRules";
 import {PartsList} from "../parts/PartsList";
 import {DataDefaults} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import DamageData = Shadowrun.DamageData;
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import AlchemyTrigger = Shadowrun.AlchemyTrigger;
 
-
-export interface SpellCastingTestData extends SuccessTestData {
-    force: number
+export interface AlchemicalSpellCastingTestData extends SuccessTestData {
     drain: number
-    reckless: boolean
-
     drainDamage: DamageData
+    force: number
+    trigger: AlchemyTrigger
+    name: string
 }
 
 /**
- * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
+ * Alchemical Spellcasting tests as described on SR5#306 in the spellcasting chapter.
  *
  */
-export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
+export class AlchemicalSpellCastingTest extends SuccessTest<AlchemicalSpellCastingTestData> {
 
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
         data.force = data.force || 0;
         data.drain = data.drain || 0;
-        data.reckless = data.reckless || false;
         data.drainDamage = data.drainDamage || DataDefaults.damageData();
+        data.name = data.name || '';
+        data.trigger = data.trigger || '';
 
         return data;
     }
 
     override get _dialogTemplate()  {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/spellcasting-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/alchemical-spellcasting-test-dialog.html';
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/spellcasting-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/alchemical-spellcasting-test-message.html';
     }
 
     /**
@@ -50,7 +52,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
 
     static override _getDefaultTestAction(): Partial<MinimalActionData> {
         return {
-            skill: 'spellcasting',
+            skill: 'alchemy',
             attribute: 'magic'
         };
     }
@@ -92,7 +94,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         if (!this.item) return;
 
         const lastUsedForce = this.item.getLastSpellForce();
-        const suggestedForce = SpellcastingRules.calculateMinimalForce(this.item.getDrain);
+        const suggestedForce = AlchemicalSpellCastingRules.calculateMinimalForce(this.item.getDrain);
         this.data.force = lastUsedForce.value || suggestedForce;
     }
 
@@ -106,7 +108,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         this.data.limit.mod = PartsList.AddUniquePart(
             this.data.limit.mod,
             'SR5.Force',
-            SpellcastingRules.calculateLimit(force));
+            AlchemicalSpellCastingRules.calculateLimit(force));
     }
 
     override calculateBaseValues() {
@@ -120,8 +122,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     calculateDrainValue() {
         const force = Number(this.data.force);
         const drain = Number(this.item?.getDrain);
-        const reckless = this.data.reckless;
-        this.data.drain = SpellcastingRules.calculateDrain(force, drain, reckless);
+        this.data.drain = AlchemicalSpellCastingRules.calculatePreparationDrain(force, drain, this.data.trigger);
     }
 
     /**
@@ -133,13 +134,11 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         const force = Number(this.data.force);
         const drain = Number(this.data.drain);
         const magic = this.actor.getAttribute('magic').value;
-
         this.data.drainDamage = DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
     }
 
     override async processResults() {
         this.calcDrainDamage();
-
         await super.processResults();
     }
 

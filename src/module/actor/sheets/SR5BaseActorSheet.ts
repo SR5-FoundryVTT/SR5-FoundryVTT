@@ -17,7 +17,7 @@ import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import DeviceData = Shadowrun.DeviceData;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
-import SpellCategory = Shadowrun.SpellCateogry;
+import SpellCategory = Shadowrun.SpellCategory;
 import SpellData = Shadowrun.SpellData;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
@@ -245,6 +245,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
+        data.alchemical_spells = this._prepareSortedCategorizedSpells(data.itemType["alchemical_spell"]); 
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
@@ -1050,6 +1051,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         }
 
         contentVisibility['default'] = defaultVisibility;
+        setVisibility('alchemical_spell')
         setVisibility('adept_power');
         setVisibility('spell');
         setVisibility('ritual');

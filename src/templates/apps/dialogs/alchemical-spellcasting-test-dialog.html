@@ -1,0 +1,33 @@
+<form>
+    <div class="dialog-content-common">
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.html'}}
+        <hr />
+        <div>
+            <div class="form-group">
+                <label>{{localize "SR5.RecklessSpellButton"}}</label>
+                <input type="checkbox" name="test.data.reckless" {{#if test.data.reckless}}checked{{/if}}/>
+            </div>
+            <div class="form-group">
+                <label>{{localize "SR5.Force"}}</label>
+                <input name="test.data.force" type="number" class="disabled-for-display" value="{{test.data.force}}" />
+            </div>
+            <div class="form-group">
+                <label data-tooltip="SR5.Preparation.Trigger">{{ localize "SR5.Preparation.Trigger" }}</label>
+                <select style="color: white" name="test.data.trigger">
+                    {{#select test.data.trigger}}
+                    <option value="command">{{localize "SR5.Preparation.Command"}}</option>
+                    <option value="contact">{{localize "SR5.Preparation.Contact"}}</option>
+                    <option value="time">{{localize "SR5.Preparation.Time"}}</option>
+                    {{/select}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>{{localize "SR5.DrainValue"}} ({{test.item.getDrain}})</label>
+                <input disabled type="number" class="disabled-for-display" value="{{test.data.drain}}" />
+            </div>
+        </div>
+    </div>
+    <div>
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.html'}}
+    </div>
+</form>
