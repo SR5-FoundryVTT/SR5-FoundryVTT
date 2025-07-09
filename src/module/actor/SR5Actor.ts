@@ -1283,22 +1283,25 @@ export class SR5Actor extends Actor {
      * Returns the most appropriate token document for the actor.
      *
      * The method prioritizes:
-     * 1. A linked token on the canvas.
-     * 2. A unlinked token on the canvas.
-     * 3. Fallback to the actor's own assigned token reference (maybe null).
+     * 1. A currently selected (controlled) token on the canvas that belongs to this actor.
+     * 2. A linked token on the canvas (if the actor is linked).
+     * 3. The actor’s stored token reference, if available (may be null).
      *
      * @returns The token document if available, otherwise null.
      */
     getToken(): TokenDocument | null {
-        // Try to find a linked token first.
+        // Priority 1: Return a controlled token that belongs to this actor.
+        const controlledTokens = canvas.tokens?.controlled;
+        if (controlledTokens) {
+            const owned = this.getActiveTokens().find(t => controlledTokens.includes(t));
+            if (owned) return owned.document;
+        }
+
+        // Priority 2: Look for a linked token (unique for linked actors).
         const linked = this.getActiveTokens(true);
         if (linked.length > 0) return linked[0].document;
 
-        // Fallback to unlinked tokens.
-        const unlinked = this.getActiveTokens(false);
-        if (unlinked.length > 0) return unlinked[0].document;
-
-        // Fallback to use the actor's stored token reference (maybe null).
+        // Priority 3: Fallback to the actor's assigned token reference.
         return this.token;
     }
 
