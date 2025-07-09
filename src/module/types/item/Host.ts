@@ -21,7 +21,7 @@ const HostData = {
 
     category: new StringField({ required: true, initial: 'host', readonly: true }),
     atts: new SchemaField(MatrixAttributes(true)),
-    networkDevices: new ArrayField(new DocumentUUIDField()),
+    networkDevices: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),
 }
 
 export class Host extends ItemBase<typeof HostData> {

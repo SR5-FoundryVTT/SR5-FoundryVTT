@@ -13,7 +13,7 @@ const DeviceData = {
         choices: ['commlink', 'cyberdeck', 'rcc'],
     }),
     atts: new SchemaField(MatrixAttributes(true)),
-    networkDevices: new ArrayField(new DocumentUUIDField()),
+    networkDevices: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),
 };
 
 export class Device extends ItemBase<typeof DeviceData> {
