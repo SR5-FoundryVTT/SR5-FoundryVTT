@@ -1184,10 +1184,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
      *
      * @return Will return null should no token have been placed on scene.
      */
-    getToken(): Token | null {
+    getToken(): TokenDocument | null {
         const tokens = this.getActiveTokens(this._isLinkedToToken());
-        if (tokens.length === 0) return null;
-        else return tokens[0];
+        if (tokens.length === 0) return this.token;
+        return tokens[0].document;
     }
 
     /**
@@ -1560,7 +1560,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
             return;
 
         // Set effect as active, as we've already made sure it isn't.
-        await token.toggleEffect(effect, { overlay: true, active: true });
+        await token.object?.toggleEffect(effect, { overlay: true, active: true });
     }
 
     /**

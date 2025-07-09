@@ -561,7 +561,7 @@ export class Helpers {
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        if (useTokenForChatOutput && token?.document) return token.document.texture.src || '';
+        if (useTokenForChatOutput && token) return token.texture.src || '';
         return actor.img || '';
     }
 

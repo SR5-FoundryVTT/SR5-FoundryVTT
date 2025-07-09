@@ -277,8 +277,7 @@ export class SituationModifier {
      * @param sources The sources list, as used within #apply
      */
     _addSceneSourceDataFromActor(actor: SR5Actor, sources: SourceModifierData[]) {
-        const token = actor.getToken();
-        const scene = token?.scene;
+        const scene = actor.getToken()?.parent;
 
         if (!scene) return;
         const sceneSource = this._getDocumentsSourceData(scene);

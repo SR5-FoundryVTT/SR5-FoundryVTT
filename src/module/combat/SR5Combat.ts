@@ -34,7 +34,7 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
     getActorCombatant(actor: SR5Actor) {
         const token = actor.getToken();
         if (!token) return null;
-        return this.getCombatantByToken(token);
+        return this.getCombatantByToken(token.id!);
     }
 
     /**
