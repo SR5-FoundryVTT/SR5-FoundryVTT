@@ -1282,27 +1282,23 @@ export class SR5Actor extends Actor {
     /**
      * Returns the most appropriate token document for the actor.
      *
-     * The method prioritizes:
-     * 1. A currently selected (controlled) token on the canvas that belongs to this actor.
-     * 2. A linked token on the canvas (if the actor is linked).
-     * 3. The actor’s stored token reference, if available (may be null).
+     * Priority:
+     * 1. Synthetic token (if this actor is synthetic).
+     * 2. A controlled linked token on the canvas.
+     * 3. Any linked token on the canvas.
+     * 4. Null if no token is available.
      *
      * @returns The token document if available, otherwise null.
      */
     getToken(): TokenDocument | null {
-        // Priority 1: Return a controlled token that belongs to this actor.
-        const controlledTokens = canvas.tokens?.controlled;
-        if (controlledTokens) {
-            const owned = this.getActiveTokens().find(t => controlledTokens.includes(t));
-            if (owned) return owned.document;
-        }
+        // 1. this is a synthetic actor, return its token.
+        if (this.token) return this.token;
 
-        // Priority 2: Look for a linked token (unique for linked actors).
-        const linked = this.getActiveTokens(true);
-        if (linked.length > 0) return linked[0].document;
+        const linkedTokens = this.getActiveTokens(true);
+        const controlled = canvas.tokens?.controlled?.find(t => linkedTokens.includes(t));
 
-        // Priority 3: Fallback to the actor's assigned token reference.
-        return this.token;
+        // controlled & linked -> linked
+        return controlled?.document ?? linkedTokens[0]?.document ?? null;
     }
 
     hasActivePlayerOwner(): boolean {
