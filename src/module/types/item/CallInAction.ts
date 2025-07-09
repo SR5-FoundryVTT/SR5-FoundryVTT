@@ -9,7 +9,7 @@ const CallInActionData = {
     actor_type: new StringField({
         blank: true,
         required: true,
-        choices: ['spirit', 'sprite', ''],
+        choices: ['spirit', 'sprite'],
     }),
     spirit: new SchemaField({
         type: new StringField({ required: true }),

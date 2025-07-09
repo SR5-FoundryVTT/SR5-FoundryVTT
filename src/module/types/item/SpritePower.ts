@@ -7,7 +7,7 @@ const SpritePowerData = {
     action: new SchemaField(ActionRollData()),
 
     duration: new StringField({ required: true, initial: 'always' }),
-    optional: new StringField({ required: true, initial: 'standard' }),
+    optional: new StringField({ required: true, initial: 'standard', choices: ['standard', 'enabled_option', 'disabled_option'] }),
     enabled: new BooleanField({ initial: true }),
 }
 

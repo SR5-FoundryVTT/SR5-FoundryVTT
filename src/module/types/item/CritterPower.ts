@@ -8,7 +8,21 @@ const CritterPowerData = {
     action: new SchemaField(ActionRollData()),
     armor: new SchemaField(ArmorValueData()),
 
-    category: new StringField({ required: true }),
+    category: new StringField({
+        blank: true,
+        required: true,
+        choices: [
+            'mundane',
+            'paranormal',
+            'weakness',
+            'emergent',
+            'drake',
+            'shapeshifter',
+            'free_spirit',
+            'paranormal_infected',
+            'echoes',
+        ],
+    }),
     powerType: new StringField({ required: true }),
     range: new StringField({ required: true }),
     duration: new StringField({ required: true, initial: "always" }),
@@ -17,8 +31,6 @@ const CritterPowerData = {
     optional: new StringField({ required: true, initial: "standard" }),
     enabled: new BooleanField({ initial: true }),
 }
-
-// export type CritterPowerCategory = 'mundane' | 'paranormal' | 'weakness' | 'emergent' | 'drake' | 'shapeshifter' | 'free_spirit' | 'paranormal_infected' | 'echoes' | '';
 
 export class CritterPower extends ItemBase<typeof CritterPowerData> {
     static override defineSchema() {

@@ -1,5 +1,5 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
-const { NumberField, BooleanField, StringField } = foundry.data.fields;
+const { NumberField, BooleanField, StringField, DocumentUUIDField } = foundry.data.fields;
 
 const ContactData = {
     ...BaseItemData(),
@@ -10,7 +10,7 @@ const ContactData = {
     family: new BooleanField(),
     blackmail: new BooleanField(),
     group: new BooleanField(),
-    linkedActor: new StringField({ required: true }),
+    linkedActor: new DocumentUUIDField(),
 };
 
 export class Contact extends ItemBase<typeof ContactData> {

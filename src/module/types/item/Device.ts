@@ -1,7 +1,7 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { MatrixAttributes } from "../template/Matrix";
 import { TechnologyData } from "../template/Technology";
-const { SchemaField, ArrayField, StringField } = foundry.data.fields;
+const { SchemaField, ArrayField, StringField, DocumentUUIDField } = foundry.data.fields;
 
 const DeviceData = {
     ...BaseItemData(),
@@ -13,7 +13,7 @@ const DeviceData = {
         choices: ['commlink', 'cyberdeck', 'rcc'],
     }),
     atts: new SchemaField(MatrixAttributes(true)),
-    networkDevices: new ArrayField(new StringField({ required: true })),
+    networkDevices: new ArrayField(new DocumentUUIDField()),
 };
 
 export class Device extends ItemBase<typeof DeviceData> {

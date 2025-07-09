@@ -1,7 +1,7 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { MatrixAttributes } from "../template/Matrix";
 import { AnyMutableObject } from "fvtt-types/utils";
-const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField, DocumentUUIDField } = foundry.data.fields;
 
 export const SourceEntityField = () => ({
     id: new StringField({ required: true }),
@@ -21,7 +21,7 @@ const HostData = {
 
     category: new StringField({ required: true, initial: 'host', readonly: true }),
     atts: new SchemaField(MatrixAttributes(true)),
-    networkDevices: new ArrayField(new StringField({ required: true })),
+    networkDevices: new ArrayField(new DocumentUUIDField()),
 }
 
 export class Host extends ItemBase<typeof HostData> {

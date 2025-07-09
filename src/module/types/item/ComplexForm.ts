@@ -9,7 +9,7 @@ const ComplexFormData = {
     target: new StringField({
         blank: true,
         required: true,
-        choices: ['persona', 'device', 'file', 'self', 'sprite', 'other', 'host', ''], // what to do with 'host' (from chummer)?
+        choices: ['persona', 'device', 'file', 'self', 'sprite', 'other', 'host'], // what to do with 'host' (from chummer)?
     }),
     duration: new StringField({ required: true }),
     fade: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

@@ -4,28 +4,28 @@ const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fie
 
 const SpellData = {
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData({test: '', followedTest: 'DrainTest'})),
+    action: new SchemaField(ActionRollData({followedTest: 'DrainTest'})),
 
     type: new StringField({
         blank: true,
         required: true,
-        choices: ['physical', 'mana', '']
+        choices: ['physical', 'mana']
     }),
     category: new StringField({
         blank: true,
         required: true,
-        choices: ['combat', 'detection', 'enchantment', 'health', 'illusion', 'manipulation', 'ritual', ''] // what to do with enchantment (from chummer)?
+        choices: ['combat', 'detection', 'enchantment', 'health', 'illusion', 'manipulation', 'ritual'] // what to do with enchantment (from chummer)?
     }),
     drain: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     range: new StringField({
         blank: true,
         required: true,
-        choices: ['touch', 'los', 'los_a', '']
+        choices: ['touch', 'los', 'los_a']
     }),
     duration: new StringField({
         blank: true,
         required: true,
-        choices: ['instant', 'sustained', 'permanent', '']
+        choices: ['instant', 'sustained', 'permanent']
     }),
 
     extended: new BooleanField({ initial: false }),
@@ -33,14 +33,14 @@ const SpellData = {
         type: new StringField({
             blank: true,
             required: true,
-            choices: ['direct', 'indirect', '']
+            choices: ['direct', 'indirect']
         }),
     }),
     detection: new SchemaField({
         type: new StringField({
             blank: true,
             required: true,
-            choices: ['directional', 'psychic', 'area', '']
+            choices: ['directional', 'psychic', 'area']
         }),
         passive: new BooleanField(),
         extended: new BooleanField(), // do we need this?
@@ -49,12 +49,12 @@ const SpellData = {
         type: new StringField({
             blank: true,
             required: true,
-            choices: ['obvious', 'realistic', '']
+            choices: ['obvious', 'realistic']
         }),
         sense: new StringField({
             blank: true,
             required: true,
-            choices: ['single-sense', 'multi-sense', '']
+            choices: ['single-sense', 'multi-sense']
         }),
     }),
     manipulation: new SchemaField({
@@ -67,7 +67,7 @@ const SpellData = {
         type: new StringField({
             blank: true,
             required: true,
-            choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter', '']
+            choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter']
         }),
     }),
 };

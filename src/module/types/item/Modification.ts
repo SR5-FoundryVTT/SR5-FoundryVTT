@@ -9,17 +9,17 @@ const ModificationData = {
     type: new StringField({
         blank: true,
         required: true,
-        choices: ['weapon', 'armor', 'vehicle', 'drone', '']
+        choices: ['weapon', 'armor', 'vehicle', 'drone']
     }),
     mount_point: new StringField({
         blank: true,
         required: true,
-        choices: ['barrel', 'stock', 'top', 'side', 'internal', 'under', '']
+        choices: ['barrel', 'stock', 'top', 'side', 'internal', 'under']
     }),
     modification_category: new StringField({
         blank: true,
         required: true,
-        choices: ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons', '']
+        choices: ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons']
     }),
     dice_pool: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

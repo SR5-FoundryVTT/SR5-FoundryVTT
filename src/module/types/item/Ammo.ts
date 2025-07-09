@@ -10,14 +10,14 @@ export const AmmoData = () => ({
     element: new StringField({
         blank: true,
         required: true,
-        choices: ['fire', 'cold', 'acid', 'electricity', 'radiation', ''],
+        choices: ['fire', 'cold', 'acid', 'electricity', 'radiation'],
     }),
     ap: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     damage: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     damageType: new StringField({
         blank: true,
         required: true,
-        choices: ['physical', 'stun', 'matrix', ''],
+        choices: ['physical', 'stun', 'matrix'],
     }),
     replaceDamage: new BooleanField(),
     blast: new SchemaField(BlastData()),

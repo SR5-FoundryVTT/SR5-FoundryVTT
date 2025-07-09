@@ -16,7 +16,7 @@ const AmmunitionData = () => ({
     clip_type: new StringField({
         blank: true,
         required: true,
-        choices: ['removable_clip', 'break_action', 'belt_fed', 'internal_magazin', 'muzzle_loader', 'cylinder', 'drum', 'bow', ''],
+        choices: ['removable_clip', 'break_action', 'belt_fed', 'internal_magazin', 'muzzle_loader', 'cylinder', 'drum', 'bow'],
     }),
     partial_reload_value: new NumberField({ required: true, nullable: false, integer: true, initial: -1 }),
 });
@@ -55,13 +55,13 @@ const ThrownWeaponData = () => ({
 
 const WeaponData = {
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData({test: '', opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'})),
+    action: new SchemaField(ActionRollData({opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'})),
     technology: new SchemaField(TechnologyData()),
 
     category: new StringField({
         blank: true,
         required: true,
-        choices: ['melee', 'range', 'thrown', ''],
+        choices: ['melee', 'range', 'thrown'],
     }),
     subcategory: new StringField({ required: true }),
     ammo: new SchemaField(AmmunitionData()),
