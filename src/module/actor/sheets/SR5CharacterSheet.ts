@@ -353,7 +353,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
         // Build general hierarchy of marked documents.
         for (const target of markedDocuments) {
-            // Mark icon as selected.
+            // Carry over current target selection state from icons or marks list on last render.
             target.selected = this.selectedMatrixTarget === target.document.uuid;
             
             // List marked networks together with personas on top level.
@@ -368,19 +368,40 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
                 continue;
             }
 
-            // Put unmarked personas of icons in a persona network on top level.
-            if (target.document.isMatrixDevice && target.document.persona) {
-                const persona = target.document.persona;
-                const personaTarget = targets.find(t => t.document.uuid === persona.uuid);
+            // Retrieve persona once to avoid multiple fromUuid calls.
+            const persona = target.document.persona as SR5Actor | undefined;
 
-                // Adjust existing or create new persona target.
+            // Handle persona icons.
+            if (target.document.isMatrixDevice && persona) {
+                // Peresona device icons only show as personas, not as devices.
+                // const personaDevice = persona.getMatrixDevice() as SR5Item;
+                // if (target.document.uuid === personaDevice?.uuid) {
+                //     targets.push({
+                //         name: Helpers.getChatSpeakerName(persona),
+                //         token: persona.getToken(),
+                //         network: persona.network?.name ?? '',
+                //         document: persona,
+                //         icons: [],
+                //         type: ActorMarksFlow.getDocumentType(persona),
+                //         marks: target.marks,
+                //         markId: persona.uuid,
+                //         runningSilent: persona.isRunningSilent,
+                //         selected: this.selectedMatrixTarget === target.document.uuid
+                //     });
+                //     continue;
+                // }
+
+                // Attach device icon to their persona.
+                // Already in target list...
+                const personaTarget = targets.find(t => t.document.uuid === persona.uuid);
                 if (personaTarget) {
                     personaTarget.icons.push(target);
+                // ... or to be added in.
                 } else {
                     targets.push({
                         name: Helpers.getChatSpeakerName(persona),
                         token: persona.getToken(),
-                        network: persona.network?.name ?? '',
+                        network: ActorMarksFlow.getDocumentNetwork(persona),
                         document: persona,
                         icons: [target],
                         type: ActorMarksFlow.getDocumentType(persona),

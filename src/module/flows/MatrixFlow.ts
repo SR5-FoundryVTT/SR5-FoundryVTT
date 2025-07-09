@@ -398,7 +398,11 @@ export const MatrixFlow = {
         // TODO: Don´t show this for IC, Spirits, Sprite
         if (!(document instanceof SR5Actor)) return connectedIcons;
 
+        const personaDevice = document.getMatrixDevice();
         for (const device of document.wirelessDevices) {
+            // Persona devices don't have their own device icon.
+            if (personaDevice && device.uuid === personaDevice.uuid) continue;
+
             connectedIcons.push({
                 name: Helpers.getChatSpeakerName(device),
                 document: device,

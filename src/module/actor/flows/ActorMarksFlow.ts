@@ -147,16 +147,23 @@ export const ActorMarksFlow = {
         const documents: Shadowrun.MarkedDocument[] = [];
 
         for (const {uuid, name, marks} of matrixData) {
-            const document = fromUuidSync(uuid ?? '');
+            let document = fromUuidSync(uuid ?? '');
             if (!document) {
                 console.error(`Shadowrun 5e | ActorMarksFlow.getMarkedDocuments: Could not find document for uuid ${uuid}. Consider cleaning all marks.`);
                 continue;   
             }
+
+            // Replace marked persona device with persona itself.
+            const persona = document instanceof SR5Item ? document.persona : null;
+            if (persona && persona.getMatrixDevice()?.uuid === uuid) document = persona;
+
             const network = ActorMarksFlow.getDocumentNetwork(document);
             const type = ActorMarksFlow.getDocumentType(document);
+            // TODO: taMiF/marks markId should be useless if document.uuid is mostly used and the unique name is confusing.
             const markId = uuid;
 
             // Default values for matrix targets.
+            // TODO: taMiF/marks why are these defaults?
             const token = null;
             const runningSilent = false;
 
@@ -176,12 +183,9 @@ export const ActorMarksFlow = {
      */
     getDocumentNetwork(document: Shadowrun.NetworkDevice) {
         // A host/grid is it's own network.
-        if (document instanceof SR5Item && document.type === 'host') return '';
-        // if (document instanceof SR5Item && document.type === 'grid') return '';
+        if (document instanceof SR5Item && ['host', 'grid'].includes(document.type)) return '';
         // A matrix persona might be connected to a netowrk.
         if (document instanceof SR5Actor && document.hasNetwork) return document.network?.name ?? '';
-        // A matrix device might be part of a PAN/WAN
-        if (document instanceof SR5Item && document.isSlave) return document.master?.name ?? '';
 
         return '';
     },
