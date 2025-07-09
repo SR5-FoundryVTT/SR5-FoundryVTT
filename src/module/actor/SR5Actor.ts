@@ -1279,34 +1279,27 @@ export class SR5Actor extends Actor {
         return Helpers.onGetFlag(data);
     }
 
-    /** Return either the linked token or the token of the synthetic actor.
+    /**
+     * Returns the most appropriate token document for the actor.
      *
-     * @return Will return null should no token have been placed on scene.
+     * The method prioritizes:
+     * 1. A linked token on the canvas.
+     * 2. A unlinked token on the canvas.
+     * 3. Fallback to the actor's own assigned token reference (maybe null).
+     *
+     * @returns The token document if available, otherwise null.
      */
     getToken(): TokenDocument | null {
-        // Linked actors can only have one token, which isn't stored within actor data...
-        if (this._isLinkedToToken() && this.hasToken()) {
-            const linked = true;
-            const tokens = this.getActiveTokens(linked) as unknown as Token[];
-            // This assumes for a token to exist and should fail if not.
-            return tokens[0].document;
-        }
+        // Try to find a linked token first.
+        const linked = this.getActiveTokens(true);
+        if (linked.length > 0) return linked[0].document;
 
-        // Unlinked actors can have multiple active token but each have theirs directly attached...
+        // Fallback to unlinked tokens.
+        const unlinked = this.getActiveTokens(false);
+        if (unlinked.length > 0) return unlinked[0].document;
+
+        // Fallback to use the actor's stored token reference (maybe null).
         return this.token;
-    }
-
-    /**
-     * There is no need for a token to placed. The prototype token is enough.
-     */
-    _isLinkedToToken(): boolean {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        // If an actor is linked, all it's copies also contain this linked status, even if they're not.
-        return this.prototypeToken.actorLink && !this.token;
-    }
-
-    hasToken(): boolean {
-        return this.getActiveTokens().length > 0;
     }
 
     hasActivePlayerOwner(): boolean {
