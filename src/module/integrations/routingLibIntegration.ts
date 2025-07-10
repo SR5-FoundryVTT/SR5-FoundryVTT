@@ -50,11 +50,13 @@ declare global {
     interface BaseGrid {
         getOffset(position: Waypoint): GridCoordinate;
 
+        getCenterPoint(coordinate: GridCoordinate): Waypoint;
         getTopLeftPoint(coordinate: GridCoordinate): Waypoint;
-        getSnappedPoint(p: Point, behavior: {mode: number}): Point;
 
+        size: number;
         sizeX: number;
         sizeY: number;
+        isHex: boolean;
         isGridless: boolean;
     }
 }
@@ -99,10 +101,17 @@ export class RoutingLibIntegration {
         });
     }
 
-    private static centerOffset(grid: BaseGrid, waypoint: FoundryWaypoint) {
+    /**
+     * Converts waypoint coordinates between Foundry (top-left) and RoutingLib (center-based).
+     * 
+     * Use 'toRoutingLib' to shift to center-based coordinates (used for pathfinding).
+     * Use 'adjustGridless' to correct output when using a gridless grid that was treated as gridded.
+     */
+    private static convertWaypoint(grid: BaseGrid, waypoint: FoundryWaypoint, mode: 'toRoutingLib' | 'adjustGridless') {
         return {
-            x: waypoint.x + (grid.isGridless ? 0 : grid.sizeX / 2),
-            y: waypoint.y + (grid.isGridless ? 0 : grid.sizeY / 2),
+            ...waypoint,
+            x: waypoint.x + (grid.sizeX / 2) * (mode === 'toRoutingLib' ? 1 : -1),
+            y: waypoint.y + (grid.sizeY / 2) * (mode === 'toRoutingLib' ? 1 : -1),
         };
     }
 
@@ -124,18 +133,14 @@ export class RoutingLibIntegration {
         }
 
         pathfindingResult.promise = new Promise<FoundryWaypoint[] | null>((resolve) => {
-            const maxDistance = Math.max(movement.run.value * 5, 20);
-
-            // Snap waypoints to their grid cells to avoid issues from minor floating-point differences.
-            for (let i = 0; i < waypoints.length; i++) {
-                const offset = grid.getOffset(this.centerOffset(grid, waypoints[i]));
-                waypoints[i] = {...waypoints[i], ...grid.getTopLeftPoint(offset)};
-            }
+            const maxDistance = Math.max(movement.run.value * 5, 20 * (grid.isGridless ? grid.size : 1));
 
             for (let i = 1; i < waypoints.length; i++) {
-                const fromWaypoint = waypoints[i - 1];
-                const { i: fromY, j: fromX } = grid.getOffset(this.centerOffset(grid, fromWaypoint));
-                const { i: toY, j: toX } = grid.getOffset(this.centerOffset(grid, waypoints[i]));
+                const fromWaypoint = this.convertWaypoint(grid, waypoints[i - 1], 'toRoutingLib');
+                const toWaypoint = this.convertWaypoint(grid, waypoints[i], 'toRoutingLib');
+
+                const { i: fromY, j: fromX } = grid.getOffset(fromWaypoint);
+                const { i: toY, j: toX } = grid.getOffset(toWaypoint);
 
                 const from = { x: fromX, y: fromY };
                 const to = { x: toX, y: toY };
@@ -164,8 +169,8 @@ export class RoutingLibIntegration {
                         for (const waypoint of route.path) {
                             const topLeftPoint = grid.getTopLeftPoint({ j: waypoint.x, i: waypoint.y });
                             routedWaypoints.push({
-                                x: topLeftPoint.x,
-                                y: topLeftPoint.y,
+                                x: Math.round(topLeftPoint.x),
+                                y: Math.round(topLeftPoint.y),
                                 elevation: fromWaypoint.elevation,
                                 width: fromWaypoint.width,
                                 height: fromWaypoint.height,
@@ -177,6 +182,11 @@ export class RoutingLibIntegration {
                             });
                         }
                     }
+
+                    // routingLib returns waypoints with coordinates relative to the top-left of the token.
+                    for (let i = 0; i < routedWaypoints.length && grid.isGridless; i++)
+                        routedWaypoints[i] = this.convertWaypoint(grid, routedWaypoints[i], 'adjustGridless');
+
                     return routedWaypoints;
                 })
                 .catch(() => {
