@@ -51,6 +51,10 @@ declare global {
         getOffset(position: Waypoint): GridCoordinate;
 
         getTopLeftPoint(coordinate: GridCoordinate): Waypoint;
+        getSnappedPoint(p: Point, behavior: {mode: number}): Point;
+
+        sizeX: number;
+        sizeY: number;
     }
 }
 
@@ -94,6 +98,13 @@ export class RoutingLibIntegration {
         });
     }
 
+    private static centerOffset(grid: BaseGrid, waypoint: FoundryWaypoint) {
+        return {
+            x: waypoint.x + grid.sizeX / 2,
+            y: waypoint.y + grid.sizeY / 2,
+        };
+    }
+
     static routinglibPathfinding(waypoints: FoundryWaypoint[], token: SR5Token, movement: Shadowrun.Movement): PathfindingResult  {
         const grid = token.scene?.grid ?? foundry.documents.BaseScene.defaultGrid;
 
@@ -113,10 +124,17 @@ export class RoutingLibIntegration {
 
         pathfindingResult.promise = new Promise<FoundryWaypoint[] | null>((resolve) => {
             const maxDistance = Math.max(movement.run.value * 5, 20);
+
+            // Snap waypoints to their grid cells to avoid issues from minor floating-point differences.
+            for (let i = 0; i < waypoints.length; i++) {
+                const offset = grid.getOffset(this.centerOffset(grid, waypoints[i]));
+                waypoints[i] = {...waypoints[i], ...grid.getTopLeftPoint(offset)};
+            }
+
             for (let i = 1; i < waypoints.length; i++) {
                 const fromWaypoint = waypoints[i - 1];
-                const { i: fromY, j: fromX } = grid.getOffset(fromWaypoint);
-                const { i: toY, j: toX } = grid.getOffset(waypoints[i]);
+                const { i: fromY, j: fromX } = grid.getOffset(this.centerOffset(grid, fromWaypoint));
+                const { i: toY, j: toX } = grid.getOffset(this.centerOffset(grid, waypoints[i]));
 
                 const from = { x: fromX, y: fromY };
                 const to = { x: toX, y: toY };
