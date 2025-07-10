@@ -1,14 +1,19 @@
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
-import { Helpers } from "../../helpers";
-import { SR5Item } from "../../item/SR5Item";
-import { onManageActiveEffect, onManageItemActiveEffect, prepareSortedItemEffects, prepareSortedEffects } from "../../effects";
-import { SR5 } from "../../config";
-import { SkillEditSheet } from "../../apps/skills/SkillEditSheet";
-import { SR5Actor } from "../SR5Actor";
-import { KnowledgeSkillEditSheet } from "../../apps/skills/KnowledgeSkillEditSheet";
-import { LanguageSkillEditSheet } from "../../apps/skills/LanguageSkillEditSheet";
-import { MoveInventoryDialog } from "../../apps/dialogs/MoveInventoryDialog";
+import { Helpers } from '../../helpers';
+import { SR5Item } from '../../item/SR5Item';
+import {
+    onManageActiveEffect,
+    onManageItemActiveEffect,
+    prepareSortedItemEffects,
+    prepareSortedEffects,
+} from '../../effects';
+import { SR5 } from '../../config';
+import { SkillEditSheet } from '../../apps/skills/SkillEditSheet';
+import { SR5Actor } from '../SR5Actor';
+import { KnowledgeSkillEditSheet } from '../../apps/skills/KnowledgeSkillEditSheet';
+import { LanguageSkillEditSheet } from '../../apps/skills/LanguageSkillEditSheet';
+import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { ChummerImportForm } from '../../apps/chummer-import-form';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
@@ -23,16 +28,17 @@ import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
+import { Translation } from '../../utils/strings';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
  */
 export interface SheetItemData {
-    type: string,
-    name: string,
-    system: Shadowrun.ShadowrunItemDataData
-    properties: any,
-    description: any
+    type: string;
+    name: string;
+    system: Shadowrun.ShadowrunItemDataData;
+    properties: any;
+    description: any;
 }
 
 export interface InventorySheetDataByType {
@@ -43,11 +49,11 @@ export interface InventorySheetDataByType {
 }
 
 export interface InventorySheetData {
-    name: string,
-    label: string,
+    name: string;
+    label: string;
     types: {
-        [type: string]: InventorySheetDataByType
-    }
+        [type: string]: InventorySheetDataByType;
+    };
 }
 
 export type InventoriesSheetData = Record<string, InventorySheetData>;
@@ -56,7 +62,6 @@ export type InventoriesSheetData = Record<string, InventorySheetData>;
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
 // when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong system.
 let globalSkillAppId: number = -1;
-
 
 /**
  * Sort a list of items by name in ascending alphabetical order.
@@ -100,13 +105,11 @@ const sortyByQuality = (a: any, b: any) => {
     if (a.system.type === 'positive' && b.system.type === 'negative') return -1;
     if (a.system.type === 'negative' && b.system.type === 'positive') return 1;
     return a.name < b.name ? -1 : 1;
-}
+};
 
 export interface SR5BaseSheetDelays {
     skills: ReturnType<typeof setTimeout> | null;
 }
-
-
 
 /**
  * This class should not be used directly but be extended for each actor type.
@@ -122,8 +125,8 @@ export class SR5BaseActorSheet extends ActorSheet {
     };
     // Used together with _filters to delay textinput
     _delays: SR5BaseSheetDelays = {
-        skills: null
-    }
+        skills: null,
+    };
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
     _scroll: string;
     _inventoryOpenClose: Record<string, boolean> = {};
@@ -225,8 +228,8 @@ export class SR5BaseActorSheet extends ActorSheet {
             // @ts-expect-error TODO: foundry-vtt-types v10
             data: actorData.system,
             // @ts-expect-error TODO: foundry-vtt-types v10
-            system: actorData.system
-        }
+            system: actorData.system,
+        };
 
         // Sheet related general purpose fields. These aren't persistent.
         data.config = SR5;
@@ -245,7 +248,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
-        data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
+        data.spells = this._prepareSortedCategorizedSpells(data.itemType['spell']);
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
 
@@ -258,7 +261,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             // secrets: this.actor.isOwner,
             // rollData: this.actor.getRollData.bind(this.actor),
             // @ts-expect-error TODO: foundry-vtt-types v10
-            relativeTo: this.actor
+            relativeTo: this.actor,
         });
 
         data.bindings = this._prepareKeybindings();
@@ -270,11 +273,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     override activateListeners(html) {
         super.activateListeners(html);
 
-        Helpers.setupCustomCheckbox(this, html)
+        Helpers.setupCustomCheckbox(this, html);
 
         // Active Effect management
-        html.find(".effect-control").on('click', event => onManageActiveEffect(event, this.actor));
-        html.find(".item-effect-control").on('click', event => onManageItemActiveEffect(event));
+        html.find('.effect-control').on('click', (event) => onManageActiveEffect(event, this.actor));
+        html.find('.item-effect-control').on('click', (event) => onManageItemActiveEffect(event));
 
         // Inventory visibility switch
         html.find('.item-toggle').on('click', this._onInventorySectionVisiblitySwitch.bind(this));
@@ -367,11 +370,18 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Situation modifiers application
-        html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
+        html.find('.show-situation-modifiers-application').on(
+            'click',
+            this._onShowSituationModifiersApplication.bind(this),
+        );
 
         // Freshly imported item toggle
-        html.find('.toggle-fresh-import-all-off').on('click', async (event) => this._toggleAllFreshImportFlags(event, false));
-        html.find('.toggle-fresh-import-all-on').on('click', async (event) => this._toggleAllFreshImportFlags(event, true));
+        html.find('.toggle-fresh-import-all-off').on('click', async (event) =>
+            this._toggleAllFreshImportFlags(event, false),
+        );
+        html.find('.toggle-fresh-import-all-on').on('click', async (event) =>
+            this._toggleAllFreshImportFlags(event, true),
+        );
 
         // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
@@ -408,7 +418,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 type: type,
                 label: SR5.itemTypes[type],
                 isOpen: this._inventoryOpenClose[type],
-                items: []
+                items: [],
             };
         }
     }
@@ -424,7 +434,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             sceneId: this.actor.isToken ? canvas.scene?.id : null,
             tokenId: this.actor.isToken ? this.actor.token?.id : null,
             type: '',
-            data: {}
+            data: {},
         };
 
         // Handle different item type data transfers.
@@ -437,49 +447,50 @@ export class SR5BaseActorSheet extends ActorSheet {
                 dragData.type = 'Skill';
                 dragData.data = {
                     skillId: element.dataset.itemId,
-                    skill: this.actor.getSkill(element.dataset.itemId)
+                    skill: this.actor.getSkill(element.dataset.itemId),
                 };
 
                 // Set data transfer
-                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
 
                 return;
 
             // Knowlege skill data transfer
             case 'knowledgeskill':
                 // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
-                const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
+                const skillId = element.dataset.itemId.includes('.')
+                    ? element.dataset.itemId.split('.')[0]
+                    : element.dataset.itemId;
 
                 dragData.type = 'Skill';
                 dragData.data = {
                     skillId,
-                    skill: this.actor.getSkill(skillId)
+                    skill: this.actor.getSkill(skillId),
                 };
 
                 // Set data transfer
-                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
 
                 return;
 
             // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
-            case 'ActiveEffect':
-                {
-                    const effectId = element.dataset.itemId;
-                    let effect = this.actor.effects.get(effectId);
-                    if (!effect) {
-                        // check to see if it belongs to an item we own
-                        effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
-                    }
-                    if (effect) {
-                        // Prepare data transfer
-                        dragData.type = 'ActiveEffect';
-                        dragData.data = effect;
-
-                        // Set data transfer
-                        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                    }
-                    return;
+            case 'ActiveEffect': {
+                const effectId = element.dataset.itemId;
+                let effect = this.actor.effects.get(effectId);
+                if (!effect) {
+                    // check to see if it belongs to an item we own
+                    effect = (await fromUuid(effectId)) as SR5ActiveEffect | undefined;
                 }
+                if (effect) {
+                    // Prepare data transfer
+                    dragData.type = 'ActiveEffect';
+                    dragData.data = effect;
+
+                    // Set data transfer
+                    event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+                }
+                return;
+            }
 
             // All default Foundry data transfer.
             default:
@@ -516,13 +527,15 @@ export class SR5BaseActorSheet extends ActorSheet {
                 return;
             }
             if (data.type === 'Actor' && data.uuid !== this.actor.uuid) {
-                const actor = await fromUuid(data.uuid) as SR5Actor;
+                const actor = (await fromUuid(data.uuid)) as SR5Actor;
                 const itemData = {
-                    name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
-                    type: 'contact',
-                    'system.linkedActor': actor.uuid
+                    'name':
+                        actor.name ??
+                        `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
+                    'type': 'contact',
+                    'system.linkedActor': actor.uuid,
                 };
-                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
+                (await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true })) as SR5Item[];
             }
         }
         // Keep upstream document created for actions base on it.
@@ -533,7 +546,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Add any created items to the selected inventory.
         if (Array.isArray(documents)) {
-            const items = documents.filter(document => document instanceof SR5Item);
+            const items = documents.filter((document) => document instanceof SR5Item);
             await this.actor.inventory.addItems(this.selectedInventory, items);
         }
 
@@ -581,7 +594,6 @@ export class SR5BaseActorSheet extends ActorSheet {
                 element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
             }
         }
-
     }
 
     /**
@@ -629,12 +641,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     _setInventoryVisibility(isOpen: boolean) {
-        Object.keys(CONFIG.Item.typeLabels)
-            .forEach(type => this._setInventoryTypeVisibility(type, isOpen));
+        Object.keys(CONFIG.Item.typeLabels).forEach((type) => this._setInventoryTypeVisibility(type, isOpen));
     }
 
     _setInventoryTypeVisibility(type: string, isOpen: boolean) {
-        this._inventoryOpenClose[type] = isOpen
+        this._inventoryOpenClose[type] = isOpen;
     }
 
     async _onItemCreate(event) {
@@ -649,7 +660,9 @@ export class SR5BaseActorSheet extends ActorSheet {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type: type,
         };
-        const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
+        const items = (await this.actor.createEmbeddedDocuments('Item', [itemData], {
+            renderSheet: true,
+        })) as SR5Item[];
         if (!items) return;
 
         // Add the item to the selected inventory.
@@ -835,13 +848,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         else if (track === 'physical') {
             data[`system.track.physical.value`] = 0;
             data['system.track.physical.overflow.value'] = 0;
-
         } else if (track === 'edge') {
             data[`system.attributes.edge.uses`] = 0;
-
         } else if (track === 'overflow') {
             data['system.track.physical.overflow.value'] = 0;
-
         } else if (track === 'matrix') {
             await this.actor.setMatrixDamage(0);
         }
@@ -899,7 +909,9 @@ export class SR5BaseActorSheet extends ActorSheet {
                 }
             };
 
-            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
+            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) =>
+                cleanupAttribute(att),
+            );
         }
     }
 
@@ -919,7 +931,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         inventoriesSheet[this.actor.allInventories.name] = {
             name: this.actor.allInventories.name,
             label: this.actor.allInventories.label,
-            types: {}
+            types: {},
         };
         this._addInventoryTypes(inventoriesSheet[this.actor.allInventories.name]);
 
@@ -928,27 +940,27 @@ export class SR5BaseActorSheet extends ActorSheet {
         inventoriesSheet[this.actor.defaultInventory.name] = {
             name: this.actor.defaultInventory.name,
             label: this.actor.defaultInventory.label,
-            types: {}
+            types: {},
         };
         this._addInventoryTypes(inventoriesSheet[this.actor.defaultInventory.name]);
 
-        Object.values(this.actor.system.inventories).forEach(inventory => {
-            const { name, label, itemIds } = inventory
+        Object.values(this.actor.system.inventories).forEach((inventory) => {
+            const { name, label, itemIds } = inventory;
 
             // Avoid re-adding default inventories.
             if (!inventoriesSheet.hasOwnProperty(name)) {
                 inventoriesSheet[name] = {
                     name,
                     label,
-                    types: {}
-                }
+                    types: {},
+                };
             }
 
             // Add default inventory types for this sheet type first, so they appear on top.
             this._addInventoryTypes(inventoriesSheet[name]);
 
             // Inform user about duplicate inventory mapping for a single item.
-            itemIds.forEach(id => {
+            itemIds.forEach((id) => {
                 itemIdInventory[id] = inventory;
             });
         });
@@ -969,7 +981,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             // Build inventory list this item should be shown an.
             const addTo: string[] = inventory.showAll ? Object.keys(inventoriesSheet) : [inventory.name];
 
-            addTo.forEach(name => {
+            addTo.forEach((name) => {
                 const inventorySheet = inventoriesSheet[name];
 
                 // Should an item have been added to any inventory that wouldn't cary it's type normaly
@@ -979,21 +991,21 @@ export class SR5BaseActorSheet extends ActorSheet {
                         type: item.type,
                         label: SR5.itemTypes[item.type],
                         isOpen: this._inventoryOpenClose[item.type],
-                        items: []
+                        items: [],
                     };
                 }
 
                 inventorySheet.types[item.type].items.push(sheetItem);
-            })
+            });
         }
 
-        Object.values(inventoriesSheet).forEach(inventory => {
+        Object.values(inventoriesSheet).forEach((inventory) => {
             this._addInventoryItemTypes(inventory);
 
             // Sort the items.
             Object.values(inventory.types).forEach((type) => {
                 type.items.sort(sortByName);
-            })
+            });
         });
 
         return inventoriesSheet;
@@ -1010,26 +1022,29 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Categorize and sort spells to display cleanly.
-     * 
-     * @param inventories 
+     *
+     * @param inventories
      */
     _prepareSortedCategorizedSpells(spellSheets: SheetItemData[]) {
-        const sortedSpells : Record<string, SheetItemData[]> = {};
-        const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
+        const sortedSpells: Record<string, SheetItemData[]> = {};
+        const spellTypes: string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
 
         // Add all spell types in system.
-        spellTypes.forEach(type => {
+        spellTypes.forEach((type) => {
             sortedSpells[type] = [];
         });
 
-        spellSheets.forEach(spell => {
+        spellSheets.forEach((spell) => {
             // Check if the spell category is defined and if it's something we expect, if not we use the 'notfound' category
-            const category = ((spell.system.category === undefined) || !spellTypes.includes(spell.system.category)) ? 'notfound' : spell.system.category;
+            const category =
+                spell.system.category === undefined || !spellTypes.includes(spell.system.category)
+                    ? 'notfound'
+                    : spell.system.category;
             sortedSpells[category].push(spell);
         });
 
-        spellTypes.forEach(type => {
-            sortedSpells[type].sort((a, b) : number => {
+        spellTypes.forEach((type) => {
+            sortedSpells[type].sort((a, b): number => {
                 return a.name.localeCompare(b.name);
             });
         });
@@ -1041,13 +1056,13 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Used by the sheet to choose whether to show or hide hideable fields
      */
     _prepareContentVisibility(data) {
-        const contentVisibility : Record<string, boolean> = {}
+        const contentVisibility: Record<string, boolean> = {};
         const defaultVisibility = data.system.category_visibility.default;
 
         // If prefix is empty uses the category as a prefix
         const setVisibility = (category: string, prefix?: string) => {
             contentVisibility[prefix || category + '_list'] = defaultVisibility || data.itemType[category].length > 0;
-        }
+        };
 
         contentVisibility['default'] = defaultVisibility;
         setVisibility('adept_power');
@@ -1107,14 +1122,10 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Most sheet items are raw item types, some are sub types.
         // These are just for display purposes and has been done for call_in_action items.
-        const sheetItemTypes = [
-            ...Object.keys(CONFIG.Item.typeLabels),
-            'summoning',
-            'compilation'
-        ];
+        const sheetItemTypes = [...Object.keys(CONFIG.Item.typeLabels), 'summoning', 'compilation'];
 
         // Add all item types in system.
-        sheetItemTypes.forEach(type => {
+        sheetItemTypes.forEach((type) => {
             itemsByType[type] = [];
         });
 
@@ -1142,7 +1153,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             }
         });
 
-        return itemsByType
+        return itemsByType;
     }
 
     /**
@@ -1226,7 +1237,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Prepare skills with sorting and filtering given by this sheet.
-     * 
+     *
      * @param sheetData What is to be displayed on sheet.
      */
     _prepareSkillsWithFilters(sheetData: SR5ActorSheetData) {
@@ -1261,15 +1272,27 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     _showGeneralSkill(skillId, skill: SkillField) {
-        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
+        return (
+            !this._isSkillMagic(skillId, skill) &&
+            !this._isSkillResonance(skill) &&
+            this._isSkillFiltered(skillId, skill)
+        );
     }
 
     _showMagicSkills(skillId, skill: SkillField, sheetData: SR5ActorSheetData) {
-        return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic' && this._isSkillFiltered(skillId, skill);
+        return (
+            this._isSkillMagic(skillId, skill) &&
+            sheetData.system.special === 'magic' &&
+            this._isSkillFiltered(skillId, skill)
+        );
     }
 
     _showResonanceSkills(skillId, skill: SkillField, sheetData: SR5ActorSheetData) {
-        return this._isSkillResonance(skill) && sheetData.system.special === 'resonance' && this._isSkillFiltered(skillId, skill);
+        return (
+            this._isSkillResonance(skill) &&
+            sheetData.system.special === 'resonance' &&
+            this._isSkillFiltered(skillId, skill)
+        );
     }
 
     _isSkillFiltered(skillId, skill) {
@@ -1287,9 +1310,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     _doesSkillContainText(key, skill, text) {
-        if (!text) {
-            return true;
-        }
+        if (!text) return true;
 
         // Search both english keys, localized labels and all specializations.
         const name = this._getSkillLabelOrName(skill);
@@ -1297,6 +1318,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         // some "specs" were a string from old code I think
         const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
         let searchString = `${searchKey} ${name} ${specs}`;
+
+        const { group } = skill;
+        if (group) {
+            const key = `SR5.SkillGroup.${group.replace(/ /g, '')}`;
+            const localizedGroup = game.i18n.localize(key as Translation);
+            searchString += localizedGroup !== key ? localizedGroup : group;
+        }
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
     }
@@ -1329,8 +1357,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *       hiding HTML elements based on their text.
      */
     async _onFilterSkills(event) {
-        if (this._delays.skills)
-            clearTimeout(this._delays.skills);
+        if (this._delays.skills) clearTimeout(this._delays.skills);
 
         this._delays.skills = setTimeout(() => {
             this._filters.skills = event.currentTarget.value;
@@ -1344,7 +1371,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         const itemId = Helpers.listItemId(event);
         // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
         const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
-        if (!skillId) return console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`);
+        if (!skillId)
+            return console.error(
+                `Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`,
+            );
         return this.actor.rollSkill(skillId, { event });
     }
 
@@ -1358,7 +1388,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onOpenSourceSkill(event) {
         event.preventDefault();
-        const [skillId,] = Helpers.listItemId(event).split('.');
+        const [skillId] = Helpers.listItemId(event).split('.');
 
         const skill = this.actor.getSkill(skillId);
         if (!skill) {
@@ -1400,7 +1430,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         const [skill, category] = Helpers.listItemId(event).split('.');
 
         if (!skill || !category) {
-            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`);
+            return console.error(
+                `Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`,
+            );
         }
 
         this._showSkillEditForm(
@@ -1560,7 +1592,10 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Inform users about issues with templating or programming.
         if (item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
-            return console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item);
+            return console.error(
+                `Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`,
+                item,
+            );
         }
 
         await item.update({ 'system.technology.quantity': quantity });
@@ -1591,10 +1626,12 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (item.isDevice) {
             await this.document.equipOnlyOneItemOfType(item);
         } else {
-            await this.actor.updateEmbeddedDocuments('Item', [{
-                '_id': iid,
-                'system.technology.equipped': !item.isEquipped(),
-            }]);
+            await this.actor.updateEmbeddedDocuments('Item', [
+                {
+                    '_id': iid,
+                    'system.technology.equipped': !item.isEquipped(),
+                },
+            ]);
         }
 
         this.actor.render(false);
@@ -1614,18 +1651,22 @@ export class SR5BaseActorSheet extends ActorSheet {
             case 'standard':
                 return;
             case 'enabled_option':
-                await this.actor.updateEmbeddedDocuments('Item', [{
-                    '_id': iid,
-                    'system.optional': 'disabled_option',
-                    'system.enabled': false,
-                }]);
+                await this.actor.updateEmbeddedDocuments('Item', [
+                    {
+                        '_id': iid,
+                        'system.optional': 'disabled_option',
+                        'system.enabled': false,
+                    },
+                ]);
                 break;
             case 'disabled_option':
-                await this.actor.updateEmbeddedDocuments('Item', [{
-                    '_id': iid,
-                    'system.optional': 'enabled_option',
-                    'system.enabled': true,
-                }]);
+                await this.actor.updateEmbeddedDocuments('Item', [
+                    {
+                        '_id': iid,
+                        'system.optional': 'enabled_option',
+                        'system.enabled': true,
+                    },
+                ]);
                 break;
         }
 
@@ -1689,14 +1730,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory))
             return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
 
-
         $('.selection-inventory').hide();
         $('.inline-input-inventory').show();
 
         // Mark action and pre-select.
-        $('#input-inventory')
-            .data('action', action)
-            .select();
+        $('#input-inventory').data('action', action).select();
     }
 
     /**
@@ -1715,9 +1753,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         $('.inline-input-inventory').hide();
 
         // Reset to selected inventory for next try.
-        $('#input-inventory')
-            .data('action', undefined)
-            .val(this.selectedInventory);
+        $('#input-inventory').data('action', undefined).val(this.selectedInventory);
     }
 
     /**
@@ -1763,8 +1799,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const inventory = String($(event.currentTarget).val());
 
-        if (inventory)
-            this.selectedInventory = inventory;
+        if (inventory) this.selectedInventory = inventory;
 
         this.render();
     }
@@ -1827,7 +1862,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param event A mouse/pointer event
      */
     async _onMatrixAttributeSelected(event) {
-        if (!("matrix" in this.actor.system)) return;
+        if (!('matrix' in this.actor.system)) return;
 
         let iid = this.actor.system.matrix.device;
         let item = this.actor.items.get(iid);
@@ -1900,17 +1935,19 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @returns List of prepare sit. mod data
      */
-    _prepareSituationModifiers(): { category: string, label: string, value: number, hidden: boolean }[] {
+    _prepareSituationModifiers(): { category: string; label: string; value: number; hidden: boolean }[] {
         const modifiers = this.actor.getSituationModifiers();
         modifiers.applyAll();
         if (!modifiers) return [];
 
-        return Object.entries(modifiers._modifiers).map(([category, modifier]: [Shadowrun.SituationModifierType, SituationModifier]) => {
-            const hidden = this._hideSituationModifier(category);
+        return Object.entries(modifiers._modifiers).map(
+            ([category, modifier]: [Shadowrun.SituationModifierType, SituationModifier]) => {
+                const hidden = this._hideSituationModifier(category);
 
-            const label = SR5.modifierTypes[category];
-            return { category, value: modifier.total, hidden, label };
-        });
+                const label = SR5.modifierTypes[category];
+                return { category, value: modifier.total, hidden, label };
+            },
+        );
     }
 
     /**
@@ -1929,7 +1966,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             case 'defense':
                 return true;
             case 'recoil':
-                return !this.actor.hasPhysicalBody
+                return !this.actor.hasPhysicalBody;
             default:
                 return false;
         }
@@ -1965,24 +2002,30 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param event
      */
     _onResetActorRunData(event) {
-        this.actor.resetRunData()
+        this.actor.resetRunData();
     }
 
     /**
-     * Prepare keybindings to be shown when hovering over a rolling icon 
+     * Prepare keybindings to be shown when hovering over a rolling icon
      * in any list item view that has rolls.
      */
     _prepareKeybindings() {
         return {
-            skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
-            card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
-        }
+            skip: game.keybindings
+                .get('shadowrun5e', 'hide-test-dialog')
+                .map((binding) => binding.key.replace('Key', '').toUpperCase())
+                .join(', '),
+            card: game.keybindings
+                .get('shadowrun5e', 'show-item-card')
+                .map((binding) => binding.key.replace('Key', '').toUpperCase())
+                .join(', '),
+        };
     }
 
     /**
      * These effect apply to types are meant to be shown on the item effects section of the effects sheet.
-     * 
-     * They are limited to those effects directly affecting this actor. Effects affecting other actors, aren't shown 
+     *
+     * They are limited to those effects directly affecting this actor. Effects affecting other actors, aren't shown
      * on the actors own sheet.
      */
     get itemEffectApplyTos() {

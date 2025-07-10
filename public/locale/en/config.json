@@ -1025,6 +1025,23 @@
         "Tracking": "Tracking",
         "UnarmedCombat": "Unarmed Combat"
     },
+    "SR5.SkillGroup": {
+        "Acting": "Acting",
+        "Athletics": "Athletics",
+        "Biotech": "Biotech",
+        "CloseCombat": "Close Combat",
+        "Conjuring": "Conjuring",
+        "Cracking": "Cracking",
+        "Electronics": "Electronics",
+        "Enchanting": "Enchanting",
+        "Engineering": "Engineering",
+        "Firearms": "Firearms",
+        "Influence": "Influence",
+        "Outdoors": "Outdoors",
+        "Sorcery": "Sorcery",
+        "Stealth": "Stealth",
+        "Tasking": "Tasking"
+    },
     "SR5.Soak": "Soak",
     "SR5.SoakTest": "Damage Resist Test",
     "SR5.Social": "Social",
