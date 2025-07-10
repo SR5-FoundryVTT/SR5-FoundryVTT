@@ -103,18 +103,29 @@ export class RoutingLibIntegration {
 
     /**
      * Converts waypoint coordinates between Foundry (top-left) and RoutingLib (center-based).
-     * 
-     * Use 'toRoutingLib' to shift to center-based coordinates (used for pathfinding).
-     * Use 'adjustGridless' to correct output when using a gridless grid that was treated as gridded.
+     *
+     * Use 'toRoutingLib' to shift to center-based coordinates for pathfinding.
+     * Use 'fromRoutingLib' to shift back to top-left coordinates.
      */
-    private static convertWaypoint(grid: BaseGrid, waypoint: FoundryWaypoint, mode: 'toRoutingLib' | 'adjustGridless') {
+    private static convertWaypoint<T extends { x: number, y: number }>(
+        grid: BaseGrid,
+        waypoint: T,
+        mode: 'toRoutingLib' | 'fromRoutingLib'
+    ): T {
         return {
             ...waypoint,
-            x: waypoint.x + (grid.sizeX / 2) * (mode === 'toRoutingLib' ? 1 : -1),
-            y: waypoint.y + (grid.sizeY / 2) * (mode === 'toRoutingLib' ? 1 : -1),
+            x: Math.round(waypoint.x + (grid.sizeX / 2) * (mode === 'toRoutingLib' ? 1 : -1)),
+            y: Math.round(waypoint.y + (grid.sizeY / 2) * (mode === 'toRoutingLib' ? 1 : -1)),
         };
     }
 
+    /**
+     * Calculates a path using RoutingLib's pathfinding.
+     *
+     * @param waypoints - The waypoints to route through.
+     * @param token - The token for which the path is calculated.
+     * @param movement - The movement data of the token's actor.
+     */
     static routinglibPathfinding(waypoints: FoundryWaypoint[], token: SR5Token, movement: Shadowrun.Movement): PathfindingResult  {
         const grid = token.scene?.grid ?? foundry.documents.BaseScene.defaultGrid;
 
@@ -167,10 +178,11 @@ export class RoutingLibIntegration {
                         routedWaypoints.pop();
                         const fromWaypoint = waypoints[i];
                         for (const waypoint of route.path) {
-                            const topLeftPoint = grid.getTopLeftPoint({ j: waypoint.x, i: waypoint.y });
+                            const centerPoint = grid.getCenterPoint({ j: waypoint.x, i: waypoint.y });
+                            const foundryWaypoint = this.convertWaypoint(grid, centerPoint, 'fromRoutingLib');
                             routedWaypoints.push({
-                                x: Math.round(topLeftPoint.x),
-                                y: Math.round(topLeftPoint.y),
+                                x: foundryWaypoint.x,
+                                y: foundryWaypoint.y,
                                 elevation: fromWaypoint.elevation,
                                 width: fromWaypoint.width,
                                 height: fromWaypoint.height,
@@ -182,14 +194,9 @@ export class RoutingLibIntegration {
                             });
                         }
                     }
-
-                    // routingLib returns waypoints with coordinates relative to the top-left of the token.
-                    for (let i = 0; i < routedWaypoints.length && grid.isGridless; i++)
-                        routedWaypoints[i] = this.convertWaypoint(grid, routedWaypoints[i], 'adjustGridless');
-
                     return routedWaypoints;
                 })
-                .catch(() => {
+                .catch(async () => {
                     pathfindingResult.cancel!()
                     const findMovementPathResult: PathfindingResult = token.findMovementPath(waypoints, {skipRoutingLib: true});
                     return findMovementPathResult.promise
