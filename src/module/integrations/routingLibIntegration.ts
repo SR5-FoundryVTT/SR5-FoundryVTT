@@ -55,6 +55,7 @@ declare global {
 
         sizeX: number;
         sizeY: number;
+        isGridless: boolean;
     }
 }
 
@@ -100,8 +101,8 @@ export class RoutingLibIntegration {
 
     private static centerOffset(grid: BaseGrid, waypoint: FoundryWaypoint) {
         return {
-            x: waypoint.x + grid.sizeX / 2,
-            y: waypoint.y + grid.sizeY / 2,
+            x: waypoint.x + (grid.isGridless ? 0 : grid.sizeX / 2),
+            y: waypoint.y + (grid.isGridless ? 0 : grid.sizeY / 2),
         };
     }
 
