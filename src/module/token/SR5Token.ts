@@ -32,7 +32,7 @@ export class SR5Token extends Token {
     }
 
     static tokenConfig(app, html, data, options) {
-        if (!RoutingLibIntegration.routingLibReady) return;
+        if (!RoutingLibIntegration.routingLibReady || !app.actor?.system?.movement) return;
 
         // Default it to true, so that it is enabled by default.
         const flagValue = app.token.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;
