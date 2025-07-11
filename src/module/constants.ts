@@ -59,6 +59,7 @@ export const FLAGS = {
     TokenRulerColorRunning: "TokenRulerColorRunning",
     TokenRulerColorSprinting: "TokenRulerColorSprinting",
     TokenRulerOpacity: 'TokenRulerOpacity',
+    TokenUseRoutingLib: 'TokenUseRoutingLib',
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

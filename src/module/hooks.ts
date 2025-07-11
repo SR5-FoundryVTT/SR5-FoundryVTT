@@ -99,6 +99,8 @@ export class HooksManager {
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory);
         // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD);
+        Hooks.on('renderTokenConfig', SR5Token.tokenConfig);
+        Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions);
