@@ -27,7 +27,7 @@ export class ArmorParser {
 
         const otherArmors = getArray(chummerChar.otherarmors?.otherarmor)
 
-        otherArmors.forEach((chummerArmor) => {
+        for (const chummerArmor of otherArmors) {
             try {
                 const itemData = this.parseOtherArmor(chummerArmor);
 
@@ -39,7 +39,7 @@ export class ArmorParser {
             } catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return parsedArmors;
     }
