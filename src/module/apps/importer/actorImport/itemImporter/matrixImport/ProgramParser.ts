@@ -1,6 +1,6 @@
-import { DataDefaults } from "src/module/data/DataDefaults";
+import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions";
 import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions.js"
+import { DataDefaults } from "src/module/data/DataDefaults";
 import { ActorSchema } from "../../ActorSchema";
 import { Unwrap } from "../ItemsParser";
 

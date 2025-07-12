@@ -1,9 +1,9 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
-import { SR5 } from "../../../../../config.js";
-import { ActorSchema } from "../../ActorSchema.js";
-import { DataDefaults } from "src/module/data/DataDefaults.js";
-
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { DataDefaults } from "src/module/data/DataDefaults";
+import { ActorSchema } from "../../ActorSchema";
+import { SR5 } from "../../../../../config";
+import { Unwrap } from "../ItemsParser";
 
 export class LifestyleParser {
     async parseLifestyles(chummerChar: ActorSchema, assignIcons: boolean = false) {
@@ -29,7 +29,7 @@ export class LifestyleParser {
         return parsedLifestyle;
     }
 
-    parseLifestyle(chummerLifestyle) {
+    parseLifestyle(chummerLifestyle: Unwrap<NonNullable<ActorSchema['lifestyles']>['lifestyle']>) {
         const parserType = 'lifestyle';
         const system = DataDefaults.baseSystemData(parserType);
 
@@ -49,8 +49,8 @@ export class LifestyleParser {
             }
         }
 
-        system.cost = chummerLifestyle.totalmonthlycost;
-        system.permanent = chummerLifestyle.purchased;
+        system.cost = Number(chummerLifestyle.totalmonthlycost) || 0;
+        system.permanent = chummerLifestyle.purchased === 'True';
         system.description = parseDescription(chummerLifestyle);
 
         // The name of the lifestyle is optional, so we use a fallback here.

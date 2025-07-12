@@ -1,6 +1,6 @@
+import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions";
+import { BaseGearParser } from "../importHelper/BaseGearParser";
 import { DataDefaults } from "src/module/data/DataDefaults";
-import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions.js"
 import { ActorSchema } from "../../ActorSchema";
 import { Unwrap } from "../ItemsParser";
 
@@ -33,7 +33,7 @@ export class AmmoParser extends BaseGearParser {
             else
                 parsedGear.system.damageType = 'physical';
 
-            parsedGear.system.element = (chummerGear.weaponbonusdamage_english || '').match(/\(e\)/)?.pop() == '(e)' ? 'electricity' : '';
+            parsedGear.system.element = (chummerGear.weaponbonusdamage_english || '').match(/\(e\)/)?.pop() === '(e)' ? 'electricity' : '';
         }
 
         parsedGear.system.accuracy = Number(chummerGear.weaponbonusacc) || 0;

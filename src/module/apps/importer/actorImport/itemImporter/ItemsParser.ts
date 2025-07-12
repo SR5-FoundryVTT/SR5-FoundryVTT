@@ -1,20 +1,19 @@
-import { getArray } from "./importHelper/BaseParserFunctions.js"
-import { GearsParser } from "./importHelper/GearsParser.js"
-import { ArmorParser } from "./armorImport/ArmorParser.js";
-import { WareParser } from "./wareImport/WareParser.js";
-import { QualityParser } from "./bioImport/QualityParser.js";
-import { PowerParser } from "./magicImport/PowerParser.js";
-import { SpellParser } from "./magicImport/SpellParser.js";
-import { WeaponParser } from "./weaponImport/WeaponParser.js";
-import { LifestyleParser } from "./bioImport/LifestyleParser.js";
-import { ContactParser } from "./bioImport/ContactParser.js";
-import SimpleParser from "./importHelper/SimpleParser.js";
-import { CritterPowerParser } from "./magicImport/CritterPowerParser.js";
-import { RitualParser } from "./magicImport/RitualParser.js";
-import { ActorSchema } from "../ActorSchema.js";
+import { getArray } from "./importHelper/BaseParserFunctions"
+import { GearsParser } from "./importHelper/GearsParser"
+import { ArmorParser } from "./armorImport/ArmorParser";
+import { WareParser } from "./wareImport/WareParser";
+import { QualityParser } from "./bioImport/QualityParser";
+import { PowerParser } from "./magicImport/PowerParser";
+import { SpellParser } from "./magicImport/SpellParser";
+import { WeaponParser } from "./weaponImport/WeaponParser";
+import { LifestyleParser } from "./bioImport/LifestyleParser";
+import { ContactParser } from "./bioImport/ContactParser";
+import SimpleParser from "./importHelper/SimpleParser";
+import { CritterPowerParser } from "./magicImport/CritterPowerParser";
+import { RitualParser } from "./magicImport/RitualParser";
+import { ActorSchema } from "../ActorSchema";
 
-import { ImportHelper as IH } from "src/module/apps/itemImport/helper/ImportHelper.js";
-import { importOptionsType } from "../characterImporter/CharacterImporter.js";
+import { importOptionsType } from "../characterImporter/CharacterImporter";
 
 export type Unwrap<T> = T extends Array<infer U> ? U : T;
 

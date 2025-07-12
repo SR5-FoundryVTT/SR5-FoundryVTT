@@ -1,6 +1,6 @@
-import { DataDefaults } from "src/module/data/DataDefaults";
+import { formatAsSlug, genImportFlags, getArray, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions"
 import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions.js"
+import { DataDefaults } from "src/module/data/DataDefaults";
 import { ActorSchema } from "../../ActorSchema";
 import { Unwrap } from "../ItemsParser";
 
@@ -27,17 +27,7 @@ export class SinParser extends BaseGearParser {
 
         // Create licenses if there are any
         if (chummerGear.children) {
-
-            // "gear" is either  a single gear entry or an array of gear entries depending on the number of licenses
-            const chummerLicenses : any[] = [];
-            if (!Array.isArray(chummerGear.children.gear)) {
-                chummerLicenses.push(chummerGear.children.gear)
-            }
-            else {
-                chummerLicenses.push(...chummerGear.children.gear);
-            }
-
-            parsedGear.system.licenses = this.parseLicenses(chummerLicenses);
+            parsedGear.system.licenses = this.parseLicenses(getArray(chummerGear.children));
         }
 
         // Assign import flags

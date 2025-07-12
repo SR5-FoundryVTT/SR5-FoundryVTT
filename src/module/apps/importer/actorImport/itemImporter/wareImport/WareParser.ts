@@ -1,8 +1,8 @@
-import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
-import { ActorSchema } from "../../ActorSchema.js";
-import { Unwrap } from "../ItemsParser.js";
-import { DataDefaults } from "src/module/data/DataDefaults.js";
+import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { DataDefaults } from "src/module/data/DataDefaults";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 export class WareParser {
 
@@ -31,7 +31,7 @@ export class WareParser {
     parseWare(chummerWare: Unwrap<NonNullable<ActorSchema['cyberwares']>['cyberware']>) {
         // set based on if this is cyberware or bioware
         let parserType = chummerWare.improvementsource.toLowerCase() as 'cyberware' | 'bioware';
-        if (!['cyberware', 'bioware'].includes(parserType)) {parserType = 'cyberware'}; //default to cyberware if no match
+        if (!['cyberware', 'bioware'].includes(parserType)) { parserType = 'cyberware' }; //default to cyberware if no match
         const system = DataDefaults.baseSystemData(parserType);
         system.description = parseDescription(chummerWare);
         system.technology = parseTechnology(chummerWare);

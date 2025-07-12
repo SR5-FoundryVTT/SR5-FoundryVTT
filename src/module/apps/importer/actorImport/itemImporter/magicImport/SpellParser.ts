@@ -1,9 +1,9 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
-import { DataDefaults } from "../../../../../data/DataDefaults.js";
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
-import { ActorSchema } from "../../ActorSchema.js";
-import { Unwrap } from "../ItemsParser.js";
-import { SR5Item } from "src/module/item/SR5Item.js";
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
+import { DataDefaults } from "../../../../../data/DataDefaults";
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { SR5Item } from "src/module/item/SR5Item";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 export class SpellParser {
     async parseSpells(chummerChar: ActorSchema, assignIcons: boolean = false) {
@@ -14,12 +14,12 @@ export class SpellParser {
         for (const spell of spells) {
             try {
                 if (spell.alchemy !== 'True') {
-                const itemData = await this.parseSpell(spell);
+                    const itemData = await this.parseSpell(spell);
 
-                if (assignIcons)
-                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
+                    if (assignIcons)
+                        itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
-                parsedSpells.push(itemData);
+                    parsedSpells.push(itemData);
                 }
             } catch (e) {
                 console.error(e);

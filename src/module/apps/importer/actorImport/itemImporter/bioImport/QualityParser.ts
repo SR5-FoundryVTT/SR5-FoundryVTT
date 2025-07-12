@@ -1,9 +1,9 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
-import { ActorSchema } from "../../ActorSchema.js";
-import { Unwrap } from "../ItemsParser.js";
-import { DataDefaults } from "src/module/data/DataDefaults.js";
-import { SR5Item } from "src/module/item/SR5Item.js";
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { DataDefaults } from "src/module/data/DataDefaults";
+import { SR5Item } from "src/module/item/SR5Item";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 export class QualityParser {
 

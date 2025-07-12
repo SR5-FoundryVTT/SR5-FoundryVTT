@@ -1,7 +1,7 @@
-import { ActorSchema } from "../../ActorSchema.js";
-import { getArray } from "../importHelper/BaseParserFunctions.js"
-import { Unwrap } from "../ItemsParser.js";
-import { WeaponParser } from "../weaponImport/WeaponParser.js";
+import { getArray } from "../importHelper/BaseParserFunctions";
+import { WeaponParser } from "../weaponImport/WeaponParser";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 type VehicleType = Unwrap<NonNullable<ActorSchema['vehicles']>['vehicle']>;
 

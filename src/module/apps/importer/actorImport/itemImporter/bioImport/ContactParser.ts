@@ -1,8 +1,8 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
-import { ActorSchema } from "../../ActorSchema.js";
-import { Unwrap } from "../ItemsParser.js";
-import { DataDefaults } from "src/module/data/DataDefaults.js";
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { DataDefaults } from "src/module/data/DataDefaults";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 export class ContactParser {
     async parseContacts(chummerChar: ActorSchema, assignIcons: boolean = false) {
@@ -45,8 +45,8 @@ export class ContactParser {
         }
 
         system.loyalty = Number(chummerContact.loyalty) || 0;
-        system.family = (chummerContact.family === 'True');
-        system.blackmail = (chummerContact.blackmail === 'True');
+        system.family = chummerContact.family === 'True';
+        system.blackmail = chummerContact.blackmail === 'True';
         system.description = parseDescription(chummerContact);
 
         const itemName = chummerContact.name ? chummerContact.name : '[Unnamed connection]';

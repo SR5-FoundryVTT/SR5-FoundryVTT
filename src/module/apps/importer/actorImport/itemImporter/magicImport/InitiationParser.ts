@@ -1,6 +1,6 @@
+import { getArray } from "../importHelper/BaseParserFunctions";
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ActorSchema } from "../../ActorSchema";
-import { getArray } from "../importHelper/BaseParserFunctions";
 
 export class InitiationParser {
     parseInitiation(chummerChar: ActorSchema, system: SR5Actor<'character'>['system']) {

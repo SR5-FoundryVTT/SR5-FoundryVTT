@@ -1,8 +1,8 @@
 import { parseDescription, createItemData, genImportFlags, formatAsSlug } from "./BaseParserFunctions";
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
-import { Unwrap } from "../ItemsParser";
-import { ActorSchema } from "../../ActorSchema";
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
 import { DataDefaults } from "src/module/data/DataDefaults";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 export default class SimpleParser {
     async parseCollection(parsingCollection: Unwrap<NonNullable<ActorSchema['metamagics']>['metamagic']>[], parserType: 'echo' | 'metamagic', assignIcons: boolean = false) {

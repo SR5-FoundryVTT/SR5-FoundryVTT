@@ -1,8 +1,8 @@
-import { parseDescription, parseTechnology, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
-import { DataDefaults } from "../../../../../data/DataDefaults.js";
-import { SR5 } from "../../../../../config.js";
-import { ActorSchema } from "../../ActorSchema.js";
-import { Unwrap } from "../ItemsParser.js";
+import { parseDescription, parseTechnology, formatAsSlug, genImportFlags } from "./BaseParserFunctions"
+import { DataDefaults } from "../../../../../data/DataDefaults";
+import { ActorSchema } from "../../ActorSchema";
+import { SR5 } from "../../../../../config";
+import { Unwrap } from "../ItemsParser";
 
 /**
  * Parses a certain class of gear (depending on the implementation).

@@ -1,11 +1,11 @@
-import { getArray } from "../importHelper/BaseParserFunctions.js";
+import { importOptionsType } from "../../characterImporter/CharacterImporter";
+import { getArray } from "../importHelper/BaseParserFunctions";
 import { WeaponParser } from "../weaponImport/WeaponParser";
-import { GearsParser } from "../importHelper/GearsParser.js";
+import { GearsParser } from "../importHelper/GearsParser";
 import MountedWeaponParser from "./MountedWeaponParser";
-import VehicleModsParser from "./VehicleModsParser";
 import { SR5Actor } from '../../../../../actor/SR5Actor';
-import { ActorSchema } from "../../ActorSchema.js";
-import { importOptionsType } from "../../characterImporter/CharacterImporter.js";
+import VehicleModsParser from "./VehicleModsParser";
+import { ActorSchema } from "../../ActorSchema";
 
 export default class VehicleParser {
 

@@ -1,13 +1,13 @@
-import { parseDescription, getArray, getValues, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
-import { ActorSchema } from "../../ActorSchema.js";
-import { Unwrap } from "../ItemsParser.js";
-import { DataDefaults } from "src/module/data/DataDefaults.js";
-import { DamageType } from "src/module/types/item/Action.js";
-import { SR5Item } from "src/module/item/SR5Item.js";
+import { parseDescription, getArray, getValues, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { DataDefaults } from "src/module/data/DataDefaults";
+import { DamageType } from "src/module/types/item/Action";
+import { SR5Item } from "src/module/item/SR5Item";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 export class WeaponParser {
-    private parseDamage(val) {
+    private parseDamage(val: string) {
         const damage = {
             damage: 0,
             type: '' as DamageType['type']['base'],
@@ -52,7 +52,7 @@ export class WeaponParser {
     async parseWeaponArray(weapons: Unwrap<NonNullable<ActorSchema['weapons']>['weapon']>[], assignIcons: boolean = false) {
         const parsedWeapons: ReturnType<WeaponParser['parseWeapon']>[] = [];
         const iconList = await IconAssign.getIconFiles();
-        weapons.forEach((chummerWeapon) => {
+        for (const chummerWeapon of weapons) {
             try {
                 const itemData = this.parseWeapon(chummerWeapon);
 
@@ -64,7 +64,7 @@ export class WeaponParser {
             } catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return parsedWeapons;
     }
@@ -288,8 +288,7 @@ export class WeaponParser {
                         embeddedItems: ammo
                     }
                 }
-            }
-            else {
+            } else {
                 item.flags.shadowrun5e.embeddedItems.push(...ammo)
             }            
         }
@@ -325,8 +324,7 @@ export class WeaponParser {
                         embeddedItems: accessories
                     }
                 }
-            }
-            else {
+            } else {
                 itemData.flags.shadowrun5e.embeddedItems.push(...accessories)
             }            
         }

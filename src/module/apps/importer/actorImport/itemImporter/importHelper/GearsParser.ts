@@ -1,5 +1,5 @@
-import { ParserSelector } from "./ParserSelector";
 import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { ParserSelector } from "./ParserSelector";
 import { ActorSchema } from "../../ActorSchema";
 import { Unwrap } from "../ItemsParser";
 
