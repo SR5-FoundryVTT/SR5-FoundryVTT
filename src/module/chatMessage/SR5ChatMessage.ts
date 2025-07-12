@@ -17,8 +17,8 @@ export class SR5ChatMessage extends ChatMessage {
     get test(): SuccessTest | undefined {
         // Check if message contains any test data.
         const flagData = this._testData;
-        if (flagData === null || flagData === undefined) return;
-        if (this.id === null || this.id === '') return;
+        if (flagData === null || flagData === undefined) return undefined;
+        if (this.id === null || this.id === '') return undefined;
 
         return TestCreator._fromMessageTestData(flagData);
     }

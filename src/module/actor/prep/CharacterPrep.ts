@@ -10,17 +10,16 @@ import { MovementPrep } from './functions/MovementPrep';
 import { WoundsPrep } from './functions/WoundsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { NPCPrep } from './functions/NPCPrep';
-import { SR5ItemDataWrapper } from "../../data/SR5ItemDataWrapper";
 import { Helpers } from '../../helpers';
 import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
+import { SR5Item } from 'src/module/item/SR5Item';
 
 export class CharacterPrep {
-    static prepareBaseData(system: Shadowrun.CharacterData) {
+    static prepareBaseData(system: Actor.SystemOfType<'character'>) {
         CharacterPrep.addSpecialAttributes(system);
         SkillsPrep.prepareSkillData(system);
 
-        ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
@@ -35,7 +34,7 @@ export class CharacterPrep {
      * @param system
      * @param items
      */
-    static prepareDerivedData(system: Shadowrun.CharacterData, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'character'>, items: SR5Item[]) {
         AttributesPrep.prepareAttributes(system);
         AttributesPrep.prepareEssence(system, items);
 
@@ -73,7 +72,7 @@ export class CharacterPrep {
      * 
      * @param system Physical humanoid system data.
      */
-    static prepareRecoil(system: Shadowrun.CharacterData | Shadowrun.CritterData | Shadowrun.SpiritData | Shadowrun.VehicleData) {
+    static prepareRecoil(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>) {
         Helpers.calcTotal(system.values.recoil, { min: 0 });
     }
 
@@ -82,7 +81,7 @@ export class CharacterPrep {
      * 
      * @param system Character system data
      */
-    static prepareRecoilCompensation(system: Shadowrun.CharacterData | Shadowrun.CritterData | Shadowrun.SpiritData) {
+    static prepareRecoilCompensation(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
         const recoilCompensation = RangedWeaponRules.humanoidRecoilCompensationValue(system.attributes.strength.value);
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
         system.values.recoil_compensation.base = baseRc;
@@ -91,11 +90,11 @@ export class CharacterPrep {
         Helpers.calcTotal(system.values.recoil_compensation, { min: 0 });
     }
 
-    static addSpecialAttributes(system: Shadowrun.CharacterData) {
+    static addSpecialAttributes(system: Actor.SystemOfType<'character'>) {
         const { attributes } = system;
 
         // This is necessary to support critter actor types.
-        attributes.initiation = DataDefaults.attributeData({ base: system.magic.initiation, label: "SR5.Initiation", hidden: true });;
-        attributes.submersion = DataDefaults.attributeData({ base: system.technomancer.submersion, label: "SR5.Submersion", hidden: true });;
+        attributes.initiation = DataDefaults.createData('attribute_field', { base: system.magic.initiation, label: "SR5.Initiation", hidden: true });;
+        attributes.submersion = DataDefaults.createData('attribute_field', { base: system.technomancer.submersion, label: "SR5.Submersion", hidden: true });;
     }
 }

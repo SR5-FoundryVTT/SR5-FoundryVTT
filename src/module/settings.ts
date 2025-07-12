@@ -200,7 +200,6 @@ export const registerSystemSettings = () => {
         config: true,
         type: String,
         default: 'BOTH',
-        // @ts-expect-error TODO: foundry-vtt-types v10
         choices: {
             'BOTH': 'SETTINGS.FreshColorAndIcon',
             'COLOR': 'SETTINGS.FreshColor',
@@ -241,8 +240,7 @@ export const registerSystemSettings = () => {
         hint: 'SETTINGS.TokenRulerColorWalkingDescription',
         scope: 'world',
         config: true,
-        // @ts-expect-error not yet in typings
-        type: new foundry.data.fields.ColorField({ initial: '00FF00' }),
+        type: new foundry.data.fields.ColorField({ initial: '00FF00' } as const ),
     });
 
     /**
@@ -253,8 +251,7 @@ export const registerSystemSettings = () => {
         hint: 'SETTINGS.TokenRulerColorRunningDescription',
         scope: 'world',
         config: true,
-        // @ts-expect-error not yet in typings
-        type: new foundry.data.fields.ColorField({ initial: '0000FF' }),
+        type: new foundry.data.fields.ColorField({ initial: '0000FF' } as const ),
     });
 
     /**
@@ -265,8 +262,7 @@ export const registerSystemSettings = () => {
         hint: 'SETTINGS.TokenRulerColorSprintingDescription',
         scope: 'world',
         config: true,
-        // @ts-expect-error not yet in typings
-        type: new foundry.data.fields.ColorField({ initial: 'FF0000' }),
+        type: new foundry.data.fields.ColorField({ initial: 'FF0000' } as const ),
     });
 
     /**
@@ -277,7 +273,6 @@ export const registerSystemSettings = () => {
         hint: 'SETTINGS.TokenRulerOpacityDescription',
         scope: 'world',
         config: true,
-        // @ts-expect-error not yet in typings
-        type: new foundry.data.fields.AlphaField({ initial: 0.5 }),
+        type: new foundry.data.fields.AlphaField({ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 } as const),
     });
 };

@@ -1,7 +1,6 @@
-import { SR5Actor } from './../module/actor/SR5Actor';
-import { SR5TestingDocuments } from './utils';
-import { QuenchBatchContext } from '@ethaks/fvtt-quench';
+import { SR5TestFactory } from './utils';
 import { SR5Item } from '../module/item/SR5Item';
+import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 /**
  * Unit tests around rules for ranged weapons.
@@ -10,28 +9,19 @@ import { SR5Item } from '../module/item/SR5Item';
  * @param context 
  */
 export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
+    after(async () => { factory.destroy(); });
 
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
 
     const getWeaponWithEquippedAmmo = async (weaponAmmo: number, weaponAmmoMax: number, ammoQuantity: number) => {
-        const actor = await testActor.create({type: 'character', name: 'Test Character'});
-        const items = actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}]);
-        const item = items[0] as SR5Item;
-        // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}) as SR5Item;
-        //@ts-expect-error
-        const ammoItem = new SR5Item({type: 'ammo', name: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}}, {parent: item});
+        const actor = await factory.createActor({type: 'character'});
+        const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: weaponAmmo, max: weaponAmmoMax}}}}]);
+        const item = items![0] as SR5Item<'weapon'>;
+
+        const ammoItem = await factory.createItem({type: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}});
         await item.createNestedItem(ammoItem.toObject());
 
         // NOTE: I don't know why ammo is not equipped when created as such... this can be removed, if that is fixed.
@@ -57,34 +47,33 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
         });
 
         it('Reload weapon causes reduction in available clips', async () => {
-            const actor = await testActor.create({type: 'character', name: 'Test Character'});
+            const actor = await factory.createActor({type: 'character'});
             const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}, spare_clips: {value: 1, max: 1}}}}]);
-            const item = items[0] as SR5Item;
-            // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}, spare_clips: {value: 1, max: 1}}}}) as SR5Item;
-            assert.strictEqual(item.system.ammo?.spare_clips.value, 1);
-            await item.reloadAmmo(true);
-            assert.strictEqual(item.system.ammo?.spare_clips.value, 0);
+            const item = items![0] as SR5Item<'weapon'>;
+            assert.strictEqual(item.system.ammo.spare_clips.value, 1);
+            await item.reloadAmmo(false);
+            assert.strictEqual(item.system.ammo.spare_clips.value, 0);
         });
 
         it('Reloads weapon fully when no ammo is used', async () => {
-            const actor = await testActor.create({type: 'character', name: 'Test Character'});
+            const actor = await factory.createActor({type: 'character'});
             const items = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}]);
-            const item = items[0] as SR5Item;
-            // const item = await testItem.create({type: 'weapon', system: {category: 'range', ammo: {current: {value: 0, max: 30}}}}) as SR5Item;
-            assert.strictEqual(item.system.ammo?.current.value, 0);
-            await item.reloadAmmo(true);
-            assert.strictEqual(item.system.ammo?.current.value, item.system.ammo?.current.max);
+            const item = items![0] as SR5Item<'weapon'>;
+
+            assert.strictEqual(item.system.ammo.current.value, 0);
+            await item.reloadAmmo(false);
+            assert.strictEqual(item.system.ammo.current.value, item.system.ammo.current.max);
         });
 
         it('Reloads weapon fully when ammo is equipped and reduced ammo', async () => {
             // Set current bullets to partial value.
             const item = await getWeaponWithEquippedAmmo(15, 30, 30);
 
-            const ammo = item.getEquippedAmmo();
-            assert.strictEqual(item.system.ammo?.current.value, 15);
+            const ammo = item.getEquippedAmmo()!;
+            assert.strictEqual(item.system.ammo.current.value, 15);
             assert.strictEqual(ammo.system.technology?.quantity, 30);
-            await item.reloadAmmo(true);
-            assert.strictEqual(item.system.ammo?.current.value, item.system.ammo?.current.max);
+            await item.reloadAmmo(false);
+            assert.strictEqual(item.system.ammo.current.value, item.system.ammo.current.max);
             assert.strictEqual(ammo.system.technology?.quantity, 15);
         });
 
@@ -92,11 +81,11 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             // Set current bullets to partial value.
             const item = await getWeaponWithEquippedAmmo(15, 30, 0);
 
-            const ammo = item.getEquippedAmmo();
-            assert.strictEqual(item.system.ammo?.current.value, 15);
+            const ammo = item.getEquippedAmmo()!;
+            assert.strictEqual(item.system.ammo.current.value, 15);
             assert.strictEqual(ammo.system.technology?.quantity, 0);
-            await item.reloadAmmo(true);
-            assert.strictEqual(item.system.ammo?.current.value, 15);
+            await item.reloadAmmo(false);
+            assert.strictEqual(item.system.ammo.current.value, 15);
             assert.strictEqual(ammo.system.technology?.quantity, 0);
         });
 
@@ -104,11 +93,11 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             // Set current bullets to partial value.
             const item = await getWeaponWithEquippedAmmo(15, 30, 10);
 
-            const ammo = item.getEquippedAmmo();
-            assert.strictEqual(item.system.ammo?.current.value, 15);
+            const ammo = item.getEquippedAmmo()!;
+            assert.strictEqual(item.system.ammo.current.value, 15);
             assert.strictEqual(ammo.system.technology?.quantity, 10);
-            await item.reloadAmmo(true);
-            assert.strictEqual(item.system.ammo?.current.value, 25);
+            await item.reloadAmmo(false);
+            assert.strictEqual(item.system.ammo.current.value, 25);
             assert.strictEqual(ammo.system.technology?.quantity, 0);
         });
     });

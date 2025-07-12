@@ -6,7 +6,7 @@ import NoiseModifiersData = Shadowrun.NoiseModifiersData;
  * Rules application of situation modifieres for matrix.
  */
 export class NoiseModifier extends SituationModifier {
-    override source: NoiseModifiersSourceData
-    override applied: NoiseModifiersData
+    declare source: NoiseModifiersSourceData
+    declare applied: NoiseModifiersData
     override type: Shadowrun.SituationModifierType = 'noise'
 }

@@ -1,6 +1,5 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { WeaponParserBase } from './WeaponParserBase';
-import WeaponItemData = Shadowrun.WeaponItemData;
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { Weapon } from '../../schema/WeaponsSchema';
 
@@ -11,7 +10,7 @@ export class RangedParser extends WeaponParserBase {
         return match ? parseInt(match) : 0;
     }
 
-    protected override getSystem(jsonData: Weapon): WeaponItemData['system'] {
+    protected override getSystem(jsonData: Weapon) {
         const system = super.getSystem(jsonData);
 
         // Some new weapons don't have any rc defined in XML.
@@ -19,7 +18,7 @@ export class RangedParser extends WeaponParserBase {
         system.range.rc.value = Number(jsonData?.rc?._TEXT) || 0;
 
         const rangeCategory = jsonData.range?._TEXT || jsonData.category._TEXT;
-        system.range.ranges = DataDefaults.weaponRangeData(this.GetRangeDataFromImportedCategory(rangeCategory));
+        system.range.ranges = DataDefaults.createData('range', this.GetRangeDataFromImportedCategory(rangeCategory));
 
         system.ammo.current.value = this.GetAmmo(jsonData);
         system.ammo.current.max = this.GetAmmo(jsonData);

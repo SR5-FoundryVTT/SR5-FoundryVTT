@@ -2,8 +2,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR } from "../constants";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
-import RangesTemplateData = Shadowrun.RangesTemplateData;
-import RangeTemplateData = Shadowrun.RangeTemplateData;
+import { RangeTemplateType, RangesTemplateType } from "../types/template/Weapon";
 
 /**
  * Shadowrun5e rules applying to ranged weapons in general.
@@ -21,7 +20,7 @@ export const RangedWeaponRules = {
      * @param ranges Configured weapon ranges in meters taken from the weapon item configuration.
      * @returns The matching weapon range for the given distance.
      */
-    getRangeForTargetDistance(distance: number, ranges: RangesTemplateData): RangeTemplateData {
+    getRangeForTargetDistance(distance: number, ranges: RangesTemplateType): RangeTemplateType {
         // Assume ranges to be in ASC order and to define their max range.
         // Should no range be found, assume distance to be out of range.
         const rangeKey = Object.keys(ranges).find(range => distance <= ranges[range].distance);
@@ -40,10 +39,10 @@ export const RangedWeaponRules = {
      * @param item 
      * @returns total amount of recoil compensation to be used when attacking with this item.
      */
-    recoilCompensation(item: SR5Item): number {
-        let compensation = item.recoilCompensation;
+    recoilCompensation(item: SR5Item<'weapon'>): number {
+        let compensation = item.isRangedWeapon() ? item.system.range.rc.value : 0;
         if (item.actor) {
-            compensation += item.actor.recoilCompensation;
+            compensation += item.actor.recoilCompensation();
         }
         return compensation;
     },
@@ -56,7 +55,7 @@ export const RangedWeaponRules = {
      */
     actorRecoilCompensation(actor: SR5Actor): number {
         // Each new attack allows one free compensation.
-        if (actor.isVehicle()) return RangedWeaponRules.vehicleRecoilCompensation(actor);
+        if (actor.isType('vehicle')) return RangedWeaponRules.vehicleRecoilCompensation(actor);
         else return RangedWeaponRules.humanoidRecoilCompensation(actor);
     },
 
@@ -66,7 +65,7 @@ export const RangedWeaponRules = {
      * @returns The recoil compensation part a vehicle will add to the total recoil compensation.
      */
     vehicleRecoilCompensation(actor: SR5Actor): number {
-        if (!actor.isVehicle()) return 0;
+        if (!actor.isType('vehicle')) return 0;
 
         const body = actor.getAttribute('body');
         return body ? body.value : 0;
@@ -90,7 +89,8 @@ export const RangedWeaponRules = {
      * @returns The recoil compensation part a humanoid will add to the total recoil compensation.
      */
     humanoidRecoilCompensation(actor: SR5Actor): number {
-        if (actor.isVehicle() || actor.isIC() || actor.isSprite()) return 0;
+        const noBody = actor.isType('vehicle', 'ic', 'sprite');
+        if (noBody) return 0;
 
         const strength = actor.getAttribute('strength');
         if (!strength) return 0;

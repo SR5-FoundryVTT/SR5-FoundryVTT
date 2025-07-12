@@ -16,11 +16,9 @@
             </div>
             <div class="attributes smooth">
                 <div class="block">
-                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                            name=(localize system.track.physical.label)
-                            value=system.track.physical.value
-                            max=system.track.physical.max
-                            id='physical'
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.html'
+                        id='physical'
+                        track = system.track.physical
                     }}
                 </div>
             </div>

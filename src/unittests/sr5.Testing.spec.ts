@@ -1,62 +1,50 @@
-import {SR5TestingDocuments} from "./utils";
-import {SR5Actor} from "../module/actor/SR5Actor";
-import {SR5Item} from "../module/item/SR5Item";
-import {TestCreator} from "../module/tests/TestCreator";
+import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import { TestCreator } from "../module/tests/TestCreator";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    after(async () => { factory.destroy(); });
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {
-           const actionData = {
-                'system.action.test': 'SuccessTest',
-                'type': 'action',
-                'system.action.type': 'simple',
-                'system.action.attribute': 'body',
-                'system.action.skill': 'automatics',
-                'system.action.spec': false,
-                'system.action.limit': {
-                    base: 1,
-                    value: 1,
-                    attribute: 'physical',
+            const action = await factory.createItem({
+                type: 'action',
+                system: {
+                    action: {
+                        test: 'SuccessTest',
+                        type: 'simple',
+                        attribute: 'body',
+                        skill: 'automatics',
+                        limit: {
+                            base: 1,
+                            value: 1,
+                            attribute: 'physical',
+                        },
+                        threshold: {
+                            base: 1,
+                            value: 1,
+                        },
+                        damage: {
+                            ap: { value: 5, base: 5, mod: [] },
+                            base: 5,
+                            type: { value: 'physical', base: 'physical' },
+                            value: 5
+                        }
+                    }
                 },
-                'system.action.threshold': {
-                    base: 1,
-                    value: 1,
-                },
-                'system.action.damage': {
-                    ap: {value: 5, base: 5, mod: Array(0)},
-                    attribute: "",
-                    base: 5,
-                    base_formula_operator: "add",
-                    element: {value: '', base: ''},
-                    itemSource: {actorId: '', itemId: '', itemType: '', itemName: ''},
-                    mod: [],
-                    type: {value: 'physical', base: 'physical'},
-                    value: 5
+            });
+
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 5 }, strength: { base: 1 }, reaction: { base: 1 } },
+                    skills: { active: { automatics: { base: 45 } } }
                 }
-            };
-
-            const action = await testItem.create(actionData);
-
-            const actorData = {'type': 'character',
-                               'system.attributes.body.base': 5,
-                               'system.skills.active.automatics.base': 45};
-            const actor = await testActor.create(actorData);
+            });
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 
@@ -83,40 +71,42 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('evaluate an opposed roll from a opposed action', async () => {
-            const actionData = {
-                'type': 'action',
-                'data.action.test': 'SuccessTest',
-
-                'data.action.type': 'simple',
-                'data.action.attribute': 'body',
-                'data.action.skill': 'automatics',
-                'data.action.spec': false,
-                'data.action.limit': {
-                    base: 1,
-                    value: 1,
-                    attribute: 'physical',
-                },
-                'data.action.threshold': {
-                    base: 1,
-                    value: 1,
-                },
-                'data.action.opposed': {
-                    "type": "custom",
-                    // TODO: This could maybe simply be SuccessTest?
-                    "test": "OpposedTest",
-                    "attribute": "reaction",
-                    "attribute2": "intuition",
-                    "skill": "",
-                    "mod": 0,
-                    "description": ""
+            const action = await factory.createItem({
+                type: 'action',
+                system: {
+                    action: {
+                        test: 'SuccessTest',
+                        type: 'simple',
+                        attribute: 'body',
+                        skill: 'automatics',
+                        spec: false,
+                        limit: {
+                            base: 1,
+                            value: 1,
+                            attribute: 'physical',
+                        },
+                        threshold: {
+                            base: 1,
+                            value: 1,
+                        },
+                        opposed: {
+                            type: 'custom',
+                            test: 'OpposedTest',
+                            attribute: 'reaction',
+                            attribute2: 'intuition',
+                            skill: '',
+                            description: ''
+                        }
+                    }
                 }
-            };
-
-            const action = await testItem.create(actionData);
-            const actorData = {'type': 'character',
-                               'data.attributes.body.base': 5,
-                               'data.skills.active.automatics.base': 45};
-            const actor = await testActor.create(actorData);
+            });
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 5 } },
+                    skills: { active: { automatics: { base: 45 } } }
+                }
+            });
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 

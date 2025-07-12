@@ -10,7 +10,7 @@
  * Other than this file config.ts exists and only contains mappings between fixed names/ids and translation labels.
  *
  */
-export const SYSTEM_NAME = 'shadowrun5e';
+export const SYSTEM_NAME = 'shadowrun5e' as const;
 export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}`;
 export const FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
@@ -59,11 +59,11 @@ export const FLAGS = {
     TokenRulerColorRunning: "TokenRulerColorRunning",
     TokenRulerColorSprinting: "TokenRulerColorSprinting",
     TokenRulerOpacity: 'TokenRulerOpacity',
-};
+} as const;
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
     RollMode: 'rollMode'
-}
+} as const;
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
 
 export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {

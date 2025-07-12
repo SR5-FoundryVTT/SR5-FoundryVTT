@@ -1,19 +1,24 @@
-declare namespace Shadowrun {
-    export interface SinData extends
-        SinPartData,
-        DescriptionPartData,
-        ImportFlags,
-        TechnologyPartData {
+import { BaseItemData, ItemBase } from "./ItemBase";
+import { TechnologyData } from "../template/Technology";
+const { HTMLField, SchemaField, ArrayField, StringField } = foundry.data.fields;
 
-    }
+const LicenseData = () => ({
+    name: new StringField({ required: true }),
+    rtg: new StringField({ required: true }),
+    description: new HTMLField(),
+});
 
-    export interface SinPartData {
-        licenses: LicenseData[];
-    }
+const SinData = {
+    ...BaseItemData(),
+    technology: new SchemaField(TechnologyData()),
 
-    export interface LicenseData {
-        name: string
-        rtg: string
-        description: string
+    licenses: new ArrayField(new SchemaField(LicenseData())),
+}
+
+export class Sin extends ItemBase<typeof SinData> {
+    static override defineSchema() {
+        return SinData;
     }
 }
+
+console.log("SinData", SinData, new Sin());
