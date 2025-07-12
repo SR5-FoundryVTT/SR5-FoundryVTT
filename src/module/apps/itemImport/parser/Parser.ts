@@ -109,7 +109,7 @@ export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItem
             if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType]).includes(subType))
                 entity.system.importFlags.subType = subType;
 
-            const entitySystem = entity.system as Shadowrun.ShadowrunItemDataData | Shadowrun.ShadowrunActorDataData;
+            const entitySystem = entity.system as Shadowrun.ShadowrunItemData['system'] | Shadowrun.ShadowrunActorDataData;
             entity.img = IconAssign.iconAssign(entity.system.importFlags, DataImporter.iconList, entitySystem);
         }
     }

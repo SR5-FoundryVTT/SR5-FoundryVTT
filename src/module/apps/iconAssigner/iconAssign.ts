@@ -23,7 +23,7 @@ export async function getIconFiles(): Promise<string[]> {
 export function iconAssign(
     importFlags: Shadowrun.ImportFlagData,
     iconList: string[],
-    system?: Shadowrun.ShadowrunItemDataData | Shadowrun.ShadowrunActorDataData | Shadowrun.ShadowrunItemData['system']
+    system?: Shadowrun.ShadowrunActorDataData | Shadowrun.ShadowrunItemData['system']
 ): string {
 
     const defaultImg = "icons/svg/item-bag.svg";
