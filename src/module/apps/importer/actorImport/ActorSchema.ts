@@ -1,5 +1,3 @@
-import { object } from "node_modules/fvtt-types/src/foundry/common/prosemirror/schema/other.mjs";
-
 type Many<T> = T[];
 type MaybeEmpty<T> = T | null;
 type OneOrMany<T> = T | Many<T>;
