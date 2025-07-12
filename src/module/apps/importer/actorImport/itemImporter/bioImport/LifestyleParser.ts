@@ -1,35 +1,38 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
-import { SR5 } from "../../../../../config.js";
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { ActorSchema } from "../../ActorSchema";
+import { SR5 } from "../../../../../config";
+import { Unwrap } from "../ItemsParser";
 
 
 export class LifestyleParser {
-    async parseLifestyles(chummerChar, assignIcons) {
+    async parseLifestyles(chummerChar: ActorSchema, assignIcons: boolean) {
 
-        const chummerLifestyle = getArray(chummerChar.lifestyles.lifestyle);
-        const parsedLifestyle = [];
+        const chummerLifestyles = getArray(chummerChar.lifestyles?.lifestyle);
+        const parsedLifestyle: Shadowrun.LifestyleItemData[] = [];
         const iconList = await IconAssign.getIconFiles();
 
-        chummerLifestyle.forEach(async (chummerLifestyle) => {
+        for (const chummerLifestyle of chummerLifestyles) {
             try {
                 const itemData = this.parseLifestyle(chummerLifestyle);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                if (assignIcons)
+                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                 parsedLifestyle.push(itemData);
             }
              catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return parsedLifestyle;
     }
 
-    parseLifestyle(chummerLifestyle) {
+    parseLifestyle(chummerLifestyle: Unwrap<NonNullable<ActorSchema['lifestyles']>['lifestyle']>) {
         const parserType = 'lifestyle';
-        const system = {};
+        const system = {} as Shadowrun.LifestyleData;
 
         // Advanced lifestyles and lifestyle qualities are not supported at the moment
         // Map the chummer lifestyle type to our sr5 foundry type.
@@ -47,8 +50,8 @@ export class LifestyleParser {
             }
         }
 
-        system.cost = chummerLifestyle.totalmonthlycost;
-        system.permanent = chummerLifestyle.purchased;
+        system.cost = Number(chummerLifestyle.totalmonthlycost) || 0;
+        system.permanent = chummerLifestyle.purchased === 'True';
         system.description = parseDescription(chummerLifestyle);
 
         // The name of the lifestyle is optional, so we use a fallback here.

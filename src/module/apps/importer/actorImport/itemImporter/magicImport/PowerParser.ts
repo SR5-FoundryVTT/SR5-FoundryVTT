@@ -1,32 +1,35 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 export class PowerParser {
 
-    async parsePowers(chummerChar, assignIcons) {
-        const powers = getArray(chummerChar.powers.power);
-        const parsedPowers = [];
+    async parsePowers(chummerChar: ActorSchema, assignIcons: boolean) {
+        const powers = getArray(chummerChar.powers?.power);
+        const parsedPowers: Shadowrun.AdeptPowerItemData[] = [];
         const iconList = await IconAssign.getIconFiles();
 
-        powers.forEach(async (chummerPower) => {
+        for (const chummerPower of powers) {
             try {
                 const itemData = this.parsePower(chummerPower);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                if (assignIcons)
+                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                 parsedPowers.push(itemData);
             } catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return parsedPowers;
     }
 
-    parsePower(chummerPower) {
+    parsePower(chummerPower: Unwrap<NonNullable<ActorSchema['powers']>['power']>) {
         const parserType = 'adept_power';
-        const system = {};
+        const system = {} as Shadowrun.AdeptPowerData;
         system.description = parseDescription(chummerPower);
 
         system.level = parseInt(chummerPower.rating);

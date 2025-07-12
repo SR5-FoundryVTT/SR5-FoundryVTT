@@ -1,14 +1,16 @@
-import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
+import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions";
+import { BaseGearParser } from "../importHelper/BaseGearParser";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 /**
  * Parses SINs and the attached licenses.
  * Licenses that are not attached to a SIN are not handled.
  */
 export class SinParser extends BaseGearParser {
-    override parse(chummerGear : any) : any {
+    override parse(chummerGear: any) : any {
         const parserType = 'sin';
-        const parsedGear =  super.parse(chummerGear);
+        const parsedGear = super.parse(chummerGear) as unknown as Shadowrun.SinItemData;
         parsedGear.type = parserType;
 
         // Create licenses if there are any
@@ -32,8 +34,8 @@ export class SinParser extends BaseGearParser {
         return parsedGear;
     }
 
-    private parseLicenses(chummerLicenses : any) : any[] {
-        const parsedLicenses : any[] = [];
+    private parseLicenses(chummerLicenses: any) {
+        const parsedLicenses: Shadowrun.LicenseData[] = [];
 
         chummerLicenses.forEach(chummerLicense => {
             if (chummerLicense.category_english === 'ID/Credsticks')

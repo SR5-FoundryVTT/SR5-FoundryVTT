@@ -117,7 +117,7 @@ declare namespace Shadowrun {
         type: 'bioware';
         name: string;
         img: string;
-        data:  BiowareData;
+        data: BiowareData;
         system: BiowareData;
     }
     export interface ComplexFormItemData {

@@ -1,34 +1,37 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
 import { DataDefaults } from "../../../../../data/DataDefaults";
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 export class SpellParser {
-    async parseSpells(chummerChar, assignIcons) {
-        const spells = getArray(chummerChar.spells.spell).filter(chummerSpell => !chummerSpell.category_english.includes("Rituals"));
-        const parsedSpells = [];
+    async parseSpells(chummerChar: ActorSchema, assignIcons: boolean) {
+        const spells = getArray(chummerChar.spells?.spell).filter(chummerSpell => !chummerSpell.category_english.includes("Rituals"));
+        const parsedSpells: Shadowrun.SpellItemData[] = [];
         const iconList = await IconAssign.getIconFiles();
 
-        spells.forEach(async (chummerSpell) => {
+        for (const spell of spells) {
             try {
-                if (chummerSpell.alchemy.toLowerCase() !== 'true') {
-                    const itemData = await this.parseSpell(chummerSpell);
+                if (spell.alchemy !== 'True') {
+                    const itemData = await this.parseSpell(spell);
 
                     // Assign the icon if enabled
-                    if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                    if (assignIcons)
+                        itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                     parsedSpells.push(itemData);
                 }
             } catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return parsedSpells;
     }
 
-    async parseSpell(chummerSpell) {
+    async parseSpell(chummerSpell: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
         const parserType = 'spell';
-        const system = {};
+        const system = {} as Shadowrun.SpellData;
 
         this.prepareSystem(system, chummerSpell)
 
@@ -48,10 +51,9 @@ export class SpellParser {
         return createItemData(chummerSpell.name, parserType, system);
     }
 
-    prepareSystem(system, chummerSpell) {
+    prepareSystem(system: Shadowrun.SpellData, chummerSpell: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
 
-        system.category = chummerSpell.category_english.toLowerCase().replace(/\s/g, '_');
-        system.name = chummerSpell.name;
+        system.category = chummerSpell.category_english.toLowerCase().replace(/\s/g, '_') as any;
         system.type = chummerSpell.type === 'M' ? 'mana' : 'physical';
         system.range =
             chummerSpell.range === 'T'
@@ -60,12 +62,12 @@ export class SpellParser {
                         .toLowerCase()
                         .replace(/\s/g, '_')
                         .replace('(', '')
-                        .replace(')', '');
+                        .replace(')', '') as any;
         system.drain = parseInt(chummerSpell.dv.replace(/[A-Z]*/g, ''));
         system.description = parseDescription(chummerSpell);
     }
 
-    parseDuration(chummerSpell, system) {
+    parseDuration(chummerSpell: Unwrap<NonNullable<ActorSchema['spells']>['spell']>, system: Shadowrun.SpellData) {
         if (chummerSpell.duration.toLowerCase() === 's') {
             system.duration = 'sustained';
         }
@@ -77,8 +79,8 @@ export class SpellParser {
         }
     }
 
-    prepareAction(system) {
-        system.action = {};
+    prepareAction(system: Shadowrun.SpellData) {
+        system.action = {} as Shadowrun.SpellData['action'];
         system.action.type = 'varies';
         system.action.skill = 'spellcasting';
         system.action.attribute = 'magic';
@@ -87,8 +89,8 @@ export class SpellParser {
         system.action.damage.type.value = '';
     }
 
-    handleSpellTypeSpecifics(system, chummerSpell) {
-        let category = chummerSpell.category_english;
+    handleSpellTypeSpecifics(system: Shadowrun.SpellData, chummerSpell: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
+        const category = chummerSpell.category_english;
         if (chummerSpell.descriptors) {
             const desc = chummerSpell.descriptors.toLowerCase();
             if (category.toLowerCase() === 'combat') {
@@ -106,25 +108,19 @@ export class SpellParser {
         }
     }
 
-    handleCombatSpellSpecifics(system, desc, damage) {
-        system.combat = {};
+    handleCombatSpellSpecifics(system: Shadowrun.SpellData, desc: string, damage: string) {
+        system.combat = {} as Shadowrun.SpellData['combat'];
         if (desc.includes('indire')) {
             system.combat.type = 'indirect';
-            system.action.opposed = {
-                type: 'defense',
-            };
+            system.action.opposed.test = 'defense';
         } else {
             system.combat.type = 'direct';
             if (system.type === 'mana') {
-                system.action.opposed = {
-                    type: 'soak',
-                    attribute: 'willpower',
-                };
+                system.action.opposed.test = 'soak';
+                system.action.opposed.attribute = 'willpower';
             } else if (system.type === 'physical') {
-                system.action.opposed = {
-                    type: 'soak',
-                    attribute: 'body',
-                };
+                system.action.opposed.test = 'soak';
+                system.action.opposed.attribute = 'body';
             }
         }
 
@@ -134,8 +130,8 @@ export class SpellParser {
         }
     }
 
-    handleDetectionSpellSpecifics(system, desc) {
-        system.detection = {};
+    handleDetectionSpellSpecifics(system: Shadowrun.SpellData, desc: string) {
+        system.detection = {} as Shadowrun.SpellData['detection'];
         const split = desc.split(',');
         split.forEach((token) => {
             token = token || '';
@@ -148,19 +144,17 @@ export class SpellParser {
             else if (token.includes('active'))
                 system.detection.passive = false;
             else if (token)
-                system.detection.type = token.toLowerCase();
+                system.detection.type = token.toLowerCase() as any;
         });
         if (!system.detection.passive) {
-            system.action.opposed = {
-                type: 'custom',
-                attribute: 'willpower',
-                attribute2: 'logic',
-            };
+            system.action.opposed.type = 'custom';
+            system.action.opposed.attribute = 'willpower';
+            system.action.opposed.attribute2 = 'logic';
         }
     }
 
-    handleIllusionSpellSpecifics(system, desc) {
-        system.illusion = {};
+    handleIllusionSpellSpecifics(system: Shadowrun.SpellData, desc: string) {
+        system.illusion = {} as Shadowrun.SpellData['illusion'];
         const split = desc.split(',');
         split.forEach((token) => {
             token = token || '';
@@ -169,27 +163,23 @@ export class SpellParser {
             if (token.includes('area')) return;
 
             if (token.includes('sense'))
-                system.illusion.sense = token.toLowerCase();
+                system.illusion.sense = token.toLowerCase() as any;
             else if (token)
-                system.illusion.type = token.toLowerCase();
+                system.illusion.type = token.toLowerCase() as any;
         });
         if (system.type === 'mana') {
-            system.action.opposed = {
-                type: 'custom',
-                attribute: 'willpower',
-                attribute2: 'logic',
-            };
+            system.action.opposed.type = 'custom';
+            system.action.opposed.attribute = 'willpower';
+            system.action.opposed.attribute2 = 'logic';
         } else {
-            system.action.opposed = {
-                type: 'custom',
-                attribute: 'intuition',
-                attribute2: 'logic',
-            };
+            system.action.opposed.type = 'custom';
+            system.action.opposed.attribute = 'intuition';
+            system.action.opposed.attribute2 = 'logic';
         }
     }
 
-    handleManipulationSpellSpecifics(system, desc){
-        system.manipulation = {};
+    handleManipulationSpellSpecifics(system: Shadowrun.SpellData, desc: string){
+        system.manipulation = {} as Shadowrun.SpellData['manipulation'];
         if (desc.includes('environmental'))
             system.manipulation.environmental = true;
         if (desc.includes('physical'))
@@ -199,18 +189,14 @@ export class SpellParser {
         // TODO figure out how to parse damaging
 
         if (system.manipulation.mental) {
-            system.action.opposed = {
-                type: 'custom',
-                attribute: 'willpower',
-                attribute2: 'logic',
-            };
+            system.action.opposed.type = 'custom';
+            system.action.opposed.attribute = 'willpower';
+            system.action.opposed.attribute2 = 'logic';
         }
         if (system.manipulation.physical) {
-            system.action.opposed = {
-                type: 'custom',
-                attribute: 'body',
-                attribute2: 'strength',
-            };
+            system.action.opposed.type = 'custom';
+            system.action.opposed.attribute = 'body';
+            system.action.opposed.attribute2 = 'strength';
         }
     }
 }

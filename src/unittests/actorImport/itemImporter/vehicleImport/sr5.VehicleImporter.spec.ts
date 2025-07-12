@@ -30,7 +30,7 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
 
             const parsedVehicles = await vehicleParser.parseVehicles(
                 actor,
-                { vehicles: { vehicle: [chummerDrone, chummerVehicle] } },
+                { vehicles: { vehicle: [chummerDrone, chummerVehicle] } } as any,
                 { vehicles: true },
             );
 

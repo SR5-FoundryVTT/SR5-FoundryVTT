@@ -1,14 +1,16 @@
+import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions";
 import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 /**
  * Parses devices (commlinks, decks, and RCCs)
  */
 export class DeviceParser extends BaseGearParser {
 
-    override parse(chummerGear : any) : any {
+    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): any {
         const parserType = 'device';
-        const parsedGear =  super.parse(chummerGear);
+        const parsedGear = super.parse(chummerGear);
         parsedGear.type = parserType;
         parsedGear.system.technology.rating = chummerGear.devicerating;
 
