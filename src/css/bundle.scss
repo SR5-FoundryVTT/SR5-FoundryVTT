@@ -610,12 +610,10 @@ input[type='text'].display {
         min-height: 250px;
     }
     .scroll-area-knowledge {
+        flex: 1;
         overflow-y: auto;
-        max-height: 300px;
-        margin-bottom: 0.5em;
-        flex-grow: 1;
-        flex-shrink: 1;
-        flex-basis: auto;
+        overflow-x: hidden;
+        min-height: 0;
     }
 
     .scroll-area-mods {
