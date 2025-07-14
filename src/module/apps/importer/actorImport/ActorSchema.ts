@@ -1131,7 +1131,7 @@ export type ActorSchema = {
             objectname: string;
             objectname_english: string;
             armor: string;
-            improvesource: MaybeEmpty<string>;
+            improvesource: string;
             enabled: TruthyString;
             customname: MaybeEmpty<string>;
             customgroup: MaybeEmpty<string>;

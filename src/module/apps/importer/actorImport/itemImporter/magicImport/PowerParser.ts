@@ -37,9 +37,9 @@ export class PowerParser {
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerPower.fullname), parserType);
-        if (chummerPower.name != chummerPower.fullname) {
+        if (chummerPower.name !== chummerPower.fullname) {
             setSubType(system, parserType, formatAsSlug(chummerPower.name));
-            if (system.importFlags.subType) {
+            if (system.importFlags.subType && chummerPower.extra) {
                 system.importFlags.name = formatAsSlug(chummerPower.extra);
             }
         }

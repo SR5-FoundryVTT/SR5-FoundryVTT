@@ -33,16 +33,16 @@ export class CritterPowerParser {
         system.description = parseDescription(chummerCritterPower);
 
 
-        system.rating = parseFloat(chummerCritterPower.extra);
+        system.rating = Number(chummerCritterPower.extra) || 0;
         system.powerType = chummerCritterPower.type === "P" ? 'physical' : 'mana';
-        system.range = chummerCritterPower.range;
-        system.duration = chummerCritterPower.duration;
+        system.range = chummerCritterPower.range || 'Self';
+        system.duration = chummerCritterPower.duration || 'Always';
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerCritterPower.fullname), parserType);
-        if (chummerCritterPower.name_english != chummerCritterPower.fullname) {
+        if (chummerCritterPower.name_english !== chummerCritterPower.fullname) {
             setSubType(system, parserType, formatAsSlug(chummerCritterPower.name_english));
-            if (system.importFlags.subType) {
+            if (system.importFlags.subType && chummerCritterPower.extra) {
                 system.importFlags.name = formatAsSlug(chummerCritterPower.extra);
             }
         }

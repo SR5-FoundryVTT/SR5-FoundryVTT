@@ -31,8 +31,8 @@ export class QualityParser {
         const parserType = 'quality';
         const system = {} as Shadowrun.QualityData;
         system.type = chummerQuality.qualitytype_english.toLowerCase() as any;
-        system.rating = parseInt(chummerQuality.extra) || 0;
-        system.karma = (parseInt(chummerQuality.bp) || 0) * Math.max(system.rating, 1);
+        system.rating = Number(chummerQuality.extra) || 0;
+        system.karma = (Number(chummerQuality.bp) || 0) * Math.max(system.rating, 1);
         system.description = parseDescription(chummerQuality);
 
         // Assign import flags
