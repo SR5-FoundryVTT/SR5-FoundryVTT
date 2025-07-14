@@ -159,7 +159,7 @@ export const ActorMarksFlow = {
 
             const network = ActorMarksFlow.getDocumentNetwork(document);
             const type = ActorMarksFlow.getDocumentType(document);
-            // TODO: taMiF/marks markId should be useless if document.uuid is mostly used and the unique name is confusing.
+            // Store actual target uuid, as sometimes shown and marked icons can differ.
             const markId = uuid;
 
             // Default values for matrix targets.
