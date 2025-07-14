@@ -76,6 +76,7 @@ import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
+import { Migrator } from '../migrator/Migrator';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -167,6 +168,14 @@ export class SR5Item extends Item {
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
+    }
+
+    // @ts-expect-error TODO: foundry-vtt-types v10
+    static override migrateData(source: any) {
+        Migrator.migrate("Item", source);
+
+        // @ts-expect-error TODO: foundry-vtt-types v10
+        return super.migrateData(source);
     }
 
     /**

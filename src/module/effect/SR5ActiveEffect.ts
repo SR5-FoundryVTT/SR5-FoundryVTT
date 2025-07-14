@@ -4,8 +4,7 @@ import { EffectChangeData, EffectChangeDataSource } from "@league-of-foundry-dev
 import { SYSTEM_NAME } from "../constants";
 import { SR5Item } from "../item/SR5Item";
 import { TagifyTags, tagifyFlagsToIds } from "../utils/sheets";
-
-
+import { Migrator } from "../migrator/Migrator";
 
 /**
  * Shadowrun Active Effects implement additional ways of altering document data.
@@ -398,11 +397,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         /**
          * label -> name
          * @deprecated since v11
-         */
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
+        */
+       // @ts-expect-error TODO: foundry-vtt-types v10
+       this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
 
-        return data;
+        Migrator.migrate("ActiveEffect", data);
+
+        // @ts-expect-error foundry-vtt-types v10
+        return super.migrateData(data);
     }
     /**
      * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
