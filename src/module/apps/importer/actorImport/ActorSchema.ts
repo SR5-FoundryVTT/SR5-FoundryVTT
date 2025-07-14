@@ -733,7 +733,7 @@ export type ActorSchema = {
             grade: string;
             location: MaybeEmpty<string>;
             extra: MaybeEmpty<string>;
-            improvementsource: MaybeEmpty<string>;
+            improvementsource: string;
             isgeneware: TruthyString;
             attack: string;
             sleaze: string;
@@ -1023,7 +1023,7 @@ export type ActorSchema = {
                 source: MaybeEmpty<string>;
                 page: MaybeEmpty<string>;
                 grade: string;
-                improvementsource: MaybeEmpty<string>;
+                improvementsource: string;
                 notes?: MaybeEmpty<string>;
             };
         }>>;
@@ -1036,7 +1036,7 @@ export type ActorSchema = {
                 name_english: string;
                 source: MaybeEmpty<string>;
                 page: MaybeEmpty<string>;
-                improvementsource: MaybeEmpty<string>;
+                improvementsource: string;
                 notes?: MaybeEmpty<string>;
             };
         }>>;
@@ -1049,7 +1049,7 @@ export type ActorSchema = {
                 name_english: string;
                 source: MaybeEmpty<string>;
                 page: MaybeEmpty<string>;
-                improvementsource: MaybeEmpty<string>;
+                improvementsource: string;
                 notes?: MaybeEmpty<string>;
             };
         }>>;
@@ -1064,7 +1064,7 @@ export type ActorSchema = {
             source: MaybeEmpty<string>;
             page: MaybeEmpty<string>;
             grade: string;
-            improvementsource: MaybeEmpty<string>;
+            improvementsource: string;
             notes?: MaybeEmpty<string>;
         }>;
     }>;
@@ -1077,7 +1077,7 @@ export type ActorSchema = {
             name_english: string;
             source: MaybeEmpty<string>;
             page: MaybeEmpty<string>;
-            improvementsource: MaybeEmpty<string>;
+            improvementsource: string;
             notes?: MaybeEmpty<string>;
         }>;
     }>;
@@ -1090,7 +1090,7 @@ export type ActorSchema = {
             name_english: string;
             source: MaybeEmpty<string>;
             page: MaybeEmpty<string>;
-            improvementsource: MaybeEmpty<string>;
+            improvementsource: string;
             notes?: MaybeEmpty<string>;
         }>;
     }>;
