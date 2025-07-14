@@ -5,6 +5,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { tagifyFlagsToIds } from "../utils/sheets";
 import { ModifiableValueType } from "../types/template/Base";
 import DataModel = foundry.abstract.DataModel;
+import { Migrator } from "../migrator/Migrator";
 
 /**
  * Shadowrun Active Effects implement additional ways of altering document data.
@@ -476,7 +477,9 @@ export class SR5ActiveEffect extends ActiveEffect {
          */
         this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
 
-        return data;
+        Migrator.migrate("ActiveEffect", data);
+
+        return super.migrateData(data);
     }
     /**
      * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...

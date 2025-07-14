@@ -37,6 +37,7 @@ import { WarePrep } from './prep/WarePrep';
 import { ConditionType } from '../types/template/Condition';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from '../types/flags/ItemFlags';
 import { MatrixType } from '../types/template/Matrix';
+import { Migrator } from '../migrator/Migrator';
 
 ActionResultFlow; // DON'T TOUCH!
 
@@ -110,6 +111,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
     }
     async setLastFireRangeMod(environmentalMod: FireRangeType) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
+    }
+
+    static override migrateData(source: any) {
+        Migrator.migrate("Item", source);
+        return super.migrateData(source);
     }
 
     /**

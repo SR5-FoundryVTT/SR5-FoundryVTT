@@ -38,6 +38,7 @@ import { InventoryType } from '../types/actor/Common';
 import { SkillRollOptions } from '../types/rolls/ActorRolls';
 import { FireModeType } from '../types/flags/ItemFlags';
 import { MatrixType } from '../types/template/Matrix';
+import { Migrator } from '../migrator/Migrator';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -97,6 +98,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
         if (!isNaN(num))
             return this.setFlag(SYSTEM_NAME, 'overwatchScore', num);
         return;
+    }
+
+    static override migrateData(source: any) {
+        Migrator.migrate("Actor", source);
+        return super.migrateData(source);
     }
 
     /**
