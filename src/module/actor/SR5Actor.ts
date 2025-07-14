@@ -1279,34 +1279,26 @@ export class SR5Actor extends Actor {
         return Helpers.onGetFlag(data);
     }
 
-    /** Return either the linked token or the token of the synthetic actor.
+    /**
+     * Returns the most appropriate token document for the actor.
      *
-     * @return Will return null should no token have been placed on scene.
+     * Priority:
+     * 1. Synthetic token (if this actor is synthetic).
+     * 2. A controlled linked token on the canvas.
+     * 3. Any linked token on the canvas.
+     * 4. Null if no token is available.
+     *
+     * @returns The token document if available, otherwise null.
      */
     getToken(): TokenDocument | null {
-        // Linked actors can only have one token, which isn't stored within actor data...
-        if (this._isLinkedToToken() && this.hasToken()) {
-            const linked = true;
-            const tokens = this.getActiveTokens(linked) as unknown as Token[];
-            // This assumes for a token to exist and should fail if not.
-            return tokens[0].document;
-        }
+        // 1. this is a synthetic actor, return its token.
+        if (this.token) return this.token;
 
-        // Unlinked actors can have multiple active token but each have theirs directly attached...
-        return this.token;
-    }
+        const linkedTokens = this.getActiveTokens(true);
+        const controlled = canvas.tokens?.controlled?.find(t => linkedTokens.includes(t));
 
-    /**
-     * There is no need for a token to placed. The prototype token is enough.
-     */
-    _isLinkedToToken(): boolean {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        // If an actor is linked, all it's copies also contain this linked status, even if they're not.
-        return this.prototypeToken.actorLink && !this.token;
-    }
-
-    hasToken(): boolean {
-        return this.getActiveTokens().length > 0;
+        // controlled & linked -> linked
+        return controlled?.document ?? linkedTokens[0]?.document ?? null;
     }
 
     hasActivePlayerOwner(): boolean {
