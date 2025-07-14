@@ -14,8 +14,8 @@ export class Migrator {
     ] as const;
 
     public static migrate(type: "Actor" | "Item" | "ActiveEffect", data: any) {
-         // Skip tombstone items
-        if (data._tombstone || data._stats == null) return data;
+        // Skip items with no stats
+        if (data._stats == null) return data;
 
         const version = data._stats.systemVersion || "0.0.0";
         const migrators = this.s_Versions.filter(v => this.compareVersion(v.TargetVersion, version) > 0);
