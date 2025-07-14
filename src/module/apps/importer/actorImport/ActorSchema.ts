@@ -1,3 +1,9 @@
+/**
+ * This type was generated based on empirically exported data from Chummer.
+ * It may be incomplete or inaccurate due to inconsistencies or missing data in the source.
+ * Use with caution and verify against real-world usage where possible.
+ */
+
 type Many<T> = T[];
 type MaybeEmpty<T> = T | null;
 type OneOrMany<T> = T | Many<T>;
@@ -981,7 +987,13 @@ export type ActorSchema = {
                     location?: MaybeEmpty<string>;
                     included: TruthyString;
                     weapons: ActorSchema['weapons'];
-                    mods?: null;
+                    mods?: (
+                        NonNullable<ActorSchema['vehicles']>['vehicle'] extends infer V
+                            ? V extends any[]
+                                ? V[number]
+                                : V
+                            : never
+                    )['mods'];
                     cyberwares?: ActorSchema['cyberwares'];
                     notes?: MaybeEmpty<string>;
                 }>;
