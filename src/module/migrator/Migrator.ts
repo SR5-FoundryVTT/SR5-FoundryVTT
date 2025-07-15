@@ -23,6 +23,9 @@ export class Migrator {
         const version = data._stats.systemVersion;
         const migrators = this.s_Versions.filter(v => this.compareVersion(v.TargetVersion, version) > 0);
 
+        // If no migrators found, nothing to do.
+        if (migrators.length === 0) return;
+
         for (const migrator of migrators) {
             if (type === "Actor")
                 migrator.migrateActor(data);
