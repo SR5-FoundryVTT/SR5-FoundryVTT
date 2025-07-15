@@ -1,15 +1,10 @@
 import { BonusSchema } from '../schema/BonusSchema';
 
-import EffectTagsData = Shadowrun.EffectTagsData;
-import EffectChangeData = Shadowrun.EffectChangeData;
-import EffectOptionsData = Shadowrun.EffectOptionsData;
-import EffectDurationData = Shadowrun.EffectDurationData;
-
-export type CreateData = (
+export type DocCreateData = (
     Actor.CreateData | Item.CreateData
-) & {
-    effects?: EffectOptionsData[];
-};
+) & { effects?: any[] };
+
+export type AECreateData = Omit<ActiveEffect.CreateData, "name"> & { name?: string, changes?: any[] };
 
 export type ActiveEffectMode = typeof CONST.ACTIVE_EFFECT_MODES[keyof typeof CONST.ACTIVE_EFFECT_MODES];
 export const { CUSTOM, MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACTIVE_EFFECT_MODES;
@@ -52,60 +47,66 @@ export class BonusConstant {
         "Street": [],
     } as const;
 
-    public static simpleEffects: Partial<Record<
-        keyof BonusSchema,
-        Omit<EffectChangeParameter, 'value'> & { overrides?: Partial<EffectOptionsData>; tags?: Partial<EffectTagsData> }
-    >> = {
-        accel: { key: "system.vehicle_stats.acceleration.mod" },
-        armor: { key: "system.armor.mod", overrides: { name: "Add Armor" } },
-        body: { key: "system.attributes.body.mod" },
-        composure: { key: "system.modifiers.composure" },
+    public static readonly simpleEffects = {
+        accel: { changes: [{ key: "system.vehicle_stats.acceleration.mod" }] },
+        armor: {
+            name: "Add Armor",
+            changes: [{ key: "system.armor.mod" }]
+        },
+        body: { changes: [{ key: "system.attributes.body.mod" }] },
+        composure: { changes: [{ key: "system.modifiers.composure" }] },
         damageresistance: {
-            key: "data.modifiers.mod",
-            overrides: { name: "Add Damage Resistance" },
-            tags: { selection_tests: '[{"value":"Physical Damage Resist", "id":"PhysicalResistTest"}]' }
+            name: "Add Damage Resistance",
+            changes: [{ key: "data.modifiers.mod" }],
+            system: { applyTo: 'test_all', selection_tests: [{ id: "PhysicalResistTest" }] },
         },
-        defensetest: { key: "system.modifiers.defense" },
-        dodge: { key: "system.modifiers.defense" },
+        defensetest: { changes: [{ key: "system.modifiers.defense" }] },
+        dodge: { changes: [{ key: "system.modifiers.defense" }] },
         drainresist: {
-            key: "data.modifiers.mod",
-            overrides: { name: "Add Drain Resistance" },
-            tags: { selection_tests: '[{"value":"Drain Test", "id":"DrainTest"}]' }
+            name: "Add Drain Resistance",
+            changes: [{ key: "data.modifiers.mod" }],
+            system: { applyTo: 'test_all', selection_tests: [{ id: "DrainTest" }] },
         },
-        essencemax: { key: "system.attributes.essence.mod" },
+        essencemax: { changes: [{ key: "system.attributes.essence.mod" }] },
         fadingresist: {
-            key: "data.modifiers.mod",
-            overrides: { name: "Add Fading Resistance" },
-            tags: { selection_tests: '[{"value":"Fade Test", "id":"FadeTest"}]' }
+            name: "Add Fading Resistance",
+            changes: [{ key: "data.modifiers.mod" }],
+            system: { applyTo: 'test_all', selection_tests: [{ id: "FadeTest" }] },
         },
-        handling: { key: "system.vehicle_stats.handling.mod" },
-        initiativedice: { key: "system.modifiers.meat_initiative_dice", overrides: { name: "Increase Initiative Dice" } },
-        judgeintentions: { key: "system.modifiers.judge_intentions" },
-        matrixinitiativediceadd: { key: "system.modifiers.matrix_initiative_dice", overrides: { name: "Increase Matrix Initiative Dice" } },
-        mentallimit: { key: "system.limits.mental.mod" },
-        memory: { key: "system.modifiers.memory" },
-        offroadhandling: { key: "system.vehicle_stats.off_road_handling.mod" },
-        offroadspeed: { key: "system.vehicle_stats.off_road_speed.mod" },
-        pilot: { key: "system.vehicle_stats.pilot.mod" },
+        handling: { changes: [{ key: "system.vehicle_stats.handling.mod" }] },
+        initiativedice: {
+            name: "Increase Initiative Dice",
+            changes: [{ key: "system.modifiers.meat_initiative_dice" }]
+        },
+        judgeintentions: { changes: [{ key: "system.modifiers.judge_intentions"}] },
+        matrixinitiativediceadd: {
+            name: "Increase Matrix Initiative Dice",
+            changes: [{ key: "system.modifiers.matrix_initiative_dice" }]
+        },
+        mentallimit: { changes: [{ key: "system.limits.mental.mod" }] },
+        memory: { changes: [{ key: "system.modifiers.memory" }] },
+        offroadhandling: { changes: [{ key: "system.vehicle_stats.off_road_handling.mod" }] },
+        offroadspeed: { changes: [{ key: "system.vehicle_stats.off_road_speed.mod" }] },
+        pilot: { changes: [{ key: "system.vehicle_stats.pilot.mod" }] },
         physicalcmrecovery: {
-            key: "data.modifiers.mod",
-            overrides: { name: "Natural Recovery Physical" },
-            tags: { selection_tests: '[{"value":"Natural Recovery Physical", "id":"NaturalRecoveryPhysicalTest"}]' }
+            name: "Natural Recovery Physical",
+            changes: [{ key: "data.modifiers.mod" }],
+            system: { applyTo: 'test_all', selection_tests: [{ id: "NaturalRecoveryPhysicalTest" }] }
         },
-        physicallimit: { key: "system.limits.physical.mod" },
-        reach: { key: "system.modifiers.reach" },
-        seats: { key: "system.vehicle_stats.seats.mod" },
-        sensor: { key: "system.vehicle_stats.sensor.mod" },
-        speed: { key: "system.vehicle_stats.speed.mod" },
+        physicallimit: { changes: [{ key: "system.limits.physical.mod" }] },
+        reach: { changes: [{ key: "system.modifiers.reach" }] },
+        seats: { changes: [{ key: "system.vehicle_stats.seats.mod" }] },
+        sensor: { changes: [{ key: "system.vehicle_stats.sensor.mod" }] },
+        speed: { changes: [{ key: "system.vehicle_stats.speed.mod" }] },
         spellresistance: {
-            key: "data.modifiers.mod",
-            overrides: { name: "Add Spell Resistance" },
-            tags: { selection_tests: '[{"value":"Combat Spell Defense","id":"CombatSpellDefenseTest"}]' }
+            name: "Add Spell Resistance",
+            changes: [{ key: "data.modifiers.mod" } ],
+            system: { applyTo: 'test_all', selection_tests: [{ id: "CombatSpellDefenseTest" }] }
         },
         stuncmrecovery: {
-            key: "data.modifiers.mod",
-            overrides: { name: "Natural Recovery Stun" },
-            tags: { selection_tests: '[{"value":"Natural Recovery Stun", "id":"NaturalRecoveryStunTest"}]' }
+            name: "Natural Recovery Stun",
+            changes: [{ key: "data.modifiers.mod" }],
+            system: { applyTo: 'test_all', selection_tests: [{ id: "NaturalRecoveryStunTest" }] }
         }
-    } as const;
+    } as const satisfies Partial< Record< keyof BonusSchema, AECreateData > >;
 }

@@ -80,7 +80,7 @@ import { Spirit } from './types/actor/Spirit';
 import { Sprite } from './types/actor/Sprite';
 import { Vehicle } from './types/actor/Vehicle';
 
-import { ActiveEffectDM } from './types/activeeffect/ActiveEffect';
+import { ActiveEffectDM } from './types/effect/ActiveEffect';
 import { Action } from './types/item/Action';
 import { AdeptPower } from './types/item/AdeptPower';
 import { Ammo } from './types/item/Ammo';

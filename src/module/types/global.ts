@@ -16,7 +16,7 @@ import { Spirit } from "./actor/Spirit";
 import { Sprite } from "./actor/Sprite";
 import { Vehicle } from "./actor/Vehicle";
 
-import { ActiveEffectDM } from "./activeeffect/ActiveEffect";
+import { ActiveEffectDM } from "./effect/ActiveEffect";
 import { Action } from './item/Action';
 import { AdeptPower } from './item/AdeptPower';
 import { Ammo } from './item/Ammo';
@@ -124,20 +124,6 @@ declare module "fvtt-types/configuration" {
     }
 
     interface FlagConfig {
-        ActiveEffect: {
-            shadowrun5e: {
-                applyTo?: Shadowrun.EffectApplyTo;
-                appliedByTest?: boolean;
-                onlyForEquipped?: boolean;
-                onlyForWireless?: boolean;
-                onlyForItemTest?: boolean;
-                selection_tests?: string;
-                selection_categories?: string;
-                selection_skills?: string;
-                selection_attributes?: string;
-                selection_limits?: string;
-            };
-        };
         Actor: {
             shadowrun5e: {
                 turnsSinceLastAttack?: number;
