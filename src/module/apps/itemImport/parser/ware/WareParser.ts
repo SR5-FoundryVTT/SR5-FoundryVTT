@@ -1,8 +1,9 @@
 import { Parser } from '../Parser';
-import { Bioware, BiowareSchema } from '../../schema/BiowareSchema';
-import { Cyberware, CyberwareSchema } from '../../schema/CyberwareSchema';
+import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { Bioware, BiowareSchema } from '../../schema/BiowareSchema';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
+import { Cyberware, CyberwareSchema } from '../../schema/CyberwareSchema';
 import Ware = Shadowrun.WareItemData;
 
 export class WareParser extends Parser<Ware> {
@@ -30,7 +31,7 @@ export class WareParser extends Parser<Ware> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Bioware | Cyberware): Promise<Folder> {
+    protected override async getFolder(jsonData: Bioware | Cyberware, compendiumKey: CompendiumKey): Promise<Folder> {
         let rootFolder: string = "Other";
         const categoryData = jsonData.category._TEXT;
         const folderName = TH.getTranslation(categoryData, {type: 'category'});
@@ -39,6 +40,6 @@ export class WareParser extends Parser<Ware> {
             if (category._TEXT === categoryData)
                 rootFolder = category.$.blackmarket;
 
-        return IH.getFolder('Trait', rootFolder, folderName);
+        return IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

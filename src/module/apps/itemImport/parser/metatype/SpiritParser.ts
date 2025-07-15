@@ -3,6 +3,7 @@ import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 import SpiritActorData = Shadowrun.SpiritActorData;
+import { CompendiumKey } from "../../importer/Constants";
 
 export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
     protected override parseType: string = 'spirit';
@@ -83,23 +84,24 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
         addTranslations(powerList, 'power');
         addTranslations(qualityList, 'quality');
 
-        const allTraits = await IH.findItem('Trait', [...powerList, ...qualityList].map(i => translationMap[i]));
+        const allPowers = await IH.findItem('Critter_Power', powerList.map(i => translationMap[i]));
+        const allQualities = await IH.findItem('Quality', qualityList.map(i => translationMap[i]));
         const spiritName = name._TEXT;
 
         return [
-            ...this.getMetatypeItems(allTraits, powers?.power, { type: 'Power', critter: spiritName }, translationMap),
-            ...this.getMetatypeItems(allTraits, qualities?.positive?.quality, { type: 'Power', critter: spiritName }, translationMap),
-            ...this.getMetatypeItems(allTraits, qualities?.negative?.quality, { type: 'Power', critter: spiritName }, translationMap),
-            ...this.getMetatypeItems(allTraits, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }, translationMap),
+            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spiritName }, translationMap),
+            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Power', critter: spiritName }, translationMap),
+            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Power', critter: spiritName }, translationMap),
+            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }, translationMap),
         ];
     }
 
-    protected override async getFolder(jsonData: Metatype): Promise<Folder> {
+    protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
         const rootFolder = TH.getTranslation("Spirit", {type: 'category'});
         const folderName = TH.getTranslation(category, {type: 'category'});
         const specFolder = category === 'Insect Spirits' ? jsonData.name._TEXT.match(/\(([^)]+)\)/)?.[1] : undefined;
 
-        return IH.getFolder('Critter', rootFolder, folderName, specFolder);
+        return IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);
     }
 }

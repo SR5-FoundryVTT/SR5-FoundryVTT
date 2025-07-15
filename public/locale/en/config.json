@@ -233,14 +233,17 @@
     "SR5.CollapseAll": "Collapse All",
     "SR5.CommonProgram": "Common Program",
     "SR5.Compendiums": {
-        "Root": "SR5e Imports",
-        "Critter": "Critters & Spirits & Sprites",
-        "Drone": "Drones & Vehicles",
-        "Gear": "Gears",
-        "Trait": "Traits",
-        "Magic": "Spell & Complex Forms",
-        "Modification": "Modifications",
-        "Weapon": "Weapons"
+        "sr5critter": "Critters & Spirits & Sprites",
+        "sr5drone": "Drones & Vehicles",
+        "sr5gear": "Armors & Gears",
+        "sr5trait": "Quality & Powers",
+        "sr5magic": "Spell & Complex Forms",
+        "sr5modification": "Modifications",
+        "sr5ware": "Bioware & Cyberware",
+        "sr5weapon": "Weapons",
+        "Folders": {
+            "Root": "SR5e Imports"
+        }
     },
     "SR5.Compilation": {
         "DropSprite": "Drop Sprite",
