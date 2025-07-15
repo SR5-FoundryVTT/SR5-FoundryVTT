@@ -21,6 +21,9 @@ export class Migrator {
         const version = data._stats.systemVersion;
         const migrators = this.s_Versions.filter(v => this.compareVersion(v.TargetVersion, version) > 0);
 
+        // If no migrators found, nothing to do.
+        if (migrators.length === 0) return;
+
         for (const migrator of migrators) {
             if (type === "Actor")
                 migrator.migrateActor(data);
@@ -34,6 +37,7 @@ export class Migrator {
         // This change only affects the in-memory copy during migration and will not persist
         // unless the document is explicitly updated. The system will automatically replace
         // this value on save, so setting it here is safe and non-destructive.
+        // @ts-expect-error FVTT-Types V9 does not have it... :D
         data._stats.systemVersion = game.system.version;
     }
 
