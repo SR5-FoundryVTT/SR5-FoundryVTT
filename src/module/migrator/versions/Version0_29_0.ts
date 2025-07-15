@@ -13,7 +13,7 @@ export class Version0_29_0 extends VersionMigration {
         console.log(actor);
     }
 
-    override migrateActiveEffect(effect: ActiveEffect.Implementation) {
+    override migrateActiveEffect(effect: any) {
         const flag = effect.flags?.shadowrun5e;
         if (!flag) return;
 

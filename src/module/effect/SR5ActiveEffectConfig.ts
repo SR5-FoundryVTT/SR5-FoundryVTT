@@ -99,7 +99,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         const select = event.currentTarget as HTMLSelectElement;
 
-        if (this.object.getFlag(SYSTEM_NAME, 'applyTo') === select.value) return;
+        if (this.object.system.applyTo === select.value) return;
 
         if (this.object.changes.length) {
             ui.notifications?.error('You must delete changes before changing the apply-to type.');

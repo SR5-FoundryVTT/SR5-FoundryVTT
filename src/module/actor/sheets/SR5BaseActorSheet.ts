@@ -15,7 +15,6 @@ import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
-import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
 import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
@@ -488,9 +487,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (data !== undefined) {
             if (data.type === 'ActiveEffect' && data.actorId !== this.actor.id) {
                 const effect = data.data;
-                const applyTo = effect.flags.shadowrun5e.applyTo as EffectApplyTo;
                 // if the effect is just supposed to apply to the item's test, it won't work on an actor
-                if (applyTo === 'test_item') {
+                if (effect.system.applyTo === 'test_item') {
                     ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
                     return;
                 }

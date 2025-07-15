@@ -184,23 +184,23 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({ type: 'character' });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Actor Effect',
-                flags: { shadowrun5e: { applyTo: 'actor' } },
+                system: { applyTo: 'actor' },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }, {
                 name: 'Targeted Actor Effect',
-                flags: { shadowrun5e: { applyTo: 'targeted_actor' } },
+                system: { applyTo: 'targeted_actor' },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }, {
                 name: 'Test_All Effect',
-                flags: { shadowrun5e: { applyTo: 'test_all' } },
+                system: { applyTo: 'test_all' },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }, {
                 name: 'Test_Item Effect',
-                flags: { shadowrun5e: { applyTo: 'test_item' } },
+                system: { applyTo: 'test_item' },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }, {
                 name: 'Modifiers Effect',
-                flags: { shadowrun5e: { applyTo: 'modifier' } },
+                system: { applyTo: 'modifier' },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
@@ -218,7 +218,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 origin: actor.uuid,
                 name: 'Test Effect',
-                flags: { shadowrun5e: { applyTo: 'test_all' } },
+                system: { applyTo: 'test_all' },
                 changes: [
                     // NOTE: test doesn't use system.
                     { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
@@ -258,8 +258,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { applyTo: 'test_all' } },
-                'changes': [
+                system: { applyTo: 'test_all' },
+                changes: [
                     // NOTE: test doesn't use system.
                     { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
                     { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
@@ -294,7 +294,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             // Create a effect on actor that should NOT apply.
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect Actor',
-                flags: { shadowrun5e: { applyTo: 'test_item' } },
+                system: { applyTo: 'test_item' },
                 changes: [
                     { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
                     { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
@@ -313,7 +313,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             // Create the correct effect on the correct item.
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect Correct Item',
-                flags: { shadowrun5e: { applyTo: 'test_item' } },
+                system: { applyTo: 'test_item' },
                 changes: [
                     { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
                     { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
@@ -326,7 +326,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             // Create the wrong effect on the wrong item.
             await item2.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect Wrong Item',
-                flags: { shadowrun5e: { applyTo: 'test_item' } },
+                system: { applyTo: 'test_item' },
                 changes: [
                     { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
                     { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
@@ -380,14 +380,14 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             let item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { onlyForWireless: true } },
+                system: { onlyForWireless: true },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
             item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { onlyForWireless: true } },
+                system: { onlyForWireless: true },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
@@ -405,14 +405,14 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             let item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { onlyForEquipped: true } },
+                system: { onlyForEquipped: true },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
             item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { onlyForEquipped: true } },
+                system: { onlyForEquipped: true },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
@@ -430,14 +430,14 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             let item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { onlyForEquipped: true, onlyForWireless: true } },
+                system: { onlyForEquipped: true, onlyForWireless: true },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
             item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { onlyForEquipped: true, onlyForWireless: false } },
+                system: { onlyForEquipped: true, onlyForWireless: false },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
@@ -455,7 +455,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 disabled: true,
-                flags: { shadowrun5e: { onlyForEquipped: true, onlyForWireless: true } },
+                system: { onlyForEquipped: true, onlyForWireless: true },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
@@ -477,7 +477,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             let actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action' }]);
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { applyTo: 'test_all', selection_tests: "[{\"value\":\"Success Test\",\"id\":\"SuccessTest\"}]" } },
+                system: { applyTo: 'test_all', selection_tests: [{ value: "Success Test", id: "SuccessTest" }] },
                 changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
@@ -528,7 +528,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const weapon = await factory.createItem({ type: 'weapon', system: { category: 'range' } });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { applyTo: 'test_all' } },
+                system: { applyTo: 'test_all' },
                 changes: [{ key: 'data.damage', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
@@ -543,7 +543,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({ type: 'character' });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { applyTo: 'test_all' } },
+                system: { applyTo: 'test_all' },
                 changes: [
                     { key: 'data.limit', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
                     { key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
@@ -582,7 +582,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({ type: 'character' });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                flags: { shadowrun5e: { applyTo: 'test_all', selection_categories: '[{"value":"Social Actions","id":"social"}]' } },
+                system: { applyTo: 'test_all', selection_categories: [{ value: "Social Actions", id: "social"}] },
                 changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
