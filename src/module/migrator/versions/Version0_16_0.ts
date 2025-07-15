@@ -18,7 +18,5 @@ export class Version0_16_0 extends VersionMigration {
         // Migrate magic character actors with wrong templates for initiation (initiation = {})
         if ('initiation' in actor.system.magic && isNaN(actor.system.magic.initiation))
             foundry.utils.setProperty(actor, 'system.magic.initiation', 0);
-
-        return actor;
     }
 }

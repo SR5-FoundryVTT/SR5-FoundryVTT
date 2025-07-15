@@ -13,10 +13,10 @@ export class Migrator {
         new Version0_27_0(),
     ] as const;
 
-    public static migrate(type: "Actor" | "Item" | "ActiveEffect", data: any) {
+    public static migrate(type: "Actor" | "Item" | "ActiveEffect", data: any): void {
         // Skip items with no systemVersion is found.
         // Unless forced changed, the abscense of systemVersion means it is just an update and not migration.
-        if (data._stats?.systemVersion == null) return data;
+        if (data._stats?.systemVersion == null) return;
 
         const version = data._stats.systemVersion;
         const migrators = this.s_Versions.filter(v => this.compareVersion(v.TargetVersion, version) > 0);
@@ -29,8 +29,6 @@ export class Migrator {
             else if (type === "ActiveEffect")
                 migrator.migrateActiveEffect(data);
         }
-
-        return data;
     }
 
     /**
