@@ -4,7 +4,7 @@ import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 
 export class Migrator {
-    // List of all version migrations and their target version numbers.
+    // List of all migrators.
     // ⚠️ Keep this list sorted in ascending order by version number (oldest → newest).
     private static readonly s_Versions = [
         new Version0_8_0(),
@@ -14,10 +14,11 @@ export class Migrator {
     ] as const;
 
     public static migrate(type: "Actor" | "Item" | "ActiveEffect", data: any) {
-        // Skip items with no stats
-        if (data._stats == null) return data;
+        // Skip items with no systemVersion is found.
+        // Unless forced changed, the abscense of systemVersion means it is just an update and not migration.
+        if (data._stats?.systemVersion == null) return data;
 
-        const version = data._stats.systemVersion || "0.0.0";
+        const version = data._stats.systemVersion;
         const migrators = this.s_Versions.filter(v => this.compareVersion(v.TargetVersion, version) > 0);
 
         for (const migrator of migrators) {
