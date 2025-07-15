@@ -258,6 +258,28 @@ ___________________
             storage: DataStorage
         };
 
+        CONFIG.statusEffects.push({
+            id: 'sr5running',
+            //@ts-expect-error
+            name: 'SR5.StatusEffects.Running',
+            img: 'systems/shadowrun5e/dist/icons/status-effects/running.svg',
+            changes: [
+                {key: "data.modifiers.mod", mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, value: "-2"},
+            ],
+            flags: { shadowrun5e: { applyTo: 'test_all' } }
+        });
+
+        CONFIG.statusEffects.push({
+            id: 'sr5sprinting',
+            //@ts-expect-error
+            name: 'SR5.StatusEffects.Sprinting',
+            img: 'systems/shadowrun5e/dist/icons/status-effects/sprinting.svg',
+            changes: [
+                {key: "data.modifiers.mod", mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, value: "-2"},
+            ],
+            flags: { shadowrun5e: { applyTo: 'test_all' } }
+        });
+
         // Register document classes
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
