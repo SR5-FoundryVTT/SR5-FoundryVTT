@@ -58,7 +58,7 @@ ActionResultFlow; // DON'T TOUCH!
  *
  *       Be wary of SR5Item.actor for this reason!
  */
-export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSubTypes> extends Item<SubType> {
+export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> extends Item<SubType> {
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
     // to allow for embedded items in items in actors.
     items: SR5Item[] = [];
@@ -795,11 +795,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubTypes = Item.ConfiguredSu
         return DEFAULT_ROLL_NAME;
     }
 
-    isType<ST extends readonly Item.ConfiguredSubTypes[]>(this: SR5Item, ...types: ST): this is SR5Item<ST[number]> {
+    isType<ST extends readonly Item.ConfiguredSubType[]>(this: SR5Item, ...types: ST): this is SR5Item<ST[number]> {
         return types.includes(this.type as ST[number]);
     }
 
-    asType<ST extends readonly Item.ConfiguredSubTypes[]>(this: SR5Item, ...types: ST): SR5Item<ST[number]> | undefined {
+    asType<ST extends readonly Item.ConfiguredSubType[]>(this: SR5Item, ...types: ST): SR5Item<ST[number]> | undefined {
         return types.some((t) => this.isType(t)) ? this : undefined;
     }
 

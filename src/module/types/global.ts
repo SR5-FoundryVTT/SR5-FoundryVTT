@@ -48,10 +48,10 @@ import { RoutingLib } from "../integrations/routingLibIntegration";
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
         ActiveEffect: typeof SR5ActiveEffect;
-        Actor: typeof SR5Actor<Actor.ConfiguredSubTypes>;
+        Actor: typeof SR5Actor<Actor.ConfiguredSubType>;
         ChatMessage: typeof SR5ChatMessage;
         Combat: typeof SR5Combat<Combat.SubType>;
-        Item: typeof SR5Item<Item.ConfiguredSubTypes>;
+        Item: typeof SR5Item<Item.ConfiguredSubType>;
         Roll: typeof SR5Roll;
         Sheet: typeof FormApplication;
     }

@@ -55,7 +55,7 @@ import { Migrator } from '../migrator/Migrator';
  * </code></pre>
  *
  */
-export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.ConfiguredSubTypes> extends Actor<SubType> {
+export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.ConfiguredSubType> extends Actor<SubType> {
     // This is the default inventory name and label for when no other inventory has been created.
     defaultInventory: InventoryType = {
         name: 'Carried',
@@ -502,11 +502,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubTypes = Actor.Configure
     /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
      *  Please check SR5ActorType for reference.
      */
-    isType<ST extends readonly Actor.ConfiguredSubTypes[]>(this: SR5Actor, ...types: ST): this is SR5Actor<ST[number]> {
+    isType<ST extends readonly Actor.ConfiguredSubType[]>(this: SR5Actor, ...types: ST): this is SR5Actor<ST[number]> {
         return types.includes(this.type as ST[number]);
     }
 
-    asType<ST extends readonly Actor.ConfiguredSubTypes[]>(this: SR5Actor, ...types: ST): SR5Actor<ST[number]> | undefined {
+    asType<ST extends readonly Actor.ConfiguredSubType[]>(this: SR5Actor, ...types: ST): SR5Actor<ST[number]> | undefined {
         return types.some((t) => this.isType(t)) ? this : undefined;
     }
 

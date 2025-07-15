@@ -1082,7 +1082,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param item: The item to transform into a 'sheet item'
      */
-    async _prepareSheetItem<SI extends Item.ConfiguredSubTypes>(item: SR5Item<SI>): Promise<SheetItemData> {
+    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<SheetItemData> {
         // Copy derived schema data instead of source data (false)
         const sheetItem = item.toObject(false) as unknown as SheetItemData;
 

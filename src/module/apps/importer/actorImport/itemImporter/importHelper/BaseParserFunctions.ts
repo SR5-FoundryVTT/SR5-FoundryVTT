@@ -86,7 +86,7 @@ export function setSubType(parsedItem: ReturnType<SR5Item['system']['toObject']>
     }
 }
 
-export function createItemData<T extends Item.ConfiguredSubTypes>(
+export function createItemData<T extends Item.ConfiguredSubType>(
     name: string,
     type: T,
     system: T extends any ? ReturnType<Extract<Item.SystemOfType<T>, { toObject: (...args: any[]) => any }>['toObject']> : never

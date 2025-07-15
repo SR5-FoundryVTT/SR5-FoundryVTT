@@ -6,7 +6,7 @@ export class SR5TestFactory {
     readonly items: SR5Item[] = [];
     readonly scenes: Scene[] = [];
 
-    async createActor<T extends Actor.ConfiguredSubTypes>(
+    async createActor<T extends Actor.ConfiguredSubType>(
         data: Omit<Actor.CreateData, "name"> & { name?: string, type: T },
         context?: Actor.ConstructionContext
     ): Promise<SR5Actor<T>> {
@@ -15,7 +15,7 @@ export class SR5TestFactory {
         return actor;
     }
 
-    async createItem<T extends Item.ConfiguredSubTypes>(
+    async createItem<T extends Item.ConfiguredSubType>(
         data: Omit<Item.CreateData, "name"> & { name?: string, type: T },
         context?: Item.ConstructionContext
     ): Promise<SR5Item<T>> {

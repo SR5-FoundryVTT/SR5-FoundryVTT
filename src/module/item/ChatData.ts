@@ -15,7 +15,7 @@ import { Translation } from '../utils/strings';
  * These info boxes will be shown in a few places, most notibly the chat message but also
  * - actor sheets
  */
-export const ChatData: { [K in Item.ConfiguredSubTypes]: (item: SR5Item<K>) => string[] } = {
+export const ChatData: { [K in Item.ConfiguredSubType]: (item: SR5Item<K>) => string[] } = {
     action: (item: SR5Item<'action'>) => {
         const props: string[] = [];
         const { system, labels } = item;
