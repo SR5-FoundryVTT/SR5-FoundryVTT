@@ -16,6 +16,7 @@ import { Spirit } from "./actor/Spirit";
 import { Sprite } from "./actor/Sprite";
 import { Vehicle } from "./actor/Vehicle";
 
+import { ActiveEffectDM } from "./activeeffect/ActiveEffect";
 import { Action } from './item/Action';
 import { AdeptPower } from './item/AdeptPower';
 import { Ammo } from './item/Ammo';
@@ -41,6 +42,7 @@ import { Spell } from './item/Spell';
 import { SpritePower } from './item/SpritePower';
 import { Weapon } from './item/Weapon';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from "./flags/ItemFlags";
+
 import { RoutingLib } from "../integrations/routingLibIntegration";
 
 declare module "fvtt-types/configuration" {
@@ -79,6 +81,9 @@ declare module "fvtt-types/configuration" {
     }
 
     interface DataModelConfig {
+        ActiveEffect: {
+            base: typeof ActiveEffectDM;
+        };
         Actor: {
             character: typeof Character;
             critter: typeof Critter;

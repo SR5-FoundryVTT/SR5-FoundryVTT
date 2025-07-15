@@ -13,13 +13,19 @@ const ActiveEffectData = {
     onlyForWireless: new BooleanField(),
     onlyForItemTest: new BooleanField(),
 
+    selection_attributes: new ArrayField(
+        new SchemaField({
+            value: new StringField({ required: true, nullable: false }),
+            id: new StringField({ required: true, nullable: false }),
+        })
+    ),
     selection_categories: new ArrayField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_tests: new ArrayField(
+    selection_limits: new ArrayField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
@@ -31,7 +37,7 @@ const ActiveEffectData = {
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_attributes: new ArrayField(
+    selection_tests: new ArrayField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),

@@ -2,6 +2,7 @@ import { Version0_8_0 } from "./versions/Version0_8_0";
 import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
+import { Version0_29_0 } from './versions/Version0_29_0';
 
 export class Migrator {
     // List of all migrators.
@@ -11,6 +12,7 @@ export class Migrator {
         new Version0_18_0(),
         new Version0_16_0(),
         new Version0_27_0(),
+        new Version0_29_0(),
     ] as const;
 
     public static migrate(type: "Actor" | "Item" | "ActiveEffect", data: any): void {
@@ -29,6 +31,12 @@ export class Migrator {
             else if (type === "ActiveEffect")
                 migrator.migrateActiveEffect(data);
         }
+
+        // Set the current system version to indicate that this data has been migrated.
+        // This change only affects the in-memory copy during migration and will not persist
+        // unless the document is explicitly updated. The system will automatically replace
+        // this value on save, so setting it here is safe and non-destructive.
+        data._stats.systemVersion = game.system.version;
     }
 
     /**
