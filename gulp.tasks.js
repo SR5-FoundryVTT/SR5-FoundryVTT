@@ -3,7 +3,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const del = import('del'); //es6m
 const chalk = import('chalk'); //es6m
-const tsPaths = require("esbuild-ts-paths")
+const tsPaths = require("esbuild-ts-paths");
+const glob = require("glob");
 
 // Sass
 const gulpsass = require('gulp-sass')(require('sass'));
@@ -19,6 +20,7 @@ const {typecheckPlugin} = require("@jgoz/esbuild-plugin-typecheck");
 // Config
 const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
+const localeFolder = path.resolve(destFolder, 'locale')
 const jsBundle = 'bundle.js';
 const entryPoint = "./src/module/main.ts";
 
@@ -153,10 +155,104 @@ async function linkUserData() {
     }
 }
 
+function loadI18n(target, data) {
+    const setProperty = (object, key, value) => {
+        if (!key) return false;
+        let current = object;
+        const parts = key.split(".");
+        const lastKey = parts.pop();
+
+        for (const part of parts) {
+            if (!(part in current)) current[part] = {};
+            current = current[part];
+        }
+
+        if (!(lastKey in current) || current[lastKey] !== value) {
+            current[lastKey] = value;
+            return true;
+        }
+        return false;
+    };
+
+    const expandObject = (value, depth = 0) => {
+        if (depth > 32) throw new Error("Max object expansion depth exceeded");
+        if (!value || typeof value !== "object" || Array.isArray(value)) return value;
+
+        const result = {};
+        for (const [key, val] of Object.entries(value)) {
+            setProperty(result, key, expandObject(val, depth + 1));
+        }
+        return result;
+    };
+
+    const expanded = expandObject(data);
+    Object.assign(target, expanded);
+}
+
+async function buildI18n() {
+    const srcDir = path.resolve("src/i18n");
+    const outDir = localeFolder;
+    const langs = await fs.readdir(srcDir);
+
+    for (const lang of langs) {
+        const langPath = path.join(srcDir, lang);
+        if (!(await fs.stat(langPath)).isDirectory()) continue;
+
+        const files = glob.sync(`${langPath}/**/*.json`);
+        const result = {};
+
+        for (const file of files) {
+            const content = await fs.readJson(file);
+            loadI18n(result, content);
+        }
+
+        await fs.ensureDir(outDir);
+        await fs.writeJson(path.join(outDir, `${lang}.json`), result, { spaces: 2 });
+        console.log(`✅ Built locale/${lang}.json`);
+    }
+}
+
+function flattenKeys(obj, prefix = "") {
+    const result = {};
+    for (const [key, val] of Object.entries(obj)) {
+        const fullKey = prefix ? `${prefix}.${key}` : key;
+        if (val && typeof val === "object" && !Array.isArray(val)) {
+            Object.assign(result, flattenKeys(val, fullKey));
+        } else {
+            result[fullKey] = val;
+        }
+    }
+    return result;
+}
+
+async function testI18n() {
+    const langDir = localeFolder;
+    const files = glob.sync(`${langDir}/*.json`);
+    const baseLang = "en"; // foundry-vtt fallback language
+
+    const base = flattenKeys(await fs.readJson(path.join(langDir, `${baseLang}.json`)));
+
+    for (const file of files) {
+        const lang = path.basename(file, ".json");
+        if (lang === baseLang) continue;
+
+        const current = flattenKeys(await fs.readJson(file));
+        const missing = Object.keys(base).filter(k => !(k in current));
+        const extra = Object.keys(current).filter(k => !(k in base));
+
+        console.log(`🔍 ${lang}:`);
+        if (missing.length) console.warn(`  ❌ Missing keys: ${missing.length}`, missing.slice(0, 5));
+        if (extra.length) console.warn(`  ⚠️ Extra keys: ${extra.length}`, extra.slice(0, 5));
+        if (!missing.length && !extra.length) console.log("  ✅ All keys match.");
+    }
+}
+
+exports.i18n = buildI18n;
+exports["i18n:test"] = testI18n;
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
-exports.build = gulp.series(copyAssets, buildSass, buildJS, buildPacks);
+exports.build = gulp.series(copyAssets, buildSass, buildJS, buildPacks, buildI18n);
 exports.watch = gulp.series(copyAssets, buildSass, buildPacks, watch);
 exports.rebuild = gulp.series(cleanDist, exports.build);
 exports.link = linkUserData;
