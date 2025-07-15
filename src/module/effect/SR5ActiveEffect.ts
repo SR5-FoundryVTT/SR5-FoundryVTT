@@ -460,34 +460,19 @@ export class SR5ActiveEffect extends ActiveEffect {
         return changes;
     }
 
-    /**
-     * Override Foundry effect data migration to avoid data => system migration.
-     *
-     * Since the system provides autocomplete-inline-properties as a relationship and
-     * has it configured to provide system as the default key, the Foundry migration
-     * shouldn't be necessary. The migration hinders effects with apply-to test.
-     *
-     * All migrations here are taken from FoundryVtt common.js BaseActiveEffect#migrateData
-     * for v11.315
-     */
     static override migrateData(data: any) {
-        /**
-         * label -> name
-         * @deprecated since v11
-         */
-        this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
-
         Migrator.migrate("ActiveEffect", data);
 
         return super.migrateData(data);
     }
+
     /**
      * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
-   * Cast a raw ActiveEffect.ChangeData change string to an Array of an inner type.
-   * @param {string} raw      The raw string value
-   * @param {string} type     The target data type of inner array elements
-   * @returns {Array<*>}      The parsed delta cast as a typed array
-   */
+     * Cast a raw ActiveEffect.ChangeData change string to an Array of an inner type.
+     * @param {string} raw      The raw string value
+     * @param {string} type     The target data type of inner array elements
+     * @returns {Array<*>}      The parsed delta cast as a typed array
+     */
     __castArray(raw, type) {
         let delta;
         try {
@@ -501,11 +486,11 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
-    * Cast a raw ActiveEffect.ChangeData change string to the desired data type.
-    * @param {string} raw      The raw string value
-    * @param {string} type     The target data type that the raw value should be cast to match
-    * @returns {*}             The parsed delta cast to the target data type
-    */
+     * Cast a raw ActiveEffect.ChangeData change string to the desired data type.
+     * @param {string} raw      The raw string value
+     * @param {string} type     The target data type that the raw value should be cast to match
+     * @returns {*}             The parsed delta cast to the target data type
+     */
     __castDelta(raw, type) {
         let delta;
         switch (type) {
