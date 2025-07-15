@@ -394,13 +394,6 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     // @ts-expect-error foundry-vtt-types v10
     static override migrateData(data: any) {
-        /**
-         * label -> name
-         * @deprecated since v11
-        */
-       // @ts-expect-error TODO: foundry-vtt-types v10
-       this._addDataFieldMigration(data, "label", "name", d => d.label || "Unnamed Effect");
-
         Migrator.migrate("ActiveEffect", data);
 
         // @ts-expect-error foundry-vtt-types v10

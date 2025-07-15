@@ -23,4 +23,9 @@ export class Version0_18_0 extends VersionMigration {
 
         return actor;
     }
+
+    override migrateActiveEffect(effect: any) {
+        effect.name ??= effect.label || "Unnamed Effect";
+        delete effect.label;
+    }
 }
