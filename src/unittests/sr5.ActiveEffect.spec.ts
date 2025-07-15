@@ -127,7 +127,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     disabled: false,
                     name: 'Test Effect'
                 }]);
-                await effect![0]?.update({
+                await effect[0]?.update({
                     changes: [{
                         key: 'system.modifiers.global',
                         value: '3',
@@ -154,7 +154,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]) as SR5ActiveEffect[];
 
             const effect = effects.pop()!;
-            assert.strictEqual(effect.applyTo, 'actor');
+            assert.strictEqual(effect.system.applyTo, 'actor');
         });
 
         it('Create an item effect and assert its not created on actor as until FoundryVTT v10', async () => {
@@ -166,7 +166,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     category: 'range'
                 }
             }]);
-            const weapon = items![0];
+            const weapon = items[0];
             const effects = await weapon.createEmbeddedDocuments('ActiveEffect', [{
                 origin: weapon.uuid,
                 name: 'Test Effect',
@@ -175,7 +175,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             // Effects with a custom applyTo should not be applied to the actor.
-            assert.lengthOf(effects!, 1);
+            assert.lengthOf(effects, 1);
             assert.lengthOf(actor.effects.contents, 0);
             assert.lengthOf(weapon.effects.contents, 1);
         });
@@ -254,7 +254,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
 
-            const item = items!.pop()!;
+            const item = items.pop()!;
 
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
@@ -308,7 +308,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 { type: 'action', name: 'Test Action 2' }
             ]);
 
-            const item = items!.pop()!;
+            const item = items.pop()!;
 
             // Create the correct effect on the correct item.
             await item.createEmbeddedDocuments('ActiveEffect', [{
@@ -321,7 +321,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            const item2 = items!.pop()!;
+            const item2 = items.pop()!;
 
             // Create the wrong effect on the wrong item.
             await item2.createEmbeddedDocuments('ActiveEffect', [{
@@ -363,7 +363,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            const effect = effects!.pop()!;
+            const effect = effects.pop()!;
 
             assert.isTrue(effect.disabled);
             assert.lengthOf(actor.effects.contents, 1);
@@ -377,14 +377,14 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: true } } }
             ]);
 
-            let item = items!.pop()!;
+            let item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForWireless: true } },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            item = items!.pop()!;
+            item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForWireless: true } },
@@ -402,14 +402,14 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 { type: 'cyberware', name: 'Unequipped Item', system: { technology: { equipped: false } } }
             ]);
 
-            let item = items!.pop()!;
+            let item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForEquipped: true } },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            item = items!.pop()!;
+            item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForEquipped: true } },
@@ -427,14 +427,14 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 { type: 'cyberware', name: 'Wired Unequipped Item', system: { technology: { equipped: false, wireless: false } } }
             ]);
 
-            let item = items!.pop()!;
+            let item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForEquipped: true, onlyForWireless: true } },
                 changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            item = items!.pop()!;
+            item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 flags: { shadowrun5e: { onlyForEquipped: true, onlyForWireless: false } },
@@ -451,7 +451,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: true } } },
             ]);
 
-            const item = items!.pop()!;
+            const item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 disabled: true,
@@ -481,7 +481,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            let test = await TestCreator.fromItem(actions![0] as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            let test = await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
             await test.execute();
 
             // The first roll should have the effect applied
@@ -493,7 +493,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(test.pool.mod.reduce(reduceModifiersByName('Test Effect'), 0), 2);
 
             actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action', system: { action: { extended : true  } } }]);
-            test = await TestCreator.fromItem(actions![0] as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            test = await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
 
             // This will trigger the first and all extended rolls...
             await test.execute();

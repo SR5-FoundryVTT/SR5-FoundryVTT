@@ -50,10 +50,10 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         data.modes = this.applyModifyLabelToCustomMode(data.modes);
 
-        data.applyTo = this.document.applyTo;
-        data.onlyForWireless = this.document.onlyForWireless;
-        data.onlyForEquipped = this.document.onlyForEquipped;
-        data.onlyForItemTest = this.document.onlyForItemTest;
+        data.applyTo = this.document.system.applyTo;
+        data.onlyForWireless = this.document.system.onlyForWireless;
+        data.onlyForEquipped = this.document.system.onlyForEquipped;
+        data.onlyForItemTest = this.document.system.onlyForItemTest;
 
         data.applyToOptions = this.prepareApplyToOptions();
         data.hasChanges = this.prepareEffectHasChanges();
@@ -149,7 +149,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
     }
 
     _activateTagifyListeners(html: JQuery) {
-        switch (this.object.applyTo) {
+        switch (this.object.system.applyTo) {
             case 'test_all':
                 this._prepareTestSelectionTagify(html);
                 this._prepareActionCategoriesSelectionTagify(html);
@@ -172,9 +172,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const maxItems = values.length;
 
         // Fetch current selections.
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_tests') as string;
-        const selected = value ? JSON.parse(value) : [];
-
+        const selected = this.object.system.selection_tests;
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 
@@ -193,9 +191,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const maxItems = values.length;
 
         // Fetch current selections.
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_categories') as string;
-        const selected = value ? JSON.parse(value) : [];
-
+        const selected = this.object.system.selection_categories;
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 
@@ -213,8 +209,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const actorOrNothing = !(actor instanceof SR5Actor) ? undefined : actor;
 
         // Use ActionFlow to assure either custom skills or global skills to be included.
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_skills') as string;
-        const selected = value ? JSON.parse(value) : [];
+        const selected = this.object.system.selection_skills;
         const selectedSkillNames = selected.map(({id}) => id);
         const skills = ActionFlow.sortedActiveSkills(actorOrNothing, selectedSkillNames);
         const values = Object.entries(skills).map(([id, label]) => ({ label: label as Translation, id }));
@@ -228,8 +223,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         const values = Object.entries(SR5.attributes).map(([attribute, label]) => ({ label, id: attribute }));
         const maxItems = values.length;
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_attributes') as string;
-        const selected = value ? JSON.parse(value) : [];
+        const selected = this.object.system.selection_attributes;
 
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }
@@ -239,8 +233,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         const values = Object.entries(SR5.limits).map(([limit, label]) => ({ label, id: limit }));
         const maxItems = values.length;
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_limits') as string;
-        const selected = value ? JSON.parse(value) : [];
+        const selected = this.object.system.selection_limits;
 
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }

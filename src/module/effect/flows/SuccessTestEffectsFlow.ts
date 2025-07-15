@@ -83,7 +83,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      */
     _skipEffectForTestLimitations(effect: SR5ActiveEffect) {
         // Filter effects that don't apply to this test.
-        const tests = effect.selectionTests;
+        const tests = effect.system.selection_tests.map(test => test.id);
         // Opposed tests use the same item as the success test but normally don't apply effects from it.
         // However if an effect defines a test, it should apply to it.
         if (tests.length === 0 && this.test.opposing) return true;
@@ -92,18 +92,18 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Check for action categories
         // Both the effect and test can both define multiple categories.
         // One match is enough.
-        const categories = effect.selectionCategories;
+        const categories = effect.system.selection_categories.map(test => test.id) as Shadowrun.ActionCategories[];
         const testCategories = this.test.data.categories;
         if (categories.length > 0 && !categories.find(category => testCategories.includes(category))) return true;
 
         // Check for test skill.
-        const skills = effect.selectionSkills;
+        const skills = effect.system.selection_skills.map(test => test.id);
         const skillId = this.test.data.action.skill;
         const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
         if (skills.length > 0 && !skills.includes(skillName)) return true;
 
         // Check for test attributes used.
-        const attributes = effect.selectionAttributes;
+        const attributes = effect.system.selection_attributes.map(test => test.id);
         const attribute = this.test.data.action.attribute;
         const attribute2 = this.test.data.action.attribute2;
         if (attributes.length > 0 && attribute && !attributes.includes(attribute)) return true;
@@ -111,7 +111,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (attributes.length > 0 && !attribute && !attribute2) return true;
 
         // Check for test limits used.
-        const limits = effect.selectionLimits;
+        const limits = effect.system.selection_limits.map(test => test.id);
         const limit = this.test.data.action.limit.attribute!;
         if (limits.length > 0 && !limits.includes(limit)) return true;
 
@@ -277,8 +277,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     *allApplicableEffectsToTargetActor(): Generator<SR5ActiveEffect> {
         if (!this.test.item) return;
 
-        for (const effect of this.test.item.effects as unknown as SR5ActiveEffect[]) {
-            if (effect.applyTo === 'targeted_actor') yield effect;
+        for (const effect of this.test.item.effects) {
+            if (effect.system.applyTo === 'targeted_actor') yield effect;
         }
     }
 }

@@ -233,77 +233,11 @@ export class SR5ActiveEffect extends ActiveEffect {
         return ['base', 'value', 'mod', 'override', 'temp'];
     }
 
-    /**
-     * Apply to target configured for this effect.
-     *
-     * @returns Either the configured value or 'actor' as a default.
-     */
-    get applyTo() {
-        return this.getFlag(SYSTEM_NAME, 'applyTo') || 'actor';
-    }
-
-    /**
-     * Some effects should only be applied depending on their parent items wireless status.
-     *
-     * When this flag is set, the parent item wireless status is taken into account.
-     */
-    get onlyForWireless(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'onlyForWireless') || false;
-    }
-
-    /**
-     * Some effects should only be applied depending on their parent items enabled status.
-     *
-     * When this flag is set, the parent item enabled status is taken into account.
-     */
-    get onlyForEquipped(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'onlyForEquipped') || false;
-    }
-
-    /**
-     * Some modifier effects should only be applied if they're applied for their parent items test.
-     *
-     * When this flag is set, this effect shouldn't apply always.
-     */
-    get onlyForItemTest(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'onlyForItemTest') || false;
-    }
-
-    /**
-     * Determine if this effect has been created using the test effect application flow
-     * typically reserved for targeted_actor effects.
-     *
-     * @returns true, when the effect has been applied by a test.
-     */
-    get appliedByTest(): boolean {
-        return this.getFlag(SYSTEM_NAME, 'appliedByTest') || false;
-    }
-
-    get selectionTests(): string[] {
-        return tagifyFlagsToIds(this, 'selection_tests');
-    }
-
-    get selectionCategories() {
-        return tagifyFlagsToIds(this, 'selection_categories') as Shadowrun.ActionCategories[];
-    }
-
-    get selectionSkills(): string[] {
-        return tagifyFlagsToIds(this, 'selection_skills');
-    }
-
-    get selectionAttributes(): string[] {
-        return tagifyFlagsToIds(this, 'selection_attributes');
-    }
-
-    get selectionLimits(): string[] {
-        return tagifyFlagsToIds(this, 'selection_limits');
-    }
-
     override get isSuppressed(): boolean {
         if (!(this.parent instanceof SR5Item)) return false;
 
-        if (this.onlyForEquipped && !this.parent.isEquipped()) return true;
-        if (this.onlyForWireless && !this.parent.system.technology?.wireless) return true;
+        if (this.system.onlyForEquipped && !this.parent.isEquipped()) return true;
+        if (this.system.onlyForWireless && !this.parent.system.technology?.wireless) return true;
         if (this.parent.isType('critter_power') && !this.parent.system.enabled) return true;
         if (this.parent.isType('sprite_power') && !this.parent.system.enabled) return true;
 
@@ -324,8 +258,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         const actor = this.actor;
         if (!actor) return false;
 
-        if (this.applyTo === 'targeted_actor') {
-            return this.appliedByTest;
+        if (this.system.applyTo === 'targeted_actor') {
+            return this.system.appliedByTest;
         }
 
         return true;

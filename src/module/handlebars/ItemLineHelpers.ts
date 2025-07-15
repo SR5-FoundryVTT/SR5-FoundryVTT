@@ -770,7 +770,7 @@ export const registerItemLineHelpers = () => {
             {
                 // Apply To Column
                 text: {
-                    text: game.i18n?.localize(SR5.effectApplyTo[effect.applyTo]),
+                    text: game.i18n?.localize(SR5.effectApplyTo[effect.system.applyTo]),
                     cssClass: 'six',
                 }
             },

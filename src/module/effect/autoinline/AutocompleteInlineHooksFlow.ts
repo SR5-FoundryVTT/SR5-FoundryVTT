@@ -72,12 +72,13 @@ export const AutocompleteInlineHooksFlow =  {
      */
     keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
         const effect = EffectConfig.object;
+        const testsId = effect.system.selection_tests.map(test => test.id);
 
         // For  effects targeting specific tests, we can provide a merge of all tests data.
-        if (effect.selectionTests.length > 0) {
+        if (testsId.length > 0) {
             const actor = effect.actor;
             const testData = {};
-            for (const TestClassName of effect.selectionTests) {
+            for (const TestClassName of testsId) {
                 if (!TestClassName) return {};
                 const TestClass = TestCreator._getTestClass(TestClassName);
                 if (!TestClass) return {};
@@ -160,7 +161,7 @@ export const AutocompleteInlineHooksFlow =  {
         const effect = EffectConfig.object;
 
         if (effect.parent instanceof SR5Item) {
-            const item = effect.parent as SR5Item;
+            const item = effect.parent;
             const action = item.getAction();
             if (!action) return {};                
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;

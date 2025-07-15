@@ -69,14 +69,14 @@
         <div class="form-group">
             <label>{{ localize "SR5.ActiveEffect.OnlyForWireless" }}</label>
             <div class="form-fields">
-                <input type="checkbox" name="flags.shadowrun5e.onlyForWireless" {{checked onlyForWireless}}/>
+                <input type="checkbox" name="system.onlyForWireless" {{checked onlyForWireless}}/>
             </div>
         </div>
 
         <div class="form-group">
             <label>{{ localize "SR5.ActiveEffect.OnlyForEquipped" }}</label>
             <div class="form-fields">
-                <input type="checkbox" name="flags.shadowrun5e.onlyForEquipped" {{checked onlyForEquipped}}/>
+                <input type="checkbox" name="system.onlyForEquipped" {{checked onlyForEquipped}}/>
             </div>
         </div>
         {{/if}}
@@ -87,7 +87,7 @@
         <div class="form-group">
             <label data-tooltip="{{localize 'SR5.Tooltips.Effect.ApplyTo'}}">{{ localize "SR5.ActiveEffect.ApplyTo" }}</label>
             <div class="form-fields">
-                <select name="flags.shadowrun5e.applyTo" data-dtype="Text" 
+                <select name="system.applyTo" data-dtype="Text" 
                     {{#if hasChanges}}disabled{{/if}}
                     {{#if hasChanges}}data-tooltip="{{localize 'SR5.Tooltips.Effect.AlterApplyToWithChanges'}}"{{/if}}
                 >
@@ -100,31 +100,31 @@
         <div class="form-group">
             <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Tests" }}</label>
             <div class="form-fields">
-                <input name="flags.shadowrun5e.selection_tests" id="test-selection" class="tagify-selection" data-dtype="Text"/>
+                <input name="system.selection_tests" id="test-selection" class="tagify-selection" data-dtype="Text"/>
             </div>
         </div>
         <div class="form-group">
             <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.ActionCategories" }}</label>
             <div class="form-fields">
-                <input name="flags.shadowrun5e.selection_categories" id="categories-selection" class="tagify-selection" data-dtype="Text"/>
+                <input name="system.selection_categories" id="categories-selection" class="tagify-selection" data-dtype="Text"/>
             </div>
         </div>
         <div class="form-group">
             <label  data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Skills" }}</label>
             <div class="form-fields">
-                <input name="flags.shadowrun5e.selection_skills" id="skill-selection" class="tagify-selection" data-dtype="Text"/>
+                <input name="system.selection_skills" id="skill-selection" class="tagify-selection" data-dtype="Text"/>
             </div>
         </div>
         <div class="form-group">
             <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyAllFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Attributes" }}</label>
             <div class="form-fields">
-                <input name="flags.shadowrun5e.selection_attributes" id="attribute-selection" class="tagify-selection" data-dtype="Text"/>
+                <input name="system.selection_attributes" id="attribute-selection" class="tagify-selection" data-dtype="Text"/>
             </div>
         </div>
         <div class="form-group">
             <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Limits" }}</label>
             <div class="form-fields">
-                <input name="flags.shadowrun5e.selection_limits" id="limit-selection" class="tagify-selection" data-dtype="Text"/>
+                <input name="system.selection_limits" id="limit-selection" class="tagify-selection" data-dtype="Text"/>
             </div>
         </div>
         {{/ife}}
@@ -133,7 +133,7 @@
         <div class="form-group">
             <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyForItemTest'}}">{{ localize "SR5.ActiveEffect.OnlyForItemTest" }}</label>
             <div class="form-fields">
-                <input type="checkbox" name="flags.shadowrun5e.onlyForItemTest" {{checked onlyForItemTest}}/>
+                <input type="checkbox" name="system.onlyForItemTest" {{checked onlyForItemTest}}/>
             </div>
         </div>
         {{/ife}}
