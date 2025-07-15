@@ -20,8 +20,6 @@ export class Version0_18_0 extends VersionMigration {
             console.log(`Actor (${actor._id}). Delete these effects:`, toDelete);
             actor.effects = actor.effects.filter(effect => !effect.origin?.includes('.Item.'));
         }
-
-        return actor;
     }
 
     override migrateActiveEffect(effect: any) {

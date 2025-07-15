@@ -17,23 +17,17 @@ export abstract class VersionMigration {
      * Apply this migration to an actor.
      * Override in subclasses to modify actor data as needed.
      */
-    public migrateActor(actor: any): any {
-        return actor;
-    }
+    public migrateActor(actor: any): void { }
 
     /**
      * Apply this migration to an item.
      * Override in subclasses to modify item data as needed.
      */
-    public migrateItem(item: any): any {
-        return item;
-    }
+    public migrateItem(item: any): void { }
 
     /**
      * Apply this migration to an active effect.
      * Override in subclasses to modify active effect data as needed.
      */
-    public migrateActiveEffect(effect: any): any {
-        return effect;
-    }
+    public migrateActiveEffect(effect: any): void { }
 }

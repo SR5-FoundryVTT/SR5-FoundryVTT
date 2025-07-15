@@ -20,7 +20,5 @@ export class Version0_27_0 extends VersionMigration {
             if (spiritSystem.spiritType === 'vucub')
                 spiritSystem.spiritType = 'vucub_caquix';
         }
-
-        return actor;
     }
 }

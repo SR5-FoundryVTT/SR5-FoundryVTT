@@ -14,6 +14,5 @@ export class Version0_8_0 extends VersionMigration {
 
     override migrateItem(item: any) {
         UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
-        return item;
     }
 }
