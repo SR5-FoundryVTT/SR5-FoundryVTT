@@ -29,6 +29,12 @@ export class Migrator {
             else if (type === "ActiveEffect")
                 migrator.migrateActiveEffect(data);
         }
+
+        // Set the current system version to indicate that this data has been migrated.
+        // This change only affects the in-memory copy during migration and will not persist
+        // unless the document is explicitly updated. The system will automatically replace
+        // this value on save, so setting it here is safe and non-destructive.
+        data._stats.systemVersion = game.system.version;
     }
 
     /**
