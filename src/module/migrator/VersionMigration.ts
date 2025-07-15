@@ -11,7 +11,7 @@ export abstract class VersionMigration {
     /**
      * The target version string that this migration upgrades data to.
      */
-    public abstract TargetVersion: string;
+    public abstract TargetVersion: `${number}.${number}.${number}`;
 
     /**
      * Apply this migration to an actor.
@@ -35,20 +35,5 @@ export abstract class VersionMigration {
      */
     public migrateActiveEffect(effect: any): any {
         return effect;
-    }
-
-    protected setByDotPath(obj: Record<string, any>, path: string, value: any): void {
-        const parts = path.split('.');
-        let current = obj;
-
-        for (let i = 0; i < parts.length - 1; i++) {
-            const part = parts[i];
-            if (!(part in current) || typeof current[part] !== 'object' || current[part] === null || Array.isArray(current[part])) {
-                current[part] = {};
-            }
-            current = current[part];
-        }
-
-        current[parts[parts.length - 1]] = value;
     }
 }

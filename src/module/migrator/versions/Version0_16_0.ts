@@ -12,14 +12,13 @@ export class Version0_16_0 extends VersionMigration {
 
     override migrateActor(actor: any) {
         // Some actors did have heat, when they shouldn't.
-        if (actor.type !== 'character' && actor.type !== 'critter' && actor.type !== 'vehicle') {
-            this.setByDotPath(actor.system, 'visibilityChecks.meat.hasHeat', false);
-        }
+        if (actor.type !== 'character' && actor.type !== 'critter' && actor.type !== 'vehicle')
+            foundry.utils.setProperty(actor, 'system.visibilityChecks.meat.hasHeat', false);
 
         // Migrate magic character actors with wrong templates for initiation (initiation = {})
-        if ('initiation' in actor.system.magic && isNaN(actor.system.magic.initiation)) {
-            this.setByDotPath(actor.system, 'magic.initiation', 0);
-        }
+        if ('initiation' in actor.system.magic && isNaN(actor.system.magic.initiation))
+            foundry.utils.setProperty(actor, 'system.magic.initiation', 0);
+
         return actor;
     }
 }
