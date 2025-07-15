@@ -80,6 +80,7 @@ import { Spirit } from './types/actor/Spirit';
 import { Sprite } from './types/actor/Sprite';
 import { Vehicle } from './types/actor/Vehicle';
 
+import { ActiveEffectDM } from './types/activeeffect/ActiveEffect';
 import { Action } from './types/item/Action';
 import { AdeptPower } from './types/item/AdeptPower';
 import { Ammo } from './types/item/Ammo';
@@ -329,6 +330,8 @@ ___________________
         // Add Shadowrun configuration onto general Foundry config for module access.
         // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
+
+        CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
 
         CONFIG.Item.dataModels["action"] = Action;
         CONFIG.Item.dataModels["ammo"] = Ammo;

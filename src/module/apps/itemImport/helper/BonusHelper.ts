@@ -196,7 +196,7 @@ export class BonusHelper {
                                 .filter(skillId => !excludedSkill || skillId !== excludedSkill)
                                 .map(skillId => ({ value: skillId.replace("_", " ").capitalize(), id: skillId }))
 
-                if (!skills || !skills.length)
+                if (!skills?.length)
                     console.log("Error skillcategory:", skillCategory.name._TEXT);
                 else
                     this.createEffect(
