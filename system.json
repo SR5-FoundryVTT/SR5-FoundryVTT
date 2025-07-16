@@ -22,27 +22,27 @@
         {
             "lang": "en",
             "name": "English",
-            "path": "dist/locale/en/config.json"
+            "path": "dist/locale/en.json"
         },
         {
             "lang": "de",
             "name": "Deutsch",
-            "path": "dist/locale/de/config.json"
+            "path": "dist/locale/de.json"
         },
         {
             "lang": "pt-BR",
             "name": "Português (Brasil)",
-            "path": "dist/locale/pt-BR/config.json"
+            "path": "dist/locale/pt-BR.json"
         },
         {
             "lang": "fr",
             "name": "Français",
-            "path": "dist/locale/fr/config.json"
+            "path": "dist/locale/fr.json"
         },
         {
             "lang": "ko",
             "name": "Korean",
-            "path": "dist/locale/ko/config.json"
+            "path": "dist/locale/ko.json"
         }
     ],
     "packs": [
@@ -88,11 +88,7 @@
             "name": "Shadowrun 5e",
             "color": "#cc0000",
             "sorting": "m",
-            "packs": [
-                "system-macros",
-                "general-actions",
-                "matrix-actions"
-            ]
+            "packs": ["system-macros", "general-actions", "matrix-actions"]
         }
     ],
     "relationships": [

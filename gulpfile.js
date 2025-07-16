@@ -8,4 +8,5 @@ gulp.task('rebuild', tasks.rebuild);
 gulp.task('watch', tasks.watch);
 gulp.task('clean', tasks.clean);
 gulp.task('sass', tasks.sass);
-gulp.task('link', tasks.link)
+gulp.task('link', tasks.link);
+gulp.task("i18n:test", tasks["i18n:test"]);
