@@ -160,6 +160,11 @@ declare module "fvtt-types/configuration" {
                 itemMacro?: boolean;
             }
         };
+        Token: {
+            shadowrun5e: {
+                TokenUseRoutingLib?: boolean;
+            };
+        }
         User: {
             shadowrun5e: {
                 showApplication?: boolean;

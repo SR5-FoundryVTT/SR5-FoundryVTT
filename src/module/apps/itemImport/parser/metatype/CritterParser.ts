@@ -1,10 +1,10 @@
+import { SystemType } from "../Parser";
 import { Metatype } from "../../schema/MetatypeSchema";
+import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
+import { DataDefaults } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { SkillFieldType } from "src/module/types/template/Skills";
-import { SystemType } from "../Parser";
 
 export class CritterParser extends MetatypeParserBase<'character'> {
     protected readonly parseType = 'character';
@@ -141,28 +141,29 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         mapTranslation(spells, 'spell');
         mapTranslation(power, 'power');
 
-        const [magicObj, traitsObj] = await Promise.all([
-            IH.findItem('Magic', [...complex, ...spells].map(name => translationMap[name])),
-            IH.findItem('Trait', [...bioware, ...quality, ...power].map(name => translationMap[name])),
-        ]);
+        const allComplexForm = await IH.findItem('Complex_Form', complex.map(name => translationMap[name]));
+        const allSpells = await IH.findItem('Spell', spells.map(name => translationMap[name]));
+        const allPowers = await IH.findItem('Critter_Power', power.map(name => translationMap[name]));
+        const allQualities = await IH.findItem('Quality', [...quality, ...bioware].map(name => translationMap[name]));
+        const allBiowares = await IH.findItem('Ware', bioware.map(name => translationMap[name]));
 
         const name = jsonData.name._TEXT;
         return [
-            ...this.getMetatypeItems(magicObj, spellsData, { type: 'Spell', critter: name }, translationMap),
-            ...this.getMetatypeItems(traitsObj, jsonData.powers?.power, { type: 'Power', critter: name }, translationMap),
-            ...this.getMetatypeItems(traitsObj, jsonData.biowares?.bioware, { type: 'Bioware', critter: name }, translationMap),
-            ...this.getMetatypeItems(traitsObj, optionalpowers?.optionalpower, { type: 'Power', critter: name }, translationMap),
-            ...this.getMetatypeItems(traitsObj, qualities?.positive?.quality, { type: 'Quality', critter: name }, translationMap),
-            ...this.getMetatypeItems(traitsObj, qualities?.negative?.quality, { type: 'Quality', critter: name }, translationMap),
-            ...this.getMetatypeItems(magicObj, jsonData.complexforms?.complexform, { type: 'Complex Form', critter: name }, translationMap),
+            ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: name }, translationMap),
+            ...this.getMetatypeItems(allPowers, jsonData.powers?.power, { type: 'Power', critter: name }, translationMap),
+            ...this.getMetatypeItems(allBiowares, jsonData.biowares?.bioware, { type: 'Bioware', critter: name }, translationMap),
+            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Power', critter: name }, translationMap),
+            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Quality', critter: name }, translationMap),
+            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Quality', critter: name }, translationMap),
+            ...this.getMetatypeItems(allComplexForm, jsonData.complexforms?.complexform, { type: 'Complex Form', critter: name }, translationMap),
         ];
     }
 
-    protected override async getFolder(jsonData: Metatype): Promise<Folder> {
+    protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
         const rootFolder = TH.getTranslation("Critter", {type: 'category'});
         const folderName = TH.getTranslation(category, {type: 'category'});
 
-        return IH.getFolder('Critter', rootFolder, folderName);
+        return IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

@@ -48,6 +48,31 @@ export class RoutingLibIntegration {
         });
     }
 
+    /**
+     * Converts waypoint coordinates between Foundry (top-left) and RoutingLib (center-based).
+     *
+     * Use 'toRoutingLib' to shift to center-based coordinates for pathfinding.
+     * Use 'fromRoutingLib' to shift back to top-left coordinates.
+     */
+    private static convertWaypoint<T extends { x?: number, y?: number }>(
+        grid: foundry.grid.BaseGrid,
+        waypoint: T,
+        mode: 'toRoutingLib' | 'fromRoutingLib'
+    ): T & { x: number, y: number } {
+        return {
+            ...waypoint,
+            x: Math.round(waypoint.x! + (grid.sizeX / 2) * (mode === 'toRoutingLib' ? 1 : -1)),
+            y: Math.round(waypoint.y! + (grid.sizeY / 2) * (mode === 'toRoutingLib' ? 1 : -1)),
+        };
+    }
+
+    /**
+     * Calculates a path using RoutingLib's pathfinding.
+     *
+     * @param waypoints - The waypoints to route through.
+     * @param token - The token for which the path is calculated.
+     * @param movement - The movement data of the token's actor.
+     */
     static routinglibPathfinding(
         waypoints: Token.FindMovementPathWaypoint[],
         token: SR5Token,
@@ -70,15 +95,14 @@ export class RoutingLibIntegration {
         }
 
         pathfindingResult.promise = new Promise<TokenDocument.MovementWaypoint[] | null>((resolve) => {
-            const maxDistance = Math.max(movement.run.value * 5, 20);
+            const maxDistance = Math.max(movement.run.value * 5, 20 * (grid.isGridless ? grid.size : 1));
+
             for (let i = 1; i < waypoints.length; i++) {
-                const fromWaypoint = waypoints[i - 1];
+                const fromWaypoint = this.convertWaypoint(grid, waypoints[i - 1], 'toRoutingLib');
+                const toWaypoint = this.convertWaypoint(grid, waypoints[i], 'toRoutingLib');
 
-                if (fromWaypoint.x === undefined || fromWaypoint.y === undefined || waypoints[i].x === undefined || waypoints[i].y === undefined)
-                    throw new Error('Waypoints must have defined x and y coordinates.');
-
-                const { i: fromY, j: fromX } = grid.getOffset(fromWaypoint as TokenDocument.MovementWaypoint & { x: number, y: number });
-                const { i: toY, j: toX } = grid.getOffset(waypoints[i] as TokenDocument.MovementWaypoint & { x: number, y: number });
+                const { i: fromY, j: fromX } = grid.getOffset(fromWaypoint);
+                const { i: toY, j: toX } = grid.getOffset(toWaypoint);
 
                 const from = { x: fromX, y: fromY };
                 const to = { x: toX, y: toY };
@@ -105,10 +129,11 @@ export class RoutingLibIntegration {
                         routedWaypoints.pop();
                         const fromWaypoint = waypoints[i];
                         for (const waypoint of route.path) {
-                            const topLeftPoint = grid.getTopLeftPoint({ j: waypoint.x, i: waypoint.y });
+                            const centerPoint = grid.getCenterPoint({ j: waypoint.x, i: waypoint.y });
+                            const foundryWaypoint = this.convertWaypoint(grid, centerPoint, 'fromRoutingLib');
                             routedWaypoints.push({
-                                x: topLeftPoint.x,
-                                y: topLeftPoint.y,
+                                x: foundryWaypoint.x,
+                                y: foundryWaypoint.y,
                                 elevation: fromWaypoint.elevation,
                                 width: fromWaypoint.width,
                                 height: fromWaypoint.height,

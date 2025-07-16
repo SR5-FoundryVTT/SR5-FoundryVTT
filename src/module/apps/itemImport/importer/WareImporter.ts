@@ -21,7 +21,7 @@ export class WareImporter extends DataImporter {
         return WareImporter.ParseItems<WareTypes>(
             jsonDatas,
             {
-                compendiumKey: "Trait",
+                compendiumKey: () => "Ware",
                 parser: new WareParser(key, jsonObject.categories.category),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);

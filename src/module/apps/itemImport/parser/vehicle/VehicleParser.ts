@@ -1,6 +1,7 @@
-import { Parser, SystemType } from '../Parser';
+import { Parser } from '../Parser';
 import { SR5Item } from '../../../../item/SR5Item';
 import { Vehicle } from '../../schema/VehiclesSchema';
+import { CompendiumKey } from '../../importer/Constants';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
 
@@ -27,8 +28,8 @@ export class VehicleParser extends Parser<'vehicle'> {
                 continue;
             }
 
-            const itemBase = foundItem.toObject();
-            const system = itemBase.system as SystemType<'modification' | 'equipment' | 'weapon'>;
+            const itemBase = game.items.fromCompendium(foundItem);
+            const system = itemBase.system as Item.SystemOfType<'modification' | 'equipment' | 'weapon'>;
 
             if ('technology' in system)
                 system.technology.equipped = true;
@@ -98,7 +99,7 @@ export class VehicleParser extends Parser<'vehicle'> {
         for (const name of allWeaponName) translationMap[name] = TH.getTranslation(name, { type: 'weapon' });
 
         const [modItem, gearItem, weaponItem] = await Promise.all([
-            IH.findItem('Modification', allModName.map(name => translationMap[name])),
+            IH.findItem('Vehicle_Mod', allModName.map(name => translationMap[name])),
             IH.findItem('Gear', allGearName.map(name => translationMap[name])),
             IH.findItem('Weapon', allWeaponName.map(name => translationMap[name])),
         ]);
@@ -112,12 +113,12 @@ export class VehicleParser extends Parser<'vehicle'> {
         ];
     }
 
-    protected override async getFolder(jsonData: Vehicle): Promise<Folder> {
+    protected override async getFolder(jsonData: Vehicle, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category._TEXT;
         const isDrone = category.startsWith("Drones:");
         const rootFolder = TH.getTranslation(isDrone ? "Drones" : "Vehicles");
         const folderName = TH.getTranslation(category);
 
-        return IH.getFolder('Drone', rootFolder, folderName);
+        return IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

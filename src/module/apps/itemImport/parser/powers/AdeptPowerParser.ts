@@ -1,5 +1,6 @@
 import { Parser } from '../Parser';
 import { Power } from '../../schema/PowersSchema';
+import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 
 export class AdeptPowerParser extends Parser<'adept_power'> {
@@ -13,7 +14,7 @@ export class AdeptPowerParser extends Parser<'adept_power'> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Power): Promise<Folder> {
-        return IH.getFolder('Trait', "Adept Powers");
+    protected override async getFolder(jsonData: Power, compendiumKey: CompendiumKey): Promise<Folder> {
+        return IH.getFolder(compendiumKey, "Adept Powers");
     }
 }

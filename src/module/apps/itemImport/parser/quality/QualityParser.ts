@@ -1,5 +1,6 @@
 import { Parser } from '../Parser';
 import { Quality } from '../../schema/QualitiesSchema';
+import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
@@ -15,13 +16,13 @@ export class QualityParser extends Parser<'quality'> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Quality): Promise<Folder> {
+    protected override async getFolder(jsonData: Quality, compendiumKey: CompendiumKey): Promise<Folder> {
         const isMetagenic = jsonData.metagenic?._TEXT === 'True';
         const rootFolder = isMetagenic
             ? TH.getTranslation('Quality (Metagenic)', { type: 'category' })
             : TH.getTranslation('Quality', { type: 'category' });
         const folderName = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
 
-        return IH.getFolder('Trait', rootFolder, folderName);
+        return IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

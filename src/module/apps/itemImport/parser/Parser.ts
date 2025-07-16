@@ -3,7 +3,7 @@ import { TranslationHelper as TH, TranslationType } from "../helper/TranslationH
 import * as IconAssign from "../../iconAssigner/iconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 import { BonusHelper as BH } from "../helper/BonusHelper";
-import { Constants } from "../importer/Constants";
+import { CompendiumKey, Constants } from "../importer/Constants";
 
 import { Armor, Mod as ArmorMod } from "../schema/ArmorSchema";
 import { Bioware } from "../schema/BiowareSchema";
@@ -36,22 +36,22 @@ export abstract class Parser<SubType extends SystemEntityType> {
         return Object.keys(game.model.Actor).includes(this.parseType);
     }
 
-    protected abstract getFolder(jsonData: ParseData): Promise<Folder>;
+    protected abstract getFolder(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Folder>;
     protected async getItems(jsonData: ParseData): Promise<Item.Source[]> { return []; }
     protected getSystem(jsonData: ParseData) { return this.getBaseSystem(); }
 
-    public async Parse(jsonData: ParseData): Promise<Actor.CreateData | Item.CreateData> {
+    public async Parse(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Actor.CreateData | Item.CreateData> {
         const itemPromise = this.getItems(jsonData);
         let bonusPromise: Promise<void> | undefined;
 
         const name = jsonData.name._TEXT;
-        const typeOption = Constants.MAP_TRANSLATION_TYPE[this.parseType] as TranslationType;
+        const typeOption = Constants.MAP_TRANSLATION_TYPE[this.parseType as string];
         const options = {id: jsonData.id._TEXT, type: typeOption};
 
         const entity = {
             name: TH.getTranslation(name, options),
             type: this.parseType as any,
-            folder: (await this.getFolder(jsonData)).id,
+            folder: (await this.getFolder(jsonData, compendiumKey)).id,
             system: this.getSystem(jsonData),
         } satisfies Actor.CreateData | Item.CreateData;
 

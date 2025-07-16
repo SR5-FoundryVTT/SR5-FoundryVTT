@@ -1,6 +1,6 @@
 import { SR5 } from "../../../config";
-import { Constants } from './Constants';
 import { ParseData } from "../parser/Parser";
+import { CompendiumKey, Constants } from './Constants';
 import { ImportHelper as IH } from '../helper/ImportHelper';
 
 const xml2js = require('xml2js');
@@ -88,35 +88,36 @@ export abstract class DataImporter {
     protected static async ParseItems<TInput extends ParseData>(
         inputs: TInput[],
         options: {
-            compendiumKey: keyof typeof Constants.MAP_COMPENDIUM_KEY;
-            parser: { Parse(data: TInput): Promise<(Actor.CreateData | Item.CreateData)> };
+            compendiumKey: (data: TInput) => CompendiumKey;
+            parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<Actor.CreateData | Item.CreateData> };
             filter?: (input: TInput) => boolean;
             injectActionTests?: (item: Item.CreateData) => void;
             errorPrefix?: string;
         }
     ): Promise<void> {
         const { compendiumKey, parser, filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
-        const items: (Actor.CreateData | Item.CreateData)[] = [];
-
-        await IH.GetCompendium(compendiumKey);
+        const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
 
         for (const data of inputs) {
             try {
                 if (!this.supportedBookSource(data) || !filter(data)) continue;
-
-                const item = await parser.Parse(data);
+                
+                const key = compendiumKey(data);
+                const item = await parser.Parse(data, key);
                 injectActionTests?.(item as Item.CreateData);
-                items.push(item);
+
+                if (!itemMap.has(key)) itemMap.set(key, []);
+                itemMap.get(key)!.push(item);
             } catch (error) {
                 console.error(error);
                 ui.notifications?.error(`${errorPrefix}: ${data?.name?._TEXT ?? "Unknown"}`);
             }
         };
 
-        const compendium = Constants.MAP_COMPENDIUM_KEY[compendiumKey];
-        if (compendium.type === 'Actor')
-            await Actor.create(items as Actor.CreateData[], { pack: compendium.pack });
-        else
-            await Item.create(items as Item.CreateData[], { pack: compendium.pack });
+        for (const [key, items] of itemMap.entries()) {
+            await IH.GetCompendium(key);
+            const compendium = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[key]];
+            await (compendium.type === 'Actor' ? Actor : Item).create(items as any, { pack: compendium.pack });
+        }
     }
 }

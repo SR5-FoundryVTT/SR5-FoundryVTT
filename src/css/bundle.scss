@@ -1,4 +1,4 @@
-@import "node_modules/@yaireo/tagify/dist/tagify";
+@import 'node_modules/@yaireo/tagify/dist/tagify';
 
 @import 'config';
 @import 'item';
@@ -19,7 +19,7 @@
 
 @font-face {
     font-family: 'IwaOGoPro-Md';
-    src: url("assets/fonts/IwaOGoPro-Md.otf");
+    src: url('assets/fonts/IwaOGoPro-Md.otf');
 }
 
 // .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
@@ -36,7 +36,7 @@
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
-        >* {
+        > * {
             flex: 0;
         }
     }
@@ -46,7 +46,7 @@
         flex-direction: column-reverse;
         flex-wrap: nowrap;
 
-        >* {
+        > * {
             flex: 0;
         }
     }
@@ -58,11 +58,21 @@
         justify-content: flex-start;
     }
 
-    .flex5 { flex: 5; }
-    .flex6 { flex: 6; }
-    .flex7 { flex: 7; }
-    .flex8 { flex: 8; }
-    .flex9 { flex: 9; }
+    .flex5 {
+        flex: 5;
+    }
+    .flex6 {
+        flex: 6;
+    }
+    .flex7 {
+        flex: 7;
+    }
+    .flex8 {
+        flex: 8;
+    }
+    .flex9 {
+        flex: 9;
+    }
 
     .nowrap {
         flex-wrap: nowrap;
@@ -95,7 +105,7 @@
     .show-situation-modifiers-application {
         @include rollable;
     }
-    .grid-2-col{
+    .grid-2-col {
         display: grid;
     }
 
@@ -111,11 +121,12 @@
 
     /* New or updated rules */
     .license-section .item-text.rtg.rate,
-    .license-section .rtg-rate.item-text {  /* Updated */
+    .license-section .rtg-rate.item-text {
+        /* Updated */
         margin-left: 0;
         padding-left: 0;
         text-align: left;
-        width: 22px;  /* Updated */
+        width: 22px; /* Updated */
     }
     //Header Rating
     .license-section .item-text.rtg.rate-header {
@@ -123,7 +134,7 @@
         margin-left: -1em;
     }
     //Header detail
-    .detail{
+    .detail {
         margin-left: 1em !important;
     }
     //Rating width
@@ -135,12 +146,12 @@
         max-width: 1em;
     }
     .item-name-field {
-        max-width: 11em;  /* Set to your desired max width */
+        max-width: 11em; /* Set to your desired max width */
     }
 
     .display.left.name-display {
-        width: 100%;  /* Takes the maximum width of the parent */
-        max-width: 100%;  /* Optional, ensures it doesn't go beyond parent */
+        width: 100%; /* Takes the maximum width of the parent */
+        max-width: 100%; /* Optional, ensures it doesn't go beyond parent */
     }
     // This class is only used for sin license descriptions and seems to be mostly a hack to get the description to better align with the license rating.
     .display.desc-sin {
@@ -154,14 +165,15 @@
 
     .item-text.item-name-header {
         /* Set to your desired width */
-        max-width: 11em;  /* Optional, ensures it doesn't go beyond the set width */
+        max-width: 11em; /* Optional, ensures it doesn't go beyond the set width */
     }
 
     .license-section .list-item.item-section .item-text.rtg.rate,
-    .license-section .list-item .rtg-rate.item-text {  /* Updated */
+    .license-section .list-item .rtg-rate.item-text {
+        /* Updated */
         flex-basis: calc(25% - 1em);
         text-align: left;
-        width: 22px;  /* Updated */
+        width: 22px; /* Updated */
     }
 
     .license-section .list-item.item-section .item-text.desc.detail,
@@ -171,8 +183,9 @@
     }
 
     /* Specifics for the rtg-rate input field */
-    .license-section .list-item .rtg-rate.item-text input {  /* Updated */
-        width: 22px;  /* Updated */
+    .license-section .list-item .rtg-rate.item-text input {
+        /* Updated */
+        width: 22px; /* Updated */
     }
 
     // Specific em
@@ -250,7 +263,6 @@
         top: 2px;
         z-index: 9;
     }
-
 }
 
 label.checkbox {
@@ -264,7 +276,7 @@ label.checkbox {
     -moz-user-select: none;
     -ms-user-select: none;
 
-    &:hover input~.checkmark {
+    &:hover input ~ .checkmark {
         text-shadow: 0 0 0.2em $rollcolor;
     }
 
@@ -399,22 +411,22 @@ input[type='text'].display {
         }
     }
 }
-    /**
+/**
      * Special SR5 hr and select display
      */
 .sr5 {
-
     hr {
         border-color: $yellow;
     }
 
-    select.display, select {
+    select.display,
+    select {
         color: $color;
         background: rgba($black, 0.05);
         border-radius: 0.3em;
         border-color: $dark;
 
-        >option {
+        > option {
             background-color: $dark;
         }
     }
@@ -472,14 +484,13 @@ input[type='text'].display {
         color: $white !important;
     }
 
-
     .entity-link.content-link {
         color: $white !important;
     }
 
     // An origin link is a uuid based entity link, without drag support.
     .origin-link {
-        background: #DDD;
+        background: #ddd;
         padding: 1px 4px;
         border: 1px solid #4b4a44;
         border-radius: 2px;
@@ -503,7 +514,6 @@ input[type='text'].display {
 
     // Styling for any prosemirror editors within shadowrun applications.
     .editor.prosemirror {
-
         // handles dropdown menus, not select based.
         .pm-dropdown {
             color: $color;
@@ -523,7 +533,7 @@ input[type='text'].display {
             }
 
             // li represents each menu entry in both menus and sub-menus
-            ul>li:hover {
+            ul > li:hover {
                 color: $color;
                 border-color: rgba($white, 0.1);
                 background: rgba($black, 0.05);
@@ -565,7 +575,7 @@ input[type='text'].display {
             }
         }
 
-        >* {
+        > * {
             margin: 0 0.5em;
         }
     }
@@ -581,7 +591,7 @@ input[type='text'].display {
         border-top: 0px;
     }
 
-    .description>.editor {
+    .description > .editor {
         height: 95%;
         min-height: 15em;
         width: 100%;
@@ -595,20 +605,18 @@ input[type='text'].display {
         overflow-y: auto;
         color: $white;
     }
-    .flexcontainer-skills{
+    .flexcontainer-skills {
         display: flex;
-        height: 250px;
+        min-height: 250px;
     }
     .scroll-area-knowledge {
+        flex: 1;
         overflow-y: auto;
-        max-height: 300px;
-        margin-bottom: 0.5em;
-        flex-grow: 1;
-        flex-shrink: 1;
-        flex-basis: auto;
+        overflow-x: hidden;
+        min-height: 0;
     }
 
-    .scroll-area-mods{
+    .scroll-area-mods {
         height: 600px;
     }
 
@@ -644,8 +652,8 @@ input[type='text'].display {
         align-items: stretch; // Make tabs stretch instead of space horizontally.
         border-bottom: 1px solid $yellow;
 
-        >a {
-        margin: 0.25em;
+        > a {
+            margin: 0.25em;
             padding: 0.25em;
             margin-bottom: 0;
             position: relative;
@@ -661,7 +669,7 @@ input[type='text'].display {
             }
         }
 
-        >.item {
+        > .item {
             // Make tabs stretch across horizontally.
             color: $white;
             flex: 1;
@@ -679,7 +687,7 @@ input[type='text'].display {
         min-height: 36px;
     }
 
-    label.item-text.item-name[for="select-inventory"] {
+    label.item-text.item-name[for='select-inventory'] {
         color: $yellow;
     }
 
@@ -695,11 +703,11 @@ input[type='text'].display {
             display: flex;
             flex-flow: column nowrap;
 
-            >* {
+            > * {
                 flex: 0;
             }
 
-            >.inventory {
+            > .inventory {
                 flex: 1;
             }
         }
@@ -713,16 +721,16 @@ input[type='text'].display {
         align-content: stretch;
         height: 100%;
 
-        >* {
+        > * {
             flex: 1;
             width: 100%;
         }
 
-        >*:not(:first-child) {
+        > *:not(:first-child) {
             margin-left: 0.25em;
         }
 
-        >*:not(:last-child) {
+        > *:not(:last-child) {
             border-right: $groove;
             padding-right: 0.25em;
         }
@@ -887,7 +895,7 @@ input[type='text'].display {
         margin: 0.1em;
         margin-right: $groove-width;
         margin-left: $groove-width;
-        &.matrix{
+        &.matrix {
             color: $white;
         }
         .has-desc {
@@ -917,7 +925,7 @@ input[type='text'].display {
             border-bottom: 1px solid $yellow;
             border-radius: 0.2em;
             padding-top: 5px;
-            &.sprite{
+            &.sprite {
                 background: none;
             }
             &.faded {
@@ -957,7 +965,7 @@ input[type='text'].display {
                 flex-flow: row nowrap;
                 justify-content: flex-start;
                 align-items: center;
-                flex-grow:1;
+                flex-grow: 1;
             }
 
             .item-right {
@@ -976,19 +984,19 @@ input[type='text'].display {
                     @include rollable;
 
                     &:hover {
-                        >img {
+                        > img {
                             content: url('assets/dice-solid.svg');
                             filter: invert(1);
                         }
                     }
                 }
 
-                >img {
+                > img {
                     margin: 0;
                     transform: translateY(10%);
                 }
 
-                &+.item-name {
+                & + .item-name {
                     border-left: none !important;
                 }
             }
@@ -1036,7 +1044,7 @@ input[type='text'].display {
                     &.fresh-import {
                         color: $freshImportColor;
                     }
-                    &.mods-label{
+                    &.mods-label {
                         color: $white;
                     }
                 }
@@ -1064,7 +1072,8 @@ input[type='text'].display {
                 &.input {
                     text-align: right;
                     width: 9.5em;
-                    &.defense{ //Moves the selector Box for defense to the left to align
+                    &.defense {
+                        //Moves the selector Box for defense to the left to align
                         width: 13.5em;
                     }
                 }
@@ -1072,7 +1081,7 @@ input[type='text'].display {
                 &.desc {
                     width: 16em;
                 }
-                .content-inner{
+                .content-inner {
                     color: $white;
                 }
             }
@@ -1106,7 +1115,7 @@ input[type='text'].display {
                 flex-flow: wrap row;
                 padding: 0.25em 0;
 
-                >* {
+                > * {
                     flex-shrink: 0;
                     border-right: $groove;
                     border-bottom: $groove;
@@ -1125,8 +1134,8 @@ input[type='text'].display {
                 //padding-right: 0.5em;
             }
         }
-        .item-desc:after{
-            content: "";
+        .item-desc:after {
+            content: '';
             clear: both;
             display: table;
         }
@@ -1293,14 +1302,14 @@ input[type='text'].display {
 //END SR5 Style
 
 .custom-item-element {
-    color: $white;               /* Text color */
+    color: $white; /* Text color */
 }
 //lable back to white color
-.matrix-label{
+.matrix-label {
     color: $white;
 }
 
-.scroll-area-matrix{
+.scroll-area-matrix {
     overflow-y: auto;
     color: $white;
 }
@@ -1308,30 +1317,30 @@ input[type='text'].display {
 //table in any Item
 .SR5 th {
     color: $yellow;
-    padding: 10px;               /* Padding */
-    text-align: left;          /* Left text */
+    padding: 10px; /* Padding */
+    text-align: left; /* Left text */
     border-bottom: 2px solid $edge; /* Add a border at the bottom */
     font-size: medium;
 }
 .SR5 th:hover {
     color: $pdfColor;
 }
-.SR5 caption{
+.SR5 caption {
     background: none;
     color: $yellow;
     padding: 6px;
     text-align: left;
     font-size: medium;
 }
-.SR5 caption:hover{
+.SR5 caption:hover {
     color: $fDarkRed;
 }
-.SR5 tr{
+.SR5 tr {
     color: $white;
 }
-.SR5 tr:hover{
+.SR5 tr:hover {
     color: $pdfColor;
 }
 .SR5 tr p:not(th p) {
-    padding-left: 10px;  /* Padding on the left */
+    padding-left: 10px; /* Padding on the left */
 }

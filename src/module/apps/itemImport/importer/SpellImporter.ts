@@ -1,11 +1,12 @@
+import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
 import { SpellsSchema, Spell } from '../schema/SpellsSchema';
 import { SpellParserBase } from '../parser/spell/SpellParserBase';
 import { CombatSpellParser } from '../parser/spell/CombatSpellParser';
-import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser';
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellParser } from '../parser/spell/DetectionSpellParser';
-import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser';
 
 export class SpellImporter extends DataImporter{
     public files = ['spells.xml'];
@@ -15,7 +16,7 @@ export class SpellImporter extends DataImporter{
     }
 
     static parserWrap = class {
-        public async Parse(jsonData: Spell): Promise<Item.CreateData> {
+        public async Parse(jsonData: Spell, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const spellParserBase = new SpellParserBase();
             const combatSpellParser = new CombatSpellParser();
             const illusionSpellParser = new IllusionSpellParser();
@@ -29,7 +30,7 @@ export class SpellImporter extends DataImporter{
                                  : category === 'Manipulation'  ? manipulationSpellParser
                                                                 : spellParserBase;
 
-            return await selectedParser.Parse(jsonData) as Item.CreateData;
+            return await selectedParser.Parse(jsonData, compendiumKey) as Item.CreateData;
         }
     };
 
@@ -37,7 +38,7 @@ export class SpellImporter extends DataImporter{
         return SpellImporter.ParseItems<Spell>(
             jsonObject.spells.spell,
             {
-                compendiumKey: "Magic",
+                compendiumKey: () => "Spell",
                 parser: new SpellImporter.parserWrap(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);

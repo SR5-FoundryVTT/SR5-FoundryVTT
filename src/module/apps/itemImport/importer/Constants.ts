@@ -1,21 +1,56 @@
 import { SR5 } from '../../../config';
 
+export type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
+
 export class Constants {
-    
-    public static readonly MAP_COMPENDIUM_KEY = {
+
+    public static readonly MAP_COMPENDIUM_CONFIG = {
         // Actors
-        'Critter':          { pack: 'world.sr5critter',         type: 'Actor' }, // Critters, Spirits and Sprites
-        'Drone':            { pack: 'world.sr5drone',           type: 'Actor' }, // Vehicles and Drones
+        'Critter':          { pack: 'world.sr5critter',         type: 'Actor', folder: null, subFolder: null }, // Critters, Spirits and Sprites
+        'Drone':            { pack: 'world.sr5drone',           type: 'Actor', folder: null, subFolder: null }, // Vehicles and Drones
 
-        // Items 
-        'Gear':             { pack: 'world.sr5gear',            type: 'Item' }, // Armor + General Gear
-        'Trait':            { pack: 'world.sr5trait',           type: 'Item' }, // Bioware + Cyberware + Quality + Powers
-        'Magic':            { pack: 'world.sr5magic',           type: 'Item' }, // Spells, rituals, complex forms
-        'Modification':     { pack: 'world.sr5modification',    type: 'Item' }, // Armor/Vehicle/weapon mods + ammo
-        'Weapon':           { pack: 'world.sr5weapon',          type: 'Item' }, // Weapons
-    } as const;
+        // Items
+        'Gear':             { pack: 'world.sr5gear',            type: 'Item', folder: null, subFolder: null }, // Armor + General Gear
+        'Trait':            { pack: 'world.sr5trait',           type: 'Item', folder: null, subFolder: null }, // Quality + Powers
+        'Magic':            { pack: 'world.sr5magic',           type: 'Item', folder: null, subFolder: null }, // Spells, rituals, complex forms
+        'Modification':     { pack: 'world.sr5modification',    type: 'Item', folder: null, subFolder: null }, // Armor/Vehicle/weapon mods + ammo
+        'Ware':             { pack: 'world.sr5ware',            type: 'Item', folder: null, subFolder: null }, // Bioware + Cyberware
+        'Weapon':           { pack: 'world.sr5weapon',          type: 'Item', folder: null, subFolder: null }, // Weapons
+    } as const satisfies Record<string, { pack: string; type: 'Actor' | 'Item'; folder: string | null, subFolder: string | null }>;
 
-    public static readonly MAP_TRANSLATION_TYPE: Record<string, string> = {
+    public static readonly MAP_COMPENDIUM_KEY = {
+        // --- Critters ---
+        'Critter':          'Critter',
+        'Spirit':           'Critter',
+        'Sprite':           'Critter',
+        'Critter_Power':    'Trait',
+
+        // --- Character Traits ---
+        'Quality':          'Trait',
+        'Ware':             'Ware',
+
+        // --- Vehicles ---
+        'Drone':            'Drone',
+        'Vehicle':          'Drone',
+        'Vehicle_Mod':      'Modification',
+
+        // --- Magic ---
+        'Adept_Power':      'Trait',
+        'Complex_Form':     'Magic',
+        'Echo':             'Trait',
+        'Spell':            'Magic',
+
+        // --- Gear ---
+        'Ammo':             'Gear',
+        'Armor':            'Gear',
+        'Device':           'Gear',
+        'Program':          'Gear',
+        'Gear':             'Gear',
+        'Weapon':           'Weapon',
+        'Weapon_Mod':       'Modification',
+    } as const satisfies Record<string, keyof typeof Constants.MAP_COMPENDIUM_CONFIG>;
+
+    public static readonly MAP_TRANSLATION_TYPE = {
         'adept_power': 'power',
         'ammo': 'gear',
         'armor': 'armor',
@@ -35,7 +70,7 @@ export class Constants {
         'sprite_power': 'power',
         'vehicle': 'vehicle',
         'weapon': 'weapon'
-    } as const;
+    } as const satisfies Record<string, string>;
 
     public static readonly MAP_CATEGORY_TO_SKILL = {
         'Assault Cannons': 'heavy_weapons',
@@ -66,9 +101,7 @@ export class Constants {
         'Unarmed': 'unarmed_combat',
     } as const;
 
-    public static readonly MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY:
-        Record<string, Exclude<keyof typeof SR5.weaponRangeCategories, "manual">> =
-    {
+    public static readonly MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY = {
         'Tasers': 'taser',
         'Holdouts': 'holdOutPistol',
         'Light Pistols': 'lightPistol',
@@ -98,5 +131,5 @@ export class Constants {
         'Harpoon Gun': 'harpoonGun',
         'Harpoon Gun (Underwater)': 'harpoonGunUnderwater',
         'Flamethrowers': 'flamethrower',
-    } as const;
+    } as const satisfies Record<string, Exclude<keyof typeof SR5.weaponRangeCategories, "manual">> ;
 }

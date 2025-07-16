@@ -23,8 +23,8 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'critter
                 continue;
             }
 
-            const itemBase = foundItem.toObject();
-            const system = itemBase.system as SystemType<'bioware' | 'cyberware' | 'complex_form' | 'quality' | 'spell' | 'adept_power' | 'critter_power' | 'weapon' | 'equipment'>;
+            const itemBase = game.items.fromCompendium(foundItem);
+            const system = itemBase.system;
 
             if (item.$?.select)
                 itemBase.name += ` (${item.$.select})`;

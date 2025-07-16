@@ -1,3 +1,4 @@
+import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
 import { MeleeParser } from '../parser/weapon/MeleeParser';
 import { RangedParser } from '../parser/weapon/RangedParser';
@@ -14,22 +15,17 @@ export class WeaponImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        private categories: WeaponsSchema['categories']['category'];
-        constructor(categories: WeaponsSchema['categories']['category']) {
-            this.categories = categories;
-        }
-
-        public async Parse(jsonData: Weapon): Promise<Item.CreateData> {
-            const rangedParser = new RangedParser(this.categories);
-            const meleeParser = new MeleeParser(this.categories);
-            const thrownParser = new ThrownParser(this.categories);
+        public async Parse(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
+            const rangedParser = new RangedParser();
+            const meleeParser = new MeleeParser();
+            const thrownParser = new ThrownParser();
 
             const category = WeaponParserBase.GetWeaponType(jsonData);
             const selectedParser = category === 'range' ? rangedParser
                                  : category === 'melee' ? meleeParser
                                                         : thrownParser;
 
-            return await selectedParser.Parse(jsonData) as Item.CreateData;
+            return await selectedParser.Parse(jsonData, compendiumKey) as Item.CreateData;
         }
     };
 
@@ -37,8 +33,8 @@ export class WeaponImporter extends DataImporter {
         return WeaponImporter.ParseItems<Weapon>(
             jsonObject.weapons.weapon,
             {
-                compendiumKey: "Weapon",
-                parser: new WeaponImporter.parserWrap(jsonObject.categories.category),
+                compendiumKey: () => "Weapon",
+                parser: new WeaponImporter.parserWrap(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },

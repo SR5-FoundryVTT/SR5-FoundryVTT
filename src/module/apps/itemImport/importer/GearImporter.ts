@@ -1,3 +1,4 @@
+import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
 import { AmmoParser } from '../parser/gear/AmmoParser';
 import { GearSchema, Gear } from '../schema/GearSchema';
@@ -14,12 +15,12 @@ export class GearImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        private categories: GearSchema['categories']['category'];
+        private readonly categories: GearSchema['categories']['category'];
         constructor(categories: GearSchema['categories']['category']) {
             this.categories = categories;
         }
 
-        public async Parse(jsonData: Gear): Promise<Item.CreateData> {
+        public async Parse(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const ammoParser = new AmmoParser(this.categories);
             const deviceParser = new DeviceParser(this.categories);
             const programParser = new ProgramParser(this.categories);
@@ -34,7 +35,7 @@ export class GearImporter extends DataImporter {
                                  : programTypes.includes(category) ? programParser
                                                                    : equipmentParser;
 
-            return await selectedParser.Parse(jsonData) as Item.CreateData;
+            return await selectedParser.Parse(jsonData, compendiumKey) as Item.CreateData;
         }
     };
 
@@ -42,11 +43,11 @@ export class GearImporter extends DataImporter {
         return GearImporter.ParseItems<Gear>(
             jsonObject.gears.gear,
             {
-                compendiumKey: "Gear",
+                compendiumKey: () => "Gear",
                 parser: new GearImporter.parserWrap(jsonObject.categories.category),
                 filter: jsonData => jsonData.id._TEXT !== 'd63eb841-7b15-4539-9026-b90a4924aeeb',
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Gear"
             }

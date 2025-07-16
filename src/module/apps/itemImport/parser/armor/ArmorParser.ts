@@ -1,5 +1,6 @@
 import { Parser } from '../Parser';
 import { Armor } from '../../schema/ArmorSchema'
+import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
@@ -15,10 +16,10 @@ export class ArmorParser extends Parser<'armor'> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Armor): Promise<Folder> {
+    protected override async getFolder(jsonData: Armor, compendiumKey: CompendiumKey): Promise<Folder> {
         const rootFolder = TH.getTranslation("Armor", { type: 'category' });
         const category = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
 
-        return IH.getFolder('Gear', rootFolder, category);
+        return IH.getFolder(compendiumKey, rootFolder, category);
     }
 }

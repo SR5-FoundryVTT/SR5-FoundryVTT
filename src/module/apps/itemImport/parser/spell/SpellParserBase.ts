@@ -1,5 +1,6 @@
 import { Parser, SystemType } from '../Parser';
 import { Spell } from '../../schema/SpellsSchema';
+import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
@@ -57,9 +58,9 @@ export class SpellParserBase extends Parser<'spell'> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Spell): Promise<Folder> {
+    protected override async getFolder(jsonData: Spell, compendiumKey: CompendiumKey): Promise<Folder> {
         const folderName = TH.getTranslation(jsonData.category._TEXT, {type: 'category'});
 
-        return IH.getFolder("Magic", folderName);
+        return IH.getFolder(compendiumKey, folderName);
     }
 }

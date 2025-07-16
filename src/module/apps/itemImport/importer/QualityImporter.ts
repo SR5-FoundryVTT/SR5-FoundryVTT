@@ -14,7 +14,7 @@ export class QualityImporter extends DataImporter {
         return QualityImporter.ParseItems<Quality>(
             jsonObject.qualities.quality,
             {
-                compendiumKey: "Trait",
+                compendiumKey: () => "Quality",
                 parser: new QualityParser(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);

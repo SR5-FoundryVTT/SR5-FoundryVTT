@@ -1,4 +1,5 @@
 import { Parser, SystemType } from "../Parser";
+import { CompendiumKey } from "../../importer/Constants";
 import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
@@ -31,8 +32,8 @@ export class AmmoParser extends Parser<'ammo'> {
         return system;
     }
 
-    public override async Parse(jsonData: Gear): Promise<Item.CreateData> {
-        const item = await super.Parse(jsonData) as Item.CreateData;
+    public override async Parse(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
+        const item = await super.Parse(jsonData, compendiumKey) as Item.CreateData;
         const system = item.system as SystemType<'ammo'>;
 
         // TODO: This can be improved by using the stored english name in item.system.importFlags.name
@@ -56,7 +57,7 @@ export class AmmoParser extends Parser<'ammo'> {
         return item;
     }
 
-    protected override async getFolder(jsonData: Gear): Promise<Folder> {
+    protected override async getFolder(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
         const rootFolder = TH.getTranslation("Weapons", {type: 'category'})
         const folderName = TH.getTranslation(categoryData, {type: 'category'});
@@ -69,6 +70,6 @@ export class AmmoParser extends Parser<'ammo'> {
                 specFolder = splitName[0].trim();
         }
 
-        return IH.getFolder('Gear', rootFolder, folderName, specFolder);
+        return IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);
     }
 }

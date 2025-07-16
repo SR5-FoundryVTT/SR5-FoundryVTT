@@ -1,5 +1,6 @@
 import { Parser } from "../Parser";
 import { Power } from "../../schema/CritterpowersSchema";
+import { CompendiumKey } from "../../importer/Constants";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 
 export class SpritePowerParser extends Parser<'sprite_power'> {
@@ -14,7 +15,7 @@ export class SpritePowerParser extends Parser<'sprite_power'> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Power): Promise<Folder> {
-        return IH.getFolder('Trait', "Sprite Powers");
+    protected override async getFolder(jsonData: Power, compendiumKey: CompendiumKey): Promise<Folder> {
+        return IH.getFolder(compendiumKey, "Sprite Powers");
     }
 }

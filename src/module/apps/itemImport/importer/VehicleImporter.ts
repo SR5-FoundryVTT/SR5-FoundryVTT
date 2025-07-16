@@ -13,7 +13,9 @@ export class VehicleImporter extends DataImporter {
         return VehicleImporter.ParseItems<Vehicle>(
             jsonObject.vehicles.vehicle,
             {
-                compendiumKey: "Drone",
+                compendiumKey: (jsonData: Vehicle) => {
+                    return jsonData.category._TEXT.includes("Drone") ? "Drone" : "Vehicle";
+                },
                 parser: new VehicleParser(),
                 errorPrefix: "Failed Parsing Vehicle"
             }

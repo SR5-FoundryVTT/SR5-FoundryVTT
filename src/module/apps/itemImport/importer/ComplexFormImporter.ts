@@ -14,7 +14,7 @@ export class ComplexFormImporter extends DataImporter {
         return ComplexFormImporter.ParseItems<Complexform>(
             jsonObject.complexforms.complexform,
             {
-                compendiumKey: "Magic",
+                compendiumKey: () => "Complex_Form",
                 parser: new ComplexFormParser(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);

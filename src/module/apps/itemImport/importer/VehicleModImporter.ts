@@ -14,7 +14,7 @@ export class VehicleModImporter extends DataImporter {
         return VehicleModImporter.ParseItems<Mod>(
             jsonObject.mods.mod,
             {
-                compendiumKey: "Modification",
+                compendiumKey: () => "Vehicle_Mod",
                 parser: new VehicleModParser(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);

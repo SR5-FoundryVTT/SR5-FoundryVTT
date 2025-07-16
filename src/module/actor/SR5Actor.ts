@@ -1185,27 +1185,26 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         });
     }
 
-    /** 
-     * Return either the linked TokenDocument or that of the synthetic actor.
+    /**
+     * Returns the most appropriate token document for the actor.
      *
-     * @return Will return null should no token have been placed on scene.
+     * Priority:
+     * 1. Synthetic token (if this actor is synthetic).
+     * 2. A controlled linked token on the canvas.
+     * 3. Any linked token on the canvas.
+     * 4. Null if no token is available.
+     *
+     * @returns The token document if available, otherwise null.
      */
     getToken(): TokenDocument | null {
-        const tokens = this.getActiveTokens(this._isLinkedToToken());
-        if (tokens.length === 0) return this.token;
-        return tokens[0].document;
-    }
+        // This is a synthetic actor, return its token.
+        if (this.token) return this.token;
 
-    /**
-     * There is no need for a token to placed. The prototype token is enough.
-     */
-    _isLinkedToToken(): boolean {
-        // If an actor is linked, all it's copies also contain this linked status, even if they're not.
-        return this.prototypeToken.actorLink && !this.token;
-    }
+        const linkedTokens = this.getActiveTokens(true);
+        const controlled = canvas.tokens?.controlled?.find(t => linkedTokens.includes(t));
 
-    hasToken(): boolean {
-        return this.getActiveTokens().length > 0;
+        // controlled & linked -> linked
+        return controlled?.document ?? linkedTokens[0]?.document ?? null;
     }
 
     hasActivePlayerOwner(): boolean {

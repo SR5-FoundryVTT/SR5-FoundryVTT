@@ -1,4 +1,5 @@
 import { Parser, SystemType } from '../Parser';
+import { CompendiumKey } from '../../importer/Constants';
 import { Complexform } from '../../schema/ComplexformsSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 
@@ -42,7 +43,7 @@ export class ComplexFormParser extends Parser<'complex_form'> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Complexform): Promise<Folder> {
-        return IH.getFolder('Magic', "Complex Forms");
+    protected override async getFolder(jsonData: Complexform, compendiumKey: CompendiumKey): Promise<Folder> {
+        return IH.getFolder(compendiumKey, "Complex Forms");
     }
 }

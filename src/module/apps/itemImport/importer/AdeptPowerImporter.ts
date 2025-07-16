@@ -13,7 +13,7 @@ export class AdeptPowerImporter extends DataImporter {
         return AdeptPowerImporter.ParseItems<Power>(
             jsonObject.powers.power,
             {
-                compendiumKey: "Trait",
+                compendiumKey: () => "Adept_Power",
                 parser: new AdeptPowerParser(),
                 errorPrefix: "Failed Parsing Complex Form"
             }

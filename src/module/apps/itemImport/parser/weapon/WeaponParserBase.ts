@@ -1,11 +1,11 @@
 import { SR5 } from '../../../../config';
 import { Parser, SystemType } from '../Parser';
-import { Constants } from '../../importer/Constants';
+import { Weapon } from '../../schema/WeaponsSchema';
 import { RangeType } from 'src/module/types/item/Weapon';
 import { DamageType } from 'src/module/types/item/Action';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { Weapon, WeaponsSchema } from '../../schema/WeaponsSchema';
+import { CompendiumKey, Constants } from '../../importer/Constants';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 import PhysicalAttribute = Shadowrun.PhysicalAttribute;
@@ -14,11 +14,6 @@ type DamageElement = SystemType<'weapon'>['action']['damage']['element']['base']
 
 export class WeaponParserBase extends Parser<'weapon'> {
     protected readonly parseType = 'weapon';
-    private readonly categories: WeaponsSchema['categories']['category'];
-
-    constructor(categories: WeaponsSchema['categories']['category']) {
-        super(); this.categories = categories;
-    }
 
     protected override async getItems(jsonData: Weapon): Promise<Item.Source[]> {
         if (!jsonData.accessories?.accessory) return [];
@@ -29,7 +24,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         for (const name of accessoriesNames)
             translationMap[name] = TH.getTranslation(name, { type: 'accessory' });
 
-        const foundItems = await IH.findItem('Modification', Object.values(translationMap));
+        const foundItems = await IH.findItem('Weapon_Mod', Object.values(translationMap));
         const itemMap = new Map(foundItems.map(item => [item.name, item]));
 
         const result: Item.Source[] = [];
@@ -43,7 +38,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
                 continue;
             }
 
-            const accessoryBase = foundItem.toObject();
+            const accessoryBase = game.items.fromCompendium(foundItem);
             const system = accessoryBase.system as SystemType<'modification'>;
             system.technology.equipped = true;
 
@@ -75,7 +70,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
     }
 
     public static GetWeaponType(weaponJson: Weapon): SystemType<'weapon'>['category'] {
-        let type = weaponJson.type._TEXT;
+        const type = weaponJson.type._TEXT;
         //melee is the least specific, all melee entries are accurate
         if (type === 'Melee') {
             return 'melee';
@@ -196,14 +191,11 @@ export class WeaponParserBase extends Parser<'weapon'> {
         };
     }
 
-    protected override async getFolder(jsonData: Weapon): Promise<Folder> {
+    protected override async getFolder(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
+        const root = WeaponParserBase.GetWeaponType(jsonData).capitalize() ?? "Other";
         const folderName = TH.getTranslation(categoryData, { type: 'category' });
-        const match = this.categories.find(c => c._TEXT === categoryData);
-        const root = match?.$?.type?.capitalize?.() ?? 'Other';
 
-        return ['Gun', 'Melee', 'Other'].includes(root)
-            ? IH.getFolder('Weapon', root, folderName)
-            : IH.getFolder('Weapon', folderName);
+        return IH.getFolder(compendiumKey, root, root === 'Thrown' ? undefined : folderName);
     }
 }

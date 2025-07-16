@@ -14,7 +14,7 @@ export class EchoesImporter extends DataImporter {
         return EchoesImporter.ParseItems<Echo>(
             jsonObject.echoes.echo,
             {
-                compendiumKey: "Trait",
+                compendiumKey: () => "Echo",
                 parser: new EchoParser(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
