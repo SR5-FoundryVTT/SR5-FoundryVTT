@@ -4,7 +4,6 @@ import { DescriptionData } from "../template/Description";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
 import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
-import { SanitizedModel } from "../fields/SanitizedModel";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
@@ -68,4 +67,4 @@ export const CommonData = () => ({
 
 export type InventoryType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof InventoryData>>;
 
-export abstract class ActorBase<DS extends ReturnType<typeof CommonData>> extends SanitizedModel<DS, Actor.Implementation> {}
+export abstract class ActorBase<DS extends ReturnType<typeof CommonData>> extends foundry.abstract.TypeDataModel<DS, Actor.Implementation> {}

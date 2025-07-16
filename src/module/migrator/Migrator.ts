@@ -4,6 +4,8 @@ import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_29_0 } from './versions/Version0_29_0';
 import { MigratorDocumentTypes } from "./VersionMigration";
+import { DataModelValidationFailure } from "node_modules/fvtt-types/src/foundry/common/data/validation-failure.mjs";
+const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
 export class Migrator {
     // List of all migrators.
@@ -31,6 +33,11 @@ export class Migrator {
 
         for (const migrator of migrators)
             migrator[`migrate${type}`](data);
+
+        // After all migrations, clean the data model.
+        // This ensures that the data conforms to the current schema.
+        const schema = CONFIG[type].dataModels[data.type].schema;
+        schema.clean(data.system);
 
         // Set the current system version to indicate that this data has been migrated.
         // This change only affects the in-memory copy during migration and will not persist

@@ -1,4 +1,3 @@
-import { SanitizedModel } from "../fields/SanitizedModel";
 const { ArrayField, SchemaField, BooleanField, StringField } = foundry.data.fields;
 
 const ActiveEffectData = {
@@ -45,7 +44,7 @@ const ActiveEffectData = {
     ),
 }
 
-export class ActiveEffectDM extends SanitizedModel<typeof ActiveEffectData, ActiveEffect.Implementation> {
+export class ActiveEffectDM extends foundry.abstract.TypeDataModel<typeof ActiveEffectData, ActiveEffect.Implementation> {
     static override defineSchema() {
         return ActiveEffectData;
     }

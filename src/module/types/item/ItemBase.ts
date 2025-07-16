@@ -1,5 +1,4 @@
 import { ImportFlagData } from "../template/ImportFlags";
-import { SanitizedModel } from "../fields/SanitizedModel";
 import { DescriptionData } from "../template/Description";
 const { SchemaField } = foundry.data.fields;
 
@@ -15,4 +14,4 @@ export const BaseItemData = () => ({
  * Subclasses should extend this class to inherit default schema structure and standardized
  * data migration logic for shared item properties across the system.
  */
-export abstract class ItemBase<DS extends ReturnType<typeof BaseItemData>> extends SanitizedModel<DS, Item.Implementation> {}
+export abstract class ItemBase<DS extends ReturnType<typeof BaseItemData>> extends foundry.abstract.TypeDataModel<DS, Item.Implementation> {}
