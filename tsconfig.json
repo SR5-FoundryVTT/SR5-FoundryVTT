@@ -11,8 +11,8 @@
         "noEmitOnError": false,
         "noImplicitOverride": true,
         "resolveJsonModule": true,
+        "baseUrl": "./",
         "paths": {
-            "baseUrl": ["."],
             "@/*": ["./src/*"]
         }
     }

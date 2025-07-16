@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const del = import('del'); //es6m
 const chalk = import('chalk'); //es6m
-const tsPaths = require("esbuild-ts-paths")
+const { TsconfigPathsPlugin } = require("@esbuild-plugins/tsconfig-paths")
 
 // Sass
 const gulpsass = require('gulp-sass')(require('sass'));
@@ -49,7 +49,7 @@ async function buildJS() {
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
         // Don't typescheck on build. Instead typecheck on PR and push and assume releases to build.
-        plugins: [tsPaths()],
+        plugins: [TsconfigPathsPlugin({tsconfig: './tsconfig.json'})],
     }).catch((err) => {
         console.error(err)
     })
