@@ -372,7 +372,7 @@
         "DicePoolModifier": "Mod Pilha De Dados",
         "DmgTypeMatrix": "Matriz",
         "DmgTypePhysical": "Físico",
-        "DmgTypeStun": "Atordoamento",
+        "DmgTypeStun": "Atord.",
         "Dodge": "Esquiva",
         "DontApplyWounds": "Não Aplicar Ferimentos",
         "Drain": "Dreno",
@@ -1574,7 +1574,7 @@
             "Type": "Tipo",
             "Weapon": "Arma"
         },
-        "Wireless": "Conexão Sem Fio",
+        "Wireless": "Conexão Sem Fio"
     },
     "TYPES": {
         "Actor": {
