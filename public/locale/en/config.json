@@ -56,6 +56,7 @@
         "TokenRulerColorWalkingDescription": "The color for distance within walking rate.",
         "TokenRulerOpacity": "Token Movement Opacity",
         "TokenRulerOpacityDescription": "How opaque the token ruler measurements are displayed. (0 = fully transparent, 1 = fully opaque)",
+        "TokenUseRoutingLib": "Use RoutingLib",
         "UseDamageConditionDescription": "System marks tokens according to their condition monitor",
         "UseDamageConditionName": "Use system handling for token status effects",
         "UseImportIconOverridesDescription": "When importing items, use the same icons for some different item types when it makes sense. Uncheck if using custom icons.",

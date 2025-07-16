@@ -49,6 +49,7 @@
         "TokenRulerColorWalkingDescription": "A cor para a distância dentro da taxa de caminhada.",
         "TokenRulerOpacity": "Opacidade do Movimento do Token",
         "TokenRulerOpacityDescription": "Quão opacas as medições do régua do token são exibidas. (0 = totalmente transparente, 1 = totalmente opaco)",
+        "TokenUseRoutingLib": "Usar RoutingLib",
         "UseDamageConditionDescription": "O sistema marca tokens de acordo com o monitor de condição deles",
         "UseDamageConditionName": "Usar tratamento do sistema para efeitos de status do token",
         "UseImportIconOverridesDescription": "Ao importar itens, use os mesmos ícones para alguns tipos de itens diferentes quando fizer sentido. Desmarque se estiver usando ícones personalizados.",
