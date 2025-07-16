@@ -3,6 +3,7 @@ import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_29_0 } from './versions/Version0_29_0';
+import { MigratorDocumentTypes } from "./VersionMigration";
 
 export class Migrator {
     // List of all migrators.
@@ -15,25 +16,21 @@ export class Migrator {
         new Version0_29_0(),
     ] as const;
 
-    public static migrate(type: "Actor" | "Item" | "ActiveEffect", data: any): void {
+    public static migrate(type: MigratorDocumentTypes, data: any): void {
         // Skip items with no systemVersion is found.
         // Unless forced changed, the abscense of systemVersion means it is just an update and not migration.
         if (data._stats?.systemVersion == null) return;
 
         const version = data._stats.systemVersion;
-        const migrators = this.s_Versions.filter(v => this.compareVersion(v.TargetVersion, version) > 0);
+        const migrators = this.s_Versions.filter(migrator =>
+            migrator.implements[type] && this.compareVersion(migrator.TargetVersion, version) > 0
+        );
 
         // If no migrators found, nothing to do.
         if (migrators.length === 0) return;
 
-        for (const migrator of migrators) {
-            if (type === "Actor")
-                migrator.migrateActor(data);
-            else if (type === "Item")
-                migrator.migrateItem(data);
-            else if (type === "ActiveEffect")
-                migrator.migrateActiveEffect(data);
-        }
+        for (const migrator of migrators)
+            migrator[`migrate${type}`](data);
 
         // Set the current system version to indicate that this data has been migrated.
         // This change only affects the in-memory copy during migration and will not persist

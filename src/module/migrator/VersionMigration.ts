@@ -7,6 +7,9 @@
  * These methods are designed to be atomic and modular, enabling precise upgrades
  * without requiring full system-wide context.
  */
+
+export type MigratorDocumentTypes = "Actor" | "Item" | "ActiveEffect";
+
 export abstract class VersionMigration {
     /**
      * The target version string that this migration upgrades data to.
@@ -30,4 +33,20 @@ export abstract class VersionMigration {
      * Override in subclasses to modify active effect data as needed.
      */
     public migrateActiveEffect(effect: any): void { }
+
+    /**
+     * Indicates whether the subclass overrides the corresponding migration method
+     * (`migrateActor`, `migrateItem`, `migrateActiveEffect`), used to determine if
+     * the migration applies to a given document type.
+     */
+    public readonly implements: Record<MigratorDocumentTypes, boolean>;
+    constructor() {
+        const proto = Object.getPrototypeOf(this);
+        this.implements = {
+            Actor: proto.migrateActor !== VersionMigration.prototype.migrateActor,
+            Item: proto.migrateItem !== VersionMigration.prototype.migrateItem,
+            ActiveEffect: proto.migrateActiveEffect !== VersionMigration.prototype.migrateActiveEffect
+        };
+        console.log(this);
+    }
 }

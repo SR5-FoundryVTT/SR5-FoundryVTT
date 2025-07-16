@@ -9,6 +9,10 @@ import { VersionMigration } from "../VersionMigration";
 export class Version0_29_0 extends VersionMigration {
     readonly TargetVersion = "0.29.0";
 
+    // Considering this a migration so those documents can be sanitized.
+    override migrateActor(actor: any) { }
+    override migrateItem(item: any) { }
+
     override migrateActiveEffect(effect: any) {
         const flag = effect.flags?.shadowrun5e;
         if (!flag) return;
