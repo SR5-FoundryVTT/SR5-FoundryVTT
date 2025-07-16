@@ -1,4 +1,4 @@
-import * as englishTranslations from "../../../public/locale/en/config.json";
+import * as englishTranslations from '../../../src/i18n/en/config.json';
 import { NestedKeys } from './types';
 // import * as germanTranslations from '../../../public/locale/de/config.json';
 // import * as koreanTranslations from '../../../public/locale/ko/config.json';
@@ -20,8 +20,6 @@ export type Translation = NestedKeys<typeof englishTranslations>;
 export function formatStrict(stringId: Translation, data: Record<string, Translation>): string {
     return game.i18n.format(
         stringId,
-        Object.fromEntries(
-            Object.entries(data)
-                .map(([key, value]) =>
-                    [key, game.i18n.localize(value)])));
+        Object.fromEntries(Object.entries(data).map(([key, value]) => [key, game.i18n.localize(value)])),
+    );
 }
