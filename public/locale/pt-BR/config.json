@@ -230,14 +230,17 @@
         "CollapseAll": "Recolher Tudo",
         "CommonProgram": "Programa Comum",
         "Compendiums": {
-            "Root": "Importações SR5e",
-            "Critter": "Criaturas & Espíritos & Sprites",
-            "Drone": "Drones & Veículos",
-            "Gear": "Equipamentos",
-            "Trait": "Traços",
-            "Magic": "Magia & Formas Complexas",
-            "Modification": "Modificações",
-            "Weapon": "Armas"
+            "sr5critter": "Criaturas & Espíritos & Sprites",
+            "sr5drone": "Drones & Veículos",
+            "sr5gear": "Armaduras & Equipamentos",
+            "sr5trait": "Qualidades & Poderes",
+            "sr5magic": "Magia & Formas Complexas",
+            "sr5modification": "Modificações",
+            "sr5ware": "Biônicos & Cibernéticos",
+            "sr5weapon": "Armas",
+            "Folders": {
+                "Root": "Importações SR5e"
+            }
         },
         "Compilation": {
             "DropSprite": "Soltar Sprite",
