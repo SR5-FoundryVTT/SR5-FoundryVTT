@@ -33,7 +33,7 @@
         "ManualRollOnSuccessTestDescription": "Allow user to manually roll dice on tests and report back hits",
         "MarkImportsDescription": "Denote freshly imported items on actor sheets to highlight that they should be reviewed",
         "MarkImportsName": "Mark Fresh Imports",
-        "MustHaveRessourcesOnTest": "Stop Tests with missing ressouces",
+        "MustHaveRessourcesOnTest": "Stop Tests with missing resources",
         "MustHaveRessourcesOnTestDescription": "Only allow actors with all necessary resources to roll a test",
         "NoMarking": "Don't Mark Fresh Imports",
         "OnlyAllowRollOnDefaultableSkills": "Only defaultable unknown skill rolls",
@@ -1348,7 +1348,7 @@
                 "physical_overflow_track": "Modifies physical overflow damage track",
                 "physical_track": "Modifies physical damage track",
                 "reach": "Modifies reach of melee attacks",
-                "run": "Modifies running distance by mulitples of the agility attribute",
+                "run": "Modifies running distance by multiples of the agility attribute",
                 "soak": "Modifies physical damage resist tests pool",
                 "social_limit": "Modifies social limit",
                 "stun_track": "Modifies stun damage track",
@@ -1358,7 +1358,7 @@
             "RangedAttack": {
                 "Recoil": "Progressive Recoil",
                 "RecoilAfterAttack": "Progressive Recoil including this attack",
-                "RecoilBeforeAttack": "Progressive Recoil now, befor attacking",
+                "RecoilBeforeAttack": "Progressive Recoil now, before attacking",
                 "RecoilCompensation": "Total RC, including actor and item RC",
                 "ResetRecoil": "Reset progressive recoil to none"
             },
