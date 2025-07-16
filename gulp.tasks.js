@@ -248,11 +248,11 @@ async function testI18n() {
 }
 
 exports.i18n = buildI18n;
-exports["i18n:test"] = testI18n;
+exports["i18n:test"] = gulp.series(buildI18n, testI18n);
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
 exports.build = gulp.series(copyAssets, buildSass, buildJS, buildPacks, buildI18n);
-exports.watch = gulp.series(copyAssets, buildSass, buildPacks, watch);
+exports.watch = gulp.series(copyAssets, buildSass, buildPacks, buildI18n, watch);
 exports.rebuild = gulp.series(cleanDist, exports.build);
 exports.link = linkUserData;
