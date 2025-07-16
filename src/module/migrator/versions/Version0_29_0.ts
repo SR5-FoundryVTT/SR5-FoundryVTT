@@ -9,10 +9,6 @@ import { VersionMigration } from "../VersionMigration";
 export class Version0_29_0 extends VersionMigration {
     readonly TargetVersion = "0.29.0";
 
-    override migrateActor(actor: any): void {
-        console.log(actor);
-    }
-
     override migrateActiveEffect(effect: any) {
         const flag = effect.flags?.shadowrun5e;
         if (!flag) return;
