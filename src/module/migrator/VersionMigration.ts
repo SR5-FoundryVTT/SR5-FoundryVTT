@@ -47,6 +47,5 @@ export abstract class VersionMigration {
             Item: proto.migrateItem !== VersionMigration.prototype.migrateItem,
             ActiveEffect: proto.migrateActiveEffect !== VersionMigration.prototype.migrateActiveEffect
         };
-        console.log(this);
     }
 }
