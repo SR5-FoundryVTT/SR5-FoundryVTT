@@ -2,7 +2,7 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "Modificadores Ambientais",
-            "OverwatchScoreTracker": "Rastreador de Pontuação de Vigilância",
+            "OverwatchScoreTracker": "Monitor de Valor de Vigilância",
             "SituationalModifiers": "Modificadores Situacionais"
         }
     },
@@ -29,22 +29,22 @@
         "MustHaveRessourcesOnTest": "Parar Testes com recursos faltando",
         "MustHaveRessourcesOnTestDescription": "Permitir apenas atores com todos os recursos necessários para rolar um teste",
         "NoMarking": "Não Marcar Importações Recentes",
-        "OnlyAllowRollOnDefaultableSkills": "Permite rolar pericias desconhecidas, mesmo sem uso padrão",
-        "OnlyAllowRollOnDefaultableSkillsDescription": "Quando desmarcado, pericias desconhecidas podem ser roladas, mesmo que não possam ser padronizadas.",
+        "OnlyAllowRollOnDefaultableSkills": "Permite rolar perícias desconhecidas, mesmo sem uso padrão",
+        "OnlyAllowRollOnDefaultableSkillsDescription": "Quando desmarcado, perícias desconhecidas podem ser roladas, mesmo que não pudessem normalmente.",
         "OnlyAutoRollNPCInCombat": "Rolar apenas a iniciativa do NPC automaticamente",
-        "OnlyAutoRollNPCInCombatDescription": "Quando desmarcado, os jogadores devem rolar manualmente sua iniciativa em cada nova passagem / rodada",
+        "OnlyAutoRollNPCInCombatDescription": "Quando desmarcado, os jogadores devem rolar manualmente sua iniciativa em cada rodada",
         "ShowGlitchAnimationDescription": "Deve exibir a animação como parte do texto de falha no cartão de rolagem",
         "ShowGlitchAnimationName": "Exibir Animação de Falha",
-        "ShowSkillsWithDetails": "Mostrar listas de pericias mais detalhadas",
-        "ShowSkillsWithDetailsDescription": "Quando selecionado, a exibição da lista de pericias espelhará o estilo do livro de regras básicas (itálico, atributos curtos)",
+        "ShowSkillsWithDetails": "Mostrar listas de perícias mais detalhadas",
+        "ShowSkillsWithDetailsDescription": "Quando selecionado, a exibição da lista de perícias espelhará o estilo do livro de regras básicas (itálico, atributos curtos)",
         "ShowTokenNameForChatOutputDescription": "O nome do token deve ser usado para a saída do cartão de rolagem em vez do nome do ator quando disponível",
         "ShowTokenNameForChatOutputName": "Usar Nome do Token para Cartão de Rolagem",
         "TokenHealthBars": "Barras de saúde do token",
-        "TokenHealthBarsDescription": "Uma trilha de dano completa será mostrada como uma barra de saúde vazia em um Token em vez de espelhar",
+        "TokenHealthBarsDescription": "Um monitor de dano completa será mostrada como uma barra de saúde vazia em um Token em vez de espelhar",
         "TokenRulerColorRunning": "Cor de Movimento de Corrida do Token",
         "TokenRulerColorRunningDescription": "A cor para a distância dentro da taxa de corrida.",
-        "TokenRulerColorSprinting": "Cor de Movimento de Sprint do Token",
-        "TokenRulerColorSprintingDescription": "A cor para a distância acima da taxa de corrida, onde o sprint é necessário.",
+        "TokenRulerColorSprinting": "Cor de Movimento de Arrancada do Token",
+        "TokenRulerColorSprintingDescription": "A cor para a distância acima da taxa de corrida, onde o arrancada é necessário.",
         "TokenRulerColorWalking": "Cor de Movimento de Caminhada do Token",
         "TokenRulerColorWalkingDescription": "A cor para a distância dentro da taxa de caminhada.",
         "TokenRulerOpacity": "Opacidade do Movimento do Token",
@@ -117,7 +117,7 @@
             "New": "Novo Efeito",
             "OnlyForEquipped": "Aplicar apenas para item equipado",
             "OnlyForItemTest": "Aplicar apenas para teste do item acoplador",
-            "OnlyForWireless": "Aplicar apenas para wireless ativo",
+            "OnlyForWireless": "Aplicar apenas para conexão sem fio ativo",
             "Test": {
                 "ActionCategories": "Filtro de Categorias de Ação",
                 "Attributes": "Filtro de Atributos",
@@ -130,7 +130,7 @@
         "ActorTypes": {
             "Character": "Personagem",
             "Critter": "Criatura",
-            "IC": "IC",
+            "IC": "GELO",
             "Spirit": "Espírito",
             "Sprite": "Sprite",
             "Vehicle": "Veículo"
@@ -186,7 +186,7 @@
         "Block": "Bloquear",
         "Bonus": "Bônus",
         "Bonuses": "Bônus",
-        "Bullet": "Projétel",
+        "Bullet": "Projétil",
         "BulletCount": "Num. Disparos",
         "Bullets": "Projéteis",
         "COMBAT": {
@@ -201,7 +201,7 @@
             "CreateSummoning": "Criar ação de invocação",
             "Summoning": "Invocação"
         },
-        "CanDefault": "Pode Usar Sem Treino",
+        "CanDefault": "Pode Usar Sem Perícia",
         "Capacity": "Capacidade",
         "CareerKarma": "Carma de Carreira",
         "ChangelogApplication": {
@@ -305,7 +305,7 @@
                 "Physical": "Físico"
             }
         },
-        "Cyberware": "Cyberware",
+        "Cyberware": "Cibernético",
         "CyberwareGrade": "Classe",
         "CyberwareGradeAlpha": "Alphaware",
         "CyberwareGradeBeta": "Betaware",
@@ -399,11 +399,11 @@
             "ClearModifiers": "Limpar modificadores pessoais",
             "Extreme": "Combinação de duas ou mais condições no nível pesado",
             "LightGlare": {
-                "Good": "Luz Completa/Sem Reflexo",
-                "Heavy": "Escuridão Total/Reflexo Cegante",
-                "Light": "Luz Parcial/Reflexo Fraco",
-                "Moderate": "Luz Fraca/Reflexo Moderado",
-                "Title": "Luz/Reflexo"
+                "Good": "Luz Total/Sem Clarão",
+                "Heavy": "Escuridão Total/Clarão Cegante",
+                "Light": "Luz Parcial/Clarão Fraco",
+                "Moderate": "Luz Fraca/Clarão Moderado",
+                "Title": "Luz/Clarão"
             },
             "Modifier": {
                 "Title": "Modificador"
@@ -418,14 +418,14 @@
             "Title": "Modificadores Ambientais",
             "Total": "Resultado",
             "Visibility": {
-                "Good": "Limpo",
-                "Heavy": "Chuva Pesada/Neblina/Fumaça",
-                "Light": "Chuva Leve/Neblina/Fumaça",
-                "Moderate": "Chuva Moderada/Neblina/Fumaça",
+                "Good": "Claro",
+                "Heavy": "Chuva/Neblina/Fumaça Pesada",
+                "Light": "Chuva/Neblina/Fumaça Leve",
+                "Moderate": "Chuva/Neblina/Fumaça Moderada",
                 "Title": "Visibilidade"
             },
             "Wind": {
-                "Good": "Nenhum ou Brisa Leve",
+                "Good": "Nada ou Brisa Leve",
                 "Heavy": "Ventos Fortes",
                 "Light": "Ventos Leves",
                 "Moderate": "Ventos Moderados",
@@ -492,28 +492,28 @@
         "Help": "Ajuda",
         "Hits": "Acertos",
         "Host": {
-            "Attributes": "Atributos do Host",
+            "Attributes": "Atributos do Central",
             "CustomAttributes": "Atributos Personalizados",
-            "DropICActor": "Arraste e solte um ator IC na ordem de resposta de segurança",
-            "ICOrder": "Ordem IC",
-            "MissingIC": "IC Faltando",
-            "Rating": "Nível do Host"
+            "DropICActor": "Arraste e solte um ator GELO na ordem de resposta de segurança",
+            "ICOrder": "Ordem GELO",
+            "MissingIC": "GELO Faltando",
+            "Rating": "Nível do Central"
         },
         "HotSim": "Hot Sim",
         "IC": {
-            "MissingHost": "Arraste e solte um item host",
+            "MissingHost": "Arraste e solte um item central",
             "Type": "Tipo",
             "Types": {
                 "Acid": "Ácido",
-                "Binder": "Binder",
-                "BlackIC": "IC Preto",
-                "Blaster": "Blaster",
+                "Binder": "Cimentador",
+                "BlackIC": "Gelo Negro",
+                "Blaster": "Disruptor",
                 "Bloodhound": "Bloodhound",
                 "BlueGoo": "Gosma Azul",
                 "Catapult": "Catapulta",
-                "Crash": "Colisão",
+                "Crash": "Travamento",
                 "Flicker": "Cintilador",
-                "Jammer": "Bloqueador",
+                "Jammer": "Perturbador",
                 "Killer": "Assassino",
                 "Marker": "Marcador",
                 "Patrol": "Patrulha",
@@ -521,8 +521,8 @@
                 "Scramble": "Embaralhador",
                 "Shocker": "Chocante",
                 "Sleuther": "Investigador",
-                "Sparky": "Sparky",
-                "TarBaby": "Tar Baby",
+                "Sparky": "Matador",
+                "TarBaby": "Piche",
                 "Track": "Rastreador"
             }
         },
@@ -538,7 +538,7 @@
         "IncomingFade": "Enfraquecimento Recebido",
         "Information": "Info",
         "Infos": {
-            "CantModifyHostContent": "Não é possível alterar os dados do host a partir de um ator IC.",
+            "CantModifyHostContent": "Não é possível alterar os dados do central a partir de um ator GELO.",
             "ConsumedEquippedAmmo": "Munição equipada consumida",
             "ResetProgressiveRecoil": "Recuo progressivo reiniciado para zero balas disparadas"
         },
@@ -560,15 +560,15 @@
             "AdeptPower": "Poder de Adepto",
             "Ammo": "Munição",
             "Armor": "Armadura",
-            "Bioware": "Bioware",
+            "Bioware": "Biônico",
             "ComplexForm": "Forma Complexa",
             "Contact": "Contato",
             "CritterPower": "Poder de Criatura",
-            "Cyberware": "Cyberware",
+            "Cyberware": "Cibernético",
             "Device": "Dispositivo",
             "Echo": "Eco",
             "Equipment": "Equipamento",
-            "Host": "Host",
+            "Host": "Central",
             "Lifestyle": "Estilo de Vida",
             "Metamagic": "Metamagia",
             "Modification": "Modificação",
@@ -587,8 +587,8 @@
                 "Label": "Ocultar Diálogo de Teste"
             },
             "OverwatchScoreTracker": {
-                "Hint": "Abrir rastreador de pontuação de vigilância",
-                "Label": "Rastreador de Pontuação de Vigilância"
+                "Hint": "Abrir monitor de valor de vigilância",
+                "Label": "Monitor de Valor de Vigilância"
             },
             "ShowItemCard": {
                 "Hint": "Mostrar apenas o cartão do item no chat em vez de rolar o teste",
@@ -623,7 +623,7 @@
                 "DisabledOptionSpritePowers": "Poderes de Sprite Opcionais - Desativado",
                 "EnabledOptionCritterPowers": "Poderes de Criatura Opcionais - Ativado",
                 "EnabledOptionSpritePowers": "Poderes de Sprite Opcionais - Ativado",
-                "ICConfiguration": "Configuração IC",
+                "ICConfiguration": "Configuração de GELO",
                 "Matrix": "Matriz",
                 "PersonalInventory": "Pessoal",
                 "ResetActorForNewRun": "Resetar Ator para Nova Corrida",
@@ -654,9 +654,9 @@
                 "ItemEffects": "Efeitos do Item",
                 "MissingNetworkDevices": "Arraste e solte um dispositivo para adicioná-lo",
                 "NetworkDevices": "Dispositivos em Rede",
-                "PAN": "PAN",
+                "PAN": "RAP",
                 "SubtractOne": "Subtrair Um",
-                "WAN": "WAN"
+                "WAN": "RAA"
             },
             "Sidebar": {
                 "Changelog": "Registro de Alterações",
@@ -796,7 +796,7 @@
             "PainTolerancePhysical": "Tolerância à Dor Física",
             "PainToleranceStun": "Tolerância à Dor Atordoante",
             "PhysicalLimit": "Limite Físico",
-            "PhysicalOverflowTrack": "Monitor de Sobrepor Físico",
+            "PhysicalOverflowTrack": "Monitor de Excesso de Dano",
             "PhysicalTrack": "Monitor Físico",
             "Reach": "Alcance",
             "Recoil": "Recuo",
@@ -818,7 +818,7 @@
         "Movement": "Movimento",
         "MovementTypes": {
             "Run": "Correr",
-            "Sprint": "Disparar"
+            "Sprint": "Arrancar"
         },
         "Mundane": "Mundano",
         "Name": "Nome",
@@ -840,13 +840,13 @@
         "OpposingNetHits": "Acertos Excedentes de Oposição",
         "OriginalDicePool": "Grupo Original de Dados",
         "OutOfRange": "Fora de Alcance",
-        "Overflow": "Sobrepor",
+        "Overflow": "Excesso de Dano",
         "Override": "Substituir",
         "OverwatchScore": "Valor de Vigilância",
         "OverwatchScoreTracker": {
             "AddSelect": "Adicionar tokens selecionados ao ator vinculado",
-            "CantDeleteUserCharacter": "Personagem do jogador não pode ser removido do rastreador",
-            "DeleteScore": "Excluir valor do rastreador",
+            "CantDeleteUserCharacter": "Personagem do jogador não pode ser removido do monitor",
+            "DeleteScore": "Excluir valor do monitor",
             "GMOnly": "DEUS está rastreando sua localização...",
             "NotifyNoSelectedTokens": "Pelo menos um token vinculado deve ser selecionado.",
             "OnlyLinkedActorsSupported": "Apenas atores vinculados são suportados. Tokens selecionados com atores não vinculados serão ignorados.",
@@ -858,7 +858,7 @@
         "PartialCover": "Cobert Parcial",
         "Passive": "Passivo",
         "PhysicalLimit": "Limite Físico",
-        "PhysicalOverflowTrack": "Monitor de Sobrepor Físico",
+        "PhysicalOverflowTrack": "Monitor de Excesso de Dano",
         "PhysicalTrack": "Monitor Físico",
         "PlaceMarks": "Colocar Marcas",
         "PlaceTemplate": "Colocar Modelo",
@@ -1175,9 +1175,9 @@
             "Types": {
                 "Companion": "Companheiro",
                 "Courier": "Mensageiro",
-                "Crack": "Crack",
+                "Crack": "Invasor",
                 "Data": "Dados",
-                "Fault": "Falha",
+                "Fault": "Defeito",
                 "Generalist": "Generalista",
                 "Machine": "Máquina"
             }
@@ -1253,9 +1253,9 @@
             "PhysicalResistTest": "Resistência a Dano Físico",
             "PilotVehicleTest": "Teste de Pilotagem de Veículo",
             "RangedAttackTest": "Ataque de Arma à Distância",
-            "RitualSpellcastingTest": "Lançamento de Feitiço Ritual",
+            "RitualSpellcastingTest": "Rolagem de Feitiço Ritual",
             "SkillTest": "Teste de Pericia",
-            "SpellCastingTest": "Lançamento de Feitiço",
+            "SpellCastingTest": "Rolagem de Feitiço",
             "SuccessTest": "Teste de Sucesso",
             "SummonSpiritTest": "Invocar Espírito",
             "SuppressionDefenseTest": "Defesa de Supressão",
@@ -1294,7 +1294,7 @@
                 "OnlyAllFilteredUsed": "Este efeito só se aplicará para testes que correspondam a todas as seleções",
                 "OnlyFilteredUsed": "Este efeito só se aplicará para testes que correspondam a pelo menos uma seleção",
                 "OnlyForItemTest": "Apenas afeta o teste do item pai",
-                "OnlyForWireless": "Este efeito se aplicará apenas para itens que tenham wireless habilitado"
+                "OnlyForWireless": "Este efeito se aplicará apenas para itens que tenham conexão sem fio habilitado"
             },
             "Item": {
                 "ActionCategories": "Selecione categorias de ação para usar em vez das categorias padrão do teste. Usando Efeitos Ativos, você pode usar categorias para modificar valores de teste",
@@ -1334,7 +1334,7 @@
                 "pain_tolerance_physical": "Modifica o dano a ser ignorado antes do primeiro modificador de ferida",
                 "pain_tolerance_stun": "Modifica o dano a ser ignorado antes do primeiro modificador de ferida",
                 "physical_limit": "Modifica o limite físico",
-                "physical_overflow_track": "Modifica a trilha de dano de sobrepor físico",
+                "physical_overflow_track": "Modifica o monitor de dano de excesso de dano",
                 "physical_track": "Modifica o monitor de dano físico",
                 "reach": "Modifica o alcance dos ataques corpo a corpo",
                 "run": "Modifica a distância de corrida por múltiplos do atributo de agilidade",
@@ -1353,7 +1353,7 @@
             },
             "Ritual": {
                 "Force": "Força do ritual",
-                "ReagentDrams": "Drams de reagentes usados para alterar a drenagem"
+                "ReagentDrams": "Dracmas de reagentes usados para alterar a drenagem"
             },
             "SituationalModifier": {
                 "Recoil": "Quantidade de munição disparadas"
@@ -1362,7 +1362,7 @@
                 "DragOnCanvas": "Arraste o espírito no canvas",
                 "Force": "Força do espírito invocado",
                 "PreparedSpirit": "Use um ator espírito preparado em vez de criar um genérico",
-                "ReagentDrams": "Drams de reagentes usados para alterar o limite de invocação",
+                "ReagentDrams": "Dracmas de reagentes usados para alterar o limite de invocação",
                 "SpiritType": "Tipo do espírito invocado"
             },
             "Test": {
@@ -1479,7 +1479,7 @@
             "CantSpendMulitplePointsOfEdge": "Não pode gastar vários pontos de trunfo em um teste ou ação",
             "CompilationNotConcluded": "Compilação incompleta. Aguarde o sprite se opor à compilação para determinar o enfraquecimento.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Pontos de trunfo não podem ser gastos em testes sem atores",
-            "HostItemOnlyAcceptIC": "Apenas atores IC podem ser adicionados aos hosts",
+            "HostItemOnlyAcceptIC": "Apenas atores GELOs podem ser adicionados aos hosts",
             "InvalidCompilationLevel": "Atributo de ressonância muito baixo para este nível de sprite",
             "InvalidMarksCount": "Você está tentando colocar um número estranho de marcas",
             "InvalidSummoningForce": "O valor da força escolhido não adere às regras",
@@ -1562,7 +1562,7 @@
                 "Extreme": "Extremo",
                 "Long": "Longo",
                 "Medium": "Médio",
-                "Ranges": "Alcances",
+                "Ranges": "Distâncias",
                 "Short": "Curto"
             },
             "Reach": "Alcance",
@@ -1570,13 +1570,13 @@
             "Type": "Tipo",
             "Weapon": "Arma"
         },
-        "Wireless": "Wireless"
+        "Wireless": "Conexão Sem Fio",
     },
     "TYPES": {
         "Actor": {
             "character": "Personagem",
             "critter": "Criatura (descontinuado)",
-            "ic": "IC",
+            "ic": "GELO",
             "spirit": "Espírito",
             "sprite": "Sprite",
             "vehicle": "Veículo/Drone"
@@ -1586,16 +1586,16 @@
             "adept_power": "Poder de Adepto",
             "ammo": "Munição",
             "armor": "Armadura",
-            "bioware": "Bioware",
+            "bioware": "Biônico",
             "call_in_action": "Invocar/Compilar",
             "complex_form": "Forma Complexa",
             "contact": "Contato",
             "critter_power": "Poder de Criatura",
-            "cyberware": "Cyberware",
+            "cyberware": "Cibernético",
             "device": "Dispositivo",
             "echo": "Eco",
             "equipment": "Equipamento",
-            "host": "Host",
+            "host": "Central",
             "lifestyle": "Estilo de Vida",
             "metamagic": "Metamagia",
             "modification": "Modificação de Equipamento",
