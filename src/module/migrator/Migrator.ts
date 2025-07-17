@@ -104,15 +104,16 @@ export class Migrator {
             else if (field instanceof ArrayField && Array.isArray(value))
                 this._sanitize(value, failure, () => field.element, logs, currentPath);
             else {
-                const cleanValue = field.clean(value);
-                if (field.validate(cleanValue) == null) {
-                    logs[currentPath.join(".")] = { oldValue: value, newValue: cleanValue };
-                    source[fieldName] = cleanValue;
+                let newValue: unknown;
+                if (!(field instanceof ArrayField)) {
+                    const cleanValue = field.clean(value);
+                    newValue = field.validate(cleanValue) == null ? cleanValue : field.getInitialValue();
                 } else {
-                    const initialValue = field.getInitialValue();
-                    logs[currentPath.join(".")] = { oldValue: value, newValue: initialValue };
-                    source[fieldName] = initialValue;
+                    newValue = field.getInitialValue();
                 }
+
+                logs[currentPath.join(".")] = { oldValue: value, newValue };
+                source[fieldName] = newValue;
             }
         }
     }
