@@ -20,11 +20,15 @@ export class Migrator {
     ] as const;
 
     /**
-     * Runs migration logic on a given data object of the specified type.
+     * Applies migration logic to a provided data object of the specified type.
+     * 
+     * Note: This method is only compatible with documents from Foundry VTT version 10 or later,
+     * as it relies on the `_stats.systemVersion` field introduced in v10.
      */
     public static migrate(type: MigratorDocumentTypes, data: any): void {
         // Lack of _stats usually indicates new or updated data, not needing migration.
-        if (data._stats == null || data._stats.systemVersion === game.system.version) return;
+        if (!data._stats || !('systemVersion' in data._stats)) return;
+        if (data._stats.systemVersion === game.system.version) return;
 
         const version = data._stats.systemVersion || "0.0.0";
         const migrators = this.s_Versions.filter(migrator =>
