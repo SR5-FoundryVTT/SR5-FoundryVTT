@@ -1,11 +1,12 @@
 /**
  * A GM-Tool to keep track of all players overwatch scores
  */
-import {Helpers} from "../../helpers";
+import { Helpers } from "../../helpers";
+import { SR5Actor } from "@/module/actor/SR5Actor";
 
-export class OverwatchScoreTracker extends Application {
+export class OverwatchScoreTracker extends foundry.appv1.api.Application {
     static MatrixOverwatchDiceCount = '2d6';
-    static get defaultOptions() {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'overwatch-score-tracker';
         options.classes = ['sr5'];
@@ -18,9 +19,10 @@ export class OverwatchScoreTracker extends Application {
     }
 
     // Contains only non-user actors added manually by the GM.
-    static addedActors = [];
+    static addedActors: string[] = [];
+    actors: ReturnType<SR5Actor['toObject']>[] = [];
 
-    getData(options) {
+    override getData(options) {
         // Get list of user character actors
         const actors = this._prepareCharacterActorsData();
 
@@ -47,10 +49,10 @@ export class OverwatchScoreTracker extends Application {
                 acc.push(user.character.toObject());
             }
             return acc;
-        }, []);
+        }, [] as ReturnType<SR5Actor['toObject']>[]);
     }
 
-    activateListeners(html) {
+    override activateListeners(html) {
         html.find('.overwatch-score-reset').on('click', this._resetOverwatchScore.bind(this));
         html.find('.overwatch-score-add').on('click', this._addOverwatchScore.bind(this));
         html.find('.overwatch-score-input').on('change', this._setOverwatchScore.bind(this));
@@ -62,7 +64,8 @@ export class OverwatchScoreTracker extends Application {
     // returns the actor that this event is acting on
     _getActorFromEvent(event) {
         const id = $(event.currentTarget).closest('.list-item').data('actorId');
-        if (id) return game.actors.get(id);
+        if (id) return game.actors.get(id) as SR5Actor;
+        return undefined;
     }
 
     _onAddActor(event) {
@@ -70,7 +73,8 @@ export class OverwatchScoreTracker extends Application {
 
         const tokens = Helpers.getControlledTokens();
         if (tokens.length === 0) {
-            return ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+            ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+            return;
         }
 
         // Warn user about selected unlinked token actors.
@@ -82,7 +86,7 @@ export class OverwatchScoreTracker extends Application {
         // Add linked token actors.
         tokens.filter(token => token.document.actorLink).forEach(token => {
             // Double check that the actor actually lives in the actors collection.
-            const actor = game.actors.get(token.document.actorId);
+            const actor = game.actors.get(token.document.actorId!);
             if (!actor) return;
             if (this._isActorOnTracker(actor)) return;
 
@@ -137,7 +141,7 @@ export class OverwatchScoreTracker extends Application {
         if (!actor) return;
 
 
-        const index = OverwatchScoreTracker.addedActors.indexOf(actor.id);
+        const index = OverwatchScoreTracker.addedActors.indexOf(actor.id!);
         if (index === -1) {
             ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.CantDeleteUserCharacter'), {localize: true});
             return;

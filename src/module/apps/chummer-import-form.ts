@@ -1,8 +1,8 @@
 import { CharacterImporter } from "./importer/actorImport/characterImporter/CharacterImporter"
 import { SpiritImporter } from "./importer/actorImport/spiritImporter/SpiritImporter"
 
-export class ChummerImportForm extends FormApplication {
-    static get defaultOptions() {
+export class ChummerImportForm extends foundry.appv1.api.FormApplication {
+    static override get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'chummer-import';
         options.classes = ['shadowrun5e'];
@@ -13,15 +13,17 @@ export class ChummerImportForm extends FormApplication {
         return options;
     }
 
-    getData() {
+    override async _updateObject(event, formData) {  }
+
+    override getData() {
         return {};
     }
 
-    activateListeners(html) {
+    override activateListeners(html) {
         html.find('.submit-chummer-import').click(async (event) => {
             event.preventDefault();
 
-            const chummerFile = JSON.parse($('.chummer-text').val());
+            const chummerFile = JSON.parse($('.chummer-text').val() as string);
             const importOptions = {
                 assignIcons: $('.assignIcons').is(':checked'),
 
@@ -38,7 +40,7 @@ export class ChummerImportForm extends FormApplication {
             };
 
             let importer;
-            switch(this.object.type) {
+            switch((this.object as any).type) {
                 case 'character': importer = new CharacterImporter(); break;
                 case 'spirit': importer = new SpiritImporter(); break;
             }
@@ -47,7 +49,7 @@ export class ChummerImportForm extends FormApplication {
             ui.notifications?.info(
                 'Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;'
             );
-            this.close();
+            void this.close();
         });
     }
 }
