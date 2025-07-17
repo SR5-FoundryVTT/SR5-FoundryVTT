@@ -15,13 +15,23 @@ export class Version0_29_0 extends VersionMigration {
 
     override migrateActiveEffect(effect: any) {
         const flag = effect.flags?.shadowrun5e;
+
         if (!flag) return;
 
-        if (flag.applyTo) effect.system.applyTo = flag.applyTo;
-        if (flag.appliedByTest) effect.system.appliedByTest = flag.appliedByTest;
-        if (flag.onlyForEquipped) effect.system.onlyForEquipped = flag.onlyForEquipped;
-        if (flag.onlyForWireless) effect.system.onlyForWireless = flag.onlyForWireless;
-        if (flag.onlyForItemTest) effect.system.onlyForItemTest = flag.onlyForItemTest;
+        if (flag.applyTo)
+            effect.system.applyTo = flag.applyTo;
+
+        if (flag.appliedByTest != null)
+            effect.system.appliedByTest = flag.appliedByTest;
+
+        if (flag.onlyForEquipped != null)
+            effect.system.onlyForEquipped = flag.onlyForEquipped;
+
+        if (flag.onlyForWireless != null)
+            effect.system.onlyForWireless = flag.onlyForWireless;
+
+        if (flag.onlyForItemTest != null)
+            effect.system.onlyForItemTest = flag.onlyForItemTest;
 
         if (flag.selection_attributes)
             effect.system.selection_attributes = JSON.parse(flag.selection_attributes);

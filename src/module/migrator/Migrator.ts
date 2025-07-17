@@ -17,12 +17,14 @@ export class Migrator {
         new Version0_29_0(),
     ] as const;
 
+    /**
+     * Runs migration logic on a given data object of the specified type.
+     */
     public static migrate(type: MigratorDocumentTypes, data: any): void {
-        // Skip items with no systemVersion is found.
-        // Unless forced changed, the abscense of systemVersion means it is just an update and not migration.
-        if (data._stats?.systemVersion == null) return;
+        // Lack of _stats usually indicates new or updated data, not needing migration.
+        if (data._stats == null || data._stats.systemVersion === game.system.version) return;
 
-        const version = data._stats.systemVersion;
+        const version = data._stats.systemVersion || "0.0.0";
         const migrators = this.s_Versions.filter(migrator =>
             migrator.implements[type] && this.compareVersion(migrator.TargetVersion, version) > 0
         );
@@ -38,7 +40,7 @@ export class Migrator {
         const schema = CONFIG[type].dataModels[data.type].schema;
         const failure = schema.validate(data.system, { partial: true });
         if (failure)
-            this._sanitize(data.system, failure, (key) => schema.fields[key]);
+            this._sanitize(data.system, failure, (key) => schema.fields[key], [type, data._id]);
 
         // Set the current system version to indicate that this data has been migrated.
         // This change only affects the in-memory copy during migration and will not persist
@@ -48,11 +50,11 @@ export class Migrator {
     }
 
     /**
-     * Check whether a value is a structured object or array-like object.
+     * Check whether a value is a structured object.
      * This is used to determine whether the value can have nested validation failures.
      */
-    private static isStructured(value: unknown): value is Record<string, unknown> | ArrayLike<unknown> {
-        return value !== null && typeof value === "object";
+    private static isStructured(value: unknown): value is Record<string, unknown> {
+        return value !== null && typeof value === "object" && !Array.isArray(value);
     }
 
     /**
@@ -65,13 +67,13 @@ export class Migrator {
      * @param source - The object or array to sanitize.
      * @param modelFailure - The validation failure data structure, containing fields and/or elements with issues.
      * @param resolveField - A function that retrieves the corresponding schema field for a given key.
-     * @param path - (Optional) The current nested path being processed, used for logging and tracing.
+     * @param path - The current nested path being processed, used for logging and tracing.
      */
     private static _sanitize(
-        source: Record<string, unknown> | ArrayLike<unknown>,
+        source: Record<string, unknown> | Array<unknown>,
         modelFailure: foundry.data.validation.DataModelValidationFailure,
         resolveField: (key: string) => foundry.data.fields.DataField.Any,
-        path: string[] = [],
+        path: string[],
     ): void {
         // Merge both named field failures and indexed element failures into one flat map for iteration.
         const failures = {
@@ -86,7 +88,9 @@ export class Migrator {
 
             if (field instanceof SchemaField && this.isStructured(value))
                 this._sanitize(value, failure, (subKey) => field.fields[subKey], currentPath);
-            else if ((field instanceof ArrayField || field instanceof TypedObjectField) && this.isStructured(value))
+            else if (field instanceof TypedObjectField && this.isStructured(value))
+                this._sanitize(value, failure, () => field.element, currentPath);
+            else if (field instanceof ArrayField && Array.isArray(value))
                 this._sanitize(value, failure, () => field.element, currentPath);
             else {
                 const initialValue = field.getInitialValue();
