@@ -6,6 +6,8 @@ import { Version0_29_0 } from './versions/Version0_29_0';
 import { MigratorDocumentTypes } from "./VersionMigration";
 const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
+type InvalidLogs = Record<string, { oldValue: unknown; newValue: unknown; }>;
+
 export class Migrator {
     // List of all migrators.
     // ⚠️ Keep this list sorted in ascending order by version number (oldest → newest).
@@ -39,8 +41,16 @@ export class Migrator {
         // This ensures that the data conforms to the current schema.
         const schema = CONFIG[type].dataModels[data.type].schema;
         const failure = schema.validate(data.system, { partial: true });
-        if (failure)
-            this._sanitize(data.system, failure, (key) => schema.fields[key], [type, data._id]);
+        if (failure) {
+            const logs: InvalidLogs = {};
+            this._sanitize(data.system, failure, (key) => schema.fields[key], logs);
+            console.warn(
+                `Document Sanitized on Migration:\n` +
+                `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n` +
+                `ID: ${data._id}; Name: ${data.name};`
+            );
+            console.table(logs);
+        }
 
         // Set the current system version to indicate that this data has been migrated.
         // This change only affects the in-memory copy during migration and will not persist
@@ -73,7 +83,8 @@ export class Migrator {
         source: Record<string, unknown> | Array<unknown>,
         modelFailure: foundry.data.validation.DataModelValidationFailure,
         resolveField: (key: string) => foundry.data.fields.DataField.Any,
-        path: string[],
+        logs: InvalidLogs,
+        path: string[] = []
     ): void {
         // Merge both named field failures and indexed element failures into one flat map for iteration.
         const failures = {
@@ -87,15 +98,21 @@ export class Migrator {
             const currentPath = [...path, fieldName];
 
             if (field instanceof SchemaField && this.isStructured(value))
-                this._sanitize(value, failure, (subKey) => field.fields[subKey], currentPath);
+                this._sanitize(value, failure, (subKey) => field.fields[subKey], logs, currentPath);
             else if (field instanceof TypedObjectField && this.isStructured(value))
-                this._sanitize(value, failure, () => field.element, currentPath);
+                this._sanitize(value, failure, () => field.element, logs, currentPath);
             else if (field instanceof ArrayField && Array.isArray(value))
-                this._sanitize(value, failure, () => field.element, currentPath);
+                this._sanitize(value, failure, () => field.element, logs, currentPath);
             else {
-                const initialValue = field.getInitialValue();
-                console.warn(`Replaced invalid value at ${currentPath.join(".")}:`, value, "→", initialValue);
-                source[fieldName] = initialValue;
+                const cleanValue = field.clean(value);
+                if (field.validate(cleanValue) == null) {
+                    logs[currentPath.join(".")] = { oldValue: value, newValue: cleanValue };
+                    source[fieldName] = cleanValue;
+                } else {
+                    const initialValue = field.getInitialValue();
+                    logs[currentPath.join(".")] = { oldValue: value, newValue: initialValue };
+                    source[fieldName] = initialValue;
+                }
             }
         }
     }
