@@ -15,6 +15,13 @@ export class Version0_29_0 extends VersionMigration {
     override migrateItem(item: any) {
         if (item.type === 'sin' && item.system?.licenses)
             item.system.licenses = Object.values(item.system.licenses);
+
+        if (item.type === 'modification' && item.system?.mount_point) {
+            item.system.mount_point = item.system.mount_point.toLowerCase();
+
+            if (item.system?.mount_point === 'under_barrel')
+                item.system.mount_point = 'under';
+        }
     }
 
     override migrateActiveEffect(effect: any) {

@@ -6,8 +6,6 @@ import { Version0_29_0 } from './versions/Version0_29_0';
 import { MigratorDocumentTypes } from "./VersionMigration";
 const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
-type InvalidLogs = Record<string, { oldValue: unknown; newValue: unknown; }>;
-
 export class Migrator {
     // List of all migrators.
     // ⚠️ Keep this list sorted in ascending order by version number (oldest → newest).
@@ -46,7 +44,7 @@ export class Migrator {
         const schema = CONFIG[type].dataModels[data.type].schema;
         const failure = schema.validate(data.system, { partial: true });
         if (failure) {
-            const logs: InvalidLogs = {};
+            const logs: Record<string, { oldValue: unknown; newValue: unknown; }> = {};
             this._sanitize(data.system, failure, (key) => schema.fields[key], logs);
             console.warn(
                 `Document Sanitized on Migration:\n` +
@@ -87,7 +85,7 @@ export class Migrator {
         source: Record<string, unknown> | Array<unknown>,
         modelFailure: foundry.data.validation.DataModelValidationFailure,
         resolveField: (key: string) => foundry.data.fields.DataField.Any,
-        logs: InvalidLogs,
+        logs: Record<string, { oldValue: unknown; newValue: unknown; }>,
         path: string[] = []
     ): void {
         // Merge both named field failures and indexed element failures into one flat map for iteration.
@@ -109,6 +107,8 @@ export class Migrator {
                 this._sanitize(value, failure, () => field.element, logs, currentPath);
             else {
                 let newValue: unknown;
+
+                // Avoid conversion from T to [T] on cleaning in ArrayField.
                 if (!(field instanceof ArrayField)) {
                     const cleanValue = field.clean(value);
                     newValue = field.validate(cleanValue) == null ? cleanValue : field.getInitialValue();

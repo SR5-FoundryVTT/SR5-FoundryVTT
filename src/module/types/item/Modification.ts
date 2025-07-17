@@ -21,7 +21,7 @@ const ModificationData = {
         required: true,
         choices: ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons']
     }),
-    dice_pool: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: -1 }),
+    dice_pool: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     rc: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     conceal: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

@@ -1,10 +1,10 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyData } from "../template/Technology";
-const { HTMLField, SchemaField, ArrayField, StringField } = foundry.data.fields;
+const { HTMLField, SchemaField, ArrayField, NumberField, StringField } = foundry.data.fields;
 
-const LicenseData = () => ({
+export const LicenseData = () => ({
     name: new StringField({ required: true }),
-    rtg: new StringField({ required: true }),
+    rtg: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
     description: new HTMLField(),
 });
 

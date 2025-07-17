@@ -498,11 +498,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (!licenses) return;
 
         // Add the new license to the list
-        licenses.push({
-            name: '',
-            rtg: '',
-            description: '',
-        });
+        licenses.push(DataDefaults.createData('license'));
 
         await this.update({ system: { licenses } });
     }

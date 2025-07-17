@@ -37,7 +37,7 @@ import { MovementField } from "../types/template/Movement";
 import { Program } from "../types/item/Program";
 import { Quality } from "../types/item/Quality";
 import { Ritual } from "../types/item/Ritual";
-import { Sin } from "../types/item/Sin";
+import { LicenseData, Sin } from "../types/item/Sin";
 import { Spell } from "../types/item/Spell";
 import { SpritePower } from "../types/item/SpritePower";
 
@@ -92,6 +92,7 @@ const schemaMap = {
     damage: DamageData,
     description: DescriptionData,
     fire_mode: FireModeData,
+    license: LicenseData,
     limit_field: LimitField,
     minimal_action: MinimalActionData,
     movement_field: MovementField,
