@@ -1,6 +1,6 @@
+import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
-import { ModifiableValue, KeyValuePair } from "./Base";
-const { SchemaField, BooleanField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
+const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedObjectField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
@@ -9,7 +9,6 @@ export const SkillField = () => ({
     name: new StringField({ required: true }),
     hidden: new BooleanField(),
     label: new StringField({ required: true }),
-    bonus: new ArrayField(new SchemaField(KeyValuePair())),
     attribute: new StringField({ required: true }),
     _delete: new BooleanField(), // Does it use it?
     specs: new ArrayField(new StringField({ required: true })),
@@ -17,6 +16,10 @@ export const SkillField = () => ({
     id: new StringField({ required: true }),
     link: new StringField({ required: true }),
     group: new StringField({ required: true }),
+    bonus: new ArrayField(new SchemaField({
+        key: new StringField({ required: true }),
+        value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    })),
 });
 
 function skill(createData: foundry.data.fields.SchemaField.CreateData<ReturnType<typeof SkillField>> = {}): SkillFieldType {

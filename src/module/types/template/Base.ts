@@ -56,11 +56,6 @@ export const ValueField = () => ({
     manualMod: new StringField({ required: true }),
 });
 
-export const KeyValuePair = () => ({
-    key: new StringField({ required: true }),
-    value: new StringField({ required: true }),
-});
-
 export type ValueFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ValueField>>;
 export type BaseValuePairType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BaseValuePair>>;
 export type ModifiableValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValue>>;
