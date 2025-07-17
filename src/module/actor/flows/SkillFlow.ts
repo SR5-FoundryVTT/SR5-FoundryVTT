@@ -27,7 +27,7 @@ export class SkillFlow {
      */
     static allowDefaultingRoll(skill: SkillFieldType): boolean {
         // Check if settings allow rolls of skills that otherwise would need to be defaulted.
-        const allowUnimproviseable = game.settings.get(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills) === false;
+        const allowUnimproviseable = !game.settings.get(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills);
         if (allowUnimproviseable)
             return true;
 

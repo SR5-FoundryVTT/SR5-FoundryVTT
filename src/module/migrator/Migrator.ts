@@ -48,8 +48,8 @@ export class Migrator {
             this._sanitize(data.system, failure, (key) => schema.fields[key], logs);
             console.warn(
                 `Document Sanitized on Migration:\n` +
-                `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n` +
-                `ID: ${data._id}; Name: ${data.name};`
+                `ID: ${data._id}; Name: ${data.name};\n` +
+                `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n`
             );
             console.table(logs);
         }

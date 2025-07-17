@@ -849,12 +849,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param sheetData ActorSheetData as created within getData method
      */
-    _prepareActorModifiers(sheetData: SR5ActorSheetData) {        
-        // TODO: 123499/taMiF What can we do with modifiers?
-        // for (const [key, value] of Object.entries(modifiers)) {
-        //     if (value === 0) modifiers[key] = '';
-        // }
-
+    _prepareActorModifiers(sheetData: SR5ActorSheetData) {
         // Empty zero value modifiers for display purposes.
         const { modifiers } = sheetData.system;
 
@@ -866,7 +861,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         const sorted = {};
         for (const modifier of modifierList) {
-            sorted[modifier] = Number(modifiers[modifier]) || 0;
+            sorted[modifier] = Number(modifiers[modifier]) || '';
         }
 
         sheetData.system.modifiers = sorted as any;
@@ -878,9 +873,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const attributes = sheetData.system.attributes;
         for (const [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
-                // TODO: 123499/taMiF What can we do with temp?
-                // if (attribute.temp === 0)
-                //     attribute.temp = null;
+                if (attribute.temp === 0)
+                    // @ts-expect-error - temp is not defined in the SR5Attribute type
+                    attribute.temp = null;
             }
         }
     }
@@ -892,9 +887,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 const att = matrix[attribute];
                 if (att) {
                     if (!att.mod) att.mod = [];
-                    // TODO: 123499/taMiF What can we do with temp?
-                    // if (att.temp === 0)
-                    //     att.temp = null;
+                    if (att.temp === 0)
+                        // @ts-expect-error - so it doesn't show in sheet
+                        att.temp = null;
                 }
             };
 
