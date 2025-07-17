@@ -9,9 +9,13 @@ import { VersionMigration } from "../VersionMigration";
 export class Version0_29_0 extends VersionMigration {
     readonly TargetVersion = "0.29.0";
 
-    // Considering this a migration so those documents can be sanitized.
+    // Considering this a migration so Actor documents can be sanitized.
     override migrateActor(actor: any) { }
-    override migrateItem(item: any) { }
+
+    override migrateItem(item: any) {
+        if (item.type === 'sin' && item.system?.licenses)
+            item.system.licenses = Object.values(item.system.licenses);
+    }
 
     override migrateActiveEffect(effect: any) {
         const flag = effect.flags?.shadowrun5e;
