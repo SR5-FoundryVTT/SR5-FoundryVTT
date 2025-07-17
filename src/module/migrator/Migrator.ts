@@ -4,7 +4,6 @@ import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_29_0 } from './versions/Version0_29_0';
 import { MigratorDocumentTypes } from "./VersionMigration";
-import { DataModelValidationFailure } from "node_modules/fvtt-types/src/foundry/common/data/validation-failure.mjs";
 const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
 export class Migrator {
@@ -33,17 +32,68 @@ export class Migrator {
 
         for (const migrator of migrators)
             migrator[`migrate${type}`](data);
-
-        // After all migrations, clean the data model.
+        
+        // After all migrations, sanitize the data model.
         // This ensures that the data conforms to the current schema.
         const schema = CONFIG[type].dataModels[data.type].schema;
-        schema.clean(data.system);
+        const failure = schema.validate(data.system, { partial: true });
+        if (failure)
+            this._sanitize(data.system, failure, (key) => schema.fields[key]);
 
         // Set the current system version to indicate that this data has been migrated.
         // This change only affects the in-memory copy during migration and will not persist
         // unless the document is explicitly updated. The system will automatically replace
         // this value on save, so setting it here is safe and non-destructive.
         data._stats.systemVersion = game.system.version;
+    }
+
+    /**
+     * Check whether a value is a structured object or array-like object.
+     * This is used to determine whether the value can have nested validation failures.
+     */
+    private static isStructured(value: unknown): value is Record<string, unknown> | ArrayLike<unknown> {
+        return value !== null && typeof value === "object";
+    }
+
+    /**
+     * Recursively sanitize a source object or array by replacing invalid values
+     * with their field's default values based on a model failure structure.
+     *
+     * This ensures that all invalid data (either from nested fields or arrays)
+     * is corrected to conform with the expected data model schema.
+     * 
+     * @param source - The object or array to sanitize.
+     * @param modelFailure - The validation failure data structure, containing fields and/or elements with issues.
+     * @param resolveField - A function that retrieves the corresponding schema field for a given key.
+     * @param path - (Optional) The current nested path being processed, used for logging and tracing.
+     */
+    private static _sanitize(
+        source: Record<string, unknown> | ArrayLike<unknown>,
+        modelFailure: foundry.data.validation.DataModelValidationFailure,
+        resolveField: (key: string) => foundry.data.fields.DataField.Any,
+        path: string[] = [],
+    ): void {
+        // Merge both named field failures and indexed element failures into one flat map for iteration.
+        const failures = {
+            ...modelFailure.fields,
+            ...Object.fromEntries(modelFailure.elements.map(e => [e.id.toString(), e.failure]))
+        };
+
+        for (const [fieldName, failure] of Object.entries(failures)) {
+            const value = source[fieldName];
+            const field = resolveField(fieldName);
+            const currentPath = [...path, fieldName];
+
+            if (field instanceof SchemaField && this.isStructured(value))
+                this._sanitize(value, failure, (subKey) => field.fields[subKey], currentPath);
+            else if ((field instanceof ArrayField || field instanceof TypedObjectField) && this.isStructured(value))
+                this._sanitize(value, failure, () => field.element, currentPath);
+            else {
+                const initialValue = field.getInitialValue();
+                console.warn(`Replaced invalid value at ${currentPath.join(".")}:`, value, "→", initialValue);
+                source[fieldName] = initialValue;
+            }
+        }
     }
 
     /**
