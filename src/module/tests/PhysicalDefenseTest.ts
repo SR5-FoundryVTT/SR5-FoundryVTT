@@ -43,7 +43,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.hbs';
     }
 
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {

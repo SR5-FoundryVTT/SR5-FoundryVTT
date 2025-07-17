@@ -43,7 +43,7 @@ export class MoveInventoryDialog extends FormDialog {
             },
             default: 'cancel',
             templateData: { inventories },
-            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/move-inventory-dialog.html',
+            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/move-inventory-dialog.hbs',
             onAfterClose: async html => {
                 return html.find('input[name="inventories"]:checked').val();
             }

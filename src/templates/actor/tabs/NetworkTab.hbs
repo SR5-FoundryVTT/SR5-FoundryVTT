@@ -1,0 +1,47 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='network'}}
+<div class="inventory">
+    <div class="scroll-area">
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                name=(localize "SR5.Labels.Sheet.NetworkDevices")
+                itemId='networkDevice'
+                rightSide=(NetworkDevicesListRightSide)
+                icons=(NetworkDevicesListHeaderIcons)
+        }}
+        {{!-- Don't use the ListItem Handlebar helper as to avoid its item drag&drop functionality. --}}
+        {{#each networkDevices}}
+        <div class="list-item" data-token-id="{{this.actor.token.id}}" data-actor-id="{{this.actor.id}}" data-device-id="{{this.id}}" data-list-item-index="{{@index}}">
+            <div class="list-item-content">
+                <div class="item-left">
+                    <div class="item-img">
+                        <img src="{{this.img}}"
+                            data-tooltip="{{this.name}}"
+                            height="24px"
+                            width="24px"/>
+                    </div>
+                    <div class="item-text item-name">{{this.name}}</div>
+                </div>
+                <div class="item-right">
+                    <div class="item-text">
+                        {{#if this.actor.token}}
+                        {{this.actor.token.name}} ({{this.actor.token.parent.name}})
+                        {{else}}
+                        {{this.actor.name}}
+                        {{/if}}
+                    </div>
+                    <div class="item-text">
+                        {{localizeDocumentType this}}
+                    </div>
+                    <div class="item-text item-icons">
+                        <a class="" data-tooltip="SR5.Del">
+                            <i class="item-icon fas fa-trash network-device-remove"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{else}}
+        {{localize "SR5.Labels.Sheet.MissingNetworkDevices"}}
+        {{/each}}
+    </div>
+</div>
+{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}

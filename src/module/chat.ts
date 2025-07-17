@@ -41,7 +41,7 @@ const createChatData = async (template: string, templateData) => {
 
 export async function createItemChatMessage(options) {
     const templateData = createChatTemplateData(options);
-    return await createChatMessage('systems/shadowrun5e/dist/templates/rolls/item-card.html', templateData);
+    return await createChatMessage('systems/shadowrun5e/dist/templates/rolls/item-card.hbs', templateData);
 }
 
 function createChatTemplateData(options) {

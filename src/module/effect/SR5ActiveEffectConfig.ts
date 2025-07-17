@@ -37,7 +37,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
     }
 
     override get template(): string {
-        return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
+        return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.hbs';
     }
 
     // TODO check what it does, somehow it is needed to override the submit method.

@@ -1,0 +1,20 @@
+<div class="matrix">
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+            name=(localize 'SR5.CallInAction.Compilation')
+            itemId='compilation'
+            icons=(ItemHeaderIcons 'compilation')
+            rightSide=(ItemHeaderRightSide 'compilation')
+    }}
+    {{#each itemType.compilation as |item iid|}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                img=item.img
+                name=item.name
+                itemId=item._id
+                icons=(ItemIcons item)
+                rightSide=(ItemRightSide item)
+                hasDesc="true"
+                hasRoll="true"
+                description=item.description.value
+        }}
+    {{/each}}
+</div>

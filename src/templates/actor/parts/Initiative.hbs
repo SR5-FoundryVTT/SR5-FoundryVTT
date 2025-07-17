@@ -1,0 +1,56 @@
+{{#> "systems/shadowrun5e/dist/templates/common/Attribute.hbs"}}
+    <div class="track">
+        <div class="attribute-name">
+            <select name="system.initiative.perception" class="display">
+                {{#select system.initiative.perception}}
+                    {{#if system.initiative.meatspace}}
+                        <option value="meatspace">{{localize "SR5.InitCatMeatspace"}}</option>
+                    {{/if}}
+
+                    {{#ife system.special 'magic'}}
+                        <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
+                    {{/ife}}
+
+                    {{#if system.initiative.matrix}}
+                        <option value="matrix">{{localize "SR5.InitCatMatrix"}}</option>
+                    {{/if}}
+                {{/select}}
+            </select>
+        </div>
+        <div class="attribute-name">
+            <label
+                    data-tooltip="SR5.UseEdgeForInitiativeRoll"
+                    class="checkbox init-edge-label"
+            >
+                <input
+                        type="checkbox"
+                        class="submit-checkbox hidden"
+                        name="system.initiative.edge"
+                    {{checked system.initiative.edge}}
+                />
+                <span class="checkmark far"></span>
+            </label>
+        </div>
+    </div>
+    <div class="track">
+        <div class="attribute-input-container">
+            <input
+                    class="display"
+                    size="4"
+                    type="text"
+                    value="{{system.initiative.current.base.value}}"
+                    disabled
+            />
+        </div>
+        <div class="track-plus"></div>
+        <div class="attribute-input-container">
+            <input
+                    class="display"
+                    size="4"
+                    type="text"
+                    value="{{system.initiative.current.dice.text}}"
+                    disabled
+            />
+        </div>
+    </div>
+{{/"systems/shadowrun5e/dist/templates/common/Attribute.hbs"}}

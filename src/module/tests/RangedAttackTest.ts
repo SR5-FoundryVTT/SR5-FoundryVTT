@@ -118,7 +118,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.hbs';
     }
 
     /**

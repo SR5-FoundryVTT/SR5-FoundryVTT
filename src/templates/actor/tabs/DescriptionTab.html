@@ -1,9 +1,0 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='description'}}
-<div class="inventory">
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                        name=(localize 'SR5.Description')
-                        itemId='biography'}}
-    {{editor biographyHTML target="system.description.value" button=true
-            editable=true engine="prosemirror" collaborate=false}}
-</div>
-{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html' }}

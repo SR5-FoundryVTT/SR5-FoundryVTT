@@ -1058,7 +1058,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             },
             participants: []
         };
-        const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.html', templateData);
+        const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.hbs', templateData);
         // Prepare the actual message.
         const messageData =  {
             user: game.user?.id,

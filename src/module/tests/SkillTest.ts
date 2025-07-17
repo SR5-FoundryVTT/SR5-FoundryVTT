@@ -30,7 +30,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      * Allow users to alter detailed skill values.
      */
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.hbs';
     }
 
     /**

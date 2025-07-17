@@ -201,10 +201,10 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         // v10 actor.limited doesn't take GM into account, so we have to do it ourselves.
         if (!game.user?.isGM && this.actor.limited) {
-            return `${path}/actor-limited/${this.actor.type}.html`;
+            return `${path}/actor-limited/${this.actor.type}.hbs`;
         }
 
-        return `${path}/actor/${this.actor.type}.html`;
+        return `${path}/actor/${this.actor.type}.hbs`;
     }
 
     /** SheetData used by _all_ actor types! */

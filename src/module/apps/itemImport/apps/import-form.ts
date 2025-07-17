@@ -107,7 +107,7 @@ export class Import extends Application {
         options.id = 'chummer-data-import';
         options.classes = ['app', 'window-app', 'filepicker'];
         options.title = 'Chummer/Data Import';
-        options.template = 'systems/shadowrun5e/dist/templates/apps/compendium-import.html';
+        options.template = 'systems/shadowrun5e/dist/templates/apps/compendium-import.hbs';
         options.width = 600;
         options.height = 'auto';
         return options;

@@ -49,7 +49,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
     }
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/summonspirit-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/summonspirit-test-dialog.hbs';
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {

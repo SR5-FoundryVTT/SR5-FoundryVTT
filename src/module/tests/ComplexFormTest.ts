@@ -30,11 +30,11 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
     }
 
     override get _dialogTemplate()  {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/complexform-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/complexform-test-dialog.hbs';
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/complexform-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/complexform-test-message.hbs';
     }
 
     /**

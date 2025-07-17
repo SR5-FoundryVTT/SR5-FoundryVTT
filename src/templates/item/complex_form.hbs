@@ -1,0 +1,31 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    {{> "systems/shadowrun5e/dist/templates/item/parts/header.hbs" }}
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
+        <a class="item" data-tab="form">{{localize "SR5.ComplexForm"}}</a>
+        <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
+    </nav>
+    <section class="sheetbody">
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="flexrow align-start nowrap full-height">
+                {{> "systems/shadowrun5e/dist/templates/item/parts/description.hbs"}}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="form">
+            <div class="tabbody">
+                <div class="inventory">
+                    <div class="scroll-area">
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/complex_form.hbs" header=(localize "SR5.ItemTypes.ComplexForm")}}
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/action.hbs" header=(localize "SR5.Action") hideActionCategory=true}}
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/damage.hbs" header=(localize "SR5.Damage")}}
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/opposed.hbs" 
+                            header=(localize "SR5.Labels.Action.OpposedTest")
+                            disableTestSelection=false
+                        }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs"}}
+    </section>
+</form>

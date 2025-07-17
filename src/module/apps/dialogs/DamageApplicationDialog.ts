@@ -21,7 +21,7 @@ export class DamageApplicationDialog extends FormDialog {
 
     static getDialogData(actors : SR5Actor[], damage: DamageType): FormDialogData {
         const title = game.i18n.localize('SR5.DamageApplication.Title');
-        const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html';
+        const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.hbs';
 
         // Simplify / refactor this
         const actorDamage : any = actors.map(a => { return {actor:a} }) ;

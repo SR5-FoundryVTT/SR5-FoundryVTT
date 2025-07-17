@@ -43,11 +43,11 @@ export class DrainTest extends SuccessTest<DrainTestData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/drain-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/drain-test-dialog.hbs';
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.hbs';
     }
 
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {

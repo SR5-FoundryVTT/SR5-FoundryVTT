@@ -1,0 +1,39 @@
+<div class="flexcol">
+    {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.hbs"
+            name=(localize "SR5.Labels.ActorSheet.ICConfiguration")
+    }}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.IC.Type") }}
+        <div>
+            {{> "systems/shadowrun5e/dist/templates/common/Select.hbs"
+                    options=config.ic.types
+                    value=system.icType
+                    path="system.icType"
+            }}
+        </div>
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Host.Rating") }}
+        <div>
+            {{> "systems/shadowrun5e/dist/templates/common/ValueInput.hbs"
+                    cssClass="attribute-input"
+                    size="2"
+                    maxLength="2"
+                    value=system.host.rating
+                    name="system.host.rating"
+                    fieldType="Number"
+                    placeholder="0"
+                    disabled=(disabledHelper host)
+            }}
+        </div>
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
+
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.ItemTypes.Host") }}
+        <div>
+            {{#if host }}
+                <a class="entity-link content-link" draggable="true" data-type="Item" data-id="{{host.id}}" data-uuid="{{host.uuid}}"><i class="fas fa-user">{{host.name}}</i></a>
+                <a class="close entity-remove"><i class="fas fa-times"></i></a>
+            {{else}}
+                {{localize "SR5.IC.MissingHost"}}
+            {{/if}}
+        </div>
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
+</div>

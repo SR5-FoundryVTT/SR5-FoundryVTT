@@ -1,0 +1,21 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+   {{> 'systems/shadowrun5e/dist/templates/actor-limited/parts/Header.hbs' }}
+    <section class="sheetbody">
+        <div class="inventory">
+            <div class="split-container">
+            <div>
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                        name=(localize 'SR5.Biography')
+                        itemId='biography'
+                        icons=(ItemHeaderIcons 'biography')
+                }}
+                {{editor biographyHTML target="system.description.value" engine="prosemirror" callaborate=false button=false
+                         editable=false}}
+            </div>
+            <div class="scroll-area">
+                {{> 'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscVehicle.hbs' }}
+            </div>
+        </div>
+        </div>
+    </section>
+</form>

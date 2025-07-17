@@ -2,7 +2,7 @@ import {FLAGS, SYSTEM_NAME} from "../constants";
 
 export class ChangelogApplication extends Application {
     override get template(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/changelog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/changelog.hbs';
     }
 
     static override get defaultOptions() {

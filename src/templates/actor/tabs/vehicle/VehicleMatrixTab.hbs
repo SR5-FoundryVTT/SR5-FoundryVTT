@@ -1,0 +1,45 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='matrix'}}
+    <div>
+        {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.hbs"
+                name=(localize "SR5.Labels.ActorSheet.Matrix")
+        }}
+        <div class="attributes">
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.hbs" }}
+            <div class="block">
+                <div class="block-line gap-4 border-bottom center">
+                    <label>
+                        {{localize "SR5.RunningSilent"}}
+                        <input
+                                type="checkbox"
+                                class="submit-checkbox"
+                                name="system.matrix.running_silent"
+                            {{checked system.matrix.running_silent}}
+                        />
+                    </label>
+                </div>
+                <div class="attribute">
+                    <div class="attribute-name">
+                        {{localize "SR5.ConditionMonitor"}}
+                    </div>
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
+                            value=system.matrix.condition_monitor.value
+                            max=system.matrix.condition_monitor.max
+                            id="matrix"
+                    }}
+                </div>
+            </div>
+            {{#each config.matrixAttributes as |label key|}}
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.hbs"
+                        matrixAtt=(lookup ../system.matrix key)
+                        isCyberdeck=../system.matrix.is_cyberdeck
+                        key=key
+                        label=label
+                        matrixAttributes=../config/matrixAttributes
+                        item=../system.matrix.item }}
+            {{/each}}
+        </div>
+    </div>
+    <div class="inventory">
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.hbs' }}
+    </div>
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}

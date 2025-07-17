@@ -61,7 +61,7 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
     }
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/compilation-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/compilation-test-dialog.hbs';
     }
 
     override get canBeExtended() {

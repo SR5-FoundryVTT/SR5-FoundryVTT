@@ -1,0 +1,58 @@
+<div class="scroll-area-sprite-power">
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+            name=(localize 'SR5.Labels.ActorSheet.SpritePowers')
+            itemId='sprite_power'
+            icons=(ItemHeaderIcons 'sprite_power')
+            rightSide=(ItemHeaderRightSide 'sprite_power')
+    }}
+    {{#each itemType.sprite_power as |item i|}} {{#if (or (not system.optional) (eq system.optional "standard"))}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+            img=item.img
+            name=item.name
+            itemId=item._id
+            icons=(ItemIcons item)
+            rightSide=(ItemRightSide item)
+            hasDesc="true"
+            hasRoll="true"
+            description=item.description.value
+        }}
+    {{/if}} {{/each}}
+
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+            name=(localize 'SR5.Labels.ActorSheet.EnabledOptionSpritePowers')
+            itemId='sprite_power'
+            icons=(ItemHeaderIcons 'sprite_power')
+            rightSide=(ItemHeaderRightSide 'sprite_power')
+    }}
+    {{#each itemType.sprite_power as |item i|}} {{#ife system.optional "enabled_option"}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+            img=item.img
+            name=item.name
+            itemId=item._id
+            icons=(ItemIcons item)
+            rightSide=(ItemRightSide item)
+            hasDesc="true"
+            hasRoll="true"
+            description=item.description.value
+        }}
+    {{/ife}} {{/each}}
+
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+            name=(localize 'SR5.Labels.ActorSheet.DisabledOptionSpritePowers')
+            itemId='sprite_power'
+            icons=(ItemHeaderIcons 'sprite_power')
+            rightSide=(ItemHeaderRightSide 'sprite_power')
+    }}
+    {{#each itemType.sprite_power as |item i|}} {{#ife system.optional "disabled_option"}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+            img=item.img
+            name=item.name
+            itemId=item._id
+            icons=(ItemIcons item)
+            rightSide=(ItemRightSide item)
+            hasDesc="true"
+            hasRoll="true"
+            description=item.description.value
+        }}
+    {{/ife}} {{/each}}
+</div>
