@@ -38,11 +38,17 @@ input[type='text'].display {
  * JOURNAL ENTRY STYLING
  */
 // Journal Entry
+body:not(.theme-dark) {
+    .sheet.journal-entry .journal-entry-content,
+    // Journal Entry Page Editor
+    .journal-sheet.journal-entry-page .window-content {
+        background: url('assets/light-page.webp') repeat;
+    }
+}
+
 .sheet.journal-entry .journal-entry-content,
 // Journal Entry Page Editor
 .journal-sheet.journal-entry-page .window-content {
-    background: url('assets/light-page.webp') repeat;
-
     // As we only change headers in journal-entires, avoid cross styling outside of it.
     // This clashed with Weather Control module and others.
     h1 {

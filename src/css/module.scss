@@ -10,7 +10,7 @@
     justify-content: flex-start;
 }
 //window background
-body #forien-quest-log .window-content, .window-app.forien-quest-preview .window-content {
+body:not(.theme-dark) #forien-quest-log .window-content, .window-app.forien-quest-preview .window-content {
     border-radius: 0 0 5px 5px;
     margin: 0;
     padding: 0;
