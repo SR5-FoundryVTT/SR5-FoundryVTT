@@ -12,16 +12,6 @@
 @import 'module';
 @import 'effect';
 
-@font-face {
-    font-family: 'klavika-medium';
-    src: url('assets/fonts/klavika-medium.otf');
-}
-
-@font-face {
-    font-family: 'IwaOGoPro-Md';
-    src: url('assets/fonts/IwaOGoPro-Md.otf');
-}
-
 // .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
 .Roll {
     @include rollable;
@@ -678,7 +668,6 @@ input[type='text'].display {
     }
     .sheet .editor-content {
         color: $white;
-        font-family: $editorFonts;
         height: 100%;
         overflow-y: auto;
         word-break: break-word;

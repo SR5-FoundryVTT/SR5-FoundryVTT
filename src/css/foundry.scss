@@ -39,20 +39,18 @@ input[type='text'].display {
  */
 // Journal Entry
 .sheet.journal-entry .journal-entry-content,
-// Journal Entry Page Editor 
+// Journal Entry Page Editor
 .journal-sheet.journal-entry-page .window-content {
     background: url('assets/light-page.webp') repeat;
 
     // As we only change headers in journal-entires, avoid cross styling outside of it.
     // This clashed with Weather Control module and others.
     h1 {
-        font-family: 'klavika-medium';
         color: $darkred;
         font-size: 25px;
     }
 
     h2 {
-        font-family: 'klavika-medium';
         color: $darkred;
     }
 
@@ -63,7 +61,6 @@ input[type='text'].display {
             background: inherit;
             text-align: left;
             color: $yellow;
-            font-family: 'klavika-medium';
             font-size: medium;
             padding: 9px;
         }
@@ -117,14 +114,13 @@ input[type='text'].display {
     z-index: 2;
 }
 .journal-sheet .journal-header .title {
-    background: 
+    background:
         $nameplate-background,
         url("assets/page.webp") repeat;
     background-repeat: no-repeat, repeat;
     background-size: 100% 41px, auto; // first layer = 60px tall
     background-position: center, top;
     border-radius: 0;
-    font-family: 'klavika-medium';
     text-align: left !important;
     text-indent: 5px;
     color: white;
@@ -135,7 +131,6 @@ input[type='text'].display {
 
 
 .journal-sheet h3 {
-    font-family: 'klavika-medium';
     color: $darkred;
 }
 
