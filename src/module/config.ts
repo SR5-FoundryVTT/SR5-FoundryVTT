@@ -23,6 +23,7 @@ export const SR5 = {
     itemTypes: {
         action: 'SR5.ItemTypes.Action',
         adept_power: 'SR5.ItemTypes.AdeptPower',
+        alchemical_spell: 'SR5.ItemTypes.AlchemicalSpell',
         ammo: 'SR5.ItemTypes.Ammo',
         armor: 'SR5.ItemTypes.Armor',
         bioware: 'SR5.ItemTypes.Bioware',
@@ -37,6 +38,7 @@ export const SR5 = {
         lifestyle: 'SR5.ItemTypes.Lifestyle',
         metamagic: 'SR5.ItemTypes.Metamagic',
         modification: 'SR5.ItemTypes.Modification',
+        preparation: 'SR5.ItemTypes.Preparation',
         program: 'SR5.ItemTypes.Program',
         quality: 'SR5.ItemTypes.Quality',
         ritual: 'SR5.ItemTypes.Ritual',
@@ -827,6 +829,7 @@ export const SR5 = {
      * When casting tests from these item types, use these tests as active tests
      */
     activeTests: {
+        'alchemical_spell': 'AlchemicalSpellCastingTest',
         'spell': 'SpellCastingTest',
         'ritual': 'RitualSpellcastingTest',
         'complex_form': 'ComplexFormTest'
@@ -1249,6 +1252,14 @@ export const SR5 = {
         action: {},
         adept_power: {
             'adept-spell': 'spell/spell'
+        },
+        alchemical_spell: {
+            'combat': '',
+            'detection': '',
+            'enchantments': '',
+            'health': '',
+            'illusion': '',
+            'manipulation': ''
         },
         ammo: {
             'ammo': '',

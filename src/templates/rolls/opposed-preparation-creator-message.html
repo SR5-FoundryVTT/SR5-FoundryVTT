@@ -1,0 +1,8 @@
+{{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.html'}}
+{{#if test.failure}}
+<div class="sr5 chat-card roll-card">
+    <div class="card-content">
+        Preparation made at Force: {{test.preparation.system.force}} and Potency: {{test.preparation.system.potency}}
+    </div>
+</div>
+{{/if}}

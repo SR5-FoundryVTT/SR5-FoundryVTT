@@ -33,6 +33,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'lifestyle',
             'contact',
             'spell',
+            'alchemical_spell',
             'ritual_spells',
             'adept_power',
             'complex_form',
@@ -64,7 +65,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             'cyberware',
             'device',
             'equipment',
-            'modification'
+            'modification',
+            'preparation'
         ];
     }
 

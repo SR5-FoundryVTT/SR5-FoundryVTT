@@ -174,6 +174,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     public item: SR5Item | undefined;
     public rolls: SR5Roll[];
     public targets: TokenDocument[];
+    public pushTheLimit: boolean;
 
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
     public effects: SuccessTestEffectsFlow<this>;
@@ -183,6 +184,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.actor = documents?.actor;
         this.item = documents?.item;
         this.rolls = documents?.rolls || [];
+        this.pushTheLimit = (this.actor != undefined);
 
         // User selected targets of this test.
         this.targets = [];

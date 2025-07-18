@@ -1,0 +1,49 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Preparation.Potency"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="4"
+                type="number"
+                name="system.potency"
+                value="{{system.potency}}"
+                data-dtype="Number"
+                placeholder="{{localize "SR5.Preparation.Potency"}}"
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Force"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="4"
+                type="number"
+                name="system.force"
+                value="{{system.force}}"
+                data-dtype="Number"
+                placeholder="{{localize "SR5.Force"}}"
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Preparation.Trigger"}}
+        </div>
+        <div class="inputs">
+            <select disabled style="color: white" name="system.trigger">
+              {{#select system.trigger}}
+              <option value="command">{{localize "SR5.Preparation.Command"}}</option>
+              <option value="contact">{{localize "SR5.Preparation.Contact"}}</option>
+              <option value="time">{{localize "SR5.Preparation.Time"}}</option>
+              {{/select}}
+            </select>
+        </div>
+    </div>
+</div>

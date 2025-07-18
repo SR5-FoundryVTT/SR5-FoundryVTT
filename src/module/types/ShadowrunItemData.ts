@@ -17,6 +17,7 @@ declare namespace Shadowrun {
     export type ShadowrunItemData =
         | ActionItemData
         | AdeptPowerItemData
+        | AlchemicalSpellItemData
         | AmmoItemData
         | ArmorItemData
         | BiowareItemData
@@ -31,6 +32,7 @@ declare namespace Shadowrun {
         | LifestyleItemData
         | MetamagicItemData
         | ModificationItemData
+        | PreparationItemData
         | ProgramItemData
         | QualityItemData
         | SinItemData
@@ -62,6 +64,7 @@ declare namespace Shadowrun {
     export type ShadowrunItemDataData =
         Partial<ActionData> &
         Partial<AdeptPowerData> &
+        Partial<AlchemicalSpellItemData> &
         Partial<AmmoData> &
         Partial<ArmorData> &
         Partial<BiowareData> &
@@ -76,6 +79,7 @@ declare namespace Shadowrun {
         Partial<LifestyleData> &
         Partial<MetamagicData> &
         Partial<ModificationData> &
+        Partial<PreparationData> &
         Partial<ProgramData> &
         Partial<QualityData> &
         Partial<SinData> &
@@ -98,6 +102,13 @@ declare namespace Shadowrun {
         img: string;
         data: AdeptPowerData;
         system: AdeptPowerData;
+    }
+    export interface AlchemicalSpellItemData {
+        type: 'alchemical_spell';
+        name: string;
+        img: string;
+        data: SpellData;
+        system: SpellData;
     }
     export interface AmmoItemData {
         type: 'ammo';
@@ -196,6 +207,13 @@ declare namespace Shadowrun {
         img: string;
         data: ModificationData;
         system: ModificationData;
+    }
+    export interface PreparationItemData {
+        type: 'program';
+        name: string;
+        img: string;
+        data: PreparationData;
+        system: PreparationData;
     }
     export interface ProgramItemData {
         type: 'program';

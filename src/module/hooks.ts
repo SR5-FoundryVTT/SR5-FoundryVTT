@@ -2,6 +2,7 @@ import { CompileSpriteTest } from './tests/CompileSpriteTest';
 import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
 import { OpposedRitualTest } from './tests/OpposedRitualTest';
 import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
+import { AlchemicalSpellCastingTest } from './tests/AlchemicalSpellCastingTest';
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
 import { registerSystemSettings } from './settings';
@@ -69,6 +70,8 @@ import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
+import { OpposedAlchemicalSpellCastingTest } from './tests/OpposedAlchemicalSpellCastingTest';
+import { PreparationCastingTest } from './tests/PreparationCastingTest';
 import { RoutingLibIntegration } from './integrations/routingLibIntegration';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
@@ -170,6 +173,9 @@ ___________________
                 PhysicalDefenseTest,
                 SuppressionDefenseTest,
                 PhysicalResistTest,
+                AlchemicalSpellCastingTest,
+                OpposedAlchemicalSpellCastingTest,
+                PreparationCastingTest,
                 SpellCastingTest,
                 RitualSpellcastingTest,
                 OpposedRitualTest,
@@ -213,7 +219,9 @@ ___________________
                 DroneInfiltrationTest,
                 SummonSpiritTest,
                 CompileSpriteTest,
-                RitualSpellcastingTest
+                RitualSpellcastingTest,
+                AlchemicalSpellCastingTest,
+                PreparationCastingTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -224,6 +232,7 @@ ___________________
                 OpposedTest,
                 PhysicalDefenseTest,
                 SuppressionDefenseTest,
+                OpposedAlchemicalSpellCastingTest,
                 CombatSpellDefenseTest,
                 OpposedSummonSpiritTest,
                 OpposedCompileSpriteTest,
