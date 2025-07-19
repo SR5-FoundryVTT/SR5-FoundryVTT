@@ -30,7 +30,7 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-
+import { Migrator } from '../migrator/Migrator';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -91,6 +91,14 @@ export class SR5Actor extends Actor {
         if (!isNaN(num)) {
             return this.setFlag(SYSTEM_NAME, 'overwatchScore', num);
         }
+    }
+
+    // @ts-expect-error FoundryVTT v10
+    static override migrateData(source: any) {
+        Migrator.migrate("Actor", source);
+
+        // @ts-expect-error FoundryVTT v10
+        return super.migrateData(source);
     }
 
     /**

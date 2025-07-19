@@ -31,17 +31,6 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
-    /**
-     * Track system version upon which a migration was last applied
-     */
-    game.settings.register(SYSTEM_NAME, VersionMigration.KEY_DATA_VERSION, {
-        name: 'System Data Version.',
-        scope: 'world',
-        config: false,
-        type: String,
-        default: '0',
-    });
-
     game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
         name: 'SETTINGS.ShowGlitchAnimationName',
         hint: 'SETTINGS.ShowGlitchAnimationDescription',
