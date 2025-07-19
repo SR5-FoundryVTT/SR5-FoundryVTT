@@ -1,171 +1,145 @@
-import { VersionMigration } from './VersionMigration';
-import {Version0_8_0} from "./versions/Version0_8_0";
+import { Version0_8_0 } from "./versions/Version0_8_0";
 import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
+import { Version0_29_0 } from './versions/Version0_29_0';
+import { MigratorDocumentTypes } from "./VersionMigration";
+const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
-type VersionDefinition = {
-    versionNumber: string;
-    migration: VersionMigration;
-};
 export class Migrator {
-    // Map of all version migrations to their target version numbers.
-    private static readonly s_Versions: VersionDefinition[] = [
-        { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
-        { versionNumber: Version0_18_0.TargetVersion, migration: new Version0_18_0() },
-        { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() },
-        { versionNumber: Version0_27_0.TargetVersion, migration: new Version0_27_0() },
-    ];
+    // List of all migrators.
+    // ⚠️ Keep this list sorted in ascending order by version number (oldest → newest).
+    private static readonly s_Versions = [
+        new Version0_8_0(),
+        new Version0_18_0(),
+        new Version0_16_0(),
+        new Version0_27_0(),
+        new Version0_29_0(),
+    ] as const;
 
     /**
-     * Check if the current world is empty of any migrate documents.
+     * Applies migration logic to a provided data object of the specified type.
      * 
+     * Note: This method is only compatible with documents from Foundry VTT version 10 or later,
+     * as it relies on the `_stats.systemVersion` field introduced in v10.
      */
-    public static get isEmptyWorld(): boolean {
-        return game.actors?.contents.length === 0 &&
-            game.items?.contents.length === 0 &&
-            game.scenes?.contents.length === 0 &&
-            Migrator.onlySystemPacks
-    }
+    public static migrate(type: MigratorDocumentTypes, data: any): void {
+        // Lack of _stats usually indicates new or updated data, not needing migration.
+        if (!data._stats || !('systemVersion' in data._stats)) return;
+        if (data._stats.systemVersion === game.system.version) return;
 
-    public static get onlySystemPacks(): boolean {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        return game.packs.contents.filter(pack => pack.metadata.packageType !== 'system' && pack.metadata.packageName !== 'shadowrun5e').length === 0;
-    }
+        const version = data._stats.systemVersion || "0.0.0";
+        const migrators = this.s_Versions.filter(migrator =>
+            migrator.implements[type] && this.compareVersion(migrator.TargetVersion, version) > 0
+        );
 
-    public static async InitWorldForMigration() {
-        console.log('Shadowrun 5e | Initializing an empty world for future migrations');
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, game.system.version);
-    }
+        // If no migrators found, nothing to do.
+        if (migrators.length === 0) return;
 
-    public static async BeginMigration() {
-        let currentVersion = game.settings.get(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION) as string;
-        if (currentVersion === undefined || currentVersion === null) {
-            currentVersion = VersionMigration.NO_VERSION;
-        }
-
-        const migrations = Migrator.s_Versions.filter(({ versionNumber }) => {
-            // if versionNUmber is greater than currentVersion, we need to apply this migration
-            return this.compareVersion(versionNumber, currentVersion) === 1;
-        });
-
-        // No migrations are required, exit.
-        if (migrations.length === 0) {
-            return;
-        }
-
-        const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
-        const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
-        const localizedWarningRequired = game.i18n.localize('SR5.MIGRATION.WarningRequired');
-        const localizedWarningDescription = game.i18n.localize('SR5.MIGRATION.WarningDescription');
-        const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
-        const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
-
-        const d = new Dialog({
-            title: localizedWarningTitle,
-            content:
-                `<h2 style="color: red; text-align: center">${localizedWarningHeader}</h2>` +
-                `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
-                `<p>${localizedWarningDescription}</p>` +
-                `<h3 style="color: red">${localizedWarningBackup}</h3>`,
-            buttons: {
-                ok: {
-                    label: localizedWarningBegin,
-                    callback: () => this.migrate(migrations),
-                },
-            },
-            default: 'ok',
-        });
-        d.render(true);
-    }
-
-    private static async migrate(migrations: VersionDefinition[]) {
-        // we want to apply migrations in ascending order until we're up to the latest
-        migrations.sort((a, b) => {
-            return this.compareVersion(a.versionNumber, b.versionNumber);
-        });
+        for (const migrator of migrators)
+            migrator[`migrate${type}`](data);
         
-        // Before starting, configure each migration
-        for (const {migration} of migrations) {
-            // Show a configuration or information dialog and abort if necessary.
-            const consent = await migration.AskForUserConsentAndConfiguration();
-            if (!consent) return;
+        // After all migrations, sanitize the data model.
+        // This ensures that the data conforms to the current schema.
+        const schema = CONFIG[type].dataModels[data.type].schema;
+        const failure = schema.validate(data.system, { partial: true });
+        if (failure) {
+            const logs: Record<string, { oldValue: unknown; newValue: unknown; }> = {};
+            this._sanitize(data.system, failure, (key) => schema.fields[key], logs);
+            console.warn(
+                `Document Sanitized on Migration:\n` +
+                `ID: ${data._id}; Name: ${data.name};\n` +
+                `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n`
+            );
+            console.table(logs);
         }
 
-        await this.migrateWorld(game, migrations);
-        await this.migrateCompendium(game, migrations);
-
-        const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.SuccessTitle');
-        const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.SuccessHeader');
-        const localizedSuccessDescription = game.i18n.localize('SR5.MIGRATION.SuccessDescription');
-        const localizedSuccessPacksInfo = game.i18n.localize('SR5.MIGRATION.SuccessPacksInfo');
-        const localizedSuccessConfirm = game.i18n.localize('SR5.MIGRATION.SuccessConfirm');
-        const packsDialog = new Dialog({
-            title: localizedWarningTitle,
-            content:
-                `<h2 style="text-align: center; color: green">${localizedWarningHeader}</h2>` +
-                `<p>${localizedSuccessDescription}</p>` +
-                `<p style="text-align: center"><i>${localizedSuccessPacksInfo}</i></p>`,
-            buttons: {
-                ok: {
-                    icon: '<i class="fas fa-check"></i>',
-                    label: localizedSuccessConfirm,
-                },
-            },
-            default: 'ok',
-        });
-        packsDialog.render(true);
+        // Set the current system version to indicate that this data has been migrated.
+        // This change only affects the in-memory copy during migration and will not persist
+        // unless the document is explicitly updated. The system will automatically replace
+        // this value on save, so setting it here is safe and non-destructive.
+        data._stats.systemVersion = game.system.version;
     }
 
     /**
-     * Migrate all world objects
-     * @param game
-     * @param migrations
+     * Check whether a value is a structured object.
+     * This is used to determine whether the value can have nested validation failures.
      */
-    private static async migrateWorld(game: Game, migrations: VersionDefinition[]) {
-        // Run the migrations in order
-        for (const { migration } of migrations) {
-            // Migrate after user accepted.
-            await migration.Migrate(game);
-        }
+    private static isStructured(value: unknown): value is Record<string, unknown> {
+        return value !== null && typeof value === "object" && !Array.isArray(value);
     }
 
     /**
-     * Iterate over all world compendium packs
-     * @param game Game that will be migrated
-     * @param migrations Instances of the version migration
+     * Recursively sanitize a source object or array by replacing invalid values
+     * with their field's default values based on a model failure structure.
+     *
+     * This ensures that all invalid data (either from nested fields or arrays)
+     * is corrected to conform with the expected data model schema.
+     * 
+     * @param source - The object or array to sanitize.
+     * @param modelFailure - The validation failure data structure, containing fields and/or elements with issues.
+     * @param resolveField - A function that retrieves the corresponding schema field for a given key.
+     * @param path - The current nested path being processed, used for logging and tracing.
      */
-    private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
-        // Migrate World Compendium Packs
-        // @ts-expect-error // v11 onwards uses packageType
-        const packs = game.packs?.filter((pack) => pack.metadata.packageType === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
+    private static _sanitize(
+        source: Record<string, unknown> | Array<unknown>,
+        modelFailure: foundry.data.validation.DataModelValidationFailure,
+        resolveField: (key: string) => foundry.data.fields.DataField.Any,
+        logs: Record<string, { oldValue: unknown; newValue: unknown; }>,
+        path: string[] = []
+    ): void {
+        // Merge both named field failures and indexed element failures into one flat map for iteration.
+        const failures = {
+            ...modelFailure.fields,
+            ...Object.fromEntries(modelFailure.elements.map(e => [e.id.toString(), e.failure]))
+        };
 
-        if (!packs) return;
+        for (const [fieldName, failure] of Object.entries(failures)) {
+            const value = source[fieldName];
+            const field = resolveField(fieldName);
+            const currentPath = [...path, fieldName];
 
-        // Run the migrations in order on each pack.
-        for (const pack of packs) {
-            for (const { migration } of migrations) {
-                await migration.MigrateCompendiumPack(pack);
+            if (field instanceof SchemaField && this.isStructured(value))
+                this._sanitize(value, failure, (subKey) => field.fields[subKey], logs, currentPath);
+            else if (field instanceof TypedObjectField && this.isStructured(value))
+                this._sanitize(value, failure, () => field.element, logs, currentPath);
+            else if (field instanceof ArrayField && Array.isArray(value))
+                this._sanitize(value, failure, () => field.element, logs, currentPath);
+            else {
+                let newValue: unknown;
+
+                // Avoid conversion from T to [T] on cleaning in ArrayField.
+                if (!(field instanceof ArrayField)) {
+                    const cleanValue = field.clean(value);
+                    newValue = field.validate(cleanValue) == null ? cleanValue : field.getInitialValue();
+                } else {
+                    newValue = field.getInitialValue();
+                }
+
+                logs[currentPath.join(".")] = { oldValue: value, newValue };
+                source[fieldName] = newValue;
             }
         }
     }
 
-    // found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/
-    // updated for typescript
     /**
-     * compare two version numbers, returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal
+     * compare two version numbers
      * @param v1
      * @param v2
+     * @return 1 if v1 > v2, -1 if v1 < v2, 0 if equal
      */
-    public static compareVersion(v1: string, v2: string) {
-        const s1 = v1.split('.').map((s) => parseInt(s, 10));
-        const s2 = v2.split('.').map((s) => parseInt(s, 10));
-        const k = Math.min(v1.length, v2.length);
-        for (let i = 0; i < k; ++i) {
-            if (s1[i] > s2[i]) return 1;
-            if (s1[i] < s2[i]) return -1;
+    public static compareVersion(v1: string, v2: string): number {
+        const s1 = v1.split('.').map(Number);
+        const s2 = v2.split('.').map(Number);
+        const length = Math.max(s1.length, s2.length);
+
+        for (let i = 0; i < length; i++) {
+            const n1 = s1[i] ?? 0;
+            const n2 = s2[i] ?? 0;
+            if (n1 > n2) return 1;
+            if (n1 < n2) return -1;
         }
-        return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1;
+
+        return 0;
     }
 }

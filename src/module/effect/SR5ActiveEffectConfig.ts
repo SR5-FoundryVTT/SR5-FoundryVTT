@@ -30,27 +30,34 @@ import { ActiveEffectConfigV1 } from "./ActiveEffectConfigV1";
  * situational modifiers and others still can behave differently.
  */
 export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
-    override object: SR5ActiveEffect;
-    // @ts-expect-error Foundry v13 This is not type issue, but a type override for legacy Application v1 support...
-    override document: SR5ActiveEffect;
+    declare object: SR5ActiveEffect;
 
-    override get template(): string {
-        return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
+    public override get document(): SR5ActiveEffect {
+        return super.document as SR5ActiveEffect;
     }
 
-    override async getData(options?: Application.RenderOptions): Promise<ActiveEffectConfig.Data> {
+    override get template(): string {
+        return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.hbs';
+    }
+
+    // TODO check what it does, somehow it is needed to override the submit method.
+    public override _getSubmitData(updateData={}): Record<string, any> {
+        return super._getSubmitData(updateData);
+    }
+
+    override async getData(options?: Application.RenderOptions): Promise<any> {
         const data = await super.getData(options) as any;
 
         data.modes = this.applyModifyLabelToCustomMode(data.modes);
 
-        data.applyTo = this.document.applyTo;
-        data.onlyForWireless = this.document.onlyForWireless;
-        data.onlyForEquipped = this.document.onlyForEquipped;
-        data.onlyForItemTest = this.document.onlyForItemTest;
+        data.applyTo = this.document.system.applyTo;
+        data.onlyForWireless = this.document.system.onlyForWireless;
+        data.onlyForEquipped = this.document.system.onlyForEquipped;
+        data.onlyForItemTest = this.document.system.onlyForItemTest;
 
         data.applyToOptions = this.prepareApplyToOptions();
         data.hasChanges = this.prepareEffectHasChanges();
-        data.isv11 = game.version.startsWith('11.');
+        data.isv11 = game.release.generation === 11;
 
         return data;
     }
@@ -92,7 +99,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         const select = event.currentTarget as HTMLSelectElement;
 
-        if (this.object.getFlag(SYSTEM_NAME, 'applyTo') === select.value) return;
+        if (this.object.system.applyTo === select.value) return;
 
         if (this.object.changes.length) {
             ui.notifications?.error('You must delete changes before changing the apply-to type.');
@@ -142,7 +149,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
     }
 
     _activateTagifyListeners(html: JQuery) {
-        switch (this.object.applyTo) {
+        switch (this.object.system.applyTo) {
             case 'test_all':
                 this._prepareTestSelectionTagify(html);
                 this._prepareActionCategoriesSelectionTagify(html);
@@ -157,7 +164,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const inputElement = html.find('input#test-selection').get(0) as HTMLInputElement;
 
         // Tagify expects this format for localized tags.
-        // @ts-expect-error TODO: I've been lazy and need proper typing of class SuccessTest
         const values = Object.values(game.shadowrun5e.tests).map(((test: any) => ({
             label: test.label, id: test.name
         })));
@@ -166,9 +172,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const maxItems = values.length;
 
         // Fetch current selections.
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_tests') as string;
-        const selected = value ? JSON.parse(value) : [];
-
+        const selected = this.object.system.selection_tests;
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 
@@ -187,9 +191,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const maxItems = values.length;
 
         // Fetch current selections.
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_categories') as string;
-        const selected = value ? JSON.parse(value) : [];
-
+        const selected = this.object.system.selection_categories;
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }
 
@@ -207,8 +209,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const actorOrNothing = !(actor instanceof SR5Actor) ? undefined : actor;
 
         // Use ActionFlow to assure either custom skills or global skills to be included.
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_skills') as string;
-        const selected = value ? JSON.parse(value) : [];
+        const selected = this.object.system.selection_skills;
         const selectedSkillNames = selected.map(({id}) => id);
         const skills = ActionFlow.sortedActiveSkills(actorOrNothing, selectedSkillNames);
         const values = Object.entries(skills).map(([id, label]) => ({ label: label as Translation, id }));
@@ -222,8 +223,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         const values = Object.entries(SR5.attributes).map(([attribute, label]) => ({ label, id: attribute }));
         const maxItems = values.length;
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_attributes') as string;
-        const selected = value ? JSON.parse(value) : [];
+        const selected = this.object.system.selection_attributes;
 
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }
@@ -233,8 +233,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         const values = Object.entries(SR5.limits).map(([limit, label]) => ({ label, id: limit }));
         const maxItems = values.length;
-        const value = this.object.getFlag(SYSTEM_NAME, 'selection_limits') as string;
-        const selected = value ? JSON.parse(value) : [];
+        const selected = this.object.system.selection_limits;
 
         createTagifyOnInput(inputElement, values, maxItems, selected);
     }

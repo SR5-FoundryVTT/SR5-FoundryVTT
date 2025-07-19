@@ -1,25 +1,22 @@
-import { Parser } from '../Parser';
+import { Parser, SystemType } from '../Parser';
 import { Mod } from '../../schema/VehiclesSchema';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import ModificationItemData = Shadowrun.ModificationItemData;
-import ModificationCategoryType = Shadowrun.ModificationCategoryType;
 
-export class VehicleModParser extends Parser<ModificationItemData> {
-    protected override parseType: string = 'modification';
+export class VehicleModParser extends Parser<'modification'> {
+    protected readonly parseType = 'modification';
 
-    protected override getSystem(jsonData: Mod): ModificationItemData['system'] {
+    protected override getSystem(jsonData: Mod) {
         const system = this.getBaseSystem();
-        
         system.type = 'vehicle';
-        
-        const categoryName = jsonData.category._TEXT;
-        
+
+        const allowedCategories = ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons', ''];
+        const rawCategory = jsonData.category._TEXT?.toLowerCase() ?? '';
+        const category = rawCategory === 'powertrain' ? 'power_train' : rawCategory;
+
         system.modification_category = (
-            categoryName === undefined      ? "" :
-            categoryName === "Powertrain"   ? "power_train"
-                                            : categoryName.toLowerCase()
-        ) as ModificationCategoryType;
+            allowedCategories.includes(category) ? category : ''
+        ) as SystemType<'modification'>['modification_category'];
 
         const slots = jsonData.slots._TEXT.match(/[0-9]\.?[0-9]*/g);
         if (slots)

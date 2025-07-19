@@ -1,8 +1,9 @@
+import { SR5Item } from "../../SR5Item";
 import { Helpers } from "../../../helpers";
 import { PartsList } from "../../../parts/PartsList";
 import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
 import { ItemCostFlow } from "../../flows/ItemCostFlow";
-import { SR5Item } from "../../SR5Item";
+import { TechnologyType } from "src/module/types/template/Technology";
 
 /**
  * Item data preparation around the 'technology' template.json item template.
@@ -14,14 +15,8 @@ export const TechnologyPrep = {
      * See SR5#228 'Matrix Damage'
      * @param technology The system technology section to be altered
      */
-    prepareConditionMonitor(technology: Shadowrun.TechnologyData) {        
-        // taMiF: This seems to be legacy code to avoid a migration.
-        //        Leave it in, as it doesn't hurt for now.
-        if (technology.condition_monitor === undefined) {
-            technology.condition_monitor = { value: 0, max: 0, label: '' };
-        }
-        
-        const rating = typeof technology.rating === 'string' ? 0 : technology.rating;
+    prepareConditionMonitor(technology: TechnologyType) {        
+        const rating = technology.rating;
         technology.condition_monitor.max = 8 + Math.ceil(rating / 2);
     },
 
@@ -32,16 +27,11 @@ export const TechnologyPrep = {
      * @param technology The system technology section to be altered
      * @param equippedMods Those item mods that are equipped.
      */
-    prepareConceal(technology: Shadowrun.TechnologyData, equippedMods: SR5Item[]) {
-        // Calculate conceal data.
-        if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: []};
-
+    prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[]) {
         const concealParts = new PartsList<number>();
-        equippedMods.forEach((mod) => {
-            if (mod.system.conceal  && mod.system.conceal > 0) {
-                concealParts.addUniquePart(mod.name as string, mod.system.conceal);
-            }
-        });
+        for (const mod of equippedMods)
+            if (mod.system.conceal > 0)
+                concealParts.addUniquePart(mod.name, mod.system.conceal);
 
         technology.conceal.mod = concealParts.list;
         technology.conceal.value = Helpers.calcTotal(technology.conceal);
@@ -53,7 +43,7 @@ export const TechnologyPrep = {
      * @param item The item for additional data
      * @param technology The system technology section to be altered
      */
-    prepareAvailability(item: SR5Item, technology: Shadowrun.TechnologyData) {
+    prepareAvailability(item: SR5Item, technology: TechnologyType) {
         const availability = String(technology.availability ?? 0);
 
         const {adjusted, value} = ItemAvailabilityFlow.prepareAvailabilityValue(availability, technology.calculated.availability.adjusted, item.getRating());
@@ -68,7 +58,7 @@ export const TechnologyPrep = {
      * @param item The item for additional data
      * @param technology The system technology section to be altered
      */
-    prepareCost(item: SR5Item, technology: Shadowrun.TechnologyData) {
+    prepareCost(item: SR5Item, technology: TechnologyType) {
         const baseCost = Number(technology.cost ?? 0);
         const rating = item.getRating();
 

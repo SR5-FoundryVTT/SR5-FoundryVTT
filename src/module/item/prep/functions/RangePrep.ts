@@ -1,3 +1,4 @@
+import { RangeWeaponType } from "src/module/types/item/Weapon";
 import { PartsList } from "../../../parts/PartsList";
 import { SR5Item } from "../../SR5Item";
 import { Helpers } from '../../../helpers';
@@ -5,12 +6,12 @@ import { Helpers } from '../../../helpers';
  * Weapon item data preparation
  */
 export const RangePrep = {
-    prepareData(range: Shadowrun.RangeWeaponData, equippedMods: SR5Item[]) {
+    prepareData(range: RangeWeaponType, equippedMods: SR5Item<'modification'>[]) {
         RangePrep.clearMods(range);
         RangePrep.prepareRecoilCompensation(range, equippedMods);
     },
 
-    clearMods(range: Shadowrun.RangeWeaponData) {
+    clearMods(range: RangeWeaponType) {
         range.rc.mod = [];
     },
     /**
@@ -19,13 +20,14 @@ export const RangePrep = {
      * @param range The system range data for weapons to be altered.
      * @param equippedMods Those item mods that are equipped.
      */
-    prepareRecoilCompensation(range: Shadowrun.RangeWeaponData, equippedMods: SR5Item[]) {
+    prepareRecoilCompensation(range: RangeWeaponType, equippedMods: SR5Item<'modification'>[]) {
         const rangeParts = new PartsList<number>();
-        
+
         // Apply ammo recoil compensation.
-        equippedMods.forEach(mod => {
-            if (mod.system.rc) rangeParts.addPart(mod.name as string, mod.system.rc);            
-        });
+        for (const mod of equippedMods)
+            if (mod.system.rc)
+                rangeParts.addPart(mod.name, mod.system.rc);
+
         range.rc.mod = rangeParts.list;
         range.rc.value = Helpers.calcTotal(range.rc);
     }

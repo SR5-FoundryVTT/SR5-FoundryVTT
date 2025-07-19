@@ -1,9 +1,7 @@
 import { SR5 } from "../../../config";
-import { CompendiumKey, Constants } from './Constants';
 import { ParseData } from "../parser/Parser";
+import { CompendiumKey, Constants } from './Constants';
 import { ImportHelper as IH } from '../helper/ImportHelper';
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 
 const xml2js = require('xml2js');
 
@@ -87,18 +85,18 @@ export abstract class DataImporter {
      * - If parsing fails, an error notification is displayed with the provided or default error prefix.
      * - Optionally, additional actions can be injected into parsed items using `injectActionTests`.
      */
-    protected static async ParseItems<TInput extends ParseData, TOutput extends (ShadowrunActorData | ShadowrunItemData)>(
+    protected static async ParseItems<TInput extends ParseData>(
         inputs: TInput[],
         options: {
             compendiumKey: (data: TInput) => CompendiumKey;
-            parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<TOutput> };
+            parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<Actor.CreateData | Item.CreateData> };
             filter?: (input: TInput) => boolean;
-            injectActionTests?: (item: TOutput) => void;
+            injectActionTests?: (item: Item.CreateData) => void;
             errorPrefix?: string;
         }
     ): Promise<void> {
         const { compendiumKey, parser, filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
-        const itemMap = new Map<CompendiumKey, TOutput[]>();
+        const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
 
         for (const data of inputs) {
             try {
@@ -106,7 +104,7 @@ export abstract class DataImporter {
                 
                 const key = compendiumKey(data);
                 const item = await parser.Parse(data, key);
-                injectActionTests?.(item);
+                injectActionTests?.(item as Item.CreateData);
 
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);

@@ -12,7 +12,7 @@ export class ActiveEffectConfigV1 extends DocumentSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["sheet", "active-effect-sheet"],
-      template: "templates/sheets/active-effect-config.html",
+      template: "templates/sheets/active-effect-config.hbs",
       width: 580,
       height: "auto",
       tabs: [{navSelector: ".tabs", contentSelector: "form", initial: "details"}]

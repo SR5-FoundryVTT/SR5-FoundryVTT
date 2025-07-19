@@ -30,7 +30,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      * Allow users to alter detailed skill values.
      */
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.hbs';
     }
 
     /**
@@ -47,7 +47,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
     override _prepareData(data: any, options: TestOptions) {
         data = super._prepareData(data, options);
 
-        data.action = data.action || DataDefaults.actionRollData();
+        data.action = data.action || DataDefaults.createData('action_roll');
 
         // Preselect based on action.
         data.attribute = data.action.attribute;
@@ -100,7 +100,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
 
         // Remove last used limit and its modifiers and replace with new selection.
         const useSelection = this.data.limitSelection !== this.data.action.limit.attribute;
-        const selectedLimit = useSelection ? this.data.limitSelection : this.data.action.limit.attribute;
+        const selectedLimit = useSelection ? this.data.limitSelection : this.data.action.limit.attribute!;
         const usedLimit = this.actor.getLimit(selectedLimit);
         const lastUsedLimit = this.actor.getLimit(this.lastUsedLimit);
 

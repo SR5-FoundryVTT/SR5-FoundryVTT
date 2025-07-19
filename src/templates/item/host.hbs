@@ -1,0 +1,86 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    {{> "systems/shadowrun5e/dist/templates/item/parts/header.hbs"}}
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
+        <a class="item" data-tab="host">{{localize "SR5.ItemTypes.Host"}}</a>
+        <a class="item" data-tab="marks">{{localize "SR5.Marks"}}</a>
+        <a class="item" data-tab="network">{{localize "SR5.Labels.Sheet.WAN"}}</a>
+        <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
+    </nav>
+    <section class="sheetbody">
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="flexrow align-start nowrap full-height">
+                <div class="flexcol flex0">
+                    <div class="technology">
+                        <div class="flexrow nowrap">
+                            <label>{{localize "SR5.Rating"}}</label>
+                            <input class="display"
+                                    type="text"
+                                    size="2"
+                                    maxlength="2"
+                                    name="system.rating"
+                                    value="{{system.rating}}"
+                                    data-dtype="Number"
+                                    placeholder="2"/>
+                        </div>
+                    </div>
+                </div>
+                {{> "systems/shadowrun5e/dist/templates/item/parts/description.hbs"}}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="host">
+            <div class="tabbody">
+                <div class="inventory">
+                    <div class="scroll-area">
+                        <!-- Input for Host Matrix Attributes -->
+                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                                name=(localize "SR5.Host.Attributes")
+                        }}
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/matrix.hbs"}}
+                        <!-- Selection for Custom Matrix Attributes -->
+                        <div class="item-form">
+                            <div class="form-line">
+                                <div class="label"><label for="custom-host-attributes">{{localize "SR5.Host.CustomAttributes"}}</label></div>
+                                <div class="inputs"><input id="custom-host-attributes" type="checkbox" name="system.customAttributes" {{#if system.customAttributes}}checked{{/if}}/></div>
+                            </div>
+                        </div>
+                        {{#if false}}
+                        <!-- Disabled possible future feature of IC deploy order -->
+                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                                name=(localize "SR5.Host.ICOrder")
+                        }}
+                        <!-- List of IC connected to host -->
+                        {{#each system.ic as | ic |}}
+                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListEntityItem.hbs'
+                                id=ic.id
+                                linkName=ic.name
+                                pack=pack
+                                type="Actor"
+                                list="ic"
+                                position=@index
+                                missingLabel="SR5.Host.MissingIC"
+                        }}
+                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                            name=ic.name
+                            itemId=ic.id
+                            itemType="actor"
+                            hasRoll="true"
+                            itemNameCssClass="skill-roll"
+                        }}
+                        {{else}}
+                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                                    name=(localize "SR5.Host.DropICActor")
+                        }}
+                        {{/each}}
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="marks">
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.hbs' }}
+        </div>
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/NetworkTab.hbs"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs"}}
+    </section>
+</form>

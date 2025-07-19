@@ -1,18 +1,12 @@
-import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5Actor} from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
+import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { NetworkDeviceFlow } from '../../item/flows/NetworkDeviceFlow';
 
 interface VehicleSheetDataFields {
     driver: SR5Actor|undefined
     networkController: SR5Item | undefined
 }
-
-interface VehicleActorSheetData extends SR5ActorSheetData {
-    vehicle: VehicleSheetDataFields
-}
-
 
 export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     /**
@@ -122,8 +116,8 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        // @ts-expect-error
-        device.sheet.render(true);
+        if (device instanceof SR5Item || device instanceof SR5Actor)
+            device?.sheet?.render(true);
     }
 
     async _onControllerRemove(event) {
