@@ -1,6 +1,5 @@
 import { ModifiableField } from "../fields/ModifiableField";
 import { AttributeField } from "./Attributes";
-import { ModifiableValue } from "./Base";
 import { ConditionData } from "./Condition";
 
 const { SchemaField, NumberField, BooleanField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
@@ -29,10 +28,6 @@ export const MatrixAttributeField = () => ({
 });
 
 export const MatrixData = () => ({
-    dice: new ModifiableField(ModifiableValue()),
-    // TODO: taMiF check if it's used
-    base: new ModifiableField(ModifiableValue()),
-
     attack: new ModifiableField(MatrixAttributeField()),
     sleaze: new ModifiableField(MatrixAttributeField()),
     data_processing: new ModifiableField(MatrixAttributeField()),
@@ -41,7 +36,6 @@ export const MatrixData = () => ({
     condition_monitor: new SchemaField(ConditionData()),
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     name: new StringField({ required: true }),
-    // TODO: tamIf check if it's used
     device: new StringField({ required: true }),
     is_cyberdeck: new BooleanField(),
     hot_sim: new BooleanField(),
