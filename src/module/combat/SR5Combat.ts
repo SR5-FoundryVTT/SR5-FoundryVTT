@@ -192,7 +192,8 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
         const turnsSinceLastAttack = Number(turnsSinceLastAttackSetting);
         if (turnsSinceLastAttack > 0)
             await combatant.actor?.clearProgressiveRecoil();
-        else combatant.flags[SYSTEM_NAME]![FLAGS.TurnsSinceLastAttack] = 1;
+        else
+            await combatant.setFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack, 1);
     }
 
     /**
