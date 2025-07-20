@@ -8,7 +8,8 @@
  * without requiring full system-wide context.
  */
 
-export type MigratorDocumentTypes = "Actor" | "Item" | "ActiveEffect";
+export type MigratableDocument = Actor.Implementation | Item.Implementation | ActiveEffect.Implementation;
+export type MigratableDocumentName = MigratableDocument['documentName'];
 
 export abstract class VersionMigration {
     /**
@@ -39,7 +40,7 @@ export abstract class VersionMigration {
      * (`migrateActor`, `migrateItem`, `migrateActiveEffect`), used to determine if
      * the migration applies to a given document type.
      */
-    public readonly implements: Record<MigratorDocumentTypes, boolean>;
+    public readonly implements: Record<MigratableDocumentName, boolean>;
     constructor() {
         const proto = Object.getPrototypeOf(this);
         this.implements = {

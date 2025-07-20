@@ -3,7 +3,7 @@ import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_30_0 } from './versions/Version0_30_0';
-import { VersionMigration, MigratorDocumentTypes } from "./VersionMigration";
+import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
 const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
 /**
@@ -23,7 +23,7 @@ const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
  * 
  * For this, check these methods:
  * - migrate
- * - updateMigratedDocuments
+ * - updateMigratedDocument
  */
 export class Migrator {
     // List of all migrators.
@@ -37,7 +37,7 @@ export class Migrator {
     ] as const;
 
     // Returns an array of migration functions applicable to the given document type and version.
-    private static getMigrators(type: MigratorDocumentTypes, version: string | null): readonly VersionMigration[] {
+    private static getMigrators(type: MigratableDocumentName, version: string | null): readonly VersionMigration[] {
         version ??= '0.0.0'; // Default to '0.0.0' if no version is provided.
         return this.s_Versions.filter(migrator =>
             migrator.implements[type] && this.compareVersion(migrator.TargetVersion, version) > 0
@@ -50,7 +50,7 @@ export class Migrator {
      * This is connected to Migrator.updateMigratedDocument which will persist migrated data during the
      * update process.
      */
-    public static migrate(type: MigratorDocumentTypes, data: any): void {
+    public static migrate(type: MigratableDocumentName, data: any): void {
         // Lack of _stats usually indicates new or updated data, not needing migration.
         if (!data._stats || !('systemVersion' in data._stats)) return;
         if (data._stats.systemVersion === game.system.version) return;
@@ -91,7 +91,7 @@ export class Migrator {
      * 
      * @param doc Updated document.
      */
-    static async updateMigratedDocument(doc: Actor | Item | ActiveEffect) {
+    static async updateMigratedDocument(doc: MigratableDocument) {
         // No need to migrate if the document is already up-to-date.
         if (doc._stats.systemVersion === game.system.version) return;
 
