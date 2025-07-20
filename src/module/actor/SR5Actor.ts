@@ -105,6 +105,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return super.migrateData(source);
     }
 
+    override async update(
+        data: Actor.UpdateData | undefined,
+        operation?: Actor.Database.UpdateOperation,
+    ) {
+        await Migrator.updateMigratedDocuments(this);
+        return super.update(data, operation);
+    }
+
     /**
      * General data preparation order.
      * Check base, embeddedEntities and derived methods (see super.prepareData implementation for order)

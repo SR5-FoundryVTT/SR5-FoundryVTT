@@ -398,6 +398,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         return super.migrateData(data);
     }
 
+    override async update(
+        data: ActiveEffect.UpdateData | undefined,
+        operation?: ActiveEffect.Database.UpdateOperation,
+    ) {
+        await Migrator.updateMigratedDocuments(this);
+        return super.update(data, operation);
+    }
+
     /**
      * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
      * Cast a raw ActiveEffect.ChangeData change string to an Array of an inner type.

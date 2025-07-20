@@ -3,7 +3,7 @@ import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_30_0 } from './versions/Version0_30_0';
-import { MigratorDocumentTypes } from "./VersionMigration";
+import { VersionMigration, MigratorDocumentTypes } from "./VersionMigration";
 const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
 export class Migrator {
@@ -17,21 +17,23 @@ export class Migrator {
         new Version0_30_0(),
     ] as const;
 
+    // Returns an array of migration functions applicable to the given document type and version.
+    private static getMigrators(type: MigratorDocumentTypes, version: string | null): readonly VersionMigration[] {
+        version ??= '0.0.0'; // Default to '0.0.0' if no version is provided.
+        return this.s_Versions.filter(migrator =>
+            migrator.implements[type] && this.compareVersion(migrator.TargetVersion, version) > 0
+        );
+    }
+
     /**
      * Applies migration logic to a provided data object of the specified type.
-     * 
-     * Note: This method is only compatible with documents from Foundry VTT version 10 or later,
-     * as it relies on the `_stats.systemVersion` field introduced in v10.
      */
     public static migrate(type: MigratorDocumentTypes, data: any): void {
         // Lack of _stats usually indicates new or updated data, not needing migration.
         if (!data._stats || !('systemVersion' in data._stats)) return;
         if (data._stats.systemVersion === game.system.version) return;
 
-        const version = data._stats.systemVersion || "0.0.0";
-        const migrators = this.s_Versions.filter(migrator =>
-            migrator.implements[type] && this.compareVersion(migrator.TargetVersion, version) > 0
-        );
+        const migrators = this.getMigrators(type, data._stats.systemVersion);
 
         // If no migrators found, nothing to do.
         if (migrators.length === 0) return;
@@ -53,12 +55,21 @@ export class Migrator {
             );
             console.table(logs);
         }
+    }
 
-        // Set the current system version to indicate that this data has been migrated.
-        // This change only affects the in-memory copy during migration and will not persist
-        // unless the document is explicitly updated. The system will automatically replace
-        // this value on save, so setting it here is safe and non-destructive.
-        data._stats.systemVersion = game.system.version;
+    // Update a migrated document’s systemVersion and persist it to the database.
+    static async updateMigratedDocuments(doc: Actor | Item | ActiveEffect) {
+        // No need to migrate if the document is already up-to-date.
+        if (doc._stats.systemVersion === game.system.version) return;
+
+        // If no migrators found, nothing to do.
+        const migrators = this.getMigrators(doc.documentName, doc._stats.systemVersion);
+        if (migrators.length === 0) return;
+
+        // Mark document as up-to-date
+        doc._stats.systemVersion = game.system.version;
+        // Persist the change without triggering diff logic
+        await doc.update(doc.toObject() as any, { diff: false, recursive: false });
     }
 
     /**
