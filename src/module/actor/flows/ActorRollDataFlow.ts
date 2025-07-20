@@ -37,7 +37,9 @@ export const ActorRollDataFlow = {
             const injectAttributes = ['intuition', 'agility'];
             ActorRollDataFlow._injectAttributes(injectAttributes, driverAttributes, rollData, { bigger: false });  
 
-            const injectSkills = ['perception', 'sneaking', 'gunnery']
+            const injectSkills = ['perception', 'sneaking', 'gunnery', 'pilot_aerospace', 'pilot_aircraft',
+                'pilot_exotic_vehicle', 'pilot_ground_craft', 'pilot_walker', 'pilot_water_craft'
+            ]
             ActorRollDataFlow._injectSkills(injectSkills, driverSkills, rollData, { bigger: false });  
         }
     },
@@ -91,8 +93,6 @@ export const ActorRollDataFlow = {
     _injectSkills(names: string[], skills: Shadowrun.CharacterSkills, rollData: Shadowrun.ShadowrunActorDataData, options: { bigger: boolean }) {
         const targetAttributes = rollData.skills.active as Shadowrun.AttributesData;
         for (const name of names) {
-            console.log(skills)
-            console.log(name)
             const sourceAttribute = foundry.utils.duplicate(skills.active[name]);
             const targetAttribute = targetAttributes[name];
 
