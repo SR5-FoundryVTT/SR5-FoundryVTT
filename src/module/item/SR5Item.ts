@@ -609,7 +609,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (!items) return;
 
         // Reduce items to id:item HashMap style
-        const loaded = this.items.reduce((object, item) => {
+        const loaded = this.items.reduce<Record<string, SR5Item>>((object, item) => {
             object[item.id as string] = item;
             return object;
         }, {});
@@ -617,8 +617,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Merge and overwrite existing owned items with new changes.
         const tempItems = items.map((item) => {
             // Set user permissions to owner, to allow none-GM users to edit their own nested items.
-            const data = game.user ? { ownership: { [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER } } :
-                {};
+            const data = game.user ? { ownership: { [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER } } : {};
             item = foundry.utils.mergeObject(item, data);
 
             // Case: MODIFY => Update existing item.
@@ -1063,7 +1062,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     override async update(data: Item.UpdateData | undefined, options?: Item.Database.UpdateOperation) {
-        await Migrator.updateMigratedDocuments(this);
+        await Migrator.updateMigratedDocument(this);
 
         // Item.item => Embedded item into another item!
         if (this._isNestedItem)

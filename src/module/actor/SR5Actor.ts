@@ -109,7 +109,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         data: Actor.UpdateData | undefined,
         operation?: Actor.Database.UpdateOperation,
     ) {
-        await Migrator.updateMigratedDocuments(this);
+        await Migrator.updateMigratedDocument(this);
         return super.update(data, operation);
     }
 

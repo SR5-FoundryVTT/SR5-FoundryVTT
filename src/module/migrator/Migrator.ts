@@ -47,7 +47,7 @@ export class Migrator {
     /**
      * Applies migration logic to a provided data object of the specified type during world load
      * 
-     * This is connected to Migrator.updateMigratedDocuments which will persist migrated data during the
+     * This is connected to Migrator.updateMigratedDocument which will persist migrated data during the
      * update process.
      */
     public static migrate(type: MigratorDocumentTypes, data: any): void {
@@ -83,7 +83,7 @@ export class Migrator {
      * Apply migrated data to the document to persist and mark it as up-to-date.
      * 
      * This is connected to Migrator.migrate which will migrate document data on the fly
-     * during a documents migrateData call before data preparation.
+     * during a document migrateData call before data preparation.
      * 
      * To avoid endless migrations during world load, we assume the document is migrated and will
      * persist that migration based on an out of date document system version, whenever it's
@@ -91,7 +91,7 @@ export class Migrator {
      * 
      * @param doc Updated document.
      */
-    static async updateMigratedDocuments(doc: Actor | Item | ActiveEffect) {
+    static async updateMigratedDocument(doc: Actor | Item | ActiveEffect) {
         // No need to migrate if the document is already up-to-date.
         if (doc._stats.systemVersion === game.system.version) return;
 

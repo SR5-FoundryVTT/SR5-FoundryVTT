@@ -402,7 +402,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         data: ActiveEffect.UpdateData | undefined,
         operation?: ActiveEffect.Database.UpdateOperation,
     ) {
-        await Migrator.updateMigratedDocuments(this);
+        await Migrator.updateMigratedDocument(this);
         return super.update(data, operation);
     }
 
