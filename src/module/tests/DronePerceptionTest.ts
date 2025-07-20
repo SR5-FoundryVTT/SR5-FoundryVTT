@@ -19,6 +19,13 @@ export class DronePerceptionTest extends SuccessTest {
 
                 return {attribute, skill, limit};
             }
+            case "rigger": {
+                const attribute = 'intuition';
+                const skill = 'perception';
+                const limit = {attribute: 'sensor'};
+
+                return {attribute, skill, limit};
+            }
 
             default:
                 return actor.skillActionData('perception');
