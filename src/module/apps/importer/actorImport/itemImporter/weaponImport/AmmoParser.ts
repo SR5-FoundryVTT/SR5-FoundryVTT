@@ -1,14 +1,16 @@
-import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions.js"
+import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions";
+import { BaseGearParser } from "../importHelper/BaseGearParser";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 /**
  * Parses ammunition
  */
 export class AmmoParser extends BaseGearParser {
 
-    override parse(chummerGear : any) : any {
+    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>) : any {
         const parserType = 'ammo';
-        const parsedGear =  super.parse(chummerGear);
+        const parsedGear = super.parse(chummerGear) as unknown as Shadowrun.AmmoItemData;
         parsedGear.type = parserType;
 
         if (chummerGear.weaponbonusap) {
@@ -16,7 +18,7 @@ export class AmmoParser extends BaseGearParser {
         }
 
         if (chummerGear.weaponbonusdamage) {
-            parsedGear.system.damage = parseInt(chummerGear.weaponbonusdamage_english);
+            parsedGear.system.damage = Number(chummerGear.weaponbonusdamage_english) || 0;
 
            if (chummerGear.weaponbonusdamage.includes('S')) {
                 parsedGear.system.damageType = 'stun';
@@ -27,16 +29,12 @@ export class AmmoParser extends BaseGearParser {
                 parsedGear.system.damageType = 'physical';
             }
 
-            parsedGear.system.element = chummerGear.weaponbonusdamage_english.match(/\(e\)/)?.pop() == '(e)' ? 'electricity' : '';
+            parsedGear.system.element = (chummerGear.weaponbonusdamage_english ||'').match(/\(e\)/)?.pop() == '(e)' ? 'electricity' : '';
         }
 
-        parsedGear.system.accuracy = parseInt(chummerGear.weaponbonusacc);
-        parsedGear.system.blast = {
-                        radius: 0,
-                        dropoff: 0
-                    };
+        parsedGear.system.accuracy = Number(chummerGear.weaponbonusacc) || 0;
+        parsedGear.system.blast = { radius: 0, dropoff: 0 };
         parsedGear.system.replaceDamage = false;
-
 
         // Assign import flags
         parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
