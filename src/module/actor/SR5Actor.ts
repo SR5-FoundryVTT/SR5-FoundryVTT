@@ -187,14 +187,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Get all ActiveEffects applicable to this actor.
-     * 
-     * The system uses a custom method of determining what ActiveEffect is applicable that doesn't 
+     *
+     * The system uses a custom method of determining what ActiveEffect is applicable that doesn't
      * use default FoundryVTT allApplicableEffect.
-     * 
+     *
      * The system has additional support for:
      * - taking actor effects from items (apply-To actor)
      * - having effects apply that are part of a targeted action against this actor (apply-To targeted_actor)
-     * 
+     *
      * NOTE: FoundryVTT applyActiveEffects will check for disabled effects.
      */
     override *allApplicableEffects() {
@@ -209,13 +209,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * All temporary ActiveEffects that should display on the Token
-     * 
+     *
      * The shadowrun5e system uses a custom application method with different effect application targets. Some of
      * these effects exist on the actor or one of it's items, however still shouldn't show in their token.
-     * 
-     * While default Foundry relies on allApplicableEffects, as it only knows apply-to actor effects, we have to 
+     *
+     * While default Foundry relies on allApplicableEffects, as it only knows apply-to actor effects, we have to
      * return all effects that are temporary instead, to include none-actor apply-to effects.
-     * 
+     *
      * NOTE: Foundry also shows disabled effects by default. We behave the same.
      */
     override get temporaryEffects(): SR5ActiveEffect[] {
@@ -433,13 +433,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Return armor worn by this actor.
-     * 
+     *
      * @param damage If given will be applied to the armor to get modified armor.
      * @returns Armor or modified armor.
      */
     getArmor(damage?: DamageType): ActorArmorType {
         // Prepare base armor data.
-        const armor = !("armor" in this.system) ? 
+        const armor = !("armor" in this.system) ?
             DataDefaults.createData('armor') :
             (foundry.utils.duplicate(this.system.armor) as ActorArmorType);
         // Prepare damage to apply to armor.
@@ -458,7 +458,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             if (armorForDamageElement > 0)
                 PartsList.AddUniquePart(armor.mod, 'SR5.Element', armorForDamageElement);
         }
-        
+
         Helpers.calcTotal(armor, {min: 0});
 
         return armor;
@@ -548,13 +548,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Current recoil compensation with current recoil included.
-     * 
+     *
      * @returns A positive number or zero.
     */
     get currentRecoilCompensation(): number {
         return Math.max(this.recoilCompensation() - this.recoil(), 0);
     }
-    
+
     /**
      * Amount of progressive recoil this actor has accrued.
      */
@@ -575,13 +575,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param name An attribute or other stats name.
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
-    getAttribute(this:SR5Actor, name: string): AttributeFieldType {
+    getAttribute(this:SR5Actor, name: string, options: {rollData?: Shadowrun.ShadowrunActorDataData} = {}): AttributeFieldType {
         // First check vehicle stats, as they don't always exist.
+        const rollData = options.rollData || this.getRollData() as Shadowrun.ShadowrunActorDataData;
+
+        // TODO: does this need to change w.r.t. rollData?
         const stats = this.getVehicleStats();
         if (stats?.[name]) return stats[name];
 
         // Second check general attributes.
-        const attributes = this.getAttributes();
+        const attributes = rollData.attributes;
         return attributes[name];
     }
 
@@ -814,11 +817,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param id Either the searched id, name or translated label of a skill
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
-    getSkill(this: SR5Actor, id: string, options = { byLabel: false }): SkillFieldType | undefined {
-        if (options.byLabel)
+    getSkill(this: SR5Actor, id: string, options: { byLabel?: boolean, rollData? : Shadowrun.ShadowrunActorDataData } = {byLabel: false}): SkillFieldType | undefined {
+        if (options?.byLabel)
             return this.getSkillByLabel(id);
 
-        const { skills } = this.system;
+        const skills = options.rollData?.skills ?? this.system.skills;
 
         // Find skill by direct id to key matching.
         if (skills.active.hasOwnProperty(id)) {
@@ -880,7 +883,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * For the given skillId as it be would in the skill data structure for either
      * active, knowledge or language skill.
-     * 
+     *
      * @param skillId Legacy / default skills have human-readable ids, while custom one have machine-readable.
      * @returns The label (not yet translated) OR set custom name.
      */
@@ -895,10 +898,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Add a new knowledge skill for a specific category.
-     * 
+     *
      * Knowledge skills are stored separately from active and language skills and have
      * some values pre-defined by their category (street, professional, ...)
-     * 
+     *
      * @param category Define the knowledge skill category
      * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The id of the created knowledge skill.
@@ -924,7 +927,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Add a new active skill.
-     * 
+     *
      * @param skillData Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The new active skill id.
      */
@@ -954,7 +957,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Add a language skill.
-     * 
+     *
      * @param skill Partially define the SkillField properties needed. Omitted properties will be default.
      * @returns The new language skill id.
      */
@@ -994,7 +997,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         await this.update(updateData);
     }
 
-    /** 
+    /**
      * Delete the given active skill by it's id. It doesn't
      *
      * @param skillId Either a random id for custom skills or the skills name used as an id.
@@ -1054,7 +1057,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Show all hidden skills.
-     * 
+     *
      * For hiding/showing skill see SR5Actor#showSkill and SR5Actor#hideSkill.
      */
     async showHiddenSkills() {
@@ -1077,7 +1080,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
-     * Prompt the current user for a generic roll. 
+     * Prompt the current user for a generic roll.
      */
     async promptRoll() {
         await this.tests.promptSuccessTest();
@@ -1111,7 +1114,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Get an action from any pack with the given name, configured for this actor and let the caller handle it..
-     * 
+     *
      * @param packName The name of the item pack to search.
      * @param actionName The name within that pack.
      * @param options Success Test options
@@ -1140,9 +1143,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Get an action as defined within the systems general action pack.
-     * 
+     *
      * @param actionName The action with in the general pack.
-     * @param options Success Test options 
+     * @param options Success Test options
      */
     async generalActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         return this.packActionTest(SR5.packNames.GeneralActionsPack as Shadowrun.PackName, actionName, options);
@@ -1326,9 +1329,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
-     * Add matrix modifier values to the given modifier parts from whatever Value as part of 
+     * Add matrix modifier values to the given modifier parts from whatever Value as part of
      * matrix success test.
-     * 
+     *
      * @param parts The Value.mod field as a PartsList
      * @param atts The attributes used for the success test.
      */
@@ -1345,7 +1348,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Remove matrix modifier values to the given modifier part
-     * 
+     *
      * @param parts A Value.mod field as a PartsList
      */
     _removeMatrixParts(parts: PartsList<number>) {
@@ -1471,13 +1474,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Apply damage to an actors main damage monitor / track.
-     * 
+     *
      * This includes physical and stun for meaty actors and matrix for matrix actors.
-     * 
+     *
      * Applying damage will also reduce the initiative score of an active combatant.
-     * 
+     *
      * Handles rule 'Changing Initiative' on SR5#160.
-     * 
+     *
      * @param damage The damage to be taken.
      * @param track The track to apply that damage to.
      */
@@ -1502,10 +1505,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Apply damage to an actors physical overflow damage monitor / track.
-     * 
+     *
      * @param damage The damage to overflow.
      * @param track The track to overflow the damage into.
-     * @returns 
+     * @returns
      */
     async _addDamageToOverflow(damage: DamageType, track: OverflowTrackType) {
         if (damage.value === 0) return;
@@ -1553,7 +1556,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Apply damage of any type to this actor. This should be the main entry method to applying damage.
-     * 
+     *
      * @param damage Damage to be applied
      */
     async addDamage(damage: DamageType) {
@@ -1605,9 +1608,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Depending on this actors defeated status, apply the correct effect and status.
-     * 
+     *
      * This will only work when the actor is connected to a token.
-     * 
+     *
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async applyDefeatedStatus(defeated?: DefeatedStatus) {
@@ -1642,7 +1645,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Remove defeated status effects from this actor, depending on current status.
-     * 
+     *
      * @param defeated Optional defeated status to be used. Will be determined if not given.
      */
     async removeDefeatedStatus(defeated?: DefeatedStatus) {
@@ -1651,12 +1654,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const removeStatus: string[] = [];
         if ((!defeated.unconscious && !defeated.dying) || defeated.dead) removeStatus.push('unconscious');
         if (!defeated.dead) removeStatus.push('dead');
-        
+
         // Remove out old defeated effects.
         if (removeStatus.length) {
             const existing = this.effects.reduce<string[]>((arr, e) => {
                 if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status)) ) arr.push(e.id as string);
-                    return arr; 
+                    return arr;
             }, []);
 
             if (existing.length) await this.deleteEmbeddedDocuments('ActiveEffect', existing);
@@ -1705,7 +1708,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Determine if this actor is an active combatant in the current combat.
-     * 
+     *
      * @returns true if the actor is a combatant with an initiative score, false otherwise.
      */
     get combatActive(): boolean {
@@ -1721,7 +1724,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Return the initiative score for a currently active combat
-     * 
+     *
      * @returns The score or zero.
      */
     get combatInitiativeScore(): number {
@@ -1842,7 +1845,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             await this.update({ system: { technomancerUuid: '' } });
     }
 
-    /** 
+    /**
      * Get all situational modifiers from this actor.
      * NOTE: These will return selections only without higher level selections applied.
      *       You'll have to manually trigger .applyAll or apply what's needed.
@@ -1853,7 +1856,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Set all situational modifiers for this actor
-     * 
+     *
      * @param modifiers The DocumentSituationModifiers instance to save source modifiers from.
      *                  The actor will not be checked, so be careful.
      */
@@ -2036,7 +2039,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * How many previous attacks has this actor been subjected to?
-     * 
+     *
      * @returns A positive number or zero.
      */
     previousAttacks(this: SR5Actor): number {
@@ -2045,7 +2048,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Apply a new consecutive defense multiplier based on the amount of attacks given
-     * 
+     *
      * @param previousAttacks Attacks within a combat turn. If left out, will guess based on current modifier.
      */
     async calculateNextDefenseMultiModifier(previousAttacks: number = this.previousAttacks()) {
@@ -2073,7 +2076,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Add a firemode recoil to the progressive recoil.
-     * 
+     *
      * @param fireMode Ranged Weapon firemode used to attack with.
      */
     async addProgressiveRecoil(fireMode: FireModeType) {
@@ -2082,7 +2085,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         if (!this.hasPhysicalBody) return;
         if (!fireMode.recoil) return;
-        
+
         await this.addRecoil(fireMode.value);
     }
 
@@ -2106,7 +2109,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Determine if the actor has a physical body
-     * 
+     *
      * @returns true, if the actor can interact with the physical plane
      */
     get hasPhysicalBody(): boolean {
@@ -2118,7 +2121,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async resetRunData() {
         console.log(`Shadowrun 5e | Resetting actor ${this.name} (${this.id}) for a new run`);
-        
+
         const updateData: Record<string, any> = {};
 
         if (this.isType('character', 'critter', 'spirit', 'vehicle')) {
@@ -2142,9 +2145,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Will unequip all other items of the same type as the given item.
-     * 
+     *
      * It's not necessary for the given item to be equipped.
-     * 
+     *
      * @param unequipItem Input item that will be equipped while unequipping all others of the same type.
      */
     async equipOnlyOneItemOfType(unequipItem: SR5Item) {
@@ -2155,7 +2158,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             await unequipItem.update({ system: { technology: { equipped: !unequipItem.isEquipped() } } });
             return
         }
-        
+
         // For a set of items, assure only the selected is equipped.
         await this.updateEmbeddedDocuments('Item', sameTypeItems.map(item => ({
             _id: item.id,
