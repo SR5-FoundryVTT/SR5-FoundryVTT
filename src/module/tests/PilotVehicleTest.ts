@@ -24,6 +24,13 @@ export class PilotVehicleTest extends SuccessTest {
 
                 return {attribute, skill, limit};
             }
+            case "rigger": {
+                const attribute = 'reaction';
+                const skill = actor.getVehicleTypeSkillName();
+                const limit = {attribute: vehicleData.system.environment};
+
+                return {attribute, skill, limit};
+            }
 
             default:
                 const skillId = actor.getVehicleTypeSkillName();
