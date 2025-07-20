@@ -70,7 +70,7 @@ export class Migrator {
 
         if (correctionLogs) {
             console.warn(
-                `Document Sanitized on Migration (${Object.keys(correctionLogs).length} fields):\n` +
+                `Document Sanitized on Migration:\n` +
                 `ID: ${data._id}; Name: ${data.name};\n` +
                 `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n`
             );
