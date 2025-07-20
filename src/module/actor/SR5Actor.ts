@@ -100,9 +100,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return;
     }
 
-    static override migrateData(source: any) {
-        Migrator.migrate("Actor", source);
-        return super.migrateData(source);
+    override _initializeSource(
+        data: this | Actor.CreateData,
+        options?: foundry.abstract.Document.InitializeSourceOptions
+    ) {
+        Migrator.migrate("Actor", data);
+        return super._initializeSource(data, options);
     }
 
     override async update(

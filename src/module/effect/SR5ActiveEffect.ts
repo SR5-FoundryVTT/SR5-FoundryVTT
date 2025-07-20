@@ -392,10 +392,12 @@ export class SR5ActiveEffect extends ActiveEffect {
         return changes;
     }
 
-    static override migrateData(data: any) {
+    override _initializeSource(
+        data: this | ActiveEffect.CreateData,
+        options?: foundry.abstract.Document.InitializeSourceOptions
+    ) {
         Migrator.migrate("ActiveEffect", data);
-
-        return super.migrateData(data);
+        return super._initializeSource(data, options);
     }
 
     override async update(
