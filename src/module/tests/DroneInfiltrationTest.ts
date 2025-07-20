@@ -23,7 +23,7 @@ export class DroneInfiltrationTest extends SuccessTest {
             case "rigger": {
                 const attribute = 'intuition';
                 const skill = 'sneaking';
-                const limit = 'handling';
+                const limit = {attribute: 'handling'};
 
                 return {attribute, skill, limit};
             }
