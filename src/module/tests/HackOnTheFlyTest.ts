@@ -55,6 +55,7 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
     }
 
     override prepareBaseValues() {
+        super.prepareBaseValues();
         MarkPlacementFlow.prepareBaseValues(this);
     }
 
