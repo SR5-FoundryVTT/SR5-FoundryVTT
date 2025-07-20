@@ -47,6 +47,7 @@ export class MatrixPrep {
             matrix.is_cyberdeck = device.isCyberdeck();
             matrix.name = device.getName();
             matrix.item = device.getData();
+            matrix.running_silent = device.isRunningSilent();
             const deviceAtts = device.getASDF();
             if (deviceAtts) {
                 // setup the actual matrix attributes for the actor

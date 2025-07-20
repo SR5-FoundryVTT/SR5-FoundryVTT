@@ -967,6 +967,7 @@
     "SR5.RtgAboveZero": "Rtg > 0",
     "SR5.Run": "Run",
     "SR5.RunningSilent": "Running Silent",
+    "SR5.RunningSilentControlledByDevice": "Running Silent is controlled by your active Matrix Device:",
     "SR5.RunningSpeed": "Running",
     "SR5.SIN": "SIN",
     "SR5.SameGrid": "Same Grid",

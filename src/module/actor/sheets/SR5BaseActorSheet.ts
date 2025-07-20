@@ -1658,6 +1658,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         this.actor.render(false);
     }
 
+    /**
+     * Toggle the Wireless state of an item, iterating through the different states
+     * @param event
+     */
     async _onListItemToggleWireless(event: MouseEvent) {
         event.preventDefault();
         event.stopPropagation();
