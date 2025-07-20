@@ -2,7 +2,7 @@ import { Version0_8_0 } from "./versions/Version0_8_0";
 import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
-import { Version0_29_0 } from './versions/Version0_29_0';
+import { Version0_30_0 } from './versions/Version0_30_0';
 import { MigratorDocumentTypes } from "./VersionMigration";
 const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
@@ -14,7 +14,7 @@ export class Migrator {
         new Version0_18_0(),
         new Version0_16_0(),
         new Version0_27_0(),
-        new Version0_29_0(),
+        new Version0_30_0(),
     ] as const;
 
     /**

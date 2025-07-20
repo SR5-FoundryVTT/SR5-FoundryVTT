@@ -6,8 +6,8 @@ import { VersionMigration } from "../VersionMigration";
  * Migrate Active Model to Data Model.
  */
 
-export class Version0_29_0 extends VersionMigration {
-    readonly TargetVersion = "0.29.0";
+export class Version0_30_0 extends VersionMigration {
+    readonly TargetVersion = "0.30.0";
 
     // Considering this a migration so Actor documents can be sanitized.
     override migrateActor(actor: any) { }
