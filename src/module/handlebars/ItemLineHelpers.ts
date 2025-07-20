@@ -1,5 +1,5 @@
-import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
-import {SR5} from "../config";
+import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
+import { SR5 } from '../config';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
 import { SR5Item } from '../item/SR5Item';
@@ -495,7 +495,7 @@ export const registerItemLineHelpers = () => {
                         },
                         qtyInput,
                     ];
-                };
+                }
 
                 if (wrapper.isDroneModification()) {
                     return [
@@ -808,6 +808,19 @@ export const registerItemLineHelpers = () => {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
         };
+        const wirelessIcon = {
+            icon: `${wrapper.isWireless() ?
+                        wrapper.isRunningSilent() 
+                                ? 'fa-duotone fa-wifi-fair' 
+                                : 'fas fa-wifi' 
+                        : 'fa-duotone fa-wifi-slash'
+                    } item-wireless-toggle`,
+            title: game.i18n.localize(wrapper.isWireless()
+                                        ? wrapper.isRunningSilent()
+                                            ? 'SR5.RunningSilent'
+                                            : 'SR5.WirelessOnline'
+                                        : 'SR5.WirelessOffline')
+        }
         const removeIcon = {
             icon: 'fas fa-trash item-delete',
             title: game.i18n.localize('SR5.DeleteItem'),
@@ -831,6 +844,9 @@ export const registerItemLineHelpers = () => {
             case 'cyberware':
             case 'bioware':
             case 'weapon':
+                if (wrapper.canBeWireless()) {
+                    icons.unshift(wirelessIcon)
+                }
                 icons.unshift(equipIcon);
         }
 

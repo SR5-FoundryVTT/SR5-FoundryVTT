@@ -761,7 +761,7 @@ export class SR5Item extends Item {
      * Determine if this items matrix icon is running silent.
      */
     get isRunningSilent(): boolean {
-        return false;
+        return this.wrapper.isRunningSilent();
     }
 
     /**

@@ -174,13 +174,11 @@
         </div>
         <div class="flexrow nowrap">
             <label>{{localize "SR5.Wireless"}}</label>
-            <input
-                class="checkbox"
-                type="checkbox"
-                name="system.technology.wireless"
-                {{checked
-                system.technology.wireless}}
-            />
+            {{> "systems/shadowrun5e/dist/templates/common/Select.html"
+                        options=config.wirelessModes
+                        value=system.technology.wireless
+                        path="system.technology.wireless"
+            }}
         </div>
         <div class="flexrow nowrap">
             <label>{{localize "SR5.Labels.Sheet.PAN"}}</label>

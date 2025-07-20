@@ -1153,6 +1153,13 @@ export const SR5 = {
         'full_auto': 'SR5.Weapon.Mode.FullAuto'
     },
 
+    wirelessModes: {
+        'online': 'SR5.WirelessOnline',
+        'silent': 'SR5.RunningSilent',
+        'offline': 'SR5.WirelessOffline',
+        'none': 'SR5.WirelessUnavailable'
+    },
+
     /**
      * The preconfigured default Shadowrun firemodes according to SR5#180
      *

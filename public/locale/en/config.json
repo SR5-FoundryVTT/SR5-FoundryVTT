@@ -1332,6 +1332,7 @@
     "SR5.Threshold": "Threshold",
     "SR5.ToggleActive": "Toggle Active",
     "SR5.ToggleEquip": "Toggle Equipped",
+    "SR5.ToggleWireless": "Toggle Wireless",
     "SR5.Tooltips": {
         "Actor": {
             "ConnectNetwork": "Enter this host/grid",
@@ -1643,6 +1644,9 @@
         "Weapon": "Weapon"
     },
     "SR5.Wireless": "Wireless",
+    "SR5.WirelessOnline": "Online",
+    "SR5.WirelessOffline": "Offline",
+    "SR5.WirelessUnavailable": "Unavailable",
     "TYPES.Actor.character": "Character",
     "TYPES.Actor.critter": "Critter (deprecated)",
     "TYPES.Actor.ic": "IC",

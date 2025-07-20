@@ -4,6 +4,7 @@ declare namespace Shadowrun {
         technology: TechnologyData
         matrix: MatrixTechnologyData
     };
+    export type WirelessType = 'online' | 'silent' | 'offline' | 'none';
     export type TechnologyData = {
         rating: NumberOrEmpty
         availability: string
@@ -12,7 +13,7 @@ declare namespace Shadowrun {
         equipped: boolean
         conceal: ModifiableValue
         condition_monitor: ConditionData
-        wireless: boolean
+        wireless: WirelessType
 
         // Network PAN/WAN master device uuid
         master: string

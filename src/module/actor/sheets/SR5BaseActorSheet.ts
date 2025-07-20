@@ -290,6 +290,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
         html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
         html.find('.item-enable-toggle').on('click', this._onListItemToggleEnabled.bind(this));
+        html.find('.item-wireless-toggle').on('click', this._onListItemToggleWireless.bind(this));
 
         // Item list description display handling...
         html.find('.hidden').hide();
@@ -1655,6 +1656,29 @@ export class SR5BaseActorSheet extends ActorSheet {
         }
 
         this.actor.render(false);
+    }
+
+    async _onListItemToggleWireless(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        if (!item) return;
+
+        // iterate through the states of online -> silent -> offline
+        const newState = event.shiftKey ? 'none'
+                                                    : item.isWireless()
+                                                        ? item.isRunningSilent
+                                                            ? 'offline'
+                                                            : 'silent'
+                                                        : 'online';
+
+        // update the embedded item with the new wireless state
+        await this.actor.updateEmbeddedDocuments('Item', [{
+            '_id': iid,
+            'system.technology.wireless': newState,
+        }]);
     }
 
     /**
