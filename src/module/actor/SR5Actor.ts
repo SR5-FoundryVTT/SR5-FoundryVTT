@@ -593,13 +593,16 @@ export class SR5Actor extends Actor {
      * @param name An attribute or other stats name.
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
-    getAttribute(name: string): Shadowrun.AttributeField {
+    getAttribute(name: string, options: {rollData?: Shadowrun.ShadowrunActorDataData} = {}): Shadowrun.AttributeField {
         // First check vehicle stats, as they don't always exist.
+        const rollData = options.rollData || this.getRollData() as Shadowrun.ShadowrunActorDataData;
+
+        // TODO: does this need to change w.r.t. rollData?
         const stats = this.getVehicleStats();
         if (stats?.[name]) return stats[name];
 
         // Second check general attributes.
-        const attributes = this.getAttributes();
+        const attributes = rollData.attributes;
         return attributes[name];
     }
 
@@ -861,11 +864,11 @@ export class SR5Actor extends Actor {
      * @param id Either the searched id, name or translated label of a skill
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
-    getSkill(id: string, options = { byLabel: false }): Shadowrun.SkillField | undefined {
-        if (options.byLabel)
+    getSkill(id: string, options: { byLabel?: boolean, rollData? : Shadowrun.ShadowrunActorDataData } = {byLabel: false}): Shadowrun.SkillField | undefined {
+        if (options?.byLabel)
             return this.getSkillByLabel(id);
 
-        const { skills } = this.system;
+        const skills = options.rollData?.skills ?? this.system.skills;
 
         // Find skill by direct id to key matching.
         if (skills.active.hasOwnProperty(id)) {
