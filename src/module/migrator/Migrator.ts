@@ -6,6 +6,25 @@ import { Version0_30_0 } from './versions/Version0_30_0';
 import { VersionMigration, MigratorDocumentTypes } from "./VersionMigration";
 const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
 
+/**
+ * Seamless data migrator for the SR5 system.
+ * 
+ * This will automatically migrate data during world load and persist the changes on a otherwise
+ * unconnected document update.
+ * 
+ * Using this approach allows the system to both load collection, compendium and imported document data,
+ * apply migrations for missing migration steps, based on the documents last system schema version.
+ *
+ * The migration is done during world load, to avoid documents entering the "invalid document" state
+ * and allow users a seamless experience when opening an out-of-date world / document.
+ * 
+ * Documents will get remigrated so long until the migrated data can be applied on the next update made to
+ * it. If a document is not updated, it will remain out-of-date and be remigrated on every world load.
+ * 
+ * For this, check these methods:
+ * - migrate
+ * - updateMigratedDocuments
+ */
 export class Migrator {
     // List of all migrators.
     // ⚠️ Keep this list sorted in ascending order by version number (oldest → newest).
@@ -26,7 +45,10 @@ export class Migrator {
     }
 
     /**
-     * Applies migration logic to a provided data object of the specified type.
+     * Applies migration logic to a provided data object of the specified type during world load
+     * 
+     * This is connected to Migrator.updateMigratedDocuments which will persist migrated data during the
+     * update process.
      */
     public static migrate(type: MigratorDocumentTypes, data: any): void {
         // Lack of _stats usually indicates new or updated data, not needing migration.
@@ -57,7 +79,18 @@ export class Migrator {
         }
     }
 
-    // Update a migrated document’s systemVersion and persist it to the database.
+    /**
+     * Apply migrated data to the document to persist and mark it as up-to-date.
+     * 
+     * This is connected to Migrator.migrate which will migrate document data on the fly
+     * during a documents migrateData call before data preparation.
+     * 
+     * To avoid endless migrations during world load, we assume the document is migrated and will
+     * persist that migration based on an out of date document system version, whenever it's
+     * updated next by the user.
+     * 
+     * @param doc Updated document.
+     */
     static async updateMigratedDocuments(doc: Actor | Item | ActiveEffect) {
         // No need to migrate if the document is already up-to-date.
         if (doc._stats.systemVersion === game.system.version) return;
