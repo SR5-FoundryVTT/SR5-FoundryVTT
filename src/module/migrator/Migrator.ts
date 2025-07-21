@@ -39,7 +39,6 @@ export class Migrator {
 
     // Returns an array of migration functions applicable to the given document type and version.
     private static getMigrators(type: MigratableDocumentName | null, version: string | null): readonly VersionMigration[] {
-        version ??= '0.0.0'; // Default to '0.0.0' if no version is provided.
         return this.s_Versions.filter(migrator =>
             (!type || migrator.implements[type]) && this.compareVersion(migrator.TargetVersion, version) > 0
         );
@@ -54,12 +53,15 @@ export class Migrator {
     public static migrate(type: MigratableDocumentName, data: any): void {
         // Lack of _stats usually indicates new or updated data, not needing migration.
         if (!data._stats || !('systemVersion' in data._stats)) return;
-        if (data._stats.systemVersion === game.system.version) return;
+        if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return;
 
         const migrators = this.getMigrators(type, data._stats.systemVersion);
 
         // If no migrators found, nothing to do.
-        if (migrators.length === 0) return;
+        if (migrators.length === 0) {
+            data._stats.systemVersion = game.system.version;
+            return;
+        }
 
         for (const migrator of migrators)
             migrator[`migrate${type}`](data);
@@ -77,6 +79,8 @@ export class Migrator {
             );
             console.table(correctionLogs);
         }
+        // Mark as migrated to the current system version.
+        data._stats.systemVersion = game.system.version + ".0";
     }
 
     /**
@@ -95,12 +99,17 @@ export class Migrator {
         // No need to migrate if the document is already up-to-date.
         if (doc._stats.systemVersion === game.system.version) return;
 
-        // If no migrators found, nothing to do.
-        const migrators = this.getMigrators(doc.documentName, doc._stats.systemVersion);
-        if (migrators.length === 0) return;
-
         // Mark document as up-to-date
         doc._stats.systemVersion = game.system.version;
+        doc._source._stats.systemVersion = game.system.version;
+
+        if (doc.parent) {
+            if (doc.parent instanceof Actor)
+                await this.updateMigratedDocument(doc.parent);
+            else if (doc.parent instanceof TokenDocument && doc.parent.actor)
+                await this.updateMigratedDocument(doc.parent.actor);
+        }
+
         // Persist the change without triggering diff logic
         return doc.update(doc.toObject(false) as any, { diff: false, recursive: false });
     }
@@ -145,17 +154,44 @@ export class Migrator {
     private static async migrateAll() {
         const start = performance.now();
 
-        await Promise.all(
-            game.items.map(async item =>
-                this._migrateAll(item as Item.Implementation)
-            )
-        );
+        for (const item of game.items) {
+            await this.updateMigratedDocument(item as Item.Implementation);
 
-        await Promise.all(
-            game.actors.map(async actor =>
-                this._migrateAll(actor as Actor.Implementation)
-            )
-        );
+            for (const effect of item.effects)
+                await this.updateMigratedDocument(effect);
+        }
+
+        for (const actor of game.actors) {
+            await this.updateMigratedDocument(actor as Actor.Implementation);
+
+            for (const effect of actor.effects)
+                await this.updateMigratedDocument(effect);
+
+            for (const item of actor.items) {
+                await this.updateMigratedDocument(item);
+
+                for (const effect of item.effects)
+                    await this.updateMigratedDocument(effect);
+            }
+        }
+
+        for (const scene of game.scenes) {
+            for (const token of scene.tokens) {
+                if (token.actor) {
+                    await this.updateMigratedDocument(token.actor);
+
+                    for (const effect of token.actor.effects)
+                        await this.updateMigratedDocument(effect);
+
+                    for (const item of token.actor.items) {
+                        await this.updateMigratedDocument(item);
+
+                        for (const effect of item.effects)
+                            await this.updateMigratedDocument(effect);
+                    }
+                }
+            }
+        }
 
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
 
@@ -174,22 +210,14 @@ export class Migrator {
         d.render(true);
     }
 
-    private static async _migrateAll(doc: Actor.Implementation | Item.Implementation) {
-        const itemMigrations = doc.items.map(async item => this._migrateAll(item));
-        const effectMigrations = doc.effects.map(async effect => this.updateMigratedDocument(effect));
-
-        await Promise.all([ ...itemMigrations, ...effectMigrations ]);
-
-        return this.updateMigratedDocument(doc);
-    }
-
     /**
      * compare two version numbers
      * @param v1
      * @param v2
      * @return 1 if v1 > v2, -1 if v1 < v2, 0 if equal
      */
-    public static compareVersion(v1: string, v2: string): number {
+    public static compareVersion(v1: string | null, v2: string | null): number {
+        v1 ??= '0.0.0'; v2 ??= '0.0.0';
         const s1 = v1.split('.').map(Number);
         const s2 = v2.split('.').map(Number);
         const length = Math.max(s1.length, s2.length);
