@@ -1082,12 +1082,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     override async update(data: Item.UpdateData | undefined, options?: Item.Database.UpdateOperation) {
-        await Migrator.updateMigratedDocument(this);
-
         // Item.item => Embedded item into another item!
         if (this._isNestedItem)
             return this.updateNestedItem(data);
-
+        
+        await Migrator.updateMigratedDocument(this);
         // Actor.item => Directly owned item by an actor!
         return super.update(data, options);
     }
