@@ -198,8 +198,12 @@ export class Migrator {
         type CollectionType = (Actor.Implementation | Item.Implementation)['collections']['items' | 'effects'];
         for (const [key, collection] of Object.entries<CollectionType>(doc.collections))
             if (key === 'items' || key === 'effects')
-                for (const child of collection)
+                for (const child of collection) {
                     collectionPromises.push(this.updateMigratedDocument(child));
+
+                    if (child instanceof Item)
+                        await this.migrateWithCollections(child);
+                }
 
         await Promise.all(collectionPromises);
     }
