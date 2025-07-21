@@ -29,11 +29,9 @@ export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
 
 
 export class SR5CharacterSheet extends SR5BaseActorSheet {
-    // Stores which document has been selected for a Decker in the matrix tab.
+    // Stores which document has been selected in the matrix tab.
     // We accept this selection to not be persistant across Foundry sessions.
     selectedMatrixTarget: string|undefined;
-    // Stores if the hacking tab should show marked documents or new targets.
-    showMatrixHackingTarget: 'marked'|'targets' = 'marked';
 
     static override get defaultOptions() {
         const defaultOptions = super.defaultOptions;
@@ -108,12 +106,10 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         data.matrixActions = await this.getMatrixActions();
 
         data.selectedMatrixTarget = this.selectedMatrixTarget;
-        data.showMatrixMarkedDocuments = this.showMatrixHackingTarget === 'marked';
-        data.showMatrixTargets = this.showMatrixHackingTarget === 'targets';
 
         // When target overview is shown, collect all matrix targets.
         // TODO: taMiF this is a bis of a mess and will need to be reusable across both targets and marked docs and different actor types.
-        if (data.showMatrixTargets) {
+        {
             const {targets} = MatrixFlow.getMatrixTargets(this.actor);
 
             for (const target of targets) {
@@ -134,7 +130,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             data.matrixTargets = targets;
         }
         // When marked documents overview is shown, collect all marked documents.
-        else if (data.showMatrixMarkedDocuments) {
+        {
             const markedDocuments = await this.actor.getAllMarkedDocuments();
             data.markedDocuments = this._prepareMarkedDocumentTargets(markedDocuments);
         }
@@ -152,8 +148,50 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         html.find('.select-matrix-target').on('click', this._onSelectMatrixTarget.bind(this));
         html.find('.open-matrix-target').on('click', this._onOpenMarkedDocument.bind(this));
 
-        html.find('.switch-matrix-hacking-target').on('click', this._onSwitchMatrixHackingTarget.bind(this));
         html.find('.targets-refresh').on('click', this._onTargetsRefresh.bind(this));
+
+        html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
+        html.find('.matrix-toggle-hot-sim').on('click', this._onMatrixToggleMatrixPerception.bind(this));
+    }
+
+    private async _onMatrixToggleMatrixPerception(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const newState = this.actor.isUsingVR ? this.actor.isUsingHotSim ? 'ar' : 'hot_sim' : 'col_sim';
+
+        const update = {
+            system: {
+                matrix: {
+                    hot_sim: newState === 'hot_sim',
+                    vr: newState === 'hot_sim' || newState === 'col_sim',
+                }
+            }
+        }
+        await this.actor.update(update)
+    }
+
+    private async _onMatrixToggleRunningSilent(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.actor.isMatrixActor) return;
+
+        const device = this.actor.matrixData?.device;
+        if (!device) return;
+
+
+        const item = this.actor.items.get(device);
+        if (!item) return;
+
+        // iterate through the states of online -> silent -> offline
+        const newState = item.isRunningSilent ? 'online' : 'silent';
+
+        // update the embedded item with the new wireless state
+        await this.actor.updateEmbeddedDocuments('Item', [{
+            '_id': device,
+            'system.technology.wireless': newState,
+        }]);
     }
 
     /**
@@ -324,16 +362,6 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         this.render();
     }
 
-    /**
-     * Switch between different display modes on the matrix hacking tab for what target type display to
-     * users.
-     */
-    async _onSwitchMatrixHackingTarget(event) {
-        event.stopPropagation();
-
-        this.showMatrixHackingTarget = this.showMatrixHackingTarget === 'marked' ? 'targets' : 'marked';
-        this.render();
-    }
 
     /**
      * Manual user interaction to refresh list of show matrix targets.

@@ -1,10 +1,10 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabGroup='matrix' tabId='marks'}}
 <div class="matrix">
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
             name=(localize 'SR5.Marks')
             itemId='mark'
             rightSide=(MarkListHeaderRightSide)
             icons=(MarkListHeaderIcons)
-            itemCssClass='switch-matrix-hacking-target'
     }}
     {{#each markedDocuments}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
@@ -33,3 +33,4 @@
         {{/each}}
     {{/each}}
 </div>
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

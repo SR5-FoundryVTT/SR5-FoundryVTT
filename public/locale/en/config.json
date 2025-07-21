@@ -634,8 +634,11 @@
         },
         "ActorSheet": {
             "AddNetwork": "Direct Connect Network",
+            "Compilations": "Compilations",
             "CreateInventory": "Create inventory place",
             "CritterPowers": "Critter Powers",
+            "ColdSim": "Cold Sim",
+            "DisplayingPersona": "Displaying Persona",
             "DeviceRating": "Device Rating",
             "DeviceSetup": "Device Setup",
             "DisabledOptionCritterPowers": "Optional Critter Powers - Disabled",
