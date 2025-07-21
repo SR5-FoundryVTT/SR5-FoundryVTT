@@ -143,25 +143,44 @@ export class Migrator {
      * This is called during world load to ensure all actors are up-to-date with the latest system version.
      */
     private static async migrateAll() {
-        for (const item of game.items)
-            await this._migrateAll(item as Item.Implementation);
-        
-        for (const actor of game.actors)
-            await this._migrateAll(actor as Actor.Implementation);
+        const start = performance.now();
+
+        await Promise.all(
+            game.items.map(async item =>
+                this._migrateAll(item as Item.Implementation)
+            )
+        );
+
+        await Promise.all(
+            game.actors.map(async actor =>
+                this._migrateAll(actor as Actor.Implementation)
+            )
+        );
 
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
+
+        const d = new Dialog({
+            title: "Migration Complete",
+            content:
+                `<h2 style="color: red; text-align: center">Migration Complete</h2>` +
+                `<p style="text-align: center">It took ${performance.now() - start} milliseconds.</p>`,
+            buttons: {
+                ok: {
+                    label: "OK",
+                },
+            },
+            default: 'ok',
+        });
+        d.render(true);
     }
 
     private static async _migrateAll(doc: Actor.Implementation | Item.Implementation) {
-        // Migrate all items and effects within the document
-        for (const item of doc.items)
-            await this._migrateAll(item);
+        const itemMigrations = doc.items.map(async item => this._migrateAll(item));
+        const effectMigrations = doc.effects.map(async effect => this.updateMigratedDocument(effect));
 
-        for (const effect of doc.effects)
-            await this.updateMigratedDocument(effect);
+        await Promise.all([ ...itemMigrations, ...effectMigrations ]);
 
-        // Finally, update the document to persist the migration
-        await this.updateMigratedDocument(doc);
+        return this.updateMigratedDocument(doc);
     }
 
     /**
