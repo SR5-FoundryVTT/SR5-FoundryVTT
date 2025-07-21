@@ -432,9 +432,10 @@ ___________________
 
     static async ready() {
         if (game.user?.isGM) {
-            if (ChangelogApplication.showApplication) {
-                await new ChangelogApplication().render(true);
-            }
+            await Migrator.BeginMigration();
+
+            if (ChangelogApplication.showApplication)
+                new ChangelogApplication().render(true);
         }
 
         // Connect chat dice icon to shadowrun basic success test roll.

@@ -1,6 +1,5 @@
 // game settings for shadowrun 5e
 
-import { VersionMigration } from './migrator/VersionMigration';
 import { FLAGS, SYSTEM_NAME } from './constants';
 
 export const registerSystemSettings = () => {
@@ -29,6 +28,17 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: true,
+    });
+
+    /**
+     * Track system version upon which a migration was last applied
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.KEY_DATA_VERSION , {
+        name: 'System Data Version.',
+        scope: 'world',
+        config: false,
+        type: String,
+        default: '',
     });
 
     game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {

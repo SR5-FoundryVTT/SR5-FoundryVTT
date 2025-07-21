@@ -13,6 +13,7 @@
 export const SYSTEM_NAME = 'shadowrun5e' as const;
 export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}`;
 export const FLAGS = {
+    KEY_DATA_VERSION: 'systemMigrationVersion',
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',

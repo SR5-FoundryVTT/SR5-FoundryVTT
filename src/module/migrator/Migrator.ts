@@ -1,3 +1,4 @@
+import { FLAGS } from "../constants";
 import { Sanitizer } from "./Sanitizer";
 import { Version0_8_0 } from "./versions/Version0_8_0";
 import { Version0_18_0 } from './versions/Version0_18_0';
@@ -37,10 +38,10 @@ export class Migrator {
     ] as const;
 
     // Returns an array of migration functions applicable to the given document type and version.
-    private static getMigrators(type: MigratableDocumentName, version: string | null): readonly VersionMigration[] {
+    private static getMigrators(type: MigratableDocumentName | null, version: string | null): readonly VersionMigration[] {
         version ??= '0.0.0'; // Default to '0.0.0' if no version is provided.
         return this.s_Versions.filter(migrator =>
-            migrator.implements[type] && this.compareVersion(migrator.TargetVersion, version) > 0
+            (!type || migrator.implements[type]) && this.compareVersion(migrator.TargetVersion, version) > 0
         );
     }
 
@@ -101,7 +102,75 @@ export class Migrator {
         // Mark document as up-to-date
         doc._stats.systemVersion = game.system.version;
         // Persist the change without triggering diff logic
-        await doc.update(doc.toObject() as any, { diff: false, recursive: false });
+        return doc.update(doc.toObject(false) as any, { diff: false, recursive: false });
+    }
+
+    public static async BeginMigration() {
+        const currentVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION) || '0.0.0';
+
+        // No migrations are required, exit.
+        const migrators = this.getMigrators(null, currentVersion);
+        if (migrators.length === 0) return;
+
+        const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
+        const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
+        const localizedWarningRequired = game.i18n.localize('SR5.MIGRATION.WarningRequired');
+        const localizedWarningDescription = game.i18n.localize('SR5.MIGRATION.WarningDescription');
+        const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
+        const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
+
+        const d = new Dialog({
+            title: localizedWarningTitle,
+            content:
+                `<h2 style="color: red; text-align: center">${localizedWarningHeader}</h2>` +
+                `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
+                `<p>${localizedWarningDescription}</p>` +
+                `<h3 style="color: red">${localizedWarningBackup}</h3>`,
+            buttons: {
+                ok: {
+                    label: localizedWarningBegin,
+                    callback: () => this.migrateAll(),
+                },
+            },
+            default: 'ok',
+        });
+        d.render(true);
+    }
+
+    /**
+     * Migrate all actors in the game.
+     * 
+     * This is called during world load to ensure all actors are up-to-date with the latest system version.
+     */
+    private static async migrateAll() {
+        for (const item of game.items)
+            await this._migrateAll(item as Item.Implementation);
+        
+        for (const actor of game.actors)
+            await this._migrateAll(actor as Actor.Implementation);
+
+        await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
+    }
+
+    private static async _migrateAll(doc: Actor.Implementation | Item.Implementation) {
+        // Migrate all items and effects within the document
+        for (const item of doc.items)
+            await this._migrateAll(item);
+
+        for (const effect of doc.effects) {
+            try {
+                await this.updateMigratedDocument(effect);
+            } catch (error) {
+                console.error(`Failed to migrate effect ${effect.id}:`, error);
+            }
+        }
+
+        // Finally, update the document to persist the migration
+        try {
+            await this.updateMigratedDocument(doc);
+        } catch (error) {
+            console.error(`Failed to migrate document ${doc.id}:`, error);
+        }
     }
 
     /**
