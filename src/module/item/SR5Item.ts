@@ -652,32 +652,49 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
+    async updateNestedEffects(changes) {
+        changes = Array.isArray(changes) ? changes : [changes];
+        if (!changes || changes.length === 0) return;
+
+        for(const effectChanges of changes) {
+            const effect = this.effects.get(effectChanges._id);
+            if (!effect) continue;
+
+            // TODO: The _id field has been added by the system. Even so, don't change the id to avoid any byproducts.
+            delete effectChanges._id;
+
+            foundry.utils.mergeObject(effect, expandObject(effectChanges), { inplace: true });
+        }
+
+        this.prepareNestedItems();
+        this.prepareData();
+        this.render(false);
+    }
+
+    // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     async updateNestedItems(changes) {
         const items = foundry.utils.duplicate(this.getNestedItems());
         if (!items) return;
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
-        changes.forEach((itemChanges) => {
+        for(const itemChanges of changes) {
             const index = items.findIndex((i) => i._id === itemChanges._id);
-            if (index === -1) return;
+            if (index === -1) continue;
             const item = items[index];
 
             // TODO: The _id field has been added by the system. Even so, don't change the id to avoid any byproducts.
             delete itemChanges._id;
 
             if (item) {
-                itemChanges = expandObject(itemChanges);
-                foundry.utils.mergeObject(item, itemChanges);
+                foundry.utils.mergeObject(item, expandObject(itemChanges));
                 items[index] = item;
-                // this.items[index].data = items[index];
             }
-        });
+        }
 
         await this.setNestedItems(items);
         this.prepareNestedItems();
         this.prepareData();
         this.render(false);
-        return true;
     }
 
     /**

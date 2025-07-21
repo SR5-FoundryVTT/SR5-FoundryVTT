@@ -405,6 +405,12 @@ export class SR5ActiveEffect extends ActiveEffect {
         operation?: ActiveEffect.Database.UpdateOperation,
     ) {
         await Migrator.updateMigratedDocument(this);
+
+        if (this.parent instanceof SR5Item && this.parent._isNestedItem) {
+            await this.parent.updateNestedEffects(data);
+            return this;
+        }
+
         return super.update(data, operation);
     }
 
