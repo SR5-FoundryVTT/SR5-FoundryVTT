@@ -138,7 +138,7 @@ export class Migrator {
             buttons: {
                 ok: {
                     label: localizedWarningBegin,
-                    callback: () => this.migrateAll(),
+                    callback: async () => this.migrateAll(),
                 },
             },
             default: 'ok',
@@ -154,44 +154,25 @@ export class Migrator {
     private static async migrateAll() {
         const start = performance.now();
 
-        for (const item of game.items) {
-            await this.updateMigratedDocument(item as Item.Implementation);
+        await Promise.all(
+            game.items.map(async item => {
+                return this.migrateWithCollections(item as Item.Implementation);
+            })
+        );
 
-            for (const effect of item.effects)
-                await this.updateMigratedDocument(effect);
-        }
+        await Promise.all(
+            game.actors.map(async actor => {
+                return this.migrateWithCollections(actor as Actor.Implementation);
+            })
+        );
 
-        for (const actor of game.actors) {
-            await this.updateMigratedDocument(actor as Actor.Implementation);
-
-            for (const effect of actor.effects)
-                await this.updateMigratedDocument(effect);
-
-            for (const item of actor.items) {
-                await this.updateMigratedDocument(item);
-
-                for (const effect of item.effects)
-                    await this.updateMigratedDocument(effect);
-            }
-        }
-
-        for (const scene of game.scenes) {
-            for (const token of scene.tokens) {
-                if (token.actor) {
-                    await this.updateMigratedDocument(token.actor);
-
-                    for (const effect of token.actor.effects)
-                        await this.updateMigratedDocument(effect);
-
-                    for (const item of token.actor.items) {
-                        await this.updateMigratedDocument(item);
-
-                        for (const effect of item.effects)
-                            await this.updateMigratedDocument(effect);
-                    }
-                }
-            }
-        }
+        await Promise.all(
+            Array.from(game.scenes).flatMap(scene =>
+                scene.tokens
+                    .filter(token => !!token.actor)
+                    .map(async token => this.migrateWithCollections(token.actor!))
+            )
+        );
 
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
 
@@ -208,6 +189,19 @@ export class Migrator {
             default: 'ok',
         });
         d.render(true);
+    }
+
+    private static async migrateWithCollections(doc: Actor.Implementation | Item.Implementation) {
+        await this.updateMigratedDocument(doc);
+
+        const collectionPromises: Promise<any>[] = [];
+        type CollectionType = (Actor.Implementation | Item.Implementation)['collections']['items' | 'effects'];
+        for (const [key, collection] of Object.entries<CollectionType>(doc.collections))
+            if (key === 'items' || key === 'effects')
+                for (const child of collection)
+                    collectionPromises.push(this.updateMigratedDocument(child));
+
+        await Promise.all(collectionPromises);
     }
 
     /**
