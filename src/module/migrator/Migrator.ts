@@ -157,20 +157,11 @@ export class Migrator {
         for (const item of doc.items)
             await this._migrateAll(item);
 
-        for (const effect of doc.effects) {
-            try {
-                await this.updateMigratedDocument(effect);
-            } catch (error) {
-                console.error(`Failed to migrate effect ${effect.id}:`, error);
-            }
-        }
+        for (const effect of doc.effects)
+            await this.updateMigratedDocument(effect);
 
         // Finally, update the document to persist the migration
-        try {
-            await this.updateMigratedDocument(doc);
-        } catch (error) {
-            console.error(`Failed to migrate document ${doc.id}:`, error);
-        }
+        await this.updateMigratedDocument(doc);
     }
 
     /**
