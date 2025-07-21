@@ -55,6 +55,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
     }
 
     override prepareBaseValues() {
+        super.prepareBaseValues();
         MarkPlacementFlow.prepareBaseValues(this);
     }
 
