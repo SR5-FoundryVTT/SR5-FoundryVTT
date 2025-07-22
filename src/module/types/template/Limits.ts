@@ -31,10 +31,8 @@ export const MatrixLimits = () => ({
 export const VehicleLimits = () => ({
     ...Limits(),
     sensor: new ModifiableField(LimitField()),
-    pilot: new ModifiableField(LimitField()),
     handling: new ModifiableField(LimitField()),
     speed: new ModifiableField(LimitField()),
-    acceleration: new ModifiableField(LimitField()),
 });
 
 export type LimitFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof LimitField>>;
