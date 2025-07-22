@@ -22,16 +22,16 @@ export const TechnologyData = () => ({
     // === Calculated Values ===
     calculated: new SchemaField({
         essence: new SchemaField({
-        value: new NumberField({ required: true, nullable: false, initial: 0 }),
-        adjusted: new BooleanField({ initial: false }),
+            value: new NumberField({ required: true, nullable: false, initial: 0 }),
+            adjusted: new BooleanField({ initial: false }),
         }),
         availability: new SchemaField({
-        value: new StringField({ required: true }),
-        adjusted: new BooleanField({ initial: false }),
+            value: new StringField({ required: true }),
+            adjusted: new BooleanField({ initial: false }),
         }),
         cost: new SchemaField({
-        value: new NumberField({ required: true, nullable: false, initial: 0 }),
-        adjusted: new BooleanField({ initial: false }),
+            value: new NumberField({ required: true, nullable: false, initial: 0 }),
+            adjusted: new BooleanField({ initial: false }),
         }),
     }),
 });

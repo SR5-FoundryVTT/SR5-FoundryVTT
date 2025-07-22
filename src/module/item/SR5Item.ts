@@ -415,52 +415,67 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * 
      * TODO: Currently only the minimal amount of bullets is reloaded. For weapons using ejectable clips, this should be full clip capacity.
      */
-    async reloadAmmo(partialReload: boolean) {
+    async reloadAmmo(isPartial: boolean) {
         const weapon = this.asType('weapon');
         if (!weapon) return;
 
-        // Prepare reloading by getting ammunition information.
+        // Determine how many bullets can be reloaded based on clip type and agility.
+        const maxPartial = RangedWeaponRules.partialReload(
+            weapon.system.ammo.clip_type,
+            this.actor?.getAttribute('agility').value
+        );
+
+        // Fallback to full reload if there is no partial reload.
+        if (maxPartial === -1) isPartial = false;
+
         const ammo = this.getEquippedAmmo();
-        const remainingBullets = weapon.system.ammo.current.value;
-        // Don't adhere to clip sizes, only reload from the point of capacity left.
-        const missingBullets = Math.max(0, weapon.system.ammo.current.max - remainingBullets);
-        // This checks how many rounds are required for a partial reload.
-        const partialReloadBulletsNeeded = Math.min(weapon.system.ammo.current.max - remainingBullets, RangedWeaponRules.partialReload(weapon.system.ammo.clip_type, this.actor?.getAttribute('agility').value));
-        // If there aren't ANY ammo items, just use weapon max as to not enforce ammo onto users without.
-        const availableBullets = ammo ? Number(ammo.system.technology.quantity) : weapon.system.ammo.current.max;
+        const current = weapon.system.ammo.current.value;
+        const max = weapon.system.ammo.current.max;
+
+        // Number of bullets missing from the weapon.
+        const missing = Math.max(0, max - current);
+        // How many bullets would be reloaded in a partial reload.
+        const partialAmount = Math.min(missing, maxPartial);
+        // Use available ammo quantity, or fallback to max if ammo isn't enforced.
+        const available = ammo?.system.technology.quantity ?? max;
 
         // Validate ammunition and clip availability.
         if (weapon.system.ammo.spare_clips.value === 0 && weapon.system.ammo.spare_clips.max > 0) {
             // Should this ever be enforced, change info to warn.
             ui.notifications?.info("SR5.Warnings.CantReloadWithoutSpareClip", { localize: true });
         }
-        if (ammo && Number(ammo.system.technology.quantity) === 0) {
+
+        const ammoQty = ammo?.system.technology.quantity ?? 0;
+        if (ammo && ammoQty === 0) {
             ui.notifications?.warn('SR5.Warnings.CantReloadAtAllDueToAmmo', { localize: true });
             return;
         }
-        if (ammo && Number(ammo.system.technology.quantity) < missingBullets) {
-            if (partialReload && partialReloadBulletsNeeded !== -1 && Number(ammo.system.technology?.quantity) < partialReloadBulletsNeeded) {
-                ui.notifications?.info('SR5.Warnings.CantReloadPartialDueToAmmo', { localize: true });
-            } else {
-                ui.notifications?.info('SR5.Warnings.CantReloadFullyDueToAmmo', { localize: true });
-            }
+        if (ammo && ammoQty < missing) {
+            if (isPartial && partialAmount !== -1 && ammoQty < partialAmount)
+                ui.notifications.info('SR5.Warnings.CantReloadPartialDueToAmmo', { localize: true });
+            else
+                ui.notifications.info('SR5.Warnings.CantReloadFullyDueToAmmo', { localize: true });
         }
 
         // Prepare what can be reloaded.
-        const reloadedBullets = Math.min(missingBullets, availableBullets, partialReload ? partialReloadBulletsNeeded : Infinity);
+        const reloaded = Math.min(
+            missing,
+            available,
+            isPartial ? partialAmount : Infinity
+        );
 
         await this.update({
             system: {
                 ammo: {
-                    ...(weapon.system.ammo.spare_clips.max > 0
-                        ? { spare_clips: { value: Math.max(0, weapon.system.ammo.spare_clips.value - 1) } }
-                        : {}),
-                    current: { value: remainingBullets + reloadedBullets }
+                    current: { value: current + reloaded },
+                    ...(weapon.system.ammo.spare_clips.max > 0 && {
+                        spare_clips: { value: Math.max(0, weapon.system.ammo.spare_clips.value - 1) }
+                    })
                 }
             }
         });
 
-        await ammo?.update({ system: { technology: { quantity: Math.max(0, Number(ammo.system.technology.quantity) - reloadedBullets) } } });
+        await ammo?.update({ system: { technology: { quantity: Math.max(0, ammoQty - reloaded) } } });
     }
 
     async equipNestedItem(id: string, type: string, options: { unequipOthers?: boolean, toggle?: boolean } = {}) {
@@ -585,12 +600,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             itemData.forEach((ogItem) => {
                 const item = foundry.utils.duplicate(ogItem);
                 item._id = randomID(16);
-                if (item.type === 'ammo' || item.type === 'modification') {
-                    if (item?.system?.technology?.equipped) {
-                        item.system.technology.equipped = false;
-                    }
+                if (item.type === 'ammo' || item.type === 'modification')
                     currentItems.push(item);
-                }
             });
 
             await this.setNestedItems(currentItems);

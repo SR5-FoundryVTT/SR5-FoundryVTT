@@ -2,6 +2,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR } from "../constants";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
+import { AmmunitionType } from "../types/item/Weapon";
 import { RangeTemplateType, RangesTemplateType } from "../types/template/Weapon";
 
 /**
@@ -119,14 +120,14 @@ export const RangedWeaponRules = {
     /**
      * The number of bullets when reloading during a complex action according to SR5#163 'Reloading Weapons'
      * @param clip The currently used clip
-     * @param dex The owning actors dexterity value
+     * @param agi The owning actors agility value
      * @returns The number of bullets when reloading during a complex action or -1 if it can only be fully reloaded directly
      */
-    partialReload(clip: string = '', dex: number = 1): number {
+    partialReload(clip: AmmunitionType['clip_type'], agi: number = 1): number {
         switch (clip) {
             case 'internal_magazin':
             case 'cylinder':
-                return dex;
+                return agi;
             case 'break_action':
                 return 2;
             case 'muzzle_loader':
