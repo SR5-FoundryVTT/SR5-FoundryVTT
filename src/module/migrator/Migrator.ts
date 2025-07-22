@@ -37,6 +37,10 @@ export class Migrator {
         new Version0_30_0(),
     ] as const;
 
+    private static get _migrationMark() {
+        return game.system.version + ".0";
+    }
+
     // Returns an array of migration functions applicable to the given document type and version.
     private static getMigrators(type: MigratableDocumentName | null, version: string | null): readonly VersionMigration[] {
         return this.s_Versions.filter(migrator =>
@@ -51,17 +55,14 @@ export class Migrator {
      * update process.
      */
     public static migrate(type: MigratableDocumentName, data: any): void {
-        // Lack of _stats usually indicates new or updated data, not needing migration.
+        // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
         if (!data._stats || !('systemVersion' in data._stats)) return;
         if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return;
 
         const migrators = this.getMigrators(type, data._stats.systemVersion);
 
         // If no migrators found, nothing to do.
-        if (migrators.length === 0) {
-            data._stats.systemVersion = game.system.version;
-            return;
-        }
+        if (migrators.length === 0) return;
 
         for (const migrator of migrators)
             migrator[`migrate${type}`](data);
@@ -79,8 +80,9 @@ export class Migrator {
             );
             console.table(correctionLogs);
         }
-        // Mark as migrated to the current system version.
-        data._stats.systemVersion = game.system.version + ".0";
+
+        // Mark as a migratable document.
+        data._stats.systemVersion = this._migrationMark;
     }
 
     /**
@@ -96,15 +98,15 @@ export class Migrator {
      * @param doc Updated document.
      */
     static async updateMigratedDocument(doc: MigratableDocument) {
-        // No need to migrate if the document is already up-to-date.
-        if (doc._stats.systemVersion === game.system.version) return;
+        // No need to migrate if the document is not a migratable document.
+        if (doc._stats.systemVersion !== this._migrationMark) return;
 
         // Mark document as up-to-date
         doc._stats.systemVersion = game.system.version;
         doc._source._stats.systemVersion = game.system.version;
 
         if (doc.parent) {
-            if (doc.parent instanceof Actor)
+            if (doc.parent instanceof Actor || doc.parent instanceof Item)
                 await this.updateMigratedDocument(doc.parent);
             else if (doc.parent instanceof TokenDocument && doc.parent.actor)
                 await this.updateMigratedDocument(doc.parent.actor);
@@ -156,7 +158,7 @@ export class Migrator {
         const progress = ui.notifications.info("Migrating Documents...", {progress: true});
 
         const tokensWithActors = Array.from(game.scenes).flatMap(scene =>
-            scene.tokens.filter(token => !!token.actor)
+            scene.tokens.filter(token => !!token.actor && !token.actorLink)
         );
 
         let completed = 0;
@@ -165,16 +167,15 @@ export class Migrator {
         await Promise.all(
             game.items.map(async item => {
                 return this.migrateWithCollections(item as Item.Implementation).then(() => {
-                    progress.update!({pct: ++completed / total});
+                    progress.update({pct: ++completed / total});
                 });
             })
         );
 
-
         await Promise.all(
             game.actors.map(async actor => {
                 return this.migrateWithCollections(actor as Actor.Implementation).then(() => {
-                    progress.update!({pct: ++completed / total});
+                    progress.update({pct: ++completed / total});
                 });
             })
         );
@@ -182,7 +183,7 @@ export class Migrator {
         await Promise.all(
             tokensWithActors.map(async token => {
                 return this.migrateWithCollections(token.actor!).then(() => {
-                    progress.update!({pct: ++completed / total});
+                    progress.update({pct: ++completed / total});
                 });
             })
         );
@@ -212,12 +213,11 @@ export class Migrator {
         for (const [key, collection] of Object.entries<CollectionType>(doc.collections)) {
             if (key === 'effects' || key === 'items') {
                 for (const child of collection) {
-                    collectionPromises.push((async () => {
-                        await this.updateMigratedDocument(child);
-
-                        if (child instanceof Item)
-                            await this.migrateWithCollections(child);
-                    })());
+                    collectionPromises.push(
+                        child instanceof Item
+                            ? this.migrateWithCollections(child)
+                            : this.updateMigratedDocument(child)
+                    );
                 }
             }
         }
