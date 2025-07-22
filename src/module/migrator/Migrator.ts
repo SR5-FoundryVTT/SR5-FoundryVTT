@@ -153,25 +153,38 @@ export class Migrator {
      */
     private static async migrateAll() {
         const start = performance.now();
+        const progress = ui.notifications.info("Migrating Documents...", {progress: true});
+
+        const tokensWithActors = Array.from(game.scenes).flatMap(scene =>
+            scene.tokens.filter(token => !!token.actor)
+        );
+
+        let completed = 0;
+        const total = game.items.size + game.actors.size + tokensWithActors.length;
 
         await Promise.all(
             game.items.map(async item => {
-                return this.migrateWithCollections(item as Item.Implementation);
+                return this.migrateWithCollections(item as Item.Implementation).then(() => {
+                    progress.update!({pct: ++completed / total});
+                });
             })
         );
+
 
         await Promise.all(
             game.actors.map(async actor => {
-                return this.migrateWithCollections(actor as Actor.Implementation);
+                return this.migrateWithCollections(actor as Actor.Implementation).then(() => {
+                    progress.update!({pct: ++completed / total});
+                });
             })
         );
 
         await Promise.all(
-            Array.from(game.scenes).flatMap(scene =>
-                scene.tokens
-                    .filter(token => !!token.actor)
-                    .map(async token => this.migrateWithCollections(token.actor!))
-            )
+            tokensWithActors.map(async token => {
+                return this.migrateWithCollections(token.actor!).then(() => {
+                    progress.update!({pct: ++completed / total});
+                });
+            })
         );
 
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
@@ -195,17 +208,21 @@ export class Migrator {
         await this.updateMigratedDocument(doc);
 
         const collectionPromises: Promise<any>[] = [];
-        type CollectionType = (Actor.Implementation | Item.Implementation)['collections']['items' | 'effects'];
-        for (const [key, collection] of Object.entries<CollectionType>(doc.collections))
-            if (key === 'items' || key === 'effects')
+        type CollectionType = (Actor.Implementation | Item.Implementation)['collections']['effects' | 'items'];
+        for (const [key, collection] of Object.entries<CollectionType>(doc.collections)) {
+            if (key === 'effects' || key === 'items') {
                 for (const child of collection) {
-                    collectionPromises.push(this.updateMigratedDocument(child));
+                    collectionPromises.push((async () => {
+                        await this.updateMigratedDocument(child);
 
-                    if (child instanceof Item)
-                        await this.migrateWithCollections(child);
+                        if (child instanceof Item)
+                            await this.migrateWithCollections(child);
+                    })());
                 }
+            }
+        }
 
-        await Promise.all(collectionPromises);
+        return Promise.all(collectionPromises);
     }
 
     /**
