@@ -37,6 +37,7 @@ export class Migrator {
         new Version0_30_0(),
     ] as const;
 
+    // Generate the migration version mark used to track current system version in documents.
     private static get _migrationMark() {
         return game.system.version + ".0";
     }
@@ -165,27 +166,27 @@ export class Migrator {
         const total = game.items.size + game.actors.size + tokensWithActors.length;
 
         await Promise.all(
-            game.items.map(async item => {
-                return this.migrateWithCollections(item as Item.Implementation).then(() => {
+            game.items.map(async item =>
+                this.migrateWithCollections(item as Item.Implementation).then(() => {
                     progress.update({pct: ++completed / total});
-                });
-            })
+                })
+            )
         );
 
         await Promise.all(
-            game.actors.map(async actor => {
-                return this.migrateWithCollections(actor as Actor.Implementation).then(() => {
+            game.actors.map(async actor =>
+                this.migrateWithCollections(actor as Actor.Implementation).then(() => {
                     progress.update({pct: ++completed / total});
-                });
-            })
+                })
+            )
         );
 
         await Promise.all(
-            tokensWithActors.map(async token => {
-                return this.migrateWithCollections(token.actor!).then(() => {
+            tokensWithActors.map(async token =>
+                this.migrateWithCollections(token.actor!).then(() => {
                     progress.update({pct: ++completed / total});
-                });
-            })
+                })
+            )
         );
 
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
@@ -198,6 +199,7 @@ export class Migrator {
             buttons: {
                 ok: {
                     label: "OK",
+                    callback: () => { progress.remove(); },
                 },
             },
             default: 'ok',
