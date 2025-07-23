@@ -128,7 +128,6 @@ declare module "fvtt-types/configuration" {
             shadowrun5e: {
                 turnsSinceLastAttack?: number;
                 overwatchScore?: number;
-                embeddedItems: Item.Source[];
             }
         };
         ChatMessage: {
