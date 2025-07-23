@@ -24,7 +24,7 @@
       border: none;
       color: white;
       margin: 0;
-      text-underline: none;
+      text-decoration: none;
     }
   }
 
@@ -221,5 +221,15 @@
   to {
     opacity: 1;
     transform: scaleY(1);
+  }
+}
+
+/* Innerhalb deiner SCSS-Datei, z.B. am Ende von teamwork-participant.scss */
+.sr5.chat-card.teamwork-card {
+  /* …die bisherigen Regeln… */
+
+  /* Link in der Header-Zeile (h3.header-name) auf Weiß zwingen */
+  .card-header .header-name a.chat-document-link {
+    color: white !important;
   }
 }

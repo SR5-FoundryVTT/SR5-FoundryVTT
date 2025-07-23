@@ -7,6 +7,7 @@ import { DataDefaults } from '../data/DataDefaults';
 import { SR5 } from '../config';
 import { TeamWorkDialog } from '../apps/dialogs/TeamworkDialog';
 import { FLAGS, SYSTEM_NAME } from '../constants';
+type ActorAttribute = Shadowrun.ActorAttribute;
 
 export interface TestAttributes {
     skill?: string;
@@ -165,7 +166,13 @@ export class JournalEnrichers {
                     break;
 
                 case "teamwork":
-                    await TeamworkFlow.initiateTeamworkTest(testAttributes)
+                    await TeamworkFlow.initiateTeamworkTest({
+                        skill: TeamworkFlow.constructSkillEntry({ id: testAttributes.skill ?? "" }),
+                        attribute: TeamworkFlow.constructAttributeEntry(testAttributes.attribute as ActorAttribute | undefined),
+                        threshold: testAttributes.threshold ? Number(testAttributes.threshold) : undefined,
+                        allowOtherSkills: Boolean(testAttributes.allowOtherSkills),
+                        limit: TeamworkFlow.constructLimitEntry(testAttributes.limit)
+                    });
                     break;
 
                 case "action":
@@ -191,7 +198,7 @@ export class JournalEnrichers {
             ui.notifications?.error("No actor found to perform this test.");
             return;
         }
-        
+
         const rawLabel = testAttributes.skill;
         const found = actor.getSkillByLabel(rawLabel!);
 
@@ -690,7 +697,7 @@ export class JournalEnrichers {
 
 
 
-    static getAttributeKeyByLabel(searchedFor?: string): Shadowrun.ActorAttribute {
+    static getAttributeKeyByLabel(searchedFor?: string): ActorAttribute {
         if (!searchedFor) return '';
 
         const disallowedKeys = ['pilot', 'force', 'initiation', 'submersion', 'rating'];
@@ -700,7 +707,7 @@ export class JournalEnrichers {
 
             const translated = game.i18n.localize(i18nKey);
             if (this.normalizeLabel(translated) === this.normalizeLabel(searchedFor)) {
-                return key as Shadowrun.ActorAttribute;
+                return key as ActorAttribute;
             }
         }
 

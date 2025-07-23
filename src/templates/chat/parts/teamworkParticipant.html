@@ -10,19 +10,33 @@
 </summary>
   {{#if (or differentSkill differentAttribute differentLimit glitched)}}
   <div class="different-skills">
-    {{#if glitched}}
-    {{#ife criticalGlitched true}}
-    {{localize "SR5.GlitchCritical"}}
-    {{else}}
-    {{localize "SR5.Glitch"}}
-    {{/ife}}
-    {{/if}}
-    {{#if differentSkill}}<span>{{localize "SR5.Skill.Teamwork.DifferentSkill"}}: {{localizeSkill
-      differentSkill}}</span>{{/if}}
-    {{#if differentAttribute}}<span>{{localize "SR5.Skill.Teamwork.DifferentAttribute"}}: {{localize
-      differentAttribute}}</span>{{/if}}
-    {{#if differentLimit}}<span>{{localize "SR5.Skill.Teamwork.DifferentLimit"}}: {{localize
-      differentLimit}}</span>{{/if}}
-  </div>
+  {{#if glitched}}
+    <div class="glitch-line">
+      {{#ife criticalGlitched true}}
+        {{localize "SR5.GlitchCritical"}}
+      {{else}}
+        {{localize "SR5.Glitch"}}
+      {{/ife}}
+    </div>
+  {{/if}}
+
+  {{#if differentSkill}}
+    <div class="different-skill-line">
+      {{localize "SR5.Skill.Teamwork.DifferentSkill"}}: {{localizeSkill differentSkill}}
+    </div>
+  {{/if}}
+
+  {{#if differentAttribute}}
+    <div class="different-attribute-line">
+      {{localize "SR5.Skill.Teamwork.DifferentAttribute"}}: {{localize differentAttribute}}
+    </div>
+  {{/if}}
+
+  {{#if differentLimit}}
+    <div class="different-limit-line">
+      {{localize "SR5.Skill.Teamwork.DifferentLimit"}}: {{localize differentLimit}}
+    </div>
+  {{/if}}
+</div>
   {{/if}}
 </details>
