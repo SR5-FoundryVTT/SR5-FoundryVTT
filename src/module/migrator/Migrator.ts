@@ -49,16 +49,33 @@ export class Migrator {
         );
     }
 
+    private static getEmbeddedItems(data: any) {
+        const items = data.flags?.shadowrun5e?.embeddedItems || [];
+        if (items == null) return [];
+        if (Array.isArray(items)) return items;
+        if (typeof items === 'object') return Object.values(items);
+        return [items];
+    }
+
     /**
      * Applies migration logic to a provided data object of the specified type during world load
      * 
      * This is connected to Migrator.updateMigratedDocument which will persist migrated data during the
      * update process.
      */
-    public static migrate(type: MigratableDocumentName, data: any): void {
+    public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false): void {
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
         if (!data._stats || !('systemVersion' in data._stats)) return;
         if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return;
+
+        if (type === "Item") {
+            for (const nestedItems of this.getEmbeddedItems(data))
+                this.migrate("Item", nestedItems, true);
+
+            if (nested)
+                for (const nestedEffect of data.effects ?? [])
+                    this.migrate("ActiveEffect", nestedEffect, true);
+        }
 
         const migrators = this.getMigrators(type, data._stats.systemVersion);
 
@@ -83,7 +100,7 @@ export class Migrator {
         }
 
         // Mark as a migratable document.
-        data._stats.systemVersion = this._migrationMark;
+        data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
     }
 
     /**
@@ -114,7 +131,7 @@ export class Migrator {
         }
 
         // Persist the change without triggering diff logic
-        return doc.update(doc.toObject(false) as any, { diff: false, recursive: false });
+        return doc.update(doc.toObject() as any, { diff: false, recursive: false });
     }
 
     public static async BeginMigration() {
