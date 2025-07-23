@@ -137,10 +137,10 @@ export class TeamworkFlow {
     }
 
     static constructAttributeEntry(data?: string): AttributeEntry | undefined {
-        if (typeof data === "string" && data in SR5.limits) {
+        if (typeof data === "string" && data in SR5.attributes) {
             return {
                 name: data as ActorAttribute,
-                label: SR5.limits[data]
+                label: SR5.attributes[data]
             }
         }
 
@@ -222,12 +222,12 @@ export class TeamworkFlow {
         request?: boolean;
     }): Promise<Partial<TeamworkData> & { specialization?: boolean, cancelled?: boolean }> {
         if (!data.actors.length) return { cancelled: true };
-        const dialogData = await new TeamWorkDialog(data).select();        
+        const dialogData = await new TeamWorkDialog(data).select();   
+
+        // dialogData.actor = (await fromUuid(dialogData.actor) as SR5Actor)
+        if (!dialogData.actor) return { cancelled: true };             
 
         console.log("showTeamworkDialog data", dialogData)
-
-        dialogData.actor = (await fromUuid(dialogData.actor) as SR5Actor)
-        if (!dialogData.actor) return { cancelled: true };
 
         return dialogData ?? { cancelled: true };
     }
@@ -257,7 +257,7 @@ export class TeamworkFlow {
             request: true
         });
 
-        console.log("initiateTeamworkTest data", data)
+        console.log("initiateTeamworkTest data", dialogData)
 
         if (dialogData.cancelled) return;
 

@@ -5,8 +5,7 @@ import { SR5 } from "../../config";
 
 import { Translation } from "../../utils/strings";
 
-export interface TeamWorkDialogData extends Omit<FormDialogData, "templateData">
-{
+export interface TeamWorkDialogData extends Omit<FormDialogData, "templateData"> {
   templateData: {
     actors: SR5Actor[];
     skills: SkillGroup[];
@@ -130,6 +129,7 @@ export class TeamWorkDialog extends FormDialog {
   }
 
   override getData(): TeamWorkDialogData {
+    console.log("🔍 Initial this.data.attribute =", this.data.templateData.attribute);
     const data = super.getData() as unknown as TeamWorkDialogData;
 
     if (!this.baseActors) {
@@ -157,7 +157,7 @@ export class TeamWorkDialog extends FormDialog {
   //   const limitEntry = TeamworkFlow.constructLimitEntry(formData["limit.name"]);
   //   limitEntry.base = Number(formData["limit.base"]);
   //   this.data.limit = limitEntry;
-    
+
   //   this.data.threshold = Number(formData.threshold);
   //   this.data.allowOtherSkills = Boolean(formData.allowOtherSkills);
   //   this.data.specialization = Boolean(formData.specialization);
@@ -191,6 +191,7 @@ export class TeamWorkDialog extends FormDialog {
 
     // Initialer Zustand
     limitBaseInput.trigger('input');
+    LimitNameInput.trigger('change');
   }
 
 
@@ -214,6 +215,11 @@ export class TeamWorkDialog extends FormDialog {
     allowOtherSkills: boolean,
     specialization: boolean
   } | undefined {
+
+    if (this.selectedButton === "cancel") {
+      return this._emptySelection() as any;
+    }
+
     const {
       actor,
       skill,
@@ -225,6 +231,16 @@ export class TeamWorkDialog extends FormDialog {
     } = this.data.templateData;
 
     if (!actor || !skill || !attribute) return this._emptySelection() as any;
+
+    console.log("onAfterClose: ", {
+      actor: actor,
+      skill: skill,
+      attribute: attribute,
+      limit: limit,
+      threshold: threshold ?? 0,
+      allowOtherSkills: allowOtherSkills ?? false,
+      specialization: specialization ?? false
+    })
 
 
     return {
@@ -277,12 +293,13 @@ export class TeamWorkDialog extends FormDialog {
         await this.render();
         return
 
-      case 'skill.id':
+      case 'skill':
         // 1) Finde den neuen SkillEntry
         const skillId = el.value;
-        const newSkill = this.baseSkills
+        const newSkill: SkillEntry = this.baseSkills
           .flatMap(g => g.skills)
           .find(s => s.id === skillId)!;
+
 
         // 2) Setze Attribut und Limit
         data.skill = newSkill;
@@ -309,10 +326,12 @@ export class TeamWorkDialog extends FormDialog {
         return;
 
       case 'limit.name':
+        console.log("[onChangeInput] limit.name changed:", el.value);
         const limitKey = el.value;
         const limits = TeamworkFlow.limitList;
         const limit = limits.find(a => a.name === limitKey)
           ?? limits.find(a => a.label === limitKey);
+        console.log("[onChangeInput] found limit:", limit);
         if (limit) {
           data.limit = limit;
         }
@@ -334,5 +353,9 @@ export class TeamWorkDialog extends FormDialog {
     }
 
     await super._onChangeInput(event as any);
+  }
+
+  override applyFormData(): void {
+
   }
 }

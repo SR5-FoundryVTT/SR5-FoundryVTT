@@ -37,7 +37,7 @@
     <select class="form-control" name="attribute" {{#if lockedSkill}}disabled{{/if}}>
       {{#each attributes as |attribute|}}
       <option value="{{attribute.name}}" {{#ife attribute.name ../attribute.name}}selected{{/ife}}>
-        {{attribute.label}}
+        {{localize attribute.label}}
       </option>
       {{/each}}
     </select>
