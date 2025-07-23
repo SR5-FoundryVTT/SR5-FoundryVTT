@@ -2,17 +2,23 @@ import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { AttributeEntry, LimitEntry, LimitKey, SkillEntry, SkillGroup, TeamworkData, TeamworkFlow } from "../../actor/flows/TeamworkFlow";
 import { SR5 } from "../../config";
+
 import { Translation } from "../../utils/strings";
 
-export interface TeamWorkDialogData extends FormDialogData, TeamworkData {
-  actors: SR5Actor[];
-  skills: SkillGroup[];
-  attributes: AttributeEntry[];
-  filter: string;
-  limits: LimitEntry[];
-  request: boolean;
-  specialization: boolean;
-  cancelled: boolean;
+export interface TeamWorkDialogData extends Omit<FormDialogData, "templateData">
+{
+  templateData: {
+    actors: SR5Actor[];
+    skills: SkillGroup[];
+    attributes: AttributeEntry[];
+    filter: string;
+    limits: LimitEntry[];
+    request: boolean;
+    specialization: boolean;
+    cancelled: boolean;
+    showAllowOtherSkills: boolean;
+    lockedSkill: boolean;
+  } & TeamworkData;
 }
 
 
@@ -60,10 +66,10 @@ export class TeamWorkDialog extends FormDialog {
 
     const threshold = teamworkData.threshold ?? 0;
     const showAllowOtherSkills = true;
-    const allowOtherSkills = showAllowOtherSkills && teamworkData.allowOtherSkills;
+    const allowOtherSkills = Boolean(showAllowOtherSkills && teamworkData.allowOtherSkills);
     const limit = teamworkData.limit?.name != undefined && teamworkData.limit.name !== "" ? teamworkData.limit.name : skill?.limit ?? "";
     const limits = TeamworkFlow.limitList;
-    const request = teamworkData.request;
+    const request = Boolean(teamworkData.request);
     const lockedSkill = !request && (!showAllowOtherSkills || !allowOtherSkills);
 
     const templateData = {
@@ -127,16 +133,39 @@ export class TeamWorkDialog extends FormDialog {
     const data = super.getData() as unknown as TeamWorkDialogData;
 
     if (!this.baseActors) {
-      this.baseActors = this.data.actors;
-      this.baseSkills = TeamworkFlow.buildSkillGroups(this.data.actor);
+      this.baseActors = this.data.templateData.actors;
+      this.baseSkills = TeamworkFlow.buildSkillGroups(this.data.templateData.actor);
     }
-    this.data.skills = this.baseSkills;
+    this.data.templateData.skills = this.baseSkills;
     return data;
   }
 
+  // /**
+  // * Wurde im Dialog auf „Submit“ geklickt: Form-Daten übernehmen und Dialog schließen.
+  // */
+  // override async _updateData(formData: Record<string, any>): Promise<void> {
+  //   console.log('➤ TeamworkDialog: _updateData', formData);
+  //   // Alle Werte ins this.data schreiben, der FormDialog schließt dann automatisch mit this.data
+  //   const actor = this.data.actor = (await fromUuid(formData.actor)) as SR5Actor;
+  //   this.data.skill = TeamworkFlow.constructSkillEntry(
+  //     { id: formData["skill.id"] },
+  //     actor
+  //   );
+  //   this.data.attribute = TeamworkFlow.constructAttributeEntry(
+  //     formData.attribute
+  //   );
+  //   const limitEntry = TeamworkFlow.constructLimitEntry(formData["limit.name"]);
+  //   limitEntry.base = Number(formData["limit.base"]);
+  //   this.data.limit = limitEntry;
+    
+  //   this.data.threshold = Number(formData.threshold);
+  //   this.data.allowOtherSkills = Boolean(formData.allowOtherSkills);
+  //   this.data.specialization = Boolean(formData.specialization);
+  // }
+
   override activateListeners(html: JQuery) {
     super.activateListeners(html);
-    const data = this.data.templateData as TeamWorkDialogData;
+    const data = this.data.templateData;
 
     const limitBaseInput = html.find<HTMLInputElement>('input[name="limit.base"]');
     const LimitNameInput = html.find<HTMLSelectElement>('select[name="limit.name"]');
@@ -177,14 +206,14 @@ export class TeamWorkDialog extends FormDialog {
   }
 
   override onAfterClose(html: JQuery<HTMLElement>): {
-      actor: SR5Actor,
-      skill: SkillEntry,
-      attribute: AttributeEntry,
-      limit?: LimitEntry,
-      threshold: number,
-      allowOtherSkills: boolean,
-      specialization: boolean
-    } | undefined {
+    actor: SR5Actor,
+    skill: SkillEntry,
+    attribute: AttributeEntry,
+    limit?: LimitEntry,
+    threshold: number,
+    allowOtherSkills: boolean,
+    specialization: boolean
+  } | undefined {
     const {
       actor,
       skill,
@@ -193,9 +222,10 @@ export class TeamWorkDialog extends FormDialog {
       threshold,
       allowOtherSkills,
       specialization
-    } = this.data as TeamWorkDialogData;
+    } = this.data.templateData;
 
-    if (!actor|| !skill || !attribute) return this._emptySelection() as any;
+    if (!actor || !skill || !attribute) return this._emptySelection() as any;
+
 
     return {
       actor: actor,
@@ -215,7 +245,7 @@ export class TeamWorkDialog extends FormDialog {
   override async _onChangeInput(event: any): Promise<void> {
     const el = event.target as HTMLInputElement;
     const name = el.name;
-    const data = this.data.templateData as TeamWorkDialogData;
+    const data = this.data.templateData;
 
     switch (name) {
       case 'actor':
@@ -268,7 +298,7 @@ export class TeamWorkDialog extends FormDialog {
         // Hier fangen wir manuelles Attribut-Ändern ab:
         const attributeKey = el.value;
         // `this.baseActors` kennst Du schon, aber hier brauchst Du die Attributliste:
-        const attributes = TeamworkFlow.buildAttributeList(this.data.actor);
+        const attributes = TeamworkFlow.buildAttributeList(this.data.templateData.actor);
         // finde das Objekt in der Liste
         const attribute = attributes.find(a => a.name === attributeKey)
           ?? attributes.find(a => a.label === attributeKey);

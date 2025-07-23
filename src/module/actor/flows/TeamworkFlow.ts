@@ -222,7 +222,9 @@ export class TeamworkFlow {
         request?: boolean;
     }): Promise<Partial<TeamworkData> & { specialization?: boolean, cancelled?: boolean }> {
         if (!data.actors.length) return { cancelled: true };
-        const dialogData = await new TeamWorkDialog(data).select();
+        const dialogData = await new TeamWorkDialog(data).select();        
+
+        console.log("showTeamworkDialog data", dialogData)
 
         dialogData.actor = (await fromUuid(dialogData.actor) as SR5Actor)
         if (!dialogData.actor) return { cancelled: true };
@@ -255,13 +257,17 @@ export class TeamworkFlow {
             request: true
         });
 
+        console.log("initiateTeamworkTest data", data)
+
         if (dialogData.cancelled) return;
+
+        if (!dialogData.actor ||!dialogData.skill || !dialogData.attribute) return;
 
         // Setze initiales Flag-Objekt
         const teamworkData: TeamworkMessageData = {
-            actor: dialogData.actor!,
-            skill: dialogData.skill!,
-            attribute: dialogData.attribute!,
+            actor: dialogData.actor,
+            skill: dialogData.skill,
+            attribute: dialogData.attribute,
             threshold: dialogData.threshold,
             limit: dialogData.limit,
             allowOtherSkills: dialogData.allowOtherSkills!,
@@ -281,7 +287,7 @@ export class TeamworkFlow {
         const templateContext = {
             ...teamworkData,
             limit: (SR5.limits as Record<LimitKey, string>)[dialogData.limit?.name ?? ""] ?? undefined,
-            attribute: (SR5.attributes as Record<ActorAttribute, string>)[dialogData.attribute!.name] ?? undefined
+            attribute: (SR5.attributes as Record<ActorAttribute, string>)[dialogData.attribute.name] ?? undefined
         };
 
         console.log("initiateTeamworkTest templateContext", templateContext)
@@ -333,6 +339,8 @@ export class TeamworkFlow {
         });
 
         if (!dialogData) return;
+
+        console.log(dialogData)
 
         // 1) Basis-ActionData holen
         const skillAction: Shadowrun.ActionRollData | undefined = actor.skillActionData(dialogData.skill!.id, { specialization: dialogData.specialization });
