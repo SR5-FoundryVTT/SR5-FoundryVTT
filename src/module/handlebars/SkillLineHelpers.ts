@@ -69,11 +69,10 @@ export const registerSkillLineHelpers = () => {
         }
     });
     Handlebars.registerHelper('SkillRightSide', function (skillType: string, skill: SkillFieldType) {
-        const specs = Array.isArray(skill.specs) ? skill.specs : [skill.specs];
         return [
             {
                 html: {
-                    text: specs.map(spec => `<span class="roll skill-spec-roll">${spec}</span>`).join(', '),
+                    text: skill.specs.map(spec => `<span class="roll skill-spec-roll">${spec}</span>`).join(', '),
                     cssClass: 'skill-spec-item',
                 }
             },
