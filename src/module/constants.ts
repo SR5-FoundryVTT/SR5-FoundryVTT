@@ -13,7 +13,6 @@
 export const SYSTEM_NAME = 'shadowrun5e';
 export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}`;
 export const FLAGS = {
-    DiagonalMovement: 'diagonalMovement',
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
@@ -55,7 +54,12 @@ export const FLAGS = {
     DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
     TeamworkTestFlow: 'TeamworkTestFlow',
     UseDamageCondition: 'UseDamageCondition',
-    GlobalDataStorage: 'GlobalDataStorage'
+    GlobalDataStorage: 'GlobalDataStorage',
+    TokenRulerColorWalking: "TokenRulerColorWalking",
+    TokenRulerColorRunning: "TokenRulerColorRunning",
+    TokenRulerColorSprinting: "TokenRulerColorSprinting",
+    TokenRulerOpacity: 'TokenRulerOpacity',
+    TokenUseRoutingLib: 'TokenUseRoutingLib',
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -120,24 +124,24 @@ export const SR = {
         // come to  be.
         // These are the most extreme outer, possible modified values for each attribute.
         ranges: {
-            magic: {min: 0},
-            edge: {min: 0},
-            resonance: {min: 0},
-            essence: {min: 0},
-            body: {min: 0},
-            agility: {min: 0},
-            reaction: {min: 0},
-            strength: {min: 0},
-            willpower: {min: 0},
-            logic: {min: 0},
-            intuition: {min: 0},
-            charisma: {min: 0},
-            attack: {min: 0},
-            sleaze: {min: 0},
-            data_processing: {min: 0},
-            firewall: {min: 0},
-            host_rating: {min: 0, max: 12},
-            pilot: {min: 0},
+            magic: { min: 0 },
+            edge: { min: 0 },
+            resonance: { min: 0 },
+            essence: { min: 0 },
+            body: { min: 0 },
+            agility: { min: 0 },
+            reaction: { min: 0 },
+            strength: { min: 0 },
+            willpower: { min: 0 },
+            logic: { min: 0 },
+            intuition: { min: 0 },
+            charisma: { min: 0 },
+            attack: { min: 0 },
+            sleaze: { min: 0 },
+            data_processing: { min: 0 },
+            firewall: { min: 0 },
+            host_rating: { min: 0, max: 12 },
+            pilot: { min: 0 },
             force: {min: 0}
         },
         /**
@@ -145,18 +149,18 @@ export const SR = {
          * 1 for each.
          */
         rangesSpirit: {
-            magic: {min: 0},
-            edge: {min: 0},
-            essence: {min: 0},
-            body: {min: 1},
-            agility: {min: 1},
-            reaction: {min: 1},
-            strength: {min: 1},
-            willpower: {min: 1},
-            logic: {min: 1},
-            intuition: {min: 1},
-            charisma: {min: 1},
-            pilot: {min: 0},
+            magic: { min: 0 },
+            edge: { min: 0 },
+            essence: { min: 0 },
+            body: { min: 1 },
+            agility: { min: 1 },
+            reaction: { min: 1 },
+            strength: { min: 1 },
+            willpower: { min: 1 },
+            logic: { min: 1 },
+            intuition: { min: 1 },
+            charisma: { min: 1 },
+            pilot: { min: 0 },
             force: {min: 1}
         },
         // Use for initial default values that aren't simply range.<>.min values.
@@ -173,7 +177,7 @@ export const SR = {
         vehicle: {
             // These physical attributes don't really exist on a vehicle.
             // System does manage them in regards to GitHub issue #712
-            strength: {min: 0},
+            strength: { min: 0 },
             agility: {min: 0}
         }
     },
@@ -187,7 +191,7 @@ export const SR = {
             dice: 4
         },
         ranges: {
-            base: {min: 0},
+            base: { min: 0 },
             dice: {min: 0, max: 5}
         }
     },
@@ -236,5 +240,14 @@ export const SR = {
                 }
             }
         }
+    },
+    gradeModifiers: {
+        standard: { essence: 1, avail: 0, cost: 1 },
+        alpha: { essence: 0.8, avail: 2, cost: 1.2 },
+        beta: { essence: 0.7, avail: 4, cost: 1.5 },
+        delta: { essence: 0.5, avail: 8, cost: 2.5 },
+        gamma: { essence: 0.4, avail: 12, cost: 5 },
+        grey: { essence: 0.75, avail: 0, cost: 1.3 },
+        used: { essence: 1.25, avail: -4, cost: 0.75 },
     }
 }

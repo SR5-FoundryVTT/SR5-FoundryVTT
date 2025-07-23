@@ -10,7 +10,7 @@
     justify-content: flex-start;
 }
 //window background
-body #forien-quest-log .window-content, .window-app.forien-quest-preview .window-content {
+body:not(.theme-dark) #forien-quest-log .window-content, .window-app.forien-quest-preview .window-content {
     border-radius: 0 0 5px 5px;
     margin: 0;
     padding: 0;
@@ -22,7 +22,7 @@ body #forien-quest-log .window-content, .window-app.forien-quest-preview .window
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: flex-start;
-    
+
     padding: 8px;
     //color: var(--color-text-dark-primary);
     overflow-y: auto;
@@ -35,8 +35,13 @@ body #forien-quest-log .window-content, .window-app.forien-quest-preview .window
     color: $yellow;
 }
 body #forien-quest-log .quest-log .log-body header {
-    background: url(assets/journal-banner.webp) repeat;
-    font-family: $editorFonts;
+    background:
+        $nameplate-background,
+        url("assets/page.webp") repeat;
+    background-repeat: no-repeat, repeat;
+    background-size: 100% 41px, auto; // first layer = 60px tall
+    background-position: center, top;
+    border-radius: 0;
     text-align: left !important;
     text-indent: 5px;
     color: $white;
@@ -56,10 +61,6 @@ body #forien-quest-log .quest-log .table ul li.drag-quest:hover {
     border-color: var(--palette-primary,var(--default-primary-accent,$red));
     box-shadow: 0 0 2px var(--palette-primary,var(--default-primary-accent,$red)) inset; //$red is the var for Red
 }
-// Quest Pause Hover
-//body #forien-quest-log .actions i:hover, .window-app.forien-quest-preview .actions i:hover {
-    //color: $green;
-//}
 
 body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .quest-giver-name h2:hover {
     color: var(--palette-primary,var(--default-primary-accent,$darkred));
@@ -75,7 +76,6 @@ body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .
 body #forien-quest-log .quest-log .log-body header h1 {
     align-self: flex-end;
     border: none;
-    font-family: 'klavika-medium';
     font-size: medium;
     margin: 0;
     padding-bottom: 26px;
@@ -106,12 +106,10 @@ body #forien-quest-log h1, .window-app.forien-quest-preview h1 {
     line-height: 1;
     margin: 0 0 8px;
     padding: 0 0 30px;
-    color: #ffffff; 
-    //border-bottom: 2px solid var(--color-underline-header);
+    color: #ffffff;
 }
 // h1 quest log header
 body #forien-quest-log h1, .window-app.forien-quest-preview h1 {
-    //background: url(assets/journal-banner-small.webp) repeat;
     color: $white;
 }
 
@@ -119,12 +117,10 @@ body #forien-quest-log h1, body .window-app.forien-quest-preview h1 {
     line-height: 1;  /* or whatever line-height value you want */
     text-indent: 10px;
     padding-top: 2px;
-    //background: url(assets/journal-banner-small.webp) repeat;
 }
 
 // h4 Quest Log
 body #quest-tracker .window-header h4 {
-    font-family: 'klavika-medium';
     color: $yellow;
     font-size: large;
 }
@@ -142,7 +138,6 @@ body #forien-quest-log .quest-log .table ul .title h2, body .window-app.forien-q
 
 body #quest-tracker .quest .title a, #quest-tracker .quest .title i {
     filter: drop-shadow(1px 1px 1px #000);
-    font-family: 'klavika-medium';
     font-size: medium;
     color: $yellow;
 }
@@ -151,8 +146,13 @@ body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .
     align-items: center;
     display: flex;
     justify-content: space-between;
-    background: url(assets/journal-banner-small.webp) repeat;
-    background-size: cover;
+    background:
+        $nameplate-background,
+        url("assets/page.webp") repeat;
+    background-repeat: no-repeat, repeat;
+    background-size: 100% 41px, auto; // first layer = 60px tall
+    background-position: center, top;
+    border-radius: 0;
 }
 
 body .window-app.forien-quest-preview .quest-body .quest-info .quest-col-right .quest-tasks .toggleState:hover {
@@ -278,7 +278,6 @@ h2{
     border-bottom: 1px solid $edge;
 }}
 h4.message-sender{
-    font-family: 'klavika-medium' ;
     font-size: small;
     color: $white;
 }

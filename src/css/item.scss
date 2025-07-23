@@ -2,6 +2,12 @@
 .sr5.item {
     min-height: 484px;
     min-width: 600px;
+    .window-content {
+        border: none;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        padding: 0 6px;
+    }
     .wholesheet {
         height: 100%;
         display: flex;
@@ -11,6 +17,9 @@
     .sheetbody {
         overflow: auto;
         flex: 1;
+    }
+    img {
+        margin-top: 6px;
     }
 
     .item-header {
@@ -23,16 +32,13 @@
             border: 0px;
             flex: 1;
             height: 60px;
-            font-size: var(--font-size-18);
-
+            font-size: var(--font-size-20);
             .display {
-                background: url("assets/item-banner.webp") repeat;
+                background: $nameplate-background;
                 border: none;
-                font-family: 'klavika-medium';
-                height: 60px;
-                padding-bottom: 1em;
+                height: 35px;
+                margin-top: 11px;
                 padding-left: 7px;
-                padding-top: 1em;
                 text-align: left;
             }
         }
@@ -94,27 +100,45 @@
     }
     .technology {
         @include systemFonts;
-
         min-width: 12em;
         padding-top: 10px;
         padding-left: 10px;
 
         > * {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: space-between;
-        }
-        .unit {
-            font-size: 10px;
-            top: 5px;
-            left: 2px;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: space-between;
         }
 
         label {
-            color: $yellow;
+          color: $yellow;
         }
 
-    }
+        .tech-adjustable-label {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+
+        .tech-adjustable-input {
+          flex: 1;
+          position: relative;
+
+          input.display {
+            width: 100%;
+          }
+
+          .unit {
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            pointer-events: none;
+          }
+        }
+      }
     .description {
         padding: 2px;
         padding-left: 10px;
@@ -124,13 +148,14 @@
         grid-column-start: 2; //will be ignored by flex and is used to place when grid is on
     }
     .item-form {
-        padding: 0 0.5em;
+        padding: 0.5em;
         &.des{
             max-width: 14em;
         }
         .header {
             @include title;
-            font-size: 1.75em;
+            font-size: 1.25em;
+            color: $yellow;
         }
         .form-line {
             display: flex;
@@ -194,6 +219,39 @@
             }
             label {
                 color: $yellow;
+            }
+        }
+    }
+
+    /** Header Removal **/
+
+    &.sheet.window-app {
+        box-shadow: 0 0 10px 0px rgba(235,181,49,0.3);
+
+        & .window-header {
+            border-bottom: none;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+            background-repeat: repeat;
+            background-size: 100% 20px auto;
+            flex: 0 0 20px;
+            padding: 0 3px 0 0;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+
+            & a {
+            display: inline-flex;
+            padding: 6px 0 0 0;
+            font-size: 0px;
+            color: rgb(100, 100, 100);
+
+            & .fa-solid,
+                & .fas {
+                    font-size: 12px;
+                }
+            }
+
+            & .window-title {
+            font-size: 0;
             }
         }
     }

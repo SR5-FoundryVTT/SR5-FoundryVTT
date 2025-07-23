@@ -56,7 +56,6 @@ import { NetworkDeviceFlow } from './item/flows/NetworkDeviceFlow';
 import { registerSystemKeybindings } from './keybindings';
 import { SkillTest } from './tests/SkillTest';
 
-import { canvasInit } from './canvas';
 import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
 import { OpposedCompileSpriteTest } from './tests/OpposedCompileSpriteTest';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
@@ -70,8 +69,9 @@ import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
-
-
+import { RoutingLibIntegration } from './integrations/routingLibIntegration';
+import { SR5TokenDocument } from './token/SR5TokenDocument';
+import { SR5TokenRuler } from './token/SR5TokenRuler';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -81,21 +81,29 @@ export class HooksManager {
         console.log('Shadowrun 5e | Registering system hooks');
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
-        Hooks.once('init', HooksManager.init);
+        Hooks.once('init', () => {
+            HooksManager.init();
+            
+            // Custom Module Integrations
+            // See src/module/integartions for more information.
+            if (game.modules.get('routinglib')?.active) {
+                RoutingLibIntegration.init();
+            }
+        });
         Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
 
-        Hooks.on('canvasInit', canvasInit);
         Hooks.on('ready', HooksManager.ready);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
-        Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory);
-        Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
+        Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory);
         // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD);
+        Hooks.on('renderTokenConfig', SR5Token.tokenConfig);
+        Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
-        Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
+        Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions);
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners);
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant);
@@ -262,6 +270,25 @@ ___________________
         CONFIG.ActiveEffect.legacyTransferral = false;
 
         CONFIG.Token.objectClass = SR5Token;
+        CONFIG.Token.documentClass = SR5TokenDocument;
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        CONFIG.Token.rulerClass = SR5TokenRuler;
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        CONFIG.Token.movement.actions['run'] = {
+            label: 'SR5.MovementTypes.Run',
+            icon: 'fa-solid fa-person-running',
+            canSelect: () => false,
+            // @ts-expect-error TODO: foundry-vtt-types v13
+            getAnimationOptions: () => ({ movementSpeed: CONFIG.Token.movement.defaultSpeed * 2 }),
+        };
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        CONFIG.Token.movement.actions['sprint'] = {
+            label: 'SR5.MovementTypes.Sprint',
+            icon: 'fa-solid fa-person-running-fast',
+            canSelect: () => false,
+            // @ts-expect-error TODO: foundry-vtt-types v13
+            getAnimationOptions: () => ({ movementSpeed: CONFIG.Token.movement.defaultSpeed * 3 }),
+        };
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
@@ -372,7 +399,7 @@ ___________________
 
     /**
      * Handle drop events on the hotbar creating different macros.
-     * 
+     *
      * NOTE: FoundryVTT Hook callbacks won't be resolved when returning a promise.
      *       While this function calls async methods, it's order of operations isn't important.
      *
@@ -394,7 +421,7 @@ ___________________
 
     static getSceneControlButtons(controls) {
         if (game.user?.isGM) {
-            const overwatchScoreTrackControl = { 
+            const overwatchScoreTrackControl = {
                 name: 'overwatch-score-tracker',
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',
                 icon: 'fas fa-network-wired',
@@ -419,50 +446,14 @@ ___________________
         console.debug('Shadowrun5e | Registering new chat messages related hooks');
     }
 
-    /**
-     * Extend rendering of Sidebar tab 'ActorDirectory' by
-     * - the Chummer Actor Import button
-     * @param app Foundry ActorDirectory app instance
-     * @param html HTML element of the app
-     */
-    static renderActorDirectory(app: Application, html: HTMLElement) {
-        if(!game.user?.isGM) {
-            return 
-        }
-
-        // Already exists, no need to add again.
-        const existing = $(html).find('#chummer-actor-import');
-        if (existing.length > 0) {
+    static renderCompendiumDirectory(app: Application, html: HTMLElement) {
+        if (!game.user?.isGM) {
             return;
         }
-        
-        const button = $('<button id="chummer-actor-import" class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('footer').append(button);
-        button.on('click', (event) => {
-            new Import().render(true);
-        });
-    }
 
-    /**
-     * Extend rendering of Sidebar tab 'ItemDirectory' by
-     * - the Chummer Item Import button
-     * 
-     * @param app Foundry ItemDirectory app instance
-     * @param html HTML element of the app
-     */
-    static renderItemDirectory(app: Application, html: HTMLElement) {
-        if(!game.user?.isGM){
-            return 
-        }
+        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
+        $(html).find('.directory-footer').append(button);
 
-        // Already exists, no need to add again.
-        const existing = $(html).find('#chummer-item-import');
-        if (existing.length > 0) {
-            return;
-        }
-        
-        const button = $('<button id="chummer-item-import" class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('footer').append(button);
         button.on('click', (event) => {
             new Import().render(true);
         });

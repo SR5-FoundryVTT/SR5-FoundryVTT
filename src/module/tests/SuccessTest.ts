@@ -1961,12 +1961,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     /**
      * Foundry ChatMessage context options (right click) used for all test types.
-     * @param html
-     * @param options
+     * @param app The ChatLog application. 
+     * @param options The list of options to be shown in the context menu.
      */
-    static chatMessageContextOptions(html, options) {
+    static chatMessageContextOptions(app, options) {
         const pushTheLimit = async (li) => {
-            const messageId = li.data().messageId;
+            const messageId = $(li).data().messageId;
             const test = await TestCreator.fromMessage(messageId);
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 
@@ -1974,7 +1974,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         const secondChance = async (li) => {
-            const messageId = li.data().messageId;
+            const messageId = $(li).data().messageId;
             const test = await TestCreator.fromMessage(messageId);
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 
@@ -1982,7 +1982,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         };
 
         const extendTest = async (li) => {
-            const messageId = li.data().messageId;
+            const messageId = $(li).data().messageId;
             const test = await TestCreator.fromMessage(messageId);
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 

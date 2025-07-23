@@ -1,21 +1,19 @@
 {
-  "include": [
-    "src/**/*",
-    "src/module/types/global.d.ts"
-  ],
-  "exclude": ["node_modules", "**/*.spec.ts"],
-  "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "types": [
-      "@league-of-foundry-developers/foundry-vtt-types",
-      "@ethaks/fvtt-quench"
-    ],
-    "moduleResolution": "node",
-    "strictNullChecks": true,
-    "skipLibCheck": true,
-    "noEmitOnError": false,
-    "noImplicitOverride": true,
-    "resolveJsonModule": true
-  }
+    "include": ["src/**/*", "src/module/types/global.d.ts"],
+    "exclude": ["node_modules", "**/*.spec.ts"],
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "types": ["@league-of-foundry-developers/foundry-vtt-types", "@ethaks/fvtt-quench"],
+        "moduleResolution": "node",
+        "strictNullChecks": true,
+        "skipLibCheck": true,
+        "noEmitOnError": false,
+        "noImplicitOverride": true,
+        "resolveJsonModule": true,
+        "baseUrl": "./",
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    }
 }

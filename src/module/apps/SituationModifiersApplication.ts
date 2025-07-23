@@ -449,7 +449,7 @@ export class SituationModifiersApplication extends FormApplication {
         container.append(column);
 
         // Connect SR-FoundryVTT tokenHUD elements to FoundryVTT tokenHUD column structure.
-        html.find('.col.right').after(container);
+        $(html).find('.col.right').after(container);
 
         // Hand DOM element over and let ModifierHandlers add their TokenHUDElements.
         SituationModifiersApplication._staticHandlers.forEach(handler => handler.addTokenHUDElements(column, data._id, actor, modifiers));

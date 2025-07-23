@@ -38,21 +38,25 @@ input[type='text'].display {
  * JOURNAL ENTRY STYLING
  */
 // Journal Entry
-.sheet.journal-entry .journal-entry-content,
-// Journal Entry Page Editor 
-.journal-sheet.journal-entry-page .window-content {
-    background: url('assets/light-page.webp') repeat;
+body:not(.theme-dark) {
+    .sheet.journal-entry .journal-entry-content,
+    // Journal Entry Page Editor
+    .journal-sheet.journal-entry-page .window-content {
+        background: url('assets/light-page.webp') repeat;
+    }
+}
 
+.sheet.journal-entry .journal-entry-content,
+// Journal Entry Page Editor
+.journal-sheet.journal-entry-page .window-content {
     // As we only change headers in journal-entires, avoid cross styling outside of it.
     // This clashed with Weather Control module and others.
     h1 {
-        font-family: 'klavika-medium';
         color: $darkred;
         font-size: 25px;
     }
 
     h2 {
-        font-family: 'klavika-medium';
         color: $darkred;
     }
 
@@ -63,7 +67,6 @@ input[type='text'].display {
             background: inherit;
             text-align: left;
             color: $yellow;
-            font-family: 'klavika-medium';
             font-size: medium;
             padding: 9px;
         }
@@ -107,9 +110,23 @@ input[type='text'].display {
     }
 }
 
+.sheet.journal-entry .journal-entry-pages {
+    margin: 14px 8px 16px 16px;
+}
+.journal-entry .journal-header {
+    height: 80px;
+    width: 100%;
+    margin: auto;
+    z-index: 2;
+}
 .journal-sheet .journal-header .title {
-    background: url('assets/journal-banner.webp') repeat;
-    font-family: 'klavika-medium';
+    background:
+        $nameplate-background,
+        url("assets/page.webp") repeat;
+    background-repeat: no-repeat, repeat;
+    background-size: 100% 41px, auto; // first layer = 60px tall
+    background-position: center, top;
+    border-radius: 0;
     text-align: left !important;
     text-indent: 5px;
     color: white;
@@ -117,8 +134,9 @@ input[type='text'].display {
     height: 80px;
 }
 
+
+
 .journal-sheet h3 {
-    font-family: 'klavika-medium';
     color: $darkred;
 }
 
@@ -224,4 +242,9 @@ input[type='text'].display {
 .fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
 {
     color: $pdfColor;
+}
+.window-resizable-handle {
+    .fa-solid {
+        transform: rotate(45deg)
+    }
 }

@@ -208,12 +208,12 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isEnabled(): boolean {
-        if(!this.isCritterPower && !this.isSpritePower) return false;
+        if(!this.isCritterPower() && !this.isSpritePower()) return false;
         return this.getData().enabled !== undefined ? this.getData().enabled === true : true;
     }
 
     canBeDisabled(): boolean {
-        if(!this.isCritterPower && !this.isSpritePower) return false;
+        if(!this.isCritterPower() && !this.isSpritePower()) return false;
         return (this.getData().optional || 'standard') !== 'standard'
     }
 
@@ -305,7 +305,8 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
      * @returns A decimal as essence modifier
      */
     getEssenceLoss(): number {
-        const loss = Number(this.getData()?.essence) ?? 0;
+        const lossRaw = Number(this.getData()?.technology?.calculated.essence.adjusted ? this.getData()?.technology?.calculated.essence.value : this.getData()?.essence);
+        const loss = isNaN(lossRaw) ? 0 : lossRaw;
         const quantity = Number(this.getData()?.technology?.quantity) ?? 1;
 
         return loss * quantity
