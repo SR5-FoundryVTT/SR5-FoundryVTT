@@ -6,6 +6,11 @@ import { Translation } from '../utils/strings';
 import { SkillFieldType } from '../types/template/Skills';
 
 export const registerBasicHelpers = () => {
+    /**
+     * Localization helper for mapping a key to a key-localization mapping.
+     * 
+     * This is used for mapping an Item type to it's localization label and other similar mappings.
+     */
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj) strId = obj[strId];
         return game.i18n.localize(strId);
@@ -137,7 +142,7 @@ export const registerBasicHelpers = () => {
     });
     Handlebars.registerHelper('disabledHelper', function (value) {
         const val = Boolean(value);
-        return val ? val : undefined;
+        return val || undefined;
     });
     // TODO: This helper doesn't work... Don't know why, but it doesn't.
     Handlebars.registerHelper('localizeShortened', function (label: string, length: number, options: any): SafeString {
@@ -147,7 +152,7 @@ export const registerBasicHelpers = () => {
     /**
      * Given an object return the value for a given key.
      */
-    Handlebars.registerHelper('objValue', function(obj: Object, key: string) {
+    Handlebars.registerHelper('objValue', function(obj: Record<string, unknown>, key: string) {
         return obj[key] ||  '';
     });
 
@@ -166,10 +171,10 @@ export const registerBasicHelpers = () => {
      */
     Handlebars.registerHelper('itemMarking', function(element: string) {
         const mark = game.settings.get(SYSTEM_NAME, 'MarkImports');
-        if (element == 'ANY' && mark != 'NONE') {
+        if (element === 'ANY' && mark !== 'NONE') {
             return true;
         }
-        if (mark == element || mark == 'BOTH') {
+        if (mark === element || mark === 'BOTH') {
             return true;
         }
         return false;
@@ -179,7 +184,7 @@ export const registerBasicHelpers = () => {
      * Check whether an actor has any items that are freshly imported
      */
     Handlebars.registerHelper('hasAnyFreshImports', function(actor: SR5Actor) {
-        if (game.settings.get(SYSTEM_NAME, 'MarkImports') != 'NONE') {
+        if (game.settings.get(SYSTEM_NAME, 'MarkImports') !== 'NONE') {
             const allItems = actor.items;
             for (const item of allItems) {
                 if (item.system.importFlags) {

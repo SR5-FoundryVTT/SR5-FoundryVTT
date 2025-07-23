@@ -13,6 +13,7 @@ const SinData = {
     technology: new SchemaField(TechnologyData()),
 
     licenses: new ArrayField(new SchemaField(LicenseData())),
+    networks: new ArrayField(new StringField({ required: true, nullable: false })),
 }
 
 export class Sin extends ItemBase<typeof SinData> {

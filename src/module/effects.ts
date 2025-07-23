@@ -25,7 +25,10 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
     // These element grabs rely heavily on HTML structure within the templates.
     const icon = event.currentTarget;    
     const item = event.currentTarget.closest('.list-item-effect');
-    const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId) : null;
+    const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId)! : null;
+
+    if (!effect) return;
+
     // The HTML dataset must be defined
     switch (icon.dataset.action) {
         case "create":
@@ -38,18 +41,16 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
         case "edit":
             return effect.sheet.render(true);
 
-        case "delete":
+        case "delete": {
             const userConsented = await Helpers.confirmDeletion();
             if (!userConsented) return;
 
             return effect.delete();
-
+        }
         case "toggle":
             return effect.toggleDisabled();
         case "open-origin":
             return effect.renderSourceSheet();
-        default:
-            return;
     }
 }
 
@@ -78,8 +79,6 @@ export async function onManageItemActiveEffect(event: MouseEvent) {
             return effect.toggleDisabled();
         case "open-origin":
             return effect.parent?.sheet?.render(true);
-        default:
-            return;
     }
 }
 

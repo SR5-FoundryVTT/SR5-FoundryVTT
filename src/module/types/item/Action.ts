@@ -5,15 +5,16 @@ const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foun
 
 const ResultActionData = () => ({
     action: new StringField({
+        blank: true,
         required: true,
-        initial: 'placeMarks',
-        choices: ['modifyCombatantInit', 'placeMarks']
+        choices: ['modifyCombatantInit', 'forceReboot']
     }),
     label: new StringField({ required: true }),
     value: new StringField({ required: true })
 });
 
 const ActionResultData = () => ({
+    // TODO success: Record<string, any>
     success: new SchemaField({
         matrix: new SchemaField({
             placeMarks: new BooleanField(),
@@ -28,6 +29,13 @@ export const MinimalActionData = () => ({
     limit: new ModifiableField(ModifiableValueLinked()),
     mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     skill: new StringField({ required: true }),
+});
+
+export const ActionCategory = () => ({
+    matrix: new SchemaField({
+        owner: new BooleanField(),
+        marks: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    }),
 });
 
 export const DamageData = () => ({
@@ -81,6 +89,7 @@ export const ActionRollData = (
     ...MinimalActionData(),
     test: new StringField({ required: true, initial: test }),
     type: new StringField({ required: true }),
+    category: new SchemaField(ActionCategory()),
     categories: new ArrayField(new StringField({ required: true })),
     spec: new BooleanField(),
     mod_description: new StringField({ required: true }),

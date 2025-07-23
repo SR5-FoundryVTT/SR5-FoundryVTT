@@ -18,7 +18,7 @@ export interface TestDialogData extends FormDialogData {
 export interface TestDialogListener {
     query: string
     on: string
-    callback: (event: JQuery<HTMLElement>, dialog: TestDialog) => void
+    callback: (event: any, dialog: TestDialog) => void
 }
 
 /**
@@ -54,7 +54,7 @@ export class TestDialog extends FormDialog {
         super.activateListeners(html);
 
         // Handle in-dialog entity links to render the respective sheets.
-        html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet)
+        html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers))
 
         this._injectExternalActiveListeners(html);
     }

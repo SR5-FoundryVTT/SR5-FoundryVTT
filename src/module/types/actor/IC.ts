@@ -19,7 +19,6 @@ const ICData = {
     matrix: new SchemaField(MatrixData()),
     host: new SchemaField({
         rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-        id: new StringField({ required: true }),
         atts: new SchemaField(MatrixAttributes(false)),
     }),
 

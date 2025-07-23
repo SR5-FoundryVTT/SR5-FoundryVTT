@@ -19,12 +19,22 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpritePowersTab.hbs',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ConfigTab.hbs',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/HackingTab.hbs',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.hbs',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.hbs',
+
+        // item tabs
+        'systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/GridDescriptionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/DescriptionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/ActionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/MiscellaneousTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/NetworksTab.hbs',
 
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.hbs',
@@ -55,6 +65,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.hbs',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.hbs',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.hbs',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/Targets.hbs',
 
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.hbs',
@@ -91,13 +102,13 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscCritter.hbs',
 
 
+        // item parts
         'systems/shadowrun5e/dist/templates/item/parts/description.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/technology.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/header.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/weapon-ammo-list.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/action.hbs',
-        'systems/shadowrun5e/dist/templates/item/parts/action_results.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/modifier.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/damage.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.hbs',
@@ -117,6 +128,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/summoning.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/compilation.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/ritual.hbs',
+        'systems/shadowrun5e/dist/templates/item/parts/misc_matrix.hbs',
 
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs',
@@ -157,7 +169,10 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs',
 
         // Modifier management parts
-        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
+        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
+
+        // Application - Matrix Network Hacking
+        'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs'
     ];
 
     return foundry.applications.handlebars.loadTemplates(templatePaths);

@@ -1,4 +1,6 @@
-import {SR} from "../constants";
+import { SR } from "../constants";
+import { DataDefaults } from "../data/DataDefaults";
+import { DamageType } from "../types/item/Action";
 
 export class MatrixRules {
     /**
@@ -65,9 +67,40 @@ export class MatrixRules {
         return 0;
     }
 
+    /**
+     * Amount of marks that is valid in general for a target (includes zero marks)
+     * @param marks The possibly faulty amount of marks
+     * @returns A valid amount of marks
+     */
     static getValidMarksCount(marks: number): number {
         marks = Math.min(marks, MatrixRules.maxMarksCount());
         return Math.max(marks, MatrixRules.minMarksCount());
+    }
+
+    /**
+     * Amount of marks that can be placed. SR5#240 'Hack on the Fly'
+     * @param marks The possibly faulty amount of marks
+     * @returns A valid amount of marks
+     */
+    static getValidMarksPlacementCount(marks: number): number {
+        // As we handle mark placement, we must assure at least one mark is placed.
+        marks = Math.min(marks, MatrixRules.maxMarksCount());
+        return Math.max(marks, 1);
+    }
+
+    /**
+     * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brut Force'
+     * @param marks Mount of marks to be placed
+     */
+    static getMarkPlacementModifier(marks: number): number {
+        marks = MatrixRules.getValidMarksPlacementCount(marks);
+
+        // Only handle cases with actual modifiers and otherwise return zero for a secure fallback.
+        switch (marks) {
+            case 2: return -4;
+            case 3: return -10;
+        }
+        return 0;
     }
 
     /**
@@ -76,5 +109,96 @@ export class MatrixRules {
      */
     static hostMatrixAttributeRatings(hostRating): number[] {
         return [0, 1, 2, 3].map(rating => rating + hostRating);
+    }
+    
+    /**
+     * Determine the modifier when decking a target on a different Grid. See SR5#233 'Grids on a run'
+     */
+    static differentGridModifier(): number {
+        return -2;
+    }
+
+    /**
+     * Determine the maximum count of PAN slaves for a master device.
+     * 
+     * See SR5#233 'PANS and WANS'
+     * @param rating The device rating of the master device
+     * @returns The max amount of slaves
+     */
+    static maxPANSlaves(rating: number): number {
+        return rating * 3;
+    }
+
+    /**
+     * Determine if the current number of slaves in a PAN is valid.
+     * 
+     * See SR5#233 'PANS and WANS'
+     * @param rating The device rating of the master device
+     * @param slaves Amount of slaves in the PAN
+     * 
+     * @returns true, amount of slaves is valid.
+     */
+    static validPANSlaveCount(rating: number, slaves: number): boolean {
+        return this.maxPANSlaves(rating) <= slaves;
+    }
+
+    /**
+     * Determine if the given attributes result in an illegal matrix action rolled.
+     * 
+     * See SR5#231-232 'Overwatch Score and Convergence'
+     * 
+     * @param attribute 
+     * @param attribute2 
+     * @param limit 
+     */
+    static isIllegalAction(attribute: Shadowrun.ActorAttribute, attribute2: Shadowrun.ActorAttribute, limit: Shadowrun.ActorAttribute): boolean {
+        for (const illegal of ['attack', 'sleaze']) {
+            if (attribute === illegal || attribute2 === illegal || limit === illegal) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * At which score should Overwatch converge?
+     * 
+     * See SR5#231-232 'Overwatch Score and Convergence'
+     * 
+     */
+    static overwatchConvergenceScore() {
+        return 40;
+    }
+
+    /**
+     * Determine if the given overwatch score should cause a Convergence by GOD.
+     * 
+     * See SR5#231-232 'Overwatch Score and Convergence'
+     * 
+     * @param score The overwatch score to check.
+     */
+    static isOverwatchScoreConvergence(score: number) {
+        return score >= MatrixRules.overwatchConvergenceScore();
+    }
+
+    /**
+     * Determine the damage value to convergence with.
+     * 
+     * See SR5#229-230 'User Mode' Virtual Reality sections.
+     */
+    static convergenceDamage(): DamageType {
+        return DataDefaults.createData('damage', {base: 12, value: 12, type: {base: 'matrix', value: 'matrix'}});
+    }
+
+    /**
+     * Damage for Matrix dumpshock.
+     * 
+     * See SR5#229 'Dumpshock & Link-Locking'
+     * @param hotSim Is the persona using a hot sim?
+     */
+    static dumpshockDamage(hotSim: boolean): DamageType {
+        const type = hotSim ? 'physical' : 'stun';
+        const damage = 6;
+
+        return DataDefaults.createData('damage', {type: {base: type, value: type}, base: damage, value: damage});
     }
 }

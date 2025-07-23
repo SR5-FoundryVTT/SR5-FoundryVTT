@@ -13,8 +13,11 @@
     },
     "action": {
       "type": "complex",
-      "test": "SuccessTest",
-      "categories": ["matrix", "brute_force"],
+      "test": "BruteForceTest",
+      "categories": [
+        "matrix",
+        "brute_force"
+      ],
       "attribute": "logic",
       "attribute2": "logic",
       "skill": "cybercombat",
@@ -22,6 +25,7 @@
       "spec": false,
       "mod": null,
       "mod_description": "",
+      "roll_mode": "",
       "limit": {
         "value": 0,
         "base": 0,
@@ -61,7 +65,7 @@
       },
       "opposed": {
         "type": "custom",
-        "test": "OpposedTest",
+        "test": "OpposedBruteForceTest",
         "attribute": "firewall",
         "attribute2": "willpower",
         "skill": "",
@@ -69,7 +73,7 @@
         "mod": 0,
         "description": "",
         "resist": {
-          "test": "",
+          "test": "MatrixResistTest",
           "skill": "",
           "attribute": "",
           "attribute2": "",
@@ -94,11 +98,14 @@
       "dice_pool_mod": []
     },
     "result": {
-      "success": {
-        "matrix": {
-          "placeMarks": false
-        }
-      }
+      "success": {}
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false,
+      "isImported": false
     }
   },
   "ownership": {
@@ -109,10 +116,12 @@
   "_stats": {
     "systemId": "shadowrun5e",
     "systemVersion": "0.8.6",
-    "coreVersion": "10.291",
+    "coreVersion": "12.331",
     "createdTime": null,
     "modifiedTime": 1670064512371,
-    "lastModifiedBy": "sr5ebuilder"
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
   },
   "_key": "!items!qqdJRdGwldDQA6JG"
 }

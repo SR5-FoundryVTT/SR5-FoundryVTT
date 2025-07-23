@@ -61,6 +61,11 @@ export const FLAGS = {
     TokenRulerColorSprinting: "TokenRulerColorSprinting",
     TokenRulerOpacity: 'TokenRulerOpacity',
     TokenUseRoutingLib: 'TokenUseRoutingLib',
+    GeneralActionsPack: 'GeneralActionsPack',
+    MatrixActionsPack: 'MatrixActionsPack',
+    UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
+    MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
+    CompendiaSettingsMenu: 'CompendiaSettingsMenu',
 } as const;
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

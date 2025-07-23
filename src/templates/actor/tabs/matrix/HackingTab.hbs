@@ -1,0 +1,54 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix' tabId='decking'}}
+<div class="inventory">
+    <div class="flexrow align-start">
+        <div>
+            {{#if network}}
+                {{localize "SR5.Labels.ActorSheet.Network"}}: {{network.name}}
+                <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                    <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                </a>
+            {{else}}
+                {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+            {{/if}}
+        </div>
+        <div>
+            <a class="show-matrix-network-hacking">
+                {{localize "SR5.Labels.ActorSheet.MarkNetwork"}} <i class="item-icon fas fa-network-wired"></i>
+            </a>
+        </div>
+        <div>
+            <a class="reboot-persona-device">
+                Reboot <i class="item-icon fas fa-power-off"></i>
+            </a>
+        </div>
+    </div>
+    <div class="split-container">
+        <div class="scroll-area scroll-area-matrix-hacking">
+        {{#if showMatrixMarkedDocuments}}
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.hbs' }}
+        {{/if}}
+        {{#if showMatrixTargets}}
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Targets.hbs' }}
+        {{/if}}
+        </div>
+        <div>
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                name=(localize 'SR5.Actions')
+                rightSide=(MatrixActionsHeaderRightSide)
+            }}
+            <div class="scroll-area scroll-area-matrix-hacking matrix-hacking-actions">
+                {{#each matrixActions}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                    name=this.name
+                    itemId=this.uuid
+                    itemType="matrix-action"
+                    hasRoll="true"
+                    rightSide=(MatrixActionsItemRightSide this)
+                }}
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}

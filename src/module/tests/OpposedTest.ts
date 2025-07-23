@@ -81,7 +81,21 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         return againstNetHits;
     }
 
-    static override async _getOpposedActionTestData(againstData: SuccessTestData, actor: SR5Actor, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    /**
+     * Prepare any OpposedTest from given test data. This test data should origin from a original success test, that is to be opposed.
+     * 
+     * Typically this would be as part of a test => message => oppose flow
+     * 
+     * @param againstData The original test to be opposed in raw data.
+     * @param document The actor used to oppose this original test with.
+     * @param previousMessageId The chat message the original test is stored within.
+     * @returns TestData for the opposed test.
+     */
+    static override async _getOpposedActionTestData(
+        againstData: SuccessTestData,
+        document: SR5Actor|SR5Item,
+        previousMessageId: string
+    ): Promise<OpposedTestData | undefined> {
         if (!againstData.opposed) {
             console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData, this);
             return;
@@ -89,7 +103,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         if (againstData.opposed.type !== '') {
             console.warn(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type '' is supported`, this);
         }
-        if (!actor) {
+        if (!document) {
             console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`, this);
             return;
         }
@@ -104,8 +118,10 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
             pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
             limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
             threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),
-            //@ts-expect-error
+            //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
             values: {},
+
+            modifiers: DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'}),
 
             sourceItemUuid: againstData.sourceItemUuid,
             against: againstData
@@ -116,7 +132,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         // and calculate netHits accordingly.
         data.threshold.base = againstData.values.netHits.value;
 
-        // Casting an opposed action doesn't give as complete ActionData from the original.
+        // The original action doesn't contain a complete set of ActionData.
         // Therefore we must create an empty dummy action.
         let action = DataDefaults.createData('action_roll');
 
@@ -132,12 +148,12 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         if (againstData.sourceItemUuid) {
             const item = await fromUuid(againstData.sourceItemUuid) as SR5Item;
             if (item) {
-                const itemAction = this._getDocumentTestAction(item, actor);
+                const itemAction = this._getDocumentTestAction(item, document);
                 action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
             }
         }
 
-        return await this._prepareActionTestData(action, actor, data);
+        return this._prepareActionTestData(action, document, data, againstData) as OpposedTestData;
     }
 
     /**
@@ -218,7 +234,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
     static override async chatMessageListeners(message: ChatMessage, html, data) {
         // TODO: querySelectorAll ?
-        $(html).find('.opposed-action').on('click', OpposedTest._castOpposedAction);
+        $(html).find('.opposed-action').on('click', OpposedTest._castOpposedAction.bind(this));
     }
 
     /**

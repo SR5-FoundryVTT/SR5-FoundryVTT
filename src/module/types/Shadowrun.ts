@@ -5,13 +5,14 @@ declare namespace Shadowrun {
     export type MentalAttribute = 'logic' | 'intuition' | 'charisma' | 'willpower';
     export type SpecialAttribute = 'edge' | 'essence' | 'magic' | 'resonance';
     export type MatrixAttribute = 'attack' | 'sleaze' | 'data_processing' | 'firewall';
+    export type TechnicalAttribute = 'rating';
 
     export type SpaceTypes = 'meatspace' | 'astral' | 'matrix';
 
     /**
      * Any valid attribute that an actor can have.
      */
-    export type ActorAttribute = PhysicalAttribute | MentalAttribute | SpecialAttribute | MatrixAttribute | '';
+    export type ActorAttribute = PhysicalAttribute | MentalAttribute | SpecialAttribute | MatrixAttribute | TechnicalAttribute | '';
 
     /**
      * A list of mods to apply to a value.
@@ -50,6 +51,7 @@ declare namespace Shadowrun {
         | 'drain'
         | 'natural_recovery_stun'
         | 'natural_recovery_physical'
+        | 'resist_matrix'
         | 'armor'
         | 'fade'
         | 'composure'
@@ -59,7 +61,8 @@ declare namespace Shadowrun {
         | 'physical_defense'
         | 'drone_pilot_vehicle'
         | 'drone_perception'
-        | 'drone_infiltration';
+        | 'drone_infiltration'
+        | string; // Allow document names to be given...
 
     /**
      * What kind of action is being performed.
@@ -94,6 +97,7 @@ declare namespace Shadowrun {
         'resist' | // resisting damage after getting hit
         'resist_disease' | // resisting against diseases
         'resist_toxin' | // resisting against toxins
+        'resist_matrix' | // resisting against matrix damage
         'resonance' | // all resonance actions in general
         'rigging' | // all rigging actions in general
         'social' | // all social skill actions

@@ -1,0 +1,15 @@
+<form>
+    {{#if test.persona}}
+    <div class="document">
+        <img src="{{test.persona.img}}" />
+        {{test.persona.name}}
+    </div>
+    {{/if}}
+    {{#if test.device}}
+    <div class="document">
+        <img src="{{test.device.img}}" />
+        {{test.icon.name}}
+    </div>
+    {{/if}}
+    {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs'}}
+</form>

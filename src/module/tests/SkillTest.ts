@@ -4,7 +4,7 @@ import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { Translation } from '../utils/strings';
 
 export interface SkillTestData extends SuccessTestData {
-    attribute: string
+    attribute: Shadowrun.ActorAttribute
     limitSelection: string
 }
 
@@ -60,9 +60,10 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      * Skill test provides a selection for attribute and limit during TestDialog.
      */
     override prepareBaseValues() {
-        super.prepareBaseValues();
         this.prepareAttributeSelection();
         this.prepareLimitSelection();
+
+        super.prepareBaseValues();
     }
 
     /**
@@ -79,17 +80,14 @@ export class SkillTest extends SuccessTest<SkillTestData> {
 
         if (!usedAttribute || !lastUsedAttribute) return; 
 
-
         const pool = new PartsList<number>(this.pool.mod);
 
         // Replace previous attribute with new one, without changing other modifiers
         pool.removePart(lastUsedAttribute.label);
-        this.actor._removeMatrixParts(pool);
         pool.addPart(usedAttribute.label, usedAttribute.value);
 
-        if (this.actor._isMatrixAttribute(selectedAttribute)) this.actor._addMatrixParts(pool, true);
-
         this.lastUsedAttribute = selectedAttribute;
+        this.data.action.attribute = selectedAttribute;
     }
 
     /**
@@ -107,15 +105,13 @@ export class SkillTest extends SuccessTest<SkillTestData> {
         if (!usedLimit || !lastUsedLimit) return;
 
         const limit = new PartsList<number>(this.limit.mod);
-        const pool = new PartsList<number>(this.pool.mod);
 
         // Replace previous limit with new one, without changing other modifiers.
         limit.removePart(lastUsedLimit.label);
         limit.addPart(usedLimit.label, usedLimit.value);
-        this.actor._removeMatrixParts(pool);
-
-        if (limit && this.actor._isMatrixAttribute(selectedLimit)) this.actor._addMatrixParts(pool, true);
 
         this.lastUsedLimit = selectedLimit;
+
+        this.data.action.limit.attribute = selectedLimit as Shadowrun.ActorAttribute;
     }
 }

@@ -36,8 +36,8 @@ export class ActionFlow {
         return damage;
     }
 
-    static _applyModifiableValue(value: ModifiableValueLinkedType, actor: SR5Actor) {
-        const attribute = actor.findAttribute(value.attribute);
+    static _applyModifiableValue(value: ModifiableValueLinkedType, document: SR5Actor|SR5Item) {
+        const attribute = document.getAttribute(value.attribute);
         if (!attribute) return;
 
         if (!value.base_formula_operator) {
@@ -145,7 +145,10 @@ export class ActionFlow {
      * @param skillName The skill name to be injected.
      */
     static _injectMissingCustomSkill(skills: Record<string, Translation>, skillName?: string) {
-        if (!skillName) return;
+        if (!skillName || typeof skillName !== 'string') {
+            console.error(`Shadowrun5e | Invalid skill name provided, expected string: ${skillName}`)
+            return;
+        }
 
         const foundCustomSkill = Object.values(skills).some(name => name === skillName);
         if (foundCustomSkill) return;

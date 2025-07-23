@@ -955,6 +955,8 @@ input[type='text'].display {
                 justify-content: flex-start;
                 align-items: center;
                 flex-grow: 1;
+                // Do not let long text overspill
+                overflow: hidden;
             }
 
             .item-right {
@@ -1086,6 +1088,9 @@ input[type='text'].display {
             &.skill-header {
                 @include rollable;
             }
+        }
+        .selected-list-item {
+            color: $edge;
         }
     }
 

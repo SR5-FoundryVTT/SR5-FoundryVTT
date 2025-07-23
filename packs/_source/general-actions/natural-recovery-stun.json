@@ -3,7 +3,24 @@
   "name": "Natural Recovery Stun",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/redist/healing.svg",
-  "data": {
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "12.331",
+    "systemId": null,
+    "systemVersion": null,
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "ownership": {
+    "default": 0
+  },
+  "system": {
     "description": {
       "value": "",
       "chat": "",
@@ -12,7 +29,9 @@
     "action": {
       "type": "complex",
       "test": "NaturalRecoveryStunTest",
-      "categories": ["recovery_stun"],
+      "categories": [
+        "recovery_stun"
+      ],
       "attribute": "body",
       "attribute2": "willpower",
       "skill": "",
@@ -20,6 +39,7 @@
       "spec": "",
       "mod": null,
       "mod_description": "",
+      "roll_mode": "",
       "limit": {
         "value": 0,
         "base": 0,
@@ -91,20 +111,15 @@
       ]
     },
     "result": {
-      "success": {
-        "matrix": {
-          "placeMarks": false
-        }
-      }
+      "success": {}
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false,
+      "isImported": false
     }
   },
-  "effects": [],
-  "folder": null,
-  "sort": 0,
-  "permission": {
-    "default": 0,
-    "SPXNNTkUujenPCaS": 3
-  },
-  "flags": {},
   "_key": "!items!bVuagJE5ze31KrJC"
 }

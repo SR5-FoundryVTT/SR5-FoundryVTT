@@ -1,6 +1,6 @@
 <div class="matrix">
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
-            name=(localize 'SR5.Programs')
+            name=(concatStrings (localize 'SR5.Programs') " " program_count)
             itemId='program'
             icons=(ItemHeaderIcons 'program')
             rightSide=(ItemHeaderRightSide 'program')

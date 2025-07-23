@@ -91,7 +91,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      */
     override async processSuccess() {
         await this.updateSummonTestForFollowup();
-        await this.cleanupAfterExecutionCancel();
+        await this._cleanUpAfterDialogCancel();
     }
 
     override get successLabel(): Translation {
@@ -205,7 +205,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      * 
      * When user cancels the dialog, the spirits has been created. Remove it.
      */
-    override async cleanupAfterExecutionCancel() {
+    override async _cleanUpAfterDialogCancel() {
         if (!this.data.summonedSpiritUuid) return;
         const actor = await fromUuid(this.data.summonedSpiritUuid as any) as SR5Actor | null;
         await actor?.delete();

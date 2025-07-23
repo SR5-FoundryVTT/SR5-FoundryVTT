@@ -68,7 +68,7 @@ const VehicleData = {
 
     // === Driver & Networking ===
     driver: new StringField({ required: true }),
-    networkController: new StringField({ required: true }),
+    master: new StringField({ required: true }),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'matrix')),

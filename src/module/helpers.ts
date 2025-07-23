@@ -95,6 +95,10 @@ export class Helpers {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
+    static listItemUuid(event): string {
+        return event.currentTarget.closest('.list-item').dataset.uuid;
+    }
+
     static listHeaderId(event): string {
         return event.currentTarget.closest('.list-header').dataset.itemId;
     }
@@ -464,49 +468,56 @@ export class Helpers {
         return actors;
     }
 
-    /**
+        /**
      * Given a SuccessTestData subset fetch all target actors.
      *
+     * TODO: TEST this whole function with all use cases....
+     * TODO: CHECK THIS ASSUMPTION?
      * BEWARE: A target will always be token based BUT linked actors provide an actor uuid instead of
      * pointing to their token actors.
-     * 
+     *
      * @param testData The test data containing target uuids.
+     * @returns A list of documents targeted by the original test.
      */
-    static async getTestTargetActors(testData: SuccessTestData): Promise<SR5Actor[]> {
-        const actors: SR5Actor[] = [];
-        for (const uuid of testData.targetActorsUuid) {
-            const tokenOrActor = await fromUuid(uuid as any);
-            // Assume given target to be an actor.
-            let actor = tokenOrActor;
+    static async getTestTargetDocuments(testData: SuccessTestData): Promise<Shadowrun.TestTargetDocument[]> {
+        const documents: Shadowrun.TestTargetDocument[] = [];
+        for (const uuid of testData.targetUuids) {
+            const document = await fromUuid(uuid) as Shadowrun.TestTargetDocument;
 
-            // In case of a Token, extract it's synthetic actor.
-            if (tokenOrActor instanceof TokenDocument) {
-                if (!tokenOrActor.actor) continue;
-                actor = tokenOrActor.actor;
-            }
-
-            // Avoid fromUuid pulling an unwanted Document type.
-            if (!(actor instanceof SR5Actor)) {
-                console.error(`Shadowrun5e | testData with targets containt UUID ${uuid} which doesn't provide an actor or syntheic actor`, tokenOrActor);
+            if (document instanceof SR5Item) {
+                documents.push(document);
                 continue;
             }
 
-            actors.push(actor);
+            if (document instanceof SR5Actor) {
+                documents.push(document);
+                continue;
+            }
+
+            // In case of a Token, extract it's synthetic actor.
+            if (document instanceof TokenDocument) {
+                if (!document.actor) continue;
+                documents.push(document.actor);
+            }
+
+            // Inform about unexpected document types.
+            console.error(`Shadowrun5e | testData with targets containt UUID ${uuid} which doesn't provide an actor or syntheic actor`, document);
         }
-        return actors;
+        return documents;
     }
+
     /**
      * Check given test for actors to use for opposed tests.
      *
      * @param testData The test to use for actor selection
      * @returns A list of actors that should be used for an opposed test.
      */
-    static async getOpposedTestActors(testData: SuccessTestData): Promise<SR5Actor[]> {
+    static async getOpposedTestTargets(testData: SuccessTestData): Promise<Shadowrun.TestTargetDocument[]> {
         const overwriteSelectionWithTarget = game.settings.get(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection) as boolean;
 
         // Honor user preference of using test targets, if any are set.
-        if (overwriteSelectionWithTarget && testData.targetActorsUuid.length > 0) {
-            return await Helpers.getTestTargetActors(testData);
+        if (overwriteSelectionWithTarget && testData.targetUuids.length > 0) {
+            return Helpers.getTestTargetDocuments(testData);
         }
 
         // Otherwise fallback to default behavior
@@ -534,17 +545,20 @@ export class Helpers {
      * This can be relevant for when GMs either manually or by module change the tokens name, while the actors name
      * is untouched and might even be detrimental to share with players.
      *
-     * @param actor
+     * @param document Any document that can be targeted by a Success Test
+     * @returns A string representing this documents name.
      */
-    static getChatSpeakerName(actor: SR5Actor): string {
-        if (!actor) return '';
+    static getChatSpeakerName(document: Shadowrun.TestTargetDocument): string {
+        if (!document) return '';
+
+        if (document instanceof SR5Item) return document.name as string;
 
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = actor.getToken();
+        const token = document instanceof TokenDocument ? document : document.getToken();
 
         if (useTokenNameForChatOutput && token) return token.name;
 
-        return actor.name;
+        return document.name as string;
     }
 
     /**
@@ -552,17 +566,19 @@ export class Helpers {
      *
      * The use token name setting is also respected.
      *
-     * @param actor Either an actual or a virtual actor, taken from a token.
+     * @param document Any document that can be targeted by a Success Test
      * @returns A path pointing to an image.
      */
-    static getChatSpeakerImg(actor: SR5Actor): string {
-        if (!actor) return '';
+    static getChatSpeakerImg(document: Shadowrun.TestTargetDocument): string {
+        if (!document) return '';
+
+        if (document instanceof SR5Item) return document.img;
 
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = actor.getToken();
+        const token = document instanceof TokenDocument ? document : document.getToken();
 
         if (useTokenForChatOutput && token) return token.texture.src || '';
-        return actor.img || '';
+        return document.img || '';
     }
 
     static createDamageData(
@@ -852,71 +868,6 @@ export class Helpers {
     }
 
     /**
-     * A markId is valid if:
-     * - It's scene still exists
-     * - The token still exists on that scene
-     * - And a possible owned item still exists on that documents actor.
-     */
-    static isValidMarkId(markId: string): boolean {
-        if (!game.scenes) return false;
-
-        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
-
-        const scene = game.scenes.get(sceneId);
-        if (!scene) return false;
-
-        const tokenDocument = scene.tokens.get(targetId);
-        if (!tokenDocument) return false;
-
-        const actor = tokenDocument.actor;
-        // Some targets are allowed without a targeted owned item.
-        if (itemId && !actor?.items.get(itemId)) return false;
-
-        return true;
-    }
-
-    /**
-     * Build a markId string. See Helpers.deconstructMarkId for usage.
-     *
-     * @param sceneId Optional id in a markId
-     * @param targetId Mandatory id in a markId
-     * @param itemId Optional id in a markId
-     * @param separator Should you want to change the default separator used. Make sure not to use a . since Foundry will split the key into objects.
-     */
-    static buildMarkId(sceneId: string, targetId: string, itemId: string | undefined, separator = '/'): string {
-        return [sceneId, targetId, itemId || ''].join(separator);
-    }
-
-    /**
-     * Deconstruct the given markId string.
-     *
-     * @param markId 'sceneId.targetId.itemId' with itemId being optional
-     * @param separator Should you want to change the default separator used
-     */
-    static deconstructMarkId(markId: string, separator = '/'): [sceneId: string, targetId: string, itemId: string] {
-        const ids = markId.split(separator);
-
-        if (ids.length !== 3) {
-            console.error('A mark id must always be of length 3');
-        }
-
-        return ids as [string, string, string];
-    }
-
-    static getMarkIdDocuments(markId: string): TargetedDocument | undefined {
-        if (!game.scenes || !game.items) return undefined;
-
-        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
-
-        const scene = game.scenes.get(sceneId);
-        if (!scene) return undefined;
-        const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
-        const item = target?.actor?.items?.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
-
-        return { scene, target, item };
-    }
-
-    /**
      * Return true if all given keys are present in the given object.
      * Values don't matter for this comparison.
      *
@@ -932,6 +883,20 @@ export class Helpers {
     }
 
     /**
+     * Pack document names don't necessarily match what is displayed in the UI.
+     *
+     * TODO: Why even do this? Does the ui actually not match to the pack document name?
+     * @param documentName A string to be transformed. Malformed values will result in empty strings.
+     * @returns
+     */
+    static packDocumentName(documentName?: string) {
+        // Fail gracefully.
+        documentName ??= '';
+        // eslint-disable-next-line
+        return documentName.toLowerCase().replace(new RegExp(' ', 'g'), '_')
+    }
+
+    /**
      * Check packs for a given action.
      *
      * TODO: Use pack and action ids to avoid polluted user namespaces
@@ -940,15 +905,19 @@ export class Helpers {
      * @param packName The metadata name of the pack
      * @param actionName The name of the action within that pack
      */
-    static async getPackAction(packName, actionName): Promise<SR5Item | undefined> {
+    static async getPackAction(packName: string, actionName: string): Promise<SR5Item | undefined> {
         console.debug(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
         const pack = game.packs.find(pack =>
             pack.metadata.system === SYSTEM_NAME &&
-            pack.metadata.name === packName);
+            (pack.metadata.name === packName || pack.metadata.label === packName));
+
         if (!pack) return undefined;
 
         // TODO: Use predefined ids instead of names...
-        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(/ /g, '_') === actionName.toLowerCase());
+        // TODO: use replaceAll instead, which needs an change to es2021 at least for the ts compiler
+        actionName = Helpers.packDocumentName(actionName).toLocaleLowerCase();
+        // eslint-disable-next-line
+        const packEntry = pack.index.find(data => Helpers.packDocumentName(data.name) === actionName);
         if (!packEntry) return undefined;
 
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
@@ -956,6 +925,51 @@ export class Helpers {
 
         console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;
+    }
+
+    /**
+     * Returns the general actions pack name to use, when the general actions pack is referenced.
+     */
+    static getGeneralActionsPackName(): Shadowrun.PackName {
+        const overrideGeneralpackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) as Shadowrun.PackName;
+        return overrideGeneralpackName || SR5.packNames.generalActions as Shadowrun.PackName;
+    }
+
+    /**
+     * Return the matrix action pack name to use, when the matrix actions pack is referenced.
+     */
+    static getMatrixActionsPackName(): Shadowrun.PackName {
+        const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.MatrixActionsPack) as Shadowrun.PackName;
+        return overrideMatrixPackName || SR5.packNames.matrixActions as Shadowrun.PackName;
+    }
+
+    /**
+     * Retrieve all actions from a given pack.
+     *
+     * Other item types in that pack will be ignored.
+     *
+     * TODO: Allow filtering by categories?
+     * TODO: Generalize this to search for items and make the type paramater
+     *
+     * @param packName The item pack that contains actions.
+     */
+    static async getPackActions(packName: string): Promise<SR5Item[]> {
+        console.debug(`Shadowrun 5e | Trying to fetch all actions from pack ${packName}`);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName);
+        if (!pack) return [];
+
+        // @ts-expect-error foundry-vtt-types v10
+        const packEntries = pack.index.filter(data => data.type === 'action');
+
+        const documents: SR5Item[] = [];
+        for (const packEntry of packEntries) {
+            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item;
+            if (!document) continue;
+            documents.push(document);
+        }
+
+        console.debug(`Shadowrun5e | Fetched all actions from pack ${packName}`, documents);
+        return documents;
     }
 
     /**
@@ -1065,5 +1079,32 @@ export class Helpers {
      */
     static getAttributeTranslation(attribute: string) : string {
         return game.i18n.localize(`SR5.Attr${this.capitalizeFirstLetter(attribute)}` as Translation)
+    }
+
+    /**
+     * Transform uuid into a format that can be stored as keys in Foundry without object splitting.
+     */
+    static uuidForStorage(uuid: string) {
+        return uuid.replace('.', '_');
+    }
+
+    /**
+     * Reforms a transformed uuid back into a usable format.
+     */
+    static uuidFromStorage(uuid: string) {
+        return uuid.replace('_', '.');
+    }
+
+    /**
+     * Sort a list of documents by name in ascending alphabetical order.
+     *
+     * @param a Any type of document data
+     * @param b Any type of document data
+     * @returns
+     */
+    static sortByName(a: {name: string}, b: {name: string}) {
+        if (a.name > b.name) return 1;
+        if (a.name < b.name) return -1;
+        return 0;
     }
 }

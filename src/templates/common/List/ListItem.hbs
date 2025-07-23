@@ -1,8 +1,8 @@
-<div class="{{#if itemHeader}}list-header{{else}}list-item{{/if}} {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}" data-item-type="{{itemType}}"{{/if}} {{#each itemData}}data-{{@key}}="{{this}}"{{/each}}>
+<div class="{{#if itemHeader}}list-header{{else}}list-item{{/if}} {{itemCssClass}}" {{#if itemUuid}}data-uuid="{{itemUuid}}"{{/if}} {{#if itemId}}data-item-id="{{itemId}}" data-item-type="{{itemType}}"{{/if}} {{#each itemData}}data-{{@key}}="{{this}}"{{/each}}>
     <div class="list-item-content">
         <div class="item-left">
             {{#if img}}
-                <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">                    
+                <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll {{itemImgCssClass}}">                    
                     <img src="{{img}}" {{#if hasRoll}}data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}" data-tooltip-direction="LEFT"{{/if}} height="24px" width="24px"/>
                 </div>
             {{/if}}
@@ -62,9 +62,9 @@
                         </div>
                     {{/ife}}
                 {{/if}}
-                {{#if option.hbs}}
-                    <div class="item-text {{option.hbs.cssClass}}">
-                        {{{option.hbs.text}}}
+                {{#if option.html}}
+                    <div class="item-text {{option.html.cssClass}}">
+                        {{{option.html.text}}}
                     </div>
                 {{/if}}
             {{/each}}

@@ -72,7 +72,7 @@ export class ICPrep {
      * For connected hosts overwrite matrix attributes with the hosts attributes, otherwise leave as is.
      */
     static prepareHostAttributes(system: Actor.SystemOfType<'ic'>) {
-        if (!system.host.id) return;
+        if (!system.host.atts) return;
 
         Object.entries(system.host.atts).forEach(([deviceAttribute, attribute]) => {
             system.matrix[attribute.att].base = attribute.value;

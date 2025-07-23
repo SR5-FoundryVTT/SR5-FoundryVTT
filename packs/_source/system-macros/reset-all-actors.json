@@ -1,24 +1,26 @@
 {
   "name": "Reset All Actors",
   "type": "script",
-  "author": "aEwR8k8iDXLLsvfJ",
+  "author": "MhM0V7OoctM9Cezw",
   "img": "icons/svg/dice-target.svg",
   "scope": "global",
-  "command": "console.log('Shadowrun 5e | Reset all actors for a new run');\n\ngame.actors.forEach(actor => actor.resetRunData());",
+  "command": "console.log('Shadowrun 5e | Reset all actors for a new run');\n\ngame.actors.forEach(actor => actor.resetRunData());\ngame.items.forEach(item => item.resetRunData());",
   "flags": {},
   "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "coreVersion": "12.331",
     "systemId": "shadowrun5e",
-    "systemVersion": "0.9.0",
-    "coreVersion": "10.291",
-    "createdTime": 1677239005898,
-    "modifiedTime": 1677239448364,
+    "systemVersion": "0.24.0",
+    "createdTime": 1736169971406,
+    "modifiedTime": 1736169971406,
     "lastModifiedBy": "sr5ebuilder"
   },
   "folder": null,
-  "sort": 0,
   "ownership": {
     "default": 0
   },
-  "_id": "uelsuP7iB2riZ4ww",
-  "_key": "!macros!uelsuP7iB2riZ4ww"
+  "_id": "CMR2wl02oWmVBr1B",
+  "sort": 0,
+  "_key": "!macros!CMR2wl02oWmVBr1B"
 }

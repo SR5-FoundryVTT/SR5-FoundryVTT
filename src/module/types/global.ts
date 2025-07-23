@@ -30,6 +30,7 @@ import { Cyberware } from './item/Cyberware';
 import { Device } from './item/Device';
 import { Echo } from './item/Echo';
 import { Equipment } from './item/Equipment';
+import { Grid } from "./item/Grid";
 import { Host } from './item/Host';
 import { Lifestyle } from './item/Lifestyle';
 import { Metamagic } from './item/Metamagic';
@@ -44,6 +45,7 @@ import { Weapon } from './item/Weapon';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from "./flags/ItemFlags";
 
 import { RoutingLib } from "../integrations/routingLibIntegration";
+import SR5CompendiaSettings from "../settings/SR5CompendiaSettings";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -109,6 +111,7 @@ declare module "fvtt-types/configuration" {
             device: typeof Device;
             echo: typeof Echo;
             equipment: typeof Equipment;
+            grid: typeof Grid;
             host: typeof Host;
             lifestyle: typeof Lifestyle;
             metamagic: typeof Metamagic;
@@ -227,6 +230,9 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.TokenRulerColorRunning": foundry.data.fields.ColorField<{ initial: '0000FF' }>;
         "shadowrun5e.TokenRulerColorSprinting": foundry.data.fields.ColorField<{ initial: 'FF0000' }>;
         "shadowrun5e.TokenRulerOpacity": foundry.data.fields.NumberField<{ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 }>;
+        "shadowrun5e.CompendiaSettingsMenu": SR5CompendiaSettings;
+        "shadowrun5e.GeneralActionsPack": string;
+        "shadowrun5e.MatrixActionsPack": string;
     }
 }
 

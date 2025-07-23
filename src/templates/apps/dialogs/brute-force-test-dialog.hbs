@@ -1,0 +1,65 @@
+<form>
+    <div class="dialog-content-common">
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs'}}
+        <hr/>
+        <div>
+            <div class="form-group">
+                <label>{{localize "SR5.Marks"}}</label>
+                <input name="test.data.marks" type="number" class="disabled-for-display"
+                        value="{{test.data.marks}}" min="1" max="3"/>
+            </div>
+            <div class="form-group">
+                <label>{{localize "SR5.SameGrid"}}</label>
+                <input type="checkbox" class="checkbox" name="test.data.sameGrid" {{checked test.data.sameGrid}}/>
+            </div>
+            <div class="form-group">
+                <label>{{localize "SR5.DirectConnection"}}</label>
+                <input type="checkbox" class="checkbox" name="test.data.directConnection" {{checked test.data.directConnection}}/>
+            </div>
+            {{#if test.controller}}
+            <div class="document">
+                <img src="{{test.controller.img}}"/>
+                {{test.controller.name}}
+            </div>
+            {{/if}}
+            <div class="form-group">
+                <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnMainIcon"}}</label>
+                <input type="checkbox" class="checkbox" name="test.data.placeOnMainIcon" {{checked test.data.placeOnMainIcon}}/>
+            </div>
+            {{#if test.persona}}
+            <!-- Persona targeted -->
+            <div class="form-group">
+                <label>{{localize "SR5.Target"}}</label>
+                <div>{{test.persona.name}}</div>
+            </div>
+            {{/if}}
+            {{#if test.host}}
+            <div class="form-group">
+                <label>{{localize "TYPES.Item.host"}}</label>
+                <div>{{test.host.name}}</div>
+            </div>
+            {{/if}}
+            {{#if test.grid}}
+            <div class="form-group">
+                <label>{{localize "TYPES.Item.grid"}}</label>
+                <div>{{test.grid.name}}</div>
+            </div>
+            {{/if}}
+            <!-- Devices connected to persona or host -->
+            {{#ife test.data.placeOnMainIcon false}}
+            <div class="form-group">
+                <label>{{localize "SR5.Labels.MarkPlacement.PlaceOnDevice"}}</label>
+                <select name="test.data.iconUuid" class="display">
+                    {{#select test.data.iconUuid}}
+                    {{#each test.devices}}
+                    <option value="{{this.uuid}}">{{this.name}}</option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            </div>
+            {{/ife}}
+        </div>
+    <div>
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs'}}
+    </div>
+</form>

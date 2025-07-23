@@ -2,14 +2,14 @@
 <div class="inventory">
     <div class="scroll-area">
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
-                name=(localize "SR5.Labels.Sheet.NetworkDevices")
-                itemId='networkDevice'
-                rightSide=(NetworkDevicesListRightSide)
-                icons=(NetworkDevicesListHeaderIcons)
+                name=(concatStrings (localize "SR5.Labels.Sheet.NetworkDevices") " " ../pan_counter)
+                itemId='slave'
+                rightSide=(SlavesListRightSide)
+                icons=(SlavesListHeaderIcons)
         }}
         {{!-- Don't use the ListItem Handlebar helper as to avoid its item drag&drop functionality. --}}
-        {{#each networkDevices}}
-        <div class="list-item" data-token-id="{{this.actor.token.id}}" data-actor-id="{{this.actor.id}}" data-device-id="{{this.id}}" data-list-item-index="{{@index}}">
+        {{#each slaves}}
+        <div class="list-item" data-token-id="{{this.actor.token.id}}" data-actor-id="{{this.actor.id}}" data-uuid="{{this.uuid}}">
             <div class="list-item-content">
                 <div class="item-left">
                     <div class="item-img">
@@ -29,7 +29,7 @@
                         {{/if}}
                     </div>
                     <div class="item-text">
-                        {{localizeDocumentType this}}
+                        {{localizeOb this.type ../config.itemTypes}}
                     </div>
                     <div class="item-text item-icons">
                         <a class="" data-tooltip="SR5.Del">

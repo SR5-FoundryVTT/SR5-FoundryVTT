@@ -63,7 +63,7 @@ export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
      */
     override async processSuccess() {
         await this.updateRitualTestForFollowup();
-        await this.cleanupAfterExecutionCancel();
+        await this._cleanUpAfterDialogCancel();
     }
 
     override get successLabel(): Translation {

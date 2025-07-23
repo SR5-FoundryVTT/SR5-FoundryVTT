@@ -201,7 +201,7 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
      */
     override setupTurns(): any[] {
         const turns = super.setupTurns();
-        return turns.sort(SR5Combat.sortByRERIC);
+        return turns.sort(SR5Combat.sortByRERIC.bind(SR5Combat));
     }
 
     /**
@@ -486,7 +486,8 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
 
     override async delete(...args): Promise<this | undefined> {
         // Remove all combat related modifiers.
-        this.combatants.contents.forEach(combatant => { void combatant.actor?.removeDefenseMultiModifier(); });
+        for (const combatant of this.combatants)
+            await combatant.actor?.removeDefenseMultiModifier();
         return super.delete(...args);
     }
 }
