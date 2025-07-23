@@ -1097,31 +1097,30 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return message;
     }
 
-        /**
+    /**
      * Roll a skill test for a specific skill
      * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
      * @param options Optional options to configure the roll.
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-        async rollTeamworkTest(skillId: string, teamworkData: TeamworkMessageData, options: SkillRollOptions={}) {
-            console.info(`Shadowrun5e | Rolling teamwork test for ${skillId}`);
-    
-            const action = this.skillActionData(skillId, options);
-            if (!action) return;
-            if(!teamworkData.criticalGlitch) {
-                action.limit.mod.push({name: "Teamwork", value: teamworkData.additionalLimit})
-            }
+    async rollTeamworkTest(skillId: string, teamworkData: TeamworkMessageData, options: SkillRollOptions={}) {
+        console.info(`Shadowrun5e | Rolling teamwork test for ${skillId}`);
 
-            action.dice_pool_mod.push({name: "Teamwork", value: teamworkData.additionalDice})
-    
-            const showDialog = this.tests.shouldShowDialog(options.event);
-            const test = await this.tests.fromAction(action, this, {showDialog});
-            if (!test) return;
-
-    
-            return await test.execute();
+        const action = this.skillActionData(skillId, options);
+        if (!action) return;
+        if(!teamworkData.criticalGlitch) {
+            action.limit.mod.push({name: "Teamwork", value: teamworkData.additionalLimit})
         }
+
+        action.dice_pool_mod.push({name: "Teamwork", value: teamworkData.additionalDice})
+
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.tests.fromAction(action, this, {showDialog});
+        if (!test) return;
+
+        return test.execute();
+    }
 
     /**
      * Is the given attribute id a matrix attribute
