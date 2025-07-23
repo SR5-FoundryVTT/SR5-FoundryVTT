@@ -50,7 +50,7 @@ export class Migrator {
     }
 
     private static getEmbeddedItems(data: any) {
-        const items = data.flags?.shadowrun5e?.embeddedItems || [];
+        const items = data.flags?.shadowrun5e?.embeddedItems;
         if (items == null) return [];
         if (Array.isArray(items)) return items;
         if (typeof items === 'object') return Object.values(items);
