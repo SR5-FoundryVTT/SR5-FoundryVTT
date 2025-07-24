@@ -59,13 +59,14 @@ ActionResultFlow; // DON'T TOUCH!
  *       Be wary of SR5Item.actor for this reason!
  */
 export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> extends Item<SubType> {
-    // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
-    // to allow for embedded items in items in actors.
+    //Those declarations must be initialized on prepareData, otherwise they will be undefined
+
+    // Item.items isn't the Foundry default ItemCollection but is overwritten within
+    // prepareNestedItems to allow for embedded items in items in actors.
     declare items: SR5Item[];
     declare descriptionHTML: string | undefined;
-
     // Item Sheet labels for quick info on an item dropdown.
-    labels: { roll?: string; opposedRoll?: string } = {};
+    declare labels: { roll?: string; opposedRoll?: string };
 
     /**
      * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
@@ -159,9 +160,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-     * PREPARE DATA CANNOT PULL FROM this.actor at ALL
-     * - as of foundry v0.7.4, actor data isn't prepared by the time we prepare items
-     * - this caused issues with Actions that have a Limit or Damage attribute and so those were moved
+     * This function is run on construction of the item and prepares all data for the item.
      */
     override prepareData(this: SR5Item) {
         super.prepareData();
