@@ -12,38 +12,25 @@ export type MigratableDocument = Actor.Implementation | Item.Implementation | Ac
 export type MigratableDocumentName = MigratableDocument['documentName'];
 
 export abstract class VersionMigration {
-    /**
-     * The target version string that this migration upgrades data to.
-     */
-    public abstract TargetVersion: `${number}.${number}.${number}`;
+    abstract TargetVersion: `${number}.${number}.${number}`;
+
+    migrateActor(_actor: any): void {}
+    handlesActor(_actor: Readonly<any>) { return this.migrates.Actor; }
+
+    migrateItem(_item: any): void {}
+    handlesItem(_item: Readonly<any>) { return this.migrates.Item; }
+
+    migrateActiveEffect(_effect: any): void {}
+    handlesActiveEffect(_effect: Readonly<any>) { return this.migrates.ActiveEffect; }
 
     /**
-     * Apply this migration to an actor.
-     * Override in subclasses to modify actor data as needed.
+     * Flags which migration methods have been overridden in the subclass.
+     * Used to determine support for each document type.
      */
-    public migrateActor(actor: any): void { }
-
-    /**
-     * Apply this migration to an item.
-     * Override in subclasses to modify item data as needed.
-     */
-    public migrateItem(item: any): void { }
-
-    /**
-     * Apply this migration to an active effect.
-     * Override in subclasses to modify active effect data as needed.
-     */
-    public migrateActiveEffect(effect: any): void { }
-
-    /**
-     * Indicates whether the subclass overrides the corresponding migration method
-     * (`migrateActor`, `migrateItem`, `migrateActiveEffect`), used to determine if
-     * the migration applies to a given document type.
-     */
-    public readonly implements: Record<MigratableDocumentName, boolean>;
+    private readonly migrates: Record<MigratableDocumentName, boolean>;
     constructor() {
         const proto = Object.getPrototypeOf(this);
-        this.implements = {
+        this.migrates = {
             Actor: proto.migrateActor !== VersionMigration.prototype.migrateActor,
             Item: proto.migrateItem !== VersionMigration.prototype.migrateItem,
             ActiveEffect: proto.migrateActiveEffect !== VersionMigration.prototype.migrateActiveEffect

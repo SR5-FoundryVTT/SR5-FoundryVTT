@@ -43,9 +43,14 @@ export class Migrator {
     }
 
     // Returns an array of migration functions applicable to the given document type and version.
-    private static getMigrators(type: MigratableDocumentName | null, version: string | null): readonly VersionMigration[] {
+    private static getMigrators(
+        version: string | null,
+        type?: MigratableDocumentName,
+        data?: any
+    ): readonly VersionMigration[] {
         return this.s_Versions.filter(migrator =>
-            (!type || migrator.implements[type]) && this.compareVersion(migrator.TargetVersion, version) > 0
+            (!type || migrator[`handles${type}`](data)) &&
+            this.compareVersion(migrator.TargetVersion, version) > 0
         );
     }
 
@@ -81,7 +86,7 @@ export class Migrator {
             }
         }
 
-        const migrators = this.getMigrators(type, data._stats.systemVersion);
+        const migrators = this.getMigrators(data._stats.systemVersion, type, data);
 
         // If no migrators found, nothing to do.
         if (migrators.length === 0) return;
@@ -142,7 +147,7 @@ export class Migrator {
         const currentVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION) || '0.0.0';
 
         // No migrations are required, exit.
-        const migrators = this.getMigrators(null, currentVersion);
+        const migrators = this.getMigrators(currentVersion);
         if (migrators.length === 0) return;
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
