@@ -61,11 +61,11 @@ ActionResultFlow; // DON'T TOUCH!
 export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> extends Item<SubType> {
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
     // to allow for embedded items in items in actors.
-    items: SR5Item[] = [];
+    declare items: SR5Item[];
+    declare descriptionHTML: string | undefined;
 
     // Item Sheet labels for quick info on an item dropdown.
     labels: { roll?: string; opposedRoll?: string } = {};
-    descriptionHTML: string | undefined;
 
     /**
      * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
@@ -132,14 +132,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Set the embedded item data
      * @param items
      */
-    async setNestedItems(items: any[]) {
-        // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
-        // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
-        await this.setFlag(SYSTEM_NAME, FLAGS.EmbeddedItems, items);
+    async setNestedItems(items: Item.Source[]) {
+        return this.setFlag(SYSTEM_NAME, FLAGS.EmbeddedItems, items);
     }
 
     async clearNestedItems() {
-        await this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
+        return this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
     }
 
     get hasOpposedRoll(): boolean {
@@ -600,7 +598,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Prepare embeddedItems
      */
     prepareNestedItems() {
-        this.items = this.items || [];
+        this.items ??= [];
 
         const items = this.getNestedItems();
         if (!items) return;

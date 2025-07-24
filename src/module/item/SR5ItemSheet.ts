@@ -205,7 +205,10 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         // Enrich descriptions
         await Promise.all(
             [ammunition, weaponMods, armorMods, vehicleMods, droneMods].flat().map(
-                async item => foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description.value).then(html => item.descriptionHTML = html)
+                async item => {
+                    const html = await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description.value);
+                    item.descriptionHTML = html;
+                }
             )
         );
 
