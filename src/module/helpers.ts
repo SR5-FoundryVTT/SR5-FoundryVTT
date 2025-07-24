@@ -518,15 +518,6 @@ export class Helpers {
         return {label: localizedLabel, distance, modifier}
     }
 
-    static convertIndexedObjectToArray(indexedObject: object): object[] {
-        return Object.keys(indexedObject).map((index) => {
-            if (Number.isNaN(index)) {
-                console.warn('An object with no numerical index was given, which is likely a bug.', indexedObject);
-            }
-            return indexedObject[index];
-        });
-    }
-
     /**
      * Depending on the system setting allow GMs to define if they want to always display the name within the actor
      * or within the token.
