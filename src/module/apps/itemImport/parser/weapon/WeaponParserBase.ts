@@ -42,7 +42,10 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
                 continue;
             }
 
-            const accessoryBase = game.items!.fromCompendium(foundItem) as Shadowrun.ModificationItemData;
+            // Create a new _id since it will not be created on the creation of the item.
+            const accessoryBase = game.items!.fromCompendium(foundItem, { keepId: true }) as Shadowrun.ModificationItemData;
+            // @ts-expect-error
+            accessoryBase._id = foundry.utils.randomID();
             accessoryBase.system.technology.equipped = true;
 
             const ratingText = accessory.rating?._TEXT;
