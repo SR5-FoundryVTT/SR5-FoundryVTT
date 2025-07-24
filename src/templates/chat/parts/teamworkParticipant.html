@@ -1,42 +1,48 @@
-<details class="teamwork-participant">
-  <summary>
-  <div class="participant-header">
+<div class="teamwork-participant {{#if glitched}}glitched{{/if}}">
+  <!-- Klickbarer Header wie .glitch-content -->
+  <div class="participant-header clickable show-participant-details">
     <div class="participant-actor">
-      <img src="{{actor.img}}" alt="{{actor.name}}" class="participant-avatar"/>
+      <img src="{{actor.img}}" alt="{{actor.name}}" class="participant-avatar" />
       <span class="participant-name">{{actor.name}}</span>
     </div>
-    <span class="participant-hits">{{netHits}} {{localize "SR5.Hits"}}</span>
+    <div class="participant-controls">
+      <span class="participant-hits">{{netHits}} {{localize "SR5.Hits"}}</span>
+      <a class="roll delete-participant" data-actor-id="{{actor.id}}" data-tooltip="{{localize 'SR5.Common.Remove'}}">
+          <i class="item-icon fas fa-trash item-edit"></i>
+        </a>
+    </div>
   </div>
-</summary>
-  {{#if (or differentSkill differentAttribute differentLimit glitched)}}
-  <div class="different-skills">
-  {{#if glitched}}
-    <div class="glitch-line">
-      {{#ife criticalGlitched true}}
-        {{localize "SR5.GlitchCritical"}}
-      {{else}}
-        {{localize "SR5.Glitch"}}
-      {{/ife}}
-    </div>
-  {{/if}}
 
-  {{#if differentSkill}}
-    <div class="different-skill-line">
-      {{localize "SR5.Skill.Teamwork.DifferentSkill"}}: {{localizeSkill differentSkill}}
-    </div>
-  {{/if}}
+  <!-- Inhalt wie .card-rolls -->
+  <div class="participant-details" style="display: none;">
+    <div class="card-content">
+      {{#if glitched}}
+        <div class="glitch-line glitch-message {{#if criticalGlitched}}critical{{/if}}">
+          {{#ife criticalGlitched true}}
+            {{localize "SR5.GlitchCritical"}}
+          {{else}}
+            {{localize "SR5.Glitch"}}
+          {{/ife}}
+        </div>
+      {{/if}}
 
-  {{#if differentAttribute}}
-    <div class="different-attribute-line">
-      {{localize "SR5.Skill.Teamwork.DifferentAttribute"}}: {{localize differentAttribute}}
-    </div>
-  {{/if}}
+      {{#if differentSkill}}
+        <div class="different-skill-line">
+          {{localize "SR5.Skill.Teamwork.DifferentSkill"}}: {{localizeSkill differentSkill}}
+        </div>
+      {{/if}}
 
-  {{#if differentLimit}}
-    <div class="different-limit-line">
-      {{localize "SR5.Skill.Teamwork.DifferentLimit"}}: {{localize differentLimit}}
+      {{#if differentAttribute}}
+        <div class="different-attribute-line">
+          {{localize "SR5.Skill.Teamwork.DifferentAttribute"}}: {{localize differentAttribute.label}}
+        </div>
+      {{/if}}
+
+      {{#if differentLimit}}
+        <div class="different-limit-line">
+          {{localize "SR5.Skill.Teamwork.DifferentLimit"}}: {{localize differentLimit.label}}
+        </div>
+      {{/if}}
     </div>
-  {{/if}}
+  </div>
 </div>
-  {{/if}}
-</details>

@@ -66,6 +66,28 @@ export interface SkillGroup {
     skills: SkillEntry[];
 }
 
+export interface TeamworkFlagData {
+    actorId: string;
+    skill: string;
+    attribute?: ActorAttribute;
+    threshold?: number;
+    limit?: LimitKey | number;
+    allowOtherSkills: boolean;
+    additionalDice: Shadowrun.ValueMaxPair<number>;
+    additionalLimit: number;
+    criticalGlitched: boolean;
+    specialization: boolean;
+    participants: {
+        actorId: string;
+        netHits: number;
+        glitched: boolean;
+        criticalGlitched: boolean;
+        differentSkill: string | undefined;
+        differentAttribute: ActorAttribute | undefined;
+        differentLimit: LimitKey | undefined;
+    }[];
+}
+
 export class TeamworkFlow {
 
     /** Gruppierte und sortierte Skill‐Listen für den Dialog und die Flows */
@@ -170,6 +192,91 @@ export class TeamworkFlow {
         }
     }
 
+    static async setTeamworkMessageFlag(message: ChatMessage, data: TeamworkMessageData): Promise<void> {
+
+        if (!data.actor?.id) throw new Error("TeamworkData: actor.id fehlt");
+        if (!data.skill?.id) throw new Error("TeamworkData: skill.id fehlt");
+
+        const flagData: TeamworkFlagData = {
+            actorId: data.actor.id,
+            skill: data.skill.id,
+            attribute: data.attribute?.name,
+            threshold: data.threshold,
+            limit: typeof data.limit?.base === "number" ? data.limit.base :
+                data.limit?.name ?? undefined,
+            allowOtherSkills: data.allowOtherSkills,
+            additionalDice: data.additionalDice,
+            additionalLimit: data.additionalLimit,
+            criticalGlitched: data.criticalGlitched,
+            specialization: data.specialization,
+            participants: data.participants.map(p => {
+                if (!p.actor?.id) {
+                    throw new Error("TeamworkFlagData: participant.actor.id is missing");
+                }
+                return {
+                    actorId: p.actor.id,
+                    netHits: p.netHits,
+                    glitched: p.glitched,
+                    criticalGlitched: p.criticalGlitched,
+                    differentSkill: p.differentSkill?.id,
+                    differentAttribute: p.differentAttribute?.name,
+                    differentLimit: p.differentLimit?.name,
+                };
+            }),
+        };
+
+        await message.setFlag(SYSTEM_NAME, FLAGS.Test, flagData);
+    }
+
+    static async getTeamworkMessageData(message: ChatMessage): Promise<TeamworkMessageData> {
+        const flag = await message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkFlagData;
+        if (!flag) throw new Error("Kein Teamwork-Daten-Flag an der Nachricht gefunden");
+
+        console.log("getTeamworkMessageData flag", flag);
+
+        const actor = game.actors?.get(flag.actorId) as SR5Actor;
+        if (!actor) {
+            throw new Error(`Actor with ID ${flag.actorId} not found`);
+        }
+
+        const skill: SkillEntry = this.constructSkillEntry({ id: flag.skill }, actor);
+
+        const attribute: AttributeEntry | undefined = this.constructAttributeEntry(flag.attribute);
+
+        const limit: LimitEntry = this.constructLimitEntry(flag.limit);
+
+        const participants: ParticipantEntry[] = flag.participants.map(p => {
+            const participantActor: SR5Actor | undefined = game.actors?.get(p.actorId);
+            if (!participantActor) {
+                throw new Error(`Participant Actor with ID ${flag.actorId} not found`);
+            }
+            return {
+                actor: participantActor,
+                netHits: p.netHits,
+                glitched: p.glitched,
+                criticalGlitched: p.criticalGlitched,
+                differentSkill: p.differentSkill ? participantActor.getSkill(p.differentSkill) : undefined,
+                differentAttribute: this.constructAttributeEntry(p.differentAttribute),
+                differentLimit: this.constructLimitEntry(p.differentLimit)
+            };
+        });
+
+        return {
+            actor,
+            skill,
+            attribute,
+            threshold: flag.threshold,
+            limit,
+            allowOtherSkills: flag.allowOtherSkills,
+            additionalDice: flag.additionalDice,
+            additionalLimit: flag.additionalLimit,
+            criticalGlitched: flag.criticalGlitched,
+            specialization: flag.specialization,
+            participants,
+        };
+    }
+
+
     static get limitList(): { name: LimitKey; label: string }[] {
         return Object.entries(SR5.limits)
             .map(([key, label]) => ({
@@ -203,6 +310,23 @@ export class TeamworkFlow {
         html = $(html);
         if (!html?.find('.sr5-teamwork-addparticipant')) return;
 
+        html.find(".show-participant-details").on("click", (event) => {
+            if ($(event.target).closest("a, button, .roll").length > 0) return;
+
+            const card = $(event.currentTarget).closest(".teamwork-participant");
+            const details = card.find(".participant-details");
+            details.slideToggle(200);
+        });
+        html.find('.delete-participant').on('click', async (event) => {
+            event.preventDefault();
+            event.stopPropagation(); // Verhindert das Auslösen des Toggles
+
+            const actorId = $(event.currentTarget).data("actorId");
+            if (!actorId) return;
+
+            await this.deleteParticipant(message, actorId);
+        });
+
         $(html).find('.sr5-teamwork-addparticipant').on('click', _ => this.addParticipant(message));
         $(html).find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
     }
@@ -222,10 +346,10 @@ export class TeamworkFlow {
         request?: boolean;
     }): Promise<Partial<TeamworkData> & { specialization?: boolean, cancelled?: boolean }> {
         if (!data.actors.length) return { cancelled: true };
-        const dialogData = await new TeamWorkDialog(data).select();   
+        const dialogData = await new TeamWorkDialog(data).select();
 
         // dialogData.actor = (await fromUuid(dialogData.actor) as SR5Actor)
-        if (!dialogData.actor) return { cancelled: true };             
+        if (!dialogData.actor) return { cancelled: true };
 
         console.log("showTeamworkDialog data", dialogData)
 
@@ -259,9 +383,7 @@ export class TeamworkFlow {
 
         console.log("initiateTeamworkTest data", dialogData)
 
-        if (dialogData.cancelled) return;
-
-        if (!dialogData.actor ||!dialogData.skill || !dialogData.attribute) return;
+        if (dialogData.cancelled || !dialogData.actor || !dialogData.skill || !dialogData.attribute) return;
 
         // Setze initiales Flag-Objekt
         const teamworkData: TeamworkMessageData = {
@@ -284,16 +406,16 @@ export class TeamworkFlow {
 
         console.log("initiateTeamworkTest teamworkData", teamworkData)
 
-        const templateContext = {
-            ...teamworkData,
-            limit: (SR5.limits as Record<LimitKey, string>)[dialogData.limit?.name ?? ""] ?? undefined,
-            attribute: (SR5.attributes as Record<ActorAttribute, string>)[dialogData.attribute.name] ?? undefined
-        };
+        // const templateContext = {
+        //     ...teamworkData,
+        //     limit: (SR5.limits as Record<LimitKey, string>)[dialogData.limit?.name ?? ""] ?? undefined,
+        //     attribute: (SR5.attributes as Record<ActorAttribute, string>)[dialogData.attribute.name] ?? undefined
+        // };
 
-        console.log("initiateTeamworkTest templateContext", templateContext)
+        // console.log("initiateTeamworkTest templateContext", templateContext)
 
         // Rendern und ChatMessage anlegen
-        const content = await renderTemplate("systems/shadowrun5e/dist/templates/chat/teamworkRequest.html", templateContext);
+        const content = await renderTemplate("systems/shadowrun5e/dist/templates/chat/teamworkRequest.html", teamworkData);
         const msg = await ChatMessage.create({
             user: user.id,
             speaker: ChatMessage.getSpeaker(),
@@ -304,7 +426,7 @@ export class TeamworkFlow {
             return ui.notifications?.error("Teamwork-Nachricht nicht gefunden");
         }
 
-        await msg.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData);
+        await this.setTeamworkMessageFlag(msg, teamworkData);
     }
 
     /**
@@ -318,18 +440,31 @@ export class TeamworkFlow {
         const user = game.user;
         if (!user || !game.actors || !message) return;
 
-        const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData;
+        const teamworkData = await this.getTeamworkMessageData(message);
 
-        const actor = await JournalEnrichers.findActor();
-        if (!actor) {
-            return ui.notifications?.error("Kein valider Akteur gefunden.");
-        }
+        const baseActor = await JournalEnrichers.findActor();
 
-        const skill = teamworkData.skill ? this.constructSkillEntry({ id: teamworkData.skill.id ?? teamworkData.skill.label ?? "" }, actor) : undefined
+        const skill = teamworkData.skill ? this.constructSkillEntry({ id: teamworkData.skill.id ?? teamworkData.skill.label ?? "" }, baseActor) : undefined
+
+        console.log("addParticipants contributingActorIds: ", teamworkData);
+
+        const contributingActorIds = [
+            teamworkData.actor?.id,
+            ...(teamworkData.participants?.map(p => p.actor.id) ?? [])
+        ].filter(Boolean);
+
+        console.log("addParticipants contributingActorIds: ", contributingActorIds)
+
+        const actorList = (this.actorList ?? []).filter(a => !contributingActorIds.includes(a.id));
+
+        console.log("addParticipants actorlist: ", actorList)
+
+        // TODO: Fehlerbehandlung
+        if (actorList.length === 0) return;
 
         const dialogData = await this.showTeamworkDialog({
-            actors: this.actorList ?? [actor],
-            actor,
+            actors: actorList,
+            actor: baseActor,
             skill,
             attribute: teamworkData.attribute ? teamworkData.attribute : this.constructAttributeEntry(skill?.attribute),
             threshold: teamworkData.threshold ?? undefined,
@@ -338,18 +473,18 @@ export class TeamworkFlow {
             request: true
         });
 
-        if (!dialogData) return;
+        if (!dialogData || dialogData.cancelled || !dialogData.actor || !dialogData.skill || !dialogData.attribute) return;
 
         console.log(dialogData)
 
         // 1) Basis-ActionData holen
-        const skillAction: Shadowrun.ActionRollData | undefined = actor.skillActionData(dialogData.skill!.id, { specialization: dialogData.specialization });
+        const skillAction: Shadowrun.ActionRollData | undefined = dialogData.actor.skillActionData(dialogData.skill!.id, { specialization: dialogData.specialization });
         if (!skillAction) {
             return;
         }
 
         // 2) Attribut überschreiben, falls der User ein anderes gewählt hat        
-            skillAction.attribute =  dialogData.attribute!.name;
+        skillAction.attribute = dialogData.attribute!.name;
 
         // 3) Threshold eintragen
         const threshold = dialogData.threshold ?? 0;
@@ -364,15 +499,19 @@ export class TeamworkFlow {
             skillAction.limit.base = limit;
         } else if (typeof limit === "string" && limit !== "") {
             // Attribut‐Limit
-            const actual = actor.getLimit(limit).base ?? 0;
+            const actual = dialogData.actor.getLimit(limit).base ?? 0;
             skillAction.limit.value = actual;
             skillAction.limit.base = actual;
             skillAction.limit.attribute = limit as Shadowrun.LimitAttribute;
         }
 
+        console.log("addParticipant: ", dialogData.actor)
+
         // 5) Test erstellen & ausführen
         try {
-            const test = await TestCreator.fromAction(skillAction, actor);
+            console.log("addParticipant SkillAction: ", skillAction)
+
+            const test = await TestCreator.fromAction(skillAction, dialogData.actor);
             if (!test) return;
             test.data.title = teamworkData.skill.label;
             const results = await test.execute() as SuccessTest;
@@ -380,13 +519,63 @@ export class TeamworkFlow {
             // 6) Ergebnis in die ursprüngliche Message einhängen
             await TeamworkFlow.addResultsToMessage(
                 message,
-                actor,
+                dialogData.actor,
                 results
             );
         } catch (err) {
             //TODO: Lokalisierung
             console.error("Fehler im Teilnehmer-Wurf:", err);
             ui.notifications?.error("Fehler im Teilnehmer-Wurf:", err);
+        }
+    }
+
+
+    static async deleteParticipant(message: ChatMessage, actorId: string) {
+        const teamworkData = await this.getTeamworkMessageData(message);
+
+        const participant = teamworkData.participants.find(p => p.actor.id === actorId);
+        if (!participant) return;
+
+        const user = game.user;
+
+        if (!user) return;
+        const isOwner = participant.actor.testUserPermission(user, "OWNER");
+
+        // Nur GM darf Teilnehmer mit Critical Glitch entfernen
+        if (participant.criticalGlitched && !user.isGM) {
+            ui.notifications?.warn("SR5.Warning.OnlyGMCanRemoveCritical");
+            return;
+        }
+
+        // Erlaube nur GMs oder Eigentümern des Teilnehmers das Löschen
+        if (!user?.isGM && !isOwner) {
+            ui.notifications?.warn("SR5.Warning.NotAuthorized");
+            return;
+        }
+
+        // Teilnehmer entfernen
+        teamworkData.participants = teamworkData.participants.filter(p => p.actor.id !== actorId);
+
+        // Wenn es der letzte Critical Glitch war, entferne den Flag
+        if (participant.criticalGlitched) {
+            const stillCritical = teamworkData.participants.some(p => p.criticalGlitched);
+            if (!stillCritical) {
+                teamworkData.criticalGlitched = false;
+            }
+        }
+
+        // Re-render der Karte
+        const content = await renderTemplate(
+            "systems/shadowrun5e/dist/templates/chat/teamworkRequest.html",
+            teamworkData
+        );
+
+        // Aktualisieren der Nachricht (über Socket wenn nicht GM)
+        if (user?.isGM) {
+            await this.setTeamworkMessageFlag(message, teamworkData);
+            await message.update({ content });
+        } else {
+            await this._sendUpdateSocketMessage(message, content, teamworkData);
         }
     }
 
@@ -400,7 +589,7 @@ export class TeamworkFlow {
     static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest) {
 
         // 1.) Flag auslesen
-        const teamworkData = (await message.getFlag(SYSTEM_NAME, FLAGS.Test)) as TeamworkMessageData;
+        const teamworkData = await this.getTeamworkMessageData(message);
 
         // 2.) Neue Teilnehmer-Info anhängen
         const netHits = results.data.values.netHits.value;
@@ -434,7 +623,7 @@ export class TeamworkFlow {
         // 4.) ChatMessage updaten — Content + Flag
         try {
             if (game.user?.isGM) {
-                await message.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData);
+                await this.setTeamworkMessageFlag(message, teamworkData);
                 await message.update({ content });
             }
             else {
@@ -451,13 +640,11 @@ export class TeamworkFlow {
      * @param message 
      */
     static async rollTeamworkTest(message: ChatMessage) {
-        const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData;
+        const teamworkData = await this.getTeamworkMessageData(message);
 
-        const actor = game.actors?.get((teamworkData.actor as any)._id);
+        if (!teamworkData.actor) return;
 
-        if (!actor) return;
-
-        await actor.rollTeamworkTest(teamworkData);
+        await teamworkData.actor.rollTeamworkTest(teamworkData);
     }
 
     /**
@@ -481,9 +668,13 @@ export class TeamworkFlow {
             return;
         }
 
-        const message = fromUuidSync(socketMessage.data.messageUuid);
+        const message = fromUuidSync(socketMessage.data.messageUuid) as ChatMessage;
 
-        message?.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData)
+        //TODO: Fehlerbehandlung
+        if (!message) return;
+
+        await this.setTeamworkMessageFlag(message, socketMessage.data.teamworkData);
+
         message?.update({ content: socketMessage.data.content })
     }
 

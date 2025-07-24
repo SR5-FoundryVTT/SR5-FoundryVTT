@@ -46,6 +46,8 @@ export class TeamWorkDialog extends FormDialog {
     options: FormDialogOptions = {}) {
     options.applyFormChangesOnSubmit = true;
 
+    console.log("TWDialog constructor actors: ", teamworkData.actors)
+
     const actors = teamworkData.actors ?? game.actors?.filter(actor => actor.testUserPermission(game.user!, "OWNER")) ?? [];
     const actor = teamworkData.actor ?? actors[0] ?? undefined;
     const attributes = actor

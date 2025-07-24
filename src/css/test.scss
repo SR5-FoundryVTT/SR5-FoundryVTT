@@ -148,6 +148,32 @@
   background: var(--color-dialog-bg);
   color: var(--color-input-text);
   overflow: hidden;
+  position: relative;
+  transition: background-color 0.3s;
+
+  &.glitched {
+    background-color: #3f1e1e; // dunkles Rot
+    border-color: #c0392b;
+  }
+
+  .participant-controls {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+
+    .participant-delete {
+      background: none;
+      border: none;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 1em;
+      padding: 0;
+    }
+
+    .participant-delete:hover {
+      color: #ff4d4d;
+    }
+  }
 
   summary {
     list-style: none;
