@@ -125,7 +125,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     /**
      * Return an Array of the Embedded Item Data
      */
-    getNestedItems(): any[] {
+    getNestedItems(): Item.Source[] {
         return this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems) ?? [];
     }
 
@@ -571,15 +571,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Create an item in this item
      * @param itemData
      */
-    async createNestedItem(itemData) {
+    async createNestedItem(itemData: Item.Source | Item.Source[]) {
         if (!Array.isArray(itemData)) itemData = [itemData];
         // weapons accept items
         if (this.type === 'weapon') {
-            const currentItems = foundry.utils.duplicate(this.getNestedItems());
+            const currentItems = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
 
             itemData.forEach((ogItem) => {
-                const item = foundry.utils.duplicate(ogItem);
-                item._id = randomID(16);
+                const item = foundry.utils.duplicate(ogItem) as Item.Source;
+                item._id = foundry.utils.randomID();
                 if (item.type === 'ammo' || item.type === 'modification')
                     currentItems.push(item);
             });
@@ -612,11 +612,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const tempItems = items.map((item) => {
             // Set user permissions to owner, to allow none-GM users to edit their own nested items.
             const data = game.user ? { ownership: { [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER } } : {};
-            item = foundry.utils.mergeObject(item, data);
+            item = foundry.utils.mergeObject(item, data) as Item.Source;
 
             // Case: MODIFY => Update existing item.
-            if (item._id in loaded) {
-                const currentItem = loaded[item._id];
+            if (item._id! in loaded) {
+                const currentItem = loaded[item._id!];
 
                 // Update DocumentData directly, since we're not really having database items here.
                 currentItem.updateSource(item);
@@ -664,7 +664,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     async updateNestedItems(changes) {
-        const items = foundry.utils.duplicate(this.getNestedItems());
+        const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
         if (!items) return;
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
@@ -706,7 +706,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @returns {Promise<boolean>}
      */
     async deleteOwnedItem(deleted) {
-        const items = foundry.utils.duplicate(this.getNestedItems());
+        const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
         if (!items) return;
 
         const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
@@ -715,9 +715,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // we need to clear the items when one is deleted or it won't actually be deleted
         await this.clearNestedItems();
         await this.setNestedItems(items);
-        await this.prepareNestedItems();
-        await this.prepareData();
-        await this.render(false);
+        this.prepareNestedItems();
+        this.prepareData();
+        this.render(false);
         return true;
     }
 

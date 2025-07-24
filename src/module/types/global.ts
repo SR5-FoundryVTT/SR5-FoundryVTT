@@ -151,7 +151,7 @@ declare module "fvtt-types/configuration" {
                 lastSpellForce?: SpellForceType;
                 lastComplexFormLevel?: ComplexFormLevelType;
                 lastFireRange?: FireRangeType;
-                embeddedItems?: Item.Source[];
+                embeddedItems: Item.Source[];
             };
         };
         Macro: {
