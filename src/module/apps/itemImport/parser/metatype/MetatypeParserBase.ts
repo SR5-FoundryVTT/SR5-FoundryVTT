@@ -25,7 +25,7 @@ export abstract class MetatypeParserBase<TResult extends ShadowrunActorData> ext
                 continue;
             }
 
-            const itemBase = game.items!.fromCompendium(foundItem) as ItemDataSource;
+            const itemBase = game.items!.fromCompendium(foundItem, { keepId: true }) as ItemDataSource;
 
             if (item.$?.select)
                 itemBase.name += ` (${item.$.select})`;
