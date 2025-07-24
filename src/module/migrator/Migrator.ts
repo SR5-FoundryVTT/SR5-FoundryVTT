@@ -49,12 +49,9 @@ export class Migrator {
         );
     }
 
-    private static getEmbeddedItems(data: any) {
-        const items = data.flags?.shadowrun5e?.embeddedItems;
-        if (items == null) return [];
-        if (Array.isArray(items)) return items;
-        if (typeof items === 'object') return Object.values(items);
-        return [items];
+    private static normalizeArray(data: any): any[] {
+        if (data == null) return [];
+        return Array.isArray(data) ? data : Object.values(data); 
     }
 
     /**
@@ -69,12 +66,19 @@ export class Migrator {
         if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return;
 
         if (type === "Item") {
-            for (const nestedItems of this.getEmbeddedItems(data))
+            const items = this.normalizeArray(data.flags?.shadowrun5e?.embeddedItems);
+            for (const nestedItems of items)
                 this.migrate("Item", nestedItems, true);
 
-            if (nested)
-                for (const nestedEffect of data.effects ?? [])
+            foundry.utils.setProperty(data, 'flags.shadowrun5e.embeddedItems', items);
+
+            if (nested) {
+                const effects = this.normalizeArray(data.effects);
+                for (const nestedEffect of effects)
                     this.migrate("ActiveEffect", nestedEffect, true);
+
+                foundry.utils.setProperty(data, 'effects', effects);
+            }
         }
 
         const migrators = this.getMigrators(type, data._stats.systemVersion);
