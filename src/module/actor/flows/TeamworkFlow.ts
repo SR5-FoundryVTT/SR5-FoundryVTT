@@ -71,7 +71,7 @@ export interface TeamworkFlagData {
     skill: string;
     attribute?: ActorAttribute;
     threshold?: number;
-    limit?: LimitKey | number;
+    limit?: LimitKey | number | undefined;
     allowOtherSkills: boolean;
     additionalDice: Shadowrun.ValueMaxPair<number>;
     additionalLimit: number;
@@ -158,7 +158,7 @@ export class TeamworkFlow {
         return { name: "", label: "" };
     }
 
-    static constructAttributeEntry(data?: string): AttributeEntry | undefined {
+    static constructAttributeEntry(data?: ActorAttribute): AttributeEntry | undefined {
         if (typeof data === "string" && data in SR5.attributes) {
             return {
                 name: data as ActorAttribute,
@@ -175,7 +175,7 @@ export class TeamworkFlow {
             const skill = actor.getSkill(id);
             if (skill) return {
                 id: id,
-                label: game.i18n.localize(skill.label as Translation) ?? skill.name,
+                label: (game.i18n.localize(skill.label as Translation) ?? "").trim() || skill.name,
                 attribute: skill.attribute as ActorAttribute,
                 limit: actor.getAttributes()[skill.attribute]?.limit as LimitKey ?? ""
             }
@@ -317,6 +317,7 @@ export class TeamworkFlow {
             const details = card.find(".participant-details");
             details.slideToggle(200);
         });
+
         html.find('.delete-participant').on('click', async (event) => {
             event.preventDefault();
             event.stopPropagation(); // Verhindert das Auslösen des Toggles
@@ -442,9 +443,7 @@ export class TeamworkFlow {
 
         const teamworkData = await this.getTeamworkMessageData(message);
 
-        const baseActor = await JournalEnrichers.findActor();
 
-        const skill = teamworkData.skill ? this.constructSkillEntry({ id: teamworkData.skill.id ?? teamworkData.skill.label ?? "" }, baseActor) : undefined
 
         console.log("addParticipants contributingActorIds: ", teamworkData);
 
@@ -455,7 +454,13 @@ export class TeamworkFlow {
 
         console.log("addParticipants contributingActorIds: ", contributingActorIds)
 
+        const baseActor = await JournalEnrichers.findActor();
+
         const actorList = (this.actorList ?? []).filter(a => !contributingActorIds.includes(a.id));
+
+        const preselectedActor = actorList.some(a => a.id === baseActor?.id) ? baseActor : undefined;
+
+        const skill = teamworkData.skill ? this.constructSkillEntry({ id: teamworkData.skill.id ?? teamworkData.skill.label ?? "" }, baseActor) : undefined
 
         console.log("addParticipants actorlist: ", actorList)
 
@@ -464,7 +469,7 @@ export class TeamworkFlow {
 
         const dialogData = await this.showTeamworkDialog({
             actors: actorList,
-            actor: baseActor,
+            actor: preselectedActor,
             skill,
             attribute: teamworkData.attribute ? teamworkData.attribute : this.constructAttributeEntry(skill?.attribute),
             threshold: teamworkData.threshold ?? undefined,
@@ -493,16 +498,16 @@ export class TeamworkFlow {
 
         // 4) Limit setzen: Zahl vs. Attribut-Limit
         const limit = dialogData.limit;
-        if (typeof limit === "number") {
+        if (limit?.base != null && !isNaN(limit.base)) {
             // fester Wert: nur value/base anpassen, attribute bleibt wie in skillActionData
-            skillAction.limit.value = limit;
-            skillAction.limit.base = limit;
-        } else if (typeof limit === "string" && limit !== "") {
+            skillAction.limit.value = limit.base;
+            skillAction.limit.base = limit.base;
+        } else if (limit?.name) {
             // Attribut‐Limit
-            const actual = dialogData.actor.getLimit(limit).base ?? 0;
+            const actual = dialogData.actor.getLimit(limit.name).base ?? 0;
             skillAction.limit.value = actual;
             skillAction.limit.base = actual;
-            skillAction.limit.attribute = limit as Shadowrun.LimitAttribute;
+            skillAction.limit.attribute = limit.name as Shadowrun.LimitAttribute;
         }
 
         console.log("addParticipant: ", dialogData.actor)
@@ -599,14 +604,24 @@ export class TeamworkFlow {
             glitched: results.rolls[0].glitched,
             criticalGlitched: results.rolls[0].criticalGlitched,
             differentSkill: results.data.action.skill !== teamworkData.skill.id ? actor.getSkill(results.data.action.skill) : undefined,
-            differentAttribute: results.data.action.attribute !== teamworkData.attribute?.name ? this.constructAttributeEntry((SR5.attributes as Record<ActorAttribute, string>)[results.data.action.attribute]) : undefined,
-            differentLimit: typeof teamworkData.limit === "string"
-                ? (results.data.action.limit.attribute !== teamworkData.limit
-                    ? (SR5.limits as Record<LimitKey, string>)[results.data.action.limit.attribute]
-                    : undefined)
-                : (typeof teamworkData.limit === "number" && results.data.action.limit.base !== teamworkData.limit
-                    ? `${results.data.action.limit.base}`
-                    : undefined)
+            differentAttribute: results.data.action.attribute !== teamworkData.attribute?.name
+                ? this.constructAttributeEntry(results.data.action.attribute)
+                : undefined,
+            differentLimit:
+                teamworkData.limit?.base !== undefined
+                    ? (
+                        results.data.action.limit.base !== teamworkData.limit.base
+                            ? { name: '', label: '', base: results.data.action.limit.base }
+                            : undefined
+                    )
+                    : (
+                        results.data.action.limit.attribute !== teamworkData.limit?.name
+                            ? {
+                                name: results.data.action.limit.attribute as LimitKey,
+                                label: SR5.limits[results.data.action.limit.attribute],
+                            }
+                            : undefined
+                    )
         });
 
         // 3.) Content komplett neu rendern
@@ -641,8 +656,16 @@ export class TeamworkFlow {
      */
     static async rollTeamworkTest(message: ChatMessage) {
         const teamworkData = await this.getTeamworkMessageData(message);
+        const actor = teamworkData.actor;
+        const user = game.user;
 
-        if (!teamworkData.actor) return;
+        if (!actor || !user) return;
+
+        const isOwner = actor.testUserPermission(user, "OWNER");
+        if (!user?.isGM && !isOwner) {
+            ui.notifications?.warn("SR5.Warning.NotAuthorized");
+            return;
+        }
 
         await teamworkData.actor.rollTeamworkTest(teamworkData);
     }

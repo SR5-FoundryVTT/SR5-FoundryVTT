@@ -83,7 +83,7 @@ export class HooksManager {
 
         Hooks.once('init', () => {
             HooksManager.init();
-            
+
             // Custom Module Integrations
             // See src/module/integartions for more information.
             if (game.modules.get('routinglib')?.active) {

@@ -54,7 +54,7 @@ export class JournalEnrichers {
         CONFIG.TextEditor.enrichers.push(
             {
                 pattern: pattern,
-                enricher: (match, options) => {
+                enricher: (match: RegExpMatchArray, options: any) => {
                     const type = match[1]
                     const value = match[2].replace(/<\/?[^>]+>/g, "").trim() as string
                     const label = match[3] || value.replace(/_/g, " "); // Use label if provided, else use action name
@@ -114,6 +114,18 @@ export class JournalEnrichers {
                     }
 
                     const $link = $(`<a class="sr5-roll-request">${label}<em class="fas fa-comment-alt" style="margin-left: 5px;"></em></a>`);
+
+
+                    console.log("enricher-relativeTo", options)
+                    const relativeDoc = options?.relativeTo as unknown;
+                    if (!testAttributes.documentUuid && relativeDoc && typeof relativeDoc === "object") {
+                        if (
+                            relativeDoc instanceof CONFIG.Actor.documentClass ||
+                            relativeDoc instanceof CONFIG.Item.documentClass
+                        ) {
+                            testAttributes.documentUuid = relativeDoc.uuid;
+                        }
+                    }
 
                     const attrs = this.buildRollRequestAttributes(testAttributes);
 
