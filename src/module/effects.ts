@@ -30,8 +30,7 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
     switch (icon.dataset.action) {
         case "create":
             return owner.createEmbeddedDocuments('ActiveEffect', [{
-                label: game.i18n.localize("SR5.ActiveEffect.New"),
-                // icon: "icons/svg/aura.svg",
+                name: game.i18n.localize("SR5.ActiveEffect.New"),
                 origin: owner.uuid
             }]);
 
