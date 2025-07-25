@@ -37,18 +37,16 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
         case "edit":
             return effect.sheet.render(true);
 
-        case "delete":
+        case "delete": {
             const userConsented = await Helpers.confirmDeletion();
             if (!userConsented) return;
 
             return effect.delete();
-
+        }
         case "toggle":
             return effect.toggleDisabled();
         case "open-origin":
             return effect.renderSourceSheet();
-        default:
-            return;
     }
 }
 
@@ -77,8 +75,6 @@ export async function onManageItemActiveEffect(event: MouseEvent) {
             return effect.toggleDisabled();
         case "open-origin":
             return effect.parent?.sheet?.render(true);
-        default:
-            return;
     }
 }
 
