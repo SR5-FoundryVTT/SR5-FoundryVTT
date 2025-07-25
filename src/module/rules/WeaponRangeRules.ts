@@ -16,6 +16,8 @@ export interface WeaponRangeTestDataFragment {
     targetRanges: Shadowrun.TargetRangeTemplateData[]
     // index of selected target range in targetRanges
     targetRangesSelected: number
+    // keep track of last target selected, so it can reset range if changed
+    lastTargetSelected: number
 }
 
 type WeaponRangeTest = SuccessTest<WeaponRangeTestDataFragment & SuccessTestData>
@@ -28,6 +30,7 @@ export class WeaponRangeTestBehavior {
         data.ranges = {};
         data.range = 0;
         data.targetRanges = [];
+        data.lastTargetSelected = -1;
         data.targetRangesSelected = 0;
         data.damage = data.damage || DataDefaults.damageData();
     }
@@ -145,7 +148,11 @@ export class WeaponRangeTestBehavior {
             // Cast select options string to integer index.
             test.data.targetRangesSelected = Number(test.data.targetRangesSelected);
             const target = test.data.targetRanges[test.data.targetRangesSelected];
-            test.data.range = target.range.modifier;
+
+            if (test.data.lastTargetSelected !== test.data.targetRangesSelected)
+                test.data.range = target.range.modifier;
+
+            test.data.lastTargetSelected = test.data.targetRangesSelected;
 
             // Reduce all targets selected down to the actual target fired upon.
             const token = fromUuidSync(target.tokenUuid) as TokenDocument;

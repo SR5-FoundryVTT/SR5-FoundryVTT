@@ -1,21 +1,20 @@
 {{#if test.hasTargets}}
     <div class="form-group">
-        <label>{{localize 'SR5.SelectedTargets'}}</label>
+        <label>{{localize 'SR5.Target'}}</label>
         <select name="test.data.targetRangesSelected">
             {{#select test.data.targetRangesSelected}}
             {{#each test.data.targetRanges as |target|}}
-                <option value="{{@index}}">{{target.name}} [{{localize target.range.label}} ({{target.range.distance}}/{{target.distance}}{{target.unit}})]</option>
+            <option value="{{@index}}">{{target.name}} ({{target.distance}} {{target.unit}})</option>
             {{/each}}
             {{/select}}
         </select>
     </div>
-{{else}}
-    <div class="form-group">
-        <label>{{localize 'SR5.Range'}}</label>
-        <select name="test.data.range">
-            {{#select test.data.range}} {{#each test.data.ranges as |range key|}}
-            <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
-            {{/each}} {{/select}}
-        </select>
-    </div>
 {{/if}}
+<div class="form-group">
+    <label>{{localize 'SR5.Range'}}</label>
+    <select name="test.data.range">
+        {{#select test.data.range}} {{#each test.data.ranges as |range key|}}
+        <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
+        {{/each}} {{/select}}
+    </select>
+</div>
