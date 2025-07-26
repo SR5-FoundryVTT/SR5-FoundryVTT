@@ -81,6 +81,8 @@ import { SRStorage } from './storage/storage';
 import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
 import { MatrixICFlow } from './actor/flows/MatrixICFlow';
 import { SocketMessage } from './sockets';
+import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
+import { MatrixTest } from './tests/MatrixTest';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -171,6 +173,8 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalDefenseTest,
+                MatrixTest,
+                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 PhysicalResistTest,
                 SpellCastingTest,
@@ -212,6 +216,8 @@ ___________________
                 SpellCastingTest,
                 ComplexFormTest,
                 PhysicalDefenseTest,
+                MatrixTest,
+                MatrixDefenseTest,
                 NaturalRecoveryStunTest,
                 NaturalRecoveryPhysicalTest,
                 DrainTest,
@@ -234,6 +240,7 @@ ___________________
             opposedTests: {
                 OpposedTest,
                 PhysicalDefenseTest,
+                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 CombatSpellDefenseTest,
                 OpposedSummonSpiritTest,

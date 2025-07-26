@@ -1,0 +1,45 @@
+{{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.html'}}
+<div class="sr5 chat-card roll-card">
+    <div class="card-content can-wrap">
+        <div class="left-side">
+            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
+                name=(localize "SR5.Incoming")
+                damage=test.data.incomingDamage
+                showAP=false
+            }}
+        </div>
+        <div class="right-side">
+            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
+                name=(localize "SR5.Modified")
+                damage=test.data.modifiedDamage
+                showAP=false
+            }}
+        </div>
+    </div>
+    {{#if resistTest}}
+    <div class="card-buttons">
+        <div class="button resist-action" data-action="{{resistTest.test}}">
+            {{localize resistTest.label}}
+        </div>
+    </div>
+    {{/if}}
+</div>
+<div class="sr5 chat-card roll-card">
+    <div class="test-line">
+        <span class="test-name {{#if roll}}test-roll{{/if}}">
+            {{localize "SR5.Labels.Message.TargetedIcon"}}
+        </span>
+    </div>
+    <div class="card-title card-header">
+        <div class="container container--fluid">
+            <div class="container__row">
+                <div class="container__col">
+                    <div class="document">
+                        <a class="chat-select-link" data-token-id="{{test.icon.id}}"><img src="{{test.icon.img}}" class="entity-selectable"/></a>
+                        <h3 class="header-name"><a class="chat-document-link" data-uuid="{{test.icon.uuid}}">{{test.icon.name}}</a></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

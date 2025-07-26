@@ -6,7 +6,6 @@ import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
 import { MarksStorage } from '../storage/MarksStorage';
-import { MatrixResistTest } from '../tests/MatrixResistTest';
 import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
 
@@ -124,29 +123,53 @@ export const MatrixFlow = {
         await MatrixFlow.sendOverwatchConvergenceMessage(templateData);
     },
 
-    /**
-     * Execute a matrix damage resistance test and modify the damage accordingly.
-     *
-     * @param actor The actor to resist the damage.
-     * @param damage The damage to be resited.
-     * @returns Modified damage after resistance based on damage given.
-     */
-    async executeMatrixDamageResistance(actor: SR5Actor, damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData | undefined> {
-        const test = await actor.generalActionTest('resist_matrix') as MatrixResistTest;
-        if (!test) {
-            console.error('Shadowrun 5e | The General Action pack does not contain a recovery_matrix action.');
-            return;
+    async determineMatrixFailedAttack(test: SuccessTest | OpposedTest) {
+        if (!test.opposing) return;
+        console.log('SMM Handling matrix damage resist', test);
+
+        // @ts-expect-error - Only OpposedTest has this property
+        const against = test.against as SuccessTest;
+        if (!against) return;
+        if (!against.hasTestCategory('matrix')) return;
+
+        const actor = against.actor;
+        if (!actor) return;
+
+        // if we succeeded in defending against an ATTACK test, we need to send back "bad data" in the form of 1 matrix damage
+        if (test.success && MatrixRules.isAttackAction(
+            against.data.action.attribute,
+            against.data.action.attribute2,
+            against.data.action.limit.attribute
+        )) {
+            const alias = game.user?.name;
+            const linkedTokens = actor.getActiveTokens(true) || [];
+            const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
+
+            const templateData = {
+                damage: MatrixRules.failedAttackDamage(),
+                speaker: {
+                    actor,
+                    alias,
+                    token,
+                },
+            };
+            await this.sendFailedAttackActionMessage(templateData);
         }
 
-        // Prepare test data for execution
-        test.data.incomingDamage = damage;
-        test.data = test._prepareData(test.data, test.data.options);
+    },
 
-        console.error(test.data.incomingDamage, test.data.modifiedDamage);
+    /**
+     * Send out a chat message to apply damage to the attacker for failing an attack action
+     * TODO: Add param typing
+     */
+    async sendFailedAttackActionMessage(templateData) {
+        const content = await renderTemplate(
+            'systems/shadowrun5e/dist/templates/chat/matrix-failed-attack-action.hbs',
+            templateData,
+        );
+        const messageData = { content, speaker: templateData.speaker };
+        await ChatMessage.create(messageData);
 
-        await test.execute();
-
-        return test.data.modifiedDamage;
     },
 
     /**

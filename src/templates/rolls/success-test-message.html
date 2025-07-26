@@ -173,6 +173,15 @@
         {{/each}}
     </div>
     {{/if}}
+    {{#if resistActions}}
+    <div class="card-buttons">
+        {{#each resistActions}}
+        <div class="button resist-action" data-action="{{this.test}}">
+            {{localize this.label}}
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
     {{#if resultActions}}
     <div class="card-content">
         <div class="left-side">

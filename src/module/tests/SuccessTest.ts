@@ -26,6 +26,7 @@ import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
+import { MatrixTestData } from './MatrixTest';
 
 export interface TestDocuments {
     // Legacy field that used be the source document.
@@ -401,6 +402,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     static async _getOpposedActionTestData(testData, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
+        return undefined;
+    }
+
+    static async _getResistActionTestData(testData, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
+        console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resist message actions`);
         return undefined;
     }
 
@@ -926,7 +932,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get hasDamage(): boolean {
         // check that we don't have a damage value of 0 and a damage type that isn't empty
-        return this.data.action.damage.value !== 0 && this.data.action.damage.type.value !== '';
+        return (this.data.action.damage.value !== 0 || this.data.action.damage.attribute !== "")
+                                && this.data.action.damage.type.value !== '';
     }
 
     /**
@@ -1579,6 +1586,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (this.extended) {
             await this.executeAsExtended();
         }
+
+        Hooks.call('sr5_afterTestComplete', this);
     }
 
     /**
@@ -1775,6 +1784,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
             followupActions: this._prepareFollowupActionsTemplateData(),
+            resistActions: this._prepareResistActionsTemplateData(),
             resultActions: this._prepareResultActionsTemplateData(),
             previewTemplate: this._canPlaceBlastTemplate,
             showDescription: this._canShowDescription,
@@ -1841,6 +1851,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const testCls = TestCreator._getTestClass(this.data.action.followed.test);
         if (!testCls) return [];
         return [{ label: testCls.label }]
+    }
+
+    /**
+     * Prepare Resist actions a test allows. These are actions
+     * meant to be taken following completion of an opposed test.
+     */
+    _prepareResistActionsTemplateData(): Shadowrun.FollowupAction[] {
+        // by default, we don't return any resist actions in a normal SuccessTest
+        // this is overridden by OpposedTest
+        return []
     }
 
     /**
@@ -2141,7 +2161,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: TestOptions) {
         // Determine actors to roll test with.
-        let documents = await Helpers.getOpposedTestTargets(againstData);
+        // build documents based on the category, matrix can target individual icons
+        let documents = (againstData.categories.includes('matrix'))
+                                    ? await Helpers.getMatrixTestTargetDocuments(againstData as MatrixTestData)
+                                    : await Helpers.getOpposedTestTargets(againstData);
 
         // Inform user about tokens with deleted sidebar actors.
         // This can both happen for linked tokens immediately and unlinked tokens after reloading.

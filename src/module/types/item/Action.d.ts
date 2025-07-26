@@ -191,6 +191,7 @@ declare namespace Shadowrun {
         'addiction_mental' | // resisting against mental addiction
         'addiction_physical' | // resisting against physical addiction
         'addiction' | // resisting against addiction in general
+        'attack_matrix' | // attacks made in the matrix that will deal extra damage per mark, similar to Data Spike
         'attack_melee' | // attacks made with melee weapons
         'attack_ranged' | // attacks made with ranged weapons
         'attack_thrown' | // attacks made with thrown weapons
@@ -199,6 +200,7 @@ declare namespace Shadowrun {
         'climbing' | // using climbing skills
         'compiling' | // technomancer compiling sprites action
         'complex_form' | // technomancer threading complex form action
+        'defense_matrix' | // for defending in the matrix -- the attributes in the test vary
         'defense_suppression' | // defending against suppression attacks
         'defense' | // defending in general, includes all other defense types
         'drain' | // resisting against drain

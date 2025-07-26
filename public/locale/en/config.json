@@ -757,6 +757,7 @@
     "SR5.MatrixAttrDataProc": "Data Proc.",
     "SR5.MatrixAttrFirewall": "Firewall",
     "SR5.MatrixAttrSleaze": "Sleaze",
+    "SR5.MatrixDefense": "Matrix Defense",
     "SR5.MatrixNetworkHackingApplication": {
         "Icons": "Icons",
         "Invite": "Ask for invite",
@@ -1282,6 +1283,7 @@
         "AttackDodged": "Attack Dodged",
         "AttackDoesNoPhysicalDamageToVehicle": "Attack Hits But Does No Physical Damage To Vehicle",
         "AttackHits": "Attack Hits",
+        "AttackResisted": "Attack Resisted",
         "BruteForceFailure": "Brute Force failed!",
         "BruteForceSuccess": "Brute Force successful!",
         "Failure": "Failure!",

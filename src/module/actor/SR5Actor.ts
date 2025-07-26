@@ -542,6 +542,19 @@ export class SR5Actor extends Actor {
         }
     }
 
+    /**
+     * Get the Attribute to add when making a Full Matrix Defense
+     * - TODO should we make a world setting on if this should sync with the full defense attribute? make a second modifier?
+     */
+    getFullMatrixDefenseAttribute(): Shadowrun.AttributeField | undefined {
+        if (this.isVehicle()) {
+            return this.findVehicleStat('pilot');
+        } else if (this.isCharacter()) {
+            // todo make this customizable
+            return this.findAttribute('willpower');
+        }
+    }
+
     getEquippedWeapons(): SR5Item[] {
         return this.items.filter((item: SR5Item) => item.isEquipped() && item.isWeapon);
     }
@@ -1202,7 +1215,7 @@ export class SR5Actor extends Actor {
      * @param actionName The action with in the general pack.
      * @param options Success Test options
      */
-    async matrixlActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
+    async matrixActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         return await this.packActionTest(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
     }
 
@@ -2225,5 +2238,10 @@ export class SR5Actor extends Actor {
         // Avoid changing actor system data as Foundry just returns it.
         const rollData = foundry.utils.duplicate(super.getRollData());
         return ActorRollDataFlow.getRollData(this, rollData, options);
+    }
+
+    // TODO make this an overrideable item somehow, certain qualities can change the amount of damage that a mark does
+    getExtraMarkDamageModifier() {
+        return 2;
     }
 }

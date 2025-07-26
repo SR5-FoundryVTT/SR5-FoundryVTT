@@ -1,5 +1,10 @@
 import { SR } from "../constants";
 import { DataDefaults } from "../data/DataDefaults";
+import { SR5Item } from '../item/SR5Item';
+import { SR5Actor } from '../actor/SR5Actor';
+import DamageData = Shadowrun.DamageData;
+import { PartsList } from '../parts/PartsList';
+import { Helpers } from '../helpers';
 
 export class MatrixRules {
     /**
@@ -159,6 +164,18 @@ export class MatrixRules {
         return false;
     }
 
+    static isSleazeAction(attribute: Shadowrun.ActorAttribute, attribute2: Shadowrun.ActorAttribute, limit: Shadowrun.ActorAttribute): boolean {
+        const illegal = 'sleaze';
+        return attribute === illegal || attribute2 === illegal || limit === illegal;
+
+    }
+
+    static isAttackAction(attribute: Shadowrun.ActorAttribute, attribute2: Shadowrun.ActorAttribute, limit: Shadowrun.ActorAttribute): boolean {
+        const illegal = 'attack';
+        return attribute === illegal || attribute2 === illegal || limit === illegal;
+
+    }
+
     /**
      * At which score should Overwatch converge?
      * 
@@ -190,6 +207,14 @@ export class MatrixRules {
     }
 
     /**
+     * Determine the damage value dealt for failed Attack Actions
+     *
+     */
+    static failedAttackDamage(): Shadowrun.DamageData {
+        return DataDefaults.damageData({base: 1, value: 1, type: {base: 'matrix', value: 'matrix'}});
+    }
+
+    /**
      * Damage for Matrix dumpshock.
      * 
      * See SR5#229 'Dumpshock & Link-Locking'
@@ -200,5 +225,50 @@ export class MatrixRules {
         const damage = 6;
         
         return DataDefaults.damageData({type: {base: type, value: type}, base: damage, value: damage});
+    }
+
+    static modifyDamageAfterHit(attackerHits: number, defenderHits: number, damage: DamageData): DamageData {
+        const modified = foundry.utils.duplicate(damage);
+
+        /**
+         * Copied the following lines from CombatRules
+         */
+        // netHits should never be below zero...
+        if (attackerHits < 0) attackerHits = 0;
+        if (defenderHits < 0) defenderHits = 0;
+
+        // add net hits as separate parts
+        PartsList.AddUniquePart(modified.mod, 'SR5.Attacker', attackerHits);
+        PartsList.AddUniquePart(modified.mod, 'SR5.Defender', -defenderHits);
+
+        modified.value = Helpers.calcTotal(modified, {min: 0});
+
+        return modified;
+    }
+
+    /**
+     * What active defenses are available for the given item? Based on SR5#190 'Active Defenses'
+     * @param weapon The equipped weapon used for the attack.
+     * @param actor The actor performing the attack.
+     */
+    static availableActiveDefenses (weapon: SR5Item, actor: SR5Actor): Shadowrun.ActiveDefenseData {
+        // General purpose active defenses. ()
+        const activeDefenses: Shadowrun.ActiveDefenseData  = {
+            full_defense: {
+                label: 'SR5.FullMatrixDefense',
+                value: actor.getFullMatrixDefenseAttribute()?.value,
+                initMod: -10,
+            },
+        };
+
+        if (weapon.isSlave) {
+            activeDefenses['intervene'] = {
+                label: 'SR5.Intervene',
+                value: 0, // TODO get actor's pan device to use for defending
+                initMod: -5,
+            }
+        }
+
+        return activeDefenses;
     }
 }
