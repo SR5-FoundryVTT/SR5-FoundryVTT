@@ -642,23 +642,23 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return items.find((item) => item.id === itemId);
     }
 
-    // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     async updateNestedEffects(changes) {
+        if (!this._isNestedItem) return;
+
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
 
         for(const effectChanges of changes) {
             const effect = this.effects.get(effectChanges._id);
             if (!effect) continue;
-
-            // TODO: The _id field has been added by the system. Even so, don't change the id to avoid any byproducts.
-            delete effectChanges._id;
-
             foundry.utils.mergeObject(effect, expandObject(effectChanges), { inplace: true });
         }
 
-        this.prepareNestedItems();
-        this.prepareData();
+        const parent = this.parent as unknown as SR5Item;
+
+        parent.prepareNestedItems();
+        parent.prepareData();
+        parent.render(false);
         this.render(false);
     }
 
