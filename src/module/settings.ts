@@ -281,6 +281,30 @@ export const registerSystemSettings = () => {
         type: new foundry.data.fields.AlphaField({ initial: 0.5 }),
     });
 
+    /**
+     * Use the default icon overrides setting
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.AllowDifferentSkillForTeamworkTests, {
+        name: 'SETTINGS.AllowDifferentSkillForTeamworkTestsName',
+        hint: 'SETTINGS.AllowDifferentSkillForTeamworkTestsDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true
+    });
+
+    /**
+     * Use the default icon overrides setting
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.AllowLeaderAsParticipantForTeamworkTests, {
+        name: 'SETTINGS.AllowLeaderAsParticipantForTeamworkTestsName',
+        hint: 'SETTINGS.AllowLeaderAsParticipantForTeamworkTestsDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false
+    });
+
 
 };
 
@@ -321,7 +345,7 @@ export const registerReadySystemSettings = () => {
         scope: 'world',
         config: true,
         type: String,
-        default: 'NO',
+        default: 'shadowrun5e.general-actions',
         choices: buildChoicesByPackType("Item")
     });
 };

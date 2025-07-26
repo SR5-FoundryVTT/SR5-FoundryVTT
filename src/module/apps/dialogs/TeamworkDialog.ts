@@ -4,6 +4,7 @@ import { AttributeEntry, LimitEntry, LimitKey, SkillEntry, SkillGroup, TeamworkD
 import { SR5 } from "../../config";
 
 import { Translation } from "../../utils/strings";
+import { FLAGS, SYSTEM_NAME } from "@/module/constants";
 
 export interface TeamWorkDialogData extends Omit<FormDialogData, "templateData"> {
   templateData: {
@@ -66,7 +67,7 @@ export class TeamWorkDialog extends FormDialog {
     );
 
     const threshold = teamworkData.threshold ?? 0;
-    const showAllowOtherSkills = true;
+    const showAllowOtherSkills = game.settings.get(SYSTEM_NAME, FLAGS.AllowDifferentSkillForTeamworkTests) as boolean;
     const allowOtherSkills = Boolean(showAllowOtherSkills && teamworkData.allowOtherSkills);
     const limit = teamworkData.limit?.name != undefined && teamworkData.limit.name !== "" ? teamworkData.limit.name : skill?.limit ?? "";
     const limits = TeamworkFlow.limitList;

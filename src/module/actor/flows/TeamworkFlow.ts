@@ -448,7 +448,9 @@ export class TeamworkFlow {
         console.log("addParticipants contributingActorIds: ", teamworkData);
 
         const contributingActorIds = [
-            teamworkData.actor?.id,
+            (!game.settings.get(SYSTEM_NAME, FLAGS.AllowLeaderAsParticipantForTeamworkTests) as boolean)
+                ? teamworkData.actor?.id
+                : undefined,
             ...(teamworkData.participants?.map(p => p.actor.id) ?? [])
         ].filter(Boolean);
 

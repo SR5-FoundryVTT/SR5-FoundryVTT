@@ -8,6 +8,7 @@ import { SR5 } from '../config';
 import { TeamWorkDialog } from '../apps/dialogs/TeamworkDialog';
 import { FLAGS, SYSTEM_NAME } from '../constants';
 type ActorAttribute = Shadowrun.ActorAttribute;
+type ActionRollData = Shadowrun.ActionRollData;
 
 export interface TestAttributes {
     skill?: string;
@@ -22,7 +23,7 @@ export interface TestAttributes {
     opposedLimit?: string | number;
     name?: string;
     actorUuid?: string;
-    compendiumKey?: string;
+    packKey?: string;
     label: string;
     value: string;
     allowOtherSkills?: boolean;
@@ -100,7 +101,27 @@ export class JournalEnrichers {
 
                             testAttributes.testType = type === "RollAction" ? "action" : "macro";
                             testAttributes.name = parts[0];
-                            if (parts.length === 2) testAttributes.compendiumKey = parts[1];
+
+                            let packKey: string | undefined;
+
+                            if (parts.length === 2) {
+                                packKey = parts[1];
+                            } else {
+                                switch (testAttributes.testType) {
+                                    case "action":
+                                        packKey = testAttributes.packKey = game.settings.get(SYSTEM_NAME, FLAGS.RollActionDefaultPack) as string;
+                                        break;
+                                    case "macro":
+                                        packKey = testAttributes.packKey = game.settings.get(SYSTEM_NAME, FLAGS.RollMacroDefaultPack) as string;
+                                        break;
+                                    default:
+                                        packKey = undefined
+                                        break;
+                                }
+                            };
+
+                            testAttributes.packKey = (typeof packKey === "string" && game.packs.has(packKey)) ? packKey : undefined;
+
                             break;
 
                         default:
@@ -246,7 +267,7 @@ export class JournalEnrichers {
 
     static async executeMacro(testattributes: TestAttributes) {
         const macroName = testattributes.name?.trim();
-        const compendiumKey = testattributes.compendiumKey?.trim() || "world.macros"; // vollständiger Pfad
+        const packKey = testattributes.packKey?.trim();
 
         if (!macroName) {
             ui.notifications?.warn("Kein Makroname angegeben.");
@@ -254,51 +275,105 @@ export class JournalEnrichers {
         }
 
         try {
-            const pack = game.packs.get(compendiumKey);
-            if (!pack) {
-                ui.notifications?.error(`Compendium '${compendiumKey}' nicht gefunden.`);
-                return;
-            }
+            let macro: Macro | undefined;
 
-            const index = await pack.getIndex();
-            const entry = index.find(e => e.name === macroName);
-            if (!entry) {
-                ui.notifications?.error(`Makro '${macroName}' im Compendium '${compendiumKey}' nicht gefunden.`);
-                return;
-            }
-            const document = await pack.getDocument(entry._id);
-            if (document instanceof Macro) {
-                await document.execute();
+            if (packKey) {
+                const pack = game.packs.get(packKey);
+
+                if (!pack) {
+                    ui.notifications?.error(`Compendium '${packKey}' nicht gefunden.`);
+                    return;
+                }
+
+                const index = await pack.getIndex();
+                const entry = index.find(e => e.name === macroName);
+                if (!entry) {
+                    ui.notifications?.error(`Makro '${macroName}' im Compendium '${packKey}' nicht gefunden.`);
+                    return;
+                }
+
+                const document = await pack.getDocument(entry._id);
+                if (document instanceof Macro) {
+                    macro = document;
+                } else {
+                    ui.notifications?.error("Das gefundene Dokument ist kein Makro.");
+                    return;
+                }
             } else {
-                ui.notifications?.error("Das gefundene Dokument ist kein Makro.");
+                // Aus der Welt (nicht aus einem Kompendium)
+                macro = game.macros?.getName(macroName);
+                if (!macro) {
+                    ui.notifications?.error(`Makro '${macroName}' nicht in der Welt gefunden.`);
+                    return;
+                }
             }
 
+            await macro.execute();
         } catch (error) {
-            //TODO: Lokalisierung
-            console.error(`Fehler beim Ausführen von Makro '${macroName}' aus '${compendiumKey}':`, error);
+            console.error(`Fehler beim Ausführen von Makro '${macroName}' aus '${packKey ?? "world"}':`, error);
             ui.notifications?.error("Fehler beim Ausführen des Makros. Siehe Konsole für Details.");
         }
     }
 
     static async rollAction(testAttributes: TestAttributes) {
-        const user = game.user;
-        if (!user || !testAttributes.name) return;
-        const compendiumKey = testAttributes.compendiumKey ?? "actions"; // Use the same compendium key that worked in the macro
+        const actionName = testAttributes.name?.trim();
+        if (!actionName) return;
+        const packKey = testAttributes.packKey?.trim();
 
-        console.log(`Attempting to roll action: ${testAttributes.name} from compendium: ${compendiumKey}`);
+        console.log(`Attempting to roll action: ${actionName} from ${packKey}`);
 
-        let actor = await this.findActor(testAttributes.actorUuid);
-
+        const actor = await this.findActor(testAttributes.actorUuid);
         if (!actor) {
             ui.notifications?.error("No actor found to perform this action.");
             return;
         }
 
         try {
-            const test = await TestCreator.fromPackAction(compendiumKey, testAttributes.name, actor);
+            let action: ActionRollData | undefined;
+            let test;
+
+            if (packKey) {
+                const pack = game.packs.get(packKey);
+
+                if (!pack) {
+                    ui.notifications?.error(`Compendium '${packKey}' nicht gefunden.`);
+                    return;
+                }
+
+                const index = await pack.getIndex();
+
+                for (const e of index) {
+                    if (e.name !== actionName) continue;
+
+                    const doc = await pack.getDocument(e._id);
+                    if (doc instanceof SR5Item && doc.getAction() !== undefined) {
+                        action = doc.getAction();
+                        break;
+                    }
+                }
+
+                if (!action) {
+                    ui.notifications?.error(`Keine gültige Aktion '${actionName}' im Compendium '${packKey}' gefunden.`);
+                    return;
+                }
+
+                test = await TestCreator.fromAction(action, actor);
+            } else {
+                // Suche die Aktion als Item direkt auf dem Actor
+                const item = actor.items.find(i => i.name === actionName && i.getAction() !== undefined)
+                    ?? game.items?.find(i => i.name === actionName && i.getAction() !== undefined);
+                if (!item) {
+                    ui.notifications?.error(`Aktion '${actionName}' weder in ${actor.name} noch in der Seitenleiste gefunden.`);
+                    return;
+                }
+
+                test = await TestCreator.fromItem(item, actor);
+            }
+
             await test?.execute();
         } catch (error) {
-            ui.notifications?.error("Error using TestCreator.fromPackAction:", error);
+            console.error(`Fehler beim Ausführen von Aktion '${actionName}' aus '${packKey ?? "world"}':`, error);
+            ui.notifications?.error("Fehler beim Ausführen der Aktion. Siehe Konsole für Details.");
         }
     }
 
@@ -601,7 +676,7 @@ export class JournalEnrichers {
             ["opposedLimit", "data-opposedLimit"],
             ["name", "data-name"],
             ["actorUuid", "data-actor-uuid"],
-            ["compendiumKey", "data-compendiumKey"],
+            ["packKey", "data-packKey"],
             ["label", "data-label"],
 
         ];
@@ -637,7 +712,7 @@ export class JournalEnrichers {
             opposedlimit: "opposedLimit",
             name: "name",
             actoruuid: "actorUuid",
-            compendiumkey: "compendiumKey",
+            packkey: "packKey",
             allowOtherSkills: "allowOtherSkills"
         };
 
