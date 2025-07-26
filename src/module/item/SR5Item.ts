@@ -114,12 +114,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
     }
 
-    override _initializeSource(
-        data: this | Item.CreateData,
-        options?: foundry.abstract.Document.InitializeSourceOptions
-    ) {
-        Migrator.migrate("Item", data);
-        return super._initializeSource(data, options);
+    static override migrateData(source: any) {
+        Migrator.migrate("Item", source);
+        return super.migrateData(source);
     }
 
     /**
