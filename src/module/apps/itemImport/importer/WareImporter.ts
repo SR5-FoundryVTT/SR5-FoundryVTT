@@ -3,7 +3,6 @@ import { WareParser } from '../parser/ware/WareParser';
 import { Bioware, BiowareSchema } from '../schema/BiowareSchema';
 import { Cyberware, CyberwareSchema } from '../schema/CyberwareSchema';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
-import WareItemData = Shadowrun.WareItemData;
 type WareTypes = Bioware | Cyberware;
 
 export class WareImporter extends DataImporter {
@@ -19,13 +18,13 @@ export class WareImporter extends DataImporter {
         const jsonDatas = 'biowares' in jsonObject ? jsonObject.biowares.bioware
                                                    : jsonObject.cyberwares.cyberware;
 
-        return WareImporter.ParseItems<WareTypes, WareItemData>(
+        return WareImporter.ParseItems<WareTypes>(
             jsonDatas,
             {
                 compendiumKey: () => "Ware",
                 parser: new WareParser(key, jsonObject.categories.category),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: `Failed Parsing ${key.capitalize()}`
             }

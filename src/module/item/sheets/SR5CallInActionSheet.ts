@@ -19,10 +19,10 @@ interface SR5CallInActionSheetData extends SR5BaseItemSheetData {
  */
 export class SR5CallInActionSheet extends SR5ItemSheet {
     override async getData(options: any): Promise<SR5CallInActionSheetData> {
-        const data = await super.getData(options) as unknown as SR5BaseItemSheetData;
+        const data = await super.getData(options) as SR5BaseItemSheetData;
 
-        const system = data.system as Shadowrun.CallInActionData;
-        
+        const system = data.system as Item.SystemOfType<'call_in_action'>;
+
         // Allow for prepared actors to be shown on sheet.
         const spirit = await this.prepareSpirit(system);
         const sprite = await this.prepareSprite(system)
@@ -54,8 +54,8 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
         if (data.type !== 'Actor') return;
         const actor = await fromUuid(data.uuid) as SR5Actor;
 
-        if (actor.isSpirit()) await this.updatePreparedSpirit(actor);
-        if (actor.isSprite()) await this.updatePreparedSprite(actor);
+        if (actor.isType('spirit')) await this.updatePreparedSpirit(actor);
+        if (actor.isType('sprite')) await this.updatePreparedSprite(actor);
     }
 
     override activateListeners(html: any): void {
@@ -71,7 +71,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
      * 
      * @returns null should the configured spirit not exist anymore.
      */
-    async prepareSpirit(system: Shadowrun.CallInActionData): Promise<SR5Actor|null> {
+    async prepareSpirit(system: Item.SystemOfType<'call_in_action'>): Promise<SR5Actor|null> {
         if (!system.spirit.uuid) {
             return null;
         }
@@ -84,7 +84,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
      * 
      * @returns null should the configured sprite not exist anymore.
      */
-    async prepareSprite(system: Shadowrun.CallInActionData): Promise<SR5Actor|null> {
+    async prepareSprite(system: Item.SystemOfType<'call_in_action'>): Promise<SR5Actor|null> {
         if (!system.sprite.uuid) {
             return null;
         }
@@ -95,14 +95,14 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
      * Handling the removal of a spirit by any sheet action.
      */
     async handleSpiritRemove(event: any) {
-        await this.item.update({'system.spirit.uuid': ''});
+        await this.item.update({ system: { spirit: { uuid: '' } } });
     }
     
     /**
      * User requested removal of the prepared sprite.
      */
     async handleSpriteRemove(event: any) {
-        await this.item.update({'system.sprite.uuid': ''});
+        await this.item.update({ system: { spirit: { uuid: '' } } });
     }
 
     /**
@@ -110,14 +110,15 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
      * 
      * @param actor The prepared actor
      */
-    async updatePreparedSpirit(actor: SR5Actor) {
-        const spirit = actor.asSpirit();
-        if (!spirit) return;
-
+    async updatePreparedSpirit(spirit: SR5Actor<'spirit'>) {
         await this.item.update({
-            'system.spirit.uuid': actor.uuid,
-            'system.spirit.type': spirit.system.spiritType,
-            'system.spirit.force': spirit.system.force,
+            system: {
+                spirit: {
+                    uuid: spirit.uuid,
+                    type: spirit.system.spiritType,
+                    force: spirit.system.force
+                }
+            }
         });
     }
 
@@ -126,14 +127,15 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
      * 
      * @param actor The prepared actor
      */
-    async updatePreparedSprite(actor: SR5Actor) {
-        const sprite = actor.asSprite();
-        if (!sprite) return;
-
+    async updatePreparedSprite(sprite: SR5Actor<'sprite'>) {
         await this.item.update({
-            'system.sprite.uuid': actor.uuid,
-            'system.sprite.type': sprite.system.spriteType,
-            'system.sprite.level': sprite.system.level,
+            system: {
+                sprite: {
+                    uuid: sprite.uuid,
+                    type: sprite.system.spriteType,
+                    level: sprite.system.level
+                }
+            }
         });
     }
 }

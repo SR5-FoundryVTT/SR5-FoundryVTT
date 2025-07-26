@@ -1,59 +1,166 @@
-import { VersionMigration } from './VersionMigration';
-import {Version0_8_0} from "./versions/Version0_8_0";
+import { FLAGS } from "../constants";
+import { Sanitizer } from "./Sanitizer";
+import { Version0_8_0 } from "./versions/Version0_8_0";
 import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
+import { Version0_30_0 } from './versions/Version0_30_0';
+import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
 
-type VersionDefinition = {
-    versionNumber: string;
-    migration: VersionMigration;
-};
+/**
+ * Seamless data migrator for the SR5 system.
+ * 
+ * This will automatically migrate data during world load and persist the changes on a otherwise
+ * unconnected document update.
+ * 
+ * Using this approach allows the system to both load collection, compendium and imported document data,
+ * apply migrations for missing migration steps, based on the documents last system schema version.
+ *
+ * The migration is done during world load, to avoid documents entering the "invalid document" state
+ * and allow users a seamless experience when opening an out-of-date world / document.
+ * 
+ * Documents will get remigrated so long until the migrated data can be applied on the next update made to
+ * it. If a document is not updated, it will remain out-of-date and be remigrated on every world load.
+ * 
+ * For this, check these methods:
+ * - migrate
+ * - updateMigratedDocument
+ */
 export class Migrator {
-    // Map of all version migrations to their target version numbers.
-    private static readonly s_Versions: VersionDefinition[] = [
-        { versionNumber: Version0_8_0.TargetVersion, migration: new Version0_8_0() },
-        { versionNumber: Version0_18_0.TargetVersion, migration: new Version0_18_0() },
-        { versionNumber: Version0_16_0.TargetVersion, migration: new Version0_16_0() },
-        { versionNumber: Version0_27_0.TargetVersion, migration: new Version0_27_0() },
-    ];
+    // List of all migrators.
+    // ⚠️ Keep this list sorted in ascending order by version number (oldest → newest).
+    private static readonly s_Versions = [
+        new Version0_8_0(),
+        new Version0_18_0(),
+        new Version0_16_0(),
+        new Version0_27_0(),
+        new Version0_30_0(),
+    ] as const;
+
+    // Generate the migration version mark used to track current system version in documents.
+    private static get _migrationMark() {
+        return game.system.version + ".0";
+    }
+
+    // Returns an array of migration functions applicable to the given document type and version.
+    private static getMigrators(
+        version: string | null,
+        type?: MigratableDocumentName,
+        data?: any
+    ): readonly VersionMigration[] {
+        return this.s_Versions.filter(migrator =>
+            (!type || migrator[`handles${type}`](data)) &&
+            this.compareVersion(migrator.TargetVersion, version) > 0
+        );
+    }
+
+    private static normalizeArray(data: any): any[] {
+        if (data == null) return [];
+        return Array.isArray(data) ? data : Object.values(data); 
+    }
 
     /**
-     * Check if the current world is empty of any migrate documents.
+     * Applies migration logic to a provided data object of the specified type during world load
      * 
+     * This is connected to Migrator.updateMigratedDocument which will persist migrated data during the
+     * update process.
+     * 
+     * Note: This method was previously called during `_initializeSource`,
+     * but that caused migration of embedded items to be skipped in synthetic documents.
      */
-    public static get isEmptyWorld(): boolean {
-        return game.actors?.contents.length === 0 &&
-            game.items?.contents.length === 0 &&
-            game.scenes?.contents.length === 0 &&
-            Migrator.onlySystemPacks
+    public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false): boolean {
+        // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
+        if (!data._stats || !('systemVersion' in data._stats)) return false;
+        if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return false;
+
+        let migrated = false;
+        if (type === "Item") {
+            const items = this.normalizeArray(data.flags?.shadowrun5e?.embeddedItems);
+            for (const nestedItems of items) {
+                const nestedMigrated = this.migrate("Item", nestedItems, true);
+                migrated = migrated || nestedMigrated;
+            }
+            foundry.utils.setProperty(data, 'flags.shadowrun5e.embeddedItems', items);
+
+            if (nested) {
+                const effects = this.normalizeArray(data.effects);
+                for (const nestedEffect of effects) {
+                    const nestedMigrated = this.migrate("ActiveEffect", nestedEffect, true);
+                    migrated = migrated || nestedMigrated;
+                }
+                foundry.utils.setProperty(data, 'effects', effects);
+            }
+        }
+
+        const migrators = this.getMigrators(data._stats.systemVersion, type, data);
+
+        if (migrators.length === 0) {
+            if (migrated)
+                data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
+
+            return migrated;
+        }
+
+        for (const migrator of migrators)
+            migrator[`migrate${type}`](data);
+        
+        // After all migrations, sanitize the data model.
+        // This ensures that the data conforms to the current schema.
+        const schema = CONFIG[type].dataModels[data.type].schema;
+        const correctionLogs = Sanitizer.sanitize(schema, data.system);
+
+        if (correctionLogs) {
+            console.warn(
+                `Document Sanitized on Migration:\n` +
+                `ID: ${data._id}; Name: ${data.name};\n` +
+                `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n`
+            );
+            console.table(correctionLogs);
+        }
+
+        // Mark as a migratable document.
+        data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
+
+        return true;
     }
 
-    public static get onlySystemPacks(): boolean {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        return game.packs.contents.filter(pack => pack.metadata.packageType !== 'system' && pack.metadata.packageName !== 'shadowrun5e').length === 0;
-    }
+    /**
+     * Apply migrated data to the document to persist and mark it as up-to-date.
+     * 
+     * This is connected to Migrator.migrate which will migrate document data on the fly
+     * during a document migrateData call before data preparation.
+     * 
+     * To avoid endless migrations during world load, we assume the document is migrated and will
+     * persist that migration based on an out of date document system version, whenever it's
+     * updated next by the user.
+     * 
+     * @param doc Updated document.
+     */
+    static async updateMigratedDocument(doc: MigratableDocument) {
+        // No need to migrate if the document is not a migratable document.
+        if (doc._stats.systemVersion !== this._migrationMark) return;
 
-    public static async InitWorldForMigration() {
-        console.log('Shadowrun 5e | Initializing an empty world for future migrations');
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, game.system.version);
+        // Mark document as up-to-date
+        doc._stats.systemVersion = game.system.version;
+        doc._source._stats.systemVersion = game.system.version;
+
+        if (doc.parent) {
+            if (doc.parent instanceof Actor || doc.parent instanceof Item)
+                await this.updateMigratedDocument(doc.parent);
+            else if (doc.parent instanceof TokenDocument && doc.parent.actor)
+                await this.updateMigratedDocument(doc.parent.actor);
+        }
+
+        // Persist the change without triggering diff logic
+        return doc.update(doc.toObject() as any, { diff: false, recursive: false });
     }
 
     public static async BeginMigration() {
-        let currentVersion = game.settings.get(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION) as string;
-        if (currentVersion === undefined || currentVersion === null) {
-            currentVersion = VersionMigration.NO_VERSION;
-        }
-
-        const migrations = Migrator.s_Versions.filter(({ versionNumber }) => {
-            // if versionNUmber is greater than currentVersion, we need to apply this migration
-            return this.compareVersion(versionNumber, currentVersion) === 1;
-        });
+        const currentVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION) || '0.0.0';
 
         // No migrations are required, exit.
-        if (migrations.length === 0) {
-            return;
-        }
+        const migrators = this.getMigrators(currentVersion);
+        if (migrators.length === 0) return;
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
         const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
@@ -72,7 +179,7 @@ export class Migrator {
             buttons: {
                 ok: {
                     label: localizedWarningBegin,
-                    callback: () => this.migrate(migrations),
+                    callback: async () => this.migrateAll(),
                 },
             },
             default: 'ok',
@@ -80,92 +187,115 @@ export class Migrator {
         d.render(true);
     }
 
-    private static async migrate(migrations: VersionDefinition[]) {
-        // we want to apply migrations in ascending order until we're up to the latest
-        migrations.sort((a, b) => {
-            return this.compareVersion(a.versionNumber, b.versionNumber);
-        });
-        
-        // Before starting, configure each migration
-        for (const {migration} of migrations) {
-            // Show a configuration or information dialog and abort if necessary.
-            const consent = await migration.AskForUserConsentAndConfiguration();
-            if (!consent) return;
-        }
+    /**
+     * Migrate all actors in the game.
+     * 
+     * This is called during world load to ensure all actors are up-to-date with the latest system version.
+     */
+    private static async migrateAll() {
+        const start = performance.now();
+        const progress = ui.notifications.info("Migrating Documents...", {progress: true});
 
-        await this.migrateWorld(game, migrations);
-        await this.migrateCompendium(game, migrations);
+        const tokensWithActors = Array.from(game.scenes).flatMap(scene =>
+            scene.tokens.filter(token => !!token.actor && !token.actorLink)
+        );
 
-        const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.SuccessTitle');
-        const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.SuccessHeader');
-        const localizedSuccessDescription = game.i18n.localize('SR5.MIGRATION.SuccessDescription');
-        const localizedSuccessPacksInfo = game.i18n.localize('SR5.MIGRATION.SuccessPacksInfo');
-        const localizedSuccessConfirm = game.i18n.localize('SR5.MIGRATION.SuccessConfirm');
-        const packsDialog = new Dialog({
-            title: localizedWarningTitle,
+        let completed = 0;
+        const total = game.items.size + game.actors.size + tokensWithActors.length;
+
+        // Items
+        await this.runInBatches([...game.items], async item =>
+            this.migrateWithCollections(item as Item.Implementation).then(() => {
+                progress.update({pct: ++completed / total});
+            })
+        );
+
+        // Actors
+        await this.runInBatches([...game.actors], async actor =>
+            this.migrateWithCollections(actor as Actor.Implementation).then(() => {
+                progress.update({pct: ++completed / total});
+            })
+        );
+
+        // Tokens
+        await this.runInBatches(tokensWithActors, async token =>
+            this.migrateWithCollections(token.actor!).then(() => {
+                progress.update({pct: ++completed / total});
+            })
+        );
+
+        await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
+
+        const d = new Dialog({
+            title: "Migration Complete",
             content:
-                `<h2 style="text-align: center; color: green">${localizedWarningHeader}</h2>` +
-                `<p>${localizedSuccessDescription}</p>` +
-                `<p style="text-align: center"><i>${localizedSuccessPacksInfo}</i></p>`,
+                `<h2 style="color: red; text-align: center">Migration Complete</h2>` +
+                `<p style="text-align: center">It took ${performance.now() - start} milliseconds.</p>`,
             buttons: {
                 ok: {
-                    icon: '<i class="fas fa-check"></i>',
-                    label: localizedSuccessConfirm,
+                    label: "OK",
+                    callback: () => { progress.remove(); },
                 },
             },
             default: 'ok',
         });
-        packsDialog.render(true);
+        d.render(true);
     }
 
-    /**
-     * Migrate all world objects
-     * @param game
-     * @param migrations
-     */
-    private static async migrateWorld(game: Game, migrations: VersionDefinition[]) {
-        // Run the migrations in order
-        for (const { migration } of migrations) {
-            // Migrate after user accepted.
-            await migration.Migrate(game);
+    private static readonly CONCURRENCY_LIMIT = Math.max((navigator.hardwareConcurrency || 1) - 1, 1);
+    private static async runInBatches<T>(
+        items: T[],
+        task: (item: T) => Promise<void>
+    ) {
+        let i = 0;
+        async function worker() {
+            while (i < items.length)
+                await task(items[i++]);
         }
+
+        const workers = Array.from({ length: this.CONCURRENCY_LIMIT }, worker);
+        return Promise.all(workers);
     }
 
-    /**
-     * Iterate over all world compendium packs
-     * @param game Game that will be migrated
-     * @param migrations Instances of the version migration
-     */
-    private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
-        // Migrate World Compendium Packs
-        // @ts-expect-error // v11 onwards uses packageType
-        const packs = game.packs?.filter((pack) => pack.metadata.packageType === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.type));
+    private static async migrateWithCollections(doc: Actor.Implementation | Item.Implementation) {
+        await this.updateMigratedDocument(doc);
 
-        if (!packs) return;
-
-        // Run the migrations in order on each pack.
-        for (const pack of packs) {
-            for (const { migration } of migrations) {
-                await migration.MigrateCompendiumPack(pack);
+        const collectionPromises: Promise<any>[] = [];
+        type CollectionType = (Actor.Implementation | Item.Implementation)['collections']['effects' | 'items'];
+        for (const [key, collection] of Object.entries<CollectionType>(doc.collections)) {
+            if (key === 'effects' || key === 'items') {
+                for (const child of collection) {
+                    collectionPromises.push(
+                        child instanceof Item
+                            ? this.migrateWithCollections(child)
+                            : this.updateMigratedDocument(child)
+                    );
+                }
             }
         }
+
+        return Promise.all(collectionPromises);
     }
 
-    // found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/
-    // updated for typescript
     /**
-     * compare two version numbers, returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal
+     * compare two version numbers
      * @param v1
      * @param v2
+     * @return 1 if v1 > v2, -1 if v1 < v2, 0 if equal
      */
-    public static compareVersion(v1: string, v2: string) {
-        const s1 = v1.split('.').map((s) => parseInt(s, 10));
-        const s2 = v2.split('.').map((s) => parseInt(s, 10));
-        const k = Math.min(v1.length, v2.length);
-        for (let i = 0; i < k; ++i) {
-            if (s1[i] > s2[i]) return 1;
-            if (s1[i] < s2[i]) return -1;
+    public static compareVersion(v1: string | null, v2: string | null): number {
+        v1 ??= '0.0.0'; v2 ??= '0.0.0';
+        const s1 = v1.split('.').map(Number);
+        const s2 = v2.split('.').map(Number);
+        const length = Math.max(s1.length, s2.length);
+
+        for (let i = 0; i < length; i++) {
+            const n1 = s1[i] ?? 0;
+            const n2 = s2[i] ?? 0;
+            if (n1 > n2) return 1;
+            if (n1 < n2) return -1;
         }
-        return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1;
+
+        return 0;
     }
 }

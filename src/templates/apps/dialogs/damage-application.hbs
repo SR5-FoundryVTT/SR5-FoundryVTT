@@ -1,0 +1,15 @@
+{{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
+        name=(localize "SR5.IncomingDamage")
+        damage=damage
+        showAP=true
+}}
+
+<div class="modified-target-damage">
+    {{#each actorDamage as |actorDamage|}}
+    <div class="modified-target-damage-cell">
+        <img src="{{speakerImg actor}}" data-tooltip="{{speakerName actor}}" width="36" height="36"/>
+    </div>
+    <div class="modified-target-damage-cell important">{{speakerName actor}}</div>
+    <div class="modified-target-damage-cell important">{{damageCode ../damage}}</div>
+    {{/each}}
+</div>

@@ -1,20 +1,24 @@
-import { Parser } from '../Parser';
+import { Parser, SystemType } from '../Parser';
 import { Spell } from '../../schema/SpellsSchema';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import SpellCateogry = Shadowrun.SpellCateogry;
-import SpellItemData = Shadowrun.SpellItemData;
 
-export class SpellParserBase extends Parser<SpellItemData> {
-    protected override parseType: string = 'spell';
+export class SpellParserBase extends Parser<'spell'> {
+    protected readonly parseType = 'spell';
 
-    protected override getSystem(jsonData: Spell): SpellItemData['system'] {
-        const system = this.getBaseSystem(
-            {action: {type: 'varies', attribute: 'magic', skill: 'spellcasting'}} as Shadowrun.SpellData
-        );
+    protected override getSystem(jsonData: Spell) {
+        const system = this.getBaseSystem();
 
-        system.category = jsonData.category._TEXT.toLowerCase() as SpellCateogry;
+        system.action.type = 'varies';
+        system.action.attribute = 'magic';
+        system.action.skill = 'spellcasting';
+
+        system.category = jsonData.category._TEXT.toLowerCase() as SystemType<'spell'>['category'];
+
+        // Remove trailing 's' from category if it exists
+        if (system.category.endsWith('s'))
+            system.category = system.category.slice(0, -1) as SystemType<'spell'>['category'];
 
         const damage = jsonData.damage._TEXT;
         if (damage === 'P') {

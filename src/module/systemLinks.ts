@@ -41,14 +41,15 @@ export const RenderSettings = {
                     url: "http://sr5-foundryvtt.privateworks.com/index.php/Main_Page",
                     label: "SR5.Labels.Sidebar.Wiki",
                 },
-            ].map((data: { url: string, label: Translation }): HTMLAnchorElement => {
+            ] satisfies { url: string; label: Translation }[];
+            const anchorLinks = links.map((data): HTMLAnchorElement => {
                 const anchor = document.createElement('a');
                 anchor.href = data.url;
                 anchor.innerText = game.i18n.localize(data.label);
                 anchor.target = "_blank";
                 return anchor;
             });
-            systemInfo.append(...links);
+            systemInfo.append(...anchorLinks);
             systemRow?.after(systemInfo);
         });
     }

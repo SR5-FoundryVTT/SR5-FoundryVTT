@@ -1,19 +1,18 @@
-import { Parser } from "../Parser";
+import { Parser, SystemType } from "../Parser";
+import { CompendiumKey } from "../../importer/Constants";
 import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
-import AmmoItemData = Shadowrun.AmmoItemData;
-import { CompendiumKey } from "../../importer/Constants";
 
-export class AmmoParser extends Parser<AmmoItemData> {
-    protected override parseType: string = 'ammo';
-    protected categories: GearSchema['categories']['category'];
+export class AmmoParser extends Parser<'ammo'> {
+    protected readonly parseType = 'ammo';
+    protected readonly categories: GearSchema['categories']['category'];
 
     constructor(categories: GearSchema['categories']['category']) {
         super(); this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Gear): AmmoItemData['system'] {
+    protected override getSystem(jsonData: Gear) {
         const system = this.getBaseSystem();
 
         const bonusData = jsonData.weaponbonus;
@@ -33,8 +32,9 @@ export class AmmoParser extends Parser<AmmoItemData> {
         return system;
     }
 
-    public override async Parse(jsonData: Gear, compendiumKey: CompendiumKey): Promise<AmmoItemData> {
-        const item = await super.Parse(jsonData, compendiumKey);
+    public override async Parse(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
+        const item = await super.Parse(jsonData, compendiumKey) as Item.CreateData;
+        const system = item.system as SystemType<'ammo'>;
 
         // TODO: This can be improved by using the stored english name in item.system.importFlags.name
         if (jsonData.addweapon?._TEXT) {
@@ -43,12 +43,12 @@ export class AmmoParser extends Parser<AmmoItemData> {
             const [foundWeapon] = await IH.findItem('Weapon', weaponTranslation, 'weapon') ?? [];
 
             if (foundWeapon && "action" in foundWeapon.system) {
-                const weaponData = foundWeapon.system as Shadowrun.WeaponData;
-                item.system.damageType = weaponData.action.damage.type.base;
-                item.system.element = weaponData.action.damage.element.base;
-                item.system.damage = weaponData.action.damage.value;
-                item.system.ap = weaponData.action.damage.ap.value;
-                item.system.blast = weaponData.thrown.blast;
+                const weaponData = foundWeapon.system as SystemType<'weapon'>;
+                system.damageType = weaponData.action.damage.type.base;
+                system.element = weaponData.action.damage.element.base;
+                system.damage = weaponData.action.damage.value;
+                system.ap = weaponData.action.damage.ap.value;
+                system.blast = weaponData.thrown.blast;
             } else if (!foundWeapon) {
                 console.log(`[Weapon Missing (Ammo)]\nAmmo: ${item.name}\nWeapon: ${weaponName}`);
             }

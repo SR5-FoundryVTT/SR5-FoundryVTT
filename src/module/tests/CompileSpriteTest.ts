@@ -1,7 +1,9 @@
+import { DeepPartial } from "fvtt-types/utils";
 import { SR5 } from "../config";
 import { DataDefaults } from "../data/DataDefaults";
 import { PartsList } from "../parts/PartsList";
 import { CompilationRules } from "../rules/CompilationRules";
+import { DamageType, MinimalActionType } from "../types/item/Action";
 import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 
 
@@ -13,7 +15,7 @@ interface CompileSpriteTestData extends SuccessTestData {
     // Testing values as described on SR5#254
     level: number
     fade: number
-    fadeDamage: Shadowrun.DamageData
+    fadeDamage: DamageType
 
     // Determine if compilation concluded and fade will apply
     fadeReady: boolean
@@ -35,14 +37,14 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
         this._prepareCompilationData(data);
 
         data.fade = data.fade || 0;
-        data.fadeDamage = data.fadeDamage || DataDefaults.damageData();
+        data.fadeDamage = data.fadeDamage || DataDefaults.createData('damage');
 
         return data;
     }
 
     _prepareCompilationData(data) {
         if (!this.item) return;
-        const compilation = this.item.asCallInAction;
+        const compilation = this.item.asType('call_in_action');
         if (!compilation || !this.item.isCompilation) return;
 
         // Choose the most explicit value given, making sure it's still usable.
@@ -59,7 +61,7 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
     }
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/compilation-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/compilation-test-dialog.hbs';
     }
 
     override get canBeExtended() {
@@ -83,11 +85,8 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
      * Limit 'level' is a dynamic test value, so it's missing here as it can't be taken from actor values
      * but will be injected during test dialog preparations.
      */
-    static override _getDefaultTestAction(): Partial<Shadowrun.MinimalActionData> {
-        return {
-            skill: 'compiling',
-            attribute: 'resonance'
-        }
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { skill: 'compiling', attribute: 'resonance' };
     }
 
     /**
@@ -148,8 +147,8 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
         this.data.fadeDamage = this.calcFadeDamage(opposingHits);
     }
 
-    calcFadeDamage(opposingHits: number): Shadowrun.DamageData {
-        if (!this.actor) return DataDefaults.damageData();
+    calcFadeDamage(opposingHits: number): DamageType {
+        if (!this.actor) return DataDefaults.createData('damage');
 
         const resonance = this.actor.getAttribute('resonance').value;
         const level = this.data.level;

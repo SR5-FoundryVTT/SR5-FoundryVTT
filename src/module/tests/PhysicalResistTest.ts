@@ -5,19 +5,18 @@ import {CombatRules} from "../rules/CombatRules";
 import {Helpers} from "../helpers";
 import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
 import {SoakFlow} from "../actor/flows/SoakFlow";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
+import { DamageType, MinimalActionType } from "../types/item/Action";
 
 
 export interface PhysicalResistTestData extends SuccessTestData {
     // The original test this resistance is taking its data from.
     following: PhysicalDefenseTestData
     // The damage BEFORE this test is done.
-    incomingDamage: DamageData
+    incomingDamage: DamageType
     // The damage AFTER this test is done.
-    modifiedDamage: DamageData
+    modifiedDamage: DamageType
     // Determine if an actor should be knockedDown after a defense.
     knockedDown: boolean
 }
@@ -40,12 +39,12 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
         // Is this test part of a followup test chain? defense => resist
         if (data.following) {
-            data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.damageData());
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+            data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.createData('damage')) as DamageType;
+            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
         // This test is part of either a standalone resist or created with its own data (i.e. edge reroll).
         } else {
-            data.incomingDamage = data.incomingDamage ?? DataDefaults.damageData();
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+            data.incomingDamage = data.incomingDamage ?? DataDefaults.createData('damage');
+            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
         }
 
         const armor = this.actor?.getArmor();
@@ -60,11 +59,11 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.hbs';
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-resist-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-resist-test-dialog.hbs';
     }
 
     /**
@@ -74,7 +73,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         return false;
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionType> {
         return {
             'attribute': 'body',
             'armor': true
@@ -114,13 +113,15 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         Helpers.calcTotal(this.data.incomingDamage.ap);
 
         // Remove user override and resulting incoming damage as base.
-        this.data.modifiedDamage = foundry.utils.duplicate(this.data.incomingDamage);
+        this.data.modifiedDamage = foundry.utils.duplicate(this.data.incomingDamage) as DamageType;
         this.data.modifiedDamage.base = this.data.incomingDamage.value;
         this.data.modifiedDamage.mod = [];
-        delete this.data.modifiedDamage.override;
+        //@ts-expect-error fvtt-types doesn't know about non-required field.
+        this.data.modifiedDamage.override = undefined;
         this.data.modifiedDamage.ap.base = this.data.incomingDamage.ap.value;
         this.data.modifiedDamage.ap.mod = [];
-        delete this.data.modifiedDamage.ap.override;
+        //@ts-expect-error fvtt-types doesn't know about non-required field.
+        this.data.modifiedDamage.ap.override = undefined;
 
         Helpers.calcTotal(this.data.modifiedDamage);
         Helpers.calcTotal(this.data.modifiedDamage.ap);
@@ -141,7 +142,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
-    private successConditions: PhysicalResistSuccessCondition[] = [
+    private readonly successConditions: PhysicalResistSuccessCondition[] = [
         {
             test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
             label: "SR5.TestResults.SoakBlockedByHardenedArmor",

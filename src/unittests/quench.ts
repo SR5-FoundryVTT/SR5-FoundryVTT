@@ -4,7 +4,6 @@ import { shadowrunAttackTesting } from './sr5.AttackTests.spec';
 import { shadowrunRulesModifiers } from './sr5.Modifiers.spec';
 import { shadowrunSR5Item } from './sr5.SR5Item.spec';
 import { shadowrunMatrix } from './sr5.Matrix.spec';
-import { shadowrunSR5Actor } from './sr5.SR5Actor.spec';
 import { shadowrunSR5CharacterDataPrep } from './sr5.CharacterDataPrep.spec';
 import { shadowrunSR5CritterDataPrep } from './sr5.CritterDataPrep.spec';
 import { shadowrunSR5SpiritDataPrep } from './sr5.SpiritDataPrep.spec';
@@ -51,7 +50,6 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.rules.ranged_weapon', shadowrunSR5RangedWeaponRules, {
         displayName: 'SHADOWRUN5e: Ranged Weapon Rules Test',
     });
-
     quench.registerBatch('shadowrun5e.characterImporter', characterImporterTesting, {
         displayName: 'SHADOWRUN5e: Chummer Character Importer',
     });
@@ -76,15 +74,10 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.importerVehicleMods', vehicleModParserTesting, {
         displayName: 'SHADOWRUN5e: Chummer Vehicle Modification Importer',
     });
-
     quench.registerBatch('shadowrun5e.entities.items', shadowrunSR5Item, { displayName: 'SHADOWRUN5e: SR5Item Test' });
-    quench.registerBatch('shadowrun5e.entities.actors', shadowrunSR5Actor, {
-        displayName: 'SHADOWRUN5e: SR5Actor Test',
-    });
     quench.registerBatch('shadowrun5e.entities.effects', shadowrunSR5ActiveEffect, {
         displayName: 'SHADOWRUN5e: SR5ActiveEffect Test',
     });
-
     quench.registerBatch('shadowrun5e.data_prep.character', shadowrunSR5CharacterDataPrep, {
         displayName: 'SHADOWRUN5e: SR5CharacterDataPreparation Test',
     });
@@ -103,11 +96,9 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.data_prep.vehicle', shadowrunSR5VehicleDataPrep, {
         displayName: 'SHADOWRUN5e: SR5VehicleDataPreparation Test',
     });
-
     quench.registerBatch('shadowrun5e.data_prep.item', shadowrunSR5ItemDataPrep, {
         displayName: 'SHADOWRUN5e: SR5ItemDataPreparation Test',
     });
-
     quench.registerBatch('shadowrun5e.flow.networkDevices', shadowrunNetworkDevices, {
         displayName: 'SHADOWRUN5e: Matrix Network Devices Test',
     });
@@ -119,7 +110,6 @@ export const quenchRegister = (quench: Quench) => {
         displayName: 'SHADOWRUN5e: Attack Test',
     });
     quench.registerBatch('shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
-
     quench.registerBatch('shadowrun5e.parser.weapon', weaponParserBaseTesting, {
         displayName: 'SHADOWRUN5e: Data Importer Weapon Parsing',
     });

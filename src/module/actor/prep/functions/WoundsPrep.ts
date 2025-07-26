@@ -1,14 +1,12 @@
 import { MonitorRules } from './../../../rules/MonitorRules';
-import TwoTrackActorData = Shadowrun.TwoTrackActorData;
-import WoundsActorData = Shadowrun.WoundsActorData;
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import { Helpers } from 'src/module/helpers';
 
 export class WoundsPrep {
-    static prepareWounds(system: ActorTypesData & TwoTrackActorData & WoundsActorData) {
+    static prepareWounds(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
         const { modifiers, track } = system;
-        
+
         // The actor overall has a wound tolerance.
-        const damageTolerance = Number(modifiers['wound_tolerance']);
+        const damageTolerance = modifiers.wound_tolerance;
         const woundBoxesThreshold = MonitorRules.woundModifierBoxesThreshold(damageTolerance);
 
         // Each track defines it's local pain tolerance.
@@ -24,8 +22,7 @@ export class WoundsPrep {
         track.physical.wounds = physicalWounds;
 
         // The actor as a whole derives these wounds for wound modifier calculation
-        system.wounds = {
-            value: stunWounds + physicalWounds,
-        };
+        system.wounds.base = stunWounds + physicalWounds;
+        system.wounds.value = Helpers.calcTotal(system.wounds);
     }
 }

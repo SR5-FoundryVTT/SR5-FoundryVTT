@@ -1,0 +1,71 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    <header class="flexrow">
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.hbs'
+            height='90px'
+            width='90px'
+        }}
+        <div class="flexcol flex-end">
+            <div class="block">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.hbs' }}
+            </div>
+            <div class="attributes smooth">
+                <div class="block">
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
+                            value=system.matrix.condition_monitor.value
+                            max=system.matrix.condition_monitor.max
+                            id="matrix"
+                            name=(localize "SR5.ConditionMonitor")
+                    }}
+                </div>
+            </div>
+        </div>
+        <div class="flexcol flex-end">
+            <header class="flexrow">
+                <div class="attributes center">
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.hbs' }}
+                </div>
+            </header>
+            <div class="flexrow align-center">
+                <div class="attribute">
+                    <div
+                    data-tooltip="SR5.Roll"
+                    class="attribute-name Roll fas fa-dice-six"
+                    style="color: #ebb531; font-size: 150%; align-self: center;"
+                    data-roll-id="prompt-roll"
+                    ></div>
+                </div>
+                <div class="flex7">
+                    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Sprite.Services") }}
+                    <div class="item-text">
+                        {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+                                cssClass="attribute-input"
+                                size="2"
+                                maxLength="2"
+                                value=system.services
+                                name="system.services"
+                        }}
+                    </div>
+                    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
+                </div>
+            </div>
+        </div>
+    </header>
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
+        <a class="item" data-tab="skills">{{localize "SR5.Skill.Skills"}}</a>
+        {{#if hasInventory }}<a class="item" data-tab="inventory">{{localize "SR5.Gear"}}</a>{{/if}}
+        <a class="item" data-tab="spritepowers">{{localize "SR5.Labels.ActorSheet.SpritePowers"}}</a>
+        <a class="item" data-tab="description">{{ localize "SR5.Description" }}</a>
+        <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
+        <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
+    </nav>
+    <section class="sheetbody">
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.hbs"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.hbs"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.hbs"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpritePowersTab.hbs"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/DescriptionTab.hbs"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.hbs"}}
+    </section>
+</form>
