@@ -280,4 +280,48 @@ export const registerSystemSettings = () => {
         // @ts-expect-error not yet in typings
         type: new foundry.data.fields.AlphaField({ initial: 0.5 }),
     });
+
+
+};
+
+export const registerReadySystemSettings = () => {
+
+    function buildChoicesByPackType(type: string): Record<string, string> {
+        const choices: Record<string, string> = {
+            NO: "No Pack"
+        };
+        for (const [key, pack] of game.packs.entries()) {
+            if (pack.metadata.type === type) {
+                // key = z.B. "world.actions", pack.metadata.label = z.B. "actions"
+                choices[key] = pack.metadata.label;
+            }
+        }
+        return choices;
+    }
+
+    /**
+         * Sets the default pack for @RollMacro
+         */
+    game.settings.register(SYSTEM_NAME, FLAGS.RollMacroDefaultPack, {
+        name: 'SETTINGS.RollMacroDefaultPackName',
+        hint: 'SETTINGS.RollMacroDefaultPackDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        default: 'NO',
+        choices: buildChoicesByPackType("Macro")
+    });
+
+    /**
+     * Sets the default pack for @RollAction
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.RollActionDefaultPack, {
+        name: 'SETTINGS.RollActionDefaultPackName',
+        hint: 'SETTINGS.RollActionDefaultPackDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        default: 'NO',
+        choices: buildChoicesByPackType("Item")
+    });
 };

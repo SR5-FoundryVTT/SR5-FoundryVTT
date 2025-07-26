@@ -199,10 +199,7 @@ export class SR5ItemSheet extends ItemSheet {
         for (const itemType of itemTypes) {
             for (const item of itemType) {
                 // @ts-expect-error
-                item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value, {
-                    // @ts-expect-error TODO: foundry-vtt-types v10
-                    relativeTo: item
-                });
+                item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value);
             }
         }
 

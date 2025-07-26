@@ -21,7 +21,7 @@ export interface TestAttributes {
     opposedAttribute2?: string;
     opposedLimit?: string | number;
     name?: string;
-    documentUuid?: string;
+    actorUuid?: string;
     compendiumKey?: string;
     label: string;
     value: string;
@@ -115,15 +115,11 @@ export class JournalEnrichers {
 
                     const $link = $(`<a class="sr5-roll-request">${label}<em class="fas fa-comment-alt" style="margin-left: 5px;"></em></a>`);
 
-
-                    console.log("enricher-relativeTo", options)
-                    const relativeDoc = options?.relativeTo as unknown;
-                    if (!testAttributes.documentUuid && relativeDoc && typeof relativeDoc === "object") {
-                        if (
-                            relativeDoc instanceof CONFIG.Actor.documentClass ||
-                            relativeDoc instanceof CONFIG.Item.documentClass
-                        ) {
-                            testAttributes.documentUuid = relativeDoc.uuid;
+                    if (options.relativeTo.uuid) {
+                        const fullUuid = options.relativeTo.uuid.split(".");
+                        const actorIndex = options.relativeTo.uuid.split(".").indexOf("Actor");
+                        if (actorIndex >= 0 && fullUuid.length > actorIndex + 1) {
+                            testAttributes.actorUuid = `Actor.${fullUuid[actorIndex + 1]}`;
                         }
                     }
 
@@ -145,9 +141,9 @@ export class JournalEnrichers {
 
         const dataset = ev.currentTarget.dataset;
 
-        const documentUuid = dataset.documentUuid;
+        const actorUuid = dataset.actorUuid;
 
-        const actor = await this.findActor(documentUuid);
+        const actor = await this.findActor(actorUuid);
 
         if ($(ev.target).hasClass('fa-comment-alt')) {
             ev.preventDefault();
@@ -179,6 +175,7 @@ export class JournalEnrichers {
 
                 case "teamwork":
                     await TeamworkFlow.initiateTeamworkTest({
+                        actor,
                         skill: TeamworkFlow.constructSkillEntry({ id: testAttributes.skill ?? "" }),
                         attribute: TeamworkFlow.constructAttributeEntry(testAttributes.attribute as ActorAttribute | undefined),
                         threshold: testAttributes.threshold ? Number(testAttributes.threshold) : undefined,
@@ -205,7 +202,7 @@ export class JournalEnrichers {
         const user = game.user;
         if (!user || !testAttributes) return;
 
-        let actor = await this.findActor(testAttributes.documentUuid);
+        let actor = await this.findActor(testAttributes.actorUuid);
         if (!actor) {
             ui.notifications?.error("No actor found to perform this test.");
             return;
@@ -290,7 +287,7 @@ export class JournalEnrichers {
 
         console.log(`Attempting to roll action: ${testAttributes.name} from compendium: ${compendiumKey}`);
 
-        let actor = await this.findActor(testAttributes.documentUuid);
+        let actor = await this.findActor(testAttributes.actorUuid);
 
         if (!actor) {
             ui.notifications?.error("No actor found to perform this action.");
@@ -305,20 +302,15 @@ export class JournalEnrichers {
         }
     }
 
-    static async findActor(documentUuid?: string): Promise<SR5Actor | undefined> {
+    static async findActor(actorUuid?: string): Promise<SR5Actor | undefined> {
         const user = game.user;
         if (!user) return;
 
         // 1. Check the UUID directly
-        if (documentUuid) {
-            const document = await fromUuid(documentUuid);
+        if (actorUuid) {
+            const document = await fromUuid(actorUuid);
             if (document instanceof CONFIG.Actor.documentClass) {
                 const actor = document as SR5Actor;
-                if (actor.testUserPermission(user, "OWNER")) return actor;
-            }
-
-            if (document instanceof CONFIG.Item.documentClass) {
-                const actor = document.actorOwner as SR5Actor;
                 if (actor.testUserPermission(user, "OWNER")) return actor;
             }
         }
@@ -608,7 +600,7 @@ export class JournalEnrichers {
             ["opposedAttribute2", "data-opposedAttribute2"],
             ["opposedLimit", "data-opposedLimit"],
             ["name", "data-name"],
-            ["documentUuid", "data-documentUuid"],
+            ["actorUuid", "data-actor-uuid"],
             ["compendiumKey", "data-compendiumKey"],
             ["label", "data-label"],
 
@@ -644,7 +636,7 @@ export class JournalEnrichers {
             opposedattribute2: "opposedAttribute2",
             opposedlimit: "opposedLimit",
             name: "name",
-            documentuuid: "documentUuid",
+            actoruuid: "actorUuid",
             compendiumkey: "compendiumKey",
             allowOtherSkills: "allowOtherSkills"
         };

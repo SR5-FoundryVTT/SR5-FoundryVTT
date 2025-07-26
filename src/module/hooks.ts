@@ -4,7 +4,7 @@ import { OpposedRitualTest } from './tests/OpposedRitualTest';
 import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
-import { registerSystemSettings } from './settings';
+import { registerReadySystemSettings, registerSystemSettings } from './settings';
 import { FLAGS, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
@@ -395,6 +395,8 @@ ___________________
 
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
         HooksManager.registerSocketListeners();
+
+        registerReadySystemSettings();
     }
 
     /**

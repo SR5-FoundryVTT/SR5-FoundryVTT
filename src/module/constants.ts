@@ -60,6 +60,8 @@ export const FLAGS = {
     TokenRulerColorSprinting: "TokenRulerColorSprinting",
     TokenRulerOpacity: 'TokenRulerOpacity',
     TokenUseRoutingLib: 'TokenUseRoutingLib',
+    RollMacroDefaultPack: "RollMacroDefaultPack",
+    RollActionDefaultPack: "RollActionDefaultPack"
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

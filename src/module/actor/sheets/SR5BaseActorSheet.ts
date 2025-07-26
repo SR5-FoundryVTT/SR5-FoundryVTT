@@ -1014,8 +1014,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param inventories 
      */
     _prepareSortedCategorizedSpells(spellSheets: SheetItemData[]) {
-        const sortedSpells : Record<string, SheetItemData[]> = {};
-        const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
+        const sortedSpells: Record<string, SheetItemData[]> = {};
+        const spellTypes: string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
 
         // Add all spell types in system.
         spellTypes.forEach(type => {
@@ -1029,7 +1029,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         });
 
         spellTypes.forEach(type => {
-            sortedSpells[type].sort((a, b) : number => {
+            sortedSpells[type].sort((a, b): number => {
                 return a.name.localeCompare(b.name);
             });
         });
@@ -1041,7 +1041,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Used by the sheet to choose whether to show or hide hideable fields
      */
     _prepareContentVisibility(data) {
-        const contentVisibility : Record<string, boolean> = {}
+        const contentVisibility: Record<string, boolean> = {}
         const defaultVisibility = data.system.category_visibility.default;
 
         // If prefix is empty uses the category as a prefix
