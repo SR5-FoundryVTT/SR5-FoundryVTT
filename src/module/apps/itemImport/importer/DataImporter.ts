@@ -1,9 +1,8 @@
+import { Parser } from 'xml2js';
 import { SR5 } from "../../../config";
 import { ParseData } from "../parser/Parser";
 import { CompendiumKey, Constants } from './Constants';
 import { ImportHelper as IH } from '../helper/ImportHelper';
-
-const xml2js = require('xml2js');
 
 /**
  * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
@@ -43,7 +42,7 @@ export abstract class DataImporter {
      * @returns A json object converted from the string.
      */
     public static async xml2json(xmlString: string): Promise<object> {
-        const parser = xml2js.Parser({
+        const parser = new Parser({
             explicitArray: false,
             explicitCharkey: true,
             charkey: IH.CHAR_KEY,
