@@ -577,12 +577,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (this.type === 'weapon') {
             const currentItems = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
 
-            itemData.forEach((ogItem) => {
+            for (const ogItem of itemData) {
                 const item = foundry.utils.duplicate(ogItem) as Item.Source;
                 item._id = foundry.utils.randomID();
                 if (item.type === 'ammo' || item.type === 'modification')
                     currentItems.push(item);
-            });
+            }
 
             await this.setNestedItems(currentItems);
         }
@@ -662,24 +662,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         this.render(false);
     }
 
-    // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
-    async updateNestedItems(changes) {
+    async updateNestedItems(changes: Item.UpdateData | Item.UpdateData[]) {
         const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
-        if (!items) return;
-        changes = Array.isArray(changes) ? changes : [changes];
-        if (!changes || changes.length === 0) return;
-        for(const itemChanges of changes) {
-            const index = items.findIndex((i) => i._id === itemChanges._id);
-            if (index === -1) continue;
-            const item = items[index];
+        const changesArray = Array.isArray(changes) ? changes : [changes];
 
-            // TODO: The _id field has been added by the system. Even so, don't change the id to avoid any byproducts.
-            delete itemChanges._id;
-
-            if (item) {
-                foundry.utils.mergeObject(item, expandObject(itemChanges));
-                items[index] = item;
-            }
+        for (const change of changesArray) {
+            const existing = items.find(i => i._id === change._id);
+            if (!existing) continue;
+            foundry.utils.mergeObject(existing, expandObject(change));
         }
 
         await this.setNestedItems(items);
@@ -931,8 +921,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.system.description?.source ?? '';
     }
 
-    setSource(this: SR5Item, source: string) {
-        this.update({ system: { description: { source } } });
+    async setSource(this: SR5Item, source: string) {
+        await this.update({ system: { description: { source } } });
         this.render(true);
     }
 

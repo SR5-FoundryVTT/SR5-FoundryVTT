@@ -74,7 +74,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     public renderSourceSheet() {
         if (this.source instanceof SR5Actor || this.source instanceof SR5Item)
             return this.source?.sheet?.render(true);
-        return;
+        return undefined;
     }
 
     async toggleDisabled() {
