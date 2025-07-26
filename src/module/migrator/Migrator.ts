@@ -68,31 +68,38 @@ export class Migrator {
      * Note: This method was previously called during `_initializeSource`,
      * but that caused migration of embedded items to be skipped in synthetic documents.
      */
-    public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false): void {
+    public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false): boolean {
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
-        if (!data._stats || !('systemVersion' in data._stats)) return;
-        if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return;
+        if (!data._stats || !('systemVersion' in data._stats)) return false;
+        if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return false;
 
+        let migrated = false;
         if (type === "Item") {
             const items = this.normalizeArray(data.flags?.shadowrun5e?.embeddedItems);
-            for (const nestedItems of items)
-                this.migrate("Item", nestedItems, true);
-
+            for (const nestedItems of items) {
+                const nestedMigrated = this.migrate("Item", nestedItems, true);
+                migrated = migrated || nestedMigrated;
+            }
             foundry.utils.setProperty(data, 'flags.shadowrun5e.embeddedItems', items);
 
             if (nested) {
                 const effects = this.normalizeArray(data.effects);
-                for (const nestedEffect of effects)
-                    this.migrate("ActiveEffect", nestedEffect, true);
-
+                for (const nestedEffect of effects) {
+                    const nestedMigrated = this.migrate("ActiveEffect", nestedEffect, true);
+                    migrated = migrated || nestedMigrated;
+                }
                 foundry.utils.setProperty(data, 'effects', effects);
             }
         }
 
         const migrators = this.getMigrators(data._stats.systemVersion, type, data);
 
-        // If no migrators found, nothing to do.
-        if (migrators.length === 0) return;
+        if (migrators.length === 0) {
+            if (migrated)
+                data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
+
+            return migrated;
+        }
 
         for (const migrator of migrators)
             migrator[`migrate${type}`](data);
@@ -113,6 +120,8 @@ export class Migrator {
 
         // Mark as a migratable document.
         data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
+
+        return true;
     }
 
     /**
