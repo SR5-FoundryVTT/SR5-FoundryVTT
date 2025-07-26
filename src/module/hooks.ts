@@ -4,48 +4,48 @@ import { OpposedRitualTest } from './tests/OpposedRitualTest';
 import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
-import { registerSystemSettings } from './settings';
+import { registerReadySystemSettings, registerSystemSettings } from './settings';
 import { FLAGS, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
 import { SR5Token } from './token/SR5Token';
-import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
+import { SR5ActiveEffect } from "./effect/SR5ActiveEffect";
 import { _combatantGetInitiativeFormula, SR5Combat } from './combat/SR5Combat';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { Import } from './apps/itemImport/apps/import-form';
-import {ChangelogApplication} from "./apps/ChangelogApplication";
+import { ChangelogApplication } from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
-import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
-import {SR5ActiveEffectConfig} from "./effect/SR5ActiveEffectConfig";
-import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
-import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
-import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
-import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
+import { SR5ICActorSheet } from "./actor/sheets/SR5ICActorSheet";
+import { SR5ActiveEffectConfig } from "./effect/SR5ActiveEffectConfig";
+import { SR5VehicleActorSheet } from "./actor/sheets/SR5VehicleActorSheet";
+import { SR5CharacterSheet } from "./actor/sheets/SR5CharacterSheet";
+import { SR5SpiritActorSheet } from "./actor/sheets/SR5SpiritActorSheet";
+import { SR5SpriteActorSheet } from "./actor/sheets/SR5SpriteActorSheet";
 
-import {SR5Roll} from "./rolls/SR5Roll";
-import {SuccessTest} from "./tests/SuccessTest";
-import {TeamworkTest} from "./actor/flows/TeamworkFlow";
-import {OpposedTest} from "./tests/OpposedTest";
-import {PhysicalDefenseTest} from "./tests/PhysicalDefenseTest";
-import {RangedAttackTest} from "./tests/RangedAttackTest";
-import {PhysicalResistTest} from "./tests/PhysicalResistTest";
-import {MeleeAttackTest} from "./tests/MeleeAttackTest";
-import {SpellCastingTest} from "./tests/SpellCastingTest";
-import {DrainTest} from "./tests/DrainTest";
-import {TestCreator} from "./tests/TestCreator";
-import {CombatSpellDefenseTest} from "./tests/CombatSpellDefenseTest";
-import {ComplexFormTest} from "./tests/ComplexFormTest";
-import {AttributeOnlyTest} from "./tests/AttributeOnlyTest";
-import {NaturalRecoveryStunTest} from "./tests/NaturalRecoveryStunTest";
-import {NaturalRecoveryPhysicalTest} from "./tests/NaturalRecoveryPhysicalTest";
-import {FadeTest} from "./tests/FadeTest";
-import {ThrownAttackTest} from "./tests/ThrownAttackTest";
-import {PilotVehicleTest} from "./tests/PilotVehicleTest";
-import {DronePerceptionTest} from "./tests/DronePerceptionTest";
-import {DroneInfiltrationTest} from "./tests/DroneInfiltrationTest";
+import { SR5Roll } from "./rolls/SR5Roll";
+import { SuccessTest } from "./tests/SuccessTest";
+import { TeamworkFlow } from "./actor/flows/TeamworkFlow";
+import { OpposedTest } from "./tests/OpposedTest";
+import { PhysicalDefenseTest } from "./tests/PhysicalDefenseTest";
+import { RangedAttackTest } from "./tests/RangedAttackTest";
+import { PhysicalResistTest } from "./tests/PhysicalResistTest";
+import { MeleeAttackTest } from "./tests/MeleeAttackTest";
+import { SpellCastingTest } from "./tests/SpellCastingTest";
+import { DrainTest } from "./tests/DrainTest";
+import { TestCreator } from "./tests/TestCreator";
+import { CombatSpellDefenseTest } from "./tests/CombatSpellDefenseTest";
+import { ComplexFormTest } from "./tests/ComplexFormTest";
+import { AttributeOnlyTest } from "./tests/AttributeOnlyTest";
+import { NaturalRecoveryStunTest } from "./tests/NaturalRecoveryStunTest";
+import { NaturalRecoveryPhysicalTest } from "./tests/NaturalRecoveryPhysicalTest";
+import { FadeTest } from "./tests/FadeTest";
+import { ThrownAttackTest } from "./tests/ThrownAttackTest";
+import { PilotVehicleTest } from "./tests/PilotVehicleTest";
+import { DronePerceptionTest } from "./tests/DronePerceptionTest";
+import { DroneInfiltrationTest } from "./tests/DroneInfiltrationTest";
 import { SuppressionDefenseTest } from './tests/SuppressionDefenseTest';
 import { SummonSpiritTest } from './tests/SummonSpiritTest';
 
@@ -83,7 +83,7 @@ export class HooksManager {
 
         Hooks.once('init', () => {
             HooksManager.init();
-            
+
             // Custom Module Integrations
             // See src/module/integartions for more information.
             if (game.modules.get('routinglib')?.active) {
@@ -291,7 +291,7 @@ ___________________
         };
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
-        CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
+        CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-expect-error
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
@@ -390,9 +390,13 @@ ___________________
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, async () => await TestCreator.promptSuccessTest());
 
+        $(document).off("click", ".sr5-roll-request");
+        $(document).on("click", ".sr5-roll-request", async (ev: JQuery.TriggeredEvent) => { await JournalEnrichers.handleClick(ev); });
+
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
-        Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks);
         HooksManager.registerSocketListeners();
+
+        registerReadySystemSettings();
     }
 
     /**
@@ -504,7 +508,7 @@ ___________________
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
             [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage],
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage],
-            [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage],
+            [FLAGS.TeamworkTestFlow]: [TeamworkFlow._handleUpdateSocketMessage],
             [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage],
         }
 
@@ -528,16 +532,18 @@ ___________________
         await SuccessTest.chatMessageListeners(message, html, data);
         await OpposedTest.chatMessageListeners(message, html, data);
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
-        await TeamworkTest.chatMessageListeners(message, html);
-        await JournalEnrichers.messageRequestHooks(html);
+        await TeamworkFlow.chatMessageListeners(message, html);
+        // TODO: Thogrim
+        // await JournalEnrichers.messageRequestHooks(html);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
         await SuccessTest.chatLogListeners(chatLog, html, data);
         await OpposedTest.chatLogListeners(chatLog, html, data);
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
-        await TeamworkTest.chatLogListeners(chatLog, html);
-        await JournalEnrichers.chatlogRequestHooks(html)
+        await TeamworkFlow.chatLogListeners(chatLog, html);
+        // TODO: Thogrim
+        // await JournalEnrichers.chatlogRequestHooks(html)
     }
 
     static configureVision() {

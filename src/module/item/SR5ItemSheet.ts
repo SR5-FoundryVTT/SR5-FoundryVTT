@@ -8,6 +8,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
+import { JournalEnrichers } from '../journal/enricher';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -134,7 +135,7 @@ export class SR5ItemSheet extends ItemSheet {
         const itemData = this.item.system;
 
         const linkedActor = await this.item.getLinkedActor();
-        
+
         // Calculated values for derived data.
         data.calculatedEssence = itemData.technology?.calculated.essence.adjusted ?? false;
         data.calculatedCost = data.calculatedEssence ? true : itemData.technology?.calculated.cost.adjusted ?? false;
@@ -242,7 +243,9 @@ export class SR5ItemSheet extends ItemSheet {
         data.resistTests = game.shadowrun5e.resistTests;
 
         // @ts-expect-error TODO: foundry-vtt-types v10
-        data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
+        data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value, {
+                    relativeTo: this.item
+                });
         data.sourceIsURL = this.item.sourceIsUrl;
         data.sourceIsPDF = this.item.sourceIsPDF;
         data.sourceIsUuid = this.item.sourceIsUuid
