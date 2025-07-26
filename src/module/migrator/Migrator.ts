@@ -194,28 +194,25 @@ export class Migrator {
         let completed = 0;
         const total = game.items.size + game.actors.size + tokensWithActors.length;
 
-        await Promise.all(
-            game.items.map(async item =>
-                this.migrateWithCollections(item as Item.Implementation).then(() => {
-                    progress.update({pct: ++completed / total});
-                })
-            )
+        // Items
+        await this.runInBatches([...game.items], async item =>
+            this.migrateWithCollections(item as Item.Implementation).then(() => {
+                progress.update({pct: ++completed / total});
+            })
         );
 
-        await Promise.all(
-            game.actors.map(async actor =>
-                this.migrateWithCollections(actor as Actor.Implementation).then(() => {
-                    progress.update({pct: ++completed / total});
-                })
-            )
+        // Actors
+        await this.runInBatches([...game.actors], async actor =>
+            this.migrateWithCollections(actor as Actor.Implementation).then(() => {
+                progress.update({pct: ++completed / total});
+            })
         );
 
-        await Promise.all(
-            tokensWithActors.map(async token =>
-                this.migrateWithCollections(token.actor!).then(() => {
-                    progress.update({pct: ++completed / total});
-                })
-            )
+        // Tokens
+        await this.runInBatches(tokensWithActors, async token =>
+            this.migrateWithCollections(token.actor!).then(() => {
+                progress.update({pct: ++completed / total});
+            })
         );
 
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
@@ -234,6 +231,21 @@ export class Migrator {
             default: 'ok',
         });
         d.render(true);
+    }
+
+    private static readonly CONCURRENCY_LIMIT = Math.max((navigator.hardwareConcurrency || 1) - 1, 1);
+    private static async runInBatches<T>(
+        items: T[],
+        task: (item: T) => Promise<void>
+    ) {
+        let i = 0;
+        async function worker() {
+            while (i < items.length)
+                await task(items[i++]);
+        }
+
+        const workers = Array.from({ length: this.CONCURRENCY_LIMIT }, worker);
+        return Promise.all(workers);
     }
 
     private static async migrateWithCollections(doc: Actor.Implementation | Item.Implementation) {
