@@ -64,6 +64,9 @@ export class Migrator {
      * 
      * This is connected to Migrator.updateMigratedDocument which will persist migrated data during the
      * update process.
+     * 
+     * Note: This method was previously called during `_initializeSource`,
+     * but that caused migration of embedded items to be skipped in synthetic documents.
      */
     public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false): void {
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
