@@ -57,6 +57,7 @@ export const DamageData = () => ({
         }),
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
+    attribute: new StringField({ required: true }),
     source: new SchemaField({
         actorId: new StringField({ required: true }),
         itemId: new StringField({ required: true }),

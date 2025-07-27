@@ -63,7 +63,7 @@ const VehicleData = () => ({
     // === Matrix & Initiative ===
     matrix: new SchemaField(MatrixData()),
     initiative: new SchemaField(Initiative('meatspace', 'matrix')),
-    full_defense_attribute: new StringField({ required: true, initial: "intuition" }),
+    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
     visibilityChecks: new SchemaField(VisibilityChecks("matrix", "meatspace")),
 
     // === Driver & Networking ===

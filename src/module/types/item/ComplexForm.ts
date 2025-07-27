@@ -1,10 +1,13 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { ActionRollData } from "./Action";
-const { SchemaField, NumberField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, StringField, ArrayField } = foundry.data.fields;
 
 const ComplexFormData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData({test: 'ComplexFormTest', opposedTest: 'OpposedTest', followedTest: 'FadeTest'})),
+    action: new SchemaField({
+        ...ActionRollData({test: 'ComplexFormTest', opposedTest: 'OpposedTest', followedTest: 'FadeTest'}),
+        categories: new ArrayField(new StringField({ required: true }), { initial: ['complex_form'] }),
+    }),
 
     target: new StringField({
         blank: true,
