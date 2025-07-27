@@ -20,6 +20,11 @@ export type MatrixDefenseNoDamageCondition = {
     label: Translation,
 }
 
+/**
+ * A MatrixDefenseTest should be used to defend against Matrix Attacks
+ * - Matrix Attacks are actions by many of the IC, and the Data Spike Action
+ * - Matrix Defense Test allows picking an active defense for the attack
+ */
 export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTestData> extends DefenseTest<T> {
     override against: MatrixTest;
     resist: MatrixResistTest;
@@ -56,7 +61,6 @@ export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTe
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
-        // TODO not adding matrix here as I think that adds noise as a modifier, which we do not want in a defense test
         return ['defense_matrix']
     }
 

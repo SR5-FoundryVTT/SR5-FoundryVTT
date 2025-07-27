@@ -9,7 +9,7 @@ import { TestCreator } from './TestCreator';
 import { MatrixDefenseTestData } from './MatrixDefenseTest';
 import DamageData = Shadowrun.DamageData;
 
-// matrix resist data is a mix of a whole bunch of other data
+// matrix resist data is a mix of a bunch of data
 // maybe we make a "Resist" base Test class?
 export type MatrixResistTestData = SuccessTestData & {
     // The persona uuid. This would be the user main persona icon, not necessarily the device.
@@ -28,7 +28,7 @@ export type MatrixResistTestData = SuccessTestData & {
  * Handle Matrix Damage Resist as defined on SR5#228.
  * 
  * These test flows exist:
- * - Brute Force/Hack on The Fly: Both will trigger this test using their Opposed variant.
+ * - Brute Force and other Matrix Attacks will trigger this test through their Opposed or Defense test.
  */
 export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     // icon of the target
@@ -48,7 +48,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
         // This test is part of either a standalone resist or created with its own data (i.e. edge reroll).
         } else {
-            // prepare the data as opposed data since we hold data similar to an opposed matrix action
+            // prepare the data as a resist test
             data = MatrixTestDataFlow._prepareDataResist(data);
             data.incomingDamage = data.incomingDamage ?? DataDefaults.damageData();
             data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
@@ -86,6 +86,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
         }
     }
 
+    // don't add 'matrix' category because we don't want things like noise
     override get testCategories(): Shadowrun.ActionCategories[] {
         return ['resist_matrix']
     }
@@ -113,14 +114,8 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     }
 
     /**
-     * Prepare any OpposedTest from given test data. This test data should origin from a original success test, that is to be opposed.
+     * Prepare any ResistTest from given test data. This should come from a MatrixDefenseTest
      *
-     * Typically this would be as part of a test => message => oppose flow
-     *
-     * @param opposedData
-     * @param document The actor used to oppose this original test with.
-     * @param previousMessageId The chat message the original test is stored within.
-     * @returns TestData for the opposed test.
      */
     static override async _getResistActionTestData(opposedData: MatrixDefenseTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<MatrixResistTestData | undefined> {
         if (!opposedData.against?.opposed.resist) {
@@ -195,7 +190,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     /**
      * Execute actions triggered by a tests chat message.
      *
-     * This can be used to trigger opposing tests.
+     * This can be used to trigger resist tests.
      */
     static override async executeMessageAction(againstData: MatrixDefenseTestData, messageId: string, options: TestOptions) {
         // Determine documents to roll test with.
