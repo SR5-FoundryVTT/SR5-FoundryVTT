@@ -37,6 +37,8 @@ export class Migrator {
         new Version0_30_0(),
     ] as const;
 
+    private static documentsToBeMigrated: number = 0;
+
     // Generate the migration version mark used to track current system version in documents.
     private static get _migrationMark() {
         return game.system.version + ".0";
@@ -120,7 +122,7 @@ export class Migrator {
 
         // Mark as a migratable document.
         data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
-
+        this.documentsToBeMigrated++;
         return true;
     }
 
@@ -160,7 +162,7 @@ export class Migrator {
 
         // No migrations are required, exit.
         const migrators = this.getMigrators(currentVersion);
-        if (migrators.length === 0) return;
+        if (migrators.length === 0 || this.documentsToBeMigrated === 0) return;
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
         const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
@@ -172,7 +174,7 @@ export class Migrator {
         const d = new Dialog({
             title: localizedWarningTitle,
             content:
-                `<h2 style="color: red; text-align: center">${localizedWarningHeader}</h2>` +
+                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.documentsToBeMigrated})</h2>` +
                 `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
                 `<p>${localizedWarningDescription}</p>` +
                 `<h3 style="color: red">${localizedWarningBackup}</h3>`,
@@ -242,7 +244,7 @@ export class Migrator {
         d.render(true);
     }
 
-    private static readonly CONCURRENCY_LIMIT = Math.max((navigator.hardwareConcurrency || 1) - 1, 1);
+    private static readonly CONCURRENCY_LIMIT = 1;
     private static async runInBatches<T>(
         items: T[],
         task: (item: T) => Promise<void>
