@@ -1,8 +1,7 @@
 {
-  "name": "Matrix Defense Test",
+  "name": "Biofeedback Resist",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/dodging.svg",
-  "_id": "9yudm48WK9eeb5Qe",
+  "img": "systems/shadowrun5e/dist/icons/importer/adept_power.svg",
   "system": {
     "description": {
       "value": "",
@@ -11,9 +10,9 @@
     },
     "action": {
       "type": "",
-      "test": "MatrixDefenseTest",
+      "test": "BiofeedbackResistTest",
       "categories": [
-        "defense_matrix"
+        "resist_biofeedback"
       ],
       "attribute": "",
       "attribute2": "",
@@ -83,7 +82,7 @@
         "armor": false,
         "mod": 0
       },
-      "modifiers": ["global", "wounds", "defense_matrix"],
+      "modifiers": [],
       "category": {
         "matrix": {
           "owner": false,
@@ -109,9 +108,15 @@
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1753300286021,
-    "modifiedTime": 1753300286038,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm"
-  },
-  "_key": "!items!9yudm48WK9eeb5Qe"
+    "createdTime": 1753648948733,
+    "modifiedTime": 1753649249195,
+    "lastModifiedBy": "gprTC3Md255Kv3Xm",
+    "exportSource": {
+      "worldId": "sr5-buffalo",
+      "uuid": "Item.vg7YocE4lcCUNhCK",
+      "coreVersion": "13.346",
+      "systemId": "shadowrun5e",
+      "systemVersion": "0.30.0"
+    }
+  }
 }
