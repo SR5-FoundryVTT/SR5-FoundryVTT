@@ -28,7 +28,7 @@ export class VehicleParser extends Parser<'vehicle'> {
                 continue;
             }
 
-            const itemBase = game.items.fromCompendium(foundItem);
+            const itemBase = game.items.fromCompendium(foundItem, { keepId: true });
             const system = itemBase.system as Item.SystemOfType<'modification' | 'equipment' | 'weapon'>;
 
             if ('technology' in system)
