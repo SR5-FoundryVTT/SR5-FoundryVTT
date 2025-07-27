@@ -113,6 +113,25 @@ export class MatrixPrep {
                 hidden,
             };
         });
+
+        // Add Rating to the Attributes -- this is not in the normal format, so we need to add it separately
+        const rating = matrix.rating;
+
+        // add Rating as well, which is just a set value
+        attributes['rating'] = {
+            base: rating,
+            value: rating,
+            mod: [],
+            label: 'SR5.Rating',
+            hidden: true,
+        }
+        limits['rating'] = {
+            base: rating,
+            value: rating,
+            mod: [],
+            label: 'SR5.Rating',
+            hidden: true,
+        }
     }
 
     static prepareMentalAttributesForDevice(system: CommonData & MatrixActorData, rating?: number) {
