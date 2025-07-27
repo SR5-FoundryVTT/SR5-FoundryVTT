@@ -83,6 +83,7 @@ import { MatrixICFlow } from './actor/flows/MatrixICFlow';
 import { SocketMessage } from './sockets';
 import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
 import { MatrixTest } from './tests/MatrixTest';
+import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -199,7 +200,8 @@ ___________________
                 OpposedBruteForceTest,
                 HackOnTheFlyTest,
                 OpposedHackOnTheFlyTest,
-                MatrixResistTest
+                MatrixResistTest,
+                BiofeedbackResistTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -230,7 +232,8 @@ ___________________
                 RitualSpellcastingTest,
                 BruteForceTest,
                 HackOnTheFlyTest,
-                MatrixResistTest
+                MatrixResistTest,
+                BiofeedbackResistTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -256,7 +259,8 @@ ___________________
              */
             resistTests: {
                 PhysicalResistTest,
-                MatrixResistTest
+                MatrixResistTest,
+                BiofeedbackResistTest
             },
             /**
              * Subset of tests meant to follow a main active test

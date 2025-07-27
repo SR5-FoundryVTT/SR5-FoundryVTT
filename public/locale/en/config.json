@@ -1308,6 +1308,7 @@
     },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attribute-Only Test",
+        "BiofeedbackResistTest": "Biofeedback Resist",
         "BruteForceTest": "Brute Force",
         "CombatSpellDefenseTest": "Combat Spell Defense",
         "CompileSpriteTest": "Compile Sprite",

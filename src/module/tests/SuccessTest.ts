@@ -1853,14 +1853,27 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return [{ label: testCls.label }]
     }
 
+    get _resistTestClass(): any | undefined {
+        return undefined; // by default we don't want to show any resist test in a success test
+    }
+
     /**
      * Prepare Resist actions a test allows. These are actions
-     * meant to be taken following completion of an opposed test.
+     * meant to be taken following completion of an opposed test
+     * or as a way to resist direct damage of a test
      */
-    _prepareResistActionsTemplateData(): Shadowrun.FollowupAction[] {
-        // by default, we don't return any resist actions in a normal SuccessTest
-        // this is overridden by OpposedTest
-        return []
+    _prepareResistActionsTemplateData() {
+        const testCls = this._resistTestClass;
+        // No resist test configured. Nothing to build.
+        if (!testCls) return [];
+
+        const action = {
+            // Store the test implementation registration name.
+            test: testCls.name,
+            label: testCls.label
+        };
+
+        return [action]
     }
 
     /**

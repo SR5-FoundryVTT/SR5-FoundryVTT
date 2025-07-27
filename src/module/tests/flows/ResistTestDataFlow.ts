@@ -9,7 +9,7 @@ import { TestCreator } from '../TestCreator';
 import { SR5Item } from '../../item/SR5Item';
 
 // Resist Test Data will have incoming and modified damage
-export type ResistTestData<T extends DefenseTestData = DefenseTestData> = SuccessTestData & {
+export type ResistTestData<T extends any = any> = SuccessTestData & {
     // Damage value of the attack
     incomingDamage: DamageData
     // Modified damage value of the attack after this defense (success or failure)
@@ -72,7 +72,7 @@ export const ResistTestDataFlow = {
      * @param title
      * @param previousMessageId
      */
-    _getResistTestData(opposedData: DefenseTestData, title: Translation, previousMessageId: string): ResistTestData {
+    _getResistTestData(opposedData: DefenseTestData | ResistTestData, title: Translation, previousMessageId: string): ResistTestData {
         return {
             title,
 
@@ -131,7 +131,7 @@ export const ResistTestDataFlow = {
         return action;
     },
 
-    async executeMessageAction(testCls: any, againstData: DefenseTestData, messageId: string, documents: any[], options: TestOptions) {
+    async executeMessageAction(testCls: any, againstData: DefenseTestData | ResistTestData, messageId: string, documents: any[], options: TestOptions) {
         // Inform user about tokens with deleted sidebar actors.
         // This can both happen for linked tokens immediately and unlinked tokens after reloading.
         // TODO: Check when this error is relevant.
@@ -159,6 +159,37 @@ export const ResistTestDataFlow = {
             // Await test chain resolution for each actor, to avoid dialog spam.
             await test.execute();
         }
-    }
+    },
 
+    /**
+     * Create ActionData for another Resist Test, based on the provided ResstTestData
+     * @param testCls
+     * @param opposedData
+     * @param test
+     */
+    // TODO use a better type for 'test'
+    async _getResistAgainActionData(testCls: any, opposedData: ResistTestData, test: string): Promise<ActionRollData> {
+        // The original action doesn't contain a complete set of ActionData.
+        // Therefore we must create an empty dummy action.
+        let action = DataDefaults.actionRollData();
+
+        // Allow the OpposedTest to overwrite action data using its class default action.
+        action = TestCreator._mergeMinimalActionDataInOrder(action,
+            // Use action data from the original action at first.
+            opposedData.action,
+            // Overwrite with the OpposedTest class default action, if any.
+            testCls._getDefaultTestAction()
+        );
+
+        // Allow the OpposedTest to overwrite action data dynamically based on item data.
+        if (opposedData.sourceItemUuid) {
+            const item = await fromUuid(opposedData.sourceItemUuid) as SR5Item;
+            if (item) {
+                const itemAction = await testCls._getDocumentTestAction(item, document);
+                action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
+            }
+        }
+        action.test = test;
+        return action;
+    },
 }

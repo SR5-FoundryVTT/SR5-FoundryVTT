@@ -270,8 +270,8 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      * This class should be used for the opposing test implementation.
      * - the resist class test will resist any damage
      */
-    get _resistTestClass(): any | undefined {
-        if (!this.data.against?.opposed?.resist) return;
+    override get _resistTestClass(): any | undefined {
+        if (this.success || !this.data.against?.opposed?.resist) return;
         return TestCreator._getTestClass(this.data.against.opposed.resist.test);
     }
 

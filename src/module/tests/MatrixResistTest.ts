@@ -6,6 +6,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixDefenseTestData } from './MatrixDefenseTest';
 import { ResistTestData, ResistTestDataFlow } from './flows/ResistTestDataFlow';
+import { BiofeedbackResistTest } from './BiofeedbackResistTest';
 
 // matrix resist data is a mix of a bunch of data
 // maybe we make a "Resist" base Test class?
@@ -64,6 +65,27 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
         return 'SR5.TestResults.ResistedSomeDamage';
     }
 
+    override get _resistTestClass(): any {
+        if (this.data.modifiedDamage.value > 0) {
+            return BiofeedbackResistTest;
+        }
+        return super._resistTestClass;
+    }
+
+    override async afterTestComplete(): Promise<void> {
+        await super.afterTestComplete();
+
+        const testCls = this._resistTestClass;
+        if (testCls) {
+            if (this.data && this.data.messageUuid) {
+                const data = await testCls._getResistActionTestData(this.data, this.persona, this.data.messageUuid)
+                console.log('biofeedback data', data);
+                const test = new testCls(data, {actor: this.persona}, this.data.options);
+                await test.execute();
+            }
+        }
+    }
+
     static override _getDefaultTestAction(): Partial<Shadowrun.MinimalActionData> {
         return {
             'attribute': 'rating',
@@ -71,9 +93,13 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
         }
     }
 
-    // don't add 'matrix' category because we don't want things like noise
+    override get testModifiers(): Shadowrun.ModifierTypes[] {
+        // override to remove wounds and global modifiers
+        return [];
+    }
+
     override get testCategories(): Shadowrun.ActionCategories[] {
-        return ['resist_matrix']
+        return ['resist', 'resist_matrix']
     }
 
     override async processResults() {

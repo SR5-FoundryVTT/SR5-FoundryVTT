@@ -215,6 +215,7 @@ declare namespace Shadowrun {
         'resist_disease' | // resisting against diseases
         'resist_toxin' | // resisting against toxins
         'resist_matrix' | // resisting against matrix damage
+        'resist_biofeedback' | // resisting against biofeedback damage
         'resonance' | // all resonance actions in general
         'rigging' | // all rigging actions in general
         'social' | // all social skill actions

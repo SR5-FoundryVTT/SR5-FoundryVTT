@@ -10,6 +10,7 @@ import { MatrixDefenseTest } from '../MatrixDefenseTest';
 import { MatrixResistTest, MatrixResistTestData } from '../MatrixResistTest';
 import { OpposedBruteForceTest } from '../OpposedBruteForceTest';
 import { OpposedHackOnTheFlyTest } from '../OpposedHackOnTheFlyTest';
+import { BiofeedbackResistTest } from '../BiofeedbackResistTest';
 
 /**
  * Apply Matrix Rules to Success Test Data relating to matrix.
@@ -20,6 +21,7 @@ export const MatrixTestDataFlow = {
         if (test.source instanceof SR5Item) return;
         // do not add matrix modifier for resist tests
         if (test.data.action.test === 'MatrixResistTest') return;
+        if (test.data.action.test === 'BiofeedbackResistTest') return;
 
         MatrixTestDataFlow.removeMatrixModifiers(test);
 
@@ -273,7 +275,7 @@ export const MatrixTestDataFlow = {
      * Devices might be related to a persona, in which case a persona will be present.
      * @param test The test to populate with documents.
      */
-    async populateResistDocuments(test: MatrixResistTest) {
+    async populateResistDocuments(test: MatrixResistTest | BiofeedbackResistTest) {
         if (test.data.iconUuid) {
             test.icon = await fromUuid(test.data.iconUuid) as SR5Item;
         }
