@@ -42,7 +42,8 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
     /**
      * Sprites have support for dropping actors onto them.
      */
-    override async _onDrop(event: DragEvent): Promise<void> {
+    // @ts-expect-error TODO: foundry-vtt-types v13 _onDrop returns void but should return array of documents.
+    override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -50,7 +51,11 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
 
         const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
 
-        await this._addTechnomancerOnDrop(dropData);
+        // Handle technomancer drops, ignore other actor drops as sprites can't handle them.
+        if (dropData.type === 'Actor') {
+            await this._addTechnomancerOnDrop(dropData);
+            return [];
+        }
 
         return await super._onDrop(event);
     }
