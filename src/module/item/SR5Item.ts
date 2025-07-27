@@ -566,6 +566,24 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Create an item in this item
+     * @param effectData
+     */
+    async createNestedActiveEffect(effectData: ActiveEffect.Implementation | ActiveEffect.Implementation[]) {
+        if (!Array.isArray(effectData)) effectData = [effectData];
+
+        for (const effect of effectData) {
+            this.effects.set(effect._id!, effect);
+        }
+
+        this.prepareNestedItems();
+        this.prepareData();
+        this.render(false);
+
+        return true;
+    }
+
+    /**
+     * Create an item in this item
      * @param itemData
      */
     async createNestedItem(itemData: Item.Source | Item.Source[]) {
@@ -648,14 +666,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         for(const effectChanges of changes) {
             const effect = this.effects.get(effectChanges._id);
             if (!effect) continue;
+            delete effectChanges._id;
             foundry.utils.mergeObject(effect, expandObject(effectChanges), { inplace: true });
+            effect.render(false);
         }
 
         const parent = this.parent as unknown as SR5Item;
-
-        parent.prepareNestedItems();
-        parent.prepareData();
-        parent.render(false);
+        await parent.updateNestedItems(this.toObject(false));
         this.render(false);
     }
 
@@ -666,6 +683,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         for (const change of changesArray) {
             const existing = items.find(i => i._id === change._id);
             if (!existing) continue;
+            delete change._id;
             foundry.utils.mergeObject(existing, expandObject(change));
         }
 
