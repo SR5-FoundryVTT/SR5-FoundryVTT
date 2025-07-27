@@ -1,27 +1,19 @@
-import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
 import { Translation } from '../utils/strings';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
-import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
+import { SuccessTest, TestOptions } from './SuccessTest';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
-import { TestCreator } from './TestCreator';
 import { MatrixDefenseTestData } from './MatrixDefenseTest';
-import DamageData = Shadowrun.DamageData;
+import { ResistTestData, ResistTestDataFlow } from './flows/ResistTestDataFlow';
 
 // matrix resist data is a mix of a bunch of data
 // maybe we make a "Resist" base Test class?
-export type MatrixResistTestData = SuccessTestData & {
+export type MatrixResistTestData = ResistTestData<MatrixDefenseTestData> & {
     // The persona uuid. This would be the user main persona icon, not necessarily the device.
     personaUuid: string | undefined
     // The icon uuid. This would be the actual mark placement target. Can be a device, a persona device, a host or actor.
     iconUuid: string | undefined
-    // Damage value of the attack
-    incomingDamage: DamageData
-    // Modified damage value of the attack after this defense (success or failure)
-    modifiedDamage: DamageData
-    // any following hits
-    following: any
 }
 
 /**
@@ -40,19 +32,12 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
 
     override _prepareData(data: MatrixResistTestData, options: any): any {
         data = super._prepareData(data, options);
-
-        // Is this test part of a followup test chain? defense => resist
         if (data.following) {
             data = MatrixTestDataFlow._prepareFollowingData(data);
-            data.incomingDamage = foundry.utils.duplicate(data.following.modifiedDamage || DataDefaults.damageData({type: {base: 'matrix', value: 'matrix'}}));
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
-        // This test is part of either a standalone resist or created with its own data (i.e. edge reroll).
         } else {
-            // prepare the data as a resist test
             data = MatrixTestDataFlow._prepareDataResist(data);
-            data.incomingDamage = data.incomingDamage ?? DataDefaults.damageData();
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
         }
+        data = ResistTestDataFlow._prepareData(data);
 
         return data;
     }
@@ -94,23 +79,13 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     override async processResults() {
         await super.processResults();
 
-        const {modified} = Helpers.reduceDamageByHits(this.data.incomingDamage, this.hits.value, 'SR5.MatrixDamageResistTest');
+        const {modified} = Helpers.reduceDamageByHits(this.data.incomingDamage, this.hits.value, 'SR5.Tests.MatrixResistTest');
         this.data.modifiedDamage = modified;
     }
 
     override calculateBaseValues() {
         super.calculateBaseValues();
-
-        // Calculate damage values in case of user dialog interaction.
-        Helpers.calcTotal(this.data.incomingDamage, {min: 0});
-
-        // Remove user override and resulting incoming damage as base.
-        this.data.modifiedDamage = foundry.utils.duplicate(this.data.incomingDamage);
-        this.data.modifiedDamage.base = this.data.incomingDamage.value;
-        this.data.modifiedDamage.mod = [];
-        delete this.data.modifiedDamage.override;
-
-        Helpers.calcTotal(this.data.modifiedDamage);
+        ResistTestDataFlow.calculateBaseValues(this.data)
     }
 
     /**
@@ -127,57 +102,15 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             return;
         }
 
-        // Prepare testing data.
-        const data: MatrixResistTestData = {
-            title: 'SR5.Tests.MatrixResistTest',
-
-            previousMessageId,
-
-            pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
-            limit: DataDefaults.valueData({label: 'SR5.Limit'}),
-            threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
-            //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
-            values: {},
-
-            modifiers: DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'}),
-            incomingDamage: opposedData.incomingDamage,
-            modifiedDamage: opposedData.modifiedDamage,
+        // get most of our resist data from the ResistTestDataFlow test data
+        const data = {
+            ...ResistTestDataFlow._getResistTestData(opposedData, 'SR5.Tests.MatrixResistTest', previousMessageId),
+            // add icon and persona for the matrix handling
             iconUuid: opposedData.iconUuid,
             personaUuid: opposedData.personaUuid,
+        };
 
-            targetUuids: opposedData.targetUuids,
-            targetActorsUuid: opposedData.targetActorsUuid,
-
-            sourceUuid: opposedData.sourceUuid,
-            sourceActorUuid: opposedData.sourceActorUuid,
-            sourceItemUuid: opposedData.sourceItemUuid,
-
-            following: opposedData,
-        }
-
-        // The original action doesn't contain a complete set of ActionData.
-        // Therefore we must create an empty dummy action.
-        let action = DataDefaults.actionRollData();
-
-        // Allow the OpposedTest to overwrite action data using its class default action.
-        action = TestCreator._mergeMinimalActionDataInOrder(action,
-            // Use action data from the original action at first.
-            opposedData.against.opposed.resist,
-            // Overwrite with the OpposedTest class default action, if any.
-            this._getDefaultTestAction()
-        );
-
-        // Allow the OpposedTest to overwrite action data dynamically based on item data.
-        if (opposedData.sourceItemUuid) {
-            const item = await fromUuid(opposedData.sourceItemUuid) as SR5Item;
-            if (item) {
-                const itemAction = await this._getDocumentTestAction(item, document);
-                action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
-            }
-        }
-
-        // set the test to be a MatrixResistTest to make sure it doesn't get affected by athe matrixTestRollDataFlow
-        action.test = 'MatrixResistTest';
+        const action = await ResistTestDataFlow._getResistActionData(this, opposedData, 'MatrixResistTest');
 
         return this._prepareActionTestData(action, document, data) as MatrixResistTestData;
     }
@@ -194,34 +127,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
      */
     static override async executeMessageAction(againstData: MatrixDefenseTestData, messageId: string, options: TestOptions) {
         // Determine documents to roll test with.
-        let documents = await Helpers.getMatrixTestTargetDocuments(againstData)
-
-        // Inform user about tokens with deleted sidebar actors.
-        // This can both happen for linked tokens immediately and unlinked tokens after reloading.
-        // TODO: Check when this error is relevant.
-        if (documents.filter(document => !document).length > 0) {
-            ui.notifications?.warn('TOKEN.WarningNoActor', {localize: true});
-            return;
-        }
-
-        // filter out actors current user shouldn't be able to test with.
-        documents = documents.filter(document => document.isOwner);
-        // Fallback to player character.
-        if (documents.length === 0 && game.user?.character) {
-            documents.push(game.user.character);
-        }
-
-        console.log('Shadowrun 5e | Casting a resist test using these actors', documents, againstData);
-
-        for (const document of documents) {
-            const data = await this._getResistActionTestData(againstData, document, messageId);
-            if (!data) return;
-
-            const documents = {source: document};
-            const test = new this(data, documents, options);
-
-            // Await test chain resolution for each actor, to avoid dialog spam.
-            await test.execute();
-        }
+        const documents = await Helpers.getMatrixTestTargetDocuments(againstData)
+        await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
     }
 }

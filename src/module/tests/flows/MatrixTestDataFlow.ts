@@ -169,8 +169,8 @@ export const MatrixTestDataFlow = {
      * @returns
      */
     _prepareFollowingData(data: MatrixResistTestData): any {
-        data.personaUuid = data.personaUuid ?? data.following.personaUuid;
-        data.iconUuid = data.iconUuid ?? data.following.iconUuid;
+        data.personaUuid = data.personaUuid ?? data.following?.personaUuid;
+        data.iconUuid = data.iconUuid ?? data.following?.iconUuid;
         return data;
     },
 
