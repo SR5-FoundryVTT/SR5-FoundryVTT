@@ -5,6 +5,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { ResistTestData, ResistTestDataFlow } from './flows/ResistTestDataFlow';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
+import { DataDefaults } from '../data/DataDefaults';
 import DamageType = Shadowrun.DamageType;
 import ModifierTypes = Shadowrun.ModifierTypes;
 
@@ -19,7 +20,9 @@ export type BiofeedbackResistTestData = ResistTestData<ResistTestData> & {
 /**
  * Handle Biofeedback Resist as defined on SR5 pg245
  *
- * Biofeedback is often used after a failed
+ * Biofeedback is often used after a matrix damage resist or when a rigger is jumped in and the vehicle takes damage
+ * - When feeding damage to this test, set the damage to be Matrix if it should be decided by the state of the actor
+ * - if you want specifically stun or physical, pass in the data wit that type
  */
 export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData> {
     // icon of the target
@@ -36,6 +39,9 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
         return data;
     }
 
+    /**
+     * Get the damage type for biofeedback based on if the target is using hotsim or coldsim
+     */
     _getBiofeedbackDamageType(): DamageType {
         const actor = this.actor ?? this.persona ?? this.device?.actorOwner ?? this.device?.actor;
         if (!actor) return 'stun'
@@ -50,12 +56,10 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
     }
 
     override get _chatMessageTemplate(): string {
-        // TODO this may need to change based on source?
         return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
     }
 
     override get _dialogTemplate(): string {
-        // TODO this may need to change based on source?
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/biofeedback-resist-test-dialog.hbs';
     }
 
@@ -66,6 +70,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
         return 'SR5.TestResults.ResistedSomeDamage';
     }
 
+    // SR5 pg 229, resisted with willpower + firewall
     static override _getDefaultTestAction(): Partial<Shadowrun.MinimalActionData> {
         return {
             'attribute': 'willpower',
@@ -78,8 +83,8 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
         return ['resist', 'resist_biofeedback']
     }
 
+    // override to remove wounds and global modifiers
     override get testModifiers(): ModifierTypes[] {
-        // override to remove wounds and global modifiers
         return [];
     }
 
@@ -123,10 +128,22 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
             return;
         }
 
-        // get most of our resist data from the ResistTestDataFlow test data
-        const data = ResistTestDataFlow._getResistTestData(opposedData, 'SR5.Tests.BiofeedbackResistTest', previousMessageId);
+        // get the amount of damage taken after the roll, and divide that by 2 for the amount of bio feedback we will take
+        const newData = foundry.utils.duplicate(opposedData);
+        const resistTotal = Math.ceil(newData.modifiedDamage.value/2);
+        newData.modifiedDamage = DataDefaults.damageData({
+            base: resistTotal,
+            value: resistTotal,
+            type: {
+                value: 'matrix',
+                base: 'matrix'
+            }
+        });
 
-        const action = await ResistTestDataFlow._getResistAgainActionData(this, opposedData, 'BiofeedbackResistTest');
+        // get most of our resist data from the ResistTestDataFlow test data
+        const data = ResistTestDataFlow._getResistTestData(newData, 'SR5.Tests.BiofeedbackResistTest', previousMessageId);
+
+        const action = await ResistTestDataFlow._getResistAgainActionData(this, newData, 'BiofeedbackResistTest');
 
         return this._prepareActionTestData(action, document, data) as BiofeedbackResistTestData;
     }

@@ -11,6 +11,7 @@ import { MatrixResistTestData } from './MatrixResistTest';
 import { ResistTestData, ResistTestDataFlow } from './flows/ResistTestDataFlow';
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
+import { BiofeedbackResistTest } from './BiofeedbackResistTest';
 
 export interface PhysicalResistTestData extends ResistTestData<PhysicalDefenseTestData> {
     // Determine if an actor should be knockedDown after a defense.
@@ -74,6 +75,30 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     override get testModifiers(): ModifierTypes[] {
         return ['soak'];
     }
+
+    override get _resistTestClass(): any {
+        // TODO implement a way to detect if the target is a vehicle that is jumped into
+        const isJumpedIn = false;
+        if (isJumpedIn && this.data.modifiedDamage.value > 0) {
+            return BiofeedbackResistTest;
+        }
+        return super._resistTestClass;
+    }
+
+    override async afterTestComplete(): Promise<void> {
+        await super.afterTestComplete();
+
+        const testCls = this._resistTestClass;
+        if (testCls) {
+            // create a resist class for biofeedback
+            if (this.data && this.data.messageUuid) {
+                const data = await testCls._getResistActionTestData(this.data, this.actor, this.data.messageUuid)
+                const test = new testCls(data, {actor: this.actor}, this.data.options);
+                await test.execute();
+            }
+        }
+    }
+
 
     override applyPoolModifiers() {
         super.applyPoolModifiers();
@@ -186,7 +211,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
             return;
         }
         // get most of our resist data from the ResistTestDataFlow test data
-        const data = ResistTestDataFlow._getResistTestData(opposedData, 'SR5.Tests.MatrixResistTest', previousMessageId);
+        const data = ResistTestDataFlow._getResistTestData(opposedData, 'SR5.Tests.PhysicalResistTest', previousMessageId);
         const action = await ResistTestDataFlow._getResistActionData(this, opposedData, 'PhysicalResistTest');
         return this._prepareActionTestData(action, document, data) as MatrixResistTestData;
     }
