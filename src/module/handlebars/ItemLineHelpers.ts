@@ -972,4 +972,14 @@ export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('EmptyIcons', () => {
         return [{}];
     })
+
+    /**
+     * Spirit Power Tabs on the spirit actor need a way to differentiate between different sections based on the
+     * spirit power values.
+     * 
+     * The resulting value will be used for ItemHeader handlebar part itemData to determine the correct section for +Add actions.
+     */
+    Handlebars.registerHelper('SpiritPowerItemData', (optional: string) => {
+        return {optional};
+    });
 };

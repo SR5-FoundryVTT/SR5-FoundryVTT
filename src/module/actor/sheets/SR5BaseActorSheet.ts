@@ -637,7 +637,13 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._inventoryOpenClose[type] = isOpen
     }
 
-    async _onItemCreate(event) {
+    /**
+     * Create a new item based on the Item Header creation action and the item type of that header.
+     * 
+     * @param event 
+     * @param data Optional additional data to be injected into the create item data.
+     */
+    async _onItemCreate(event, data = {}) {
         event.preventDefault();
         const type = event.currentTarget.closest('.list-header').dataset.itemId;
 
@@ -648,6 +654,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type: type,
+            ...data
         };
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
         if (!items) return;
