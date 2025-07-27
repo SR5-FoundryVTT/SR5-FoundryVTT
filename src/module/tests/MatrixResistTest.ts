@@ -41,6 +41,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             data = MatrixTestDataFlow._prepareDataResist(data);
         }
         data = ResistTestDataFlow._prepareData(data);
+        data.biofeedback = true;
 
         return data;
     }

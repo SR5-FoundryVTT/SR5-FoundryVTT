@@ -275,6 +275,18 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.getData().description?.source ?? '';
     }
 
+    isDamaged(): boolean {
+        const monitor = this.getConditionMonitor();
+        // if the monitor max isn't greater than 0, assume it isn't damaged
+        return monitor.max > 0 && monitor.value > 0;
+    }
+
+    isBroken(): boolean {
+        const monitor = this.getConditionMonitor();
+        // if the monitor max isn't greater than 0, assume it isn't broken
+        return monitor.max > 0 && monitor.value >= monitor.max;
+    }
+
     getConditionMonitor(): ConditionData {
         return this.getData().technology?.condition_monitor ?? { value: 0, max: 0, label: '' };
     }

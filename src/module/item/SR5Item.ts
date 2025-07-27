@@ -489,6 +489,10 @@ export class SR5Item extends Item {
         return ammo.current.value;
     }
 
+    get isBroken(): boolean {
+        return this.wrapper.isBroken();
+    }
+
     /**
      * Use the weapons ammunition with the amount of bullets fired.
      * @param fired Amount of bullets fired.

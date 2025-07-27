@@ -1103,6 +1103,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         // @ts-expect-error bad typing
         sheetItem.properties = chatData.properties;
 
+        sheetItem.isBroken = item.isBroken;
+
         return sheetItem as unknown as Shadowrun.SheetItemData;
     }
 
