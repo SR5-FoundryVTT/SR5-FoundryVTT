@@ -135,13 +135,14 @@ export const ItemRollDataFlow = {
      * @returns 
      */
     matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: Shadowrun.ActionRollData, testData?: any, againstData?: any) {
-        if (testData?.type === 'MatrixResistTest' || testData?.action?.test === 'MatrixResistTest') return;
         const actor = item.actorOwner;
 
         // CASE - Matrix Device is slaved inside a PAN or WAN
         // => Weapon slaved to owned commlink
         // => Camera slaved to host
         if (item.isMatrixDevice && item.isSlave) {
+            // don't inject master device data for resist tests
+            if (testData?.action?.test === 'MatrixResistTest') return;
             const master = item.master;
             if (!master) {
                 ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});

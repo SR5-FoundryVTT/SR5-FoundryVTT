@@ -18,6 +18,8 @@ export const MatrixTestDataFlow = {
 
     addMatrixModifiers: function(test: SuccessTest) {
         if (test.source instanceof SR5Item) return;
+        // do not add matrix modifier for resist tests
+        if (test.data.action.test === 'MatrixResistTest') return;
 
         MatrixTestDataFlow.removeMatrixModifiers(test);
 

@@ -134,8 +134,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
 
         // Prepare testing data.
         const data: MatrixResistTestData = {
-            title: opposedData.against.opposed.resist.test || undefined,
-            type: 'MatrixResistTest', // TODO figure out a way to not require this to have the tests work
+            title: 'SR5.Tests.MatrixResistTest',
 
             previousMessageId,
 
@@ -151,7 +150,13 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             iconUuid: opposedData.iconUuid,
             personaUuid: opposedData.personaUuid,
 
-            sourceItemUuid: opposedData.against.sourceItemUuid,
+            targetUuids: opposedData.targetUuids,
+            targetActorsUuid: opposedData.targetActorsUuid,
+
+            sourceUuid: opposedData.sourceUuid,
+            sourceActorUuid: opposedData.sourceActorUuid,
+            sourceItemUuid: opposedData.sourceItemUuid,
+
             following: opposedData,
         }
 
@@ -175,6 +180,9 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
                 action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
             }
         }
+
+        // set the test to be a MatrixResistTest to make sure it doesn't get affected by athe matrixTestRollDataFlow
+        action.test = 'MatrixResistTest';
 
         return this._prepareActionTestData(action, document, data) as MatrixResistTestData;
     }
