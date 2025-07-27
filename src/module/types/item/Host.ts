@@ -1,6 +1,5 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { MatrixAttributes } from "../template/Matrix";
-import { AnyMutableObject } from "fvtt-types/utils";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField, DocumentUUIDField } = foundry.data.fields;
 
 export const SourceEntityField = () => ({
@@ -11,7 +10,7 @@ export const SourceEntityField = () => ({
     data: new ObjectField({ required: false }),
 });
 
-const HostData = {
+const HostData = () => ({
     ...BaseItemData(),
 
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
@@ -22,12 +21,12 @@ const HostData = {
     category: new StringField({ required: true, initial: 'host', readonly: true }),
     atts: new SchemaField(MatrixAttributes(true)),
     networkDevices: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),
-}
+});
 
-export class Host extends ItemBase<typeof HostData> {
+export class Host extends ItemBase<ReturnType<typeof HostData>> {
     static override defineSchema() {
-        return HostData;
+        return HostData();
     }
 }
 
-console.log("HostData", HostData, new Host());
+console.log("HostData", HostData(), new Host());

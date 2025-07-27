@@ -8,17 +8,17 @@ export const LicenseData = () => ({
     description: new HTMLField(),
 });
 
-const SinData = {
+const SinData = () => ({
     ...BaseItemData(),
     technology: new SchemaField(TechnologyData()),
 
     licenses: new ArrayField(new SchemaField(LicenseData())),
-}
+});
 
-export class Sin extends ItemBase<typeof SinData> {
+export class Sin extends ItemBase<ReturnType<typeof SinData>> {
     static override defineSchema() {
-        return SinData;
+        return SinData();
     }
 }
 
-console.log("SinData", SinData, new Sin());
+console.log("SinData", SinData(), new Sin());

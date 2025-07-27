@@ -21,7 +21,7 @@ const VehicleStats = () => ({
     seats: new ModifiableField(AttributeField()),
 });
 
-const VehicleData = {
+const VehicleData = () => ({
     // === Common Base ===
     ...CommonData(),
 
@@ -99,14 +99,14 @@ const VehicleData = {
         // Miscellaneous
         "composure", "lift_carry", "judge_intentions", "memory", "global"
     )),
-};
+});
 
-export class Vehicle extends ActorBase<typeof VehicleData> {
+export class Vehicle extends ActorBase<ReturnType<typeof VehicleData>> {
     static override defineSchema() {
-        return VehicleData;
+        return VehicleData();
     }
 }
 
-console.log("VehicleData", VehicleData, new Vehicle());
+console.log("VehicleData", VehicleData(), new Vehicle());
 
 export type VehicleStatsType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof VehicleStats>>;

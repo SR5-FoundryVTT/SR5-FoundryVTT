@@ -2,7 +2,7 @@ import { BaseItemData, ItemBase } from "./ItemBase";
 import { ActionRollData } from "./Action";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
-const ComplexFormData = {
+const ComplexFormData = () => ({
     ...BaseItemData(),
     action: new SchemaField(ActionRollData({test: 'ComplexFormTest', opposedTest: 'OpposedTest', followedTest: 'FadeTest'})),
 
@@ -13,12 +13,12 @@ const ComplexFormData = {
     }),
     duration: new StringField({ required: true }),
     fade: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-};
+});
 
-export class ComplexForm extends ItemBase<typeof ComplexFormData> {
+export class ComplexForm extends ItemBase<ReturnType<typeof ComplexFormData>> {
     static override defineSchema() {
-        return ComplexFormData;
+        return ComplexFormData();
     }
 }
 
-console.log("ComplexFormData", ComplexFormData, new ComplexForm());
+console.log("ComplexFormData", ComplexFormData(), new ComplexForm());
