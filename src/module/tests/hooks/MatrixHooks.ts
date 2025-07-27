@@ -8,9 +8,12 @@ import { SuccessTest } from '../SuccessTest';
 export const MatrixHooks = {
     registerHooks: function () {
         Hooks.on('sr5_testPrepareBaseValues', MatrixHooks.onTestPrepareBaseValues_AddMatrixModifiers.bind(this));
+        // add extra damage to attack_matrix actions
         Hooks.on('sr5_testProcessResults', MatrixHooks.onTestProcessResults_AddMatrixDamageForTargetMarks.bind(this));
+        // add overwatch score for illegal actions
         Hooks.on('sr5_testProcessResults', MatrixHooks.onTestProcessResults_AddOverwatchScore.bind(this));
-        Hooks.on('sr5_afterTestComplete', MatrixHooks.onAfterTestComplete_HandleMatrixDamage.bind(this));
+        // failed matrix attacks deal 1 damage to the attacker (unresisted)
+        Hooks.on('sr5_afterTestComplete', MatrixHooks.onAfterTestComplete_HandleMatrixFailedAttack.bind(this));
     },
 
     /**
@@ -23,9 +26,8 @@ export const MatrixHooks = {
     },
 
     /**
-     * After a test has been prepared fully (including categories), extend it's data with matrix modifiers.
-     *
-     * Hook into prepareBaseValues as it's called both on initial calculation and when updating test values during dialog changes.
+     * Add damage modifiers based on the number of marks on the target device
+     * - this is intended to be called after a test has been resolved, but before the card is created
      */
     onTestProcessResults_AddMatrixDamageForTargetMarks: function(test: SuccessTest) {
         MatrixTestDataFlow.addMatrixDamageForTargetMarks(test);
@@ -40,11 +42,10 @@ export const MatrixHooks = {
     },
 
     /**
-     * After a test has been executed, determine if there's any damage to be applied
-     * - this also handles the automatic 1 damage that you get from ATTACK based actions SR 231
+     * After a test has been executed, determine if  the 1 damage that you get from failing ATTACK based actions SR 231
      * @param test
      */
-    onAfterTestComplete_HandleMatrixDamage: async function(test: SuccessTest) {
+    onAfterTestComplete_HandleMatrixFailedAttack: async function(test: SuccessTest) {
         await MatrixFlow.determineMatrixFailedAttack(test);
     },
 }

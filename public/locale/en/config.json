@@ -677,11 +677,16 @@
             "PlaceOnDevice": "Place on device",
             "PlaceOnMainIcon": "Place on persona/host"
         },
+        "Matrix": {
+            "TargetMainIcon": "Target Main Icon",
+            "TargetDevice": "Target Device"
+        },
         "Message": {
             "ClickToSelect": "Click to select on scene",
             "OverwatchConvergence": "Overwatch Convergence",
             "TargetedIcon": "Targeted Icon",
-            "TestEffects": "Applied effects"
+            "TestEffects": "Applied effects",
+            "FailedAttackAction": "Failed a Matrix Attack Action"
         },
         "Sheet": {
             "AddOne": "Add One",
@@ -1313,7 +1318,9 @@
         "ExtendedTest": "Extended Test",
         "FadeTest": "Fade Test",
         "HackOnTheFlyTest": "Hack on the Fly",
+        "MatrixDefenseTest": "Matrix Defense",
         "MatrixResistTest": "Matrix Damage Resist",
+        "MatrixTest": "Matrix Test",
         "MeleeAttackTest": "Melee Weapon Attack",
         "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
         "NaturalRecoveryStunTest": "Natural Recovery Stun",

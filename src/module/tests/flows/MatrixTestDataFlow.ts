@@ -4,10 +4,12 @@ import { Helpers } from '../../helpers';
 import { SR5Item } from '../../item/SR5Item';
 import { PartsList } from '../../parts/PartsList';
 import { SuccessTest, TestOptions } from '../SuccessTest';
-import { MatrixTest, MatrixTestData, OpposeMatrixTestData } from '../MatrixTest';
+import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from '../MatrixTest';
 import { MatrixRules } from '../../rules/MatrixRules';
 import { MatrixDefenseTest } from '../MatrixDefenseTest';
-import { MatrixResistTest } from '../MatrixResistTest';
+import { MatrixResistTest, MatrixResistTestData } from '../MatrixResistTest';
+import { OpposedBruteForceTest } from '../OpposedBruteForceTest';
+import { OpposedHackOnTheFlyTest } from '../OpposedHackOnTheFlyTest';
 
 /**
  * Apply Matrix Rules to Success Test Data relating to matrix.
@@ -107,6 +109,23 @@ export const MatrixTestDataFlow = {
     },
 
     /**
+     * Prepare data for Resisting matrix damage
+     *
+     * @param data
+     * @param options
+     * @returns
+     */
+    _prepareDataResist(data: MatrixResistTestData): any {
+        // Allow for token targeting to be used to target the main icon.
+        if (!data.iconUuid) data.iconUuid = data.targetUuids.length === 1 ? data.targetUuids[0] : undefined;
+
+        data.personaUuid = data.personaUuid ?? undefined;
+        data.iconUuid = data.iconUuid ?? undefined;
+
+        return data;
+    },
+
+    /**
      * Prepare data for the initial mark placement test.
      *
      * @param data
@@ -134,9 +153,22 @@ export const MatrixTestDataFlow = {
      * @param data
      * @returns
      */
-    _prepareOpposedData(data: OpposeMatrixTestData): any {
+    _prepareOpposedData(data: OpposedMatrixTestData): any {
         data.personaUuid = data.personaUuid ?? data.against.personaUuid;
         data.iconUuid = data.iconUuid ?? data.against.iconUuid;
+        data.targetMainIcon = data.targetMainIcon ?? data.against.targetMainIcon;
+        data.directConnection = data.directConnection ?? data.against.directConnection;
+        return data;
+    },
+
+    /**
+     * Prepare data for matrix resist data from following test data
+     * @param data
+     * @returns
+     */
+    _prepareFollowingData(data: MatrixResistTestData): any {
+        data.personaUuid = data.personaUuid ?? data.following.personaUuid;
+        data.iconUuid = data.iconUuid ?? data.following.iconUuid;
         return data;
     },
 
@@ -258,17 +290,18 @@ export const MatrixTestDataFlow = {
      * Devices might be related to a persona, in which case a persona will be present.
      * @param test The test to populate with documents.
      */
-    async populateOpposedDocuments(test: MatrixDefenseTest) {
-        if (test.against.data.iconUuid) {
+    async populateOpposedDocuments(test: MatrixDefenseTest | OpposedBruteForceTest | OpposedHackOnTheFlyTest) {
+        if (test.against?.data.iconUuid) {
             test.icon = await fromUuid(test.against.data.iconUuid) as SR5Item;
         }
-        if (test.against.data.personaUuid) {
+        if (test.against?.data.personaUuid) {
             test.persona = await fromUuid(test.against.data.personaUuid) as SR5Actor;
         }
         if (test.icon instanceof SR5Item) {
             test.device = test.icon;
         }
     },
+
     /**
      * Prepare Icon and Persona for this test based on data.
      *

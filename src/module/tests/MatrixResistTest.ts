@@ -2,15 +2,20 @@ import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
 import { Translation } from '../utils/strings';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
-import { MatrixTestData } from './MatrixTest';
-import { SuccessTest, TestOptions } from './SuccessTest';
+import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { TestCreator } from './TestCreator';
 import { MatrixDefenseTestData } from './MatrixDefenseTest';
 import DamageData = Shadowrun.DamageData;
 
-export type MatrixResistTestData = MatrixTestData & {
+// matrix resist data is a mix of a whole bunch of other data
+// maybe we make a "Resist" base Test class?
+export type MatrixResistTestData = SuccessTestData & {
+    // The persona uuid. This would be the user main persona icon, not necessarily the device.
+    personaUuid: string | undefined
+    // The icon uuid. This would be the actual mark placement target. Can be a device, a persona device, a host or actor.
+    iconUuid: string | undefined
     // Damage value of the attack
     incomingDamage: DamageData
     // Modified damage value of the attack after this defense (success or failure)
@@ -35,14 +40,16 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
 
     override _prepareData(data: MatrixResistTestData, options: any): any {
         data = super._prepareData(data, options);
-        data = MatrixTestDataFlow._prepareData(data);
 
         // Is this test part of a followup test chain? defense => resist
         if (data.following) {
+            data = MatrixTestDataFlow._prepareFollowingData(data);
             data.incomingDamage = foundry.utils.duplicate(data.following.modifiedDamage || DataDefaults.damageData({type: {base: 'matrix', value: 'matrix'}}));
             data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
         // This test is part of either a standalone resist or created with its own data (i.e. edge reroll).
         } else {
+            // prepare the data as opposed data since we hold data similar to an opposed matrix action
+            data = MatrixTestDataFlow._prepareDataResist(data);
             data.incomingDamage = data.incomingDamage ?? DataDefaults.damageData();
             data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
         }
@@ -105,11 +112,6 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
         Helpers.calcTotal(this.data.modifiedDamage);
     }
 
-    override async populateDocuments() {
-        await super.populateDocuments();
-        await MatrixTestDataFlow.populateResistDocuments(this);
-    }
-
     /**
      * Prepare any OpposedTest from given test data. This test data should origin from a original success test, that is to be opposed.
      *
@@ -130,12 +132,10 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             return;
         }
 
-        console.log('getResistActionTestData', opposedData, document, previousMessageId);
-
         // Prepare testing data.
         const data: MatrixResistTestData = {
-            // While not visible, when there is a description set, use it.
             title: opposedData.against.opposed.resist.test || undefined,
+            type: 'MatrixResistTest', // TODO figure out a way to not require this to have the tests work
 
             previousMessageId,
 
@@ -152,7 +152,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             personaUuid: opposedData.personaUuid,
 
             sourceItemUuid: opposedData.against.sourceItemUuid,
-            against: opposedData.against
+            following: opposedData,
         }
 
         // The original action doesn't contain a complete set of ActionData.
@@ -168,15 +168,20 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
         );
 
         // Allow the OpposedTest to overwrite action data dynamically based on item data.
-        if (opposedData.against.sourceItemUuid) {
-            const item = await fromUuid(opposedData.against.sourceItemUuid) as SR5Item;
+        if (opposedData.sourceItemUuid) {
+            const item = await fromUuid(opposedData.sourceItemUuid) as SR5Item;
             if (item) {
                 const itemAction = await this._getDocumentTestAction(item, document);
                 action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
             }
         }
 
-        return this._prepareActionTestData(action, document, data, opposedData) as MatrixResistTestData;
+        return this._prepareActionTestData(action, document, data) as MatrixResistTestData;
+    }
+
+    override async populateDocuments() {
+        await super.populateDocuments();
+        await MatrixTestDataFlow.populateResistDocuments(this);
     }
 
     /**

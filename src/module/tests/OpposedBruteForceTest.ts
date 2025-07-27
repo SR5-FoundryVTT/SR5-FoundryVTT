@@ -4,15 +4,17 @@ import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
 import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
-import { OpposedTest } from "./OpposedTest";
+import { OpposedTest } from './OpposedTest';
 import { TestOptions } from './SuccessTest';
 import { TestCreator } from './TestCreator';
-import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlow';
+import { MatrixPlacementData } from './flows/MarkPlacementFlow';
+import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
+import { OpposedMatrixTestData } from './MatrixTest';
 
 /**
  * Implement the opposing test for Brute Force action. See SR5#238 'Brute Force'
  */
-export class OpposedBruteForceTest extends OpposedTest {
+export class OpposedBruteForceTest extends OpposedTest<OpposedMatrixTestData> {
     override against: BruteForceTest;
     // The target icon to place a mark on.
     icon: Shadowrun.NetworkDevice;
@@ -23,7 +25,7 @@ export class OpposedBruteForceTest extends OpposedTest {
 
     override _prepareData(data: any, options?: any) {
         data = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareOpposedData(data);
+        return MatrixTestDataFlow._prepareOpposedData(data);
     }
 
     override get _dialogTemplate() {
@@ -43,7 +45,7 @@ export class OpposedBruteForceTest extends OpposedTest {
     }
 
     override async populateDocuments() {
-        MarkPlacementFlow.populateOpposedDocuments(this);
+        await MatrixTestDataFlow.populateOpposedDocuments(this);
     }
     
     /**
@@ -81,6 +83,6 @@ export class OpposedBruteForceTest extends OpposedTest {
     }
 
     static override async executeMessageAction(againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
-        await MarkPlacementFlow.executeMessageAction(this, againstData, messageId, options);
+        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }

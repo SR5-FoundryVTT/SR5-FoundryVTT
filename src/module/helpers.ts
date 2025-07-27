@@ -18,7 +18,7 @@ import { SR5Item } from './item/SR5Item';
 import { PartsList } from './parts/PartsList';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
-import { MatrixTestData, OpposeMatrixTestData } from './tests/MatrixTest';
+import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
 
 interface CalcTotalOptions {
     // Min/Max value range
@@ -501,7 +501,7 @@ export class Helpers {
         return actors;
     }
 
-    static async getMatrixTestTargetDocuments(testData: MatrixTestData | OpposeMatrixTestData): Promise<Shadowrun.TestTargetDocument[]> {
+    static async getMatrixTestTargetDocuments(testData: MatrixTestData | OpposedMatrixTestData): Promise<Shadowrun.TestTargetDocument[]> {
         const documents = await this.getTestTargetDocuments(testData);
 
         if (testData.iconUuid) {

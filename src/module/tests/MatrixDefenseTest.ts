@@ -3,7 +3,7 @@ import { CombatRules } from '../rules/CombatRules';
 import { DefenseTest, DefenseTestData } from './DefenseTest';
 import { Translation } from '../utils/strings';
 import { MatrixRules } from '../rules/MatrixRules';
-import { MatrixTest, MatrixTestData, OpposeMatrixTestData } from './MatrixTest';
+import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from './MatrixTest';
 import { SR5Item } from '../item/SR5Item';
 import { SR5Actor } from '../actor/SR5Actor';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
@@ -13,7 +13,7 @@ import { TestCreator } from './TestCreator';
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 
-export type MatrixDefenseTestData = OpposeMatrixTestData & DefenseTestData;
+export type MatrixDefenseTestData = OpposedMatrixTestData & DefenseTestData;
 
 export type MatrixDefenseNoDamageCondition = {
     test: () => boolean,

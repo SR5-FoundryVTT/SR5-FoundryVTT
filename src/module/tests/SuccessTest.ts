@@ -383,7 +383,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return {};
     }
 
-    static _prepareActionTestData(action: ActionRollData, document: SR5Actor|SR5Item, data: any, againstData: any) {
+    static _prepareActionTestData(action: ActionRollData, document: SR5Actor|SR5Item, data: any, againstData?: any) {
         return TestCreator._prepareTestDataWithAction(action, document, data, againstData);
     }
 

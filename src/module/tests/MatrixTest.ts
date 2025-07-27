@@ -4,7 +4,6 @@ import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { OpposedTestData } from './OpposedTest';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 
-
 export interface MatrixTestData extends SuccessTestData {
     // If decker and target reside on different Grids
     sameGrid: boolean
@@ -18,10 +17,12 @@ export interface MatrixTestData extends SuccessTestData {
     targetMainIcon: boolean
 }
 
-export interface OpposeMatrixTestData extends OpposedTestData {
+export interface OpposedMatrixTestData extends OpposedTestData {
     against: MatrixTestData
     personaUuid: string
     iconUuid: string
+    targetMainIcon: boolean
+    directConnection: boolean
 }
 
 /**
@@ -30,7 +31,7 @@ export interface OpposeMatrixTestData extends OpposedTestData {
  *
  * See MarkPlacementFlow for more details on the test flow.
  */
-export class MatrixTest extends SuccessTest<MatrixTestData> {
+export class MatrixTest<T extends MatrixTestData = MatrixTestData> extends SuccessTest<T> {
     override actor: SR5Actor;
 
     // The icon targeted by the action.
@@ -88,7 +89,6 @@ export class MatrixTest extends SuccessTest<MatrixTestData> {
 
     override prepareTestModifiers() {
         super.prepareTestModifiers();
-
         MatrixTestDataFlow.prepareTestModifiers(this);
     }
 

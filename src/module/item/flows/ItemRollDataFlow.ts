@@ -135,6 +135,7 @@ export const ItemRollDataFlow = {
      * @returns 
      */
     matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: Shadowrun.ActionRollData, testData?: any, againstData?: any) {
+        if (testData?.type === 'MatrixResistTest' || testData?.action?.test === 'MatrixResistTest') return;
         const actor = item.actorOwner;
 
         // CASE - Matrix Device is slaved inside a PAN or WAN
@@ -147,7 +148,7 @@ export const ItemRollDataFlow = {
                 return rollData;
             }
             
-            const directConnection = againstData?.directConnection ?? false;;
+            const directConnection = againstData?.directConnection ?? false;
             ItemRollDataFlow.injectMasterRatingsForPAN(master, actor, rollData, directConnection)
         }
 
