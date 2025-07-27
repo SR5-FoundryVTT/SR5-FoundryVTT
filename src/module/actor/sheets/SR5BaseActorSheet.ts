@@ -375,9 +375,6 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
-
-        // Linked documents on sheets.
-        html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet);
     }
 
     /**
