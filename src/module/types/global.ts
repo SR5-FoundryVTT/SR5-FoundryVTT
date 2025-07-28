@@ -235,7 +235,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.TokenRulerColorRunning": foundry.data.fields.ColorField<{ initial: '0000FF' }>;
         "shadowrun5e.TokenRulerColorSprinting": foundry.data.fields.ColorField<{ initial: 'FF0000' }>;
         "shadowrun5e.TokenRulerOpacity": foundry.data.fields.NumberField<{ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 }>;
-        "shadowrun5e.CompendiaSettingsMenu": SR5CompendiaSettings;
+        "shadowrun5e.CompendiaSettingsMenu": typeof SR5CompendiaSettings;
         "shadowrun5e.GeneralActionsPack": string;
         "shadowrun5e.MatrixActionsPack": string;
     }
