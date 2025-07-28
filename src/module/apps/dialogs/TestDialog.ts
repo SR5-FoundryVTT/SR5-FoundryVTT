@@ -53,9 +53,6 @@ export class TestDialog extends FormDialog {
     override activateListeners(html: JQuery) {
         super.activateListeners(html);
 
-        // Handle in-dialog entity links to render the respective sheets.
-        html.find('.entity-link').on('click', Helpers.renderEntityLinkSheet)
-
         this._injectExternalActiveListeners(html);
     }
 

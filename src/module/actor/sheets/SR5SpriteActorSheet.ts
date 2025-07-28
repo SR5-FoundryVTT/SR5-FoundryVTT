@@ -46,9 +46,13 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
 
         const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
 
-        await this._addTechnomancerOnDrop(dropData);
+        // Handle technomancer drops, ignore other actor drops as sprites can't handle them.
+        if (dropData.type === 'Actor') {
+            await this._addTechnomancerOnDrop(dropData);
+            return [];
+        }
 
-        return await super._onDrop(event);
+        return super._onDrop(event);
     }
 
     /**

@@ -2,7 +2,7 @@
 {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Summoner") }}
 <div>
     {{#if summoner}}
-    <a class="entity-link content-link" draggable="true" data-type="Actor" data-id="{{summoner.id}}" data-uuid="{{summoner.uuid}}">
+    <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{summoner.id}}" data-uuid="{{summoner.uuid}}">
         <i class="fas fa-user"></i>{{summoner.name}}
         <a class="close summoner-remove"><i class="fas fa-times"></i></a>
     </a>
