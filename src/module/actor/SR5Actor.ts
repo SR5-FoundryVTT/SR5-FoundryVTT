@@ -48,6 +48,7 @@ import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
+import { RollDataOptions } from '../item/Types';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -489,10 +490,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param persona The persona to check visibility for.
      */
     matrixPersonaIsVisible(persona: SR5Actor) {
-        const matrixData = this.matrixData;
+        const matrixData = this.matrixData();
         if (!matrixData) return false;
 
-        const targetMatrixData = persona.matrixData;
+        const targetMatrixData = persona.matrixData();
         if (!targetMatrixData) return false;
 
         // Assume each actor only has the one token.
@@ -718,7 +719,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Determine if this actors matrix icon is running silent.
      */
     get isRunningSilent(): boolean {
-        const matrixData = this.matrixData;
+        const matrixData = this.matrixData();
         if (!matrixData) return false;
         return matrixData.running_silent;
     }
@@ -1718,9 +1719,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return combatant?.initiative ?? 0;
     }
 
-    getVehicleStats(): VehicleStatsType | undefined {
-        if (this.isType('vehicle')) return this.system.vehicle_stats;
-        return undefined;
+    getVehicleStats(this: SR5Actor) {
+        return this.system.vehicle_stats;
     }
 
     /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
@@ -1771,7 +1771,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Is this actor currently using the VR matrix mode?
      */
     get isUsingVR(): boolean {
-        const matrixData = this.matrixData;
+        const matrixData = this.matrixData();
         if (!matrixData) return false;
         return matrixData.vr;
     }
@@ -1783,7 +1783,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     get isUsingHotSim(): boolean {
         if (!this.isUsingVR) return false;
-        const matrixData = this.matrixData;
+        const matrixData = this.matrixData();
         if (!matrixData) return false;
         return matrixData.hot_sim;
     }
@@ -1792,7 +1792,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Is this actors persona currently being link locked?
      */
     get isLinkLocked(): boolean {
-        const matrixData = this.matrixData;
+        const matrixData = this.matrixData();
         if (!matrixData) return false;
         return matrixData.link_locked;
     }
@@ -1853,7 +1853,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Check if the current actor has matrix capabilities.
      */
-    get isMatrixActor(): boolean {
+    get isMatrixActor() {
         return 'matrix' in this.system;
     }
 
@@ -1895,11 +1895,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Retrieve all matrix devices of this actor that are equipped and set to wireless.
      */
-    get wirelessDevices(): SR5Item[] {
+    get wirelessDevices() {
         return this.items.filter(item => item.isMatrixDevice && item.isEquipped() && item.isWireless());
     }
 
-    get matrixData() {
+    matrixData(this: SR5Actor) {
         return this.system.matrix;
     }
 
@@ -1912,7 +1912,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Additional options that may be needed
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: Shadowrun.NetworkDevice | undefined, marks: number, options: SetMarksOptions = {}) {
+    async setMarks(target: SR5Actor | SR5Item | undefined, marks: number, options: SetMarksOptions = {}) {
         await ActorMarksFlow.setMarks(this, target, marks, options);
     }
 
@@ -1955,7 +1955,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @returns
      */
     get marksData() {
-        return this.matrixData?.marks;
+        return this.matrixData()?.marks;
     }
 
     /**
@@ -1980,7 +1980,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns The document to retrieve all marks this actor has access to.
      */
-    async _getDocumentWithMarks(): Promise<Shadowrun.NetworkDevice | undefined> {
+    async _getDocumentWithMarks(): Promise<SR5Actor | SR5Item | undefined | null> {
         // CASE - IC marks are stored on their host item.
         if (this.isType('ic')) {
             return this.network;
@@ -2162,7 +2162,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @param options System specific options influencing roll data.
      */
-    override getRollData(options: RollDataOptions = {}): any {
+    override getRollData(options: RollDataOptions = {}) {
         // Avoid changing actor system data as Foundry just returns it.
         const rollData = foundry.utils.duplicate(super.getRollData());
         return ActorRollDataFlow.getRollData(this, rollData, options);

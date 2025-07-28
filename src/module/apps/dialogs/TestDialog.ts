@@ -120,8 +120,8 @@ export class TestDialog extends FormDialog {
      * Callback for after the dialog has closed.
      * @param html
      */
-    override onAfterClose(html: JQuery<HTMLElement>): SuccessTestData {
-        return this.data.test.data;
+    override async onAfterClose(html: JQuery<HTMLElement>, buttonSelected?: string): Promise<SuccessTestData> {
+        return Promise.resolve(this.data.test.data);
     }
 
     /**

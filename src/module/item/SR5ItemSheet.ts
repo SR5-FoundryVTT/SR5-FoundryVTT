@@ -8,6 +8,9 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import { AmmunitionType, RangeType } from '../types/item/Weapon';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { MatrixRules } from '../rules/MatrixRules';
+import { SINFlow } from './flows/SINFlow';
 
 /**
  * FoundryVTT ItemSheetData typing
@@ -60,8 +63,8 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Host Item.
     markedDocuments: Shadowrun.MarkedDocument[]
-    networkDevices: (SR5Item | SR5Actor)[]
-    networkController: SR5Item | undefined
+    slaves: (SR5Item | SR5Actor)[]
+    master: SR5Item | null
 
     // Contact Item
     linkedActor: SR5Actor | undefined
@@ -224,15 +227,21 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         data['itemEffects'] = prepareSortedItemEffects(this.object);
 
         if (this.item.isType('host')) {
-            data['markedDocuments'] = this.item.getAllMarkedDocuments();
+            data['markedDocuments'] = await this.item.getAllMarkedDocuments();
         }
 
-        if (this.item.canBeNetworkController) {
-            data['networkDevices'] = await this.item.networkDevices();
+        if (this.item.isType('sin')) {
+            data['networks'] = await SINFlow.getNetworks(this.item);
         }
 
-        if (this.item.canBeNetworkDevice) {
-            data['networkController'] = await this.item.networkController();
+        if (this.item.canBeMaster) {
+            data.slaves = this.item.slaves;
+            // Prepare PAN counter (1/3) for simple use in handlebar
+            data['pan_counter'] = `(${data.slaves.length}/${MatrixRules.maxPANSlaves(this.item.getRating())})`;
+        }
+
+        if (this.item.canBeSlave) {
+            data['master'] = this.item.master;
         }
 
         if (this.item.isType('contact')) {
@@ -369,9 +378,10 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
          */
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
+        html.find('.sin-remove-network').on('click', this._onRemoveNetwork.bind(this));
 
-        html.find('.network-clear').on('click', this._onRemoveAllNetworkDevices.bind(this));
-        html.find('.network-device-remove').on('click', this._onRemoveNetworkDevice.bind(this));
+        html.find('.network-clear').on('click', this._onRemoveAllSlaves.bind(this));
+        html.find('.network-device-remove').on('click', this._onRemoveSlave.bind(this));
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
@@ -513,42 +523,38 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
             return this.item.createNestedItem(item._source);
         }
 
-        // Add items to hosts WAN.
-        if (this.item.isType('host') && data.type === 'Actor') {
-            const actor = await fromUuid(data.uuid);
-            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-            return this.item.addIC(actor.id, data.pack);
+        // Add actors to WAN, both GRID and HOST
+        if (this.item.isNetwork() && ['Item', 'Actor'].includes(data.type)) {
+            const document = await fromUuid(data.uuid) as SR5Actor;
+            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
+            await this.object.addSlave(document);
+            return;
         }
 
-        // Add items to a network (PAN/WAN).
-        if (this.item.canBeNetworkController && data.type === 'Item') {
-            const item = await fromUuid(data.uuid) as SR5Item;
-
-            if (!item?.id) return console.error('Shadowrun 5e | Item could not be retrieved from DropData', data);
-
-            return this.item.addNetworkDevice(item);
+        // Add document to a PAN.
+        if (this.item.isType('device') && ['Item', 'Actor'].includes(data.type)) {
+            const document = await fromUuid(data.uuid) as SR5Item | SR5Actor;
+            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
+            await this.object.addSlave(document);
+            return;
         }
 
-        // Add vehicles to a network (PAN/WAN).
-        if (this.item.canBeNetworkController && data.type === 'Actor') {
-            const actor = await fromUuid(data.uuid) as SR5Actor;
-
-            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-
-            if (!actor.isType('vehicle')) {
-                return ui.notifications?.error(game.i18n.localize('SR5.Errors.CanOnlyAddTechnologyItemsToANetwork'));
-            }
-
-            return this.item.addNetworkDevice(actor);
-        }
-
-        // link actors in existing contacts
+        // Link actors to existing contacts.
         if (this.item.isType('contact') && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid) as SR5Actor;
 
             if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
-            return this.updateLinkedActor(actor);
+            return await this.updateLinkedActor(actor);
+        }
+
+        // Add networks to SINs.
+        if (this.item.isType('sin') && data.type === 'Item') {
+            const item = await fromUuid(data.uuid) as SR5Item;
+            if (!item) return;
+            if (!item.isNetwork()) return;
+
+            await this.item.addNewNetwork(item);
         }
     }
 
@@ -652,6 +658,20 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         if (index >= 0) await this.item.removeLicense(index);
     }
 
+    /**
+     * User wants to remove a network from a SIN item.
+     */
+    async _onRemoveNetwork(event) {
+        event.preventDefault();
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
+
+        await SINFlow.removeNetwork(this.item, uuid);
+    }
+
     async _onWeaponModRemove(event) {
         await this._onOwnedItemRemove(event);
     }
@@ -728,24 +748,26 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         await this.item.deleteOwnedItem(this._eventId(event));
     }
 
-    async _onRemoveAllNetworkDevices(event) {
+    async _onRemoveAllSlaves(event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.item.removeAllNetworkDevices();
+        await this.item.removeAllSlaves();
     }
 
-    async _onRemoveNetworkDevice(event) {
+    async _onRemoveSlave(event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const networkDeviceIndex = Helpers.parseInputToNumber(event.currentTarget.closest('.list-item').dataset.listItemIndex);
+        const uuid = Helpers.listItemUuid(event);
+        const document = await fromUuid(uuid) as SR5Actor | SR5Item;
+        if (!document) return;
 
-        await this.item.removeNetworkDevice(networkDeviceIndex);
+        await this.item.removeSlave(document);
     }
 
     /**
@@ -881,13 +903,11 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedIdDocuments) return;
-        const { scene, target, item } = markedIdDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
+        if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
-        await this.item.setMarks(target, marks, { scene, item, overwrite: true });
+        await this.item.setMarks(markedDocument, marks, { overwrite: true });
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -898,12 +918,10 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedIdDocuments) return;
-        const { scene, target, item } = markedIdDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
+        if (!markedDocument) return;
 
-        await this.item.setMarks(target, by, { scene, item });
+        await this.item.setMarks(markedDocument, by);
     }
 
     async _onMarksDelete(event) {

@@ -49,7 +49,7 @@ module.exports = {
         "@typescript-eslint/ban-ts-comment": "warn",
         "@typescript-eslint/no-unused-vars": "warn",
         "prefer-const": "warn",
-        "@typescript-eslint/no-confusing-void-expression": "warn",
+        "@typescript-eslint/no-confusing-void-expression": "off",
         "@typescript-eslint/no-misused-promises": "warn",
         "@typescript-eslint/prefer-optional-chain": "warn",
         "@typescript-eslint/no-floating-promises": "warn",

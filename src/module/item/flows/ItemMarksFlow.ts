@@ -1,3 +1,4 @@
+import { SR5Actor } from "@/module/actor/SR5Actor";
 import { MarksStorage, SetMarksOptions } from "../../storage/MarksStorage";
 import { SR5Item } from "../SR5Item";
 
@@ -13,13 +14,12 @@ export const ItemMarksFlow = {
      * @param device The matrix device that could've placed marks.
      */
     async clearMarks(device: SR5Item) {
-        if (!device.isHost) return;
+        if (!device.isType('host')) return;
 
-        const host = device.asHost;
-
+        const host = device.asType('host');
         if (!host) return;
 
-        await device.update({ 'system.marks': [] });
+        await device.update({ system: { marks: [] } });
     },
 
     /**
@@ -29,10 +29,10 @@ export const ItemMarksFlow = {
      * @param uuid The icon to remove mark for.
      */
     async clearMark(device: SR5Item, uuid: string) {
-        if (!device.isHost) return;
+        if (!device.isType('host')) return;
 
         const marks = device.system.marks?.filter(mark => mark.uuid !== uuid) ?? [];
-        await device.update({ 'system.marks': marks });
+        await device.update({ system: { marks } });
     },
 
     /**
@@ -44,8 +44,8 @@ export const ItemMarksFlow = {
      * @param options Additional options that may be needed.
      *
      */
-    async setMarks(host: SR5Item, target: Shadowrun.NetworkDevice | undefined, marks: number, options: SetMarksOptions = {}) {
-        if (!host.isHost) {
+    async setMarks(host: SR5Item, target: SR5Actor | SR5Item | undefined, marks: number, options: SetMarksOptions = {}) {
+        if (!host.isType('host')) {
             console.error('Only Host item types can place matrix marks!');
             return;
         }
@@ -60,7 +60,7 @@ export const ItemMarksFlow = {
         const currentMarks = host.getMarksPlaced(target.uuid);
         let marksData = host.marksData ?? [];
         marksData = MarksStorage.setMarks(marksData, target, currentMarks, marks, options);
-        await host.update({ 'system.marks': marksData });
+        await host.update({ system: { marks: marksData } });
     },
 
     /**
@@ -70,7 +70,7 @@ export const ItemMarksFlow = {
      * @returns The amount of marks placed on the target.
      */
     getMarksPlaced(device: SR5Item, markId: string): number {
-        const host = device.asHost;
+        const host = device.asType('host');
         if (!host) return 0;
         return MarksStorage.getMarksPlaced(host.system.marks, markId);
     },
@@ -80,8 +80,8 @@ export const ItemMarksFlow = {
      * @param device The device to get marks for
      * @returns The marks data for this item.
      */
-    getMarksData(device: SR5Item): Shadowrun.MatrixMarks | undefined {
-        const host = device.asHost;
+    getMarksData(device: SR5Item) {
+        const host = device.asType('host');
         if (!host) return;
         return host.system.marks;
     },
@@ -94,7 +94,7 @@ export const ItemMarksFlow = {
      * @param data The item data given by FoundryVTT deleteItem event
      * @param id The item id
      */
-    async handleOnDeleteItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
+    async handleOnDeleteItem(item: SR5Item, data: SR5Item['system'], id: string) {
         console.debug(`Shadowrun 5e | Checking for marks for a deleted item ${item.name}`, item);
 
         await MarksStorage.clearRelations(item.uuid);

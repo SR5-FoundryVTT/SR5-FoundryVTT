@@ -1,9 +1,11 @@
+import { ActionRollType } from "@/module/types/item/Action";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5 } from "../../config";
 import { SR5Item } from "../SR5Item";
 import { RollDataOptions } from "../Types";
+import { AttributeFieldType, AttributesType } from "@/module/types/template/Attributes";
 
-type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: Shadowrun.ActionRollData, testData?: any, againstData?: any) => undefined; 
+type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: ActionRollType, testData?: any, againstData?: any) => undefined; 
 
 /**
  * Handle value retrieval for SR5Item test data values.
@@ -54,11 +56,11 @@ export const ItemRollDataFlow = {
      * @param actor Whatever actor to use for mental attributes
      * @param rollData TestData that will get modified in place
      */
-    injectOwnerMentalAttributes: (actor: SR5Actor, rollData: Shadowrun.ShadowrunItemDataData) => {
+    injectOwnerMentalAttributes: (actor: SR5Actor, rollData: SR5Item['system']) => {
         if (!rollData.attributes) return;
 
         for (const name of SR5.mentalAttributes) {
-            rollData.attributes[name] = foundry.utils.duplicate(actor.getAttribute(name));
+            rollData.attributes[name] = foundry.utils.duplicate(actor.getAttribute(name)) as AttributeFieldType;
         }
     },
 
@@ -72,7 +74,7 @@ export const ItemRollDataFlow = {
      * @param actor The carrier of the persona icon
      * @param rollData TestData that will get modified in place
      */
-    injectOwnerRatingsForPAN: (actor: SR5Actor, rollData: Shadowrun.ShadowrunItemDataData) => {
+    injectOwnerRatingsForPAN: (actor: SR5Actor, rollData: SR5Item['system']) => {
         if (!rollData.attributes) return;
 
         const PANMatrixAttributes = ['data_processing', 'firewall'];
@@ -88,11 +90,11 @@ export const ItemRollDataFlow = {
      * @param rollData The test data to be altered
      * @param directConnection true, a direct connection has been made. false, a wire-less connection is used.
      */
-    injectMasterRatingsForPAN: (master: SR5Item, actor: SR5Actor|undefined, rollData: Shadowrun.ShadowrunItemDataData, directConnection?: boolean) => {
+    injectMasterRatingsForPAN: (master: SR5Item, actor: SR5Actor|undefined, rollData: SR5Item['system'], directConnection?: boolean) => {
         // As per SR5#233, slaved devices can't use the masters ratings.
         if (directConnection) return;
 
-        const attributes = master.system.attributes as Shadowrun.AttributesData;
+        const attributes = master.system.attributes as AttributesType;
 
         const injectAttributes = ['data_processing', 'firewall', 'rating'];
         ItemRollDataFlow._injectAttributes(injectAttributes, attributes, rollData, { bigger: true });
@@ -109,8 +111,8 @@ export const ItemRollDataFlow = {
      * @param rollData The testData to inject attributes into
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    _injectAttributes(names: string[], attributes: Shadowrun.AttributesData, rollData: Shadowrun.ShadowrunItemDataData, options: { bigger: boolean }) {
-        const targetAttributes = rollData.attributes as Shadowrun.AttributesData;
+    _injectAttributes(names: string[], attributes: AttributesType, rollData: SR5Item['system'], options: { bigger: boolean }) {
+        const targetAttributes = rollData.attributes as AttributesType;
         for (const name of names) {
             const sourceAttribute = foundry.utils.duplicate(attributes[name]);
             const targetAttribute = targetAttributes[name];
@@ -134,7 +136,7 @@ export const ItemRollDataFlow = {
      * @param againstData The original tests data, when testData is an OpposedTest.
      * @returns 
      */
-    matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: Shadowrun.ActionRollData, testData?: any, againstData?: any) {
+    matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: ActionRollType, testData?: any, againstData?: any) {
         const actor = item.actorOwner;
 
         // CASE - Matrix Device is slaved inside a PAN or WAN

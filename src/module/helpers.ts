@@ -1,5 +1,5 @@
+import { SR5 } from "./config";
 import { DamageType } from "./types/item/Action";
-import TargetedDocument = Shadowrun.TargetedDocument;
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
 import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
@@ -479,10 +479,10 @@ export class Helpers {
      * @param testData The test data containing target uuids.
      * @returns A list of documents targeted by the original test.
      */
-    static async getTestTargetDocuments(testData: SuccessTestData): Promise<Shadowrun.TestTargetDocument[]> {
-        const documents: Shadowrun.TestTargetDocument[] = [];
+    static async getTestTargetDocuments(testData: SuccessTestData): Promise<(SR5Actor | SR5Item | TokenDocument)[]> {
+        const documents: (SR5Actor | SR5Item | TokenDocument)[] = [];
         for (const uuid of testData.targetUuids) {
-            const document = await fromUuid(uuid) as Shadowrun.TestTargetDocument;
+            const document = await fromUuid(uuid);
 
             if (document instanceof SR5Item) {
                 documents.push(document);
@@ -512,7 +512,7 @@ export class Helpers {
      * @param testData The test to use for actor selection
      * @returns A list of actors that should be used for an opposed test.
      */
-    static async getOpposedTestTargets(testData: SuccessTestData): Promise<Shadowrun.TestTargetDocument[]> {
+    static async getOpposedTestTargets(testData: SuccessTestData): Promise<(SR5Actor | SR5Item | TokenDocument)[]> {
         const overwriteSelectionWithTarget = game.settings.get(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection) as boolean;
 
         // Honor user preference of using test targets, if any are set.
@@ -548,17 +548,17 @@ export class Helpers {
      * @param document Any document that can be targeted by a Success Test
      * @returns A string representing this documents name.
      */
-    static getChatSpeakerName(document: Shadowrun.TestTargetDocument): string {
+    static getChatSpeakerName(document: SR5Actor | SR5Item | TokenDocument): string {
         if (!document) return '';
 
-        if (document instanceof SR5Item) return document.name as string;
+        if (document instanceof SR5Item) return document.name;
 
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = document instanceof TokenDocument ? document : document.getToken();
 
         if (useTokenNameForChatOutput && token) return token.name;
 
-        return document.name as string;
+        return document.name;
     }
 
     /**
@@ -569,16 +569,16 @@ export class Helpers {
      * @param document Any document that can be targeted by a Success Test
      * @returns A path pointing to an image.
      */
-    static getChatSpeakerImg(document: Shadowrun.TestTargetDocument): string {
+    static getChatSpeakerImg(document: SR5Actor | SR5Item | TokenDocument): string {
         if (!document) return '';
 
-        if (document instanceof SR5Item) return document.img;
+        if (document instanceof SR5Item) return document.img!;
 
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = document instanceof TokenDocument ? document : document.getToken();
 
         if (useTokenForChatOutput && token) return token.texture.src || '';
-        return document.img || '';
+        return 'img' in document ? document.img || '' : '';
     }
 
     static createDamageData(

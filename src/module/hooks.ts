@@ -58,7 +58,6 @@ import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
 import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
-import { NetworkDeviceFlow } from './item/flows/NetworkDeviceFlow';
 import { registerSystemKeybindings } from './keybindings';
 import { SkillTest } from './tests/SkillTest';
 
@@ -148,7 +147,8 @@ export class HooksManager {
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
-        Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks.bind(HooksManager));
+        Hooks.on('deleteItem', HooksManager.onDeleteItem.bind(HooksManager));
+        Hooks.on('deleteActor', HooksManager.onDeleteActor.bind(HooksManager));
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
@@ -552,7 +552,7 @@ ___________________
      * @param data The update data given.
      * @param id The items id.
      */
-    static async updateIcConnectedToHostItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
+    static async updateIcConnectedToHostItem(item: SR5Item, data: SR5Item['system'], id: string) {
         // Trigger type specific behaviour.
         switch (item.type) {
             case 'host':
@@ -564,7 +564,7 @@ ___________________
     /**
      * Collect all changes necessary when any item is deleted.
      */
-    static async onDeleteItem(item: SR5Item, data: Shadowrun.ShadowrunItemDataData, id: string) {
+    static async onDeleteItem(item: SR5Item, data: SR5Item['system'], id: string) {
         await MatrixNetworkFlow.handleOnDeleteDocument(item, data, id);
         await ItemMarksFlow.handleOnDeleteItem(item, data, id);
     }
@@ -572,7 +572,7 @@ ___________________
     /**
      * Collect all changes necessary when any actor is deleted.
      */
-    static async onDeleteActor(actor: SR5Actor, data: Shadowrun.ShadowrunActorDataData, id: string) {
+    static async onDeleteActor(actor: SR5Actor, data: SR5Actor['system'], id: string) {
         return MatrixNetworkFlow.handleOnDeleteDocument(actor, data, id);
     }
 

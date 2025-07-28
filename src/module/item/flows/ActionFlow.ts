@@ -37,7 +37,7 @@ export class ActionFlow {
     }
 
     static _applyModifiableValue(value: ModifiableValueLinkedType, document: SR5Actor|SR5Item) {
-        const attribute = document.getAttribute(value.attribute);
+        const attribute = (document as SR5Actor).getAttribute(value.attribute!);
         if (!attribute) return;
 
         if (!value.base_formula_operator) {

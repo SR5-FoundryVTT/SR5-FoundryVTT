@@ -27,11 +27,13 @@ export const MatrixAttributeField = () => ({
     device_att: new StringField({ required: true }),
 });
 
-export const MatrixMarkTarget = () => ({
-    uuid: new StringField({ required: true }),
-    name: new StringField({ required: true }),
-    marks: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-});
+export const MatrixMarksTarget = () => (
+    new ArrayField(new SchemaField({
+        uuid: new StringField({ required: true }),
+        name: new StringField({ required: true }),
+        marks: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    }))
+);
 
 export const MatrixData = () => ({
     attack: new ModifiableField(MatrixAttributeField()),
@@ -50,8 +52,9 @@ export const MatrixData = () => ({
     hot_sim: new BooleanField(),
     running_silent: new BooleanField(),
     item: new AnyField({ required: false }),
-    marks: new ArrayField(new SchemaField(MatrixMarkTarget())),
+    marks: MatrixMarksTarget(),
 });
 
 export type MatrixType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixData>>;
 export type MatrixAttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixAttributes>>;
+export type MatrixMarksType = MatrixType['marks'];

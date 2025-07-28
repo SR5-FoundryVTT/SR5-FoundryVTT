@@ -195,7 +195,7 @@ export const MarkPlacementFlow = {
     _prepareIcon(test: MarkPlacementTests) {
         // When given an icon uuid, load it.
         if (!test.data.iconUuid) return;
-        test.icon = fromUuidSync(test.data.iconUuid) as Shadowrun.NetworkDevice;
+        test.icon = fromUuidSync(test.data.iconUuid) as SR5Actor | SR5Item;
 
         // Depending on icon type, categorize targets for display and device selection.
         if (test.icon instanceof SR5Actor) { 
@@ -229,7 +229,8 @@ export const MarkPlacementFlow = {
         }
 
         const target = test.targets[0];
-        const actor = target.actor as SR5Actor;
+        // taM check this
+        const actor = (target as TokenDocument).actor!;
 
         test.persona = actor;
         // Retrieve the target icon document.
@@ -270,7 +271,7 @@ export const MarkPlacementFlow = {
      */
     _prepareHostIC(test: MarkPlacementTests) {
         if (test.icon instanceof SR5Actor) return;
-        const host = test.icon.asHost;
+        const host = test.icon.asType('host');
         if (!host) return;
 
         // Whatever is connected to a host, is always 'wireless'.
@@ -328,7 +329,7 @@ export const MarkPlacementFlow = {
         // Assure main icon selection is set as the target icon.
         if (test.data.placeOnMainIcon) test.data.iconUuid = this._getMainIconUuid(test);
         // Document might have changed in between initial preparation and dialog selections.
-        test.icon = fromUuidSync(test.data.iconUuid as string);
+        test.icon = fromUuidSync(test.data.iconUuid as string) as SR5Actor | SR5Item;
     },
 
     /**

@@ -4,6 +4,10 @@ import MarkedDocument = Shadowrun.MarkedDocument;
 import { Helpers } from "../../helpers";
 import { SR5Item } from "../../item/SR5Item";
 import { MatrixFlow } from "../../flows/MatrixFlow";
+import { SR5Actor } from "../SR5Actor";
+import { ActorMarksFlow } from "../flows/ActorMarksFlow";
+import { MatrixNetworkHackingApplication } from "@/module/apps/matrix/MatrixNetworkHackingApplication";
+import { FormDialog, FormDialogOptions } from "@/module/apps/dialogs/FormDialog";
 
 
 export interface CharacterSheetData extends SR5ActorSheetData {
@@ -117,7 +121,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             for (const target of targets) {
                 // Collect connected icons, if user wants to see them.
                 if (this._connectedIconsOpenClose[target.document.uuid]) {
-                    target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document);
+                    // TODO: taM check this
+                    target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
 
                     for (const icon of target.icons) {
                         // Mark icon as selected.
@@ -222,7 +227,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         }
         const options = {
             classes: ['sr5', 'form-dialog'],
-        } as FormDialogOptions;
+        } as unknown as FormDialogOptions;
         const dialog = new FormDialog(data, options);
         await dialog.select();
         if (dialog.canceled || dialog.selectedButton !== 'confirm') return;
@@ -244,7 +249,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const packActions = await Helpers.getPackActions(matrixPackName);
         const actorActions = MatrixFlow.getMatrixActions(this.actor);
         // Assume above collections return action only.
-        let actions = [...packActions, ...actorActions] as Shadowrun.ActionItemData[];
+        let actions = [...packActions, ...actorActions] as SR5Item<'action'>[];
 
         // Reduce actions to those matching the marks on the selected target.
         if (this.selectedMatrixTarget) {
@@ -271,7 +276,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         if (!test) return;
 
         if (this.selectedMatrixTarget) {
-            const document = fromUuidSync(this.selectedMatrixTarget) as Shadowrun.NetworkDevice;
+            const document = fromUuidSync(this.selectedMatrixTarget) as SR5Actor | SR5Item;
             if (!document) return;
 
             await test.addTarget(document);
@@ -297,7 +302,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const document = fromUuidSync(uuid) as SR5Item|SR5Actor;
         if (!document) return;
 
-        document.sheet?.render(true);
+        void document.sheet?.render(true);
     }
 
     /**
@@ -357,22 +362,22 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             target.selected = this.selectedMatrixTarget === target.document.uuid;
 
             // List marked networks together with personas on top level.
-            if (target.document.isNetwork) {
+            if (target.document instanceof SR5Item && target.document.isNetwork()) {
                 targets.push(target);
                 continue;
             }
 
             // Marked personas should be on top level.
-            if (target.document.hasPersona) {
+            if (target.document instanceof SR5Actor && target.document.hasPersona) {
                 targets.push(target);
                 continue;
             }
 
             // Retrieve persona once to avoid multiple fromUuid calls.
-            const persona = target.document.persona as SR5Actor | undefined;
+            const persona = target.document instanceof SR5Item ? target.document.persona : undefined;
 
             // Handle persona icons.
-            if (target.document.isMatrixDevice && persona) {
+            if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona) {
                 // Peresona device icons only show as personas, not as devices.
                 // const personaDevice = persona.getMatrixDevice() as SR5Item;
                 // if (target.document.uuid === personaDevice?.uuid) {
@@ -421,7 +426,9 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
                 const oldIcons = target.icons;
                 // An already marked icon will again show up when all icons are collected.
                 // So we can simply overwrite all icons here without any filtering.
-                target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document)
+
+                // TODO: taM check this
+                target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.

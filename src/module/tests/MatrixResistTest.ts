@@ -1,13 +1,14 @@
 import { DataDefaults } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
+import { DamageType, MinimalActionType } from "../types/item/Action";
 import { Translation } from "../utils/strings";
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
 
 
 export interface MatrixResistTestData extends SuccessTestData {
     following: any
-    incomingDamage: Shadowrun.DamageData
-    modifiedDamage: Shadowrun.DamageData
+    incomingDamage: DamageType
+    modifiedDamage: DamageType
 }
 
 /**
@@ -22,12 +23,12 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
 
         // Is this test part of a followup test chain? defense => resist
         if (data.following) {
-            data.incomingDamage = foundry.utils.duplicate(data.following.damage || DataDefaults.damageData({type: {base: 'matrix', value: 'matrix'}}));
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+            data.incomingDamage = foundry.utils.duplicate(data.following.damage || DataDefaults.createData('damage', {type: {base: 'matrix', value: 'matrix'}}));
+            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
         // This test is part of either a standalone resist or created with its own data (i.e. edge reroll).
         } else {
-            data.incomingDamage = data.incomingDamage ?? DataDefaults.damageData();
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
+            data.incomingDamage = data.incomingDamage ?? DataDefaults.createData('damage');
+            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
         }
 
         return data;
@@ -48,7 +49,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
         return 'SR5.TestResults.ResistedSomeDamage';
     }
 
-    static override _getDefaultTestAction(): Partial<Shadowrun.MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionType> {
         return {
             'attribute': 'rating',
             'attribute2': 'firewall'

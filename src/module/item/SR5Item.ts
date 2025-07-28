@@ -5,10 +5,8 @@ import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
 import { DataDefaults } from "../data/DataDefaults";
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
-import { MatrixRules } from "../rules/MatrixRules";
 import { TestCreator } from "../tests/TestCreator";
-import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
-import { HostDataPreparation, HostPrep } from "./prep/HostPrep";
+import { HostPrep } from "./prep/HostPrep";
 import RollEvent = Shadowrun.RollEvent;
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
@@ -17,30 +15,21 @@ import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 
-/**
- * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
- * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of execution within transpiled bundle.js code, 
- * resulting OpposedTest not finding SuccessTest (undefined) when extending it.
- * 
- * ... I'd love to remove this, or even just comment it, but tree-shaking will do it's job.
- * 
- * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
- * 
- * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
- * NOTE: still not fixed with esbuild@0.19.5
- */
-import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
-import { ActionResultType, ActionRollType } from '../types/item/Action';
+import { ActionResultType, ActionRollType, DamageType } from '../types/item/Action';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
 import { ConditionType } from '../types/template/Condition';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from '../types/flags/ItemFlags';
-import { MatrixType } from '../types/template/Matrix';
 import { Migrator } from '../migrator/Migrator';
 import { MatrixNetworkFlow } from './flows/MatrixNetworkFlow';
 import { ItemRollDataFlow } from './flows/ItemRollDataFlow';
 import { ItemMarksFlow } from './flows/ItemMarksFlow';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { AttributeFieldType } from '../types/template/Attributes';
+import { MatrixFlow } from '../flows/MatrixFlow';
+import { RollDataOptions } from './Types';
+import { SetMarksOptions } from '../storage/MarksStorage';
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -213,10 +202,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
             TechnologyPrep.prepareConceal(technology, equippedMods);
-            TechnologyPrep.prepareAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
-            TechnologyPrep.prepareMatrixAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
-            TechnologyPrep.prepareMentalAttributes(this.system as Shadowrun.ShadowrunTechnologyItemDataData);
-            TechnologyPrep.prepareConceal(technology, equippedMods);            
             TechnologyPrep.prepareAvailability(this, technology);
             TechnologyPrep.prepareCost(this, technology);
         }
@@ -242,12 +227,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             WarePrep.prepareBaseData(this.system as Item.SystemOfType<'bioware' | 'cyberware'>);
     }
 
-    override prepareDerivedData(): void {
+    override prepareDerivedData(this: SR5Item): void {
         super.prepareDerivedData();
 
         const technology = this.getTechnologyData();
         if (technology)
-            TechnologyPrep.calculateAttributes(this.system.attributes);
+            TechnologyPrep.calculateAttributes(this.system.attributes!);
 
         if (this.isType('host'))
             HostPrep.prepareDerivedData(this.system);
@@ -287,7 +272,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const showDialog = !TestCreator.shouldHideDialog(event);
         const test = await TestCreator.fromItem(this, this.actor, { showDialog });
         await test?.execute();
-        return;
+        return undefined;
     }
 
     /**
@@ -556,12 +541,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param item The network item to add to this SIN.
      */
     async addNewNetwork(item: SR5Item) {
-        const sin = this.asSin;
+        const sin = this.asType('sin');
         if (!sin) return;
-        if (!item.isGrid && !item.isHost) return;
+        if (!item.isNetwork()) return;
 
         sin.system.networks.push(item.uuid);
-        await this.update({'system.networks': sin.system.networks});
+        await this.update({ system: { networks: sin.system.networks } });
     }
 
     isWeaponModification(): this is SR5Item<'modification'> & { system : { type: 'weapon' } } {
@@ -819,7 +804,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @param damage Damage to be applied.
      */
-    async addDamage(damage: Shadowrun.DamageData) {
+    async addDamage(damage: DamageType) {
         switch (damage.type.value) {
             case 'matrix':
                 return await this.addMatrixDamage(damage);
@@ -833,7 +818,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @param damage The matrix damage to be applied.
      */
-    async addMatrixDamage(damage: Shadowrun.DamageData) {
+    async addMatrixDamage(damage: DamageType) {
         if (damage.type.value !== 'matrix') return;
 
         const track = this.getConditionMonitor();
@@ -854,15 +839,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return action.extended;
     }
 
-    getTechnologyData(): SR5Item['system']['technology'] {
-        const systemTechnologyItems = [
-            'ammo', 'armor', 'device', 'equipment', 'modification',
-            'program', 'sin', 'bioware', 'cyberware', 'weapon',
-        ] as const;
-        return this.asType(...systemTechnologyItems)?.system.technology;
+    getTechnologyData(this: SR5Item) {
+        return this.system.technology;
     }
 
-    getMasterUuid(): string|undefined {
+    getMasterUuid() {
         return this.getTechnologyData()?.master;
     }
 
@@ -874,7 +855,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.getTechnologyData()?.networkController;
     }
 
-    async setMasterUuid(masterUuid: string|undefined): Promise<void> {
+    async setMasterUuid(masterUuid: string | undefined): Promise<void> {
         await this.update({ system: { technology: { master: masterUuid } } });
     }
 
@@ -1182,6 +1163,38 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return super.update(data, options);
     }
 
+    isWireless(this: SR5Item): boolean {
+        return this.system.technology?.wireless ?? false;
+    }
+
+    isNetwork(): this is SR5Item<'grid' | 'host'> {
+        return this.isType('host', 'grid');
+    }
+
+        /**
+     * Determine if this item is part of a WAN / PAN network.
+     *
+     * @returns true, when item is part of any network, false if not.
+     */
+    get isSlave(): boolean {
+        if (!this.isMatrixDevice) return false;
+        return !!this.master;
+    }
+
+    /**
+     * Should this matrix item be visible to a player?
+     */
+    matrixIconVisibleToPlayer(this: SR5Item): boolean {
+        return this.system.matrix?.visible === true;
+    }
+
+    /**
+     * Determine if this items matrix icon is running silent.
+     */
+    get isRunningSilent(): boolean {
+        return false;
+    }
+
     /**
      * Place a Matrix Mark for this Item.
      *
@@ -1231,7 +1244,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
      * @param slave The matrix item to be connected.
      */
-    async addSlave(slave: Shadowrun.NetworkDevice) {
+    async addSlave(slave: SR5Actor | SR5Item) {
         await MatrixNetworkFlow.addSlave(this, slave);
     }
 
@@ -1239,7 +1252,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     * In case this item is a network master, remove the slave from the network.
     * @param slave The matrix item to be disconnected.
     */
-    async removeSlave(slave: Shadowrun.NetworkDevice) {
+    async removeSlave(slave: SR5Actor | SR5Item) {
         await MatrixNetworkFlow.removeSlave(this, slave);
     }
 
@@ -1255,7 +1268,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @returns Foundry Documents with marks placed.
      */
     async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
-        if (!this.isHost) return [];
+        if (!this.isType('host')) return [];
 
         const marksData = this.marksData;
         if (!marksData) return [];
@@ -1343,11 +1356,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param name An attribute or other stats name.
      * @returns Either an AttributeField or undefined, if the attribute doesn't exist on this document.
      */
-    getAttribute(name: string, options: {rollData?: Shadowrun.ShadowrunItemDataData} = {}): Shadowrun.AttributeField | undefined {
-        const rollData = options.rollData || this.getRollData() as Shadowrun.ShadowrunItemDataData;
+    getAttribute(name: string, options: {rollData?: SR5Item['system']} = {}): AttributeFieldType | undefined {
+        const rollData = options.rollData || this.getRollData();
         // Attributes for hosts work only within their own attributes.
-        if (this.type === 'host') {
-            const rollData = this.getRollData() as Shadowrun.HostData;
+        if (this.isType('host')) {
+            const rollData = this.getRollData();
             return rollData.attributes?.[name];
         }
 
@@ -1360,7 +1373,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param changedSlot 'att1', ... 'att4'
      * @param changedAttribute 'attack'
      */
-    async changeMatrixAttributeSlot(changedSlot: string, changedAttribute: Shadowrun.MatrixAttribute) {
+    async changeMatrixAttributeSlot(this: SR5Item, changedSlot: string, changedAttribute: Shadowrun.MatrixAttribute) {
         if (!this.system.atts) return;
         const updateData = MatrixFlow.changeMatrixAttribute(this.system.atts, changedSlot, changedAttribute);
         return await this.update(updateData);

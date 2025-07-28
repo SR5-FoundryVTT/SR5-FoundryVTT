@@ -121,7 +121,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
             //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
             values: {},
 
-            modifiers: DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'}),
+            modifiers: DataDefaults.createData('value_field', {label: 'SR5.Labels.Action.Modifiers'}),
 
             sourceItemUuid: againstData.sourceItemUuid,
             against: againstData

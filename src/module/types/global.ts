@@ -137,6 +137,7 @@ declare module "fvtt-types/configuration" {
         ChatMessage: {
             shadowrun5e: {
                 TestData?: any;
+                MatrixNetworkMarkInvite: {actorUuid: string, targetUuid: string};
             }
         };
         Combat: {
@@ -184,6 +185,10 @@ declare module "fvtt-types/configuration" {
 
     namespace Hooks {
         interface HookConfig {
+            sr5_afterPrepareTestDataWithAction: any;
+            deleteActor: any;
+            sr5_testPrepareBaseValues: any;
+            sr5_testProcessResults: any;
             "routinglib.ready": () => void;
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;

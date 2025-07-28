@@ -10,10 +10,10 @@ import { TestOptions } from "./SuccessTest";
  * Implement the opposing test for Hack on the Fly action. See SR5#240 'Hack On The Fly'
  */
 export class OpposedHackOnTheFlyTest extends OpposedTest {
-    override against: HackOnTheFlyTest;
-    icon: Shadowrun.NetworkDevice
-    device: SR5Item;
-    persona: SR5Actor;
+    declare against: HackOnTheFlyTest;
+    declare icon: SR5Actor | SR5Item;
+    declare device: SR5Item;
+    declare persona: SR5Actor;
 
     override _prepareData(data: any, options?: TestOptions) {
         data = super._prepareData(data, options);
@@ -37,7 +37,7 @@ export class OpposedHackOnTheFlyTest extends OpposedTest {
     }
 
     override async populateDocuments() {
-        MarkPlacementFlow.populateOpposedDocuments(this);
+        void MarkPlacementFlow.populateOpposedDocuments(this);
     }
 
     /**

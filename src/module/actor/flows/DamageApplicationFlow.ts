@@ -4,6 +4,11 @@ import { Helpers } from '../../helpers';
 import { TestCreator } from '../../tests/TestCreator';
 import { DamageType } from "src/module/types/item/Action";
 import { SR5Item } from "@/module/item/SR5Item";
+import { OverflowTrackType, TrackType } from "@/module/types/template/ConditionMonitors";
+import { ConditionType } from "@/module/types/template/Condition";
+import { CombatRules } from "@/module/rules/CombatRules";
+import { DataDefaults } from "@/module/data/DataDefaults";
+import { ResonsanceRules } from "@/module/rules/ResonanceRules";
 type DamageElement = Item.SystemOfType<'weapon'>['action']['damage']['element']['base'];
 
 export class DamageApplicationFlow {
@@ -14,18 +19,16 @@ export class DamageApplicationFlow {
      * @param targets The actors that are affected
      * @param damage The damage the actors will receive
      */
-    async runApplyDamage(targets: (SR5Actor|SR5Item)[], damage : DamageType) {
+    async runApplyDamage(targets: (SR5Actor | SR5Item)[], damage: DamageType) {
         // Show user the affected actors and the damage values
         const damageApplicationDialog = new DamageApplicationDialog(targets, damage);
         await damageApplicationDialog.select();
 
-        if (damageApplicationDialog.canceled) {
+        if (damageApplicationDialog.canceled)
             return;
-        }
 
-        targets.forEach((target) => {
-            this.applyDamageToActor(target, damage);
-        });
+        for (const target of targets)
+            void this.applyDamageToActor(target, damage);
     }
 
     /** Apply all types of damage to the actor.
@@ -92,7 +95,8 @@ export class DamageApplicationFlow {
             await test.populateDocuments();
 
             // If targeting is available, use that.
-            if (test.hasTargets) test.targets.forEach(target => targets.push(target.actor as SR5Actor));
+            // taM check this
+            if (test.hasTargets) (test.targets as TokenDocument[]).forEach(target => targets.push(target.actor as SR5Actor));
             else targets.push(test.actor as SR5Actor);
         }
 
@@ -111,7 +115,7 @@ export class DamageApplicationFlow {
      * @param actor The actor to apply the damage to.
      * @param damage Damage to be applied
      */
-    static async addDamage(actor: SR5Actor, damage: Shadowrun.DamageData) {
+    static async addDamage(actor: SR5Actor, damage: DamageType) {
         switch(damage.type.value) {
             case 'matrix':
                 await DamageApplicationFlow.addMatrixDamage(actor, damage);
@@ -131,7 +135,7 @@ export class DamageApplicationFlow {
      * @param damage The damage to add.
      * @returns The remaining damage that could not be applied fully and should overflow.
     */
-    static async addStunDamage(actor: SR5Actor, damage: DamageData) {
+    static async addStunDamage(actor: SR5Actor, damage: DamageType) {
         if (damage.type.value !== 'stun') return damage;
 
         const track = actor.getStunTrack();
@@ -149,6 +153,7 @@ export class DamageApplicationFlow {
 
         await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
         await DamageApplicationFlow.addPhysicalDamage(actor, overflow);
+        return undefined;
     }
 
     /**
@@ -156,7 +161,7 @@ export class DamageApplicationFlow {
      * @param actor The actor to add the damage to.
      * @param damage The damage to add.
      */
-    static async addPhysicalDamage(actor: SR5Actor, damage: DamageData) {
+    static async addPhysicalDamage(actor: SR5Actor, damage: DamageType) {
         if (damage.type.value !== 'physical') {
             return damage;
         }
@@ -171,6 +176,7 @@ export class DamageApplicationFlow {
 
         await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
         await DamageApplicationFlow._addDamageToOverflow(actor, overflow, track);
+        return undefined;
     }
 
     /**
@@ -178,7 +184,7 @@ export class DamageApplicationFlow {
      * @param actor The actor to add the damage to.
      * @param damage The damage to add.
      */
-    static async addMatrixDamage(actor: SR5Actor, damage: DamageData) {
+    static async addMatrixDamage(actor: SR5Actor, damage: DamageType) {
         if (damage.type.value !== 'matrix') return;
 
         // CASE - Technomancer with Living Persona.
@@ -195,13 +201,11 @@ export class DamageApplicationFlow {
 
         const { rest } = DamageApplicationFlow._calcDamageOverflow(damage, track);
 
-        if (device) {
+        if (device)
             await DamageApplicationFlow._addDamageToDeviceTrack(rest, device);
-        }
-        if (actor.isIC() || actor.isSprite()) {
+        if (actor.isType('ic', 'sprite'))
             await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
-        }
-
+        return undefined;
     }
 
     /**
@@ -219,7 +223,7 @@ export class DamageApplicationFlow {
         value = Math.max(value, 0);
 
         // Use artificial damage to be consistent across other damage application Actor methods.
-        const damage = DataDefaults.damageData({
+        const damage = DataDefaults.createData('damage', {
             type: { base: 'matrix', value: 'matrix' },
             base: value,
             value
@@ -236,19 +240,18 @@ export class DamageApplicationFlow {
 
         // If a matrix device is used, damage that instead of the actor.
         const device = actor.getMatrixDevice();
-        if (device) {
-            return await device.update({ 'system.technology.condition_monitor': track });
-        }
+        if (device)
+            return device.update({ system: { technology: { condition_monitor: track } } });
 
         // IC actors use a matrix track.
-        if (actor.isIC()) {
-            return await actor.update({ 'system.track.matrix': track });
-        }
+        if (actor.isType('ic'))
+            return actor.update({ system: { track: { matrix: track } } });
 
         // Emerged actors use a personal device like condition monitor.
-        if (actor.isMatrixActor) {
-            return await actor.update({ 'system.matrix.condition_monitor': track });
-        }
+        if (actor.isMatrixActor)
+            return (actor as SR5Actor).update({ system: { matrix: { condition_monitor: track } } });
+
+        return undefined;
     }
 
     /**
@@ -259,7 +262,7 @@ export class DamageApplicationFlow {
      * @param track The track to overflow the damage into.
      * @returns 
      */
-    static async _addDamageToOverflow(actor: SR5Actor, damage: Shadowrun.DamageData, track: Shadowrun.OverflowTrackType) {
+    static async _addDamageToOverflow(actor: SR5Actor, damage: DamageType, track: OverflowTrackType) {
         if (damage.value === 0) return;
         if (track.overflow.value === track.overflow.max) return;
 
@@ -287,7 +290,7 @@ export class DamageApplicationFlow {
      * @param damage The damage to be taken.
      * @param track The track to apply that damage to.
      */
-    static async _addDamageToTrack(actor: SR5Actor, damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData) {
+    static async _addDamageToTrack(actor: SR5Actor, damage: DamageType, track: TrackType | OverflowTrackType | ConditionType) {
         if (damage.value === 0) return;
         if (track.value === track.max) return;
 
@@ -316,12 +319,12 @@ export class DamageApplicationFlow {
      * @param track The track to which the damage will be applied.
      * @returns The updated track with the applied damage.
      */
-    static _addDamageToTrackValue(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData): Shadowrun.TrackType | Shadowrun.OverflowTrackType | Shadowrun.ConditionData {
+    static _addDamageToTrackValue(damage: DamageType, track: TrackType | OverflowTrackType | ConditionType): TrackType | OverflowTrackType | ConditionType {
         if (damage.value === 0) return track;
         if (track.value === track.max) return track;
 
         //  Avoid cross referencing.
-        track = foundry.utils.duplicate(track);
+        track = foundry.utils.duplicate(track) as TrackType | OverflowTrackType | ConditionType;
 
         track.value += damage.value;
         if (track.value > track.max) {
@@ -340,7 +343,7 @@ export class DamageApplicationFlow {
      * @param device 
      * @returns 
      */
-    static async _addDamageToDeviceTrack(damage: Shadowrun.DamageData, device: SR5Item) {
+    static async _addDamageToDeviceTrack(damage: DamageType, device: SR5Item) {
         if (!device) return;
 
         let condition = device.getCondition();
@@ -351,8 +354,8 @@ export class DamageApplicationFlow {
 
         condition = DamageApplicationFlow._addDamageToTrackValue(damage, condition);
 
-        const updateData = {'system.technology.condition_monitor': condition};
-        await device.update(updateData);
+        await device.update({ system: { technology: { condition_monitor: condition } } });
+        return undefined;
     }
 
     /** 
@@ -364,7 +367,7 @@ export class DamageApplicationFlow {
      * @param track The track to apply the damage to.
      * @returns Any overflowing damage and the rest that can be applied.
      */
-    static _calcDamageOverflow(damage: Shadowrun.DamageData, track: Shadowrun.TrackType | Shadowrun.ConditionData): { overflow: Shadowrun.DamageData, rest: Shadowrun.DamageData } {
+    static _calcDamageOverflow(damage: DamageType, track: TrackType | ConditionType): { overflow: DamageType, rest: DamageType } {
         const freeTrackDamage = track.max - track.value;
         const overflowDamage = damage.value > freeTrackDamage ?
             damage.value - freeTrackDamage :
@@ -372,8 +375,8 @@ export class DamageApplicationFlow {
         const restDamage = damage.value - overflowDamage;
 
         //  Avoid cross referencing.
-        const overflow = foundry.utils.duplicate(damage);
-        const rest = foundry.utils.duplicate(damage);
+        const overflow = foundry.utils.duplicate(damage) as DamageType;
+        const rest = foundry.utils.duplicate(damage) as DamageType;
 
         overflow.value = overflowDamage;
         rest.value = restDamage;

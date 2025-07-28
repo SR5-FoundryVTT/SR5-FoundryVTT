@@ -222,7 +222,7 @@ export const TestCreator = {
             return;
         }   
 
-        await testClass.executeMessageAction(testData.data, id, options);
+        return testClass.executeMessageAction(testData.data, id, options);
     },
 
     /**
@@ -412,7 +412,7 @@ export const TestCreator = {
      * @param actor Actor to use for retrieving source values and execute test with.
      * @param data Any test implementations resulting basic test data.
      */
-    _prepareTestDataWithAction: function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData, againstData?: any) {
+    _prepareTestDataWithAction: function(action: ActionRollType, document: SR5Actor|SR5Item, data: SuccessTestData, againstData?: any) {
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 
@@ -435,7 +435,7 @@ export const TestCreator = {
      * 
      * @returns resulting TestData
      */
-    _prepareTestDataWithActionForActor: function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData, againstData?: any) {
+    _prepareTestDataWithActionForActor: function(action: ActionRollType, actor: SR5Actor, data: SuccessTestData, againstData?: any) {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = actor.getRollData({againstData: againstData ?? data.following?.against});
         console.error('Dev check', rollData);
@@ -570,7 +570,7 @@ export const TestCreator = {
      * @param againstData Optional testData to use for additional context. This is data from a previous test.
      * @returns TestData that's ready to be used to construct a new test instance.
      */
-    _prepareTestDataWithActionForItem: function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData, againstData?: any) {
+    _prepareTestDataWithActionForItem: function(action: ActionRollType, item: SR5Item, data: SuccessTestData, againstData?: any) {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = item.getRollData({action, testData: data, againstData: againstData ?? data.following?.against});
 

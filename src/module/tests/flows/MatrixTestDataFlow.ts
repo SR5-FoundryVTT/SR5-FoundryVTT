@@ -58,7 +58,7 @@ export const MatrixTestDataFlow = {
             if (!("matrix" in actor.system)) return;
 
             // Apply general matrix modifiers based on commlink/cyberdeck status.
-            const matrix = actor.system.matrix;
+            const matrix = actor.system.matrix!;
             if (matrix.hot_sim) pool.addUniquePart('SR5.HotSim', 2);
             if (matrix.running_silent) pool.addUniquePart('SR5.RunningSilent', -2);
         }

@@ -6,6 +6,14 @@ import { PhysicalDefenseTest } from "../../tests/PhysicalDefenseTest";
 
 type ResultActions = ResultActionType['action'];
 
+type ActionResultOptions = {
+    messageId: string
+    // The original event tirggering this action result.
+    event: Event
+    // The original element taken from the event.
+    element: JQuery<HTMLElement>
+}
+
 /**
  * Whenever any action or test implementation can cause a result that needs
  * to be manually applied, use this handler
@@ -30,29 +38,15 @@ export class ActionResultFlow {
      * NOTE: This is a horrible system and likely to be replaced someday...
      *
      * @param resultAction The action descriptor based on SuccessTest#_prepareResultActionsTemplateData.
-     * @param test The SuccessTest subclass the action has been emitted from.
+     * @param context In what context has the result action been triggered
      */
-    static async executeResult(resultAction: ResultActions, test: SuccessTest) {
+    static async executeResult(resultAction: ResultActions, context: ActionResultOptions) {
         const handler = ActionResultFlow._handlersResultAction.get(resultAction);
 
-        if (!handler) 
+        if (!handler)
             return console.error(`Shadowrun 5e | Action result ${resultAction} has not handler registered`);
 
-        await handler(test);
-
-    }
-    /**
-     * Matrix Marks are placed on either actors (persona, ic) or items (device, host, technology).
-     */
-    static async placeMatrixMarks(active: SR5Actor, targets: Token[], marks: number) {
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            ui.notifications?.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
-            return;
-        }
-
-        for (const target of targets) {
-            await active.setMarks(target, marks);
-        }
+        await handler(context);
     }
 
     /**

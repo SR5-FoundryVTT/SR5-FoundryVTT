@@ -89,7 +89,8 @@ export class WeaponRangeTestBehavior {
 
         // Build target ranges for template display.
         test.data.targetRanges = test.targets.map(token => {
-            const distance = Helpers.measureTokenDistance(attacker, token);
+            // taM Check this
+            const distance = Helpers.measureTokenDistance(attacker, token as TokenDocument);
             const range = RangedWeaponRules.getRangeForTargetDistance(distance, test.data.ranges);
             return {
                 tokenUuid: token.uuid,

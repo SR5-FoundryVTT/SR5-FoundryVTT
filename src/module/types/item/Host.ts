@@ -1,8 +1,9 @@
 import { DevicePartData } from "./Device";
-import { Attributes } from "../template/Attributes";
+import { AttributeField, Attributes } from "../template/Attributes";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { MatrixMasterData } from "../template/MatrixNetwork";
-const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
+import { MatrixMarksTarget } from "../template/Matrix";
+const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField } = foundry.data.fields;
 
 export const SourceEntityField = () => ({
     id: new StringField({ required: true }),
@@ -19,12 +20,12 @@ const HostData = {
     // override
     category: new StringField({ required: true, initial: 'host', readonly: true }),
 
-    attributes: new SchemaField(Attributes()),
+    attributes: new SchemaField({ ...Attributes(), rating: new SchemaField(AttributeField()) }),
     matrix: new SchemaField(MatrixMasterData()),
 
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
-    marks: new TypedObjectField(new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 })),
-    ic: new ArrayField(new SchemaField(SourceEntityField())),
+    marks: MatrixMarksTarget(),
+    ic: new ArrayField(new StringField({ required: true, nullable: false })),
     customAttributes: new BooleanField(),
 }
 

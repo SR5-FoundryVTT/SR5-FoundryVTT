@@ -284,6 +284,7 @@ export const registerSystemSettings = () => {
         hint: 'SR5.CompendiaSettings.Description',
         label: 'SR5.CompendiaSettings.Label',
         icon: 'fas fa-book',
+        //@ts-expect-error let's figure it out together :D
         type: SR5CompendiaSettings,
         restricted: true, // Don't show to non GMs
     });

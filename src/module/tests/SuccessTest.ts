@@ -179,14 +179,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     public rolls: SR5Roll[];
     // Targets can be either actor/item or a token.
-    public targets: Shadowrun.TestTargetDocument[];
+    public targets: (SR5Actor | SR5Item | TokenDocument)[];
     public dialog: TestDialog | null;
 
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
     public effects: SuccessTestEffectsFlow<this>;
 
     // Allow this.constructor to not reference Function.
-    ['constructor']: typeof SuccessTest;
+    declare ['constructor']: typeof SuccessTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Store given documents to avoid later fetching.
@@ -320,7 +320,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Get the label for this test type used for i18n.
      */
     static get label(): Translation {
-        return `SR5.Tests.${this.name}`;
+        return `SR5.Tests.${this.name}` as Translation;
     }
 
     /**
@@ -379,7 +379,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return {};
     }
 
-    static _prepareActionTestData(action: ActionRollData, document: SR5Actor | SR5Item, data: any, againstData: any) {
+    static _prepareActionTestData(action: ActionRollType, document: SR5Actor | SR5Item, data: any, againstData: any) {
         return TestCreator._prepareTestDataWithAction(action, document, data, againstData);
     }
 
@@ -733,9 +733,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (this.targets.length === 0 && this.data.targetUuids) {
             this.targets = [];
             for (const uuid of this.data.targetUuids) {
-                const document = await fromUuid(uuid);
+                const document = await fromUuid(uuid as any) as SR5Actor | SR5Item | null;
                 if (!document) continue;
-                
+
                 if (document instanceof SR5Item) {
                     this.targets.push(document);
                     continue;
@@ -1591,7 +1591,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (this.opposing) return;
         if (this.opposed) return;
 
-        for (const target of this.targets) {
+        // taM check this
+        for (const target of this.targets as TokenDocument[]) {
             if (target.actor === null) continue;
             await this.effects.createTargetActorEffects(target.actor);
         }
@@ -2155,16 +2156,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         documents = documents.filter(document => document.isOwner);
         // Fallback to player character.
         if (documents.length === 0 && game.user?.character) {
-            documents.push(game.user.character);
+            documents.push(game.user.character as SR5Actor);
         }
 
         console.log('Shadowrun 5e | Casting an opposed test using these actors', documents, againstData);
 
         for (const document of documents) {
-            const data = await this._getOpposedActionTestData(againstData, document, messageId);
+            // taM check this
+            const data = await this._getOpposedActionTestData(againstData, document as SR5Actor | SR5Item, messageId);
             if (!data) return;
 
-            const documents = {source: document};
+            const documents = { source: document as SR5Actor | SR5Item };
             const test = new this(data, documents, options);
 
             // Await test chain resolution for each actor, to avoid dialog spam.

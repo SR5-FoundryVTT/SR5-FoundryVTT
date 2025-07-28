@@ -1,7 +1,7 @@
 import { ModifiableValue } from "./Base";
 import { ConditionData } from "./Condition";
 import { ModifiableField } from "../fields/ModifiableField";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField } = foundry.data.fields;
 
 export const TechnologyData = () => ({
     // === Basic Info ===
@@ -17,6 +17,7 @@ export const TechnologyData = () => ({
 
     // === Wireless & Networking ===
     wireless: new BooleanField({ required: true, initial: true }),
+    master: new DocumentUUIDField(),
     networkController: new StringField({ required: false }),
 
     // === Calculated Values ===

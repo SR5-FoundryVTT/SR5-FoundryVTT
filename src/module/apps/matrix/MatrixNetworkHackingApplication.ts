@@ -73,7 +73,7 @@ export class MatrixNetworkHackingApplication extends Application {
         html.find('.matrix-network-hackonthefly').on('click', this.handleHackOnTheFly.bind(this));
     }
 
-    override async getData(options?: Partial<ApplicationOptions> | undefined): Promise<MatrixNetworkHackingSheetData> {
+    override async getData(options?: Partial<Application.Options> | undefined): Promise<MatrixNetworkHackingSheetData> {
         const data = await super.getData(options) as MatrixNetworkHackingSheetData;
 
         data.config = SR5;
@@ -89,7 +89,7 @@ export class MatrixNetworkHackingApplication extends Application {
      * Execute the chosen mark placement action test.
      */
     async executeMarkPlacementActionTest(targetUuid: string, action: string) {
-        const target = await fromUuid(targetUuid) as Shadowrun.NetworkDevice;
+        const target = await fromUuid(targetUuid) as SR5Actor | SR5Item;
         if (!target) {
             console.error('Shadowrun 5e | Could not find target with uuid', targetUuid);
             return;
@@ -155,6 +155,6 @@ export class MatrixNetworkHackingApplication extends Application {
         const network = fromUuidSync(uuid) as SR5Item | null;
         if (!network) return;
 
-        MatrixNetworkFlow.AskForNetworkMarkInvite(this.actor, network);
+        void MatrixNetworkFlow.AskForNetworkMarkInvite(this.actor, network);
     }
 }

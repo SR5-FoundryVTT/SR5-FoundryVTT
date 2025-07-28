@@ -4,9 +4,9 @@ import {SR5Item} from "../../item/SR5Item";
 import MarkedDocument = Shadowrun.MarkedDocument;
 
 interface ICActorSheetData extends SR5ActorSheetData {
-    host: SR5Item|undefined
-    markedDocuments: MarkedDocument[]
-    disableMarksEdit: boolean
+    host: SR5Item | undefined | null;
+    markedDocuments: MarkedDocument[];
+    disableMarksEdit: boolean;
 }
 
 export class SR5ICActorSheet extends SR5BaseActorSheet {

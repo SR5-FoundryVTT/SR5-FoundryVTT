@@ -70,9 +70,9 @@ export const MatrixFlow = {
         if (!against) return;
         if (!against.hasTestCategory('matrix')) return;
         if (!MatrixRules.isIllegalAction(
-            against.data.action.attribute,
-            against.data.action.attribute2,
-            against.data.action.limit.attribute)) {
+            against.data.action.attribute as any,
+            against.data.action.attribute2 as any,
+            against.data.action.limit.attribute as any)) {
             return;
         }
 
@@ -222,7 +222,7 @@ export const MatrixFlow = {
      * @param actor The actor that is affected by dumpshock.
      */
     getDumpshockDamage(actor: SR5Actor) {
-        if (!actor.isUsingVR) return DataDefaults.damageData({ type: { base: 'stun', value: 'stun' } });
+        if (!actor.isUsingVR) return DataDefaults.createData('damage', { type: { base: 'stun', value: 'stun' } });
 
         return MatrixRules.dumpshockDamage(actor.isUsingHotSim);
     },
@@ -253,7 +253,7 @@ export const MatrixFlow = {
 
         // Prepare all targets based on network connection.
         const network = actor.network;
-        const targets = network?.isHost ?
+        const targets = network?.isType('host') ?
             MatrixFlow.prepareHostTargets(actor) :
             MatrixFlow.prepareGridTargets(actor);
 
@@ -287,7 +287,8 @@ export const MatrixFlow = {
         for (const slave of host.slaves) {
             const type = ActorMarksFlow.getDocumentType(slave);
             // For persona slaves get their possible token.
-            const token = slave.getToken ? slave.getToken() : null;
+            // taM check this
+            const token = 'getToken' in slave ? slave.getToken() : null;
 
             // Remove the actor itself from the list of targets.
             if (slave.uuid === actor.uuid) continue;
@@ -351,11 +352,12 @@ export const MatrixFlow = {
                 // TODO: taMiF/marks this will filter out targets without persona but active icons.
                 if (!target.hasPersona) continue;
                 // Filter out IC as they can't be targeted outside their host.
-                if (target.isIC()) continue;
+                if (target.isType('ic')) continue;
                 // Filter out persona based on matrix rules.
                 if (!actor.matrixPersonaIsVisible(target)) continue;
 
-                const type = ActorMarksFlow.getDocumentType(document);
+                // taM Check this
+                const type = ActorMarksFlow.getDocumentType(document as any);
                 targets.push({
                     name: token.name,
                     document: token.actor,
@@ -425,7 +427,7 @@ export const MatrixFlow = {
      * Collect visible hosts for selection.
      */
     visibelHosts() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host') && item.matrixIconVisibleToPlayer) ?? [];
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host') && item.matrixIconVisibleToPlayer()) ?? [];
     },
 
     /**
@@ -439,7 +441,7 @@ export const MatrixFlow = {
      * Collect visible grids for selection.
      */
     visibleGrids() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid') && item.matrixIconVisibleToPlayer) ?? [];
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid') && item.matrixIconVisibleToPlayer()) ?? [];
     },
 
     /**

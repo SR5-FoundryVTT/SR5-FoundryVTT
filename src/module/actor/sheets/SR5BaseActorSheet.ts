@@ -21,6 +21,7 @@ import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/t
 import { DescriptionType } from 'src/module/types/template/Description';
 import { ChatData } from 'src/module/item/ChatData';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
+import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -186,7 +187,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                     contentSelector: '.tabsbody[data-group="primary"]',
                     initial: 'skills',
                 },
-            ],
+            ] as {navSelector: string, contentSelector: string, initial: string}[],
         });
     }
 
@@ -878,7 +879,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         }
 
         sheetData.system.modifiers = sorted as any;
-        sheetData.woundTolerance = 3 + modifiers.wound_tolerance;
+        sheetData.woundTolerance = 3 + ('wound_tolerance' in modifiers ? modifiers.wound_tolerance : 0);
     }
 
     _prepareActorAttributes(sheetData: SR5ActorSheetData) {

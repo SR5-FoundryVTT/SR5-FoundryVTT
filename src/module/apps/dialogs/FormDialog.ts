@@ -1,7 +1,7 @@
 export interface FormDialogData extends Dialog.Data<HTMLElement | JQuery> {
 	templateData: object;
 	templatePath: string;
-	onAfterClose?: (html: any, selectedButton: string) => Promise<object>;
+	onAfterClose?: (html: any, selectedButton?: string) => Promise<object>;
 }
 
 export interface FormDialogOptions extends Dialog.Options {
@@ -20,7 +20,7 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     selectedButton!: string;
     form!: HTMLFormElement;
 
-    _onAfterClose: (html: any, selectedButton: string) => Promise<object>;
+    _onAfterClose: (html: any, selectedButton?: string) => Promise<object>;
     _selectionPromise: Promise<object>;
     _selectionResolve!: (event: any) => void;
     _selectionReject!: (event: any) => void;
@@ -194,5 +194,5 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     /**
      * Sub dialogs should override this method for custom handling of closing dialog.
      */
-    onAfterClose(html: JQuery<HTMLElement>) {}
+    async onAfterClose(html: JQuery<HTMLElement>, selectedButton?: string) { return {} as object; }
 }

@@ -4,7 +4,8 @@ import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
 import { SR5Item } from '../item/SR5Item';
-import { text } from "stream/consumers";
+import { SR5Actor } from "../actor/SR5Actor";
+import { ActorMarksFlow } from "../actor/flows/ActorMarksFlow";
 
 /**
  * Typing around the legacy item list helper.
@@ -678,7 +679,6 @@ export const registerItemLineHelpers = () => {
             /**
              * Call In Actions differ depending on called in actor type.
              */
-            //@ts-expect-error
             case 'call_in_action':
                 if (item.system.actor_type === 'spirit') {
                     const summoningData = item.system as Item.SystemOfType<'call_in_action'>;
@@ -715,11 +715,9 @@ export const registerItemLineHelpers = () => {
                         }
                     ]
                 }
-
-            default:
-                return [];
-        }
-    });
+            }
+            return [];
+        });
 
     Handlebars.registerHelper('ItemIcons', function (itemStored: Item.Stored) {
         const item = new SR5Item(itemStored as SR5Item);
@@ -1092,7 +1090,7 @@ export const registerItemLineHelpers = () => {
             };
 
         const icons: any = [];
-        if (target.document.hasPersona) icons.push(toggleConnectedItemsIcon);
+        if (target.document instanceof SR5Actor && target.document.hasPersona) icons.push(toggleConnectedItemsIcon);
         return icons; 
     });
     Handlebars.registerHelper('MatrixTargetItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {
@@ -1137,8 +1135,8 @@ export const registerItemLineHelpers = () => {
         ];
 
         // Handle document type specific icons.
-        if (target.document.isNetwork) icons.unshift(connectNetworkIcon);
-        if (target.document.hasPersona) icons.push(toggleConnectedItemsIcon)
+        if (target.document instanceof SR5Item && target.document.isNetwork()) icons.unshift(connectNetworkIcon);
+        if (target.document instanceof SR5Actor && target.document.hasPersona) icons.push(toggleConnectedItemsIcon)
 
         return icons;
     });

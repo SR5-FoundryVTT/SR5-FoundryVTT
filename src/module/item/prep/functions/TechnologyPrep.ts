@@ -4,6 +4,8 @@ import { PartsList } from "../../../parts/PartsList";
 import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
 import { ItemCostFlow } from "../../flows/ItemCostFlow";
 import { TechnologyType } from "src/module/types/template/Technology";
+import { AttributesType } from "@/module/types/template/Attributes";
+import { AttributesPrep } from "@/module/actor/prep/functions/AttributesPrep";
 
 /**
  * Item data preparation around the 'technology' template.json item template.
@@ -35,6 +37,16 @@ export const TechnologyPrep = {
 
         technology.conceal.mod = concealParts.list;
         technology.conceal.value = Helpers.calcTotal(technology.conceal);
+    },
+
+    /**
+     * Calculate device attributes.
+     * @param attributes 
+     */
+    calculateAttributes: (attributes: AttributesType) => {
+        for (const [name, attribute] of Object.entries(attributes)) {
+            AttributesPrep.calculateAttribute(name, attribute);
+        }
     },
 
     /**
