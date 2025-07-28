@@ -7,6 +7,7 @@ import { createTagify, parseDropData } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
+import { AmmunitionType, RangeType } from '../types/item/Weapon';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { MatrixRules } from '../rules/MatrixRules';
 import { SINFlow } from './flows/SINFlow';
@@ -18,9 +19,9 @@ interface FoundryItemSheetData {
     // Item type
     type: string
     // Legacy Item Document Data
-    data: Shadowrun.ShadowrunItemData
+    data: SR5Item
     // Item Document System Data
-    system: Shadowrun.ShadowrunItemDataData
+    system: SR5Item['system']
     // A descriptive document  reference
     item: SR5Item
     document: SR5Item
@@ -49,11 +50,11 @@ export interface SR5BaseItemSheetData extends FoundryItemSheetData {
  */
 interface SR5ItemSheetData extends SR5BaseItemSheetData {
     // Nested item typing for different sheets
-    ammunition: Shadowrun.AmmoItemData[]
-    weaponMods: Shadowrun.ModificationItemData[]
-    armorMods: Shadowrun.ModificationItemData[]
-    vehicleMods: Shadowrun.ModificationItemData[]
-    droneMods: Shadowrun.ModificationItemData[]
+    ammunition: SR5Item<'ammo'>[]
+    weaponMods: SR5Item<'modification'>[]
+    armorMods: SR5Item<'modification'>[]
+    vehicleMods: SR5Item<'modification'>[]
+    droneMods: SR5Item<'modification'>[]
 
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
@@ -62,7 +63,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     // Host Item.
     markedDocuments: Shadowrun.MarkedDocument[]
-    slaves: Shadowrun.NetworkDevice[]
+    slaves: (SR5Item | SR5Actor)[]
     master: SR5Item | null
 
     // Contact Item
@@ -84,12 +85,6 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     isUsingRangeCategory: boolean
 
-    // Define if the miscellaneous tab is shown or not.
-    showMiscTab: boolean
-
-    // Misc. Tab has different sections that can be shown or hidden.
-    miscMatrixPart: boolean
-
     // Allow users to view what values is calculated and what isn´t
     calculatedEssence: boolean
     calculatedCost: boolean
@@ -100,9 +95,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-export class SR5ItemSheet extends ItemSheet {
+export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
     private _shownDesc: any[] = [];
-    private _scroll: string;
+    private _scroll: string | undefined;
 
     /**
      * Extend and override the default options used by the Simple Item Sheet
@@ -110,15 +105,15 @@ export class SR5ItemSheet extends ItemSheet {
      */
     static override get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ['sr5', 'sheet', 'item'],
+            classes: Array.from(['sr5', 'sheet', 'item']),
             width: 735,
             height: 450,
-            tabs: [{ navSelector: '.tabs', contentSelector: '.sheetbody' }],
+            tabs: Array.from([{ navSelector: '.tabs', contentSelector: '.sheetbody' }]),
         });
     }
 
     override get template() {
-        return `systems/shadowrun5e/dist/templates/item/${this.item.type}.html`;
+        return `systems/shadowrun5e/dist/templates/item/${this.item.type}.hbs`;
     }
 
     /* -------------------------------------------- */
@@ -135,7 +130,7 @@ export class SR5ItemSheet extends ItemSheet {
         data.system = data.item.system;
         //@ts-expect-error // TODO: remove TODO: foundry-vtt-types v10
         data.data = data.item.system;
-        const itemData = this.item.system;
+        const itemData = this.item.toObject(false).system as SR5Item['system'];
 
         const linkedActor = await this.item.getLinkedActor();
         
@@ -145,24 +140,34 @@ export class SR5ItemSheet extends ItemSheet {
         data.calculatedAvailability = data.calculatedEssence ? true : itemData.technology?.calculated.availability.adjusted ?? false;
         data.ratingForCalculation = data.calculatedEssence || data.calculatedCost || data.calculatedAvailability;
 
-        if (itemData.action) {
+        if ('action' in itemData && itemData.action) {
             try {
-                const action = itemData.action as any;
-                if (itemData.action.mod === 0) delete action.mod;
-                if (action.limit === 0) delete action.limit;
+                const action = itemData.action;
+                if (itemData.action.mod === 0)
+                    //@ts-expect-error fvtt-types doesn't know about non-required field.
+                    action.mod = undefined;
+                if (action.limit.base === 0)
+                    //@ts-expect-error fvtt-types doesn't know about non-required field.
+                    action.limit = undefined;
                 if (action.damage) {
-                    if (action.damage.mod === 0) delete action.damage.mod;
-                    if (action.damage.ap.mod === 0) delete action.damage.ap.mod;
+                    if (action.damage.mod.length === 0) 
+                        //@ts-expect-error fvtt-types doesn't know about non-required field.
+                        action.damage.mod = undefined;
+                    if (action.damage.ap.mod.length === 0)
+                        //@ts-expect-error fvtt-types doesn't know about non-required field.
+                        action.damage.ap.mod = undefined;
                 }
                 if (action.limit) {
-                    if (action.limit.mod === 0) delete action.limit.mod;
+                    if (action.limit.mod.length === 0)
+                        //@ts-expect-error fvtt-types doesn't know about non-required field.
+                        action.limit.mod = undefined;
                 }
             } catch (e) {
                 console.error(e);
             }
         }
 
-        if (itemData.technology) {
+        if ('technology' in itemData && itemData.technology) {
             try {
                 const technology = itemData.technology as any;
                 if (technology.rating === 0) delete technology.rating;
@@ -178,42 +183,42 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Reduce nested items into typed lists.
          */
-        const itemTypes = this.item.items.reduce(
-            (sheetItemData: [Shadowrun.AmmoItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[], Shadowrun.ModificationItemData[]], nestedItem: SR5Item) => {
-                const itemData = nestedItem.toObject();
-                // itemData.descriptionHTML = await TextEditor.enrichHTML(itemData.system.description.value);
-
-                //@ts-expect-error// TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'ammo') sheetItemData[0].push(itemData);
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'weapon') sheetItemData[1].push(itemData);
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'armor') sheetItemData[2].push(itemData);
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'vehicle') sheetItemData[3].push(itemData);
-                //@ts-expect-error TODO: foundry-vtt-types v10
-                if (nestedItem.type === 'modification' && "type" in nestedItem.system && nestedItem.system.type === 'drone') sheetItemData[4].push(itemData);
-
-                return sheetItemData;
+        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = this.item.items.reduce<[
+                SR5Item<'ammo'>[],
+                SR5Item<'modification'>[],
+                SR5Item<'modification'>[],
+                SR5Item<'modification'>[],
+                SR5Item<'modification'>[]
+            ]>(
+            (acc, item: SR5Item) => {
+                const data = item.toObject() as unknown as SR5Item;
+                if (item.type === 'ammo') acc[0].push(data as SR5Item<'ammo'>);
+                else if (item.type === 'modification') {
+                    const type = item.system?.type;
+                    if (type === 'weapon') acc[1].push(data as SR5Item<'modification'>);
+                    else if (type === 'armor') acc[2].push(data as SR5Item<'modification'>);
+                    else if (type === 'vehicle') acc[3].push(data as SR5Item<'modification'>);
+                    else if (type === 'drone') acc[4].push(data as SR5Item<'modification'>);
+                }
+                return acc;
             },
-            [[], [], [], [], []],
+            [[], [], [], [], []]
         );
 
-        for (const itemType of itemTypes) {
-            for (const item of itemType) {
-                // TODO: foundry-vtt-types v10
-                // @ts-expect-error // Lazy typing
-                // eslint-disable-next-line
-                item.descriptionHTML = await TextEditor.enrichHTML(item.system.description.value);
-            }
-        }
+        // Enrich descriptions
+        await Promise.all(
+            [ammunition, weaponMods, armorMods, vehicleMods, droneMods].flat().map(
+                async item => foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description.value).then(html => item.descriptionHTML = html)
+            )
+        );
 
-        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = itemTypes;
+        // Assign to template data
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
         data['vehicleMods'] = vehicleMods;
         data['droneMods'] = droneMods;
+
         data['activeSkills'] = this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
@@ -221,11 +226,11 @@ export class SR5ItemSheet extends ItemSheet {
         data['effects'] = prepareSortedEffects(this.item.effects.contents);
         data['itemEffects'] = prepareSortedItemEffects(this.object);
 
-        if (this.item.isHost) {
+        if (this.item.isType('host')) {
             data['markedDocuments'] = await this.item.getAllMarkedDocuments();
         }
 
-        if (this.item.isSin) {
+        if (this.item.isType('sin')) {
             data['networks'] = await SINFlow.getNetworks(this.item);
         }
 
@@ -239,8 +244,8 @@ export class SR5ItemSheet extends ItemSheet {
             data['master'] = this.item.master;
         }
 
-        if (this.item.isContact) {
-            data['linkedActor'] = await this.item.getLinkedActor() as SR5Actor;
+        if (this.item.isType('contact')) {
+            data['linkedActor'] = await this.item.getLinkedActor();
         }
 
         // Provide action parts with all test variants.
@@ -249,21 +254,25 @@ export class SR5ItemSheet extends ItemSheet {
         data.activeTests = game.shadowrun5e.activeTests;
         data.resistTests = game.shadowrun5e.resistTests;
 
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
+        if (this.item.system.description)
+            data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
+
         data.sourceIsURL = this.item.sourceIsUrl;
         data.sourceIsPDF = this.item.sourceIsPDF;
         data.sourceIsUuid = this.item.sourceIsUuid
-
-        data.isUsingRangeCategory = this.item.isUsingRangeCategory;
+        
+        data.isUsingRangeCategory = false;
+        if (this.item.isType('weapon')) {
+            if (this.item.isRangedWeapon()) {
+                const category = this.item.system.range.ranges.category;
+                data.isUsingRangeCategory = !!category && category !== 'manual';
+            } else if (this.item.isThrownWeapon()) {
+                const category = this.item.system.thrown.ranges.category;
+                data.isUsingRangeCategory = !!category && category !== 'manual';
+            }
+        }
 
         data.rollModes = CONFIG.Dice.rollModes;
-
-        // What tabs should be shown on this sheet?
-        data.showMiscTab = this._prepareShowMiscTab();
-
-        // What sections should be shown on the misc. tab?
-        data.miscMatrixPart = this.item.hasActionCategory('matrix');
 
         return {
             ...data,
@@ -279,9 +288,7 @@ export class SR5ItemSheet extends ItemSheet {
      * @returns Enriched HTML result
      */
     async enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): Promise<string> {
-        // TODO: foundry-vtt-types v10
-        // eslint-disable-next-line
-        return await TextEditor.enrichHTML(editorValue, options);
+        return await foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
     }
 
     /**
@@ -309,6 +316,13 @@ export class SR5ItemSheet extends ItemSheet {
         return ActionFlow.sortedActiveSkills(this.item.actorOwner, skills);
     }
 
+    _getNetworkDevices(): SR5Item[] {
+        // return NetworkDeviceFlow.getNetworkDevices(this.item);
+        return [];
+    }
+
+    /* -------------------------------------------- */
+
     /**
      * Activate event listeners using the prepared sheet HTML
      * @param html -  The prepared HTML object ready to be rendered into the DOM
@@ -321,13 +335,15 @@ export class SR5ItemSheet extends ItemSheet {
         /**
          * Drag and Drop Handling
          */
-        //@ts-expect-error // Ignore null-case
-        this.form.ondragover = (event) => this._onDragOver(event);
-        //@ts-expect-error // Ignore null-case
-        this.form.ondrop = async (event) => await this._onDrop(event);
+        //@ts-expect-error
+        this.form.ondragover = (event) => {
+            this._onDragOver(event);
+        }
+        //@ts-expect-error
+        this.form.ondrop = (event) => this._onDrop(event);
 
         // Active Effect management
-        html.find(".effect-control").click(async event => await onManageActiveEffect(event, this.item));
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.item));
 
         /**
          * General item handling
@@ -348,10 +364,10 @@ export class SR5ItemSheet extends ItemSheet {
          */
         html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
         html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
-        html.find('select[name="change-ammo"]').on('change', async (event) => await this._onAmmoEquip(event.target.value));
+        html.find('select[name="change-ammo"]').on('change', async (event) => this._onAmmoEquip(event.target.value));
         html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
-        html.find('.ammo-reload').on('click', async (event) => await this._onAmmoReload(event, false));
-        html.find('select[name="change-clip-type"]').on('change', async (event) => await this._onClipEquip(event.target.value));
+        html.find('.ammo-reload').on('click', async (event) => this._onAmmoReload(event, false));
+        html.find('select[name="change-clip-type"]').on('change', async (event) => this._onClipEquip(event.target.value));
 
         html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
@@ -364,14 +380,13 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
         html.find('.sin-remove-network').on('click', this._onRemoveNetwork.bind(this));
 
-
         html.find('.network-clear').on('click', this._onRemoveAllSlaves.bind(this));
         html.find('.network-device-remove').on('click', this._onRemoveSlave.bind(this));
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
-        html.find('.marks-add-one').on('click', async (event) => await this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) => await this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
+        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
 
@@ -382,7 +397,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Freshly imported item toggle
-        html.find('.toggle-fresh-import-off').on('click', async (event) => await this._toggleFreshImportFlag(event, false));
+        html.find('.toggle-fresh-import-off').on('click', async (event) => this._toggleFreshImportFlag(event, false));
 
         html.find('.select-ranged-range-category').on('change', this._onSelectRangedRangeCategory.bind(this));
         html.find('.select-thrown-range-category').on('change', this._onSelectThrownRangeCategory.bind(this));
@@ -400,16 +415,16 @@ export class SR5ItemSheet extends ItemSheet {
      * User requested removal of the linked actor.
      */
     async handleLinkedActorRemove(event: any) {
-        await this.item.update({ 'system.linkedActor': '' });
+        await this.item.update({ system: { linkedActor: '' } });
     }
 
     /**
      * Updating the contacts linked actor.
-     *
+     * 
      * @param actor The prepared actor
      */
     async updateLinkedActor(actor: SR5Actor) {
-        await this.item.update({ 'system.linkedActor': actor.uuid });
+        await this.item.update({ system: { linkedActor: actor.uuid } });
     }
 
     _addDragSupportToListItemTemplatePartial(i, item) {
@@ -486,7 +501,7 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // CASE - Add items to a weapons modification / ammo
-        if (this.item.isWeapon && data.type === 'Item') {
+        if (this.item.isType('weapon') && data.type === 'Item') {
             let item;
             // Case 1 - Data explicitly provided
             if (data.data) {
@@ -505,11 +520,11 @@ export class SR5ItemSheet extends ItemSheet {
             // Provide readable error for failing item retrieval assumptions.
             if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
 
-            return await this.item.createNestedItem(item._source);
+            return this.item.createNestedItem(item._source);
         }
 
         // Add actors to WAN, both GRID and HOST
-        if (this.item.isNetwork && ['Item', 'Actor'].includes(data.type)) {
+        if (this.item.isNetwork() && ['Item', 'Actor'].includes(data.type)) {
             const document = await fromUuid(data.uuid) as SR5Actor;
             if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
             await this.object.addSlave(document);
@@ -517,15 +532,15 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // Add document to a PAN.
-        if (this.item.isDevice && ['Item', 'Actor'].includes(data.type)) {
-            const document = await fromUuid(data.uuid) as Shadowrun.NetworkDevice;
+        if (this.item.isType('device') && ['Item', 'Actor'].includes(data.type)) {
+            const document = await fromUuid(data.uuid) as SR5Item | SR5Actor;
             if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
             await this.object.addSlave(document);
             return;
         }
 
         // Link actors to existing contacts.
-        if (this.item.isContact && data.type === 'Actor') {
+        if (this.item.isType('contact') && data.type === 'Actor') {
             const actor = await fromUuid(data.uuid) as SR5Actor;
 
             if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
@@ -534,10 +549,10 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         // Add networks to SINs.
-        if (this.item.isSin && data.type === 'Item') {
+        if (this.item.isType('sin') && data.type === 'Item') {
             const item = await fromUuid(data.uuid) as SR5Item;
             if (!item) return;
-            if (!item.isGrid && !item.isHost) return;
+            if (!item.isNetwork()) return;
 
             await this.item.addNewNetwork(item);
         }
@@ -572,36 +587,46 @@ export class SR5ItemSheet extends ItemSheet {
                 },
             });
         } else {
-            const ranges: Omit<Shadowrun.RangeData, 'category'> = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
+            type RangesType = Omit<RangeType, 'category' | 'attribute'> & { attribute?: string };
+            const ranges: RangesType = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
 
             await this.item.update({
                 [key]: {
                     ...ranges,
-                    attribute: ranges.attribute || null, //Clear attribute if necessary
+                    attribute: ranges.attribute || null,
                     category: selectedRangeCategory,
                 },
             });
         }
     }
 
-    /**
-     * User selected a new matrix attribute on a specific matrix attribute slot (att1, att2,)
-     * Switch out slots for the old and selected matrix attribute.
-     */
+    //Swap slots (att1, att2, etc.) for ASDF matrix attributes
     async _onMatrixAttributeSelected(event) {
-        if (!this.item.system.atts) return;
+        if (!('atts' in this.item.system) || !this.item.system.atts) return;
 
-        const attribute = event.currentTarget.value;
+        // sleaze, attack, etc.
+        const selectedAtt = event.currentTarget.value;
+        // att1, att2, etc..
         const changedSlot = event.currentTarget.dataset.att;
 
-        await this.item.changeMatrixAttributeSlot(changedSlot, attribute);
+        const oldValue = this.item.system.atts[changedSlot].att;
+
+        const data = {}
+
+        Object.entries(this.item.system.atts).forEach(([slot, { att }]) => {
+            if (slot === changedSlot) {
+                data[`system.atts.${slot}.att`] = selectedAtt;
+            } else if (att === selectedAtt) {
+                data[`system.atts.${slot}.att`] = oldValue;
+            }
+        });
+
+        await this.item.update(data);
     }
 
     async _onEditItem(event) {
         const item = this.item.getOwnedItem(this._eventId(event));
-        if (item) {
-            item.sheet?.render(true);
-        }
+        return item?.sheet?.render(true);
     }
 
     async _onEntityRemove(event) {
@@ -657,16 +682,14 @@ export class SR5ItemSheet extends ItemSheet {
 
     async _onAddWeaponMod(event) {
         event.preventDefault();
-        const type = 'modification';
         // TODO: Move this into DataDefaults...
+        const type = 'modification';
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type,
+            type: type as Item.SubType,
             system: { type: 'weapon' }
         };
-        // @ts-expect-error // Lazy typing...
-        const item = new SR5Item(itemData, { parent: this.item });
-        //@ts-expect-error TODO: foundry-vtt-types v10
+        const item = new SR5Item(itemData);
         await this.item.createNestedItem(item._source);
     }
 
@@ -696,21 +719,23 @@ export class SR5ItemSheet extends ItemSheet {
         const type = 'ammo';
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type
+            type: type as Item.SubType
         };
-        // @ts-expect-error // Lazy typing...
-        const item = new SR5Item(itemData, { parent: this.item });
-        // @ts-expect-error TODO: foundry-vtt-types v10
+        const item = new SR5Item(itemData);
         await this.item.createNestedItem(item._source);
     }
 
-    async _onClipEquip(clipType: string) {
+    async _onClipEquip(clipType: AmmunitionType['clip_type']) {
         if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
 
         const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
         await this.item.update({
-            'system.ammo.clip_type': clipType,
-            'system.ammo.partial_reload_value': RangedWeaponRules.partialReload(clipType, agilityValue)
+            system: {
+                ammo: {
+                    clip_type: clipType,
+                    partial_reload_value: RangedWeaponRules.partialReload(clipType, agilityValue)
+                }
+            }
         }, { render: true });
     }
 
@@ -739,7 +764,7 @@ export class SR5ItemSheet extends ItemSheet {
         if (!userConsented) return;
 
         const uuid = Helpers.listItemUuid(event);
-        const document = await fromUuid(uuid) as Shadowrun.NetworkDevice;
+        const document = await fromUuid(uuid) as SR5Actor | SR5Item;
         if (!document) return;
 
         await this.item.removeSlave(document);
@@ -756,12 +781,13 @@ export class SR5ItemSheet extends ItemSheet {
      * Add a tagify element for an action-modifier dom element.
      *
      * Usage: Call method after render with a singular item's html sub-dom-tree.
-     *
+     * 
      * Only action items will trigger the creation of a tagify element.
      *
      * @param html see DocumentSheet.activateListeners#html param for documentation.
      */
     _createActionModifierTagify(html) {
+        if (!('action' in this.item.system)) return;
         const inputElement = html.find('input#action-modifier').get(0);
 
         if (!inputElement) {
@@ -790,19 +816,20 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('input#action-modifier').on('change', async (event) => {
             const modifiers = tagify.value.map(tag => tag.id);
             // render would loose tagify input focus. submit on close will save.
-            await this.item.update({ 'system.action.modifiers': modifiers }, { render: false });
+            await this.item.update({ system: { action: { modifiers } } }, { render: false });
         });
     }
 
     /**
      * Add a tagify element for an action-categories dom element.
-     *
+     * 
      * Usage: Call method after render with a singular item's html sub-dom-tree.
-     *
+     * 
      * Only action items will trigger the creation of a tagify element.
-     * @param html
+     * @param html 
      */
     _createActionCategoriesTagify(html) {
+        if (!('action' in this.item.system)) return;
         const inputElement = html.find('input#action-categories').get(0) as HTMLInputElement;
 
         if (!inputElement) {
@@ -832,7 +859,7 @@ export class SR5ItemSheet extends ItemSheet {
             // Custom tags will not have an id, so use value as id.
             const categories = tagify.value.map(tag => tag.id ?? tag.value);
             // render would loose tagify input focus. submit on close will save.
-            await this.item.update({ 'system.action.categories': categories }, { render: false });
+            await this.item.update({ system: { action: { categories } } }, { render: false });
         });
     }
 
@@ -871,7 +898,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
-        if (!this.item.isHost) return;
+        if (!this.item.isType('host')) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -886,7 +913,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
-        if (!this.item.isHost) return;
+        if (!this.item.isType('host')) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -900,7 +927,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksDelete(event) {
         event.stopPropagation();
 
-        if (!this.item.isHost) return;
+        if (!this.item.isType('host')) return;
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -914,7 +941,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onMarksClearAll(event) {
         event.stopPropagation();
 
-        if (!this.item.isHost) return;
+        if (!this.item.isType('host')) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -925,14 +952,14 @@ export class SR5ItemSheet extends ItemSheet {
     async _onOpenOriginLink(event) {
         event.preventDefault();
 
-        console.log('Shadowrun 5e | Opening PAN/WAN master');
+        console.log('Shadowrun 5e | Opening PAN/WAN network controller');
 
         const originLink = event.currentTarget.dataset.originLink;
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        // @ts-expect-error // TODO: foundry-vtt-types v10
-        device.sheet.render(true);
+        if (device instanceof SR5Item || device instanceof SR5Actor)
+            await device?.sheet?.render(true);
     }
 
     async _onControllerRemove(event) {
@@ -978,7 +1005,7 @@ export class SR5ItemSheet extends ItemSheet {
         console.debug('Toggling isFreshImport on item to ->', onOff, event);
         const item = this.item;
         if (item.system.importFlags) {
-            await item.update({ 'system.importFlags.isFreshImport': onOff });
+            await item.update({ system: { importFlags: { isFreshImport: onOff } } });
         }
     }
 
@@ -991,7 +1018,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         // Assure owned item device.
         if (!(this.document.parent instanceof SR5Actor)) return;
-        if (!this.document.isDevice) return;
+        if (!this.document.isType('device')) return;
         if (!this.document.isEquipped()) return;
 
         await this.document.parent.equipOnlyOneItemOfType(this.document);
@@ -1002,47 +1029,29 @@ export class SR5ItemSheet extends ItemSheet {
      */
     async _onPowerOptionalInputChanged(event) {
         event.preventDefault();
-        if (!this.item.isCritterPower && !this.item.isSpritePower) return;
+        const power = this.item.asType('critter_power') || this.item.asType('sprite_power') || undefined;
+        if (!power) return;
 
         let selectedRangeCategory;
 
-        if (this.item.isCritterPower) {
+        if (this.item.isType('critter_power')) {
             selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.critterPower.optional;
         } else {
             selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.spritePower.optional;
         }
 
-        this.item.system.optional = selectedRangeCategory;
+        power.system.optional = selectedRangeCategory;
 
-        switch (this.item.system.optional) {
+        switch (power.system.optional) {
             case 'standard':
             case 'enabled_option':
-                this.item.system.enabled = true;
+                power.system.enabled = true;
                 break;
             case 'disabled_option':
-                this.item.system.enabled = false;
+                power.system.enabled = false;
                 break;
         }
 
         this.item.render(false);
-    }
-
-    /**
-     * Go through an action item action categories and if at least one is found that needs additional
-     * configuration, let the sheet show the misc. tab.
-     *
-     * @returns true, when the tab is to be shown.
-     */
-    _prepareShowMiscTab() {
-        // Currently, only action items use this tab.
-        const action = this.object.asAction();
-        if (!action) return false;
-
-        const relevantCatogires: Shadowrun.ActionCategories[] = ['matrix'];
-        for (const category of relevantCatogires) {
-            if (this.document.hasActionCategory(category)) return true;
-        }
-
-        return false;
     }
 }

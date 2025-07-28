@@ -1,49 +1,34 @@
-import { SR5Item } from '../module/item/SR5Item';
-import { SR5Actor } from './../module/actor/SR5Actor';
-import { SR5TestingDocuments } from './utils';
+import { SR5TestFactory } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    after(async () => { factory.destroy(); });
 
     describe('ICDataPrep', () => {
         it('Matrix condition monitor track calculation with modifiers', async () => {
-            const actor = await testActor.create({ type: 'ic' }) as SR5Actor;
-
-            let ic = actor.asIC() as Shadowrun.ICActorData;
+            const ic = await factory.createActor({ type: 'ic' });
             assert.equal(ic.system.matrix.condition_monitor.max, 8);
 
-            await actor.update({ 'system.modifiers.matrix_track': 1 });
-            ic = actor.asIC() as Shadowrun.ICActorData;
+            await ic.update({ system: { modifiers: { matrix_track: 1 } } });
             assert.equal(ic.system.matrix.condition_monitor.max, 9);
         });
 
-
         it('visibility checks', async () => {
-            const actor = await testActor.create({ type: 'ic' }) as SR5Actor;
-            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, false);
-            assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
-            assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
-            assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, false);
-            assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, true);
-            assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
+            const ic = await factory.createActor({ type: 'ic' });
+            assert.strictEqual(ic.system.visibilityChecks.astral.hasAura, false);
+            assert.strictEqual(ic.system.visibilityChecks.astral.astralActive, false);
+            assert.strictEqual(ic.system.visibilityChecks.astral.affectedBySpell, false);
+            assert.strictEqual(ic.system.visibilityChecks.meat.hasHeat, false);
+            assert.strictEqual(ic.system.visibilityChecks.matrix.hasIcon, true);
+            assert.strictEqual(ic.system.visibilityChecks.matrix.runningSilent, false);
         });
 
         it('has meat attributes based on the host rating', async () => {
-            const ic = await testActor.create({ type: 'ic', 'system.host.rating': 5}) as SR5Actor;
+            const ic = await factory.createActor({ type: 'ic', system: { host: { rating: 5 } } });
 
             assert.strictEqual(ic.system.attributes.agility.value, 5);
             assert.strictEqual(ic.system.attributes.reaction.value, 5);
@@ -56,8 +41,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('has rating attribute based on the host rating', async () => {
-            const ic = await testActor.create({ type: 'ic', 'system.host.rating': 5}) as SR5Actor;
-
+            const ic = await factory.createActor({ type: 'ic', system: { host: { rating: 5 } } });
             assert.strictEqual(ic.system.attributes.rating.value, 5);
         });
     });

@@ -113,9 +113,9 @@ export const MarkPlacementFlow = {
         // Host devices always use direct connections. // TODO: add rule reference
         if (test.host) test.data.directConnection = true;
         // If a device has been pre-targeted before dialog, show this on the first render.
-        if (test.icon instanceof SR5Item && !test.icon.isHost) test.data.placeOnMainIcon = false;
+        if (test.icon instanceof SR5Item && !test.icon.isType('host')) test.data.placeOnMainIcon = false;
         // Grid items don´t show any devices for now.
-        if (test.icon instanceof SR5Item && test.icon.isGrid) test.data.placeOnMainIcon = true;
+        if (test.icon instanceof SR5Item && test.icon.isType('grid')) test.data.placeOnMainIcon = true;
         // Cross grid placement between source and target.
         if (test.source instanceof SR5Actor && test.icon instanceof SR5Actor) MarkPlacementFlow._crossGridConnectionForActors(test);
         if (test.source instanceof SR5Actor && test.icon instanceof SR5Item) MarkPlacementFlow._crossGridConnectionForActorAndItem(test);
@@ -128,11 +128,11 @@ export const MarkPlacementFlow = {
     _crossGridConnectionForActors(test: MarkPlacementTests) {
         const sourceActor = test.source as SR5Actor;
         const sourceNetwork = sourceActor.network;
-        if (!sourceNetwork?.isGrid) return;
+        if (!sourceNetwork?.isType('grid')) return;
 
         const targetActor = test.icon as SR5Actor;
         const targetNetwork = targetActor.network;
-        if (!targetNetwork?.isGrid) return;
+        if (!targetNetwork?.isType('grid')) return;
 
         test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
     },
@@ -144,11 +144,11 @@ export const MarkPlacementFlow = {
     _crossGridConnectionForActorAndItem(test: MarkPlacementTests) {
         const sourceActor = test.source as SR5Actor;
         const sourceNetwork = sourceActor.network;
-        if (!sourceNetwork?.isGrid) return;
+        if (!sourceNetwork?.isType('grid')) return;
 
         const targetActor = test.icon as SR5Actor;
         const targetNetwork = targetActor.master;
-        if (!targetNetwork?.isGrid) return;
+        if (!targetNetwork?.isType('grid')) return;
 
         test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
     },
@@ -195,7 +195,7 @@ export const MarkPlacementFlow = {
     _prepareIcon(test: MarkPlacementTests) {
         // When given an icon uuid, load it.
         if (!test.data.iconUuid) return;
-        test.icon = fromUuidSync(test.data.iconUuid) as Shadowrun.NetworkDevice;
+        test.icon = fromUuidSync(test.data.iconUuid) as SR5Actor | SR5Item;
 
         // Depending on icon type, categorize targets for display and device selection.
         if (test.icon instanceof SR5Actor) { 
@@ -203,8 +203,8 @@ export const MarkPlacementFlow = {
         }
         
         // Store network type icons for easy access.
-        if (test.icon instanceof SR5Item && test.icon.isHost) test.host = test.icon;
-        if (test.icon instanceof SR5Item && test.icon.isGrid) test.grid = test.icon;
+        if (test.icon instanceof SR5Item && test.icon.isType('host')) test.host = test.icon;
+        if (test.icon instanceof SR5Item && test.icon.isType('grid')) test.grid = test.icon;
 
         // When given a persona uuid, load it.
         if (test.data.personaUuid) test.persona = fromUuidSync(test.data.personaUuid) as SR5Actor;
@@ -229,7 +229,8 @@ export const MarkPlacementFlow = {
         }
 
         const target = test.targets[0];
-        const actor = target.actor as SR5Actor;
+        // taM check this
+        const actor = (target as TokenDocument).actor!;
 
         test.persona = actor;
         // Retrieve the target icon document.
@@ -247,7 +248,7 @@ export const MarkPlacementFlow = {
     _prepareActorDevices(test: MarkPlacementTests) {
         test.devices = [];
         if (!test.persona) return;
-        if (!test.persona.isCharacter || !test.persona.isCritter || !test.persona.isVehicle) return;
+        if (!test.persona.isType('character', 'critter', 'vehicle')) return;
 
         // Collect network devices
         test.devices = test.persona.wirelessDevices;
@@ -258,7 +259,7 @@ export const MarkPlacementFlow = {
      */
     _prepareHostDevices(test: MarkPlacementTests) {
         if (!(test.icon instanceof SR5Item)) return;
-        const host = test.icon.asHost;
+        const host = test.icon.asType('host');
         if (!host) return;
 
         // Whatever is connected to a host, is always 'wireless'.
@@ -270,7 +271,7 @@ export const MarkPlacementFlow = {
      */
     _prepareHostIC(test: MarkPlacementTests) {
         if (test.icon instanceof SR5Actor) return;
-        const host = test.icon.asHost;
+        const host = test.icon.asType('host');
         if (!host) return;
 
         // Whatever is connected to a host, is always 'wireless'.
@@ -328,7 +329,7 @@ export const MarkPlacementFlow = {
         // Assure main icon selection is set as the target icon.
         if (test.data.placeOnMainIcon) test.data.iconUuid = this._getMainIconUuid(test);
         // Document might have changed in between initial preparation and dialog selections.
-        test.icon = fromUuidSync(test.data.iconUuid as string);
+        test.icon = fromUuidSync(test.data.iconUuid as string) as SR5Actor | SR5Item;
     },
 
     /**

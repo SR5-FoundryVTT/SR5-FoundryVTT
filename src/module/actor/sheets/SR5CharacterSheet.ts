@@ -1,18 +1,20 @@
-import { MatrixNetworkHackingApplication } from '../../apps/matrix/MatrixNetworkHackingApplication';
-import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
+import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import MarkedDocument = Shadowrun.MarkedDocument;
 import { Helpers } from "../../helpers";
-import { SR5Item } from '../../item/SR5Item';
-import { FormDialog, FormDialogOptions } from '../../apps/dialogs/FormDialog';
-import { SR5Actor } from '../SR5Actor';
-import { MatrixFlow } from '../../flows/MatrixFlow';
-import { ActorMarksFlow } from '../flows/ActorMarksFlow';
+import { SR5Item } from "../../item/SR5Item";
+import { MatrixFlow } from "../../flows/MatrixFlow";
+import { SR5Actor } from "../SR5Actor";
+import { ActorMarksFlow } from "../flows/ActorMarksFlow";
+import { MatrixNetworkHackingApplication } from "@/module/apps/matrix/MatrixNetworkHackingApplication";
+import { FormDialog, FormDialogOptions } from "@/module/apps/dialogs/FormDialog";
 
 
-export interface CharacterSheetData extends Shadowrun.SR5ActorSheetData {
+export interface CharacterSheetData extends SR5ActorSheetData {
     awakened: boolean
     emerged: boolean
     woundTolerance: number
-    markedDocuments: Shadowrun.MarkedDocument[]
+    markedDocuments: MarkedDocument[]
     handledItemTypes: string[]
     inventory: Record<string, any>
     network: SR5Item | null
@@ -119,14 +121,15 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             for (const target of targets) {
                 // Collect connected icons, if user wants to see them.
                 if (this._connectedIconsOpenClose[target.document.uuid]) {
-                    target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document);
+                    // TODO: taM check this
+                    target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
 
                     for (const icon of target.icons) {
                         // Mark icon as selected.
                         icon.selected = this.selectedMatrixTarget === icon.document.uuid;
                     }
                 }
-                
+
                 // Mark target as selected.
                 target.selected = this.selectedMatrixTarget === target.document.uuid;
             }
@@ -163,8 +166,10 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         event.preventDefault();
         const type = event.currentTarget.closest('.list-header').dataset.itemId;
 
-        if (type !== 'summoning' && type !== 'compilation') return await super._onItemCreate(event);
-        await this._onCallInActionCreate(type);
+        if (type !== 'summoning' && type !== 'compilation')
+            return super._onItemCreate(event);
+
+        return this._onCallInActionCreate(type);
     }
 
     /**
@@ -172,20 +177,20 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
      *
      * @param type The call in action sub type.
      */
-    async _onCallInActionCreate(type: 'summoning' | 'compilation') {
+    async _onCallInActionCreate(type: 'summoning'|  'compilation') {
         // Determine actor type from sub item type.
         const typeToActorType = {
             'summoning': 'spirit',
             'compilation': 'sprite'
-        }
+        } as const;
         const actor_type = typeToActorType[type];
         if (!actor_type) return console.error('Shadowrun 5e | Call In Action Unknown actor type during creation');
 
         // TODO: Add translation for item names...
-        const itemData = {
+        const itemData: Item.CreateData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(type)}`,
             type: 'call_in_action',
-            'system.actor_type': actor_type
+            system: { actor_type }
         };
 
         await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
@@ -218,11 +223,11 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
             content: '',
             default: 'cancel',
             templateData: {},
-            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.html'
+            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.hbs'
         }
         const options = {
             classes: ['sr5', 'form-dialog'],
-        } as FormDialogOptions;
+        } as unknown as FormDialogOptions;
         const dialog = new FormDialog(data, options);
         await dialog.select();
         if (dialog.canceled || dialog.selectedButton !== 'confirm') return;
@@ -244,7 +249,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const packActions = await Helpers.getPackActions(matrixPackName);
         const actorActions = MatrixFlow.getMatrixActions(this.actor);
         // Assume above collections return action only.
-        let actions = [...packActions, ...actorActions] as Shadowrun.ActionItemData[];
+        let actions = [...packActions, ...actorActions] as SR5Item<'action'>[];
 
         // Reduce actions to those matching the marks on the selected target.
         if (this.selectedMatrixTarget) {
@@ -271,7 +276,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         if (!test) return;
 
         if (this.selectedMatrixTarget) {
-            const document = fromUuidSync(this.selectedMatrixTarget) as Shadowrun.NetworkDevice;
+            const document = fromUuidSync(this.selectedMatrixTarget) as SR5Actor | SR5Item;
             if (!document) return;
 
             await test.addTarget(document);
@@ -297,7 +302,7 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         const document = fromUuidSync(uuid) as SR5Item|SR5Actor;
         if (!document) return;
 
-        document.sheet?.render(true);
+        void document.sheet?.render(true);
     }
 
     /**
@@ -355,24 +360,24 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
         for (const target of markedDocuments) {
             // Carry over current target selection state from icons or marks list on last render.
             target.selected = this.selectedMatrixTarget === target.document.uuid;
-            
+
             // List marked networks together with personas on top level.
-            if (target.document.isNetwork) {
+            if (target.document instanceof SR5Item && target.document.isNetwork()) {
                 targets.push(target);
                 continue;
             }
 
             // Marked personas should be on top level.
-            if (target.document.hasPersona) {
+            if (target.document instanceof SR5Actor && target.document.hasPersona) {
                 targets.push(target);
                 continue;
             }
 
             // Retrieve persona once to avoid multiple fromUuid calls.
-            const persona = target.document.persona as SR5Actor | undefined;
+            const persona = target.document instanceof SR5Item ? target.document.persona : undefined;
 
             // Handle persona icons.
-            if (target.document.isMatrixDevice && persona) {
+            if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona) {
                 // Peresona device icons only show as personas, not as devices.
                 // const personaDevice = persona.getMatrixDevice() as SR5Item;
                 // if (target.document.uuid === personaDevice?.uuid) {
@@ -421,7 +426,9 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
                 const oldIcons = target.icons;
                 // An already marked icon will again show up when all icons are collected.
                 // So we can simply overwrite all icons here without any filtering.
-                target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document)
+
+                // TODO: taM check this
+                target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.

@@ -14,15 +14,15 @@ export interface TeamworkMessageData {
 export class TeamworkTest {
     
     static async chatLogListeners(chatLog: ChatLog, html) {
-         // setup chat listener messages for each message as some need the message context instead of chatlog context.
-         // @ts-expect-error TODO: querySelectorAll?
-         $(html).find('.chat-message').each(async (index, element) => {
+        const elements = $(html).find('.chat-message').toArray();
+
+        for (const element of elements) {
             const id = $(element).data('messageId');
             const message = game.messages?.get(id);
-            if (!message) return;
+            if (!message) continue;
 
-            await this.chatMessageListeners(message, element)
-        });
+            await this.chatMessageListeners(message, element);
+        }
     }
 
     static async chatMessageListeners(message: ChatMessage, html) {
@@ -41,9 +41,9 @@ export class TeamworkTest {
      * @returns 
      */
     static async addParticipant(message: ChatMessage) {
-        const actor = await Helpers.chooseFromAvailableActors()
+        const actor = await Helpers.chooseFromAvailableActors() as SR5Actor;
 
-        if(actor === undefined) {
+        if (!actor) {
             //in a normal running game this should not happen
             ui.notifications?.error('SR5.Errors.NoAvailableActorFound', {localize: true});
             return
@@ -52,7 +52,7 @@ export class TeamworkTest {
         const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
         const results = await actor?.rollSkill(teamworkData.skill) as SuccessTest;
         if(results.rolls.length > 0) {
-            this.addResultsToMessage(message, actor, results, teamworkData)
+            void this.addResultsToMessage(message, actor, results, teamworkData)
         }
     }
 
@@ -66,7 +66,6 @@ export class TeamworkTest {
     static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest, teamworkData: TeamworkMessageData) {
         //wrap the old content to presever it, this is necessary for pre-render hooks
         const wrapper = document.createElement("dív");
-        //@ts-expect-error v11 type
         wrapper.innerHTML = message.content;
 
         const participantsRoot = wrapper.getElementsByClassName("sr5-teamwork-participants")[0];
@@ -77,7 +76,7 @@ export class TeamworkTest {
         const participant = document.createElement('div');
         participant.innerHTML += actor.name + ": " + netHits;
 
-        if(roll.glitched) {
+        if (roll.glitched) {
             participant.innerHTML += " " + game.i18n.localize('SR5.Skill.Teamwork.Glitched')
         }
 
@@ -93,11 +92,11 @@ export class TeamworkTest {
         participantsRoot.appendChild(participant)
 
         if(game.user?.isGM) {
-            message.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData)
-            message.update({content: wrapper.innerHTML})
+            void message.setFlag(SYSTEM_NAME, FLAGS.Test, teamworkData)
+            void message.update({content: wrapper.innerHTML})
         }
         else {
-            this._sendUpdateSocketMessage(message, wrapper.innerHTML, teamworkData)
+            void this._sendUpdateSocketMessage(message, wrapper.innerHTML, teamworkData)
         }
 
     }
@@ -108,10 +107,9 @@ export class TeamworkTest {
      */
     static async rollTeamworkTest(message: ChatMessage) {
         const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
-        //@ts-expect-error v11 type
-        const actor = game.actors?.get(message.speaker.actor)
+        const actor = game.actors?.get(message.speaker.actor!) as SR5Actor;
         
-        actor?.rollTeamworkTest(teamworkData.skill, teamworkData)
+        void actor?.rollTeamworkTest(teamworkData.skill, teamworkData)
     }
 
     /**
@@ -120,7 +118,7 @@ export class TeamworkTest {
      * @param effectsData The effects data to be applied;
      */
     static async _sendUpdateSocketMessage(message: ChatMessage, content: string, teamworkData: TeamworkMessageData) {
-        await SocketMessage.emitForGM(FLAGS.TeamworkTestFlow, { messageUuid: message.uuid, content, teamworkData });
+        return SocketMessage.emitForGM(FLAGS.TeamworkTestFlow, { messageUuid: message.uuid, content, teamworkData });
     }
 
     /**
@@ -135,11 +133,10 @@ export class TeamworkTest {
             return;
         }
 
-        const message = fromUuidSync(socketMessage.data.messageUuid);
-        if (!message) return;
+        // todo type this properly
+        const message = fromUuidSync(socketMessage.data.messageUuid) as any;
 
-        await message.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData)
-        await message.update({content: socketMessage.data.content})
+        await message?.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData);
+        await message?.update({content: socketMessage.data.content});
     }
-
 }

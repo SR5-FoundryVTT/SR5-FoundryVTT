@@ -1,5 +1,6 @@
 import { SR } from "../constants";
 import { DataDefaults } from "../data/DataDefaults";
+import { DamageType } from "../types/item/Action";
 
 export class MatrixRules {
     /**
@@ -87,7 +88,6 @@ export class MatrixRules {
         return Math.max(marks, 1);
     }
 
-
     /**
      * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brut Force'
      * @param marks Mount of marks to be placed
@@ -110,7 +110,7 @@ export class MatrixRules {
     static hostMatrixAttributeRatings(hostRating): number[] {
         return [0, 1, 2, 3].map(rating => rating + hostRating);
     }
-
+    
     /**
      * Determine the modifier when decking a target on a different Grid. See SR5#233 'Grids on a run'
      */
@@ -185,8 +185,8 @@ export class MatrixRules {
      * 
      * See SR5#229-230 'User Mode' Virtual Reality sections.
      */
-    static convergenceDamage(): Shadowrun.DamageData {
-        return DataDefaults.damageData({base: 12, value: 12, type: {base: 'matrix', value: 'matrix'}});
+    static convergenceDamage(): DamageType {
+        return DataDefaults.createData('damage', {base: 12, value: 12, type: {base: 'matrix', value: 'matrix'}});
     }
 
     /**
@@ -195,10 +195,10 @@ export class MatrixRules {
      * See SR5#229 'Dumpshock & Link-Locking'
      * @param hotSim Is the persona using a hot sim?
      */
-    static dumpshockDamage(hotSim: boolean): Shadowrun.DamageData {
+    static dumpshockDamage(hotSim: boolean): DamageType {
         const type = hotSim ? 'physical' : 'stun';
         const damage = 6;
-        
-        return DataDefaults.damageData({type: {base: type, value: type}, base: damage, value: damage});
+
+        return DataDefaults.createData('damage', {type: {base: type, value: type}, base: damage, value: damage});
     }
 }

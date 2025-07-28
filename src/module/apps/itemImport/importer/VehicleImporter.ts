@@ -10,10 +10,12 @@ export class VehicleImporter extends DataImporter {
     }
 
     async Parse(jsonObject: VehiclesSchema): Promise<void> {
-        return await VehicleImporter.ParseItems<Vehicle, Shadowrun.VehicleActorData>(
+        return VehicleImporter.ParseItems<Vehicle>(
             jsonObject.vehicles.vehicle,
             {
-                compendiumKey: "Drone",
+                compendiumKey: (jsonData: Vehicle) => {
+                    return jsonData.category._TEXT.includes("Drone") ? "Drone" : "Vehicle";
+                },
                 parser: new VehicleParser(),
                 errorPrefix: "Failed Parsing Vehicle"
             }

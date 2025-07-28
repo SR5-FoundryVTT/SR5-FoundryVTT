@@ -1,35 +1,35 @@
 /**
  * A GM-Tool to keep track of all players overwatch scores
  */
-import { SR5Actor } from "../../actor/SR5Actor";
-import {Helpers} from "../../helpers";
+import { Helpers } from "../../helpers";
+import { SR5Actor } from "@/module/actor/SR5Actor";
 import { OverwatchStorage } from "../../storage/OverwatchStorage";
 
-export class OverwatchScoreTracker extends Application {
+export class OverwatchScoreTracker extends foundry.appv1.api.Application {
     static MatrixOverwatchDiceCount = '2d6';
     static override get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'overwatch-score-tracker';
         options.classes = ['sr5'];
         options.title = game.i18n.localize('SR5.OverwatchScoreTrackerTitle');
-        options.template = 'systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.html';
+        options.template = 'systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.hbs';
         options.width = 550;
         options.height = 'auto';
         options.resizable = true;
         return options;
     }
 
-    // List of raw user character data
-    actors: any[] = [];
+    // Contains only non-user actors added manually by the GM.
+    static addedActors: string[] = [];
+    actors: SR5Actor[] = [];
 
     override async getData(options) {
-        // Get list of user character actors
         await this._addMissingUserCharactersToStorage();
         this.actors = OverwatchStorage.trackedActors();
 
         return {
             scores: this.actors.map(actor => ({score: actor.getOverwatchScore(), actor})),
-            isGM: game.user?.isGM,
+            isGM: game.user.isGM,
         };
     }
 
@@ -40,8 +40,8 @@ export class OverwatchScoreTracker extends Application {
             if (user.isGM || !user.character) continue;
 
             const actor = user.character;
-            if (OverwatchStorage.isTrackedActor(actor)) continue;
-            await OverwatchStorage.trackActor(actor);
+            if (OverwatchStorage.isTrackedActor(actor as SR5Actor)) continue;
+            await OverwatchStorage.trackActor(actor as SR5Actor);
         }
     }
 
@@ -65,25 +65,23 @@ export class OverwatchScoreTracker extends Application {
 
         const tokens = Helpers.getControlledTokens();
         if (tokens.length === 0) {
-            return ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+            ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+            return;
         }
 
         // Warn user about selected unlinked token actors.
-        // @ts-expect-error TODO: foundry-vtt-types v10
         const unlinkedActor = tokens.find(token => !token.document.actorLink);
         if (unlinkedActor !== undefined) {
             ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported'));
         }
 
         // Add linked token actors.
-        // @ts-expect-error TODO: foundry-vtt-types v10
         tokens.filter(token => token.document.actorLink).forEach(token => {
             // Double check that the actor actually lives in the actors collection.
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            const actor = game.actors?.get(token.document.actorId);
+            const actor = game.actors.get(token.document.actorId!);
             if (!actor) return;
-            if (OverwatchStorage.isTrackedActor(actor)) return;
-            OverwatchStorage.trackActor(actor);
+            if (OverwatchStorage.isTrackedActor(actor as SR5Actor)) return;
+            void OverwatchStorage.trackActor(actor as SR5Actor);
         });
 
         this.render();

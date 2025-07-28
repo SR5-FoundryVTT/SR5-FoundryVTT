@@ -1,3 +1,4 @@
+import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from "../../item/SR5Item";
 import { OpposedTest } from "../../tests/OpposedTest";
 import { SuccessTest } from "../../tests/SuccessTest";
@@ -20,9 +21,8 @@ export const AutocompleteInlineHooksFlow =  {
      */
     setupHook: () => {
         // Module might not be installed.
-        const aipModule = game.modules.get("autocomplete-inline-properties");
+        const aipModule = game.modules.get("autocomplete-inline-properties") as any;
         if (!aipModule) return;
-        // @ts-expect-error // Lazy Typing
         // API might be missing.
         const api = aipModule.API;
         if (!api) return;
@@ -72,12 +72,13 @@ export const AutocompleteInlineHooksFlow =  {
      */
     keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
         const effect = EffectConfig.object;
+        const testsId = effect.system.selection_tests.map(test => test.id);
 
         // For  effects targeting specific tests, we can provide a merge of all tests data.
-        if (effect.selectionTests.length > 0) {
+        if (testsId.length > 0) {
             const actor = effect.actor;
             const testData = {};
-            for (const TestClassName of effect.selectionTests) {
+            for (const TestClassName of testsId) {
                 if (!TestClassName) return {};
                 const TestClass = TestCreator._getTestClass(TestClassName);
                 if (!TestClass) return {};
@@ -100,6 +101,8 @@ export const AutocompleteInlineHooksFlow =  {
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;
             return {data: new SuccessTestClass({}, {actor: item.actor, item}).data};
         }
+
+        return {};
     },
 
     /**
@@ -168,5 +171,6 @@ export const AutocompleteInlineHooksFlow =  {
             
             return {data: opposedTest.data};
         }
+        return {};
     }
 }

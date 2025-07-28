@@ -1,5 +1,6 @@
 import { DataDefaults } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
+import { DamageType } from "../types/item/Action";
 import { DrainRules } from "./DrainRules";
 
 /**
@@ -25,7 +26,7 @@ export const RitualRules = {
      * @param hits The amount of hits of the opposing ritual
      */
     drainValue: (hits: number, reagents: number, force: number): number => {
-        const reduction = Math.max(Math.floor(reagents / force) - 1, 0);
+        let reduction = Math.max(Math.floor(reagents / force) - 1, 0);
         return Math.max(hits * 2 - reduction, 2);
     },
 
@@ -38,11 +39,11 @@ export const RitualRules = {
      * @param drain The drain for the ritual
      * @param magic The magic attribute level of the ritual leader
      */
-    calcDrainDamage: (hits, drain: number, magic: number): Shadowrun.DamageData => {
+    calcDrainDamage: (hits, drain: number, magic: number): DamageType => {
         if (hits < 0) hits = 0;
         if (magic < 0) magic = 1;
 
-        const damage = DataDefaults.damageData();
+        const damage = DataDefaults.createData('damage');
         damage.base = drain;
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);
         Helpers.calcTotal(damage, { min: 0 });

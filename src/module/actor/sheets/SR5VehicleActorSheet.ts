@@ -1,7 +1,7 @@
-import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 import {SR5Actor} from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
-import { MatrixNetworkFlow } from '../../item/flows/MatrixNetworkFlow';
+import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
+import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 
 interface VehicleSheetDataFields {
     driver: SR5Actor|undefined
@@ -17,7 +17,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): string[] {
-        const itemTypes = super.getHandledItemTypes();
+        let itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -51,6 +51,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     override async getData(options) {
         const data = await super.getData(options);
 
+        // Vehicle actor type specific fields.
         data.vehicle = this._prepareVehicleFields();
 
         return data;
@@ -86,7 +87,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         }
 
         // Handle none specific drop events.
-        return await super._onDrop(event);
+        return super._onDrop(event);
     }
 
     _prepareVehicleFields(): VehicleSheetDataFields {
@@ -115,13 +116,13 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         const device = await fromUuid(originLink);
         if (!device) return;
 
-        // @ts-expect-error TODO: foundry-vtt-types v11
-        device.sheet.render(true);
+        if (device instanceof SR5Item || device instanceof SR5Actor)
+            device?.sheet?.render(true);
     }
 
     async _onControllerRemove(event) {
         event.preventDefault();
 
-        await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
+        return MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
     }
 }

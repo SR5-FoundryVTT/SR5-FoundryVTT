@@ -72,7 +72,7 @@ async function watch() {
         gulp.watch(pattern).on('change', () => gulp.src(pattern).pipe(gulp.dest(path.resolve(destFolder, out))));
     }
 
-    gulp.watch('public/**/*').on('change', () => gulp.src('public/**/*', {encoding: false}).pipe(gulp.dest(destFolder)));
+    gulp.watch('public/**/*').on('change', () => gulp.src('public/**/*').pipe(gulp.dest(destFolder)));
     watch('src/templates/**/*', 'templates');
     watch('src/module/tours/jsons/**/*', 'tours');
 
@@ -89,7 +89,7 @@ async function watch() {
             outfile: path.resolve(destFolder, jsBundle),
             plugins: [typecheckPlugin({watch: true})],
       })
-      
+
       // Enable watch mode
       await context.watch();
 }
@@ -110,10 +110,10 @@ async function buildSass() {
 /**
  * FoundryVTT compendium/packs.
  * Create all needed packs from their source files.
- * 
+ *
  * Since gulp tasks uses a commonJS file, while pack uses a es6 module, we have to use the node execution of packs.
- * 
- * Rebuilding packs.mjs to be commonJS as well, would mean to deviate from the dnd5e source of it, which I avoid to 
+ *
+ * Rebuilding packs.mjs to be commonJS as well, would mean to deviate from the dnd5e source of it, which I avoid to
  * keep future changes on their side easier to merge.
  */
 async function buildPacks() {

@@ -1,5 +1,11 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
+import { Translation } from "../utils/strings";
+
+/**
+ * Everything around SR5#190 'Active Defenses'
+ */
+export type ActiveDefenseData = Record<string, { label: Translation, value: number|undefined, initMod: number, weapon?: string, disabled?: boolean }>
 
 export const ActiveDefenseRules = {
     /**
@@ -7,9 +13,9 @@ export const ActiveDefenseRules = {
      * @param weapon The equipped weapon used for the attack.
      * @param actor The actor performing the attack.
      */
-    availableActiveDefenses: (weapon: SR5Item, actor: SR5Actor): Shadowrun.ActiveDefenseData => {
+    availableActiveDefenses: (weapon: SR5Item<'weapon'>, actor: SR5Actor): ActiveDefenseData => {
         // General purpose active defenses. ()
-        const activeDefenses: Shadowrun.ActiveDefenseData  = {
+        const activeDefenses: ActiveDefenseData  = {
             full_defense: {
                 label: 'SR5.FullDefense',
                 value: actor.getFullDefenseAttribute()?.value,
@@ -17,7 +23,7 @@ export const ActiveDefenseRules = {
             },
         };
 
-        if (!weapon.isMeleeWeapon) return activeDefenses;
+        if (!weapon.isMeleeWeapon()) return activeDefenses;
 
         // Melee weapon specific active defenses.
         activeDefenses['dodge'] = {
@@ -33,7 +39,7 @@ export const ActiveDefenseRules = {
         activeDefenses['parry'] = {
             label: 'SR5.Parry',
             weapon: weapon.name || '',
-            value: actor.findActiveSkill(weapon.getActionSkill())?.value,
+            value: actor.findActiveSkill(weapon.system.action.skill)?.value,
             initMod: -5,
         };
 

@@ -1,3 +1,4 @@
+import { SR5Actor } from "../actor/SR5Actor";
 import { DataStorage } from "../data/DataStorage";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
@@ -21,7 +22,7 @@ export const NetworkStorage = {
      * @param slave A network icon document.
      * @param removeFromOthers When true, the slave will be removed from all other networks.
      */
-    async addSlave(master: SR5Item, slave: Shadowrun.NetworkDevice, removeFromOthers: boolean = false) {
+    async addSlave(master: SR5Item, slave: SR5Actor | SR5Item, removeFromOthers: boolean = false) {
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
@@ -55,7 +56,7 @@ export const NetworkStorage = {
      * @param master The master network document.
      * @param slave A network icon document.
      */
-    async removeSlave(master: SR5Item, slave: Shadowrun.NetworkDevice) {
+    async removeSlave(master: SR5Item, slave: SR5Actor | SR5Item) {
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
@@ -73,7 +74,7 @@ export const NetworkStorage = {
      *
      * @param slave A network icon document.
      */
-    async removeFromNetworks(slave: Shadowrun.NetworkDevice) {
+    async removeFromNetworks(slave: SR5Actor | SR5Item) {
         const networks = NetworkStorage.getStorage();
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
 
@@ -93,7 +94,7 @@ export const NetworkStorage = {
      * @param slave A network icon document.
      * @returns true, when slave is part of a master network.
      */
-    isSlave(master: SR5Item, slave: Shadowrun.NetworkDevice): boolean {
+    isSlave(master: SR5Item, slave: SR5Actor | SR5Item): boolean {
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
@@ -123,7 +124,7 @@ export const NetworkStorage = {
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuids = networks[masterUuid] ?? [];
-        return slaveUuids.map(uuid => fromUuidSync(Helpers.uuidFromStorage(uuid))) as Shadowrun.NetworkDevice[];
+        return slaveUuids.map(uuid => fromUuidSync(Helpers.uuidFromStorage(uuid))) as (SR5Actor | SR5Item)[];
     },
 
     /**
@@ -132,7 +133,7 @@ export const NetworkStorage = {
      * @param slave Slave network icon document.
      * @returns The master network document or null if not found.
      */
-    getMaster(slave: Shadowrun.NetworkDevice): SR5Item | null {
+    getMaster(slave: SR5Actor | SR5Item): SR5Item | null {
         const networks = NetworkStorage.getStorage();
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
 

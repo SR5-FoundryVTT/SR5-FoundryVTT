@@ -11,7 +11,7 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): string[] {
-        const itemTypes = super.getHandledItemTypes();
+        let itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -29,12 +29,8 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
         const data = await super.getData(options);
 
         // Collect sprite technomancer for easy interaction.
-        const sprite = this.document.asSprite();
-        if (sprite !== undefined) {
-            if (sprite.system.technomancerUuid !== '') {
-                data['technomancer'] = await fromUuid(sprite.system.technomancerUuid);
-            }
-        }
+        if (this.document.isType('sprite') && this.document.system.technomancerUuid !== '')
+            data['technomancer'] = await fromUuid(this.document.system.technomancerUuid as any);
 
         return data;
     }
@@ -42,7 +38,7 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
     /**
      * Sprites have support for dropping actors onto them.
      */
-    override async _onDrop(event: DragEvent): Promise<void> {
+    override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -62,7 +58,7 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
     async _addTechnomancerOnDrop(dropData: any): Promise<void> {
         if (dropData.type !== 'Actor') return;
         const actor = await fromUuid(dropData.uuid) as SR5Actor;
-        if (!actor.isCharacter()) return;
+        if (!actor.isType('character')) return;
 
         this.document.addTechnomancer(actor);
     }

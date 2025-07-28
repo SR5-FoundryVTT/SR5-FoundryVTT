@@ -1,25 +1,23 @@
+
+//todo: v10 foundry-vtt-types 
+
 import LowLightVisionFilter from "./lowlightFilter";
 
-//@ts-expect-error // TODO: foundry-vtt-types v10
-export default class LowlightVisionDetectionMode extends DetectionMode {
+export default class LowlightVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
 
-  static getDetectionFilter() {
-    //@ts-expect-error // TODO: foundry-vtt-types v10
-    this._detectionFilter ??= LowLightVisionFilter.create();
-    //@ts-expect-error // TODO: foundry-vtt-types v10
-    return this._detectionFilter;
-  }
+    static override getDetectionFilter() {
+        return this._detectionFilter ??= LowLightVisionFilter.create();
+    }
 
-  _canDetect(visionSource, target) {
-    const tgt = target?.document;
-    const targetIsVisible =
-      tgt instanceof TokenDocument
-      //@ts-expect-error // TODO: foundry-vtt-types v10
-      && !tgt.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
+    override _canDetect(visionSource, target) {
+        const tgt = target?.document;
+        const targetIsVisible =
+            tgt instanceof TokenDocument
+            && !tgt.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
 
-    const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
+        const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 
-    return targetIsVisible && !isAstralPerceiving
-
-  }
+        return targetIsVisible && !isAstralPerceiving
+    }
 }
+  

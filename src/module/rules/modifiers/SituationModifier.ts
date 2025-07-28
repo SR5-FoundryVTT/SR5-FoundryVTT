@@ -1,10 +1,12 @@
 import { SuccessTest } from './../../tests/SuccessTest';
 import { SR5Actor } from './../../actor/SR5Actor';
-import { DocumentSituationModifiers } from '../DocumentSituationModifiers';
+import { DocumentSituationModifiers, ModifiableDocumentTypes } from '../DocumentSituationModifiers';
 import Modifier = Shadowrun.ModifierData;
 import SourceModifierData = Shadowrun.SourceModifierData;
 import ActiveModifierValue = Shadowrun.ActiveModifierValue;
 import { SituationModifierEffectsFlow } from '../../effect/flows/SituationModifierEffectsFlow';
+import { SR5 } from '../../config';
+
 
 export interface SituationalModifierApplyOptions {
     // When set to true, applied will be regenerated always.
@@ -19,6 +21,7 @@ export interface SituationalModifierApplyOptions {
     test?: SuccessTest
 }
 
+export type ModifierTypes = Partial<keyof typeof SR5['modifierTypes']>;
 
 /**
  * Base class for handling a single modifier type that's applied to a document.
@@ -42,15 +45,16 @@ export interface SituationalModifierApplyOptions {
  * all types for a document.
  */
 export class SituationModifier {
-    type: Shadowrun.SituationModifierType;
+    type: Shadowrun.SituationModifierType | undefined;
     // A reference to the modifiers this handler is used within.
     modifiers?: DocumentSituationModifiers
     // The original source modifier data. This shouldn't be altered.
     source: SourceModifierData
     // The applied modifier data, originating from the original source data.
-    applied: Modifier
-
-    globalActivesApplied: boolean;
+    // @ts-expect-error Applied can by undefined, though it will be set before use.
+    //                  Defining it as unapplied, trickles type issues all over the place...
+    //                  It also needs in a falsible state, so the #apply method functions correctly.
+    applied: Modifier;
 
     // The effects flow for this modifier.
     effects: SituationModifierEffectsFlow<this>;
@@ -121,7 +125,6 @@ export class SituationModifier {
      * Determine if the source data has an active modifier set for this situational modifier.
      */
     get hasActive(): boolean {
-        //@ts-expect-error TODO: foundry-vtt-types v10
         return !foundry.utils.isEmpty(this.source.active);
     }
 
@@ -284,7 +287,7 @@ export class SituationModifier {
         sources.push(sceneSource);
     }
 
-    _getDocumentsSourceData(document: Shadowrun.ModifiableDocumentTypes): SourceModifierData|undefined {
+    _getDocumentsSourceData(document: ModifiableDocumentTypes): SourceModifierData|undefined {
         // To access another objects
         if (!this.type) return;
         // A placed token must apply it's scene modifiers first.

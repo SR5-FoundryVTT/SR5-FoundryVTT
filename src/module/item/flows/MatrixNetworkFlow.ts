@@ -20,7 +20,7 @@ export class MatrixNetworkFlow {
      *
      * @param target Whatever Document you want to link to.
      */
-    static buildLink(target: Shadowrun.NetworkDevice | TokenDocument) {
+    static buildLink(target: SR5Actor | SR5Item | TokenDocument) {
         return target.uuid;
     }
 
@@ -46,7 +46,7 @@ export class MatrixNetworkFlow {
     static resolveLink(link: string) {
         if (!link) return;
 
-        return fromUuidSync(link) as Shadowrun.NetworkDevice | undefined;
+        return fromUuidSync(link) as SR5Actor | SR5Item | undefined;
     }
 
     /**
@@ -58,7 +58,7 @@ export class MatrixNetworkFlow {
      * @param master
      * @param slave
      */
-    static async addSlave(master: SR5Item, slave: Shadowrun.NetworkDevice) {
+    static async addSlave(master: SR5Item, slave: SR5Actor | SR5Item) {
         console.debug(`Shadowrun5e | Adding document ${slave?.name} to the master ${master?.name}`, master, slave);
         if (!master || !slave) return console.error('Shadowrun 5e | Either the networks master or device did not resolve.');
 
@@ -79,7 +79,7 @@ export class MatrixNetworkFlow {
     * @param slave The network icon or slave.
     * @returns true, if the slave can be added to the master.
     */
-    static validateSlave(master: SR5Item, slave: Shadowrun.NetworkDevice) {
+    static validateSlave(master: SR5Item, slave: SR5Actor | SR5Item) {
         // Disallow direct circular relationship.
         if (master.id === slave.id) {
             console.warn('Shadowrun 5e | A device cant be its own network master');
@@ -87,19 +87,19 @@ export class MatrixNetworkFlow {
         }
 
         // Validate PAN relationsships.
-        if (master.isDevice && !slave.canBeSlave) {
+        if (master.isType('device') && !slave.canBeSlave) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.CantConnectToPAN'));
             return false;
         }
 
         // Validate WAN relationships.
-        if (master.isNetwork && !slave.canBeMatrixIcon) {
+        if (master.isNetwork() && !slave.canBeMatrixIcon) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.CantConnectToWAN'));
             return false;
         }
 
         // Validate IC to master relationships.
-        if (slave instanceof SR5Actor && master.isGrid && slave.isIC()) {
+        if (slave instanceof SR5Actor && master.isType('grid') && slave.isType('ic')) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.CantConnectICToGrid'));
             return false;
         }
@@ -112,8 +112,8 @@ export class MatrixNetworkFlow {
 
      * @param slave A network device that's connected to a master.
      */
-    static async removeSlaveFromMaster(slave: Shadowrun.NetworkDevice | undefined) {
-        console.debug(`Shadowrun 5e | Removing device ${slave.name} from its master`);
+    static async removeSlaveFromMaster(slave: SR5Actor | SR5Item | undefined) {
+        console.debug(`Shadowrun 5e | Removing device ${slave?.name} from its master`);
 
         if (!slave) return;
         if (!slave.canBeSlave) return;
@@ -123,10 +123,8 @@ export class MatrixNetworkFlow {
 
         // Retrieve master to update it's sheet.
         const master = MatrixNetworkFlow.getMaster(slave);
-        if (!master) {
-            console.error(`Shadowrun 5e | Could not find master for device ${slave.name}`);
-            return;
-        }
+        if (!master)
+            return console.error(`Shadowrun 5e | Could not find master for device ${slave.name}`);
 
         await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
     }
@@ -139,7 +137,7 @@ export class MatrixNetworkFlow {
      * @param master The master device that's connected to the slave.
      * @param slave The matrix icon to be disconnected.
      */
-    static async removeSlave(master: SR5Item, slave: Shadowrun.NetworkDevice) {
+    static async removeSlave(master: SR5Item, slave: SR5Actor | SR5Item) {
         console.debug(`Shadowrun 5e | Removing device with uuid ${slave.uuid} from network`);
 
         await NetworkStorage.removeSlave(master, slave);
@@ -162,10 +160,9 @@ export class MatrixNetworkFlow {
         await NetworkStorage.removeSlaves(master);
 
         // Since no document update occured, we have to trigger a update for cross session sheet re-render.
-        await master.update({'system.matrix.updatedConnections': Date.now()});
-        for (const slave of slaves) {
-            await slave.update({'system.matrix.updatedConnections': Date.now()});
-        }
+        await master.update({system: {matrix: {updatedConnections: Date.now()}}});
+        for (const slave of slaves)
+            await slave.update({system: {matrix: {updatedConnections: Date.now()}}});
     }
 
     /**
@@ -174,7 +171,7 @@ export class MatrixNetworkFlow {
      * @param master The master device to retrieve slaves for.
      * @returns A list of network devices slaved to the master.
      */
-    static getSlaves(master: SR5Item): Shadowrun.NetworkDevice[] {
+    static getSlaves(master: SR5Item): (SR5Actor | SR5Item)[] {
         console.debug(`Shadowrun 5e | Getting slaves for master ${master.name}`, master);
 
         if (!master.canBeMaster) {
@@ -196,15 +193,15 @@ export class MatrixNetworkFlow {
      * @param data The document data given by FoundryVTT deleteItem event
      * @param id The document id
      */
-    static async handleOnDeleteDocument(document: Shadowrun.NetworkDevice, data: any, id: string) {
+    static async handleOnDeleteDocument(document: SR5Actor | SR5Item, data: any, id: string) {
         console.debug(`Shadowrun 5e | Checking for network on deleted item ${document.name}`, document);
         // A deleted master must be removed from all its devices.
-        if (document.canBeMaster) return await MatrixNetworkFlow.removeAllSlaves(document);
+        if (document instanceof SR5Item && document.canBeMaster) return MatrixNetworkFlow.removeAllSlaves(document);
         // A deleted device must be removed from its master.
-        if (document.canBeMatrixIcon) return await MatrixNetworkFlow.disconnectNetwork(document);
+        if (document.canBeMatrixIcon) return MatrixNetworkFlow.disconnectNetwork(document);
     }
 
-    static _currentUserCanModifyDevice(device: Shadowrun.NetworkDevice): boolean {
+    static _currentUserCanModifyDevice(device: SR5Actor | SR5Item): boolean {
         return game.user?.isGM || device.isOwner;
     }
 
@@ -213,7 +210,7 @@ export class MatrixNetworkFlow {
      *
      * @param slave This matrix icon will be disconnected from it's network.
      */
-    static async disconnectNetwork(slave: Shadowrun.NetworkDevice) {
+    static async disconnectNetwork(slave: SR5Actor | SR5Item) {
         const master = MatrixNetworkFlow.getMaster(slave);
         await NetworkStorage.removeFromNetworks(slave);
 
@@ -226,7 +223,7 @@ export class MatrixNetworkFlow {
      * @param slave A matrix network device.
      * @returns true, if the device is connected to a network.
      */
-    static isSlave(slave: Shadowrun.NetworkDevice) {
+    static isSlave(slave: SR5Actor | SR5Item) {
         const networks = NetworkStorage.getStorage();
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
         for (const slaves of Object.values(networks)) {
@@ -238,7 +235,7 @@ export class MatrixNetworkFlow {
     /**
      * Retrieve the master of a given network device.
      */
-    static getMaster(slave: Shadowrun.NetworkDevice): SR5Item | null {
+    static getMaster(slave: SR5Actor | SR5Item): SR5Item | null {
         // Validate actor icons.
         if (slave instanceof SR5Actor) {
             if (!slave.isMatrixActor) {
@@ -264,8 +261,8 @@ export class MatrixNetworkFlow {
      * @param options.players If true, only grids visible to players are returned.
      */
     static getGrids(options = {players: true}): SR5Item[] {
-        const grids = game.items?.filter(item => item.isGrid) ?? [];
-        if (options.players) return grids.filter(grid => grid.matrixIconVisibleToPlayer);
+        const grids = (game.items as unknown as SR5Item[]).filter(item => item.isType('grid'));
+        if (options.players) return grids.filter(grid => grid.matrixIconVisibleToPlayer());
         return grids;
     }
 
@@ -275,8 +272,8 @@ export class MatrixNetworkFlow {
      * @param options.players If true, only networks visible to players are returned.
      */
     static getNetworks(options = {players: false}): SR5Item[] {
-        const networks = game.items?.filter(item => item.isNetwork) ?? [];
-        if (options.players) return networks.filter(network => network.matrixIconVisibleToPlayer);
+        const networks = (game.items as unknown as SR5Item[]).filter(item => item.isNetwork()) ?? [];
+        if (options.players) return networks.filter(network => network.matrixIconVisibleToPlayer());
         return networks;
     }
 
@@ -316,8 +313,8 @@ export class MatrixNetworkFlow {
      * @param master The network master to update.
      * @param slave The network slave to update.
      */
-    static async _triggerUpdateForNetworkConnectionChange(master: SR5Item | undefined | null, slave: Shadowrun.NetworkDevice | undefined | null) {
-        const updateData = {'system.matrix.updatedConnections': Date.now()};
+    static async _triggerUpdateForNetworkConnectionChange(master: SR5Item | undefined | null, slave: SR5Actor | SR5Item | undefined | null) {
+        const updateData = { system: { matrix: { updatedConnections: Date.now() } } };
 
         // Players will trigger this workflow as well and likely can't update one of the documents.
         if (game.user?.isGM) {
@@ -347,7 +344,7 @@ export class MatrixNetworkFlow {
      * 
      * This will allow the GM to accept this invitation.
      */
-    static async AskForNetworkMarkInvite(actor: SR5Actor, target: Shadowrun.NetworkDevice) {
+    static async AskForNetworkMarkInvite(actor: SR5Actor, target: SR5Actor | SR5Item) {
         if (!actor || !target) {
             console.error('Shadowrun 5e | No actor or target given for network mark invite.');
             return;
@@ -360,14 +357,14 @@ export class MatrixNetworkFlow {
         const messageData = {
             content,
             speaker: ChatMessage.getSpeaker({actor}),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: 'base',
             flags: {
                 [`${SYSTEM_NAME}.${FLAGS.MatrixNetworkMarkInvite}`]: {
                     actorUuid: actor.uuid,
                     targetUuid: target.uuid,
                 }
             }
-        };
+        } satisfies ChatMessage.CreateData;
 
         await ChatMessage.create(messageData);
     }
@@ -383,10 +380,8 @@ export class MatrixNetworkFlow {
 
         // Disallow players to accept, even if they have permissions.
         // This is doneto avoid permission checks on all involved documents.
-        if (!game.user?.isGM) {
-            ui.notifications.warn('SR5.Warnings.OnlyGMCanDoThis', {localize: true});
-            return;
-        }
+        if (!game.user?.isGM)
+            return ui.notifications.warn('SR5.Warnings.OnlyGMCanDoThis', {localize: true});
 
 
         // Collect necessary data from chat message.
@@ -395,23 +390,19 @@ export class MatrixNetworkFlow {
         const message = game.messages?.get(messageId);
         if (!message) return;
 
-        const {actorUuid, targetUuid} = message.getFlag(SYSTEM_NAME, FLAGS.MatrixNetworkMarkInvite) as {actorUuid: string, targetUuid: string};
+        const {actorUuid, targetUuid} = message.getFlag(SYSTEM_NAME, FLAGS.MatrixNetworkMarkInvite);
 
         const actor = await fromUuid(actorUuid) as SR5Actor | undefined;
         const network = await fromUuid(targetUuid) as SR5Item | undefined;
 
-        if (!actor || !network) {
-            console.error('Shadowrun 5e | Could not resolve actor or network for mark invite', actorUuid, targetUuid);
-            return;
-        }
+        if (!actor || !network)
+            return console.error('Shadowrun 5e | Could not resolve actor or network for mark invite', actorUuid, targetUuid);
 
 
         // Do nothing, if enough marks are already placed.
         const marks = actor.getMarksPlaced(network.uuid);
-        if (marks > 0) {
-            ui.notifications.warn(game.i18n.format('SR5.Warnings.AlreadyJoinedNetwork', {name: actor.name}));
-            return;
-        }
+        if (marks > 0)
+            return ui.notifications.warn(game.i18n.format('SR5.Warnings.AlreadyJoinedNetwork', {name: actor.name}));
         // Only mark, don't connect. Not all players want to immediately connect to the network.
         await actor.setMarks(network, 1);
 
@@ -420,8 +411,8 @@ export class MatrixNetworkFlow {
         const messageData = {
             content: game.i18n.format('SR5.Messages.MarkInvitation.InviteAccepted', {networkName: network.name, userName: actor.name}),
             speaker: ChatMessage.getSpeaker({actor}),
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER
-        };
+            type: 'base'
+        } satisfies ChatMessage.CreateData;
         await ChatMessage.create(messageData);
     }
 

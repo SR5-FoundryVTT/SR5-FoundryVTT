@@ -1,18 +1,21 @@
 import { Parser } from '../Parser';
+import { CompendiumKey } from '../../importer/Constants';
 import { Power } from '../../schema/CritterpowersSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import CritterPowerCategory = Shadowrun.CritterPowerCategory;
-import CritterPowerItemData = Shadowrun.CritterPowerItemData;
+import { CritterPowerCategories } from 'src/module/types/item/CritterPower';
 
-export class CritterPowerParser extends Parser<CritterPowerItemData> {
-    protected override parseType: string = 'critter_power';
+export class CritterPowerParser extends Parser<'critter_power'> {
+    protected readonly parseType = 'critter_power';
 
-    protected override getSystem(jsonData: Power): CritterPowerItemData['system'] {
+    protected override getSystem(jsonData: Power) {
         const system = this.getBaseSystem();
 
-        const category = jsonData.category._TEXT.toLowerCase();
-        system.category = (category.includes("infected") ? "infected" : category) as CritterPowerCategory;
+        let category = jsonData.category._TEXT.toLowerCase();
+        category = (category.includes("infected") ? "infected" : category);
+        system.category = CritterPowerCategories.includes(category as any)
+            ? (category as typeof CritterPowerCategories[number])
+            : "";
 
         system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : "";
 
@@ -27,11 +30,11 @@ export class CritterPowerParser extends Parser<CritterPowerItemData> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Power): Promise<Folder> {
+    protected override async getFolder(jsonData: Power, compendiumKey: CompendiumKey): Promise<Folder> {
         const rootFolder = "Critter Powers";
         const category = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
 
-        return await IH.getFolder('Trait', rootFolder, category);
+        return IH.getFolder(compendiumKey, rootFolder, category);
     }
 
     protected static readonly rangeMap: Record<string, string> = {

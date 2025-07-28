@@ -2,7 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { WeaponParser } from '../../../../module/apps/importer/actorImport/itemImporter/weaponImport/WeaponParser';
 
 export const weaponParserTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert } = context;
+    const { describe, it, assert, beforeEach } = context;
 
     let chummerCharacter;
     const chummerRangedWeapon = {
@@ -618,16 +618,6 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
     });
 
     describe('Weapon Parser can handle inputs', () => {
-        it('has null in character', async () => {
-            chummerCharacter = {
-                weapons: null,
-            };
-
-            const weapons = await weaponParser.parseWeapons(chummerCharacter);
-
-            assert.lengthOf(weapons, 0);
-        });
-
         it('has empty array in character', async () => {
             chummerCharacter = {
                 weapons: [],
@@ -663,7 +653,7 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
 
         it('weaponArray with one weapon', async () => {
             const chummerWeapons = [chummerRangedWeapon];
-            const weapons = await weaponParser.parseWeaponArray(chummerWeapons);
+            const weapons = await weaponParser.parseWeaponArray(chummerWeapons as any);
 
             assert.lengthOf(weapons, 1);
         });

@@ -7,8 +7,9 @@ import { SR5Item } from './item/SR5Item';
  * @returns {Promise}
  */
 import {Helpers} from "./helpers";
-import SkillField = Shadowrun.SkillField;
 import {SR5Actor} from "./actor/SR5Actor";
+import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
+import { SkillFieldType } from './types/template/Skills';
 
 /**
  * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.
@@ -17,24 +18,24 @@ import {SR5Actor} from "./actor/SR5Actor";
  * @param slot The slot to be dropped into on the Macro bar
  */
 export async function createItemMacro(dropData, slot) {
-    if (!game?.macros) return;
+    if (!game || !game.macros) return;
 
     const item = await SR5Item.fromDropData(dropData);
     if (!(item instanceof SR5Item)) return console.error(`Shadowrun 5e | Macro Drop expected an item document but got a different document type`, item);
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    let macro = game.macros.contents.find((m) => m.name === item.name);
+    let macro = game.macros.contents.find((m: Macro.Stored<"script" | "chat">) => m.name === item.name) as Macro;
     if (!macro) {
         macro = await Macro.create(
             {
-                name: item.name as string,
+                name: item.name,
                 type: 'script',
                 img: item.img,
-                command,
-                flags: { 'shadowrun5e.itemMacro': true },
+                command: command,
+                flags: { shadowrun5e: { itemMacro: true } },
             },
             { renderSheet: false },
-        );
+        ) as Macro;
     }
 
     if (macro) game.user?.assignHotbarMacro(macro, slot);
@@ -47,7 +48,7 @@ export async function createItemMacro(dropData, slot) {
  * @return {Promise}
  */
 export function rollItemMacro(itemName) {
-    if (!game?.actors) return;
+    if (!game || !game.actors) return;
 
     const speaker = ChatMessage.getSpeaker();
     let actor;
@@ -68,10 +69,10 @@ export function rollItemMacro(itemName) {
  * @param data A data object for skill macros.
  * @param slot The hotbar slot to use.
  */
-export async function createSkillMacro(data: {skillId: string, skill: SkillField}, slot) {
+export async function createSkillMacro(data: {skillId: string, skill: SkillFieldType}, slot) {
     if (!game.macros || !game.user) return;
 
-    const {skill} = data;
+    const {skillId, skill} = data;
 
     // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
     const name = Helpers.getSkillLabelOrName(skill);
@@ -94,8 +95,8 @@ export async function createSkillMacro(data: {skillId: string, skill: SkillField
  *
  * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
  */
-export async function rollSkillMacro(skillLabel) {
-    if (!game?.actors) return;
+export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData>| void> {
+    if (!game || !game.actors) return;
     if (!skillLabel) return;
 
     // Fetch the actor from the current users token or the actor collection.

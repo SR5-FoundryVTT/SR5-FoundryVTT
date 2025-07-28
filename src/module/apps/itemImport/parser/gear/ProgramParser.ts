@@ -1,18 +1,18 @@
 import { Parser } from "../Parser";
+import { CompendiumKey } from "../../importer/Constants";
 import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
-import ProgramItemData = Shadowrun.ProgramItemData;
 
-export class ProgramParser extends Parser<ProgramItemData> {
-    protected override parseType: string = 'program';
-    protected categories: GearSchema['categories']['category'];
+export class ProgramParser extends Parser<'program'> {
+    protected readonly parseType = 'program';
+    protected readonly categories: GearSchema['categories']['category'];
 
     constructor(categories: GearSchema['categories']['category']) {
         super(); this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Gear): ProgramItemData['system'] {
+    protected override getSystem(jsonData: Gear) {
         const programCategories = {
             'Hacking Programs': 'hacking_program',
             'Common Programs': 'common_program'
@@ -25,11 +25,11 @@ export class ProgramParser extends Parser<ProgramItemData> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Gear): Promise<Folder> {
+    protected override async getFolder(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
         const rootFolder = TH.getTranslation('Software', {type: 'category'})
         const folderName = TH.getTranslation(categoryData, {type: 'category'});
 
-        return await IH.getFolder('Gear', rootFolder, folderName);
+        return IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

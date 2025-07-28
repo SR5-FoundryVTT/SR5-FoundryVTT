@@ -9,6 +9,8 @@ import { MarksStorage } from '../storage/MarksStorage';
 import { MatrixResistTest } from '../tests/MatrixResistTest';
 import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
+import { DamageType } from '../types/item/Action';
+import { MatrixAttributesType } from '../types/template/Matrix';
 
 /**
  * General handling around everything matrix related.
@@ -26,7 +28,7 @@ export const MatrixFlow = {
      * @returns Changed matrix attributes data.
      */
     changeMatrixAttribute(
-        matrixAttributes: Shadowrun.MatrixAttributes,
+        matrixAttributes: MatrixAttributesType,
         changedSlot: string,
         attribute: Shadowrun.MatrixAttribute,
     ): Record<string, any> {
@@ -68,9 +70,9 @@ export const MatrixFlow = {
         if (!against) return;
         if (!against.hasTestCategory('matrix')) return;
         if (!MatrixRules.isIllegalAction(
-            against.data.action.attribute,
-            against.data.action.attribute2,
-            against.data.action.limit.attribute)) {
+            against.data.action.attribute as any,
+            against.data.action.attribute2 as any,
+            against.data.action.limit.attribute as any)) {
             return;
         }
 
@@ -131,7 +133,7 @@ export const MatrixFlow = {
      * @param damage The damage to be resited.
      * @returns Modified damage after resistance based on damage given.
      */
-    async executeMatrixDamageResistance(actor: SR5Actor, damage: Shadowrun.DamageData): Promise<Shadowrun.DamageData | undefined> {
+    async executeMatrixDamageResistance(actor: SR5Actor, damage: DamageType): Promise<DamageType | undefined> {
         const test = await actor.generalActionTest('resist_matrix') as MatrixResistTest;
         if (!test) {
             console.error('Shadowrun 5e | The General Action pack does not contain a recovery_matrix action.');
@@ -196,7 +198,7 @@ export const MatrixFlow = {
     /**
      * Inform GM and users about the result of a reboot action.
      */
-    async sendRebootDeviceMessage(actor: SR5Actor, device: SR5Item | undefined, delay: number, damage: Shadowrun.DamageData) {
+    async sendRebootDeviceMessage(actor: SR5Actor, device: SR5Item | undefined, delay: number, damage: DamageType) {
         const speaker = {
             actor,
             alias: game.user?.name,
@@ -220,7 +222,7 @@ export const MatrixFlow = {
      * @param actor The actor that is affected by dumpshock.
      */
     getDumpshockDamage(actor: SR5Actor) {
-        if (!actor.isUsingVR) return DataDefaults.damageData({ type: { base: 'stun', value: 'stun' } });
+        if (!actor.isUsingVR) return DataDefaults.createData('damage', { type: { base: 'stun', value: 'stun' } });
 
         return MatrixRules.dumpshockDamage(actor.isUsingHotSim);
     },
@@ -251,7 +253,7 @@ export const MatrixFlow = {
 
         // Prepare all targets based on network connection.
         const network = actor.network;
-        const targets = network?.isHost ?
+        const targets = network?.isType('host') ?
             MatrixFlow.prepareHostTargets(actor) :
             MatrixFlow.prepareGridTargets(actor);
 
@@ -275,7 +277,7 @@ export const MatrixFlow = {
      */
     prepareHostTargets(actor: SR5Actor) {
         const host = actor.network;
-        if (!host?.isHost) {
+        if (!host?.isType('host')) {
             console.error('Shadowrun 5e | Actor is not connected to a host network');
             return [];
         }
@@ -285,7 +287,8 @@ export const MatrixFlow = {
         for (const slave of host.slaves) {
             const type = ActorMarksFlow.getDocumentType(slave);
             // For persona slaves get their possible token.
-            const token = slave.getToken ? slave.getToken() : null;
+            // taM check this
+            const token = 'getToken' in slave ? slave.getToken() : null;
 
             // Remove the actor itself from the list of targets.
             if (slave.uuid === actor.uuid) continue;
@@ -349,11 +352,12 @@ export const MatrixFlow = {
                 // TODO: taMiF/marks this will filter out targets without persona but active icons.
                 if (!target.hasPersona) continue;
                 // Filter out IC as they can't be targeted outside their host.
-                if (target.isIC()) continue;
+                if (target.isType('ic')) continue;
                 // Filter out persona based on matrix rules.
                 if (!actor.matrixPersonaIsVisible(target)) continue;
 
-                const type = ActorMarksFlow.getDocumentType(document);
+                // taM Check this
+                const type = ActorMarksFlow.getDocumentType(document as any);
                 targets.push({
                     name: token.name,
                     document: token.actor,
@@ -423,27 +427,27 @@ export const MatrixFlow = {
      * Collect visible hosts for selection.
      */
     visibelHosts() {
-        return game.items?.filter(item => item.isHost && item.matrixIconVisibleToPlayer) ?? [];
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host') && item.matrixIconVisibleToPlayer()) ?? [];
     },
 
     /**
      * Collect all hosts for selection.
      */
     allHosts() {
-        return game.items?.filter(item => item.isHost) ?? [];
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host')) ?? [];
     },
 
     /**
      * Collect visible grids for selection.
      */
     visibleGrids() {
-        return game.items?.filter(item => item.isGrid && item.matrixIconVisibleToPlayer) ?? [];
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid') && item.matrixIconVisibleToPlayer()) ?? [];
     },
 
     /**
      * Collect all grids for selection.
      */
     allGrids() {
-        return game.items?.filter(item => item.isGrid) ?? [];
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid')) ?? [];
     }
 };

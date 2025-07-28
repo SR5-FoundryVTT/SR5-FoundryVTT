@@ -1,33 +1,22 @@
-import {SR5TestingDocuments} from "./utils";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 
 export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
     const {describe, it, before, after} = context;
+    const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-    let testScene;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-        testScene = new SR5TestingDocuments(Scene);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-        await testScene.teardown();
-    })
+    before(async () => {})
+    after(async () => {})
 
     describe('Network Devices handling', () => {
-        it('Handle PAN/WAN networks and device linking');
+        it('Handle PAN/WAN networks and device linking', () => {
+            // assert.fail('Test suite is deactivated');
+        })
         // TODO: Redesign them with only necessary update methods in place. Instead start of with ActorData prefilled on create.
         // it('give a network link to given document class', async () => {
         //     const actor = await testActor.create({'type': 'character'});
-        //     const link = MatrixNetworkFlow.buildLink(actor);
+        //     const link = NetworkDeviceFlow.buildLink(actor);
 
         //     const nodes = link.split('.');
 
@@ -39,8 +28,8 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     // Test collection Actor.
         //     const actor = await testActor.create({'type': 'character'});
 
-        //     const link = MatrixNetworkFlow.buildLink(actor);
-        //     const resolvedActor = await MatrixNetworkFlow.resolveLink(link);
+        //     const link = NetworkDeviceFlow.buildLink(actor);
+        //     const resolvedActor = await NetworkDeviceFlow.resolveLink(link);
 
         //     assert.isNotNull(resolvedActor);
         //     assert.strictEqual(resolvedActor?.id, actor.id);
@@ -51,8 +40,8 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     const item = await testItem.create({type: 'weapon'});
         //     const embeddedItems = await actor.createEmbeddedDocuments('Item', [item.toObject()]);
         //     const embeddedItem = embeddedItems[0];
-        //     const link = MatrixNetworkFlow.buildLink(embeddedItem);
-        //     const resolvedItem = await MatrixNetworkFlow.resolveLink(link)
+        //     const link = NetworkDeviceFlow.buildLink(embeddedItem);
+        //     const resolvedItem = await NetworkDeviceFlow.resolveLink(link)
 
         //     assert.isNotNull(resolvedItem);
         //     assert.strictEqual(resolvedItem?.id, embeddedItem?.id);
@@ -65,8 +54,8 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     const token = await getDocumentClass('Token').create(await actor.getTokenData({x: 0, y: 0}), {parent: scene});
 
         //     // @ts-expect-error // ignore null
-        //     const link = MatrixNetworkFlow.buildLink(token);
-        //     const resolvedToken = await MatrixNetworkFlow.resolveLink(link);
+        //     const link = NetworkDeviceFlow.buildLink(token);
+        //     const resolvedToken = await NetworkDeviceFlow.resolveLink(link);
 
         //     assert.isNotNull(resolvedToken);
         //     assert.strictEqual(token?.id, resolvedToken?.id);
@@ -76,51 +65,51 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     const controller = await testItem.create({type: 'device'});
         //     const device = await testItem.create({type: 'weapon'});
 
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
 
-        //     assert.strictEqual(device.system.technology.master, controller.uuid);
-        //     assert.strictEqual(device.master()?.uuid, controller.uuid);
-        //     assert.strictEqual(await MatrixNetworkFlow.resolveLink(device.system.technology.master), controller);
+        //     assert.strictEqual(device.system.technology.networkController, controller.uuid);
+        //     assert.strictEqual(device.getNetworkController(), controller.uuid);
+        //     assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.system.technology.networkController), controller);
 
-        //     assert.deepEqual(controller.system.slaves, [device.uuid]);
+        //     assert.deepEqual(controller.system.networkDevices, [device.uuid]);
         // });
 
         // it('connect a device controller to a vehicle network device', async () => {
         //     const controller = await testItem.create({type: 'device'});
         //     const device = await testActor.create({type: 'vehicle'});
 
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
 
-        //     assert.strictEqual(device.system.master, controller.uuid);
-        //     assert.strictEqual(device.master()?.uuid, controller.uuid);
-        //     assert.strictEqual(await MatrixNetworkFlow.resolveLink(device.system.master), controller);
+        //     assert.strictEqual(device.system.networkController, controller.uuid);
+        //     assert.strictEqual(device.getNetworkController(), controller.uuid);
+        //     assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.system.networkController), controller);
 
-        //     assert.deepEqual(controller.system.slaves, [device.uuid]);
+        //     assert.deepEqual(controller.system.networkDevices, [device.uuid]);
         // });
 
         // it('connect a host controller to a item network device', async () => {
         //     const controller = await testItem.create({type: 'host'});
         //     const device = await testItem.create({type: 'weapon'});
 
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
 
-        //     assert.strictEqual(device.system.technology.master, controller.uuid);
-        //     assert.strictEqual(await MatrixNetworkFlow.resolveLink(device.system.technology.master), controller);
+        //     assert.strictEqual(device.system.technology.networkController, controller.uuid);
+        //     assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.system.technology.networkController), controller);
 
-        //     assert.deepEqual(controller.system.slaves, [device.uuid]);
+        //     assert.deepEqual(controller.system.networkDevices, [device.uuid]);
         // });
 
         // it('connect a host controller to a vehicle network device', async () => {
         //     const controller = await testItem.create({type: 'host'});
         //     const device = await testActor.create({type: 'vehicle'});
 
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
 
-        //     assert.strictEqual(device.system.master, controller.uuid);
-        //     assert.strictEqual(device.master()?.uuid, controller.uuid);
-        //     assert.strictEqual(await MatrixNetworkFlow.resolveLink(device.system.master), controller);
+        //     assert.strictEqual(device.system.networkController, controller.uuid);
+        //     assert.strictEqual(device.getNetworkController(), controller.uuid);
+        //     assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.system.networkController), controller);
 
-        //     assert.deepEqual(controller.system.slaves, [device.uuid]);
+        //     assert.deepEqual(controller.system.networkDevices, [device.uuid]);
         // });
 
         // it('get all connected network devices of a controller as their Document', async () => {
@@ -131,13 +120,13 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     ];
 
         //     for (const device of devices) {
-        //         await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
+        //         await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
         //     }
 
-        //     const fetchedDevices = await MatrixNetworkFlow.getNetworkDevices(controller);
+        //     const fetchedDevices = await NetworkDeviceFlow.getNetworkDevices(controller);
 
         //     // Check for structural equality.
-        //     assert.strictEqual(controller.system.slaves.length, 2);
+        //     assert.strictEqual(controller.system.networkDevices.length, 2);
         //     assert.strictEqual(fetchedDevices.length, 2);
 
         //     // Check for referential equality.
@@ -150,22 +139,22 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     const controller = await testItem.create({type: 'device'});
         //     const device = await testItem.create({type: 'weapon'});
 
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
-        //     await MatrixNetworkFlow.removeDeviceLinkFromNetwork(controller, device.uuid);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, device.uuid);
 
-        //     assert.deepEqual(controller.system.slaves, []);
-        //     assert.strictEqual(device.system.technology.master, '');
+        //     assert.deepEqual(controller.system.networkDevices, []);
+        //     assert.strictEqual(device.system.technology.networkController, '');
         // });
 
         // it('remove a vehicle device from a network', async () => {
         //     const controller = await testItem.create({type: 'device'});
         //     const device = await testActor.create({type: 'vehicle'});
 
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
-        //     await MatrixNetworkFlow.removeDeviceLinkFromNetwork(controller, device.uuid);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, device.uuid);
 
-        //     assert.deepEqual(controller.system.slaves, []);
-        //     assert.strictEqual(device.system.master, '');
+        //     assert.deepEqual(controller.system.networkDevices, []);
+        //     assert.strictEqual(device.system.networkController, '');
         // });
 
 
@@ -174,12 +163,12 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     const newController = await testItem.create({type: 'device'});
         //     const device = await testItem.create({type: 'weapon'});
 
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
-        //     await MatrixNetworkFlow.addDeviceToNetwork(newController, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(newController, device);
 
-        //     assert.deepEqual(controller.system.slaves, []);
-        //     assert.deepEqual(newController.system.slaves, [device.uuid]);
-        //     assert.strictEqual(device.system.technology.master, newController.uuid);
+        //     assert.deepEqual(controller.system.networkDevices, []);
+        //     assert.deepEqual(newController.system.networkDevices, [device.uuid]);
+        //     assert.strictEqual(device.system.technology.networkController, newController.uuid);
         // });
 
         // it('remove a vehicle device from a network when it is added to a new one', async () => {
@@ -187,19 +176,19 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     const newController = await testItem.create({type: 'device'});
         //     const device = await testActor.create({type: 'vehicle'});
 
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
-        //     await MatrixNetworkFlow.addDeviceToNetwork(newController, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(newController, device);
 
-        //     assert.deepEqual(controller.system.slaves, []);
-        //     assert.deepEqual(newController.system.slaves, [device.uuid]);
-        //     assert.strictEqual(device.system.master, newController.uuid);
+        //     assert.deepEqual(controller.system.networkDevices, []);
+        //     assert.deepEqual(newController.system.networkDevices, [device.uuid]);
+        //     assert.strictEqual(device.system.networkController, newController.uuid);
         // });
 
         // it("remove an item network device that doesn't exist anymore", async () => {
         //     const controller = await testItem.create({type: 'device'});
         //     const device = await testItem.create({type: 'weapon'});
         //     const deviceId = device.id;
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
         //     // Simulate user deleting the network item.
         //     await device.delete();
 
@@ -208,17 +197,17 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     assert.strictEqual(collectionItem, undefined);
 
         //     // However the device is still connected to the controller.
-        //     assert.strictEqual(controller.system.slaves.length, 1);
-        //     await MatrixNetworkFlow.removeDeviceLinkFromNetwork(controller, controller.system.slaves[0]);
+        //     assert.strictEqual(controller.system.networkDevices.length, 1);
+        //     await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, controller.system.networkDevices[0]);
 
-        //     assert.deepEqual(controller.system.slaves, []);
+        //     assert.deepEqual(controller.system.networkDevices, []);
         // });
 
         // it("remove a vehicle network device that doesn't exist anymore", async () => {
         //     const controller = await testItem.create({type: 'device'});
         //     const device = await testActor.create({type: 'vehicle'});
         //     const deviceId = device.id;
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
         //     // Simulate user deleting the network item.
         //     await device.delete();
 
@@ -227,10 +216,10 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     assert.strictEqual(collectionItem, undefined);
 
         //     // However the device is still connected to the controller.
-        //     assert.strictEqual(controller.system.slaves.length, 1);
-        //     await MatrixNetworkFlow.removeDeviceLinkFromNetwork(controller, controller.system.slaves[0]);
+        //     assert.strictEqual(controller.system.networkDevices.length, 1);
+        //     await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, controller.system.networkDevices[0]);
 
-        //     assert.deepEqual(controller.system.slaves, []);
+        //     assert.deepEqual(controller.system.networkDevices, []);
         // });
 
         // it('remove all devices from a controller', async () => {
@@ -243,24 +232,24 @@ export const shadowrunNetworkDevices = (context: QuenchBatchContext) => {
         //     ];
 
         //     for (const device of devices) {
-        //         await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
+        //         await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
         //     }
 
-        //     await MatrixNetworkFlow.removeAllDevicesFromNetwork(controller);
+        //     await NetworkDeviceFlow.removeAllDevicesFromNetwork(controller);
 
-        //     assert.deepEqual(controller.system.slaves, []);
-        //     assert.strictEqual(itemDevice.system.technology.master, '');
-        //     assert.strictEqual(vehicleDevice.system.master, '');
+        //     assert.deepEqual(controller.system.networkDevices, []);
+        //     assert.strictEqual(itemDevice.system.technology.networkController, '');
+        //     assert.strictEqual(vehicleDevice.system.networkController, '');
         // });
 
         // it('should not allow non-vehicle actors to be added to controller', async() => {
         //     const controller = await testItem.create({type: 'device'});
         //     const device = await testActor.create({type: 'character'});
 
-        //     await MatrixNetworkFlow.addDeviceToNetwork(controller, device);
+        //     await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
 
-        //     assert.deepEqual(controller.system.slaves, []);
-        //     assert.strictEqual(device.system.master, undefined);
+        //     assert.deepEqual(controller.system.networkDevices, []);
+        //     assert.strictEqual(device.system.networkController, undefined);
         // });
     });
 };

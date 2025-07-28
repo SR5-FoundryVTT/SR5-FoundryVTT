@@ -1,30 +1,15 @@
-import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
-
-import {DocumentSituationModifiers} from "../module/rules/DocumentSituationModifiers";
+import { SR5TestFactory } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SituationModifier } from "../module/rules/modifiers/SituationModifier";
-import { SR5TestingDocuments } from './utils';
-import { SR5Actor } from '../module/actor/SR5Actor';
-import { SR5Item } from '../module/item/SR5Item';
+import { DocumentSituationModifiers } from "../module/rules/DocumentSituationModifiers";
+import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
 
 export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
-    const {describe, it, assert, before, after} = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-    let testScene;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-        testScene = new SR5TestingDocuments(Scene);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-        await testScene.teardown();
-    })
+    after(async () => { factory.destroy(); });
 
     const defaultSourceModifiers = {
         environmental: {
@@ -194,17 +179,20 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
             })
 
             it('use default modifiers for faulty constructor params', () => {
-                // Set faulty types to any to circumvent typescript errors.
-                assert.deepEqual(new DocumentSituationModifiers({} as any).source, defaultSourceModifiers);
+                //@ts-expect-error
+                assert.deepEqual(new DocumentSituationModifiers({}).source, defaultSourceModifiers);
                 assert.deepEqual(new DocumentSituationModifiers(undefined).source, defaultSourceModifiers);
-                assert.deepEqual(new DocumentSituationModifiers(null as any).source, defaultSourceModifiers);
-                assert.deepEqual(new DocumentSituationModifiers(0 as any).source, defaultSourceModifiers);
-                assert.deepEqual(new DocumentSituationModifiers(1 as any).source, defaultSourceModifiers);
+                //@ts-expect-error
+                assert.deepEqual(new DocumentSituationModifiers(null).source, defaultSourceModifiers);
+                //@ts-expect-error
+                assert.deepEqual(new DocumentSituationModifiers(0).source, defaultSourceModifiers);
+                //@ts-expect-error
+                assert.deepEqual(new DocumentSituationModifiers(1).source, defaultSourceModifiers);
                 assert.deepEqual(new DocumentSituationModifiers().source, defaultSourceModifiers);
             })
 
             it('Store data depending on document type', async () => {
-                const actor = await testActor.create({type: 'character'}) as SR5Actor;
+                const actor = await factory.createActor({type: 'character'});
                 let modifiers = actor.getSituationModifiers();
 
                 assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
@@ -214,7 +202,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
 
                 assert.equal(modifiers.source.noise.fixed, 1);
 
-                const scene = await testScene.create() as Scene;
+                const scene = await factory.createScene({});
                 modifiers = DocumentSituationModifiers.fromDocument(scene);
 
                 assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
@@ -226,9 +214,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
             })
 
             it('clear documents data to defaults', async () => {
-                
-                const actor = await testActor.create({
-                    type: 'character'}) as SR5Actor;
+                const actor = await factory.createActor({type: 'character'});
 
                 const modifiers = actor.getSituationModifiers();
                 
@@ -242,4 +228,3 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
         })
     })
 }
-

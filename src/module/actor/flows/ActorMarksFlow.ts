@@ -2,6 +2,7 @@ import { MarksStorage, SetMarksOptions } from "../../storage/MarksStorage";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
 import { Translation } from "../../utils/strings";
+import { MatrixMarksType } from "@/module/types/template/Matrix";
 
 /**
  * This flow handles everything around matrix mark management.
@@ -17,20 +18,18 @@ export const ActorMarksFlow = {
      * @param target The icon being marked
      * @param marks The amount of marks placed
      */
-    async setMarks(persona: SR5Actor, target: Shadowrun.NetworkDevice|undefined, marks: number, options: SetMarksOptions = {}) {
+    async setMarks(persona: SR5Actor, target: SR5Actor | SR5Item | undefined, marks: number, options: SetMarksOptions = {}) {
 
         // Don't allow self marking.
         if (persona.id === target?.id) {
             return;
         }
         // Assert that the target is valid document.
-        if (target && !(target instanceof SR5Item) && !(target instanceof SR5Actor)) {
-            console.error('Shadowrun 5e | Setting marks is not supported on this target', target)
-            return;
-        }
+        if (target && !(target instanceof SR5Item) && !(target instanceof SR5Actor))
+            return console.error('Shadowrun 5e | Setting marks is not supported on this target', target)
 
         // CASE - IC and hosts
-        if (persona.isIC() && persona.hasHost()) {
+        if (persona.isType('ic') && persona.hasHost()) {
             const host = persona.network;
             await host?.setMarks(target, marks, options);
             return;
@@ -39,21 +38,20 @@ export const ActorMarksFlow = {
         // CASE - Persona isn't a matrix actor.
         if (!persona.isMatrixActor) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
-            console.error(`The actor type ${persona.type} can't place matrix marks!`);
-            return;
+            return console.error(`The actor type ${persona.type} can't place matrix marks!`);
         }
 
         // Abort for non-matrix actors
         if (target instanceof SR5Actor && !target.isMatrixActor) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
-            console.error(`The actor type ${target.type} can't receive matrix marks!`);
-            return;
+            return console.error(`The actor type ${target.type} can't receive matrix marks!`);
         }
 
         // For IC targets: place marks on both ic and host.
-        if (target instanceof SR5Actor && target.isIC() && target.hasHost()) {
+        if (target instanceof SR5Actor && target.isType('ic') && target.hasHost()) {
             const host = target.network;
-            await persona.setMarks(host, marks, options);
+            // taM Check this
+            await persona.setMarks(host!, marks, options);
         }
 
         // Assure targeting of the persona device if necessary, if one is in use.
@@ -72,12 +70,13 @@ export const ActorMarksFlow = {
         // If the targeted devices is within a WAN, place mark on the host as well.
         if (target instanceof SR5Item && target.isSlave) {
             const host = target.master;
-            await persona.setMarks(host, marks, options);
+            // taM Check this
+            await persona.setMarks(host!, marks, options);
         }
 
 
         // DEFAULT CASE - PLACE MARKS ON TARGET
-        const matrixData = persona.matrixData;
+        const matrixData = persona.matrixData();
 
         if (!matrixData) return;
         // TODO: Support marking a non-document target (using only a name)
@@ -85,7 +84,7 @@ export const ActorMarksFlow = {
 
         const marksData = MarksStorage.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
 
-        await persona.update({'system.matrix.marks': marksData});
+        await persona.update({ system: { matrix: { marks: marksData } } });
         await MarksStorage.storeRelations(persona.uuid, marksData);
     },
 
@@ -93,11 +92,11 @@ export const ActorMarksFlow = {
      * Remove ALL marks placed by this actor
      */
     async clearMarks(persona: SR5Actor) {
-        const matrixData = persona.matrixData;
+        const matrixData = persona.matrixData();
         if (!matrixData) return;
 
         // Delete all markId properties from ActorData
-        await persona.update({'system.matrix.marks': []});
+        await persona.update({ system: { matrix: { marks: [] } } });
     },
 
     /**
@@ -106,8 +105,8 @@ export const ActorMarksFlow = {
     async clearMark(persona: SR5Actor, uuid: string) {
         if (!persona.isMatrixActor) return;
 
-        const marksData = persona.matrixData?.marks.filter(mark => mark.uuid !== uuid) ?? [];
-        await persona.update({'system.matrix.marks': marksData});
+        const marksData = persona.matrixData()?.marks.filter(mark => mark.uuid !== uuid) ?? [];
+        await persona.update({ system: { matrix: { marks: marksData } } });
     },
 
     /**
@@ -119,7 +118,7 @@ export const ActorMarksFlow = {
      * @returns Amount of marks placed
      */
     getMarksPlaced(persona: SR5Actor, uuid: string): number {
-        return MarksStorage.getMarksPlaced(persona.matrixData?.marks ?? [], uuid);
+        return MarksStorage.getMarksPlaced(persona.matrixData()?.marks ?? [], uuid);
     },
 
     /**
@@ -130,7 +129,7 @@ export const ActorMarksFlow = {
      * @returns FoundryVTT Document
      */
     async getMarkedDocument(uuid: string) {
-        const target = await fromUuid(uuid) as SR5Actor | SR5Item | null;
+        const target = await fromUuid(uuid) as SR5Actor | SR5Item;
 
         if (target instanceof SR5Item && ActorMarksFlow.targetIsPersonaDevice(target)) return target.parent;
 
@@ -143,11 +142,11 @@ export const ActorMarksFlow = {
      * @param matrixData Any documents matrix mark data.
      * @returns The documents that have been marked.
      */
-    async getMarkedDocuments(matrixData: Shadowrun.MatrixMarks) {
+    async getMarkedDocuments(matrixData: MatrixMarksType) {
         const documents: Shadowrun.MarkedDocument[] = [];
 
         for (const {uuid, name, marks} of matrixData) {
-            let document = fromUuidSync(uuid ?? '');
+            let document = fromUuidSync(uuid ?? '') as SR5Actor | SR5Item;
             if (!document) {
                 console.error(`Shadowrun 5e | ActorMarksFlow.getMarkedDocuments: Could not find document for uuid ${uuid}. Consider cleaning all marks.`);
                 continue;   
@@ -181,7 +180,7 @@ export const ActorMarksFlow = {
      * @param document Any markable document
      * @returns A document name
      */
-    getDocumentNetwork(document: Shadowrun.NetworkDevice) {
+    getDocumentNetwork(document: SR5Actor | SR5Item): string {
         // A host/grid is it's own network.
         if (document instanceof SR5Item && ['host', 'grid'].includes(document.type)) return '';
         // A matrix persona might be connected to a netowrk.
@@ -199,7 +198,7 @@ export const ActorMarksFlow = {
      * @param document Any markable document
      * @returns A translation key to be translated.
      */
-    getDocumentType(document: Shadowrun.NetworkDevice): Translation {
+    getDocumentType(document: SR5Actor | SR5Item): Translation {
         if (document instanceof SR5Item && document.type === 'host') return 'SR5.ItemTypes.Host';
         if (document instanceof SR5Item && document.type === 'grid') return 'SR5.ItemTypes.Grid';
         if (document instanceof SR5Item) return 'SR5.Device';

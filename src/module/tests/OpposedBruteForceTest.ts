@@ -13,13 +13,13 @@ import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlo
  * Implement the opposing test for Brute Force action. See SR5#238 'Brute Force'
  */
 export class OpposedBruteForceTest extends OpposedTest {
-    override against: BruteForceTest;
+    declare against: BruteForceTest;
     // The target icon to place a mark on.
-    icon: Shadowrun.NetworkDevice;
+    declare icon: SR5Actor | SR5Item;
     // The target icon, if it's representing a device.
-    device: SR5Item;
+    declare device: SR5Item;
     // The target icon, if it's representing a persona.
-    persona: SR5Actor;
+    declare persona: SR5Actor;
 
     override _prepareData(data: any, options?: any) {
         data = super._prepareData(data, options);
@@ -63,7 +63,7 @@ export class OpposedBruteForceTest extends OpposedTest {
 
         // Setup optional damage value
         const damage = Math.floor(this.againstNetHits.value / 2);
-        this.data.damage = DataDefaults.damageData({base: damage, type: {base: 'matrix', value: 'matrix'}});
+        this.data.damage = DataDefaults.createData('damage', {base: damage, type: {base: 'matrix', value: 'matrix'}});
         Helpers.calcTotal(this.data.damage);
     }
 
