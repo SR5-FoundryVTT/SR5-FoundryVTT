@@ -9,14 +9,14 @@ export const SINFlow = {
      * @param item A SIN item.
      */
     async getNetworks(item: SR5Item) {
-        const sin = item.asSin;
+        const sin = item.asType('sin');
         if (!sin) return [];
 
         const networks: SR5Item[] = [];
 
         for (const uuid of sin.system.networks) {
             const network = await fromUuid(uuid) as SR5Item;
-            if (!network.isGrid && !network.isHost) {
+            if (!network.isType('grid', 'host')) {
                 console.error(`SINFlow.getNetworks: Network with uuid ${uuid} is not a grid or host.`);
                 continue;
             }
@@ -31,10 +31,10 @@ export const SINFlow = {
      * @param networkUuid The UUID of the network to remove.
      */
     async removeNetwork(item: SR5Item, networkUuid: string) {
-        const sin = item.asSin;
+        const sin = item.asType('sin');
         if (!sin) return;
 
         const networks = sin.system.networks.filter(uuid => uuid !== networkUuid);
-        await item.update({ "system.networks": networks });
+        await item.update({ system: { networks } });
     }
 }

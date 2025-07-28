@@ -2,7 +2,7 @@ import { PartsList } from '../parts/PartsList';
 import ModList = Shadowrun.ModList;
 import {Helpers} from "../helpers";
 import {SafeString} from "handlebars";
-import DamageData = Shadowrun.DamageData;
+import { DamageType } from '../types/item/Action';
 
 export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
@@ -12,7 +12,7 @@ export const registerRollAndLabelHelpers = () => {
         return '';
     });
 
-    Handlebars.registerHelper('damageCode', function(damage: DamageData): SafeString {
+    Handlebars.registerHelper('damageCode', function(damage: DamageType): SafeString {
         const typeCode = Handlebars.helpers.damageAbbreviation(damage.type.value);
         const code = `${damage.value}${typeCode}`;
         return new Handlebars.SafeString(code);
@@ -33,8 +33,11 @@ export const registerRollAndLabelHelpers = () => {
                     return 'green';
                 case 6:
                     return 'green';
+                default:
+                    return '';
             }
         }
+        return '';
     });
 
     Handlebars.registerHelper('elementIcon', function (element) {
@@ -62,6 +65,6 @@ export const registerRollAndLabelHelpers = () => {
         return value > 0 ?  `+${value}`: `${value}`;
     });
 
-    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName.bind(this));
-    Handlebars.registerHelper('speakerImg', Helpers.getChatSpeakerImg.bind(this));
+    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName.bind(Helpers));
+    Handlebars.registerHelper('speakerImg', Helpers.getChatSpeakerImg.bind(Helpers));
 };

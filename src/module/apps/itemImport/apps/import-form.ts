@@ -22,16 +22,16 @@ export class Import extends Application {
     private readonly githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
-        version: "v5.225.922",
-        branch: "d800ca7a7e8effcb1b80ba83ba3a94e3c344cbf1",
+        version: "v5.225.937",
+        branch: "fb3bd44a2bfa68d015faf7831b2c8de565acb60d",
     } as const;
 
-    private currentParsedFile: string;
+    private currentParsedFile: string = "";
     private dataFiles: File[] = [];
     private parsedFiles: string[] = [];
     private supportedDataFiles: string[] = [];
 
-    private langDataFile: File;
+    private langDataFile: File | undefined;
     private selectedLanguage: string = "";
 
     private icons: boolean = true;
@@ -107,7 +107,7 @@ export class Import extends Application {
         options.id = 'chummer-data-import';
         options.classes = ['app', 'window-app', 'filepicker'];
         options.title = 'Chummer/Data Import';
-        options.template = 'systems/shadowrun5e/dist/templates/apps/compendium-import.html';
+        options.template = 'systems/shadowrun5e/dist/templates/apps/compendium-import.hbs';
         options.width = 600;
         options.height = 'auto';
         return options;
@@ -255,7 +255,7 @@ export class Import extends Application {
         getTextForFile: (param: any) => Promise<{ text: string; name: string; } | null>
     ) {
         if (deleteCompendiums)
-            for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_KEY))
+            for (const [_, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
                 await game.packs?.get(compendium.pack)?.deleteCompendium();
 
         this.parsedFiles = [];
@@ -346,16 +346,16 @@ export class Import extends Application {
             console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
         });
 
-        html.find("input[type='file'].langDataFileDrop").on('change', async (event: JQuery.ChangeEvent<HTMLInputElement>) => {
-            Array.from(event.target.files).forEach((file: File) => {
+        html.find("input[type='file'].langDataFileDrop").on('change', async (event: JQuery.TriggeredEvent) => {
+            Array.from(event.target.files as File[]).forEach(file => {
                 if (this.isLangDataFile(file))
                     this.langDataFile = file;
             });
             await this.render();
         });
 
-        html.find("input[type='file'].filedatadrop").on('change', async (event: JQuery.ChangeEvent<HTMLInputElement>) => {
-            Array.from(event.target.files).forEach((file: File) => {
+        html.find("input[type='file'].filedatadrop").on('change', async (event: JQuery.TriggeredEvent) => {
+            Array.from(event.target.files as File[]).forEach(file => {
                 if (this.isDataFile(file)) {
                     // Allow user to overwrite an already added file, they have their reasons.
                     const existingIdx = this.dataFiles.findIndex((dataFile) => dataFile.name === file.name);
@@ -405,18 +405,17 @@ export class Import extends Application {
             await this.render();
         });
 
-        html.find('.bookOption').on('click', (event: JQuery.ClickEvent<HTMLInputElement>) => {
-            const checkbox = event.currentTarget;
+        html.find('.bookOption').on('click', (event: JQuery.TriggeredEvent) => {
+            const checkbox = event.currentTarget as HTMLInputElement;
             const bookCode = checkbox.dataset.book;
             const isChecked = checkbox.checked;
 
             const book = this.shadowrunBooks.find(b => b.code === bookCode);
-            if (book)
-                book.value = isChecked;
+            if (book) book.value = isChecked;
         });
 
-        html.find('#languageSelect').on('change', (event: JQuery.ChangeEvent<HTMLSelectElement>) => {
-            this.selectedLanguage = event.currentTarget.value;
+        html.find('#languageSelect').on('change', (event: JQuery.TriggeredEvent) => {
+            this.selectedLanguage = (event.currentTarget as HTMLSelectElement).value;
         });
 
         html.find('.bookSelectAllBtn').on('click', async () => {

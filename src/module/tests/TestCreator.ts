@@ -18,6 +18,8 @@ import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {SR5} from "../config";
 import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
+import { ActionRollType, DamageType, MinimalActionType } from "../types/item/Action";
+import { DeepPartial } from "fvtt-types/utils";
 
 /**
  * Any test implementation can either be created by calling it's constructor directly or by using the TestCreator.
@@ -40,7 +42,7 @@ export const TestCreator = {
      * @param values The values to use for the test.
      * @param options See TestOptions documentation.
      */
-    fromPool: function(values: { pool: number, limit?: number, threshold?: number }={pool: 0, limit: 0, threshold: 0}, options: TestOptions={}): SuccessTest {
+    fromPool: function(values: { pool: number, limit?: number, threshold?: number }={pool: 0, limit: 0, threshold: 0}, options: TestOptions = {}): SuccessTest {
         const data = TestCreator._minimalTestData();
         data.pool.base = values.pool;
         data.threshold.base = values.threshold || 0;
@@ -61,7 +63,7 @@ export const TestCreator = {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item, options: TestOptions={}): Promise<SuccessTest | undefined> {
+    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item, options?: TestOptions): Promise<SuccessTest | undefined> {
         //@ts-expect-error Default to item parent actor, if none given.
         if (!document) document = item.parent;
         if (!(document instanceof SR5Actor)) {
@@ -91,14 +93,14 @@ export const TestCreator = {
 
     /**
      * Create a test from action data only, when not having an item.
-     * 
+     *
      * NOTE: While this method doesn't need to be async, keep async for consistency with other TestCreator.from* apis.
      *
      * @param action The action data to use for the test.
-     * @param document The source document to use for retrieving source values defined within the action.
+     * @param document The document to use for retrieving source values defined within the action.
      * @param options See TestOptions documentation.
      */
-    fromAction: async function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, options: TestOptions={}): Promise<SuccessTest | undefined> {
+    fromAction: async function(action: ActionRollType, document: SR5Actor | SR5Item, options: TestOptions = {}): Promise<SuccessTest | undefined> {
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
@@ -126,14 +128,14 @@ export const TestCreator = {
      * @param document The document used to roll the test with
      * @param options General TestOptions
      */
-    fromPackAction: async function(packName: string, actionName: string, document: SR5Actor|SR5Item, options: TestOptions={}): Promise<SuccessTest|undefined> {
+    fromPackAction: async function(packName: string, actionName: string, document: SR5Actor | SR5Item, options: TestOptions = {}): Promise<SuccessTest|undefined> {
         const item = await Helpers.getPackAction(packName, actionName);
         if (!item) {
             console.error(`Shadowrun5 | The pack ${packName} doesn't include an item ${actionName}`);
             return;
         }
 
-        return await TestCreator.fromItem(item, document, options);
+        return TestCreator.fromItem(item, document, options);
     },
 
     /**
@@ -141,9 +143,11 @@ export const TestCreator = {
      * 
      * @param id The message id to retrieve test data from.
      */
-    fromMessage: async function(id: string, options: TestOptions={}): Promise<SuccessTest | undefined> {
+    fromMessage: async function(id: string, options: TestOptions = {}): Promise<SuccessTest | undefined> {
         const flagData = TestCreator.getTestDataFromMessage(id);
-        if (flagData) return this._fromMessageTestData(flagData, options);
+        if (flagData)
+            return this._fromMessageTestData(flagData, options);
+        return undefined;
     },
 
     /**
@@ -174,12 +178,12 @@ export const TestCreator = {
      * @param testData 
      * @returns 
      */
-    _fromMessageTestData: function(testData, options: TestOptions={}) {
+    _fromMessageTestData: function(testData, options: TestOptions = {}) {
         // Use test data to create the original test from it.
         testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
         if (!testData?.rolls) return;
 
-        const rolls = testData.rolls.map(roll => SR5Roll.fromData<SR5Roll>(roll));
+        const rolls = testData.rolls.map(roll => SR5Roll.fromData(roll));
         const documents = {rolls};
 
         // Allow callers to overwrite previous test options, otherwise fall back.
@@ -218,7 +222,7 @@ export const TestCreator = {
             return;
         }   
 
-        await testClass.executeMessageAction(testData.data, id, options);
+        return testClass.executeMessageAction(testData.data, id, options);
     },
 
     /**
@@ -231,7 +235,7 @@ export const TestCreator = {
      *                  won't be used for retrieving source values.
      * @param options Optional test options.
      */
-    fromTestData: function(data: TestData, documents?: TestDocuments, options: TestOptions={}): SuccessTest {
+    fromTestData: function(data: TestData, documents?: TestDocuments, options: TestOptions = {}): SuccessTest {
         const type = data.type || 'SuccessTest';
         const cls = TestCreator._getTestClass(type);
         return new cls(data, documents, options);
@@ -251,9 +255,9 @@ export const TestCreator = {
      * @param opposed The opposed test to create a resist test with.
      * @param options See TestOptions documentation.
      */
-    fromOpposedTestResistTest: async function(opposed: OpposedTest, options: TestOptions={}): Promise<SuccessTest | void> {
+    fromOpposedTestResistTest: async function(opposed: OpposedTest, options: TestOptions = {}): Promise<SuccessTest | void> {
         // Don't change the data's source.
-        const opposedData = foundry.utils.duplicate(opposed.data);
+        const opposedData = foundry.utils.duplicate(opposed.data) as OpposedTestData;
 
         if (!opposedData?.against?.opposed?.resist?.test) return console.error(`Shadowrun 5e | Given test doesn't define an opposed resist test`, opposed);
         if (!opposed.source) return console.error(`Shadowrun 5e | Given test doesn't have a source actor`, opposed);
@@ -276,7 +280,7 @@ export const TestCreator = {
      * @param test Any test implementation with an action providing a follow up test.
      * @param options See TestOptions documentation.
      */
-    fromFollowupTest: async function(test: SuccessTest, options: TestOptions={}): Promise<SuccessTest  | void> {
+    fromFollowupTest: async function(test: SuccessTest, options: TestOptions = {}): Promise<SuccessTest | void> {
         if (!test?.data?.action?.followed?.test) return;
         if (!test.item) return console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
         if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
@@ -291,7 +295,7 @@ export const TestCreator = {
 
         // Allow different elements of this to override action data.
         const action = TestCreator._mergeMinimalActionDataInOrder(
-            DataDefaults.actionRollData({test: testCls.name}),
+            DataDefaults.createData('action_roll', {test: testCls.name}),
             await testCls._getDocumentTestAction(test.item, test.actor),
             testCls._getDefaultTestAction());
 
@@ -329,7 +333,7 @@ export const TestCreator = {
         if (!game.shadowrun5e.tests.hasOwnProperty(testName)) {
             console.error(`Shadowrun 5e | Tried getting a Test Class ${testName}, which isn't registered in: `, game.shadowrun5e.tests);
             return;
-        } 
+        }
         return game.shadowrun5e.tests[testName];
     },
 
@@ -345,7 +349,7 @@ export const TestCreator = {
         const data = TestCreator._minimalTestData();
 
         // Get user defined action configuration.
-        let action = item.getAction();
+        let action = item.getAction() as ActionRollType;
         if (!action || !actor) {
             return data;
         }
@@ -353,7 +357,8 @@ export const TestCreator = {
         action = TestCreator._mergeMinimalActionDataInOrder(
             action,
             await testCls._getDocumentTestAction(item, actor),
-            testCls._getDefaultTestAction());
+            testCls._getDefaultTestAction()
+        );
 
         return TestCreator._prepareTestDataWithAction(action, actor, data);
     },
@@ -386,7 +391,7 @@ export const TestCreator = {
         data.targetActorsUuid = [];
 
         // Setup the original item actions minimal action resist configuration as a complete item action.
-        let action = DataDefaults.actionRollData({
+        let action = DataDefaults.createData('action_roll', {
             ...opposedData.against.opposed.resist
         });
         // Provide default action information.
@@ -404,13 +409,10 @@ export const TestCreator = {
      * Prepare test data with source values based on action data.
      *
      * @param action Action data to prepare test data with.
-     * @param document Document to use for retrieving source values and execute test with.
+     * @param actor Actor to use for retrieving source values and execute test with.
      * @param data Any test implementations resulting basic test data.
-     * @param againstData Optional testData to use for additional context. This is data from a previous test.
-     * 
-     * @returns Resulting TestData
      */
-    _prepareTestDataWithAction: function(action: Shadowrun.ActionRollData, document: SR5Actor|SR5Item, data: SuccessTestData, againstData?: any) {
+    _prepareTestDataWithAction: function(action: ActionRollType, document: SR5Actor|SR5Item, data: SuccessTestData, againstData?: any) {
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 
@@ -433,11 +435,11 @@ export const TestCreator = {
      * 
      * @returns resulting TestData
      */
-    _prepareTestDataWithActionForActor: function(action: Shadowrun.ActionRollData, actor: SR5Actor, data: SuccessTestData, againstData?: any) {
+    _prepareTestDataWithActionForActor: function(action: ActionRollType, actor: SR5Actor, data: SuccessTestData, againstData?: any) {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = actor.getRollData({againstData: againstData ?? data.following?.against});
         console.error('Dev check', rollData);
-        
+
         const pool = new PartsList<number>(data.pool.mod);
 
         // Prepare pool values.
@@ -515,7 +517,7 @@ export const TestCreator = {
         // Prepare general damage values...
         // ...a test without damage, shouldn't contain any damage information.
         if (ActionFlow.hasDamage(action.damage)) {
-            data.damage = foundry.utils.duplicate(action.damage);
+            data.damage = foundry.utils.duplicate(action.damage) as DamageType;
         }
 
         // Prepare opposed and resist tests...
@@ -568,7 +570,7 @@ export const TestCreator = {
      * @param againstData Optional testData to use for additional context. This is data from a previous test.
      * @returns TestData that's ready to be used to construct a new test instance.
      */
-    _prepareTestDataWithActionForItem: function(action: Shadowrun.ActionRollData, item: SR5Item, data: SuccessTestData, againstData?: any) {
+    _prepareTestDataWithActionForItem: function(action: ActionRollType, item: SR5Item, data: SuccessTestData, againstData?: any) {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = item.getRollData({action, testData: data, againstData: againstData ?? data.following?.against});
 
@@ -592,13 +594,13 @@ export const TestCreator = {
      */
     _minimalTestData: function(): any {
         return {
-            pool: DataDefaults.valueData({label: 'SR5.DicePool'}),
-            limit: DataDefaults.valueData({label: 'SR5.Limit'}),
-            threshold: DataDefaults.valueData({label: 'SR5.Threshold'}),
-            damage: DataDefaults.damageData(),
-            modifiers: DataDefaults.valueData({label: 'SR5.Labels.Action.Modifiers'}),
+            pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
+            limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
+            threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),
+            damage: DataDefaults.createData('damage'),
+            modifiers: DataDefaults.createData('value_field', {label: 'SR5.Labels.Action.Modifiers'}),
             values: {},
-            action: DataDefaults.actionRollData(),
+            action: DataDefaults.createData('action_roll'),
             opposed: {}
         };
     },
@@ -618,9 +620,9 @@ export const TestCreator = {
      * @param defaultActions List of partial actions, as defined by test implementations.
      * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
      */
-    _mergeMinimalActionDataInOrder: function(sourceAction, ...defaultActions: Partial<Shadowrun.MinimalActionData>[]): Shadowrun.ActionRollData {
+    _mergeMinimalActionDataInOrder: function(sourceAction: ActionRollType, ...defaultActions: DeepPartial<MinimalActionType>[]): ActionRollType {
         // This action might be taken from ItemData, causing changes to be reflected upstream.
-        const resultAction = foundry.utils.duplicate(sourceAction);
+        const resultAction = foundry.utils.duplicate(sourceAction) as ActionRollType;
 
         // Check if overwriting default 
         for (const defaultAction of defaultActions) {
@@ -628,7 +630,7 @@ export const TestCreator = {
 
             // Iterate over complete MinimalActionData to avoid tests providing other ActionRollData fields they're not
             // supposed to override.
-            for (const key of Object.keys(DataDefaults.minimalActionData())) {
+            for (const key of Object.keys(DataDefaults.createData('minimal_action'))) {
                 if (TestCreator._keepItemActionValue(sourceAction, defaultAction, key)) continue;
 
                 resultAction[key] = defaultAction[key];
@@ -649,7 +651,7 @@ export const TestCreator = {
      * @param key The action key to take the value from
      * @returns true for when the original action value should be kept, false if it's to be overwritten.
      */
-    _keepItemActionValue(action: Shadowrun.ActionRollData, defaultAction: Partial<Shadowrun.MinimalActionData>, key: string): boolean {
+    _keepItemActionValue(action: ActionRollType, defaultAction: DeepPartial<MinimalActionType>, key: string): boolean {
         if (!defaultAction.hasOwnProperty(key)) return true;
 
         // Avoid user confusion. A user might change one value of a logical value grouping (skill+attribute)
@@ -675,7 +677,7 @@ export const TestCreator = {
      * @param key A key of action configuration within action parameter
      * @returns false, when the value behind key is a default value. true, when it's a custom value.
      */
-    _actionHasNoneDefaultValue(action: Shadowrun.ActionRollData, key: string): boolean {
+    _actionHasNoneDefaultValue(action: ActionRollType, key: string): boolean {
         if (!action.hasOwnProperty(key)) return false;
 
         // NOTE: A more complete comparison would take a default ActionRollData object and compare the sub-key against it.

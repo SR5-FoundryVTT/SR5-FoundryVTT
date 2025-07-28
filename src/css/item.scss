@@ -36,7 +36,6 @@
             .display {
                 background: $nameplate-background;
                 border: none;
-                font-family: 'klavika-medium';
                 height: 35px;
                 margin-top: 11px;
                 padding-left: 7px;
@@ -104,32 +103,32 @@
         min-width: 12em;
         padding-top: 10px;
         padding-left: 10px;
-      
+
         > * {
           display: flex;
           flex-flow: row nowrap;
           justify-content: space-between;
         }
-      
+
         label {
           color: $yellow;
         }
-      
+
         .tech-adjustable-label {
           display: flex;
           justify-content: space-between;
           align-items: center;
           width: 100%;
         }
-      
+
         .tech-adjustable-input {
           flex: 1;
           position: relative;
-      
+
           input.display {
             width: 100%;
           }
-      
+
           .unit {
             position: absolute;
             right: 0.5em;
@@ -139,7 +138,7 @@
             pointer-events: none;
           }
         }
-      }      
+      }
     .description {
         padding: 2px;
         padding-left: 10px;

@@ -5,7 +5,7 @@
     "quoteProps": "consistent",
     "trailingComma": "all",
     "bracketSpacing": true,
-    "endOfLine": "crlf",
+    "endOfLine": "lf",
     "printWidth": 120,
     "semi": true
 }

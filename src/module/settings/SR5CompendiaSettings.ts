@@ -5,20 +5,19 @@ import { FLAGS, SYSTEM_NAME } from "../constants";
  * Render a list of selects for different use case compendia, allowing users to select which compendia they want to use
  * for each use case.
  */
-export default class SR5CompendiaSettings extends FormApplication {
+export default class SR5CompendiaSettings extends foundry.appv1.api.FormApplication {
     static override get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             id: 'sr5-compendia-settings',
             title: game.i18n.localize('SR5.CompendiaSettings.Title'),
             template: `systems/shadowrun5e/dist/templates/apps/settings/compendia-settings.hbs`,
             classes: [],
-            width: '400',
+            width: 400,
             height: 'auto',
             closeOnSubmit: true,
         });
     }
 
-    //@ts-expect-error TODO: foundry-vtt-types v13
     override async getData(options) {
         // Provide user with list of all compendium packs to be set for system packs.
         const generalActionsPackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack);
@@ -32,7 +31,6 @@ export default class SR5CompendiaSettings extends FormApplication {
         }
         
         // Collect packs for the system.
-        // @ts-expect-error TODO: foundry-vtt-types v13 =>  package to packageType
         const worldItemPacks = game.packs.filter(p => p.metadata.type === 'Item' && p.metadata.packageType === 'world' && p.metadata.system === SYSTEM_NAME);
         const generalActionsPackChoices = {
             // TODO: taMiF/marks use compendium label these packs as well?

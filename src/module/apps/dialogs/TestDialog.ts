@@ -1,9 +1,9 @@
-import {FormDialog, FormDialogData, FormDialogOptions} from "./FormDialog";
-import {SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
-
-import {SR5} from "../../config";
-import {Helpers} from "../../helpers";
+import { SR5 } from "../../config";
+import { Helpers } from "../../helpers";
 import { Translation } from '../../utils/strings';
+import { ModifiableValueType } from "src/module/types/template/Base";
+import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
+import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
 
 export interface TestDialogData extends FormDialogData {
     test: SuccessTest
@@ -25,7 +25,7 @@ export interface TestDialogListener {
  * TODO: Add TestDialog JSDoc
  */
 export class TestDialog extends FormDialog {
-    override data: TestDialogData
+    declare data: TestDialogData
     // Listeners as given by the dialogs creator.
     listeners: TestDialogListener[]
 
@@ -45,7 +45,7 @@ export class TestDialog extends FormDialog {
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
-        // @ts-expect-error TODO: foundry-vtt-types v11
+        // @ts-expect-error
         options.width = 'auto';
         return options;
     }
@@ -64,7 +64,7 @@ export class TestDialog extends FormDialog {
      */
     _injectExternalActiveListeners(html: JQuery) {
         for (const listener of this.listeners) {
-            //@ts-expect-error // Lazy Typing
+            //@ts-expect-error
             html.find(listener.query).on(listener.on, (event: JQuery<HTMLElement>) => listener.callback.bind(this.data.test)(event, this));
         }
     }
@@ -75,10 +75,11 @@ export class TestDialog extends FormDialog {
      * data.templatePath work's the same and can be used as well.
      */
     override get templateContent(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.hbs';
     }
 
-    override getData() {
+    //@ts-expect-error
+    getData() {
         const data = super.getData() as unknown as TestDialogData;
 
         //@ts-expect-error //TODO: default to general roll mode user setting
@@ -119,8 +120,8 @@ export class TestDialog extends FormDialog {
      * Callback for after the dialog has closed.
      * @param html
      */
-    override onAfterClose(html: JQuery<HTMLElement>): SuccessTestData {
-        return this.data.test.data;
+    override async onAfterClose(html: JQuery<HTMLElement>, buttonSelected?: string): Promise<SuccessTestData> {
+        return Promise.resolve(this.data.test.data);
     }
 
     /**
@@ -136,8 +137,8 @@ export class TestDialog extends FormDialog {
         // First, apply changes to ValueField style values in a way that makes sense.
         Object.entries(data).forEach(([key, value]) => {
             // key is expected to be relative from TestDialog.data and begin with 'test'
-            const valueField = foundry.utils.getProperty(this.data, key);
-            if (foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
+            const valueField = foundry.utils.getProperty(this.data, key) as ModifiableValueType | undefined | null;
+            if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
 
             // Remove from further automatic data merging.
             delete data[key]
@@ -146,9 +147,10 @@ export class TestDialog extends FormDialog {
             if (valueField.value === value) return;
 
             if (value === null || value === '')
-                delete valueField.override
+                // @ts-expect-error fvtt-types don't know about the null somehow
+                valueField.override = null;
             else
-                valueField.override = {name: 'SR5.ManualOverride', value: Number(value)};
+                valueField.override = { name: 'SR5.ManualOverride', value: Number(value) };
         });
 
         // Second, apply generic values.

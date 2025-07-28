@@ -1,0 +1,16 @@
+{{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs' actor=test.persona item=test.icon}}
+{{#if test.failure}}
+<div class="sr5 chat-card roll-card">
+    <div class="card-content can-wrap">
+        <div class="left-side">
+            <div class="test-value">
+                <span class="value">{{localize "SR5.Marks"}}: </span>
+                <span class="value-result">{{test.against.data.marks}}</span>
+            </div>
+        </div>
+        <div class="right-side">
+
+        </div>
+    </div>
+</div>
+{{/if}}

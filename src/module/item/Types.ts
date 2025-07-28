@@ -1,9 +1,11 @@
+import { ActionRollType } from "../types/item/Action"
+
 /**
  * Options given to determine roll data of a source document during test creation.
  */
 export interface RollDataOptions {
     // The action that caused this role.
-    action?: Shadowrun.ActionRollData
+    action?: ActionRollType
     // The active test for this roll. This can be a SuccessTest or a OpposedTest.
     // OpposedTest will also provide againstData.
     testData?: any

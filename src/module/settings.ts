@@ -1,13 +1,12 @@
 // game settings for shadowrun 5e
 
-import { VersionMigration } from './migrator/VersionMigration';
 import { FLAGS, SYSTEM_NAME } from './constants';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
 export const registerSystemSettings = () => {
     /**
      * No actual setting.
-     * 
+     *
      * Instead this is used to store global data outside of FoundryVTT document storage.
      * See DataStorage.ts for more information.
      */
@@ -18,29 +17,6 @@ export const registerSystemSettings = () => {
         config: false,
         type: Object,
         default: {}
-    });
-
-    /**
-     * Register diagonal movement rule setting
-     */
-    game.settings.register(SYSTEM_NAME, FLAGS.DiagonalMovement, {
-        name: 'SETTINGS.DiagonalMovementName',
-        hint: 'SETTINGS.DiagonalMovementDescription',
-        scope: 'world',
-        config: true,
-        type: String,
-        default: 'EUCL',
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        choices: {
-            '1-1-1': 'SETTINGS.IgnoreDiagonal',
-            '1-2-1': 'SETTINGS.EstimateDiagonal',
-            'EUCL': 'SETTINGS.Euclidean',
-        },
-        onChange: (rule) => {
-            // @ts-expect-error canvas grid should not be undefined here...
-            // Copy DnD5e's approach to movement measurement and add a custom field to the grid to be used in canvas.ts#measureDistances
-            canvas.grid.diagonalRule = rule
-        },
     });
 
     /**
@@ -58,12 +34,12 @@ export const registerSystemSettings = () => {
     /**
      * Track system version upon which a migration was last applied
      */
-    game.settings.register(SYSTEM_NAME, VersionMigration.KEY_DATA_VERSION, {
+    game.settings.register(SYSTEM_NAME, FLAGS.KEY_DATA_VERSION , {
         name: 'System Data Version.',
         scope: 'world',
         config: false,
         type: String,
-        default: '0',
+        default: '',
     });
 
     game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
@@ -85,7 +61,7 @@ export const registerSystemSettings = () => {
     });
 
     game.settings.register(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills, {
-         name: 'SETTINGS.OnlyAllowRollOnDefaultableSkills',
+        name: 'SETTINGS.OnlyAllowRollOnDefaultableSkills',
         hint: 'SETTINGS.OnlyAllowRollOnDefaultableSkillsDescription',
         scope: 'world',
         config: true,
@@ -103,7 +79,7 @@ export const registerSystemSettings = () => {
     });
 
     game.settings.register(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat, {
-         name: 'SETTINGS.OnlyAutoRollNPCInCombat',
+        name: 'SETTINGS.OnlyAutoRollNPCInCombat',
         hint: 'SETTINGS.OnlyAutoRollNPCInCombatDescription',
         scope: 'world',
         config: true,
@@ -224,7 +200,6 @@ export const registerSystemSettings = () => {
         config: true,
         type: String,
         default: 'BOTH',
-        // @ts-expect-error TODO: foundry-vtt-types v10
         choices: {
             'BOTH': 'SETTINGS.FreshColorAndIcon',
             'COLOR': 'SETTINGS.FreshColor',
@@ -258,6 +233,50 @@ export const registerSystemSettings = () => {
     });
 
     /**
+     * TokenRuler color: Walking
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerColorWalking, {
+        name: 'SETTINGS.TokenRulerColorWalking',
+        hint: 'SETTINGS.TokenRulerColorWalkingDescription',
+        scope: 'world',
+        config: true,
+        type: new foundry.data.fields.ColorField({ initial: '00FF00' } as const ),
+    });
+
+    /**
+     * TokenRuler color: Running
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerColorRunning, {
+        name: 'SETTINGS.TokenRulerColorRunning',
+        hint: 'SETTINGS.TokenRulerColorRunningDescription',
+        scope: 'world',
+        config: true,
+        type: new foundry.data.fields.ColorField({ initial: '0000FF' } as const ),
+    });
+
+    /**
+     * TokenRuler color: Sprinting
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerColorSprinting, {
+        name: 'SETTINGS.TokenRulerColorSprinting',
+        hint: 'SETTINGS.TokenRulerColorSprintingDescription',
+        scope: 'world',
+        config: true,
+        type: new foundry.data.fields.ColorField({ initial: 'FF0000' } as const ),
+    });
+
+    /**
+     * TokenRuler color: Sprinting
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerOpacity, {
+        name: 'SETTINGS.TokenRulerOpacity',
+        hint: 'SETTINGS.TokenRulerOpacityDescription',
+        scope: 'world',
+        config: true,
+        type: new foundry.data.fields.AlphaField({ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 } as const),
+    });
+
+    /**
      * Select compendia to use for system porpuses like different action packs
      */
     game.settings.registerMenu(SYSTEM_NAME, FLAGS.CompendiaSettingsMenu, {
@@ -265,7 +284,7 @@ export const registerSystemSettings = () => {
         hint: 'SR5.CompendiaSettings.Description',
         label: 'SR5.CompendiaSettings.Label',
         icon: 'fas fa-book',
-        // @ts-expect-error TODO: foundry-vtt-types v13
+        //@ts-expect-error let's figure it out together :D
         type: SR5CompendiaSettings,
         restricted: true, // Don't show to non GMs
     });

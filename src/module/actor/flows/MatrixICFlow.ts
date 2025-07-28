@@ -15,9 +15,9 @@ export const MatrixICFlow = {
      */
     async connectToHost(host: SR5Item, ic: SR5Actor) {
         // Allow call to drop out gracefully.
-        if (!ic.isIC()) return;
+        if (!ic.isType('ic')) return;
         // TODO: foundry-vtt-types v9
-        const hostData = host.asHost;
+        const hostData = host.asType('host');
         if (!hostData) return;
 
         // Allow local value calculation and data preparation to work without the host item prepared.
@@ -26,7 +26,7 @@ export const MatrixICFlow = {
             atts: foundry.utils.duplicate(hostData.system.atts)
         }
 
-        await ic.update({ 'system.host': updateData });
+        await ic.update({ system: { host: updateData } });
     },
 
     /**
@@ -40,7 +40,7 @@ export const MatrixICFlow = {
      */
     async disconnectFromHost(ic: SR5Actor) {
         // Graceful exit if not an IC actor.
-        if (!ic.isIC()) return;
+        if (!ic.isType('ic')) return;
 
         // Fully reset rating and attributes, to allow users to edit the them using the IC actor sheet.
         const updateData = {
@@ -49,7 +49,7 @@ export const MatrixICFlow = {
             atts: null
         }
 
-        await ic.update({ 'system.host': updateData });
+        await ic.update({ system: { host: updateData } });
     },
 
     /**
@@ -62,14 +62,14 @@ export const MatrixICFlow = {
     async handleUpdateItemHost(host: SR5Item) {
         if (!canvas.ready || !game.actors) return;
 
-        if (!host.isHost) return;
+        if (!host.isType('host')) return;
         // Collect actors from sidebar and active scene to update / rerender
         const connectedIC = [
             // All sidebar actors should also include tokens with linked actors.
-            ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
+            ...(game.actors as unknown as SR5Actor[]).filter(actor => actor.isType('ic') && actor.hasHost()) as SR5Actor<'ic'>[],
             // All token actors that aren't linked.
             // @ts-expect-error // TODO: foundry-vtt-types v10
-            ...canvas.scene.tokens.filter(token => !token.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
+            ...canvas.scene.tokens.filter(token => !token.actorLink && token.actor?.isType('ic') && token.actor?.hasHost()).map(t => t.actor)
         ];
 
         // Update host data on the ic actor.
@@ -87,9 +87,9 @@ export const MatrixICFlow = {
      */
     async updateFromHost(host: SR5Item, ic: SR5Actor) {
         // Allow call to drop out gracefully.
-        if (!ic.isIC()) return;
+        if (!ic.isType('ic')) return;
         // TODO: foundry-vtt-types v9
-        const hostData = host.asHost;
+        const hostData = host.asType('host');
         if (!hostData) return;
 
         const updateData = {
@@ -98,7 +98,7 @@ export const MatrixICFlow = {
         }
 
         // Some host data isn't stored on the IC actor (marks) and won't cause an automatic render.
-        await ic.update({ 'system.host': updateData }, { render: false });
+        await ic.update({ system: { host: updateData } }, { render: false });
         await ic.sheet?.render();
     },
 }

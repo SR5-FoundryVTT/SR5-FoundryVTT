@@ -12,7 +12,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
 
-        data.damage = data.damage || DataDefaults.damageData();
+        data.damage = data.damage || DataDefaults.createData('damage');
 
         return data;
     }
@@ -33,7 +33,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.hbs';
     }
 
     override get showSuccessLabel(): boolean {
@@ -41,10 +41,10 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
     }
 
     override async prepareDocumentData() {
-        if (!this.item || !this.item.isMeleeWeapon) return;
+        if (!this.item || !this.item.isMeleeWeapon()) return;
 
         this.data.reach = this.item.getReach();
-        this.data.reach += this.actor?.system.modifiers.reach || 0;
+        this.data.reach += this.actor && 'reach' in this.actor.system.modifiers ? this.actor?.system.modifiers.reach : 0;
 
         await super.prepareDocumentData();
     }
@@ -75,7 +75,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
      */
     override canConsumeDocumentResources(): boolean {
         if (this.item === undefined) return true;
-        if (!this.item.usesAmmo) return true;
+        if (!this.item.usesAmmo()) return true;
 
         // Consume one ammo per attack.
         if (!this.item.hasAmmo(1)) {
@@ -101,7 +101,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
      */
     async consumeWeaponAmmo(): Promise<boolean> {  
         if (this.item === undefined) return true;
-        if (!this.item.usesAmmo) return true;
+        if (!this.item.usesAmmo()) return true;
 
         // Notify user about some but not no ammo. Still let them punch though.
         if (!this.item.hasAmmo(1)) {

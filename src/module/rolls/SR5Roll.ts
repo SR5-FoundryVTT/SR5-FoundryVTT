@@ -3,12 +3,14 @@ import ModList = Shadowrun.ModList;
 
 // TODO: Data for casting actor / item (uuid)
 // TODO: maybe copy of the action data from the casting item / actor
-interface ShadowrunRollData {
-    limit: number
-    threshold: number
-    parts: ModList<number> // TODO: Is this useful?
-    explodeSixes: boolean
+export type ShadowrunRollData = {
+    limit: number;
+    threshold: number;
+    parts: ModList<number>; // TODO: Is this useful?
+    explodeSixes: boolean;
+    [key: string]: number | boolean | ModList<number>;
 }
+
 
 /**
  * Apply Shadowrun 5 rules to a FoundryVTT Roll.
@@ -18,18 +20,25 @@ interface ShadowrunRollData {
  *
  * TODO: A chat message should contain all data needed to cast resulting actions.
  */
-export class SR5Roll extends Roll {
-    override data: ShadowrunRollData
+export class SR5Roll extends Roll<ShadowrunRollData> {
+    // toJSON(): any {
+    //     // TODO: Check if data includes custom ShadowrunRollData
+    //     const data = super.toJSON();
+    //     // add class Roll to the json so dice-so-nice works
+    //     // TODO: Check if this is still necessary.
+    //     // data.class = 'Roll';
+    //     return data;
+    // }
 
     get sides(): number[] {
-        // TODO: The system only supports v11+... this should be removable
         // 0.7.x foundryVTT
         if (this.terms) {
-            //@ts-expect-error TODO: foundry-vtt-types v10
+            //@ts-expect-error
             return this.terms[0].results.map(result => result.result);
         }
 
-        //@ts-expect-error // Supports old 0.6.x foundryVTT
+        //@ts-expect-error
+        // 0.6.x foundryVTT
         return this.parts[0].rolls.map(roll => roll.roll);
     }
 
@@ -74,13 +83,13 @@ export class SR5Roll extends Roll {
      *       Use SR5Roll#diceThrown instead
      */
     get pool(): number {
-        // TODO: system only supports v11+... this should be removable
         // 0.7.x > FoundryVTT
         if (this.terms) {
-            return this.dice[0].number;
+            return this.dice[0].number!;
         }
 
-        //@ts-expect-error // till 0.6.x FoundryVTT
+        //@ts-expect-error
+        // till 0.6.x FoundryVTT
         return this.parts[0].rolls.length;
     }
 

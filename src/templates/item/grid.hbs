@@ -1,0 +1,11 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    {{> "systems/shadowrun5e/dist/templates/item/parts/header.hbs"}}
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
+        <a class="item" data-tab="network">{{localize "SR5.Labels.Sheet.WAN"}}</a>
+    </nav>
+    <section class="sheetbody">
+        {{> "systems/shadowrun5e/dist/templates/item/tabs/GridDescriptionTab.hbs"}}
+        {{> "systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs"}}
+    </section>
+</form>

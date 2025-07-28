@@ -31,10 +31,9 @@ const createChatData = async (template: string, templateData) => {
         },
         item: templateData.item,
         content: html,
-        rollMode: game.settings.get(CORE_NAME, CORE_FLAGS.RollMode)
+        rollMode: game.settings.get(CORE_NAME, 'rollMode')!
     };
 
-    // @ts-expect-error // TODO: foundry-vtt-types v10
     ChatMessage.applyRollMode(chatData, chatData.rollMode);
 
     return chatData;
@@ -42,13 +41,13 @@ const createChatData = async (template: string, templateData) => {
 
 export async function createItemChatMessage(options) {
     const templateData = createChatTemplateData(options);
-    return await createChatMessage('systems/shadowrun5e/dist/templates/rolls/item-card.html', templateData);
+    return await createChatMessage('systems/shadowrun5e/dist/templates/rolls/item-card.hbs', templateData);
 }
 
 function createChatTemplateData(options) {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    const {actor, item, description, tests} = options;
+    let {actor, item, description, tests} = options;
 
     const token = actor?.getToken();
     const title = game.i18n.localize("SR5.Description");

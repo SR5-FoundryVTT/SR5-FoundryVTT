@@ -1,7 +1,8 @@
 // AUTO‑GENERATED — DO NOT EDIT
 
 import { BonusSchema } from './BonusSchema';
-import { Empty, Many } from './Types';
+import { ConditionsSchema } from './ConditionsSchema';
+import { Empty, Many, OneOrMany } from './Types';
 
 export interface Echo {
     bonus?: BonusSchema;

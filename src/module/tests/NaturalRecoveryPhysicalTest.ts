@@ -9,7 +9,7 @@ export class NaturalRecoveryPhysicalTest extends SuccessTest {
             return this;
         }
 
-        return await super.execute();
+        return super.execute();
     }
 
     override prepareBaseValues() {

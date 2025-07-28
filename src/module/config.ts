@@ -735,6 +735,7 @@ export const SR5 = {
         physical_overflow_track: 'SR5.ModifierTypes.PhysicalOverflowTrack',
         physical_track: 'SR5.ModifierTypes.PhysicalTrack',
         reach: 'SR5.ModifierTypes.Reach',
+        recoil: 'SR5.ModifierTypes.Recoil',
         run: 'SR5.ModifierTypes.Run',
         soak: 'SR5.ModifierTypes.Soak',
         social_limit: 'SR5.ModifierTypes.SocialLimit',
@@ -778,6 +779,7 @@ export const SR5 = {
         physical_overflow_track: 'SR5.Tooltips.Modifiers.physical_overflow_track',
         physical_track: 'SR5.Tooltips.Modifiers.physical_track',
         reach: 'SR5.Tooltips.Modifiers.reach',
+        recoil: 'SR5.Tooltips.Modifiers.recoil',
         run: 'SR5.Tooltips.Modifiers.run',
         soak: 'SR5.Tooltips.Modifiers.soak',
         social_limit: 'SR5.Tooltips.Modifiers.social_limit',
@@ -1233,7 +1235,7 @@ export const SR5 = {
         action: 'complex',
         mode: 'full_auto'
     }
-    ] as Shadowrun.FireModeData[],
+    ],
 
     /**
      * Active/AdvancedEffect apply To types and their labels.
@@ -1458,19 +1460,19 @@ export const SR5 = {
             'hovercraft': 'vehicle/hovercraft',
 
             /* Drones */
-            'drones-micro': 'vehicle/drone',
-            'drones-mini': 'vehicle/drone',
-            'drones-small': 'vehicle/drone',
-            'drones-medium': 'vehicle/drone',
-            'drones-anthro': 'vehicle/anthro',
-            'drones-large': 'vehicle/drone',
-            'drones-huge': 'vehicle/drone',
-            'drones-missile': 'vehicle/drone',
+            'drones-micro': 'drone/micro',
+            'drones-mini': 'drone/mini',
+            'drones-small': 'drone/small',
+            'drones-medium': 'drone/medium',
+            'drones-anthro': 'drone/anthro',
+            'drones-large': 'drone/large',
+            'drones-huge': 'drone/huge',
+            'drones-missile': 'ammo/missile',
         },
         weapon: {
             // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'
             'melee': '',
-            'ranged': '',
+            'range': '',
             'thrown': '',
             'assault-cannons': '',
             'assault-rifles': '',

@@ -4,9 +4,9 @@ import {SR5Item} from "../../item/SR5Item";
 import MarkedDocument = Shadowrun.MarkedDocument;
 
 interface ICActorSheetData extends SR5ActorSheetData {
-    host: SR5Item|null
-    markedDocuments: MarkedDocument[]
-    disableMarksEdit: boolean
+    host: SR5Item | undefined | null;
+    markedDocuments: MarkedDocument[];
+    disableMarksEdit: boolean;
 }
 
 export class SR5ICActorSheet extends SR5BaseActorSheet {
@@ -60,7 +60,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
 
         // Some item types need special handling for IC Actors.
         switch(dropData.type) {
-            case 'Item':                
+            case 'Item':
                 const item = await fromUuid(dropData.uuid) as SR5Item;
                 
                 // Handle item types that aren't handled but are still useable.
@@ -76,6 +76,6 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         }        
 
         // Default cases can be handled by the base class and Foundry.
-        return await super._onDrop(event);
+        return super._onDrop(event);
     }
 }

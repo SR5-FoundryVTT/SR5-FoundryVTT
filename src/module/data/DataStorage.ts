@@ -86,13 +86,11 @@ export const DataStorage = {
     },
 
     /**
-     * Handle socket messages around setting data storage.
-     * 
+     * Handle socket messages around setting data storage as GM only.
      * @param message.data.key The set method key param
      * @param message.data.value The set method value param
      */
     _handleSetDataStorageSocketMessage: async function (message: Shadowrun.SocketMessageData) {
-
         await DataStorage._setAsGM(message.data.key, message.data.value);
     }
 }

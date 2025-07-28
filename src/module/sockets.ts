@@ -1,4 +1,5 @@
 import {SYSTEM_SOCKET} from "./constants";
+import SocketMessageBody = Shadowrun.SocketMessageData;
 
 /**
  * Simple handling of creating and emitting socket messages
@@ -11,11 +12,11 @@ import {SYSTEM_SOCKET} from "./constants";
  * To listen to these socket messages see Hooks#registerSocketListeners
  */
 export class SocketMessage {
-    static _createMessage(type, data, userId?): Shadowrun.SocketMessageData {
+    static _createMessage(type, data, userId?): SocketMessageBody {
         return {type, data, userId}
     }
 
-    static async emit(type, data) {
+    static emit(type, data) {
         if (!game.socket) return;
 
         const message = SocketMessage._createMessage(type, data);
@@ -32,7 +33,7 @@ export class SocketMessage {
      * @param data 
      * @returns 
      */
-    static async emitForGM(type, data) {
+    static emitForGM(type, data) {
         if (!game.socket || !game.user || !game.users) return;
         if (game.user.isGM) return console.error('Active user is GM! Aborting socket message...');
 
@@ -72,7 +73,7 @@ export class SocketMessage {
         console.debug('Shadowrun 5e | Handling update documents as GM message', message);
 
         for (const documentData of message.data as {uuid: string, updateData: any}[]) {
-            const document = await fromUuid(documentData.uuid);
+            const document = await fromUuid(documentData.uuid as any) as Actor.Implementation | Item.Implementation;
             if (!document) continue;
             if (!documentData.updateData) return;
             await document.update(documentData.updateData);

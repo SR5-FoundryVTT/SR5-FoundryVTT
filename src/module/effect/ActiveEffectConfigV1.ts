@@ -1,7 +1,4 @@
 //@ts-nocheck // This is copied FoundryVTT v12 code for Application v1 support. All of this should be removed once we do Application v2.
-/* eslint-disable @typescript-eslint/await-thenable */
-/* eslint-disable @typescript-eslint/return-await */
-
 /**
  * The Application responsible for configuring a single ActiveEffect document within a parent Actor or Item.
  * @extends {DocumentSheet}
@@ -15,7 +12,7 @@ export class ActiveEffectConfigV1 extends DocumentSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["sheet", "active-effect-sheet"],
-      template: "templates/sheets/active-effect-config.html",
+      template: "templates/sheets/active-effect-config.hbs",
       width: 580,
       height: "auto",
       tabs: [{navSelector: ".tabs", contentSelector: "form", initial: "details"}]
@@ -107,7 +104,7 @@ export class ActiveEffectConfigV1 extends DocumentSheet {
   /** @inheritdoc */
   _getSubmitData(updateData={}) {
     const fd = new FormDataExtended(this.form, {editors: this.editors});
-    const data = foundry.utils.expandObject(fd.object);
+    let data = foundry.utils.expandObject(fd.object);
     if ( updateData ) foundry.utils.mergeObject(data, updateData);
     data.changes = Array.from(Object.values(data.changes || {}));
     data.statuses ??= [];

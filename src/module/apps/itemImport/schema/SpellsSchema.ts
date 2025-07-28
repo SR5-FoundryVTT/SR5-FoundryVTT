@@ -2,7 +2,7 @@
 
 import { BonusSchema } from './BonusSchema';
 import { ConditionsSchema } from './ConditionsSchema';
-import { Empty, Many } from './Types';
+import { Empty, Many, OneOrMany } from './Types';
 
 export interface Spell {
     bonus?: BonusSchema;

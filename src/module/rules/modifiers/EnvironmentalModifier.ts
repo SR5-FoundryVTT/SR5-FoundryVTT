@@ -8,8 +8,8 @@ import EnvironmentalModifiersData = Shadowrun.EnvironmentalModifiersData;
   * Rules application of situation modifieres for matrix.
  */
 export class EnvironmentalModifier extends SituationModifier {
-    override source: EnvironmentalModifiersSourceData
-    override applied: EnvironmentalModifiersData
+    declare source: EnvironmentalModifiersSourceData
+    declare applied: EnvironmentalModifiersData
     override type: Shadowrun.SituationModifierType = 'environmental';
 
     

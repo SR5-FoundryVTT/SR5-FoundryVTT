@@ -1,15 +1,12 @@
-import { WeaponParserBase } from './WeaponParserBase';
-import BlastData = Shadowrun.BlastData;
-import WeaponItemData = Shadowrun.WeaponItemData;
-import { DataDefaults } from '../../../../data/DataDefaults';
+import { SystemType } from '../Parser';
 import { Weapon } from '../../schema/WeaponsSchema';
+import { WeaponParserBase } from './WeaponParserBase';
+import { BlastType } from 'src/module/types/item/Weapon';
+import { DataDefaults } from '../../../../data/DataDefaults';
 
 export class ThrownParser extends WeaponParserBase {
-    public GetBlast(system: WeaponItemData['system'], jsonData: Weapon): BlastData {
-        const blastData: BlastData = {
-            radius: 0,
-            dropoff: 0,
-        };
+    public GetBlast(system: SystemType<'weapon'>, jsonData: Weapon): BlastType {
+        const blastData: BlastType = { radius: 0, dropoff: 0 };
 
         const blastCode = jsonData.damage._TEXT;
 
@@ -33,11 +30,11 @@ export class ThrownParser extends WeaponParserBase {
         return blastData;
     }
 
-    protected override getSystem(jsonData: Weapon): WeaponItemData['system'] {
+    protected override getSystem(jsonData: Weapon) {
         const system = super.getSystem(jsonData);
 
         const rangeCategory = jsonData.range?._TEXT || jsonData.category._TEXT;
-        system.thrown.ranges = DataDefaults.weaponRangeData(this.GetRangeDataFromImportedCategory(rangeCategory));
+        system.thrown.ranges = DataDefaults.createData('range', this.GetRangeDataFromImportedCategory(rangeCategory));
 
         system.thrown.blast = this.GetBlast(system, jsonData);
 

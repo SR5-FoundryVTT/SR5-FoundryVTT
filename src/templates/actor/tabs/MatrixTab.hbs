@@ -1,0 +1,10 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='matrix'}}
+<nav class="tabs" data-group="matrix">
+    <a class="item" data-tab="decking">{{localize "SR5.Labels.ActorSheet.Hacking"}}</a>
+    <a class="item" data-tab="config">{{localize "SR5.Labels.ActorSheet.DeviceSetup"}}</a>
+</nav>
+<section data-group='matrix' class="tabsbody">
+    {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/HackingTab.hbs'}}
+    {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ConfigTab.hbs'}}
+</section>
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}

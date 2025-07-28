@@ -1,9 +1,8 @@
 import { SR5 } from "../../../config";
-import { Constants } from './Constants';
 import { ParseData } from "../parser/Parser";
+import { CompendiumKey, Constants } from './Constants';
 import { ImportHelper as IH } from '../helper/ImportHelper';
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+
 const xml2js = require('xml2js');
 
 /**
@@ -86,36 +85,39 @@ export abstract class DataImporter {
      * - If parsing fails, an error notification is displayed with the provided or default error prefix.
      * - Optionally, additional actions can be injected into parsed items using `injectActionTests`.
      */
-    protected static async ParseItems<TInput extends ParseData, TOutput extends (ShadowrunActorData | ShadowrunItemData)>(
+    protected static async ParseItems<TInput extends ParseData>(
         inputs: TInput[],
         options: {
-            compendiumKey: keyof typeof Constants.MAP_COMPENDIUM_KEY;
-            parser: { Parse: (data: TInput) => Promise<TOutput> };
+            compendiumKey: (data: TInput) => CompendiumKey;
+            parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<Actor.CreateData | Item.CreateData> };
             filter?: (input: TInput) => boolean;
-            injectActionTests?: (item: TOutput) => void;
+            injectActionTests?: (item: Item.CreateData) => void;
             errorPrefix?: string;
         }
     ): Promise<void> {
         const { compendiumKey, parser, filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
-        const items: TOutput[] = [];
-
-        await IH.GetCompendium(compendiumKey);
+        const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
 
         for (const data of inputs) {
             try {
                 if (!this.supportedBookSource(data) || !filter(data)) continue;
+                
+                const key = compendiumKey(data);
+                const item = await parser.Parse(data, key);
+                injectActionTests?.(item as Item.CreateData);
 
-                const item = await parser.Parse(data);
-                injectActionTests?.(item);
-                items.push(item);
+                if (!itemMap.has(key)) itemMap.set(key, []);
+                itemMap.get(key)!.push(item);
             } catch (error) {
                 console.error(error);
                 ui.notifications?.error(`${errorPrefix}: ${data?.name?._TEXT ?? "Unknown"}`);
             }
         };
 
-        const compendium = Constants.MAP_COMPENDIUM_KEY[compendiumKey];
-        //@ts-expect-error TODO: foundry-vtt-types v9
-        await (compendium.type === 'Actor' ? Actor : Item).create(items, { pack: compendium.pack });
+        for (const [key, items] of itemMap.entries()) {
+            await IH.GetCompendium(key);
+            const compendium = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[key]];
+            await (compendium.type === 'Actor' ? Actor : Item).create(items as any, { pack: compendium.pack });
+        }
     }
 }

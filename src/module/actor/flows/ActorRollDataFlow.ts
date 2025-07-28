@@ -17,7 +17,7 @@ export const ActorRollDataFlow = {
      * @param options
      */
     getRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions) {
-        if (actor.isVehicle()) ActorRollDataFlow.injectAstralRollData(actor, rollData, options);
+        if (actor.isType('vehicle')) ActorRollDataFlow.injectAstralRollData(actor, rollData, options);
         return rollData;
     },
 

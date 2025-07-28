@@ -9,21 +9,21 @@ import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlo
  * See MarkPlacementFlow for more details on the test flow.
  */
 export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
-    override actor: SR5Actor;
+    declare actor: SR5Actor;
 
     // The icon to place a mark on.
     // If an actor was selected, this will point to either the persona device or the actor itself, if no persona device is used.
-    icon: Shadowrun.NetworkDevice;
+    declare icon: SR5Actor | SR5Item;
     // The persona matrix actor. If in use, icon will either point to the actor, if no persona device is used, or the persona device.
-    persona: SR5Actor|null;
+    declare persona: SR5Actor|null;
     // The devices connected to the main icon persona / host.
-    devices: (Shadowrun.NetworkDevice)[];
+    declare devices: (SR5Actor | SR5Item)[];
     // Started ic on selected host.
-    ic: SR5Actor[];
+    declare ic: SR5Actor[];
     // Host used as main icon.
-    host: SR5Item|null;
+    declare host: SR5Item|null;
     // Grid used as main icon.
-    grid: SR5Item|null;
+    declare grid: SR5Item|null;
 
     override _prepareData(data: MatrixPlacementData, options: TestOptions = {}): any {
         data = super._prepareData(data, options);
@@ -63,7 +63,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
      */
     override async _cleanUpAfterDialog() {
         await super._cleanUpAfterDialog();
-        MarkPlacementFlow.setIconUuidBasedOnPlacementSelection(this);
+        void MarkPlacementFlow.setIconUuidBasedOnPlacementSelection(this);
     }
 
     override async populateDocuments() {
@@ -83,7 +83,7 @@ export class BruteForceTest extends SuccessTest<MatrixPlacementData> {
         MarkPlacementFlow.validateBaseValues(this);
     }
 
-    override async addTarget(document: Shadowrun.NetworkDevice) {
+    override async addTarget(document: SR5Actor | SR5Item) {
         await MarkPlacementFlow.addTarget(this, document);
     }
 }

@@ -11,13 +11,13 @@ export class ComplexFormImporter extends DataImporter {
     }
 
     async Parse(jsonObject: ComplexformsSchema): Promise<void> {
-        return await ComplexFormImporter.ParseItems<Complexform, Shadowrun.ComplexFormItemData>(
+        return ComplexFormImporter.ParseItems<Complexform>(
             jsonObject.complexforms.complexform,
             {
-                compendiumKey: "Magic",
+                compendiumKey: () => "Complex_Form",
                 parser: new ComplexFormParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Complex Form"
             }

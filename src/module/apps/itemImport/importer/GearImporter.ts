@@ -1,3 +1,4 @@
+import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
 import { AmmoParser } from '../parser/gear/AmmoParser';
 import { GearSchema, Gear } from '../schema/GearSchema';
@@ -5,9 +6,6 @@ import { DeviceParser } from '../parser/gear/DeviceParser';
 import { ProgramParser } from '../parser/gear/ProgramParser';
 import { EquipmentParser } from '../parser/gear/EquipmentParser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
-
-type gearTypes = Shadowrun.EquipmentItemData | Shadowrun.AmmoItemData |
-                 Shadowrun.DeviceItemData | Shadowrun.ProgramItemData;
 
 export class GearImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -22,7 +20,7 @@ export class GearImporter extends DataImporter {
             this.categories = categories;
         }
 
-        public async Parse(jsonData: Gear): Promise<gearTypes> {
+        public async Parse(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const ammoParser = new AmmoParser(this.categories);
             const deviceParser = new DeviceParser(this.categories);
             const programParser = new ProgramParser(this.categories);
@@ -37,15 +35,15 @@ export class GearImporter extends DataImporter {
                                  : programTypes.includes(category) ? programParser
                                                                    : equipmentParser;
 
-            return await selectedParser.Parse(jsonData);
+            return await selectedParser.Parse(jsonData, compendiumKey) as Item.CreateData;
         }
     };
 
     async Parse(jsonObject: GearSchema): Promise<void> {
-        return await GearImporter.ParseItems<Gear, gearTypes>(
+        return GearImporter.ParseItems<Gear>(
             jsonObject.gears.gear,
             {
-                compendiumKey: "Gear",
+                compendiumKey: () => "Gear",
                 parser: new GearImporter.parserWrap(jsonObject.categories.category),
                 filter: jsonData => jsonData.id._TEXT !== 'd63eb841-7b15-4539-9026-b90a4924aeeb',
                 injectActionTests: item => {

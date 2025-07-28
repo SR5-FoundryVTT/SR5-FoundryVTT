@@ -9,7 +9,7 @@ export const mountedWeaponParserTesting = (context: QuenchBatchContext) => {
 
     describe('Mounted Weapon Parser', () => {
         it('parses weapons', async () => {
-            const weapons = await mountedWeaponParser.parseWeapons(chummerVehicle);
+            const weapons = await mountedWeaponParser.parseWeapons(chummerVehicle as any);
 
             assert.lengthOf(weapons, 1);
         });

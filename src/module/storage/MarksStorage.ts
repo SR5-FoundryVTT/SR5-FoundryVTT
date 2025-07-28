@@ -1,5 +1,8 @@
+import { SR5Actor } from '../actor/SR5Actor';
 import { DataStorage } from '../data/DataStorage';
+import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
+import { MatrixMarksType } from '../types/template/Matrix';
 
 /**
  * Options for the setMarks method.
@@ -39,7 +42,7 @@ export const MarksStorage = {
      *
      * @returns marksData, altered in place.
      */
-    setMarks(marksData: Shadowrun.MatrixMarks, target: Shadowrun.NetworkDevice | undefined, currentMarks: number, marks: number, options: SetMarksOptions = {}) {
+    setMarks(marksData: MatrixMarksType, target: SR5Actor | SR5Item | undefined, currentMarks: number, marks: number, options: SetMarksOptions = {}) {
         // TODO: Allow for no target
         if (!target) return [];
 
@@ -68,7 +71,7 @@ export const MarksStorage = {
      * @param marksData Marks data to count marks with
      * @param uuid Document to search for
      */
-    getMarksPlaced(marksData: Shadowrun.MatrixMarks, uuid: string): number {
+    getMarksPlaced(marksData: MatrixMarksType, uuid: string): number {
         const marks = marksData.find(marks => marks.uuid === uuid);
         return marks ? marks.marks : 0;
     },
@@ -97,7 +100,7 @@ export const MarksStorage = {
      * @param uuid The document placing marks
      * @param marksData The raw marks data of the actor.
      */
-    async storeRelations(uuid: string, marksData: Shadowrun.MatrixMarks) {
+    async storeRelations(uuid: string, marksData: MatrixMarksType) {
         uuid = MarksStorage._uuidForStorage(uuid);
         const key = `${MarksStorage.key}.${uuid}`;
         const marks = marksData.map(({uuid}) => uuid);
@@ -110,7 +113,7 @@ export const MarksStorage = {
      * @param document The actor to retrieve marks for
      * @returns The actors marks data
      */
-    retrieveMarks(document: Shadowrun.NetworkDevice): string[] {
+    retrieveMarks(document: SR5Actor | SR5Item): string[] {
         const storage = MarksStorage.getStorage();
         const uuid = MarksStorage._uuidForStorage(document.uuid);
         return storage[uuid] ?? [];
@@ -135,7 +138,7 @@ export const MarksStorage = {
             storage[uuidForStorage] = markRelations.filter(markedUuid => markedUuid !== uuid);
 
             // Update lokal marks placed on the main uuid.
-            const document = fromUuidSync(MarksStorage._uuidFromStorage(uuidForStorage)) as Shadowrun.NetworkDevice;
+            const document = fromUuidSync(MarksStorage._uuidFromStorage(uuidForStorage)) as SR5Actor | SR5Item;
             if (!document) continue;
 
             await document.clearMark(uuid);

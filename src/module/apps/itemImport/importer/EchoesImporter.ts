@@ -11,13 +11,13 @@ export class EchoesImporter extends DataImporter {
     }
 
     async Parse(jsonObject: EchoesSchema): Promise<void> {
-        return await EchoesImporter.ParseItems<Echo, Shadowrun.EchoItemData>(
+        return EchoesImporter.ParseItems<Echo>(
             jsonObject.echoes.echo,
             {
-                compendiumKey: "Trait",
+                compendiumKey: () => "Echo",
                 parser: new EchoParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Echoes"
             }

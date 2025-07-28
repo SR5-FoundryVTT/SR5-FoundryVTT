@@ -1,0 +1,10 @@
+{{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs'}}
+{{#if test.failure}}
+<div class="sr5 chat-card roll-card">
+    <div class="card-content">
+        <div class="left-side">
+            <p><a class="content-link" draggable="true" data-link="" data-uuid="{{test.actor.uuid}}" data-id="{{test.actor.id}}" data-type="Actor" data-tooltip="SR5.Tooltips.SummoningTest.DragOnCanvas"><i class="fas fa-user"></i>{{test.actor.name}}</a></p>
+        </div>
+    </div>
+</div>
+{{/if}}

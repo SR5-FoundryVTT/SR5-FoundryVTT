@@ -4,8 +4,8 @@ export interface DefeatedStatus {
     unconscious: boolean,
     dying: boolean,
     dead: boolean,
-
 }
+
 export const ConditionRules = {
     /**
      * Determine the current defeated status of an actor
@@ -14,7 +14,7 @@ export const ConditionRules = {
      */
     determineDefeatedStatus: (actor: SR5Actor): DefeatedStatus => {
         const stun = actor.getStunTrack();
-        const phyiscal = actor.getPhysicalTrack();
+        const physical = actor.getPhysicalTrack();
         const matrix = actor.getMatrixTrack();
 
         let unconscious = false;
@@ -22,19 +22,18 @@ export const ConditionRules = {
         let dead = false;
 
         // Some actor types die differently.
-        if (actor.isIC() || actor.isSprite()) {
+        if (actor.isType('ic', 'sprite')) {
             dead = matrix?.value === matrix?.max;
-        } else if (actor.isVehicle() || actor.isGrunt()) {
-            dead = phyiscal?.value === phyiscal?.max;
+        } else if (actor.isType('vehicle') || actor.isGrunt()) {
+            dead = physical?.value === physical?.max;
         } else {
             unconscious = stun?.value === stun?.max;
-            dying = phyiscal?.value === phyiscal?.max;
-            dead = phyiscal?.overflow.value === phyiscal?.overflow.max;
+            dying = physical?.value === physical?.max;
+            dead = dying && physical?.overflow.value === physical?.overflow.max;
         }
 
         return {
             unconscious, dying, dead
         }
     }
-
 }

@@ -20,6 +20,10 @@ interface DocumentSituationModifiersTotalForOptions {
     test?: SuccessTest
 }
 
+/**
+ * These documents can store situational modifiers
+ */
+export type ModifiableDocumentTypes = SR5Actor | Scene;
 
 /**
  * Handle all per document situation modifiers.
@@ -74,13 +78,13 @@ interface DocumentSituationModifiersTotalForOptions {
  */
 export class DocumentSituationModifiers {
     // A reference to the original document holding modifier source data.
-    document: Shadowrun.ModifiableDocumentTypes | undefined;
+    document: ModifiableDocumentTypes | undefined;
     // The source data stored on the document.
     source: SituationModifiersSourceData;
     // The applied data from the document and it's apply chain.
-    applied: SituationModifiersData;
+    applied!: SituationModifiersData;
     // Handlers for the different modifier categories.
-    _modifiers: {
+    _modifiers!: {
         noise: NoiseModifier,
         background_count: BackgroundCountModifier,
         environmental: EnvironmentalModifier,
@@ -94,7 +98,7 @@ export class DocumentSituationModifiers {
      * @param data situational modifiers taken from a Document.
      * @param document The source document used to retrieve data.
      */
-    constructor(data?: SituationModifiersSourceData, document?: Shadowrun.ModifiableDocumentTypes) {
+    constructor(data?: SituationModifiersSourceData, document?: ModifiableDocumentTypes) {
         // Fail gracefully for no modifiers given.
         // This can happen as Foundry returns empty objects for no flags set.
         if (!data || foundry.utils.getType(data) !== 'Object') {
@@ -106,7 +110,6 @@ export class DocumentSituationModifiers {
 
         // Map all modifier types to their respectiv implementation.
         this._prepareModifiers();
-        
     }
 
     /**
@@ -247,11 +250,11 @@ export class DocumentSituationModifiers {
      * @param document The document to clear.
      * @returns A new instance with the resulting modifiers structure
      */
-    static async clearAllOn(document: Shadowrun.ModifiableDocumentTypes) {
+    static async clearAllOn(document: ModifiableDocumentTypes) {
         if (document instanceof SR5Actor) {
             // Overwrite all selections with default values.
-            await document.update({'system.-=situation_modifiers': null}, {render: false});
-            await document.update({'system.situation_modifiers': DocumentSituationModifiers._defaultModifiers});
+            //@ts-expect-error Does fvtt support == operator?
+            await document.update({ system: { '==situation_modifiers': DocumentSituationModifiers._defaultModifiers } });
         } else {
             await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
             await document.setFlag(SYSTEM_NAME, FLAGS.Modifier, DocumentSituationModifiers._defaultModifiers);
@@ -265,7 +268,7 @@ export class DocumentSituationModifiers {
      * @param category Modifiers category to clear
      * @returns A new instance with the resulting modifiers structure
      */
-    static async clearTypeOn(document: Shadowrun.ModifiableDocumentTypes, category: keyof SituationModifiersSourceData): Promise<DocumentSituationModifiers> {
+    static async clearTypeOn(document: ModifiableDocumentTypes, category: keyof SituationModifiersSourceData): Promise<DocumentSituationModifiers> {
         const modifiers = DocumentSituationModifiers.getDocumentModifiers(document);
 
         if (!modifiers.source.hasOwnProperty(category)) return modifiers;
@@ -315,7 +318,7 @@ export class DocumentSituationModifiers {
      * @param document Any document with flags support.
      * @returns The raw modifier data of a document
      */
-    static getDocumentModifiersData(document: Shadowrun.ModifiableDocumentTypes): SituationModifiersSourceData {
+    static getDocumentModifiersData(document: ModifiableDocumentTypes): SituationModifiersSourceData {
         if (document instanceof SR5Actor) {
             return document.system.situation_modifiers;
         } else {
@@ -328,7 +331,7 @@ export class DocumentSituationModifiers {
      * 
      * @param document The document containing modifiers or implementing a custom modifier retrieval system.
      */
-    static fromDocument(document: Shadowrun.ModifiableDocumentTypes): DocumentSituationModifiers {
+    static fromDocument(document: ModifiableDocumentTypes): DocumentSituationModifiers {
         // Actor targets might have no personal modifiers, but still see the scene modifiers then, and use those
         // as a template for their local modifiers.
         if (document instanceof SR5Actor) {
@@ -344,7 +347,7 @@ export class DocumentSituationModifiers {
      * @param document Any document that may contain situational modifiers.
      * @returns A full set of situational modifiers.
      */
-    static getDocumentModifiers(document: Shadowrun.ModifiableDocumentTypes): DocumentSituationModifiers {
+    static getDocumentModifiers(document: ModifiableDocumentTypes): DocumentSituationModifiers {
         const data = DocumentSituationModifiers.getDocumentModifiersData(document);
         return new DocumentSituationModifiers(data, document);
     }
@@ -355,10 +358,11 @@ export class DocumentSituationModifiers {
      * @param document Any document with flags support.
      * @param modifiers Source data of all situation modifiers for this document.
      */
-    static async setDocumentModifiers(document: Shadowrun.ModifiableDocumentTypes, modifiers: SituationModifiersSourceData) {
+    static async setDocumentModifiers(document: ModifiableDocumentTypes, modifiers: SituationModifiersSourceData) {
         if (document instanceof SR5Actor) {
-            // Disable diffing to overwrite the whole object. 
-            await document.update({'system.situation_modifiers': modifiers}, {diff: false});
+            // Disable diffing to overwrite the whole object.
+            // @ts-expect-error fvtt doesn't support == operator
+            await document.update({ system: { "==situation_modifiers": modifiers } });
         } else {
             // Due to active selection merging by Foundry mergeObject, we need to delete first.
             await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
