@@ -69,7 +69,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     }
 
     override get _resistTestClass(): any {
-        if (this.data.modifiedDamage.value > 0 && this.data.biofeedback) {
+        if (this.persona && this.data.iconUuid === this.persona.uuid && this.data.biofeedback && this.data.modifiedDamage.value > 0) {
             return BiofeedbackResistTest;
         }
         return super._resistTestClass;
