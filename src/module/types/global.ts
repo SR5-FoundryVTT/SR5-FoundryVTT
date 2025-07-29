@@ -233,12 +233,6 @@ declare global {
     // eslint-disable-next-line no-var
     var routinglib: RoutingLib | null;
 
-    /**
-     * Retrieve an Entity or Embedded Entity by its Universally Unique Identifier (uuid).
-     * @param uuid - The uuid of the Entity or Embedded Entity to retrieve
-     */
-    function fromUuidSync(uuid: string): foundry.abstract.Document<any, any> | null;
-
     // Use declaration merging to add strong typing to Foundry's game.i18n localize and format functions,
     // sourcing valid translation strings from this system's english translations file
     interface Localization {
