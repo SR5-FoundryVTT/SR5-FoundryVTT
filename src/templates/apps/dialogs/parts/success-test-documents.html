@@ -1,14 +1,12 @@
 {{#if test.actor}}
 <div class="document">
     <img src="{{speakerImg test.actor}}"/>
-    <a class="entity-link content-link" data-type="Actor"
-        data-id="{{test.actor.id}}" data-uuid="{{test.actor.uuid}}">{{speakerName test.actor}}</a>
+    <a class="content-link" data-type="Actor" data-link data-id="{{test.actor.id}}" data-uuid="{{test.actor.uuid}}">{{speakerName test.actor}}</a>
 </div>
 {{#if test.item}}
 <div class="document">
     <img src="{{test.item.img}}"/>
-    <a class="entity-link content-link" data-type="Item"
-        data-id="{{test.item.id}}" data-uuid="{{test.item.uuid}}">{{test.item.name}}</a>
+    <a class="content-link" data-type="Item" data-link data-id="{{test.item.id}}" data-uuid="{{test.item.uuid}}">{{test.item.name}}</a>
 </div>
 {{/if}}
 {{/if}}
