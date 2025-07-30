@@ -1,10 +1,10 @@
 <form>
   <div class="dialog-content-teamwork grid-two-col">
-    <!-- Actor-Filter -->
+    <!-- Actor filter: Filters selectable actors by name -->
     <label>{{localize "SR5.Dialogs.Teamwork.Filter.Actor"}}</label>
     <input type="text" name="filter" value="{{filter}}" placeholder="{{localize "SR5.Dialogs.Teamwork.Filter.Placeholder"}}" />
 
-    <!-- Actor-Auswahl -->
+    <!-- Actor selection -->
     <label>{{localize "SR5.FOUNDRY.Actor"}}</label>
     <select class="form-control" name="actor">
       {{#each actors as |actor|}}
@@ -19,7 +19,7 @@
       {{/each}}
     </select>
 
-    <!-- Skill-Auswahl -->
+    <!-- Skill selection -->
     <label>{{localize "SR5.Skill.Skill"}}</label>
     <select class="form-control" name="skill" {{#if lockedSkill}}disabled{{/if}}>
       {{#each skills}}
@@ -32,7 +32,7 @@
       {{/each}}
     </select>
 
-    <!-- Attribut-Auswahl -->
+    <!-- Attribute selection -->
     <label>{{localize "SR5.Attribute"}}</label>
     <select class="form-control" name="attribute" {{#if lockedSkill}}disabled{{/if}}>
       {{#each attributes as |attribute|}}
@@ -59,16 +59,16 @@
       </select>
     </div>
 
-    <!-- Schwellenwert -->
+    <!-- Threshold -->
     <label>{{localize "SR5.Threshold"}}</label>
     <input type="number" name="threshold" value="{{threshold}}" min="0" {{#if (not request)}}disabled{{/if}} />
 
-    <!-- Spezialisierung -->
+    <!-- Specialization -->
     <label>{{localize "SR5.Specialization"}}</label>
     <input type="checkbox" name="specialization" {{#if specialization}}checked{{/if}} />
 
 
-    <!-- Checkbox “Andere Skills erlauben” -->
+    <!-- Allow other skills -->
     {{#if showAllowOtherSkills}}
     <label data-tooltip="SR5.Tooltip.Teamwork.AllowOtherSkills">{{localize
       "SR5.Dialogs.Teamwork.AllowOtherSkills"}}</label>

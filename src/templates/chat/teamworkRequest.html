@@ -1,11 +1,9 @@
 <div class="sr5 chat-card teamwork-card rollRequest-card">
-  {{!-- Header mit Test-Icon und Titel --}}
   <div class="card-title card-header">
     <i class="fas fa-users"></i>
     <span class="test-name">{{localize "SR5.Dialogs.Teamwork.Title"}}</span>
   </div>
 
-  {{!-- Ausgewählter Schauspieler --}}
   {{#if actor}}
   <div class="card-title card-header">
     <div class="container container--fluid">
@@ -25,7 +23,6 @@
   </div>
   {{/if}}
 
-  {{!-- Test-Parameter --}}
   <div class="card-main-content">
     <div class="card-content">
       <ul class="test-params">
@@ -46,7 +43,6 @@
     </div>
   </div>
 
-  {{!-- Bereits abgegebene Ergebnisse --}}
   <div class="card-participants">
     <div class="card-content">
       <h4>{{localize "SR5.Skill.Teamwork.Participants"}}</h4>
@@ -61,17 +57,5 @@
   {{/each}}
 </div>
     </div>
-  </div>
-
-  {{!-- Action-Buttons --}}
-  <div class="card-buttons">
-    <button class="button sr5-teamwork-addparticipant">
-      <i class="fas fa-user-plus"></i>
-      {{localize "SR5.Skill.Teamwork.TakePart"}}
-    </button>
-    <button class="button sr5-teamwork-start">
-      <i class="fas fa-dice"></i>
-      {{localize "SR5.Skill.Teamwork.Start"}}
-    </button>
   </div>
 </div>

@@ -21,9 +21,17 @@ export interface TeamWorkDialogData extends Omit<FormDialogData, "templateData">
   } & TeamworkData;
 }
 
-
-
-
+/**
+ * Presents and manages the teamwork test configuration dialog.
+ *
+ * This dialog class handles:
+ *  - Initializing form state from provided `TeamworkDialogOptions` (actors, pre-selected actor/skill/attribute, thresholds, limits, specialization, etc.).
+ *  - Rendering the Handlebars template and binding UI event listeners (input changes, button clicks, drag/drop support).
+ *  - Validating and normalizing user selections into a `Partial<TeamworkData>` result.
+ *  - Providing live result previews and feedback via `updateResult()`.
+ *  - Returning the finalized configuration or cancellation flag through the `select()` method.
+ *
+ */
 export class TeamWorkDialog extends FormDialog {
   override data: TeamWorkDialogData;
   private baseActors: SR5Actor[];
@@ -31,7 +39,21 @@ export class TeamWorkDialog extends FormDialog {
   private filter: string;
   private lockedSkill: boolean;
 
-
+/**
+ * Initializes a new TeamworkDialog with given data and window options.
+ *
+ * @param teamworkData  Partial configuration for the teamwork test:
+ *   - `actors?`: list of eligible {@link SR5Actor} instances (defaults to user-owned actors)
+ *   - `actor?`: pre-selected {@link SR5Actor}
+ *   - `skill?`: pre-selected {@link SkillEntry}
+ *   - `attribute?`: pre-selected {@link AttributeEntry}
+ *   - `threshold?`: initial pass threshold (number)
+ *   - `allowOtherSkills?`: whether alternate skills are permitted (boolean)
+ *   - `limit?`: initial {@link LimitEntry} override
+ *   - `request?`: if true, dialog opens in request-only mode (no immediate roll)
+ * @param options       {@link FormDialogOptions} to customize dialog behavior and appearance.
+ *                      `applyFormChangesOnSubmit` is disabled by default.
+ */
   constructor(
     teamworkData: {
       actors?: SR5Actor[];
@@ -45,6 +67,7 @@ export class TeamWorkDialog extends FormDialog {
     },
     // @ts-expect-error // TODO: default option value with all the values...
     options: FormDialogOptions = {}) {
+      // Prevent automatic form data binding on submit; we apply changes manually in onAfterClose
     options.applyFormChangesOnSubmit = false;
 
     console.log("TWDialog constructor actors: ", teamworkData.actors)
@@ -105,13 +128,12 @@ export class TeamWorkDialog extends FormDialog {
       templateData,
       templatePath: "systems/shadowrun5e/dist/templates/apps/dialogs/teamwork-dialog.html",
       title: "Teamwork",
-      content: "",      // bleibt leer, wird vom Template befüllt
-      buttons        // Buttons hier  
+      content: "",
+      buttons 
     };
 
     super(data, options);
 
-    // Initialisiere Deine Caches
     this.baseActors = actors;
     this.baseSkills = TeamworkFlow.buildSkillGroups(actor);
   }
@@ -131,6 +153,16 @@ export class TeamWorkDialog extends FormDialog {
     return 'systems/shadowrun5e/dist/templates/apps/dialogs/teamwork-dialog.html';
   }
 
+  /**
+ * Prepares and returns the dialog’s context data for rendering.
+ *
+ * This override:
+ *  1. Calls the base `getData()` to assemble default template context.
+ *  2. Ensures `baseActors` and `baseSkills` are initialized on first render.
+ *  3. Updates `this.data.templateData.skills` to always reflect the latest skill groups for the selected actor.
+ *
+ * @returns The full {@link TeamWorkDialogData} context object for the Handlebars template.
+ */
   override getData(): TeamWorkDialogData {
     console.log("🔍 Initial this.data.attribute =", this.data.templateData.attribute);
     const data = super.getData() as unknown as TeamWorkDialogData;
@@ -143,29 +175,18 @@ export class TeamWorkDialog extends FormDialog {
     return data;
   }
 
-  // /**
-  // * Wurde im Dialog auf „Submit“ geklickt: Form-Daten übernehmen und Dialog schließen.
-  // */
-  // override async _updateData(formData: Record<string, any>): Promise<void> {
-  //   console.log('➤ TeamworkDialog: _updateData', formData);
-  //   // Alle Werte ins this.data schreiben, der FormDialog schließt dann automatisch mit this.data
-  //   const actor = this.data.actor = (await fromUuid(formData.actor)) as SR5Actor;
-  //   this.data.skill = TeamworkFlow.constructSkillEntry(
-  //     { id: formData["skill.id"] },
-  //     actor
-  //   );
-  //   this.data.attribute = TeamworkFlow.constructAttributeEntry(
-  //     formData.attribute
-  //   );
-  //   const limitEntry = TeamworkFlow.constructLimitEntry(formData["limit.name"]);
-  //   limitEntry.base = Number(formData["limit.base"]);
-  //   this.data.limit = limitEntry;
-
-  //   this.data.threshold = Number(formData.threshold);
-  //   this.data.allowOtherSkills = Boolean(formData.allowOtherSkills);
-  //   this.data.specialization = Boolean(formData.specialization);
-  // }
-
+  /**
+ * Attaches event listeners to the limit input fields to enforce mutual exclusivity
+ * and validate numeric base values.
+ *
+ * This override:
+ *  - Calls the base listener setup.
+ *  - Disables the limit-name dropdown whenever a non-empty numeric base is entered.
+ *  - On blur, parses and validates the base input, clearing invalid entries and re-enabling the dropdown.
+ *  - Triggers initial input/change events to initialize the controls’ state.
+ *
+ * @param html The jQuery-wrapped HTML element of the dialog.
+ */
   override activateListeners(html: JQuery) {
     super.activateListeners(html);
     const data = this.data.templateData;
@@ -173,7 +194,6 @@ export class TeamWorkDialog extends FormDialog {
     const limitBaseInput = html.find<HTMLInputElement>('input[name="limit.base"]');
     const LimitNameInput = html.find<HTMLSelectElement>('select[name="limit.name"]');
 
-    // Sobald im Zahlenfeld etwas steht, wird das Dropdown deaktiviert
     limitBaseInput.on('input', () => {
       const val = limitBaseInput.val() as string;
       LimitNameInput.prop('disabled', val.trim() !== '');
@@ -192,7 +212,6 @@ export class TeamWorkDialog extends FormDialog {
       }
     });
 
-    // Initialer Zustand
     limitBaseInput.trigger('input');
     LimitNameInput.trigger('change');
   }
@@ -209,6 +228,21 @@ export class TeamWorkDialog extends FormDialog {
     };
   }
 
+  /**
+ * Processes the dialog result after it closes, returning the selected configuration
+ * or `undefined` if the user cancelled or required fields are missing.
+ *
+ * @param html The jQuery-wrapped HTML element of the dialog (not used for data retrieval).
+ * @returns An object with the finalized selections:
+ *   - `actor`: the chosen {@link SR5Actor}
+ *   - `skill`: the chosen {@link SkillEntry}
+ *   - `attribute`: the chosen {@link AttributeEntry}
+ *   - `limit?`: optional {@link LimitEntry} override
+ *   - `threshold`: numeric threshold value
+ *   - `allowOtherSkills`: whether alternate skills are permitted
+ *   - `specialization`: whether specialization was toggled
+ *   or `undefined` if cancelled or missing required fields.
+ */
   override onAfterClose(html: JQuery<HTMLElement>): {
     actor: SR5Actor,
     skill: SkillEntry,
@@ -261,6 +295,21 @@ export class TeamWorkDialog extends FormDialog {
     return { cancelled: true };
   }
 
+  /**
+ * Handles updates to form inputs, synchronizing changes in `templateData` and
+ * re-rendering the dialog for dynamic fields (actor, filter, skill, attribute, limit, and toggles).
+ *
+ * This override:
+ *  - Updates actor selection: rebuilds skill groups and resets filters.
+ *  - Applies live filtering of the actor list based on the search term.
+ *  - Responds to skill changes by updating the associated attribute and limit.
+ *  - Updates attribute and limit selections from their respective inputs.
+ *  - Toggles `specialization` and `allowOtherSkills` flags.
+ *  - Delegates to the base handler for unrecognized fields.
+ *
+ * @param event The input event triggered on a form field change.
+ * @returns A Promise that resolves once any necessary re-render has completed.
+ */
   override async _onChangeInput(event: any): Promise<void> {
     const el = event.target as HTMLInputElement;
     const name = el.name;
@@ -271,7 +320,7 @@ export class TeamWorkDialog extends FormDialog {
         const uuid = el.value;
 
         const actor = this.baseActors.find(a => a.uuid === uuid);
-        if (!actor) return;                  // falls nichts gefunden wurde, abbrechen
+        if (!actor) return;
         data.actor = actor;
 
         this.baseSkills = TeamworkFlow.buildSkillGroups(actor);
@@ -297,35 +346,27 @@ export class TeamWorkDialog extends FormDialog {
         return
 
       case 'skill':
-        // 1) Finde den neuen SkillEntry
         const skillId = el.value;
         const newSkill: SkillEntry = this.baseSkills
           .flatMap(g => g.skills)
           .find(s => s.id === skillId)!;
-
-
-        // 2) Setze Attribut und Limit
+          
         data.skill = newSkill;
         data.attribute = { name: newSkill.attribute, label: SR5.attributes[newSkill.attribute] };
         if (data.limit) data.limit.name = newSkill.limit;
         if (data.limit) data.limit.label = SR5.limits[newSkill.limit];
 
-        // 4) Re-render um UI up-to-date zu halten
         await this.render();
         return;
 
       case 'attribute':
-        // Hier fangen wir manuelles Attribut-Ändern ab:
         const attributeKey = el.value;
-        // `this.baseActors` kennst Du schon, aber hier brauchst Du die Attributliste:
         const attributes = TeamworkFlow.buildAttributeList(this.data.templateData.actor);
-        // finde das Objekt in der Liste
         const attribute = attributes.find(a => a.name === attributeKey)
           ?? attributes.find(a => a.label === attributeKey);
         if (attribute) {
           data.attribute = attribute;
         }
-        // kein Re-render nötig, das Dropdown aktualisiert sich selbst
         return;
 
       case 'limit.name':

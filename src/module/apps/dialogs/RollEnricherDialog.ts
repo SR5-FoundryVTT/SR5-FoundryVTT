@@ -37,7 +37,6 @@ export interface RollEnricherDialogData extends Omit<FormDialogData, "templateDa
     }
 }
 
-
 export class RollEnricherDialog extends FormDialog {
     override data: RollEnricherDialogData;
     private _submitted = false;
@@ -77,8 +76,8 @@ export class RollEnricherDialog extends FormDialog {
             },
             templatePath: "systems/shadowrun5e/dist/templates/apps/dialogs/roll-enricher-dialog.html",
             title: `@Roll${Helpers.capitalizeFirstLetter(type === "success" || type === "extended" || type === "opposed" ? "test" : type)}`,
-            content: "",      // bleibt leer, wird vom Template befüllt
-            buttons        // Buttons hier  
+            content: "",
+            buttons
         };
 
         super(data, options);
@@ -121,7 +120,7 @@ export class RollEnricherDialog extends FormDialog {
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
-        // @ts-expect-error width:auto
+        // @ts-expect-error
         options.width = 'auto';
         return options;
     }
@@ -153,23 +152,18 @@ export class RollEnricherDialog extends FormDialog {
             if (ev.key === 'Enter') {
                 ev.preventDefault();
 
-                // 3) Aktuelles Feld lokalisieren
                 const idx = fields.indexOf(ev.currentTarget as HTMLElement);
                 if (idx === -1) return;
 
-                // 4) Nächsten Index berechnen
                 let nextIdx: number;
                 if (ev.key === 'Enter') {
                     nextIdx = idx + 1;
                 } else {
-                    // Tab (mit Shift → rückwärts)
                     nextIdx = ev.shiftKey ? idx - 1 : idx + 1;
                 }
-                // wrap-around
                 if (nextIdx < 0) nextIdx = fields.length - 1;
                 if (nextIdx >= fields.length) nextIdx = 0;
 
-                // 5) Fokus setzen
                 const next = fields[nextIdx];
                 (next as HTMLElement).focus();
             }
@@ -231,7 +225,19 @@ export class RollEnricherDialog extends FormDialog {
         this.updateResult();
     }
 
-
+/**
+ * Handles drop events on the dialog to import data from dragged entities.
+ *
+ * Supports drops of:
+ *  - Items: extracts action data (skill, attributes, limits, thresholds) and sets template fields.
+ *  - Skills: sets opposed skill and attribute fields based on the dropped skill.
+ *  - Macros: sets the macro name and compendium pack.
+ *  - Actors: populates attributeList and skillList for the selected actor.
+ *
+ * @param event The jQuery-triggered drop event carrying a DragEvent with serialized data.
+ * @param html  The jQuery-wrapped HTML element of the dialog, used to access this.data.templateData.
+ * @returns     A Promise that resolves once the template data has been updated and the dialog re-rendered.
+ */
     async dropHandler(event: JQuery.TriggeredEvent, html: JQuery<HTMLElement>) {
         event.preventDefault();
         const dragEvent = event.originalEvent as DragEvent;
@@ -239,6 +245,7 @@ export class RollEnricherDialog extends FormDialog {
         const templateData = this.data.templateData;
         console.log(dropData);
 
+        // If the dropped UUID comes from a non-default compendium pack for this type, update templateData.compendium
         function setCompendium(uuid) {
             const parts = uuid.split(".");
             if (parts[0] === "Compendium" && (templateData.type === "action" || templateData.type === "macro")) {
@@ -311,6 +318,24 @@ export class RollEnricherDialog extends FormDialog {
         await this.render();
     }
 
+    /**
+ * Updates the live result string based on current template data selections.
+ *
+ * This method:
+ *  - Reads `this.data.templateData` to determine the dialog `type` and relevant fields.
+ *  - Validates required inputs for each roll type, setting `data.invalidResult` accordingly.
+ *  - Constructs the roll syntax string (`@RollAction`, `@RollAttribute`, `@RollTest`, `@RollTeamwork`, etc.) with appropriate parameters and localized labels.
+ *  - Injects the generated result into the `.result-text` element and toggles the `invalid-result` CSS class.
+ *
+ * Supported dialog types:
+ *  - `action` / `macro`: uses `data.name` and optional `data.compendium`
+ *  - `attribute`: `@RollAttribute[[attribute threshold]]`
+ *  - `skill`: `@RollAttribute[[skill threshold]]`
+ *  - `teamwork`: `@RollTeamwork` with skill, attribute, limit, threshold, and participants flag
+ *  - `test`: `@RollTest` with success, extended, or opposed test syntax
+ *
+ * @returns void
+ */
     async updateResult() {
         const data = this.data.templateData;
         const label = data.label?.trim() ? `{${data.label}}` : "";

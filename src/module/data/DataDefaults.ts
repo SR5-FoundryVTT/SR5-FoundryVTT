@@ -140,7 +140,6 @@ export class DataDefaults {
      * @returns 
      */
     static actionRollData(partialActionRollData: DeepPartial<ActionRollData> = {}): ActionRollData {
-        console.log("🔍 actionRollData called with:", partialActionRollData);
         return foundry.utils.mergeObject({
             type: '',
             categories: [],

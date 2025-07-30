@@ -1,15 +1,19 @@
 import { RollEnricherDialog } from "../dialogs/RollEnricherDialog";
 import { Helpers } from "../../helpers";
 
+/**
+ * Utility class to configure and handle custom ProseMirror dropdown menus
+ * for roll-enrichment in FoundryVTT.
+ *
+ * @remarks
+ * Binds hooks to ProseMirror menu to insert enriched roll elements based on type.
+ */
 export class EditorDropdowns {
-    // ProseMirror-API ist auf `foundry.prosemirror` verfügbar
-    // @ts-expect-error: foundry.prosemirror lacks type declarations
+    // @ts-expect-error
     private static ProseMirror = foundry.prosemirror;
 
-    /** Referenz auf das gerade verwendete ProseMirrorMenu */
     private static menu: any;
 
-    /** Die sechs Roll-Typen */
     private static rollTypeOptions = [
         "action",
         "attribute",
@@ -18,14 +22,15 @@ export class EditorDropdowns {
         "teamwork"
     ] as const;
 
-    /** Die drei Test-Untertypen */
     private static testTypeOptions = [
         "success",
         "extended",
         "opposed",
     ] as const;
 
-    /** Muss im `init`-Hook einmalig aufgerufen werden */
+     /**
+     * Registers hooks to extend the ProseMirror editor with roll-enricher dropdowns.
+     */
     static setProseMirrorDropdowns(): void {
         Hooks.on(
             "getProseMirrorMenuDropDowns",
@@ -37,7 +42,11 @@ export class EditorDropdowns {
         );
     }
 
-    /** Baut das `@Roll`-Dropdown dynamisch auf */
+    /**
+     * Populates the roll enricher dropdown entries based on configured roll and test types.
+     *
+     * @param dropdowns - The existing dropdown menus to augment.
+     */
     private static setRollEnricherDropdown(
         dropdowns: Record<string, any>
     ): void {
@@ -45,7 +54,6 @@ export class EditorDropdowns {
             title: "@Roll",
             icon: '<span class="fa-stack fa-2x"><i class="fas fa-dice-d6 fa-stack-1x"></i><i class="fas fa-dice-d6 fa-stack-1x" style="transform: translate(0.4em,0.4em);"></i></span>',
             entries: [
-                // 1) Flache Einträge für action, attribute, macro, skill, teamwork
                 ...this.rollTypeOptions
                     .map((rt) => ({
                         action: `helper-roll-${rt}`,
@@ -55,7 +63,6 @@ export class EditorDropdowns {
                                 await new RollEnricherDialog(rt).select()
                             ),
                     })),
-                // 2) Verschachtelter Block für "test"
                 {
                     action: "helper-roll-test",
                     title: "@RollTest",
@@ -72,17 +79,19 @@ export class EditorDropdowns {
         };
     }
 
+    /**
+     * Inserts HTML content into the ProseMirror editor at the current selection.
+     *
+     * @param htmlString - The HTML string to parse and insert.
+     */
     private static addElement(htmlString: string) {
         if (!htmlString) return;
-        // 1) Verwende den DOMParser aus deinem Schema
         const parser = this.ProseMirror.DOMParser.fromSchema(this.ProseMirror.defaultSchema);
-        // 2) Parse den String als Inline-Slice (nicht als ganzen Block)
         const slice = parser.parseSlice(new DOMParser().parseFromString(htmlString, "text/html").body);
 
         const view = this.menu.view;
         const { state, dispatch } = view;
         const { from, to } = state.selection;
-        // 3) Füge nur den Inline-Slice ein (ersetzt ggf. Auswahl)
         dispatch(state.tr.replaceRange(from, to, slice));
         view.focus();
     }

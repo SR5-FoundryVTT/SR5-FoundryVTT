@@ -1,5 +1,5 @@
 /**
- * CSS for Success Test & Teamwork Dialog styling.
+ * CSS for Success Test styling.
  */
 @import 'config';
 
@@ -28,12 +28,11 @@
     }
   }
 
-  /* Nur im Teamwork-Dialog */
+/**
+ * CSS for Teamwork relevant styling.
+ */
   &#teamwork-dialog {
 
-    /* Geschlossene Selects unverändert lassen */
-
-    /* Dropdown-Listen im Dark-Theme */
     select.form-control,
     select {
 
@@ -77,7 +76,6 @@
         justify-self: start;
       }
 
-      /* Inputs & Selects in rechter Spalte */
       .form-control,
       input[type="number"],
       input[type="text"] {
@@ -88,7 +86,6 @@
       }
     }
 
-    /* Weiße Schrift in Textinputs */
     .dialog-content-teamwork {
 
       input[name="filter"],
@@ -96,26 +93,22 @@
         color: #ffffff !important;
       }
 
-      /* Limit-Text als Input */
       input[name="limit"] {
         background-color: var(--color-input-bg) !important;
         color: #ffffff !important;
       }
 
-      /* datalist-Optionen */
       datalist#sr5-teamwork-limit-options option {
         background-color: #4d4d4d !important;
         color: #ffffff !important;
       }
 
-      /* Fallback-Select für Limits */
       select[name="limit"],
       select[name="limitSelect"] {
         background-color: var(--color-input-bg) !important;
         color: var(--color-input-text) !important;
       }
 
-      /* Layout der Limit-Zeile */
       .limit-controls {
         display: grid;
         grid-template-columns: 6ch auto;
@@ -140,7 +133,6 @@
   }
 }
 
-/* -- Teilnehmer‐Kachel -- */
 .teamwork-participant {
   border: 1px solid var(--color-border-dark);
   border-radius: 4px;
@@ -152,7 +144,7 @@
   transition: background-color 0.3s;
 
   &.glitched {
-    background-color: #3f1e1e; // dunkles Rot
+    background-color: #3f1e1e; 
     border-color: #c0392b;
   }
 
@@ -182,7 +174,6 @@
     font-weight: bold;
     display: block;
     width: 100%;
-    /* Optional: Deine gewünschte Font-Size */
     font-size: var(--font-size-12);
   }
 
@@ -228,7 +219,7 @@
   }
 }
 
-/* Glitch‐Nachricht */
+
 .glitch-message {
   color: #ff4d4d;
   font-style: italic;
@@ -250,23 +241,20 @@
   }
 }
 
-/* Innerhalb deiner SCSS-Datei, z.B. am Ende von teamwork-participant.scss */
 .sr5.chat-card.teamwork-card {
-  /* …die bisherigen Regeln… */
-
-  /* Link in der Header-Zeile (h3.header-name) auf Weiß zwingen */
   .card-header .header-name a.chat-document-link {
     color: white !important;
   }
 }
 
-/* Wrapper um Header, Grid und Footer */
+/**
+ * CSS for RollEnricher Dialog relevant styling.
+ */
 .roll-enricher-wrapper {
   display: flex;
   flex-direction: column;
   gap: 0.5em;
 
-  /* 1) Erklärungstext ganz oben */
   >.explanation {
     margin-bottom: 0.5em;
 
@@ -277,17 +265,13 @@
     }
   }
 
-  /* 2) Der Grid-Container nur für deine Spalten und Trenner */
   >.roll-enricher-dialog {
     display: grid;
     grid-auto-flow: column;
-    /* je .col oder .sep wird eine neue Spalte */
     grid-auto-columns: auto;
-    /* Trenner passen sich ihrem Inhalt an */
     grid-gap: 0.5em;
     align-items: end;
 
-    /* alle Input-Spalten bekommen fixe Breite */
     >.col {
       display: flex;
       flex-direction: column;
@@ -314,7 +298,6 @@
       }
     }
 
-    /* Trenner-Spans bleiben so breit wie ihr Inhalt */
     >.sep {
       display: inline-flex;
       align-items: center;
@@ -325,10 +308,8 @@
     .skillattribute-group {
   display: grid;
 
-  /* 2 Spalten mit je 15ch Breite */
   grid-template-columns: repeat(2, 15ch);
 
-  /* flow by row: erst Zeile 1, dann Zeile 2 usw. */
   grid-auto-flow: row;
 
   grid-gap: 0.5em;
@@ -337,7 +318,6 @@
 
     .skillattribute-group .combined-label {
       grid-column: 1 / -1;
-      /* spannt über beide Spalten */
       text-align: center;
     }
 
@@ -346,7 +326,6 @@
     }
   }
 
-  /* 3) Footer mit Ergebnis und Buttons */
   >.roll-enricher-footer {
     display: flex;
     align-items: center;

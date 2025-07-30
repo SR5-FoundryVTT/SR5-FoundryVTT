@@ -282,7 +282,7 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Use the default icon overrides setting
+     * Allows participants to use alternate skills in teamwork tests.
      */
     game.settings.register(SYSTEM_NAME, FLAGS.AllowDifferentSkillForTeamworkTests, {
         name: 'SETTINGS.AllowDifferentSkillForTeamworkTestsName',
@@ -294,7 +294,7 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Use the default icon overrides setting
+     * Allows teamwork leaders to participate as participants in their own teamwork tests.
      */
     game.settings.register(SYSTEM_NAME, FLAGS.AllowLeaderAsParticipantForTeamworkTests, {
         name: 'SETTINGS.AllowLeaderAsParticipantForTeamworkTestsName',
@@ -308,8 +308,24 @@ export const registerSystemSettings = () => {
 
 };
 
+/**
+ * Register system settings that depend on compendium data.
+ *
+ * These settings are initialized in the `ready` hook because compendium packs
+ * are only fully loaded and indexed once Foundry reaches the ready state.
+ * Building choice lists for default macro and action packs requires access
+ * to `game.packs`, which is populated at that time.
+ */
 export const registerReadySystemSettings = () => {
 
+    /**
+ * Build a mapping of compendium pack keys to their localized labels for a given document type.
+ *
+ * @param type - The document type to filter compendium packs by (e.g., "Item", "JournalEntry").
+ * @returns An object where each key is the pack's collection identifier (e.g., "world.actions")
+ *          and each value is the pack's display label (e.g., "Actions"), including a
+ *          `"NO": "No Pack"` entry to represent the absence of a pack.
+ */
     function buildChoicesByPackType(type: string): Record<string, string> {
         const choices: Record<string, string> = {
             NO: "No Pack"

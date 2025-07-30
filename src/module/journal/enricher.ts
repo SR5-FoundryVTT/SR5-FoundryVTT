@@ -1,11 +1,9 @@
 import { TeamworkFlow } from './../actor/flows/TeamworkFlow';
 import { TestCreator } from './../tests/TestCreator';
 import { SR5Actor } from "../actor/SR5Actor";
-import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { DataDefaults } from '../data/DataDefaults';
 import { SR5 } from '../config';
-import { TeamWorkDialog } from '../apps/dialogs/TeamworkDialog';
 import { FLAGS, SYSTEM_NAME } from '../constants';
 type ActorAttribute = Shadowrun.ActorAttribute;
 type ActionRollData = Shadowrun.ActionRollData;
@@ -30,6 +28,12 @@ export interface TestAttributes {
     testType: "success" | "opposed" | "extended" | "teamwork" | "action" | "macro" | "invalid";
 }
 
+/**
+ * Utility class to enrich entries with interactive roll links.
+ *
+ * Supported keywords: `RollAction`, `RollAttribute`, `RollMacro`, `RollSkill`,
+ * `RollTeamwork`, `RollTest`.
+ */
 export class JournalEnrichers {
 
     static get keywords() {
@@ -40,15 +44,26 @@ export class JournalEnrichers {
         return str.replace(/ /g, '_').toLowerCase();
     }
 
+    /**
+ * Initialize and register all text‐editor enrichers for custom roll markup.
+ *
+ * Parses specialized strings using {@link JournalEnrichers.parseTeamworkString} and
+ * {@link JournalEnrichers.parseTestString}.
+ *
+ * @static
+ */
     static setEnrichers() {
-        const typePattern = `(${JournalEnrichers.keywords.join("|")})`;
-        const opening = "\\[\\[";
-        // const valuePattern = "((?:[^\\[\\]]|\\[[^\\[\\]]*\\])*)";
-        const valuePattern = "([\\s\\S]*?)";
+        const typePattern = `(${JournalEnrichers.keywords.join("|")})`; // 1: keyword
+        const opening = "\\[\\["; 
+        const valuePattern = "([\\s\\S]*?)"; // 2: content
 
-        const closing = "\\]\\](?!\\])";
-        const labelPattern = "(?:\\{([^}]+)\\})?";
+        const closing = "\\]\\](?!\\])"; 
+        const labelPattern = "(?:\\{([^}]+)\\})?"; // 3: optional label
 
+        // Build the enricher regex:
+        //   group 1 = keyword (one of JournalEnrichers.keywords)
+        //   group 2 = inner content (everything between [[ and ]])
+        //   group 3 = optional label (enclosed in {…})
         const pattern = new RegExp(`@${typePattern}${opening}${valuePattern}${closing}${labelPattern}`, "g");
 
         //@ts-expect-error
@@ -58,7 +73,7 @@ export class JournalEnrichers {
                 enricher: (match: RegExpMatchArray, options: any) => {
                     const type = match[1]
                     const value = match[2].replace(/<\/?[^>]+>/g, "").trim() as string
-                    const label = match[3] || value.replace(/_/g, " "); // Use label if provided, else use action name
+                    const label = match[3] || value.replace(/_/g, " ");
 
                     const testAttributes: TestAttributes = { label: label, testType: "success", value: value }
 
@@ -156,6 +171,11 @@ export class JournalEnrichers {
         )
     }
 
+    /**
+ * Handle click events on enriched roll links in journal entries.
+ *
+ * @param ev - The jQuery click event triggered on the roll link element.
+ */
     static async handleClick(ev: JQuery.TriggeredEvent) {
         const user = game.user;
         if (!user) return;
@@ -170,7 +190,6 @@ export class JournalEnrichers {
             ev.preventDefault();
             ev.stopPropagation();
 
-            // --- Speaker-Bestimmung ---
             const speaker = actor ? { actor: actor.id } : { alias: user.name };
 
             const templateData = JournalEnrichers.deconstructRollRequestAttributes(dataset);
@@ -219,6 +238,11 @@ export class JournalEnrichers {
         }
     }
 
+    /**
+ * Execute a test for the given attributes.
+ *
+ * @param testAttributes - Parsed roll/test parameters (actorUuid, attribute(s), skill, limit, threshold, testType, label, etc.)
+ */
     static async rollTest(testAttributes: TestAttributes) {
         const user = game.user;
         if (!user || !testAttributes) return;
@@ -233,7 +257,7 @@ export class JournalEnrichers {
         const found = actor.getSkillByLabel(rawLabel!);
 
 
-        //TODO: Opposed Limit und Schwellenwert einbauen
+        //TODO: Implement opposed limit and interval
         const testData = DataDefaults.actionRollData({
             attribute: this.getAttributeKeyByLabel(testAttributes.attribute),
             attribute2: this.getAttributeKeyByLabel(testAttributes.attribute2),
@@ -300,7 +324,6 @@ export class JournalEnrichers {
                     return;
                 }
             } else {
-                // Aus der Welt (nicht aus einem Kompendium)
                 macro = game.macros?.getName(macroName);
                 if (!macro) {
                     ui.notifications?.error(`Makro '${macroName}' nicht in der Welt gefunden.`);
@@ -315,6 +338,17 @@ export class JournalEnrichers {
         }
     }
 
+    /**
+ * Execute an action roll using the provided attributes.
+ *
+ * Fetches the action by name from the specified compendium (if `packKey` is given)
+ * or from the actor’s own items, then creates and executes the corresponding test.
+ *
+ * @param testAttributes - Parameters for the action roll, including:
+ *   - `name`: The action name to look up
+ *   - `packKey`: (Optional) The compendium key to search
+ *   - `actorUuid`: The UUID of the actor performing the action
+ */
     static async rollAction(testAttributes: TestAttributes) {
         const actionName = testAttributes.name?.trim();
         if (!actionName) return;
@@ -359,7 +393,6 @@ export class JournalEnrichers {
 
                 test = await TestCreator.fromAction(action, actor);
             } else {
-                // Suche die Aktion als Item direkt auf dem Actor
                 const item = actor.items.find(i => i.name === actionName && i.getAction() !== undefined)
                     ?? game.items?.find(i => i.name === actionName && i.getAction() !== undefined);
                 if (!item) {
@@ -377,11 +410,21 @@ export class JournalEnrichers {
         }
     }
 
+    /**
+ * Find the appropriate actor for rolls or actions.
+ *
+ * Attempts to resolve an actor by UUID (if provided) with OWNER permission,
+ * then falls back to a single controlled token’s actor, and finally to the
+ * user’s assigned character. Returns undefined if no valid actor is found.
+ *
+ * @param actorUuid - Optional UUID of the actor to look up.
+ * @returns The resolved actor or undefined.
+ */
     static async findActor(actorUuid?: string): Promise<SR5Actor | undefined> {
         const user = game.user;
         if (!user) return;
 
-        // 1. Check the UUID directly
+        // 1: character by given uuid
         if (actorUuid) {
             const document = await fromUuid(actorUuid);
             if (document instanceof CONFIG.Actor.documentClass) {
@@ -390,14 +433,14 @@ export class JournalEnrichers {
             }
         }
 
-        // 2. Check controlled token
+        // 2: character by selected token
         const controlled = canvas.tokens?.controlled ?? [];
         if (controlled.length === 1) {
             const tokenActor = controlled[0].actor;
             if (tokenActor?.testUserPermission(user, "OWNER")) return tokenActor as SR5Actor;
         }
 
-        // 3. Use user's assigned character
+        // 3: user assigned character
         if (user.character) {
             return user.character as SR5Actor;
         }
@@ -405,107 +448,20 @@ export class JournalEnrichers {
         return undefined;
     }
 
-    // /**
-    //  * This hook listens to roll-request clicks, extracts the data and forwards it to create a chat message
-    //  * @param journal The journal where the roll is triggered
-    //  * @param html the triggering html
-    //  * @param data 
-    //  */
-    // static async setEnricherHooks(journal, html, data) {
-    //     const rolls = {
-    //         "Teamwork": "startTeamworkTest",
-    //         "RollSkill": "rollSkill",
-    //         "RollAttribute": "rollAttribute"
-    //     }
-
-    //     html.on("click", ".sr5-roll-request", (ev) => {
-    //         const element = ev.currentTarget
-
-    //         const rollType = element.dataset.request
-    //         const rollTypeName = "SR5.GMRequest." + rollType;
-    //         const rollEntity = element.dataset.skill
-    //         let rollEntityName = JournalEnrichers.getRollEntityTranslation(rollType, rollEntity);
-    //         const threshold = element.dataset.threshold
-
-    //         const templateData = {
-    //             rollType: rolls[rollType],
-    //             rollTypeName: rollTypeName,
-    //             rollEntity: rollEntity,
-    //             rollEntityName: rollEntityName,
-    //             threshold: threshold
-    //         }
-
-    //         JournalEnrichers.createChatMessage(templateData);
-    //     })
-    // }
-
-    // /**
-    //  * This method provides translations respecting the rollType
-    //  * @param type what rollType is requestd
-    //  * @param rollEntity what should be rolled
-    //  * @returns the translation or rollEntity when the keyword is unknown
-    //  */
-    // static getRollEntityTranslation(type: string, rollEntity: string) {
-    //     if (type === "RollSkill" || type === "RollTeamwork") {
-    //         return Helpers.getSkillTranslation(rollEntity)
-    //     }
-
-    //     if (type === "RollAttribute") {
-    //         return Helpers.getAttributeTranslation(rollEntity)
-    //     }
-
-    //     return rollEntity;
-    // }
-
-    // static async chatlogRequestHooks(html) {
-    //     // setup chat listener messages for each message as some need the message context instead of chatlog context.
-    //     html.find('.chat-message').each(async (index, element) => {
-    //         element = $(element);
-    //         const id = element.data('messageId');
-    //         const message = game.messages?.get(id);
-    //         if (!message) return;
-
-    //         await this.messageRequestHooks(element)
-    //     });
-    // }
-
-    // static async messageRequestHooks(html) {
-    //     html.find('.sr5-requestAnswer').on('click', async (ev) => {
-    //         const element = ev.currentTarget
-
-    //         const rollType = element.dataset.request
-    //         const rollEntity = element.dataset.rollentity
-    //         const threshold = parseInt(element.dataset.threshold)
-
-    //         let actor = await Helpers.chooseFromAvailableActors()
-
-    //         if (actor == undefined) {
-    //             //in a normal running game this should not happen
-    //             ui.notifications?.error('SR5.Errors.NoAvailableActorFound', { localize: true });
-    //             return
-    //         }
-
-    //         actor[rollType](rollEntity, { threshold: { base: threshold, value: threshold } })
-    //     })
-    // }
-
-    // static async createChatMessage(templateData) {
-    //     const html = await renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.html', templateData);
-
-    //     const chatData = {
-    //         user: game.user?.id,
-    //         speaker: ChatMessage.getSpeaker(),
-    //         content: html
-    //     };
-
-    //     await ChatMessage.create(chatData)
-    // };
-
+    /**
+ * Parse a teamwork roll string to extract and validate parameters.
+ *
+ * Supports tokens separated by `|`, handling:
+ * - `x` flag to allow other skills (only once)
+ * - `skill`, `attribute`, `threshold`, `limit` key=value pairs
+ *
+ * @param testAttributes - The attributes object with a raw `value` to parse.
+ * @returns The updated `TestAttributes` with teamwork parameters applied.
+ */
     static parseTeamworkString(testAttributes: TestAttributes) {
         const result = testAttributes;
         const raw = (result.value || '').trim();
 
-        // Leerer String ist OK
         if (!raw) {
             result.testType = "teamwork";
             return result;
@@ -516,10 +472,8 @@ export class JournalEnrichers {
             .map(s => s.trim())
             .filter(s => !!s);
 
-        // Set zum Tracken verwendeter Keys
         const seen = new Set<string>();
 
-        // Defaults
         let skill: string | undefined;
         result.allowOtherSkills = false;
         delete result.attribute;
@@ -527,7 +481,7 @@ export class JournalEnrichers {
         delete result.limit;
 
         for (const tok of tokens) {
-            // 1) X-Flag?
+            // X-Flag?
             if (/^x$/i.test(tok)) {
                 if (seen.has('x')) {
                     return ui.notifications?.error(`"x" darf nur einmal verwendet werden.`);
@@ -537,7 +491,7 @@ export class JournalEnrichers {
                 continue;
             }
 
-            // 2) key=val?
+            // key=val?
             const [keyRaw, val] = tok.split('=');
             if (val !== undefined) {
                 const key = keyRaw.toLowerCase();
@@ -568,14 +522,13 @@ export class JournalEnrichers {
                 continue;
             }
 
-            // 3) freier Token → Skill
+            // empty Token → Skill
             if (!skill) {
                 seen.add('skill');
                 skill = tok;
                 continue;
             }
 
-            // 4) alles andere ist Fehler
             return ui.notifications?.error(`Ungültiger Eintrag: ${tok}`);
         }
 
@@ -587,7 +540,19 @@ export class JournalEnrichers {
         return result;
     }
 
-
+    /**
+     * Parse a roll-test string and populate the corresponding TestAttributes.
+     *
+     * Supports three formats:
+     * - Success tests: `"skill/attribute + attribute [limit] (threshold)"`
+     * - Extended tests: `"skill/attribute + attribute [limit] (threshold, interval)"`
+     * - Opposed tests: `"skill/attribute + attribute [limit] vs opposedSkill/Attribute + opposedAttribute [otherLimit]"`
+     *
+     * @param testAttributes - The initial TestAttributes containing a raw `value` string.
+     * @returns The same TestAttributes object with fields (`skill`, `attribute`, `limit`,
+     * `threshold`, `interval`, `opposedSkill`, `opposedAttribute`, `opposedLimit`, `testType`)
+     * filled in according to the parsed format.
+     */
     static parseTestString(testAttributes: TestAttributes): TestAttributes {
         const result = testAttributes;
         const rawString = result.value;
@@ -655,6 +620,17 @@ export class JournalEnrichers {
         return result;
     }
 
+    /**
+ * Serialize roll/test parameters into HTML data attributes for link elements.
+ *
+ * Iterates over known `TestAttributes` fields and, for each non-empty value,
+ * adds the corresponding `data-` attribute (e.g. `data-skill`, `data-attribute`,
+ * `data-threshold`, etc.). Always includes `data-request` for the test type,
+ * plus `label` and `title` for display.
+ *
+ * @param data - The {@link TestAttributes} object containing roll/test parameters.
+ * @returns A record of HTML attribute names to stringified values for insertion.
+ */
     static buildRollRequestAttributes(data: TestAttributes): Record<string, string> {
 
         const attrs: Record<string, string> = {
@@ -691,6 +667,17 @@ export class JournalEnrichers {
         return attrs;
     }
 
+    /**
+ * Parse element dataset into a TestAttributes object.
+ *
+ * Reads standard `data-*` attributes (skill, attribute, limit, threshold, interval,
+ * opposedSkill, opposedAttribute, name, actorUuid, packKey, allowOtherSkills, etc.),
+ * plus `label` and `request` type, and maps them to the corresponding fields on
+ * {@link TestAttributes}.
+ *
+ * @param dataset - The {@link DOMStringMap} from an HTML element’s dataset.
+ * @returns A {@link TestAttributes} object populated with values from the dataset.
+ */
     static deconstructRollRequestAttributes(dataset: DOMStringMap): TestAttributes {
         const testAttributes: TestAttributes = {
             label: dataset.label ?? "",
@@ -698,7 +685,6 @@ export class JournalEnrichers {
             value: ""
         };
 
-        // Mapping von lowercase keys zu echten Feldnamen
         const keyMap: Record<string, keyof Omit<TestAttributes, "label" | "testType">> = {
             skill: "skill",
             attribute: "attribute",
@@ -728,54 +714,16 @@ export class JournalEnrichers {
         return testAttributes;
     }
 
-    // static findActorFromElement(currentTarget: HTMLElement): SR5Actor | undefined {
-    //     // 1. Chat Card – Versuche zuerst actorId direkt aus der Chatnachricht
-    //     const chatMessage = currentTarget.closest<HTMLElement>(".message[data-actor-id], .message[data-token-id]");
-    //     const actorId = chatMessage?.dataset.actorId;
-    //     if (actorId) {
-    //         const actor = game.actors?.get(actorId);
-    //         if (actor) return actor;
-    //     }
-
-    //     // 1b. Alternativ: Wenn tokenId gesetzt ist, versuche, den Token zu holen
-    //     const tokenId = chatMessage?.dataset.tokenId;
-    //     if (tokenId && canvas.scene) {
-    //         const tokenDoc = canvas.scene.tokens.get(tokenId);
-    //         if (tokenDoc) {
-    //             const actor = tokenDoc.actor;
-    //             if (actor) return actor;
-    //         }
-    //     }
-
-    //     // 2. Item-Fenster oder Actor/Item-Sheets
-    //     const itemElement = currentTarget.closest<HTMLElement>('[data-item-id], .item');
-    //     const appElement = itemElement?.closest<HTMLElement>('.window-app');
-    //     const appId = parseInt(appElement?.dataset.appid ?? "");
-    //     if (!isNaN(appId)) {
-    //         const app = ui.windows[appId];
-
-    //         // Typisierung über Type Assertion (as any oder spezieller)
-    //         const sheet = app as any;
-
-    //         // a) Direkt Actor
-    //         if (sheet?.document instanceof SR5Actor) return sheet.document;
-
-    //         // b) Oder Item → Actor
-    //         if (sheet?.document instanceof SR5Item && sheet.document.actorOwner) {
-    //             return sheet.document.actorOwner;
-    //         }
-    //     }
-
-    //     // 3. Fallback: Item direkt vom DOM-Element
-    //     const itemEntry = itemElement as any;
-    //     const item = itemEntry?.item;
-    //     if (item instanceof SR5Item && item.actorOwner) return item.actorOwner;
-
-    //     return undefined;
-    // }
-
-
-
+    /**
+ * Find the internal attribute key corresponding to a localized label.
+ *
+ * Iterates over the SR5.attributes mapping (excluding certain non-rollable keys),
+ * normalizes both the localized name and the search string, and returns the matching
+ * attribute key. Returns an empty string if no match is found.
+ *
+ * @param searchedFor - The localized attribute label to look up.
+ * @returns The matching {@link ActorAttribute} key, or an empty string if none found.
+ */
     static getAttributeKeyByLabel(searchedFor?: string): ActorAttribute {
         if (!searchedFor) return '';
 
@@ -793,6 +741,15 @@ export class JournalEnrichers {
         return '';
     }
 
+    /**
+ * Look up the internal limit key for a localized limit label.
+ *
+ * Iterates over the `SR5.limits` mapping, localizes each entry via `game.i18n.localize`,
+ * normalizes labels using `normalizeLabel`, and returns the matching key.
+ *
+ * @param searchedFor - The localized limit label to resolve.
+ * @returns The corresponding limit key from {@link SR5.limits}, or an empty string if none matches.
+ */
     static getLimitKeyByLabel(searchedFor?: string): Shadowrun.Limit {
         if (!searchedFor) return '';
 
@@ -813,7 +770,7 @@ export class JournalEnrichers {
         return label
             .toLowerCase()
             .trim()
-            .replace(/[\s_\-–—]+/g, ""); // ersetzt Leerzeichen, Unterstriche, Bindestriche, Gedankenstriche etc.
+            .replace(/[\s_\-–—]+/g, "");
     }
 }
 

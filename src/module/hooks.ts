@@ -533,8 +533,6 @@ ___________________
         await OpposedTest.chatMessageListeners(message, html, data);
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
         await TeamworkFlow.chatMessageListeners(message, html);
-        // TODO: Thogrim
-        // await JournalEnrichers.messageRequestHooks(html);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
@@ -542,8 +540,6 @@ ___________________
         await OpposedTest.chatLogListeners(chatLog, html, data);
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
         await TeamworkFlow.chatLogListeners(chatLog, html);
-        // TODO: Thogrim
-        // await JournalEnrichers.chatlogRequestHooks(html)
     }
 
     static configureVision() {

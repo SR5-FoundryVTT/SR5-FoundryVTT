@@ -1159,12 +1159,16 @@ export class SR5Actor extends Actor {
     }
 
     /**
- * Roll a skill test for a specific skill
- * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
- * @param options Optional options to configure the roll.
- * @param options.byLabel true to search the skill by label as displayed on the sheet.
- * @param options.specialization true to configure the skill test to use a specialization.
- */
+     * Rolls a teamwork-enhanced skill test.
+     *
+     * @param teamworkData The full input data as a `TeamworkMessageData` object:
+     *   actors, skill, modifiers, limits, participants and glitch state
+     *   (see {@link TeamworkMessageData} for details).
+     * @param options      Optional overrides for lookup and roll configuration
+     *   (see {@link Shadowrun.SkillRollOptions}).
+     *
+     * @returns A Promise that resolves to the test result, or `undefined` if cancelled.
+    */
     async rollTeamworkTest(teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions = {}) {
         console.info(`Shadowrun5e | Rolling teamwork test for ${teamworkData.skill}`);
 
@@ -1174,7 +1178,6 @@ export class SR5Actor extends Actor {
             base: teamworkData.threshold ?? 0
         };
 
-        // Dann options „aufstocken“, dabei vorhandene Werte in options nicht überschreiben
         const finalOptions = {
             ...options,
             specialization: options.specialization ?? defaultSpecialization,
@@ -1182,7 +1185,7 @@ export class SR5Actor extends Actor {
         };
 
         //TODO: Lokalisierung
-        const action = this.skillActionData(options.byLabel ? teamworkData.skill.label : (teamworkData.skill).id, options);
+        const action = this.skillActionData(finalOptions.byLabel ? teamworkData.skill.label : (teamworkData.skill).id, finalOptions);
         if (!action) return;
         if (!teamworkData.criticalGlitched) {
             action.limit.mod.push({ name: "Teamwork", value: teamworkData.additionalLimit })
