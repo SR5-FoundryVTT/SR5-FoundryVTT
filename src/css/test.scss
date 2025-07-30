@@ -322,22 +322,27 @@
       margin: 0 0.5em;
     }
 
-    /* Falls Du ein kombiniertes Label über 2 Felder hast */
-    >.combined-label {
-      grid-column: span 2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 0.25em;
+    .skillattribute-group {
+  display: grid;
 
-      label {
-        display: block;
-        text-align: center;
-      }
+  /* 2 Spalten mit je 15ch Breite */
+  grid-template-columns: repeat(2, 15ch);
 
-      label.optional {
-        font-style: italic;
-      }
+  /* flow by row: erst Zeile 1, dann Zeile 2 usw. */
+  grid-auto-flow: row;
+
+  grid-gap: 0.5em;
+  align-items: end;
+    }
+
+    .skillattribute-group .combined-label {
+      grid-column: 1 / -1;
+      /* spannt über beide Spalten */
+      text-align: center;
+    }
+
+    label.optional {
+      font-style: italic;
     }
   }
 
@@ -346,6 +351,7 @@
     display: flex;
     align-items: center;
     gap: 0.5em;
+    margin-bottom: 0.5em;
 
     .result-text {
       flex: 1;

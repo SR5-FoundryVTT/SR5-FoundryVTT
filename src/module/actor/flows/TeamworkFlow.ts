@@ -369,7 +369,7 @@ export class TeamworkFlow {
             }
         }
 
-        const skill = data.skill ? this.constructSkillEntry({ id: data.skill.id ?? data.skill.label ?? "" }, actor) : undefined
+        const skill = data.skill ? data.skill : undefined
 
         const dialogData = await this.showTeamworkDialog({
             actors: this.actorList ?? [actor],

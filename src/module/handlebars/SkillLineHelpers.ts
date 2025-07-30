@@ -113,22 +113,30 @@ export const registerSkillLineHelpers = () => {
             title: game.i18n.localize('SR5.DeleteSkill'),
             cssClass: '',
         };
+        const teamworkIcon = {
+            icon: 'fas fa-users',
+            title: game.i18n.localize('SR5.Skill.Teamwork.Start'),
+            cssClass: '',
+        };
         switch (skillType) {
             case 'active':
+                teamworkIcon.cssClass = 'start-teamwork';
                 editIcon.cssClass = 'skill-edit';
                 removeIcon.cssClass = 'remove-active'
                 openSourceIcon.cssClass = 'skill-opensource'
-                return [openSourceIcon, editIcon, removeIcon];
+                return [teamworkIcon, openSourceIcon, editIcon, removeIcon];
             case 'language':
+                teamworkIcon.cssClass = 'start-teamwork';
                 editIcon.cssClass = 'language-skill-edit';
                 removeIcon.cssClass = 'remove-language';
                 openSourceIcon.cssClass = 'language-skill-opensource'
-                return [openSourceIcon, editIcon, removeIcon];
+                return [teamworkIcon, openSourceIcon, editIcon, removeIcon];
             case 'knowledge':
+                teamworkIcon.cssClass = 'start-teamwork';
                 editIcon.cssClass = 'knowledge-skill-edit';
                 removeIcon.cssClass = 'remove-knowledge';
                 openSourceIcon.cssClass = 'knowledge-skill-opensource'
-                return [openSourceIcon, editIcon, removeIcon];
+                return [teamworkIcon, openSourceIcon, editIcon, removeIcon];
             default:
                 return [editIcon];
         }

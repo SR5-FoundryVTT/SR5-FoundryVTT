@@ -28,7 +28,7 @@ import { CombatRules } from '../rules/CombatRules';
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
-import { TeamworkMessageData } from './flows/TeamworkFlow';
+import { SkillEntry, TeamworkData, TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 
 
@@ -1182,7 +1182,7 @@ export class SR5Actor extends Actor {
         };
 
         //TODO: Lokalisierung
-        const action = this.skillActionData(options.byLabel ? teamworkData.skill.label : teamworkData.skill.id, options);
+        const action = this.skillActionData(options.byLabel ? teamworkData.skill.label : (teamworkData.skill).id, options);
         if (!action) return;
         if (!teamworkData.criticalGlitched) {
             action.limit.mod.push({ name: "Teamwork", value: teamworkData.additionalLimit })

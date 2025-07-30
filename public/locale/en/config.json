@@ -1037,6 +1037,7 @@
             "Survival": "Survival",
             "Swimming": "Swimming",
             "Teamwork": {
+                "Start": "TODO",
                 "Glitched": "Glitched",
                 "ParticipantActor": "Choose actor",
                 "RollIt": "Roll it",

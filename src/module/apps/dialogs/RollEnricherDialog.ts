@@ -85,28 +85,29 @@ export class RollEnricherDialog extends FormDialog {
 
         switch (data.templateData.type) {
             case "action":
-                data.templateData.explanation = "So funktioniert ein rollAction <br> Aktuell eingestelltes Compendium:" + game.settings.get(SYSTEM_NAME, FLAGS.RollActionDefaultPack) as string;
+                // data.templateData.explanation = "So funktioniert ein rollAction <br> Aktuell eingestelltes Compendium:" + game.settings.get(SYSTEM_NAME, FLAGS.RollActionDefaultPack) as string;
+                data.templateData.explanation = "@RollAction-Explanation"
                 data.templateData.result = "@RollAction[[]]";
                 break;
             case "macro":
-                data.templateData.explanation = "So funktioniert ein rollMacro <br> Aktuell eingestelltes Compendium:" + game.settings.get(SYSTEM_NAME, FLAGS.RollMacroDefaultPack) as string;
+                data.templateData.explanation = "@RollMacro-Explanation"
                 data.templateData.result = "@RollMacro[[]]";
                 break;
             case "attribute":
-                data.templateData.explanation = "So funktioniert ein rollAttribute";
+                data.templateData.explanation = "@RollAttribute-Explanation";
                 data.templateData.result = "@RollAttribute[[]]";
                 break;
             case "skill":
-                data.templateData.explanation = "So funktioniert ein rollSkill";
+                data.templateData.explanation = "@RollSkill-Explanation";
                 data.templateData.result = "@RollSkill[[]]";
                 break;
             case "teamwork":
-                data.templateData.explanation = "So funktioniert ein rollTeamwork";
+                data.templateData.explanation = "@RollTeamwork-Explanation";
                 data.templateData.result = "@RollTeamwork[[]]";
                 data.templateData.invalidResult = false;
                 break;
             case "test":
-                data.templateData.explanation = "So funktioniert ein rollTest";
+                data.templateData.explanation = "@RollTest-Explanation";
                 data.templateData.result = "@RollTest[[]]";
                 break;
             default:
@@ -137,6 +138,11 @@ export class RollEnricherDialog extends FormDialog {
         super.activateListeners(html);
 
         html.on("drop", event => this.dropHandler(event, html));
+
+        const copyIcon = html.find<HTMLSpanElement>(".copy-icon");
+        copyIcon.on("click", () => {
+            const text = html.find<HTMLElement>(".result-text").text();
+        });
 
         const fields: HTMLElement[] = html
             .find('input, textarea, select, button')
