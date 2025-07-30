@@ -259,3 +259,112 @@
     color: white !important;
   }
 }
+
+/* Wrapper um Header, Grid und Footer */
+.roll-enricher-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  /* 1) Erklärungstext ganz oben */
+  >.explanation {
+    margin-bottom: 0.5em;
+
+    p {
+      margin: 0;
+      font-size: 0.9em;
+      color: #ccc;
+    }
+  }
+
+  /* 2) Der Grid-Container nur für deine Spalten und Trenner */
+  >.roll-enricher-dialog {
+    display: grid;
+    grid-auto-flow: column;
+    /* je .col oder .sep wird eine neue Spalte */
+    grid-auto-columns: auto;
+    /* Trenner passen sich ihrem Inhalt an */
+    grid-gap: 0.5em;
+    align-items: end;
+
+    /* alle Input-Spalten bekommen fixe Breite */
+    >.col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: none;
+      width: 15ch;
+      margin: 0 0.25em;
+
+      label {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0.2em;
+        font-size: 0.9em;
+        cursor: help;
+      }
+
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 1em;
+        padding: 0.2em;
+        color: #fff;
+      }
+    }
+
+    /* Trenner-Spans bleiben so breit wie ihr Inhalt */
+    >.sep {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 0.5em;
+    }
+
+    /* Falls Du ein kombiniertes Label über 2 Felder hast */
+    >.combined-label {
+      grid-column: span 2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 0.25em;
+
+      label {
+        display: block;
+        text-align: center;
+      }
+
+      label.optional {
+        font-style: italic;
+      }
+    }
+  }
+
+  /* 3) Footer mit Ergebnis und Buttons */
+  >.roll-enricher-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+
+    .result-text {
+      flex: 1;
+      font-family: monospace;
+      color: #fff;
+      word-break: break-all;
+    }
+
+    .invalid-result {
+      color: #ff0000 !important;
+    }
+
+    .copy-icon {
+      cursor: pointer;
+    }
+
+    .roll-enricher-insert,
+    .roll-enricher-cancel {
+      flex: none;
+    }
+  }
+}

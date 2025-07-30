@@ -45,7 +45,7 @@ export class TeamWorkDialog extends FormDialog {
     },
     // @ts-expect-error // TODO: default option value with all the values...
     options: FormDialogOptions = {}) {
-    options.applyFormChangesOnSubmit = true;
+    options.applyFormChangesOnSubmit = false;
 
     console.log("TWDialog constructor actors: ", teamworkData.actors)
 
@@ -356,9 +356,5 @@ export class TeamWorkDialog extends FormDialog {
     }
 
     await super._onChangeInput(event as any);
-  }
-
-  override applyFormData(): void {
-
   }
 }

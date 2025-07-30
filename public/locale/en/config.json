@@ -326,7 +326,15 @@
         "CyberwareGradeStandard": "Standard",
         "CyberwareGradeUsed": "Used",
         "DIALOG": {
-            "MissingModuleContent": "In order for source PDFs to be shown, the pdf-pager module must be installed and a PDF matching the code created."
+            "MissingModuleContent": "In order for source PDFs to be shown, the pdf-pager module must be installed and a PDF matching the code created.",
+            "RollEnricherHelper": {
+                "SkillAttribute1Label": "TODO",
+                "CompendiumLabel": "Compendium",
+                "LabelLabel": "Label",
+                "IntervalLabel": "Interval",
+                "Versus": "vs.",
+                "AllowOtherSkillsLabel": "TODO"
+            }
         },
         "DP": "DP",
         "DV": "DV",
@@ -1365,6 +1373,21 @@
             "Ritual": {
                 "Force": "Force of the ritual",
                 "ReagentDrams": "Drams of reagents used for altering drain"
+            },
+            "RollEnricher": {
+                "ActionName": "TODO",
+                "MacroName": "TODO",
+                "Attribute": "TODO",
+                "Skill": "TODO",
+                "TeamworkSkill": "TODO",
+                "SkillAttribute1": "TODO",
+                "Compendium": "TODO",
+                "Threshold": "TODO",
+                "Label": "TODO",
+                "Limit": "TODO",
+                "AllowOtherSkills": "TODO",
+                "ExtendedThreshold": "TODO",
+                "Interval": "TODO"
             },
             "SituationalModifier": {
                 "Recoil": "Amount of bullets fired"

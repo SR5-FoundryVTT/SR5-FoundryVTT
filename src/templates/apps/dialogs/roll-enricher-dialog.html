@@ -1,0 +1,333 @@
+
+<div class="roll-enricher-wrapper">
+  <!-- Erklärungstext -->
+  <div class="explanation">
+    <p>
+      {{explanation}}
+    </p>
+  </div>
+
+  <form class="roll-enricher-dialog">
+  {{#ife type 'action'}}
+    <span class="sep">@RollAction[[</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.ActionName">SR5.ItemName</label>
+      <input
+        type="text"
+        name="name"
+        placeholder="SR5.ItemName"
+        value="{{name}}"
+        required
+      />
+    </div>
+    <span class="sep">|</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Compendium"  class="optional">SR5.DIALOG.RollEnricherHelper.Label.Compendium</label>
+      <input
+        type="text"
+        name="compendium"
+        placeholder="SR5.DIALOG.RollEnricherHelper.Label.Compendium"
+        value="{{compendium}}"
+      />
+    </div>
+    <span class="sep">]]&#x2060;}</span>
+  {{/ife}}
+
+  {{#ife type 'macro'}}
+    <span class="sep">@RollMacro[[</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.MacroName">SR5.ItemName</label>
+      <input
+        type="text"
+        name="name"
+        placeholder="SR5.ItemName"
+        value="{{name}}"
+        required
+      />
+    </div>
+    <span class="sep">|</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Compendium"  class="optional">SR5.DIALOG.RollEnricherHelper.Label.Compendium</label>
+      <input
+        type="text"
+        name="compendium"
+        placeholder="SR5.DIALOG.RollEnricherHelper.Label.Compendium"
+        value="{{compendium}}"
+      />
+    </div>
+    <span class="sep">]]&#x2060;}</span>
+  {{/ife}}
+
+  {{#ife type 'attribute'}}
+    <span class="sep">@RollAttribute[[</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Attribute"  class="optional">SR5.Attribute</label>
+      <input
+        type="text"
+        name="attribute"
+        list="datalist-attribute"
+        placeholder="SR5.Attribute"
+        value="{{attribute}}"
+        required
+      />
+    </div>
+    <span class="sep"> </span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Threshold">SR5.Threshold</label>
+      <input
+        type="number"
+        name="threshold"
+        placeholder="SR5.Threshold"
+        value="{{threshold}}"
+        min="0"
+      />
+    </div>
+    <span class="sep">]]&#x2060;}</span>
+  {{/ife}}
+
+  {{#ife type 'skill'}}
+    <span class="sep">@RollSkill[[</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Skill">SR5.Skill.Skill</label>
+      <input
+        type="text"
+        name="skill"
+        list="datalist-skill"
+        placeholder="SR5.Skill.Skill"
+        value="{{skill}}"
+        required
+      />
+    </div>
+    <span class="sep"> </span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Threshold">SR5.Threshold</label>
+      <input
+        type="number"
+        name="threshold"
+        placeholder="SR5.Threshold"
+        value="{{threshold}}"
+      />
+    </div>
+    <span class="sep">]]&#x2060;}</span>
+  {{/ife}}
+
+  {{#ife type 'teamwork'}}
+    <span class="sep">@RollTeamwork[[</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.TeamworkSkill">SR5.Skill.Skill</label>
+      <input
+        type="text"
+        name="skill"
+        list="datalist-skill"
+        placeholder="SR5.Skill.Skill"
+        value="{{skill}}"
+      />
+    </div>
+    <span class="sep">|&nbspattribute=</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Attribute">SR5.Attribute</label>
+      <input
+        type="text"
+        name="attribute"
+        list="datalist-attribute"
+        placeholder="SR5.Attribute"
+        value="{{attribute}}"
+      />
+    </div>
+    <span class="sep">|&nbsplimit=</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Limit">SR5.Limit</label>
+      <input
+        type="text"
+        name="limit"
+        placeholder="SR5.Limit"
+        value="{{limit}}"
+      />
+    </div>
+    <span class="sep">|&nbspthreshold=</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Threshold">SR5.Threshold</label>
+      <input
+        type="number"
+        name="threshold"
+        placeholder="SR5.Threshold"
+        value="{{threshold}}"
+      />
+    </div>
+    <span class="sep" {{#if ../notAllowOtherSkillsSetting}}hidden{{/if}}>|</span>
+    <div class="col" {{#if ../notAllowOtherSkillsSetting}}hidden{{/if}}>
+      <label title="SR5.Tooltips.RollEnricher.AllowOtherSkills">SR5.DIALOG.RollEnricherHelper.Label.AllowOtherSkills</label>
+      <input
+        type="checkbox"
+        name="allowOtherSkills"
+        placeholder="SR5.DIALOG.RollEnricherHelper.Label.AllowOtherSkills"
+        {{#if allowOtherSkills}}checked{{/if}}
+      />
+    </div>
+    <span class="sep">)&#x2060;]]&#x2060;{</span>
+  {{/ife}}
+
+  {{#ife type 'test'}}
+    <span class="sep">@RollTest[[</span>
+    <div class="skillattribute-group"></div>
+    <div class="combined-label">
+      <label title="SR5.Tooltips.RollEnricher.Skillattribute">SR5.DIALOG.RollEnricherHelper.Label.Skillattribute</label>
+    </div>
+    <div class="col">
+      <input
+        type="text"
+        name="skill"
+        list="datalist-skill"
+        placeholder="SR5.Skill.Skill"
+        value="{{skill}}"
+      />
+    </div>
+    <div class="col">
+      <input
+        type="text"
+        name="attribute"
+        list="datalist-attribute"
+        placeholder="SR5.Attribute"
+        value="{{attribute}}"
+      />
+    </div>
+    </div>
+    <span class="sep">+</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Attribute">SR5.Attribute</label>
+      <input
+        type="text"
+        name="secondAttribute"
+        placeholder="SR5.Attribute"
+        value="{{secondAttribute}}"
+        required
+      />
+    </div>
+    <span class="sep">[</span>
+    <div class="col">
+      <label title="SR5.Tooltips.RollEnricher.Limit">Limit</label>
+      <input
+        type="text"
+        name="limit"
+        placeholder="Limit"
+        value="{{limit}}"
+        required
+      />
+    </div>
+
+    {{#ife testType 'success'}}
+      <span class="sep">]&nbsp;(</span>
+      <div class="col">
+        <label title="SR5.Tooltips.RollEnricher.Threshold">SR5.Threshold</label>
+        <input
+          type="number"
+          name="threshold"
+          placeholder="SR5.Threshold"
+          value="{{threshold}}"
+        />
+      </div>
+      <span class="sep">)&#x2060;]]&#x2060;{</span>
+    {{/ife}}
+
+    {{#ife testType 'extended'}}
+      <span class="sep">]&nbsp;(</span>
+      <div class="col">
+        <label title="SR5.Tooltips.RollEnricher.Threshold">SR5.Threshold</label>
+        <input
+          type="number"
+          name="threshold"
+          placeholder="SR5.Threshold"
+          value="{{threshold}}"
+        />
+      </div>
+      <span class="sep">,</span>
+      <div class="col">
+        <label title="SR5.Tooltips.RollEnricher.Interval">SR5.DIALOG.RollEnricherHelper.Label.Interval</label>
+        <input
+          type="text"
+          name="interval"
+          placeholder="SR5.DIALOG.RollEnricherHelper.Label.Interval"
+          value="{{interval}}"
+        />
+      </div>
+      <span class="sep">)]]&#x2060;{</span>
+    {{/ife}}
+
+    {{#ife testType 'opposed'}}
+      <span class="sep">]&nbsp;SR5.DIALOG.RollEnricherHelper.Versus</span>
+      <div class="col-span-2 combined-label">
+        <label title="SR5.Tooltips.RollEnricher.Skillattribute">SR5.DIALOG.RollEnricherHelper.Label.Skillattribute</label>
+      </div>
+      <div class="col">
+        <input
+          type="text"
+          name="opposedSkill"
+        list="datalist-skill"
+          placeholder="SR5.Skill.Skill"
+          value="{{opposedSkill}}"
+        />
+      </div>
+      <div class="col">
+        <input
+          type="text"
+          name="opposedattribute"
+        list="datalist-attribute"
+          placeholder="SR5.Attribute"
+          value="{{opposedattribute}}"
+        />
+      </div>
+      <span class="sep">+</span>
+      <div class="col">
+        <label title="SR5.Tooltips.RollEnricher.Attribute">SR5.Attribute</label>
+        <input
+          type="text"
+          name="opposedSecondAttribute"
+          placeholder="SR5.Attribute"
+          value="{{opposedSecondAttribute}}"
+        />
+      </div>
+      <span class="sep">[</span>
+      <div class="col">
+        <label title="SR5.Tooltips.RollEnricher.Limit">Limit</label>
+        <input
+          type="text"
+          name="limit"
+          placeholder="Limit"
+          value="{{limit}}"
+        />
+      </div>
+      <span class="sep">]]]&#x2060;{</span>
+    {{/ife}}
+  {{/ife}}
+
+  <div class="col">
+    <label title="SR5.DIALOG.RollEnricherHelper.Label.Label" class="optional">SR5.DIALOG.RollEnricherHelper.Label.Label</label>
+    <input
+      type="text"
+      name="label"
+      placeholder="SR5.DIALOG.RollEnricherHelper.Label.Label"
+      value="{{label}}"
+      required
+    />
+  </div>
+  <span class="sep">}</span>
+
+  <datalist id="datalist-attribute">
+  {{#each attributeList as |attribute|}}
+    <option value="{{attribute}}"></option>
+  {{/each}}
+</datalist>
+
+  <datalist id="datalist-skill">
+  {{#each skillList as |skill|}}
+    <option value="{{skill}}"></option>
+  {{/each}}
+</datalist>
+</form>
+
+  <div class="roll-enricher-footer">
+    <span class="result-text {{#if invalidResult}}invalid-result{{/if}}">{{result}}</span>
+    <i class="fas fa-copy copy-icon" title="Kopieren"
+       onclick="navigator.clipboard.writeText(document.querySelector('.result-text').innerText)"></i>
+  </div>
+</div>
