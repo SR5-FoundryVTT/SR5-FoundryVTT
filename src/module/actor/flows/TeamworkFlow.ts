@@ -1,17 +1,12 @@
-import { ParserSelector } from './../../apps/importer/actorImport/itemImporter/importHelper/ParserSelector';
 import { SR5Actor } from '../SR5Actor';
 import { FLAGS, SYSTEM_NAME } from '../../constants';
 import { SocketMessage } from "../../sockets";
 import { SuccessTest } from '../../tests/SuccessTest';
-import { Helpers } from '../../helpers'
 import { Translation } from '../../utils/strings';
 import { TeamWorkDialog } from '../../apps/dialogs/TeamworkDialog';
-import { JournalEnrichers, TestAttributes } from '../../journal/enricher';
-import { DataDefaults } from '../../data/DataDefaults';
 import { TestCreator } from '../../tests/TestCreator';
-import { SR5Roll } from '../../rolls/SR5Roll';
 import { SR5 } from '../../config';
-import { isNumberObject } from 'util/types';
+import { RollEnricher } from '@/module/apps/editor/enricher/enricher';
 type ActorAttribute = Shadowrun.ActorAttribute;
 
 export type LimitKey = keyof typeof SR5.limits | '';
@@ -95,71 +90,73 @@ export interface TeamworkFlagData {
  *  - Grouping and sorting available skills and attributes for the dialog.
  *  - Building and parsing message flags to persist state between interactions.
  *  - Rendering and updating the teamwork dialog in the chat log.
- *  - Adding, deleting, and managing participants (including leader logic).
+ *  - Adding, deleting, and managing participants.
  *  - Aggregating individual participant rolls and applying teamwork modifiers.
  *  - Executing the final combined roll with limits, dice-pool adjustments, and specialization.
  *  - Synchronizing updates across clients via socket messages for non-GM users.
  */
 export class TeamworkFlow {
 
-/**
- * Builds grouped and sorted skill lists for the teamwork dialog.
- *
- * @param actor Optional {@link SR5Actor} whose skills will be grouped. If omitted or null, returns an empty array.
- * @returns An array of {@link SkillGroup} objects, each containing a `group` label and its sorted `skills` array.
- *
- * This method:
- *  - Filters the actor’s skills into three categories: active, language, and knowledge.
- *  - Sorts each category alphabetically by skill label.
- *  - Converts each skill entry into the format required by the dialog dropdown.
- *  - Returns a structure mapping category names to their respective sorted skill arrays.
- */
+    /**
+     * Builds grouped and sorted skill lists for the teamwork dialog.
+     *
+     * @param actor Optional {@link SR5Actor} whose skills will be grouped. If omitted or null, returns an empty array.
+     * @returns An array of {@link SkillGroup} objects, each containing a `group` label and its sorted `skills` array.
+     */
     static buildSkillGroups(actor?: SR5Actor): SkillGroup[] {
         if (!actor) return [];
-        const { active, language, knowledge } = actor.getSkills();
-        const attrs = actor.getAttributes();
-        const sortBy = (a: SkillEntry, b: SkillEntry) =>
-            a.label.localeCompare(b.label);
 
-        const groups: SkillGroup[] = [];
+        try {
+            const skillsData = actor.getSkills();
+            if (!skillsData || typeof skillsData !== "object") {
+                throw new Error("actor.getSkills() returned invalid data");
+            }
 
-        // Active Skills
-        const activeSkills = Object.keys(active)
-            .map((id) => this.constructSkillEntry({ id }, actor))
-            .filter((entry): entry is SkillEntry => Boolean(entry?.id))
-            .sort(sortBy);
-        if (activeSkills.length) groups.push({ group: "Active Skills", skills: activeSkills });
+            const { active, language, knowledge } = skillsData;
+            const sortBy = (a: SkillEntry, b: SkillEntry) =>
+                a.label.localeCompare(b.label);
 
-        // Language Skills
-        const languageSkills: SkillEntry[] = Object.keys(language.value ?? {})
-            .map((id) => this.constructSkillEntry({ id }, actor))
-            .filter((entry): entry is SkillEntry => Boolean(entry?.id))
-            .sort(sortBy);
+            const groups: SkillGroup[] = [];
 
-        if (languageSkills.length) {
-            groups.push({ group: "Language Skills", skills: languageSkills });
-        }
-
-
-        // Knowledge‐Groups
-        for (const [catKey, catList] of Object.entries(knowledge) as [keyof Shadowrun.KnowledgeSkills, Shadowrun.KnowledgeSkillList][]) {
-            const list: SkillEntry[] = Object.keys(catList.value ?? {})
+            // Active Skills
+            const activeSkills = Object.keys(active ?? [])
                 .map((id) => this.constructSkillEntry({ id }, actor))
                 .filter((entry): entry is SkillEntry => Boolean(entry?.id))
                 .sort(sortBy);
-            if (list.length) groups.push({ group: `Knowledge (${catKey})`, skills: list });
-        }
+            if (activeSkills.length) groups.push({ group: "Active Skills", skills: activeSkills });
 
-        return groups;
+            // Language Skills
+            const languageSkills: SkillEntry[] = Object.keys(language.value ?? {})
+                .map((id) => this.constructSkillEntry({ id }, actor))
+                .filter((entry): entry is SkillEntry => Boolean(entry?.id))
+                .sort(sortBy);
+
+            if (languageSkills.length) {
+                groups.push({ group: "Language Skills", skills: languageSkills });
+            }
+
+
+            // Knowledge‐Groups
+            for (const [catKey, catList] of Object.entries(knowledge) as [keyof Shadowrun.KnowledgeSkills, Shadowrun.KnowledgeSkillList][]) {
+                const list: SkillEntry[] = Object.keys(catList.value ?? {})
+                    .map((id) => this.constructSkillEntry({ id }, actor))
+                    .filter((entry): entry is SkillEntry => Boolean(entry?.id))
+                    .sort(sortBy);
+                if (list.length) groups.push({ group: `Knowledge (${catKey})`, skills: list });
+            }
+
+            return groups;
+        } catch (err) {
+            console.error("Error building skill groups:", err);
+            return [];
+        }
     }
 
     /**
  * Constructs a flat, alphabetically sorted list of actor attributes for the dialog.
  *
  * @param actor The {@link SR5Actor} whose attributes will be listed.
- * @returns An array of objects each containing:
- *   - `name`: the attribute key ({@link ActorAttribute})
- *   - `label`: the localized display label (string)
+ * @returns An array of {@link AttributeEntry}
  */
     static buildAttributeList(actor: SR5Actor): { name: ActorAttribute; label: string }[] {
         return Object.entries(actor.getAttributes())
@@ -170,17 +167,12 @@ export class TeamworkFlow {
             .sort((a, b) => a.label.localeCompare(b.label));
     }
 
-/**
- * Normalizes a raw limit input into a consistent {@link LimitEntry} object.
- *
- * @param data Optional raw limit value:
- *   - If a numeric string or number, returns a `LimitEntry` with `base` set to that value.
- *   - If a string matching a known limit key (in {@link SR5.limits}), returns a named `LimitEntry` with associated label.
- *   - Otherwise returns an empty `LimitEntry` (`name` and `label` empty).
- * @returns A {@link LimitEntry} object with either:
- *   - `base` populated for numeric inputs, or
- *   - `name` and `label` populated for named limits.
- */
+    /**
+     * Normalizes a raw limit input into a consistent {@link LimitEntry} object.
+     *
+     * @param data Optional raw limit value
+     * @returns A {@link LimitEntry} object 
+     */
     static constructLimitEntry(data?: string | number): LimitEntry {
         if (data && !isNaN(+data!)) {
             return {
@@ -198,14 +190,12 @@ export class TeamworkFlow {
         return { name: "", label: "" };
     }
 
-/**
- * Normalizes an attribute key into an {@link AttributeEntry}.
- *
- * @param data Optional attribute key ({@link ActorAttribute}).
- *   - If `data` matches a key in {@link SR5.attributes}, returns an entry with `name` and localized `label`.
- *   - Otherwise returns `undefined`.
- * @returns An {@link AttributeEntry} object or `undefined` if `data` is invalid.
- */
+    /**
+     * Normalizes an attribute key into an {@link AttributeEntry}.
+     *
+     * @param data Optional attribute key ({@link ActorAttribute}).
+     * @returns An {@link AttributeEntry} object or `undefined` if `data` is invalid.
+     */
     static constructAttributeEntry(data?: ActorAttribute): AttributeEntry | undefined {
         if (typeof data === "string" && data in SR5.attributes) {
             return {
@@ -222,11 +212,7 @@ export class TeamworkFlow {
  *
  * @param data  An object containing the `id` of the skill to construct.
  * @param actor Optional {@link SR5Actor} whose skill definitions provide label, attribute, and limit information.
- * @returns A {@link SkillEntry} with:
- *   - `id`: the provided skill identifier.
- *   - `label`: localized skill label (falls back to `skill.name` or `SR5.activeSkills[id]`).
- *   - `attribute`: primary attribute key for the skill, or empty string if unavailable.
- *   - `limit`: associated limit key for the skill’s attribute, or empty string if unavailable.
+ * @returns A {@link SkillEntry} with
  */
     static constructSkillEntry(data: Pick<SkillEntry, "id">, actor?: SR5Actor): SkillEntry {
         const id = data.id;
@@ -252,47 +238,64 @@ export class TeamworkFlow {
     }
 
     /**
- * Persists the teamwork test state by attaching all relevant data as flags on the ChatMessage.
- *
- * @param message    The {@link ChatMessage} to update with teamwork flags.
- * @param data       The {@link TeamworkMessageData}  
- * @throws Error    If `data.actor.id` or `data.skill.id` is missing, or if any participant actor ID is absent.
- * @returns          A Promise that resolves once the flag has been set.
- */
-    static async setTeamworkMessageFlag(message: ChatMessage, data: TeamworkMessageData): Promise<void> {
+     * Persists the teamwork test state by attaching all relevant data as flags on the ChatMessage.
+     *
+     * @param message    The {@link ChatMessage} to update with teamwork flags.
+     * @param data       The {@link TeamworkMessageData} containing all required teamwork parameters.
+     * @throws {Error}  If `data.actor.id` is missing.
+     * @throws {Error}  If `data.skill.id` is missing.
+     * @throws {Error}  If any participant in `data.participants` is missing `actor.id`.
+     * @returns {Promise<boolean>} 
+     *   Resolves to `true` if the flag was set successfully;  
+     *   resolves to `false` if an error occurred while setting the flag.
+     */
+    static async setTeamworkMessageFlag(message: ChatMessage, data: TeamworkMessageData): Promise<boolean> {
 
-        if (!data.actor?.id) throw new Error("TeamworkData: actor.id fehlt");
-        if (!data.skill?.id) throw new Error("TeamworkData: skill.id fehlt");
+        if (!data.actor?.id) {
+            throw new Error("TeamworkMessageData: missing actor.id");
+        }
+        if (!data.skill?.id) {
+            throw new Error("TeamworkMessageData: missing skill.id");
+        }
 
-        const flagData: TeamworkFlagData = {
-            actorId: data.actor.id,
-            skill: data.skill.id,
-            attribute: data.attribute?.name,
-            threshold: data.threshold,
-            limit: typeof data.limit?.base === "number" ? data.limit.base :
-                data.limit?.name ?? undefined,
-            allowOtherSkills: data.allowOtherSkills,
-            additionalDice: data.additionalDice,
-            additionalLimit: data.additionalLimit,
-            criticalGlitched: data.criticalGlitched,
-            specialization: data.specialization,
-            participants: data.participants.map(p => {
-                if (!p.actor?.id) {
-                    throw new Error("TeamworkFlagData: participant.actor.id is missing");
-                }
-                return {
-                    actorId: p.actor.id,
-                    netHits: p.netHits,
-                    glitched: p.glitched,
-                    criticalGlitched: p.criticalGlitched,
-                    differentSkill: p.differentSkill?.id,
-                    differentAttribute: p.differentAttribute?.name,
-                    differentLimit: p.differentLimit?.name,
-                };
-            }),
-        };
+        try {
+            const flagData: TeamworkFlagData = {
+                actorId: data.actor.id,
+                skill: data.skill.id,
+                attribute: data.attribute?.name,
+                threshold: data.threshold,
+                limit: typeof data.limit?.base === "number" ? data.limit.base :
+                    data.limit?.name ?? undefined,
+                allowOtherSkills: data.allowOtherSkills,
+                additionalDice: data.additionalDice,
+                additionalLimit: data.additionalLimit,
+                criticalGlitched: data.criticalGlitched,
+                specialization: data.specialization,
+                participants: data.participants.map(p => {
+                    if (!p.actor?.id) {
+                        throw new Error("TeamworkFlagData: participant.actor.id is missing");
+                    }
+                    return {
+                        actorId: p.actor.id,
+                        netHits: p.netHits,
+                        glitched: p.glitched,
+                        criticalGlitched: p.criticalGlitched,
+                        differentSkill: p.differentSkill?.id,
+                        differentAttribute: p.differentAttribute?.name,
+                        differentLimit: p.differentLimit?.name,
+                    };
+                }),
+            };
 
-        await message.setFlag(SYSTEM_NAME, FLAGS.Test, flagData);
+            await message.setFlag(SYSTEM_NAME, FLAGS.Test, flagData);
+            return true;
+        } catch (err: any) {
+            console.error("Error setting the teamwork flag:", err);
+            ui.notifications?.error(
+                `Error saving the teamwork data: ${err.message}`
+            );
+            return false;
+        }
     }
 
     /**
@@ -305,60 +308,63 @@ export class TeamworkFlow {
  *   - the main actor or any participant actor cannot be retrieved by ID  
  */
     static async getTeamworkMessageData(message: ChatMessage): Promise<TeamworkMessageData> {
-        const flag = await message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkFlagData;
-        if (!flag) throw new Error("Kein Teamwork-Daten-Flag an der Nachricht gefunden");
+        try {
+            const flag = await message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkFlagData;
+            if (!flag) throw new Error("No teamwork data flag found on the message.");
 
-        console.log("getTeamworkMessageData flag", flag);
-
-        const actor = game.actors?.get(flag.actorId) as SR5Actor;
-        if (!actor) {
-            throw new Error(`Actor with ID ${flag.actorId} not found`);
-        }
-
-        const skill: SkillEntry = this.constructSkillEntry({ id: flag.skill }, actor);
-
-        const attribute: AttributeEntry | undefined = this.constructAttributeEntry(flag.attribute);
-
-        const limit: LimitEntry = this.constructLimitEntry(flag.limit);
-
-        const participants: ParticipantEntry[] = flag.participants.map(p => {
-            const participantActor: SR5Actor | undefined = game.actors?.get(p.actorId);
-            if (!participantActor) {
-                throw new Error(`Participant Actor with ID ${flag.actorId} not found`);
+            const actor = game.actors?.get(flag.actorId) as SR5Actor;
+            if (!actor) {
+                throw new Error(`Actor with ID ${flag.actorId} not found`);
             }
-            return {
-                actor: participantActor,
-                netHits: p.netHits,
-                glitched: p.glitched,
-                criticalGlitched: p.criticalGlitched,
-                differentSkill: p.differentSkill ? participantActor.getSkill(p.differentSkill) : undefined,
-                differentAttribute: this.constructAttributeEntry(p.differentAttribute),
-                differentLimit: this.constructLimitEntry(p.differentLimit)
-            };
-        });
 
-        return {
-            actor,
-            skill,
-            attribute,
-            threshold: flag.threshold,
-            limit,
-            allowOtherSkills: flag.allowOtherSkills,
-            additionalDice: flag.additionalDice,
-            additionalLimit: flag.additionalLimit,
-            criticalGlitched: flag.criticalGlitched,
-            specialization: flag.specialization,
-            participants,
-        };
+            const skill: SkillEntry = this.constructSkillEntry({ id: flag.skill }, actor);
+
+            const attribute: AttributeEntry | undefined = this.constructAttributeEntry(flag.attribute);
+
+            const limit: LimitEntry = this.constructLimitEntry(flag.limit);
+
+            const participants: ParticipantEntry[] = flag.participants.map(p => {
+                const participantActor: SR5Actor | undefined = game.actors?.get(p.actorId);
+                if (!participantActor) {
+                    throw new Error(`Participant Actor with ID ${flag.actorId} not found`);
+                }
+                return {
+                    actor: participantActor,
+                    netHits: p.netHits,
+                    glitched: p.glitched,
+                    criticalGlitched: p.criticalGlitched,
+                    differentSkill: p.differentSkill ? participantActor.getSkill(p.differentSkill) : undefined,
+                    differentAttribute: this.constructAttributeEntry(p.differentAttribute),
+                    differentLimit: this.constructLimitEntry(p.differentLimit)
+                };
+            });
+
+            return {
+                actor,
+                skill,
+                attribute,
+                threshold: flag.threshold,
+                limit,
+                allowOtherSkills: flag.allowOtherSkills,
+                additionalDice: flag.additionalDice,
+                additionalLimit: flag.additionalLimit,
+                criticalGlitched: flag.criticalGlitched,
+                specialization: flag.specialization,
+                participants,
+            };
+        } catch (err: any) {
+            console.error("Error loading teamwork message data:", err);
+            throw err;
+        }
     }
 
-/**
- * Provides a localized, alphabetically sorted list of all limit options.
- *
- * @returns An array of objects each containing:
- *   - `name`: the limit key ({@link LimitKey})
- *   - `label`: the localized display label (string)
- */
+    /**
+     * Provides a localized, alphabetically sorted list of all limit options.
+     *
+     * @returns An array of objects each containing:
+     *   - `name`: the limit key ({@link LimitKey})
+     *   - `label`: the localized display label (string)
+     */
     static get limitList(): { name: LimitKey; label: string }[] {
         return Object.entries(SR5.limits)
             .map(([key, label]) => ({
@@ -429,7 +435,7 @@ export class TeamworkFlow {
 
         html.find('.delete-participant').on('click', async (event) => {
             event.preventDefault();
-            event.stopPropagation(); 
+            event.stopPropagation();
 
             const actorId = $(event.currentTarget).data("actorId");
             if (!actorId) return;
@@ -469,16 +475,14 @@ export class TeamworkFlow {
 
         if (!dialogData.actor) return { cancelled: true };
 
-        console.log("showTeamworkDialog data", dialogData)
-
         return dialogData ?? { cancelled: true };
     }
-    
+
     /**
  * Initiates the teamwork test by displaying the selection dialog and posting the initial chat message.
  *
  * This method:
- *  1. Ensures a valid actor is available (uses `data.actor` or prompts via {@link JournalEnrichers.findActor}).
+ *  1. Ensures a valid actor is available (uses `data.actor` or prompts via {@link RollEnricher.findActor}).
  *  2. Opens the teamwork dialog with pre-filled or default values.
  *  3. Aborts if the dialog is cancelled or missing required selections.
  *  4. Builds the initial {@link TeamworkMessageData} object with defaults for dice, limit, and participants.
@@ -497,9 +501,9 @@ export class TeamworkFlow {
 
         let actor = data.actor;
         if (!actor) {
-            actor = await JournalEnrichers.findActor();
+            actor = await RollEnricher.findActor();
             if (!actor) {
-                return ui.notifications?.error("Kein valider Akteur gefunden.");
+                return ui.notifications?.error("No valid actor found.");
             }
         }
 
@@ -515,8 +519,6 @@ export class TeamworkFlow {
             limit: data.limit ?? this.constructLimitEntry(),
             request: true
         });
-
-        console.log("initiateTeamworkTest data", dialogData)
 
         if (dialogData.cancelled || !dialogData.actor || !dialogData.skill || !dialogData.attribute) return;
 
@@ -538,8 +540,6 @@ export class TeamworkFlow {
             specialization: dialogData.specialization!
         };
 
-        console.log("initiateTeamworkTest teamworkData", teamworkData)
-
         const content = await renderTemplate("systems/shadowrun5e/dist/templates/chat/teamworkRequest.html", teamworkData);
         const msg = await ChatMessage.create({
             user: user.id,
@@ -548,10 +548,14 @@ export class TeamworkFlow {
         });
 
         if (!msg) {
-            return ui.notifications?.error("Teamwork-Nachricht nicht gefunden");
+            return ui.notifications?.error("Teamwork message not found.");
         }
 
-        await this.setTeamworkMessageFlag(msg, teamworkData);
+        const flagOk = await this.setTeamworkMessageFlag(msg, teamworkData);
+            if (!flagOk) {
+                console.error("Shadowrun 5e | Failed to set teamwork flag");
+                return false;
+            }
     }
 
     /**
@@ -575,10 +579,6 @@ export class TeamworkFlow {
 
         const teamworkData = await this.getTeamworkMessageData(message);
 
-
-
-        console.log("addParticipants contributingActorIds: ", teamworkData);
-
         const contributingActorIds = [
             (!game.settings.get(SYSTEM_NAME, FLAGS.AllowLeaderAsParticipantForTeamworkTests) as boolean)
                 ? teamworkData.actor?.id
@@ -586,9 +586,7 @@ export class TeamworkFlow {
             ...(teamworkData.participants?.map(p => p.actor.id) ?? [])
         ].filter(Boolean);
 
-        console.log("addParticipants contributingActorIds: ", contributingActorIds)
-
-        const baseActor = await JournalEnrichers.findActor();
+        const baseActor = await RollEnricher.findActor();
 
         const actorList = (this.actorList ?? []).filter(a => !contributingActorIds.includes(a.id));
 
@@ -596,10 +594,7 @@ export class TeamworkFlow {
 
         const skill = teamworkData.skill ? this.constructSkillEntry({ id: teamworkData.skill.id ?? teamworkData.skill.label ?? "" }, baseActor) : undefined
 
-        console.log("addParticipants actorlist: ", actorList)
-
-        // TODO: Fehlerbehandlung
-        if (actorList.length === 0) return;
+        if (actorList.length === 0) return ui.notifications?.warn("No more actors available to add as participants.");
 
         const dialogData = await this.showTeamworkDialog({
             actors: actorList,
@@ -614,13 +609,11 @@ export class TeamworkFlow {
 
         if (!dialogData || dialogData.cancelled || !dialogData.actor || !dialogData.skill || !dialogData.attribute) return;
 
-        console.log(dialogData)
-
         const skillAction: Shadowrun.ActionRollData | undefined = dialogData.actor.skillActionData(dialogData.skill!.id, { specialization: dialogData.specialization });
         if (!skillAction) {
-            return;
+            return ui.notifications?.warn("Could not prepare skill test for selected participant.");
         }
-     
+
         skillAction.attribute = dialogData.attribute!.name;
 
         const threshold = dialogData.threshold ?? 0;
@@ -637,11 +630,7 @@ export class TeamworkFlow {
             skillAction.limit.attribute = limit.name as Shadowrun.LimitAttribute;
         }
 
-        console.log("addParticipant: ", dialogData.actor)
-
         try {
-            console.log("addParticipant SkillAction: ", skillAction)
-
             const test = await TestCreator.fromAction(skillAction, dialogData.actor);
             if (!test) return;
             test.data.title = teamworkData.skill.label;
@@ -653,29 +642,17 @@ export class TeamworkFlow {
                 results
             );
         } catch (err) {
-            //TODO: Lokalisierung
-            console.error("Fehler im Teilnehmer-Wurf:", err);
-            ui.notifications?.error("Fehler im Teilnehmer-Wurf:", err);
+            console.error(`Error executing participant test for actor ${dialogData.actor.id}:`, err);
+            ui.notifications?.error("An error occurred during the participant's skill test.")
         }
     }
 
-/**
- * Removes a participant from an ongoing teamwork test and updates the chat message.
+    /**
+ * Removes a participant and updates the teamwork chat message.
  *
- * This method:
- *  - Loads the current {@link TeamworkMessageData} from the message flags.
- *  - Finds and validates the target participant.
- *    • Only GMs can remove a critical-glitched participant.
- *    • Non-GMs must be the owner of the participant actor.
- *  - Filters out the specified participant and clears the overall `criticalGlitched` flag
- *    if no participants remain critical-glitched.
- *  - Renders the updated teamwork request template.
- *  - If the current user is GM, updates the message content and flags directly;
- *    otherwise sends the update via socket synchronization.
- *
- * @param message The {@link ChatMessage} containing the teamwork test.
- * @param actorId The actor ID of the participant to remove.
- * @returns A Promise that resolves once the message and flags have been updated.
+ * @param message The {@link ChatMessage} of the teamwork test.
+ * @param actorId The ID of the participant to remove.
+ * @returns A Promise that resolves after updating, or returns early on error or cancellation.
  */
     static async deleteParticipant(message: ChatMessage, actorId: string) {
         const teamworkData = await this.getTeamworkMessageData(message);
@@ -713,29 +690,26 @@ export class TeamworkFlow {
         );
 
         if (user?.isGM) {
-            await this.setTeamworkMessageFlag(message, teamworkData);
+            const flagOk = await this.setTeamworkMessageFlag(message, teamworkData);
+            if (!flagOk) {
+                console.error("Shadowrun 5e | Failed to set teamwork flag");
+                return false;
+            }
             await message.update({ content });
         } else {
-            await this._sendUpdateSocketMessage(message, content, teamworkData);
+            const synced = await this._sendUpdateSocketMessage(message, content, teamworkData);
+            if (!synced) return;
         }
     }
 
 
     /**
- * Appends a participant’s test results to the teamwork message and updates the chat content.
- *
- * This method:
- *  1. Retrieves existing teamwork state from the message flags.
- *  2. Computes net hits, glitch, and critical glitch status from the provided `SuccessTest`.
- *  3. Determines any overrides for skill, attribute, or limit compared to the original test.
- *  4. Updates the teamwork data: adds the participant entry, increments additional dice and limit values, and updates the overall glitch flag.
- *  5. Renders the updated teamwork request template.
- *  6. Persists the new state and content: directly for GMs or via socket synchronization for non-GMs.
+ * Appends a participant’s test results and updates the teamwork chat message.
  *
  * @param message The {@link ChatMessage} to update.
- * @param actor   The {@link SR5Actor} who just performed the test.
- * @param results A {@link SuccessTest} containing the roll outcome and metadata.
- * @returns       A Promise that resolves once the chat message and flags are updated.
+ * @param actor   The {@link SR5Actor} who performed the test.
+ * @param results The {@link SuccessTest} with roll outcome.
+ * @returns       A Promise that resolves after updating, or returns early on error.
  */
     static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest) {
 
@@ -779,25 +753,25 @@ export class TeamworkFlow {
 
         try {
             if (game.user?.isGM) {
-                await this.setTeamworkMessageFlag(message, teamworkData);
+                const flagOk = await this.setTeamworkMessageFlag(message, teamworkData);
+            if (!flagOk) {
+                console.error("Shadowrun 5e | Failed to set teamwork flag");
+                return false;
+            }
                 await message.update({ content });
             }
             else {
-                await this._sendUpdateSocketMessage(message, content, teamworkData)
+                const synced = await this._sendUpdateSocketMessage(message, content, teamworkData);
+                if (!synced) return;
             }
         } catch (err) {
-            ui.notifications?.error(`Teamwork: ${err}`);
+            console.error("Error persisting teamwork results:", err);
         }
 
     }
 
     /**
  * Executes the final teamwork roll if the user has permission.
- *
- * This method:
- *  1. Retrieves the current teamwork state from the message flags.
- *  2. Checks that the current user is either GM or the owner of the initiating actor.
- *  3. Delegates to the actor’s `rollTeamworkTest` method with the accumulated teamwork data.
  *
  * @param message The {@link ChatMessage} containing the teamwork test data.
  * @returns       A Promise that resolves once the teamwork roll is initiated, or returns early if unauthorized or data is missing.
@@ -819,33 +793,62 @@ export class TeamworkFlow {
     }
 
     /**
-     * Send out a socket message to a connected GM to update the message.
-     * @param actor The actor to create the effects on.
-     * @param effectsData The effects data to be applied;
-     */
-    static async _sendUpdateSocketMessage(message: ChatMessage, content: String, teamworkData: TeamworkMessageData) {
-        await SocketMessage.emitForGM(FLAGS.TeamworkTestFlow, { messageUuid: message.uuid, content: content, teamworkData: teamworkData });
+ * Send out a socket message to a connected GM to update the teamwork message.
+ *
+ * @param message       The {@link ChatMessage} to update remotely.
+ * @param content       The new HTML content for the message.
+ * @param teamworkData  The {@link TeamworkMessageData} payload to sync.
+ * @returns             A Promise that resolves to `true` if the socket emit succeeded, or `false` on error.
+ */
+    static async _sendUpdateSocketMessage(message: ChatMessage, content: String, teamworkData: TeamworkMessageData): Promise<boolean> {
+        try {
+            await SocketMessage.emitForGM(FLAGS.TeamworkTestFlow, { messageUuid: message.uuid, content, teamworkData });
+            return true;
+        } catch (err: any) {
+            console.error("Error emitting teamwork update socket message:", err);
+            return false;
+        }
     }
 
     /**
-     * Handle a sent socket message to update the content and flags of a message.
-     * @param {string} message.actorUuid Must contain the uuid of the actor to create the effects on.
-     * @param {ActiveEffectData[]} message.effectsData Must contain a list of effects data to be applied.
-     * @returns 
-     */
-    static async _handleUpdateSocketMessage(socketMessage: Shadowrun.SocketMessageData) {
-        if (!socketMessage.data.hasOwnProperty('messageUuid') || !socketMessage.data.hasOwnProperty('content') || !socketMessage.data.hasOwnProperty('teamworkData')) {
-            console.error(`Shadowrun 5e | Teamwork Socket Message is missing necessary properties`, socketMessage);
-            return;
+ * Handle an incoming socket message to update the content and flags of a teamwork chat message.
+ *
+ * @param socketMessage  The socket message data, which must contain:
+ *                       - `data.messageUuid`: the UUID of the ChatMessage to update  
+ *                       - `data.content`: the rendered HTML  
+ *                       - `data.teamworkData`: the updated TeamworkMessageData  
+ * @returns              A Promise that resolves to `true` on success, or `false` on any error.
+ */
+    static async _handleUpdateSocketMessage(socketMessage: Shadowrun.SocketMessageData): Promise<boolean> {
+        try {
+
+            if (!socketMessage.data.hasOwnProperty('messageUuid') || !socketMessage.data.hasOwnProperty('content') || !socketMessage.data.hasOwnProperty('teamworkData')) {
+                console.error(`Shadowrun 5e | Teamwork Socket Message is missing necessary properties`, socketMessage);
+                return false;
+            }
+
+            const message = fromUuidSync(socketMessage.data.messageUuid) as ChatMessage | null;
+
+            if (!message) {
+                console.error(
+                    "Shadowrun 5e | Could not resolve ChatMessage from UUID",
+                    socketMessage.data.messageUuid
+                );
+                return false;
+            }
+
+            const flagOk = await this.setTeamworkMessageFlag(message, socketMessage.data.teamworkData);
+            if (!flagOk) {
+                console.error("Shadowrun 5e | Failed to set teamwork flag in socket handler");
+                return false;
+            }
+
+            message?.update({ content: socketMessage.data.content })
+            return true;
+
+        } catch (error) {
+            console.error("Error handling teamwork socket message:", error);
+            return false;
         }
-
-        const message = fromUuidSync(socketMessage.data.messageUuid) as ChatMessage;
-
-        //TODO: Fehlerbehandlung
-        if (!message) return;
-
-        await this.setTeamworkMessageFlag(message, socketMessage.data.teamworkData);
-
-        message?.update({ content: socketMessage.data.content })
     }
 }

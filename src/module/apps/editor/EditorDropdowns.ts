@@ -3,10 +3,6 @@ import { Helpers } from "../../helpers";
 
 /**
  * Utility class to configure and handle custom ProseMirror dropdown menus
- * for roll-enrichment in FoundryVTT.
- *
- * @remarks
- * Binds hooks to ProseMirror menu to insert enriched roll elements based on type.
  */
 export class EditorDropdowns {
     // @ts-expect-error

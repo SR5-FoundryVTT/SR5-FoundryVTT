@@ -37,6 +37,16 @@ export interface RollEnricherDialogData extends Omit<FormDialogData, "templateDa
     }
 }
 
+/**
+ * A specialized FormDialog for configuring and enriching roll messages across multiple contexts.
+ *
+ * Depending on the provided type ("action", "attribute", "macro", "skill", "teamwork", "success", "extended", or "opposed"),
+ * this dialog:
+ *  - Renders the appropriate HTML template with input fields for the selected context.
+ *  - Populates drop-down lists (skills, attributes) based on game data.
+ *  - Supports drag-and-drop of items, skills, macros, and actors to auto-fill fields.
+ *  - Validates and processes user input, then returns structured data for insertion or execution of the roll.
+ */
 export class RollEnricherDialog extends FormDialog {
     override data: RollEnricherDialogData;
     private _submitted = false;
@@ -85,28 +95,40 @@ export class RollEnricherDialog extends FormDialog {
         switch (data.templateData.type) {
             case "action":
                 // data.templateData.explanation = "So funktioniert ein rollAction <br> Aktuell eingestelltes Compendium:" + game.settings.get(SYSTEM_NAME, FLAGS.RollActionDefaultPack) as string;
-                data.templateData.explanation = "@RollAction-Explanation"
+                data.templateData.explanation = "SR5.DIALOG.RollEnricherHelper.ActionExplanation"
                 data.templateData.result = "@RollAction[[]]";
                 break;
             case "macro":
-                data.templateData.explanation = "@RollMacro-Explanation"
+                data.templateData.explanation = "SR5.DIALOG.RollEnricherHelper.MacroExplanation"
                 data.templateData.result = "@RollMacro[[]]";
                 break;
             case "attribute":
-                data.templateData.explanation = "@RollAttribute-Explanation";
+                data.templateData.explanation = "SR5.DIALOG.RollEnricherHelper.AttributeExplanation";
                 data.templateData.result = "@RollAttribute[[]]";
                 break;
             case "skill":
-                data.templateData.explanation = "@RollSkill-Explanation";
+                data.templateData.explanation = "SR5.DIALOG.RollEnricherHelper.SkillExplanation";
                 data.templateData.result = "@RollSkill[[]]";
                 break;
             case "teamwork":
-                data.templateData.explanation = "@RollTeamwork-Explanation";
+                data.templateData.explanation = "SR5.DIALOG.RollEnricherHelper.TeamworkExplanation";
                 data.templateData.result = "@RollTeamwork[[]]";
                 data.templateData.invalidResult = false;
                 break;
             case "test":
-                data.templateData.explanation = "@RollTest-Explanation";
+                switch (data.templateData.testType) {
+                    case "success":
+                        data.templateData.explanation = "SR5.DIALOG.RollEnricherHelper.SuccessExplanation";
+                        break;
+                    case "extended":
+                        data.templateData.explanation = "SR5.DIALOG.RollEnricherHelper.ExtendedExplanation";
+                        break;
+                    case "opposed":
+                        data.templateData.explanation = "SR5.DIALOG.RollEnricherHelper.OpposedExplanation";
+                        break;
+                    default:
+                        break;
+                }
                 data.templateData.result = "@RollTest[[]]";
                 break;
             default:
@@ -225,25 +247,32 @@ export class RollEnricherDialog extends FormDialog {
         this.updateResult();
     }
 
-/**
- * Handles drop events on the dialog to import data from dragged entities.
- *
- * Supports drops of:
- *  - Items: extracts action data (skill, attributes, limits, thresholds) and sets template fields.
- *  - Skills: sets opposed skill and attribute fields based on the dropped skill.
- *  - Macros: sets the macro name and compendium pack.
- *  - Actors: populates attributeList and skillList for the selected actor.
- *
- * @param event The jQuery-triggered drop event carrying a DragEvent with serialized data.
- * @param html  The jQuery-wrapped HTML element of the dialog, used to access this.data.templateData.
- * @returns     A Promise that resolves once the template data has been updated and the dialog re-rendered.
- */
+    /**
+     * Handles drop events on the dialog to import data from dragged entities.
+     *
+     * Supports drops of:
+     *  - Items: extracts action data (skill, attributes, limits, thresholds) and sets template fields.
+     *  - Skills: sets (opposed)skill and (opposed)attribute fields based on the dropped skill.
+     *  - Macros: sets the macro name and compendium pack.
+     *  - Actors: populates attributeList and skillList for the selected actor.
+     *
+     * @param event The jQuery-triggered drop event carrying a DragEvent with serialized data.
+     * @param html  The jQuery-wrapped HTML element of the dialog, used to access this.data.templateData.
+     * @returns     A Promise that resolves once the template data has been updated and the dialog re-rendered.
+     */
     async dropHandler(event: JQuery.TriggeredEvent, html: JQuery<HTMLElement>) {
         event.preventDefault();
-        const dragEvent = event.originalEvent as DragEvent;
-        const dropData = JSON.parse(dragEvent.dataTransfer?.getData("text/plain") ?? "{}");
+        let dropData;
+
+        try {
+            const dragEvent = event.originalEvent as DragEvent;
+            dropData = JSON.parse(dragEvent.dataTransfer?.getData("text/plain") ?? "{}");
+        } catch (err: any) {
+            console.error("Could not parse drag data", err);
+            return;
+        }
+
         const templateData = this.data.templateData;
-        console.log(dropData);
 
         // If the dropped UUID comes from a non-default compendium pack for this type, update templateData.compendium
         function setCompendium(uuid) {
@@ -260,6 +289,7 @@ export class RollEnricherDialog extends FormDialog {
         switch (dropData.type) {
             case 'Item': // set name, compendium, (opposed)attribute, (opposed)attribute2, threshold, (opposed)skill, (opposed)limit
                 const item = await fromUuid(dropData.uuid) as SR5Item
+                if (!item) return;
                 const action = item?.getAction();
 
                 if (action) {
@@ -278,21 +308,26 @@ export class RollEnricherDialog extends FormDialog {
                 setCompendium(item.uuid);
                 break;
             case 'Skill': // set (opposed)skill, (opposed)attribute
-                templateData.skill = dropData.data.skill.name.trim() ? dropData.data.skill.name : game.i18n.localize(SR5.activeSkills[dropData.data.skillId] as Translation);
-                templateData.attribute = game.i18n.localize(dropData.data.skill.attribute as Translation)
+                if (!dropData.data?.skill) return;
+                const { name, attribute } = dropData.data.skill;
+
+                templateData.skill = name.trim() ? name : game.i18n.localize(SR5.activeSkills[dropData.data.skillId] as Translation);
+                templateData.attribute = game.i18n.localize(attribute as Translation)
                 if (templateData.skill?.trim()) {
-                    templateData.opposedSkill = dropData.data.skill.name.trim() ? dropData.data.skill.name : game.i18n.localize(SR5.activeSkills[dropData.data.skillId] as Translation);
-                    templateData.opposedAttribute = game.i18n.localize(dropData.data.skill.attribute as Translation)
+                    templateData.opposedSkill = name.trim() ? name : game.i18n.localize(SR5.activeSkills[dropData.data.skillId] as Translation);
+                    templateData.opposedAttribute = game.i18n.localize(attribute as Translation)
                 }
                 break;
             case 'Macro': // set name, compendium
                 const macro = await fromUuid(dropData.uuid) as Macro
+                if(!macro) return;
 
                 templateData.name = macro.name?.trim() ?? "";
                 setCompendium(macro.uuid);
                 break;
             case 'Actor': // set attributeList, skillList
                 const actor = await fromUuid(dropData.uuid) as SR5Actor;
+                if(!actor) return;
                 templateData.attributeList = Object
                     .values(actor.getAttributes())
                     .filter(a => !a.hidden)
@@ -320,19 +355,6 @@ export class RollEnricherDialog extends FormDialog {
 
     /**
  * Updates the live result string based on current template data selections.
- *
- * This method:
- *  - Reads `this.data.templateData` to determine the dialog `type` and relevant fields.
- *  - Validates required inputs for each roll type, setting `data.invalidResult` accordingly.
- *  - Constructs the roll syntax string (`@RollAction`, `@RollAttribute`, `@RollTest`, `@RollTeamwork`, etc.) with appropriate parameters and localized labels.
- *  - Injects the generated result into the `.result-text` element and toggles the `invalid-result` CSS class.
- *
- * Supported dialog types:
- *  - `action` / `macro`: uses `data.name` and optional `data.compendium`
- *  - `attribute`: `@RollAttribute[[attribute threshold]]`
- *  - `skill`: `@RollAttribute[[skill threshold]]`
- *  - `teamwork`: `@RollTeamwork` with skill, attribute, limit, threshold, and participants flag
- *  - `test`: `@RollTest` with success, extended, or opposed test syntax
  *
  * @returns void
  */

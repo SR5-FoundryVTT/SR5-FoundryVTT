@@ -67,11 +67,11 @@ import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 import { RenderSettings } from './systemLinks';
 import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
-import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 import { RoutingLibIntegration } from './integrations/routingLibIntegration';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
+import { RollEnricher } from './apps/editor/enricher/enricher';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -391,7 +391,7 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await TestCreator.promptSuccessTest());
 
         $(document).off("click", ".sr5-roll-request");
-        $(document).on("click", ".sr5-roll-request", async (ev: JQuery.TriggeredEvent) => { await JournalEnrichers.handleClick(ev); });
+        $(document).on("click", ".sr5-roll-request", async (ev: JQuery.TriggeredEvent) => { await RollEnricher.handleClick(ev); });
 
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners);
         HooksManager.registerSocketListeners();
@@ -551,6 +551,6 @@ ___________________
     }
 
     static async configureTextEnrichers() {
-        await JournalEnrichers.setEnrichers();
+        await RollEnricher.setEnricher();
     }
 }

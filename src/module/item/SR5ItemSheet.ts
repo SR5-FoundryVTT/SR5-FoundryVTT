@@ -8,7 +8,6 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
 import RangeData = Shadowrun.RangeData;
-import { JournalEnrichers } from '../journal/enricher';
 
 /**
  * FoundryVTT ItemSheetData typing

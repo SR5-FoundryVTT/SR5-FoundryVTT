@@ -333,7 +333,15 @@
                 "LabelLabel": "Label",
                 "IntervalLabel": "Interval",
                 "Versus": "vs.",
-                "AllowOtherSkillsLabel": "TODO"
+                "AllowOtherSkillsLabel": "TODO",
+                "ActionExplanation": "TODO",
+                "MacroExplanation": "TODO",
+                "SkillExplanation": "TODO",
+                "AttributeExplanation": "TODO",
+                "TeamworkExplanation": "TODO",
+                "SuccessExplanation": "TODO",
+                "OpposedExplanation": "TODO",
+                "ExtendedExplanation": "TODO"
             }
         },
         "DP": "DP",

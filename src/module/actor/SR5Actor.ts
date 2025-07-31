@@ -28,7 +28,7 @@ import { CombatRules } from '../rules/CombatRules';
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
-import { SkillEntry, TeamworkData, TeamworkMessageData } from './flows/TeamworkFlow';
+import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 
 
@@ -1109,56 +1109,6 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Roll a skill test for a specific skill
-     * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
-     * @param options Optional options to configure the roll.
-     * @param options.byLabel true to search the skill by label as displayed on the sheet.
-     * @param options.specialization true to configure the skill test to use a specialization.
-     */
-    async startTeamworkTest(skillId: string, options: Shadowrun.SkillRollOptions = {}) {
-        console.info(`Shadowrun5e | Starting teamwork test for ${skillId}`);
-
-        // Prepare message content.
-        const templateData = {
-            title: "Teamwork " + Helpers.getSkillTranslation(skillId),
-            // Note: While ChatData uses ids, this uses full documents.
-            speaker: {
-                actor: this,
-                token: this.token
-            },
-            participants: []
-        };
-        const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.html', templateData);
-        // Prepare the actual message.
-        const messageData = {
-            user: game.user?.id,
-            // Use type roll, for Foundry built in content visibility.
-            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-            speaker: {
-                actor: this.id,
-                alias: game.user?.name,
-                token: this.token
-            },
-            content,
-            // Manually build flag data to give renderChatMessage hook flag access.
-            // This test data is needed for all subsequent testing based on this chat messages.
-            flags: {
-                // Add test data to message to allow ChatMessage hooks to access it.
-                [SYSTEM_NAME]: { [FLAGS.Test]: { skill: skillId } },
-                'core.canPopout': true
-            },
-            sound: CONFIG.sounds.dice,
-        };
-
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        const message = await ChatMessage.create(messageData, options);
-
-        if (!message) return;
-
-        return message;
-    }
-
-    /**
      * Rolls a teamwork-enhanced skill test.
      *
      * @param teamworkData The full input data as a `TeamworkMessageData` object:
@@ -1168,37 +1118,50 @@ export class SR5Actor extends Actor {
      *   (see {@link Shadowrun.SkillRollOptions}).
      *
      * @returns A Promise that resolves to the test result, or `undefined` if cancelled.
+     * 
+     * @throws Will log an error and return `undefined` if:
+ * - The skill action cannot be generated (`skillActionData` fails).
+ * - An exception occurs during the test setup or execution phases.
     */
     async rollTeamworkTest(teamworkData: TeamworkMessageData, options: Shadowrun.SkillRollOptions = {}) {
         console.info(`Shadowrun5e | Rolling teamwork test for ${teamworkData.skill}`);
 
-        const defaultSpecialization = teamworkData.specialization ?? false;
-        const defaultThreshold = {
-            value: teamworkData.threshold ?? 0,
-            base: teamworkData.threshold ?? 0
-        };
+        try {
 
-        const finalOptions = {
-            ...options,
-            specialization: options.specialization ?? defaultSpecialization,
-            threshold: options.threshold ?? defaultThreshold
-        };
+            const defaultSpecialization = teamworkData.specialization ?? false;
+            const defaultThreshold = {
+                value: teamworkData.threshold ?? 0,
+                base: teamworkData.threshold ?? 0
+            };
 
-        //TODO: Lokalisierung
-        const action = this.skillActionData(finalOptions.byLabel ? teamworkData.skill.label : (teamworkData.skill).id, finalOptions);
-        if (!action) return;
-        if (!teamworkData.criticalGlitched) {
-            action.limit.mod.push({ name: "Teamwork", value: teamworkData.additionalLimit })
+            const finalOptions = {
+                ...options,
+                specialization: options.specialization ?? defaultSpecialization,
+                threshold: options.threshold ?? defaultThreshold
+            };
+
+            //TODO: Lokalisierung
+            const action = this.skillActionData(finalOptions.byLabel ? teamworkData.skill.label : (teamworkData.skill).id, finalOptions);
+            if (!action) {
+                throw new Error(`SkillAction for ${teamworkData.skill} could not be created.`);
+            }
+            if (!teamworkData.criticalGlitched) {
+                action.limit.mod.push({ name: "Teamwork", value: teamworkData.additionalLimit })
+            }
+
+            action.dice_pool_mod.push({ name: "Teamwork", value: Math.min(teamworkData.additionalDice.value, teamworkData.additionalDice.max) })
+
+            const showDialog = this.tests.shouldShowDialog(options.event);
+            const test = await this.tests.fromAction(action, this, { showDialog });
+            if (!test) return;
+
+
+            return await test.execute();
         }
-
-        action.dice_pool_mod.push({ name: "Teamwork", value: Math.min(teamworkData.additionalDice.value, teamworkData.additionalDice.max) })
-
-        const showDialog = this.tests.shouldShowDialog(options.event);
-        const test = await this.tests.fromAction(action, this, { showDialog });
-        if (!test) return;
-
-
-        return await test.execute();
+        catch (err: any) {
+            console.error("Error on teamwork test:", err);
+            return;
+        }
     }
 
     /**
