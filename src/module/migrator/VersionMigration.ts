@@ -1,3 +1,6 @@
+export type MigratableDocument = Actor.Implementation | Item.Implementation | ActiveEffect.Implementation;
+export type MigratableDocumentName = MigratableDocument['documentName'];
+
 /**
  * Base class for version migrations that convert game data from an older version to a newer one.
  * 
@@ -6,11 +9,21 @@
  * 
  * These methods are designed to be atomic and modular, enabling precise upgrades
  * without requiring full system-wide context.
+ * 
+ * Note: if you want to sanitize a document without migration, return true on the handles functions,
+ * and not implement a migration function for the document. Sanitation then will be called.
+ * 
+ * Note: if you want to migrate a new embedded item during document migration, consider this approach:
+ *
+ * override migrateActor(_actor: any): void {
+ *     _actor.items.push({
+ *         name: "New Embedded Item",
+ *         type: "action",
+ *         _id: foundry.utils.randomID(16),
+ *         system: DataDefaults.baseSystemData('action'),
+ *     } as any);
+ * }
  */
-
-export type MigratableDocument = Actor.Implementation | Item.Implementation | ActiveEffect.Implementation;
-export type MigratableDocumentName = MigratableDocument['documentName'];
-
 export abstract class VersionMigration {
     abstract TargetVersion: `${number}.${number}.${number}`;
 

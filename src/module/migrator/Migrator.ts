@@ -105,7 +105,7 @@ export class Migrator {
 
         for (const migrator of migrators)
             migrator[`migrate${type}`](data);
-        
+
         // After all migrations, sanitize the data model.
         // This ensures that the data conforms to the current schema.
         const schema = CONFIG[type].dataModels[data.type].schema;
@@ -198,12 +198,12 @@ export class Migrator {
         const start = performance.now();
         const progress = ui.notifications.info("Migrating Documents...", {progress: true});
 
-        const tokensWithActors = Array.from(game.scenes).flatMap(scene =>
+        const tokensWithSynthActors = Array.from(game.scenes).flatMap(scene =>
             scene.tokens.filter(token => !!token.actor && !token.actorLink)
         );
 
         let completed = 0;
-        const total = game.items.size + game.actors.size + tokensWithActors.length;
+        const total = game.items.size + game.actors.size + tokensWithSynthActors.length;
 
         // Items
         await this.runInBatches([...game.items], async item =>
@@ -220,7 +220,7 @@ export class Migrator {
         );
 
         // Tokens
-        await this.runInBatches(tokensWithActors, async token =>
+        await this.runInBatches(tokensWithSynthActors, async token =>
             this.migrateWithCollections(token.actor!).then(() => {
                 progress.update({pct: ++completed / total});
             })
