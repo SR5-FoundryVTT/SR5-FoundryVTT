@@ -6,6 +6,7 @@ import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_30_0 } from './versions/Version0_30_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
+const { deepClone } = foundry.utils;
 
 /**
  * Seamless data migrator for the SR5 system.
@@ -176,7 +177,7 @@ export class Migrator {
             buttons: {
                 ok: {
                     label: localizedWarningBegin,
-                    callback: async () => this.migrateAll(),
+                    callback: async () => this.updateAllMigratableDocuments(),
                 },
             },
             default: 'ok',
@@ -184,97 +185,79 @@ export class Migrator {
         d.render(true);
     }
 
+    // Track migration progress
+    private static totalMigrations = 0;
+    private static completedMigrations = 0;
+    private static progressbar: Notifications.Notification | null = null;
+    private static updateProgressbar() {
+        if (!this.progressbar)
+            this.progressbar = ui.notifications.info("Migrating Documents...", { progress: true });
+
+        this.completedMigrations++;
+        this.progressbar.update({
+            pct: this.completedMigrations / this.totalMigrations,
+            message: `Migrating Documents... (${this.completedMigrations}/${this.totalMigrations})`
+        });
+    }
+
+    /**
+     * Update documents of a specific type.
+     */
+    private static async updateDocuments<Doc extends typeof Actor | typeof Item | typeof ActiveEffect>(
+        cls: Doc,
+        docs: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[0]>,
+        parent: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[1]>['parent'] = null
+    ) {
+        this.updateProgressbar();
+        return cls.implementation.updateDocuments(
+            docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
+            { diff: false, recursive: false, parent: parent as any }
+        );
+    }
+
     /**
      * Migrate all actors in the game.
-     * 
-     * This is called during world load to ensure all actors are up-to-date with the latest system version.
      */
-    private static async migrateAll() {
+    private static async updateAllMigratableDocuments() {
         const start = performance.now();
-        const progress = ui.notifications.info("Migrating Documents...", { progress: true });
 
         // Estimate total migration steps
-        const totalMigrations =
+        this.totalMigrations =
             1 + game.items.size +                         // Items + their effects
             1 + game.actors.size * 2 +                    // Actor + their items + their effects
             [...game.actors].reduce((sum, actor) => sum + actor.items.size, 0) +  // Actor item effects
             game.scenes.size;                             // Non-actor tokens
 
-        let completedMigrations = 0;
+        /* Items and its embedded Effects */
+        await this.updateDocuments(Item, deepClone(game.items._source));
 
-        function updateProgress(): void {
-            progress.update({
-                pct: ++completedMigrations / totalMigrations,
-                message: `Migrating Documents... (${completedMigrations}/${totalMigrations})`
-            });
-        }
+        for (const item of game.items)
+            // @ts-expect-error Fvtt-types not supporting parent
+            await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
 
-        function getMigratedDocuments<T extends Item.Source | Actor.Source | ActiveEffect.Source>(docs: T[]): T[] {
-            updateProgress();
-            return foundry.utils.deepClone(docs).filter(
-                d => d._stats?.systemVersion === Migrator._migrationMark
-            );
-        }
-
-        // ------------------------------
-        // Items and its embedded Effects
-        // ------------------------------
-        await Item.implementation.updateDocuments(
-            getMigratedDocuments(game.items._source),
-            { diff: false, recursive: false }
-        );
-
-        for (const item of game.items) {
-            await ActiveEffect.implementation.updateDocuments(
-                getMigratedDocuments(item.toObject().effects),
-                // @ts-expect-error Fvtt-types not supporting parent
-                { diff: false, recursive: false, parent: item }
-            );
-        }
-
-        // ---------------------------------
-        // Actors and its embedded documents
-        // ---------------------------------
-        await Actor.implementation.updateDocuments(
-            getMigratedDocuments(game.actors._source),
-            { diff: false, recursive: false }
-        );
+        /* Actors and its embedded documents */
+        await this.updateDocuments(Actor, deepClone(game.actors._source));
 
         for (const actor of game.actors) {
-            await Item.implementation.updateDocuments(
-                getMigratedDocuments(actor.toObject().items),
-                // @ts-expect-error Fvtt-types not supporting parent
-                { diff: false, recursive: false, parent: actor }
-            );
-
-            await ActiveEffect.implementation.updateDocuments(
-                getMigratedDocuments(actor.toObject().effects),
-                // @ts-expect-error Fvtt-types not supporting parent
-                { diff: false, recursive: false, parent: actor }
-            );
-
-            for (const item of actor.items) {
-                await ActiveEffect.implementation.updateDocuments(
-                    getMigratedDocuments(item.toObject().effects),
-                    { diff: false, recursive: false, parent: item }
-                );
-            }
+            // @ts-expect-error Fvtt-types not supporting parent
+            await this.updateDocuments(Item, actor.toObject().items, actor);
+            // @ts-expect-error Fvtt-types not supporting parent
+            await this.updateDocuments(ActiveEffect, actor.toObject().effects, actor);
+            
+            for (const item of actor.items)
+                await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
         }
 
-        // ------
-        // Tokens
-        // ------
+        /* Tokens */
         for (const scene of game.scenes) {
+            this.updateProgressbar();
             await TokenDocument.implementation.updateDocuments(
-                foundry.utils.deepClone(scene.tokens.filter(t => !t.actorLink).map(t => t.toObject())),
+                scene.tokens.filter(t => !t.actorLink).map(t => t.toObject()),
                 { diff: false, recursive: false, parent: scene }
             );
-            updateProgress();
         }
 
-        // ------------------
-        // Finalize Migration
-        // ------------------
+        /* Finalize Migration */
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
 
         new Dialog({
@@ -287,7 +270,7 @@ export class Migrator {
                 ok: {
                     label: "OK",
                     callback: () => {
-                        progress.remove();
+                        this.progressbar?.remove();
                         ui.notifications.info("Documents have been migrated!");
                     }
                 }
