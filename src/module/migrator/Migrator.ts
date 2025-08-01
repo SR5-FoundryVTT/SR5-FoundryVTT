@@ -240,7 +240,7 @@ export class Migrator {
             { diff: false, recursive: false }
         );
 
-        for (const actor of [...game.actors]) {
+        for (const actor of game.actors) {
             await Item.implementation.updateDocuments(
                 getMigratedDocuments(actor.toObject().items),
                 // @ts-expect-error Fvtt-types not supporting parent
