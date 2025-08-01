@@ -1,12 +1,12 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 
-// @ts-expect-error not yet included in typings TODO: foundry-vtt-types v13 Add missing types.
 const Color = foundry.utils.Color;
 
-// @ts-expect-error not yet included in typings TODO: foundry-vtt-types v13 Add missing types.
 export class SR5TokenRuler extends foundry.canvas.placeables.tokens.TokenRuler {
-    // TODO: foundry-vtt-types v13 Add missing types.
-    _getGridHighlightStyle(waypoint, offset) {
+    override _getGridHighlightStyle(
+        waypoint: foundry.canvas.placeables.tokens.TokenRuler.Waypoint,
+        offset: foundry.grid.BaseGrid.Offset3D
+    ) {
         const highlightStyle = super._getGridHighlightStyle(waypoint, offset);
 
         if (highlightStyle.alpha === 0) {
@@ -23,13 +23,12 @@ export class SR5TokenRuler extends foundry.canvas.placeables.tokens.TokenRuler {
             highlightStyle.color = Color.from(game.settings.get(SYSTEM_NAME, FLAGS.TokenRulerColorSprinting));
         }
 
-        highlightStyle.alpha = game.settings.get(SYSTEM_NAME, FLAGS.TokenRulerOpacity);
+        highlightStyle.alpha = game.settings.get(SYSTEM_NAME, FLAGS.TokenRulerOpacity) ?? undefined;
 
         return highlightStyle;
     }
 
-    // TODO: foundry-vtt-types v13 Add missing types.
-    _getSegmentStyle(waypoint) {
+    override _getSegmentStyle(waypoint: foundry.canvas.placeables.tokens.TokenRuler.Waypoint) {
         const segmentStyle = super._getSegmentStyle(waypoint);
         if (segmentStyle.width === 0) {
             return segmentStyle;

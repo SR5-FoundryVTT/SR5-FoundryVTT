@@ -1,12 +1,16 @@
-declare namespace Shadowrun {
-    export interface MetamagicData extends
-        MetamagicPartData,
-        ActionPartData,
-        ImportFlags,
-        DescriptionPartData {
+import { BaseItemData, ItemBase } from "./ItemBase";
+import { ActionRollData } from "./Action";
+const { SchemaField } = foundry.data.fields;
 
-    }
+const MetamagicData = () => ({
+    ...BaseItemData(),
+    action: new SchemaField(ActionRollData()),
+});
 
-    export interface MetamagicPartData {
+export class Metamagic extends ItemBase<ReturnType<typeof MetamagicData>> {
+    static override defineSchema() {
+        return MetamagicData();
     }
 }
+
+console.log("MetamagicData", MetamagicData(), new Metamagic());

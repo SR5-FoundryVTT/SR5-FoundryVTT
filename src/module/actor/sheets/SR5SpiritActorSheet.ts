@@ -31,12 +31,8 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     override async getData(options: any) {
         const data = await super.getData(options);
 
-        const spirit = this.document.asSpirit();
-        if (spirit) {
-            if (spirit.system.summonerUuid) {
-                data['summoner'] = await fromUuid((this.document.system as Shadowrun.SpiritData).summonerUuid);
-            }
-        }
+        if (this.document.isType('spirit') && this.document.system.summonerUuid)
+            data['summoner'] = await fromUuid(this.document.system.summonerUuid as any);
 
         return data;
     }
@@ -54,7 +50,6 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     /**
      * Spirit actors have additional drop cases to handle.
      */
-    // @ts-expect-error TODO: foundry-vtt-types _onDrop returns void but should return array of documents.
     override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
@@ -81,7 +76,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     async _addSummonerOnDrop(dropData: { type: string; uuid: string; }) {
         if (dropData.type !== 'Actor') return;
         const actor = await fromUuid(dropData.uuid) as SR5Actor;
-        if (!actor.isCharacter()) return;
+        if (!actor.isType('character')) return;
 
         await this.document.addSummoner(actor);
     }

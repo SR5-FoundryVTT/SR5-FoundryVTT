@@ -11,13 +11,13 @@ export class QualityImporter extends DataImporter {
     }
 
     async Parse(jsonObject: QualitiesSchema): Promise<void> {
-        return QualityImporter.ParseItems<Quality, Shadowrun.QualityItemData>(
+        return QualityImporter.ParseItems<Quality>(
             jsonObject.qualities.quality,
             {
                 compendiumKey: () => "Quality",
                 parser: new QualityParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Quality"
             }

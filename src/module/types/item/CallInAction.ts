@@ -1,17 +1,32 @@
-declare namespace Shadowrun {
-    /**
-     * Call In Action can be used to create different types of actors.
-     *
-     * This is used for summoning spirits and compiling sprites.
-     */
-    export interface CallInActionData extends
-        DescriptionPartData,
-        ActionPartData,
-        SummoningData,
-        ImportFlags,
-        CompilationData
-        {
-            // Define actor type to create. Should default to empty string.
-            actor_type: '' | 'sprite' | 'spirit'
-        }
+import { ActionRollData } from "./Action";
+import { BaseItemData, ItemBase } from "./ItemBase";
+const { SchemaField, NumberField, StringField } = foundry.data.fields;
+
+const CallInActionData = () => ({
+    ...BaseItemData(),
+    action: new SchemaField(ActionRollData({ test: '' })),
+
+    actor_type: new StringField({
+        blank: true,
+        required: true,
+        choices: ['spirit', 'sprite'],
+    }),
+    spirit: new SchemaField({
+        type: new StringField({ required: true }),
+        force: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        uuid: new StringField({ required: true }),
+    }),
+    sprite: new SchemaField({
+        type: new StringField({ required: true }),
+        level: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        uuid: new StringField({ required: true }),
+    }),
+});
+
+export class CallInAction extends ItemBase<ReturnType<typeof CallInActionData>> {
+    static override defineSchema() {
+        return CallInActionData();
+    }
 }
+
+console.log("CallInActionData", CallInActionData(), new CallInAction());

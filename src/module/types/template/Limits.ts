@@ -1,35 +1,38 @@
-/// <reference path="../Shadowrun.ts" />
-declare namespace Shadowrun {
-    /**
-     * General actor limits, available for all actors.
-     * 
-     * The general fallback is to still allow any limit name to be applied during actor prep.
-     */
-    export interface Limits {
-        [name: string]: LimitField;
+import { ModifiableField } from "../fields/ModifiableField";
+import { ModifiableValue } from "./Base";
+const { BooleanField, StringField } = foundry.data.fields;
 
-        social: LimitField
-        mental: LimitField
-        physical: LimitField
-    }
+export const LimitField = () => ({
+    ...ModifiableValue(),
+    attribute: new StringField({ required: false }), // Does it use it?
+    label: new StringField({ required: true }),
+    hidden: new BooleanField(),
+});
 
-    export interface AwakendLimits extends Limits {
-        astral: LimitField
-        magic: LimitField
-        initiation: LimitField
-    }
+export const Limits = () => ({
+    social: new ModifiableField(LimitField()),
+    mental: new ModifiableField(LimitField()),
+    physical: new ModifiableField(LimitField()),
+});
 
-    export interface MatrixLimits extends Limits {
-        attack: LimitField
-        stealth: LimitField
-        firewall: LimitField
-        // TODO: What's the key for dp?
-        data_processing: LimitField
-    }
+export const AwakendLimits = () => ({
+    astral: new ModifiableField(LimitField()),
+    magic: new ModifiableField(LimitField()),
+    initiation: new ModifiableField(LimitField()),
+});
 
-    /**
-     * Describes a limit used in actor data.
-     * Differes from LimitValue which is used in item action data and contains less fields.
-     */
-    export type LimitField = BaseValuePair<number> & ModifiableValue & CanHideFiled & LabelField;
-}
+export const MatrixLimits = () => ({
+    attack: new ModifiableField(LimitField()),
+    sleaze: new ModifiableField(LimitField()),
+    firewall: new ModifiableField(LimitField()),
+    data_processing: new ModifiableField(LimitField()),
+});
+
+export const VehicleLimits = () => ({
+    ...Limits(),
+    sensor: new ModifiableField(LimitField()),
+    handling: new ModifiableField(LimitField()),
+    speed: new ModifiableField(LimitField()),
+});
+
+export type LimitFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof LimitField>>;

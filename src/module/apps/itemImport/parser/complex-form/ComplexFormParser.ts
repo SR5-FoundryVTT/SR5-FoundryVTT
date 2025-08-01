@@ -1,17 +1,17 @@
-import { Parser } from '../Parser';
+import { Parser, SystemType } from '../Parser';
+import { CompendiumKey } from '../../importer/Constants';
 import { Complexform } from '../../schema/ComplexformsSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import ComplexFormTarget = Shadowrun.ComplexFormTarget;
-import ComplexFormItemData = Shadowrun.ComplexFormItemData;
-import { CompendiumKey } from '../../importer/Constants';
 
-export class ComplexFormParser extends Parser<ComplexFormItemData> {
-    protected override parseType: string = 'complex_form';
+export class ComplexFormParser extends Parser<'complex_form'> {
+    protected readonly parseType = 'complex_form';
 
-    protected override getSystem(jsonData: Complexform): ComplexFormItemData['system'] {
-        const system = this.getBaseSystem(
-            {action: {type: 'complex', attribute: 'resonance', skill: 'compiling'}} as Shadowrun.ComplexFormData
-        );
+    protected override getSystem(jsonData: Complexform) {
+        const system = this.getBaseSystem();
+
+        system.action.type = 'complex';
+        system.action.attribute = 'resonance';
+        system.action.skill = 'compiling';
 
         const fade = jsonData.fv._TEXT;
         if (fade.includes('+') || fade.includes('-'))
@@ -33,7 +33,7 @@ export class ComplexFormParser extends Parser<ComplexFormItemData> {
             case 'Persona':
             case 'Self':
             case 'Sprite':
-                system.target = target.toLowerCase() as ComplexFormTarget;
+                system.target = target.toLowerCase() as SystemType<'complex_form'>['target'];
                 break;
             default:
                 system.target = 'other';
