@@ -450,11 +450,20 @@ export const MatrixTestDataFlow = {
      * @param options
      */
     async executeMessageAction(testCls: any, againstData: MatrixTestData, messageId: string, options: TestOptions): Promise<void> {
-        if (!againstData.iconUuid) return;
-
-        // Some opposed tests only need an item, no actor...
-        const document = await fromUuid(againstData.iconUuid);
+        let document: any | null;
+        if (againstData.iconUuid) {
+            document = await fromUuid(againstData.iconUuid)
+        }
         // if (!(document instanceof SR5Item)) return;
+        if (!document) {
+            const actor = Helpers.getSelectedActorsOrCharacter()[0];
+            document = actor;
+            againstData.iconUuid = actor.uuid;
+        }
+        if (!document) {
+            document = game.user?.character;
+            againstData.iconUuid = game.user?.character?.uuid;
+        }
         if (!document) return;
 
         const data = await testCls._getOpposedActionTestData(againstData, document, messageId);
