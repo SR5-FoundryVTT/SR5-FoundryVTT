@@ -70,16 +70,18 @@ export class Migrator {
      * Note: This method was previously called during `_initializeSource`,
      * but that caused migration of embedded items to be skipped in synthetic documents.
      */
-    public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false): boolean {
+    public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false, path: string[] = []): boolean {
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
         if (!data._stats || !('systemVersion' in data._stats)) return false;
         if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return false;
+
+        path = [...path, type, data._id];
 
         let migrated = false;
         if (type === "Item") {
             const items = this.normalizeArray(data.flags?.shadowrun5e?.embeddedItems);
             for (const nestedItems of items) {
-                const nestedMigrated = this.migrate("Item", nestedItems, true);
+                const nestedMigrated = this.migrate("Item", nestedItems, true, path);
                 migrated = migrated || nestedMigrated;
             }
             foundry.utils.setProperty(data, 'flags.shadowrun5e.embeddedItems', items);
@@ -87,7 +89,7 @@ export class Migrator {
             if (nested) {
                 const effects = this.normalizeArray(data.effects);
                 for (const nestedEffect of effects) {
-                    const nestedMigrated = this.migrate("ActiveEffect", nestedEffect, true);
+                    const nestedMigrated = this.migrate("ActiveEffect", nestedEffect, true, path);
                     migrated = migrated || nestedMigrated;
                 }
                 foundry.utils.setProperty(data, 'effects', effects);
@@ -114,7 +116,7 @@ export class Migrator {
         if (correctionLogs) {
             console.warn(
                 `Document Sanitized on Migration:\n` +
-                `ID: ${data._id}; Name: ${data.name};\n` +
+                `UUID: ${path.join('.')}; Name: ${data.name};\n` +
                 `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n`
             );
             console.table(correctionLogs);
@@ -146,23 +148,16 @@ export class Migrator {
         doc._stats.systemVersion = game.system.version;
         doc._source._stats.systemVersion = game.system.version;
 
-        if (doc.parent) {
-            if (doc.parent instanceof Actor || doc.parent instanceof Item)
-                await this.updateMigratedDocument(doc.parent);
-            else if (doc.parent instanceof TokenDocument && doc.parent.actor)
-                await this.updateMigratedDocument(doc.parent.actor);
-        }
+        // Update Parent First
+        if (doc.parent instanceof Actor || doc.parent instanceof Item)
+            await this.updateMigratedDocument(doc.parent);
 
         // Persist the change without triggering diff logic
         return doc.update(doc.toObject() as any, { diff: false, recursive: false });
     }
 
     public static async BeginMigration() {
-        const currentVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION) || '0.0.0';
-
-        // No migrations are required, exit.
-        const migrators = this.getMigrators(currentVersion);
-        if (migrators.length === 0 || this.documentsToBeMigrated === 0) return;
+        if (this.documentsToBeMigrated === 0) return;
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
         const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
@@ -196,87 +191,109 @@ export class Migrator {
      */
     private static async migrateAll() {
         const start = performance.now();
-        const progress = ui.notifications.info("Migrating Documents...", {progress: true});
+        const progress = ui.notifications.info("Migrating Documents...", { progress: true });
 
-        const tokensWithSynthActors = Array.from(game.scenes).flatMap(scene =>
-            scene.tokens.filter(token => !!token.actor && !token.actorLink)
-        );
+        // Estimate total migration steps
+        const totalMigrations =
+            1 + game.items.size +                         // Items + their effects
+            1 + game.actors.size * 2 +                    // Actor + their items + their effects
+            [...game.actors].reduce((sum, actor) => sum + actor.items.size, 0) +  // Actor item effects
+            game.scenes.size;                             // Non-actor tokens
 
-        let completed = 0;
-        const total = game.items.size + game.actors.size + tokensWithSynthActors.length;
+        let completedMigrations = 0;
 
-        // Items
-        await this.runInBatches([...game.items], async item =>
-            this.migrateWithCollections(item as Item.Implementation).then(() => {
-                progress.update({pct: ++completed / total});
-            })
-        );
-
-        // Actors
-        await this.runInBatches([...game.actors], async actor =>
-            this.migrateWithCollections(actor as Actor.Implementation).then(() => {
-                progress.update({pct: ++completed / total});
-            })
-        );
-
-        // Tokens
-        await this.runInBatches(tokensWithSynthActors, async token =>
-            this.migrateWithCollections(token.actor!).then(() => {
-                progress.update({pct: ++completed / total});
-            })
-        );
-
-        await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
-
-        const d = new Dialog({
-            title: "Migration Complete",
-            content:
-                `<h2 style="color: red; text-align: center">Migration Complete</h2>` +
-                `<p style="text-align: center">It took ${performance.now() - start} milliseconds.</p>`,
-            buttons: {
-                ok: {
-                    label: "OK",
-                    callback: () => { progress.remove(); },
-                },
-            },
-            default: 'ok',
-        });
-        d.render(true);
-    }
-
-    private static readonly CONCURRENCY_LIMIT = 1;
-    private static async runInBatches<T>(
-        items: T[],
-        task: (item: T) => Promise<void>
-    ) {
-        let i = 0;
-        async function worker() {
-            while (i < items.length)
-                await task(items[i++]);
+        function updateProgress(): void {
+            progress.update({
+                pct: ++completedMigrations / totalMigrations,
+                message: `Migrating Documents... (${completedMigrations}/${totalMigrations})`
+            });
         }
 
-        const workers = Array.from({ length: this.CONCURRENCY_LIMIT }, worker);
-        return Promise.all(workers);
-    }
+        function getMigratedDocuments<T extends Item.Source | Actor.Source | ActiveEffect.Source>(docs: T[]): T[] {
+            updateProgress();
+            return foundry.utils.deepClone(docs).filter(
+                d => d._stats?.systemVersion === Migrator._migrationMark
+            );
+        }
 
-    private static async migrateWithCollections(doc: Actor.Implementation | Item.Implementation) {
-        await this.updateMigratedDocument(doc);
+        // ------------------------------
+        // Items and its embedded Effects
+        // ------------------------------
+        await Item.implementation.updateDocuments(
+            getMigratedDocuments(game.items._source),
+            { diff: false, recursive: false }
+        );
 
-        const collectionPromises: Promise<any>[] = [];
-        type CollectionType = (Actor.Implementation | Item.Implementation)['collections']['effects' | 'items'];
-        for (const [key, collection] of Object.entries<CollectionType>(doc.collections)) {
-            if (key === 'effects' || key === 'items') {
-                for (const child of collection) {
-                    collectionPromises.push(
-                        child instanceof Item
-                            ? this.migrateWithCollections(child)
-                            : this.updateMigratedDocument(child)
-                    );
-                }
+        for (const item of game.items) {
+            await ActiveEffect.implementation.updateDocuments(
+                getMigratedDocuments(item.toObject().effects),
+                // @ts-expect-error Fvtt-types not supporting parent
+                { diff: false, recursive: false, parent: item }
+            );
+        }
+
+        // ---------------------------------
+        // Actors and its embedded documents
+        // ---------------------------------
+        await Actor.implementation.updateDocuments(
+            getMigratedDocuments(game.actors._source),
+            { diff: false, recursive: false }
+        );
+
+        for (const actor of [...game.actors]) {
+            await Item.implementation.updateDocuments(
+                getMigratedDocuments(actor.toObject().items),
+                // @ts-expect-error Fvtt-types not supporting parent
+                { diff: false, recursive: false, parent: actor }
+            );
+
+            await ActiveEffect.implementation.updateDocuments(
+                getMigratedDocuments(actor.toObject().effects),
+                // @ts-expect-error Fvtt-types not supporting parent
+                { diff: false, recursive: false, parent: actor }
+            );
+
+            for (const item of actor.items) {
+                await ActiveEffect.implementation.updateDocuments(
+                    getMigratedDocuments(item.toObject().effects),
+                    { diff: false, recursive: false, parent: item }
+                );
             }
         }
 
-        return Promise.all(collectionPromises);
+        // ------
+        // Tokens
+        // ------
+        for (const scene of game.scenes) {
+            await TokenDocument.implementation.updateDocuments(
+                foundry.utils.deepClone(scene.tokens.filter(t => !t.actorLink).map(t => t.toObject())),
+                { diff: false, recursive: false, parent: scene }
+            );
+            updateProgress();
+        }
+
+        // ------------------
+        // Finalize Migration
+        // ------------------
+        await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
+
+        new Dialog({
+            title: "Migration Complete",
+            content: `
+                <h2 style="color: red; text-align: center">Migration Complete</h2>
+                <p style="text-align: center">It took ${(performance.now() - start).toFixed(2)} milliseconds.</p>
+            `,
+            buttons: {
+                ok: {
+                    label: "OK",
+                    callback: () => {
+                        progress.remove();
+                        ui.notifications.info("Documents have been migrated!");
+                    }
+                }
+            },
+            default: "ok"
+        }).render(true);
     }
 
     /**
