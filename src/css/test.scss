@@ -1,5 +1,5 @@
 /**
- * CSS for Success Test Dialog styling.
+ * CSS for Success Test styling.
  */
 @import 'config';
 
@@ -9,12 +9,8 @@
   }
 
   .form-group {
-    /**
-     * Lazy hack to allow for a two segment elemnt style, with the right ones text 
-     * being flush to the end.
-     */
     .form-group-element-2 {
-      flex: 2
+      flex: 2;
     }
 
     .form-group-element-1-right {
@@ -23,13 +19,337 @@
     }
   }
 
-
   .dialog-content-common {
     h2 {
       border: none;
       color: white;
       margin: 0;
-      text-underline: none;
+      text-decoration: none;
+    }
+  }
+
+/**
+ * CSS for Teamwork relevant styling.
+ */
+  &#teamwork-dialog {
+
+    select.form-control,
+    select {
+
+      & option,
+      & optgroup {
+        background-color: var(--color-input-bg) !important;
+        color: var(--color-input-text) !important;
+      }
+
+      & option {
+        background-color: #4d4d4d !important;
+      }
+
+      & option:checked {
+        background-color: #767676 !important;
+      }
+
+      & option:hover {
+        background-color: #5e5e5e !important;
+      }
+
+      & optgroup {
+        background-color: #3b3b3b !important;
+        font-weight: bold;
+        padding: .25em .5em !important;
+      }
+
+      & option.group-label {
+        background-color: #3b3b3b !important;
+      }
+    }
+
+    .dialog-content-teamwork.grid-two-col {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 1em;
+      row-gap: .5em;
+      align-items: center;
+
+      label {
+        justify-self: start;
+      }
+
+      .form-control,
+      input[type="number"],
+      input[type="text"] {
+        width: 100%;
+        max-width: 20em;
+        box-sizing: border-box;
+        text-align: right;
+      }
+    }
+
+    .dialog-content-teamwork {
+
+      input[name="filter"],
+      input[name="threshold"] {
+        color: #ffffff !important;
+      }
+
+      input[name="limit"] {
+        background-color: var(--color-input-bg) !important;
+        color: #ffffff !important;
+      }
+
+      datalist#sr5-teamwork-limit-options option {
+        background-color: #4d4d4d !important;
+        color: #ffffff !important;
+      }
+
+      select[name="limit"],
+      select[name="limitSelect"] {
+        background-color: var(--color-input-bg) !important;
+        color: var(--color-input-text) !important;
+      }
+
+      .limit-controls {
+        display: grid;
+        grid-template-columns: 6ch auto;
+        column-gap: .5em;
+        align-items: center;
+
+        .limit-number {
+          width: 6ch;
+          min-width: 6ch;
+          max-width: 6ch;
+          text-align: center;
+          box-sizing: border-box;
+          background: var(--color-input-bg) !important;
+          color: var(--color-input-text) !important;
+        }
+
+        .limit-select {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.teamwork-participant {
+  border: 1px solid var(--color-border-dark);
+  border-radius: 4px;
+  margin-bottom: .5em;
+  background: var(--color-dialog-bg);
+  color: var(--color-input-text);
+  overflow: hidden;
+  position: relative;
+  transition: background-color 0.3s;
+
+  &.glitched {
+    background-color: #3f1e1e; 
+    border-color: #c0392b;
+  }
+
+  .participant-controls {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+
+    .participant-delete {
+      background: none;
+      border: none;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 1em;
+      padding: 0;
+    }
+
+    .participant-delete:hover {
+      color: #ff4d4d;
+    }
+  }
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: .5em 1em;
+    font-weight: bold;
+    display: block;
+    width: 100%;
+    font-size: var(--font-size-12);
+  }
+
+  .participant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .participant-actor {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .participant-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none !important;
+    flex-shrink: 0;
+  }
+
+  .participant-name {
+    font-weight: normal;
+  }
+
+  .participant-hits {
+    white-space: nowrap;
+    font-weight: normal;
+  }
+
+  .different-skills {
+    padding: .5em 1em;
+    background: var(--color-toolbar-bg);
+    border-top: 1px solid var(--color-border-dark);
+  }
+
+  &[open] .different-skills {
+    animation: expand .2s ease-out forwards;
+  }
+}
+
+
+.glitch-message {
+  color: #ff4d4d;
+  font-style: italic;
+
+  &.critical {
+    font-weight: bold;
+  }
+}
+
+@keyframes expand {
+  from {
+    opacity: 0;
+    transform: scaleY(.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.sr5.chat-card.teamwork-card {
+  .card-header .header-name a.chat-document-link {
+    color: white !important;
+  }
+}
+
+/**
+ * CSS for RollEnricher Dialog relevant styling.
+ */
+.roll-enricher-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  >.explanation {
+    margin-bottom: 0.5em;
+
+    p {
+      margin: 0;
+      font-size: 0.9em;
+      color: #ccc;
+    }
+  }
+
+  >.roll-enricher-dialog {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: auto;
+    grid-gap: 0.5em;
+    align-items: end;
+
+    >.col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: none;
+      width: 15ch;
+      margin: 0 0.25em;
+
+      label {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0.2em;
+        font-size: 0.9em;
+        cursor: help;
+      }
+
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 1em;
+        padding: 0.2em;
+        color: #fff;
+      }
+    }
+
+    >.sep {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 0.5em;
+    }
+
+    .skillattribute-group {
+  display: grid;
+
+  grid-template-columns: repeat(2, 15ch);
+
+  grid-auto-flow: row;
+
+  grid-gap: 0.5em;
+  align-items: end;
+    }
+
+    .skillattribute-group .combined-label {
+      grid-column: 1 / -1;
+      text-align: center;
+    }
+
+    label.optional {
+      font-style: italic;
+    }
+  }
+
+  >.roll-enricher-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-bottom: 0.5em;
+
+    .result-text {
+      flex: 1;
+      font-family: monospace;
+      color: #fff;
+      word-break: break-all;
+    }
+
+    .invalid-result {
+      color: #ff0000 !important;
+    }
+
+    .copy-icon {
+      cursor: pointer;
+    }
+
+    .roll-enricher-insert,
+    .roll-enricher-cancel {
+      flex: none;
     }
   }
 }

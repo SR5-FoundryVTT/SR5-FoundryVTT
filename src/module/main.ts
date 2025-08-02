@@ -1,3 +1,4 @@
+import { EditorManager } from './apps/editor/EditorManager';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 import {HooksManager} from "./hooks";
 
@@ -8,3 +9,4 @@ import {HooksManager} from "./hooks";
 
 HooksManager.registerHooks();
 HandlebarManager.registerHelpers();
+EditorManager.registerMenuItems();

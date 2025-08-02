@@ -333,7 +333,8 @@ export class SR5Item extends Item {
         if (!system.description) system.description = { chat: '', source: '', value: '' };
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
         if (!system.description.value) system.description.value = '';
-        system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions });
+        // @ts-expect-error
+        system.description.value = await TextEditor.enrichHTML(system.description.value, { ...htmlOptions, relativeTo: this });
 
         const props = [];
         // Add additional chat data fields depending on item type.

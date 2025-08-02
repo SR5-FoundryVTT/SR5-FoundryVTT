@@ -1,3 +1,4 @@
+import { TeamworkFlow } from './../flows/TeamworkFlow';
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { Helpers } from "../../helpers";
@@ -330,6 +331,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
 
         // Skill CRUD handling...
+        html.find('.start-teamwork').on('click', this._onStartTeamworkTest.bind(this))
         html.find('.skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
         html.find('.knowledge-skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
         html.find('.language-skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
@@ -1021,8 +1023,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param inventories 
      */
     _prepareSortedCategorizedSpells(spellSheets: SheetItemData[]) {
-        const sortedSpells : Record<string, SheetItemData[]> = {};
-        const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
+        const sortedSpells: Record<string, SheetItemData[]> = {};
+        const spellTypes: string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
 
         // Add all spell types in system.
         spellTypes.forEach(type => {
@@ -1036,7 +1038,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         });
 
         spellTypes.forEach(type => {
-            sortedSpells[type].sort((a, b) : number => {
+            sortedSpells[type].sort((a, b): number => {
                 return a.name.localeCompare(b.name);
             });
         });
@@ -1048,7 +1050,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Used by the sheet to choose whether to show or hide hideable fields
      */
     _prepareContentVisibility(data) {
-        const contentVisibility : Record<string, boolean> = {}
+        const contentVisibility: Record<string, boolean> = {}
         const defaultVisibility = data.system.category_visibility.default;
 
         // If prefix is empty uses the category as a prefix
@@ -1362,6 +1364,18 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
         return this.actor.rollSkill(skillId, { event, specialization: true });
     }
+    
+    async _onStartTeamworkTest(event) {
+        event.preventDefault();
+        const [skillId,] = Helpers.listItemId(event).split('.');
+        const skill = this.actor.getSkill(skillId);
+        if (!skill) {
+            return console.error(`Shadowrun 5e | Start teamwork test failed due to missing skill ${skillId}`);
+        }
+
+        TeamworkFlow.initiateTeamworkTest({ actor: this.actor, skill: TeamworkFlow.constructSkillEntry({ id: skill.id ?? skill.label ?? "" }, this.actor) });
+
+    }
 
     async _onOpenSourceSkill(event) {
         event.preventDefault();
@@ -1369,7 +1383,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const skill = this.actor.getSkill(skillId);
         if (!skill) {
-            return console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`);
+            return console.error(`Shadowrun 5e | Open skill source failed due to missing skill ${skillId}`);
         }
 
         LinksHelpers.openSource(skill.link);
