@@ -12,7 +12,7 @@
 {{/if}}
 <div class="form-group">
     <label>{{localize 'SR5.Range'}}</label>
-    <select name="test.data.range">
+    <select name="test.data.range" {{#if test.hasTargets}}disabled{{/if}}>
         {{#select test.data.range}} {{#each test.data.ranges as |range key|}}
         <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
         {{/each}} {{/select}}
