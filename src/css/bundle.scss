@@ -942,6 +942,12 @@ input[type='text'].display {
             align-items: center;
             align-content: center;
 
+            // vertically center the rows, using a table would have
+            // been better, but i pray for V2 or during the rework.
+            &:not(.list-header > .list-item-content) {
+              margin-top: 0.3125rem;
+            }
+
             .item-center {
                 display: flex;
                 flex-flow: row nowrap;
