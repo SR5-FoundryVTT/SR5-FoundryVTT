@@ -489,6 +489,7 @@ export class SR5Item extends Item {
         return ammo.current.value;
     }
 
+
     /**
      * Use the weapons ammunition with the amount of bullets fired.
      * @param fired Amount of bullets fired.
@@ -761,7 +762,7 @@ export class SR5Item extends Item {
      * Determine if this items matrix icon is running silent.
      */
     get isRunningSilent(): boolean {
-        return false;
+        return this.system.technology?.wireless === 'silent';
     }
 
     /**
@@ -1311,7 +1312,32 @@ export class SR5Item extends Item {
     }
 
     isWireless(): boolean {
-        return this.wrapper.isWireless();
+        return this.system.technology?.wireless === 'online' || this.isRunningSilent;
+    }
+
+    /**
+     * Determine if an item is capable of being wireless
+     */
+    get canBeWireless(): boolean {
+        return this.system.technology?.wireless !== 'none';
+    }
+
+    /**
+     * Determine if an item has taken Matrix Damage
+     */
+    get isDamaged(): boolean {
+        const monitor = this.getConditionMonitor();
+        // if the monitor max isn't greater than 0, assume it isn't damaged
+        return monitor.max > 0 && monitor.value > 0;
+    }
+
+    /**
+     * Determine if an item's Matrix Condition Monitor is filled
+     */
+    get isBroken(): boolean {
+        const monitor = this.getConditionMonitor();
+        // if the monitor max isn't greater than 0, assume it isn't broken
+        return monitor.max > 0 && monitor.value >= monitor.max;
     }
 
     /**

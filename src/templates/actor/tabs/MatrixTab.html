@@ -1,10 +1,117 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='matrix'}}
-<nav class="tabs" data-group="matrix">
-    <a class="item" data-tab="decking">{{localize "SR5.Labels.ActorSheet.Hacking"}}</a>
-    <a class="item" data-tab="config">{{localize "SR5.Labels.ActorSheet.DeviceSetup"}}</a>
-</nav>
-<section data-group='matrix' class="tabsbody">
-    {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/HackingTab.html'}}
-    {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ConfigTab.html'}}
-</section>
+<div class="flexrow list-header item-section space-between">
+    <div>
+        <a class="roll" data-roll-id="matrix.device-rating">
+            {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
+        </a>
+    </div>
+    <div>
+        <a class="matrix-toggle-hot-sim" data-tooltip="SR5.MatrixPerceptionToggle">
+            {{#if system.matrix.hot_sim}}
+            {{localize "SR5.HotSim"}}
+            {{else if system.matrix.vr}}
+            {{localize "SR5.Labels.ActorSheet.ColdSim"}}
+            {{else}}
+            {{localize "SR5.Vision.AugmentedReality"}}
+            {{/if}}
+        </a>
+    </div>
+    <div>
+        <a class="matrix-toggle-running-silent" data-tooltip=" SR5.MatrixToggleRunningSilent">
+            {{#if system.matrix.running_silent}}
+            {{localize "SR5.RunningSilent"}}
+            {{else}}
+            {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
+            {{/if}}
+        </a>
+    </div>
+    <div>
+        <a class="reboot-persona-device" data-tooltip="SR5.RebootPersonaAndClearAllMarks">
+            {{localize "SR5.Labels.Sheet.RebootDevice"}} <i class="item-icon fas fa-power-off"></i>
+        </a>
+    </div>
+</div>
+<div class="split-container">
+    <div>
+        <div class="attributes">
+            {{#each config.matrixAttributes as |label key|}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html"
+            matrixAtt=(lookup ../system.matrix key)
+            isCyberdeck=../system.matrix.is_cyberdeck
+            key=key
+            label=label
+            matrixAttributes=../config/matrixAttributes
+            item=../system.matrix.item }}
+            {{/each}}
+        </div>
+        <div class="inventory">
+            <div class="flexrow align-start list-header item-section space-between">
+                <div>
+                    {{#if network}}
+                    {{localize "SR5.Labels.ActorSheet.Network"}}: {{network.name}}
+                    <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                        <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                    </a>
+                    {{else}}
+                    {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                    <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                    {{/if}}
+                </div>
+                <div>
+                    <a class="show-matrix-network-hacking">
+                        {{localize "SR5.Labels.ActorSheet.MarkNetwork"}} <i class="item-icon fas fa-network-wired"></i>
+                    </a>
+                </div>
+            </div>
+            <div>
+                <nav class="tabs" data-group="matrix">
+                    <a class="item" data-tab="programs">{{localize "SR5.Programs"}}</a>
+                    <a class="item" data-tab="targets">{{localize "SR5.Labels.ActorSheet.Icons"}}</a>
+                    <a class="item" data-tab="marks">{{localize "SR5.Marks"}}</a>
+                    {{#if emerged}}
+                    <a class="item" data-tab="compilations">{{localize "SR5.Labels.ActorSheet.Compilations"}}</a>
+                    {{/if}}
+                </nav>
+                <div class="scroll-area scroll-area-matrix-hacking">
+                    <section data-group='matrix' class="tabsbody">
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Targets.html'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html'}}
+                        {{#if emerged}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.html'}}
+                        {{/if}}
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        {{#if system.matrix.device}}
+            {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+            name=(localize "SR5.ConditionMonitor")
+            value=system.matrix.condition_monitor.value
+            max=system.matrix.condition_monitor.max
+            id="matrix"
+            }}
+        {{/if}}
+        {{#if emerged}}
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html' }}
+        {{/if}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Actions')
+        rightSide=(MatrixActionsHeaderRightSide)
+        }}
+        <div class="scroll-area scroll-area-matrix-hacking matrix-hacking-actions">
+            {{#each matrixActions}}
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+            name=this.name
+            itemId=this.uuid
+            itemType="matrix-action"
+            hasRoll="true"
+            rightSide=(MatrixActionsItemRightSide this)
+            }}
+            {{/each}}
+        </div>
+    </div>
+</div>
 {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

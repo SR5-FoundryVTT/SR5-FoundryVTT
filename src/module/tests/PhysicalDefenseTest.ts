@@ -1,22 +1,17 @@
-import {PartsList} from "../parts/PartsList";
-import {CombatRules} from "../rules/CombatRules";
-import {MeleeRules} from "../rules/MeleeRules";
-import {MeleeAttackData} from "./MeleeAttackTest";
-import {TestCreator} from "./TestCreator";
-import {DefenseTest, DefenseTestData} from "./DefenseTest";
-import { SR5Combat } from "../combat/SR5Combat";
+import { PartsList } from '../parts/PartsList';
+import { CombatRules } from '../rules/CombatRules';
+import { MeleeRules } from '../rules/MeleeRules';
+import { MeleeAttackData } from './MeleeAttackTest';
+import { TestCreator } from './TestCreator';
+import { DefenseTest, DefenseTestData } from './DefenseTest';
+import { Translation } from '../utils/strings';
+import { ActiveDefenseRules } from '../rules/ActiveDefenseRules';
 import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
-import { FLAGS, SYSTEM_NAME } from "../constants";
-import { Translation } from '../utils/strings';
-import { ActiveDefenseRules } from "../rules/ActiveDefenseRules";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
     cover: number
-    // Dialog input for active defense modifier
-    activeDefense: string
-    activeDefenses: Record<string, { label: Translation, value: number|undefined, initMod: number, weapon?: string, disabled?: boolean }>
     // Melee weapon reach modification.
     isMeleeAttack: boolean
     defenseReach: number
@@ -102,11 +97,6 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         const incomingReach = attackData.reach || 0;
         const defenseReach = this.data.defenseReach;
         this.data.defenseReach = MeleeRules.defenseReachModifier(incomingReach, defenseReach);
-    }
-
-    override calculateBaseValues() {
-        super.calculateBaseValues();
-        this.applyIniModFromActiveDefense();
     }
 
     override applyPoolModifiers() {
@@ -224,54 +214,6 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         await test.execute();
     }
 
-    override canConsumeDocumentResources() {
-        // Check if the actor is in active combat situation and has enough initiative score left.
-        if (this.actor && this.data.iniMod && game.combat) {
-            const combat: SR5Combat = game.combat as unknown as SR5Combat;
-            const combatant = combat.getActorCombatant(this.actor);
-            if (!combatant?.initiative) return true;
-            
-            if (combatant && combatant.initiative + this.data.iniMod < 0) {
-                ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
-                return false;
-            }
-        }
-
-        return super.canConsumeDocumentResources();
-    }
-
-    /**
-     * Should an active defense be selected apply the initiative modifier to the defenders combat initiative.
-     */
-    applyIniModFromActiveDefense() {
-        if (!this.actor) return;
-        if (!this.data.activeDefense) return;
-
-        const activeDefense = this.data.activeDefenses[this.data.activeDefense];
-        if (!activeDefense) return;
-
-        // Use DefenseTest general iniMod behaviour.
-        this.data.iniMod = activeDefense.initMod;
-    }
-
-    override _prepareResultActionsTemplateData() {
-        const actions = super._prepareResultActionsTemplateData();
-
-        // Don't add an action if no active defense was selected.
-        if (!this.data.activeDefense) return actions;
-
-        const activeDefense = this.data.activeDefenses[this.data.activeDefense];
-        if (!activeDefense) return actions;
-
-        actions.push({
-            action: 'modifyCombatantInit',
-            label: 'SR5.Initiative',
-            value: String(activeDefense.initMod)
-        });
-
-        return actions;
-    }
-
     /**
      * Increase the actors multi defense modifier.
      */
@@ -279,24 +221,5 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         if (!this.actor) return;
 
         this.actor.calculateNextDefenseMultiModifier();
-    }
-
-    /**
-     * Based in combatants ini score, pre-filter available active defense modes.
-     * 
-     * This behaviour can be disabled using the must have ressources setting.
-     */
-    _filterActiveDefenses() {
-        if (!this.actor) return;
-        
-        // Don't validate ini costs when costs are to be ignored.
-        const mustHaveRessouces = game.settings.get(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest);
-        if (!mustHaveRessouces) return;
-
-        // TODO: Check ressource setting.
-        const iniScore = this.actor.combatInitiativeScore;
-        Object.values(this.data.activeDefenses).forEach(mode => 
-            { mode.disabled = CombatRules.canUseActiveDefense(iniScore, mode.initMod) }
-        )
     }
 }

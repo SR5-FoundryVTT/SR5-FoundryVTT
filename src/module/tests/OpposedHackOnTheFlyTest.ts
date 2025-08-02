@@ -1,15 +1,17 @@
-import { SR5Actor } from "../actor/SR5Actor";
-import { SR5Item } from "../item/SR5Item";
-import { Translation } from "../utils/strings";
-import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
-import { HackOnTheFlyTest } from "./HackOnTheFlyTest";
-import { OpposedTest } from "./OpposedTest";
-import { TestOptions } from "./SuccessTest";
+import { SR5Actor } from '../actor/SR5Actor';
+import { SR5Item } from '../item/SR5Item';
+import { Translation } from '../utils/strings';
+import { MatrixPlacementData } from './flows/MarkPlacementFlow';
+import { HackOnTheFlyTest } from './HackOnTheFlyTest';
+import { OpposedTest } from './OpposedTest';
+import { TestOptions } from './SuccessTest';
+import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
+import { OpposedMatrixTestData } from './MatrixTest';
 
 /**
  * Implement the opposing test for Hack on the Fly action. See SR5#240 'Hack On The Fly'
  */
-export class OpposedHackOnTheFlyTest extends OpposedTest {
+export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> {
     override against: HackOnTheFlyTest;
     icon: Shadowrun.NetworkDevice
     device: SR5Item;
@@ -17,7 +19,7 @@ export class OpposedHackOnTheFlyTest extends OpposedTest {
 
     override _prepareData(data: any, options?: TestOptions) {
         data = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareOpposedData(data);
+        return MatrixTestDataFlow._prepareOpposedData(data);
     }
 
     override get _dialogTemplate() {
@@ -37,7 +39,7 @@ export class OpposedHackOnTheFlyTest extends OpposedTest {
     }
 
     override async populateDocuments() {
-        MarkPlacementFlow.populateOpposedDocuments(this);
+        await MatrixTestDataFlow.populateOpposedDocuments(this);
     }
 
     /**
@@ -55,6 +57,6 @@ export class OpposedHackOnTheFlyTest extends OpposedTest {
     }
 
     static override async executeMessageAction(againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
-        await MarkPlacementFlow.executeMessageAction(this, againstData, messageId, options);
+        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }

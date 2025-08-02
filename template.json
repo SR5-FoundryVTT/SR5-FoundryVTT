@@ -1342,7 +1342,7 @@
                         "value": 0,
                         "max": 9
                     },
-                    "wireless": true,
+                    "wireless": "none",
                     "master": ""
                 },
                 "matrix": {
