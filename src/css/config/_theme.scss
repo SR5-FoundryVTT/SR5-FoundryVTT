@@ -1,0 +1,134 @@
+// -----------------------------------------------------------------------------
+// SCSS Theme File
+//
+// Purpose:
+// - Handles theming variables.
+// - Define visual tokens like colors, shadows, gradients, etc.
+// - This file **writes to** CSS custom properties when applicable.
+//
+// Examples:
+// - Color palette mapping
+// - Light/dark mode conditions
+// - CSS variable definitions for themes
+// -----------------------------------------------------------------------------
+
+@use 'functions';
+@use 'sass:color';
+
+// switch to using oklch-colors
+$primary: functions.createColorMap(#ebb531); // default: 800
+$secondary: functions.createColorMap(#55101e); // default: 300
+$neutral: functions.createColorMap(black); // same as picking white or black
+$dark-base: black; // we really should not be using black
+$light-base: white; // we really should not be using white
+
+$color-scheme: (
+    // primary highlight color in dark mode
+    'primary': functions.createColorMap(oklch(80% 0.15 85)),
+    // secondary accent color in dark mode
+    'secondary': functions.createColorMap(oklch(30% 0.15 25)),
+    // neutral color palette, slight chroma, to give
+    // it a warm feeling
+    'neutral': functions.createColorMap(oklch(10% 0.015 55)),
+    // use it for magic related things
+    'magic': functions.createColorMap(oklch(50% 0.15 325)),
+    // matrix green, use it for matrix colors but also
+    // for success states
+    'matrix': functions.createColorMap(oklch(50% 0.15 170)),
+    // use for stun damage, or indicating something
+    // is purely mental, otherwise use the color for
+    // info states
+    'mental': functions.createColorMap(oklch(50% 0.15 210)),
+    // use for error or meatspace related things
+    'physical': functions.createColorMap(oklch(50% 0.15 10)),
+    // neutral but with chroma / more color, use for
+    // overflow damage or warnings
+    'overflow': functions.createColorMap(oklch(50% 0.15 55))
+);
+
+// new properties should be scoped to .sr5 classes, however since we do not
+// universally apply .sr5 to all properties that should be styled, we instead
+// use :root --sr5-varname properties until we can do so.
+body {
+    // text-colors
+    --sr5-text-primary: #{functions.getColor($color-scheme, 'neutral', 300)};
+    --sr5-text-primary-muted: #{functions.getColor($color-scheme, 'neutral', 500)};
+    --sr5-text-highlight: #{functions.getColor($color-scheme, 'secondary', 200)};
+    --sr5-text-highlight-muted: #{functions.getColor($color-scheme, 'secondary', 400)};
+    // controls [form elements, buttons]
+    --sr5-control-background: #{color.adjust(functions.getColor($color-scheme, 'neutral', 100), $alpha: -0.9)};
+    --sr5-control-background-inverse: #{color.adjust(functions.getColor($color-scheme, 'neutral', 700), $alpha: -0.9)};
+    --sr5-control-border: #{functions.getColor($color-scheme, 'neutral', 700)};
+    // background elements
+    --sr5-surface: #{functions.getColor($color-scheme, 'neutral', 900)};
+    --sr5-surface-elevated: #{functions.getColor($color-scheme, 'neutral', 800)};
+    --sr5-application-background: #{functions.asset('light-page.webp')};
+    --sr5-application-title-background: linear-gradient(
+        to right,
+        #{functions.getColor($color-scheme, 'primary', 700)} 30%,
+        transparent 100%
+    );
+
+    &.theme-dark {
+        // shadowrun-related colors
+        --sr5-color-stun: #{functions.getColor($color-scheme, 'mental', 300)};
+        --sr5-color-physical: #{functions.getColor($color-scheme, 'physical', 300)};
+        --sr5-color-overflow: #{functions.getColor($color-scheme, 'overflow', 300)};
+        --sr5-color-matrix: #{functions.getColor($color-scheme, 'matrix', 300)};
+        --sr5-color-edge: #{functions.getColor($color-scheme, 'primary', 300)};
+        // text-colors
+        --sr5-text-primary: #{functions.getColor($color-scheme, 'neutral', 900)};
+        --sr5-text-primary-muted: #{functions.getColor($color-scheme, 'neutral', 700)};
+        --sr5-text-highlight: #{functions.getColor($color-scheme, 'primary', 800)};
+        --sr5-text-highlight-muted: #{functions.getColor($color-scheme, 'primary', 600)};
+        // controls [form elements, buttons]
+        --sr5-control-background: #{color.adjust(functions.getColor($color-scheme, 'neutral', 900), $alpha: -0.9)};
+        --sr5-control-background-inverse: #{color.adjust(functions.getColor($color-scheme, 'neutral', 300), $alpha: -0.9)};
+        --sr5-control-border: #{functions.getColor($color-scheme, 'neutral', 100)};
+        // background elements
+        --sr5-surface: #{functions.getColor($color-scheme, 'neutral', 100)};
+        --sr5-surface-elevated: #{functions.getColor($color-scheme, 'neutral', 200)};
+        --sr5-application-background: linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.6)),
+            #{functions.asset('page.webp')} repeat;
+        --sr5-application-title-background: linear-gradient(
+            to right,
+            #{functions.getColor($color-scheme, 'secondary', 300)} 30%,
+            transparent 100%
+        );
+    }
+}
+
+// LEGACY VARIABLES, REMOVE FOR CSS VARIABLES WHENEVER POSSIBLE
+$black: $dark-base;
+$red: red;
+$grey: functions.getColorFromMap($neutral, 600);
+$white: $light-base;
+$darkred: functions.getColorFromMap($secondary, 300);
+$light: functions.getColorFromMap($neutral, 900);
+$light-2: functions.getColorFromMap($neutral, 700);
+$dark: functions.getColorFromMap($neutral, 300);
+$yellow: functions.getColorFromMap($primary, 800);
+$pdfColor: color.adjust(functions.getColorFromMap($primary, 800), $alpha: -0.35); //#e67260;
+$fadedBlack: color.adjust($dark-base, $alpha: -0.3);
+
+// secondary red: hue: 14.32, l: 30%
+$fLightRed: #cc5e5e; // hue: 22.03, l: 61.7%
+$fDarkRed: #af0505; // hue: 28.05, l: 47.5%
+$bgrButton: rgba(70, 7, 7, 0.692); // hue: 26.88, l: 25.6%
+
+$physical: red; // hue: 29.23, l: 62.8%
+
+// primary yellow: hue 84.5%, l: 80%
+$edge: #c7b002; // hue: 99.82, l: 75.4%
+
+$color: $light-base;
+$inner-color: $light-base;
+$outline-color: $dark-base;
+
+$groove-width: 1px;
+$groove-color: $dark-base;
+$groove: $groove-width solid $dark-base;
+$border-under: 1px groove $dark-base;
+
+$grid__cols: 12;
+$sheet-max-width: 690px;

@@ -1,6 +1,8 @@
 /**
  * Rules around the value modifier pop up that's shown for Value style data structures like Attributes, Skills, etc.
  */
+@use '../config';
+
 .sr5 .value {
     >.value-modifiers-container {
         display: none;
@@ -23,8 +25,8 @@
     .value-modifiers {
         display: grid;
         grid-template-columns: 200px 50px;
-        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
-        border: 1px solid $dark;
+        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), config.asset('page.webp') repeat;
+        border: 1px solid config.$dark;
         padding: 0.5em 0.5em 0.5em 0.5em;
         text-align: left;
         font-weight: normal;
@@ -34,18 +36,18 @@
         }
 
         >.value-modifiers-base {
-            border-bottom: 1px solid $yellow;
-            color: $white;
+            border-bottom: 1px solid config.$yellow;
+            color: config.$white;
         }
 
         >.value-modifiers-modifier {
-            color: $white;
+            color: config.$white;
         }
 
         >.value-modifiers-total {
             font-weight: bold;
-            border-top: 1px double $yellow;
-            color: $white;
+            border-top: 1px double config.$yellow;
+            color: config.$white;
         }
 
         >.value-modifiers-invalid-total {

@@ -1,0 +1,28 @@
+// -----------------------------------------------------------------------------
+// SCSS Bootstrap File (NOT for direct compilation)
+//
+// Purpose:
+// - Collects all style modules using `@forward`
+// - Serves as the central import point for `bundle.scss`
+// - Helps control load order and export public mixins/variables
+//
+// Usage:
+// - `bundle.scss` uses this via `@use 'bootstrap';`
+// - Do not define styles here directly
+//
+// Note:
+// - To add new sheets/components/config files, forward them here.
+// -----------------------------------------------------------------------------
+
+
+@forward 'sheets-v1/active-effect';
+@forward 'sheets-v1/actor';
+@forward 'sheets-v1/chat-message';
+@forward 'sheets-v1/foundry';
+@forward 'sheets-v1/item';
+@forward 'sheets-v1/modifiers';
+@forward 'sheets-v1/modifiers-container';
+@forward 'sheets-v1/test';
+
+@forward 'overrides/forien-quest-log';
+@forward 'overrides/tagify';

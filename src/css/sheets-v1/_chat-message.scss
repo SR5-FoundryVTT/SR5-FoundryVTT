@@ -1,10 +1,13 @@
-@import 'config';
+@use '../config';
+
+// we should not be using it here, but got to fix switching to oklch
+@use 'sass:color';
 
 .sr5 {
     &.chat-card {
-        @include sheet;
+        @include config.sheet;
         font-style: normal;
-        font-size: 1rem;
+        @include config.font-size(16);
 
         /**
          * Content with this class should be hidden from players eyes
@@ -17,13 +20,13 @@
         .clickable:hover {
             cursor: pointer;
             background: #4b4a44;
-            color: $white;
+            color: config.$white;
         }
 
         .card-header {
             padding: 0.25em 0;
-            border-bottom: $groove;
-            
+            border-bottom: config.$groove;
+
 
             img {
                 flex: 0 0;
@@ -39,17 +42,17 @@
                 align-self: center;
                 flex: 1;
                 margin: 0;
-                font-size: var(--font-size-12);
+                @include config.font-size(12);
             }
         }
         .card-header:first-of-type {
-            color: $yellow;
-            border-color: $yellow;
+            color: config.$yellow;
+            border-color: config.$yellow;
         }
         .button {
-            color: $color;
-            border-color: $black;
-            background: rgba($light, 0.2);
+            color: config.$color;
+            border-color: config.$black;
+            background: color.adjust(config.$light, $alpha: -0.8);
             border-radius: 0.3em;
             text-align: center;
             margin-top: 0.5em;
@@ -62,17 +65,17 @@
 
             &:hover {
                 cursor: pointer;
-                // box-shadow: 0 0 0.25em 0.15em $black;
+                // box-shadow: 0 0 0.25em 0.15em config.$black;
                 outline: none;
                 box-shadow: 0 0 5px var(--color-shadow-primary);
             }
         }
         .card-description {
             span {
-                border-right: $groove;
+                border-right: config.$groove;
                 padding: 0;
                 padding-right: 0.3em;
-                font-size: 0.75em;
+                @include config.font-size(12);
 
                 &:last-child {
                     border-right: none;
@@ -80,9 +83,9 @@
                 }
             }
             .card-description-content {
-                border-bottom: $groove;
+                border-bottom: config.$groove;
             }
-        }        
+        }
 
         .damage-line {
             margin-top: 0.25em;
@@ -94,11 +97,11 @@
     }
     &.roll-card {
         margin: 0.15em;
-        font-size: 12px;
+        @include config.font-size(12);
 
         .card-title {
             display: flex;
-            border-bottom: $groove;
+            border-bottom: config.$groove;
             justify-content: flex-start;
             align-content: center;
             align-items: flex-end;
@@ -126,10 +129,10 @@
                 white-space: nowrap;
                 // Override Foundry default header styling.
                 border-bottom: none;
-                color: $white;
+                color: config.$white;
 
                 &:hover {
-                    text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower, 1px 1px 0 $cornflower;
+                    text-shadow: -1px -1px 0 #6495ed, 1px -1px 0 #6495ed, -1px 1px 0 #6495ed, 1px 1px 0 #6495ed;
                 }
             }
 
@@ -161,8 +164,8 @@
             .place-template {
                 padding: 2px 5px;
                 line-height: 1em;
-                color: $black;
-                font-size: 18px;
+                color: config.$black;
+                @include config.font-size(18);
                 margin-right: 1em;
                 flex: 0;
             }
@@ -176,11 +179,11 @@
         }
         .card-description {
             padding: 0.25em;
-            border-bottom: $groove;
+            border-bottom: config.$groove;
             display: none;
         }
         .card-content {
-            border-bottom: $groove;
+            border-bottom: config.$groove;
 
             padding: 0.25em 0.25em 0.25em;
             display: flex;
@@ -242,10 +245,10 @@
                 }
             }
             p {
-                font-size: 0.8em;
+                @include config.font-size(12);
             }
             h3 {
-                font-size: 1em;
+                @include config.font-size(14);
                 margin: 0;
                 font-weight: bold;
             }
@@ -270,8 +273,8 @@
                 }
             }
             .test-code {
-                @include systemFonts;
-                font-size: var(--font-size-12);
+                @include config.systemFonts;
+                @include config.font-size(12);
             }
             &.can-wrap {
                 flex-flow: row wrap;
@@ -288,7 +291,7 @@
         }
         .dice-rolls {
             display: none;
-            border-bottom: $groove;
+            border-bottom: config.$groove;
         }
         .dice-roll-content {
             padding: 0.5em 0.5em;
@@ -296,14 +299,14 @@
             flex-flow: row wrap;
             justify-content: center;
             .dice-roll {
-                background-image: url(/icons/svg/d6-grey.svg);
+                background-image: config.asset('d6-grey.svg', 'icons/svg/');
                 background-size: 24px 24px;
-                font-size: 16px;
+                @include config.font-size(16);
                 font-weight: bold;
                 text-align: center;
                 width: 24px;
                 line-height: 24px;
-                
+
                 // Consistent margin on top, if missing result boxes will clip.
                 margin-top: 5px;
 
@@ -320,7 +323,7 @@
         .glitch-content {
             display: flex;
             flex-flow: column;
-            border-bottom: $groove;
+            border-bottom: config.$groove;
 
             .glitch {
                 position: relative;
@@ -369,7 +372,7 @@
 
             @media only screen and (max-width: 400px) {
                 .glitch {
-                    font-size: 3em;
+                    @include config.font-size(48);
                 }
             }
 
@@ -410,6 +413,6 @@
     }
     .chat-select-link img:hover {
         padding: 0;
-        border: $groove;
+        border: config.$groove;
     }
 }

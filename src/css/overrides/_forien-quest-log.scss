@@ -1,5 +1,7 @@
 /** This is intended to replace foriens Quest Log to Match its CSS to Shadowrun Styles
  */
+@use '../config';
+
  #forien-quest-log.window-app .window-content {
     overflow: visible;
 }
@@ -14,7 +16,7 @@ body:not(.theme-dark) #forien-quest-log .window-content, .window-app.forien-ques
     border-radius: 0 0 5px 5px;
     margin: 0;
     padding: 0;
-    background: url("assets/light-page.webp") repeat;
+    background: config.asset('light-page.webp') repeat;
 }
 
 .window-app .window-content {
@@ -30,21 +32,19 @@ body:not(.theme-dark) #forien-quest-log .window-content, .window-app.forien-ques
 }
 
 #forien-quest-log .actions i.fa-play, .window-app.forien-quest-preview .actions i.fa-play {
-    font-size: 14px;
+    @include config.font-size(14);
     padding-top: 2px;
-    color: $yellow;
+    color: config.$yellow;
 }
 body #forien-quest-log .quest-log .log-body header {
-    background:
-        $nameplate-background,
-        url("assets/page.webp") repeat;
-    background-repeat: no-repeat, repeat;
-    background-size: 100% 41px, auto; // first layer = 60px tall
+    // removed the background asset, to better support light mode
+    background: var(--sr5-application-title-background) no-repeat;
+    background-size: 100% var(--font-size-40, 2.5rem), auto; // first layer = 60px tall
     background-position: center, top;
     border-radius: 0;
     text-align: left !important;
     text-indent: 5px;
-    color: $white;
+    color: config.$white;
     border-width: 0;
     height: 80px;
     border-block-end: 2px solid var(--palette-primary,var(--default-primary-accent,#782e22));
@@ -58,25 +58,25 @@ body #forien-quest-log .quest-log .log-body header {
 
 //table list hover
 body #forien-quest-log .quest-log .table ul li.drag-quest:hover {
-    border-color: var(--palette-primary,var(--default-primary-accent,$red));
-    box-shadow: 0 0 2px var(--palette-primary,var(--default-primary-accent,$red)) inset; //$red is the var for Red
+    border-color: var(--palette-primary,var(--default-primary-accent,config.$red));
+    box-shadow: 0 0 2px var(--palette-primary,var(--default-primary-accent,config.$red)) inset; //config.$red is the var for Red
 }
 
 body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .quest-giver-name h2:hover {
-    color: var(--palette-primary,var(--default-primary-accent,$darkred));
-    text-shadow: 0 0 5px #fff, 0 0 3px #fff, 0 0 4px $darkred, 0 0 5px $darkred, 0 0 5px $darkred, 0 0 4px $darkred, 0 0 4px $white; /* Add this line for glow */
+    color: var(--palette-primary,var(--default-primary-accent,config.$darkred));
+    text-shadow: 0 0 5px #fff, 0 0 3px #fff, 0 0 4px config.$darkred, 0 0 5px config.$darkred, 0 0 5px config.$darkred, 0 0 4px config.$darkred, 0 0 4px config.$white; /* Add this line for glow */
 }
 
 .tox .tox-tbtn svg {
     display: block;
-    fill: $white;
+    fill: config.$white;
 }
 
 
 body #forien-quest-log .quest-log .log-body header h1 {
     align-self: flex-end;
     border: none;
-    font-size: medium;
+    @include config.font-size(16);
     margin: 0;
     padding-bottom: 26px;
     background: rgba(255, 255, 255, 0);
@@ -89,28 +89,28 @@ body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .
     margin: 0;
     transition: color .3s ease;
     background: #ffffff00;
-    color: $darkred;
+    color: config.$darkred;
 }
 
 body #forien-quest-log .actions-single i, .window-app.forien-quest-preview .actions-single i {
     cursor: pointer;
-    font-size: 18px;
+    @include config.font-size(18);
     transition: color .3s ease;
-    color: $yellow;
+    color: config.$yellow;
 }
 //h1 quest Log
 body #forien-quest-log h1, .window-app.forien-quest-preview h1 {
     flex: 0 0 1px;
-    font-size: 22px;
+    @include config.font-size(22);
     font-weight: 700;
     line-height: 1;
     margin: 0 0 8px;
     padding: 0 0 30px;
-    color: #ffffff;
+    color: var(--sr5-text-primary);
 }
 // h1 quest log header
 body #forien-quest-log h1, .window-app.forien-quest-preview h1 {
-    color: $white;
+    color: config.$white;
 }
 
 body #forien-quest-log h1, body .window-app.forien-quest-preview h1 {
@@ -121,46 +121,44 @@ body #forien-quest-log h1, body .window-app.forien-quest-preview h1 {
 
 // h4 Quest Log
 body #quest-tracker .window-header h4 {
-    color: $yellow;
-    font-size: large;
+    color: config.$yellow;
+    @include config.font-size(20);
 }
 //h2
 body #forien-quest-log .quest-log .table ul .title h2, body .window-app.forien-quest-preview h2 {
     border-width: 2px;
-    font-size: 20px;
+    @include config.font-size(20);
     font-weight: 700;
     margin: 4px;
     padding: 0px;
-    color: $edge;
-    background: $fadedBlack;
+    color: config.$edge;
+    background: config.$fadedBlack;
 }
 
 
 body #quest-tracker .quest .title a, #quest-tracker .quest .title i {
     filter: drop-shadow(1px 1px 1px #000);
-    font-size: medium;
-    color: $yellow;
+    @include config.font-size(16);
+    color: config.$yellow;
 }
 
 body .window-app.forien-quest-preview .quest-body .details-header .quest-setup .quest-title {
     align-items: center;
     display: flex;
     justify-content: space-between;
-    background:
-        $nameplate-background,
-        url("assets/page.webp") repeat;
-    background-repeat: no-repeat, repeat;
-    background-size: 100% 41px, auto; // first layer = 60px tall
+    // removed background asset to better support light mode
+    background: var(--sr5-application-title-background) no repeat;
+    background-size: 100%  var(--font-size-40, 2.5rem), auto;
     background-position: center, top;
     border-radius: 0;
 }
 
 body .window-app.forien-quest-preview .quest-body .quest-info .quest-col-right .quest-tasks .toggleState:hover {
-    color: var(--palette-primary,var(--default-primary-accent,$yellow));
+    color: var(--palette-primary,var(--default-primary-accent,config.$yellow));
 }
 
 body #forien-quest-log .actions i.fa-times-circle, .window-app.forien-quest-preview .actions i.fa-times-circle {
-    color: $red;
+    color: config.$red;
 }
 
 body .quest-tasks ul {
@@ -170,16 +168,16 @@ body .quest-tasks ul {
 body .window-app.forien-quest-preview .quest-body .quest-info .quest-col-right header {
     border-block-end: 2px solid var(--palette-primary,var(--default-primary-accent,#782e22));
     border-bottom: 2px solid var(--palette-primary,var(--default-primary-accent,#782e22));
-    color: $edge;
+    color: config.$edge;
     display: flex;
     flex: 0 0 1px;
     margin-bottom: 4px;
-    background: $fadedBlack;
+    background: config.$fadedBlack;
 }
 //table h2
 body #forien-quest-log .quest-log .table ul li.drag-quest {
     align-items: center;
-    background: $fadedBlack;
+    background: config.$fadedBlack;
     border: 1px solid #0000;
     border-radius: 5px;
     display: flex;
@@ -190,7 +188,7 @@ body #forien-quest-log .quest-log .table ul li.drag-quest {
 }
 //title h2
 body #forien-quest-log .quest-log .table ul .title h2 {
-    color: $edge;
+    color: config.$edge;
     background: #00000000;
 }
 
@@ -201,12 +199,12 @@ body .open-quest.tasks {
 //Buttons
 body .window-app.forien-quest-preview .quest-body .quest-info .quest-col-right button {
     flex: 0 0 1px;
-    font-size: 15px;
+    @include config.font-size(15);
     height: 20px;
     line-height: 1;
     white-space: nowrap;
-    background: $darkred;
-    color: $white;
+    background: config.$darkred;
+    color: config.$white;
 }
 
 #forien-quest-log button, .window-app.forien-quest-preview button {
@@ -217,33 +215,33 @@ body .window-app.forien-quest-preview .quest-body .quest-info .quest-col-right b
     margin-right: 4px;
     margin-top: 2px;
     transition: border-color .3s ease,background .3s ease,box-shadow .3s ease;
-    background: $darkred;
-    color: $white;
+    background: config.$darkred;
+    color: config.$white;
 }
 //Play
 #forien-quest-log .actions i.move.fas.fa-play:hover, .window-app.forien-quest-preview .actions i.move.fas.fa-play:hover {
-    color: $green;
+    color: green;
 }
 //Trashbin
 body #forien-quest-log .actions i.delete.fas.fa-trash:hover, body .window-app.forien-quest-preview .actions i.delete.fas.fa-trash:hover {
-    color: $fLightRed;
+    color: config.$fLightRed;
 }
 
 body #forien-quest-log .actions i.fa-trash, body .window-app.forien-quest-preview .actions i.fa-trash {
-    color: $fDarkRed;
+    color: config.$fDarkRed;
 }
 //Back to deactive
 body #forien-quest-log .actions i.move.fas.fa-stop-circle:hover, body .window-app.forien-quest-preview .actions i.move.fas.fa-stop-circle:hover {
-    color: $edge;
+    color: config.$edge;
 }
 
 //Make Available
 #forien-quest-log .actions i.move.fas.fa-clipboard:hover, .window-app.forien-quest-preview .actions i.move.fas.fa-clipboard:hover {
-    color: $edge;
+    color: config.$edge;
 }
 
 body #forien-quest-log .quest-log .table ul .title p {
-    color: $white;
+    color: config.$white;
 }
 //End Quest Log Styles
 
@@ -254,31 +252,32 @@ body #forien-quest-log .quest-log .table ul .title p {
 // Public Roll
 .chat-message,
 .chat-message.emote {
-    color: $white;
-    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)), url("assets/page.webp") repeat;
-    border: 1px solid $dark;
+    color: config.$white;
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)), config.asset('page.webp') repeat;
+    border: 1px solid config.$dark;
     .message-content.h2{
-        color: $yellow;
+        color: config.$yellow;
     }
     a.content-link{
         background: none;
+        color: config.$light;
     }
 }
 
 //Icons
 span.fa.fa-calendar{
-    color: $yellow;
+    color: config.$yellow;
 }
 
 //headers
 .message-content{
 h2{
-    color: $yellow;
-    font-size: 1.5em;
-    border-bottom: 1px solid $edge;
+    color: config.$yellow;
+    @include config.font-size(20); // i do not know what the parent was, it was parent +50%
+    border-bottom: 1px solid config.$edge;
 }}
 h4.message-sender{
-    font-size: small;
-    color: $white;
+    @include config.font-size(13);
+    color: config.$white;
 }
 //End Simple Calendar

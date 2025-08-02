@@ -1,0 +1,55 @@
+@use 'variables';
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:color';
+
+@function asset($path, $prefix: 'assets/') {
+    @return url('#{variables.$base-url}#{$prefix}#{$path}');
+}
+
+@function round-decimals($number, $places: 2) {
+    $factor: math.pow(10, $places);
+    @return math.div(math.round($number * $factor), $factor);
+}
+
+@function createColorMap($inputColor) {
+    $result-map: ();
+    $oklch-base: color.to-space($inputColor, oklch);
+    $lightness-base: color.channel($oklch-base, 'lightness');
+    $start: math.round(math.div($lightness-base, 10));
+
+    @for $i from 1 through 9 {
+        $step: $i * 100;
+        $offset: ($i - $start) * 10;
+        $new-lightness: math.clamp(0%, $lightness-base + $offset, 100%);
+
+        $variant: color.adjust($oklch-base, $lightness: $new-lightness - $lightness-base);
+        $correctedVariant: color.to-gamut($variant, rgb, $method: local-minde);
+
+        $rounded-lightness: round-decimals(color.channel($correctedVariant, 'lightness', $space: oklch));
+        $rounded-chroma: round-decimals(color.channel($correctedVariant, 'chroma', $space: oklch));
+        $rounded-hue: round-decimals(color.channel($correctedVariant, 'hue', $space: oklch));
+
+        $result-map: map.set(
+            $result-map,
+            $step,
+            color.change(
+                $correctedVariant,
+                $lightness: $rounded-lightness,
+                $chroma: $rounded-chroma,
+                $hue: $rounded-hue,
+                $space: oklch
+            )
+        );
+    }
+
+    @return $result-map;
+}
+
+@function getColorFromMap($inputColor, $target) {
+    @return map.get($inputColor, $target);
+}
+
+@function getColor($color-scheme, $color, $shade) {
+    @return map.get(map.get($color-scheme, $color), $shade);
+}

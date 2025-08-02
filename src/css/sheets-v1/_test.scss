@@ -1,7 +1,7 @@
 /**
  * CSS for Success Test Dialog styling.
  */
-@import 'config';
+@use '../config';
 
 .sr5.form-dialog {
   .dialog-title {
@@ -10,7 +10,7 @@
 
   .form-group {
     /**
-     * Lazy hack to allow for a two segment elemnt style, with the right ones text 
+     * Lazy hack to allow for a two segment elemnt style, with the right ones text
      * being flush to the end.
      */
     .form-group-element-2 {

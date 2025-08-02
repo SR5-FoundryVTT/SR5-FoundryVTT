@@ -1,3 +1,12 @@
+@use 'sass:math';
+@use 'variables';
+@use 'theme';
+@use 'functions';
+
+// sadly we got to use it here too, gotta remove
+// it asap
+@use 'sass:color';
+
 @mixin basic-rollable {
     &:hover {
         @include linkHovered;
@@ -11,19 +20,19 @@
 }
 
 @mixin systemFonts {
-    font-family: $systemFonts;
+    font-family: variables.$sans-font-stack;
 }
 
 @mixin title {
-    font-family: $systemFonts;
-    color: $color;
+    font-family: variables.$sans-font-stack;
+    color: theme.$color;
     @include textOutline;
 }
 
 @mixin textOutline {
-    color: $color;
-    text-shadow: -1px -1px 0 $outline-color, 1px -1px 0 $outline-color, -1px 1px 0 $outline-color,
-        1px 1px 0 $outline-color;
+    color: theme.$color;
+    text-shadow: -1px -1px 0 theme.$outline-color, 1px -1px 0 theme.$outline-color, -1px 1px 0 theme.$outline-color,
+        1px 1px 0 theme.$outline-color;
 }
 
 @mixin shortUnder {
@@ -34,16 +43,30 @@
         position: absolute;
         width: 50%;
         transform: translateX(50%);
-        border-bottom: $border-under;
+        border-bottom: theme.$border-under;
     }
 }
 
 @mixin sheet {
-    background: linear-gradient(rgba(0, 0, 0, 0.60), rgba(0, 0, 0, 0.60)), url("assets/page.webp") repeat;
-    color: $color;
+    background: linear-gradient(
+            #{color.adjust(theme.$dark-base, $alpha: -0.4)},
+            #{color.adjust(theme.$dark-base, $alpha: -0.4)}
+        ),
+        #{functions.asset("page.webp")} repeat;
+    color: theme.$color;
 }
 
 @mixin linkHovered {
     text-shadow: 0 0 8px var(--color-shadow-primary);
-    color: $fLightRed;
+    color: theme.$fLightRed;
+}
+
+/// Apply a FoundryVTT font size using a CSS variable fallback.
+/// Example: @include font-size(16);
+/// Base size that foundry uses at the moment (v13) is 14.
+@mixin font-size($px, $lh: null) {
+  font-size: var(--font-size-#{$px}, #{math.div($px, 16)}rem);
+  @if $lh != null {
+      line-height: $lh;
+  }
 }

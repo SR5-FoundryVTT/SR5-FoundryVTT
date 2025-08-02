@@ -1,68 +1,19 @@
-$systemFonts: 'Signika', 'Palatino Linotype', sans-serif;
+/// Global system variables unrelated to theming.
+/// Layout dimensions, assets paths, etc.
+///
+/// Should NOT set any CSS custom properties. Purely for internal SCSS usage.
+///
+/// Examples:
+/// - $actor-sheet-min-height: 43.125rem
+/// - $window-header-height: 1.25rem
+/// - $sans-font-stack: 'Signika', sans-serif;
 
-$black: black;
-$blue: blue;
-$cornflower: #6495ed;
-$green: green;
-$red: red;
-$grey: grey;
-$white: white;
-$darkblue: darkblue;
-$crimson: crimson;
-$darkred: #55101e;
-$light: darken($white, 10%);
-$light-1: darken($light, 10%);
-$light-2: darken($light-1, 10%);
-$dark: darken($grey, 20%);
-$dark2: #222;
-$dark-sunken: #41404073; //Removed as no longer needed in situational modifiers
-$matrix-green: rgb(7, 145, 35);
-$mce-background: #939393;
-$yellow: #ebb531;
-$freshImportColor: #ffdc80;
-$pdfColor: #ebb531a6;//#e67260;
-$fadedBlack: #000000b8;
-$fLightRed: #cc5e5e;
-$fDarkRed: #af0505;
-$bgrButton: rgba(70, 7, 7, 0.692);
+$base-url: '/systems/shadowrun5e/dist/';
 
-$stun: $blue;
-$physical: $red;
-$matrix: $matrix-green;
+$sans-font-stack: 'Signika', sans-serif;
+$serif-font-stack:  'Palatino Linotype', serif;
+$mono-font-stack: monospace;
 
-$edge: #C7B002;
 
-$roll-limit-hit: $green;
-$roll-failure-background: #ffdddd;
-$roll-failure-border: #6e0000;
-
-$rollcolor: $darkblue;
-
-$color: $white;
-$inner-color: $white;
-$outline-color: $black;
-
-$groove-width: 1px;
-$groove-color: $dark;
-$groove: $groove-width solid $groove-color;
-$light-border: $dark;
-
-$dark-sunken-box-shadow: inset 0 0 3px 0 $darkred, 0 -2px 2px -1px $darkred, -2px 0 2px -2px $fDarkRed, -2px 0 2px -2px $fDarkRed, 2px 0 2px -2px $darkred, 2px 0 2px -2px $darkred, 0 3px 3px -3px $fLightRed, 0 2px 2px -2px $fLightRed, 0 1px 1px -1px $fLightRed;
-
-$radius: 0.25em;
-$small-distance: 0.15em;
-$medium-distance: 0.25em;
-$large-distance: 0.5em;
-
-$border-under: 1px groove $groove-color;
-
-$sheetbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
-    url('assets/brushed_metal.jpg') repeat;
-
-$popupbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
-    url('assets/brushed_metal.jpg') repeat;
-
-$grid__cols: 12;
-$sheet-max-width: 690px;
-
-$nameplate-background: linear-gradient(to right, $darkred 30%, rgba(85, 16, 30, 0.0) 100%);
+$actor-sheet-min-width: 54.375rem;
+$actor-sheet-min-height: 43.125rem;

@@ -1,4 +1,5 @@
-@import 'config';
+@use '../config';
+
 .sr5.item {
     min-height: 484px;
     min-width: 600px;
@@ -26,15 +27,15 @@
         display: flex;
         flex-flow: row nowrap;
         align-items: stretch;
-        // border: $groove;
+        // border: config.$groove;
         .item-name {
-            @include systemFonts;
+            @include config.systemFonts;
             border: 0px;
             flex: 1;
             height: 60px;
-            font-size: var(--font-size-20);
+            @include config.font-size(20);
             .display {
-                background: $nameplate-background;
+                background: var(--sr5-application-title-background);
                 border: none;
                 height: 35px;
                 margin-top: 11px;
@@ -50,8 +51,8 @@
             height: 2em;
 
             .source-button {
-                color: $light;
-                font-size: 16px;
+                color: config.$light;
+                @include config.font-size(16);
                 height: 2em;
                 left: .5em;
                 padding: 2px;
@@ -70,10 +71,10 @@
             }
         }
         .item-type {
-            @include systemFonts;
+            @include config.systemFonts;
             flex: 0;
             padding: 0 0.5em;
-            color: $color;
+            color: config.$color;
             display: flex;
             flex-flow: column;
             align-content: center;
@@ -81,7 +82,7 @@
         }
         .item-image {
             max-width: 100px;
-            border-right: $groove;
+            border-right: config.$groove;
             margin-bottom: 0;
             padding-bottom: 0;
             border: none;
@@ -89,17 +90,17 @@
         .item-info {
             flex: 1;
             > :not(:last-child) {
-                border-bottom: $groove;
+                border-bottom: config.$groove;
             }
 
             .toggle-fresh-import-off {
                 flex-grow: 0;
-                background-color: $bgrButton;
+                background-color: config.$bgrButton;
             }
         }
     }
     .technology {
-        @include systemFonts;
+        @include config.systemFonts;
         min-width: 12em;
         padding-top: 10px;
         padding-left: 10px;
@@ -111,7 +112,7 @@
         }
 
         label {
-          color: $yellow;
+          color: config.$yellow;
         }
 
         .tech-adjustable-label {
@@ -134,7 +135,7 @@
             right: 0.5em;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 0.8em;
+            @include config.font-size(11);
             pointer-events: none;
           }
         }
@@ -153,9 +154,9 @@
             max-width: 14em;
         }
         .header {
-            @include title;
-            font-size: 1.25em;
-            color: $yellow;
+            @include config.title;
+            @include config.font-size(18);
+            color: config.$yellow;
         }
         .form-line {
             display: flex;
@@ -164,17 +165,17 @@
             align-content: center;
             padding: 0.1em 0.25em;
             &.advanced{
-                color: $yellow;
+                color: config.$yellow;
             }
             > * {
                 flex: 1;
             }
             .label {
-                color: $light;
-                font-size: 1.15em;
-                @include systemFonts;
+                color: config.$light;
+                @include config.font-size(16);
+                @include config.systemFonts;
                 &.advanced{
-                    color: $yellow;
+                    color: config.$yellow;
                 }
             }
             .inputs {
@@ -182,7 +183,7 @@
                 flex-flow: row;
                 justify-content: flex-end;
                 align-items: center;
-                font-size: 0.75em;
+                @include config.font-size(11);
                 &.between {
                     justify-content: space-between;
                 }
@@ -203,22 +204,22 @@
                 }
             }
             select {
-                color: $color;
-                background: rgba($black, 0.05);
+                color: config.$color;
+                background: rgba(config.$black, 0.05);
                 border-radius: 0.3em;
-                border-color: $dark;
+                border-color: config.$dark;
                 > option {
-                    background-color: $dark;
+                    background-color: config.$dark;
                 }
             }
             input {
-                color: $color;
-                background: rgba($black, 0.05);
+                color: config.$color;
+                background: rgba(config.$black, 0.05);
                 border-radius: 0.3em;
-                border-color: $dark;
+                border-color: config.$dark;
             }
             label {
-                color: $yellow;
+                color: config.$yellow;
             }
         }
     }
@@ -230,7 +231,7 @@
 
         & .window-header {
             border-bottom: none;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), config.asset('page.webp') repeat;
             background-repeat: repeat;
             background-size: 100% 20px auto;
             flex: 0 0 20px;
@@ -241,12 +242,12 @@
             & a {
             display: inline-flex;
             padding: 6px 0 0 0;
-            font-size: 0px;
+            font-size: 0;
             color: rgb(100, 100, 100);
 
             & .fa-solid,
                 & .fas {
-                    font-size: 12px;
+                    @include config.font-size(12);
                 }
             }
 

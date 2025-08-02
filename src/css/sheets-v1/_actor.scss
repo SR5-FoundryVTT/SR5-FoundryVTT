@@ -1,8 +1,8 @@
-@import 'config';
+@use '../config';
 
 .sr5.actor {
-    min-height: 690px;
-    min-width: 870px;
+    min-height: config.$actor-sheet-min-height;
+    min-width: config.$actor-sheet-min-width;
     .window-content {
         border: none;
         border-bottom-left-radius: 8px;
@@ -15,9 +15,9 @@
         overflow: hidden;
     }
     .name {
-        @include systemFonts;
-        background: $nameplate-background;
-        font-size: 200%;
+        @include config.systemFonts;
+        background: var(--sr5-application-title-background);
+        @include config.font-size(28); // bastardization, this sets the height of the container not the font size!
         margin-bottom: 0;
         padding-left: 5px;
         input[type=text].display {
@@ -29,10 +29,9 @@
         flex: 1;
     }
     .limit-title {
-        font-size: 115%;
+        @include config.font-size(16);
     }
     .attributes {
-        // border-top: $;
         display: flex;
         flex-flow: row;
         flex-wrap: nowrap;
@@ -48,14 +47,14 @@
             flex-wrap: wrap;
         }
         .attribute {
-            @include title;
+            @include config.title;
 
             align-items: center;
-            color: $yellow;
+            color: config.$yellow;
             display: flex;
             flex-flow: column nowrap;
             flex: 1 0 auto;
-            font-size: 100%;
+            @include config.font-size(14);
             justify-content: space-evenly;
             min-width: 4em;
             padding-top: 4px;
@@ -94,22 +93,22 @@
             > .attribute-value {
                 > .attribute-value-total {
                     color: white;
-                    font-size: 125%;
+                    @include config.font-size(18);
                     width: 100%;
                     text-align: center;
                 }
             }
 
             > .attribute-name {
-                font-size: 115%;
+                @include config.font-size(16);
                 width: 100%;
                 text-align: center;
                 margin-bottom: 0;
                 &.icon {
-                    font-size: 0.75em;
+                    @include config.font-size(12);
                 }
                 &.roll {
-                    @include rollable;
+                    @include config.rollable;
                 }
             }
 
@@ -118,7 +117,7 @@
                 position: relative;
                 margin-bottom: 2px;
                 .mod {
-                    font-size: 0.75em;
+                    @include config.font-size(12);
                     margin-top: -2px;
                 }
                 &.row {
@@ -133,13 +132,13 @@
             }
 
             .toggle-fresh-import-all-off {
-                font-size: 0.75em;
-                background-color: $bgrButton;
+                @include config.font-size(12);
+                background-color: config.$bgrButton;
             }
 
             .toggle-fresh-import-all-on {
-                font-size: 0.75em;
-                background-color: $bgrButton;
+                @include config.font-size(12);
+                background-color: config.$bgrButton;
             }
 
             .track {
@@ -183,11 +182,11 @@
         }
     }
     .limit {
-        @include systemFonts;
+        @include config.systemFonts;
         padding: 0 0.1em;
         margin-top: -2px;
         text-align: center;
-        font-size: 115%;
+        @include config.font-size(16);
         display: flex;
         flex-flow: column nowrap;
         justify-content: center;
@@ -197,7 +196,7 @@
 
     // Interaction Element for Skill Lists
     .skill-header {
-        @include rollable;
+        @include config.rollable;
     }
 
     // Sprite sheet power tab list had broken flex/block relations, causing missing a scrollbar.
@@ -218,7 +217,7 @@
 
         & .window-header {
             border-bottom: none;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), config.asset('page.webp') repeat;
             background-repeat: repeat;
             background-size: 100% 20px auto;
             flex: 0 0 20px;
@@ -229,12 +228,12 @@
             & a {
             display: inline-flex;
             padding: 6px 0 0 0;
-            font-size: 0px;
+            font-size: 0;
             color: rgb(100, 100, 100);
 
             & .fa-solid,
                 & .fas {
-                    font-size: 12px;
+                    @include config.font-size(12);
                 }
             }
 
@@ -246,7 +245,7 @@
 }
 
 .sr5 #filter-skills.display.text.left {
-    font-size: 15px;
+    @include config.font-size(15);
 }
 
 /**
@@ -263,4 +262,9 @@
         flex-flow: column nowrap;
         overflow: hidden;
     }
+}
+
+.sr5 .flexcol-skills {
+    display: flex;
+    flex-direction: column;
 }
