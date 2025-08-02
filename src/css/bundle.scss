@@ -603,10 +603,6 @@ input[type='text'].display {
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
-        // This is a hack due to broken flex / grid styling on the current sheet, making fixed heights necessary for scroll bars.
-        // Raising this above 300px (remaining sheet height on default sheet dimension), will break scroll behavior
-        // on default dimensions
-        max-height: 300px;
         min-height: 0;
     }
 
