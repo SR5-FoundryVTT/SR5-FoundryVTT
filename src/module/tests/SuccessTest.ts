@@ -26,7 +26,6 @@ import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
-import { MatrixTestData } from './MatrixTest';
 
 export interface TestDocuments {
     // Legacy field that used be the source document.
@@ -2176,7 +2175,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Determine actors to roll test with.
         // build documents based on the category, matrix can target individual icons
         let documents = (againstData.categories.includes('matrix'))
-                                    ? await Helpers.getMatrixTestTargetDocuments(againstData as MatrixTestData)
+                                    ? await Helpers.getMatrixTestTargetDocuments(againstData as any)
                                     : await Helpers.getOpposedTestTargets(againstData);
 
         // Inform user about tokens with deleted sidebar actors.

@@ -125,7 +125,6 @@ export const MatrixFlow = {
 
     async determineMatrixFailedAttack(test: SuccessTest | OpposedTest) {
         if (!test.opposing) return;
-        console.log('SMM Handling matrix damage resist', test);
 
         // @ts-expect-error - Only OpposedTest has this property
         const against = test.against as SuccessTest;
@@ -160,7 +159,6 @@ export const MatrixFlow = {
 
     /**
      * Send out a chat message to apply damage to the attacker for failing an attack action
-     * TODO: Add param typing
      */
     async sendFailedAttackActionMessage(templateData) {
         const content = await renderTemplate(
@@ -174,7 +172,6 @@ export const MatrixFlow = {
 
     /**
      * Send out a chat message to inform the GM about convergenace and provide actions for it.
-     * TODO: Add param typing
      */
     async sendOverwatchConvergenceMessage(templateData) {
         const content = await renderTemplate(

@@ -94,9 +94,7 @@ export const MatrixTestDataFlow = {
         const icon = (test as MatrixTest).icon;
 
         if (icon) {
-            console.log('processing target', icon);
             // get the target's persona if the target itself is not an item
-            // TODO n3rf this could probably be cleaned up
             const targetItem = (icon instanceof SR5Item)
                 ? icon : icon instanceof SR5Actor ? icon.hasPersona
                     ? icon.getMatrixDevice() : undefined : undefined;

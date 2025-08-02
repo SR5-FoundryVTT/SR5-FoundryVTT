@@ -164,12 +164,26 @@ export class MatrixRules {
         return false;
     }
 
+    /**
+     * Sleaze Actions are defined as a test using the Sleaze attribute, generally as a Limit
+     * see Sleaze Actions on pg 231
+     * @param attribute
+     * @param attribute2
+     * @param limit
+     */
     static isSleazeAction(attribute: Shadowrun.ActorAttribute, attribute2: Shadowrun.ActorAttribute, limit: Shadowrun.ActorAttribute): boolean {
         const illegal = 'sleaze';
         return attribute === illegal || attribute2 === illegal || limit === illegal;
 
     }
 
+    /**
+     * Attack Actions are defined as a test using the Attack attribute, generally as a Limit
+     * see Attack Actions on pg 231
+     * @param attribute
+     * @param attribute2
+     * @param limit
+     */
     static isAttackAction(attribute: Shadowrun.ActorAttribute, attribute2: Shadowrun.ActorAttribute, limit: Shadowrun.ActorAttribute): boolean {
         const illegal = 'attack';
         return attribute === illegal || attribute2 === illegal || limit === illegal;
@@ -261,6 +275,8 @@ export class MatrixRules {
             },
         };
 
+        // Intervene is defined in Kill Code pg39
+        // this needs to perform a roll and then add the hits of that roll as a bonus modifier
         if (weapon.isSlave) {
             activeDefenses['intervene'] = {
                 label: 'SR5.Intervene',

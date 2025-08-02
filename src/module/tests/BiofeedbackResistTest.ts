@@ -158,7 +158,6 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
         const documents = againstData.action.test === 'MatrixResistTest'
                                             ? await Helpers.getMatrixTestTargetDocuments(againstData as any)
                                             : await Helpers.getTestTargetDocuments(againstData)
-        console.log('executeMessageAction', foundry.utils.duplicate(againstData), documents);
         await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
     }
 }

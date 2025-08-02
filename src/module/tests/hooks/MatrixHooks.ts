@@ -8,11 +8,8 @@ import { SuccessTest } from '../SuccessTest';
 export const MatrixHooks = {
     registerHooks: function () {
         Hooks.on('sr5_testPrepareBaseValues', MatrixHooks.onTestPrepareBaseValues_AddMatrixModifiers.bind(this));
-        // add extra damage to attack_matrix actions
         Hooks.on('sr5_testProcessResults', MatrixHooks.onTestProcessResults_AddMatrixDamageForTargetMarks.bind(this));
-        // add overwatch score for illegal actions
         Hooks.on('sr5_testProcessResults', MatrixHooks.onTestProcessResults_AddOverwatchScore.bind(this));
-        // failed matrix attacks deal 1 damage to the attacker (unresisted)
         Hooks.on('sr5_afterTestComplete', MatrixHooks.onAfterTestComplete_HandleMatrixFailedAttack.bind(this));
     },
 

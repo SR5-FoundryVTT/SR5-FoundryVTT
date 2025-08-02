@@ -544,13 +544,11 @@ export class SR5Actor extends Actor {
 
     /**
      * Get the Attribute to add when making a Full Matrix Defense
-     * - TODO should we make a world setting on if this should sync with the full defense attribute? make a second modifier?
      */
     getFullMatrixDefenseAttribute(): Shadowrun.AttributeField | undefined {
         if (this.isVehicle()) {
             return this.findVehicleStat('pilot');
         } else if (this.isCharacter()) {
-            // todo make this customizable
             return this.findAttribute('willpower');
         }
     }
@@ -2240,7 +2238,9 @@ export class SR5Actor extends Actor {
         return ActorRollDataFlow.getRollData(this, rollData, options);
     }
 
-    // TODO make this an overrideable item somehow, certain qualities can change the amount of damage that a mark does
+    /**
+     * Get the amount of damage each extra mark does when getting attacked in the matrix
+     */
     getExtraMarkDamageModifier() {
         return 2;
     }

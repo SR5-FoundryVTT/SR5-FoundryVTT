@@ -413,6 +413,7 @@ export const registerItemLineHelpers = () => {
      */
     Handlebars.registerHelper('ItemRightSide', function (item: Shadowrun.ShadowrunItemData): ItemListRightSide[] {
         const wrapper = new SR5ItemDataWrapper(item);
+        const newItem = new SR5Item(item);
         const qtyInput = {
             input: {
                 type: 'number',
@@ -423,8 +424,8 @@ export const registerItemLineHelpers = () => {
 
         const cmField = {
                 text: {
-                    text: wrapper.isBroken() ? game.i18n.localize('SR5.Broken') : `[${wrapper.getConditionMonitor().value}/${wrapper.getConditionMonitor().max}]`,
-                    cssClass: wrapper.isBroken() ? 'is-broken' :  wrapper.isDamaged() ? 'is-damaged' : '',
+                    text: newItem.isBroken ? game.i18n.localize('SR5.Broken') : `[${newItem.getConditionMonitor().value}/${newItem.getConditionMonitor().max}]`,
+                    cssClass: newItem.isBroken ? 'is-broken' :  newItem.isDamaged ? 'is-damaged' : '',
             }
         }
 
@@ -813,6 +814,7 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('InventoryItemIcons', function (item: Shadowrun.ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
+        const newItem = new SR5Item(item);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
             title: game.i18n.localize('SR5.MoveItemInventory')
@@ -826,14 +828,14 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.Broken')
         }
         const wirelessIcon = {
-            icon: `${wrapper.isWireless() ?
-                        wrapper.isRunningSilent() 
+            icon: `${newItem.isWireless() ?
+                        newItem.isRunningSilent 
                                 ? 'fa-duotone fa-wifi-fair' 
                                 : 'fas fa-wifi' 
                         : 'fa-duotone fa-wifi-slash'
                     } item-wireless-toggle`,
-            title: game.i18n.localize(wrapper.isWireless()
-                                        ? wrapper.isRunningSilent()
+            title: game.i18n.localize(newItem.isWireless()
+                                        ? newItem.isRunningSilent
                                             ? 'SR5.RunningSilent'
                                             : 'SR5.WirelessOnline'
                                         : 'SR5.WirelessOffline')
@@ -861,8 +863,8 @@ export const registerItemLineHelpers = () => {
             case 'cyberware':
             case 'bioware':
             case 'weapon':
-                if (!wrapper.isBroken()) {
-                    if (wrapper.canBeWireless()) {
+                if (!newItem.isBroken) {
+                    if (newItem.canBeWireless) {
                         icons.unshift(wirelessIcon)
                     }
                     icons.unshift(equipIcon);
