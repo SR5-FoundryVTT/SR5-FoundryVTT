@@ -1,5 +1,7 @@
-import { ParserSelector } from "./ParserSelector";
 import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { ParserSelector } from "./ParserSelector";
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
 
 /**
  * Parses all gear from a chummer character file and turns them into foundry sr item data objects
@@ -10,21 +12,22 @@ export class GearsParser {
      * Parses all chummer gear entries
      * @param chummerGears Array of chummer gear entries
      */
-    async parseGears(chummerGears : any, assignIcons : boolean) : Promise<any> {
-        let items : any[] = [];
+    async parseGears(chummerGears: Unwrap<NonNullable<ActorSchema['gears']>['gear']>[], assignIcons: boolean) {
+        const items: Shadowrun.EquipmentItemData[] = [];
         const iconList = await IconAssign.getIconFiles();
 
-        chummerGears.forEach(async (chummerGear) => {
+        for (const chummerGear of chummerGears) {
             try {
                 // First filter out gear entries, that we do not want to handle.
                 if (!this.gearShouldBeParsed(chummerGear)) {
-                    return;
+                    continue;
                 }
 
                 const itemData = this.parseGearEntry(chummerGear);
 
                 // Assign the icon if enabled
-                if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                if (assignIcons)
+                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                 items.push(itemData);
             }
@@ -32,18 +35,18 @@ export class GearsParser {
             catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return items;
     }
 
-    private parseGearEntry(chummerGear : any) : any {
+    private parseGearEntry(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>) {
         const parserSelector = new ParserSelector();
         const parser = parserSelector.select(chummerGear);
         return parser.parse(chummerGear);
     }
 
-    private gearShouldBeParsed(chummerGear : any) : boolean {
+    private gearShouldBeParsed(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): boolean {
         // We do not handle grenades and rockets here since they are also in the weapons section with more info.
         const englishGearName = (chummerGear.name_english as string).toLowerCase();
         if (englishGearName.startsWith('grenade') ||

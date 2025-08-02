@@ -1,33 +1,37 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions.js"
-import * as IconAssign from '../../../../iconAssigner/iconAssign.js';
+import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
+import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { ActorSchema } from "../../ActorSchema";
+import { Unwrap } from "../ItemsParser";
+
 
 export class RitualParser {
-    async parseRituals(chummerChar, assignIcons) {
-        const items = getArray(chummerChar.spells.spell).filter(chummerSpell => chummerSpell.category_english.includes("Rituals"));
-        const parsedItems = [];
+    async parseRituals(chummerChar: ActorSchema, assignIcons: boolean) {
+        const items = getArray(chummerChar.spells?.spell).filter(chummerSpell => chummerSpell.category_english.includes("Rituals"));
+        const parsedItems: any[] = [];
         const iconList = await IconAssign.getIconFiles();
 
-        items.forEach(async (item) => {
+        for (const item of items) {
             try {
                 if (item.alchemy.toLowerCase() !== 'true') {
                     const itemData = this.parseRitual(item);
 
                     // Assign the icon if enabled
-                    if (assignIcons) {itemData.img = await IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system)};
+                    if (assignIcons)
+                        itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
 
                     parsedItems.push(itemData);
                 }
             } catch (e) {
                 console.error(e);
             }
-        });
+        };
 
         return parsedItems;
     }
 
-    parseRitual(chummerRitual) {
+    parseRitual(chummerRitual: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
         const parserType = 'ritual';
-        const system = {};
+        const system = {} as any;
 
         this.prepareSystem(system, chummerRitual)
         this.prepareAction(system)
@@ -36,7 +40,7 @@ export class RitualParser {
         system.importFlags = genImportFlags(formatAsSlug(chummerRitual.name_english), parserType);
         setSubType(system, parserType, formatAsSlug(chummerRitual.category_english));
 
-        return createItemData(chummerRitual.name, parserType, system);
+        return createItemData(chummerRitual.name, parserType as any, system);
     }
 
     prepareSystem(system, chummerRitual) {

@@ -1,6 +1,8 @@
-import { parseDescription, parseTechnology, formatAsSlug, genImportFlags } from "./BaseParserFunctions.js"
-import { DataDefaults } from "../../../../../data/DataDefaults.js";
-import { SR5 } from "../../../../../config.js";
+import { parseDescription, parseTechnology, formatAsSlug, genImportFlags } from "./BaseParserFunctions"
+import { DataDefaults } from "../../../../../data/DataDefaults";
+import { ActorSchema } from "../../ActorSchema";
+import { SR5 } from "../../../../../config";
+import { Unwrap } from "../ItemsParser";
 
 /**
  * Parses a certain class of gear (depending on the implementation).
@@ -10,14 +12,14 @@ export interface GearParser {
      * Parses a gear entry and returns the corresponding foundry sr item data.
      * @param chummerGear A chummer gear entry
      */
-    parse(chummerGear : any) : any
+    parse: (chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>) => any
 }
 
 /**
  * Base class for all gear parsers. Parses common information across all gear.
  */
 export class BaseGearParser implements GearParser {
-    parse(chummerGear : any) : any {
+    parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): any {
         const parsedGear = this.getDefaultData();
         const parserType = 'equipment';
         parsedGear.name = chummerGear.name;

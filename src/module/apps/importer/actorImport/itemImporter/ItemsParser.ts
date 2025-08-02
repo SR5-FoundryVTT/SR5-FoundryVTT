@@ -1,16 +1,19 @@
-import { getArray } from "./importHelper/BaseParserFunctions.js"
-import { GearsParser } from "./importHelper/GearsParser.js"
-import { ArmorParser } from "./armorImport/ArmorParser.js";
-import { WareParser } from "./wareImport/WareParser.js";
-import { QualityParser } from "./bioImport/QualityParser.js";
-import { PowerParser } from "./magicImport/PowerParser.js";
-import { SpellParser } from "./magicImport/SpellParser.js";
-import { WeaponParser } from "./weaponImport/WeaponParser.js";
-import { LifestyleParser } from "./bioImport/LifestyleParser.js";
-import { ContactParser } from "./bioImport/ContactParser.js";
-import SimpleParser from "./importHelper/SimpleParser.js";
-import { CritterPowerParser } from "./magicImport/CritterPowerParser.js";
-import { RitualParser } from "./magicImport/RitualParser.js";
+import { getArray } from "./importHelper/BaseParserFunctions"
+import { GearsParser } from "./importHelper/GearsParser"
+import { ArmorParser } from "./armorImport/ArmorParser";
+import { WareParser } from "./wareImport/WareParser";
+import { QualityParser } from "./bioImport/QualityParser";
+import { PowerParser } from "./magicImport/PowerParser";
+import { SpellParser } from "./magicImport/SpellParser";
+import { WeaponParser } from "./weaponImport/WeaponParser";
+import { LifestyleParser } from "./bioImport/LifestyleParser";
+import { ContactParser } from "./bioImport/ContactParser";
+import SimpleParser from "./importHelper/SimpleParser";
+import { CritterPowerParser } from "./magicImport/CritterPowerParser";
+import { RitualParser } from "./magicImport/RitualParser";
+import { ActorSchema } from "../ActorSchema";
+
+export type Unwrap<T> = T extends Array<infer U> ? U : T;
 
 /**
  * Parses all items (qualities, weapons, gear, ...) from a chummer character.
@@ -22,8 +25,8 @@ export class ItemsParser {
      * @param {*} chummerChar The chummer char holding the items
      * @param {*} importOptions Additional import option that specify what items will be imported.
      */
-    async parse(chummerChar, importOptions) {
-        const promises = [];
+    async parse(chummerChar: ActorSchema, importOptions) {
+        const promises: Promise<Shadowrun.ShadowrunItemData[]>[] = [];
         Object.freeze(chummerChar)
 
         if (importOptions.qualities && chummerChar.qualities?.quality) {
@@ -65,12 +68,12 @@ export class ItemsParser {
         }
 
         if(chummerChar.metamagics?.metamagic) {
-            let metamagics = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("metamagic"))
+            const metamagics = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("metamagic"))
             promises.push(new SimpleParser().parseCollection(metamagics, "metamagic", importOptions.assignIcons));
         }
 
         if(chummerChar.metamagics?.metamagic) {
-            let echoes = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("echo"))
+            const echoes = getArray(chummerChar.metamagics.metamagic).filter(meta => meta.improvementsource.toLowerCase().includes("echo"))
             promises.push(new SimpleParser().parseCollection(echoes, "echo", importOptions.assignIcons));
         }
 
