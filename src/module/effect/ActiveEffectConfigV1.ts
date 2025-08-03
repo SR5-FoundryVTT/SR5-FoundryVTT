@@ -110,4 +110,28 @@ export class ActiveEffectConfigV1 extends DocumentSheet {
     data.statuses ??= [];
     return data;
   }
+
+  /**
+   * Method is overriden from Application to resolve issues with effect modules not 
+   * - finding the config class, due to the class rename
+   * - hooks being called with DOM elements instead of jQuery objects
+   */
+  _callHooks(hookName, html, ...hookArgs) {
+    for ( const cls of this.constructor._getInheritanceChain() ) {
+      if ( !cls.name ) continue;
+      const formatHook = typeof hookName === "string" ? className => `${hookName}${className}` : hookName;
+
+      // START - Support for Foundry v13 versions of Effect Macro module
+      let hook = formatHook(cls.name);
+      if (hook === 'renderActiveEffectConfigV1') {
+        // Change hook name to whats expected by Foundry default and therefore modules.
+        hook = 'renderActiveEffectConfig';
+        // Convert Jquery back to DOM element for Foundry v13 behavior.
+        html = html.get()[0];
+      }
+      // END 
+
+      Hooks.callAll(hook, this, html, ...hookArgs);
+    }
+  }
 }
