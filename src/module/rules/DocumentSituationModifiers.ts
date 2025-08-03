@@ -357,8 +357,8 @@ export class DocumentSituationModifiers {
      */
     static async setDocumentModifiers(document: Shadowrun.ModifiableDocumentTypes, modifiers: SituationModifiersSourceData) {
         if (document instanceof SR5Actor) {
-            // Disable diffing to overwrite the whole object. 
-            await document.update({'system.situation_modifiers': modifiers}, {diff: false});
+            // Overwrite the whole modifier object.
+            await document.update({'system.==situation_modifiers': modifiers});
         } else {
             // Due to active selection merging by Foundry mergeObject, we need to delete first.
             await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);

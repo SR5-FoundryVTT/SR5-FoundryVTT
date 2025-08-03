@@ -14,7 +14,7 @@ export class VehicleModImporter extends DataImporter {
         return await VehicleModImporter.ParseItems<Mod, Shadowrun.ModificationItemData>(
             jsonObject.mods.mod,
             {
-                compendiumKey: "Modification",
+                compendiumKey: () => "Vehicle_Mod",
                 parser: new VehicleModParser(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);

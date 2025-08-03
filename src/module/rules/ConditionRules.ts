@@ -14,7 +14,7 @@ export const ConditionRules = {
      */
     determineDefeatedStatus: (actor: SR5Actor): DefeatedStatus => {
         const stun = actor.getStunTrack();
-        const phyiscal = actor.getPhysicalTrack();
+        const physical = actor.getPhysicalTrack();
         const matrix = actor.getMatrixTrack();
 
         let unconscious = false;
@@ -25,11 +25,11 @@ export const ConditionRules = {
         if (actor.isIC() || actor.isSprite()) {
             dead = matrix?.value === matrix?.max;
         } else if (actor.isVehicle() || actor.isGrunt()) {
-            dead = phyiscal?.value === phyiscal?.max;
+            dead = physical?.value === physical?.max;
         } else {
             unconscious = stun?.value === stun?.max;
-            dying = phyiscal?.value === phyiscal?.max;
-            dead = phyiscal?.overflow.value === phyiscal?.overflow.max;
+            dying = physical?.value === physical?.max;
+            dead = dying && physical?.overflow.value === physical?.overflow.max;
         }
 
         return {

@@ -14,7 +14,7 @@ export class QualityImporter extends DataImporter {
         return await QualityImporter.ParseItems<Quality, Shadowrun.QualityItemData>(
             jsonObject.qualities.quality,
             {
-                compendiumKey: "Trait",
+                compendiumKey: () => "Quality",
                 parser: new QualityParser(),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);

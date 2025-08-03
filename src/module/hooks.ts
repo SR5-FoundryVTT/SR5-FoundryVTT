@@ -62,10 +62,7 @@ import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from
 import { MatrixNetworkFlow } from './item/flows/MatrixNetworkFlow';
 import { AutocompleteInlineHooksFlow } from './effect/autoinline/AutocompleteInlineHooksFlow';
 import { ActionFollowupFlow } from './item/flows/ActionFollowupFlow';
-
 import { registerSystemKeybindings } from './keybindings';
-
-import { canvasInit } from './canvas';
 import { SR5CallInActionSheet } from './item/sheets/SR5CallInActionSheet';
 import { SR5ChatMessage } from './chatMessage/SR5ChatMessage';
 import VisionConfigurator from './vision/visionConfigurator';
@@ -84,6 +81,9 @@ import { SocketMessage } from './sockets';
 import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
 import { MatrixTest } from './tests/MatrixTest';
 import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
+import { RoutingLibIntegration } from './integrations/routingLibIntegration';
+import { SR5TokenDocument } from './token/SR5TokenDocument';
+import { SR5TokenRuler } from './token/SR5TokenRuler';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -93,10 +93,17 @@ export class HooksManager {
         console.log('Shadowrun 5e | Registering system hooks');
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
-        Hooks.once('init', HooksManager.init.bind(HooksManager));
+        Hooks.once('init', () => {
+            HooksManager.init();
+            
+            // Custom Module Integrations
+            // See src/module/integartions for more information.
+            if (game.modules.get('routinglib')?.active) {
+                RoutingLibIntegration.init();
+            }
+        });
         Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
 
-        Hooks.on('canvasInit', canvasInit.bind(HooksManager));
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
@@ -104,6 +111,8 @@ export class HooksManager {
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
         // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(HooksManager));
+        Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(SR5Token));
+        Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(SR5Token));
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
         Hooks.on('deleteItem', HooksManager.onDeleteItem.bind(HooksManager));
         Hooks.on('deleteActor', HooksManager.onDeleteActor.bind(HooksManager));
@@ -295,6 +304,25 @@ ___________________
         CONFIG.ActiveEffect.legacyTransferral = false;
 
         CONFIG.Token.objectClass = SR5Token;
+        CONFIG.Token.documentClass = SR5TokenDocument;
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        CONFIG.Token.rulerClass = SR5TokenRuler;
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        CONFIG.Token.movement.actions['run'] = {
+            label: 'SR5.MovementTypes.Run',
+            icon: 'fa-solid fa-person-running',
+            canSelect: () => false,
+            // @ts-expect-error TODO: foundry-vtt-types v13
+            getAnimationOptions: () => ({ movementSpeed: CONFIG.Token.movement.defaultSpeed * 2 }),
+        };
+        // @ts-expect-error TODO: foundry-vtt-types v13
+        CONFIG.Token.movement.actions['sprint'] = {
+            label: 'SR5.MovementTypes.Sprint',
+            icon: 'fa-solid fa-person-running-fast',
+            canSelect: () => false,
+            // @ts-expect-error TODO: foundry-vtt-types v13
+            getAnimationOptions: () => ({ movementSpeed: CONFIG.Token.movement.defaultSpeed * 3 }),
+        };
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
@@ -403,7 +431,7 @@ ___________________
 
     /**
      * Handle drop events on the hotbar creating different macros.
-     * 
+     *
      * NOTE: FoundryVTT Hook callbacks won't be resolved when returning a promise.
      *       While this function calls async methods, it's order of operations isn't important.
      *
@@ -425,7 +453,7 @@ ___________________
 
     static getSceneControlButtons(controls) {
         if (game.user?.isGM) {
-            const overwatchScoreTrackControl = { 
+            const overwatchScoreTrackControl = {
                 name: 'overwatch-score-tracker',
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',
                 icon: 'fas fa-network-wired',

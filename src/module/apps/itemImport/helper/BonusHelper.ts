@@ -139,7 +139,7 @@ export class BonusHelper {
                     sheet, { name: "Shared Tolerance" },
                     [
                         { key: "system.modifiers.pain_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
-                        { key: "system.modifiers.stun_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
+                        { key: "system.modifiers.pain_tolerance_stun", value: cm.sharedthresholdoffset._TEXT },
                     ],
                 );
             }

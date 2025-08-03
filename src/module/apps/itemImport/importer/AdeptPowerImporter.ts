@@ -13,7 +13,7 @@ export class AdeptPowerImporter extends DataImporter {
         return await AdeptPowerImporter.ParseItems<Power, Shadowrun.AdeptPowerItemData>(
             jsonObject.powers.power,
             {
-                compendiumKey: "Trait",
+                compendiumKey: () => "Adept_Power",
                 parser: new AdeptPowerParser(),
                 errorPrefix: "Failed Parsing Complex Form"
             }

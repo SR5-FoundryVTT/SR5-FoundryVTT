@@ -1,7 +1,7 @@
 {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=lineName}}
   <div>
       {{#ifne id undefined}}
-      <a class="entity-link content-link" draggable="true" data-type="{{type}}" data-id="{{id}}" {{#if pack}}data-pack="{{pack}}"{{/if}}><i class="fas fa-user">{{linkName}}</i></a>
+      <a class="content-link" draggable="true" data-type="{{type}}" data-link data-id="{{id}}" {{#if pack}}data-pack="{{pack}}"{{/if}}><i class="fas fa-user">{{linkName}}</i></a>
       <a class="close entity-remove" data-entity="{{type}}" data-list="{{list}}" data-position={{position}}><i class="fas fa-times"></i></a>
       {{else}}
       {{localize missingLabel}}

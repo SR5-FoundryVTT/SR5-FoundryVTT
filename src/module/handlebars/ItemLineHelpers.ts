@@ -1217,4 +1217,14 @@ export const registerItemLineHelpers = () => {
             }}
         ];
     });
+
+    /**
+     * Sprite Power Tabs on the sprite actor need a way to differentiate between different sections based on the
+     * sprite power values.
+     * 
+     * The resulting value will be used for ItemHeader handlebar part itemData to determine the correct section for +Add actions.
+     */
+    Handlebars.registerHelper('SpritePowerItemData', (optional: string) => {
+        return {optional};
+    });
 };

@@ -1468,14 +1468,14 @@ export const SR5 = {
             'hovercraft': 'vehicle/hovercraft',
 
             /* Drones */
-            'drones-micro': 'vehicle/drone',
-            'drones-mini': 'vehicle/drone',
-            'drones-small': 'vehicle/drone',
-            'drones-medium': 'vehicle/drone',
-            'drones-anthro': 'vehicle/anthro',
-            'drones-large': 'vehicle/drone',
-            'drones-huge': 'vehicle/drone',
-            'drones-missile': 'vehicle/drone',
+            'drones-micro': 'drone/micro',
+            'drones-mini': 'drone/mini',
+            'drones-small': 'drone/small',
+            'drones-medium': 'drone/medium',
+            'drones-anthro': 'drone/anthro',
+            'drones-large': 'drone/large',
+            'drones-huge': 'drone/huge',
+            'drones-missile': 'ammo/missile',
         },
         weapon: {
             // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'

@@ -3,6 +3,7 @@ import { Gear,GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { TranslationHelper as TH } from "../../helper/TranslationHelper";
 import DeviceItemData = Shadowrun.DeviceItemData;
+import { CompendiumKey } from "../../importer/Constants";
 
 export class DeviceParser extends Parser<DeviceItemData> {
     protected override parseType: string = 'device';
@@ -43,11 +44,11 @@ export class DeviceParser extends Parser<DeviceItemData> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Gear): Promise<Folder> {
+    protected override async getFolder(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
         const rootFolder = TH.getTranslation('Electronics', {type: 'category'});
         const folderName = TH.getTranslation(categoryData, {type: 'category'});
 
-        return await IH.getFolder('Gear', rootFolder, folderName);
+        return IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

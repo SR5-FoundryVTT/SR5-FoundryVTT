@@ -1,6 +1,7 @@
 import { DataImporter } from './DataImporter';
 import { VehicleParser } from '../parser/vehicle/VehicleParser';
 import { VehiclesSchema, Vehicle } from '../schema/VehiclesSchema';
+import { CompendiumKey } from './Constants';
 
 export class VehicleImporter extends DataImporter {
     public files = ["vehicles.xml"];
@@ -13,7 +14,9 @@ export class VehicleImporter extends DataImporter {
         return await VehicleImporter.ParseItems<Vehicle, Shadowrun.VehicleActorData>(
             jsonObject.vehicles.vehicle,
             {
-                compendiumKey: "Drone",
+                compendiumKey: (jsonData: Vehicle) => {
+                    return jsonData.category._TEXT.includes("Drone") ? "Drone" : "Vehicle";
+                },
                 parser: new VehicleParser(),
                 errorPrefix: "Failed Parsing Vehicle"
             }

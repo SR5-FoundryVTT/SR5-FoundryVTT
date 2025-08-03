@@ -2,6 +2,7 @@ import { Parser } from "../Parser";
 import { Power } from "../../schema/CritterpowersSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import SpritePowerItemData = Shadowrun.SpritePowerItemData;
+import { CompendiumKey } from "../../importer/Constants";
 
 /**
  * Handle a Chummer5a critterpower.xml power element subset for emergent powers to system spirte_power documents.
@@ -20,7 +21,7 @@ export class SpritePowerParser extends Parser<SpritePowerItemData> {
         return system;
     }
 
-    protected override async getFolder(jsonData: Power): Promise<Folder> {
-        return await IH.getFolder('Trait', "Sprite Powers");
+    protected override async getFolder(jsonData: Power, compendiumKey: CompendiumKey): Promise<Folder> {
+        return IH.getFolder(compendiumKey, "Sprite Powers");
     }
 }

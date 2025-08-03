@@ -42,7 +42,8 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
     /**
      * Sprites have support for dropping actors onto them.
      */
-    override async _onDrop(event: DragEvent): Promise<void> {
+    // @ts-expect-error TODO: foundry-vtt-types v13 _onDrop returns void but should return array of documents.
+    override async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -50,7 +51,11 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
 
         const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
 
-        await this._addTechnomancerOnDrop(dropData);
+        // Handle technomancer drops, ignore other actor drops as sprites can't handle them.
+        if (dropData.type === 'Actor') {
+            await this._addTechnomancerOnDrop(dropData);
+            return [];
+        }
 
         return await super._onDrop(event);
     }
@@ -75,5 +80,27 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
         event.stopPropagation();
 
         await this.document.removeTechnomancer();
+    }
+
+    /**
+     * Custom behavior for ListHeader item creation for sprites.
+     */
+    override async _onItemCreate(event: any) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const type = event.currentTarget.closest('.list-header').dataset.itemId;
+        const optional = event.currentTarget.closest('.list-header').dataset.optional;
+
+        switch (type) {
+            // Sprite powers need special handling, as there are different sections for them.
+            case 'sprite_power':
+                if (!optional) return console.error('Shadowrun 5e | Sprite Actor Sheet: Missing optional value for sprite power item creation.');
+                await super._onItemCreate(event, {system: {optional}});
+                break;
+            default:
+                await super._onItemCreate(event);
+                break;
+        }
     }
 }

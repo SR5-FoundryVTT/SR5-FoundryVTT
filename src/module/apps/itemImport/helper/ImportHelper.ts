@@ -1,11 +1,11 @@
 import { BaseItem } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents.mjs';
 import { SR5Item } from "../../../item/SR5Item";
-import { Constants } from '../importer/Constants';
-type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
+import { Constants, CompendiumKey } from '../importer/Constants';
 
 export type OneOrMany<T> = T | T[];
 export type ArrayItem<T> = T extends (infer U)[] ? U : never;
 export type NotEmpty<T> = T extends object ? NonNullable<T> : never;
+type SplitPack<T extends string> = T extends `${infer Scope}.${infer PackName}` ? [Scope, PackName] : never;
 
 /**
  * A utility class providing helper methods for importing and managing data in Foundry VTT.
@@ -56,68 +56,12 @@ export class ImportHelper {
         if (Array.isArray(name) ? name.length === 0 : !name) return [];
 
         type ItemType = CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
-        const pack = game.packs?.get(Constants.MAP_COMPENDIUM_KEY[compKey].pack) as ItemType;
+        const pack = game.packs?.get(Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[compKey]].pack) as ItemType;
 
         return await pack.getDocuments({
             name__in: this.getArray(name),
             ...(types ? { type__in: this.getArray(types) } : {})
         });
-    }
-
-    /**
-     * Retrieves a compendium by its mapped key. If the compendium does not exist, it will be created with the corresponding metadata.
-     *
-     * @param ctype The compendium key (e.g., "Actor" or "Item") mapped in MAP_COMPENDIUM_KEY.
-     * @returns A promise that resolves with the compendium collection.
-     * @throws If the compendium key is invalid or improperly formatted.
-     */
-    public static async GetCompendium(ctype: CompendiumKey): Promise<CompendiumCollection<CompendiumCollection.Metadata>> {
-        const { pack, type } = Constants.MAP_COMPENDIUM_KEY[ctype];
-        let compendium = game.packs.get(pack);
-
-        // Create the compendium if it doesn't exist
-        if (!compendium) {
-            const [scope, packName] = pack.split(".");
-            if (!scope || !packName) throw new Error(`Invalid compendium key: ${pack}`);
-
-            const folderName = game.i18n.localize("SR5.Compendiums.Root");
-            let currentFolder = game.folders?.find(
-                (folder) => folder.name === folderName
-                //@ts-expect-error
-                && folder.type === "Compendium"
-            );
-
-            if (!currentFolder) {
-                currentFolder = await Folder.create({
-                    name: folderName,
-                    //@ts-expect-error
-                    type: "Compendium",
-                    color: "#00cc00"
-                });
-            }
-
-            // Create the compendium pack
-            compendium = await CompendiumCollection.createCompendium({
-                name: packName,
-                label: game.i18n.localize(`SR5.Compendiums.${ctype}`),
-                type: type,
-                package: scope,
-                private: false,
-                path: `packs/${packName}`,
-                ownership: {
-                    PLAYER: "OBSERVER",
-                    TRUSTED: "OBSERVER",
-                    ASSISTANT: "OWNER"
-                }
-            });
-
-            // Manually assign compendium to the folder via settings
-            const config = game.settings.get("core", "compendiumConfiguration") ?? {};
-            Object.assign(config, { [`world.${packName}`]: { folder: currentFolder?.id ?? null } });
-            await game.settings.set("core", "compendiumConfiguration", config);
-        }
-
-        return compendium;
     }
 
     /**
@@ -128,17 +72,14 @@ export class ImportHelper {
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
     public static async NewFolder(ctype: CompendiumKey, name: string, folder: Folder | null = null): Promise<Folder> {
-        const { pack, type } = Constants.MAP_COMPENDIUM_KEY[ctype];
+        const { pack, type } = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[ctype]];
 
-        const folderCreated = await Folder.create(
-            { name: name, type: type, folder: folder?.id ?? null },
-            { pack: pack }
-        );
+        const folderCreated = await Folder.create({ name, type, folder: folder?.id ?? null }, { pack });
 
         if (!folderCreated) throw new Error("Folder creation failed.");
         return folderCreated;
     }
-
+    
     /**
      * Finds or creates a folder within a compendium in Foundry VTT.
      * 
@@ -161,6 +102,69 @@ export class ImportHelper {
         );
 
         return folder || this.NewFolder(ctype, name, parent);
+    }
+
+    /**
+     * Helper method to create a new folder for the import compendium tab.
+     * @param name The name of the folder.
+     * @param parent The parent folder, or `null` if the folder is at the root level.
+     * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
+     */
+    private static async getCompendiumFolder(name: string, parent: Folder | null = null): Promise<Folder> {
+        // @ts-expect-errorx
+        let folder = game.folders?.find(f => f.name === name && f.type === "Compendium" && f.folder === parent);
+        if (!folder)
+            // @ts-expect-error
+            folder = await Folder.create({ name, color: "#00cc00", folder: parent?.id ?? null, type: "Compendium" });
+        return folder!;
+    }
+
+    /**
+     * Retrieves a compendium by its mapped key. If the compendium does not exist, it will be created with the corresponding metadata.
+     *
+     * @param ctype The compendium key (e.g., "Actor" or "Item") mapped in MAP_COMPENDIUM_KEY.
+     * @returns A promise that resolves with the compendium collection.
+     * @throws If the compendium key is invalid or improperly formatted.
+     */
+    public static async GetCompendium(ctype: CompendiumKey): Promise<CompendiumCollection<CompendiumCollection.Metadata>> {
+        const { pack, type, folder, subFolder } = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[ctype]];
+        let compendium = game.packs.get(pack);
+
+        // Create the compendium if it doesn't exist
+        if (!compendium) {
+            const [scope, packName] = pack.split(".") as SplitPack<typeof pack>;
+            if (!scope || !packName) throw new Error(`Invalid compendium key: ${pack}`);
+
+            // Create the compendium pack
+            compendium = await CompendiumCollection.createCompendium({
+                name: packName,
+                label: game.i18n.localize(`SR5.Compendiums.${packName}`),
+                type: type,
+                package: scope,
+                private: false,
+                path: `packs/${packName}`,
+                ownership: {
+                    PLAYER: "OBSERVER",
+                    TRUSTED: "OBSERVER",
+                    ASSISTANT: "OWNER"
+                }
+            });
+
+            // Manually assign compendium to the folder via settings
+            let currentFolder = await this.getCompendiumFolder(game.i18n.localize(`SR5.Compendiums.Folders.Root`));
+
+            if (folder) {
+                currentFolder = await this.getCompendiumFolder(game.i18n.localize(`SR5.Compendiums.Folders.${folder}`), currentFolder);
+                if (subFolder)
+                    currentFolder = await this.getCompendiumFolder(game.i18n.localize(`SR5.Compendiums.Folders.${subFolder}`), currentFolder);
+            }
+
+            const config = game.settings.get("core", "compendiumConfiguration") ?? {};
+            Object.assign(config, { [pack]: { folder: currentFolder?.id ?? null } });
+            await game.settings.set("core", "compendiumConfiguration", config);
+        }
+
+        return compendium;
     }
 
     /**
