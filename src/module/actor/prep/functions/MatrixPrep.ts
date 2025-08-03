@@ -120,14 +120,14 @@ export class MatrixPrep {
         // add Rating as well, which is just a set value
         attributes['rating'] = {
             base: rating,
-            value: rating,
+            value: 0,
             mod: [],
             label: 'SR5.Rating',
             hidden: true,
         }
         limits['rating'] = {
             base: rating,
-            value: rating,
+            value: 0,
             mod: [],
             label: 'SR5.Rating',
             hidden: true,
