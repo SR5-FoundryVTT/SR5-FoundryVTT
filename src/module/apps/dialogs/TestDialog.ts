@@ -2,7 +2,6 @@ import {FormDialog, FormDialogData, FormDialogOptions} from "./FormDialog";
 import {SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
 
 import {SR5} from "../../config";
-import {Helpers} from "../../helpers";
 import { Translation } from '../../utils/strings';
 
 export interface TestDialogData extends FormDialogData {

@@ -4,7 +4,7 @@ import { SR5 } from '../../../../config';
 import { CompendiumKey, Constants } from '../../importer/Constants';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { Weapon, WeaponsSchema } from '../../schema/WeaponsSchema';
+import { Weapon } from '../../schema/WeaponsSchema';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 import RangeData = Shadowrun.RangeData;
@@ -44,7 +44,7 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
 
             // Create a new _id since it will not be created on the creation of the item.
             const accessoryBase = game.items!.fromCompendium(foundItem, { keepId: true }) as Shadowrun.ModificationItemData;
-            // @ts-expect-error
+            // @ts-expect-error foundry-vtt-types v11
             accessoryBase._id = foundry.utils.randomID();
             accessoryBase.system.technology.equipped = true;
 
