@@ -728,8 +728,8 @@
                 "Caretaker": "Insecte Nourrice",
                 "Ceramic": "Ceramique",
                 "Chindi": "Chindi",
-                "Corpse": "Cadavre",
                 "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Cadavre",
                 "Crawler": "Crawler (Démon)",
                 "Croki": "Croki",
                 "Detritus": "Détritus",
@@ -787,8 +787,8 @@
                 "Unbreakable": "Incassable",
                 "Vrygoths": "Vrygoths",
                 "VucubCaquix": "Vucub Caquix",
-                "Water": "Eau",
                 "Watcher": "Beobachterin",
+                "Water": "Eau",
                 "Worker": "Insecte Ouvrier",
                 "Wraith": "Spectre"
             }

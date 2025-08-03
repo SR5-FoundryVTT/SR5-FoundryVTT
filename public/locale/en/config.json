@@ -238,17 +238,17 @@
         "CollapseAll": "Collapse All",
         "CommonProgram": "Common Program",
         "Compendiums": {
+            "Folders": {
+                "Root": "SR5e Imports"
+            },
             "sr5critter": "Critters & Spirits & Sprites",
             "sr5drone": "Drones & Vehicles",
             "sr5gear": "Armors & Gears",
-            "sr5trait": "Quality & Powers",
             "sr5magic": "Spell & Complex Forms",
             "sr5modification": "Modifications",
+            "sr5trait": "Quality & Powers",
             "sr5ware": "Bioware & Cyberware",
-            "sr5weapon": "Weapons",
-            "Folders": {
-                "Root": "SR5e Imports"
-            }
+            "sr5weapon": "Weapons"
         },
         "Compilation": {
             "DropSprite": "Drop Sprite",
@@ -1111,8 +1111,8 @@
                 "Caretaker": "Insect Caretaker",
                 "Ceramic": "Ceramic",
                 "Chindi": "Chindi",
-                "Corpse": "Corpse",
                 "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Corpse",
                 "Crawler": "Crawler (Demon)",
                 "Croki": "Croki",
                 "Detritus": "Detritus",
@@ -1170,8 +1170,8 @@
                 "Unbreakable": "Unbreakable",
                 "Vrygoths": "Vrygoths",
                 "VucubCaquix": "Vucub Caquix",
-                "Water": "Water",
                 "Watcher": "Watcher",
+                "Water": "Water",
                 "Worker": "Insect Worker",
                 "Wraith": "Wraith"
             }
@@ -1311,10 +1311,10 @@
                 "ActionCategories": "Select action categories to use instead of the test's default categories. Using Active Effects you can use categories to modify test values",
                 "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",
                 "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
-                "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
                 "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
-                "DisabledForPreparedActor": "Disabled due to use of prepared actor",
-                "CostAdjustment": "Adjust actual cost based on the item rating"
+                "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
+                "CostAdjustment": "Adjust actual cost based on the item rating",
+                "DisabledForPreparedActor": "Disabled due to use of prepared actor"
             },
             "Modifiers": {
                 "armor": "Modifies total armor value",

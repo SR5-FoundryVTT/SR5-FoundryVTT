@@ -1093,8 +1093,8 @@
                 "Caretaker": "Insekt: Pfleger",
                 "Ceramic": "Keramik",
                 "Chindi": "Chindi",
-                "Corpse": "Leiche",
                 "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Leiche",
                 "Crawler": "Crawler (Dämon)",
                 "Croki": "Croki",
                 "Detritus": "Geröll",
@@ -1152,8 +1152,8 @@
                 "Unbreakable": "Unzerbrechlich",
                 "Vrygoths": "Vrygoths",
                 "VucubCaquix": "Vucub Caquix",
-                "Water": "Wasser",
                 "Watcher": "Beobachter",
+                "Water": "Wasser",
                 "Worker": "Insekt: Arbeiter",
                 "Wraith": "Wraith"
             }
@@ -1290,8 +1290,8 @@
                 "ActionCategories": "Überschreibe alle Standardkategorien der Probe mit dieser Auswahl. Mit einem Active Effect können dadurch die Werte der Action modifiziert werden.",
                 "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",
                 "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
-                "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
                 "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
+                "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
                 "DisabledForPreparedActor": "Deaktiviert da ein vorbereiteter Akteur verwendet wird"
             },
             "Modifiers": {

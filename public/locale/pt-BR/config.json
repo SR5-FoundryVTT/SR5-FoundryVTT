@@ -231,17 +231,17 @@
         "CollapseAll": "Recolher Tudo",
         "CommonProgram": "Programa Comum",
         "Compendiums": {
+            "Folders": {
+                "Root": "Importações SR5e"
+            },
             "sr5critter": "Criaturas & Espíritos & Sprites",
             "sr5drone": "Drones & Veículos",
             "sr5gear": "Armaduras & Equipamentos",
-            "sr5trait": "Qualidades & Poderes",
             "sr5magic": "Magia & Formas Complexas",
             "sr5modification": "Modificações",
+            "sr5trait": "Qualidades & Poderes",
             "sr5ware": "Biônicos & Cibernéticos",
-            "sr5weapon": "Armas",
-            "Folders": {
-                "Root": "Importações SR5e"
-            }
+            "sr5weapon": "Armas"
         },
         "Compilation": {
             "DropSprite": "Soltar Sprite",
@@ -1104,8 +1104,8 @@
                 "Caretaker": "Cuidador de Insetos",
                 "Ceramic": "Cerâmica",
                 "Chindi": "Chindi",
-                "Corpse": "Cadáver",
                 "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Cadáver",
                 "Crawler": "Rastejador (Demônio)",
                 "Croki": "Croki",
                 "Detritus": "Detritos",
@@ -1163,8 +1163,8 @@
                 "Unbreakable": "Inquebrável",
                 "Vrygoths": "Vrygoths",
                 "VucubCaquix": "Vucub Caquix",
-                "Water": "Água",
                 "Watcher": "Observador",
+                "Water": "Água",
                 "Worker": "Inseto Trabalhador",
                 "Wraith": "Espectro"
             }
@@ -1271,13 +1271,13 @@
         "Tooltips": {
             "Actor": {
                 "Critter": "Permitir o uso de poderes de criatura",
+                "DefaultCategoryVisibility": "Mostrar categorias de itens mesmo que nenhum item tenha sido adicionado a eles",
                 "Grunt": "Aplicar regras de soldado a este ator",
                 "Metatype": "Como NPC, o metatipo também aplicará modificadores rápidos de atributo",
                 "MissingSummoner": "Arraste e solte o personagem ou use a ação de invocação",
                 "MissingTechnomancer": "Arraste e solte o personagem ou use a ação de compilação",
                 "NPC": "Marque o ator como NPC para obter recursos adicionais",
-                "ResetActorForNewRun": "Redefinir dano, vantagem, etc. para uma nova corrida",
-                "DefaultCategoryVisibility": "Mostrar categorias de itens mesmo que nenhum item tenha sido adicionado a eles"
+                "ResetActorForNewRun": "Redefinir dano, vantagem, etc. para uma nova corrida"
             },
             "CallInAction": {
                 "ActorType": "Tipo de ator para chamar"
@@ -1304,10 +1304,10 @@
                 "ActionCategories": "Selecione categorias de ação para usar em vez das categorias padrão do teste. Usando Efeitos Ativos, você pode usar categorias para modificar valores de teste",
                 "ActionModifier": "Selecione modificadores de reserva de dados para usar em vez dos modificadores padrão do teste",
                 "ActionRollMode": "Modo de rolagem padrão ao lançar esta ação. Substituirá a configuração global do chat",
-                "AvailabilityAdjustment": "Ajuste a disponibilidade real com base no nível do item",
                 "AmmoReplaceDamage": "Defina para substituir o dano da arma em vez de modificá-lo",
-                "DisabledForPreparedActor": "Desativado devido ao uso de ator preparado",
-                "CostAdjustment": "Ajuste o custo real com base na nível do item"
+                "AvailabilityAdjustment": "Ajuste a disponibilidade real com base no nível do item",
+                "CostAdjustment": "Ajuste o custo real com base na nível do item",
+                "DisabledForPreparedActor": "Desativado devido ao uso de ator preparado"
             },
             "Modifiers": {
                 "armor": "Modifica o valor total da armadura",
