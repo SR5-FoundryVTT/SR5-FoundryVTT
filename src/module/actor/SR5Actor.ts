@@ -542,6 +542,17 @@ export class SR5Actor extends Actor {
         }
     }
 
+    /**
+     * Get the Attribute to add when making a Full Matrix Defense
+     */
+    getFullMatrixDefenseAttribute(): Shadowrun.AttributeField | undefined {
+        if (this.isVehicle()) {
+            return this.findVehicleStat('pilot');
+        } else if (this.isCharacter()) {
+            return this.findAttribute('willpower');
+        }
+    }
+
     getEquippedWeapons(): SR5Item[] {
         return this.items.filter((item: SR5Item) => item.isEquipped() && item.isWeapon);
     }
@@ -1142,7 +1153,7 @@ export class SR5Actor extends Actor {
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
         const testCls = this.tests._getTestClass('SuccessTest') as typeof SuccessTest;
-        const test = new testCls({}, { actor: this }, { showDialog });
+        const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
 
         // Build pool values.
         const pool = new PartsList<number>(test.pool.mod);
@@ -1202,7 +1213,7 @@ export class SR5Actor extends Actor {
      * @param actionName The action with in the general pack.
      * @param options Success Test options
      */
-    async matrixlActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
+    async matrixActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         return await this.packActionTest(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
     }
 
@@ -2225,5 +2236,12 @@ export class SR5Actor extends Actor {
         // Avoid changing actor system data as Foundry just returns it.
         const rollData = foundry.utils.duplicate(super.getRollData());
         return ActorRollDataFlow.getRollData(this, rollData, options);
+    }
+
+    /**
+     * Get the amount of damage each extra mark does when getting attacked in the matrix
+     */
+    getExtraMarkDamageModifier() {
+        return 2;
     }
 }

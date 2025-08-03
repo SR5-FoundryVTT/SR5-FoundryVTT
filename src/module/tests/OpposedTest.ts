@@ -213,6 +213,25 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      *
      * @param event A PointerEvent by user interaction to trigger the test action.
      */
+    static async _castResistAction(event) {
+        event.preventDefault();
+
+        const button = $(event.currentTarget);
+        const card = button.closest('.chat-message');
+
+        // Collect information needed to create the opposed action test.
+        const messageId = card.data('messageId');
+        const resistActionTest = button.data('action');
+
+        const showDialog = !TestCreator.shouldHideDialog(event);
+        await TestCreator.fromMessageAction(messageId, resistActionTest, {showDialog});
+    }
+
+    /**
+     * Using a message action cast an opposed test to that messages active test.
+     *
+     * @param event A PointerEvent by user interaction to trigger the test action.
+     */
     static async _castOpposedAction(event) {
         event.preventDefault();
 
@@ -229,6 +248,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
     static override async chatMessageListeners(message: ChatMessage, html, data) {
         $(html).find('.opposed-action').on('click', OpposedTest._castOpposedAction.bind(this));
+        $(html).find('.resist-action').on('click', OpposedTest._castResistAction.bind(this));
     }
 
     /**
@@ -244,6 +264,34 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         }
 
         return templateData;
+    }
+
+    /**
+     * This class should be used for the opposing test implementation.
+     * - the resist class test will resist any damage
+     */
+    override get _resistTestClass(): any | undefined {
+        if (this.success || !this.data.against?.opposed?.resist) return;
+        return TestCreator._getTestClass(this.data.against.opposed.resist.test);
+    }
+
+    /**
+     * Prepare Resist actions a test allows. These are actions
+     * meant to be taken following completion of an opposed test.
+     */
+    override _prepareResistActionsTemplateData() {
+        if (this.success) return super._prepareResistActionsTemplateData();
+        const testCls = this._resistTestClass;
+        // No opposing test configured. Nothing to build.
+        if (!testCls) return super._prepareResistActionsTemplateData();
+
+        const action = {
+            // Store the test implementation registration name.
+            test: testCls.name,
+            label: testCls.label
+        };
+
+        return [action]
     }
 
     override async afterFailure() {

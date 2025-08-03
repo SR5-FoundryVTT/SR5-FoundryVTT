@@ -1,4 +1,5 @@
 {{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.html'}}
+{{#if test.icon}}
 <div class="sr5 chat-card roll-card">
     <div class="test-line">
         <span class="test-name {{#if roll}}test-roll{{/if}}">
@@ -18,3 +19,4 @@
         </div>
     </div>
 </div>
+{{/if}}

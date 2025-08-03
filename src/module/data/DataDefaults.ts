@@ -347,7 +347,7 @@ export class DataDefaults {
                 value: 0,
                 max: 0,
             },
-            wireless: true,
+            wireless: 'none',
             master: undefined
         }, partialTechnologyData);
     }

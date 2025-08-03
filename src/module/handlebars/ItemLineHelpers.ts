@@ -1,5 +1,5 @@
-import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
-import {SR5} from "../config";
+import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
+import { SR5 } from '../config';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
 import { SR5Item } from '../item/SR5Item';
@@ -413,6 +413,7 @@ export const registerItemLineHelpers = () => {
      */
     Handlebars.registerHelper('ItemRightSide', function (item: Shadowrun.ShadowrunItemData): ItemListRightSide[] {
         const wrapper = new SR5ItemDataWrapper(item);
+        const newItem = new SR5Item(item);
         const qtyInput = {
             input: {
                 type: 'number',
@@ -420,6 +421,19 @@ export const registerItemLineHelpers = () => {
                 cssClass: 'item-qty',
             },
         };
+
+        const cmField = {
+                text: {
+                    text: newItem.isBroken ? game.i18n.localize('SR5.Broken') : `[${newItem.getConditionMonitor().value}/${newItem.getConditionMonitor().max}]`,
+                    cssClass: newItem.isBroken ? 'is-broken' :  newItem.isDamaged ? 'is-damaged' : '',
+            }
+        }
+
+        const technologyItems: ItemListRightSide[] = [];
+
+        if (wrapper.getConditionMonitor().max > 0 && wrapper.getConditionMonitor().value > 0) {
+            technologyItems.push(cmField);
+        }
 
         switch (item.type) {
             case 'action':
@@ -495,7 +509,7 @@ export const registerItemLineHelpers = () => {
                         },
                         qtyInput,
                     ];
-                };
+                }
 
                 if (wrapper.isDroneModification()) {
                     return [
@@ -512,7 +526,7 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
-                return [qtyInput];
+                return [...technologyItems, qtyInput];
             case 'weapon':
                 // Both Ranged and Melee Weapons can have ammo.
                 if (wrapper.isRangedWeapon() || (wrapper.isMeleeWeapon() && item.system.ammo?.current.max > 0)) {
@@ -520,7 +534,7 @@ export const registerItemLineHelpers = () => {
                     const max = wrapper.getAmmo()?.current.max ?? 0;
                     const partialReloadRounds = wrapper.getAmmo()?.partial_reload_value ?? -1;
 
-                    const reloadLinks: ItemListRightSide[] = [];
+                    const reloadLinks: ItemListRightSide[] = technologyItems.slice();
 
                     // Show reload on both no ammo configured and partially consumed clips.
                     const textReload = count < max ?
@@ -567,7 +581,7 @@ export const registerItemLineHelpers = () => {
                     
                     return reloadLinks;
                 } else {
-                    return [qtyInput];
+                    return [...technologyItems, qtyInput];
                 }
 
             case 'quality':
@@ -800,6 +814,7 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('InventoryItemIcons', function (item: Shadowrun.ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
+        const newItem = new SR5Item(item);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
             title: game.i18n.localize('SR5.MoveItemInventory')
@@ -808,6 +823,23 @@ export const registerItemLineHelpers = () => {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
         };
+        const brokenIcon = {
+            icon: 'fa-regular fa-link-slash',
+            title: game.i18n.localize('SR5.Broken')
+        }
+        const wirelessIcon = {
+            icon: `${newItem.isWireless() ?
+                        newItem.isRunningSilent 
+                                ? 'fa-duotone fa-wifi-fair' 
+                                : 'fas fa-wifi' 
+                        : 'fa-duotone fa-wifi-slash'
+                    } item-wireless-toggle`,
+            title: game.i18n.localize(newItem.isWireless()
+                                        ? newItem.isRunningSilent
+                                            ? 'SR5.RunningSilent'
+                                            : 'SR5.WirelessOnline'
+                                        : 'SR5.WirelessOffline')
+        }
         const removeIcon = {
             icon: 'fas fa-trash item-delete',
             title: game.i18n.localize('SR5.DeleteItem'),
@@ -831,7 +863,14 @@ export const registerItemLineHelpers = () => {
             case 'cyberware':
             case 'bioware':
             case 'weapon':
-                icons.unshift(equipIcon);
+                if (!newItem.isBroken) {
+                    if (newItem.canBeWireless) {
+                        icons.unshift(wirelessIcon)
+                    }
+                    icons.unshift(equipIcon);
+                } else {
+                    icons.unshift(brokenIcon);
+                }
         }
 
         return icons;

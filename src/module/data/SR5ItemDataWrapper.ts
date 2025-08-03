@@ -216,7 +216,15 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isWireless(): boolean {
-        return this.getData().technology?.wireless || false;
+        return this.getData().technology?.wireless === 'online' || this.isRunningSilent();
+    }
+
+    isRunningSilent(): boolean {
+        return this.getData().technology?.wireless === 'silent';
+    }
+
+    canBeWireless(): boolean {
+        return this.getData().technology?.wireless !== 'none';
     }
 
     isCyberdeck(): boolean {

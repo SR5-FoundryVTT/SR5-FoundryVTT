@@ -100,6 +100,11 @@ export class Version_0_30_0 extends VersionMigration {
      * @param item A matrix device item containing PAN master.
      */
     protected async MigrateMatrixDeviceData(item: SR5Item, updateData: UpdateData): Promise<UpdateData> {
+        // update wireless to new value based on the current -- for this, assume true is online and false is offline
+        if (updateData.data.technology) {
+            updateData.data.technology.wireless = item.system.technology?.wireless ? 'online' : 'offline'
+        }
+
         updateData.data['technology.-=networkController'] = null;
 
         const uuid = item.system?.technology?.networkController ?? '';
@@ -155,7 +160,7 @@ export class Version_0_30_0 extends VersionMigration {
         // No host exists, or the ic contains invalid host id.
         if (!host) {
             return updateData;
-        };
+        }
 
         // Directly set global storage.
         await NetworkStorage.addSlave(host, actor);

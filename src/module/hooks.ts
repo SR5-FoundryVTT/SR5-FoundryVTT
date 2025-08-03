@@ -81,6 +81,9 @@ import { SRStorage } from './storage/storage';
 import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
 import { MatrixICFlow } from './actor/flows/MatrixICFlow';
 import { SocketMessage } from './sockets';
+import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
+import { MatrixTest } from './tests/MatrixTest';
+import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -171,6 +174,8 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalDefenseTest,
+                MatrixTest,
+                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 PhysicalResistTest,
                 SpellCastingTest,
@@ -195,7 +200,8 @@ ___________________
                 OpposedBruteForceTest,
                 HackOnTheFlyTest,
                 OpposedHackOnTheFlyTest,
-                MatrixResistTest
+                MatrixResistTest,
+                BiofeedbackResistTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -212,6 +218,8 @@ ___________________
                 SpellCastingTest,
                 ComplexFormTest,
                 PhysicalDefenseTest,
+                MatrixTest,
+                MatrixDefenseTest,
                 NaturalRecoveryStunTest,
                 NaturalRecoveryPhysicalTest,
                 DrainTest,
@@ -224,7 +232,8 @@ ___________________
                 RitualSpellcastingTest,
                 BruteForceTest,
                 HackOnTheFlyTest,
-                MatrixResistTest
+                MatrixResistTest,
+                BiofeedbackResistTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -234,6 +243,7 @@ ___________________
             opposedTests: {
                 OpposedTest,
                 PhysicalDefenseTest,
+                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 CombatSpellDefenseTest,
                 OpposedSummonSpiritTest,
@@ -249,7 +259,8 @@ ___________________
              */
             resistTests: {
                 PhysicalResistTest,
-                MatrixResistTest
+                MatrixResistTest,
+                BiofeedbackResistTest
             },
             /**
              * Subset of tests meant to follow a main active test

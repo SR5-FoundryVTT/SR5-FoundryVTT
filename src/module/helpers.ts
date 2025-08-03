@@ -18,6 +18,7 @@ import { SR5Item } from './item/SR5Item';
 import { PartsList } from './parts/PartsList';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
+import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
 
 interface CalcTotalOptions {
     // Min/Max value range
@@ -500,6 +501,24 @@ export class Helpers {
         return actors;
     }
 
+    static async getMatrixTestTargetDocuments(testData: MatrixTestData | OpposedMatrixTestData): Promise<Shadowrun.TestTargetDocument[]> {
+        const documents = await this.getTestTargetDocuments(testData);
+
+        if (testData.iconUuid) {
+            const document = await fromUuid(testData.iconUuid) as Shadowrun.TestTargetDocument;
+
+            if (document instanceof SR5Item) {
+                documents.unshift(document);
+            }
+
+            if (document instanceof SR5Actor) {
+                documents.unshift(document);
+            }
+        }
+
+        return documents;
+    }
+
     /**
      * Given a SuccessTestData subset fetch all target actors.
      *
@@ -553,6 +572,22 @@ export class Helpers {
 
         // Otherwise fallback to default behavior
         return Helpers.getSelectedActorsOrCharacter();
+    }
+
+    /**
+     * Get Matrix targets from a test
+     * @param testData
+     */
+    static async getOpposedMatrixTestTargets(testData: MatrixTestData): Promise<Shadowrun.TestTargetDocument[]> {
+        const overwriteSelectionWithTarget = game.settings.get(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection) as boolean;
+
+        // Honor user preference of using test targets, if any are set.
+        if (overwriteSelectionWithTarget && testData.iconUuid !== '') {
+            return await Helpers.getMatrixTestTargetDocuments(testData);
+        }
+
+        // Otherwise fallback to default behavior
+        return await Helpers.getOpposedTestTargets(testData);
     }
 
     static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateData {

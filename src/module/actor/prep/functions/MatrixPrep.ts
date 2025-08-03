@@ -47,6 +47,7 @@ export class MatrixPrep {
             matrix.is_cyberdeck = device.isCyberdeck();
             matrix.name = device.getName();
             matrix.item = device.getData();
+            matrix.running_silent = device.isRunningSilent();
             const deviceAtts = device.getASDF();
             if (deviceAtts) {
                 // setup the actual matrix attributes for the actor
@@ -112,6 +113,25 @@ export class MatrixPrep {
                 hidden,
             };
         });
+
+        // Add Rating to the Attributes -- this is not in the normal format, so we need to add it separately
+        const rating = matrix.rating;
+
+        // add Rating as well, which is just a set value
+        attributes['rating'] = {
+            base: rating,
+            value: 0,
+            mod: [],
+            label: 'SR5.Rating',
+            hidden: true,
+        }
+        limits['rating'] = {
+            base: rating,
+            value: 0,
+            mod: [],
+            label: 'SR5.Rating',
+            hidden: true,
+        }
     }
 
     static prepareMentalAttributesForDevice(system: CommonData & MatrixActorData, rating?: number) {

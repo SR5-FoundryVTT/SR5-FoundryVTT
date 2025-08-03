@@ -62,6 +62,7 @@
         "AddictionMental": "Mental Addiction",
         "AddictionPhysical": "Physical Addiction",
         "Attack": "Attack Actions",
+        "AttackMatrix": "Attack Matrix",
         "AttackMelee": "Attack Melee",
         "AttackRanged": "Attack Ranged",
         "AttackThrown": "Attack Thrown",
@@ -70,6 +71,7 @@
         "Compiling": "Compiling Actions",
         "ComplexForm": "Complex Form Actions",
         "Defense": "Defense Actions",
+        "DefenseMatrix": "Defense Matrix",
         "DefenseSuppression": "Defense Suppression",
         "Drain": "Drain Actions",
         "Fade": "Fade Actions",
@@ -80,6 +82,7 @@
         "RecoveryPhysical": "Recovery Physical",
         "RecoveryStun": "Recovery Stun",
         "Resist": "Resisting Actions",
+        "ResistBiofeedback": "Resist Biofeedback",
         "ResistDisease": "Resisting Disease",
         "ResistMatrix": "Resist Matrix",
         "ResistToxin": "Resisting Toxin",
@@ -185,6 +188,7 @@
     "SR5.Block": "Block",
     "SR5.Bonus": "Bonus",
     "SR5.Bonuses": "Bonuses",
+    "SR5.Broken": "BROKEN",
     "SR5.Bullet": "Round",
     "SR5.BulletCount": "Bullet Count",
     "SR5.Bullets": "Rounds",
@@ -634,8 +638,11 @@
         },
         "ActorSheet": {
             "AddNetwork": "Direct Connect Network",
+            "Compilations": "Compilations",
             "CreateInventory": "Create inventory place",
             "CritterPowers": "Critter Powers",
+            "ColdSim": "Cold Sim",
+            "DisplayingPersona": "Displaying Persona",
             "DeviceRating": "Device Rating",
             "DeviceSetup": "Device Setup",
             "DisabledOptionCritterPowers": "Optional Critter Powers - Disabled",
@@ -674,11 +681,16 @@
             "PlaceOnDevice": "Place on device",
             "PlaceOnMainIcon": "Place on persona/host"
         },
+        "Matrix": {
+            "TargetMainIcon": "Target Main Icon",
+            "TargetDevice": "Target Device"
+        },
         "Message": {
             "ClickToSelect": "Click to select on scene",
             "OverwatchConvergence": "Overwatch Convergence",
             "TargetedIcon": "Targeted Icon",
-            "TestEffects": "Applied effects"
+            "TestEffects": "Applied effects",
+            "FailedAttackAction": "Failed a Matrix Attack Action"
         },
         "Sheet": {
             "AddOne": "Add One",
@@ -754,6 +766,7 @@
     "SR5.MatrixAttrDataProc": "Data Proc.",
     "SR5.MatrixAttrFirewall": "Firewall",
     "SR5.MatrixAttrSleaze": "Sleaze",
+    "SR5.MatrixDefense": "Matrix Defense",
     "SR5.MatrixNetworkHackingApplication": {
         "Icons": "Icons",
         "Invite": "Ask for invite",
@@ -967,6 +980,7 @@
     "SR5.RtgAboveZero": "Rtg > 0",
     "SR5.Run": "Run",
     "SR5.RunningSilent": "Running Silent",
+    "SR5.RunningSilentControlledByDevice": "Running Silent is controlled by your active Matrix Device:",
     "SR5.RunningSpeed": "Running",
     "SR5.SIN": "SIN",
     "SR5.SameGrid": "Same Grid",
@@ -1278,6 +1292,7 @@
         "AttackDodged": "Attack Dodged",
         "AttackDoesNoPhysicalDamageToVehicle": "Attack Hits But Does No Physical Damage To Vehicle",
         "AttackHits": "Attack Hits",
+        "AttackResisted": "Attack Resisted",
         "BruteForceFailure": "Brute Force failed!",
         "BruteForceSuccess": "Brute Force successful!",
         "Failure": "Failure!",
@@ -1297,6 +1312,7 @@
     },
     "SR5.Tests": {
         "AttributeOnlyTest": "Attribute-Only Test",
+        "BiofeedbackResistTest": "Biofeedback Resist",
         "BruteForceTest": "Brute Force",
         "CombatSpellDefenseTest": "Combat Spell Defense",
         "CompileSpriteTest": "Compile Sprite",
@@ -1307,7 +1323,9 @@
         "ExtendedTest": "Extended Test",
         "FadeTest": "Fade Test",
         "HackOnTheFlyTest": "Hack on the Fly",
+        "MatrixDefenseTest": "Matrix Defense",
         "MatrixResistTest": "Matrix Damage Resist",
+        "MatrixTest": "Matrix Test",
         "MeleeAttackTest": "Melee Weapon Attack",
         "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
         "NaturalRecoveryStunTest": "Natural Recovery Stun",
@@ -1332,6 +1350,7 @@
     "SR5.Threshold": "Threshold",
     "SR5.ToggleActive": "Toggle Active",
     "SR5.ToggleEquip": "Toggle Equipped",
+    "SR5.ToggleWireless": "Toggle Wireless",
     "SR5.Tooltips": {
         "Actor": {
             "ConnectNetwork": "Enter this host/grid",
@@ -1643,6 +1662,9 @@
         "Weapon": "Weapon"
     },
     "SR5.Wireless": "Wireless",
+    "SR5.WirelessOnline": "Online",
+    "SR5.WirelessOffline": "Offline",
+    "SR5.WirelessUnavailable": "Unavailable",
     "TYPES.Actor.character": "Character",
     "TYPES.Actor.critter": "Critter (deprecated)",
     "TYPES.Actor.ic": "IC",
