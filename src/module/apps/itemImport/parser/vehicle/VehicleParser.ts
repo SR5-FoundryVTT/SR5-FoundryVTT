@@ -119,6 +119,6 @@ export class VehicleParser extends Parser<VehicleActorData> {
         const rootFolder = TH.getTranslation(isDrone ? "Drones" : "Vehicles");
         const folderName = TH.getTranslation(category);
 
-        return IH.getFolder(compendiumKey, rootFolder, folderName);
+        return await IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

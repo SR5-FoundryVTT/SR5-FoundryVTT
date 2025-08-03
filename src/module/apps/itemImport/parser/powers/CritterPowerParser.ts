@@ -32,7 +32,7 @@ export class CritterPowerParser extends Parser<CritterPowerItemData> {
         const rootFolder = "Critter Powers";
         const category = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
 
-        return IH.getFolder(compendiumKey, rootFolder, category);
+        return await IH.getFolder(compendiumKey, rootFolder, category);
     }
 
     protected static readonly rangeMap: Record<string, string> = {

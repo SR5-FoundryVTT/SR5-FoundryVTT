@@ -22,6 +22,6 @@ export class SpritePowerParser extends Parser<SpritePowerItemData> {
     }
 
     protected override async getFolder(jsonData: Power, compendiumKey: CompendiumKey): Promise<Folder> {
-        return IH.getFolder(compendiumKey, "Sprite Powers");
+        return await IH.getFolder(compendiumKey, "Sprite Powers");
     }
 }

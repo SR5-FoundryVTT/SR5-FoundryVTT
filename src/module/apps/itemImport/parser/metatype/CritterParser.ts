@@ -173,6 +173,6 @@ export class CritterParser extends MetatypeParserBase<CharacterActorData> {
         const rootFolder = TH.getTranslation("Critter", {type: 'category'});
         const folderName = TH.getTranslation(category, {type: 'category'});
 
-        return IH.getFolder(compendiumKey, rootFolder, folderName);
+        return await IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

@@ -91,7 +91,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         const testCls = this._resistTestClass;
         if (testCls) {
             // create a resist class for biofeedback
-            if (this.data && this.data.messageUuid) {
+            if (this.data?.messageUuid) {
                 const data = await testCls._getResistActionTestData(this.data, this.actor, this.data.messageUuid)
                 const test = new testCls(data, {actor: this.actor}, this.data.options);
                 await test.execute();

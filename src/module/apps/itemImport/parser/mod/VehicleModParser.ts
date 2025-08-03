@@ -34,6 +34,6 @@ export class VehicleModParser extends Parser<ModificationItemData> {
         const rootFolder = "Vehicle-Mods";
         const folderName = validCategory.includes(category) ? category : "Other";
 
-        return IH.getFolder(compendiumKey, rootFolder, folderName);
+        return await IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

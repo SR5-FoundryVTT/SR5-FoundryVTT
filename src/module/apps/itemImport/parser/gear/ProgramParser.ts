@@ -31,6 +31,6 @@ export class ProgramParser extends Parser<ProgramItemData> {
         const rootFolder = TH.getTranslation('Software', {type: 'category'})
         const folderName = TH.getTranslation(categoryData, {type: 'category'});
 
-        return IH.getFolder(compendiumKey, rootFolder, folderName);
+        return await IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

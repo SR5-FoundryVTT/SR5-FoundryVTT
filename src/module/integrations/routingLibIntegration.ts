@@ -48,10 +48,10 @@ declare global {
     }
 
     interface BaseGrid {
-        getOffset(position: Waypoint): GridCoordinate;
+        getOffset: (position: Waypoint) => GridCoordinate;
 
-        getCenterPoint(coordinate: GridCoordinate): Waypoint;
-        getTopLeftPoint(coordinate: GridCoordinate): Waypoint;
+        getCenterPoint: (coordinate: GridCoordinate) => Waypoint;
+        getTopLeftPoint: (coordinate: GridCoordinate) => Waypoint;
 
         size: number;
         sizeX: number;

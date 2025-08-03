@@ -102,6 +102,6 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
         const folderName = TH.getTranslation(category, {type: 'category'});
         const specFolder = category === 'Insect Spirits' ? jsonData.name._TEXT.match(/\(([^)]+)\)/)?.[1] : undefined;
 
-        return IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);
+        return await IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);
     }
 }

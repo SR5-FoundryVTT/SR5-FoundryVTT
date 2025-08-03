@@ -40,6 +40,6 @@ export class WareParser extends Parser<Ware> {
             if (category._TEXT === categoryData)
                 rootFolder = category.$.blackmarket;
 
-        return IH.getFolder(compendiumKey, rootFolder, folderName);
+        return await IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

@@ -203,6 +203,6 @@ export class WeaponParserBase extends Parser<WeaponItemData> {
         const root = WeaponParserBase.GetWeaponType(jsonData).capitalize() ?? "Other";
         const folderName = TH.getTranslation(categoryData, { type: 'category' });
 
-        return IH.getFolder(compendiumKey, root, root === 'Thrown' ? undefined : folderName);
+        return await IH.getFolder(compendiumKey, root, root === 'Thrown' ? undefined : folderName);
     }
 }

@@ -70,6 +70,6 @@ export class AmmoParser extends Parser<AmmoItemData> {
                 specFolder = splitName[0].trim();
         }
 
-        return IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);
+        return await IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);
     }
 }

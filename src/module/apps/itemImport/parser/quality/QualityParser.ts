@@ -24,6 +24,6 @@ export class QualityParser extends Parser<QualityItemData> {
             : TH.getTranslation('Quality', { type: 'category' });
         const folderName = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
 
-        return IH.getFolder(compendiumKey, rootFolder, folderName);
+        return await IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

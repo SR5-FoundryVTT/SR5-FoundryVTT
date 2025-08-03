@@ -44,6 +44,6 @@ export class ComplexFormParser extends Parser<ComplexFormItemData> {
     }
 
     protected override async getFolder(jsonData: Complexform, compendiumKey: CompendiumKey): Promise<Folder> {
-        return IH.getFolder(compendiumKey, "Complex Forms");
+        return await IH.getFolder(compendiumKey, "Complex Forms");
     }
 }

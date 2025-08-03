@@ -57,6 +57,6 @@ export class SpellParserBase extends Parser<SpellItemData> {
     protected override async getFolder(jsonData: Spell, compendiumKey: CompendiumKey): Promise<Folder> {
         const folderName = TH.getTranslation(jsonData.category._TEXT, {type: 'category'});
 
-        return IH.getFolder(compendiumKey, folderName);
+        return await IH.getFolder(compendiumKey, folderName);
     }
 }

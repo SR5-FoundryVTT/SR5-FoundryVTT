@@ -7,7 +7,6 @@ interface Waypoint {
     action: string;
 }
 
-interface MeasureMovementOptions {}
 
 interface MeasurementWaypoint {
     cost: number;
@@ -21,7 +20,7 @@ declare global {
     interface TokenDocument {
         movementAction: string;
         movementHistory: Waypoint[];
-        measureMovementPath(waypoints: Waypoint[], options: MeasureMovementOptions): MovementMeasurement;
+        measureMovementPath: (waypoints: Waypoint[], options: any) => MovementMeasurement;
     }
 }
 
@@ -60,6 +59,7 @@ export class SR5TokenDocument extends TokenDocument {
      * @param waypoints
      * @param options
      */
+    // @ts-expect-error TODO: foundry-vtt-types v13
     override measureMovementPath(waypoints: Waypoint[], options = {}) {
         const measurement = super.measureMovementPath(waypoints, options);
 

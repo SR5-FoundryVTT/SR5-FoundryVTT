@@ -255,7 +255,7 @@ export class Import extends Application {
         getTextForFile: (param: any) => Promise<{ text: string; name: string; } | null>
     ) {
         if (deleteCompendiums)
-            for (const [_, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
+            for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
                 await game.packs?.get(compendium.pack)?.deleteCompendium();
 
         this.parsedFiles = [];

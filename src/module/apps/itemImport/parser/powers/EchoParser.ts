@@ -8,6 +8,6 @@ export class EchoParser extends Parser<EchoItemData> {
     protected override parseType: string = 'echo';
 
     protected override async getFolder(jsonData: Echo, compendiumKey: CompendiumKey): Promise<Folder> {
-        return IH.getFolder(compendiumKey, "Echoes");
+        return await IH.getFolder(compendiumKey, "Echoes");
     }
 }

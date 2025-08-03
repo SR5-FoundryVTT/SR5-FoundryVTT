@@ -64,7 +64,7 @@ module.exports = {
         "@typescript-eslint/return-await": "error",
         "@typescript-eslint/prefer-includes": "error",
         "no-unneeded-ternary": "error",
-        "@typescript-eslint/no-unnecessary-type-assertion": "error",
+        "@typescript-eslint/no-unnecessary-type-assertion": "warn",
         "no-fallthrough": "error",
         "eqeqeq": "error",
         "@typescript-eslint/prefer-readonly": "error",
