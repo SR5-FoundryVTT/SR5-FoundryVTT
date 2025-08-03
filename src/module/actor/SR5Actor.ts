@@ -1153,7 +1153,7 @@ export class SR5Actor extends Actor {
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
         const testCls = this.tests._getTestClass('SuccessTest') as typeof SuccessTest;
-        const test = new testCls({}, { actor: this }, { showDialog });
+        const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
 
         // Build pool values.
         const pool = new PartsList<number>(test.pool.mod);
