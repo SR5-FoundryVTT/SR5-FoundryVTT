@@ -303,6 +303,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         const changes = super.apply(model, change);
 
+        // Remove undefined changes, as there were already applied in ModifiableField.
         for (const key of Object.keys(changes))
             if (changes[key] === undefined)
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
