@@ -7,7 +7,6 @@ import { Helpers } from "../helpers";
 import { ValueFieldType } from "../types/template/Base";
 import { SR5Actor } from "../actor/SR5Actor";
 
-
 export interface OpposedTestValues extends SuccessTestValues {
     // The calculated overall netHits of the active vs opposed test pair.
     againstNetHits: ValueFieldType;
@@ -24,6 +23,7 @@ export interface OpposedTestData extends
     values: OpposedTestValues
     against: SuccessTestData
 }
+
 /**
  * An opposed test results from a normal success test as an opposed action.
  */
