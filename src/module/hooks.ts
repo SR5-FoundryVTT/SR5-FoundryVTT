@@ -102,6 +102,7 @@ import { Cyberware } from './types/item/Cyberware';
 import { Device } from './types/item/Device';
 import { Echo } from './types/item/Echo';
 import { Equipment } from './types/item/Equipment';
+import { Grid } from './types/item/Grid';
 import { Host } from './types/item/Host';
 import { Lifestyle } from './types/item/Lifestyle';
 import { Metamagic } from './types/item/Metamagic';
@@ -119,8 +120,6 @@ import { MatrixICFlow } from './actor/flows/MatrixICFlow';
 import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
 import { MatrixNetworkFlow } from './item/flows/MatrixNetworkFlow';
 import { SocketMessage } from './sockets';
-
-
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -385,6 +384,7 @@ ___________________
         CONFIG.Item.dataModels["device"] = Device;
         CONFIG.Item.dataModels["echo"] = Echo;
         CONFIG.Item.dataModels["equipment"] = Equipment;
+        CONFIG.Item.dataModels["grid"] = Grid;
         CONFIG.Item.dataModels["host"] = Host;
         CONFIG.Item.dataModels["lifestyle"] = Lifestyle;
         CONFIG.Item.dataModels["metamagic"] = Metamagic;

@@ -76,6 +76,9 @@
             "equipment": {
                 "htmlField": ["description.value"]
             },
+            "grid": {
+                "htmlField": ["description.value"]
+            },
             "host": {
                 "htmlField": ["description.value"]
             },
