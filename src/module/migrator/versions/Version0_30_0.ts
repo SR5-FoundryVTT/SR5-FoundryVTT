@@ -9,14 +9,14 @@ import { VersionMigration } from "../VersionMigration";
 export class Version0_30_0 extends VersionMigration {
     readonly TargetVersion = "0.30.0";
 
-    // Considering this a migration so Actor documents can be sanitized.
-    override migrateActor(actor: any) { }
+    // Handle Actor documents so they can be sanitized.
+    override handlesActor(_actor: Readonly<any>) { return true; }
 
     override migrateItem(item: any) {
         if (item.type === 'sin' && item.system?.licenses)
             item.system.licenses = Object.values(item.system.licenses);
 
-        if (item.type === 'modification' && item.system?.mount_point) {
+        if (item.type === 'modification' && typeof item.system?.mount_point === 'string') {
             item.system.mount_point = item.system.mount_point.toLowerCase();
 
             if (item.system?.mount_point === 'under_barrel')
@@ -25,9 +25,13 @@ export class Version0_30_0 extends VersionMigration {
     }
 
     override migrateActiveEffect(effect: any) {
-        const flag = effect.flags?.shadowrun5e;
+        effect.name ??= effect.label || "Unnamed Effect";
+        delete effect.label;
 
+        const flag = effect.flags?.shadowrun5e;
         if (!flag) return;
+
+        effect.system ??= {};
 
         if (flag.applyTo)
             effect.system.applyTo = flag.applyTo;

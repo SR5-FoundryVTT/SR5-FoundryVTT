@@ -2,6 +2,8 @@
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
             name=(localize 'SR5.Labels.ActorSheet.SpritePowers')
             itemId='sprite_power'
+            itemType='sprite_power'
+            itemData=(SpritePowerItemData 'standard')
             icons=(ItemHeaderIcons 'sprite_power')
             rightSide=(ItemHeaderRightSide 'sprite_power')
     }}
@@ -21,6 +23,8 @@
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
             name=(localize 'SR5.Labels.ActorSheet.EnabledOptionSpritePowers')
             itemId='sprite_power'
+            itemType='sprite_power'
+            itemData=(SpritePowerItemData 'enabled_option')
             icons=(ItemHeaderIcons 'sprite_power')
             rightSide=(ItemHeaderRightSide 'sprite_power')
     }}
@@ -40,6 +44,8 @@
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
             name=(localize 'SR5.Labels.ActorSheet.DisabledOptionSpritePowers')
             itemId='sprite_power'
+            itemType='sprite_power'
+            itemData=(SpritePowerItemData 'disabled_option')
             icons=(ItemHeaderIcons 'sprite_power')
             rightSide=(ItemHeaderRightSide 'sprite_power')
     }}

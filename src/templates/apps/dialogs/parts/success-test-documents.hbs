@@ -3,8 +3,7 @@
 {{#if test.data.sourceDocumentIsActor}}
 <div class="document">
     <img src="{{speakerImg test.source}}"/>
-    <a class="entity-link content-link" data-type="Actor"
-        data-id="{{test.source.id}}" data-uuid="{{test.source.uuid}}">{{speakerName test.source}}</a>
+    <a class="content-link" data-type="Actor" data-link data-id="{{test.source.id}}" data-uuid="{{test.source.uuid}}">{{speakerName test.source}}</a>
 </div>
 {{else}}
 <div class="document">
@@ -18,7 +17,6 @@
 {{#if test.item}}
 <div class="document">
     <img src="{{test.item.img}}"/>
-    <a class="entity-link content-link" data-type="Item"
-        data-id="{{test.item.id}}" data-uuid="{{test.item.uuid}}">{{test.item.name}}</a>
+    <a class="content-link" data-type="Item" data-link data-id="{{test.item.id}}" data-uuid="{{test.item.uuid}}">{{test.item.name}}</a>
 </div>
 {{/if}}

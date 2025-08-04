@@ -29,7 +29,7 @@
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.ItemTypes.Host") }}
         <div>
             {{#if host }}
-                <a class="entity-link content-link" draggable="true" data-type="Item" data-id="{{host.id}}" data-uuid="{{host.uuid}}"><i class="fas fa-user">{{host.name}}</i></a>
+                <a class="content-link" draggable="true" data-link data-type="Item" data-id="{{host.id}}" data-uuid="{{host.uuid}}"><i class="fas fa-user">{{host.name}}</i></a>
                 <a class="close entity-remove"><i class="fas fa-times"></i></a>
             {{else}}
                 {{localize "SR5.IC.MissingHost"}}

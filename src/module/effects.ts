@@ -31,13 +31,20 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
 
     // The HTML dataset must be defined
     switch (icon.dataset.action) {
-        case "create":
-            return owner.createEmbeddedDocuments('ActiveEffect', [{
-                label: game.i18n.localize("SR5.ActiveEffect.New"),
-                // icon: "icons/svg/aura.svg",
+        case "create": {
+            const effect = [{
+                name: game.i18n.localize("SR5.ActiveEffect.New"),
                 origin: owner.uuid
-            }]);
+            }];
 
+            if (owner instanceof Item && owner._isNestedItem) {
+                effect[0]._id = foundry.utils.randomID();
+                const sr5Effect = new SR5ActiveEffect(effect[0], { parent: owner });
+                return owner.createNestedActiveEffect(sr5Effect);
+            }
+
+            return owner.createEmbeddedDocuments('ActiveEffect', effect);
+        }
         case "edit":
             return effect.sheet.render(true);
 

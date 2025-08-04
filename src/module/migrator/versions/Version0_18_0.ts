@@ -12,9 +12,11 @@ import { VersionMigration } from "../VersionMigration";
 export class Version0_18_0 extends VersionMigration {
     readonly TargetVersion = '0.18.1';
 
-    override migrateActor(actor: any) {
-        if (!Array.isArray(actor.effects)) return actor;
+    override handlesActor(actor: Readonly<any>): boolean {
+        return Array.isArray(actor.effects);
+    }
 
+    override migrateActor(actor: any) {
         const toDelete = actor.effects.filter(effect => effect.origin?.includes('.Item.'));
         if (toDelete.length > 0) {
             console.log(`Actor (${actor._id}). Delete these effects:`, toDelete);

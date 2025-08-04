@@ -22,9 +22,9 @@ export const SkillField = () => ({
     })),
 });
 
-function skill(createData: foundry.data.fields.SchemaField.CreateData<ReturnType<typeof SkillField>> = {}): SkillFieldType {
+function skill(createData: foundry.data.fields.SchemaField.CreateData<ReturnType<typeof SkillField>> = {}) {
     const initialValue = new ModifiableField(SkillField()).getInitialValue(createData);
-    return foundry.utils.mergeObject(initialValue, createData) as SkillFieldType;
+    return foundry.utils.mergeObject(initialValue, createData);
 }
 
 export const Skills = () => new TypedObjectField(

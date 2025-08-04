@@ -21,10 +21,10 @@ const DeviceData = {
     programs: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 };
 
-export class Device extends ItemBase<typeof DeviceData> {
+export class Device extends ItemBase<ReturnType<typeof DeviceData>> {
     static override defineSchema() {
-        return DeviceData;
+        return DeviceData();
     }
 }
 
-console.log("DeviceData", DeviceData, new Device());
+console.log("DeviceData", DeviceData(), new Device());

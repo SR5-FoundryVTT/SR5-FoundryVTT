@@ -49,13 +49,14 @@ import { SetMarksOptions } from '../storage/MarksStorage';
  *       Be wary of SR5Item.actor for this reason!
  */
 export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> extends Item<SubType> {
-    // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
-    // to allow for embedded items in items in actors.
-    items: SR5Item[] = [];
+    //Those declarations must be initialized on prepareData, otherwise they will be undefined
 
+    // Item.items isn't the Foundry default ItemCollection but is overwritten within
+    // prepareNestedItems to allow for embedded items in items in actors.
+    declare items: SR5Item[];
+    declare descriptionHTML: string | undefined;
     // Item Sheet labels for quick info on an item dropdown.
-    labels: { roll?: string; opposedRoll?: string } = {};
-    descriptionHTML: string | undefined;
+    declare labels: { roll?: string; opposedRoll?: string };
 
     /**
      * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
@@ -103,50 +104,28 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
     }
 
-    override _initializeSource(
-        data: this | Item.CreateData,
-        options?: foundry.abstract.Document.InitializeSourceOptions
-    ) {
-        Migrator.migrate("Item", data);
-        return super._initializeSource(data, options);
+    static override migrateData(source: any) {
+        Migrator.migrate("Item", source);
+        return super.migrateData(source);
     }
 
     /**
      * Return an Array of the Embedded Item Data
      */
-    getNestedItems(): any[] {
-        let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
-
-        items ??= [];
-
-        // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
-        if (items && !Array.isArray(items)) {
-            items = Helpers.convertIndexedObjectToArray(items) as Item.Source[];
-        }
-
-        // Manually map wrongly converted array fields...
-        items = items.map(item => {
-            if (item.effects && !Array.isArray(item.effects)) {
-                item.effects = Helpers.convertIndexedObjectToArray(item.effects) as Item.Source['effects'];
-            }
-            return item;
-        });
-
-        return items;
+    getNestedItems(): Item.Source[] {
+        return this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems) ?? [];
     }
 
     /**
      * Set the embedded item data
      * @param items
      */
-    async setNestedItems(items: any[]) {
-        // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
-        // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
-        await this.setFlag(SYSTEM_NAME, FLAGS.EmbeddedItems, items);
+    async setNestedItems(items: Item.Source[]) {
+        return this.setFlag(SYSTEM_NAME, FLAGS.EmbeddedItems, items);
     }
 
     async clearNestedItems() {
-        await this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
+        return this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
     }
 
     get hasOpposedRoll(): boolean {
@@ -177,9 +156,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-     * PREPARE DATA CANNOT PULL FROM this.actor at ALL
-     * - as of foundry v0.7.4, actor data isn't prepared by the time we prepare items
-     * - this caused issues with Actions that have a Limit or Damage attribute and so those were moved
+     * This function is run on construction of the item and prepares all data for the item.
      */
     override prepareData(this: SR5Item) {
         this.prepareNestedItems();
@@ -617,20 +594,38 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Create an item in this item
+     * @param effectData
+     */
+    async createNestedActiveEffect(effectData: ActiveEffect.Implementation | ActiveEffect.Implementation[]) {
+        if (!Array.isArray(effectData)) effectData = [effectData];
+
+        for (const effect of effectData) {
+            this.effects.set(effect._id!, effect);
+        }
+
+        this.prepareNestedItems();
+        this.prepareData();
+        this.render(false);
+
+        return true;
+    }
+
+    /**
+     * Create an item in this item
      * @param itemData
      */
-    async createNestedItem(itemData) {
+    async createNestedItem(itemData: Item.Source | Item.Source[]) {
         if (!Array.isArray(itemData)) itemData = [itemData];
         // weapons accept items
         if (this.type === 'weapon') {
-            const currentItems = foundry.utils.duplicate(this.getNestedItems());
+            const currentItems = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
 
-            itemData.forEach((ogItem) => {
-                const item = foundry.utils.duplicate(ogItem);
-                item._id = randomID(16);
+            for (const ogItem of itemData) {
+                const item = foundry.utils.duplicate(ogItem) as Item.Source;
+                item._id = foundry.utils.randomID();
                 if (item.type === 'ammo' || item.type === 'modification')
                     currentItems.push(item);
-            });
+            }
 
             await this.setNestedItems(currentItems);
         }
@@ -645,7 +640,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Prepare embeddedItems
      */
     prepareNestedItems() {
-        this.items = this.items || [];
+        this.items ??= [];
 
         const items = this.getNestedItems();
         if (!items) return;
@@ -660,11 +655,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const tempItems = items.map((item) => {
             // Set user permissions to owner, to allow none-GM users to edit their own nested items.
             const data = game.user ? { ownership: { [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER } } : {};
-            item = foundry.utils.mergeObject(item, data);
+            item = foundry.utils.mergeObject(item, data) as Item.Source;
 
             // Case: MODIFY => Update existing item.
-            if (item._id in loaded) {
-                const currentItem = loaded[item._id];
+            if (item._id! in loaded) {
+                const currentItem = loaded[item._id!];
 
                 // Update DocumentData directly, since we're not really having database items here.
                 currentItem.updateSource(item);
@@ -690,44 +685,34 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return items.find((item) => item.id === itemId);
     }
 
-    // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     async updateNestedEffects(changes) {
+        if (!this._isNestedItem) return;
+
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
 
         for(const effectChanges of changes) {
             const effect = this.effects.get(effectChanges._id);
             if (!effect) continue;
-
-            // TODO: The _id field has been added by the system. Even so, don't change the id to avoid any byproducts.
             delete effectChanges._id;
-
             foundry.utils.mergeObject(effect, expandObject(effectChanges), { inplace: true });
+            effect.render(false);
         }
 
-        this.prepareNestedItems();
-        this.prepareData();
+        const parent = this.parent as unknown as SR5Item;
+        await parent.updateNestedItems(this.toObject(false));
         this.render(false);
     }
 
-    // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
-    async updateNestedItems(changes) {
-        const items = foundry.utils.duplicate(this.getNestedItems());
-        if (!items) return;
-        changes = Array.isArray(changes) ? changes : [changes];
-        if (!changes || changes.length === 0) return;
-        for(const itemChanges of changes) {
-            const index = items.findIndex((i) => i._id === itemChanges._id);
-            if (index === -1) continue;
-            const item = items[index];
+    async updateNestedItems(changes: Item.UpdateData | Item.UpdateData[]) {
+        const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
+        const changesArray = Array.isArray(changes) ? changes : [changes];
 
-            // TODO: The _id field has been added by the system. Even so, don't change the id to avoid any byproducts.
-            delete itemChanges._id;
-
-            if (item) {
-                foundry.utils.mergeObject(item, expandObject(itemChanges));
-                items[index] = item;
-            }
+        for (const change of changesArray) {
+            const existing = items.find(i => i._id === change._id);
+            if (!existing) continue;
+            delete change._id;
+            foundry.utils.mergeObject(existing, expandObject(change));
         }
 
         await this.setNestedItems(items);
@@ -754,7 +739,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @returns {Promise<boolean>}
      */
     async deleteOwnedItem(deleted) {
-        const items = foundry.utils.duplicate(this.getNestedItems());
+        const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
         if (!items) return;
 
         const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
@@ -1009,8 +994,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.system.description?.source ?? '';
     }
 
-    setSource(this: SR5Item, source: string) {
-        this.update({ system: { description: { source } } });
+    async setSource(this: SR5Item, source: string) {
+        await this.update({ system: { description: { source } } });
         this.render(true);
     }
 

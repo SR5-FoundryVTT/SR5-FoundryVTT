@@ -4,7 +4,7 @@ import { ActionRollData } from "./Action";
 import { TechnologyData } from "../template/Technology";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
-const BiowareData = {
+const BiowareData = () => ({
     ...BaseItemData(),
     action: new SchemaField(ActionRollData()),
     armor: new SchemaField(ArmorValueData()),
@@ -17,12 +17,12 @@ const BiowareData = {
         initial: 'standard',
         choices: ['alpha', 'beta', 'delta', 'gamma', 'standard', 'used'],
     }),
-}
+});
 
-export class Bioware extends ItemBase<typeof BiowareData> {
+export class Bioware extends ItemBase<ReturnType<typeof BiowareData>> {
     static override defineSchema() {
-        return BiowareData;
+        return BiowareData();
     }
 }
 
-console.log("BiowareData", BiowareData, new Bioware());
+console.log("BiowareData", BiowareData(), new Bioware());

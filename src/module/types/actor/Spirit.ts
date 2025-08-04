@@ -10,7 +10,7 @@ import { VisibilityChecks } from "../template/Visibility";
 import { CommonData, PhysicalCombatValues, CreateModifiers, MagicData, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
-const SpiritData = {
+const SpiritData = () => ({
     // === Core Identity ===
     ...CommonData(),
     spiritType: new StringField({ required: true }),
@@ -70,13 +70,12 @@ const SpiritData = {
         // Miscellaneous
         "composure", "lift_carry", "judge_intentions", "memory", "global"
     )),
-};
+});
 
-
-export class Spirit extends ActorBase<typeof SpiritData> {
+export class Spirit extends ActorBase<ReturnType<typeof SpiritData>> {
     static override defineSchema() {
-        return SpiritData;
+        return SpiritData();
     }
 }
 
-console.log("SpiritData", SpiritData, new Spirit());
+console.log("SpiritData", SpiritData(), new Spirit());

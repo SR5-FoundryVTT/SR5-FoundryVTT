@@ -2,7 +2,7 @@ import { ActionRollData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
-const SpellData = {
+const SpellData = () => ({
     ...BaseItemData(),
     action: new SchemaField(ActionRollData({followedTest: 'DrainTest'})),
 
@@ -70,12 +70,12 @@ const SpellData = {
             choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter']
         }),
     }),
-};
+});
 
-export class Spell extends ItemBase<typeof SpellData> {
+export class Spell extends ItemBase<ReturnType<typeof SpellData>> {
     static override defineSchema() {
-        return SpellData;
+        return SpellData();
     }
 }
 
-console.log("SpellData", SpellData, new Spell());
+console.log("SpellData", SpellData(), new Spell());

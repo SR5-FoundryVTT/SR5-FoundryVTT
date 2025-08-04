@@ -9,11 +9,11 @@ import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 // === Main Schema ===
-const ICData = {
+const ICData = () => ({
     // === Core Identity ===
     ...CommonData(),
     icType: new StringField({ required: true }),
-    special: new StringField({ required: true, initial: 'resonance', readonly: true }),
+    special: new StringField({ required: true, initial: 'mundane', readonly: true }),
 
     // === Matrix & Host ===
     matrix: new SchemaField(MatrixData()),
@@ -48,12 +48,12 @@ const ICData = {
         "matrix_track",
         "global"
     )),
-};
+});
 
-export class IC extends ActorBase<typeof ICData> {
+export class IC extends ActorBase<ReturnType<typeof ICData>> {
     static override defineSchema() {
-        return ICData;
+        return ICData();
     }
 }
 
-console.log("ICData", ICData, new IC());
+console.log("ICData", ICData(), new IC());

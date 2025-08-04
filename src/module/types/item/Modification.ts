@@ -2,7 +2,7 @@ import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyData } from "../template/Technology";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
-const ModificationData = {
+const ModificationData = () => ({
     ...BaseItemData(),
     technology: new SchemaField(TechnologyData()),
 
@@ -26,12 +26,12 @@ const ModificationData = {
     rc: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     conceal: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     slots: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-}
+});
 
-export class Modification extends ItemBase<typeof ModificationData> {
+export class Modification extends ItemBase<ReturnType<typeof ModificationData>> {
     static override defineSchema() {
-        return ModificationData;
+        return ModificationData();
     }
 }
 
-console.log("ModificationData", ModificationData, new Modification());
+console.log("ModificationData", ModificationData(), new Modification());

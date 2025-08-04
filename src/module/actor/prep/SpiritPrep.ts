@@ -110,9 +110,16 @@ export class SpiritPrep {
         return DataDefaults.createData('skill_field', { label, attribute, canDefault: false })
     }
 
+    /**
+     * Prepare armor values for spirit rules. These have some additional caveats in comparison to characters.
+     */
     static prepareSpiritArmor(system: Actor.SystemOfType<'spirit'>) {
         const { armor, attributes } = system;
+        const armorModParts = new PartsList<number>(armor.mod);
+
         armor.base = (attributes.essence.value ?? 0) * 2;
+        if (system.modifiers['armor'])
+            armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), system.modifiers['armor']);
         armor.value = Helpers.calcTotal(armor);
         armor.hardened = true;
     }
