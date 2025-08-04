@@ -301,8 +301,15 @@ export class SR5ActiveEffect extends ActiveEffect {
             return {};
         }
 
-        // Foundry default effect application will use DataModle.applyChange.
-        return super.apply(model, change);
+        const changes = super.apply(model, change);
+
+        for (const key of Object.keys(changes))
+            if (changes[key] === undefined)
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                delete changes[key];
+
+        // Foundry default effect application will use DataModel.applyChange.
+        return changes;
     }
 
     /**
