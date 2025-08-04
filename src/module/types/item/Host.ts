@@ -27,7 +27,7 @@ const HostData = () => ({
     marks: MatrixMarksTarget(),
     ic: new ArrayField(new StringField({ required: true, nullable: false })),
     customAttributes: new BooleanField(),
-}
+});
 
 export class Host extends ItemBase<ReturnType<typeof HostData>> {
     static override defineSchema() {
