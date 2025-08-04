@@ -25,9 +25,13 @@ export class Version0_30_0 extends VersionMigration {
     }
 
     override migrateActiveEffect(effect: any) {
-        const flag = effect.flags?.shadowrun5e;
+        effect.name ??= effect.label || "Unnamed Effect";
+        delete effect.label;
 
+        const flag = effect.flags?.shadowrun5e;
         if (!flag) return;
+
+        effect.system ??= {};
 
         if (flag.applyTo)
             effect.system.applyTo = flag.applyTo;

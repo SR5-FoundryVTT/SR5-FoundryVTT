@@ -72,6 +72,13 @@ export class Migrator {
      * but that caused migration of embedded items to be skipped in synthetic documents.
      */
     public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false, path: string[] = []): boolean {
+        // Nested Items and AEs before V10 doesn't have _stats and also is not automatically added when loaded from server.
+        if (nested || (type === "ActiveEffect" && data.label)) {
+            data.type ??= "base";
+            data._stats ??= {};
+            data._stats.systemVersion ??= "0.0.0";
+        }
+
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
         if (!data._stats || !('systemVersion' in data._stats)) return false;
         if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return false;
