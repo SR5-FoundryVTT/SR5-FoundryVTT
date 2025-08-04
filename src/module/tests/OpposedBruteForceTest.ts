@@ -7,12 +7,14 @@ import { BruteForceTest } from './BruteForceTest';
 import { OpposedTest } from "./OpposedTest";
 import { TestOptions } from './SuccessTest';
 import { TestCreator } from './TestCreator';
-import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlow';
+import { MatrixPlacementData } from './flows/MarkPlacementFlow';
+import { OpposedMatrixTestData } from './MatrixTest';
+import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 
 /**
  * Implement the opposing test for Brute Force action. See SR5#238 'Brute Force'
  */
-export class OpposedBruteForceTest extends OpposedTest {
+export class OpposedBruteForceTest extends OpposedTest<OpposedMatrixTestData> {
     declare against: BruteForceTest;
     // The target icon to place a mark on.
     declare icon: SR5Actor | SR5Item;
@@ -23,7 +25,7 @@ export class OpposedBruteForceTest extends OpposedTest {
 
     override _prepareData(data: any, options?: any) {
         data = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareOpposedData(data);
+        return MatrixTestDataFlow._prepareOpposedData(data);
     }
 
     override get _dialogTemplate() {
@@ -43,9 +45,9 @@ export class OpposedBruteForceTest extends OpposedTest {
     }
 
     override async populateDocuments() {
-        MarkPlacementFlow.populateOpposedDocuments(this);
+        await MatrixTestDataFlow.populateOpposedDocuments(this);
     }
-    
+
     /**
      * When failing against brute force, the decker gets a mark on the target and can deal damage.
      */
@@ -81,6 +83,6 @@ export class OpposedBruteForceTest extends OpposedTest {
     }
 
     static override async executeMessageAction(againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
-        await MarkPlacementFlow.executeMessageAction(this, againstData, messageId, options);
+        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }

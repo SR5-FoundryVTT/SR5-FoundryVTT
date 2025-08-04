@@ -1164,14 +1164,40 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     isWireless(this: SR5Item): boolean {
-        return this.system.technology?.wireless ?? false;
+        return this.system.technology?.wireless === 'online' || this.isRunningSilent();
     }
 
-    isNetwork(): this is SR5Item<'grid' | 'host'> {
+    isRunningSilent(): boolean {
+        return (this as SR5Item).system.technology?.wireless === 'silent';
+    }
+
+    canBeWireless(this: SR5Item): boolean {
+        return this.system.technology?.wireless !== 'none';
+    }
+
+    isNetwork(this: SR5Item): this is SR5Item<'grid' | 'host'> {
         return this.isType('host', 'grid');
     }
 
-        /**
+    /**
+     * Determine if an item has taken Matrix Damage
+     */
+    get isDamaged(): boolean {
+        const monitor = this.getConditionMonitor();
+        // if the monitor max isn't greater than 0, assume it isn't damaged
+        return monitor.max > 0 && monitor.value > 0;
+    }
+
+    /**
+     * Determine if an item's Matrix Condition Monitor is filled
+     */
+    get isBroken(): boolean {
+        const monitor = this.getConditionMonitor();
+        // if the monitor max isn't greater than 0, assume it isn't broken
+        return monitor.max > 0 && monitor.value >= monitor.max;
+    }
+
+    /**
      * Determine if this item is part of a WAN / PAN network.
      *
      * @returns true, when item is part of any network, false if not.
@@ -1186,13 +1212,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     matrixIconVisibleToPlayer(this: SR5Item): boolean {
         return this.system.matrix?.visible === true;
-    }
-
-    /**
-     * Determine if this items matrix icon is running silent.
-     */
-    get isRunningSilent(): boolean {
-        return false;
     }
 
     /**

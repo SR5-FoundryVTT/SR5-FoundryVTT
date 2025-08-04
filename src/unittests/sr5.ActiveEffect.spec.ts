@@ -373,8 +373,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('A wireless only effect should not apply for a wireless item', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
-                { type: 'cyberware', name: 'Wired Item', system: { technology: { wireless: false } } },
-                { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: true } } }
+                { type: 'cyberware', name: 'Wired Item', system: { technology: { wireless: 'offline' } } },
+                { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: 'online' } } }
             ]);
 
             let item = items.pop()!;
@@ -423,8 +423,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('A wireless and equipped only effect should not apply for a wired and unequipped item', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
-                { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: true } } },
-                { type: 'cyberware', name: 'Wired Unequipped Item', system: { technology: { equipped: false, wireless: false } } }
+                { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: 'online' } } },
+                { type: 'cyberware', name: 'Wired Unequipped Item', system: { technology: { equipped: false, wireless: 'offline' } } }
             ]);
 
             let item = items.pop()!;
@@ -448,7 +448,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('A wireless and equipped only effect should not apply if it the effec titself disabled', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
-                { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: true } } },
+                { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: 'online' } } },
             ]);
 
             const item = items.pop()!;

@@ -54,6 +54,9 @@ import { MatrixHooks } from './tests/hooks/MatrixHooks';
 import { MatrixResistTest } from './tests/MatrixResistTest';
 import { OpposedBruteForceTest } from './tests/OpposedBruteForceTest';
 import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
+import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
+import { MatrixTest } from './tests/MatrixTest';
+import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 
 import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
@@ -110,6 +113,7 @@ import { Sin } from './types/item/Sin';
 import { Spell } from './types/item/Spell';
 import { SpritePower } from './types/item/SpritePower';
 import { Weapon } from './types/item/Weapon';
+
 import { SRStorage } from './storage/storage';
 import { MatrixICFlow } from './actor/flows/MatrixICFlow';
 import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
@@ -217,6 +221,8 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalDefenseTest,
+                MatrixTest,
+                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 PhysicalResistTest,
                 SpellCastingTest,
@@ -241,7 +247,8 @@ ___________________
                 OpposedBruteForceTest,
                 HackOnTheFlyTest,
                 OpposedHackOnTheFlyTest,
-                MatrixResistTest
+                MatrixResistTest,
+                BiofeedbackResistTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -254,6 +261,8 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalResistTest,
+                MatrixTest,
+                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 SpellCastingTest,
                 ComplexFormTest,
@@ -270,7 +279,8 @@ ___________________
                 RitualSpellcastingTest,
                 BruteForceTest,
                 HackOnTheFlyTest,
-                MatrixResistTest
+                MatrixResistTest,
+                BiofeedbackResistTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -280,6 +290,7 @@ ___________________
             opposedTests: {
                 OpposedTest,
                 PhysicalDefenseTest,
+                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 CombatSpellDefenseTest,
                 OpposedSummonSpiritTest,
@@ -295,7 +306,8 @@ ___________________
              */
             resistTests: {
                 PhysicalResistTest,
-                MatrixResistTest
+                MatrixResistTest,
+                BiofeedbackResistTest
             },
             /**
              * Subset of tests meant to follow a main active test

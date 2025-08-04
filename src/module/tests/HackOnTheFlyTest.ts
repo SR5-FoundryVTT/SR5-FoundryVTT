@@ -1,6 +1,5 @@
 import { SR5Actor } from "../actor/SR5Actor";
-import { SR5Item } from "../item/SR5Item";
-import { SuccessTest } from "./SuccessTest";
+import { MatrixTest } from "./MatrixTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
 /**
@@ -8,22 +7,8 @@ import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlo
  *
  * See MarkPlacementFlow for more details on the test flow.
  */
-export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
+export class HackOnTheFlyTest extends MatrixTest<MatrixPlacementData> {
     declare actor: SR5Actor;
-
-    // The icon to place a mark on.
-    // If an actor was selected, this will point to either the persona device or the actor itself, if no persona device is used.
-    declare icon: SR5Actor | SR5Item;
-    // The persona matrix actor. If in use, icon will either point to the actor, if no persona device is used, or the persona device.
-    declare persona: SR5Actor;
-    // The devices connected to the main icon persona / host.
-    declare devices: (SR5Actor | SR5Item)[];
-    // Started ic on selected host.
-    declare ic: SR5Actor[];
-    // Host used as main icon.
-    declare host: SR5Item|null;
-    // Grid used as main icon.
-    declare grid: SR5Item|null;
 
     override _prepareData(data: MatrixPlacementData, options): any {
         data = super._prepareData(data, options);
@@ -54,23 +39,6 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
         return 'systems/shadowrun5e/dist/templates/chat/matrix-test-message.hbs';
     }
 
-    override prepareBaseValues() {
-        MarkPlacementFlow.prepareBaseValues(this);
-    }
-
-    /**
-     * Clean up faulty test data after dialog has been shown.
-     */
-    override async _cleanUpAfterDialog() {
-        await super._cleanUpAfterDialog();
-        void MarkPlacementFlow.setIconUuidBasedOnPlacementSelection(this);
-    }
-
-    override async populateDocuments() {
-        await super.populateDocuments();
-        MarkPlacementFlow.populateDocuments(this);
-    }
-
     override prepareTestModifiers() {
         super.prepareTestModifiers();
 
@@ -81,9 +49,5 @@ export class HackOnTheFlyTest extends SuccessTest<MatrixPlacementData> {
         super.validateBaseValues();
 
         MarkPlacementFlow.validateBaseValues(this);
-    }
-
-    override async addTarget(document: SR5Actor | SR5Item) {
-        await MarkPlacementFlow.addTarget(this, document);
     }
 }

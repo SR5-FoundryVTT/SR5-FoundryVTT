@@ -1015,6 +1015,13 @@ input[type='text'].display {
                 border: $light;
                 padding-right: 10px;
 
+                &.is-broken {
+                    color: $crimson;
+                }
+                &.is-damaged {
+                    color: $yellow;
+                }
+
                 &.faded {
                     color: $grey;
                 }

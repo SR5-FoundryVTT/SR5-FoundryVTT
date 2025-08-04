@@ -67,6 +67,7 @@ declare namespace Shadowrun {
         system: Item.Implementation['system']
         properties: any,
         description: any
+        isBroken?: boolean
     }
 
     interface InventorySheetDataByType {

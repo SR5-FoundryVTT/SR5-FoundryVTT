@@ -280,6 +280,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
         html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
         html.find('.item-enable-toggle').on('click', this._onListItemToggleEnabled.bind(this));
+        html.find('.item-wireless-toggle').on('click', this._onListItemToggleWireless.bind(this));
 
         // Item list description display handling...
         html.find('.hidden').hide();
@@ -1089,15 +1090,17 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param item: The item to transform into a 'sheet item'
      */
-    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<SheetItemData> {
+    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<Shadowrun.SheetItemData> {
         // Copy derived schema data instead of source data (false)
-        const sheetItem = item.toObject(false) as unknown as SheetItemData;
+        const sheetItem = item.toObject(false) as unknown as Shadowrun.SheetItemData;
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
 
         // Add additional chat data fields depending on item type.
-        sheetItem.properties = ChatData[item.type as SI](item).filter(Boolean);
+        sheetItem.properties = ChatData[item.type](item).filter(Boolean);
+
+        sheetItem.isBroken = item.isBroken;
 
         return sheetItem;
     }
@@ -1648,6 +1651,33 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         }
 
         this.actor.render(false);
+    }
+
+    /**
+     * Toggle the Wireless state of an item, iterating through the different states
+     * @param event
+     */
+    async _onListItemToggleWireless(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        if (!item) return;
+
+        // iterate through the states of online -> silent -> offline
+        const newState = event.shiftKey ? 'none'
+                                        : item.isWireless()
+                                            ? item.isRunningSilent()
+                                                ? 'offline'
+                                                : 'silent'
+                                            : 'online';
+
+        // update the embedded item with the new wireless state
+        await this.actor.updateEmbeddedDocuments('Item', [{
+            '_id': iid,
+            system: { technology: { wireless: newState } }
+        }]);
     }
 
     /**

@@ -10,7 +10,12 @@
             </label>
             <label class="matrix-label">
                 {{localize "SR5.RunningSilent"}}
-                <input type="checkbox" class="submit-checkbox" name="system.matrix.running_silent" {{checked
+                <input
+                    {{#if system.matrix.device}}
+                    disabled
+                    title="{{localize "SR5.RunningSilentControlledByDevice"}} {{system.matrix.name}}"
+                    {{/if}}
+                    type="checkbox" class="submit-checkbox" name="system.matrix.running_silent" {{checked
                     system.matrix.running_silent}} />
             </label>
         </div>

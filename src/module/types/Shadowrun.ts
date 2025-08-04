@@ -76,6 +76,7 @@ declare namespace Shadowrun {
         'addiction_mental' | // resisting against mental addiction
         'addiction_physical' | // resisting against physical addiction
         'addiction' | // resisting against addiction in general
+        'attack_matrix' | // matrix attacks, like data spike or IC attacks
         'attack_melee' | // attacks made with melee weapons
         'attack_ranged' | // attacks made with ranged weapons
         'attack_thrown' | // attacks made with thrown weapons
@@ -84,8 +85,9 @@ declare namespace Shadowrun {
         'climbing' | // using climbing skills
         'compiling' | // technomancer compiling sprites action
         'complex_form' | // technomancer threading complex form action
-        'defense_suppression' | // defending against suppression attacks
         'defense' | // defending in general, includes all other defense types
+        'defense_matrix' | // defending against matrix attacks
+        'defense_suppression' | // defending against suppression attacks
         'drain' | // resisting against drain
         'fade' | // resisting against fade
         'hack_on_the_fly' | // matrix hack on the fly action
@@ -95,6 +97,7 @@ declare namespace Shadowrun {
         'recovery_stun' | // natural recovery of stun damage
         'recovery' | // natural recovery in general, includes all other recovery types
         'resist' | // resisting damage after getting hit
+        'resist_biofeedback' | // resisting against biofeedback damage
         'resist_disease' | // resisting against diseases
         'resist_toxin' | // resisting against toxins
         'resist_matrix' | // resisting against matrix damage
