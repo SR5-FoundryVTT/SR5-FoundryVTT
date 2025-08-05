@@ -373,7 +373,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('A wireless only effect should not apply for a wireless item', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
-                { type: 'cyberware', name: 'Wired Item', system: { technology: { wireless: 'offline' } } },
+                { type: 'cyberware', name: 'Wired Item', system: { technology: { wireless: 'none' } } },
                 { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: 'online' } } }
             ]);
 

@@ -31,6 +31,21 @@ export const Attributes = () => ({
     edge: new ModifiableField(EdgeAttributeField()),
 });
 
+export const TechnologyAttributes = () => ({
+    willpower: new ModifiableField(AttributeField()),
+    logic: new ModifiableField(AttributeField()),
+    intuition: new ModifiableField(AttributeField()),
+    charisma: new ModifiableField(AttributeField()),
+
+    attack: new ModifiableField(AttributeField()),
+    sleaze: new ModifiableField(AttributeField()),
+    data_processing: new ModifiableField(AttributeField()),
+    firewall: new ModifiableField(AttributeField()),
+
+    rating: new ModifiableField(AttributeField()),
+});
+
 export type AttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof Attributes>>;
 export type AttributeFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof AttributeField>>;
 export type EdgeAttributeFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof EdgeAttributeField>>;
+export type TechnologyAttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof TechnologyAttributes>>;

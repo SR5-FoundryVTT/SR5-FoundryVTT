@@ -1,7 +1,7 @@
 import { ModifiableValue } from "./Base";
-import { Attributes } from "./Attributes";
 import { ConditionData } from "./Condition";
 import { MatrixMasterData } from "./MatrixNetwork";
+import { TechnologyAttributes } from "./Attributes";
 import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField } = foundry.data.fields;
 
@@ -45,7 +45,7 @@ export const TechnologyData = () => ({
 
 export const TechnologyPartData = () => ({
     technology: new SchemaField(TechnologyData()),
-    attributes: new SchemaField(Attributes()),
+    attributes: new SchemaField(TechnologyAttributes()),
     matrix: new SchemaField(MatrixMasterData())
 });
 

@@ -3,7 +3,7 @@ import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5 } from "../../config";
 import { SR5Item } from "../SR5Item";
 import { RollDataOptions } from "../Types";
-import { AttributeFieldType, AttributesType } from "@/module/types/template/Attributes";
+import { AttributeFieldType, AttributesType, TechnologyAttributesType } from "@/module/types/template/Attributes";
 
 type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: ActionRollType, testData?: any, againstData?: any) => undefined; 
 
@@ -94,7 +94,7 @@ export const ItemRollDataFlow = {
         // As per SR5#233, slaved devices can't use the masters ratings.
         if (directConnection) return;
 
-        const attributes = master.system.attributes as AttributesType;
+        const attributes = master.system.attributes!;
 
         const injectAttributes = ['data_processing', 'firewall', 'rating'];
         ItemRollDataFlow._injectAttributes(injectAttributes, attributes, rollData, { bigger: true });
@@ -111,10 +111,10 @@ export const ItemRollDataFlow = {
      * @param rollData The testData to inject attributes into
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    _injectAttributes(names: string[], attributes: AttributesType, rollData: SR5Item['system'], options: { bigger: boolean }) {
-        const targetAttributes = rollData.attributes as AttributesType;
+    _injectAttributes(names: string[], attributes: TechnologyAttributesType | AttributesType, rollData: SR5Item['system'], options: { bigger: boolean }) {
+        const targetAttributes = rollData.attributes!;
         for (const name of names) {
-            const sourceAttribute = foundry.utils.duplicate(attributes[name]);
+            const sourceAttribute = foundry.utils.duplicate(attributes[name]) as AttributeFieldType;
             const targetAttribute = targetAttributes[name];
 
             if (options.bigger) {
