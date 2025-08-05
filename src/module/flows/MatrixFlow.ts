@@ -6,7 +6,6 @@ import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
 import { MarksStorage } from '../storage/MarksStorage';
-import { MatrixResistTest } from '../tests/MatrixResistTest';
 import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
 import { DamageType } from '../types/item/Action';
