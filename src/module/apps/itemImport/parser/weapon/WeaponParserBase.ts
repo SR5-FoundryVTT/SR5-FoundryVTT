@@ -149,12 +149,12 @@ export class WeaponParserBase extends Parser<'weapon'> {
                 value: damageAp,
                 mod: [],
             },
-            attribute: damageAttribute,
             element: {
                 base: damageElement,
                 value: damageElement,
-            }
-        }
+            },
+            ...(damageAttribute && { attribute: damageAttribute })
+        } as const;
         return DataDefaults.createData('damage', partialDamageData);
     }
 
