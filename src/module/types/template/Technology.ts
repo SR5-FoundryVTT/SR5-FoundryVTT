@@ -1,5 +1,7 @@
 import { ModifiableValue } from "./Base";
+import { Attributes } from "./Attributes";
 import { ConditionData } from "./Condition";
+import { MatrixMasterData } from "./MatrixNetwork";
 import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField } = foundry.data.fields;
 
@@ -39,6 +41,12 @@ export const TechnologyData = () => ({
             adjusted: new BooleanField({ initial: false }),
         }),
     }),
+});
+
+export const TechnologyPartData = () => ({
+    technology: new SchemaField(TechnologyData()),
+    attributes: new SchemaField(Attributes()),
+    matrix: new SchemaField(MatrixMasterData())
 });
 
 export type TechnologyType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof TechnologyData>>;

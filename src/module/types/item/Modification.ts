@@ -1,10 +1,10 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { TechnologyData } from "../template/Technology";
-const { SchemaField, NumberField, StringField } = foundry.data.fields;
+import { TechnologyPartData } from "../template/Technology";
+const { NumberField, StringField } = foundry.data.fields;
 
 const ModificationData = () => ({
     ...BaseItemData(),
-    technology: new SchemaField(TechnologyData()),
+    ...TechnologyPartData(),
 
     type: new StringField({
         blank: true,

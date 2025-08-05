@@ -1,6 +1,6 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { MatrixAttributes } from "../template/Matrix";
-import { TechnologyData } from "../template/Technology";
+import { TechnologyPartData } from "../template/Technology";
 const { SchemaField, ArrayField, StringField, DocumentUUIDField, NumberField } = foundry.data.fields;
 
 export const DevicePartData = () => ({
@@ -16,7 +16,7 @@ export const DevicePartData = () => ({
 export const DeviceData = () => ({
     ...BaseItemData(),
     ...DevicePartData(),
-    technology: new SchemaField(TechnologyData()),
+    ...TechnologyPartData(),
 
     programs: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });

@@ -1,6 +1,6 @@
-import { ActionRollData } from "./Action";
+import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { TechnologyData } from "../template/Technology";
+import { TechnologyPartData } from "../template/Technology";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ValueMaxPair, ModifiableValue } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
@@ -55,8 +55,8 @@ const ThrownWeaponData = () => ({
 
 const WeaponData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData({opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'})),
-    technology: new SchemaField(TechnologyData()),
+    ...ActionPartData(),
+    ...TechnologyPartData(),
 
     category: new StringField({
         blank: true,

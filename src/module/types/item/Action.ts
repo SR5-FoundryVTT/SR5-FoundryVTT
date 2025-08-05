@@ -133,9 +133,18 @@ export const ActionRollData = (
     }),
 });
 
+export const ActionPartData = (args: {
+    test?: string;
+    opposedTest?: string;
+    resistTest?: string;
+    followedTest?: string;
+} = {}) => ({
+    action: new SchemaField(ActionRollData(args)),
+});
+
 const ActionData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData()),
+    ...ActionPartData(),
 
     result: new SchemaField(ActionResultData()),
 });

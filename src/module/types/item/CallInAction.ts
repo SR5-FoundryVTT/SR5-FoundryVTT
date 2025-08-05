@@ -1,10 +1,10 @@
-import { ActionRollData } from "./Action";
+import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const CallInActionData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData({ test: '' })),
+    ...ActionPartData({ test: '' }),
 
     actor_type: new StringField({
         blank: true,
