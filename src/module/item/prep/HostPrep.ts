@@ -5,7 +5,6 @@ import { TechnologyPrep } from "./functions/TechnologyPrep";
 
 export class HostPrep {
     static prepareBaseData(system: Item.SystemOfType<'host'>) {
-        HostPrep.setDeviceCategory(system);
         HostPrep.prepareMatrixAttributes(system);
         HostPrep.prepareMentalAttributes(system);
         HostPrep.prepareRatingAttribute(system);
@@ -17,11 +16,6 @@ export class HostPrep {
      */
     static prepareDerivedData(system: Item.SystemOfType<'host'>) {
         TechnologyPrep.calculateAttributes(system.attributes);
-    }
-
-    static setDeviceCategory(system: Item.SystemOfType<'host'>) {
-        // Host matrix 'devices' are always hosts and never commlink / cyberdecks.
-        system.category = 'host';
     }
 
     /**
@@ -57,7 +51,6 @@ export class HostPrep {
      * @param system 
      */
     static prepareMentalAttributes(system: Item.SystemOfType<'host'>) {
-
         for (const name of SR5.mentalAttributes) {
             const base = system.rating;
             const label = SR5.attributes[name]
