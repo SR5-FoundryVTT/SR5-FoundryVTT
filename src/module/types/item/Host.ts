@@ -13,7 +13,7 @@ export const SourceEntityField = () => ({
     data: new ObjectField({ required: false }),
 });
 
-const HostData = () => ({
+const HostData = {
     ...BaseItemData(),
     ...DevicePartData(),
 
@@ -27,12 +27,12 @@ const HostData = () => ({
     marks: MatrixMarksTarget(),
     ic: new ArrayField(new StringField({ required: true, nullable: false })),
     customAttributes: new BooleanField(),
-});
+}
 
-export class Host extends ItemBase<ReturnType<typeof HostData>> {
+export class Host extends ItemBase<typeof HostData> {
     static override defineSchema() {
-        return HostData();
+        return HostData;
     }
 }
 
-console.log("HostData", HostData(), new Host());
+console.log("HostData", HostData, new Host());

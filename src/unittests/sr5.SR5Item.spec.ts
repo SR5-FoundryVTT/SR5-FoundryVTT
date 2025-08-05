@@ -37,7 +37,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.strictEqual(embeddedAmmoData.type, ammo.type);
 
             // An embedded item should NOT appear in the items collection.
-            const embeddedAmmoInCollection = game.items?.get(embeddedAmmoData._id!);
+            const embeddedAmmoInCollection = game.items?.get(embeddedAmmoData._id);
             assert.strictEqual(embeddedAmmoInCollection, undefined);
         });
 

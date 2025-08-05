@@ -3,7 +3,7 @@
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Vehicle.Driver") }}
     <div>
         {{#if vehicle.driver}}
-        <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
+        <a class="entity-link content-link" draggable="true" data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
             <i class="fas fa-user"></i>
             {{vehicle.driver.name}}
         </a>

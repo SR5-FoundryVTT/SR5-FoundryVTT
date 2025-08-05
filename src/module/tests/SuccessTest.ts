@@ -9,7 +9,8 @@ import { TestRules } from "../rules/TestRules";
 import { PartsList } from "../parts/PartsList";
 import { DataDefaults } from "../data/DataDefaults";
 import { ActionFlow } from "../item/flows/ActionFlow";
-import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
+import { TestDialog } from "../apps/dialogs/TestDialog";
+import { TestDialogListener } from '../apps/dialogs/TestDialog';
 import { CORE_NAME, FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
 
@@ -378,7 +379,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return {};
     }
 
-    static _prepareActionTestData(action: ActionRollType, document: SR5Actor | SR5Item, data: any, againstData?: any) {
+    static _prepareActionTestData(action: ActionRollType, document: SR5Actor | SR5Item, data: any, againstData: any) {
         return TestCreator._prepareTestDataWithAction(action, document, data, againstData);
     }
 
@@ -397,11 +398,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     static async _getOpposedActionTestData(testData, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
-        return undefined;
-    }
-
-    static async _getResistActionTestData(testData, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
-        console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resist message actions`);
         return undefined;
     }
 
@@ -931,8 +927,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get hasDamage(): boolean {
         // check that we don't have a damage value of 0 and a damage type that isn't empty
-        return (this.data.action.damage.value !== 0 || this.data.action.damage.attribute !== "")
-                                && this.data.action.damage.type.value !== '';
+        return this.data.action.damage.value !== 0 && this.data.action.damage.type.value !== '';
     }
 
     /**
@@ -1584,8 +1579,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (this.extended) {
             await this.executeAsExtended();
         }
-
-        Hooks.call('sr5_afterTestComplete', this);
     }
 
     /**
@@ -1785,7 +1778,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             item: this.item,
             opposedActions: this._prepareOpposedActionsTemplateData(),
             followupActions: this._prepareFollowupActionsTemplateData(),
-            resistActions: this._prepareResistActionsTemplateData(),
             resultActions: this._prepareResultActionsTemplateData(),
             previewTemplate: this._canPlaceBlastTemplate,
             showDescription: this._canShowDescription,
@@ -1852,29 +1844,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const testCls = TestCreator._getTestClass(this.data.action.followed.test);
         if (!testCls) return [];
         return [{ label: testCls.label }]
-    }
-
-    get _resistTestClass(): any | undefined {
-        return undefined; // by default we don't want to show any resist test in a success test
-    }
-
-    /**
-     * Prepare Resist actions a test allows. These are actions
-     * meant to be taken following completion of an opposed test
-     * or as a way to resist direct damage of a test
-     */
-    _prepareResistActionsTemplateData() {
-        const testCls = this._resistTestClass;
-        // No resist test configured. Nothing to build.
-        if (!testCls) return [];
-
-        const action = {
-            // Store the test implementation registration name.
-            test: testCls.name,
-            label: testCls.label
-        };
-
-        return [action]
     }
 
     /**
@@ -2173,10 +2142,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: TestOptions) {
         // Determine actors to roll test with.
-        // build documents based on the category, matrix can target individual icons
-        let documents = (againstData.categories.includes('matrix'))
-                                    ? await Helpers.getMatrixTestTargetDocuments(againstData as any)
-                                    : await Helpers.getOpposedTestTargets(againstData);
+        let documents = await Helpers.getOpposedTestTargets(againstData);
 
         // Inform user about tokens with deleted sidebar actors.
         // This can both happen for linked tokens immediately and unlinked tokens after reloading.

@@ -7,14 +7,12 @@ import { BruteForceTest } from './BruteForceTest';
 import { OpposedTest } from "./OpposedTest";
 import { TestOptions } from './SuccessTest';
 import { TestCreator } from './TestCreator';
-import { MatrixPlacementData } from './flows/MarkPlacementFlow';
-import { OpposedMatrixTestData } from './MatrixTest';
-import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
+import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlow';
 
 /**
  * Implement the opposing test for Brute Force action. See SR5#238 'Brute Force'
  */
-export class OpposedBruteForceTest extends OpposedTest<OpposedMatrixTestData> {
+export class OpposedBruteForceTest extends OpposedTest {
     declare against: BruteForceTest;
     // The target icon to place a mark on.
     declare icon: SR5Actor | SR5Item;
@@ -25,7 +23,7 @@ export class OpposedBruteForceTest extends OpposedTest<OpposedMatrixTestData> {
 
     override _prepareData(data: any, options?: any) {
         data = super._prepareData(data, options);
-        return MatrixTestDataFlow._prepareOpposedData(data);
+        return MarkPlacementFlow._prepareOpposedData(data);
     }
 
     override get _dialogTemplate() {
@@ -45,9 +43,9 @@ export class OpposedBruteForceTest extends OpposedTest<OpposedMatrixTestData> {
     }
 
     override async populateDocuments() {
-        await MatrixTestDataFlow.populateOpposedDocuments(this);
+        MarkPlacementFlow.populateOpposedDocuments(this);
     }
-
+    
     /**
      * When failing against brute force, the decker gets a mark on the target and can deal damage.
      */
@@ -83,6 +81,6 @@ export class OpposedBruteForceTest extends OpposedTest<OpposedMatrixTestData> {
     }
 
     static override async executeMessageAction(againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
-        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
+        await MarkPlacementFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }

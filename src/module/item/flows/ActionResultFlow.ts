@@ -1,7 +1,8 @@
+import { SR5Actor } from "../../actor/SR5Actor";
+import { MatrixRules } from "../../rules/MatrixRules";
+import { SuccessTest } from "../../tests/SuccessTest";
 import { ResultActionType } from "src/module/types/item/Action";
-import { PhysicalDefenseTestData } from "../../tests/PhysicalDefenseTest";
-import { TestCreator } from "@/module/tests/TestCreator";
-import { Helpers } from "@/module/helpers";
+import { PhysicalDefenseTest } from "../../tests/PhysicalDefenseTest";
 
 type ResultActions = ResultActionType['action'];
 
@@ -19,14 +20,14 @@ type ActionResultOptions = {
  */
 export class ActionResultFlow {
     /**
-     * The handlers registered for specific result action.
-     * 
-     * @returns A Map mapping action name to function handler
-     */
-    static get _handlersResultAction(): Map<ResultActions, ((context: ActionResultOptions) => Promise<void>)> {
+         * The handlers registered for specific result action.
+         * 
+         * @returns A Map mapping action name to function handler
+         */
+    static get _handlersResultAction(): Map<ResultActions, Function> {
         const handlers = new Map();
-        handlers.set('modifyCombatantInit', ActionResultFlow._castInitModifierAction.bind(this));
-        handlers.set('forceReboot', ActionResultFlow._onForceReboot.bind(this));
+        handlers.set('placeMarks', () => ui.notifications?.error('Placing marks currently isnt suported. Sorry!'));
+        handlers.set('modifyCombatantInit', ActionResultFlow._castInitModifierAction);
 
         return handlers;
     }
@@ -50,37 +51,13 @@ export class ActionResultFlow {
 
     /**
      * Modify the actors combatant according the test defined initiative modifier.
-     */
-    static async _castInitModifierAction(context: ActionResultOptions) {
-        const test = await TestCreator.fromMessage(context.messageId);
-        if (!test) return;
-
-        await test.populateDocuments();
-        // NOTE: Use test data typing here, as including PhysicalDefenseTest would cause circular dependencies, breaking SuccessTest/OpposedTest import order.
-        const data = test.data as PhysicalDefenseTestData;
-        if (!data.iniMod) return;
-        await test.actor?.changeCombatInitiative(data.iniMod);
-    }
-
-    /**
-     * Reboot an actors persona device.
      * 
-     * Allow players / GM to overwrite the speaker through selections.
+     * @param test The test instance causing the initiative modification
      */
-    static async _onForceReboot(context: ActionResultOptions) {
-        const message = game.messages?.get(context.messageId);
-        if (!message) return;
-
-        const actors = Helpers.getControlledTokenActors();
-        if (!actors) {
-            const speakerId = message.speaker.actor;
-            if (!speakerId) return;
-            const actor = game.actors?.get(speakerId);
-            if (!actor) return;
-        }
-
-        for (const actor of actors) {
-            await actor.rebootPersona();
-        }
+    static async _castInitModifierAction(test: PhysicalDefenseTest) {
+        if (!(test instanceof PhysicalDefenseTest)) return;
+        
+        if (!test.data.iniMod) return;
+        await test.actor?.changeCombatInitiative(test.data.iniMod);
     }
 }

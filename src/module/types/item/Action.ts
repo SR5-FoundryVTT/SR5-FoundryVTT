@@ -65,7 +65,6 @@ export const DamageData = () => ({
         }),
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
-    attribute: new StringField({ required: true }),
     source: new SchemaField({
         actorId: new StringField({ required: true }),
         itemId: new StringField({ required: true }),
@@ -133,12 +132,12 @@ export const ActionRollData = (
     }),
 });
 
-const ActionData = () => ({
+const ActionData = {
     ...BaseItemData(),
     action: new SchemaField(ActionRollData()),
 
     result: new SchemaField(ActionResultData()),
-});
+};
 
 export type DamageType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof DamageData>>;
 export type ActionRollType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionRollData>>;
@@ -147,10 +146,10 @@ export type ActionResultType = foundry.data.fields.SchemaField.InitializedData<R
 export type ResultActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ResultActionData>>;
 export type MinimalActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MinimalActionData>>;
 
-export class Action extends ItemBase<ReturnType<typeof ActionData>> {
+export class Action extends ItemBase<typeof ActionData> {
     static override defineSchema() {
-        return ActionData();
+        return ActionData;
     }
 };
 
-console.log("ActionData", ActionData(), new Action());
+console.log("ActionData", ActionData, new Action());

@@ -1,6 +1,3 @@
-export type MigratableDocument = Actor.Implementation | Item.Implementation | ActiveEffect.Implementation;
-export type MigratableDocumentName = MigratableDocument['documentName'];
-
 /**
  * Base class for version migrations that convert game data from an older version to a newer one.
  * 
@@ -9,41 +6,44 @@ export type MigratableDocumentName = MigratableDocument['documentName'];
  * 
  * These methods are designed to be atomic and modular, enabling precise upgrades
  * without requiring full system-wide context.
- * 
- * Note: if you want to sanitize a document without migration, return true on the handles functions,
- * and not implement a migration function for the document. Sanitation then will be called.
- * 
- * Note: if you want to migrate a new embedded item during document migration, consider this approach:
- *
- * override migrateActor(_actor: any): void {
- *     _actor.items.push({
- *         name: "New Embedded Item",
- *         type: "action",
- *         _id: foundry.utils.randomID(16),
- *         system: DataDefaults.baseSystemData('action'),
- *     } as any);
- * }
  */
+
+export type MigratableDocument = Actor.Implementation | Item.Implementation | ActiveEffect.Implementation;
+export type MigratableDocumentName = MigratableDocument['documentName'];
+
 export abstract class VersionMigration {
-    abstract TargetVersion: `${number}.${number}.${number}`;
-
-    migrateActor(_actor: any): void {}
-    handlesActor(_actor: Readonly<any>) { return this.migrates.Actor; }
-
-    migrateItem(_item: any): void {}
-    handlesItem(_item: Readonly<any>) { return this.migrates.Item; }
-
-    migrateActiveEffect(_effect: any): void {}
-    handlesActiveEffect(_effect: Readonly<any>) { return this.migrates.ActiveEffect; }
+    /**
+     * The target version string that this migration upgrades data to.
+     */
+    public abstract TargetVersion: `${number}.${number}.${number}`;
 
     /**
-     * Flags which migration methods have been overridden in the subclass.
-     * Used to determine support for each document type.
+     * Apply this migration to an actor.
+     * Override in subclasses to modify actor data as needed.
      */
-    private readonly migrates: Record<MigratableDocumentName, boolean>;
+    public migrateActor(actor: any): void { }
+
+    /**
+     * Apply this migration to an item.
+     * Override in subclasses to modify item data as needed.
+     */
+    public migrateItem(item: any): void { }
+
+    /**
+     * Apply this migration to an active effect.
+     * Override in subclasses to modify active effect data as needed.
+     */
+    public migrateActiveEffect(effect: any): void { }
+
+    /**
+     * Indicates whether the subclass overrides the corresponding migration method
+     * (`migrateActor`, `migrateItem`, `migrateActiveEffect`), used to determine if
+     * the migration applies to a given document type.
+     */
+    public readonly implements: Record<MigratableDocumentName, boolean>;
     constructor() {
         const proto = Object.getPrototypeOf(this);
-        this.migrates = {
+        this.implements = {
             Actor: proto.migrateActor !== VersionMigration.prototype.migrateActor,
             Item: proto.migrateItem !== VersionMigration.prototype.migrateItem,
             ActiveEffect: proto.migrateActiveEffect !== VersionMigration.prototype.migrateActiveEffect

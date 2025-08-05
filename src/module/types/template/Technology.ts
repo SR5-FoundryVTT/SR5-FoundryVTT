@@ -16,11 +16,7 @@ export const TechnologyData = () => ({
     condition_monitor: new SchemaField(ConditionData()),
 
     // === Wireless & Networking ===
-    wireless: new StringField({
-        required: true,
-        initial: 'online',
-        choices: ['online', 'silent', 'offline', 'none'],
-    }),
+    wireless: new BooleanField({ required: true, initial: true }),
     master: new DocumentUUIDField(),
     networkController: new StringField({ required: false }),
 

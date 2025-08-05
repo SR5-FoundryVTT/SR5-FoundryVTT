@@ -43,7 +43,7 @@ export class WareParser {
 
         // Bioware has no wireless feature, so disable it by default
         if (parserType === 'bioware') {
-            system.technology.wireless = 'none';
+            system.technology.wireless = false;
         }
 
         // Assign import flags

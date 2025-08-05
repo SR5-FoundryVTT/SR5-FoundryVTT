@@ -615,7 +615,6 @@ export const SR5 = {
         'addiction_mental': "SR5.ActionCategory.AddictionMental",
         'addiction_physical': "SR5.ActionCategory.AddictionPhysical",
         'addiction': "SR5.ActionCategory.Addiction",
-        'attack_matrix': "SR5.ActionCategory.AttackMatrix",
         'attack_melee': "SR5.ActionCategory.AttackMelee",
         'attack_ranged': "SR5.ActionCategory.AttackRanged", 
         'attack_thrown': "SR5.ActionCategory.AttackThrown",
@@ -624,9 +623,8 @@ export const SR5 = {
         "climbing": "SR5.ActionCategory.Climbing",
         'compiling': "SR5.ActionCategory.Compiling",
         'complex_form': "SR5.ActionCategory.ComplexForm",
-        'defense': "SR5.ActionCategory.Defense",
-        'defense_matrix': "SR5.ActionCategory.DefenseMatrix",
         'defense_suppression': "SR5.ActionCategory.DefenseSuppression",
+        'defense': "SR5.ActionCategory.Defense", 
         'drain': "SR5.ActionCategory.Drain",
         'fade': "SR5.ActionCategory.Fade", 
         'hack_on_the_fly': "SR5.ActionCategory.HackOnTheFly",
@@ -635,7 +633,6 @@ export const SR5 = {
         'recovery_physical': "SR5.ActionCategory.RecoveryPhysical",
         'recovery_stun': "SR5.ActionCategory.RecoveryStun",
         'recovery': "SR5.ActionCategory.Recovery",
-        'resist_biofeedback': "SR5.ActionCategory.ResistBiofeedback",
         'resist_disease': "SR5.ActionCategory.ResistDisease",
         'resist_toxin': "SR5.ActionCategory.ResistToxin",
         'resist_matrix': "SR5.ActionCategory.ResistMatrix",
@@ -1156,13 +1153,6 @@ export const SR5 = {
         'semi_auto': 'SR5.Weapon.Mode.SemiAuto',
         'burst_file': 'SR5.Weapon.Mode.BurstFire',
         'full_auto': 'SR5.Weapon.Mode.FullAuto'
-    },
-
-    wirelessModes: {
-        'online': 'SR5.WirelessOnline',
-        'silent': 'SR5.RunningSilent',
-        'offline': 'SR5.WirelessOffline',
-        'none': 'SR5.WirelessUnavailable'
     },
 
     /**

@@ -208,10 +208,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         // Enrich descriptions
         await Promise.all(
             [ammunition, weaponMods, armorMods, vehicleMods, droneMods].flat().map(
-                async item => {
-                    const html = await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description.value);
-                    item.descriptionHTML = html;
-                }
+                async item => foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description.value).then(html => item.descriptionHTML = html)
             )
         );
 
@@ -483,8 +480,10 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
         // CASE - Handle dropping of documents directly into the source field like urls and pdfs.
         const targetElement = event.toElement || event.target;
-        if (targetElement?.name === 'system.description.source')
-            return this.item.setSource(data.uuid);
+        if (targetElement?.name === 'system.description.source') {
+            this.item.setSource(data.uuid);
+            return;
+        }
 
         // CASE - Handle ActiveEffects
         if (data.type === 'ActiveEffect') {
@@ -638,9 +637,14 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         const list = entityRemove.data('list');
         const position = entityRemove.data('position');
 
-        // Handle Host item lists...
-        if (list === 'ic')
-            await this.item.removeIC(position);
+        if (!list) return;
+
+        switch (list) {
+            // Handle Host item lists...
+            case 'ic':
+                await this.item.removeIC(position);
+                break;
+        }
     }
 
     async _onAddLicense(event) {
@@ -678,13 +682,15 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
     async _onAddWeaponMod(event) {
         event.preventDefault();
+        // TODO: Move this into DataDefaults...
         const type = 'modification';
-        const name = `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`;
-        const item = new SR5Item({
-            name, type,
+        const itemData = {
+            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
+            type: type as Item.SubType,
             system: { type: 'weapon' }
-        });
-        await this.item.createNestedItem(item.toObject());
+        };
+        const item = new SR5Item(itemData);
+        await this.item.createNestedItem(item._source);
     }
 
     async _onAmmoReload(event, partialReload: boolean) {
@@ -784,8 +790,10 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         if (!('action' in this.item.system)) return;
         const inputElement = html.find('input#action-modifier').get(0);
 
-        if (!inputElement)
-            return console.error('Shadowrun 5e | Action item sheet does not contain an action-modifier input element');
+        if (!inputElement) {
+            console.error('Shadowrun 5e | Action item sheet does not contain an action-modifier input element');
+            return;
+        }
 
         // Tagify expects this format for localized tags.
         const whitelist = Object.keys(SR5.modifierTypes).map(modifier => ({

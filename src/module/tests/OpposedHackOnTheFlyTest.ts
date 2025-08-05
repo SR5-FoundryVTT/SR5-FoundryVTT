@@ -1,17 +1,15 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { Translation } from "../utils/strings";
-import { MatrixPlacementData } from "./flows/MarkPlacementFlow";
-import { MatrixTestDataFlow } from "./flows/MatrixTestDataFlow";
+import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 import { HackOnTheFlyTest } from "./HackOnTheFlyTest";
-import { OpposedMatrixTestData } from "./MatrixTest";
 import { OpposedTest } from "./OpposedTest";
 import { TestOptions } from "./SuccessTest";
 
 /**
  * Implement the opposing test for Hack on the Fly action. See SR5#240 'Hack On The Fly'
  */
-export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> {
+export class OpposedHackOnTheFlyTest extends OpposedTest {
     declare against: HackOnTheFlyTest;
     declare icon: SR5Actor | SR5Item;
     declare device: SR5Item;
@@ -19,7 +17,7 @@ export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> 
 
     override _prepareData(data: any, options?: TestOptions) {
         data = super._prepareData(data, options);
-        return MatrixTestDataFlow._prepareOpposedData(data);
+        return MarkPlacementFlow._prepareOpposedData(data);
     }
 
     override get _dialogTemplate() {
@@ -39,7 +37,7 @@ export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> 
     }
 
     override async populateDocuments() {
-        await MatrixTestDataFlow.populateOpposedDocuments(this);
+        void MarkPlacementFlow.populateOpposedDocuments(this);
     }
 
     /**
@@ -57,6 +55,6 @@ export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> 
     }
 
     static override async executeMessageAction(againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
-        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
+        await MarkPlacementFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }

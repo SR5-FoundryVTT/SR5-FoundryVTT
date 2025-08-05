@@ -2,7 +2,7 @@ import { ActionRollData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
-const CallInActionData = () => ({
+const CallInActionData = {
     ...BaseItemData(),
     action: new SchemaField(ActionRollData({ test: '' })),
 
@@ -21,12 +21,13 @@ const CallInActionData = () => ({
         level: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
         uuid: new StringField({ required: true }),
     }),
-});
+}
 
-export class CallInAction extends ItemBase<ReturnType<typeof CallInActionData>> {
+
+export class CallInAction extends ItemBase<typeof CallInActionData> {
     static override defineSchema() {
-        return CallInActionData();
+        return CallInActionData;
     }
 }
 
-console.log("CallInActionData", CallInActionData(), new CallInAction());
+console.log("CallInActionData", CallInActionData, new CallInAction());

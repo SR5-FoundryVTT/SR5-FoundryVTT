@@ -1,12 +1,13 @@
-import { MatrixData } from "../template/Matrix";
 import { Attributes } from "../template/Attributes";
+import { Tracks } from "../template/ConditionMonitors";
 import { Initiative } from "../template/Initiative";
-import { VisibilityChecks } from "../template/Visibility";
 import { Limits, MatrixLimits } from "../template/Limits";
+import { MatrixData } from "../template/Matrix";
+import { VisibilityChecks } from "../template/Visibility";
 import { ActorBase, CommonData, CreateModifiers } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
-const SpriteData = () => ({
+const SpriteData = {
     // === Core Identity ===
     ...CommonData(),
     attributes: new SchemaField(Attributes()),
@@ -50,12 +51,12 @@ const SpriteData = () => ({
         // Miscellaneous
         "composure", "lift_carry", "judge_intentions", "memory", "global"
     )),
-});
+};
 
-export class Sprite extends ActorBase<ReturnType<typeof SpriteData>> {
+export class Sprite extends ActorBase<typeof SpriteData> {
     static override defineSchema() {
-        return SpriteData();
+        return SpriteData;
     }
 }
 
-console.log("SpriteData", SpriteData(), new Sprite());
+console.log("SpriteData", SpriteData, new Sprite());

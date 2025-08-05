@@ -16,7 +16,7 @@ const CharacterAttributes = () => ({
     submersion: new ModifiableField(AttributeField()),
 });
 
-const CharacterData = () => ({
+const CharacterData = {
     ...CommonData(),
 
     // === Core Identity ===
@@ -80,12 +80,12 @@ const CharacterData = () => ({
         // Miscellaneous
         "composure", "lift_carry", "judge_intentions", "memory", "global"
     )),
-});
+};
 
-export class Character extends ActorBase<ReturnType<typeof CharacterData>> {
+export class Character extends ActorBase<typeof CharacterData> {
     static override defineSchema() {
-        return CharacterData();
+        return CharacterData;
     }
 }
 
-console.log("CharacterData:", CharacterData(), new Character());
+console.log("CharacterData:", CharacterData, new Character());

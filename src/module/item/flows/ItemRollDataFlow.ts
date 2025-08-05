@@ -143,15 +143,13 @@ export const ItemRollDataFlow = {
         // => Weapon slaved to owned commlink
         // => Camera slaved to host
         if (item.isMatrixDevice && item.isSlave) {
-            // don't inject master device data for resist tests
-            if (testData?.action?.test === 'MatrixResistTest') return;
             const master = item.master;
             if (!master) {
                 ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
                 return rollData;
             }
             
-            const directConnection = againstData?.directConnection ?? false;
+            const directConnection = againstData?.directConnection ?? false;;
             ItemRollDataFlow.injectMasterRatingsForPAN(master, actor, rollData, directConnection)
         }
 

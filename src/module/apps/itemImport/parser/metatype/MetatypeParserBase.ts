@@ -23,7 +23,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'critter
                 continue;
             }
 
-            const itemBase = game.items.fromCompendium(foundItem, { keepId: true });
+            const itemBase = game.items.fromCompendium(foundItem);
             const system = itemBase.system;
 
             if (item.$?.select)

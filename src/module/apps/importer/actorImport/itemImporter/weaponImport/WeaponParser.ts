@@ -258,7 +258,7 @@ export class WeaponParser {
 
             const ammo: any[] = [];
             clips.forEach((clip) => {
-                const ammobonus = clip.ammotype;
+                const ammobonus = clip.ammotype!;
                 const systemAmmo = DataDefaults.baseSystemData('ammo', {
                     accuracy: Number(ammobonus.weaponbonusacc) || 0,
                     ap: Number(ammobonus.weaponbonusap) || 0,
@@ -278,7 +278,7 @@ export class WeaponParser {
                     }
                 });
                 const currentAmmo = createItemData(clip.name, 'ammo', systemAmmo);
-                currentAmmo._id = foundry.utils.randomID();
+                currentAmmo._id = randomID(16)
                 ammo.push(currentAmmo);
             });
 

@@ -6,7 +6,6 @@ import { Version0_16_0 } from './versions/Version0_16_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_30_0 } from './versions/Version0_30_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
-const { deepClone } = foundry.utils;
 
 /**
  * Seamless data migrator for the SR5 system.
@@ -38,28 +37,16 @@ export class Migrator {
         new Version0_30_0(),
     ] as const;
 
-    private static documentsToBeMigrated: number = 0;
-
     // Generate the migration version mark used to track current system version in documents.
     private static get _migrationMark() {
         return game.system.version + ".0";
     }
 
     // Returns an array of migration functions applicable to the given document type and version.
-    private static getMigrators(
-        version: string | null,
-        type?: MigratableDocumentName,
-        data?: any
-    ): readonly VersionMigration[] {
+    private static getMigrators(type: MigratableDocumentName | null, version: string | null): readonly VersionMigration[] {
         return this.s_Versions.filter(migrator =>
-            (!type || migrator[`handles${type}`](data)) &&
-            this.compareVersion(migrator.TargetVersion, version) > 0
+            (!type || migrator.implements[type]) && this.compareVersion(migrator.TargetVersion, version) > 0
         );
-    }
-
-    private static normalizeArray(data: any): any[] {
-        if (data == null) return [];
-        return Array.isArray(data) ? data : Object.values(data); 
     }
 
     /**
@@ -67,55 +54,20 @@ export class Migrator {
      * 
      * This is connected to Migrator.updateMigratedDocument which will persist migrated data during the
      * update process.
-     * 
-     * Note: This method was previously called during `_initializeSource`,
-     * but that caused migration of embedded items to be skipped in synthetic documents.
      */
-    public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false, path: string[] = []): boolean {
-        // Nested Items and AEs before V10 doesn't have _stats and also is not automatically added when loaded from server.
-        if (nested || (type === "ActiveEffect" && data.label)) {
-            data.type ??= "base";
-            data._stats ??= {};
-            data._stats.systemVersion ??= "0.0.0";
-        }
-
+    public static migrate(type: MigratableDocumentName, data: any): void {
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
-        if (!data._stats || !('systemVersion' in data._stats)) return false;
-        if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return false;
+        if (!data._stats || !('systemVersion' in data._stats)) return;
+        if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return;
 
-        path = [...path, type, data._id];
+        const migrators = this.getMigrators(type, data._stats.systemVersion);
 
-        let migrated = false;
-        if (type === "Item") {
-            const items = this.normalizeArray(data.flags?.shadowrun5e?.embeddedItems);
-            for (const nestedItems of items) {
-                const nestedMigrated = this.migrate("Item", nestedItems, true, path);
-                migrated = migrated || nestedMigrated;
-            }
-            foundry.utils.setProperty(data, 'flags.shadowrun5e.embeddedItems', items);
-
-            if (nested) {
-                const effects = this.normalizeArray(data.effects);
-                for (const nestedEffect of effects) {
-                    const nestedMigrated = this.migrate("ActiveEffect", nestedEffect, true, path);
-                    migrated = migrated || nestedMigrated;
-                }
-                foundry.utils.setProperty(data, 'effects', effects);
-            }
-        }
-
-        const migrators = this.getMigrators(data._stats.systemVersion, type, data);
-
-        if (migrators.length === 0) {
-            if (migrated)
-                data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
-
-            return migrated;
-        }
+        // If no migrators found, nothing to do.
+        if (migrators.length === 0) return;
 
         for (const migrator of migrators)
             migrator[`migrate${type}`](data);
-
+        
         // After all migrations, sanitize the data model.
         // This ensures that the data conforms to the current schema.
         const schema = CONFIG[type].dataModels[data.type].schema;
@@ -124,16 +76,14 @@ export class Migrator {
         if (correctionLogs) {
             console.warn(
                 `Document Sanitized on Migration:\n` +
-                `UUID: ${path.join('.')}; Name: ${data.name};\n` +
+                `ID: ${data._id}; Name: ${data.name};\n` +
                 `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n`
             );
             console.table(correctionLogs);
         }
 
         // Mark as a migratable document.
-        data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
-        this.documentsToBeMigrated++;
-        return true;
+        data._stats.systemVersion = this._migrationMark;
     }
 
     /**
@@ -156,16 +106,23 @@ export class Migrator {
         doc._stats.systemVersion = game.system.version;
         doc._source._stats.systemVersion = game.system.version;
 
-        // Update Parent First
-        if (doc.parent instanceof Actor || doc.parent instanceof Item)
-            await this.updateMigratedDocument(doc.parent);
+        if (doc.parent) {
+            if (doc.parent instanceof Actor || doc.parent instanceof Item)
+                await this.updateMigratedDocument(doc.parent);
+            else if (doc.parent instanceof TokenDocument && doc.parent.actor)
+                await this.updateMigratedDocument(doc.parent.actor);
+        }
 
         // Persist the change without triggering diff logic
-        return doc.update(doc.toObject() as any, { diff: false, recursive: false });
+        return doc.update(doc.toObject(false) as any, { diff: false, recursive: false });
     }
 
     public static async BeginMigration() {
-        if (this.documentsToBeMigrated === 0) return;
+        const currentVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION) || '0.0.0';
+
+        // No migrations are required, exit.
+        const migrators = this.getMigrators(null, currentVersion);
+        if (migrators.length === 0) return;
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
         const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
@@ -177,14 +134,14 @@ export class Migrator {
         const d = new Dialog({
             title: localizedWarningTitle,
             content:
-                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.documentsToBeMigrated})</h2>` +
+                `<h2 style="color: red; text-align: center">${localizedWarningHeader}</h2>` +
                 `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
                 `<p>${localizedWarningDescription}</p>` +
                 `<h3 style="color: red">${localizedWarningBackup}</h3>`,
             buttons: {
                 ok: {
                     label: localizedWarningBegin,
-                    callback: async () => this.updateAllMigratableDocuments(),
+                    callback: async () => this.migrateAll(),
                 },
             },
             default: 'ok',
@@ -192,98 +149,82 @@ export class Migrator {
         d.render(true);
     }
 
-    // Track migration progress
-    private static totalMigrations = 0;
-    private static completedMigrations = 0;
-    private static progressbar: Notifications.Notification | null = null;
-    private static updateProgressbar() {
-        if (!this.progressbar)
-            this.progressbar = ui.notifications.info("Migrating Documents...", { progress: true });
-
-        this.completedMigrations++;
-        this.progressbar.update({
-            pct: this.completedMigrations / this.totalMigrations,
-            message: `Migrating Documents... (${this.completedMigrations}/${this.totalMigrations})`
-        });
-    }
-
-    /**
-     * Update documents of a specific type.
-     */
-    private static async updateDocuments<Doc extends typeof Actor | typeof Item | typeof ActiveEffect>(
-        cls: Doc,
-        docs: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[0]>,
-        parent: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[1]>['parent'] = null
-    ) {
-        this.updateProgressbar();
-        return cls.implementation.updateDocuments(
-            docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
-            { diff: false, recursive: false, parent: parent as any }
-        );
-    }
-
     /**
      * Migrate all actors in the game.
+     * 
+     * This is called during world load to ensure all actors are up-to-date with the latest system version.
      */
-    private static async updateAllMigratableDocuments() {
+    private static async migrateAll() {
         const start = performance.now();
+        const progress = ui.notifications.info("Migrating Documents...", {progress: true});
 
-        // Estimate total migration steps
-        this.totalMigrations =
-            1 + game.items.size +                         // Items + their effects
-            1 + game.actors.size * 2 +                    // Actor + their items + their effects
-            [...game.actors].reduce((sum, actor) => sum + actor.items.size, 0) +  // Actor item effects
-            game.scenes.size;                             // Non-actor tokens
+        const tokensWithActors = Array.from(game.scenes).flatMap(scene =>
+            scene.tokens.filter(token => !!token.actor && !token.actorLink)
+        );
 
-        /* Items and its embedded Effects */
-        await this.updateDocuments(Item, deepClone(game.items._source));
+        let completed = 0;
+        const total = game.items.size + game.actors.size + tokensWithActors.length;
 
-        for (const item of game.items)
-            // @ts-expect-error Fvtt-types not supporting parent
-            await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
+        await Promise.all(
+            game.items.map(async item =>
+                this.migrateWithCollections(item as Item.Implementation).then(() => {
+                    progress.update({pct: ++completed / total});
+                })
+            )
+        );
 
-        /* Actors and its embedded documents */
-        await this.updateDocuments(Actor, deepClone(game.actors._source));
+        await Promise.all(
+            game.actors.map(async actor =>
+                this.migrateWithCollections(actor as Actor.Implementation).then(() => {
+                    progress.update({pct: ++completed / total});
+                })
+            )
+        );
 
-        for (const actor of game.actors) {
-            // @ts-expect-error Fvtt-types not supporting parent
-            await this.updateDocuments(Item, actor.toObject().items, actor);
-            // @ts-expect-error Fvtt-types not supporting parent
-            await this.updateDocuments(ActiveEffect, actor.toObject().effects, actor);
-            
-            for (const item of actor.items)
-                await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
-        }
+        await Promise.all(
+            tokensWithActors.map(async token =>
+                this.migrateWithCollections(token.actor!).then(() => {
+                    progress.update({pct: ++completed / total});
+                })
+            )
+        );
 
-        /* Tokens */
-        for (const scene of game.scenes) {
-            this.updateProgressbar();
-            await TokenDocument.implementation.updateDocuments(
-                scene.tokens.filter(t => !t.actorLink).map(t => t.toObject()),
-                { diff: false, recursive: false, parent: scene }
-            );
-        }
-
-        /* Finalize Migration */
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
 
-        new Dialog({
+        const d = new Dialog({
             title: "Migration Complete",
-            content: `
-                <h2 style="color: red; text-align: center">Migration Complete</h2>
-                <p style="text-align: center">It took ${(performance.now() - start).toFixed(2)} milliseconds.</p>
-            `,
+            content:
+                `<h2 style="color: red; text-align: center">Migration Complete</h2>` +
+                `<p style="text-align: center">It took ${performance.now() - start} milliseconds.</p>`,
             buttons: {
                 ok: {
                     label: "OK",
-                    callback: () => {
-                        this.progressbar?.remove();
-                        ui.notifications.info("Documents have been migrated!");
-                    }
-                }
+                    callback: () => { progress.remove(); },
+                },
             },
-            default: "ok"
-        }).render(true);
+            default: 'ok',
+        });
+        d.render(true);
+    }
+
+    private static async migrateWithCollections(doc: Actor.Implementation | Item.Implementation) {
+        await this.updateMigratedDocument(doc);
+
+        const collectionPromises: Promise<any>[] = [];
+        type CollectionType = (Actor.Implementation | Item.Implementation)['collections']['effects' | 'items'];
+        for (const [key, collection] of Object.entries<CollectionType>(doc.collections)) {
+            if (key === 'effects' || key === 'items') {
+                for (const child of collection) {
+                    collectionPromises.push(
+                        child instanceof Item
+                            ? this.migrateWithCollections(child)
+                            : this.updateMigratedDocument(child)
+                    );
+                }
+            }
+        }
+
+        return Promise.all(collectionPromises);
     }
 
     /**

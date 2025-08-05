@@ -46,13 +46,9 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
 
         const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
 
-        // Handle technomancer drops, ignore other actor drops as sprites can't handle them.
-        if (dropData.type === 'Actor') {
-            await this._addTechnomancerOnDrop(dropData);
-            return [];
-        }
+        await this._addTechnomancerOnDrop(dropData);
 
-        return super._onDrop(event);
+        return await super._onDrop(event);
     }
 
     /**
@@ -75,27 +71,5 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
         event.stopPropagation();
 
         await this.document.removeTechnomancer();
-    }
-
-    /**
-     * Custom behavior for ListHeader item creation for sprites.
-     */
-    override async _onItemCreate(event: any) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const type = event.currentTarget.closest('.list-header').dataset.itemId;
-        const optional = event.currentTarget.closest('.list-header').dataset.optional;
-
-        switch (type) {
-            // Sprite powers need special handling, as there are different sections for them.
-            case 'sprite_power':
-                if (!optional) return console.error('Shadowrun 5e | Sprite Actor Sheet: Missing optional value for sprite power item creation.');
-                await super._onItemCreate(event, {system: {optional}});
-                break;
-            default:
-                await super._onItemCreate(event);
-                break;
-        }
     }
 }

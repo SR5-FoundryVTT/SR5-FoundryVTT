@@ -1,5 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5 } from "../config";
+import { SYSTEM_NAME } from "../constants";
 import { ActionFlow } from "../item/flows/ActionFlow";
 import { createTagifyOnInput } from "../utils/sheets";
 import { Translation } from "../utils/strings";
@@ -64,7 +65,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
     override activateListeners(html: JQuery<HTMLElement>): void {
         super.activateListeners(html);
 
-        html.find('select[name="system.applyTo"]').on('change', this._onApplyToChange.bind(this));
+        html.find('select[name="flags.shadowrun5e.applyTo"]').on('change', this._onApplyToChange.bind(this));
 
         this._activateTagifyListeners(html);
     }
@@ -104,7 +105,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
             ui.notifications?.error('You must delete changes before changing the apply-to type.');
         } else {
             // Make sure applyTo is saved but also save all other form data on sheet.
-            const updateData = { 'system.applyTo': select.value };
+            const updateData = { 'flags.shadowrun5e.applyTo': select.value };
             await this._onSubmit(event, { updateData, preventClose: true })
         }
     }
@@ -201,10 +202,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
     _prepareSkillSelectionTagify(html: JQuery) {
         const inputElement = html.find('input#skill-selection').get(0) as HTMLInputElement;
 
-        if (!this.object.parent) {
-            console.error('Shadowrun 5e | SR5ActiveEffect unexpecedtly has no parent document', this.object, this);
-            return;
-        }
+        if (!this.object.parent) return console.error('Shadowrun 5e | SR5ActiveEffect unexpecedtly has no parent document', this.object, this);
 
         // Make sure custom skills of an actor source are included.
         const actor = this.object.actor;

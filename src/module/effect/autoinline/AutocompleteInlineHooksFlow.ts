@@ -1,3 +1,4 @@
+import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from "../../item/SR5Item";
 import { OpposedTest } from "../../tests/OpposedTest";
 import { SuccessTest } from "../../tests/SuccessTest";

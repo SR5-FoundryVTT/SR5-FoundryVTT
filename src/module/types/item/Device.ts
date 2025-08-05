@@ -13,18 +13,18 @@ export const DevicePartData = () => ({
     slaves: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),
 });
 
-export const DeviceData = () => ({
+const DeviceData = {
     ...BaseItemData(),
     ...DevicePartData(),
     technology: new SchemaField(TechnologyData()),
 
     programs: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-});
+};
 
-export class Device extends ItemBase<ReturnType<typeof DeviceData>> {
+export class Device extends ItemBase<typeof DeviceData> {
     static override defineSchema() {
-        return DeviceData();
+        return DeviceData;
     }
 }
 
-console.log("DeviceData", DeviceData(), new Device());
+console.log("DeviceData", DeviceData, new Device());

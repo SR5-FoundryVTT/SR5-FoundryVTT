@@ -280,7 +280,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
         html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
         html.find('.item-enable-toggle').on('click', this._onListItemToggleEnabled.bind(this));
-        html.find('.item-wireless-toggle').on('click', this._onListItemToggleWireless.bind(this));
 
         // Item list description display handling...
         html.find('.hidden').hide();
@@ -633,13 +632,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         this._inventoryOpenClose[type] = isOpen
     }
 
-    /**
-     * Create a new item based on the Item Header creation action and the item type of that header.
-     * 
-     * @param event 
-     * @param data Optional additional data to be injected into the create item data.
-     */
-    async _onItemCreate(event, data = {}) {
+    async _onItemCreate(event) {
         event.preventDefault();
         const type = event.currentTarget.closest('.list-header').dataset.itemId;
 
@@ -648,8 +641,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         // TODO: Add translation for item names...
         const itemData = {
-            ...data, type,
-            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`
+            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
+            type,
         };
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
         if (!items) return;
@@ -1096,17 +1089,15 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param item: The item to transform into a 'sheet item'
      */
-    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<Shadowrun.SheetItemData> {
+    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<SheetItemData> {
         // Copy derived schema data instead of source data (false)
-        const sheetItem = item.toObject(false) as unknown as Shadowrun.SheetItemData;
+        const sheetItem = item.toObject(false) as unknown as SheetItemData;
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
 
         // Add additional chat data fields depending on item type.
-        sheetItem.properties = ChatData[item.type](item).filter(Boolean);
-
-        sheetItem.isBroken = item.isBroken;
+        sheetItem.properties = ChatData[item.type as SI](item).filter(Boolean);
 
         return sheetItem;
     }
@@ -1657,33 +1648,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         }
 
         this.actor.render(false);
-    }
-
-    /**
-     * Toggle the Wireless state of an item, iterating through the different states
-     * @param event
-     */
-    async _onListItemToggleWireless(event: MouseEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (!item) return;
-
-        // iterate through the states of online -> silent -> offline
-        const newState = event.shiftKey ? 'none'
-                                        : item.isWireless()
-                                            ? item.isRunningSilent()
-                                                ? 'offline'
-                                                : 'silent'
-                                            : 'online';
-
-        // update the embedded item with the new wireless state
-        await this.actor.updateEmbeddedDocuments('Item', [{
-            '_id': iid,
-            system: { technology: { wireless: newState } }
-        }]);
     }
 
     /**

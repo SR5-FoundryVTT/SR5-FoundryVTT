@@ -6,6 +6,7 @@ import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
 import { MarksStorage } from '../storage/MarksStorage';
+import { MatrixResistTest } from '../tests/MatrixResistTest';
 import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
 import { DamageType } from '../types/item/Action';
@@ -125,55 +126,34 @@ export const MatrixFlow = {
         await MatrixFlow.sendOverwatchConvergenceMessage(templateData);
     },
 
-    async determineMatrixFailedAttack(test: SuccessTest | OpposedTest) {
-        if (!test.opposing) return;
-
-        // @ts-expect-error - Only OpposedTest has this property
-        const against = test.against as SuccessTest;
-        if (!against) return;
-        if (!against.hasTestCategory('matrix')) return;
-
-        const actor = against.actor;
-        if (!actor) return;
-
-        // if we succeeded in defending against an ATTACK test, we need to send back "bad data" in the form of 1 matrix damage
-        if (test.success && MatrixRules.isAttackAction(
-            against.data.action.attribute as any,
-            against.data.action.attribute2 as any,
-            against.data.action.limit.attribute as any
-        )) {
-            const alias = game.user?.name;
-            const linkedTokens = actor.getActiveTokens(true) || [];
-            const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
-
-            const templateData = {
-                damage: MatrixRules.failedAttackDamage(),
-                speaker: {
-                    actor,
-                    alias,
-                    token,
-                },
-            };
-            await this.sendFailedAttackActionMessage(templateData);
+    /**
+     * Execute a matrix damage resistance test and modify the damage accordingly.
+     *
+     * @param actor The actor to resist the damage.
+     * @param damage The damage to be resited.
+     * @returns Modified damage after resistance based on damage given.
+     */
+    async executeMatrixDamageResistance(actor: SR5Actor, damage: DamageType): Promise<DamageType | undefined> {
+        const test = await actor.generalActionTest('resist_matrix') as MatrixResistTest;
+        if (!test) {
+            console.error('Shadowrun 5e | The General Action pack does not contain a recovery_matrix action.');
+            return;
         }
 
-    },
+        // Prepare test data for execution
+        test.data.incomingDamage = damage;
+        test.data = test._prepareData(test.data, test.data.options);
 
-    /**
-     * Send out a chat message to apply damage to the attacker for failing an attack action
-     */
-    async sendFailedAttackActionMessage(templateData) {
-        const content = await renderTemplate(
-            'systems/shadowrun5e/dist/templates/chat/matrix-failed-attack-action.hbs',
-            templateData,
-        );
-        const messageData = { content, speaker: templateData.speaker };
-        await ChatMessage.create(messageData);
+        console.error(test.data.incomingDamage, test.data.modifiedDamage);
 
+        await test.execute();
+
+        return test.data.modifiedDamage;
     },
 
     /**
      * Send out a chat message to inform the GM about convergenace and provide actions for it.
+     * TODO: Add param typing
      */
     async sendOverwatchConvergenceMessage(templateData) {
         const content = await renderTemplate(
@@ -318,7 +298,7 @@ export const MatrixFlow = {
                 type,
                 document: slave,
                 token,
-                runningSilent: slave.isRunningSilent(),
+                runningSilent: slave.isRunningSilent,
                 network: host.name || '',
                 icons: []
             });
@@ -347,7 +327,7 @@ export const MatrixFlow = {
                     name: slave.name,
                     document: slave,
                     token: null,
-                    runningSilent: slave.isRunningSilent(),
+                    runningSilent: slave.isRunningSilent,
                     network: grid.name || '',
                     type,
                     icons: []
@@ -382,7 +362,7 @@ export const MatrixFlow = {
                     name: token.name,
                     document: token.actor,
                     token,
-                    runningSilent: token.actor.isRunningSilent(),
+                    runningSilent: token.actor.isRunningSilent,
                     network: token.actor.network?.name ?? '',
                     type,
                     icons: []
@@ -431,7 +411,7 @@ export const MatrixFlow = {
                 name: Helpers.getChatSpeakerName(device),
                 document: device,
                 token: null,
-                runningSilent: device.isRunningSilent(),
+                runningSilent: device.isRunningSilent,
                 network: document.network?.name ?? '',
                 type: ActorMarksFlow.getDocumentType(device),
                 icons: [],

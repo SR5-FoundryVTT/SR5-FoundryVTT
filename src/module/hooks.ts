@@ -54,9 +54,6 @@ import { MatrixHooks } from './tests/hooks/MatrixHooks';
 import { MatrixResistTest } from './tests/MatrixResistTest';
 import { OpposedBruteForceTest } from './tests/OpposedBruteForceTest';
 import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
-import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
-import { MatrixTest } from './tests/MatrixTest';
-import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 
 import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
@@ -102,7 +99,6 @@ import { Cyberware } from './types/item/Cyberware';
 import { Device } from './types/item/Device';
 import { Echo } from './types/item/Echo';
 import { Equipment } from './types/item/Equipment';
-import { Grid } from './types/item/Grid';
 import { Host } from './types/item/Host';
 import { Lifestyle } from './types/item/Lifestyle';
 import { Metamagic } from './types/item/Metamagic';
@@ -114,12 +110,13 @@ import { Sin } from './types/item/Sin';
 import { Spell } from './types/item/Spell';
 import { SpritePower } from './types/item/SpritePower';
 import { Weapon } from './types/item/Weapon';
-
 import { SRStorage } from './storage/storage';
 import { MatrixICFlow } from './actor/flows/MatrixICFlow';
 import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
 import { MatrixNetworkFlow } from './item/flows/MatrixNetworkFlow';
 import { SocketMessage } from './sockets';
+
+
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -220,8 +217,6 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalDefenseTest,
-                MatrixTest,
-                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 PhysicalResistTest,
                 SpellCastingTest,
@@ -246,8 +241,7 @@ ___________________
                 OpposedBruteForceTest,
                 HackOnTheFlyTest,
                 OpposedHackOnTheFlyTest,
-                MatrixResistTest,
-                BiofeedbackResistTest
+                MatrixResistTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -260,8 +254,6 @@ ___________________
                 RangedAttackTest,
                 ThrownAttackTest,
                 PhysicalResistTest,
-                MatrixTest,
-                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 SpellCastingTest,
                 ComplexFormTest,
@@ -278,8 +270,7 @@ ___________________
                 RitualSpellcastingTest,
                 BruteForceTest,
                 HackOnTheFlyTest,
-                MatrixResistTest,
-                BiofeedbackResistTest
+                MatrixResistTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -289,7 +280,6 @@ ___________________
             opposedTests: {
                 OpposedTest,
                 PhysicalDefenseTest,
-                MatrixDefenseTest,
                 SuppressionDefenseTest,
                 CombatSpellDefenseTest,
                 OpposedSummonSpiritTest,
@@ -305,8 +295,7 @@ ___________________
              */
             resistTests: {
                 PhysicalResistTest,
-                MatrixResistTest,
-                BiofeedbackResistTest
+                MatrixResistTest
             },
             /**
              * Subset of tests meant to follow a main active test
@@ -384,7 +373,6 @@ ___________________
         CONFIG.Item.dataModels["device"] = Device;
         CONFIG.Item.dataModels["echo"] = Echo;
         CONFIG.Item.dataModels["equipment"] = Equipment;
-        CONFIG.Item.dataModels["grid"] = Grid;
         CONFIG.Item.dataModels["host"] = Host;
         CONFIG.Item.dataModels["lifestyle"] = Lifestyle;
         CONFIG.Item.dataModels["metamagic"] = Metamagic;

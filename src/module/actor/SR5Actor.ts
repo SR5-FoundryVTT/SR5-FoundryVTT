@@ -109,9 +109,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return OverwatchStorage.setOverwatchScore(this, value);
     }
 
-    static override migrateData(source: any) {
-        Migrator.migrate("Actor", source);
-        return super.migrateData(source);
+    override _initializeSource(
+        data: this | Actor.CreateData,
+        options?: foundry.abstract.Document.InitializeSourceOptions
+    ) {
+        Migrator.migrate("Actor", data);
+        return super._initializeSource(data, options);
     }
 
     override async update(
@@ -521,17 +524,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return undefined;
     }
 
-    /**
-     * Get the Attribute to add when making a Full Matrix Defense
-     */
-    getFullMatrixDefenseAttribute(this: SR5Actor) {
-        if (this.isType('vehicle'))
-            return this.findVehicleStat('pilot');
-        if (this.isType('character'))
-            return (this as SR5Actor<'character'>).findAttribute('willpower');
-        return undefined;
-    }
-
     getEquippedWeapons(): SR5Item[] {
         return this.items.filter((item: SR5Item) => item.isEquipped() && item.isType('weapon'));
     }
@@ -726,7 +718,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Determine if this actors matrix icon is running silent.
      */
-    isRunningSilent(): boolean {
+    get isRunningSilent(): boolean {
         const matrixData = this.matrixData();
         if (!matrixData) return false;
         return matrixData.running_silent;
@@ -1091,7 +1083,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
         const testCls = this.tests._getTestClass('SuccessTest') as typeof SuccessTest;
-        const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
+        const test = new testCls({}, { actor: this }, { showDialog });
 
         // Build pool values.
         const pool = new PartsList<number>(test.pool.mod);
@@ -1151,7 +1143,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param actionName The action with in the general pack.
      * @param options Success Test options
      */
-    async matrixActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
+    async matrixlActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         return await this.packActionTest(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
     }
 
@@ -2174,12 +2166,5 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Avoid changing actor system data as Foundry just returns it.
         const rollData = foundry.utils.duplicate(super.getRollData());
         return ActorRollDataFlow.getRollData(this, rollData, options);
-    }
-
-    /**
-     * Get the amount of damage each extra mark does when getting attacked in the matrix
-     */
-    getExtraMarkDamageModifier() {
-        return 2;
     }
 }

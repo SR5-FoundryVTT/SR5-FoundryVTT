@@ -13,10 +13,9 @@
     },
     "action": {
       "type": "complex",
-      "test": "MatrixTest",
+      "test": "SuccessTest",
       "categories": [
-        "matrix",
-          "attack_matrix"
+        "matrix"
       ],
       "attribute": "logic",
       "attribute2": "",
@@ -39,7 +38,7 @@
       "extended": false,
       "damage": {
         "type": {
-          "value": "matrix",
+          "value": "",
           "base": "matrix"
         },
         "element": {
@@ -56,7 +55,7 @@
           "attribute": ""
         },
         "base_formula_operator": "add",
-        "attribute": "attack",
+        "attribute": "",
         "source": {
           "actorId": "",
           "itemId": "",
@@ -67,15 +66,15 @@
       },
       "opposed": {
         "type": "custom",
-        "test": "MatrixDefenseTest",
-        "attribute": "",
-        "attribute2": "",
+        "test": "OpposedTest",
+        "attribute": "intuition",
+        "attribute2": "firewall",
         "skill": "",
         "armor": false,
         "mod": 0,
         "description": "",
         "resist": {
-          "test": "MatrixResistTest",
+          "test": "",
           "skill": "",
           "attribute": "",
           "attribute2": "",

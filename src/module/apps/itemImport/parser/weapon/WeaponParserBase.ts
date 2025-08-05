@@ -38,9 +38,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
                 continue;
             }
 
-            // Create a new _id since it will not be created on the creation of the item.
-            const accessoryBase = game.items.fromCompendium(foundItem, { keepId: true });
-            accessoryBase._id = foundry.utils.randomID();
+            const accessoryBase = game.items.fromCompendium(foundItem);
             const system = accessoryBase.system as SystemType<'modification'>;
             system.technology.equipped = true;
 

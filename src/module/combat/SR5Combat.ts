@@ -19,7 +19,7 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
     }
 
     get initiativePass(): number {
-        return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) || SR.combat.INITIAL_INI_PASS;
+        return (this as SR5Combat).getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) || SR.combat.INITIAL_INI_PASS;
     }
 
     static async setInitiativePass(combat: SR5Combat, pass: number) {
@@ -307,6 +307,9 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
      *  Reset the Foundry pass and don't raise the Foundry turn.
      *
      * Retrigger Initiative Rolls on each new Foundry round.
+     *
+     *
+     * * @Override
      */
     override async nextTurn(): Promise<this> {
         // Maybe advance to the next round/init pass

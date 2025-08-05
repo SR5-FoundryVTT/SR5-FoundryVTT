@@ -74,7 +74,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     public renderSourceSheet() {
         if (this.source instanceof SR5Actor || this.source instanceof SR5Item)
             return this.source?.sheet?.render(true);
-        return undefined;
+        return;
     }
 
     async toggleDisabled() {
@@ -301,16 +301,8 @@ export class SR5ActiveEffect extends ActiveEffect {
             return {};
         }
 
-        const changes = super.apply(model, change);
-
-        // Remove undefined changes, as there were already applied in ModifiableField.
-        for (const key of Object.keys(changes))
-            if (changes[key] === undefined)
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete changes[key];
-
-        // Foundry default effect application will use DataModel.applyChange.
-        return changes;
+        // Foundry default effect application will use DataModle.applyChange.
+        return super.apply(model, change);
     }
 
     /**
@@ -400,10 +392,12 @@ export class SR5ActiveEffect extends ActiveEffect {
         return changes;
     }
 
-    static override migrateData(data: any) {
+    override _initializeSource(
+        data: this | ActiveEffect.CreateData,
+        options?: foundry.abstract.Document.InitializeSourceOptions
+    ) {
         Migrator.migrate("ActiveEffect", data);
-
-        return super.migrateData(data);
+        return super._initializeSource(data, options);
     }
 
     override async update(

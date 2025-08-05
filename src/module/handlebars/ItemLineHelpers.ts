@@ -423,19 +423,6 @@ export const registerItemLineHelpers = () => {
             },
         };
 
-        const cmField = {
-                text: {
-                    text: item.isBroken ? game.i18n.localize('SR5.Broken') : `[${item.getConditionMonitor().value}/${item.getConditionMonitor().max}]`,
-                    cssClass: item.isBroken ? 'is-broken' :  item.isDamaged ? 'is-damaged' : '',
-            }
-        }
-
-        const technologyItems: ItemListRightSide[] = [];
-
-        if (item.getConditionMonitor().max > 0 && item.getConditionMonitor().value > 0) {
-            technologyItems.push(cmField);
-        }
-
         switch (item.type) {
             case 'action': {
                 const system = item.system as Item.SystemOfType<'action'>;
@@ -529,7 +516,7 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
-                return [...technologyItems, qtyInput];
+                return [qtyInput];
             case 'weapon': {
                 const system = item.system as Item.SystemOfType<'weapon'>;
                 // Both Ranged and Melee Weapons can have ammo.
@@ -538,7 +525,7 @@ export const registerItemLineHelpers = () => {
                     const max = system.ammo?.current.max ?? 0;
                     const partialReloadRounds = system.ammo?.partial_reload_value ?? -1;
 
-                    const reloadLinks: ItemListRightSide[] = technologyItems.slice();
+                    const reloadLinks: ItemListRightSide[] = [];
 
                     // Show reload on both no ammo configured and partially consumed clips.
                     const textReload = count < max ?
@@ -585,7 +572,7 @@ export const registerItemLineHelpers = () => {
                     
                     return reloadLinks;
                 } else {
-                    return [...technologyItems, qtyInput];
+                    return [qtyInput];
                 }
             }
             case 'quality':
@@ -806,23 +793,6 @@ export const registerItemLineHelpers = () => {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
         };
-        const brokenIcon = {
-            icon: 'fa-regular fa-link-slash',
-            title: game.i18n.localize('SR5.Broken')
-        }
-        const wirelessIcon = {
-            icon: `${item.isWireless() ?
-                        item.isRunningSilent()
-                            ? 'fa-duotone fa-wifi-fair'
-                            : 'fas fa-wifi'
-                        : 'fa-duotone fa-wifi-slash'
-                    } item-wireless-toggle`,
-            title: game.i18n.localize(item.isWireless()
-                                        ? item.isRunningSilent()
-                                            ? 'SR5.RunningSilent'
-                                            : 'SR5.WirelessOnline'
-                                        : 'SR5.WirelessOffline')
-        }
         const removeIcon = {
             icon: 'fas fa-trash item-delete',
             title: game.i18n.localize('SR5.DeleteItem'),
@@ -838,16 +808,8 @@ export const registerItemLineHelpers = () => {
 
         const icons = [pdfIcon, moveIcon, editIcon, removeIcon];
 
-        if (item.isType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon')) {
-            if (!item.isBroken) {
-                if (item.canBeWireless())
-                    icons.unshift(wirelessIcon)
-
-                icons.unshift(equipIcon);
-            } else {
-                icons.unshift(brokenIcon);
-            }
-        }
+        if (item.isType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon'))
+            icons.unshift(equipIcon);
 
         return icons;
     });
@@ -1192,15 +1154,5 @@ export const registerItemLineHelpers = () => {
                 cssClass: 'marks-qty',
             }}
         ];
-    });
-
-    /**
-     * Sprite Power Tabs on the sprite actor need a way to differentiate between different sections based on the
-     * sprite power values.
-     * 
-     * The resulting value will be used for ItemHeader handlebar part itemData to determine the correct section for +Add actions.
-     */
-    Handlebars.registerHelper('SpritePowerItemData', (optional: string) => {
-        return {optional};
     });
 };

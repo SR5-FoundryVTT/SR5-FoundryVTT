@@ -53,7 +53,7 @@ const ThrownWeaponData = () => ({
     blast: new SchemaField(BlastData()),
 });
 
-const WeaponData = () => ({
+const WeaponData = {
     ...BaseItemData(),
     action: new SchemaField(ActionRollData({opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'})),
     technology: new SchemaField(TechnologyData()),
@@ -68,15 +68,15 @@ const WeaponData = () => ({
     range: new SchemaField(RangeWeaponData()),
     melee: new SchemaField(MeleeWeaponData()),
     thrown: new SchemaField(ThrownWeaponData()),
-});
+}
 
-export class Weapon extends ItemBase<ReturnType<typeof WeaponData>> {
+export class Weapon extends ItemBase<typeof WeaponData> {
     static override defineSchema() {
-        return WeaponData();
+        return WeaponData;
     }
 }
 
-console.log("WeaponData", WeaponData(), new Weapon());
+console.log("WeaponData", WeaponData, new Weapon());
 
 export type RangeType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangeData>>;
 export type BlastType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BlastData>>;
