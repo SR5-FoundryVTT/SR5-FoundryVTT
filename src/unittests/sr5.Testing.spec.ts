@@ -1,6 +1,8 @@
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
+import { DataDefaults } from "@/module/data/DataDefaults";
+import { Helpers } from "@/module/helpers";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -118,5 +120,31 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
     describe('OpposedTest', () => {
 
+    });
+
+    
+    /**
+     * Testing around the TestCreator and SuccessTest getting their rolldata from an SR5Item instead of an SR5Actor.
+     */
+    describe('Item Based Testing', () => {
+        it('Extract roll data from an SR5Item as source', async () => {
+            const item = await factory.createItem({ type: 'host', system: { rating: 5 } });
+            const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
+            const data = TestCreator._prepareTestDataWithActionForItem(action, item, TestCreator._minimalTestData());
+
+            Helpers.calcTotal(data.pool);
+
+            assert.strictEqual(data.pool.value, 10);
+        });
+
+        it('Use an source item to execute a test', async () => {
+            const item = await factory.createItem({ type: 'host', system: { rating: 5 } });
+            const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
+            const test = await TestCreator.fromAction(action, item, { showMessage: false, showDialog: false });
+            await test?.execute();
+
+            assert.equal(test?.data.evaluated, true);
+            assert.equal(test?.data.pool.value, 10);
+        });
     });
 };

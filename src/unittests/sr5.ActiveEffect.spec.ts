@@ -90,7 +90,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.attributes.agility.value, 3);
 
             // Case - ModifableValue with a direct key not part of value calculation (see SR5ActiveEffect.modifiableValueProperties)
-            // Skill automatics normally can default, wich we overwrite here.
+            // Skill automatics normally can default, which we overwrite here.
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
             const active = actor.system.skills.active;
             assert.deepEqual(active.automatics.mod, []);

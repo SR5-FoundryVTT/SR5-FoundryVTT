@@ -42,7 +42,7 @@ export const ModifiableValue = () => ({
 
 export const ModifiableValueLinked = () => ({
     ...ModifiableValue(),
-    attribute: new StringField({ required: false }),
+    attribute: new StringField({ required: true }),
     base_formula_operator: new StringField({
         required: false,
         initial: 'add',

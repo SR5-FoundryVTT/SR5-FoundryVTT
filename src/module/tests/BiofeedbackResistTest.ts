@@ -7,7 +7,7 @@ import { ResistTestData, ResistTestDataFlow } from './flows/ResistTestDataFlow';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 import { DataDefaults } from '../data/DataDefaults';
 import ModifierTypes = Shadowrun.ModifierTypes;
-import { MinimalActionType } from '../types/item/Action';
+import { DamageTypeType, MinimalActionType } from '../types/item/Action';
 
 // biofeedback is often caused by the results of another ResistTest
 export type BiofeedbackResistTestData = ResistTestData<ResistTestData> & {
@@ -42,7 +42,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
     /**
      * Get the damage type for biofeedback based on if the target is using hotsim or coldsim
      */
-    _getBiofeedbackDamageType(): Item.SystemOfType<'action'>['action']['damage']['type']['base'] {
+    _getBiofeedbackDamageType(): DamageTypeType {
         const actor = this.actor ?? this.persona ?? this.device?.actorOwner ?? this.device?.actor;
         if (!actor) return 'stun'
         return actor.isUsingHotSim ? 'physical': 'stun';

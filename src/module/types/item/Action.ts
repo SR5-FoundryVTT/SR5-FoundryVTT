@@ -150,6 +150,7 @@ const ActionData = () => ({
 });
 
 export type DamageType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof DamageData>>;
+export type DamageTypeType = DamageType['type']['base'];
 export type ActionRollType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionRollData>>;
 export type OpposedTestType = ActionRollType['opposed'];
 export type ActionResultType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionResultData>>;
