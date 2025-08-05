@@ -11,7 +11,6 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/tabs/SpellsTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/NetworkTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/DescriptionTab.hbs',
 
@@ -27,14 +26,6 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.hbs',
-
-        // item tabs
-        'systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs',
-        'systems/shadowrun5e/dist/templates/item/tabs/GridDescriptionTab.hbs',
-        'systems/shadowrun5e/dist/templates/item/tabs/DescriptionTab.hbs',
-        'systems/shadowrun5e/dist/templates/item/tabs/ActionTab.hbs',
-        'systems/shadowrun5e/dist/templates/item/tabs/MiscellaneousTab.hbs',
-        'systems/shadowrun5e/dist/templates/item/tabs/NetworksTab.hbs',
 
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.hbs',
@@ -110,6 +101,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/action.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/modifier.hbs',
+        'systems/shadowrun5e/dist/templates/item/parts/network.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/damage.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/spell.hbs',

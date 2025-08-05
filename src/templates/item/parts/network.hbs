@@ -1,0 +1,14 @@
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+    name=(localize 'SR5.Networks')
+    rightSide=(NetworksHeaderRightSide)
+}}
+{{#each networks}}
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+        img=this.img
+        name=this.name
+        itemUuid=this.uuid
+        description=item.description.value
+        rightSide=(NetworksItemRightSide this)
+        icons=(NetworksItemIcons)
+    }}
+{{/each}}
