@@ -83,10 +83,10 @@ export const UpdateActionFlow = {
         if (!changeData) return;
 
         const typeHandler = {
-            'weapon': UpdateActionFlow.injectWeaponTestIntoChangeData,
-            'spell': UpdateActionFlow.injectSpellTestIntoChangeData,
-            'complex_form': UpdateActionFlow.injectComplexFormTestIntoChangeData,
-            'call_in_action': UpdateActionFlow.injectCallInActionTestIntoChangeData
+            'weapon': UpdateActionFlow.injectWeaponTestIntoChangeData.bind(UpdateActionFlow),
+            'spell': UpdateActionFlow.injectSpellTestIntoChangeData.bind(UpdateActionFlow),
+            'complex_form': UpdateActionFlow.injectComplexFormTestIntoChangeData.bind(UpdateActionFlow),
+            'call_in_action': UpdateActionFlow.injectCallInActionTestIntoChangeData.bind(UpdateActionFlow)
         };
 
         const handler = typeHandler[type];

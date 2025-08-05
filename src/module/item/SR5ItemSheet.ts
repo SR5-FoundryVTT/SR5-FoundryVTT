@@ -85,6 +85,12 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     isUsingRangeCategory: boolean
 
+    // Define if the miscellaneous tab is shown or not.
+    showMiscTab: boolean
+
+    // Misc. Tab has different sections that can be shown or hidden.
+    miscMatrixPart: boolean
+
     // Allow users to view what values is calculated and what isn´t
     calculatedEssence: boolean
     calculatedCost: boolean
@@ -277,6 +283,12 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
         data.rollModes = CONFIG.Dice.rollModes;
 
+        // What tabs should be shown on this sheet?
+        data.showMiscTab = this._prepareShowMiscTab();
+
+        // What sections should be shown on the misc. tab?
+        data.miscMatrixPart = this.item.hasActionCategory('matrix');
+
         return {
             ...data,
             linkedActor
@@ -317,11 +329,6 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         const skills = skill ? [skill] : undefined;
         // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
         return ActionFlow.sortedActiveSkills(this.item.actorOwner, skills);
-    }
-
-    _getNetworkDevices(): SR5Item[] {
-        // return NetworkDeviceFlow.getNetworkDevices(this.item);
-        return [];
     }
 
     /* -------------------------------------------- */
@@ -601,28 +608,17 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         }
     }
 
-    //Swap slots (att1, att2, etc.) for ASDF matrix attributes
+    /**
+     * User selected a new matrix attribute on a specific matrix attribute slot (att1, att2,)
+     * Switch out slots for the old and selected matrix attribute.
+     */
     async _onMatrixAttributeSelected(event) {
-        if (!('atts' in this.item.system) || !this.item.system.atts) return;
+        if (!this.item.system.atts) return;
 
-        // sleaze, attack, etc.
-        const selectedAtt = event.currentTarget.value;
-        // att1, att2, etc..
+        const attribute = event.currentTarget.value;
         const changedSlot = event.currentTarget.dataset.att;
 
-        const oldValue = this.item.system.atts[changedSlot].att;
-
-        const data = {}
-
-        Object.entries(this.item.system.atts).forEach(([slot, { att }]) => {
-            if (slot === changedSlot) {
-                data[`system.atts.${slot}.att`] = selectedAtt;
-            } else if (att === selectedAtt) {
-                data[`system.atts.${slot}.att`] = oldValue;
-            }
-        });
-
-        await this.item.update(data);
+        await this.item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
 
     async _onEditItem(event) {
@@ -1045,5 +1041,24 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         }
 
         this.item.render(false);
+    }
+
+    /**
+     * Go through an action item action categories and if at least one is found that needs additional
+     * configuration, let the sheet show the misc. tab.
+     *
+     * @returns true, when the tab is to be shown.
+     */
+    _prepareShowMiscTab() {
+        // Currently, only action items use this tab.
+        const action = this.object.asType('action');
+        if (!action) return false;
+
+        const relevantCategories: Shadowrun.ActionCategories[] = ['matrix'];
+        for (const category of relevantCategories) {
+            if (this.document.hasActionCategory(category)) return true;
+        }
+
+        return false;
     }
 }
