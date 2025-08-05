@@ -25,7 +25,10 @@ export const shadowrunDamage = (context: QuenchBatchContext) => {
             assert.equal(character.system.track.stun.value, 1);
         });
         it('apply stun damage with overflow', async () => {
-            const character = await factory.createActor({ type: 'character' });
+            const character = await factory.createActor({
+                type: 'character',
+                system: { attributes: { willpower: { base: 1 }}}
+            });
             assert.equal(character.system.track.stun.value, 0);
             assert.equal(character.system.track.physical.value, 0);
 
@@ -44,7 +47,10 @@ export const shadowrunDamage = (context: QuenchBatchContext) => {
             assert.equal(character.system.track.physical.value, 1);
         });
         it('apply physical damage with overflow', async () => {
-            const character = await factory.createActor({ type: 'character' });
+            const character = await factory.createActor({
+                type: 'character',
+                system: { attributes: { body: { base: 1 }}}
+            });
             assert.equal(character.system.track.physical.value, 0);
             assert.equal(character.system.track.physical.overflow.value, 0);
 
