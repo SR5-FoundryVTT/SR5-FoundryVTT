@@ -72,10 +72,10 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
      * @returns null should the configured spirit not exist anymore.
      */
     async prepareSpirit(system: Item.SystemOfType<'call_in_action'>): Promise<SR5Actor|null> {
-        if (!system.spirit.uuid) {
+        if (!system.spirit.uuid)
             return null;
-        }
-        return await fromUuid(system.spirit.uuid) as SR5Actor;
+
+        return fromUuid(system.spirit.uuid) as Promise<SR5Actor>;
     }
 
     /**
@@ -85,10 +85,10 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
      * @returns null should the configured sprite not exist anymore.
      */
     async prepareSprite(system: Item.SystemOfType<'call_in_action'>): Promise<SR5Actor|null> {
-        if (!system.sprite.uuid) {
+        if (!system.sprite.uuid)
             return null;
-        }
-        return await fromUuid(system.sprite.uuid) as SR5Actor;
+
+        return fromUuid(system.sprite.uuid) as Promise<SR5Actor>;
     }
     
     /**

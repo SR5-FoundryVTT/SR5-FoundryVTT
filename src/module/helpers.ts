@@ -868,10 +868,10 @@ export class Helpers {
         if (!game.actors || !game.items) return undefined;
 
         if (data.pack && data.type === 'Actor')
-            return await Helpers.getEntityFromCollection(data.pack, data.id) as SR5Actor;
+            return Helpers.getEntityFromCollection(data.pack, data.id) as Promise<SR5Actor>;
 
         if (data.pack && data.type === 'Item')
-            return await Helpers.getEntityFromCollection(data.pack, data.id) as SR5Item;
+            return Helpers.getEntityFromCollection(data.pack, data.id) as Promise<SR5Item>;
 
         if (data.type === 'Actor')
             return game.actors.get(data.id) as SR5Actor;
@@ -889,7 +889,7 @@ export class Helpers {
      */
     static async getEntityFromCollection(collection: string, id: string): Promise<ClientDocument | null | undefined> {
         const pack = game.packs.find((p) => p.collection === collection);
-        return await pack?.getDocument(id);
+        return pack?.getDocument(id);
     }
 
     /**

@@ -200,6 +200,6 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      * @returns 
      */
     async getPreparedSpriteActor(): Promise<SR5Actor | null> {
-        return await fromUuid(this.data.compiledSpriteUuid as string) as SR5Actor;
+        return fromUuid(this.data.compiledSpriteUuid as string) as Promise<SR5Actor>;
     }
 }

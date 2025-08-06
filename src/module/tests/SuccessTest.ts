@@ -1391,7 +1391,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             if (!this.canConsumeDocumentResources()) return false;
         }
 
-        return await this.consumeDocumentRessources();
+        return this.consumeDocumentRessources();
     }
 
     /**

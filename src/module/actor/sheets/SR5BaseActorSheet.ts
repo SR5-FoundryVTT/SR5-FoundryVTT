@@ -677,7 +677,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (!item) return;
         await this.actor.inventory.removeItem(item);
 
-        return await this.actor.deleteEmbeddedDocuments('Item', [iid]);
+        return this.actor.deleteEmbeddedDocuments('Item', [iid]);
     }
 
     async _onItemRoll(event) {

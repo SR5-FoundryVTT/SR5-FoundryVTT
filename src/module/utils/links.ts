@@ -136,7 +136,7 @@ export class LinksHelpers {
             return LinksHelpers.openSourcePDF(source);
         }
         if (LinksHelpers.isUuid(source)) {
-            return await LinksHelpers.openSourceByUuid(source);
+            return LinksHelpers.openSourceByUuid(source);
         }
         if (LinksHelpers.isURL(source)) {
             return LinksHelpers.openSourceURL(source);

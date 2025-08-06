@@ -223,7 +223,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             previewTemplate: this.hasBlastTemplate,
             tests: this.getActionTests()
         };
-        return await createItemChatMessage(options);
+        return createItemChatMessage(options);
     }
 
     /**
@@ -235,14 +235,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         
         // Only show the item's description by user intention or by lack of testability.
         let dontRollTest = TestCreator.shouldPostItemDescription(event);
-        if (dontRollTest) return await this.postItemCard();
+        if (dontRollTest) return this.postItemCard();
         
         // Should be right here so that TestCreator.shouldPostItemDescription(event); can prevent execution beforehand. 
         if (!Hooks.call('SR5_CastItemAction', this)) return; 
 
         dontRollTest = !this.hasRoll;
 
-        if (dontRollTest) return await this.postItemCard();
+        if (dontRollTest) return this.postItemCard();
 
         if (!this.actor) return;
 
@@ -382,7 +382,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (!this.isType('weapon')) return;
 
         const value = Math.max(0, this.system.ammo.current.value - fired);
-        return await this.update({ system: { ammo: { current: { value } } } });
+        return this.update({ system: { ammo: { current: { value } } } });
     }
 
     /**
@@ -790,12 +790,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param damage Damage to be applied.
      */
     async addDamage(damage: DamageType) {
-        switch (damage.type.value) {
-            case 'matrix':
-                return await this.addMatrixDamage(damage);
-            default:
-                break;
-        }
+        if (damage.type.value === 'matrix')
+            return this.addMatrixDamage(damage);
     }
 
     /**
@@ -923,7 +919,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const uuid = this.system.linkedActor;
 
         if (uuid && this.isType('contact') && foundry.utils.parseUuid(uuid).documentType === 'Actor')
-            return await fromUuid(uuid) as SR5Actor;
+            return fromUuid(uuid) as Promise<SR5Actor>;
 
         return undefined;
     }
@@ -1277,7 +1273,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const marksData = this.marksData;
         if (!marksData) return [];
 
-        return await ActorMarksFlow.getMarkedDocuments(marksData);
+        return ActorMarksFlow.getMarkedDocuments(marksData);
     }
 
     /**
@@ -1380,7 +1376,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     async changeMatrixAttributeSlot(this: SR5Item, changedSlot: string, changedAttribute: Shadowrun.MatrixAttribute) {
         if (!this.system.atts) return;
         const updateData = MatrixFlow.changeMatrixAttribute(this.system.atts, changedSlot, changedAttribute);
-        return await this.update(updateData);
+        return this.update(updateData);
     }
 
     /**

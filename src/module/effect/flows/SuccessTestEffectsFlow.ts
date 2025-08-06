@@ -236,7 +236,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         const actor = await fromUuid(message.data.actorUuid) as SR5Actor;
 
-        return await SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, message.data.effectsData);
+        return SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, message.data.effectsData);
     }
 
     /**

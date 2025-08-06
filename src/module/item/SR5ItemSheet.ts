@@ -303,7 +303,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      * @returns Enriched HTML result
      */
     async enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): Promise<string> {
-        return await foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
+        return foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
     }
 
     /**
@@ -553,7 +553,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
             if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
 
-            return await this.updateLinkedActor(actor);
+            return this.updateLinkedActor(actor);
         }
 
         // Add networks to SINs.

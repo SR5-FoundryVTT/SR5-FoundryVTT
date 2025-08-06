@@ -187,7 +187,7 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
 
         const turnsSinceLastAttackSetting = combatant.getFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack);
         if (foundry.utils.getType(turnsSinceLastAttackSetting) !== 'number')
-            return await combatant.actor?.clearProgressiveRecoil();
+            return combatant.actor?.clearProgressiveRecoil();
 
         const turnsSinceLastAttack = Number(turnsSinceLastAttackSetting);
         if (turnsSinceLastAttack > 0)

@@ -131,10 +131,10 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     async select(): Promise<any> {
         await this.render(true);
 
-        if (this._selectionPromise === undefined || this.selection === undefined) {
+        if (this._selectionPromise === undefined || this.selection === undefined)
             return this._emptySelection();
-        }
-        return await this._selectionPromise;
+
+        return this._selectionPromise;
     }
 
     _emptySelection(): object {

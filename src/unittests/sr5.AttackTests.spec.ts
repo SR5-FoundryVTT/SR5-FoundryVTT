@@ -185,7 +185,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         const getVehicleWithArmor = async (armorValue: number): Promise<SR5Actor> => {
             const armor = DataDefaults.createData('armor', { value: armorValue, base: armorValue });
-            return await factory.createActor({ type: 'vehicle', system: { armor } });
+            return factory.createActor({ type: 'vehicle', system: { armor } });
         }
 
         const getDamage = (

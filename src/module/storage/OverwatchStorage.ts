@@ -36,7 +36,7 @@ export const OverwatchStorage = {
         const uuid = Helpers.uuidForStorage(actor.uuid);
         const ow = OverwatchStorage.getStorage();
         ow[uuid] = { score: 0 };
-        return await DataStorage.set(OverwatchStorage.key, ow);
+        return DataStorage.set(OverwatchStorage.key, ow);
     },
 
     /**
@@ -46,7 +46,7 @@ export const OverwatchStorage = {
         const uuid = Helpers.uuidForStorage(actor.uuid);
         const ow = OverwatchStorage.getStorage();
         delete ow[uuid];
-        return await DataStorage.set(OverwatchStorage.key, ow);
+        return DataStorage.set(OverwatchStorage.key, ow);
     },
 
     /**

@@ -1103,7 +1103,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const mods = new PartsList<number>(test.data.modifiers.mod);
         mods.addUniquePart('SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
-        return await test.execute();
+        return test.execute();
     }
 
     /**
@@ -1116,7 +1116,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async packActionTest(packName: Shadowrun.PackName, actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        return await this.tests.fromPackAction(packName, actionName, this, {showDialog});
+        return this.tests.fromPackAction(packName, actionName, this, {showDialog});
     }
 
     /**
@@ -1132,7 +1132,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         if (!test) return console.error('Shadowrun 5e | Rolling pack action failed');
 
-        return await test.execute();
+        return test.execute();
     }
 
     /**
@@ -1142,7 +1142,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options 
      */
     async generalActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return await this.packActionTest(SR5.packNames.generalActions as Shadowrun.PackName, actionName, options);
+        return this.packActionTest(SR5.packNames.generalActions as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1152,7 +1152,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async matrixActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return await this.packActionTest(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
+        return this.packActionTest(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1163,7 +1163,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async rollGeneralAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
             const generalPackName = Helpers.getGeneralActionsPackName();
-        return await this.rollPackAction(generalPackName, actionName, options);
+        return this.rollPackAction(generalPackName, actionName, options);
     }
 
     /**
@@ -1173,7 +1173,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async rollMatrixAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return await this.rollPackAction(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
+        return this.rollPackAction(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1196,7 +1196,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const test = await this.tests.fromAction(action, this, {showDialog});
         if (!test) return;
 
-        return await test.execute();
+        return test.execute();
     }
 
     /**
@@ -1214,7 +1214,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const test = await this.tests.fromAction(action, this, { showDialog });
         if (!test) return;
 
-        return await test.execute();
+        return test.execute();
     }
 
     /**
@@ -1227,7 +1227,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const test = await this.tests.fromItem(item, this, { showDialog });
         if (!test) return;
 
-        return await test.execute();
+        return test.execute();
     }
 
     /**
@@ -1238,7 +1238,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async testFromItem(item: SR5Item, options: Shadowrun.ActorRollOptions = {}) {
         const showDialog = this.tests.shouldShowDialog(options.event);
-        return await this.tests.fromItem(item, this, { showDialog});
+        return this.tests.fromItem(item, this, { showDialog});
     }
 
     /**
@@ -1311,7 +1311,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const test = await this.tests.fromAction(action, this, {showDialog});
         if (!test) return;
 
-        return await test.execute();
+        return test.execute();
     }
 
     /**
@@ -2028,7 +2028,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const marks = marksDevice.marksData;
         if (!marks) return [];
 
-        return await ActorMarksFlow.getMarkedDocuments(marks);
+        return ActorMarksFlow.getMarkedDocuments(marks);
     }
 
     /**

@@ -20,7 +20,7 @@ export class CritterPowerImporter extends DataImporter {
             const isSpritePower = jsonData.category._TEXT !== "Emergent";
             const selectedParser = isSpritePower ? critterPowerParser : spritePowerParser;
 
-            return await selectedParser.Parse(jsonData, compendiumKey) as Item.CreateData;
+            return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }
     };
 

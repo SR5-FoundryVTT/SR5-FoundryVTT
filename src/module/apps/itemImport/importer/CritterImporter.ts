@@ -37,7 +37,7 @@ export class CritterImporter extends DataImporter {
             const selectedParser = jsonData.category?._TEXT === 'Sprites' ? spriteParser
                                  : this.isSpirit(jsonData) ? spiritParser : critterParser;
 
-            return await selectedParser.Parse(jsonData, compendiumKey) as Actor.CreateData;
+            return selectedParser.Parse(jsonData, compendiumKey) as Promise<Actor.CreateData>;
         }
     };
 

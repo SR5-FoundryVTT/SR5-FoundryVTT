@@ -67,7 +67,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
                 switch (item.type) {
                     case 'host':
                         // We don't have to narrow down type here, the SR5Actor will handle this for us.
-                        return await this.actor.connectNetwork(item);
+                        return this.actor.connectNetwork(item);
                     }
                 
                 // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
