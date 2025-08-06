@@ -4,7 +4,7 @@ const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 const CallInActionData = () => ({
     ...BaseItemData(),
-    ...ActionPartData({ test: '' }),
+    ...ActionPartData({ test: '', type: 'complex' }),
 
     actor_type: new StringField({
         blank: true,
@@ -13,12 +13,12 @@ const CallInActionData = () => ({
     }),
     spirit: new SchemaField({
         type: new StringField({ required: true }),
-        force: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        force: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
         uuid: new StringField({ required: true }),
     }),
     sprite: new SchemaField({
         type: new StringField({ required: true }),
-        level: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        level: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
         uuid: new StringField({ required: true }),
     }),
 });

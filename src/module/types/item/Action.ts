@@ -79,17 +79,19 @@ export const ActionRollData = (
         test = 'SuccessTest',
         opposedTest = '',
         resistTest = '',
-        followedTest = ''
+        followedTest = '',
+        type = ''
     }: {
         test?: string;
         opposedTest?: string;
         resistTest?: string;
         followedTest?: string;
+        type?: string;
     } = {}
 ) => ({
     ...MinimalActionData(),
     test: new StringField({ required: true, initial: test }),
-    type: new StringField({ required: true }),
+    type: new StringField({ required: true, initial: type }),
     category: new SchemaField(ActionCategory()),
     categories: new ArrayField(new StringField({ required: true })),
     spec: new BooleanField(),
@@ -138,6 +140,7 @@ export const ActionPartData = (args: {
     opposedTest?: string;
     resistTest?: string;
     followedTest?: string;
+    type?: string;
 } = {}) => ({
     action: new SchemaField(ActionRollData(args)),
 });

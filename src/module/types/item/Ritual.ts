@@ -5,6 +5,7 @@ const { StringField } = foundry.data.fields;
 const RitualData = () => ({
     ...BaseItemData(),
     ...ActionPartData({
+        type: 'complex',
         test: 'RitualSpellcastingTest',
         opposedTest: 'OpposedRitualTest',
         followedTest: 'DrainTest'
