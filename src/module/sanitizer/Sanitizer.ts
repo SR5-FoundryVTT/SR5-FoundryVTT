@@ -1,5 +1,5 @@
 const { SchemaField, TypedObjectField, ArrayField } = foundry.data.fields;
-type CorrectionLog = Record<string, { oldValue: unknown; newValue: unknown }>;
+export type CorrectionLog = Record<string, { oldValue: unknown; newValue: unknown }>;
 
 /**
  * Sanitizer is responsible for validating and correcting raw data objects

@@ -1,5 +1,5 @@
 import { FLAGS } from "../constants";
-import { Sanitizer } from "./Sanitizer";
+import { Sanitizer } from "../sanitizer/Sanitizer";
 import { Version0_8_0 } from "./versions/Version0_8_0";
 import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';

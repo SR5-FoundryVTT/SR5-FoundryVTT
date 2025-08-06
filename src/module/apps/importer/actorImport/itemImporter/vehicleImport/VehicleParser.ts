@@ -6,6 +6,7 @@ import MountedWeaponParser from "./MountedWeaponParser";
 import { SR5Actor } from '../../../../../actor/SR5Actor';
 import VehicleModsParser from "./VehicleModsParser";
 import { ActorSchema } from "../../ActorSchema";
+import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 
 export default class VehicleParser {
 
@@ -50,23 +51,31 @@ export default class VehicleParser {
                 off_road_speed =  vehicle.speed
             }
 
-            await vehicleActor.update({
-                system: {
-                    driver: actor.id,
-                    vehicle_stats: {
-                        pilot: { base: Number(vehicle.pilot) || 0 },
-                        handling: { base: Number(handling) || 0 },
-                        off_road_handling: { base: Number(off_road_handling) || 0 },
-                        speed: { base: Number(speed) || 0 },
-                        off_road_speed: { base: Number(off_road_speed) || 0 },
-                        acceleration: { base: Number(vehicle.accel) || 0 },
-                        sensor: { base: Number(vehicle.sensor) || 0 },
-                        seats: { base: Number(vehicle.seats) || 0 }
-                    },
-                    attributes: { body: { base: Number(vehicle.body) || 0 } },
-                    armor: { base: Number(vehicle.armor) || 0 },
-                    isDrone: vehicle.isdrone === "True"
+            const system = {
+                driver: actor.id,
+                vehicle_stats: {
+                    pilot: { base: Number(vehicle.pilot) || 0 },
+                    handling: { base: Number(handling) || 0 },
+                    off_road_handling: { base: Number(off_road_handling) || 0 },
+                    speed: { base: Number(speed) || 0 },
+                    off_road_speed: { base: Number(off_road_speed) || 0 },
+                    acceleration: { base: Number(vehicle.accel) || 0 },
+                    sensor: { base: Number(vehicle.sensor) || 0 },
+                    seats: { base: Number(vehicle.seats) || 0 }
                 },
+                attributes: { body: { base: Number(vehicle.body) || 0 } },
+                armor: { base: Number(vehicle.armor) || 0 },
+                isDrone: vehicle.isdrone === "True"
+            };
+
+            const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.vehicle.schema, system);
+            if (consoleLogs) {
+                console.warn(`Document Sanitized on Import: Name: ${vehicle.name}\n`);
+                console.table(consoleLogs);
+            }
+
+            await vehicleActor.update({
+                system,
                 folder: actor.folder?.id
             });
 

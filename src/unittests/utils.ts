@@ -34,14 +34,9 @@ export class SR5TestFactory {
     }
 
     destroy() {
-        for (const actor of this.actors)
-            void actor.delete();
-
-        for (const item of this.items)
-            void item.delete();
-
-        for (const scene of this.scenes)
-            void scene.delete();
+        void Actor.deleteDocuments(this.actors.map(actor => actor.id!));
+        void Item.deleteDocuments(this.items.map(item => item.id!));
+        void Scene.deleteDocuments(this.scenes.map(scene => scene.id!));
 
         this.actors.length = 0;
         this.items.length = 0;

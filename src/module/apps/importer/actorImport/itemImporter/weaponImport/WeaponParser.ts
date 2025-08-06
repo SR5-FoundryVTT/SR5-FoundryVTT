@@ -300,7 +300,7 @@ export class WeaponParser {
             const chummerAccessories = getArray(chummerWeapon.accessories?.accessory);
 
             const accessories: any[] = []
-            chummerAccessories.forEach((item) => {
+            for (const item of chummerAccessories) {
                 const system = DataDefaults.baseSystemData('modification', {
                     //TODO: check this
                     mount_point: item.mount.toLowerCase() as any,
@@ -314,9 +314,9 @@ export class WeaponParser {
                     }
                 });
                 const current = createItemData(item.name, 'modification', system);
-                current._id = randomID(16)
+                current._id = foundry.utils.randomID(16);
                 accessories.push(current);
-            });
+            }
 
             if(!itemData.flags?.shadowrun5e?.embeddedItems) {
                 itemData.flags = {
