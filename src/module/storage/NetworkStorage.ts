@@ -11,7 +11,7 @@ import { SR5Item } from "../item/SR5Item";
  *    [uuid of network document]: [uuid of slave/ic/device, ...]
  */
 export const NetworkStorage = {
-    key: 'matrix.networks',
+    key: 'matrix.networks' as const,
 
     /**
      * Add a slave to a masters network.

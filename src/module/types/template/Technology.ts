@@ -20,7 +20,7 @@ export const TechnologyData = () => ({
     // === Wireless & Networking ===
     wireless: new StringField({
         required: true,
-        initial: 'online',
+        initial: 'none',
         choices: ['online', 'silent', 'offline', 'none'],
     }),
     master: new DocumentUUIDField(),

@@ -56,7 +56,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.hbs';
     }
 
     override get _dialogTemplate(): string {

@@ -23,11 +23,11 @@ export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> 
     }
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/opposing-mark-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/opposing-mark-test-dialog.hbs';
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/opposing-mark-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/opposing-mark-test-message.hbs';
     }
 
     override get successLabel(): Translation {

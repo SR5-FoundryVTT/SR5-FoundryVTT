@@ -21,7 +21,7 @@ export class BruteForceTest extends MatrixTest<MatrixPlacementData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.hbs';
     }
 
     override get _chatMessageTemplate() {

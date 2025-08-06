@@ -59,7 +59,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/matrix-resist-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/matrix-resist-test-dialog.hbs';
     }
 
     override get successLabel(): Translation {
