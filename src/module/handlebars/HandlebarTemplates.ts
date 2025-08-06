@@ -27,6 +27,14 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.hbs',
 
+        // item tabs
+        'systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/GridDescriptionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/DescriptionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/ActionTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/MiscellaneousTab.hbs',
+        'systems/shadowrun5e/dist/templates/item/tabs/NetworksTab.hbs',
+
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.hbs',
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.hbs',
