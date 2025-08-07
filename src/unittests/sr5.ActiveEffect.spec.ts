@@ -15,7 +15,6 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
     after(async () => { factory.destroy(); });
 
-    // TODO: taMiF Effects application of MODIFY (at least) is broken. We might have to fully replace ActiveEffect.apply()
     describe('SR5ActiveEffect', () => {
         it('MODIFY mode: apply system custom mode to main and sub value-keys', async () => {
             const actor = await factory.createActor({ type: 'character' });
@@ -141,6 +140,27 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             });
         });
 
+        it('ADD mode: adding to ModifableField should cause MODIFY mode to be used', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+
+            assert.strictEqual(actor.system.attributes.body.value, 0);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 0);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.skills.active.automatics', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 3 }]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.mod, [{ name: 'Test Effect', value: 3 }]);
+        });
     });
     /**
  * Tests around the systems 'advanced' effects on top of Foundry core active effects.

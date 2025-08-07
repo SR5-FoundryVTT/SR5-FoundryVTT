@@ -162,6 +162,41 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
+     * Avoid missuse of some mods to break sheet rendering. Specifically due to modify and override special
+     * handling of ModifiableField, we should save users from using mode Add wrong by adressing a ModifiableField
+     * change key directly, therefore breaking sheet rendering.
+     * 
+     * @param model The model used to check value types under key
+     * @param change  The change key to redirect.
+     */
+    static changeAddToCustomMode(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        if (change.mode !== CONST.ACTIVE_EFFECT_MODES.ADD) return;
+
+        // Check direct key and change mode.
+        let value = SR5ActiveEffect.getModifiableValue(model, change.key);
+        if (value) {
+            change.mode = CONST.ACTIVE_EFFECT_MODES.CUSTOM;
+            return;
+        }
+
+        // Move key up one hierarchy and check again
+        const nodes = change.key.split('.');
+        const property = nodes.pop() ?? '';
+        const indirectKey = nodes.join('.');
+
+        value = SR5ActiveEffect.getModifiableValue(model, indirectKey);
+        if (value) {
+            // Allow users to change keys that don't affect value calculation
+            // This could be skill.canDefault or similar.
+            const keyIsPartOfValueCalculation = this.modifiableValueProperties.includes(property);
+            if (keyIsPartOfValueCalculation) {
+                change.key = indirectKey;
+                change.mode = CONST.ACTIVE_EFFECT_MODES.CUSTOM;
+            }
+        }
+    }
+
+    /**
      * Change change mode from custom (modify) to add, if the change key is NOT a ModifiableValue.
      * 
      * @param model The model used to check value types under key
@@ -286,7 +321,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
 
-        // Alter change values before applying them.
+        // Alter change properties to the correct application methods.
+        SR5ActiveEffect.changeAddToCustomMode(model, change);
         SR5ActiveEffect.redirectToNearModifiableValue(model, change);
         SR5ActiveEffect.changeCustomToAddMode(model, change);
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
@@ -301,15 +337,16 @@ export class SR5ActiveEffect extends ActiveEffect {
             return {};
         }
 
+        // Foundry default effect application will use DataModel.applyChange.
         const changes = super.apply(model, change);
 
-        // Remove undefined changes, as there were already applied in ModifiableField.
+        // ModifiableField applies some changes outside of Foundry behavior, not causing a override value.
+        // Those override values are then undefined and should be hidden from Foundries 'override' behavior.
         for (const key of Object.keys(changes))
             if (changes[key] === undefined)
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete changes[key];
 
-        // Foundry default effect application will use DataModel.applyChange.
         return changes;
     }
 
