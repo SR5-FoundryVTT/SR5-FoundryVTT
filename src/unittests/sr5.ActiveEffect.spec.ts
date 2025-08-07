@@ -140,7 +140,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             });
         });
 
-        it('ADD mode: adding to ModifableField should cause MODIFY mode to be used', async () => {
+        it('ADD mode: adding to ModifiableField should cause MODIFY mode to be used', async () => {
             const actor = await factory.createActor({ type: 'character' });
 
             assert.strictEqual(actor.system.attributes.body.value, 0);
