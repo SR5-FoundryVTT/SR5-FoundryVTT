@@ -60,6 +60,10 @@ export const FLAGS = {
     TokenRulerColorSprinting: "TokenRulerColorSprinting",
     TokenRulerOpacity: 'TokenRulerOpacity',
     TokenUseRoutingLib: 'TokenUseRoutingLib',
+    RollMacroDefaultPack: "RollMacroDefaultPack",
+    RollActionDefaultPack: "RollActionDefaultPack",
+    AllowDifferentSkillForTeamworkTests: "AllowDifferentSkillForTeamworkTests",
+    AllowLeaderAsParticipantForTeamworkTests: "AllowLeaderAsParticipantForTeamworkTests"
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

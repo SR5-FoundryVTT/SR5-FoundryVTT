@@ -1,0 +1,61 @@
+<div class="sr5 chat-card teamwork-card rollRequest-card">
+  <div class="card-title card-header">
+    <i class="fas fa-users"></i>
+    <span class="test-name">{{localize "SR5.Dialogs.Teamwork.Title"}}</span>
+  </div>
+
+  {{#if actor}}
+  <div class="card-title card-header">
+    <div class="container container--fluid">
+      <div class="container__row">
+        <div class="container__col">
+          <div class="document">
+            <a class="chat-select-link">
+              <img src="{{actor.img}}" class="entity-selectable" data-tooltip="{{actor.name}}">
+            </a>
+            <h3 class="header-name">
+              <a class="chat-document-link" data-uuid="{{actor.uuid}}">{{actor.name}}</a>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="card-main-content">
+    <div class="card-content">
+      <ul class="test-params">
+        <li><strong>{{localize "SR5.Skill.Skill"}}:</strong> {{localizeSkill skill}}</li>
+        {{#if attribute}}
+        <li><strong>{{localize "SR5.Attribute"}}:</strong> {{localize attribute.label}}</li>
+        {{/if}}
+        {{#if limit}}
+        <li><strong>{{localize "SR5.Limit"}}:</strong> {{localize limit.label}}</li>
+        {{/if}}
+        {{#if threshold}}
+        <li><strong>{{localize "SR5.Threshold"}}:</strong> {{threshold}}</li>
+        {{/if}}
+        {{#if allowOtherSkills}}
+        <li><em>{{localize "SR5.Skill.Teamwork.OtherSkillsAllowed"}}</em></li>
+        {{/if}}
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-participants">
+    <div class="card-content">
+      <h4>{{localize "SR5.Skill.Teamwork.Participants"}}</h4>
+<div class="sr5-teamwork-participants">
+  {{#each participants}}
+    {{> systems/shadowrun5e/dist/templates/chat/parts/teamworkParticipant.html
+        name=this.name
+        netHits=this.netHits
+        glitched=this.glitched
+        criticalGlitched=this.criticalGlitched
+    }}
+  {{/each}}
+</div>
+    </div>
+  </div>
+</div>
