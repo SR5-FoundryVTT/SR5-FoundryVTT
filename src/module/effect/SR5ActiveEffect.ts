@@ -162,8 +162,8 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Avoid missuse of some mods to break sheet rendering. Specifically due to modify and override special
-     * handling of ModifiableField, we should save users from using mode Add wrong by adressing a ModifiableField
+     * Avoid misuse of some mods to break sheet rendering. Specifically due to modify and override special
+     * handling of ModifiableField, we should save users from using mode Add wrong by addressing a ModifiableField
      * change key directly, therefore breaking sheet rendering.
      * 
      * @param model The model used to check value types under key
