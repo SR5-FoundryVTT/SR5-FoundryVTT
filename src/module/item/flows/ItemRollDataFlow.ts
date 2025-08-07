@@ -35,7 +35,7 @@ export const ItemRollDataFlow = {
         };
 
         // Alter roll data for each action category used that provides different handling.
-        for (const category of againstData?.action?.categories) {
+        for (const category of againstData?.action?.categories ?? []) {
             const callback = handlers[category];
             if (!callback) continue;
             callback(item, rollData, action, testData, againstData);

@@ -179,6 +179,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
             TechnologyPrep.prepareConceal(technology, equippedMods);
+            TechnologyPrep.prepareMatrixAttributes(this.system);
+            TechnologyPrep.prepareMentalAttributes(this.system);
             TechnologyPrep.prepareAvailability(this, technology);
             TechnologyPrep.prepareCost(this, technology);
         }
@@ -1391,7 +1393,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     override getRollData(options: RollDataOptions={}): any {
         // Foundry is simply passing down 'system', so we have to duplicate to avoid contamination.
-        const rollData = foundry.utils.duplicate(super.getRollData());
+        const rollData = foundry.utils.deepClone(super.getRollData());
         return ItemRollDataFlow.getRollData(this, rollData, options);
     }
 

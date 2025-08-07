@@ -42,6 +42,29 @@ export const TechnologyPrep = {
     },
 
     /**
+     * All technology items use their device rating for mental attributes by default.
+     * See SR5#237 'Matrix Actions'.
+     * 
+     * These mental attributes might later be overwritten within SR5Item.getTestData.
+     * 
+     */
+    prepareMentalAttributes(system: SR5Item['system']) {
+        const attributes = system.attributes!;
+        const technology = system.technology!;
+
+        for (const name of SR5.mentalAttributes) {
+            // Rating can be undefined...
+            const rating = technology.rating ?? 0;
+            // Rating can be a string...
+            const base = Number(rating);
+            const label = SR5.attributes[name];
+
+            const attribute = DataDefaults.createData('attribute_field', { label, base });
+            attributes[name] = attribute;
+        }
+    },
+
+    /**
      * All technology items use their device rating for their matrix attributes by default.
      * See SR5#234 'Devices'.
      */
