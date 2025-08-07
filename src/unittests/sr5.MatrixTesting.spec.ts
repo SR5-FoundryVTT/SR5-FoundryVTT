@@ -42,8 +42,8 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
 
         it('Target a host IC and place a mark on it and the host', async () => {
             const host = await factory.createItem({ type: 'host', system: { rating: 1 } });
-            //@ts-expect-error taM check this
-            const ic = await factory.createActor({ type: 'ic', system: { host: { id: host.uuid } } });
+            const ic = await factory.createActor({ type: 'ic' });
+            await ic.connectNetwork(host);
             const decker = await factory.createActor({
                 type: 'character',
                 system: {

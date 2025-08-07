@@ -1,15 +1,11 @@
-import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5Item} from "../../item/SR5Item";
-import MarkedDocument = Shadowrun.MarkedDocument;
+import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 
-interface ICActorSheetData extends SR5ActorSheetData {
-    host: SR5Item | undefined | null;
-    markedDocuments: MarkedDocument[];
+interface ICActorSheetData extends MatrixActorSheetData {
     disableMarksEdit: boolean;
 }
 
-export class SR5ICActorSheet extends SR5BaseActorSheet {
+export class SR5ICActorSheet extends SR5MatrixActorSheet {
     /**
      * IC actors will handle these item types specifically.
      *
@@ -23,12 +19,6 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
 
     override async getData(options) {
         const data = await super.getData(options) as ICActorSheetData;
-
-        // Fetch a connected host.
-        data.host = this.actor.network;
-
-        // Display Matrix Marks
-        data.markedDocuments = await this.actor.getAllMarkedDocuments();
         data.disableMarksEdit = this.actor.hasHost();
 
         return data;

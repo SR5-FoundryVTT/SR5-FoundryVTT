@@ -25,6 +25,7 @@ const CharacterData = () => ({
     is_npc: new BooleanField(),
     npc: new SchemaField({ is_grunt: new BooleanField() }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    matrix_full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
     special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane'], initial: 'mundane' }),
 
     // === Attributes & Limits ===

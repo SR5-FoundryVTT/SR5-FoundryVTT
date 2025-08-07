@@ -104,6 +104,10 @@ export class Helpers {
         return event.currentTarget.closest('.list-header').dataset.itemId;
     }
 
+    static eventUuid(event): string {
+        return event.currentTarget?.dataset?.uuid ?? '';
+    }
+
     // replace 'SR5.'s on keys with 'SR5_DOT_'
     static onSetFlag(data) {
         if (!data || typeof data !== 'object') return data;

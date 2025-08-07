@@ -18,8 +18,9 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpritePowersTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ConfigTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/HackingTab.hbs',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ProgramListTab.hbs',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/MarksTab.hbs',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.hbs',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.hbs',
@@ -65,6 +66,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.hbs',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.hbs',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/Targets.hbs',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs',
 
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.hbs',

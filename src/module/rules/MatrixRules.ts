@@ -270,7 +270,7 @@ export class MatrixRules {
         const activeDefenses: Shadowrun.ActiveDefenseData  = {
             full_defense: {
                 label: 'SR5.FullMatrixDefense',
-                value: actor.getFullMatrixDefenseAttribute()?.value,
+                value: actor.getMatrixFullDefenseAttribute()?.value,
                 initMod: -10,
             },
         };

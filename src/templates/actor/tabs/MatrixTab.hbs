@@ -74,9 +74,9 @@
                 </nav>
                 <div class="scroll-area scroll-area-matrix-hacking">
                     <section data-group='matrix' class="tabsbody">
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.hbs'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Targets.hbs'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.hbs'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/MarksTab.hbs'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ProgramListTab.hbs'}}
                         {{#if emerged}}
                         {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.hbs'}}
                         {{/if}}
@@ -95,23 +95,9 @@
             }}
         {{/if}}
         {{#if emerged}}
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.hbs' }}
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.hbs' }}
         {{/if}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
-        name=(localize 'SR5.Actions')
-        rightSide=(MatrixActionsHeaderRightSide)
-        }}
-        <div class="scroll-area scroll-area-matrix-hacking matrix-hacking-actions">
-            {{#each matrixActions}}
-            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
-            name=this.name
-            itemId=this.uuid
-            itemType="matrix-action"
-            hasRoll="true"
-            rightSide=(MatrixActionsItemRightSide this)
-            }}
-            {{/each}}
-        </div>
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
     </div>
 </div>
 {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}

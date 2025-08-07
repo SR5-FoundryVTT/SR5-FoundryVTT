@@ -183,6 +183,26 @@
                     </div>
                 </div>
                 {{/if}}
+                {{#if isCharacter }}
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localize "SR5.MatrixFullDefenseAttribute"}}
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="item-text input defense">
+                                    <select name="system.matrix_full_defense_attribute" class="display">
+                                        {{#select system.matrix_full_defense_attribute}} {{#each config.attributes as |name type|}}
+                                            <option value="{{type}}">{{localize name}}</option>
+                                        {{/each}} {{/select}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {{/if}}
                 {{#if isCharacter}}
                 <div class="list-item">
                     <div class="list-item-content">

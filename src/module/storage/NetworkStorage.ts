@@ -143,6 +143,10 @@ export const NetworkStorage = {
             }
         }
 
+        // if we did not find the master in the NetworkStorage, try to load it from the uuid we have stored
+        const masterUuid = slave.getMasterUuid();
+        if (masterUuid) return fromUuidSync(masterUuid) as SR5Item | null;
+
         return null;
     },
 

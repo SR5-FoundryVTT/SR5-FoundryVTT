@@ -1,15 +1,26 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix' tabId='marks'}}
-<div class="matrix">
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
-            name=(localize 'SR5.Marks')
-            itemId='mark'
-            rightSide=(MarkListHeaderRightSide)
-            icons=(MarkListHeaderIcons)
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        name=(localize 'SR5.Marks')
+        itemId='mark'
+        rightSide=(MarkListHeaderRightSide)
+        icons=(MarkListHeaderIcons)
+}}
+{{#each markedDocuments}}
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+            img=(speakerImg this.document)
+            name=(speakerName this.document)
+            additionalCssClass=(MatrixTargetCssClass this)
+            itemImgCssClass='select-matrix-target'
+            itemNameCssClass='open-matrix-target'
+            itemUuid=this.document.uuid
+            rightSide=(MatrixMarkedDocumentItemRightSide this)
+            icons=(MatrixMarkedDocumentItemIcons this)
     }}
-    {{#each markedDocuments}}
+    {{! -- Overview of icons connected to the main icon (devices of persona) -- }}
+    {{#each this.icons}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
                 img=(speakerImg this.document)
                 name=(speakerName this.document)
+                itemCssClass='subcategory-item'
                 additionalCssClass=(MatrixTargetCssClass this)
                 itemImgCssClass='select-matrix-target'
                 itemNameCssClass='open-matrix-target'
@@ -17,20 +28,5 @@
                 rightSide=(MatrixMarkedDocumentItemRightSide this)
                 icons=(MatrixMarkedDocumentItemIcons this)
         }}
-        {{! -- Overview of icons connected to the main icon (devices of persona) -- }}
-        {{#each this.icons}}
-            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
-                    img=(speakerImg this.document)
-                    name=(speakerName this.document)
-                    itemCssClass='subcategory-item'
-                    additionalCssClass=(MatrixTargetCssClass this)
-                    itemImgCssClass='select-matrix-target'
-                    itemNameCssClass='open-matrix-target'
-                    itemUuid=this.document.uuid
-                    rightSide=(MatrixMarkedDocumentItemRightSide this)
-                    icons=(MatrixMarkedDocumentItemIcons this)
-            }}
-        {{/each}}
     {{/each}}
-</div>
-{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+{{/each}}

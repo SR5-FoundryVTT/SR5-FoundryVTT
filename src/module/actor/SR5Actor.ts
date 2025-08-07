@@ -524,11 +524,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Get the Attribute to add when making a Full Matrix Defense
      */
-    getFullMatrixDefenseAttribute(this: SR5Actor) {
-        if (this.isType('vehicle'))
+    getMatrixFullDefenseAttribute(this: SR5Actor): AttributeFieldType | undefined {
+        if (this.isType('vehicle')) {
             return this.findVehicleStat('pilot');
-        if (this.isType('character'))
-            return (this as SR5Actor<'character'>).findAttribute('willpower');
+        } else if (this.isType('character')) {
+            let att = this.system.matrix_full_defense_attribute;
+            if (!att) att = 'willpower';
+            return this.findAttribute(att);
+        }
         return undefined;
     }
 
