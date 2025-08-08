@@ -45,7 +45,7 @@ export interface Accessory {
     required?: ConditionsSchema;
     source: { _TEXT: string; };
     specialmodification?: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface Weapon {
@@ -112,7 +112,7 @@ export interface Weapon {
     useskill?: { _TEXT: string; };
     useskillspec?: { _TEXT: string; };
     weapontype?: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface WeaponsSchema {

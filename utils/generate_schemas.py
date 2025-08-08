@@ -329,7 +329,7 @@ def build_type(
 
     # Add optional `translate` element for interfaces at depth 2
     if depth == 2 and addTranslate:
-        props.append(f"{ind}{ts_key('translate')}?: string;")
+        props.append(f"{ind}{ts_key('translate')}?: {{ _TEXT: string; }};")
 
     if (depth == 1):
         body = "{\n        " + f"\n        ".join(props) + "\n    }"

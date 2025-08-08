@@ -79,7 +79,7 @@ export interface Gear {
         userange?: { _TEXT: string; };
     };
     weight?: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface GearSchema {

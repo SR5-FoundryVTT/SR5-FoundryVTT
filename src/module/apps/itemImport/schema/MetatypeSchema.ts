@@ -101,7 +101,7 @@ export interface Metatype {
     wilaug: { _TEXT: string; };
     wilmax: { _TEXT: string; };
     wilmin: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface MetatypeSchema {

@@ -14,7 +14,7 @@ export interface Complexform {
     required?: ConditionsSchema;
     source: { _TEXT: string; };
     target: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface ComplexformsSchema {

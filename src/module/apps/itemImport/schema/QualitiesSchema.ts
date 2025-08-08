@@ -56,7 +56,7 @@ export interface Quality {
     required?: ConditionsSchema;
     source: { _TEXT: string; };
     stagedpurchase?: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface QualitiesSchema {

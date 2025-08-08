@@ -49,7 +49,7 @@ export interface Bioware {
     requireparent?: Empty;
     selectside?: Empty;
     source: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface Grade {
@@ -61,7 +61,7 @@ export interface Grade {
     name: { _TEXT: string; };
     page: { _TEXT: string; };
     source: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface BiowareSchema {

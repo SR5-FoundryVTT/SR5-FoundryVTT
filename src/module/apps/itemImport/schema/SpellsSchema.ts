@@ -19,7 +19,7 @@ export interface Spell {
     source: { _TEXT: string; };
     type: { _TEXT: string; };
     useskill?: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface SpellsSchema {

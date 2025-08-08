@@ -50,7 +50,7 @@ export interface Armor {
             name: { _TEXT: string; };
         };
     };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface Mod {
@@ -76,7 +76,7 @@ export interface Mod {
             value: { _TEXT: string; };
         };
     };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface ArmorSchema {

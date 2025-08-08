@@ -22,7 +22,7 @@ export interface Power {
     source: { _TEXT: string; };
     toxic?: { _TEXT: string; };
     type: Empty | { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface CritterpowersSchema {

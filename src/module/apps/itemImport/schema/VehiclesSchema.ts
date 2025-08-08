@@ -30,7 +30,7 @@ export interface Mod {
         subsystem: Many<{ _TEXT: string; }>;
     };
     weaponmountcategories?: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface Vehicle {
@@ -98,7 +98,7 @@ export interface Vehicle {
             name: { _TEXT: string; };
         }>;
     };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface Weaponmount {
@@ -115,7 +115,7 @@ export interface Weaponmount {
     slots: { _TEXT: string; };
     source: { _TEXT: string; };
     weaponcategories?: { _TEXT: string; };
-    translate?: string;
+    translate?: { _TEXT: string; };
 };
 
 export interface VehiclesSchema {
