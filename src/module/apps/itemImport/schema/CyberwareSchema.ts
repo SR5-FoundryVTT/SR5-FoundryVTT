@@ -149,6 +149,7 @@ export interface Cyberware {
         $: { includeself: string; };
         name: { _TEXT: string; };
     };
+    translate?: string;
 };
 
 export interface Grade {
@@ -161,12 +162,13 @@ export interface Grade {
     name: { _TEXT: string; };
     page: { _TEXT: string; };
     source: { _TEXT: string; };
+    translate?: string;
 };
 
 export interface CyberwareSchema {
     $: { xmlns: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
     categories: {
-        category: Many<{ _TEXT: string; $: { blackmarket: string; }; }>;
+        category: Many<{ _TEXT: string; $: { blackmarket: string; translate?: string; }; }>;
     };
     cyberwares: {
         cyberware: Many<Cyberware>;

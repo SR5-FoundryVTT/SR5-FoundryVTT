@@ -79,12 +79,13 @@ export interface Gear {
         userange?: { _TEXT: string; };
     };
     weight?: { _TEXT: string; };
+    translate?: string;
 };
 
 export interface GearSchema {
     $: { xmlns: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
     categories: {
-        category: Many<{ _TEXT: string; $?: { blackmarket: string; }; }>;
+        category: Many<{ _TEXT: string; $?: { blackmarket: string; translate?: string; }; }>;
     };
     gears: {
         gear: Many<Gear>;

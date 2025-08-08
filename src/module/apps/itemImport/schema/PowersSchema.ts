@@ -12,6 +12,7 @@ export interface Enhancement {
     power: Empty | { _TEXT: string; };
     required: ConditionsSchema;
     source: { _TEXT: string; };
+    translate?: string;
 };
 
 export interface Power {
@@ -38,6 +39,7 @@ export interface Power {
     points: { _TEXT: string; };
     required?: ConditionsSchema;
     source: { _TEXT: string; };
+    translate?: string;
 };
 
 export interface PowersSchema {

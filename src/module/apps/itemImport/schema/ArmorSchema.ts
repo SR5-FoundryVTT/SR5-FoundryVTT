@@ -50,6 +50,7 @@ export interface Armor {
             name: { _TEXT: string; };
         };
     };
+    translate?: string;
 };
 
 export interface Mod {
@@ -75,6 +76,7 @@ export interface Mod {
             value: { _TEXT: string; };
         };
     };
+    translate?: string;
 };
 
 export interface ArmorSchema {
@@ -83,7 +85,7 @@ export interface ArmorSchema {
         armor: Many<Armor>;
     };
     categories: {
-        category: Many<{ _TEXT: string; $: { blackmarket: string; }; }>;
+        category: Many<{ _TEXT: string; $: { blackmarket: string; translate?: string; }; }>;
     };
     modcategories: {
         category: Many<{ _TEXT: string; $: { blackmarket: string; }; }>;

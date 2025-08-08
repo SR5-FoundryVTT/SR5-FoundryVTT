@@ -19,12 +19,13 @@ export interface Spell {
     source: { _TEXT: string; };
     type: { _TEXT: string; };
     useskill?: { _TEXT: string; };
+    translate?: string;
 };
 
 export interface SpellsSchema {
     $: { xmlns: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
     categories: {
-        category: Many<{ _TEXT: string; $: { alchemicalskill?: string; barehandedadeptskill?: string; useskill: string; }; }>;
+        category: Many<{ _TEXT: string; $: { alchemicalskill?: string; barehandedadeptskill?: string; translate?: string; useskill: string; }; }>;
     };
     spells: {
         spell: Many<Spell>;

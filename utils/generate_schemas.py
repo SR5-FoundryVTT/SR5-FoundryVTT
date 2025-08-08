@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 import base64
 import requests
-from lxml import etree
+from lxml import etree # type: ignore
 from io import BytesIO
 from pathlib import Path
 from collections import defaultdict, Counter
@@ -111,7 +111,7 @@ class NodeInfo:
         self.attr_block_count = 0
         self.children: Set[str] = set()
         self.attrs: Dict[str, int] = defaultdict(int)
-    
+
     def merge(self, other: NodeInfo):
         self.count += other.count
         self.text_count += other.text_count
@@ -146,6 +146,15 @@ def ts_key(name: str) -> str:
 
 def qname(el: etree._Element) -> str:
     return etree.QName(el).localname
+
+def add_custom_fields(struct: Structure) -> None:
+    """Artificially adds custom fields to the structure."""
+    # Add optional `translate` attribute to `category` elements
+    for path, info in struct.items():
+        if path.endswith("/categories/category"):
+            if 'translate' not in info.attrs:
+                # Set count to 0 to ensure it's optional
+                info.attrs['translate'] = 0
 
 # -------------------------------------------------------------------
 # XML Analysis Functions
@@ -221,6 +230,7 @@ def build_type(
     mult: Multiplicity,
     depth=0,
     second_defs: Dict[str, List[Tuple[str, Structure, Multiplicity]]] | None = None,
+    addTranslate: bool = True
 ) -> str:
     info = struct[path]
 
@@ -261,7 +271,7 @@ def build_type(
 
     # ---------- composite ----------
     props: list[str] = []
-    
+
     # attributes
     attr_block = ""
     if info.attrs:
@@ -298,7 +308,7 @@ def build_type(
         else:
             base = build_type(child_path, struct, mult, depth + 1, second_defs)
 
-        # fix empty inside of Many and OneOrMany 
+        # fix empty inside of Many and OneOrMany
         empty_prefix = ""
         if isinstance(base, str) and base.startswith("Empty | "):
             empty_prefix = "Empty | "
@@ -316,6 +326,10 @@ def build_type(
     # mixed text
     if info.text_count:
         props.append(f"{ind}_TEXT?: string;")
+
+    # Add optional `translate` element for interfaces at depth 2
+    if depth == 2 and addTranslate:
+        props.append(f"{ind}{ts_key('translate')}?: string;")
 
     if (depth == 1):
         body = "{\n        " + f"\n        ".join(props) + "\n    }"
@@ -379,9 +393,9 @@ def generate_header(imports: list[str] = []) -> str:
     lines += ["import { Empty, Many, OneOrMany } from './Types';"]
     return "\n".join(lines) + "\n"
 
-def generate_ts(struct, mult, root_tag: str, file_stem: str, depth: int = 0) -> str:
+def generate_ts(struct, mult, root_tag: str, file_stem: str, depth: int = 0, addTranslate: bool = True) -> str:
     second_defs: Dict[str, List[Tuple[str, Structure, Multiplicity]]] = {}
-    root_type = build_type(root_tag, struct, mult, depth, second_defs)
+    root_type = build_type(root_tag, struct, mult, depth, second_defs, addTranslate)
 
     lines = [generate_header(list(EXTRACT_TAGS.values()) if depth == 0 else [])]
 
@@ -400,13 +414,13 @@ def generate_ts(struct, mult, root_tag: str, file_stem: str, depth: int = 0) -> 
     # Emit root interface
     root_iface = f"{file_stem.capitalize()}Schema"
     lines.append(f"export interface {root_iface} {normalize_interface_body(root_type)};")
-    
+
     return "\n".join(lines) + "\n"
 
 def download_xml_from_github(path: str) -> etree._Element:
     api_url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/{path}?ref={BRANCH}"
     headers = {"Accept": "application/vnd.github.v3+json"}
-    
+
     response = requests.get(api_url, headers=headers)
     response.raise_for_status()
 
@@ -443,6 +457,7 @@ def main() -> None:
             xml_path = f"Chummer/data/{xml_name}"
             root = download_xml_from_github(xml_path)
             struct, mult = analyse_xml(root)
+            add_custom_fields(struct)
             ts_code = generate_ts(struct, mult, qname(root), xml_stem)
             (OUT_DIR / f"{xml_stem.capitalize()}Schema.ts").write_text(ts_code, encoding="utf-8")
             print(f"✔  {xml_name} → schema/{xml_stem}.ts")
@@ -454,6 +469,8 @@ def main() -> None:
         else:
             xml_path = f"Chummer/{'lang' if 'data' in xml_name else 'data'}/{xml_name}"
             root = download_xml_from_github(xml_path)
+            struct, mult = analyse_xml(root)
+            add_custom_fields(struct)
             xml_cache[xml_name] = analyse_xml(root)
 
     # handle merged files
@@ -468,7 +485,7 @@ def main() -> None:
         extracted = EXTRACT_STRUCTURES.get(tag)
         if extracted:
             temp_struct, temp_mult = merge_structs(extracted)
-            ts_code = generate_ts(temp_struct, temp_mult, "merged", interface_name[:-6], 2)
+            ts_code = generate_ts(temp_struct, temp_mult, "merged", interface_name[:-6], 2, False)
             ts_code = normalize_interface_body(ts_code)
             (OUT_DIR / f"{interface_name}.ts").write_text(ts_code, encoding="utf-8")
             print(f"✔  compiled {tag} → schema/{interface_name}.ts")

@@ -12,6 +12,7 @@ export interface Echo {
     name: { _TEXT: string; };
     page: { _TEXT: string; };
     source: { _TEXT: string; };
+    translate?: string;
 };
 
 export interface EchoesSchema {

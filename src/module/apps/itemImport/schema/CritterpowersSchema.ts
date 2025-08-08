@@ -22,12 +22,13 @@ export interface Power {
     source: { _TEXT: string; };
     toxic?: { _TEXT: string; };
     type: Empty | { _TEXT: string; };
+    translate?: string;
 };
 
 export interface CritterpowersSchema {
     $: { xmlns: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
     categories: {
-        category: Many<{ _TEXT: string; $?: { whitelist: string; }; }>;
+        category: Many<{ _TEXT: string; $?: { translate?: string; whitelist: string; }; }>;
     };
     powers: {
         power: Many<Power>;

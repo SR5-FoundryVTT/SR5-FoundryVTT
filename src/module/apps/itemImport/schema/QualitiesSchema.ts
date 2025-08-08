@@ -56,12 +56,13 @@ export interface Quality {
     required?: ConditionsSchema;
     source: { _TEXT: string; };
     stagedpurchase?: { _TEXT: string; };
+    translate?: string;
 };
 
 export interface QualitiesSchema {
     $: { xmlns: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
     categories: {
-        category: Many<{ _TEXT: string; }>;
+        category: Many<{ _TEXT: string; $?: { translate: string; }; }>;
     };
     qualities: {
         quality: Many<Quality>;

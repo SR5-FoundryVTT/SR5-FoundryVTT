@@ -30,6 +30,7 @@ export interface Mod {
         subsystem: Many<{ _TEXT: string; }>;
     };
     weaponmountcategories?: { _TEXT: string; };
+    translate?: string;
 };
 
 export interface Vehicle {
@@ -97,6 +98,7 @@ export interface Vehicle {
             name: { _TEXT: string; };
         }>;
     };
+    translate?: string;
 };
 
 export interface Weaponmount {
@@ -113,12 +115,13 @@ export interface Weaponmount {
     slots: { _TEXT: string; };
     source: { _TEXT: string; };
     weaponcategories?: { _TEXT: string; };
+    translate?: string;
 };
 
 export interface VehiclesSchema {
     $: { xmlns: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
     categories: {
-        category: Many<{ _TEXT: string; $: { blackmarket: string; }; }>;
+        category: Many<{ _TEXT: string; $: { blackmarket: string; translate?: string; }; }>;
     };
     modcategories: {
         category: Many<{ _TEXT: string; $: { blackmarket: string; }; }>;
