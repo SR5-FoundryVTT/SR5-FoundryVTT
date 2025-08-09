@@ -9,6 +9,7 @@ import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/W
 import { DamageType } from '../types/item/Action';
 import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
 import { FireModeType } from '../types/flags/ItemFlags';
+import { SYSTEM_NAME, FLAGS } from '../constants';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
@@ -35,7 +36,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         data.fireModes = [];
         data.fireMode = {value: 0, defense: 0, label: ''};
         WeaponRangeTestBehavior.prepareData(this, data);
-
 
         return data;
     }
@@ -157,6 +157,9 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft());
 
         WeaponRangeTestBehavior.prepareBaseValues(this);
+
+        if (game.settings.get(SYSTEM_NAME, FLAGS.RuleRG2TargetSizeModifiers).includes('RANGED'))
+            this.applyTargetSizeModifiers();
 
         super.prepareBaseValues();
     }

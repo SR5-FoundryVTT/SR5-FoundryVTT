@@ -1,6 +1,7 @@
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { DataDefaults } from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
+import { SYSTEM_NAME, FLAGS } from "../constants";
 import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface MeleeAttackData extends SuccessTestData {
@@ -47,6 +48,13 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
         this.data.reach += this.actor && 'reach' in this.actor.system.modifiers ? this.actor?.system.modifiers.reach : 0;
 
         await super.prepareDocumentData();
+    }
+    
+    override prepareBaseValues() {
+        if (game.settings.get(SYSTEM_NAME, FLAGS.RuleRG2TargetSizeModifiers).includes('MELEE'))
+            this.applyTargetSizeModifiers();
+
+        return super.prepareBaseValues();
     }
 
     /**

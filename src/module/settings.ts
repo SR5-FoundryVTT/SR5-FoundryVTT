@@ -166,6 +166,26 @@ export const registerSystemSettings = () => {
     });
 
     /**
+     * Control RG2 Target Size Modifiers
+     *
+     * See RG.108 'Target Size Modifiers'
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.RuleRG2TargetSizeModifiers, {
+        name: 'SETTINGS.RuleRG2TargetSizeModifiers',
+        hint: 'SETTINGS.RuleRG2TargetSizeModifiersDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        default: 'NONE',
+        choices: {
+            'NONE': 'SETTINGS.RuleRG2None',
+            'MELEE': 'SETTINGS.RuleRG2Melee',
+            'RANGED': 'SETTINGS.RuleRG2Ranged',
+            'MELEERANGED': 'SETTINGS.RuleRG2MeleeRanged',
+        }
+    });
+
+    /**
      * Control automatic or manual casting of dice in any success test.
      */
     game.settings.register(SYSTEM_NAME, FLAGS.ManualRollOnSuccessTest, {

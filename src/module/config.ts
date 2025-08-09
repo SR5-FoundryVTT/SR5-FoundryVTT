@@ -1070,6 +1070,16 @@ export const SR5 = {
             walker: 'SR5.Vehicle.Types.Walker',
             exotic: 'SR5.Vehicle.Types.Exotic',
         },
+        categories: {
+            micro: 'SR5.Vehicle.Categories.Micro',
+            mini: 'SR5.Vehicle.Categories.Mini',
+            small: 'SR5.Vehicle.Categories.Small',
+            medium: 'SR5.Vehicle.Categories.Medium',
+            large: 'SR5.Vehicle.Categories.Large',
+            huge: 'SR5.Vehicle.Categories.Huge',
+            anthro: 'SR5.Vehicle.Categories.Anthro',
+            missile: 'SR5.Vehicle.Categories.Missile',
+        },
         stats: {
             handling: 'SR5.Vehicle.Stats.Handling',
             off_road_handling: 'SR5.Vehicle.Stats.OffRoadHandling',

@@ -2069,4 +2069,65 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         await test.populateDocuments();
         await ActionResultFlow.executeResult(resultAction, test);
     }
+
+    // Optional Rule RG2: TARGET SIZE MODIFIERS
+    protected applyTargetSizeModifiers(){
+        const data = this.data;
+        const baseName = "\u200BRG2" as const;
+
+        if (data.targetActorsUuid.length === 0) return;
+
+        data.pool.mod = data.pool.mod.filter(mod => !mod.name.startsWith(baseName));
+        data.modifiers.mod = data.modifiers.mod.filter(mod => !mod.name.startsWith(baseName));
+
+        const uuid = data.targetActorsUuid[0];
+        const target = foundry.utils.fromUuidSync(uuid) as SR5Actor;
+        if (!(target instanceof SR5Actor)) return;
+
+        let label: string | null = null;
+        let value: number | null = null;
+
+        if (target.isType('character', 'critter', 'spirit')) {
+            const attsSum = target.system.attributes.body.value + target.system.attributes.strength.value;
+            if (attsSum < 5)                            { label = 'Small';  value = -1; }
+            else if (attsSum > 10 && attsSum <= 15)     { label = 'Bulky';  value = +1; }
+            else if (attsSum > 15)                      { label = 'Large';  value = +2; }
+
+        } else if (target.isType('vehicle')) {
+            if (!target.system.isDrone) {
+                label = 'Bulky'; value = +1;
+            } else {
+                const sizeModifiers = {
+                    minuscule: -3,
+                    tiny: -2,
+                    small: -1,
+                    average: 0,
+                    bulky: +1,
+                } as const satisfies Record<string, number>;
+
+                const normalizedCategoryMap = {
+                    micro: 'minuscule',
+                    mini: 'tiny',
+                    small: 'small',
+                    medium: 'average',
+                    large: 'bulky',
+                    huge: 'bulky',
+                    anthro: 'average',
+                    missile: 'average'
+                } as const satisfies Record<SR5Actor<'vehicle'>['system']['category'], keyof typeof sizeModifiers>;
+
+                const rawCategory = target.system.category;
+                const normalized = normalizedCategoryMap[rawCategory];
+
+                const modValue = sizeModifiers[normalized];
+                if (modValue) {
+                    label = normalized.capitalize();
+                    value = modValue;
+                }
+            }
+        }
+
+        if (label && value)
+            data.modifiers.mod.push({ name: `${baseName} (${label})`, value });
+    }
 }

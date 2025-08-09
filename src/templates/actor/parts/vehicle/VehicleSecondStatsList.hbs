@@ -33,6 +33,18 @@
     </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
 
+    {{#if system.isDrone}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Vehicle.Category") }}
+    <div>
+        {{> "systems/shadowrun5e/dist/templates/common/Select.hbs"
+                    options=config.vehicle.categories
+                    value=system.category
+                    path="system.category"
+        }}
+    </div>
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
+    {{/if}}
+
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Vehicle.ChaseEnvironment") }}
     <div>
         {{> "systems/shadowrun5e/dist/templates/common/Select.hbs"

@@ -217,9 +217,10 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.UseDamageCondition": boolean;
         "shadowrun5e.AutomateMultiDefenseModifier": boolean;
         "shadowrun5e.AutomateProgressiveRecoil": boolean;
+        "shadowrun5e.RuleRG2TargetSizeModifiers": 'NONE' | 'MELEE' | 'RANGED' | 'MELEERANGED';
         "shadowrun5e.ManualRollOnSuccessTest": boolean;
         "shadowrun5e.DefaultOpposedTestActorSelection": boolean;
-        "shadowrun5e.MarkImports": string;
+        "shadowrun5e.MarkImports": "BOTH" | "COLOR" | "ICON" | "NONE";
         "shadowrun5e.ImportIconFolder": string;
         "shadowrun5e.UseImportIconOverrides": boolean;
         "shadowrun5e.TokenRulerColorWalking": foundry.data.fields.ColorField<{ initial: '00FF00' }>;
