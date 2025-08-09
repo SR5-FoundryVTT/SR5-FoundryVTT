@@ -603,10 +603,6 @@ input[type='text'].display {
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
-        // This is a hack due to broken flex / grid styling on the current sheet, making fixed heights necessary for scroll bars.
-        // Raising this above 300px (remaining sheet height on default sheet dimension), will break scroll behavior
-        // on default dimensions
-        max-height: 300px;
         min-height: 0;
     }
 
@@ -945,6 +941,12 @@ input[type='text'].display {
             justify-content: space-between;
             align-items: center;
             align-content: center;
+
+            // vertically center the rows, using a table would have
+            // been better, but i pray for V2 or during the rework.
+            &:not(.list-header > .list-item-content) {
+              margin-top: 0.3125rem;
+            }
 
             .item-center {
                 display: flex;
