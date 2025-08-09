@@ -1,14 +1,4 @@
-import AttributeField = Shadowrun.AttributeField;
-import SkillField = Shadowrun.SkillField;
-import ModifiableValue = Shadowrun.ModifiableValue;
-import GenericValueField = Shadowrun.GenericValueField;
-import LabelField = Shadowrun.LabelField;
-import RangeTemplateData = Shadowrun.RangeTemplateData;
-import DamageData = Shadowrun.DamageData;
-import ModifiedDamageData = Shadowrun.ModifiedDamageData;
-import DamageType = Shadowrun.DamageType;
-import DamageElement = Shadowrun.DamageElement;
-import Skills = Shadowrun.Skills;
+import { DamageType } from "./types/item/Action";
 import TargetedDocument = Shadowrun.TargetedDocument;
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
@@ -18,6 +8,13 @@ import { SR5Item } from './item/SR5Item';
 import { PartsList } from './parts/PartsList';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
+import { ModifiableValueType } from "./types/template/Base";
+import { AttributeFieldType } from "./types/template/Attributes";
+import { SkillFieldType, SkillsType } from "./types/template/Skills";
+import { ModifiedDamageType } from "./types/rolls/ActorRolls";
+import { RangeTemplateType } from "./types/template/Weapon";
+
+type OneOrMany<T> = T | T[];
 
 interface CalcTotalOptions {
     // Min/Max value range
@@ -34,18 +31,12 @@ export class Helpers {
      * @param value
      * @param options min will a apply a minimum value, max will apply a maximum value.
      */
-    static calcTotal(value: ModifiableValue, options?: CalcTotalOptions): number {
-        if (value.mod === undefined) value.mod = [];
-
+    static calcTotal(value: ModifiableValueType, options?: CalcTotalOptions): number {
         const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (!isNaN(value.temp as number) && Number(value.temp) !== 0) {
+        if (!isNaN(value.temp) && Number(value.temp) !== 0) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
-
-        // On some values base might be undefined...
-        // Check for undefined, as some Values might be none numerical / boolean.
-        value.base = value.base !== undefined ? Number(value.base) : 0;
 
         // If the given value has an override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {
@@ -54,26 +45,15 @@ export class Helpers {
             return value.value;
         }
 
-        // Base on type change calculation behavior.
-        switch (foundry.utils.getType(value.base)) {
-            case 'number':
-                value.value = Helpers.roundTo(parts.total + value.base, options?.roundDecimals);
-                value.value = Helpers.applyValueRange(value.value, options);
-                break;
-            // boolean / string values should be applied
-            default:
-                value.value = parts.last === undefined ? value.base : parts.last;
-                break;
-        }
+        value.value = Helpers.roundTo(parts.total + value.base, options?.roundDecimals);
+        value.value = Helpers.applyValueRange(value.value, options);
 
         value.mod = parts.list;
 
         return value.value;
     }
 
-    static calcValue<ValueType>(value: GenericValueField): any {
-        if (value.mod === undefined) value.mod = [];
-
+    static calcValue(value: DamageType): any {
         if (value.override) {
             value.value = value.override.value;
 
@@ -121,8 +101,7 @@ export class Helpers {
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
     static onSetFlag(data) {
-        if (typeof data !== 'object') return data;
-        if (data === undefined || data === null) return data;
+        if (!data || typeof data !== 'object') return data;
         const newData = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5.', 'SR5_DOT_');
@@ -133,8 +112,7 @@ export class Helpers {
 
     // replace 'SR5_DOT_' with 'SR5.' on keys
     static onGetFlag(data) {
-        if (typeof data !== 'object') return data;
-        if (data === undefined || data === null) return data;
+        if (!data || typeof data !== 'object') return data;
         const newData = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5_DOT_', 'SR5.');
@@ -143,7 +121,7 @@ export class Helpers {
         return newData;
     }
 
-    static isMatrix(atts?: boolean | (AttributeField | string | SkillField)[] | AttributeField | string | SkillField) {
+    static isMatrix(atts: boolean | OneOrMany<string | AttributeFieldType | SkillFieldType>): boolean {
         if (!atts) return false;
         if (typeof atts === 'boolean') return atts;
         // array of labels to check for on the incoming data
@@ -162,14 +140,9 @@ export class Helpers {
         atts = atts.filter((att) => att);
         // iterate over the attributes and return true if we find a matrix att
         for (const att of atts) {
-            if (typeof att === 'string') {
-                if (matrixLabels.indexOf(att) >= 0) {
-                    return true;
-                }
-            } else if (typeof att === 'object' && (att as LabelField).label !== undefined) {
-                if (matrixLabels.indexOf(att.label ?? '') >= 0) {
-                    return true;
-                }
+            const label = typeof att === 'object' ? att.label : att;
+            if (matrixLabels.includes(label)) {
+                return true;
             }
         }
         // if we don't find anything return false
@@ -214,7 +187,7 @@ export class Helpers {
                 $(checkmark).removeClass('fa-check-circle');
             }
         };
-        html.find('label.checkbox').each(function () {
+        html.find('label.checkbox').each(function (this: any) {
             setContent(this);
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
@@ -286,7 +259,7 @@ export class Helpers {
             }
             Object.entries(obj)
                 .filter(([, value]) => typeof value === 'object')
-                .forEach(([key, value]) => Helpers.addLabels(value, key));
+                .forEach(([key, value]) => { Helpers.addLabels(value, key); });
         }
     }
 
@@ -307,14 +280,18 @@ export class Helpers {
 
     // TODO: Foundry 0.9 Should TokenDocument be used instead of Token?
     // TODO: Check canvas.scene.tokens
+    /**
+     * Retrieve a Token by its ID from the current canvas.
+     * @param id The token's ID. If omitted, returns the first controlled token or undefined.
+     * @returns The Token instance or undefined if not found.
+     */
     static getToken(id?: string): Token | undefined {
-        if (!canvas || !canvas.ready || !canvas.tokens) return;
+        if (!canvas || !canvas.ready || !canvas.tokens) return undefined;
 
-        for (const token of canvas.tokens.placeables) {
-            if (token.id === id) {
-                return token;
-            }
-        }
+        if (id) return canvas.tokens.placeables.find(token => token.id === id);
+
+        // If no id is provided, return the first controlled token if available
+        return canvas.tokens.controlled.length > 0 ? canvas.tokens.controlled[0] : undefined;
     }
 
     /**
@@ -334,15 +311,15 @@ export class Helpers {
 
     static getSceneTokenDocument(sceneId, tokenId): TokenDocument | undefined {
         const scene = game.scenes?.get(sceneId);
-        if (!scene) return;
+        if (!scene) return undefined;
         const token = scene.tokens.get(tokenId);
-        if (!token) return;
+        if (!token) return undefined;
 
         return token;
     }
 
     static getUserTargets(user?: User | null): Token[] {
-        user = user ? user : game.user;
+        user = user || game.user;
 
         if (!user) return []
 
@@ -350,7 +327,7 @@ export class Helpers {
     }
 
     static userHasTargets(user?: User | null): boolean {
-        user = user ? user : game.user;
+        user = user || game.user;
 
         if (!user) return false;
 
@@ -375,25 +352,21 @@ export class Helpers {
         if (!tokenOrigin || !tokenDest) return 0;
 
         // 2d coordinates and distance
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        const origin2D = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.x, tokenOrigin.y));
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        const dest2D = new PIXI.Point(...canvas.grid.getCenter(tokenDest.x, tokenDest.y));
+        const origin2D = canvas.grid.getCenterPoint({x: tokenOrigin.x, y: tokenOrigin.y});
+        const dest2D = canvas.grid.getCenterPoint({x: tokenDest.x, y: tokenDest.y});
 
         // Use gridSpace to measure in grids instead of distance. This will give results parity to FoundryVTTs canvas ruler.
-        const distanceInGridUnits2D = canvas.grid.measureDistance(origin2D, dest2D);
+        const distanceInGridUnits2D = canvas.grid.measurePath([origin2D, dest2D], {});
 
         // 3d coordinates and distance
         const originLOSHeight = Helpers.getTokenLOSHeight(tokenOrigin);
         const destLOSHeight = Helpers.getTokenLOSHeight(tokenDest);
-        // @ts-expect-error TODO: foundry-vtt-types v10
         const elevationDifference = (tokenOrigin.elevation + originLOSHeight) - (tokenDest.elevation + destLOSHeight);
         const origin3D = new PIXI.Point(0, 0);
-        const dest3D = new PIXI.Point(distanceInGridUnits2D, elevationDifference);
+        const dest3D = new PIXI.Point(distanceInGridUnits2D.distance, elevationDifference);
         
         const distanceInGridUnits3D = Math.round(Helpers.measurePointDistance(origin3D, dest3D));
 
-        //@ts-expect-error TODO: foundry-vtt-types v10
         const sceneUnit = canvas.scene.grid.units;
         return Helpers.convertLengthUnit(distanceInGridUnits3D, sceneUnit);
     }
@@ -405,7 +378,7 @@ export class Helpers {
      * @param destination 
      * @returns Distance without a unit.
      */
-    static measurePointDistance(origin: Point, destination: Point): number {
+    static measurePointDistance(origin: PIXI.Point, destination: PIXI.Point): number {
         const sideA = origin.x + destination.x;
         const sideB = origin.y + destination.y;
         return Math.sqrt(Math.pow(sideA, 2) + Math.pow(sideB, 2))
@@ -422,7 +395,6 @@ export class Helpers {
      * @returns 
      */
     static getTokenLOSHeight(token: TokenDocument): number {
-        //@ts-expect-error TODO: foundry-vtt-types v10
         return token.flags['wall-height']?.tokenHeight ?? 0;
     }
 
@@ -484,11 +456,12 @@ export class Helpers {
         const actors = Helpers.getControlledTokenActors();
 
         // Try to default to a users character.
-        if (actors.length === 0 && game.user.character) {
-            actors.push(game.user.character);
+        if (actors.length === 0 && game.user.character?.uuid) {
+            const character = fromUuidSync(game.user.character.uuid);
+            if (character && character instanceof SR5Actor) actors.push(character);
         }
 
-        return actors as SR5Actor[];
+        return actors;
     }
 
     /**
@@ -502,7 +475,7 @@ export class Helpers {
     static async getTestTargetActors(testData: SuccessTestData): Promise<SR5Actor[]> {
         const actors: SR5Actor[] = [];
         for (const uuid of testData.targetActorsUuid) {
-            const tokenOrActor = await fromUuid(uuid);
+            const tokenOrActor = await fromUuid(uuid as any);
             // Assume given target to be an actor.
             let actor = tokenOrActor;
 
@@ -540,18 +513,9 @@ export class Helpers {
         return Helpers.getSelectedActorsOrCharacter();
     }
 
-    static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateData {
+    static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateType {
         const localizedLabel = game.i18n.localize(label);
         return {label: localizedLabel, distance, modifier}
-    }
-
-    static convertIndexedObjectToArray(indexedObject: object): object[] {
-        return Object.keys(indexedObject).map((index) => {
-            if (Number.isNaN(index)) {
-                console.warn('An object with no numerical index was given, which is likely a bug.', indexedObject);
-            }
-            return indexedObject[index];
-        });
     }
 
     /**
@@ -569,9 +533,9 @@ export class Helpers {
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        if (useTokenNameForChatOutput && token) return token.name as string;
+        if (useTokenNameForChatOutput && token) return token.name;
 
-        return actor.name as string;
+        return actor.name;
     }
 
     /**
@@ -588,13 +552,18 @@ export class Helpers {
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (useTokenForChatOutput && token) return token.texture.src || '';
         return actor.img || '';
     }
 
-    static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem?: SR5Item): DamageData {
-        const damage = DataDefaults.damageData({type: {base: '', value: ''}});
+    static createDamageData(
+        value: number,
+        type: DamageType['type']['value'],
+        ap: number = 0,
+        element: DamageType['element']['value'] = '',
+        sourceItem?: SR5Item
+    ): DamageType {
+        const damage = DataDefaults.createData('damage');
         damage.base = value;
         damage.value = value;
         damage.type.base = type;
@@ -604,12 +573,12 @@ export class Helpers {
         damage.element.base = element;
         damage.element.value = element;
 
-        if (sourceItem && sourceItem.actor) {
+        if (sourceItem?.actor) {
             damage.source = {
                 actorId: sourceItem.actor.id as string,
                 itemType: sourceItem.type,
                 itemId: sourceItem.id as string,
-                itemName: sourceItem.name as string
+                itemName: sourceItem.name
             };
         }
 
@@ -620,19 +589,15 @@ export class Helpers {
      * Retrieves the item causing the damage, if there is any.
      * This only works for embedded items at the moment
      */
-    static findDamageSource(damageData: DamageData): SR5Item | undefined {
-        if (!game.actors) return;
+    static findDamageSource(damageData: DamageType): SR5Item | undefined {
+        if (!game.actors) return undefined;
 
-        if (!damageData.source) {
-            return;
-        }
+        if (!damageData.source) return undefined;
 
         const actorId = damageData.source.actorId;
         const actorSource = game.actors.get(actorId)
 
-        if (!actorSource) {
-            return;
-        }
+        if (!actorSource) return undefined;
 
         // First search the actor itself for the item
         const itemId = damageData.source.itemId;
@@ -666,12 +631,12 @@ export class Helpers {
      * do this instead
      * > reduceDamageByHits(incoming, hits, label)
      *
-     * @param incoming A DamageData value to be modified from
+     * @param incoming A DamageType value to be modified from
      * @param hits Positive or negative hits to change the damage value with.
      * @param modificationLabel The translatable label for the modification
      */
-    static modifyDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
-        const modified = foundry.utils.duplicate(incoming) as DamageData;
+    static modifyDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageType {
+        const modified = foundry.utils.duplicate(incoming) as DamageType;
         modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
@@ -682,11 +647,11 @@ export class Helpers {
      *
      * Should you want RAISE the damage value, use modifyDamageByHits directly.
      *
-     * @param incoming A DamageData value to be modified from
+     * @param incoming A DamageType value to be modified from
      * @param hits Positive hits to reduce the damage value with! Should the hits amount be negative, use modifyDamageByHits.
      * @param modificationLabel The translatable label for the modification
      */
-    static reduceDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
+    static reduceDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageType {
         if (hits < 0) hits = 0;
         return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
@@ -698,24 +663,26 @@ export class Helpers {
     }
 
     /**
-     * This can be used to create an SkillField into the Skills data path during the Skill creation process.
+     * Creates a data entry for a skill field with a random ID.
      *
-     * @param skillDataPath Could be 'data.skills.active' or 'data.skill.language.value' or more
-     * @param skillField A SkillField with whatever values. You could use DataDefaults.skillData to create one.
-     * @param idLength How long should the id (GUID) be?
+     * @param skillDataPath The data path where the skill should be added (e.g., 'data.skills.active').
+     * @param skillField The skill field data to insert.
+     * @param idLength The length of the generated random ID.
+     * @returns An object containing the generated ID and the update data, or undefined if the path is invalid.
      */
-    static getRandomIdSkillFieldDataEntry(skillDataPath: string, skillField: SkillField, idLength: number = DEFAULT_ID_LENGTH): { id: string, updateSkillData: { [skillDataPath: string]: { [id: string]: SkillField } } } | undefined {
-        if (!skillDataPath || skillDataPath.length === 0) return;
+    static getRandomIdSkillFieldDataEntry(
+        skillDataPath: string,
+        skillField: SkillFieldType,
+        idLength: number = DEFAULT_ID_LENGTH
+    ): { id: string, updateSkillData: Record<string, Record<string, SkillFieldType>> } | undefined {
+        if (!skillDataPath || skillDataPath.length === 0) return undefined;
 
         const id = randomID(idLength);
         const updateSkillData = {
             [skillDataPath]: {[id]: skillField}
         };
 
-        return {
-            id,
-            updateSkillData
-        }
+        return { id, updateSkillData }
     }
 
     /**
@@ -725,7 +692,7 @@ export class Helpers {
      * @param value Whatever needs to be stored.
      *
      */
-    static getUpdateDataEntry(path: string, value: any): { [path: string]: any } {
+    static getUpdateDataEntry(path: string, value: any): Record<string, any> {
         return {[path]: value};
     }
 
@@ -738,13 +705,13 @@ export class Helpers {
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
      *         remove the Pistols key from the 'data.skills.active' path within Entity.system.skills.active.
      */
-    static getDeleteKeyUpdateData(path: string, key: string): { [path: string]: { [key: string]: null } } {
+    static getDeleteKeyUpdateData(path: string, key: string): Record<string, Record<string, null>> {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
         return {[path]: {[`-=${key}`]: null}};
     }
 
-    static localizeSkill(skill: SkillField): string {
+    static localizeSkill(skill: SkillFieldType): string {
         return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
     }
 
@@ -758,7 +725,7 @@ export class Helpers {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted Skills given by the skills parameter
      */
-    static sortSkills(skills: Skills, asc: boolean = true): Skills {
+    static sortSkills(skills: SkillsType, asc: boolean = true): SkillsType {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
             const comparatorA = Helpers.localizeSkill(a) || aId;
@@ -815,12 +782,15 @@ export class Helpers {
      * @param permission A foundry access permission
      * @param active If true, will only return users that are also currently active.
      */
-    static getPlayersWithPermission(document: foundry.abstract.Document<any>, permission: string, active: boolean = true): User[] {
+    static getPlayersWithPermission(
+        document: SR5Actor | SR5Item,
+        permission: keyof typeof CONST.DOCUMENT_OWNERSHIP_LEVELS,
+        active: boolean = true
+    ): User[] {
         if (!game.users) return [];
 
         return game.users.filter(user => {
             if (user.isGM) return false;
-            // @ts-expect-error // Check for permissions. String is allowed
             if (!document.testUserPermission(user, permission)) return false;
             // Check for active state.
             if (active && !user.active) return false;
@@ -835,7 +805,7 @@ export class Helpers {
      * @param skill
      * @returns Either a translation or a name.
      */
-    static getSkillLabelOrName(skill: SkillField): string {
+    static getSkillLabelOrName(skill: SkillFieldType): string {
         // Custom skills don't have labels, use their name instead.
         return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name || '';
     }
@@ -845,19 +815,21 @@ export class Helpers {
      * @param data Foundry Drop Data
      */
     static async getEntityFromDropData(data: { type: 'Actor' | 'Item', pack: string, id: string }): Promise<SR5Actor | SR5Item | undefined> {
-        if (!game.actors || !game.items) return;
+        if (!game.actors || !game.items) return undefined;
 
         if (data.pack && data.type === 'Actor')
-            return await Helpers.getEntityFromCollection(data.pack, data.id) as unknown as SR5Actor;
+            return await Helpers.getEntityFromCollection(data.pack, data.id) as SR5Actor;
 
         if (data.pack && data.type === 'Item')
-            return await Helpers.getEntityFromCollection(data.pack, data.id) as unknown as SR5Item;
+            return await Helpers.getEntityFromCollection(data.pack, data.id) as SR5Item;
 
         if (data.type === 'Actor')
-            return game.actors.get(data.id);
+            return game.actors.get(data.id) as SR5Actor;
 
         if (data.type === 'Item')
-            return game.items.get(data.id);
+            return game.items.get(data.id) as SR5Item;
+    
+        return undefined;
     }
 
     /**
@@ -865,10 +837,9 @@ export class Helpers {
      * @param collection The pack name as stored in the collection property
      * @param id The entity id in that collection
      */
-    static async getEntityFromCollection(collection: string, id: string): Promise<Document> {
+    static async getEntityFromCollection(collection: string, id: string): Promise<ClientDocument | null | undefined> {
         const pack = game.packs.find((p) => p.collection === collection);
-        // @ts-expect-error // All Document types COULD be returned...
-        return await pack.getDocument(id);
+        return await pack?.getDocument(id);
     }
 
     /**
@@ -924,18 +895,16 @@ export class Helpers {
     }
 
     static getMarkIdDocuments(markId: string): TargetedDocument | undefined {
-        if (!game.scenes || !game.items) return;
+        if (!game.scenes || !game.items) return undefined;
 
         const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
 
         const scene = game.scenes.get(sceneId);
-        if (!scene) return;
+        if (!scene) return undefined;
         const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
         const item = target?.actor?.items?.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
 
-        return {
-            scene, target, item
-        }
+        return { scene, target, item };
     }
 
     /**
@@ -967,14 +936,14 @@ export class Helpers {
         const pack = game.packs.find(pack =>
             pack.metadata.system === SYSTEM_NAME &&
             pack.metadata.name === packName);
-        if (!pack) return;
+        if (!pack) return undefined;
 
         // TODO: Use predefined ids instead of names...
-        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(new RegExp(' ', 'g'), '_') === actionName.toLowerCase());
-        if (!packEntry) return;
+        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(/ /g, '_') === actionName.toLowerCase());
+        if (!packEntry) return undefined;
 
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
-        if (!item || item.type !== 'action') return;
+        if (!item || item.type !== 'action') return undefined;
 
         console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;
@@ -1002,12 +971,12 @@ export class Helpers {
      */
     static async renderDocumentSheet(uuid: string, resolveTokenToActor = true) {
         if (!uuid) return;
-        let document = await fromUuid(uuid);
+        let document = await fromUuid(uuid as any);
         if (!document) return;
         if (document instanceof TokenDocument && resolveTokenToActor && document.actor)
             document = document.actor;
-        // @ts-expect-error
-        await document.sheet.render(true);
+        if (document instanceof SR5Actor || document instanceof SR5Item)
+            await document?.sheet?.render(true);
     }
 
     /**
@@ -1031,16 +1000,15 @@ export class Helpers {
      * @returns an actor
      */
     static async chooseFromAvailableActors() {
-        let availableActors =  game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
+        const availableActors = game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
 
-        if(availableActors.length == 0) {
-            return
+        if(availableActors.length === 0) {
+            return undefined;
         }
 
-        if(availableActors.length == 1) {
+        if(availableActors.length === 1) {
             return availableActors[0]
-        }
-        else {
+        } else {
             let allActors = ''
             game.actors?.filter( e => e.isOwner && e.hasPlayerOwner).forEach(t => {
                     allActors = allActors.concat(`
@@ -1051,7 +1019,7 @@ export class Helpers {
                 ${allActors}
                 </select>`;
     
-            let choosenActor = await Dialog.prompt({
+            const choosenActor = await foundry.appv1.api.Dialog.prompt({
                 title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
                 content: dialog_content,
                 callback: (html) => html.find('select').val()

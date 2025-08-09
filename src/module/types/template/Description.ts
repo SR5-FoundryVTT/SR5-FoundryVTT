@@ -1,12 +1,9 @@
-declare namespace Shadowrun {
+const { HTMLField, StringField } = foundry.data.fields;
 
-    export type DescriptionPartData = {
-        description: DescriptionData
-    };
+export const DescriptionData = () => ({
+    value: new HTMLField(),
+    chat: new StringField({ required: true }),
+    source: new StringField({ required: true }),
+});
 
-    export type DescriptionData = {
-        value: string;
-        chat: string;
-        source: string;
-    };
-}
+export type DescriptionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof DescriptionData>>;

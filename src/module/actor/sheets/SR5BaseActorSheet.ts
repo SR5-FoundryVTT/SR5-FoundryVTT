@@ -12,17 +12,14 @@ import { MoveInventoryDialog } from "../../apps/dialogs/MoveInventoryDialog";
 import { ChummerImportForm } from '../../apps/chummer-import-form';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import SkillField = Shadowrun.SkillField;
-import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
-import DeviceData = Shadowrun.DeviceData;
-import KnowledgeSkills = Shadowrun.KnowledgeSkills;
-import SpellCategory = Shadowrun.SpellCateogry;
-import SpellData = Shadowrun.SpellData;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
-import EffectApplyTo = Shadowrun.EffectApplyTo;
 import { parseDropData } from '../../utils/sheets';
+import { InventoryType } from 'src/module/types/actor/Common';
+import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
+import { DescriptionType } from 'src/module/types/template/Description';
+import { ChatData } from 'src/module/item/ChatData';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -30,9 +27,9 @@ import { parseDropData } from '../../utils/sheets';
 export interface SheetItemData {
     type: string,
     name: string,
-    system: Shadowrun.ShadowrunItemDataData
-    properties: any,
-    description: any
+    system: SR5Item['system'],
+    properties: string[],
+    description: DescriptionType
 }
 
 export interface InventorySheetDataByType {
@@ -45,9 +42,7 @@ export interface InventorySheetDataByType {
 export interface InventorySheetData {
     name: string,
     label: string,
-    types: {
-        [type: string]: InventorySheetDataByType
-    }
+    types: Record<string, InventorySheetDataByType>
 }
 
 export type InventoriesSheetData = Record<string, InventorySheetData>;
@@ -112,7 +107,7 @@ export interface SR5BaseSheetDelays {
  * This class should not be used directly but be extended for each actor type.
  *
  */
-export class SR5BaseActorSheet extends ActorSheet {
+export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     // What document description is shown on sheet. Allow displaying multiple descriptions at the same time.
     _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.
@@ -125,15 +120,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         skills: null
     }
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
-    _scroll: string;
+    _scroll!: string;
     _inventoryOpenClose: Record<string, boolean> = {};
 
     // Store the currently selected inventory.
     selectedInventory: string;
 
-    constructor(...args) {
-        // @ts-expect-error // Since we don't need any actual data, don't define args to avoid breaking changes.
-        super(...args);
+    constructor(object: SR5Actor, options?: Partial<ActorSheet.Options> | undefined) {
+        super(object, options);
 
         // Preselect default inventory.
         this.selectedInventory = this.actor.defaultInventory.name;
@@ -207,26 +201,18 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // v10 actor.limited doesn't take GM into account, so we have to do it ourselves.
         if (!game.user?.isGM && this.actor.limited) {
-            return `${path}/actor-limited/${this.actor.type}.html`;
+            return `${path}/actor-limited/${this.actor.type}.hbs`;
         }
 
-        return `${path}/actor/${this.actor.type}.html`;
+        return `${path}/actor/${this.actor.type}.hbs`;
     }
 
     /** SheetData used by _all_ actor types! */
     override async getData(options) {
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
-        let data = super.getData() as any;
-        const actorData = this.actor.toObject(false);
-
-        data = {
-            ...data,
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            data: actorData.system,
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            system: actorData.system
-        }
+        const data = super.getData() as any;
+        data.system = this.actor.toObject(false).system;
 
         // Sheet related general purpose fields. These aren't persistent.
         data.config = SR5;
@@ -253,13 +239,12 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.contentVisibility = this._prepareContentVisibility(data);
 
-        // @ts-expect-error TODO: foundry-vtt-types v10
-        data.biographyHTML = await TextEditor.enrichHTML(actorData.system.description.value, {
-            // secrets: this.actor.isOwner,
-            // rollData: this.actor.getRollData.bind(this.actor),
-            // @ts-expect-error TODO: foundry-vtt-types v10
-            relativeTo: this.actor
-        });
+        if ('description' in data.system)
+            data.biographyHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(data.system.description.value, {
+                // secrets: this.actor.isOwner,
+                // rollData: this.actor.getRollData.bind(this.actor),
+                relativeTo: this.actor
+            });
 
         data.bindings = this._prepareKeybindings();
 
@@ -273,8 +258,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         Helpers.setupCustomCheckbox(this, html)
 
         // Active Effect management
-        html.find(".effect-control").on('click', event => onManageActiveEffect(event, this.actor));
-        html.find(".item-effect-control").on('click', event => onManageItemActiveEffect(event));
+        html.find(".effect-control").on('click', async event => onManageActiveEffect(event, this.actor));
+        html.find(".item-effect-control").on('click', async event => onManageItemActiveEffect(event));
 
         // Inventory visibility switch
         html.find('.item-toggle').on('click', this._onInventorySectionVisiblitySwitch.bind(this));
@@ -405,7 +390,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             if (inventory.types.hasOwnProperty(type)) continue;
 
             inventory.types[type] = {
-                type: type,
+                type,
                 label: SR5.itemTypes[type],
                 isOpen: this._inventoryOpenClose[type],
                 items: []
@@ -446,7 +431,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 return;
 
             // Knowlege skill data transfer
-            case 'knowledgeskill':
+            case 'knowledgeskill': {
                 // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
                 const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
 
@@ -460,7 +445,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
 
                 return;
-
+            }
             // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
             case 'ActiveEffect':
                 {
@@ -484,7 +469,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             // All default Foundry data transfer.
             default:
                 // Let default Foundry handler deal with default drag cases.
-                return super._onDragStart(event);
+                { super._onDragStart(event); return; }
         }
     }
 
@@ -492,8 +477,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
-    // @ts-expect-error
-    async _onDrop(event: DragEvent) {
+    override async _onDrop(event: DragEvent): Promise<unknown> {
         event.preventDefault();
         event.stopPropagation();
 
@@ -503,9 +487,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (data !== undefined) {
             if (data.type === 'ActiveEffect' && data.actorId !== this.actor.id) {
                 const effect = data.data;
-                const applyTo = effect.flags.shadowrun5e.applyTo as EffectApplyTo;
                 // if the effect is just supposed to apply to the item's test, it won't work on an actor
-                if (applyTo === 'test_item') {
+                if (effect.system.applyTo === 'test_item') {
                     ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
                     return;
                 }
@@ -519,14 +502,14 @@ export class SR5BaseActorSheet extends ActorSheet {
                 const actor = await fromUuid(data.uuid) as SR5Actor;
                 const itemData = {
                     name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
-                    type: 'contact',
-                    'system.linkedActor': actor.uuid
+                    type: 'contact' as Item.SubType,
+                    system: {linkedActor: actor.uuid }
                 };
-                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
+                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
             }
         }
         // Keep upstream document created for actions base on it.
-        const documents = await super._onDrop(event);
+        const documents = await (super._onDrop(event) as unknown as Promise<unknown>);
 
         // Handle specific system drop events.
         // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
@@ -542,7 +525,6 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     /**
      * Enhance Foundry state restore on rerender by more user interaction state.
-     * @override
      */
     override async _render(...args) {
         const focus = this._saveInputCursorPosition();
@@ -567,7 +549,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Use together with _restoreInputCursorPosition during render calls.
      */
     _restoreInputCursorPosition(focus) {
-        if (focus && focus.name) {
+        if (focus?.name) {
             if (!this.form) return;
 
             const element = this.form[focus.name];
@@ -578,7 +560,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 // Set selection range for supported input types.
                 if (['checkbox', 'radio'].includes(element.type)) return;
                 // set the selection range on the focus formed from before (keeps track of cursor in input)
-                element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
+                element.setSelectionRange?.(focus.selectionStart, focus.selectionEnd);
             }
         }
 
@@ -629,8 +611,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     _setInventoryVisibility(isOpen: boolean) {
-        Object.keys(CONFIG.Item.typeLabels)
-            .forEach(type => this._setInventoryTypeVisibility(type, isOpen));
+        Object.keys(CONFIG.Item.typeLabels).forEach(type => { this._setInventoryTypeVisibility(type, isOpen); });
     }
 
     _setInventoryTypeVisibility(type: string, isOpen: boolean) {
@@ -652,16 +633,15 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // TODO: Add translation for item names...
         const itemData = {
-            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type,
-            ...data
+            ...data, type,
+            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`
         };
-        const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true }) as SR5Item[];
+        const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
         if (!items) return;
 
         // Add the item to the selected inventory.
         if (this.selectedInventory !== this.actor.defaultInventory.name)
-            await this.actor.inventory.addItems(this.selectedInventory, items);
+            await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
     }
 
     async _onItemEdit(event) {
@@ -704,7 +684,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
 
         // look for roll id data in the current line
-        let rollId = $(event.currentTarget).data()?.rollId;
+        let rollId = $(event.currentTarget).data()?.rollId as string;
         // if that doesn't exist, look for a prent with RollId name
         rollId = rollId ?? $(event.currentTarget).parent('.RollId').data().rollId;
 
@@ -749,7 +729,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                 console.log('roll vehicle stat', rollId);
                 break;
 
-            case 'drone':
+            case 'drone': {
                 const droneRoll = split[1];
                 switch (droneRoll) {
                     case 'perception':
@@ -763,7 +743,7 @@ export class SR5BaseActorSheet extends ActorSheet {
                         break;
                 }
                 break;
-            // end drone
+            }
 
             case 'attribute': {
                 const attribute = split[1];
@@ -779,20 +759,21 @@ export class SR5BaseActorSheet extends ActorSheet {
                 break;
             }
 
-            case 'matrix':
+            case 'matrix': {
                 const matrixRoll = split[1];
                 switch (matrixRoll) {
-                    case 'attribute':
+                    case 'attribute': {
                         const attr = split[2];
                         await this.actor.rollAttribute(attr, options);
                         break;
+                    }
                     case 'device-rating':
                         await this.actor.rollDeviceRating(options);
                         break;
                 }
 
                 break;
-            // end matrix
+            }
         }
     }
 
@@ -806,7 +787,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const value = Number(event.currentTarget.dataset.value);
         const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
-        const data = {};
+        const data: Actor.UpdateData = {};
 
         if (track === 'stun' || track === 'physical') {
             const property = `system.track.${track}.value`;
@@ -877,36 +858,48 @@ export class SR5BaseActorSheet extends ActorSheet {
     _prepareActorModifiers(sheetData: SR5ActorSheetData) {
         // Empty zero value modifiers for display purposes.
         const { modifiers } = sheetData.system;
-        for (let [key, value] of Object.entries(modifiers)) {
-            if (value === 0) modifiers[key] = '';
+
+        const modifierList = Object.keys(modifiers);
+        modifierList.sort();
+        // shift global to the front of the list
+        modifierList.splice(modifierList.indexOf("global"), 1);
+        modifierList.unshift('global');
+
+        const sorted = {};
+        for (const modifier of modifierList) {
+            sorted[modifier] = Number(modifiers[modifier]) || '';
         }
 
-        sheetData.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
+        sheetData.system.modifiers = sorted as any;
+        sheetData.woundTolerance = 3 + modifiers.wound_tolerance;
     }
 
     _prepareActorAttributes(sheetData: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
         const attributes = sheetData.system.attributes;
-        for (let [, attribute] of Object.entries(attributes)) {
+        for (const [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
-                if (attribute.temp === 0) delete attribute.temp;
+                if (attribute.temp === 0)
+                    // @ts-expect-error - temp is not defined in the SR5Attribute type
+                    attribute.temp = null;
             }
         }
     }
 
     _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
-        //@ts-expect-error Since we're field checking, we can ignore typing...
         const { matrix } = sheetData.system;
         if (matrix) {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
                 const att = matrix[attribute];
                 if (att) {
                     if (!att.mod) att.mod = [];
-                    if (att.temp === 0) delete att.temp;
+                    if (att.temp === 0)
+                        // @ts-expect-error - so it doesn't show in sheet
+                        att.temp = null;
                 }
             };
 
-            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
+            (['firewall', 'data_processing', 'sleaze', 'attack'] as MatrixAttribute[]).forEach(att => { cleanupAttribute(att); });
         }
     }
 
@@ -919,7 +912,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         // All custom and default actor inventories.
         const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
-        const itemIdInventory: Record<string, Shadowrun.InventoryData> = {};
+        const itemIdInventory: Record<string, InventoryType> = {};
 
         // All inventories for showing all items, but not as default
         // Add first, for it to appear on top.
@@ -940,7 +933,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._addInventoryTypes(inventoriesSheet[this.actor.defaultInventory.name]);
 
         Object.values(this.actor.system.inventories).forEach(inventory => {
-            const { name, label, itemIds } = inventory
+            const { name, label, itemIds } = inventory;
 
             // Avoid re-adding default inventories.
             if (!inventoriesSheet.hasOwnProperty(name)) {
@@ -1088,16 +1081,17 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param item: The item to transform into a 'sheet item'
      */
-    async _prepareSheetItem(item: SR5Item): Promise<SheetItemData> {
+    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<SheetItemData> {
         // Copy derived schema data instead of source data (false)
         const sheetItem = item.toObject(false) as unknown as SheetItemData;
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
-        // @ts-expect-error
-        sheetItem.properties = chatData.properties;
 
-        return sheetItem as unknown as SheetItemData;
+        // Add additional chat data fields depending on item type.
+        sheetItem.properties = ChatData[item.type as SI](item).filter(Boolean);
+
+        return sheetItem;
     }
 
     /**
@@ -1156,10 +1150,10 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param sheetData An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
     _prepareActorTypeFields(sheetData: SR5ActorSheetData) {
-        sheetData.isCharacter = this.actor.isCharacter();
-        sheetData.isSpirit = this.actor.isSpirit();
-        sheetData.isCritter = this.actor.isCritter();
-        sheetData.isVehicle = this.actor.isVehicle();
+        sheetData.isCharacter = this.actor.isType('character');
+        sheetData.isSpirit = this.actor.isType('spirit');
+        sheetData.isCritter = this.actor.isType('critter');
+        sheetData.isVehicle = this.actor.isType('vehicle');
         sheetData.hasSkills = this.actor.hasSkills;
         sheetData.canAlterSpecial = this.actor.canAlterSpecial;
         sheetData.hasFullDefense = this.actor.hasFullDefense;
@@ -1168,8 +1162,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1187,8 +1182,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1205,8 +1201,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksDelete(event) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -1221,8 +1218,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMarksClearAll(event) {
         event.stopPropagation();
 
-        if (this.actor.isIC() && this.actor.hasHost()) {
-            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
         }
 
         const userConsented = await Helpers.confirmDeletion();
@@ -1240,9 +1238,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._filterActiveSkills(sheetData);
     }
 
-    _filterSkills(data: SR5ActorSheetData, skills: Skills = {}) {
+    _filterSkills(data: SR5ActorSheetData, skills: SkillsType = {}) : SkillsType {
         const filteredSkills = {};
-        for (let [key, skill] of Object.entries(skills)) {
+        for (const [key, skill] of Object.entries(skills)) {
             // Don't show hidden skills.
             if (skill.hidden) {
                 continue;
@@ -1267,15 +1265,15 @@ export class SR5BaseActorSheet extends ActorSheet {
         return this._showGeneralSkill(key, skill);
     }
 
-    _showGeneralSkill(skillId, skill: SkillField) {
+    _showGeneralSkill(skillId, skill: SkillFieldType) {
         return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
     }
 
-    _showMagicSkills(skillId, skill: SkillField, sheetData: SR5ActorSheetData) {
+    _showMagicSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
         return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic' && this._isSkillFiltered(skillId, skill);
     }
 
-    _showResonanceSkills(skillId, skill: SkillField, sheetData: SR5ActorSheetData) {
+    _showResonanceSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
         return this._isSkillResonance(skill) && sheetData.system.special === 'resonance' && this._isSkillFiltered(skillId, skill);
     }
 
@@ -1303,7 +1301,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const searchKey = skill.name === undefined ? key : '';
         // some "specs" were a string from old code I think
         const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
-        let searchString = `${searchKey} ${name} ${specs}`;
+        const searchString = `${searchKey} ${name} ${specs}`;
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
     }
@@ -1342,7 +1340,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._delays.skills = setTimeout(() => {
             this._filters.skills = event.currentTarget.value;
             this.render();
-            //@ts-expect-error TODO: foundry-vtt-types v10. Add to typing.
         }, game.shadowrun5e.inputDelay);
     }
 
@@ -1351,7 +1348,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const itemId = Helpers.listItemId(event);
         // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
         const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
-        if (!skillId) return console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`);
+        if (!skillId) { console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`); return; }
         return this.actor.rollSkill(skillId, { event });
     }
 
@@ -1369,7 +1366,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         const skill = this.actor.getSkill(skillId);
         if (!skill) {
-            return console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`);
+            console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`); return;
         }
 
         LinksHelpers.openSource(skill.link);
@@ -1380,11 +1377,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skill = Helpers.listItemId(event);
 
         if (!skill) {
-            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`); return;
         }
 
         // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skill);
     }
 
     /** Keep track of each SkillEditSheet instance and close before opening another.
@@ -1407,18 +1404,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         const [skill, category] = Helpers.listItemId(event).split('.');
 
         if (!skill || !category) {
-            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`);
+            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`); return;
         }
 
-        this._showSkillEditForm(
-            KnowledgeSkillEditSheet,
-            this.actor,
-            {
-                event: event,
-            },
-            skill,
-            category,
-        );
+        void this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, { event }, skill, category);
     }
 
     async _onShowEditLanguageSkill(event) {
@@ -1426,11 +1415,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skill = Helpers.listItemId(event);
 
         if (!skill) {
-            return console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`);
+            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`); return;
         }
 
         // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event }, skill);
     }
 
     async _closeOpenSkillApp() {
@@ -1462,7 +1451,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = Helpers.listHeaderId(event) as keyof KnowledgeSkills;
+        const category = Helpers.listHeaderId(event) as KnowledgeSkillCategory;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
@@ -1475,7 +1464,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const [skillId, category] = Helpers.listItemId(event).split('.') as [string, keyof KnowledgeSkills];
+        const [skillId, category] = Helpers.listItemId(event).split('.') as [string, KnowledgeSkillCategory];
         await this.actor.removeKnowledgeSkill(skillId, category);
     }
 
@@ -1488,7 +1477,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const skillId = await this.actor.addActiveSkill();
         if (!skillId) return;
 
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skillId);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skillId);
     }
 
     async _onRemoveActiveSkill(event: Event) {
@@ -1504,7 +1493,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onRollAttribute(event) {
         event.preventDefault();
         const attribute = event.currentTarget.closest('.attribute').dataset.attribute;
-        return this.actor.rollAttribute(attribute, { event: event });
+        return this.actor.rollAttribute(attribute, { event });
     }
 
     /**
@@ -1513,7 +1502,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      */
     async _onRollCellInput(event) {
         event.preventDefault();
-        let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
 
         switch (track) {
             case 'stun':
@@ -1549,7 +1538,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param item
      */
     _addDragSupportToListItemTemplatePartial(i, item) {
-        if (item.dataset && item.dataset.itemId) {
+        if (item.dataset?.itemId) {
             item.setAttribute('draggable', true);
             item.addEventListener('dragstart', this._onDragStart.bind(this), false);
         }
@@ -1566,11 +1555,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         const quantity = parseInt(event.currentTarget.value);
 
         // Inform users about issues with templating or programming.
-        if (item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
-            return console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item);
+        if (!item?.system || !('technology' in item?.system) || item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
+            console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item); return;
         }
 
-        await item.update({ 'system.technology.quantity': quantity });
+        await item.update({ system: { technology: { quantity } } });
     }
 
     /**
@@ -1581,7 +1570,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const item = this.actor.items.get(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
-            await item.update({ 'system.technology.rating': rtg });
+            await item.update({ system: { technology: { rating: rtg } } });
         }
     }
 
@@ -1595,12 +1584,12 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!item) return;
 
         // Handle the equipped state.
-        if (item.isDevice) {
+        if (item.isType('device')) {
             await this.document.equipOnlyOneItemOfType(item);
         } else {
             await this.actor.updateEmbeddedDocuments('Item', [{
-                '_id': iid,
-                'system.technology.equipped': !item.isEquipped(),
+                _id: iid,
+                system: { technology: { equipped: !item.isEquipped() } }
             }]);
         }
 
@@ -1615,23 +1604,21 @@ export class SR5BaseActorSheet extends ActorSheet {
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
         if (!item) return;
-        if (!item.isCritterPower && !item.isSpritePower) return;
+        if (!item.isType('critter_power') && !item.isType('sprite_power')) return;
 
         switch (item.system.optional) {
             case 'standard':
                 return;
             case 'enabled_option':
                 await this.actor.updateEmbeddedDocuments('Item', [{
-                    '_id': iid,
-                    'system.optional': 'disabled_option',
-                    'system.enabled': false,
+                    _id: iid,
+                    system: { optional: 'disabled_option', enabled: false }
                 }]);
                 break;
             case 'disabled_option':
                 await this.actor.updateEmbeddedDocuments('Item', [{
-                    '_id': iid,
-                    'system.optional': 'enabled_option',
-                    'system.enabled': true,
+                    _id: iid,
+                    system: { optional: 'enabled_option', enabled: true }
                 }]);
                 break;
         }
@@ -1693,17 +1680,16 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
 
         // Disallow editing of default inventory.
-        if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory))
-            return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
-
+        if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+            return;
+        }
 
         $('.selection-inventory').hide();
         $('.inline-input-inventory').show();
 
         // Mark action and pre-select.
-        $('#input-inventory')
-            .data('action', action)
-            .select();
+        $('#input-inventory').data('action', action).select();
     }
 
     /**
@@ -1836,29 +1822,29 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onMatrixAttributeSelected(event) {
         if (!("matrix" in this.actor.system)) return;
 
-        let iid = this.actor.system.matrix.device;
-        let item = this.actor.items.get(iid);
+        const iid = this.actor.system.matrix!.device;
+        const item = this.actor.items.get(iid);
         if (!item) {
             console.error('could not find item');
             return;
         }
         // grab matrix attribute (sleaze, attack, etc.)
-        let att = event.currentTarget.dataset.att;
+        const att = event.currentTarget.dataset.att;
         // grab device attribute (att1, att2, ...)
-        let deviceAtt = event.currentTarget.value;
+        const deviceAtt = event.currentTarget.value;
 
         // get current matrix attribute on the device
-        const deviceData = item.system as DeviceData;
-        let oldVal = deviceData.atts[deviceAtt].att;
-        let data = {
+        const deviceData = item.system as Item.SystemOfType<'device'>;
+        const oldVal = deviceData.atts[deviceAtt].att;
+        const data = {
             _id: iid,
         };
 
         // go through atts on device, setup matrix attributes on it
         // This logic swaps the two slots when a new one is selected
         for (let i = 1; i <= 4; i++) {
-            let tmp = `att${i}`;
-            let key = `system.atts.att${i}.att`;
+            const tmp = `att${i}`;
+            const key = `system.atts.att${i}.att`;
             if (tmp === deviceAtt) {
                 data[key] = att;
             } else if (deviceData.atts[`att${i}`].att === att) {
@@ -1893,11 +1879,11 @@ export class SR5BaseActorSheet extends ActorSheet {
                 $(checkmark).removeClass('fa-check-circle');
             }
         };
-        html.find('label.checkbox').each(function () {
+        html.find('label.checkbox').each(function (this: any) {
             setContent(this);
         });
-        html.find('label.checkbox').click((event) => setContent(event.currentTarget));
-        html.find('.submit-checkbox').change((event) => this._onSubmit(event));
+        html.find('label.checkbox').click((event) => { setContent(event.currentTarget); });
+        html.find('.submit-checkbox').change(async (event) => this._onSubmit(event));
     }
 
     /**
@@ -1912,12 +1898,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         modifiers.applyAll();
         if (!modifiers) return [];
 
-        return Object.entries(modifiers._modifiers).map(([category, modifier]: [Shadowrun.SituationModifierType, SituationModifier]) => {
-            const hidden = this._hideSituationModifier(category);
+        return Object.entries(modifiers._modifiers).map(
+            ([category, modifier]: [string, SituationModifier]) => {
+                const hidden = this._hideSituationModifier(category as Shadowrun.SituationModifierType);
 
-            const label = SR5.modifierTypes[category];
-            return { category, value: modifier.total, hidden, label };
-        });
+                const label = SR5.modifierTypes[category];
+                return { category, value: modifier.total, hidden, label };
+            }
+        );
     }
 
     /**
@@ -1929,9 +1917,9 @@ export class SR5BaseActorSheet extends ActorSheet {
     _hideSituationModifier(category: Shadowrun.SituationModifierType): boolean {
         switch (category) {
             case 'background_count':
-                return !this.actor.isAwakened;
+                return !this.actor.isAwakened();
             case 'environmental':
-                return this.actor.isSprite();
+                return this.actor.isType('sprite');
             // Defense modifier is already shown in general modifier section.
             case 'defense':
                 return true;
@@ -1961,7 +1949,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         console.debug('Toggling all importFlags on owned items to ->', onOff, event);
         for (const item of allItems) {
             if (item.system.importFlags) {
-                await item.update({ 'system.importFlags.isFreshImport': onOff });
+                await item.update({ system: { importFlags: { isFreshImport: onOff } } });
             }
         }
     }

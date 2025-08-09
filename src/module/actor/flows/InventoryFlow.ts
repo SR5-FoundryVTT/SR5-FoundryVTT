@@ -1,8 +1,7 @@
 import { SR5Actor } from "../SR5Actor";
 import { Helpers } from "../../helpers";
-import InventoryData = Shadowrun.InventoryData;
-import InventoriesData = Shadowrun.InventoriesData;
 import { SR5Item } from "../../item/SR5Item";
+import { InventoryType } from "src/module/types/actor/Common";
 
 /**
  * Handle all inventory related actions on an SR5Actor'.
@@ -20,7 +19,7 @@ import { SR5Item } from "../../item/SR5Item";
  * or this allInventories, which will let it appear on all inventories.
  */
 export class InventoryFlow {
-    actor: SR5Actor;
+    actor!: SR5Actor;
 
     constructor(actor: SR5Actor) {
         // Check for sub-type actors.
@@ -33,7 +32,7 @@ export class InventoryFlow {
         // This will happen if there has been some tempering with inventory data.
         // To prevent this causing issues, just set it to default data
         if (actor.system.inventories === undefined) {
-            actor.system.inventories = foundry.utils.duplicate(game.model.Actor[actor.type].inventories);
+            actor.system.inventories = foundry.utils.duplicate((game.model.Actor[actor.type] as any).inventories);
         }
 
         this.actor = actor;
@@ -51,15 +50,20 @@ export class InventoryFlow {
         name = InventoryFlow._sanitzeName(name);
 
         if (name.length === 0) return console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
-        if (this.exists(name)) return ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
+        if (this.exists(name)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
+            return;
+        }
         if (this.actor.defaultInventory.name === name) return;
 
         const updateData = {
-            'system.inventories': {
-                [name]: {
-                    name,
-                    label: name,
-                    itemIds: []
+            system: {
+                inventories: {
+                    [name]: {
+                        name,
+                        label: name,
+                        itemIds: []
+                    }
                 }
             }
         };
@@ -124,14 +128,14 @@ export class InventoryFlow {
      *
      * @param name The inventory name to return.
      */
-    getOne(name): InventoryData | undefined {
+    getOne(name: string): InventoryType | undefined {
         return this.actor.system.inventories[name];
     }
 
     /**
      * Helper to get all inventories.
      */
-    getAll(): InventoriesData {
+    getAll() {
         return this.actor.system.inventories;
     }
 
@@ -145,8 +149,10 @@ export class InventoryFlow {
         console.debug(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
 
         // Disallow editing of default inventory.
-        if (this.disallowRename(current))
-            return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+        if (this.disallowRename(current)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+            return;
+        }
 
         newName = InventoryFlow._sanitzeName(newName);
 
@@ -162,9 +168,11 @@ export class InventoryFlow {
         inventory.label = newName;
 
         const updateData = {
-            'system.inventories': {
-                [`-=${current}`]: null,
-                [newName]: inventory
+            system: {
+                inventories: {
+                    [`-=${current}`]: null,
+                    [newName]: inventory
+                }
             }
         };
 
@@ -221,9 +229,9 @@ export class InventoryFlow {
         if (this.actor.defaultInventory.name === name) return;
 
         // Collect affected inventories.
-        const inventories: InventoryData[] = name ?
+        const inventories: InventoryType[] = name ?
             [this.actor.system.inventories[name]] :
-            Object.values(this.actor.system.inventories).filter(({ itemIds }) => itemIds.includes(item.id as string));
+            Object.values(this.actor.system.inventories).filter(({ itemIds }) => itemIds.includes(item.id!));
 
         // No inventory found means, it's in the default inventory and no removal is needed.
         if (inventories.length === 0) return;

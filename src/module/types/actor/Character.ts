@@ -1,187 +1,91 @@
-/// <reference path="../Shadowrun.ts" />
+import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData, ActorBase } from "./Common";
+import { Attributes, AttributeField } from "../template/Attributes";
+import { ModifiableValue, ValueMaxPair } from "../template/Base";
+import { Tracks } from "../template/ConditionMonitors";
+import { ActorArmorData } from "../template/Armor";
+import { Movement } from "../template/Movement";
+import { Initiative } from "../template/Initiative";
+import { MatrixData } from "../template/Matrix";
+import { VisibilityChecks } from "../template/Visibility";
+import { ModifiableField } from "../fields/ModifiableField";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
-declare namespace Shadowrun {
-    export interface CharacterSkills {
-        active: Skills
-        language: KnowledgeSkillList
-        knowledge: KnowledgeSkills
-    }
+const CharacterAttributes = () => ({
+    ...Attributes(),
+    initiation: new ModifiableField(AttributeField()),
+    submersion: new ModifiableField(AttributeField()),
+});
 
-    export interface CharacterData extends
-        CommonData,
-        MatrixActorData,
-        TwoTrackActorData,
-        ArmorActorData,
-        MagicActorData,
-        WoundsActorData,
-        MovementActorData,
-        TechnomancerActorData,
-        ImportFlags,
-        NPCActorData {
-            attributes: CharacterAttributes
-            values: PhysicalCombatValues
-            metatype: string | keyof typeof SR5CONFIG.character.types;
-            full_defense_attribute: string;
-            // Drakes and Shapeshifters can have critter powers
-            is_critter: boolean;
-            // modifiers: CharacterModifiers;
-            limits: CharacterLimits
-            modifiers: Modifiers & CharacterModifiers
-    }
+const CharacterData = () => ({
+    ...CommonData(),
 
-    export interface CharacterLimits extends AwakendLimits, MatrixLimits {}
+    // === Core Identity ===
+    metatype: new StringField({ required: true }),
+    is_critter: new BooleanField(),
+    is_npc: new BooleanField(),
+    npc: new SchemaField({ is_grunt: new BooleanField() }),
+    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane'], initial: 'mundane' }),
 
-    export type PhysicalTrackActorData = {
-        track: {
-            physical: PhysicalTrack;
-        };
-    };
-    export type StunTrackActorData = {
-        track: {
-            stun: StunTrack;
-        };
-    };
+    // === Attributes & Limits ===
+    attributes: new SchemaField(CharacterAttributes()),
+    limits: new SchemaField(CharacterLimits()),
 
-    export type MovementActorData = {
-        movement: Movement;
-    };
+    // === Combat ===
+    armor: new ModifiableField(ActorArmorData()),
+    initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
+    values: new SchemaField(PhysicalCombatValues()),
+    wounds: new ModifiableField(ModifiableValue()),
 
-    export type ArmorActorData = {
-        armor: ActorArmor;
-    };
+    visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
 
-    export type WoundsActorData = {
-        wounds: WoundType;
-    };
+    // === Condition & Movement ===
+    track: new SchemaField(Tracks('physical', 'stun')),
+    movement: new SchemaField(Movement()),
 
-    export type TwoTrackActorData = {
-        track: Tracks;
-    };
+    // === Magic & Matrix ===
+    magic: new SchemaField(MagicData()),
+    matrix: new SchemaField(MatrixData()),
+    technomancer: new SchemaField({
+        attribute: new StringField({ required: true, initial: "willpower" }), // fade attribute
+        submersion: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    }),
 
-    export type MagicActorData = {
-        magic: MagicData
-    };
+    // === Economy & Reputation ===
+    karma: new SchemaField(ValueMaxPair()),
+    nuyen: new NumberField({ required: true, nullable: false, initial: 0 }),
+    notoriety: new NumberField({ required: true, nullable: false, initial: 0 }),
+    public_awareness: new NumberField({ required: true, nullable: false, initial: 0 }),
+    street_cred: new NumberField({ required: true, nullable: false, initial: 0 }),
 
-    export type TechnomancerActorData = {
-        technomancer: {
-            // Fade test attribute
-            attribute: ActorAttribute
-            submersion: number
-        }
-    }
+    // === Modifiers ===
+    modifiers: new SchemaField(CreateModifiers(
+        // Limits
+        "physical_limit", "astral_limit", "social_limit", "mental_limit",
+        // Initiative
+        "astral_initiative", "astral_initiative_dice",
+        "matrix_initiative", "matrix_initiative_dice",
+        "meat_initiative", "meat_initiative_dice",
+        // Tracks
+        "stun_track", "matrix_track", "physical_track", "physical_overflow_track",
+        // Movement
+        "walk", "run",
+        // Tolerance
+        "wound_tolerance", "pain_tolerance_stun", "pain_tolerance_physical",
+        // Combat/Defense
+        "armor", "multi_defense", "reach", "defense", "defense_dodge", "defense_parry",
+        "defense_block", "defense_melee", "defense_ranged", "soak", "recoil",
+        // Magic/Matrix
+        "drain", "fade", "essence",
+        // Miscellaneous
+        "composure", "lift_carry", "judge_intentions", "memory", "global"
+    )),
+});
 
-    export type MatrixActorData = {
-        matrix: MatrixData;
-    };
-
-    export type NPCActorData = {
-        is_npc: boolean;
-        npc: NPCData
-    }
-
-    export type WoundType = {
-        value: number;
-    };
-
-    /**
-     * In general modifiers should always be a number BUT legacy wise there were many issue with strings creeping in.
-     */
-    export interface Modifiers {
-        [name: string]: NumberOrEmpty;
-    }
-
-    export type InitiativeType = {
-        base: BaseValuePair<number> & ModifiableValue;
-        dice: BaseValuePair<number> &
-            ModifiableValue & {
-            text: string;
-        };
-    };
-
-    export type Initiative = {
-        perception: string;
-        meatspace: InitiativeType;
-        matrix: InitiativeType;
-        astral: InitiativeType;
-        current: InitiativeType;
-        edge?: boolean;
-    };
-
-    export type SkillEditFormData = {
-        skill: SkillField
-        editable_name?: boolean
-        editable_canDefault: boolean
-        editable_attribute: boolean
-        attributes: object
-    };
-
-    export interface CommonModifiers {
-        // Meant to be applied on all defense tests.
-        defense: NumberOrEmpty
-        // Meant to be applied on some defense tests that apply the defense modifier.
-        ['defense_dodge']: NumberOrEmpty
-        ['defense_parry']: NumberOrEmpty
-        ['defense_block']: NumberOrEmpty
-        ['defense_melee']: NumberOrEmpty
-        ['defense_ranged']: NumberOrEmpty
-
-        // Meant to be applied on physical resist (soak) tests.
-        soak: NumberOrEmpty
-        // Meant to be applied to all ranged attack tests.
-        recoil: NumberOrEmpty
-    }
-
-    interface MatrixModifiers {
-        matrix_initiative: NumberOrEmpty
-        matrix_initiative_dice: NumberOrEmpty
-        matrix_track: NumberOrEmpty
-    }
-
-    /**
-     * These modifiers are available for Character type actors.
-     * 
-     * This interface must correspond with modifiers inject during character data prep.
-     */
-    export interface CharacterModifiers extends CommonModifiers, MatrixModifiers {
-        drain: NumberOrEmpty
-        armor: NumberOrEmpty
-        physical_limit: NumberOrEmpty
-        astral_limit: NumberOrEmpty
-        social_limit: NumberOrEmpty
-        mental_limit: NumberOrEmpty
-        stun_track: NumberOrEmpty
-        physical_track: NumberOrEmpty
-        physical_overflow_track: NumberOrEmpty
-        meat_initiative: NumberOrEmpty
-        meat_initiative_dice: NumberOrEmpty
-        astral_initiative: NumberOrEmpty
-        astral_initiative_dice: NumberOrEmpty
-        composure: NumberOrEmpty
-        lift_carry: NumberOrEmpty
-        judge_intentions: NumberOrEmpty
-        memory: NumberOrEmpty
-        walk: NumberOrEmpty
-        run: NumberOrEmpty
-        wound_tolerance: NumberOrEmpty
-        pain_tolerance_stun: NumberOrEmpty
-        pain_tolerance_physical: NumberOrEmpty
-        essence: NumberOrEmpty
-        fade: NumberOrEmpty
-        // Meant to be applied on all defense test, for defense modifiers after multiple attacks.
-        multi_defense: NumberOrEmpty
-        reach: NumberOrEmpty
-    }
-
-    /**
-     * Actor data that can be Grunts.
-     */
-    type GruntActorData = CharacterData | SpiritData | CritterData;
-
-    /**
-     * These attributes are always available for this actor type.
-     */
-    interface CharacterAttributes extends Attributes {
-        initiation: AttributeField
-        submersion: AttributeField
+export class Character extends ActorBase<ReturnType<typeof CharacterData>> {
+    static override defineSchema() {
+        return CharacterData();
     }
 }
+
+console.log("CharacterData:", CharacterData(), new Character());

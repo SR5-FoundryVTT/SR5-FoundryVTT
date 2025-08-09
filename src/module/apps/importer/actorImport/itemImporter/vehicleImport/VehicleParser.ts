@@ -1,13 +1,15 @@
-import { getArray } from "../importHelper/BaseParserFunctions.js";
+import { importOptionsType } from "../../characterImporter/CharacterImporter";
+import { getArray } from "../importHelper/BaseParserFunctions";
 import { WeaponParser } from "../weaponImport/WeaponParser";
-import { GearsParser } from "../importHelper/GearsParser.js";
+import { GearsParser } from "../importHelper/GearsParser";
 import MountedWeaponParser from "./MountedWeaponParser";
-import VehicleModsParser from "./VehicleModsParser";
 import { SR5Actor } from '../../../../../actor/SR5Actor';
+import VehicleModsParser from "./VehicleModsParser";
+import { ActorSchema } from "../../ActorSchema";
 
 export default class VehicleParser {
 
-    async parseVehicles(actor, chummerChar, importOptions): Promise<Array<SR5Actor>|undefined> {
+    async parseVehicles(actor: SR5Actor<'character'>, chummerChar: ActorSchema, importOptions: importOptionsType): Promise<Array<SR5Actor>|undefined> {
         if(!importOptions.vehicles) {
             return;
         }
@@ -20,10 +22,7 @@ export default class VehicleParser {
         const vehicles = getArray(chummerChar.vehicles?.vehicle);
 
         return await Promise.all<SR5Actor>(vehicles.map<Promise<SR5Actor>>(async (vehicle) => {
-            const vehicleActor = (await Actor.create({
-                name: vehicle.name,
-                type: "vehicle"
-            }))!;
+            const vehicleActor = (await SR5Actor.create({ name: vehicle.name, type: "vehicle" }) as SR5Actor<'vehicle'>);
 
             const promises : Array<Promise<any>> = [];
             promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));
@@ -31,8 +30,8 @@ export default class VehicleParser {
             promises.push(new MountedWeaponParser().parseWeapons(vehicle, importOptions.assignIcons))
             promises.push(new VehicleModsParser().parseMods(vehicle, importOptions.assignIcons))
 
-            let handling;
-            let off_road_handling;
+            let handling: string | undefined;
+            let off_road_handling: string | undefined;
             if(vehicle.handling.includes("/")) {
                 handling = vehicle.handling.split("/")[0];
                 off_road_handling =  vehicle.handling.split("/")[1]
@@ -52,19 +51,23 @@ export default class VehicleParser {
             }
 
             await vehicleActor.update({
-                'system.driver': actor.id,
-                'system.vehicle_stats.pilot.base': vehicle.pilot,
-                'system.vehicle_stats.handling.base': handling,
-                'system.vehicle_stats.off_road_handling.base': off_road_handling,
-                'system.vehicle_stats.speed.base': speed,
-                'system.vehicle_stats.off_road_speed.base': off_road_speed,
-                'system.vehicle_stats.acceleration.base': vehicle.accel,
-                'system.vehicle_stats.sensor.base': vehicle.sensor,
-                'system.vehicle_stats.seats.base': vehicle.seats,
-                'system.attributes.body.base': vehicle.body,
-                'system.armor.base': vehicle.armor,
-                'system.isDrone': vehicle.isdrone === "True",
-                'folder': actor.folder?.id
+                system: {
+                    driver: actor.id,
+                    vehicle_stats: {
+                        pilot: { base: Number(vehicle.pilot) || 0 },
+                        handling: { base: Number(handling) || 0 },
+                        off_road_handling: { base: Number(off_road_handling) || 0 },
+                        speed: { base: Number(speed) || 0 },
+                        off_road_speed: { base: Number(off_road_speed) || 0 },
+                        acceleration: { base: Number(vehicle.accel) || 0 },
+                        sensor: { base: Number(vehicle.sensor) || 0 },
+                        seats: { base: Number(vehicle.seats) || 0 }
+                    },
+                    attributes: { body: { base: Number(vehicle.body) || 0 } },
+                    armor: { base: Number(vehicle.armor) || 0 },
+                    isDrone: vehicle.isdrone === "True"
+                },
+                folder: actor.folder?.id
             });
 
             await vehicleActor.createEmbeddedDocuments('Item', (await Promise.all(promises)).flat());

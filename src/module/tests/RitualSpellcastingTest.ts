@@ -2,6 +2,8 @@ import { DataDefaults } from "../data/DataDefaults";
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { PartsList } from '../parts/PartsList';
 import { RitualRules } from '../rules/RitualRules';
+import { DamageType, MinimalActionType } from "../types/item/Action";
+import { DeepPartial } from "fvtt-types/utils";
 
 
 interface RitualSpellcastingTestData extends SuccessTestData {
@@ -10,7 +12,7 @@ interface RitualSpellcastingTestData extends SuccessTestData {
     force: number
     // Drain value as described on SR5#300
     drain: number
-    drainDamage: Shadowrun.DamageData
+    drainDamage: DamageType
 
     // Reagent value as described on SR5#296 'Give the offering'
     reagents: number
@@ -33,13 +35,13 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
         this._prepareRitualData(data);
 
         data.drain = data.drain || 0;
-        data.drainDamage = data.drainDamage || DataDefaults.damageData();
+        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
 
         return data;
     }
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/ritualspellcasting-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/ritualspellcasting-test-dialog.hbs';
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
@@ -63,11 +65,8 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
     /**
      *
      */
-    static override _getDefaultTestAction(): Partial<Shadowrun.MinimalActionData> {
-        return {
-            skill: 'ritual_spellcasting',
-            attribute: 'magic'
-        }
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { skill: 'ritual_spellcasting', attribute: 'magic' }
     }
 
     override async prepareDocumentData() {
@@ -172,11 +171,12 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
      * NOTE: This will be called by the opposing test via a follow up test action.
      */
     calcDrain(opposingHits: number) {
-        if (!this.actor) return DataDefaults.damageData();
+        if (!this.actor) return DataDefaults.createData('damage');
 
         this.data.drain = RitualRules.drainValue(opposingHits, this.data.reagents, this.data.force);
         this.data.drainDamage = RitualRules.calcDrainDamage(opposingHits, this.data.drain, this.actor.getAttribute('magic').value);
         this.data.drainReady = true;
+        return;
     }
 
     /**

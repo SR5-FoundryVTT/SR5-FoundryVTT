@@ -1,25 +1,23 @@
 import { Metatype } from "../../schema/MetatypeSchema";
+import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
+import { DataDefaults } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
-import SpiritActorData = Shadowrun.SpiritActorData;
-import { CompendiumKey } from "../../importer/Constants";
 
-export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
-    protected override parseType: string = 'spirit';
+export class SpiritParser extends MetatypeParserBase<'spirit'> {
+    protected readonly parseType = 'spirit';
 
-    protected override getSystem(jsonData: Metatype): SpiritActorData['system'] {
+    protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();
-
-        system.description.source = `${jsonData.source._TEXT} ${jsonData.page._TEXT}`;
 
         switch (jsonData.category?._TEXT) {
             case "Insect Spirits":
-                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as Shadowrun.SpiritType;
+                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase();
                 break;
 
             case "Toxic Spirits": {
-                const specialMapping = new Map<string, Shadowrun.SpiritType>([
+                const specialMapping = new Map<string, string>([
                     ['Noxious Spirit', 'toxic_air'], ['Abomination Spirit', 'toxic_beasts'],
                     ['Barren Spirit', 'toxic_earth'], ['Nuclear Spirit', 'toxic_fire'],
                     ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
@@ -30,20 +28,21 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
             }
 
             case "Ritual":
-                const attrMap = {
-                    body: "bodmin",     agility: "agimin",  reaction: "reamin",
-                    strength: "strmin", charisma: "chamin", intuition: "intmin",
-                    logic: "logmin",    willpower: "wilmin"
-                } as const;
-
-                for (const [attr, key] of Object.entries(attrMap)) {
-                    system.attributes[attr].base = +jsonData[key]._TEXT;
-                }
+                system.attributes.body.base = Number(jsonData.bodmin._TEXT) || 0;
+                system.attributes.agility.base = Number(jsonData.agimin._TEXT) || 0;
+                system.attributes.reaction.base = Number(jsonData.reamin._TEXT) || 0;
+                system.attributes.strength.base = Number(jsonData.strmin._TEXT) || 0;
+                system.attributes.charisma.base = Number(jsonData.chamin._TEXT) || 0;
+                system.attributes.intuition.base = Number(jsonData.intmin._TEXT) || 0;
+                system.attributes.logic.base = Number(jsonData.logmin._TEXT) || 0;
+                system.attributes.willpower.base = Number(jsonData.wilmin._TEXT) || 0;
+                system.attributes.edge.base = Number(jsonData.edgmin._TEXT) || 0;
+                system.attributes.magic.base = Number(jsonData.magmin?._TEXT) || 0;
+                system.attributes.resonance.base = Number(jsonData.resmin?._TEXT) || 0;
 
                 system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
                     ? jsonData.name._TEXT.replace(" ", "_").toLowerCase() : "homunculus";
                 break;
-
             default:
                 system.spiritType = jsonData.name._TEXT
                     .replace(" Spirit", "").replace("Spirit of ", "")
@@ -53,20 +52,19 @@ export class SpiritParser extends MetatypeParserBase<SpiritActorData> {
 
         if (jsonData.run) {
             const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => +v || 0);
-            system.movement.run = { value, mult, base } as Shadowrun.Movement['run'];
+            system.movement.run = DataDefaults.createData('movement_field', { value, mult, base })
         }
 
         if (jsonData.walk) {
             const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => +v || 0);
-            system.movement.walk = { value, mult, base } as Shadowrun.Movement['walk'];
+            system.movement.walk = DataDefaults.createData('movement_field', { value, mult, base })
         }
         system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
-        system.is_npc = true;
 
         return system;
     }
 
-    protected override async getItems(jsonData: Metatype): Promise<Shadowrun.ShadowrunItemData[]> {
+    protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
         const { name, powers } = jsonData;
         const qualities = jsonData.qualities || undefined;
         const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers;

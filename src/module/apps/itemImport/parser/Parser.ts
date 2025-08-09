@@ -19,110 +19,94 @@ import { Spell } from "../schema/SpellsSchema";
 import { Vehicle, Mod as VehicleMod, Weaponmount } from "../schema/VehiclesSchema";
 import { Accessory, Weapon } from "../schema/WeaponsSchema";
 
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+import { TechnologyType } from "src/module/types/template/Technology";
+import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
 
 export type ParseData =
     Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
-    Power | Enhancement | Quality | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory
+    Power | Enhancement | Quality | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
 
-export abstract class Parser<TResult extends (ShadowrunActorData | ShadowrunItemData)> {
-    protected abstract parseType: string;
+export type SystemType<T extends SystemEntityType> = ReturnType<Parser<T>["getBaseSystem"]>;
+
+export abstract class Parser<SubType extends SystemEntityType> {
+    protected abstract readonly parseType: SubType;
     protected folders: Record<string, Promise<Folder>> = {};
 
-    private isActor(): boolean {
+    private isActor(): this is Parser<SystemEntityType & Actor.SubType> {
         return Object.keys(game.model.Actor).includes(this.parseType);
     }
 
     protected abstract getFolder(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Folder>;
-    protected async getItems(jsonData: ParseData): Promise<ShadowrunItemData[]> { return []; }
-    protected getSystem(jsonData: ParseData): TResult['system'] { return this.getBaseSystem(); }
+    protected async getItems(jsonData: ParseData): Promise<Item.Source[]> { return []; }
+    protected getSystem(jsonData: ParseData) { return this.getBaseSystem(); }
 
-    public async Parse(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<TResult> {
+    public async Parse(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Actor.CreateData | Item.CreateData> {
         const itemPromise = this.getItems(jsonData);
         let bonusPromise: Promise<void> | undefined;
 
         const name = jsonData.name._TEXT;
-        const typeOption = Constants.MAP_TRANSLATION_TYPE[this.parseType] as TranslationType;
+        const typeOption = Constants.MAP_TRANSLATION_TYPE[this.parseType as string];
         const options = {id: jsonData.id._TEXT, type: typeOption};
 
         const entity = {
             name: TH.getTranslation(name, options),
-            type: this.parseType,
+            type: this.parseType as any,
+            folder: (await this.getFolder(jsonData, compendiumKey)).id,
             system: this.getSystem(jsonData),
-        } as TResult;
+        } satisfies Actor.CreateData | Item.CreateData;
 
-        //@ts-expect-error
-        entity.folder = (await this.getFolder(jsonData, compendiumKey)).id;
+        const system = entity.system;
 
         // Add technology
-        if ('technology' in entity.system)
-            this.setTechnology(entity.system, jsonData);
+        if (system && 'technology' in system && system.technology)
+            this.setTechnology(system.technology, jsonData);
 
         // Add Icon
         if (DataImporter.setIcons)
-            this.setIcons(entity, jsonData);
+            this.setIcons(entity, system, jsonData);
 
         if ('bonus' in jsonData && jsonData.bonus)
-            bonusPromise = BH.addBonus(entity, jsonData.bonus);
+            bonusPromise = BH.addBonus(entity as any, jsonData.bonus);
 
         const page = jsonData.page._TEXT;
         const source = jsonData.source._TEXT;
-        entity.system.description.source = `${source} ${TH.getAltPage(name, page, options)}`;
+        system.description = DataDefaults.createData('description', {source: `${source} ${TH.getAltPage(name, page, options)}`});
 
         // Runtime branching
-        if (this.isActor()) {
-            //@ts-expect-error
-            entity.items = await itemPromise;
-        } else {
-            //@ts-expect-error
-            entity.flags ??= {};
-            //@ts-expect-error
-            entity.flags.shadowrun5e ??= {};
-            //@ts-expect-error
-            entity.flags.shadowrun5e.embeddedItems = await itemPromise;
-        }
+        if (this.isActor())
+            (entity as Actor.CreateData).items = await itemPromise;
+        else
+            (entity as Item.CreateData).flags = { shadowrun5e: { embeddedItems: await itemPromise } };
 
         await bonusPromise;
 
         return entity;
     }
 
-    private setTechnology(system: Shadowrun.ShadowrunTechnologyItemData['system'], jsonData: ParseData) {
-        system.technology.availability = 'avail' in jsonData && jsonData.avail ? jsonData.avail._TEXT || '' : '';
-        system.technology.cost = 'cost' in jsonData && jsonData.cost ? Number(jsonData.cost._TEXT) || 0 : 0;
-        system.technology.rating = 'rating' in jsonData && jsonData.rating ? Number(jsonData.rating._TEXT) || 0 : 0;
-        system.technology.conceal.base = 'conceal' in jsonData && jsonData.conceal ? Number(jsonData.conceal._TEXT) || 0 : 0;
+    private setTechnology(technology: TechnologyType, jsonData: ParseData) {
+        technology.availability = 'avail' in jsonData && jsonData.avail ? jsonData.avail._TEXT || '' : '';
+        technology.cost = 'cost' in jsonData && jsonData.cost ? Number(jsonData.cost._TEXT) || 0 : 0;
+        technology.rating = 'rating' in jsonData && jsonData.rating ? Number(jsonData.rating._TEXT) || 0 : 0;
+        technology.conceal.base = 'conceal' in jsonData && jsonData.conceal ? Number(jsonData.conceal._TEXT) || 0 : 0;
     }
 
-    protected setIcons(entity: TResult, jsonData: ParseData) {
+    protected setIcons(entity: Actor.CreateData | Item.CreateData, system: SystemType<SubType>, jsonData: ParseData) {
         // Why don't we have importFlags as base in actors?
-        if ('importFlags' in entity.system || this.isActor()) {
-            entity.system.importFlags = {
-                name: IH.formatAsSlug(jsonData.name._TEXT),
-                type: this.parseType,
-                subType: '',
-                isFreshImport: true,
-            } as Shadowrun.ImportFlagData;
+        if ('importFlags' in system && system.importFlags) {
+            system.importFlags.name = IH.formatAsSlug(jsonData.name._TEXT);
+            system.importFlags.type = this.parseType;
+            system.importFlags.subType = '';
+            system.importFlags.isFreshImport = true;
 
             const subType = 'category' in jsonData ? IH.formatAsSlug(jsonData.category?._TEXT || '') : '';
-            if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType]).includes(subType))
-                entity.system.importFlags.subType = subType;
+            if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType as string]).includes(subType))
+                system.importFlags.subType = subType;
 
-            const entitySystem = entity.system as Shadowrun.ShadowrunItemDataData | Shadowrun.ShadowrunActorDataData;
-            entity.img = IconAssign.iconAssign(entity.system.importFlags, DataImporter.iconList, entitySystem);
+            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entity.system);
         }
     }
 
-    protected getBaseSystem(systemData: Partial<TResult['system']> = {}): TResult['system'] {
-        const actor_item = this.isActor() ? 'Actor' : 'Item';
-
-        try {
-            // foundry.utils.duplicate source to avoid keeping reference to model data.
-            const modelSystemData = foundry.utils.duplicate(game.model[actor_item][this.parseType]);
-            return foundry.utils.mergeObject(modelSystemData, systemData) as TResult['system'];
-        } catch (error) {
-            throw new Error(`FoundryVTT doesn't have item type: ${this.parseType} registered in ${actor_item}`);
-        }
+    protected getBaseSystem(createData: SystemConstructorArgs<SubType> = {}) {
+        return DataDefaults.baseSystemData<SubType>(this.parseType, createData);
     };
 }

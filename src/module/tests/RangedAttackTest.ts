@@ -6,16 +6,19 @@ import {FireModeRules} from "../rules/FireModeRules";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
+import { DamageType } from '../types/item/Action';
+import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
+import { FireModeType } from '../types/flags/ItemFlags';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
-    damage: Shadowrun.DamageData
-    fireModes: Shadowrun.FireModeData[]
-    fireMode: Shadowrun.FireModeData
+    damage: DamageType
+    fireModes: FireModeType[]
+    fireMode: FireModeType
     // index of selected fireMode in fireModes
     fireModeSelected: number
-    ranges: Shadowrun.RangesTemplateData
+    ranges: RangesTemplateType
     range: number
-    targetRanges: Shadowrun.TargetRangeTemplateData[]
+    targetRanges: TargetRangeTemplateType[]
     // index of selected target range in targetRanges
     targetRangesSelected: number
     // Distance to target in meters.
@@ -24,7 +27,7 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
 
 
 export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
-    public override item: SR5Item;
+    declare item: SR5Item;
 
     override _prepareData(data, options): RangedAttackTestData {
         data = super._prepareData(data, options);
@@ -80,7 +83,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
      */
     _prepareFireMode() {        
         // No fire modes selectable on dialog for invalid item provided.
-        const weapon = this.item.asWeapon;
+        const weapon = this.item.asType('weapon');
         if (!weapon) return;
 
         this.data.fireModes = FireModeRules.availableFireModes(weapon.system.range.modes);
@@ -92,7 +95,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         }
 
         // Current firemode selected
-        const lastFireMode = this.item.getLastFireMode() || DataDefaults.fireModeData();
+        const lastFireMode = this.item.getLastFireMode() || DataDefaults.createData('fire_mode');
         // Try pre-selection based on last fire mode.
         this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
         if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;
@@ -115,7 +118,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.hbs';
     }
 
     /**
@@ -151,7 +154,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         this._selectFireMode(this.data.fireModeSelected);
         
         // Alter fire mode by ammunition constraints.
-        this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft);
+        this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft());
 
         WeaponRangeTestBehavior.prepareBaseValues(this);
 
@@ -174,7 +177,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
      *       It's done this way as no matter the fire mode, you can fire it.
      */
     override canConsumeDocumentResources() {
-        if (!this.item.isRangedWeapon) return true;
+        if (!this.item.isRangedWeapon()) return true;
         
         // Ammo consumption
         const fireMode = this.data.fireMode;
@@ -204,7 +207,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
      */
     async consumeWeaponAmmo(): Promise<boolean> {
         if (!this.item) return true;
-        if (!this.item.isRangedWeapon) return true;
+        if (!this.item.isRangedWeapon()) return true;
 
         const fireMode = this.data.fireMode;
         if (fireMode.value === 0) return true;
@@ -231,7 +234,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
      */
     get recoilBeforeAttack(): number {
         if (!this.actor) return 0;
-        return this.actor.recoil;
+        return this.actor.recoil();
     }
 
     /**
@@ -242,6 +245,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         
         const fireMode = this.data.fireMode;
         const fireModeRecoil = fireMode.recoil ? fireMode.value : 0;
-        return this.actor.recoil + fireModeRecoil;
+        return this.actor.recoil() + fireModeRecoil;
     }
 }

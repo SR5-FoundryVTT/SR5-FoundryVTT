@@ -90,14 +90,6 @@ export function createTagifyOnInput(element: HTMLInputElement, values: TagifyVal
     return tagify;
 }
 
-const tagsToIds = (tags: TagifyTags) => tags.map(tag => tag.id);
-export const tagifyFlagsToIds = (effect: SR5ActiveEffect, flag: string): string[] => {
-    const value = effect.getFlag(SYSTEM_NAME, flag);
-    if (!value) return [];
-    const tags = JSON.parse(value as string);
-    return tagsToIds(tags);
-}
-
 /**
  * Helper to parse FoundryVTT DropData directly from it's source event
  *

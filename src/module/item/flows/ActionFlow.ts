@@ -1,13 +1,14 @@
 /**
  * Handle all things related to the action template (template.json)
  */
-import { SR5Actor } from "../../actor/SR5Actor";
-import { Helpers } from "../../helpers";
-import { SR5Item } from "../SR5Item";
-import { PartsList } from "../../parts/PartsList";
 import { SR5 } from "../../config";
-import { DataDefaults } from "../../data/DataDefaults";
+import { SR5Item } from "../SR5Item";
+import { Helpers } from "../../helpers";
+import { SR5Actor } from "../../actor/SR5Actor";
+import { PartsList } from "../../parts/PartsList";
 import { Translation } from "../../utils/strings";
+import { DamageType } from "src/module/types/item/Action";
+import { ModifiableValueLinkedType } from "src/module/types/template/Base";
 
 export class ActionFlow {
     /**
@@ -17,15 +18,14 @@ export class ActionFlow {
      * @param actor The actor to use should a dynamic calculation be needed.
      * @param item
      */
-    static calcDamageData(damage: Shadowrun.DamageData, actor?: SR5Actor, item?: SR5Item): Shadowrun.DamageData {
+    static calcDamageData(damage: DamageType, actor?: SR5Actor, item?: SR5Item): DamageType {
         // Avoid manipulation on original data, which might come from database values.
-        damage = foundry.utils.duplicate(damage);
+        damage = foundry.utils.duplicate(damage) as DamageType;
 
         if (!actor) return damage;
 
-        if (item) {
+        if (item)
             damage.source = ActionFlow._damageSource(actor, item);
-        }
 
         this._applyModifiableValue(damage, actor);
         damage.value = Helpers.calcTotal(damage, { min: 0 });
@@ -36,7 +36,7 @@ export class ActionFlow {
         return damage;
     }
 
-    static _applyModifiableValue(value: Shadowrun.ModifiableValueLinked, actor: SR5Actor) {
+    static _applyModifiableValue(value: ModifiableValueLinkedType, actor: SR5Actor) {
         const attribute = actor.findAttribute(value.attribute);
         if (!attribute) return;
 
@@ -56,13 +56,14 @@ export class ActionFlow {
             case "multiply":
                 PartsList.AddUniquePart(value.mod, 'SR5.Value', (value.base * attribute.value) - value.base);
                 break;
-            case "divide":
+            case "divide": {
                 // Remove base from value by modifying.
                 PartsList.AddUniquePart(value.mod, 'SR5.BaseValue', value.base * -1);
                 // Add division result as modifier on zero.
                 const denominator = attribute.value === 0 ? 1 : attribute.value;
                 PartsList.AddUniquePart(value.mod, 'SR5.Value', Math.floor(value.base / denominator));
                 break;
+            }
         }
     }
 
@@ -72,7 +73,7 @@ export class ActionFlow {
      * @param actor The actor used to determine damage
      * @param item The item from which damage's been determined from.
      */
-    static _damageSource(actor: SR5Actor, item: SR5Item): Shadowrun.DamageSource {
+    static _damageSource(actor: SR5Actor, item: SR5Item): DamageType['source'] {
         return {
             actorId: actor.id || '',
             itemId: item.id || '',
@@ -88,7 +89,7 @@ export class ActionFlow {
      * 
      * @returns true, when the user configured damage contains any parts.
      */
-    static hasDamage(damage: Shadowrun.DamageData): boolean {
+    static hasDamage(damage: DamageType): boolean {
         if (damage.base !== 0) return true;
         if (damage.attribute) return true;
         if (damage.type) return true;
@@ -111,7 +112,7 @@ export class ActionFlow {
     static sortedActiveSkills(actor?: SR5Actor, skillNames?: string[]) {
         // CASE - Return default skills whenn no local actor skills are used.
         //        The major use case is the sidebar item creation, where no actor is available.
-        if (!actor || actor.isIC()) {
+        if (!actor || actor.isType('ic')) {
             // Inject this items custom skill into the global skill list.
             const globalSkills = foundry.utils.deepClone(SR5.activeSkills);
             skillNames?.forEach(skillName => { ActionFlow._injectMissingCustomSkill(globalSkills, skillName) });

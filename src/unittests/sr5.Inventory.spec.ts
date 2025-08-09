@@ -1,35 +1,29 @@
-import { SR5TestingDocuments } from './utils';
-import { SR5Actor } from '../module/actor/SR5Actor';
+
+import { SR5TestFactory } from './utils';
 import { SR5Item } from '../module/item/SR5Item';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
-    const { describe, it, assert, should, before, after } = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
+    after(async () => { factory.destroy(); });
 
-    before(async () => {
-        testActor = new SR5TestingDocuments<SR5Actor>(SR5Actor);
-        testItem = new SR5TestingDocuments<SR5Item>(SR5Item);
-    });
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    });
 
     describe('InventoryFlow testing', () => {
         it('create a new inventory and know of its existance', async () => {
-            const actor = await testActor.create({ type: 'character' });
+            const actor = await factory.createActor({ type: 'character' });
 
             await actor.inventory.create('test');
 
             assert.exists(actor.system.inventories['test']);
             assert.deepEqual(actor.system.inventories['test'], {
                 name: 'test',
+                type: '',
                 label: 'test',
                 itemIds: [],
+                showAll: true,
             });
 
             assert.strictEqual(actor.inventory.exists('test'), true);
@@ -37,7 +31,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
         it('remove an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = await testActor.create({ 'type': 'character', 'system.inventories': inventoriesData });
+            const actor = await factory.createActor({ type: 'character', system: { inventories: inventoriesData } });
 
             await actor.inventory.remove('test');
 
@@ -46,11 +40,13 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
         it('add and remove an item to and from an inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
-            const actor = await testActor.create({ 'type': 'character', 'system.inventories': inventoriesData });
-            const item = await actor.createEmbeddedDocuments('Item', [{ type: 'weapon', name: 'Test Weapon' }]);
+            const actor = await factory.createActor({ type: 'character', system: { inventories: inventoriesData } });
+            const item = await actor.createEmbeddedDocuments('Item', [{ type: 'weapon', name: 'Test Weapon' }]) as SR5Item<'weapon'>[];
 
             await actor.inventory.addItems('test', item);
             const itemIds = item.map((item) => item.id);
+
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
             assert.deepEqual(actor.system.inventories.test.itemIds, itemIds);
 
             await actor.inventory.removeItem(item[0]);
@@ -59,7 +55,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
 
         it('rename an existing inventory', async () => {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: ['notAnItemId'] } };
-            const actor = await testActor.create({ 'type': 'character', 'system.inventories': inventoriesData });
+            const actor = await factory.createActor({ type: 'character', system: { inventories: inventoriesData } });
 
             const before = 'test';
             const after = 'betterTest';
@@ -70,12 +66,14 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
             assert.deepEqual(actor.system.inventories[after], {
                 name: after,
                 label: after,
+                type: '',
                 itemIds: ['notAnItemId'],
+                showAll: true,
             });
         });
 
         it('create and rename an inventory including prohibited foundry chars', async () => {
-            const actor = await testActor.create({ type: 'character' });
+            const actor = await factory.createActor({ type: 'character' });
 
             await actor.inventory.create('Test.');
 
@@ -83,8 +81,10 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
             assert.notExists(actor.system.inventories['Test']['']);
             assert.deepEqual(actor.system.inventories['Test'], {
                 name: 'Test',
+                type: '',
                 label: 'Test',
                 itemIds: [],
+                showAll: true,
             });
 
             await actor.inventory.rename('Test', 'Test.');
@@ -92,8 +92,10 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
             assert.notExists(actor.system.inventories['Test']['']);
             assert.deepEqual(actor.system.inventories['Test'], {
                 name: 'Test',
+                type: '',
                 label: 'Test',
                 itemIds: [],
+                showAll: true,
             });
 
             await actor.inventory.remove('Test');
@@ -102,8 +104,10 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
             assert.exists(actor.system.inventories['Fisch']);
             assert.deepEqual(actor.system.inventories['Fisch'], {
                 name: 'Fisch',
+                type: '',
                 label: 'Fisch',
                 itemIds: [],
+                showAll: true,
             });
         });
     });

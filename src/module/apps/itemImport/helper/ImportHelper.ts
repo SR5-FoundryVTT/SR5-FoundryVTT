@@ -1,4 +1,3 @@
-import { BaseItem } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/documents.mjs';
 import { SR5Item } from "../../../item/SR5Item";
 import { Constants, CompendiumKey } from '../importer/Constants';
 import { TranslationHelper as TH } from './TranslationHelper';
@@ -52,17 +51,17 @@ export class ImportHelper {
     public static async findItem(
         compKey: CompendiumKey,
         name: OneOrMany<string>,
-        types?: OneOrMany<BaseItem['data']['type']>
+        types?: OneOrMany<Item.SubType>
     ): Promise<SR5Item[]> {
         if (Array.isArray(name) ? name.length === 0 : !name) return [];
 
-        type ItemType = CompendiumCollection<CompendiumCollection.Metadata & {type: 'Item'}>;
+        type ItemType = CompendiumCollection<'Actor' | 'Item'>;
         const pack = game.packs?.get(Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[compKey]].pack) as ItemType;
 
-        return pack.getDocuments({
+        return await pack.getDocuments({
             name__in: this.getArray(name),
             ...(types ? { type__in: this.getArray(types) } : {})
-        });
+        }) as SR5Item[];
     }
 
     /**
@@ -80,7 +79,7 @@ export class ImportHelper {
         if (!folderCreated) throw new Error("Folder creation failed.");
         return folderCreated;
     }
-    
+
     /**
      * Finds or creates a folder within a compendium in Foundry VTT.
      * 
@@ -97,8 +96,7 @@ export class ImportHelper {
     private static async FindOrCreateFolder(ctype: CompendiumKey, name: string, parent: Folder | null = null): Promise<Folder> {
         const compendium = await this.GetCompendium(ctype);
 
-        //@ts-expect-error
-        const folder = await compendium.folders?.find((folder: Folder) =>
+        const folder = compendium.folders?.find((folder: Folder) =>
             folder.name === name && folder.folder === parent
         );
 
@@ -112,10 +110,8 @@ export class ImportHelper {
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
     private static async getCompendiumFolder(name: string, parent: Folder | null = null): Promise<Folder> {
-        // @ts-expect-errorx
         let folder = game.folders?.find(f => f.name === name && f.type === "Compendium" && f.folder === parent);
         if (!folder)
-            // @ts-expect-error
             folder = await Folder.create({ name, color: "#00cc00", folder: parent?.id ?? null, type: "Compendium" });
         return folder!;
     }
@@ -127,7 +123,7 @@ export class ImportHelper {
      * @returns A promise that resolves with the compendium collection.
      * @throws If the compendium key is invalid or improperly formatted.
      */
-    public static async GetCompendium(ctype: CompendiumKey): Promise<CompendiumCollection<CompendiumCollection.Metadata>> {
+    public static async GetCompendium(ctype: CompendiumKey) {
         const { pack, type, folder, subFolder } = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[ctype]];
         let compendium = game.packs.get(pack);
 
@@ -137,18 +133,10 @@ export class ImportHelper {
             if (!scope || !packName) throw new Error(`Invalid compendium key: ${pack}`);
 
             // Create the compendium pack
-            compendium = await CompendiumCollection.createCompendium({
+            compendium = await foundry.documents.collections.CompendiumCollection.createCompendium({
+                type,
                 name: packName,
-                label: game.i18n.localize(`SR5.Compendiums.${packName}`),
-                type: type,
-                package: scope,
-                private: false,
-                path: `packs/${packName}`,
-                ownership: {
-                    PLAYER: "OBSERVER",
-                    TRUSTED: "OBSERVER",
-                    ASSISTANT: "OWNER"
-                }
+                label: game.i18n.localize(`SR5.Compendiums.${packName}`)
             });
 
             // Manually assign compendium to the folder via settings

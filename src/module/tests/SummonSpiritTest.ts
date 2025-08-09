@@ -4,6 +4,8 @@ import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { PartsList } from '../parts/PartsList';
 import { SpellcastingRules } from '../rules/SpellcastingRules';
 import { ConjuringRules } from '../rules/ConjuringRules';
+import { DamageType, MinimalActionType } from '../types/item/Action';
+import { DeepPartial } from 'fvtt-types/utils';
 
 
 interface SummonSpiritTestData extends SuccessTestData {
@@ -14,7 +16,7 @@ interface SummonSpiritTestData extends SuccessTestData {
     force: number
     // Drain value as described on SR5#300
     drain: number
-    drainDamage: Shadowrun.DamageData
+    drainDamage: DamageType
 
     // Reagent value as described on SR5#317 'Summoning'
     reagent: number
@@ -41,13 +43,13 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         this._prepareSummoningData(data);
 
         data.drain = data.drain || 0;
-        data.drainDamage = data.drainDamage || DataDefaults.damageData();
+        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
 
         return data;
     }
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/summonspirit-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/summonspirit-test-dialog.hbs';
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
@@ -73,11 +75,8 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
      * 
      * Limit 'force' is a dynamic test value, so it's missing here as it can't be taken from actor values.
      */
-    static override _getDefaultTestAction(): Partial<Shadowrun.MinimalActionData> {
-        return {
-            skill: 'summoning',
-            attribute: 'magic'
-        }
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { skill: 'summoning', attribute: 'magic' }
     }
 
     /**
@@ -159,7 +158,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
      */
     _prepareSummoningData(data: SummonSpiritTestData) {
         if (!this.item) return;
-        const summoning = this.item.asCallInAction;
+        const summoning = this.item.asType('call_in_action');
         if (!summoning || !this.item.isSummoning) return;
 
         data.spiritTypes = this._prepareSpiritTypes();
@@ -183,8 +182,8 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         this.data.drainDamage = this.calcDrainDamage(opposingHits);
     }
 
-    calcDrainDamage(opposingHits: number): Shadowrun.DamageData {
-        if (!this.actor) return DataDefaults.damageData();
+    calcDrainDamage(opposingHits: number): DamageType {
+        if (!this.actor) return DataDefaults.createData('damage');
 
         const magic = this.actor.getAttribute('magic').value;
         const force = this.data.force;

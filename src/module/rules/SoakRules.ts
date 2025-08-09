@@ -1,8 +1,7 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { Helpers } from '../helpers';
-import DamageData = Shadowrun.DamageData;
-import ModifiedDamageData = Shadowrun.ModifiedDamageData;
-import CharacterActorData = Shadowrun.CharacterData;
+import { DamageType } from '../types/item/Action';
+import { ModifiedDamageType } from '../types/rolls/ActorRolls';
 
 /**
  * Soaking rules for actors
@@ -19,13 +18,13 @@ export class SoakRules {
      * @param hits The number of hits on the soak tests
      * @returns The updated damage data
      */
-    static reduceDamage(actor: SR5Actor, damageData: DamageData, hits: number): ModifiedDamageData {
+    static reduceDamage(actor: SR5Actor, damageData: DamageType, hits: number): ModifiedDamageType {
 
         // Vehicles are immune to stun damage (electricity stun damage is handled in a different place)
         // Note: This also takes care of the vehicle immunity, since physical damage that does not exceed armor
         // will be converted to stun damage and then reduced to 0. This does not work with drones wearing armor
         // but we do not support this.
-        if (damageData.type.value === 'stun' && actor.isVehicle()) {
+        if (damageData.type.value === 'stun' && actor.isType('vehicle')) {
             return Helpers.reduceDamageByHits(damageData, damageData.value, 'SR5.VehicleStunImmunity');
         }
 
@@ -38,16 +37,16 @@ export class SoakRules {
      * @param actor The actor affected by the damage
      * @returns The updated damage data
      */
-    static modifyPhysicalDamageForArmor(damage: DamageData, actor : SR5Actor): DamageData {
-        const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
+    static modifyPhysicalDamageForArmor(damage: DamageType, actor: SR5Actor): DamageType {
+        const updatedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         if (damage.type.value === 'physical') {
             // Physical damage is only transformed for some actors
-            if (!actor.isCharacter() && !actor.isSpirit() && !actor.isCritter() && !actor.isVehicle()) {
+            if (!['character', 'spirit', 'critter', 'vehicle'].includes(actor.type)) {
                 return updatedDamage;
             }
 
-            const modifiedArmor = actor.getModifiedArmor(damage);
+            const modifiedArmor = (actor as SR5Actor<'character' | 'critter' | 'spirit' | 'vehicle'>).getModifiedArmor(damage);
             if (modifiedArmor) {
                 const armorWillChangeDamageType = modifiedArmor.value > damage.value;
 
@@ -66,15 +65,15 @@ export class SoakRules {
      * @param actor The actor affected by the damage
      * @returns The updated damage data
      */
-    static modifyMatrixDamageForBiofeedback(damage: DamageData, actor : SR5Actor): DamageData {
-        const updatedDamage = foundry.utils.duplicate(damage) as DamageData;
+    static modifyMatrixDamageForBiofeedback(damage: DamageType, actor : SR5Actor): DamageType {
+        const updatedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         if (damage.type.value === 'matrix') {
-            const actorData = actor.system as CharacterActorData;
+            const actorData = actor.system as Actor.SystemOfType<'character'>;
 
             // Only characters can receive biofeedback damage at the moment.
             // TODO Technomancer and Sprites special rules?
-            if (!actor.isCharacter()) {
+            if (!actor.isType('character')) {
                 return updatedDamage;
             }
 

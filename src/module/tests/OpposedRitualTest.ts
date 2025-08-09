@@ -15,7 +15,7 @@ interface OpposedRitualTestData extends OpposedTestData {
  * The summoner is the active actor and the spirit is the opposed actor.
  */
 export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
-    public override against: RitualSpellcastingTest
+    public declare against: RitualSpellcastingTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         super(data, documents, options);       
@@ -31,7 +31,7 @@ export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.html'
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs'
     }
 
     /**

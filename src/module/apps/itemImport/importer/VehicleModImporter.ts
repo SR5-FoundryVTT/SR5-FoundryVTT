@@ -11,13 +11,13 @@ export class VehicleModImporter extends DataImporter {
     }
 
     async Parse(jsonObject: VehiclesSchema): Promise<void> {
-        return VehicleModImporter.ParseItems<Mod, Shadowrun.ModificationItemData>(
+        return VehicleModImporter.ParseItems<Mod>(
             jsonObject.mods.mod,
             {
                 compendiumKey: () => "Vehicle_Mod",
                 parser: new VehicleModParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Vehicle Mod"
             }

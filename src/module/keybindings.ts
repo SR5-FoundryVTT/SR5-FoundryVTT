@@ -11,14 +11,14 @@ export const registerSystemKeybindings = () => {
         name: "SR5.Keybinding.ShowSituationModifiers.Label",
         hint: "SR5.Keybinding.ShowSituationModifiers.Hint",
         editable: [{ key: "KeyM", modifiers: [] }],
-        onDown: () => SituationModifiersApplication.openForKeybinding(),
+        onDown: () => { SituationModifiersApplication.openForKeybinding(); },
     });
 
     game.keybindings.register("shadowrun5e", "show-overwatch-tracker-app", {
         name: "SR5.Keybinding.OverwatchScoreTracker.Label",
         hint: "SR5.Keybinding.OverwatchScoreTracker.Hint",
         editable: [{ key: "KeyO", modifiers: [] }],
-        onDown: () => new OverwatchScoreTracker().render(true),
+        onDown: () => { new OverwatchScoreTracker().render(true); },
     });
 
     game.keybindings.register("shadowrun5e", "hide-test-dialog", {

@@ -1,7 +1,8 @@
+import { DataDefaults } from "src/module/data/DataDefaults";
+import { SR5 } from "../../../config";
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
-import {SR5} from "../../../config";
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import { SkillFieldType } from 'src/module/types/template/Skills';
 
 export class SkillsPrep {
     /**
@@ -13,38 +14,30 @@ export class SkillsPrep {
      * NOTE: Foundry also calls the prepareData multiple times with incomplete source data, causing some value properties to be missing.
      * @param system 
      */
-    static prepareSkillData(system: ActorTypesData) {
+    static prepareSkillData(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { language, active, knowledge } = system.skills;
 
         // Active skills aren't grouped and can be prepared skill by skill.
-        Object.values(active).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+        Object.values(active)
+            .forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
 
         // Language skills aren't group, but might lack the value property.
-        if (language.value) Object.values(language.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+        if (language.value)
+            Object.values(language.value).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
 
         // Knowledge skills are groupd and might also lack the value property.
         Object.values(knowledge).forEach((group) => {
-            if (group.value) Object.values(group.value).forEach((skill) => { _mergeWithMissingSkillFields(skill)} );
+            if (group.value)
+                Object.values(group.value).forEach((skill) => { DataDefaults.createData('skill_field', skill)} );
         });
     }
 
     /**
      * Prepare actor data for skills
      */
-    static prepareSkills(system: ActorTypesData) {
+    static prepareSkills(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { language, active, knowledge } = system.skills;
         if (language) {
-            if (!language.value) {
-                language.value = {};
-            }
-
-            // language.value is defined as an array in template.json
-            // However what we actually want here is an object, so we set it manually
-            // The same is done for the other knowledge skillgroups 'value' properties below
-            if (Array.isArray(language.value) && language.value.length == 0) {
-                language.value = {};
-            }
-
             language.attribute = 'intuition';
         }
 
@@ -52,7 +45,7 @@ export class SkillsPrep {
         const prepareSkill = (skill) => {
             if (!skill.base) skill.base = 0;
             if (skill.bonus?.length) {
-                for (let bonus of skill.bonus) {
+                for (const bonus of skill.bonus) {
                     skill.mod = PartsList.AddUniquePart(skill.mod, bonus.key, Number(bonus.value));
                 }
             }
@@ -69,20 +62,20 @@ export class SkillsPrep {
         const entries = Object.entries(system.skills.language.value);
         // remove entries which are deleted TODO figure out how to delete these from the data
         entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete system.skills.language.value[key]);
-
-        for (let skill of Object.values(language.value)) {
+        
+        for (const skill of Object.values(language.value)) {
             prepareSkill(skill);
             skill.attribute = 'intuition';
         }
 
         // setup knowledge skills
-        for (let [, group] of Object.entries(knowledge)) {
+        for (const [, group] of Object.entries(knowledge)) {
 
             if(!group?.value) {
                 continue;
             }
-            
-            const entries = Object.entries(group.value);    
+
+            const entries = Object.entries(group.value);
             // remove entries which are deleted TODO figure out how to delete these from the data
             group.value = entries
                 .filter(([, val]) => !val._delete)
@@ -96,34 +89,8 @@ export class SkillsPrep {
                 }, {});
         }
 
-        // skill labels
-        for (let [skillKey, skillValue] of Object.entries(active)) {
+        for (const [skillKey, skillValue] of Object.entries(active)) {
             skillValue.label = SR5.activeSkills[skillKey];
         }
     }
-}
-
-/** Just a quick, semi hacky way of setting up a complete skill data structure, while still allowing
- *  fields to be added at need.
- *
- * @param givenSkill
- * @return merge default skill fields with fields of the given field, only adding new fields in the process.
- */
-export const _mergeWithMissingSkillFields = (givenSkill) => {
-    // Only the absolute most necessary fields, not datatype complete to SkillField
-    const template = {
-        name: "",
-        base: 0,
-        value: 0,
-        attribute: "",
-        mod: [],
-        specs: [],
-        hidden: false
-    };
-
-    // Use mergeObject to reserve original object instance in case replacing it
-    // causes problems down the line with active skills taken from a preexisting
-    // data structure.
-    // overwrite false to prohibit existing values to be overwritten with empty values.
-    foundry.utils.mergeObject(givenSkill, template, {overwrite: false});
 }

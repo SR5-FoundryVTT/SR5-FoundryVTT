@@ -17,7 +17,7 @@ interface OpposedCompileSpriteTestData extends OpposedTestData {
  * The technomancer is the active actor and the sprite the opposed actor.
  */
 export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTestData> {
-    public override against: CompileSpriteTest
+    declare public against: CompileSpriteTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Due to compilation, the active actor for this test will be created during execution.
@@ -43,7 +43,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/opposed-actor-creator-message.html'
+        return 'systems/shadowrun5e/dist/templates/rolls/opposed-actor-creator-message.hbs'
     }
 
     /**
@@ -104,7 +104,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      */
     override async cleanupAfterExecutionCancel() {
         if (!this.data.compiledSpriteUuid) return;
-        const actor = await fromUuid(this.data.compiledSpriteUuid);
+        const actor = await fromUuid(this.data.compiledSpriteUuid as any) as SR5Actor;
         await actor?.delete();
         delete this.actor;
     }
@@ -127,11 +127,11 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
     async finalizeSummonedSprite() {
         if (!this.actor) return;
 
-        const technomancer = this.against.actor as Actor;
+        const technomancer = this.against.actor!;
 
         const updateData = {
             // 'system.services': this.deriveSpriteServices(),
-            'system.technomancerUuid': technomancer.uuid
+            system: { technomancerUuid: technomancer.uuid }
         }
 
         this._addOwnershipToUpdateData(updateData);
@@ -147,7 +147,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      * @param updateData The update data to add the permission to, that's applied to the sprite actor. 
      */
     _addOwnershipToUpdateData(updateData: object) {
-        const summoner = this.against.actor as Actor;
+        const summoner = this.against.actor!;
 
         // Set permissions for all users using the summoner as main character.
         const users = game.users?.filter(user => user.character?.uuid === summoner.uuid);
@@ -157,7 +157,6 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
         users.forEach(user => {
             if (user.isGM) return;
             // #TODO: Add a setting to define that this should be done and what permission it should be done with.
-            //@ts-expect-error v10
             ownership[user.id] = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
         })
         updateData['ownership'] = ownership

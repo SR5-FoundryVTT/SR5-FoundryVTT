@@ -1,17 +1,18 @@
 import { Helpers } from '../../../helpers';
 import {SR} from "../../../constants";
 import {SR5} from "../../../config";
-import AttributeField = Shadowrun.AttributeField;
-import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 import { PartsList } from '../../../parts/PartsList';
-import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { ItemPrep } from './ItemPrep';
+import { SR5Actor } from '../../SR5Actor';
+import { AttributeFieldType } from 'src/module/types/template/Attributes';
+import { ModifiableValueType } from 'src/module/types/template/Base';
+import { SR5Item } from 'src/module/item/SR5Item';
 
 export class AttributesPrep {
     /**
      * Prepare actor data for attributes
      */
-    static prepareAttributes(system: ActorTypesData, ranges?: Record<string, {min: number, max?: number}>) {
+    static prepareAttributes(system: SR5Actor['system'], ranges?: Record<string, {min: number, max?: number}>) {
         const {attributes} = system;
 
         // always have special attributes set to hidden
@@ -21,13 +22,8 @@ export class AttributesPrep {
         attributes.essence.hidden = true;
 
         // set the value for the attributes
-        for (let [name, attribute] of Object.entries(attributes)) {
-            // don't manage the attribute if it is using the old method of edge tracking
-            // needed to be able to migrate things correctly
-            if (name === 'edge' && attribute['uses'] === undefined) return;
-
+        for (const [name, attribute] of Object.entries(attributes))
             AttributesPrep.prepareAttribute(name, attribute, ranges)
-        }
     }
 
     /**
@@ -35,7 +31,7 @@ export class AttributesPrep {
      * @param name The key field (and name) of the attribute given
      * @param attribute The AttributeField to prepare
      */
-    static prepareAttribute(name: string, attribute: AttributeField, ranges?: Record<string, {min: number, max?: number}>) {
+    static prepareAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
 
@@ -53,7 +49,7 @@ export class AttributesPrep {
      * @param name The attributes name / id
      * @param attribute The attribute will be modified in place
      */
-    static calculateAttribute(name: string, attribute: AttributeField, ranges?: Record<string, {min: number, max?: number}>) {
+    static calculateAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
 
@@ -69,13 +65,13 @@ export class AttributesPrep {
      * @param system A system actor having an essence attribute
      * @param items The items that might cause an essence loss.
      */
-    static prepareEssence(system: ActorTypesData, items: SR5ItemDataWrapper[]) {
+    static prepareEssence(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5Item[]) {
         // The essence base is fixed. Changes should be made through the attribute.temp field.
         system.attributes.essence.base = SR.attributes.defaults.essence;
 
         // Modify essence by actor modifer
         const parts = new PartsList<number>(system.attributes.essence.mod);
-        
+
         const essenceMod = system.modifiers['essence'];
         if (essenceMod && !Number.isNaN(essenceMod)) {
             parts.addUniquePart('SR5.Bonus', Number(essenceMod));
@@ -85,6 +81,6 @@ export class AttributesPrep {
 
         ItemPrep.prepareWareEssenceLoss(system, items);
 
-        system.attributes.essence.value = Helpers.calcTotal(system.attributes.essence);
+        system.attributes.essence.value = Helpers.calcTotal(system.attributes.essence as ModifiableValueType);
     }
 }

@@ -10,7 +10,7 @@ export interface ThrownAttackTestData extends SuccessTestData, WeaponRangeTestDa
  * Test implementation for attack tests using weapon of category thrown.
  */
 export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
-    public override item: SR5Item;
+    declare item: SR5Item;
 
     override _prepareData(data, options): RangedAttackTestData {
         data = super._prepareData(data, options);
@@ -42,7 +42,7 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/thrown-attack-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/thrown-attack-test-dialog.hbs';
     }
 
     /**

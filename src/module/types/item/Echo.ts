@@ -1,11 +1,11 @@
-declare namespace Shadowrun {
-    export interface EchoData extends
-        EchoPartData,
-        ImportFlags,
-        DescriptionPartData {
+import { BaseItemData, ItemBase } from "./ItemBase";
 
-    }
+const EchoData = () => ({ ...BaseItemData() });
 
-    export interface EchoPartData {
+export class Echo extends ItemBase<ReturnType<typeof EchoData>> {
+    static override defineSchema() {
+        return EchoData();
     }
 }
+
+console.log("EchoData", EchoData(), new Echo());

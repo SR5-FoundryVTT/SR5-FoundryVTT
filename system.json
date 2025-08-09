@@ -15,6 +15,102 @@
         "verified": "13.346",
         "maximum": "13"
     },
+    "documentTypes": {
+        "Actor": {
+            "character": {
+                "htmlField": ["description.value"]
+            },
+            "critter": {
+                "htmlField": ["description.value"]
+            },
+            "ic": {
+                "htmlField": ["description.value"]
+            },
+            "spirit": {
+                "htmlField": ["description.value"]
+            },
+            "sprite": {
+                "htmlField": ["description.value"]
+            },
+            "vehicle": {
+                "htmlField": ["description.value"]
+            }
+        },
+        "Item": {
+            "action": {
+                "htmlField": ["description.value"]
+            },
+            "ammo": {
+                "htmlField": ["description.value"]
+            },
+            "armor": {
+                "htmlField": ["description.value"]
+            },
+            "adept_power": {
+                "htmlField": ["description.value"]
+            },
+            "bioware": {
+                "htmlField": ["description.value"]
+            },
+            "call_in_action": {
+                "htmlField": ["description.value"]
+            },
+            "complex_form": {
+                "htmlField": ["description.value"]
+            },
+            "contact": {
+                "htmlField": ["description.value"]
+            },
+            "critter_power": {
+                "htmlField": ["description.value"]
+            },
+            "cyberware": {
+                "htmlField": ["description.value"]
+            },
+            "device": {
+                "htmlField": ["description.value"]
+            },
+            "echo": {
+                "htmlField": ["description.value"]
+            },
+            "equipment": {
+                "htmlField": ["description.value"]
+            },
+            "host": {
+                "htmlField": ["description.value"]
+            },
+            "lifestyle": {
+                "htmlField": ["description.value"]
+            },
+            "metamagic": {
+                "htmlField": ["description.value"]
+            },
+            "modification": {
+                "htmlField": ["description.value"]
+            },
+            "program": {
+                "htmlField": ["description.value"]
+            },
+            "quality": {
+                "htmlField": ["description.value"]
+            },
+            "ritual": {
+                "htmlField": ["description.value"]
+            },
+            "sin": {
+                "htmlField": ["description.value"]
+            },
+            "spell": {
+                "htmlField": ["description.value"]
+            },
+            "sprite_power": {
+                "htmlField": ["description.value"]
+            },
+            "weapon": {
+                "htmlField": ["description.value"]
+            }
+        }
+    },
     "scripts": [],
     "esmodules": ["dist/bundle.js"],
     "styles": ["dist/bundle.css"],

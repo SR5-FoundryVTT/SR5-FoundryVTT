@@ -6,14 +6,16 @@ import { DataDefaults } from '../data/DataDefaults';
 import { PartsList } from '../parts/PartsList';
 import { DocumentSituationModifiers } from './DocumentSituationModifiers';
 import { SuccessTest, SuccessTestData } from '../tests/SuccessTest';
-import RangeData = Shadowrun.RangeData;
-import WeaponItemData = Shadowrun.WeaponItemData;
+import { SR5Item } from '../item/SR5Item';
+import { DamageType } from '../types/item/Action';
+import { RangeType } from '../types/item/Weapon';
+import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
 
 export interface WeaponRangeTestDataFragment {
-    damage: Shadowrun.DamageData
-    ranges: Shadowrun.RangesTemplateData
+    damage: DamageType
+    ranges: RangesTemplateType
     range: number
-    targetRanges: Shadowrun.TargetRangeTemplateData[]
+    targetRanges: TargetRangeTemplateType[]
     // index of selected target range in targetRanges
     targetRangesSelected: number
     // keep track of last target selected, so it can reset range if changed
@@ -32,7 +34,7 @@ export class WeaponRangeTestBehavior {
         data.targetRanges = [];
         data.lastTargetSelected = -1;
         data.targetRangesSelected = 0;
-        data.damage = data.damage || DataDefaults.damageData();
+        data.damage = data.damage || DataDefaults.createData('damage');
     }
 
     /**
@@ -41,15 +43,15 @@ export class WeaponRangeTestBehavior {
      * In case of selected targets, test will be overwritten.
      *
      */
-    private static prepareWeaponRanges(test: WeaponRangeTest, rangesAccessor: (weapon: WeaponItemData) => RangeData) {
+    private static prepareWeaponRanges(test: WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeType) {
         // Don't let missing weapon ranges break test.
-        const weapon = test.item?.asWeapon;
+        const weapon = test.item?.asType('weapon');
         if (!weapon) return;
 
         // Transform weapon ranges to something usable
         const ranges = rangesAccessor(weapon);
         const {range_modifiers} = SR.combat.environmental;
-        const newRanges = {} as Shadowrun.RangesTemplateData;
+        const newRanges = {} as RangesTemplateType;
 
         for (const key of ["short", "medium", "long", "extreme"] as const) {
             const rangeValue = ranges[key];
@@ -77,7 +79,6 @@ export class WeaponRangeTestBehavior {
      * This will overwrite the default weapon range selection.
      */
     private static prepareTargetRanges(test: WeaponRangeTest) {
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         if (foundry.utils.isEmpty(test.data.ranges)) return;
         if (!test.actor) return;
         if (!test.hasTargets) return;
@@ -114,9 +115,10 @@ export class WeaponRangeTestBehavior {
         // Provide test context to allow effects to limit application.
         modifiers.environmental.apply({test});
         test.data.range = modifiers.environmental.applied.active.range || test.data.targetRanges[0].range.modifier;
+        return;
     }
 
-    static prepareDocumentData(test:WeaponRangeTest, rangesAccessor: (weapon: WeaponItemData) => RangeData){
+    static prepareDocumentData(test:WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeType){
         WeaponRangeTestBehavior.prepareWeaponRanges(test, rangesAccessor);
         WeaponRangeTestBehavior.prepareTargetRanges(test);
     }

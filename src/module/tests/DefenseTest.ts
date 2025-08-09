@@ -1,14 +1,14 @@
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
-import DamageData = Shadowrun.DamageData;
 import {DataDefaults} from "../data/DataDefaults";
 import { Translation } from '../utils/strings';
+import { DamageType } from "../types/item/Action";
 
 
 export interface DefenseTestData extends OpposedTestData {
     // Damage value of the attack
-    incomingDamage: DamageData
+    incomingDamage: DamageType
     // Modified damage value of the attack after this defense (success or failure)
-    modifiedDamage: DamageData
+    modifiedDamage: DamageType
 
     // Should this defense test cause an initiative modifier to be applied, use this value
     // It's also used for display in chat.
@@ -26,7 +26,7 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
     override _prepareData(data, options?) {
         data = super._prepareData(data, options);
 
-        const damage = data.against ? data.against.damage : DataDefaults.damageData();
+        const damage = data.against ? data.against.damage : DataDefaults.createData('damage');
 
         data.incomingDamage = foundry.utils.duplicate(damage);
         data.modifiedDamage = foundry.utils.duplicate(damage);
@@ -35,7 +35,7 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html'
+        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.hbs'
     }
 
     override get successLabel(): Translation {
