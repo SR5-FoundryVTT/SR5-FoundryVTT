@@ -85,6 +85,10 @@ export class SR5ActiveEffect extends ActiveEffect {
         return this.update({ disabled });
     }
 
+    /**
+     * Foundry provides a functionless custom mode, we make use of as our 'Modify' mode
+     * till they provide a generic way of adding additional custom modes.
+     */
     protected override _applyCustom(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
         return this._applyModify(actor, change, current, delta, changes);
     }
@@ -96,7 +100,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     protected _applyModify(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
         if (SR5ActiveEffect.applyModifyToModifiableValue(this, actor, change, current, delta, changes)) return;
 
-        // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value chosen
+        // fallback to Foundry add mode for all other value types.
         super._applyAdd(actor, change, current, delta, changes);
     }
 
@@ -104,6 +108,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Apply for the custom (modify) mode but, if possible, apply to a ModifiableValue.
      * 
      * This method is designed to handle application and report back if further application is needed.
+     * 
+     * The modify mode is inteded to inject each change value into the mod array, while the total value is
+     * calculated later during document data prep.
      * 
      * @param effect
      * @param model
@@ -114,7 +121,6 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns
      */
     static applyModifyToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta, changes?) {
-        // Try applying to a ModifiableValue.
         const value = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (value) {
             value.mod.push({ name: effect.name, value: Number(change.value) });
@@ -137,7 +143,6 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param change The change key to redirect.
      */
     static redirectToNearModifiableValue(model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        // Only redirect change key for modes using it for custom application.
         if (change.mode !== CONST.ACTIVE_EFFECT_MODES.CUSTOM && 
             change.mode !== CONST.ACTIVE_EFFECT_MODES.OVERRIDE) return;
         
@@ -172,7 +177,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     static changeAddToCustomMode(model: DataModel.Any, change: ActiveEffect.ChangeData) {
         if (change.mode !== CONST.ACTIVE_EFFECT_MODES.ADD) return;
 
-        // Check direct key and change mode.
+        // Stop Add overriding ModifiableValue with change key, breaking sheet rendering.
         let value = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (value) {
             change.mode = CONST.ACTIVE_EFFECT_MODES.CUSTOM;
@@ -181,18 +186,12 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Move key up one hierarchy and check again
         const nodes = change.key.split('.');
-        const property = nodes.pop() ?? '';
         const indirectKey = nodes.join('.');
 
         value = SR5ActiveEffect.getModifiableValue(model, indirectKey);
         if (value) {
-            // Allow users to change keys that don't affect value calculation
-            // This could be skill.canDefault or similar.
-            const keyIsPartOfValueCalculation = this.modifiableValueProperties.includes(property);
-            if (keyIsPartOfValueCalculation) {
-                change.key = indirectKey;
-                change.mode = CONST.ACTIVE_EFFECT_MODES.CUSTOM;
-            }
+            change.key = indirectKey;
+            change.mode = CONST.ACTIVE_EFFECT_MODES.CUSTOM;
         }
     }
 
@@ -203,7 +202,6 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param change The change key to redirect.
      */
     static changeCustomToAddMode(model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        // Only redirect change key for custom (modify) mode.
         if (change.mode !== CONST.ACTIVE_EFFECT_MODES.CUSTOM) return;
 
         const value = SR5ActiveEffect.getModifiableValue(model, change.key);
@@ -252,6 +250,13 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
+    /**
+     * Return a ModifiableValue at the given key if it matches the ModifiableValue shape.
+     * 
+     * @param model Data model or plain object to resolve the key against.
+     * @param key   Dot-delimited path to the candidate value.
+     * @returns {ModifiableValueType | null} The ModifiableValue when found; otherwise null.
+     */
     static getModifiableValue(model: DataModel.Any, key: string): ModifiableValueType | null {
         const possibleValue = foundry.utils.getProperty(model, key);
         const possibleValueType = foundry.utils.getType(possibleValue);
@@ -262,6 +267,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         return null;
     }
 
+     /**
+     * Return keys expected in the ModifiableField shape
+     */
     static get modifiableValueProperties() {
         return ['base', 'value', 'mod', 'override', 'temp'];
     }

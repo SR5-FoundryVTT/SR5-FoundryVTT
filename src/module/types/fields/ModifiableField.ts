@@ -9,12 +9,11 @@ import SchemaField = foundry.data.fields.SchemaField;
  * A ModifiableSchemaField is a SchemaField that represents a ModifiableValue type, which 
  * holds further system functionality.
  * 
- * A ModifiableValue holds att least these properties:
- * - base
- * - value
- * - mod
- * - override
- * - temp
+ * Foundry will hand over authority over applying value changes to SchemaFields, when the document
+ * is using a DataModel schema.
+ * 
+ * ModifiableField alteres default Foundry mode behavior to allow the system to show the whole 
+ * value resolution instead of just altering the total modified value.
  */
 export class ModifiableField<
     Fields extends ReturnType<typeof ModifiableValue>,
@@ -27,11 +26,8 @@ export class ModifiableField<
     >
 > extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
     /**
-     * When applying a effect change, inject custom application logic for ModifiableValues.
+     * Foundries custom mode is the systems Modify mode.
      *
-     * Modify will inject into custom data, when system ModifiableValue-fields are found, which will later be used for
-     * value transparancy and calcution. .
-     * 
      * @param value 
      * @param delta 
      * @param model 
@@ -44,10 +40,8 @@ export class ModifiableField<
     }
 
     /**
-     * When applying a effect change, inject custom application logic for ModifiableValues.
-     * 
-     * Override will create custom data, when system ModifiableValue-fields are found, which will late be used for
-     * value transparancy and calculation.
+     * Foundries override mode is extended by the system to allow for transparent display of both the
+     * original value and the new, overriden, value.
      * 
      * @param value 
      * @param delta 
