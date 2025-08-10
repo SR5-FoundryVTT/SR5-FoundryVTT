@@ -25,7 +25,9 @@ export class SR5ActiveEffect extends ActiveEffect {
     static readonly redirectModes = [
         CONST.ACTIVE_EFFECT_MODES.CUSTOM, 
         CONST.ACTIVE_EFFECT_MODES.ADD,
-        CONST.ACTIVE_EFFECT_MODES.OVERRIDE
+        CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+        CONST.ACTIVE_EFFECT_MODES.UPGRADE,
+        CONST.ACTIVE_EFFECT_MODES.DOWNGRADE,
     ];
 
     /**
@@ -96,7 +98,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Foundry provides a functionless custom mode, we make use of as our 'Modify' mode
      * till they provide a generic way of adding additional custom modes.
      */
-    protected override _applyCustom(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
+    override _applyCustom(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
         return this._applyModify(actor, change, current, delta, changes);
     }
 
@@ -185,7 +187,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Check direct match once across all methods to avoid redundant checks.
         let isModifiableValue = !!SR5ActiveEffect.getModifiableValue(model, change.key);
 
-        if (SR5ActiveEffect.redirectModes.includes(change.mode as any)) {
+        if (!isModifiableValue && SR5ActiveEffect.redirectModes.includes(change.mode as any)) {
             isModifiableValue = SR5ActiveEffect.redirectToNearModifiableValue(model, change, isModifiableValue);
         }
 
@@ -249,10 +251,25 @@ export class SR5ActiveEffect extends ActiveEffect {
      * To complicate things, there are some use cases when overwriting an actual property of a ValueField
      * is needed. The SR5 uneducated quality needs to override the canDefault field of a skill.
      */
-    protected override _applyOverride(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
+    override _applyOverride(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
         if(SR5ActiveEffect.applyOverrideToModifiableValue(this, actor, change, current, delta)) return;
 
         super._applyOverride(actor, change, current, delta, changes);
+    }
+
+    /**
+     * Inject system upgrade / downgrade behavior into change keys using ModifiableValue.
+     */
+    override _applyUpgrade(actor: SR5Actor, change: ActiveEffect.ChangeData, current, delta, changes) {
+        // Foundry passes both upgrade and downgrade into _applyUpgrade within _applyLegacy
+        if (change.mode === CONST.ACTIVE_EFFECT_MODES.UPGRADE) {
+            if(SR5ActiveEffect.applyUpgradeToModifiableValue(this, actor, change, current, delta)) return;
+        }
+        if (change.mode === CONST.ACTIVE_EFFECT_MODES.DOWNGRADE) {
+            if(SR5ActiveEffect.applyDowngradeToModifiableValue(this, actor, change, current, delta)) return;
+        }
+
+        super._applyUpgrade(actor, change, current, delta, changes);
     }
 
     /**
@@ -271,8 +288,36 @@ export class SR5ActiveEffect extends ActiveEffect {
     static applyOverrideToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (modValue) {
-            modValue.override = { name: effect.name, value: Number(change.value) };
+            modValue.override = { name: effect.name, value: Number(change.value), min: false, max: false };
             modValue.value = Number(change.value);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 
+     */
+    static applyUpgradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
+        const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
+        if (modValue) {
+            modValue.override = { name: effect.name, value: Number(change.value), min: true, max: false };
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 
+     */
+    static applyDowngradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
+        const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
+        if (modValue) {
+            modValue.override = { name: effect.name, value: Number(change.value), min: false, max: true };
 
             return true;
         }

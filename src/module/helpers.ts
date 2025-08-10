@@ -27,9 +27,21 @@ interface CalcTotalOptions {
 
 export class Helpers {
     /**
-     * Calculate the total value for a data object
-     * - stores the total value and returns it
-     * @param value
+     * Calculate the total value for a ModifiableValue shape.
+     * 
+     * This can either be the sum of all modify values or the override total value as given.
+     * 
+     * ActiveEffect modes are related to the expected data:
+     * - Modify / Add => Will insert into the .mod array
+     * - Override => Will create a .override value with no min and max
+     * - Upgrade => Will create a .override value with min
+     * - Downgrade => Will create a .override value with max
+     * 
+     * Depending on the override value it's possible that a overriden value can be 
+     * downgraded or upgraded but still be changed further by the options.min or options.max
+     * params of the overall method. That way effect changes can't override system min/max borders.
+     *
+     * @param value The ModifiableValue shape.
      * @param options min will a apply a minimum value, max will apply a maximum value.
      */
     static calcTotal(value: ModifiableValueType, options?: CalcTotalOptions): number {
@@ -39,14 +51,23 @@ export class Helpers {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
-        // If the given value has an override defined, use that as a value, while keeping the base and mod values.
-        if (value.override) {
+        // Some values will have their total overriden directly.
+        if (value.override && !value.override.min && !value.override.max) {
             // Still apply a possible value range, even if override says otherwise.
             value.value = Helpers.applyValueRange(value.override.value, options);
             return value.value;
         }
 
-        value.value = Helpers.roundTo(parts.total + value.base, options?.roundDecimals);
+        value.value = parts.total + value.base;
+
+        // Some values will apply min / max values to their totals.
+        if (value.override && value.override.min) {
+            value.value = Helpers.applyValueRange(value.value, { min: value.override.value });
+        } else if (value.override && value.override.max) {
+            value.value = Helpers.applyValueRange(value.value, { max: value.override.value });
+        }
+
+        value.value = Helpers.roundTo(value.value, options?.roundDecimals);
         value.value = Helpers.applyValueRange(value.value, options);
 
         value.mod = parts.list;

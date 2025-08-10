@@ -78,12 +78,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // ModifiableValue should have a custom override value
             // Case - Direct change key
-            assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3, min: false, max: false });
             assert.strictEqual(actor.system.attributes.body.base, 0);
             assert.deepEqual(actor.system.attributes.body.mod, []);
             assert.strictEqual(actor.system.attributes.body.value, 3);
             // Case - Indirect change key
-            assert.deepEqual(actor.system.attributes.agility.override, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.system.attributes.agility.override, { name: 'Test Effect', value: 3, min: false, max: false });
             assert.strictEqual(actor.system.attributes.agility.base, 0);
             assert.deepEqual(actor.system.attributes.agility.mod, []);
             assert.strictEqual(actor.system.attributes.agility.value, 3);
@@ -114,7 +114,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 }]);
 
                 assert.strictEqual(actor.system.attributes.body.mod.length, 1);
-                assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3 });
+                assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3, min: false, max: false });
                 assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 5 }]);
                 assert.strictEqual(actor.system.attributes.body.value, 3);
             });
@@ -182,6 +182,56 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 3 }]);
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
             assert.deepEqual(actor.system.skills.active.automatics.mod, [{ name: 'Test Effect', value: 3 }]);
+        });
+
+        it('UPGRADE mode: should raise the value to a max', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { 
+                attributes: { body: { base: 2 } }, 
+                skills: { active: { automatics: { base: 2 } } } } 
+            });
+
+            assert.strictEqual(actor.system.attributes.body.base, 2);
+            assert.strictEqual(actor.system.skills.active.automatics.base, 2);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3, min: true, max: false });
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.override, { name: 'Test Effect', value: 3, min: true, max: false });
+        });
+
+        it('DOWNGRADE mode: should reduce the value to a min', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { 
+                attributes: { body: { base: 5 } }, 
+                skills: { active: { automatics: { base: 5 } } } } 
+            });
+
+            assert.strictEqual(actor.system.attributes.body.base, 5);
+            assert.strictEqual(actor.system.skills.active.automatics.base, 5);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3, min: false, max: true });
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.override, { name: 'Test Effect', value: 3, min: false, max: true });
         });
     });
     /**

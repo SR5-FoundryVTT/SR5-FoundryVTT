@@ -15,6 +15,13 @@ import SchemaField = foundry.data.fields.SchemaField;
  * ModifiableField alteres default Foundry mode behavior to allow the system to show the whole 
  * value resolution instead of just altering the total modified value.
  */
+/**
+ * A ModifiableField extends functionality for the ModifiableValue type for ActiveEffect change application
+ * by allowing for more granular control over how changes are applied and displayed.
+ * 
+ * This is directly related to SR5ActiveEffect and its legacy application, both sharing the same application
+ * logic.
+ */
 export class ModifiableField<
     Fields extends ReturnType<typeof ModifiableValue>,
     Options extends SchemaField.Options<Fields> = SchemaField.DefaultOptions,
@@ -27,31 +34,25 @@ export class ModifiableField<
 > extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
     /**
      * Foundries custom mode is the systems Modify mode.
-     *
-     * @param value 
-     * @param delta 
-     * @param model 
-     * @param change 
-     * @returns 
      */
     override _applyChangeCustom(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
         if (SR5ActiveEffect.applyModifyToModifiableValue(change.effect, model, change, value, delta)) return undefined;
         return super._applyChangeCustom(value, delta, model, change);
     }
 
-    /**
-     * Foundries override mode is extended by the system to allow for transparent display of both the
-     * original value and the new, overriden, value.
-     * 
-     * @param value 
-     * @param delta 
-     * @param model 
-     * @param change 
-     * @returns 
-     */
     protected override _applyChangeOverride(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
         // Return value unchanged, as effects don´t alter the output value here but add to it.
         if (SR5ActiveEffect.applyOverrideToModifiableValue(change.effect, model, change, value, delta)) return value;
         return super._applyChangeOverride(value, delta, model, change);
+    }
+
+    protected override _applyChangeUpgrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): InitializedType | undefined {
+        if (SR5ActiveEffect.applyUpgradeToModifiableValue(change.effect, model, change, value, delta)) return undefined;
+        return super._applyChangeUpgrade(value, delta, model, change);
+    }
+
+    protected override _applyChangeDowngrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): InitializedType | undefined {
+        if (SR5ActiveEffect.applyDowngradeToModifiableValue(change.effect, model, change, value, delta)) return undefined;
+        return super._applyChangeDowngrade(value, delta, model, change);
     }
 }
