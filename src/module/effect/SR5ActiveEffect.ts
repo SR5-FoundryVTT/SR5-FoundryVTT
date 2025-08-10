@@ -24,6 +24,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     // These modes should trigger a change key redirect to a ModifiableValue before applied.
     static readonly redirectModes = [
         CONST.ACTIVE_EFFECT_MODES.CUSTOM, 
+        CONST.ACTIVE_EFFECT_MODES.ADD,
         CONST.ACTIVE_EFFECT_MODES.OVERRIDE
     ];
 
@@ -172,13 +173,16 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Change mode given by user is changed to what is best for the system.
+     * Effect change given by user is altered to what is best for the system.
+     * 
+     * We do this to avoid effects breaking the sheet and easing the use of custom changes
+     * for users not aware of system internal around ModifiableValue.
      * 
      * @param model The model used to check value types under key
      * @param change The effect change data.
      */
-    static alterChangeMode(model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        // Check direct match once across all methods and reuse result.
+    static alterChange(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        // Check direct match once across all methods to avoid redundant checks.
         let isModifiableValue = !!SR5ActiveEffect.getModifiableValue(model, change.key);
 
         if (SR5ActiveEffect.redirectModes.includes(change.mode as any)) {
@@ -355,7 +359,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
 
-        SR5ActiveEffect.alterChangeMode(model, change);
+        SR5ActiveEffect.alterChange(model, change);
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
 
         // Add item error case, as FoundryVTT ActiveEffect.apply() is not meant to be used on items.
