@@ -1,5 +1,6 @@
 import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
+import { FixedTypeObjectField } from "../fields/FixedTypeObjectField";
 const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedObjectField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
@@ -27,7 +28,9 @@ function skill(createData: foundry.data.fields.SchemaField.CreateData<ReturnType
     return foundry.utils.mergeObject(initialValue, createData);
 }
 
-export const Skills = () => new TypedObjectField(
+// Use FixedTypeObjectField to allow for DataField.applyChange to work on skills.
+// See class documentation for more information.
+export const Skills = () => new FixedTypeObjectField(
     new ModifiableField(SkillField()),
     {
         required: true,
