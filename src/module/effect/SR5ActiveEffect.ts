@@ -21,6 +21,12 @@ import { Migrator } from "../migrator/Migrator";
  * application.
  */
 export class SR5ActiveEffect extends ActiveEffect {
+    // These modes should trigger a change key redirect to a ModifiableValue before applied.
+    static readonly redirectModes = [
+        CONST.ACTIVE_EFFECT_MODES.CUSTOM, 
+        CONST.ACTIVE_EFFECT_MODES.OVERRIDE
+    ];
+
     /**
      * Can be used to determine if the origin of the effect is a document owned by another document.
      *
@@ -141,28 +147,48 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @param model The model used to check value types under key
      * @param change The change key to redirect.
+     * @returns true, if a ModifiableValue is addressed.
      */
-    static redirectToNearModifiableValue(model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        if (change.mode !== CONST.ACTIVE_EFFECT_MODES.CUSTOM && 
-            change.mode !== CONST.ACTIVE_EFFECT_MODES.OVERRIDE) return;
-        
-        // Check if direct key is ModifiableValue
-        let value = SR5ActiveEffect.getModifiableValue(model, change.key);
-        if (value) {
-            return;
-        }
+    static redirectToNearModifiableValue(model: DataModel.Any, change: ActiveEffect.ChangeData, keyIsModifiableValue: boolean) {
+        if (keyIsModifiableValue) return true;
 
-        // Move key up one hierarchy and check again
+        // Move key up one hierarchy and check indirect match
         const nodes = change.key.split('.');
         const property = nodes.pop() ?? '';
         const indirectKey = nodes.join('.');
 
-        value = SR5ActiveEffect.getModifiableValue(model, indirectKey);
+        const value = SR5ActiveEffect.getModifiableValue(model, indirectKey);
         if (value) {
             // Allow users to change keys that don't affect value calculation
             // This could be skill.canDefault or similar.
             const keyIsPartOfValueCalculation = this.modifiableValueProperties.includes(property);
-            if (keyIsPartOfValueCalculation) change.key = indirectKey;
+            if (keyIsPartOfValueCalculation) {
+                change.key = indirectKey;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Change mode given by user is changed to what is best for the system.
+     * 
+     * @param model The model used to check value types under key
+     * @param change The effect change data.
+     */
+    static alterChangeMode(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        // Check direct match once across all methods and reuse result.
+        let isModifiableValue = !!SR5ActiveEffect.getModifiableValue(model, change.key);
+
+        if (SR5ActiveEffect.redirectModes.includes(change.mode as any)) {
+            isModifiableValue = SR5ActiveEffect.redirectToNearModifiableValue(model, change, isModifiableValue);
+        }
+
+        if (change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM) {
+            SR5ActiveEffect.changeCustomToAddMode(model, change, isModifiableValue);
+        } else if (change.mode === CONST.ACTIVE_EFFECT_MODES.ADD) {
+            SR5ActiveEffect.changeAddToCustomMode(model, change, isModifiableValue);
         }
     }
 
@@ -173,13 +199,13 @@ export class SR5ActiveEffect extends ActiveEffect {
      * 
      * @param model The model used to check value types under key
      * @param change  The change key to redirect.
+     * @param keyIsModifiableValue true, if the change key is a ModifiableValue.
      */
-    static changeAddToCustomMode(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+    static changeAddToCustomMode(model: DataModel.Any, change: ActiveEffect.ChangeData, keyIsModifiableValue: boolean) {
         if (change.mode !== CONST.ACTIVE_EFFECT_MODES.ADD) return;
 
         // Stop Add overriding ModifiableValue with change key, breaking sheet rendering.
-        let value = SR5ActiveEffect.getModifiableValue(model, change.key);
-        if (value) {
+        if (keyIsModifiableValue) {
             change.mode = CONST.ACTIVE_EFFECT_MODES.CUSTOM;
             return;
         }
@@ -188,7 +214,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         const nodes = change.key.split('.');
         const indirectKey = nodes.join('.');
 
-        value = SR5ActiveEffect.getModifiableValue(model, indirectKey);
+        const value = SR5ActiveEffect.getModifiableValue(model, indirectKey);
         if (value) {
             change.key = indirectKey;
             change.mode = CONST.ACTIVE_EFFECT_MODES.CUSTOM;
@@ -200,12 +226,12 @@ export class SR5ActiveEffect extends ActiveEffect {
      * 
      * @param model The model used to check value types under key
      * @param change The change key to redirect.
+     * @param keyIsModifiableValue true, if the change key is a ModifiableValue.
      */
-    static changeCustomToAddMode(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+    static changeCustomToAddMode(model: DataModel.Any, change: ActiveEffect.ChangeData, keyIsModifiableValue: boolean) {
         if (change.mode !== CONST.ACTIVE_EFFECT_MODES.CUSTOM) return;
 
-        const value = SR5ActiveEffect.getModifiableValue(model, change.key);
-        if (!value) {
+        if (!keyIsModifiableValue) {
             change.mode = CONST.ACTIVE_EFFECT_MODES.ADD;
         }
     }
@@ -329,10 +355,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
 
-        // Alter change properties to the correct application methods.
-        SR5ActiveEffect.changeAddToCustomMode(model, change);
-        SR5ActiveEffect.redirectToNearModifiableValue(model, change);
-        SR5ActiveEffect.changeCustomToAddMode(model, change);
+        SR5ActiveEffect.alterChangeMode(model, change);
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
 
         // Add item error case, as FoundryVTT ActiveEffect.apply() is not meant to be used on items.
