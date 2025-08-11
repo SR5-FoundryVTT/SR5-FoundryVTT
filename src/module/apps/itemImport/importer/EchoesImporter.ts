@@ -19,7 +19,7 @@ export class EchoesImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Echoes"
+                documentType: "Echoes"
             }
         );
     }    

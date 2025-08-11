@@ -22,7 +22,7 @@ export class QualityImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Quality"
+                documentType: "Quality"
             }
         );
     }

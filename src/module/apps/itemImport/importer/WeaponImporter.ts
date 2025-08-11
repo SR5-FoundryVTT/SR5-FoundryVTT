@@ -41,7 +41,7 @@ export class WeaponImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Weapon"
+                documentType: "Weapon"
             }
         );
     }

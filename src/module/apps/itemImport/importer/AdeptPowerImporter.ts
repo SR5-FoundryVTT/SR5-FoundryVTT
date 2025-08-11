@@ -15,7 +15,7 @@ export class AdeptPowerImporter extends DataImporter {
             {
                 compendiumKey: () => "Adept_Power",
                 parser: new AdeptPowerParser(),
-                errorPrefix: "Failed Parsing Complex Form"
+                documentType: "Complex Form"
             }
         );
     }

@@ -19,7 +19,7 @@ export class ComplexFormImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Complex Form"
+                documentType: "Complex Form"
             }
         );
     }

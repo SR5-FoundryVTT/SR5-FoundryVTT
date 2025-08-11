@@ -46,7 +46,7 @@ export class SpellImporter extends DataImporter{
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Spell"
+                documentType: "Spell"
             }
         );
     }

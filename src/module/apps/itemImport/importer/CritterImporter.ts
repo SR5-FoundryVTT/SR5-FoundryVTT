@@ -65,7 +65,7 @@ export class CritterImporter extends DataImporter {
                     return 'Critter';
                 },
                 parser: CritterImporter.parserWrap,
-                errorPrefix: "Failed Parsing Critter"
+                documentType: "Critter"
             }
         );
     }

@@ -19,7 +19,7 @@ export class WeaponModImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Weapon Mod"
+                documentType: "Weapon Mod"
             }
         );
     }

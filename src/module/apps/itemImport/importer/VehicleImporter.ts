@@ -20,7 +20,7 @@ export class VehicleImporter extends DataImporter {
                     return jsonData.category._TEXT.includes("Drone") ? "Drone" : "Vehicle";
                 },
                 parser: new VehicleParser(),
-                errorPrefix: "Failed Parsing Vehicle"
+                documentType: "Vehicle"
             }
         );
     }

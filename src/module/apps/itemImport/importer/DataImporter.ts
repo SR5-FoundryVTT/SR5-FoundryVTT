@@ -87,27 +87,39 @@ export abstract class DataImporter {
     protected static async ParseItems<TInput extends ParseData>(
         inputs: TInput[],
         options: {
+            documentType: string;
             compendiumKey: (data: TInput) => CompendiumKey;
             parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<Actor.CreateData | Item.CreateData> };
             filter?: (input: TInput) => boolean;
             injectActionTests?: (item: Item.CreateData) => void;
-            errorPrefix?: string;
         }
     ): Promise<void> {
-        const { compendiumKey, parser, filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
+        const { compendiumKey, parser, filter = () => true, injectActionTests, documentType } = options;
         const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
         const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
+        const dataInput = inputs.filter(input => this.supportedBookSource(input) && filter(input));
 
-        for (const data of inputs) {
+        let current = 0;
+        const total = dataInput.length;
+        const progressBar = ui.notifications.info(`Importing ${documentType}`, { progress: true });
+
+        const updateBar = (name: string, message: string) => {
+            current += 1;
+            progressBar.update({
+                pct: current / total,
+                message: `${documentType}: ${name} — ${message} (${current}/${total})`,
+            });
+        }
+
+        for (const data of dataInput) {
             try {
-                if (!this.supportedBookSource(data) || !filter(data)) continue;
-
                 const id = IH.guidToId(data.id._TEXT);
                 const key = compendiumKey(data);
                 const compendium = compendiums[key] ??= (await IH.GetCompendium(key));
 
                 if (compendium.index.has(id)) {
                     IH.setItem(key, data.name._TEXT, id);
+                    updateBar(data.name._TEXT, "skipped, already exists");
                     continue;
                 }
 
@@ -117,17 +129,26 @@ export abstract class DataImporter {
                 item._id = id;
                 IH.setItem(key, data.name._TEXT, id);
 
+                updateBar(data.name._TEXT, "Parsed");
+
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
             } catch (error) {
                 console.error(error);
-                ui.notifications?.error(`${errorPrefix}: ${data?.name?._TEXT ?? "Unknown"}`);
+                updateBar(data?.name?._TEXT || "Unknown", "failed to parse");
+                ui.notifications?.error(`Failed parsing ${documentType}: ${data?.name?._TEXT ?? "Unknown"}`);
             }
         };
+
+        progressBar.remove();
+        const notification = ui.notifications?.info(`${documentType}: creating documents`, { permanent: true });
 
         for (const [key, items] of itemMap.entries()) {
             const compendium = Constants.MAP_COMPENDIUM_KEY[key];
             await (compendium.type === 'Actor' ? Actor : Item).create(items as any, { pack: "world." + compendium.pack, keepId: true });
         }
+
+        notification.remove();
+        ui.notifications?.info(`${documentType}: documents created`);
     }
 }

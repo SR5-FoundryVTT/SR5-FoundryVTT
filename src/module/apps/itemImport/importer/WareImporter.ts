@@ -30,7 +30,7 @@ export class WareImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: `Failed Parsing ${key.capitalize()}`
+                documentType: `${key.capitalize()}`
             }
         );
     }

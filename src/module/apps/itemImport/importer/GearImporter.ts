@@ -52,7 +52,7 @@ export class GearImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Gear"
+                documentType: "Gear"
             }
         );
     }    

@@ -22,7 +22,7 @@ export class VehicleModImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Vehicle Mod"
+                documentType: "Vehicle Mod"
             }
         );
     }

@@ -36,7 +36,7 @@ export class CritterPowerImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Critter Power"
+                documentType: "Critter Power"
             }
         );
     }    

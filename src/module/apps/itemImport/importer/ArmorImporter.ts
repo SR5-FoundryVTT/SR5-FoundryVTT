@@ -22,7 +22,7 @@ export class ArmorImporter extends DataImporter {
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Armor"
+                documentType: "Armor"
             }
         );
     }    
