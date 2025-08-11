@@ -1,6 +1,6 @@
 import { DataImporter } from './DataImporter';
-import { AdeptPowerParser } from '../parser/powers/AdeptPowerParser';
 import { Power, PowersSchema } from '../schema/PowersSchema';
+import { AdeptPowerParser } from '../parser/powers/AdeptPowerParser';
 
 export class AdeptPowerImporter extends DataImporter {
     public files = ['powers.xml'];

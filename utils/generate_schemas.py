@@ -151,7 +151,7 @@ def add_custom_fields(struct: Structure) -> None:
     """Artificially adds custom fields to the structure."""
     # Add optional `translate` attribute to `category` elements
     for path, info in struct.items():
-        if path.endswith("/categories/category"):
+        if path.endswith("/categories/category") or path.endswith("/modcategories/category"):
             if 'translate' not in info.attrs:
                 # Set count to 0 to ensure it's optional
                 info.attrs['translate'] = 0

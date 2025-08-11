@@ -99,12 +99,10 @@ export class ImportHelper {
             .filter((id): id is string => !!id);
 
         const docs = await pack.getDocuments({ _id__in: ids });
-        return docs.map(doc => {
-            const originalId = doc._id!;
-            const newItem = game.items.fromCompendium(doc) as RetrievedItem;
-            newItem.name_english = this.idToName[compKey]![originalId];
-            return newItem;
-        });
+        return docs.map(doc => ({
+            ...game.items.fromCompendium(doc) as RetrievedItem,
+            name_english: this.idToName[compKey]![doc._id!]
+        }));
     }
 
     /**

@@ -17,7 +17,7 @@ export class ComplexFormImporter extends DataImporter {
                 compendiumKey: () => "Complex_Form",
                 parser: new ComplexFormParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Complex Form"
             }

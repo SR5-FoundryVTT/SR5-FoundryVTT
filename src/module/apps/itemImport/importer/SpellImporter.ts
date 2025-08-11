@@ -1,5 +1,6 @@
 import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
+import { ImportHelper as IH } from '../helper/ImportHelper';
 import { SpellsSchema, Spell } from '../schema/SpellsSchema';
 import { SpellParserBase } from '../parser/spell/SpellParserBase';
 import { CombatSpellParser } from '../parser/spell/CombatSpellParser';
@@ -35,13 +36,15 @@ export class SpellImporter extends DataImporter{
     };
 
     async Parse(jsonObject: SpellsSchema): Promise<void> {
+        IH.setTranslatedCategory('spells', jsonObject.categories.category);
+
         return SpellImporter.ParseItems<Spell>(
             jsonObject.spells.spell,
             {
                 compendiumKey: () => "Spell",
                 parser: new SpellImporter.parserWrap(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Spell"
             }

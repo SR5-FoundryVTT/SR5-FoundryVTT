@@ -88,7 +88,7 @@ export interface ArmorSchema {
         category: Many<{ _TEXT: string; $: { blackmarket: string; translate?: string; }; }>;
     };
     modcategories: {
-        category: Many<{ _TEXT: string; $: { blackmarket: string; }; }>;
+        category: Many<{ _TEXT: string; $: { blackmarket: string; translate?: string; }; }>;
     };
     mods: {
         mod: Many<Mod>;

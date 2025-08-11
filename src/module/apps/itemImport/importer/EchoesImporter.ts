@@ -1,6 +1,6 @@
 import { DataImporter } from './DataImporter';
-import { EchoesSchema, Echo } from '../schema/EchoesSchema';
 import { EchoParser } from '../parser/powers/EchoParser';
+import { EchoesSchema, Echo } from '../schema/EchoesSchema';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class EchoesImporter extends DataImporter {
@@ -17,7 +17,7 @@ export class EchoesImporter extends DataImporter {
                 compendiumKey: () => "Echo",
                 parser: new EchoParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Echoes"
             }

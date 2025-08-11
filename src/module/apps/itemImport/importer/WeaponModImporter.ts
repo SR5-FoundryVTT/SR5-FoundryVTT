@@ -17,7 +17,7 @@ export class WeaponModImporter extends DataImporter {
                 compendiumKey: () => "Weapon_Mod",
                 parser: new WeaponModParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Weapon Mod"
             }

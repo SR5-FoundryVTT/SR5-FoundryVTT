@@ -3,6 +3,7 @@ import { DataImporter } from './DataImporter';
 import { AmmoParser } from '../parser/gear/AmmoParser';
 import { GearSchema, Gear } from '../schema/GearSchema';
 import { DeviceParser } from '../parser/gear/DeviceParser';
+import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ProgramParser } from '../parser/gear/ProgramParser';
 import { EquipmentParser } from '../parser/gear/EquipmentParser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
@@ -40,6 +41,8 @@ export class GearImporter extends DataImporter {
     };
 
     async Parse(jsonObject: GearSchema): Promise<void> {
+        IH.setTranslatedCategory('gear', jsonObject.categories.category);
+
         return GearImporter.ParseItems<Gear>(
             jsonObject.gears.gear,
             {

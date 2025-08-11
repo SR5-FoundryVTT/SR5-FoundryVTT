@@ -1,5 +1,6 @@
 import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
+import { ImportHelper as IH } from '../helper/ImportHelper';
 import { SpritePowerParser } from '../parser/powers/SpritePowerParser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
@@ -25,6 +26,8 @@ export class CritterPowerImporter extends DataImporter {
     };
 
     async Parse(jsonObject: CritterpowersSchema): Promise<void> {
+        IH.setTranslatedCategory('critterpowers', jsonObject.categories.category);
+
         return CritterPowerImporter.ParseItems<Power>(
             jsonObject.powers.power,
             {

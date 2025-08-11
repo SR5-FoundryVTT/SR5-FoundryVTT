@@ -1,6 +1,7 @@
 import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
 import { MeleeParser } from '../parser/weapon/MeleeParser';
+import { ImportHelper as IH } from '../helper/ImportHelper';
 import { RangedParser } from '../parser/weapon/RangedParser';
 import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { WeaponsSchema, Weapon } from '../schema/WeaponsSchema';
@@ -30,13 +31,15 @@ export class WeaponImporter extends DataImporter {
     };
 
     async Parse(jsonObject: WeaponsSchema): Promise<void> {
+        IH.setTranslatedCategory('weapons', jsonObject.categories.category);
+
         return WeaponImporter.ParseItems<Weapon>(
             jsonObject.weapons.weapon,
             {
                 compendiumKey: () => "Weapon",
                 parser: new WeaponImporter.parserWrap(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
                 errorPrefix: "Failed Parsing Weapon"
             }
