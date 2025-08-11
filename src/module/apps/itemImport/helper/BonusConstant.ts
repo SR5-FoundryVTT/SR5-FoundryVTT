@@ -8,7 +8,7 @@ export type AECreateData = Omit<ActiveEffect.CreateData, "name"> & { name?: stri
 
 export type ActiveEffectMode = typeof CONST.ACTIVE_EFFECT_MODES[keyof typeof CONST.ACTIVE_EFFECT_MODES];
 export const { CUSTOM, MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACTIVE_EFFECT_MODES;
-export type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: ActiveEffectMode; }
+export type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: ActiveEffectMode; };
 
 export class BonusConstant {
     public static skillGroupTable: Record<string, string[]> = {

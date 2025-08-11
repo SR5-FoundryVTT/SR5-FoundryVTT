@@ -1,76 +1,67 @@
 import { SR5 } from '../../../config';
 
 export type CompendiumKey = keyof typeof Constants.MAP_COMPENDIUM_KEY;
+export type ChummerFile =
+    'actions' | 'armor' | 'bioware' | 'books' | 'complexforms' | 'contacts' | 'critterpowers' |
+    'critters' | 'cyberware' | 'drugcomponents' | 'echoes' | 'gear' | 'improvements' | 'licenses' |
+    'lifemodules' | 'lifestyles' | 'martialarts' | 'mentors' | 'metamagic' | 'metatypes' |
+    'options' | 'packs' | 'paragons' | 'powers' | 'priorities' | 'programs' | 'qualities' | 'ranges' |
+    'references' | 'settings' | 'sheets' | 'skills' | 'spells' | 'spiritpowers' | 'streams' |
+    'strings' | 'tips' | 'traditions' | 'vehicles' | 'vessels' | 'weapons';
+
+type CompendiumConfig = {
+    pack: string;
+    type: 'Actor' | 'Item';
+    folder: string | null;
+    subFolder: string | null;
+};
 
 export class Constants {
-
     public static readonly MAP_COMPENDIUM_CONFIG = {
         // Actors
-        'Critter':          { pack: 'world.sr5critter',         type: 'Actor', folder: null, subFolder: null }, // Critters, Spirits and Sprites
-        'Drone':            { pack: 'world.sr5drone',           type: 'Actor', folder: null, subFolder: null }, // Vehicles and Drones
+        'Critter':          { pack: 'sr5critter',         type: 'Actor', folder: null, subFolder: null }, // Critters, Spirits and Sprites
+        'Drone':            { pack: 'sr5drone',           type: 'Actor', folder: null, subFolder: null }, // Vehicles and Drones
 
         // Items
-        'Gear':             { pack: 'world.sr5gear',            type: 'Item', folder: null, subFolder: null }, // Armor + General Gear
-        'Trait':            { pack: 'world.sr5trait',           type: 'Item', folder: null, subFolder: null }, // Quality + Powers
-        'Magic':            { pack: 'world.sr5magic',           type: 'Item', folder: null, subFolder: null }, // Spells, rituals, complex forms
-        'Modification':     { pack: 'world.sr5modification',    type: 'Item', folder: null, subFolder: null }, // Armor/Vehicle/weapon mods + ammo
-        'Ware':             { pack: 'world.sr5ware',            type: 'Item', folder: null, subFolder: null }, // Bioware + Cyberware
-        'Weapon':           { pack: 'world.sr5weapon',          type: 'Item', folder: null, subFolder: null }, // Weapons
-    } as const satisfies Record<string, { pack: string; type: 'Actor' | 'Item'; folder: string | null, subFolder: string | null }>;
+        'Gear':             { pack: 'sr5gear',            type: 'Item', folder: null, subFolder: null }, // Armor + General Gear
+        'Trait':            { pack: 'sr5trait',           type: 'Item', folder: null, subFolder: null }, // Quality + Powers
+        'Magic':            { pack: 'sr5magic',           type: 'Item', folder: null, subFolder: null }, // Spells, rituals, complex forms
+        'Modification':     { pack: 'sr5modification',    type: 'Item', folder: null, subFolder: null }, // Armor/Vehicle/weapon mods + ammo
+        'Ware':             { pack: 'sr5ware',            type: 'Item', folder: null, subFolder: null }, // Bioware + Cyberware
+        'Weapon':           { pack: 'sr5weapon',          type: 'Item', folder: null, subFolder: null }, // Weapons
+    } as const satisfies Record<string, CompendiumConfig>;
 
     public static readonly MAP_COMPENDIUM_KEY = {
         // --- Critters ---
-        'Critter':          'Critter',
-        'Spirit':           'Critter',
-        'Sprite':           'Critter',
-        'Critter_Power':    'Trait',
+        Critter:        this.MAP_COMPENDIUM_CONFIG.Critter,
+        Spirit:         this.MAP_COMPENDIUM_CONFIG.Critter,
+        Sprite:         this.MAP_COMPENDIUM_CONFIG.Critter,
+        Critter_Power:  this.MAP_COMPENDIUM_CONFIG.Trait,
 
         // --- Character Traits ---
-        'Quality':          'Trait',
-        'Ware':             'Ware',
+        Quality:        this.MAP_COMPENDIUM_CONFIG.Trait,
+        Ware:           this.MAP_COMPENDIUM_CONFIG.Ware,
 
         // --- Vehicles ---
-        'Drone':            'Drone',
-        'Vehicle':          'Drone',
-        'Vehicle_Mod':      'Modification',
+        Drone:          this.MAP_COMPENDIUM_CONFIG.Drone,
+        Vehicle:        this.MAP_COMPENDIUM_CONFIG.Drone,
+        Vehicle_Mod:    this.MAP_COMPENDIUM_CONFIG.Modification,
 
         // --- Magic ---
-        'Adept_Power':      'Trait',
-        'Complex_Form':     'Magic',
-        'Echo':             'Trait',
-        'Spell':            'Magic',
+        Adept_Power:    this.MAP_COMPENDIUM_CONFIG.Trait,
+        Complex_Form:   this.MAP_COMPENDIUM_CONFIG.Magic,
+        Echo:           this.MAP_COMPENDIUM_CONFIG.Trait,
+        Spell:          this.MAP_COMPENDIUM_CONFIG.Magic,
 
         // --- Gear ---
-        'Ammo':             'Gear',
-        'Armor':            'Gear',
-        'Device':           'Gear',
-        'Program':          'Gear',
-        'Gear':             'Gear',
-        'Weapon':           'Weapon',
-        'Weapon_Mod':       'Modification',
-    } as const satisfies Record<string, keyof typeof Constants.MAP_COMPENDIUM_CONFIG>;
-
-    public static readonly MAP_TRANSLATION_TYPE = {
-        'adept_power': 'power',
-        'ammo': 'gear',
-        'armor': 'armor',
-        'bioware': 'bioware',
-        'complex_form': 'complexform',
-        'critter_power': 'power',
-        'cyberware': 'cyberware',
-        'device': 'gear',
-        'echo': 'echo',
-        'equipment': 'gear',
-        'modification': 'mod',
-        'program': 'gear',
-        'quality': 'quality',
-        'spell': 'spell',
-        'spirit': 'metatype',
-        'sprite': 'metatype',
-        'sprite_power': 'power',
-        'vehicle': 'vehicle',
-        'weapon': 'weapon'
-    } as const satisfies Record<string, string>;
+        Ammo:           this.MAP_COMPENDIUM_CONFIG.Gear,
+        Armor:          this.MAP_COMPENDIUM_CONFIG.Gear,
+        Device:         this.MAP_COMPENDIUM_CONFIG.Gear,
+        Program:        this.MAP_COMPENDIUM_CONFIG.Gear,
+        Gear:           this.MAP_COMPENDIUM_CONFIG.Gear,
+        Weapon:         this.MAP_COMPENDIUM_CONFIG.Weapon,
+        Weapon_Mod:     this.MAP_COMPENDIUM_CONFIG.Modification,
+    } as const satisfies Record<string, CompendiumConfig>;
 
     public static readonly MAP_CATEGORY_TO_SKILL = {
         'Assault Cannons': 'heavy_weapons',

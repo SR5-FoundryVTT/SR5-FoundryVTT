@@ -5,9 +5,7 @@ import { RangeType } from 'src/module/types/item/Weapon';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { CompendiumKey, Constants } from '../../importer/Constants';
-import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
-
 import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 type DamageElement = DamageType['element']['base'];
 
@@ -19,35 +17,29 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
         const accessories = IH.getArray(jsonData.accessories.accessory);
         const accessoriesNames = accessories.map(acc => acc.name._TEXT);
-        const translationMap: Record<string, string> = {};
-        for (const name of accessoriesNames)
-            translationMap[name] = TH.getTranslation(name, { type: 'accessory' });
 
-        const foundItems = await IH.findItem('Weapon_Mod', Object.values(translationMap));
-        const itemMap = new Map(foundItems.map(item => [item.name, item]));
+        const foundItems = await IH.findItems('Weapon_Mod', accessoriesNames);
+        const itemMap = new Map(foundItems.map(({name_english, ...i}) => [name_english, i]));
 
         const result: Item.Source[] = [];
         for (const accessory of accessories) {
-            const rawName = accessory.name._TEXT;
-            const translatedName = translationMap[rawName] || rawName;
-            const foundItem = itemMap.get(translatedName);
+            const name = accessory.name._TEXT;
+            const item = itemMap.get(name);
 
-            if (!foundItem) {
-                console.log(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${rawName}, ${translatedName}`);
+            if (!item) {
+                console.log(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`);
                 continue;
             }
 
-            // Create a new _id since it will not be created on the creation of the item.
-            const accessoryBase = game.items.fromCompendium(foundItem, { keepId: true });
-            accessoryBase._id = foundry.utils.randomID();
-            const system = accessoryBase.system as SystemType<'modification'>;
+            item._id = foundry.utils.randomID();
+            const system = item.system as SystemType<'modification'>;
             system.technology.equipped = true;
 
             const ratingText = accessory.rating?._TEXT;
             if (ratingText)
                 system.technology.rating = Number(ratingText) || 0;
 
-            result.push(accessoryBase as Item.Source);
+            result.push(item);
         }
 
         return result;
@@ -195,7 +187,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
     protected override async getFolder(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
         const root = WeaponParserBase.GetWeaponType(jsonData).capitalize() ?? "Other";
-        const folderName = TH.getTranslation(categoryData, { type: 'category' });
+        const folderName = IH.getTranslatedCategory('weapons', categoryData);
 
         return IH.getFolder(compendiumKey, root, root === 'Thrown' ? undefined : folderName);
     }

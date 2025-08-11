@@ -3,7 +3,6 @@ import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { DataDefaults } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 
 export class SpiritParser extends MetatypeParserBase<'spirit'> {
     protected readonly parseType = 'spirit';
@@ -75,29 +74,22 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
             ...IH.getArray(qualities?.negative?.quality),
         ].map(i => i._TEXT);
 
-        const translationMap: Record<string, string> = {};
-        const addTranslations = (items: any[], type: TranslationType) =>
-            items.forEach(i => translationMap[i] = TH.getTranslation(i, { type }));
-
-        addTranslations(powerList, 'power');
-        addTranslations(qualityList, 'quality');
-
-        const allPowers = await IH.findItem('Critter_Power', powerList.map(i => translationMap[i]));
-        const allQualities = await IH.findItem('Quality', qualityList.map(i => translationMap[i]));
+        const allPowers = await IH.findItems('Critter_Power', powerList);
+        const allQualities = await IH.findItems('Quality', qualityList);
         const spiritName = name._TEXT;
 
         return [
-            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spiritName }, translationMap),
-            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Power', critter: spiritName }, translationMap),
-            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Power', critter: spiritName }, translationMap),
-            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }, translationMap),
+            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spiritName }),
+            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Power', critter: spiritName }),
+            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Power', critter: spiritName }),
+            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }),
         ];
     }
 
     protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
-        const rootFolder = TH.getTranslation("Spirit", {type: 'category'});
-        const folderName = TH.getTranslation(category, {type: 'category'});
+        const rootFolder = game.i18n.localize("SR5.ActorType.Spirit");
+        const folderName = IH.getTranslatedCategory('metatypes', category);
         const specFolder = category === 'Insect Spirits' ? jsonData.name._TEXT.match(/\(([^)]+)\)/)?.[1] : undefined;
 
         return IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);

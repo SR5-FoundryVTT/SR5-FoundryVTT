@@ -1,11 +1,9 @@
-import { SR5Item } from "../../../item/SR5Item";
-import { Constants, CompendiumKey } from '../importer/Constants';
-import { TranslationHelper as TH } from './TranslationHelper';
+import { Constants, CompendiumKey, ChummerFile } from '../importer/Constants';
 
 export type OneOrMany<T> = T | T[];
 export type ArrayItem<T> = T extends (infer U)[] ? U : never;
 export type NotEmpty<T> = T extends object ? NonNullable<T> : never;
-type SplitPack<T extends string> = T extends `${infer Scope}.${infer PackName}` ? [Scope, PackName] : never;
+export type RetrievedItem = Item.Source & { name_english: string };
 
 /**
  * A utility class providing helper methods for importing and managing data in Foundry VTT.
@@ -15,6 +13,9 @@ type SplitPack<T extends string> = T extends `${infer Scope}.${infer PackName}` 
 export class ImportHelper {
     public static readonly CHAR_KEY = '_TEXT';
     private static readonly folders: Record<string, Promise<Folder>> = {};
+    private static readonly categoryMap: Partial<Record<ChummerFile, Record<string, string>>> = {};
+    private static readonly nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
+    private static readonly idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
 
     /**
      * Ensures the provided value is returned as an array.
@@ -40,28 +41,70 @@ export class ImportHelper {
         return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     }
 
+    public static guidToId(guid: string): string {
+        const cleanGuid = guid.replace(/-/g, '');
+        const big = BigInt('0x' + cleanGuid);
+
+        const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let result = '';
+
+        let num = big;
+        if (num === 0n) result = '0';
+        while (num > 0n) {
+            result = chars[Number(num % 62n)] + result;
+            num /= 62n;
+        }
+
+        return result.padStart(16, '0').slice(-16);
+    }
+
+    public static setTranslatedCategory(key: ChummerFile, categories: { _TEXT: string; $?: { translate?: string; }; }[]) {
+        const map = (this.categoryMap[key] ??= {});
+        for (const { _TEXT: name, $ } of categories)
+            map[name] = $?.translate ?? name;
+    }
+
+    public static getTranslatedCategory(key: ChummerFile, name: string): string {
+        const entry = this.categoryMap[key]?.[name];
+        return entry ?? name;
+    }
+
+    public static setItem(compKey: CompendiumKey, name: string, id: string) {
+        this.nameToId[compKey] ??= {};
+        this.idToName[compKey] ??= {};
+        this.nameToId[compKey][name] ??= id;
+        this.idToName[compKey][id] ??= name;
+    }
+
     /**
-     * Finds items in a compendium by name and optional type.
-     * 
-     * @param compKey - Compendium key mapped in `Constants.MAP_COMPENDIUM_KEY`.
-     * @param name - Name(s) to search for, translated via `TH.getTranslation`.
-     * @param types - (Optional) Type(s) to filter results.
-     * @returns Promise resolving to matching `SR5Item` array or empty if none.
+     * Finds items in the given compendium by name, clones them with a new ID,
+     * and adds their original English name for tracking purposes.
+     *
+     * @param compKey - The compendium category key to search in.
+     * @param names   - List of item names to retrieve.
+     * @returns Promise resolving to the cloned items.
      */
-    public static async findItem(
+    public static async findItems(
         compKey: CompendiumKey,
-        name: OneOrMany<string>,
-        types?: OneOrMany<Item.SubType>
-    ): Promise<SR5Item[]> {
-        if (Array.isArray(name) ? name.length === 0 : !name) return [];
+        names: string[],
+    ): Promise<RetrievedItem[]> {
+        if (!names.length) return [];
 
-        type ItemType = CompendiumCollection<'Actor' | 'Item'>;
-        const pack = game.packs?.get(Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[compKey]].pack) as ItemType;
+        const pack = game.packs?.get(
+            `world.${Constants.MAP_COMPENDIUM_KEY[compKey].pack}`
+        ) as CompendiumCollection<'Item'>;
 
-        return pack.getDocuments({
-            name__in: this.getArray(name),
-            ...(types ? { type__in: this.getArray(types) } : {})
-        }) as Promise<SR5Item[]>;
+        const ids = names
+            .map(n => this.nameToId[compKey]?.[n])
+            .filter((id): id is string => !!id);
+
+        const docs = await pack.getDocuments({ _id__in: ids });
+        return docs.map(doc => {
+            const originalId = doc._id!;
+            const newItem = game.items.fromCompendium(doc) as RetrievedItem;
+            newItem.name_english = this.idToName[compKey]![originalId];
+            return newItem;
+        });
     }
 
     /**
@@ -72,9 +115,9 @@ export class ImportHelper {
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
     public static async NewFolder(ctype: CompendiumKey, name: string, folder: Folder | null = null): Promise<Folder> {
-        const { pack, type } = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[ctype]];
+        const { pack, type } = Constants.MAP_COMPENDIUM_KEY[ctype];
 
-        const folderCreated = await Folder.create({ name, type, folder: folder?.id ?? null }, { pack });
+        const folderCreated = await Folder.create({ name, type, folder: folder?.id ?? null }, { pack: "world." + pack });
 
         if (!folderCreated) throw new Error("Folder creation failed.");
         return folderCreated;
@@ -124,19 +167,18 @@ export class ImportHelper {
      * @throws If the compendium key is invalid or improperly formatted.
      */
     public static async GetCompendium(ctype: CompendiumKey) {
-        const { pack, type, folder, subFolder } = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[ctype]];
-        let compendium = game.packs.get(pack);
+        const { pack, type, folder, subFolder } = Constants.MAP_COMPENDIUM_KEY[ctype];
+        let compendium = game.packs.get("world." + pack) as CompendiumCollection<'Actor' | 'Item'>;
 
         // Create the compendium if it doesn't exist
         if (!compendium) {
-            const [scope, packName] = pack.split(".") as SplitPack<typeof pack>;
-            if (!scope || !packName) throw new Error(`Invalid compendium key: ${pack}`);
+            if (!pack) throw new Error(`Invalid compendium key: ${pack}`);
 
             // Create the compendium pack
             compendium = await foundry.documents.collections.CompendiumCollection.createCompendium({
                 type,
-                name: packName,
-                label: game.i18n.localize(`SR5.Compendiums.${packName}`)
+                name: pack,
+                label: game.i18n.localize(`SR5.Compendiums.${pack}`)
             });
 
             // Manually assign compendium to the folder via settings
@@ -149,7 +191,7 @@ export class ImportHelper {
             }
 
             const config = game.settings.get("core", "compendiumConfiguration") ?? {};
-            Object.assign(config, { [pack]: { folder: currentFolder?.id ?? null } });
+            Object.assign(config, { ["world." + pack]: { folder: currentFolder?.id ?? null } });
             await game.settings.set("core", "compendiumConfiguration", config);
         }
 

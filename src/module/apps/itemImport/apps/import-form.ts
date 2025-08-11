@@ -8,7 +8,6 @@ import { EchoesImporter } from '../importer/EchoesImporter';
 import { GearImporter } from '../importer/GearImporter';
 import { QualityImporter } from '../importer/QualityImporter';
 import { SpellImporter } from '../importer/SpellImporter';
-import { TranslationHelper } from '../helper/TranslationHelper';
 import { VehicleImporter } from '../importer/VehicleImporter';
 import { VehicleModImporter } from '../importer/VehicleModImporter';
 import { WareImporter } from '../importer/WareImporter';
@@ -203,13 +202,6 @@ export class Import extends Application {
         console.log(fileName, end - start, "ms");
     }
 
-    async parseXmli18n(xmlSource: string) {
-        if (!xmlSource) return;
-
-        const jsonSource = await DataImporter.xml2json(xmlSource);
-        TranslationHelper.ParseTranslation(jsonSource);
-    }
-
     isDataFile = (file: File): boolean => {
         return this.supportedDataFiles.some((supported) => supported === file.name);
     };
@@ -251,12 +243,11 @@ export class Import extends Application {
     async handleBulkImport(
         setIcons: boolean,
         deleteCompendiums: boolean,
-        languageText: string | undefined,
         getTextForFile: (param: any) => Promise<{ text: string; name: string; } | null>
     ) {
         if (deleteCompendiums)
-            for (const [_, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
-                await game.packs?.get(compendium.pack)?.deleteCompendium();
+            for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
+                await game.packs?.get("world." + compendium.pack)?.deleteCompendium();
 
         this.parsedFiles = [];
 
@@ -266,16 +257,7 @@ export class Import extends Application {
         DataImporter.iconList = await IconAssign.getIconFiles();
 
         this.disableImportButton = true;
-        await this.render();
-
-        // Parse language if available
-        if (languageText) {
-            try {
-                await this.parseXmli18n(languageText);
-            } catch (err) {
-                ui.notifications?.warn(`Failed to parse language text`);
-            }
-        }
+        this.render();
 
         for (const fileName of this.supportedDataFiles) {
             try {
@@ -285,14 +267,14 @@ export class Import extends Application {
                 if (!text) continue;
 
                 this.currentParsedFile = name;
-                await this.render();
+                this.render();
 
                 await this.parseXML(text, name);
 
                 if (!this.parsedFiles.includes(name))
                     this.parsedFiles.push(name);
 
-                await this.render();
+                this.render();
             } catch (err) {
                 console.error(`Error importing ${fileName}:`, err);
                 ui.notifications?.error(`Failed to import ${fileName}`);
@@ -300,41 +282,35 @@ export class Import extends Application {
         }
 
         this.disableImportButton = false;
-        await this.render();
+        this.render();
 
         ui.notifications?.warn('SR5.Warnings.BulkImportPerformanceWarning', { localize: true });
     }
 
     override activateListeners(html: JQuery<HTMLElement>) {
-        html.find('#quickImportBtn').on('click', async () => {
+        html.find('#quickImportBtn').on('click', () => {
             const start = performance.now();
 
             const setIcons = $('.setIcons').is(':checked');
             const deleteCompendiums = $('.deleteCompendiums').is(':checked');
-
-            const languageText = this.selectedLanguage 
-                ? await this.fetchGitHubFile(`Chummer/lang/${this.selectedLanguage}`) 
-                : undefined;
 
             const getTextForFile = async (fileName: string) => {
                 const text = await this.fetchGitHubFile(`Chummer/data/${fileName}`);
                 return { text, name: fileName };
             };
 
-            await this.handleBulkImport(setIcons, deleteCompendiums, languageText, getTextForFile);
-            console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
+            void this.handleBulkImport(setIcons, deleteCompendiums, getTextForFile)
+                .then(() => {
+                    console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
+                });
         });
 
-        html.find('#advanceImportBtn').on('click', async () => {
+        html.find('#advanceImportBtn').on('click', () => {
             const start = performance.now();
 
             const setIcons = $('.setIcons').is(':checked');
             const deleteCompendiums = $('.deleteCompendiums').is(':checked');
 
-            const languageText = this.langDataFile
-                ? await this.langDataFile.text()
-                : undefined;
-            
             const getTextForFile = async (fileName: string) => {
                 const file = this.dataFiles.find(f => f.name === fileName);
                 if (!file) return null;
@@ -342,19 +318,21 @@ export class Import extends Application {
                 return { text, name: file.name };
             };
 
-            await this.handleBulkImport(setIcons, deleteCompendiums, languageText, getTextForFile);
-            console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
+            void this.handleBulkImport(setIcons, deleteCompendiums, getTextForFile)
+                .then(() => {
+                    console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
+                });
         });
 
-        html.find("input[type='file'].langDataFileDrop").on('change', async (event: JQuery.TriggeredEvent) => {
+        html.find("input[type='file'].langDataFileDrop").on('change', (event: JQuery.TriggeredEvent) => {
             Array.from(event.target.files as File[]).forEach(file => {
                 if (this.isLangDataFile(file))
                     this.langDataFile = file;
             });
-            await this.render();
+            this.render();
         });
 
-        html.find("input[type='file'].filedatadrop").on('change', async (event: JQuery.TriggeredEvent) => {
+        html.find("input[type='file'].filedatadrop").on('change', (event: JQuery.TriggeredEvent) => {
             Array.from(event.target.files as File[]).forEach(file => {
                 if (this.isDataFile(file)) {
                     // Allow user to overwrite an already added file, they have their reasons.
@@ -366,11 +344,10 @@ export class Import extends Application {
                 }
             });
 
-            if (this.dataFiles.length > 0) {
+            if (this.dataFiles.length > 0)
                 this.disableImportButton = false;
-            }
 
-            await this.render();
+            this.render();
         });
 
         html.find('.setIcons').on('click', () => {
@@ -381,28 +358,28 @@ export class Import extends Application {
             this.deleteCompendiums = !this.deleteCompendiums;
         });
 
-        html.find('.toggleAdvancedBtn').on('click', async () => {
+        html.find('.toggleAdvancedBtn').on('click', () => {
             this.showAdvanced = !this.showAdvanced;
-            await this.render();
+            this.render();
         });
 
-        html.find('.deleteFileBtn').on('click', async (event) => {
+        html.find('.deleteFileBtn').on('click', (event) => {
             const name = event.currentTarget.getAttribute('data-name');
             if (!name) return;
 
             this.dataFiles = this.dataFiles.filter(file => file.name !== name);
 
-            await this.render();
+            this.render();
         });
 
-        html.find('.importOptionsBtn').on('click', async () => {
+        html.find('.importOptionsBtn').on('click', () => {
             this.showImportOptions = true;
-            await this.render();
+            this.render();
         });
 
-        html.find('.closeOptionsBtn').on('click', async () => {
+        html.find('.closeOptionsBtn').on('click', () => {
             this.showImportOptions = false;
-            await this.render();
+            this.render();
         });
 
         html.find('.bookOption').on('click', (event: JQuery.TriggeredEvent) => {
@@ -418,19 +395,19 @@ export class Import extends Application {
             this.selectedLanguage = (event.currentTarget as HTMLSelectElement).value;
         });
 
-        html.find('.bookSelectAllBtn').on('click', async () => {
-            this.shadowrunBooks.forEach(book => book.value = true);
-            await this.render();
+        html.find('.bookSelectAllBtn').on('click', () => {
+            this.shadowrunBooks.forEach(book => { book.value = true; });
+            this.render();
         });
 
-        html.find('.bookUnselectAllBtn').on('click', async () => {
-            this.shadowrunBooks.forEach(book => book.value = false);
-            await this.render();
+        html.find('.bookUnselectAllBtn').on('click', () => {
+            this.shadowrunBooks.forEach(book => { book.value = false; });
+            this.render();
         });
 
-        html.find('.bookDefaultsBtn').on('click', async () => {
-            this.shadowrunBooks.forEach(book => book.value = book.default);
-            await this.render();
+        html.find('.bookDefaultsBtn').on('click', () => {
+            this.shadowrunBooks.forEach(book => { book.value = book.default; });
+            this.render();
         });
     }
 }

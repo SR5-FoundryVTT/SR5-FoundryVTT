@@ -4,7 +4,6 @@ import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { DataDefaults } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 
 export class CritterParser extends MetatypeParserBase<'character'> {
     protected readonly parseType = 'character';
@@ -131,38 +130,28 @@ export class CritterParser extends MetatypeParserBase<'character'> {
             ...IH.getArray(qualities?.negative?.quality)
         ].map(v => v._TEXT);
 
-        const translationMap: Record<string, string> = {};
-        const mapTranslation = (names: string[], type: TranslationType) =>
-            names.forEach(name => translationMap[name] = TH.getTranslation(name, { type }));
-
-        mapTranslation(bioware, 'bioware');
-        mapTranslation(complex, 'complexform');
-        mapTranslation(quality, 'quality');
-        mapTranslation(spells, 'spell');
-        mapTranslation(power, 'power');
-
-        const allComplexForm = await IH.findItem('Complex_Form', complex.map(name => translationMap[name]));
-        const allSpells = await IH.findItem('Spell', spells.map(name => translationMap[name]));
-        const allPowers = await IH.findItem('Critter_Power', power.map(name => translationMap[name]));
-        const allQualities = await IH.findItem('Quality', [...quality, ...bioware].map(name => translationMap[name]));
-        const allBiowares = await IH.findItem('Ware', bioware.map(name => translationMap[name]));
+        const allComplexForm = await IH.findItems('Complex_Form', complex);
+        const allSpells = await IH.findItems('Spell', spells);
+        const allPowers = await IH.findItems('Critter_Power', power);
+        const allQualities = await IH.findItems('Quality', [...quality, ...bioware]);
+        const allBiowares = await IH.findItems('Ware', bioware);
 
         const name = jsonData.name._TEXT;
         return [
-            ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: name }, translationMap),
-            ...this.getMetatypeItems(allPowers, jsonData.powers?.power, { type: 'Power', critter: name }, translationMap),
-            ...this.getMetatypeItems(allBiowares, jsonData.biowares?.bioware, { type: 'Bioware', critter: name }, translationMap),
-            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Power', critter: name }, translationMap),
-            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Quality', critter: name }, translationMap),
-            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Quality', critter: name }, translationMap),
-            ...this.getMetatypeItems(allComplexForm, jsonData.complexforms?.complexform, { type: 'Complex Form', critter: name }, translationMap),
+            ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: name }),
+            ...this.getMetatypeItems(allPowers, jsonData.powers?.power, { type: 'Power', critter: name }),
+            ...this.getMetatypeItems(allBiowares, jsonData.biowares?.bioware, { type: 'Bioware', critter: name }),
+            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Power', critter: name }),
+            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Quality', critter: name }),
+            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Quality', critter: name }),
+            ...this.getMetatypeItems(allComplexForm, jsonData.complexforms?.complexform, { type: 'Complex Form', critter: name }),
         ];
     }
 
     protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
-        const rootFolder = TH.getTranslation("Critter", {type: 'category'});
-        const folderName = TH.getTranslation(category, {type: 'category'});
+        const rootFolder = game.i18n.localize("SR5.ActorType.Critter");
+        const folderName = IH.getTranslatedCategory('metatypes', category);
 
         return IH.getFolder(compendiumKey, rootFolder, folderName);
     }

@@ -1,9 +1,8 @@
 import { DataImporter } from "../importer/DataImporter";
-import { TranslationHelper as TH, TranslationType } from "../helper/TranslationHelper";
 import * as IconAssign from "../../iconAssigner/iconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 import { BonusHelper as BH } from "../helper/BonusHelper";
-import { CompendiumKey, Constants } from "../importer/Constants";
+import { CompendiumKey } from "../importer/Constants";
 
 import { Armor, Mod as ArmorMod } from "../schema/ArmorSchema";
 import { Bioware } from "../schema/BiowareSchema";
@@ -62,12 +61,8 @@ export abstract class Parser<SubType extends SystemEntityType> {
         const itemPromise = this.getItems(jsonData);
         let bonusPromise: Promise<void> | undefined;
 
-        const name = jsonData.name._TEXT;
-        const typeOption = Constants.MAP_TRANSLATION_TYPE[this.parseType as string];
-        const options = {id: jsonData.id._TEXT, type: typeOption};
-
         const entity = {
-            name: TH.getTranslation(name, options),
+            name: jsonData.translate?._TEXT ?? jsonData.name._TEXT,
             type: this.parseType as any,
             folder: (await this.getFolder(jsonData, compendiumKey)).id,
             system: this.getSanitizedSystem(jsonData),
@@ -76,7 +71,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         const system = entity.system;
 
         // Add technology
-        if (system && 'technology' in system && system.technology)
+        if ('technology' in system && system.technology)
             this.setTechnology(system.technology, jsonData);
 
         // Add Icon
@@ -88,7 +83,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
         const page = jsonData.page._TEXT;
         const source = jsonData.source._TEXT;
-        system.description = DataDefaults.createData('description', {source: `${source} ${TH.getAltPage(name, page, options)}`});
+        system.description = DataDefaults.createData('description', {source: `${source} ${page}`});
 
         // Runtime branching
         if (this.isActor())

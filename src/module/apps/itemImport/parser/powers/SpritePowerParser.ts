@@ -16,6 +16,7 @@ export class SpritePowerParser extends Parser<'sprite_power'> {
     }
 
     protected override async getFolder(jsonData: Power, compendiumKey: CompendiumKey): Promise<Folder> {
-        return IH.getFolder(compendiumKey, "Sprite Powers");
+        const folder = game.i18n.localize("SR5.ItemTypes.SpritePower")
+        return IH.getFolder(compendiumKey, folder);
     }
 }

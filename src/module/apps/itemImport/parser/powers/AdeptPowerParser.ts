@@ -15,6 +15,7 @@ export class AdeptPowerParser extends Parser<'adept_power'> {
     }
 
     protected override async getFolder(jsonData: Power, compendiumKey: CompendiumKey): Promise<Folder> {
-        return IH.getFolder(compendiumKey, "Adept Powers");
+        const folder = game.i18n.localize("SR5.ItemTypes.AdeptPower")
+        return IH.getFolder(compendiumKey, folder);
     }
 }

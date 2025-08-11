@@ -96,14 +96,26 @@ export abstract class DataImporter {
     ): Promise<void> {
         const { compendiumKey, parser, filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
         const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
+        const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
 
         for (const data of inputs) {
             try {
                 if (!this.supportedBookSource(data) || !filter(data)) continue;
-                
+
+                const id = IH.guidToId(data.id._TEXT);
                 const key = compendiumKey(data);
-                const item = await parser.Parse(data, key);
+                const compendium = compendiums[key] ??= (await IH.GetCompendium(key));
+
+                if (compendium.index.has(id)) {
+                    IH.setItem(key, data.name._TEXT, id);
+                    continue;
+                }
+
+                const item = await parser.Parse(data, key);                
                 injectActionTests?.(item as Item.CreateData);
+                
+                item._id = id;
+                IH.setItem(key, data.name._TEXT, id);
 
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
@@ -114,9 +126,8 @@ export abstract class DataImporter {
         };
 
         for (const [key, items] of itemMap.entries()) {
-            await IH.GetCompendium(key);
-            const compendium = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[key]];
-            await (compendium.type === 'Actor' ? Actor : Item).create(items as any, { pack: compendium.pack });
+            const compendium = Constants.MAP_COMPENDIUM_KEY[key];
+            await (compendium.type === 'Actor' ? Actor : Item).create(items as any, { pack: "world." + compendium.pack, keepId: true });
         }
     }
 }
