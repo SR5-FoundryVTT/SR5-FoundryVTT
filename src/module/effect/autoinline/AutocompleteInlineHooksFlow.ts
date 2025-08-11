@@ -58,7 +58,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @returns Either a SR5Actor or SR5Item source object.
      */
     valueGetterActor: (EffectConfig: SR5ActiveEffectConfig) => {
-        const effect = EffectConfig.object;
+        const effect = EffectConfig.document;
         if (!effect.parent) return {};
         return effect.parent?.toObject();
     },
@@ -70,7 +70,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @returns A test object for the autocomplete module to use.
      */
     keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
-        const effect = EffectConfig.object;
+        const effect = EffectConfig.document;
         const testsId = effect.system.selection_tests.map(test => test.id);
 
         // For  effects targeting specific tests, we can provide a merge of all tests data.
@@ -110,7 +110,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig 
      */
     valueGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
-        const effect = EffectConfig.object;
+        const effect = EffectConfig.document;
         if (!effect.parent) return {};
 
         // Autocomplete inline properties module doesn't support get-er properties.
@@ -157,7 +157,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @returns A opposed test instance for autocomplete module to use.
      */
     valueGetterTargetedActorData: (EffectConfig: SR5ActiveEffectConfig) => {
-        const effect = EffectConfig.object;
+        const effect = EffectConfig.document;
 
         if (effect.parent instanceof SR5Item) {
             const item = effect.parent;
