@@ -1,10 +1,9 @@
-import { SR5Actor } from "../actor/SR5Actor";
-import { SR5 } from "../config";
-import { ActionFlow } from "../item/flows/ActionFlow";
-import { createTagifyOnInput } from "../utils/sheets";
-import { Translation } from "../utils/strings";
-import { SR5ActiveEffect } from "./SR5ActiveEffect";
-import { ActiveEffectConfigV1 } from "./ActiveEffectConfigV1";
+import { SR5Actor } from '../actor/SR5Actor';
+import { SR5 } from '../config';
+import { ActionFlow } from '../item/flows/ActionFlow';
+import { createTagifyOnInput } from '../utils/sheets';
+import { Translation } from '../utils/strings';
+const { ActiveEffectConfig } = foundry.applications.sheets;
 
 /**
  * Shadowrun system alters some behaviors of Active Effects, making a custom ActiveEffectConfig necessary.
@@ -28,24 +27,46 @@ import { ActiveEffectConfigV1 } from "./ActiveEffectConfigV1";
  * While actors apply effects as part of their prepareData flow the modifier apply-to target applies effects as part of the calculation of their
  * situational modifiers and others still can behave differently.
  */
-export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
-    declare object: SR5ActiveEffect;
 
-    public override get document(): SR5ActiveEffect {
-        return super.document as SR5ActiveEffect;
+export class SR5ActiveEffectConfig extends ActiveEffectConfig {
+
+    static override DEFAULT_OPTIONS = {
+        ...ActiveEffectConfig.DEFAULT_OPTIONS,
+        // classes: ["sheet", "active-effect-sheet"],
+        position: { width: 580 },
     }
 
-    override get template(): string {
-        return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.hbs';
+    static override TABS = {
+        ...ActiveEffectConfig.TABS,
+        sheet: {
+            ...ActiveEffectConfig.TABS.sheet,
+            tabs: [
+                ...ActiveEffectConfig.TABS.sheet.tabs,
+                { id: 'applyTo', group: 'sheet', cssClass: '', label: 'SR5.ActiveEffect.ApplyTo', icon: 'fas fa-filter' },
+                { id: 'help', group: 'sheet', cssClass: '', label: 'SR5.Help', icon: 'fas fa-book' },
+            ],
+            initial: 'details',
+        }
     }
 
-    // TODO check what it does, somehow it is needed to override the submit method.
-    public override _getSubmitData(updateData={}): Record<string, any> {
-        return super._getSubmitData(updateData);
+    protected override async _renderHTML(context, options) {
+        // push footer to the end of parts os it is rendered at the bottom
+        if (options.parts.includes("footer")) {
+            const index = options.parts.indexOf("footer");
+            options.parts.push(options.parts.splice(index, 1)[0]);
+        }
+        return await super._renderHTML(context, options);
     }
 
-    override async getData(options?: Application.RenderOptions): Promise<any> {
-        const data = await super.getData(options) as any;
+    static override PARTS = {
+        ...ActiveEffectConfig.PARTS,
+        applyTo: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-apply-to.hbs'},
+        help: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-help.hbs'},
+    }
+
+    override async _prepareContext(options) {
+        // todo n3rf don't use ANY here
+        const data = await super._prepareContext(options) as any;
 
         data.modes = this.applyModifyLabelToCustomMode(data.modes);
 
@@ -61,12 +82,36 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         return data;
     }
 
-    override activateListeners(html: JQuery<HTMLElement>): void {
-        super.activateListeners(html);
+    // keep track of the modified selections for when we update (foundry doesn't handle it well)
+    readonly selections = {
+        limits: [],
+        tests: [],
+        skills: [],
+        categories: [],
+        attributes: [],
+    }
 
-        html.find('select[name="system.applyTo"]').on('change', this._onApplyToChange.bind(this));
+    override _prepareSubmitData(event, form, formData, updateData) {
+        const data = super._prepareSubmitData(event, form, formData, updateData) as any;
+        data.system.selection_tests = this.selections.tests;
+        data.system.selection_attributes = this.selections.attributes;
+        data.system.selection_categories = this.selections.categories;
+        data.system.selection_limits = this.selections.limits;
+        data.system.selection_skills = this.selections.skills;
+        data.system.selection_tests = this.selections.tests;
+        console.log('submitData', data);
+        return data;
+    }
 
-        this._activateTagifyListeners(html);
+    override async _onRender(context, options) {
+
+        for (const input of this.element.querySelectorAll<HTMLSelectElement>('select[name="system.applyTo"]')) {
+            input.addEventListener('change', async (event) => {
+                await this.onApplyToChange(event, input);
+            });
+        }
+
+        this._activateTagifyListeners();
     }
 
     /**
@@ -77,6 +122,8 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
      * 
      * @private
      */
+    /*
+    TODO fix this
     override async _addEffectChange(): Promise<this> {
         const idx = this.document.changes.length;
         return this.submit({
@@ -86,6 +133,8 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         }) as unknown as this;
     }
 
+     */
+
     /**
      * Assure both no changes are present before changing the applyTo type
      * and re-render the sheet to refresh prepared change value options.
@@ -93,19 +142,17 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
      * This is to avoid configured changes breaking when changing to other applyTo types
      * that do not support the same change keys.
      */
-    async _onApplyToChange(event: Event) {
-        event.preventDefault();
-
+    async onApplyToChange(event: Event, target: HTMLElement) {
         const select = event.currentTarget as HTMLSelectElement;
 
-        if (this.object.system.applyTo === select.value) return;
+        if (this.document.system.applyTo === select.value) return;
 
-        if (this.object.changes.length) {
+        if (this.document.changes.length) {
             ui.notifications?.error('You must delete changes before changing the apply-to type.');
         } else {
             // Make sure applyTo is saved but also save all other form data on sheet.
             const updateData = { 'system.applyTo': select.value };
-            await this._onSubmit(event, { updateData, preventClose: true })
+            await this.submit({ updateData, preventClose: true })
         }
     }
 
@@ -130,7 +177,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const effectApplyTo = foundry.utils.deepClone(SR5.effectApplyTo) as Record<string, string>;
 
         // Actors can't use effects that only apply to tests from items.
-        if (this.object.parent instanceof SR5Actor) {
+        if (this.document.parent instanceof SR5Actor) {
             delete effectApplyTo.test_item;
         }
 
@@ -144,11 +191,12 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
      * @returns true if changes are present, false otherwise.
      */
     prepareEffectHasChanges(): boolean {
-        return this.object.changes.length > 0;
+        return this.document.changes.length > 0;
     }
 
-    _activateTagifyListeners(html: JQuery) {
-        switch (this.object.system.applyTo) {
+    _activateTagifyListeners() {
+        const html = $(this.element);
+        switch (this.document.system.applyTo) {
             case 'test_all':
                 this._prepareTestSelectionTagify(html);
                 this._prepareActionCategoriesSelectionTagify(html);
@@ -171,8 +219,10 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const maxItems = values.length;
 
         // Fetch current selections.
-        const selected = this.object.system.selection_tests;
-        createTagifyOnInput(inputElement, values, maxItems, selected);
+        const selected = this.document.system.selection_tests;
+        createTagifyOnInput(inputElement, values, maxItems, selected, (event) => {
+            this.selections.tests = JSON.parse(event.currentTarget.tagifyValue);
+        });
     }
 
     /**
@@ -190,8 +240,10 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
         const maxItems = values.length;
 
         // Fetch current selections.
-        const selected = this.object.system.selection_categories;
-        createTagifyOnInput(inputElement, values, maxItems, selected);
+        const selected = this.document.system.selection_categories;
+        createTagifyOnInput(inputElement, values, maxItems, selected,(event) => {
+            this.selections.categories = JSON.parse(event.currentTarget.tagifyValue);
+        });
     }
 
     /**
@@ -201,23 +253,25 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
     _prepareSkillSelectionTagify(html: JQuery) {
         const inputElement = html.find('input#skill-selection').get(0) as HTMLInputElement;
 
-        if (!this.object.parent) {
-            console.error('Shadowrun 5e | SR5ActiveEffect unexpecedtly has no parent document', this.object, this);
+        if (!this.document.parent) {
+            console.error('Shadowrun 5e | SR5ActiveEffect unexpecedtly has no parent document', this.document, this);
             return;
         }
 
         // Make sure custom skills of an actor source are included.
-        const actor = this.object.actor;
+        const actor = this.document.actor;
         const actorOrNothing = !(actor instanceof SR5Actor) ? undefined : actor;
 
         // Use ActionFlow to assure either custom skills or global skills to be included.
-        const selected = this.object.system.selection_skills;
+        const selected = this.document.system.selection_skills;
         const selectedSkillNames = selected.map(({id}) => id);
         const skills = ActionFlow.sortedActiveSkills(actorOrNothing, selectedSkillNames);
         const values = Object.entries(skills).map(([id, label]) => ({ label: label as Translation, id }));
         const maxItems = values.length;
 
-        createTagifyOnInput(inputElement, values, maxItems, selected);
+        createTagifyOnInput(inputElement, values, maxItems, selected,(event) => {
+            this.selections.skills = JSON.parse(event.currentTarget.tagifyValue);
+        });
     }
 
     _prepareAttributesSelectionTagify(html: JQuery) {
@@ -225,9 +279,13 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         const values = Object.entries(SR5.attributes).map(([attribute, label]) => ({ label, id: attribute }));
         const maxItems = values.length;
-        const selected = this.object.system.selection_attributes;
+        const selected = this.document.system.selection_attributes;
 
         createTagifyOnInput(inputElement, values, maxItems, selected);
+
+        createTagifyOnInput(inputElement, values, maxItems, selected,(event) => {
+            this.selections.attributes = JSON.parse(event.currentTarget.tagifyValue);
+        });
     }
 
     _prepareLimitsSelectionTagify(html: JQuery) {
@@ -235,8 +293,10 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfigV1 {
 
         const values = Object.entries(SR5.limits).map(([limit, label]) => ({ label, id: limit }));
         const maxItems = values.length;
-        const selected = this.object.system.selection_limits;
+        const selected = this.document.system.selection_limits;
 
-        createTagifyOnInput(inputElement, values, maxItems, selected);
+        createTagifyOnInput(inputElement, values, maxItems, selected,(event) => {
+            this.selections.limits = JSON.parse(event.currentTarget.tagifyValue);
+        });
     }
 }

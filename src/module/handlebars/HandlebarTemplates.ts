@@ -174,7 +174,11 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
 
         // Application - Matrix Network Hacking
-        'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs'
+        'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs',
+
+        // effects
+        'systems/shadowrun5e/dist/templates/effect/active-effect-apply-to.hbs',
+        'systems/shadowrun5e/dist/templates/effect/active-effect-help.hbs',
     ];
 
     return foundry.applications.handlebars.loadTemplates(templatePaths);
