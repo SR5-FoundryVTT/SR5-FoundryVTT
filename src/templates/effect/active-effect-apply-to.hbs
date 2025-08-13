@@ -1,47 +1,11 @@
 <section class="tab{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-<div class="form-group">
-    <label data-tooltip="{{localize 'SR5.Tooltips.Effect.ApplyTo'}}">{{ localize "SR5.ActiveEffect.ApplyTo" }}</label>
-    <div class="form-fields">
-        <select data-action="applyToSelect" name="system.applyTo"
-            {{#if hasChanges}}disabled{{/if}}
-            {{#if hasChanges}}data-tooltip="{{localize 'SR5.Tooltips.Effect.AlterApplyToWithChanges'}}"{{/if}}
-        >
-            {{selectOptions applyToOptions selected=applyTo localize=true}}
-        </select>
-    </div>
-</div>
-
+    {{formGroup systemFields.applyTo value=source.system.applyTo options=applyToOptions disabled=hasChanges rootId=rootId}}
 {{#ife applyTo "test_all"}}
-    <div class="form-group">
-        <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Tests" }}</label>
-        <div class="form-fields">
-            <input name="system.selection_tests" id="test-selection" class="tagify-selection">
-        </div>
-    </div>
-    <div class="form-group">
-        <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.ActionCategories" }}</label>
-        <div class="form-fields">
-            <input name="system.selection_categories" id="categories-selection" class="tagify-selection">
-        </div>
-    </div>
-    <div class="form-group">
-        <label  data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Skills" }}</label>
-        <div class="form-fields">
-            <input name="system.selection_skills" id="skill-selection" class="tagify-selection">
-        </div>
-    </div>
-    <div class="form-group">
-        <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyAllFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Attributes" }}</label>
-        <div class="form-fields">
-            <input name="system.selection_attributes" id="attribute-selection" class="tagify-selection">
-        </div>
-    </div>
-    <div class="form-group">
-        <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyFilteredUsed'}}">{{ localize "SR5.ActiveEffect.Test.Limits" }}</label>
-        <div class="form-fields">
-            <input name="system.selection_limits" id="limit-selection" class="tagify-selection">
-        </div>
-    </div>
+    {{formGroup systemFields.selection_tests value=source.system.selection_tests options=selection_test_options rootId=rootId}}
+    {{formGroup systemFields.selection_categories value=source.system.selection_categories options=selection_category_options rootId=rootId}}
+    {{formGroup systemFields.selection_skills value=source.system.selection_skills options=selection_skill_options rootId=rootId}}
+    {{formGroup systemFields.selection_attributes value=source.system.selection_attributes options=selection_attribute_options rootId=rootId}}
+    {{formGroup systemFields.selection_limits value=source.system.selection_limits options=selection_limit_options rootId=rootId}}
 {{/ife}}
 
 {{#ife applyTo "modifier"}}

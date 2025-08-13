@@ -1,4 +1,6 @@
-const { ArrayField, SchemaField, BooleanField, StringField } = foundry.data.fields;
+import { TagifyArrayField } from '@/module/types/fields/TagifyArrayField';
+
+const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
 const ActiveEffectData = {
     applyTo: new StringField({
@@ -12,31 +14,31 @@ const ActiveEffectData = {
     onlyForWireless: new BooleanField(),
     onlyForItemTest: new BooleanField(),
 
-    selection_attributes: new ArrayField(
+    selection_attributes: new TagifyArrayField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_categories: new ArrayField(
+    selection_categories: new TagifyArrayField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_limits: new ArrayField(
+    selection_limits: new TagifyArrayField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_skills: new ArrayField(
+    selection_skills: new TagifyArrayField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_tests: new ArrayField(
+    selection_tests: new TagifyArrayField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
@@ -48,4 +50,6 @@ export class ActiveEffectDM extends foundry.abstract.TypeDataModel<typeof Active
     static override defineSchema() {
         return ActiveEffectData;
     }
+
+    static override LOCALIZATION_PREFIXES = ["SR5.ActiveEffect"];
 }
