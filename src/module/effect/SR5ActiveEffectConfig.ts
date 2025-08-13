@@ -53,6 +53,12 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         }
     }
 
+    /**
+     * Do any final preparations when rendering the sheet
+     * @param context
+     * @param options
+     * @protected
+     */
     protected override async _renderHTML(context, options) {
         // TODO figure out how to change custom mode to MODIFY, I don't think context.modes works
         // context.modes = this.applyModifyLabelToCustomMode(context.modes);
@@ -66,14 +72,24 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         return await super._renderHTML(context, options);
     }
 
+    /**
+     * Define the different parts to use for the template
+     * - use the ActiveEffectConfig Parts by default
+     */
     static override PARTS = {
         ...ActiveEffectConfig.PARTS,
+        // override the changes tab so we can use autoinline properties
+        changes: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-changes.hbs', scrollable: ["ol[data-changes]"]},
         // override the details tab so we can include our extra settings
         details: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-details.hbs', scrollable: [""]},
         applyTo: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-apply-to.hbs'},
         help: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-help.hbs'},
     }
 
+    /**
+     * Prepare data for the templates to use
+     * @param options
+     */
     override async _prepareContext(options) {
         const data = await super._prepareContext(options) as any;
 
@@ -102,15 +118,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         return data;
     }
 
-    // keep track of the modified selections for when we update (foundry doesn't handle it well)
-    readonly selections = {
-        limits: [],
-        tests: [],
-        skills: [],
-        categories: [],
-        attributes: [],
-    }
-
     /**
      * Called just before the window itself renders
      * - add event listeners as needed
@@ -126,6 +133,12 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         }
     }
 
+    /**
+     * Handle anything needed after the sheet has been rendered
+     * - register tagify inputs
+     * @param context
+     * @param options
+     */
     override async _postRender(context, options) {
         await super._postRender(context, options);
         // once we render, process the Tagify Elements to we rendered
@@ -217,6 +230,9 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     }
 
 
+    /**
+     * Get the available Test types for applyTo Test options
+     */
     _getTestOptions() {
         // Tagify expects this format for localized tags.
         return Object.values(game.shadowrun5e.tests).map(((test: any) => ({
@@ -224,11 +240,17 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         })));
     }
 
+    /**
+     * Get the available Action Categories for applyTo Test options
+     */
     _getCategoryOptions() {
         // Tagify expects this format for localized tags.
         return Object.entries(SR5.actionCategories).map(([category, label]) => ({ label, id: category }));
     }
 
+    /**
+     * Get the available Skills for applyTo Test options
+     */
     _getSkillOptions() {
         // Make sure custom skills of an actor source are included.
         const actor = this.document.actor;
@@ -241,10 +263,16 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         return Object.entries(skills).map(([id, label]) => ({ label: label as Translation, id }));
     }
 
+    /**
+     * Get the available Attributes for applyTo Test options
+     */
     _getAttributeOptions() {
         return Object.entries(SR5.attributes).map(([attribute, label]) => ({ label, id: attribute }));
     }
 
+    /**
+     * Get the available Limits for applyTo Test options
+     */
     _getLimitOptions() {
         return Object.entries(SR5.limits).map(([limit, label]) => ({ label, id: limit }));
     }
