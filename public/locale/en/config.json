@@ -121,6 +121,51 @@
         "Active": "Active",
         "ActiveDefense": "Active Defense",
         "ActiveEffect": {
+            "FIELDS": {
+                "applyTo": {
+                    "label": "Apply-To",
+                    "hint": "Apply-To different Targets"
+                },
+                "applyByTest": {
+                    "label": "Apply-To Test via Item"
+                },
+                "onlyForEquipped": {
+                    "label": "Equipped Only",
+                    "hint": "Apply for equipped item only"
+                },
+                "onlyForItemTest": {
+                    "label": "Item Test Only",
+                    "hint": "Apply for parent item test only"
+                },
+                "onlyForWireless": {
+                    "label": "Wireless Only",
+                    "hint": "Apply for wireless active only"
+                },
+                "selection_attributes": {
+                    "label": "Attributes Filter",
+                    "hint": "Filter the test based on Attributes used"
+                },
+                "selection_categories": {
+                    "label": "Action Categories Filter",
+                    "hint": "Filter the test based on Action Category used"
+                },
+                "selection_limits": {
+                    "label": "Limits Filter",
+                    "hint": "Filter the test based on the Limit used"
+                },
+                "selection_skills": {
+                    "label": "Skills Filter",
+                    "hint": "Filter the test based on the Skills used"
+                },
+                "selection_tests": {
+                    "label": "Tests Filter",
+                    "hint": "Filter the test based on the Tests used"
+                }
+            },
+            "applyByTest": "Apply-To Test via Item",
+            "onlyForEquipped": "Apply for equipped item only",
+            "onlyForItemTest": "Apply for parent item test only",
+            "onlyForWireless": "Apply for wireless active only",
             "ApplyTo": "Apply-To",
             "ApplyTos": {
                 "TargetedActor": "Targeted Actor",
@@ -131,9 +176,6 @@
                 "Modify": "Modify"
             },
             "New": "New Effect",
-            "OnlyForEquipped": "Apply for equipped item only",
-            "OnlyForItemTest": "Apply for parent item test only",
-            "OnlyForWireless": "Apply for wireless active only",
             "Test": {
                 "ActionCategories": "Action Categories Filter",
                 "Attributes": "Attributes Filter",
