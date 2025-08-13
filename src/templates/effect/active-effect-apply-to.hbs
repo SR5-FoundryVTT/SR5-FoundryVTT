@@ -9,11 +9,6 @@
 {{/ife}}
 
 {{#ife applyTo "modifier"}}
-    <div class="form-group">
-        <label data-tooltip="{{localize 'SR5.Tooltips.Effect.OnlyForItemTest'}}">{{ localize "SR5.ActiveEffect.OnlyForItemTest" }}</label>
-        <div class="form-fields">
-            <input type="checkbox" name="system.onlyForItemTest" {{checked onlyForItemTest}}/>
-        </div>
-    </div>
+    {{formGroup systemFields.onlyForItemTest value=source.system.onlyForItemTest rootId=rootId}}
 {{/ife}}
 </section>

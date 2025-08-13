@@ -1,9 +1,11 @@
 <section class="tab changes{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <header>
         <div class="key">{{localize "EFFECT.ChangeKey"}}</div>
+        {{#ifne source.system.applyTo "modifier"}}
         <div class="mode">{{localize "EFFECT.ChangeMode"}}</div>
         <div class="value">{{localize "EFFECT.ChangeValue"}}</div>
         <div class="priority">{{localize "EFFECT.ChangePriority"}}</div>
+        {{/ifne}}
         <div class="controls"><a data-action="addChange"><i class="fa-regular fa-square-plus"></i></a></div>
     </header>
     <ol class="scrollable" data-changes>
@@ -22,7 +24,7 @@
                     </div>
                     <div class="priority">
                         {{formInput changeFields.priority name=(concat "changes." i ".priority") value=change.priority
-                                    placeholder=(lookup ../../priorities change.mode)}}
+                                    placeholder=(lookup ../../priorities change.mode) disabled=true}}
                     </div>
                     {{/ifne}}
                     <div class="controls"><a data-action="deleteChange"><i class="fa-solid fa-trash"></i></a></div>
