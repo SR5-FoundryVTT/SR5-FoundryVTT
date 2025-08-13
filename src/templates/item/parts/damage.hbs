@@ -46,6 +46,7 @@
         </div>
     </div>
     {{/ifne}}
+    {{#ifne system.action.damage.type.base "matrix"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.Element"}}
@@ -89,5 +90,22 @@
             </select>
         </div>
     </div>
-    {{/ifne}} {{/if}}
+    {{/ifne}}
+    {{/ifne}}
+    {{#ife system.action.damage.type.base "matrix"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.BiofeedbackDamage"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="checkbox"
+                class="submit-checkbox"
+                name="system.action.damage.biofeedback"
+                {{checked system.action.damage.biofeedback}}
+            />
+        </div>
+    </div>
+    {{/ife}}
+    {{/if}}
 </div>

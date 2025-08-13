@@ -16,8 +16,6 @@ export type MatrixResistTestData = ResistTestData<MatrixDefenseTestData> & {
     personaUuid: string | undefined
     // The icon uuid. This would be the actual mark placement target. Can be a device, a persona device, a host or actor.
     iconUuid: string | undefined
-    // if the test has biofeedback damage
-    biofeedback: boolean | undefined;
 }
 
 /**
@@ -42,7 +40,6 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             data = MatrixTestDataFlow._prepareDataResist(data);
         }
         data = ResistTestDataFlow._prepareData(data);
-        data.biofeedback = true;
 
         return data;
     }
@@ -70,7 +67,9 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     }
 
     override get _resistTestClass(): any {
-        if (this.persona && this.data.iconUuid === this.persona.uuid && this.data.biofeedback && this.data.modifiedDamage.value > 0) {
+        const biofeedback = (this.persona?.canTakeBiofeedbackDamage ?? false);
+        if (biofeedback && this.data.modifiedDamage.biofeedback
+                && this.data.iconUuid === this.persona.uuid && this.data.modifiedDamage.value > 0) {
             return BiofeedbackResistTest;
         }
         return super._resistTestClass;

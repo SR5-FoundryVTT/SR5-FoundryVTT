@@ -736,6 +736,18 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Get if this actor can take biofeedback damage
+     * - this takes into account VR status and actor type
+     */
+    get canTakeBiofeedbackDamage(): boolean {
+        // we can't take biofeedback damage if we aren't using VR
+        if (!this.isUsingVR) return false;
+        // IC and Sprites can't take biofeedback damage
+        return !this.isType('ic', 'sprite');
+
+    }
+
+    /**
      * Determine if an actor can choose a special trait using the special field.
      */
     get hasSpecial(): boolean {
