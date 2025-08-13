@@ -1,7 +1,6 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5 } from '../config';
 import { ActionFlow } from '../item/flows/ActionFlow';
-import { createTagifyOnInput } from '../utils/sheets';
 import { Translation } from '../utils/strings';
 
 const { ActiveEffectConfig } = foundry.applications.sheets;
@@ -131,7 +130,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         await super._postRender(context, options);
         // once we render, process the Tagify Elements to we rendered
         Hooks.call('sr5_processTagifyElements', this.element);
-        // this._activateTagifyListeners();
     }
 
     /**
@@ -218,21 +216,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         return this.document.changes.length > 0;
     }
 
-    _activateTagifyListeners() {
-        const elements = this.element.querySelectorAll<HTMLInputElement>('input.tagify-selection');
-
-        for (const element of elements) {
-            // Tagify expects this format for localized tags.
-            const values = JSON.parse(element.getAttribute('value') ?? '[]') as any[];
-            const options = JSON.parse(element.getAttribute('options') ?? '[]') as any[];
-
-            // Tagify dropdown should show all whitelist tags.
-            const maxItems = options.length;
-            createTagifyOnInput(element, options, maxItems, values, (event) => {
-                event.currentTarget.setAttribute('value', event.currentTarget.tagifyValue);
-            });
-        }
-    }
 
     _getTestOptions() {
         // Tagify expects this format for localized tags.
