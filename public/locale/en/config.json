@@ -162,10 +162,6 @@
                     "hint": "Filter the test based on the Tests used"
                 }
             },
-            "applyByTest": "Apply-To Test via Item",
-            "onlyForEquipped": "Apply for equipped item only",
-            "onlyForItemTest": "Apply for parent item test only",
-            "onlyForWireless": "Apply for wireless active only",
             "ApplyTo": "Apply-To",
             "ApplyTos": {
                 "TargetedActor": "Targeted Actor",
@@ -175,14 +171,7 @@
             "Modes": {
                 "Modify": "Modify"
             },
-            "New": "New Effect",
-            "Test": {
-                "ActionCategories": "Action Categories Filter",
-                "Attributes": "Attributes Filter",
-                "Limits": "Limits Filter",
-                "Skills": "Skills Filter",
-                "Tests": "Tests Filter"
-            }
+            "New": "New Effect"
         },
         "ActiveSkills": "Active Skills",
         "ActorTypes": {
