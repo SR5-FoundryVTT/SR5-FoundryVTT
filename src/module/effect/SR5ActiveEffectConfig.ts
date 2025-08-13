@@ -60,8 +60,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * @protected
      */
     protected override async _renderHTML(context, options) {
-        // TODO figure out how to change custom mode to MODIFY, I don't think context.modes works
-        // context.modes = this.applyModifyLabelToCustomMode(context.modes);
         context.systemFields = this.document.system.schema.fields;
         context.system = this.document.system;
         // push footer to the end of parts os it is rendered at the bottom
@@ -70,6 +68,23 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
             options.parts.push(options.parts.splice(index, 1)[0]);
         }
         return await super._renderHTML(context, options);
+    }
+
+    /**
+     * Override preparingParts to prepare our own custom modes
+     * @param partId
+     * @param context
+     * @param options
+     */
+    override async _preparePartContext(partId, context, options) {
+       const data = await super._preparePartContext(partId, context, options) as any;
+
+       // if the part is the "changes" tab, override the modes to use "Modify" instead of "Custom"
+       if (partId === 'changes') {
+           data.modes = this.applyModifyLabelToCustomMode(data.modes);
+       }
+
+       return data;
     }
 
     /**
