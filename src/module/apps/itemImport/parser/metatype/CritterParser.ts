@@ -150,7 +150,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
 
     protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
-        const rootFolder = game.i18n.localize("SR5.ActorType.Critter");
+        const rootFolder = game.i18n.localize("TYPES.Actor.critter");
         const folderName = IH.getTranslatedCategory('metatypes', category);
 
         return IH.getFolder(compendiumKey, rootFolder, folderName);

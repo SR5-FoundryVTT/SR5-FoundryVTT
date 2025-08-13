@@ -172,13 +172,6 @@ export class ImportHelper {
         if (!compendium) {
             if (!pack) throw new Error(`Invalid compendium key: ${pack}`);
 
-            // Create the compendium pack
-            compendium = await foundry.documents.collections.CompendiumCollection.createCompendium({
-                type,
-                name: pack,
-                label: game.i18n.localize(`SR5.Compendiums.${pack}`)
-            });
-
             // Manually assign compendium to the folder via settings
             let currentFolder = await this.getCompendiumFolder(game.i18n.localize(`SR5.Compendiums.Folders.Root`));
 
@@ -188,9 +181,12 @@ export class ImportHelper {
                     currentFolder = await this.getCompendiumFolder(game.i18n.localize(`SR5.Compendiums.Folders.${subFolder}`), currentFolder);
             }
 
-            const config = game.settings.get("core", "compendiumConfiguration") ?? {};
-            Object.assign(config, { ["world." + pack]: { folder: currentFolder?.id ?? null } });
-            await game.settings.set("core", "compendiumConfiguration", config);
+            // Create the compendium pack
+            compendium = await foundry.documents.collections.CompendiumCollection.createCompendium({
+                type,
+                name: pack,
+                label: game.i18n.localize(`SR5.Compendiums.${pack}`)
+            }, { folder: currentFolder?.id ?? null });
         }
 
         return compendium;

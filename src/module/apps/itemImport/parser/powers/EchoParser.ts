@@ -7,7 +7,7 @@ export class EchoParser extends Parser<'echo'> {
     protected readonly parseType = 'echo';
 
     protected override async getFolder(jsonData: Echo, compendiumKey: CompendiumKey): Promise<Folder> {
-        const folder = game.i18n.localize("SR5.ActorType.Echo");
+        const folder = game.i18n.localize("TYPES.Item.echo");
         return IH.getFolder(compendiumKey, folder);
     }
 }

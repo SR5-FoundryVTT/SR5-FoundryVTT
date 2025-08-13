@@ -52,12 +52,14 @@ export class Import extends Application {
         { name: "Dark Terrors", code: "DTR", default: true, value: true },
         { name: "Data Trails", code: "DT", default: true, value: true },
         { name: "Data Trails (Dissonant Echoes)", code: "DTD", default: false, value: false },
-        { name: "Datapuls SOTA 2080 (German-exclusive)", code: "SOTG", default: false, value: false },
-        { name: "Datapuls Verschlusssache (German-exclusive)", code: "DPVG", default: false, value: false },
+        { name: "Datapuls Österreich (German-Only)", code: "DATG", default: false, value: false },
+        { name: "Datapuls SOTA 2080 (German-Only)", code: "SOTG", default: false, value: false },
+        { name: "Datapuls SOX 2080 (German-Only)", code: "SOXG", default: false, value: false },
+        { name: "Der Almanach - Gratisrollenspieltag 2019 (German-Only)", code: "GRST2019", default: false, value: false },
         { name: "Forbidden Arcana", code: "FA", default: true, value: true },
-        { name: "Grimmes Erwachen (German-exclusive)", code: "GE", default: false, value: false },
+        { name: "Grimmes Erwachen (German-Only)", code: "GE", default: false, value: false },
         { name: "Gun Heaven 3", code: "GH3", default: true, value: true },
-        { name: "Hamburg (German-exclusive)", code: "HAMG", default: false, value: false },
+        { name: "Datapuls Hamburg (German-Only)", code: "HAMG", default: false, value: false },
         { name: "Hard Targets", code: "HT", default: true, value: true },
         { name: "Hong Kong Sourcebook", code: "HKS", default: false, value: false },
         { name: "Howling Shadows", code: "HS", default: true, value: true },
@@ -69,23 +71,32 @@ export class Import extends Application {
         { name: "Rigger 5.0", code: "R5", default: true, value: true },
         { name: "Run Faster", code: "RF", default: true, value: true },
         { name: "Run and Gun", code: "RG", default: true, value: true },
+        { name: "Parabotany (German-Only)", code: "PBG", default: false, value: false },
+        { name: "Parageology (German-Only)", code: "PGG", default: false, value: false },
+        { name: "Parazoology (German-Only)", code: "PZG", default: false, value: false },
         { name: "Sail Away, Sweet Sister", code: "SASS", default: true, value: true },
-        { name: "Schattenhandbuch (German Handbook)", code: "SHB", default: false, value: false },
-        { name: "Schattenhandbuch 2 (German Handbook)", code: "SHB2", default: false, value: false },
-        { name: "Schattenhandbuch 3 (German Handbook)", code: "SHB3", default: false, value: false },
+        { name: "Schattenhandbuch (German-Only)", code: "SHB", default: false, value: false },
+        { name: "Schattenhandbuch 2 (German-Only)", code: "SHB2", default: false, value: false },
+        { name: "Schattenhandbuch 3 (German-Only)", code: "SHB3", default: false, value: false },
+        { name: "Schattenhandbuch 4 (German-Only)", code: "SHB4", default: false, value: false },
+        { name: "Schattenload 2 (German-Only)", code: "SLG2", default: false, value: false },
+        { name: "Schattenload 3 (German-Only)", code: "SLG3", default: false, value: false },
+        { name: "Schattenload 7 (German-Only)", code: "SLG7", default: false, value: false },
         { name: "Shadow Spells", code: "SSP", default: true, value: true },
-        { name: "Shadowrun 2050 (5th Edition)", code: "2050", default: false, value: false },
+        { name: "Shadowrun 2050 (German-Only)", code: "2050", default: false, value: false },
         { name: "Shadowrun 5th Edition", code: "SR5", default: true, value: true },
         { name: "Shadowrun Missions 0803: 10 Block Tango", code: "SRM0803", default: true, value: true },
         { name: "Shadowrun Missions 0804: Dirty Laundry", code: "SRM0804", default: true, value: true },
         { name: "Shadowrun Quick-Start Rules", code: "QSR", default: true, value: true },
         { name: "Shadows In Focus: Butte", code: "SFB", default: true, value: true },
+        { name: "Shadows In Focus: Casablanca-Rabat", code: "SFCR", default: true, value: true },
+        { name: "Shadows In Focus: Marroco", code: "SFMO", default: true, value: true },
         { name: "Shadows In Focus: Metropole", code: "SFME", default: true, value: true },
         { name: "Shadows In Focus: San Francisco Metroplex", code: "SFM", default: true, value: true },
         { name: "Shadows In Focus: Sioux Nation: Counting Coup", code: "SFCC", default: true, value: true },
         { name: "Splintered State", code: "SPS", default: true, value: true },
         { name: "Sprawl Wilds", code: "SW", default: true, value: true },
-        { name: "State of the Art ADL (German Handbook)", code: "SAG", default: false, value: false },
+        { name: "State of the Art ADL (German-Only)", code: "SAG", default: false, value: false },
         { name: "Stolen Souls", code: "SS", default: true, value: true },
         { name: "Street Grimoire", code: "SG", default: true, value: true },
         { name: "Street Grimoire Errata", code: "SGE", default: true, value: true },
@@ -97,7 +108,6 @@ export class Import extends Application {
 
     constructor() {
         super();
-
         this.collectDataImporterFileSupport();
     }
 
@@ -246,8 +256,10 @@ export class Import extends Application {
         getTextForFile: (param: any) => Promise<{ text: string; name: string; } | null>
     ) {
         if (deleteCompendiums)
-            for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
-                await game.packs?.get("world." + compendium.pack)?.deleteCompendium();
+            for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG)) {
+                await game.packs.get("world." + compendium.pack)?.configure({locked: false});
+                await game.packs.get("world." + compendium.pack)?.deleteCompendium();
+            }
 
         this.parsedFiles = [];
 
@@ -283,6 +295,9 @@ export class Import extends Application {
 
         this.disableImportButton = false;
         this.render();
+
+        for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
+            await game.packs.get("world." + compendium.pack)?.configure({locked: true});
 
         ui.notifications?.warn('SR5.Warnings.BulkImportPerformanceWarning', { localize: true });
     }

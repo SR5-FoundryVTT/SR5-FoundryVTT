@@ -88,7 +88,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
     protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
-        const rootFolder = game.i18n.localize("SR5.ActorType.Spirit");
+        const rootFolder = game.i18n.localize("TYPES.Actor.spirit");
         const folderName = IH.getTranslatedCategory('metatypes', category);
         const specFolder = category === 'Insect Spirits' ? jsonData.name._TEXT.match(/\(([^)]+)\)/)?.[1] : undefined;
 
