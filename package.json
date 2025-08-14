@@ -19,8 +19,8 @@
         "eslint-plugin-deprecation": "^3.0.0",
         "eslint-plugin-prettier": "^5.0.1",
         "events": "^3.3.0",
-        "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
         "fs-extra": "^11.1.1",
+        "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
         "gulp": "^5.0.1",
         "gulp-sass": "^5.1.0",
         "prettier-eslint": "^16.1.2",
@@ -41,5 +41,8 @@
         "lint:errors": "npx eslint . --quiet",
         "lint:errors:fix": "npx eslint . --quiet --fix",
         "prettier": "npx prettier --write **/*.ts"
+    },
+    "dependencies": {
+        "jszip": "^3.10.1"
     }
 }

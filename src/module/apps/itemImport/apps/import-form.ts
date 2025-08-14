@@ -15,8 +15,9 @@ import { WeaponImporter } from '../importer/WeaponImporter';
 import { WeaponModImporter } from '../importer/WeaponModImporter';
 import { Constants } from '../importer/Constants';
 import * as IconAssign from  '../../iconAssigner/iconAssign';
+import JSZip from 'jszip';
 
-export class Import extends Application {
+export class Import extends foundry.appv1.api.Application {
     // Update Schemas in util/generate_schemas.py
     private readonly githubConfig = {
         owner: "chummer5a",
@@ -26,85 +27,18 @@ export class Import extends Application {
     } as const;
 
     private currentParsedFile: string = "";
-    private dataFiles: File[] = [];
     private parsedFiles: string[] = [];
     private supportedDataFiles: string[] = [];
-
-    private langDataFile: File | undefined;
-    private selectedLanguage: string = "";
 
     private icons: boolean = true;
     private deleteCompendiums: boolean = false;
     private disableImportButton: boolean = false;
 
-    private showAdvanced: boolean = false;
+    private ZIP: JSZip | null = null;
+    private zipFile: File | null = null;
     private showImportOptions: boolean = false;
 
-    private readonly shadowrunBooks = [
-        { name: "Aetherology", code: "AET", default: true, value: true },
-        { name: "Assassin's Primer", code: "AP", default: true, value: true },
-        { name: "Better Than Bad", code: "BTB", default: true, value: true },
-        { name: "Bloody Business", code: "BLB", default: true, value: true },
-        { name: "Book of the Lost", code: "BOTL", default: true, value: true },
-        { name: "Bullets & Bandages", code: "BB", default: true, value: true },
-        { name: "Chrome Flesh", code: "CF", default: true, value: true },
-        { name: "Cutting Aces", code: "CA", default: true, value: true },
-        { name: "Dark Terrors", code: "DTR", default: true, value: true },
-        { name: "Data Trails", code: "DT", default: true, value: true },
-        { name: "Data Trails (Dissonant Echoes)", code: "DTD", default: false, value: false },
-        { name: "Datapuls Österreich (German-Only)", code: "DATG", default: false, value: false },
-        { name: "Datapuls SOTA 2080 (German-Only)", code: "SOTG", default: false, value: false },
-        { name: "Datapuls SOX 2080 (German-Only)", code: "SOXG", default: false, value: false },
-        { name: "Der Almanach - Gratisrollenspieltag 2019 (German-Only)", code: "GRST2019", default: false, value: false },
-        { name: "Forbidden Arcana", code: "FA", default: true, value: true },
-        { name: "Grimmes Erwachen (German-Only)", code: "GE", default: false, value: false },
-        { name: "Gun Heaven 3", code: "GH3", default: true, value: true },
-        { name: "Datapuls Hamburg (German-Only)", code: "HAMG", default: false, value: false },
-        { name: "Hard Targets", code: "HT", default: true, value: true },
-        { name: "Hong Kong Sourcebook", code: "HKS", default: false, value: false },
-        { name: "Howling Shadows", code: "HS", default: true, value: true },
-        { name: "Kill Code", code: "KC", default: true, value: true },
-        { name: "Krime Katalog", code: "KK", default: true, value: true },
-        { name: "Lockdown", code: "LCD", default: true, value: true },
-        { name: "No Future", code: "NF", default: true, value: true },
-        { name: "Nothing Personal", code: "NP", default: true, value: true },
-        { name: "Rigger 5.0", code: "R5", default: true, value: true },
-        { name: "Run Faster", code: "RF", default: true, value: true },
-        { name: "Run and Gun", code: "RG", default: true, value: true },
-        { name: "Parabotany (German-Only)", code: "PBG", default: false, value: false },
-        { name: "Parageology (German-Only)", code: "PGG", default: false, value: false },
-        { name: "Parazoology (German-Only)", code: "PZG", default: false, value: false },
-        { name: "Sail Away, Sweet Sister", code: "SASS", default: true, value: true },
-        { name: "Schattenhandbuch (German-Only)", code: "SHB", default: false, value: false },
-        { name: "Schattenhandbuch 2 (German-Only)", code: "SHB2", default: false, value: false },
-        { name: "Schattenhandbuch 3 (German-Only)", code: "SHB3", default: false, value: false },
-        { name: "Schattenhandbuch 4 (German-Only)", code: "SHB4", default: false, value: false },
-        { name: "Schattenload 2 (German-Only)", code: "SLG2", default: false, value: false },
-        { name: "Schattenload 3 (German-Only)", code: "SLG3", default: false, value: false },
-        { name: "Schattenload 7 (German-Only)", code: "SLG7", default: false, value: false },
-        { name: "Shadow Spells", code: "SSP", default: true, value: true },
-        { name: "Shadowrun 2050 (German-Only)", code: "2050", default: false, value: false },
-        { name: "Shadowrun 5th Edition", code: "SR5", default: true, value: true },
-        { name: "Shadowrun Missions 0803: 10 Block Tango", code: "SRM0803", default: true, value: true },
-        { name: "Shadowrun Missions 0804: Dirty Laundry", code: "SRM0804", default: true, value: true },
-        { name: "Shadowrun Quick-Start Rules", code: "QSR", default: true, value: true },
-        { name: "Shadows In Focus: Butte", code: "SFB", default: true, value: true },
-        { name: "Shadows In Focus: Casablanca-Rabat", code: "SFCR", default: true, value: true },
-        { name: "Shadows In Focus: Marroco", code: "SFMO", default: true, value: true },
-        { name: "Shadows In Focus: Metropole", code: "SFME", default: true, value: true },
-        { name: "Shadows In Focus: San Francisco Metroplex", code: "SFM", default: true, value: true },
-        { name: "Shadows In Focus: Sioux Nation: Counting Coup", code: "SFCC", default: true, value: true },
-        { name: "Splintered State", code: "SPS", default: true, value: true },
-        { name: "Sprawl Wilds", code: "SW", default: true, value: true },
-        { name: "State of the Art ADL (German-Only)", code: "SAG", default: false, value: false },
-        { name: "Stolen Souls", code: "SS", default: true, value: true },
-        { name: "Street Grimoire", code: "SG", default: true, value: true },
-        { name: "Street Grimoire Errata", code: "SGE", default: true, value: true },
-        { name: "Street Lethal", code: "SL", default: true, value: true },
-        { name: "The Complete Trog", code: "TCT", default: true, value: true },
-        { name: "The Seattle Gambit", code: "TSG", default: true, value: true },
-        { name: "The Vladivostok Gauntlet", code: "TVG", default: true, value: true }
-    ];
+    private readonly shadowrunBooks = Constants.shadowrunBooks.map(book => ({ ...book, value: book.default }));
 
     constructor() {
         super();
@@ -127,7 +61,7 @@ export class Import extends Application {
 
         data.dataFiles = {};
         this.supportedDataFiles.forEach((supportedFileName: string) => {
-            const missing = !this.dataFiles.some((dataFile) => supportedFileName === dataFile.name);
+            const missing = !false;
             const parsed = this.parsedFiles.some((parsedFileName) => supportedFileName === parsedFileName);
             const parsing = supportedFileName === this.currentParsedFile;
 
@@ -140,13 +74,11 @@ export class Import extends Application {
         });
 
         data.icons = this.icons;
-        data.showAdvanced = this.showAdvanced;
-        data.selectedLanguage = this.selectedLanguage;
         data.deleteCompendiums = this.deleteCompendiums;
         data.showImportOptions = this.showImportOptions;
         data.disableImportButton = this.disableImportButton;
-        data.langDataFile = this.langDataFile ? this.langDataFile.name : '';
         data.finishedOverallParsing = this.supportedDataFiles.length === this.parsedFiles.length;
+        data.zipFileName = this.zipFile?.name;
 
         if (!data.finishedOverallParsing) {
             data.currentParsedFile = this.currentParsedFile?.replace(/\.xml$/i, '').capitalize() || '';
@@ -251,21 +183,25 @@ export class Import extends Application {
     }
 
     async handleBulkImport(
+        isOnline: boolean,
         setIcons: boolean,
         deleteCompendiums: boolean,
-        getTextForFile: (param: any) => Promise<{ text: string; name: string; } | null>
+        getTextForFile: (fileName: string) => Promise<string | undefined>
     ) {
-        if (deleteCompendiums)
-            for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG)) {
+        for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
                 await game.packs.get("world." + compendium.pack)?.configure({locked: false});
+
+        if (deleteCompendiums)
+            for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
                 await game.packs.get("world." + compendium.pack)?.deleteCompendium();
-            }
+
+        if (!isOnline)
+            this.ZIP = await (new JSZip()).loadAsync(this.zipFile!);
 
         this.parsedFiles = [];
 
         DataImporter.setIcons = setIcons;
-        DataImporter.supportedBooks = this.shadowrunBooks
-        .filter((book) => book.value).map((book) => book.code);
+        DataImporter.supportedBooks = this.shadowrunBooks.filter(book => book.value).map(book => book.code);
         DataImporter.iconList = await IconAssign.getIconFiles();
 
         this.disableImportButton = true;
@@ -273,22 +209,21 @@ export class Import extends Application {
 
         for (const fileName of this.supportedDataFiles) {
             try {
-                const result = await getTextForFile(fileName);
-                if (!result) continue;
-                const { text, name } = result;
-                if (!text) continue;
+                const text = await getTextForFile(fileName);
+                if (text === undefined)
+                    throw new Error(`File ${fileName} not found!`);
 
-                this.currentParsedFile = name;
+                this.currentParsedFile = fileName;
                 this.render();
 
-                await this.parseXML(text, name);
+                await this.parseXML(text, fileName);
 
-                if (!this.parsedFiles.includes(name))
-                    this.parsedFiles.push(name);
+                if (!this.parsedFiles.includes(fileName))
+                    this.parsedFiles.push(fileName);
 
                 this.render();
             } catch (err) {
-                console.error(`Error importing ${fileName}:`, err);
+                console.error(err);
                 ui.notifications?.error(`Failed to import ${fileName}`);
             }
         }
@@ -303,90 +238,46 @@ export class Import extends Application {
     }
 
     override activateListeners(html: JQuery<HTMLElement>) {
+        // --- Quick Import from GitHub ---
         html.find('#quickImportBtn').on('click', () => {
             const start = performance.now();
+            const setIcons = html.find('.setIcons').is(':checked');
+            const deleteCompendiums = html.find('.deleteCompendiums').is(':checked');
 
-            const setIcons = $('.setIcons').is(':checked');
-            const deleteCompendiums = $('.deleteCompendiums').is(':checked');
-
-            const getTextForFile = async (fileName: string) => {
-                const text = await this.fetchGitHubFile(`Chummer/data/${fileName}`);
-                return { text, name: fileName };
+            const getTextForFile = async (name: string) => {
+                return this.fetchGitHubFile(`Chummer/data/${name}`);
             };
 
-            void this.handleBulkImport(setIcons, deleteCompendiums, getTextForFile)
+            void this.handleBulkImport(true, setIcons, deleteCompendiums, getTextForFile)
                 .then(() => {
-                    console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
+                    console.log(`Quick import time: ${(performance.now() - start).toFixed(2)} ms`);
                 });
         });
 
+        // --- Manual Import from ZIP file ---
         html.find('#advanceImportBtn').on('click', () => {
             const start = performance.now();
+            const setIcons = html.find('.setIcons').is(':checked');
+            const deleteCompendiums = html.find('.deleteCompendiums').is(':checked');
 
-            const setIcons = $('.setIcons').is(':checked');
-            const deleteCompendiums = $('.deleteCompendiums').is(':checked');
-
-            const getTextForFile = async (fileName: string) => {
-                const file = this.dataFiles.find(f => f.name === fileName);
-                if (!file) return null;
-                const text = await file.text();
-                return { text, name: file.name };
+            const getTextForFile = async (name: string) => {
+                return this.ZIP?.file(name)?.async('string');
             };
 
-            void this.handleBulkImport(setIcons, deleteCompendiums, getTextForFile)
+            void this.handleBulkImport(false, setIcons, deleteCompendiums, getTextForFile)
                 .then(() => {
-                    console.log(`Time used: ${(performance.now() - start).toFixed(2)} ms`);
+                    console.log(`Manual import time: ${(performance.now() - start).toFixed(2)} ms`);
                 });
         });
 
-        html.find("input[type='file'].langDataFileDrop").on('change', (event: JQuery.TriggeredEvent) => {
-            Array.from(event.target.files as File[]).forEach(file => {
-                if (this.isLangDataFile(file))
-                    this.langDataFile = file;
-            });
+        // --- ZIP File Input Handler ---
+        html.find('#zipFileInput').on('change', (event: JQuery.TriggeredEvent) => {
+            const input = event.target as HTMLInputElement;
+            this.zipFile = input.files?.[0] ?? null;
             this.render();
         });
 
-        html.find("input[type='file'].filedatadrop").on('change', (event: JQuery.TriggeredEvent) => {
-            Array.from(event.target.files as File[]).forEach(file => {
-                if (this.isDataFile(file)) {
-                    // Allow user to overwrite an already added file, they have their reasons.
-                    const existingIdx = this.dataFiles.findIndex((dataFile) => dataFile.name === file.name);
-                    if (existingIdx === -1)
-                        this.dataFiles.push(file);
-                    else
-                        this.dataFiles[existingIdx] = file;
-                }
-            });
-
-            if (this.dataFiles.length > 0)
-                this.disableImportButton = false;
-
-            this.render();
-        });
-
-        html.find('.setIcons').on('click', () => {
-            this.icons = !this.icons;
-        });
-
-        html.find('.deleteCompendiums').on('click', () => {
-            this.deleteCompendiums = !this.deleteCompendiums;
-        });
-
-        html.find('.toggleAdvancedBtn').on('click', () => {
-            this.showAdvanced = !this.showAdvanced;
-            this.render();
-        });
-
-        html.find('.deleteFileBtn').on('click', (event) => {
-            const name = event.currentTarget.getAttribute('data-name');
-            if (!name) return;
-
-            this.dataFiles = this.dataFiles.filter(file => file.name !== name);
-
-            this.render();
-        });
-
+        // --- Settings Modal Listeners ---
         html.find('.importOptionsBtn').on('click', () => {
             this.showImportOptions = true;
             this.render();
@@ -396,18 +287,20 @@ export class Import extends Application {
             this.showImportOptions = false;
             this.render();
         });
+        
+        html.find('.setIcons').on('click', (event: JQuery.TriggeredEvent) => {
+            this.icons = (event.currentTarget as HTMLInputElement).checked;
+        });
+
+        html.find('.deleteCompendiums').on('click', (event: JQuery.TriggeredEvent) => {
+            this.deleteCompendiums = (event.currentTarget as HTMLInputElement).checked;
+        });
 
         html.find('.bookOption').on('click', (event: JQuery.TriggeredEvent) => {
             const checkbox = event.currentTarget as HTMLInputElement;
             const bookCode = checkbox.dataset.book;
-            const isChecked = checkbox.checked;
-
             const book = this.shadowrunBooks.find(b => b.code === bookCode);
-            if (book) book.value = isChecked;
-        });
-
-        html.find('#languageSelect').on('change', (event: JQuery.TriggeredEvent) => {
-            this.selectedLanguage = (event.currentTarget as HTMLSelectElement).value;
+            if (book) book.value = checkbox.checked;
         });
 
         html.find('.bookSelectAllBtn').on('click', () => {
