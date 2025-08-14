@@ -1,6 +1,6 @@
-// @ts-expect-error
+// @ts-expect-error using the ArrayField and DataField namespaces
 import { ArrayField, DataField } from 'fvtt-types/src/foundry/common/data/fields';
-// @ts-expect-error
+// @ts-expect-error using the Document namespace
 import Document from 'fvtt-types/src/foundry/common/abstract/document';
 
 /**
