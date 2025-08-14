@@ -1,7 +1,6 @@
-// @ts-expect-error using the ArrayField and DataField namespaces
-import { ArrayField, DataField } from 'fvtt-types/src/foundry/common/data/fields';
-// @ts-expect-error using the Document namespace
-import Document from 'fvtt-types/src/foundry/common/abstract/document';
+import ArrayField = foundry.data.fields.ArrayField;
+import DataField = foundry.data.fields.DataField;
+import Document = foundry.abstract.Document;
 
 /**
  * Create an ArrayField that can be used with the Tagify system
