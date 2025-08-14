@@ -5,7 +5,7 @@ import { VehicleModParser } from '../parser/mod/VehicleModParser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class VehicleModImporter extends DataImporter {
-    public files = ['vehicles.xml'];
+    public readonly files = ['vehicles.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('mods') && jsonObject['mods'].hasOwnProperty('mod');

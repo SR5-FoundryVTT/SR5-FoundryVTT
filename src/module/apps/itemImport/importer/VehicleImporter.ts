@@ -4,7 +4,7 @@ import { VehicleParser } from '../parser/vehicle/VehicleParser';
 import { VehiclesSchema, Vehicle } from '../schema/VehiclesSchema';
 
 export class VehicleImporter extends DataImporter {
-    public files = ["vehicles.xml"];
+    public readonly files = ["vehicles.xml"] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('vehicles') && jsonObject['vehicles'].hasOwnProperty('vehicle');

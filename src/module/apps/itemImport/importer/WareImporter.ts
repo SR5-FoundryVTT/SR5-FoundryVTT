@@ -7,7 +7,7 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 type WareTypes = Bioware | Cyberware;
 
 export class WareImporter extends DataImporter {
-    public files = ['bioware.xml', 'cyberware.xml'];
+    public readonly files = ['bioware.xml', 'cyberware.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return (jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware')) ||

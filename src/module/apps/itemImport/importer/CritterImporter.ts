@@ -8,7 +8,7 @@ import { MetatypeSchema, Metatype } from "../schema/MetatypeSchema";
 
 
 export class CritterImporter extends DataImporter {
-    public files = ['critters.xml'];
+    public readonly files = ['critters.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('metatypes') && jsonObject['metatypes'].hasOwnProperty('metatype');

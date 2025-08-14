@@ -10,7 +10,7 @@ import { DetectionSpellParser } from '../parser/spell/DetectionSpellParser';
 import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser';
 
 export class SpellImporter extends DataImporter{
-    public files = ['spells.xml'];
+    public readonly files = ['spells.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('spells') && jsonObject['spells'].hasOwnProperty('spell');

@@ -5,7 +5,7 @@ import { ImportHelper as IH } from '../helper/ImportHelper';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class ArmorImporter extends DataImporter {
-    public files = ['armor.xml'];
+    public readonly files = ['armor.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('armors') && jsonObject['armors'].hasOwnProperty('armor');

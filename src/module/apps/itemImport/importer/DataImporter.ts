@@ -1,8 +1,9 @@
 import { Parser } from 'xml2js';
 import { SR5 } from "../../../config";
 import { ParseData } from "../parser/Parser";
-import { CompendiumKey, Constants } from './Constants';
+import { ChummerFile, CompendiumKey, Constants } from './Constants';
 import { ImportHelper as IH } from '../helper/ImportHelper';
+type AppendXml<T extends string> = `${T}.xml`;
 
 /**
  * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
@@ -11,7 +12,7 @@ import { ImportHelper as IH } from '../helper/ImportHelper';
  */
 export abstract class DataImporter {
     public static SR5 = SR5;
-    public abstract files: string[];
+    public readonly abstract files: readonly AppendXml<ChummerFile>[];
     public static iconList: string[];
     public static setIcons: boolean = true;
     public static supportedBooks: string[] = ['2050'];

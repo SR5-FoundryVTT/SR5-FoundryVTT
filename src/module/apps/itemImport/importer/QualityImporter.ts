@@ -5,7 +5,7 @@ import { QualitiesSchema, Quality } from "../schema/QualitiesSchema";
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class QualityImporter extends DataImporter {
-    public files = ['qualities.xml'];
+    public readonly files = ['qualities.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('qualities') && jsonObject['qualities'].hasOwnProperty('quality');

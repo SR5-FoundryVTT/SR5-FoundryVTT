@@ -4,7 +4,7 @@ import { ComplexFormParser } from '../parser/complex-form/ComplexFormParser';
 import { ComplexformsSchema, Complexform } from '../schema/ComplexformsSchema';
 
 export class ComplexFormImporter extends DataImporter {
-    public files = ['complexforms.xml'];
+    public readonly files = ['complexforms.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('complexforms') && jsonObject['complexforms'].hasOwnProperty('complexform');

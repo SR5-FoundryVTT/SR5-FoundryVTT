@@ -3,7 +3,7 @@ import { Power, PowersSchema } from '../schema/PowersSchema';
 import { AdeptPowerParser } from '../parser/powers/AdeptPowerParser';
 
 export class AdeptPowerImporter extends DataImporter {
-    public files = ['powers.xml'];
+    public readonly files = ['powers.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');

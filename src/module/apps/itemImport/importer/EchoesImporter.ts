@@ -4,7 +4,7 @@ import { EchoesSchema, Echo } from '../schema/EchoesSchema';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class EchoesImporter extends DataImporter {
-    public files = ['echoes.xml'];
+    public readonly files = ['echoes.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('echoes') && jsonObject['echoes'].hasOwnProperty('echo');

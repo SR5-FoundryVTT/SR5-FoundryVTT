@@ -7,7 +7,7 @@ import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
 import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
 
 export class CritterPowerImporter extends DataImporter {
-    public files = ['critterpowers.xml'];
+    public readonly files = ['critterpowers.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');

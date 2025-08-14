@@ -7,7 +7,7 @@ export type ChummerFile =
     'lifemodules' | 'lifestyles' | 'martialarts' | 'mentors' | 'metamagic' | 'metatypes' |
     'options' | 'packs' | 'paragons' | 'powers' | 'priorities' | 'programs' | 'qualities' | 'ranges' |
     'references' | 'settings' | 'sheets' | 'skills' | 'spells' | 'spiritpowers' | 'streams' |
-    'strings' | 'tips' | 'traditions' | 'vehicles' | 'vessels' | 'weapons';
+    'strings' | 'tips' | 'traditions' | 'vehicles' | 'vessels' | 'weapons' | '_selectedsetting';
 
 type CompendiumConfig = {
     pack: string;

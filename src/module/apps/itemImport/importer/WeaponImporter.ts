@@ -9,7 +9,7 @@ import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class WeaponImporter extends DataImporter {
-    public files = ['weapons.xml'];
+    public readonly files = ['weapons.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('weapons') && jsonObject['weapons'].hasOwnProperty('weapon');

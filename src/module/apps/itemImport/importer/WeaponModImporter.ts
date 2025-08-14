@@ -4,7 +4,7 @@ import { Accessory, WeaponsSchema } from '../schema/WeaponsSchema';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class WeaponModImporter extends DataImporter {
-    public files = ['weapons.xml'];
+    public readonly files = ['weapons.xml'] as const;
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('accessories') && jsonObject['accessories'].hasOwnProperty('accessory');
