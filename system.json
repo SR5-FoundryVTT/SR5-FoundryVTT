@@ -158,6 +158,18 @@
             "system": "shadowrun5e"
         },
         {
+            "name": "ic-actions",
+            "label": "SR5e IC Actions",
+            "path": "packs/ic-actions",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
+        },
+        {
             "name": "general-actions",
             "label": "SR5e General Actions",
             "path": "packs/general-actions",
