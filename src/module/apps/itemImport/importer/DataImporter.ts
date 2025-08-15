@@ -94,7 +94,7 @@ export abstract class DataImporter {
 
                 if (!this.overrideDocuments && compendium.index.has(id)) {
                     IH.setItem(key, data.name._TEXT, id);
-                    updateBar(data.name._TEXT, "skipped, already exists");
+                    updateBar(data.name._TEXT, "Skipped");
                     continue;
                 }
 
