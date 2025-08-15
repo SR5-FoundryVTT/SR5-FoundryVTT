@@ -27,7 +27,7 @@
       <input
         type="checkbox"
         id="setIcons"
-        {{#if isImporting}}disabled{{/if}}
+        {{#if isImporting}}disabled{{else}}{{#if importDone}}disabled{{/if}}{{/if}}
         {{#if icons}}checked{{/if}}
       />
       <span>Assign icons to items automatically</span>
@@ -36,7 +36,7 @@
       <input
         type="checkbox"
         id="deleteCompendiums"
-        {{#if isImporting}}disabled{{/if}}
+        {{#if isImporting}}disabled{{else}}{{#if importDone}}disabled{{/if}}{{/if}}
         {{#if deleteCompendiums}}checked{{/if}}
       />
       <span>Clear previously imported data before import</span>
@@ -45,7 +45,7 @@
       <input
         type="checkbox"
         id="overrideDocuments"
-        {{#if isImporting}}disabled{{/if}}
+        {{#if isImporting}}disabled{{else}}{{#if importDone}}disabled{{/if}}{{/if}}
         {{#if overrideDocuments}}checked{{/if}}
       />
       <span>Override previously imported documents in compendiums</span>
