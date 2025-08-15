@@ -18,6 +18,16 @@ export default class SR5CompendiaSettings extends foundry.appv1.api.FormApplicat
         });
     }
 
+    override async activateListeners(html) {
+        const input = html.find("select");
+        input.on('change', async (event) => {
+            const {value, id} = event.target;
+            if (id && value) {
+                await game.settings.set(SYSTEM_NAME, id, value);
+            }
+        })
+    }
+
     override async getData(options) {
         // Provide user with list of all compendium packs to be set for system packs.
         const generalActionsPackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) || SR5.packNames.generalActions;
@@ -48,20 +58,18 @@ export default class SR5CompendiaSettings extends foundry.appv1.api.FormApplicat
 
         const packs = {
             general: {
-                id: 'general',
+                id: FLAGS.GeneralActionsPack,
                 label: 'SETTINGS.GeneralActionsPackName',
                 value: generalActionsPackName,
                 choices: generalActionsPackChoices,
             },
             matrix: {
-                id: 'matrix',
+                id: FLAGS.MatrixActionsPack,
                 label: 'SETTINGS.MatrixActionsPackName',
                 value: matrixActionsPackName,
                 choices: matrixActionsPackChoices,
             },
         }
-
-        console.log('packs', packs);
 
         return {
             packs
@@ -69,9 +77,10 @@ export default class SR5CompendiaSettings extends foundry.appv1.api.FormApplicat
     }
 
     async _updateObject(event, formData) {
+        // TODO this doesn't seem to ever get called
         console.log('updateData', event, formData);
         // Directly store selection in settings.
-        await game.settings.set(SYSTEM_NAME, FLAGS.GeneralActionsPack, formData.general);
-        await game.settings.set(SYSTEM_NAME, FLAGS.MatrixActionsPack, formData.matrix);
+        // await game.settings.set(SYSTEM_NAME, FLAGS.GeneralActionsPack, formData.general);
+        // await game.settings.set(SYSTEM_NAME, FLAGS.MatrixActionsPack, formData.matrix);
     }
 }
