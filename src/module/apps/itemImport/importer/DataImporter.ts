@@ -111,7 +111,7 @@ export abstract class DataImporter {
                 itemMap.get(key)!.push(item);
             } catch (error) {
                 console.error(error);
-                updateBar(data?.name?._TEXT || "Unknown", "failed to parse");
+                updateBar(data?.name?._TEXT || "Unknown", "Failed");
                 ui.notifications?.error(`Failed parsing ${documentType}: ${data?.name?._TEXT ?? "Unknown"}`);
             }
         };
