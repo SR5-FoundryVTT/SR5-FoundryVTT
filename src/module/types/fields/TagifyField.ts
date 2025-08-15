@@ -8,7 +8,7 @@ import Document = foundry.abstract.Document;
  * TODO figure out how to enforce the type? maybe just default to it? That seems smarter now that i write this todo...
  * - TODO these types were copy-pasted verbatim from ArrayFields just to make things work, it should be cleaned up
  */
-export class TagifyArrayField<
+export class TagifyField<
     const ElementFieldType extends DataField.Any | Document.AnyConstructor,
     const Options extends ArrayField.AnyOptions = ArrayField.DefaultOptions,
     const AssignmentElementType = ArrayField.AssignmentElementType<ElementFieldType>,

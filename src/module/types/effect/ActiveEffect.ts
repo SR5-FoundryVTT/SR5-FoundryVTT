@@ -1,4 +1,4 @@
-import { TagifyArrayField } from '@/module/types/fields/TagifyArrayField';
+import { TagifyField } from '@/module/types/fields/TagifyField';
 
 const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
@@ -14,31 +14,31 @@ const ActiveEffectData = {
     onlyForWireless: new BooleanField(),
     onlyForItemTest: new BooleanField(),
 
-    selection_attributes: new TagifyArrayField(
+    selection_attributes: new TagifyField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_categories: new TagifyArrayField(
+    selection_categories: new TagifyField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_limits: new TagifyArrayField(
+    selection_limits: new TagifyField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_skills: new TagifyArrayField(
+    selection_skills: new TagifyField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
         })
     ),
-    selection_tests: new TagifyArrayField(
+    selection_tests: new TagifyField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),

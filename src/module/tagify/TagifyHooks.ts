@@ -15,7 +15,10 @@ export const TagifyHooks = {
 
                 // create the tagify element, capture any changes to update the currentTarget's value
                 createTagifyOnInput(element, options, maxItems, values, (event) => {
-                    event.currentTarget.setAttribute('value', event.currentTarget.tagifyValue);
+                    if (event.currentTarget) {
+                        const target = event.currentTarget as HTMLInputElement & { tagifyValue: string };
+                        target.setAttribute('value', target.tagifyValue);
+                    }
                 });
             }
         })

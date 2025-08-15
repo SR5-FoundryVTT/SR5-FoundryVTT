@@ -3,11 +3,22 @@ import { PackSelectionConfig } from '@/module/settings/CompendiaSettingFlow';
 
 const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
 
+type ButtonType = {
+    type: string;
+    label: string;
+    icon: string;
+}
+
+export type CompendiaSettingsSheetData = {
+    packs: PackSelectionConfig[];
+    buttons: ButtonType[];
+}
+
 /**
  * Render a list of selects for different use case compendia, allowing users to select which compendia they want to use
  * for each use case.
  */
-export default abstract class AbstractCompendiaSettings extends HandlebarsApplicationMixin(ApplicationV2<any>) {
+export default abstract class AbstractCompendiaSettings extends HandlebarsApplicationMixin(ApplicationV2<CompendiaSettingsSheetData>) {
     static override DEFAULT_OPTIONS = {
         id: 'sr5-compendia-settings',
         tag: 'form',
@@ -64,7 +75,6 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
      * @param event
      * @param form
      * @param formData
-     * @private
      */
     static async #onSubmit(this: AbstractCompendiaSettings, event, form, formData) {
         const validIds = Object.values(this.getPacks()).map(({ id }) => id);

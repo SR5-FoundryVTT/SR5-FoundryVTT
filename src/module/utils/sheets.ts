@@ -62,7 +62,7 @@ interface TagifyTag {
 
 export type TagifyValues = TagifyValue[]
 export type TagifyTags = TagifyTag[]
-export type OnEventCallback = (event: Event & any) => void
+export type OnEventCallback = (event: Event) => void
 
 /**
  * Create a tagify from a given input element.

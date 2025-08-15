@@ -57,7 +57,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * Do any final preparations when rendering the sheet
      * @param context
      * @param options
-     * @protected
      */
     protected override async _renderHTML(context, options) {
         context.systemFields = this.document.system.schema.fields;
