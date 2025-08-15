@@ -15,7 +15,7 @@ import { _combatantGetInitiativeFormula, SR5Combat } from './combat/SR5Combat';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
-import { Import } from './apps/itemImport/apps/import-form';
+import { Importer } from './apps/itemImport/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
@@ -553,7 +553,7 @@ ___________________
         $(html).find('.directory-footer').append(button);
 
         button.on('click', (event) => {
-            new Import().render(true);
+            new Importer().render(true);
         });
     }
 

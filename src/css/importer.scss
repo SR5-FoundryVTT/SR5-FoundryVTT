@@ -1,0 +1,318 @@
+@import 'config';
+// ===================================
+// 🔐 CHUMMER IMPORT MODAL - SCOPED
+// Prevents CSS leakage into Foundry UI
+// ===================================
+
+.chummer-import-modal {
+  // 🔽 Local variables
+  $primary: #5d7f9c;
+  $warning: #e67e22;
+  $text: #ddd;
+  $text-muted: #aaa;
+  $bg: #1a1a1a;
+  $border: #333;
+  $hover: darken($primary, 10%);
+  $warning-bg: rgba($warning, 0.15);
+
+  // 🔽 Reset & Base
+  font-family: "Signika", sans-serif;
+  font-size: 14px;
+  color: $text;
+  line-height: 1.6;
+  border-radius: 6px;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  strong {
+    color: lighten($primary, 6%);
+  }
+
+  a {
+    color: $primary;
+    text-decoration: underline;
+
+    &:hover,
+    &:focus {
+      color: $hover;
+    }
+  }
+
+  // ⚠️ Warning Block
+  .import-warning {
+    background: $warning-bg;
+    border-left: 4px solid $warning;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    border-radius: 2px;
+    font-size: 0.95rem;
+
+    span[aria-hidden="true"] {
+      font-size: 1.4em;
+      color: $warning;
+      flex-shrink: 0;
+    }
+
+    u {
+      color: #f5d6a8;
+      text-decoration-color: $warning;
+    }
+  }
+
+  // 🔽 Import size note
+  .import-size {
+    font-size: 0.9rem;
+    color: $text-muted;
+    margin-top: 0.5rem;
+  }
+
+  // 🔽 Import Settings
+  .import-settings {
+    margin: 1.5rem 0;
+    padding: 1.1rem;
+    border: 1px solid $border;
+    border-radius: 6px;
+    background: lighten($bg, 2%);
+
+    legend {
+      font-weight: 600;
+      color: $primary;
+      font-size: 1.1rem;
+      padding: 0 0.5rem;
+    }
+
+    // ✅ Only style labels *inside* this component
+    .import-setting {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      cursor: pointer;
+
+      // ✅ Only style checkbox inputs inside .import-setting
+      input[type="checkbox"] {
+        margin: 0;
+        transform: scale(1.2);
+        // Reset any global checkbox styles
+        appearance: none;
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        border: 2px solid $border;
+        border-radius: 3px;
+        background: darken($bg, 5%);
+        position: relative;
+
+        &:checked {
+          background: $primary;
+          border-color: $primary;
+          &::after {
+            content: "✓";
+            position: absolute;
+            color: white;
+            font-size: 10px;
+            top: 50%;
+            left: 100%;
+            transform: translate(-50%, -50%);
+          }
+        }
+      }
+
+      span {
+        color: $text;
+      }
+
+      &:hover {
+        color: lighten($primary, 10%);
+      }
+    }
+  }
+
+  // 🔽 File Input & Button
+  .import-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+
+    // 📁 File Input Wrapper
+    .file-input-wrapper {
+      position: relative;
+      height: 48px;
+
+      input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        z-index: 2;
+        cursor: pointer;
+      }
+
+      .file-input-label {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 1rem;
+        background: rgba($primary, 0.1);
+        border: 1px dashed $border;
+        border-radius: 6px;
+        color: $text-muted;
+        font-size: 0.95rem;
+        text-align: center;
+        transition: all 0.2s ease;
+        z-index: 1;
+        cursor: pointer;
+
+        i {
+          margin-right: 0.5rem;
+          color: $primary;
+        }
+
+        strong {
+          color: $text;
+          font-weight: 600;
+        }
+
+        &:hover {
+          border-color: $primary;
+          background: rgba($primary, 0.15);
+          color: $text;
+        }
+      }
+    }
+
+    // ✅ Button: only style within this component
+    .import-button {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: $primary;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+
+      &:hover:not(:disabled) {
+        background: $hover;
+        transform: translateY(-1px);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      &[aria-busy="true"] {
+        pointer-events: none;
+
+        .spinner {
+          display: inline-block;
+          width: 1em;
+          height: 1em;
+          border: 2px solid #fff;
+          border-top-color: transparent;
+          border-radius: 50%;
+          animation: chummer-spin 1s linear infinite;
+        }
+      }
+
+      i {
+        font-size: 1.1em;
+      }
+    }
+  }
+
+  // 🔁 Scoped Animation (avoid global name conflict)
+  @keyframes chummer-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // 🛡️ Optional: Reset any inherited fieldset or button styles
+  // (helps if parent dialog applies global styles)
+  fieldset,
+  button,
+  input,
+  label {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: inherit;
+  }
+
+  .import-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .import-progress-bar {
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .import-progress-fill {
+    height: 100%;
+    background: #4caf50;
+    width: 0;
+    transition: width 0.3s ease;
+  }
+
+  .import-progress-text {
+    font-size: 0.9em;
+    text-align: center;
+  }
+
+  .import-done-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .import-done-text {
+    color: #4caf50;
+    font-weight: bold;
+  }
+
+  .reset-button {
+    padding: 8px 16px;
+    background: #007acc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+
+  .reset-button:hover {
+    background: #005a99;
+  }
+
+  .import-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
