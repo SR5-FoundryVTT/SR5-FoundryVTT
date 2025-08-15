@@ -1,34 +1,43 @@
 import { SR5 } from "../config";
 import { FLAGS, SYSTEM_NAME } from "../constants";
 
+const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
+
 /**
  * Render a list of selects for different use case compendia, allowing users to select which compendia they want to use
  * for each use case.
  */
-export default class SR5CompendiaSettings extends foundry.appv1.api.FormApplication {
-    static override get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            id: 'sr5-compendia-settings',
-            title: game.i18n.localize('SR5.CompendiaSettings.Title'),
-            template: `systems/shadowrun5e/dist/templates/apps/settings/compendia-settings.hbs`,
-            classes: ['form'],
+export default class SR5CompendiaSettings extends HandlebarsApplicationMixin(ApplicationV2<any>) {
+    static override DEFAULT_OPTIONS = {
+        id: 'sr5-compendia-settings',
+        tag: 'form',
+        position: {
             width: 400,
-            height: 'auto',
-            closeOnSubmit: true,
-        });
+            height: 'auto' as const,
+        },
+        window: {
+            contentClasses: ['standard-form'],
+            title: 'SR5.CompendiaSettings.Title',
+        },
+        form: {
+            handler: SR5CompendiaSettings.#onSubmit,
+            submitOnChange: true,
+            closeOnSubmit: false,
+        }
     }
 
-    override async activateListeners(html) {
-        const input = html.find("select");
-        input.on('change', async (event) => {
-            const {value, id} = event.target;
-            if (id && value) {
-                await game.settings.set(SYSTEM_NAME, id, value);
-            }
-        })
+    override get title() {
+        return game.i18n.localize('SR5.CompendiaSettings.Title');
     }
 
-    override async getData(options) {
+    static override PARTS = {
+        form: {
+            template: `systems/shadowrun5e/dist/templates/apps/settings/compendia-settings.hbs`,
+        }
+    }
+
+    override async _prepareContext(options) {
+        const context = await super._prepareContext(options);
         // Provide user with list of all compendium packs to be set for system packs.
         const generalActionsPackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) || SR5.packNames.generalActions;
         const matrixActionsPackName = game.settings.get(SYSTEM_NAME, FLAGS.MatrixActionsPack) || SR5.packNames.matrixActions;
@@ -56,31 +65,37 @@ export default class SR5CompendiaSettings extends foundry.appv1.api.FormApplicat
             matrixActionsPackChoices[pack.metadata.name] = pack.metadata.label;
         }
 
-        const packs = {
+        context.packs = {
             general: {
                 id: FLAGS.GeneralActionsPack,
-                label: 'SETTINGS.GeneralActionsPackName',
+                field: {
+                    label: 'SR5.CompendiaSettings.GeneralActions.label',
+                    hint: 'SR5.CompendiaSettings.GeneralActions.hint',
+                },
                 value: generalActionsPackName,
                 choices: generalActionsPackChoices,
             },
             matrix: {
                 id: FLAGS.MatrixActionsPack,
-                label: 'SETTINGS.MatrixActionsPackName',
+                field: {
+                    label: 'SR5.CompendiaSettings.MatrixActions.label',
+                    hint: 'SR5.CompendiaSettings.MatrixActions.hint',
+                },
                 value: matrixActionsPackName,
                 choices: matrixActionsPackChoices,
             },
         }
 
-        return {
-            packs
-        };
+        return context;
     }
 
-    async _updateObject(event, formData) {
-        // TODO this doesn't seem to ever get called
-        console.log('updateData', event, formData);
-        // Directly store selection in settings.
-        // await game.settings.set(SYSTEM_NAME, FLAGS.GeneralActionsPack, formData.general);
-        // await game.settings.set(SYSTEM_NAME, FLAGS.MatrixActionsPack, formData.matrix);
+    static async #onSubmit(this: SR5CompendiaSettings, event, form, formData) {
+        console.log('params', this, event, form, formData);
+        const expanded = foundry.utils.expandObject(formData.object);
+        console.log('expanded', expanded);
+        // TODO read in id and value to update flags
+        for (const [id, value] of Object.entries(expanded)) {
+            await game.settings.set(SYSTEM_NAME, id as any, value);
+        }
     }
 }
