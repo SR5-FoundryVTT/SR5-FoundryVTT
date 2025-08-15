@@ -1,8 +1,8 @@
 {{#each packs as |entry|}}
     <div class="form-group">
-        <label for="{{@root.rootId}}-{{entry.id}}">{{localize entry.label}}</label>
+        <label for="{{entry.id}}">{{localize entry.label}}</label>
         <div class="form-fields">
-            <select id="{{@root.rootId}}-{{entry.id}}" name="{{entry.name}}">
+            <select id="{{entry.id}}" class="compendium-select">
                 {{selectOptions entry.choices selected=entry.value localize=true sort=true}}
             </select>
         </div>
