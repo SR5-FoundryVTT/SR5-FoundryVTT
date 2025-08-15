@@ -280,7 +280,15 @@
         "CompendiaSettings": {
             "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
             "Label": "Compendium Packs",
-            "Title": "System compendiums"
+            "Title": "System compendiums",
+            "GeneralActions": {
+                "label": "General Actions",
+                "hint": "Longer General Actions Description"
+            },
+            "MatrixActions": {
+                "label": "Matrix Actions",
+                "hint": "Longer Matrix Actions Description"
+            }
         },
         "Compendiums": {
             "sr5critter": "Critters & Spirits & Sprites",
