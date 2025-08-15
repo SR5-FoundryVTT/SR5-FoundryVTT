@@ -11,7 +11,7 @@ export default class SR5CompendiaSettings extends foundry.appv1.api.FormApplicat
             id: 'sr5-compendia-settings',
             title: game.i18n.localize('SR5.CompendiaSettings.Title'),
             template: `systems/shadowrun5e/dist/templates/apps/settings/compendia-settings.hbs`,
-            classes: [],
+            classes: ['form'],
             width: 400,
             height: 'auto',
             closeOnSubmit: true,
@@ -20,14 +20,14 @@ export default class SR5CompendiaSettings extends foundry.appv1.api.FormApplicat
 
     override async getData(options) {
         // Provide user with list of all compendium packs to be set for system packs.
-        const generalActionsPackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack);
-        const matrixActionsPackName = game.settings.get(SYSTEM_NAME, FLAGS.MatrixActionsPack);
+        const generalActionsPackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) || SR5.packNames.generalActions;
+        const matrixActionsPackName = game.settings.get(SYSTEM_NAME, FLAGS.MatrixActionsPack) || SR5.packNames.matrixActions;
         const generalActionPack = game.packs.find(p => p.metadata.name === SR5.packNames.generalActions);
         const matrixActionPack = game.packs.find(p => p.metadata.name === SR5.packNames.matrixActions);
 
         if (!generalActionPack || !matrixActionPack) {
             console.error(`SR5CompendiaSettings: Could not find all systsem default compendium packs. Please reinstall the system.`);
-            return;
+            return {};
         }
         
         // Collect packs for the system.
@@ -46,17 +46,32 @@ export default class SR5CompendiaSettings extends foundry.appv1.api.FormApplicat
             matrixActionsPackChoices[pack.metadata.name] = pack.metadata.label;
         }
 
+        const packs = {
+            general: {
+                id: 'general',
+                label: 'SETTINGS.GeneralActionsPackName',
+                value: generalActionsPackName,
+                choices: generalActionsPackChoices,
+            },
+            matrix: {
+                id: 'matrix',
+                label: 'SETTINGS.MatrixActionsPackName',
+                value: matrixActionsPackName,
+                choices: matrixActionsPackChoices,
+            },
+        }
+
+        console.log('packs', packs);
+
         return {
-            generalActionsPackName,
-            matrixActionsPackName,
-            generalActionsPackChoices,
-            matrixActionsPackChoices
+            packs
         };
     }
 
     async _updateObject(event, formData) {
+        console.log('updateData', event, formData);
         // Directly store selection in settings.
-        await game.settings.set(SYSTEM_NAME, FLAGS.GeneralActionsPack, formData.generalActionsPack);
-        await game.settings.set(SYSTEM_NAME, FLAGS.MatrixActionsPack, formData.matrixActionsPack);
+        await game.settings.set(SYSTEM_NAME, FLAGS.GeneralActionsPack, formData.general);
+        await game.settings.set(SYSTEM_NAME, FLAGS.MatrixActionsPack, formData.matrix);
     }
 }
