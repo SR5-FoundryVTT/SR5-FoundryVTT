@@ -73,6 +73,7 @@ export abstract class DataImporter {
         const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
         const dataInput = filter ? inputs.filter(filter) : inputs;
 
+        let counter = 0;
         let current = 0;
         const total = dataInput.length;
         const progressBar = ui.notifications.info(`Importing ${documentType}`, { progress: true });
@@ -81,7 +82,7 @@ export abstract class DataImporter {
             current += 1;
             progressBar.update({
                 pct: current / total,
-                message: `${documentType}: ${name} — ${message} (${current}/${total})`,
+                message: `${documentType} (${current}/${total}) ${message}: ${name}`,
             });
         }
 
@@ -99,11 +100,12 @@ export abstract class DataImporter {
 
                 const item = await parser.Parse(data, key);                
                 injectActionTests?.(item as Item.CreateData);
-                
+
                 item._id = id;
                 IH.setItem(key, data.name._TEXT, id);
 
                 updateBar(data.name._TEXT, "Parsed");
+                counter++;
 
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
@@ -115,7 +117,7 @@ export abstract class DataImporter {
         };
 
         progressBar.remove();
-        const notification = ui.notifications?.info(`${documentType}: creating documents`, { permanent: true });
+        const notification = ui.notifications?.info(`${documentType}: Creating ${counter} documents`, { permanent: true });
 
         for (const [key, items] of itemMap.entries()) {
             const compendium = Constants.MAP_COMPENDIUM_KEY[key];
@@ -123,6 +125,6 @@ export abstract class DataImporter {
         }
 
         notification.remove();
-        ui.notifications?.info(`${documentType}: documents created`);
+        ui.notifications?.info(`${documentType}: ${counter} documents created`);
     }
 }
