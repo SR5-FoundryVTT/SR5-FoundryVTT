@@ -65,6 +65,11 @@ export const DamageData = () => ({
         }),
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
+    biofeedback: new StringField({
+        required: false,
+        choices: ["physical", "stun", "none"],
+        initial: 'none',
+    }),
     attribute: new StringField({ required: true }),
     source: new SchemaField({
         actorId: new StringField({ required: true }),
@@ -164,6 +169,6 @@ export class Action extends ItemBase<ReturnType<typeof ActionData>> {
     static override defineSchema() {
         return ActionData();
     }
-};
+}
 
 console.log("ActionData", ActionData(), new Action());

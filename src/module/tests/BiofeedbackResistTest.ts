@@ -43,6 +43,11 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
      * Get the damage type for biofeedback based on if the target is using hotsim or coldsim
      */
     _getBiofeedbackDamageType(): DamageTypeType {
+        const incomingDamageType = this.data.modifiedDamage.biofeedback;
+        // if the biofeedback attack only does stun, then just return stun
+        if (incomingDamageType === 'stun') {
+            return 'stun';
+        }
         const actor = this.actor ?? this.persona ?? this.device?.actorOwner ?? this.device?.actor;
         if (!actor) return 'stun'
         return actor.isUsingHotSim ? 'physical': 'stun';
