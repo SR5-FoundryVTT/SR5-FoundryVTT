@@ -1145,7 +1145,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options 
      */
     async generalActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return this.packActionTest(SR5.packNames.generalActions as Shadowrun.PackName, actionName, options);
+        return this.packActionTest(SR5.packNames.GeneralActionsPack as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1155,7 +1155,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async matrixActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return this.packActionTest(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
+        return this.packActionTest(SR5.packNames.MatrixActionsPack as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1176,7 +1176,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async rollMatrixAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return this.rollPackAction(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
+        return this.rollPackAction(SR5.packNames.MatrixActionsPack as Shadowrun.PackName, actionName, options);
     }
 
     /**
