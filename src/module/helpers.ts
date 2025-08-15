@@ -961,7 +961,7 @@ export class Helpers {
      */
     static getGeneralActionsPackName(): Shadowrun.PackName {
         const overrideGeneralpackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) as Shadowrun.PackName;
-        return overrideGeneralpackName || SR5.packNames.generalActions as Shadowrun.PackName;
+        return overrideGeneralpackName || SR5.packNames.GeneralActionsPack as Shadowrun.PackName;
     }
 
     /**
@@ -969,7 +969,7 @@ export class Helpers {
      */
     static getMatrixActionsPackName(): Shadowrun.PackName {
         const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.MatrixActionsPack) as Shadowrun.PackName;
-        return overrideMatrixPackName || SR5.packNames.matrixActions as Shadowrun.PackName;
+        return overrideMatrixPackName || SR5.packNames.MatrixActionsPack as Shadowrun.PackName;
     }
 
     /**
