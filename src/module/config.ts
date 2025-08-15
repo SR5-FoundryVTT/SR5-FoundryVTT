@@ -106,6 +106,12 @@ export const SR5 = {
         matrix: 'SR5.DmgTypeMatrix'
     },
 
+    biofeedbackOptions: {
+        physical: 'SR5.DmgTypePhysical',
+        stun: 'SR5.DmgTypeStun',
+        none: 'SR5.None'
+    },
+
     weaponRangeCategories: {
         manual: {
             label: 'SR5.Weapon.Range.Category.Manual',
