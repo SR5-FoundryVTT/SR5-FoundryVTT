@@ -28,7 +28,7 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
     }
 
     /**
-     * Return an object filled with the pack options to use for each compendium
+     * Return an array filled with the pack options to use for each compendium
      */
     abstract getPacks(): PackSelectionConfig[];
 
@@ -45,6 +45,10 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
         }
     }
 
+    /**
+     * Prepare the Context Data for the compendia settings sheet
+     * @param options
+     */
     override async _prepareContext(options) {
         const context = await super._prepareContext(options);
         context.packs = this.getPacks();
@@ -55,10 +59,19 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
         return context;
     }
 
+    /**
+     * Handle submission of data for compendia settings
+     * @param event
+     * @param form
+     * @param formData
+     * @private
+     */
     static async #onSubmit(this: AbstractCompendiaSettings, event, form, formData) {
         const validIds = Object.values(this.getPacks()).map(({ id }) => id);
         // process the formData, update the flags
         const expanded = foundry.utils.expandObject(formData.object);
+        // id is expected to be the "name" of the field
+        // value is expected to be the selected value
         for (const [id, value] of Object.entries(expanded)) {
             if (validIds.includes(id as any)) {
                 await game.settings.set(SYSTEM_NAME, id as any, value);
