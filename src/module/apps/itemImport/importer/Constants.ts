@@ -9,6 +9,8 @@ export type ChummerFile =
     'references' | 'settings' | 'sheets' | 'skills' | 'spells' | 'spiritpowers' | 'streams' |
     'strings' | 'tips' | 'traditions' | 'vehicles' | 'vessels' | 'weapons' | '_selectedsetting';
 
+export type ChummerFileXML = `${ChummerFile}.xml`;
+
 type CompendiumConfig = {
     pack: string;
     type: 'Actor' | 'Item';

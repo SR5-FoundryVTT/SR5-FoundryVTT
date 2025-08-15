@@ -6,13 +6,8 @@ import { SpriteParser } from '../parser/metatype/SpriteParser';
 import { CritterParser } from '../parser/metatype/CritterParser';
 import { MetatypeSchema, Metatype } from "../schema/MetatypeSchema";
 
-
 export class CritterImporter extends DataImporter {
     public readonly files = ['critters.xml'] as const;
-
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('metatypes') && jsonObject['metatypes'].hasOwnProperty('metatype');
-    }
 
     protected static parserWrap = class {
         public static isSpirit(jsonData: Metatype): boolean {

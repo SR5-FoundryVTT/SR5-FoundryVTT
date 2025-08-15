@@ -6,10 +6,6 @@ import { VehiclesSchema, Vehicle } from '../schema/VehiclesSchema';
 export class VehicleImporter extends DataImporter {
     public readonly files = ["vehicles.xml"] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('vehicles') && jsonObject['vehicles'].hasOwnProperty('vehicle');
-    }
-
     async Parse(jsonObject: VehiclesSchema): Promise<void> {
         IH.setTranslatedCategory('vehicles', jsonObject.categories.category);
 

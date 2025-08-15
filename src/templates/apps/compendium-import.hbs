@@ -1,229 +1,409 @@
-<form class="chummer-import" autocomplete="off" onsubmit="event.preventDefault()">
-    <header class="header-row">
+<form class="chummer-import" autocomplete="off" novalidate>
+    <header class="form-header">
         <h1>Chummer Data Import</h1>
-        <button
-            type="button"
-            class="importOptionsBtn {{#if isImporting}}disabled{{/if}}"
-            {{#if isImporting}}disabled{{/if}}
-            title="Import Settings"
-        >⚙️</button>
     </header>
 
-    <section class="import-container">
+    <section class="form-content">
         <p>
-            You can import Chummer5a XML data in two ways:
-        </p>
-        <ul>
-            <li><b>Quick Import</b> — Downloads the latest fully supported data directly from the official repository (approx. <b>7 MB</b>).</li>
-            <li><b>Import from ZIP</b> — Use a <code>.zip</code> of your local Chummer5a <code>data</code> folder (custom or different versions).</li>
-        </ul>
-        <p>
-            Includes all core game data: weapons, armor, vehicles, spells, critters, gear, and more.
-            Only the latest supported version is guaranteed to work without issues.
+            Import data from Chummer5a using the <strong>Data Exporter</strong> format.<br/>
+            Upload your own package for full content (including translations and custom data),
+            or let us download the latest supported version
+            (<strong><a href="{{info.versionLink}}" target="_blank" rel="noopener noreferrer">{{info.version}}</a></strong>) automatically.
         </p>
 
-        <div class="import-grid">
-            <div class="cell empty"></div>
-            <div class="cell">
-                <!-- ZIP File Selector -->
-                <div class="file-input-wrapper">
-                    <input type="file" id="zipFileInput" class="filedatadrop" accept=".zip,application/zip" style="display: none;" />
-                    <label for="zipFileInput" class="file-input-label">
-                        {{#if zipFileName}}
-                            <span>Selected: <b>{{zipFileName}}</b></span>
-                        {{else}}
-                            <span>Click to Select .zip File</span>
-                        {{/if}}
-                    </label>
-                </div>
+        <div class="status-warning">
+            <span aria-hidden="true">⚠</span>
+            Only Chummer5a <strong>{{info.version}}</strong> is fully supported.<br>
+            Using a different version may result in <u>missing</u> or <u>incomplete</u> data.
+        </div>
+
+        <p class="info-text">
+            Auto-download size: <strong>7&nbsp;MB</strong> (English only, standard data).
+        </p>
+        <!-- Import Settings -->
+        <fieldset class="import-settings" aria-label="Import Options">
+            <legend class="visually-hidden">Import Settings</legend>
+            <label class="checkbox-label">
+                <input type="checkbox" id="setIcons" {{#if icons}}checked{{/if}} />
+                <span>Assign icons to items automatically</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="deleteCompendiums" {{#if deleteCompendiums}}checked{{/if}} />
+                <span>Clear previously imported data before import</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="overrideDocuments" {{#if overrideDocuments}}checked{{/if}} />
+                <span>Override previously imported documents in compendiums</span>
+            </label>
+        </fieldset>
+
+        <!-- File Input & Action Button -->
+        <div class="import-actions">
+            <div class="file-input-wrapper">
+                <input
+                    type="file"
+                    id="zipFileInput"
+                    accept=".zip,application/zip"
+                    aria-label="Select a Chummer data export .zip file"
+                />
+                <label for="zipFileInput" class="file-input-label" id="fileInputLabel">
+                    {{#if zipFileName}}
+                        <span>📁 <strong>{{zipFileName}}</strong></span>
+                    {{else}}
+                        <span> Optional: Select a .zip Package</span>
+                    {{/if}}
+                </label>
             </div>
-            <div class="cell">
-                <button
-                    name="quick-import"
-                    type="submit"
-                    id="quickImportBtn"
-                    class="{{#if isImporting}}disabled{{/if}}"
-                    {{#if isImporting}}disabled{{/if}}
-                >
-                    ⬇️ Quick Import
-                </button>
-            </div>
-            <div class="cell">
-                <button
-                    name="import"
-                    type="submit"
-                    id="advanceImportBtn"
-                    class="{{#unless zipFileName}}disabled{{/unless}} {{#if isImporting}}disabled{{/if}}"
-                    {{#unless zipFileName}}disabled{{/unless}} {{#if isImporting}}disabled{{/if}}
-                >
-                    📂 Import from ZIP
-                </button>
-            </div>
+
+            <button
+                type="button"
+                id="importBtn"
+                class="import-button {{#if isImporting}}loading{{/if}}"
+                {{#if isImporting}}aria-busy{{/if}}
+                {{#if isImporting}}disabled{{/if}}
+            >
+                {{#if isImporting}}
+                    <span class="spinner"></span> Processing...
+                {{else}}
+                    {{#if zipFileName}}
+                        📂 Import from File
+                    {{else}}
+                        ⬇️ Download & Import
+                    {{/if}}
+                {{/if}}
+            </button>
         </div>
     </section>
 </form>
 
-<div class="import-options-modal {{#if showImportOptions}}show{{else}}hidden{{/if}}">
-    <div class="import-options-content">
-        <header class="modal-header">
-            <h2>Import Settings</h2>
-        </header>
-
-        <div class="modal-body">
-            <h3>General Options</h3>
-            <div class="other-settings-grid">
-                <label>
-                    <input type="checkbox" class="setIcons" {{#if icons}}checked{{/if}} />
-                    Enable automatic icon assignment for items.
-                </label>
-                <label>
-                    <input type="checkbox" class="deleteCompendiums" {{#if deleteCompendiums}}checked{{/if}} />
-                    Clear all previously imported data first.
-                </label>
-            </div>
-            <h3>Source Books to Import</h3>
-            <div class="book-options-actions">
-                <button type="button" class="bookSelectAllBtn">Select All</button>
-                <button type="button" class="bookUnselectAllBtn">Unselect All</button>
-                <button type="button" class="bookDefaultsBtn">Restore Defaults</button>
-            </div>
-            <div class="book-checkbox-grid">
-                {{#each shadowrunBooks}}
-                    <label>
-                        <input type="checkbox" class="bookOption" data-book="{{this.code}}" {{#if this.value}}checked{{/if}} />
-                        {{this.name}}
-                    </label>
-                {{/each}}
-            </div>
-        </div>
-
-        <footer class="modal-footer">
-            <button type="button" class="closeOptionsBtn">Save & Close</button>
-        </footer>
-    </div>
-</div>
-
 <style>
-    /* --- Main Form & Layout --- */
-    .chummer-import { font-family: sans-serif; }
-    .chummer-import .header-row {
+    /* === Base Reset & Typography === */
+    .chummer-import {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: var(--color-text, #333);
+        line-height: 1.5;
+    }
+
+    .chummer-import * {
+        box-sizing: border-box;
+    }
+
+    /* === Header === */
+    .form-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 2px solid var(--color-underline-header);
+        border-bottom: 2px solid var(--color-underline-header, #0066cc);
         padding-bottom: 0.25em;
+        margin-bottom: 1em;
     }
-    .chummer-import h1 { margin: 0; border-bottom: 0; }
-    /* MODIFIED: Reduced gear icon font size and adjusted padding for better proportions */
-    .chummer-import .importOptionsBtn {
-        width: 1.5em;
-        height: 1.5em;
-        font-size: 1.5em;
+
+    .form-header h1 {
         margin: 0;
-        padding: 0;
-        border: none;
-        background: white;
-        cursor: pointer;
-        line-height: 1;
+        font-size: 1.5em;
+        font-weight: 600;
+        color: var(--color-heading, #222);
+        border-bottom: none;
     }
-    .chummer-import .import-container {
-        flex-direction: column; 
-        display: flex;
-        padding: 0.5em 1em;
-    }
-    .chummer-import .import-panel {
-        flex: 1;
-        padding: 1em;
-        border: 1px solid var(--color-border-light-tertiary, #ccc);
-        border-radius: 8px;
+
+    /* === Content Layout === */
+    .form-content {
         display: flex;
         flex-direction: column;
-    }
-    .chummer-import .import-panel p { flex-grow: 1; margin: 0.5em 0 1em 0; }
-    .chummer-import code { background-color: #e0e0e0; padding: 0.1em 0.4em; border-radius: 4px; }
-
-    .import-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5em;
+        gap: 1em;
+        padding: 0 0.5em;
     }
 
-    .import-grid .cell {
+    .form-content p {
+        margin: 0;
+        font-size: 0.95em;
+    }
+
+    .info-text {
+        font-size: 0.9em;
+        color: var(--color-text-secondary, #666);
+    }
+
+    /* === Warning Banner === */
+    .status-warning {
+        padding: 0.75em 1em;
+        background-color: var(--color-warning-bg, #fff4e5);
+        border: 1px solid var(--color-warning-border, #ffd99d);
+        border-radius: 8px;
+        color: var(--color-warning-text, #b94a00);
+        font-size: 0.9em;
+        line-height: 1.4;
+    }
+
+    .status-warning span[aria-hidden="true"] {
+        margin-right: 0.3em;
+        font-size: 1.1em;
+    }
+
+    /* === Import Settings (Checkboxes) === */
+    .import-settings {
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        gap: 0.8em;
+        padding: 1em;
+        border: 1px solid var(--color-border-light-tertiary, #ddd);
+        border-radius: 8px;
+        background-color: var(--color-surface, #fafafa);
+    }
+
+    .checkbox-label {
+        display: flex;
         align-items: center;
+        gap: 0.6em;
+        cursor: pointer;
+        font-size: 0.95em;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        margin: 0;
+        accent-color: var(--color-accent, #0066cc);
+    }
+
+    /* === File Input & Button Group === */
+    .import-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.75em;
+        align-items: stretch;
     }
 
     .file-input-wrapper {
+        position: relative;
         width: 100%;
     }
 
+    #zipFileInput {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 1;
+    }
+
     .file-input-label {
-        display: block;
-        padding: 0.5em;
-        border: 1px solid #aaa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 0.75em;
+        border: 1px dashed var(--color-border-input, #aaa);
         border-radius: 6px;
-        text-align: center;
+        background-color: var(--color-input-bg, #f8f8f8);
+        color: var(--color-text-secondary, #555);
+        font-size: 0.95em;
         cursor: pointer;
-        background-color: #fafafa;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .file-input-label:hover { border-color: #a0c4e4; }
 
-    #quickImportBtn, #advanceImportBtn {
+    .file-input-label:hover,
+    .file-input-label:focus-within {
+        border-color: var(--color-primary-hover, #0088ff);
+        background-color: var(--color-input-hover, #fdfdfd);
+        color: var(--color-text, #333);
+    }
+
+    /* === Import Button === */
+    .import-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
         font-size: 1em;
-        border: 1px solid #aaa;
-        border-radius: 5px;
-        padding: 0.2em;
-        background-color: #eaeaea;
+        font-weight: 500;
+        padding: 0.75em 1.2em;
+        border: 1px solid var(--color-border-button, #aaa);
+        border-radius: 6px;
+        background-color: var(--color-button-bg, #eaeaea);
+        color: var(--color-button-text, #333);
         cursor: pointer;
+        transition: all 0.2s ease;
     }
-    button.disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
-    /* --- Status Footer --- */
-    .import-status-footer { padding: 0.5em 0; }
-    .progress-bar-container { width: 100%; background-color: #e0e0e0; border-radius: 5px; overflow: hidden; height: 8px; }
-    .progress-bar { height: 100%; background-color: #4caf50; width: 0%; transition: width 0.3s ease; }
-    .status-text { text-align: center; font-size: 0.9em; font-weight: 500; margin-bottom: 0.5em; }
 
-    /* --- Settings Modal --- */
-    .import-options-modal {
-        position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6);
-        display: none; justify-content: center; align-items: center; z-index: 1000;
+    .import-button:hover:not(.loading) {
+        background-color: var(--color-button-hover, #dcdcdc);
+        border-color: var(--color-primary-hover, #888);
     }
-    .import-options-modal.show { display: flex; }
-    /* MODIFIED: Set max-height and removed padding to allow for internal scrolling */
+
+    .import-button.loading {
+        opacity: 0.8;
+        cursor: progress;
+        pointer-events: none;
+    }
+
+    .import-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* === Spinner (for loading state) === */
+    .spinner {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* === Accessibility === */
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    /* === Responsive Design === */
+    @media (max-width: 600px) {
+        .import-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .form-content {
+            padding: 0;
+        }
+
+        .form-header {
+            margin-bottom: 1em;
+        }
+    }
+
+    /* === Reuse Your Existing Styles Below (Optional) === */
+    .chummer-import code {
+        background-color: #e0e0e0;
+        padding: 0.1em 0.4em;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.9em;
+    }
+
+    .import-status-footer { padding: 0.5em 0; }
+
+    .progress-bar-container {
+        width: 100%;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
+        height: 8px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: #4caf50;
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .status-text {
+        text-align: center;
+        font-size: 0.9em;
+        font-weight: 500;
+        margin-bottom: 0.5em;
+        color: var(--color-text-hint, #777);
+    }
+
+    /* Modal and other components you already have */
+    .import-options-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .import-options-modal.show {
+        display: flex;
+    }
+
     .import-options-content {
         background: var(--color-background-content, #fff);
         border-radius: 10px;
         width: 900px;
         max-width: 90vw;
-        max-height: 85vh; /* Set max height to 85% of viewport */
+        max-height: 85vh;
         box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
         display: flex;
         flex-direction: column;
     }
-    /* MODIFIED: Added padding to header/footer and prevented them from shrinking */
+
     .import-options-content .modal-header,
     .import-options-content .modal-footer {
         padding: 1em 1.5em;
         flex-shrink: 0;
     }
-    .import-options-content .modal-header { display: flex; justify-content: space-between; align-items: center; }
-    .import-options-content h2, .import-options-content h3 { margin: 0; font-weight: bold; }
-    /* MODIFIED: The body will now grow and scroll if content exceeds the modal's max-height */
+
+    .import-options-content .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .import-options-content h2,
+    .import-options-content h3 {
+        margin: 0;
+        font-weight: bold;
+    }
+
     .import-options-content .modal-body {
         overflow-y: auto;
         flex-grow: 1;
         padding: 1em 1.5em;
     }
-    .book-options-actions { padding: 0.5em; display: flex; justify-content: space-between; gap: 1em; }
-    .book-options-actions button { font-size: 0.85em;  }
-    .book-checkbox-grid, .other-settings-grid {
+
+    .book-options-actions {
+        padding: 0.5em;
+        display: flex;
+        justify-content: space-between;
+        gap: 1em;
+    }
+
+    .book-options-actions button {
+        font-size: 0.85em;
+    }
+
+    .book-checkbox-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 0.5em 1.5em; margin-top: 0.5em; margin-bottom: 1.5em;
+        gap: 0.5em 1.5em;
+        margin: 0.5em 0 1.5em;
     }
-    .other-settings-grid { grid-template-columns: 1fr; gap: 0.8em; }
-    .book-checkbox-grid label, .other-settings-grid label { display: flex; align-items: center; gap: 0.6em; }
-    .import-options-content .modal-footer { display: flex; justify-content: flex-end; border-top: 1px solid #eee; }
-    .hidden { display: none !important; }
+
+    .book-checkbox-grid label {
+        display: flex;
+        align-items: center;
+        gap: 0.6em;
+    }
+
+    .import-options-content .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        border-top: 1px solid #eee;
+        padding: 1em 1.5em;
+    }
+
+    .hidden {
+        display: none !important;
+    }
 </style>

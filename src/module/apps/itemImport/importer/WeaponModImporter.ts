@@ -6,10 +6,6 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 export class WeaponModImporter extends DataImporter {
     public readonly files = ['weapons.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('accessories') && jsonObject['accessories'].hasOwnProperty('accessory');
-    }
-
     async Parse(jsonObject: WeaponsSchema): Promise<void> {
         return WeaponModImporter.ParseItems<Accessory>(
             jsonObject.accessories.accessory,

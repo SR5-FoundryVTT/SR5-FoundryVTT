@@ -6,10 +6,6 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 export class EchoesImporter extends DataImporter {
     public readonly files = ['echoes.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('echoes') && jsonObject['echoes'].hasOwnProperty('echo');
-    }
-
     async Parse(jsonObject: EchoesSchema): Promise<void> {
         return EchoesImporter.ParseItems<Echo>(
             jsonObject.echoes.echo,

@@ -9,11 +9,6 @@ type WareTypes = Bioware | Cyberware;
 export class WareImporter extends DataImporter {
     public readonly files = ['bioware.xml', 'cyberware.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return (jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware')) ||
-               (jsonObject.hasOwnProperty('cyberwares') && jsonObject['cyberwares'].hasOwnProperty('cyberware'));
-    }
-
     async Parse(jsonObject: BiowareSchema | CyberwareSchema): Promise<void> {
         const key = 'biowares' in jsonObject ? 'bioware' : 'cyberware';
 

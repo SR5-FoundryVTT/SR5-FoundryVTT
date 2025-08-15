@@ -9,10 +9,6 @@ import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
 export class CritterPowerImporter extends DataImporter {
     public readonly files = ['critterpowers.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
-    }
-
     static parserWrap = class {
         public async Parse(jsonData: Power, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const critterPowerParser = new CritterPowerParser();

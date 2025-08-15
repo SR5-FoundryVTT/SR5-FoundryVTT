@@ -7,10 +7,6 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 export class ArmorImporter extends DataImporter {
     public readonly files = ['armor.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('armors') && jsonObject['armors'].hasOwnProperty('armor');
-    }
-
     async Parse(jsonObject: ArmorSchema): Promise<void> {
         IH.setTranslatedCategory('armor', jsonObject.categories.category);
 

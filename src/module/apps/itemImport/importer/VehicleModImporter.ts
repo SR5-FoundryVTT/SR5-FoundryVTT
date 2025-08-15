@@ -7,10 +7,6 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 export class VehicleModImporter extends DataImporter {
     public readonly files = ['vehicles.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('mods') && jsonObject['mods'].hasOwnProperty('mod');
-    }
-
     async Parse(jsonObject: VehiclesSchema): Promise<void> {
         IH.setTranslatedCategory('vehicles', jsonObject.modcategories.category);
 

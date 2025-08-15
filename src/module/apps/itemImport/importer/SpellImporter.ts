@@ -12,10 +12,6 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 export class SpellImporter extends DataImporter{
     public readonly files = ['spells.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('spells') && jsonObject['spells'].hasOwnProperty('spell');
-    }
-
     static parserWrap = class {
         public async Parse(jsonData: Spell, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const spellParserBase = new SpellParserBase();

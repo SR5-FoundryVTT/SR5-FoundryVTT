@@ -1,30 +1,13 @@
+import { SR5 } from "@/module/config";
+import { ParseData } from "./Types";
+import { CompendiumKey } from "../importer/Constants";
 import { DataImporter } from "../importer/DataImporter";
+import { Sanitizer } from "@/module/sanitizer/Sanitizer";
+import { BonusHelper as BH } from "../helper/BonusHelper";
 import * as IconAssign from "../../iconAssigner/iconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
-import { BonusHelper as BH } from "../helper/BonusHelper";
-import { CompendiumKey } from "../importer/Constants";
-
-import { Armor, Mod as ArmorMod } from "../schema/ArmorSchema";
-import { Bioware } from "../schema/BiowareSchema";
-import { Power as CritterPower } from "../schema/CritterpowersSchema";
-import { Cyberware } from "../schema/CyberwareSchema";
-import { Complexform } from "../schema/ComplexformsSchema";
-import { Echo } from "../schema/EchoesSchema";
-import { Gear } from "../schema/GearSchema";
-import { Metatype } from "../schema/MetatypeSchema";
-import { Power, Enhancement } from "../schema/PowersSchema";
-import { Quality } from "../schema/QualitiesSchema";
-import { Spell } from "../schema/SpellsSchema";
-import { Vehicle, Mod as VehicleMod, Weaponmount } from "../schema/VehiclesSchema";
-import { Accessory, Weapon } from "../schema/WeaponsSchema";
-
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
-import { Sanitizer } from "@/module/sanitizer/Sanitizer";
-
-export type ParseData =
-    Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
-    Power | Enhancement | Quality | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
 
 export type SystemType<T extends SystemEntityType> = ReturnType<Parser<T>["getBaseSystem"]>;
 
@@ -112,7 +95,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
             system.importFlags.isFreshImport = true;
 
             const subType = 'category' in jsonData ? IH.formatAsSlug(jsonData.category?._TEXT || '') : '';
-            if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType as string]).includes(subType))
+            if (subType && Object.keys(SR5.itemSubTypeIconOverrides[this.parseType as string]).includes(subType))
                 system.importFlags.subType = subType;
 
             entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entity.system);

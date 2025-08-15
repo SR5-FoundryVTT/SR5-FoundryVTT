@@ -1,9 +1,7 @@
 import { Parser } from 'xml2js';
-import { SR5 } from "../../../config";
-import { ParseData } from "../parser/Parser";
-import { ChummerFile, CompendiumKey, Constants } from './Constants';
+import { ParseData, Schemas } from "../parser/Types";
 import { ImportHelper as IH } from '../helper/ImportHelper';
-type AppendXml<T extends string> = `${T}.xml`;
+import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
 
 /**
  * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
@@ -11,38 +9,24 @@ type AppendXml<T extends string> = `${T}.xml`;
  * Generic type ItemDataType is the items data type DataImporter creates per entry in that Chummer5a data .xml file.
  */
 export abstract class DataImporter {
-    public static SR5 = SR5;
-    public readonly abstract files: readonly AppendXml<ChummerFile>[];
-    public static iconList: string[];
-    public static setIcons: boolean = true;
-    public static supportedBooks: string[] = ['2050'];
-    public static translationMap: Record<string, any> = {};
-
-    // Used to filter down a files entries based on category.
-    // See filterObjects for use.
-    // Leave on null to support all categories.
-    public unsupportedCategories: string[]|null = [];
-
-    /**
-     * Validate if this importer is capable of parsing the provided JSON data.
-     * @param jsonObject JSON data to check import capability for.
-     * @returns boolean True if the importer is capable of parsing the provided XML data.
-     */
-    public abstract CanParse(jsonObject: object): boolean;
+    public static setIcons = true;
+    public static iconList: string[] = [];
+    public static overrideDocuments = true;
+    public readonly abstract files: readonly ChummerFileXML[];
 
     /**
      * Parse the specified jsonObject and return Item representations.
      * @param chummerData The JSON data to parse.
      * @returns An array of created objects.
      */
-    public abstract Parse(chummerData: object): Promise<void>;
+    public abstract Parse(chummerData: Schemas): Promise<void>;
 
     /**
      * Parse an XML string into a JSON object.
      * @param xmlString The string to parse as XML.
      * @returns A json object converted from the string.
      */
-    public static async xml2json(xmlString: string): Promise<object> {
+    public static async xml2json(xmlString: string): Promise<Schemas> {
         const parser = new Parser({
             explicitArray: false,
             explicitCharkey: true,
@@ -50,17 +34,6 @@ export abstract class DataImporter {
         });
 
         return (await parser.parseStringPromise(xmlString))['chummer'];
-    }
-
-    /**
-     * Checks if the provided JSON object originates from a supported book source.
-     * 
-     * @param jsonObject - The JSON object containing source information.
-     * @returns `true` if the source is supported or undefined; otherwise, `false`.
-     */
-    private static supportedBookSource(jsonObject: ParseData): boolean {
-        const source = jsonObject?.source?._TEXT ?? '';
-        return !source || this.supportedBooks.includes(source);
     }
 
     /**
@@ -95,10 +68,10 @@ export abstract class DataImporter {
             injectActionTests?: (item: Item.CreateData) => void;
         }
     ): Promise<void> {
-        const { compendiumKey, parser, filter = () => true, injectActionTests, documentType } = options;
+        const { compendiumKey, parser, filter, injectActionTests, documentType } = options;
         const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
         const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
-        const dataInput = inputs.filter(input => this.supportedBookSource(input) && filter(input));
+        const dataInput = filter ? inputs.filter(filter) : inputs;
 
         let current = 0;
         const total = dataInput.length;
@@ -118,7 +91,7 @@ export abstract class DataImporter {
                 const key = compendiumKey(data);
                 const compendium = compendiums[key] ??= (await IH.GetCompendium(key));
 
-                if (compendium.index.has(id)) {
+                if (!this.overrideDocuments && compendium.index.has(id)) {
                     IH.setItem(key, data.name._TEXT, id);
                     updateBar(data.name._TEXT, "skipped, already exists");
                     continue;

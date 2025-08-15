@@ -11,10 +11,6 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 export class WeaponImporter extends DataImporter {
     public readonly files = ['weapons.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('weapons') && jsonObject['weapons'].hasOwnProperty('weapon');
-    }
-
     static parserWrap = class {
         public async Parse(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const rangedParser = new RangedParser();

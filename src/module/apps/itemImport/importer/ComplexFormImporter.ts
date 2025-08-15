@@ -6,10 +6,6 @@ import { ComplexformsSchema, Complexform } from '../schema/ComplexformsSchema';
 export class ComplexFormImporter extends DataImporter {
     public readonly files = ['complexforms.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('complexforms') && jsonObject['complexforms'].hasOwnProperty('complexform');
-    }
-
     async Parse(jsonObject: ComplexformsSchema): Promise<void> {
         return ComplexFormImporter.ParseItems<Complexform>(
             jsonObject.complexforms.complexform,

@@ -11,10 +11,6 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 export class GearImporter extends DataImporter {
     public readonly files = ['gear.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
-    }
-
     static parserWrap = class {
         private readonly categories: GearSchema['categories']['category'];
         constructor(categories: GearSchema['categories']['category']) {

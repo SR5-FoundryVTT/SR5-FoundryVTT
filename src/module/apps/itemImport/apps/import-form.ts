@@ -26,24 +26,12 @@ export class Import extends foundry.appv1.api.Application {
         branch: "fb3bd44a2bfa68d015faf7831b2c8de565acb60d",
     } as const;
 
-    private currentParsedFile: string = "";
-    private parsedFiles: string[] = [];
-    private supportedDataFiles: string[] = [];
-
-    private icons: boolean = true;
+    private setIcons: boolean = true;
+    private isImporting: boolean = false;
     private deleteCompendiums: boolean = false;
-    private disableImportButton: boolean = false;
+    private overrideDocuments: boolean = true;
 
-    private ZIP: JSZip | null = null;
     private zipFile: File | null = null;
-    private showImportOptions: boolean = false;
-
-    private readonly shadowrunBooks = Constants.shadowrunBooks.map(book => ({ ...book, value: book.default }));
-
-    constructor() {
-        super();
-        this.collectDataImporterFileSupport();
-    }
 
     static override get defaultOptions() {
         const options = super.defaultOptions;
@@ -51,7 +39,7 @@ export class Import extends foundry.appv1.api.Application {
         options.classes = ['app', 'window-app', 'filepicker'];
         options.title = 'Chummer/Data Import';
         options.template = 'systems/shadowrun5e/dist/templates/apps/compendium-import.hbs';
-        options.width = 600;
+        options.width = 525;
         options.height = 'auto';
         return options;
     }
@@ -59,31 +47,11 @@ export class Import extends foundry.appv1.api.Application {
     override getData(options?: any) {
         const data = super.getData(options) as any;
 
-        data.dataFiles = {};
-        this.supportedDataFiles.forEach((supportedFileName: string) => {
-            const missing = !false;
-            const parsed = this.parsedFiles.some((parsedFileName) => supportedFileName === parsedFileName);
-            const parsing = supportedFileName === this.currentParsedFile;
-
-            data.dataFiles[supportedFileName] = {
-                name: supportedFileName,
-                missing,
-                parsed,
-                parsing
-            };
-        });
-
-        data.icons = this.icons;
-        data.deleteCompendiums = this.deleteCompendiums;
-        data.showImportOptions = this.showImportOptions;
-        data.disableImportButton = this.disableImportButton;
-        data.finishedOverallParsing = this.supportedDataFiles.length === this.parsedFiles.length;
+        data.icons = this.setIcons;
+        data.isImporting = this.isImporting;
         data.zipFileName = this.zipFile?.name;
-
-        if (!data.finishedOverallParsing) {
-            data.currentParsedFile = this.currentParsedFile?.replace(/\.xml$/i, '').capitalize() || '';
-            data.filesImported = " (" + (this.parsedFiles.length + 1) + "/" + this.supportedDataFiles.length + ")";
-        }
+        data.deleteCompendiums = this.deleteCompendiums;
+        data.overrideDocuments = this.overrideDocuments;
 
         const {owner, repo, branch, version} = this.githubConfig;
         data.info = {
@@ -91,21 +59,11 @@ export class Import extends foundry.appv1.api.Application {
             versionLink: `https://www.github.com/${owner}/${repo}/tree/${branch}/Chummer/data`
         };
 
-        return { ...data, shadowrunBooks: this.shadowrunBooks };
-    }
-
-    private collectDataImporterFileSupport() {
-        this.supportedDataFiles = [];
-        Import.Importers.forEach(importer => {
-            if (this.supportedDataFiles.some(supported => importer.files.includes(supported))) {
-                return;
-            }
-            this.supportedDataFiles = this.supportedDataFiles.concat(importer.files);
-        });
+        return data;
     }
 
     //Order is important, ex. some weapons need mods to fully import, or it might take longer to import.
-    static Importers: DataImporter[] = [
+    static readonly Importers = [
         new WeaponModImporter(),
         new WeaponImporter(),
         new GearImporter(),
@@ -120,40 +78,9 @@ export class Import extends foundry.appv1.api.Application {
         new EchoesImporter(),
         new AdeptPowerImporter(),
         new ArmorImporter(),
-    ];
+    ] as const satisfies readonly DataImporter[];
 
-    /**
-     * Parse a single file with all applicable importers.
-     * 
-     * A file can contain actors and item documents, as well as both in a single file.
-     * 
-     * @param xmlSource The XML source as string.
-     * @param fileName The XML file name. Only imported supporting this file will be considered.
-     * @param setIcons Wether or not to apply system icons to the imported documents.
-     */
-    async parseXML(xmlSource: string, fileName: string) {
-        const start = performance.now();
-        const jsonSource = await DataImporter.xml2json(xmlSource);
-
-        // Apply Item Importers based on file and their ability to parse that file.
-        for (const di of Import.Importers.filter(importer => importer.files.includes(fileName)))
-            if (di.CanParse(jsonSource))
-                await di.Parse(jsonSource);
-
-        const end = performance.now();
-        console.log(fileName, end - start, "ms");
-    }
-
-    isDataFile = (file: File): boolean => {
-        return this.supportedDataFiles.some((supported) => supported === file.name);
-    };
-
-    isLangDataFile = (file: File): boolean => {
-        const pattern = /[a-zA-Z]{2}-[a-zA-Z]{2}_data\.xml/;
-        return file.name.match(pattern) !== null;
-    };
-
-    async fetchGitHubFile(path: string): Promise<string> {
+    async fetchGitHubFile(path: string): Promise<string | undefined> {
         const { owner, repo, branch } = this.githubConfig;
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
 
@@ -179,94 +106,64 @@ export class Import extends foundry.appv1.api.Application {
             }
         }
 
-        throw new Error(`fetchGitHubFile failed after ${attempts} attempts`);
+        return undefined
     }
 
-    async handleBulkImport(
-        isOnline: boolean,
-        setIcons: boolean,
-        deleteCompendiums: boolean,
-        getTextForFile: (fileName: string) => Promise<string | undefined>
-    ) {
+    async handleBulkImport() {
+        this.isImporting = true;
         for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
                 await game.packs.get("world." + compendium.pack)?.configure({locked: false});
 
-        if (deleteCompendiums)
+        if (this.deleteCompendiums)
             for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
                 await game.packs.get("world." + compendium.pack)?.deleteCompendium();
 
-        if (!isOnline)
-            this.ZIP = await (new JSZip()).loadAsync(this.zipFile!);
+        const ZIP = this.zipFile ? await (new JSZip()).loadAsync(this.zipFile) : null;
 
-        this.parsedFiles = [];
-
-        DataImporter.setIcons = setIcons;
-        DataImporter.supportedBooks = this.shadowrunBooks.filter(book => book.value).map(book => book.code);
+        DataImporter.setIcons = this.setIcons;
+        DataImporter.overrideDocuments = this.overrideDocuments;
         DataImporter.iconList = await IconAssign.getIconFiles();
 
-        this.disableImportButton = true;
         this.render();
 
-        for (const fileName of this.supportedDataFiles) {
-            try {
-                const text = await getTextForFile(fileName);
-                if (text === undefined)
-                    throw new Error(`File ${fileName} not found!`);
+        for (const importer of Import.Importers) {
+            for (const fileName of importer.files) {
+                try {
+                    const start = performance.now();
 
-                this.currentParsedFile = fileName;
-                this.render();
+                    const file = ZIP
+                        ? await ZIP.file(fileName)?.async('string')
+                        : await this.fetchGitHubFile(`Chummer/data/${fileName}`);
 
-                await this.parseXML(text, fileName);
+                    if (file === undefined) throw new Error(`File ${fileName} not found`);
+                    const json = await DataImporter.xml2json(file);
 
-                if (!this.parsedFiles.includes(fileName))
-                    this.parsedFiles.push(fileName);
-
-                this.render();
-            } catch (err) {
-                console.error(err);
-                ui.notifications?.error(`Failed to import ${fileName}`);
+                    await importer.Parse(json as any);
+                    const duration = performance.now() - start;
+                    console.debug(`Importing ${fileName} took ${duration.toFixed(2)} ms`);
+                } catch (error) {
+                    console.error(`Error importing ${fileName}:`, error);
+                    ui.notifications.error(`Error importing ${fileName}`);
+                }
             }
+            this.render();
         }
-
-        this.disableImportButton = false;
-        this.render();
 
         for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
             await game.packs.get("world." + compendium.pack)?.configure({locked: true});
-
+        
         ui.notifications?.warn('SR5.Warnings.BulkImportPerformanceWarning', { localize: true });
+        this.isImporting = false;
+        this.render();
     }
 
     override activateListeners(html: JQuery<HTMLElement>) {
         // --- Quick Import from GitHub ---
-        html.find('#quickImportBtn').on('click', () => {
+        html.find('#importBtn').on('click', () => {
             const start = performance.now();
-            const setIcons = html.find('.setIcons').is(':checked');
-            const deleteCompendiums = html.find('.deleteCompendiums').is(':checked');
-
-            const getTextForFile = async (name: string) => {
-                return this.fetchGitHubFile(`Chummer/data/${name}`);
-            };
-
-            void this.handleBulkImport(true, setIcons, deleteCompendiums, getTextForFile)
+            void this.handleBulkImport()
                 .then(() => {
                     console.log(`Quick import time: ${(performance.now() - start).toFixed(2)} ms`);
-                });
-        });
-
-        // --- Manual Import from ZIP file ---
-        html.find('#advanceImportBtn').on('click', () => {
-            const start = performance.now();
-            const setIcons = html.find('.setIcons').is(':checked');
-            const deleteCompendiums = html.find('.deleteCompendiums').is(':checked');
-
-            const getTextForFile = async (name: string) => {
-                return this.ZIP?.file(name)?.async('string');
-            };
-
-            void this.handleBulkImport(false, setIcons, deleteCompendiums, getTextForFile)
-                .then(() => {
-                    console.log(`Manual import time: ${(performance.now() - start).toFixed(2)} ms`);
                 });
         });
 
@@ -277,45 +174,16 @@ export class Import extends foundry.appv1.api.Application {
             this.render();
         });
 
-        // --- Settings Modal Listeners ---
-        html.find('.importOptionsBtn').on('click', () => {
-            this.showImportOptions = true;
-            this.render();
+        html.find('#setIcons').on('click', (event: JQuery.TriggeredEvent) => {
+            this.setIcons = (event.currentTarget as HTMLInputElement).checked;
         });
 
-        html.find('.closeOptionsBtn').on('click', () => {
-            this.showImportOptions = false;
-            this.render();
-        });
-        
-        html.find('.setIcons').on('click', (event: JQuery.TriggeredEvent) => {
-            this.icons = (event.currentTarget as HTMLInputElement).checked;
-        });
-
-        html.find('.deleteCompendiums').on('click', (event: JQuery.TriggeredEvent) => {
+        html.find('#deleteCompendiums').on('click', (event: JQuery.TriggeredEvent) => {
             this.deleteCompendiums = (event.currentTarget as HTMLInputElement).checked;
         });
 
-        html.find('.bookOption').on('click', (event: JQuery.TriggeredEvent) => {
-            const checkbox = event.currentTarget as HTMLInputElement;
-            const bookCode = checkbox.dataset.book;
-            const book = this.shadowrunBooks.find(b => b.code === bookCode);
-            if (book) book.value = checkbox.checked;
-        });
-
-        html.find('.bookSelectAllBtn').on('click', () => {
-            this.shadowrunBooks.forEach(book => { book.value = true; });
-            this.render();
-        });
-
-        html.find('.bookUnselectAllBtn').on('click', () => {
-            this.shadowrunBooks.forEach(book => { book.value = false; });
-            this.render();
-        });
-
-        html.find('.bookDefaultsBtn').on('click', () => {
-            this.shadowrunBooks.forEach(book => { book.value = book.default; });
-            this.render();
+        html.find('#overrideDocuments').on('click', (event: JQuery.TriggeredEvent) => {
+            this.overrideDocuments = (event.currentTarget as HTMLInputElement).checked;
         });
     }
 }
