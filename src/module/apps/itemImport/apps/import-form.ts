@@ -88,8 +88,8 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
     private static readonly githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
-        version: "v5.225.937",
-        branch: "fb3bd44a2bfa68d015faf7831b2c8de565acb60d",
+        version: "v5.225.977",
+        branch: "ceda7c93e54d8ede7623caa7953c88ae559465da",
     } as const;
 
     /**

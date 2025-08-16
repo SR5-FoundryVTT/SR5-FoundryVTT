@@ -7,6 +7,7 @@ import { Empty, Many, OneOrMany } from './Types';
 export interface Accessory {
     accessorycostmultiplier?: { _TEXT: string; };
     accuracy?: { _TEXT: string; };
+    addmount?: { _TEXT: string; };
     addunderbarrels?: {
         weapon: { _TEXT: string; };
     };
@@ -42,6 +43,7 @@ export interface Accessory {
     rcdeployable?: { _TEXT: string; };
     rcgroup?: { _TEXT: string; };
     reach?: { _TEXT: string; };
+    replacerange?: { _TEXT: string; };
     required?: ConditionsSchema;
     source: { _TEXT: string; };
     specialmodification?: { _TEXT: string; };
@@ -112,6 +114,10 @@ export interface Weapon {
     useskill?: { _TEXT: string; };
     useskillspec?: { _TEXT: string; };
     weapontype?: { _TEXT: string; };
+    weight?: { _TEXT: string; };
+    wirelessweaponbonus?: {
+        accuracy: { _TEXT: string; };
+    };
     translate?: { _TEXT: string; };
 };
 

@@ -14,7 +14,7 @@ from typing import DefaultDict, Dict, Set, Tuple, List, Union
 #URL constants
 OWNER = "chummer5a"
 REPO = "chummer5a"
-BRANCH = "d800ca7a7e8effcb1b80ba83ba3a94e3c344cbf1" #v5.255.922
+BRANCH = "ceda7c93e54d8ede7623caa7953c88ae559465da" #v5.255.977
 
 OUT_DIR = (Path(__file__).parent / "../src/module/apps/itemImport/schema").resolve()
 FILES = [
@@ -50,7 +50,9 @@ IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
 # Utility TypeScript definitions
 UTILITY_TYPES_TS = """\
 /**
- * utility-types.ts
+ * Generated Automatically, DO NOT EDIT
+ *
+ * Check utils/generate_schemas.py for more info
  *
  * Shared TypeScript utility types for XML-to-TS schema generation.
  */
@@ -387,7 +389,7 @@ def normalize_interface_body(body: str) -> str:
     return body
 
 def generate_header(imports: list[str] = []) -> str:
-    lines = ["// AUTO‑GENERATED — DO NOT EDIT\n"]
+    lines = ["// AUTO‑GENERATED — DO NOT EDIT - Check utils/generate_schemas.py for more info\n"]
     for imp in dict.fromkeys(imports):  # preserves order, removes duplicates
         lines.append(f"import {{ {imp} }} from './{imp}';")
     lines += ["import { Empty, Many, OneOrMany } from './Types';"]

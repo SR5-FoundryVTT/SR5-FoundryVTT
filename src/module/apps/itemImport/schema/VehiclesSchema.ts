@@ -15,6 +15,7 @@ export interface Mod {
     conditionmonitor?: { _TEXT: string; };
     cost: { _TEXT: string; };
     downgrade?: Empty;
+    forbidden?: ConditionsSchema;
     hide?: Empty;
     id: { _TEXT: string; };
     minrating?: { _TEXT: string; };
@@ -47,10 +48,21 @@ export interface Vehicle {
         gear: OneOrMany<{
             $?: { consumecapacity?: string; costfor?: string; rating?: string; select?: string; };
             gears?: {
-                gear: Many<{ _TEXT: string; $: { consumecapacity: string; rating: string; }; }>;
+                gear: Many<{
+                    $?: { consumecapacity: string; rating: string; };
+                    gears?: {
+                        gear: Many<{
+                            id: { _TEXT: string; };
+                        }>;
+                    };
+                    id?: { _TEXT: string; };
+                    rating?: { _TEXT: string; };
+                    _TEXT?: string;
+                }>;
             };
             maxrating?: { _TEXT: string; };
             name?: { _TEXT: string; };
+            qty?: { _TEXT: string; };
             rating?: { _TEXT: string; };
             _TEXT?: string;
         }>;

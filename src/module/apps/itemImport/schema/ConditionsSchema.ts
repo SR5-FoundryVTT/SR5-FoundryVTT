@@ -102,6 +102,12 @@ export interface ConditionsSchema {
             count: { _TEXT: string; };
             name: { _TEXT: string; };
         };
+        tradition?: { _TEXT: string; };
+        weapondetails?: {
+            OR: {
+                ammo: Many<{ _TEXT: string; $: { operation: string; }; }>;
+            };
+        };
     };
     parentdetails?: {
         NONE?: Empty;
@@ -113,6 +119,7 @@ export interface ConditionsSchema {
         category?: { _TEXT: string; };
         name?: { _TEXT: string; };
     };
+    tradition?: { _TEXT: string; };
     vehicledetails?: {
         OR?: {
             category?: Many<{ _TEXT: string; $?: { operation: string; }; }>;
@@ -147,6 +154,7 @@ export interface ConditionsSchema {
         ammo?: { _TEXT: string; $: { operation: string; }; };
         conceal?: { _TEXT: string; $: { operation: string; }; };
         damage?: { _TEXT: string; $: { operation: string; }; };
+        id?: { _TEXT: string; };
         mode?: { _TEXT: string; $: { operation: string; }; };
         name?: { _TEXT: string; $?: { operation: string; }; };
         type?: { _TEXT: string; };
