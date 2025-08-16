@@ -163,6 +163,17 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         } else {
             console.error("Shadowrun5e | Could not find the 'applyTo' select.");
         }
+
+        // disable and set tooltips on the priority inputs since we don't currently support changing it
+        for (let i = 0; i < this.document.changes.length; i++) {
+            const input = this.element.querySelector<HTMLInputElement>(`input[name="changes.${i}.priority"]`);
+            if (input) {
+                input.setAttribute('disabled', 'true');
+                input.setAttribute('data-tooltip', 'SR5.Tooltips.Effect.PriorityFieldDisabled');
+            } else {
+                console.error(`Shadowrun5e | Could not find the 'priority' input field for ${i}.`);
+            }
+        }
     }
 
     /**

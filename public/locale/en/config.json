@@ -1435,6 +1435,7 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
                 "ApplyTo": "Changes of this effect will apply to this target only",
+                "PriorityFieldDisabled": "Custom priority is not supported at this time",
                 "DocumentEffects": "Effects directly on this document",
                 "ItemEffects": "Effects collected from items on this document",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
