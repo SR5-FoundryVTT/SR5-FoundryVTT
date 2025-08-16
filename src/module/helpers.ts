@@ -52,7 +52,7 @@ export class Helpers {
         }
 
         // Some values will have their total overridden directly.
-        if (value.override && value.override.mode === 'replace') {
+        if (value.override) {
             // Still apply a possible value range, even if override says otherwise.
             value.value = Helpers.applyValueRange(value.override.value, options);
             return value.value;
@@ -60,13 +60,12 @@ export class Helpers {
 
         value.value = parts.total + value.base;
 
-        // Some values will apply min / max values to their totals.
-        if (value.override && value.override.mode === 'min') {
-            value.value = Helpers.applyValueRange(value.value, { min: value.override.value });
+        // In case of multiple effect changes, prioritize downgrade as I want the universe to suffer.
+        if (value.downgrade) {
+            value.value = Helpers.applyValueRange(value.value, { max: value.downgrade.value });
+        } else if (value.upgrade) {
+            value.value = Helpers.applyValueRange(value.value, { min: value.upgrade.value });
         } 
-        else if (value.override && value.override.mode === 'max') {
-            value.value = Helpers.applyValueRange(value.value, { max: value.override.value });
-        }
 
         value.value = Helpers.roundTo(value.value, options?.roundDecimals);
         value.value = Helpers.applyValueRange(value.value, options);

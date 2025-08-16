@@ -78,12 +78,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // ModifiableValue should have a custom override value
             // Case - Direct change key
-            assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3, mode: 'replace' });
+            assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3 });
             assert.strictEqual(actor.system.attributes.body.base, 0);
             assert.deepEqual(actor.system.attributes.body.mod, []);
             assert.strictEqual(actor.system.attributes.body.value, 3);
             // Case - Indirect change key
-            assert.deepEqual(actor.system.attributes.agility.override, { name: 'Test Effect', value: 3, mode: 'replace' });
+            assert.deepEqual(actor.system.attributes.agility.override, { name: 'Test Effect', value: 3 });
             assert.strictEqual(actor.system.attributes.agility.base, 0);
             assert.deepEqual(actor.system.attributes.agility.mod, []);
             assert.strictEqual(actor.system.attributes.agility.value, 3);
@@ -114,7 +114,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 }]);
 
                 assert.strictEqual(actor.system.attributes.body.mod.length, 1);
-                assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3, mode: 'replace' });
+                assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3 });
                 assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 5 }]);
                 assert.strictEqual(actor.system.attributes.body.value, 3);
             });
@@ -204,9 +204,29 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
-            assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3, mode: 'min' });
+            assert.deepEqual(actor.system.attributes.body.upgrade, { name: 'Test Effect', value: 3 });
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-            assert.deepEqual(actor.system.skills.active.automatics.override, { name: 'Test Effect', value: 3, mode: 'min' });
+            assert.deepEqual(actor.system.skills.active.automatics.upgrade, { name: 'Test Effect', value: 3 });
+        });
+
+        it('UPGRADE mode: uses the highest value for mulitple upgrade changes', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { 
+                skills: { active: { automatics: { base: 2 } } } } 
+            });
+
+            assert.strictEqual(actor.system.skills.active.automatics.base, 2);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.skills.active.automatics.value, 5);
         });
 
         it('DOWNGRADE mode: should reduce the value to a min', async () => {
@@ -229,9 +249,29 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
-            assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3, mode: 'max' });
+            assert.deepEqual(actor.system.attributes.body.downgrade, { name: 'Test Effect', value: 3 });
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-            assert.deepEqual(actor.system.skills.active.automatics.override, { name: 'Test Effect', value: 3, mode: 'max' });
+            assert.deepEqual(actor.system.skills.active.automatics.downgrade, { name: 'Test Effect', value: 3 });
+        });
+
+        it('DOWNGRADE mode: uses the lowest value for multiple downgrade changes', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { 
+                skills: { active: { automatics: { base: 6 } } } } 
+            });
+
+            assert.strictEqual(actor.system.skills.active.automatics.base, 6);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
+                    { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
         });
 
         it('MULTIPLY mode: should do nothing successfully', async () => {

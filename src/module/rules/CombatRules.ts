@@ -200,9 +200,9 @@ export class CombatRules {
         const modifiedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         // Keep base and modification intact, only overwriting the result.
-        modifiedDamage.override = {name: 'SR5.TestResults.Success', value: 0, mode: 'replace'};
+        modifiedDamage.override = {name: 'SR5.TestResults.Success', value: 0};
         Helpers.calcTotal(modifiedDamage, {min: 0});
-        modifiedDamage.ap.override = {name: 'SR5.TestResults.Success', value: 0, mode: 'replace'};
+        modifiedDamage.ap.override = {name: 'SR5.TestResults.Success', value: 0};
         Helpers.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';
 

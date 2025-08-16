@@ -20,13 +20,13 @@
         {{#if (overrideUpgrade value)}}
         <div class="value-modifier-name value-modifiers-invalid-total">{{localize 'SR5.Total'}}</div>
         <div class="value-modifiers-total value-modifiers-invalid-total">?</div>
-        <div class="value-modifier-name">{{localize value.override.name}}</div>
+        <div class="value-modifier-name">{{localize value.upgrade.name}}</div>
         <div class="value-modifiers-total">{{value.value}}</div>
         {{/if}}
         {{#if (overrideDowngrade value)}}
         <div class="value-modifier-name value-modifiers-invalid-total">{{localize 'SR5.Total'}}</div>
         <div class="value-modifiers-total value-modifiers-invalid-total">?</div>
-        <div class="value-modifier-name">{{localize value.override.name}}</div>
+        <div class="value-modifier-name">{{localize value.downgrade.name}}</div>
         <div class="value-modifiers-total">{{value.value}}</div>
         {{/if}}
     </div>

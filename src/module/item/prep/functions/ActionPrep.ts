@@ -70,7 +70,7 @@ export const ActionPrep = {
 
         // Some ammunition want to replace the weapons damage, others modify it.
         if (ammoData.replaceDamage) {
-            action.damage.override = { name: equippedAmmo.name, value: Number(ammoData.damage), mode: 'replace' };
+            action.damage.override = { name: equippedAmmo.name, value: Number(ammoData.damage) };
         } else {
             action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
         }

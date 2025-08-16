@@ -33,8 +33,6 @@ export const ModListEntry = () => ({
 
 export const OverrideModEntry = () => ({
     ...ModListEntry(),
-    // Mode will define alternative behavior for the override mod entry
-    mode: new StringField({required: true, initial: 'replace', choices: ['replace', 'min', 'max']})
 });
 
 export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
@@ -43,6 +41,8 @@ export const ModifiableValue = () => ({
     ...BaseValuePair(),
     mod: ModList(),
     override: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
+    downgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
+    upgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
     temp: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 

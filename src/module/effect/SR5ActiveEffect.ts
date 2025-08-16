@@ -288,7 +288,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     static applyOverrideToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (modValue) {
-            modValue.override = { name: effect.name, value: Number(change.value), mode: 'replace' };
+            modValue.override = { name: effect.name, value: Number(change.value) };
             modValue.value = Number(change.value);
 
             return true;
@@ -299,12 +299,13 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Apply for the Upgrade mode but, if possible, apply to a ModifiableValue.
+     * @returns true, if a ModifiableValue was found and the override was applied.
     */
     static applyUpgradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (modValue) {
-            modValue.override = { name: effect.name, value: Number(change.value), mode: 'min' };
-
+            const value = Number(change.value);
+            modValue.upgrade = modValue.upgrade?.value > value ? modValue.upgrade : { name: effect.name, value };
             return true;
         }
 
@@ -313,12 +314,13 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Apply for the Downgrade mode but, if possible, apply to a ModifiableValue.
+     * @returns true, if a ModifiableValue was found and the override was applied.
      */
     static applyDowngradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (modValue) {
-            modValue.override = { name: effect.name, value: Number(change.value), mode: 'max' };
-
+                const value = Number(change.value);
+                modValue.downgrade = modValue.downgrade?.value < value ? modValue.downgrade : { name: effect.name, value };
             return true;
         }
 

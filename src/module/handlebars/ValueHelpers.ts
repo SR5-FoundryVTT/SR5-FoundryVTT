@@ -5,25 +5,23 @@ import { ModifiableValueType } from "../types/template/Base"
  */
 export const registerValueHelpers = () => {
     Handlebars.registerHelper('overrideNone', (value: ModifiableValueType) => {
-        if (!value.override) return true;
-
-        if (value.override.mode === 'replace') return false;
-        if (value.override.mode === 'min' && value.value === value.override.value) return false;
-        if (value.override.mode === 'max' && value.value === value.override.value) return false;
+        if (value.override) return false;
+        if (value.upgrade && value.value === value.upgrade.value) return false;
+        if (value.downgrade && value.value === value.downgrade.value) return false;
 
         return true;
     });
     Handlebars.registerHelper('overrideTotal', (value: ModifiableValueType) => {
-        return value.override && value.override.mode === 'replace';
+        return value.override;
     });
     Handlebars.registerHelper('overrideUpgrade', (value: ModifiableValueType) => {
-        if (!value.override || value.override.mode !== 'min') return false;
+        if (!value.upgrade) return false;
 
-        return value.value === value.override.value;
+        return value.value === value.upgrade.value;
     });
     Handlebars.registerHelper('overrideDowngrade', (value: ModifiableValueType) => {
-        if (!value.override || value.override.mode !== 'max') return false;
+        if (!value.downgrade) return false;
 
-        return value.value === value.override.value;
+        return value.value === value.downgrade.value;
     });
 }
