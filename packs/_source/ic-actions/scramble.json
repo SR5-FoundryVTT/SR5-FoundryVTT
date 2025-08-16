@@ -1,6 +1,7 @@
 {
   "_id": "uAmdnncqLNM7CkDG",
   "_key": "!items!uAmdnncqLNM7CkDG",
+  "folder": null,
   "name": "Scramble",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/amplitude.svg",
@@ -117,20 +118,5 @@
     }
   },
   "effects": [],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755293089604,
-    "modifiedTime": 1755293181812,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.uAmdnncqLNM7CkDG",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "flags": {}
 }

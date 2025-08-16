@@ -1,6 +1,7 @@
 {
-  "_id": "gMfxNll8aoyITS6p",
-  "_item": "!items!gMfxNll8aoyITS6p",
+  "_id": "d3mon1mmBDfxdbS5",
+  "_item": "!items!d3mon1mmBDfxdbS5",
+  "folder": null,
   "name": "Patrol",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/cyber-eye.svg",
@@ -117,20 +118,5 @@
     }
   },
   "effects": [],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755292558187,
-    "modifiedTime": 1755292628397,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.d3mon1mmBDfxdbS5",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "flags": {}
 }

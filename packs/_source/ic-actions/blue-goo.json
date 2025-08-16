@@ -1,15 +1,15 @@
 {
-  "_id": "7CsaOjwsF1qEd9go",
-  "_items": "!items!7CsaOjwsF1qEd9go",
+  "_id": "GEzglPiLS2oDoDdd",
+  "_key": "!items!GEzglPiLS2oDoDdd",
   "folder": null,
-  "name": "Probe",
+  "name": "Blue Goo",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/cpu.svg",
+  "img": "systems/shadowrun5e/dist/icons/ice-bomb.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 248"
+      "source": "KC 68"
     },
     "importFlags": {
       "name": "",
@@ -58,10 +58,10 @@
         "mod": [],
         "override": null,
         "temp": 0,
-        "attribute": "",
+        "attribute": "attack",
         "base_formula_operator": "add",
         "type": {
-          "base": "",
+          "base": "matrix",
           "value": ""
         },
         "element": {
@@ -85,8 +85,8 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "intuition",
-        "attribute2": "firewall",
+        "attribute": "",
+        "attribute2": "",
         "armor": false,
         "resist": {
           "test": "",

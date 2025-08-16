@@ -42,7 +42,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         const data = await super.getData(options) as MatrixActorSheetData;
 
         data.network = this.actor.network;
-        data.matrixActions = await this.getMatrixActions();
+        data.matrixActions = await this._prepareMatrixActions();
 
 
         this._prepareMatrixTargets(data);
@@ -179,6 +179,16 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         app.render(true);
     }
 
+    /**
+     * Get Matrix actions from the set compendia pack that the character should see
+     * @protected
+     */
+    protected async _getMatrixPackActions() {
+        const matrixPackName = Helpers.getMatrixActionsPackName();
+        // Collect all sources for matrix actions.
+        return await Helpers.getPackActions(matrixPackName);
+    }
+
 
     /**
      * Retrieve all matrix actions from the corresponding pack to be displayed.
@@ -187,11 +197,8 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      *
      * @returns Alphabetically sorted array of matrix actions.
      */
-    async getMatrixActions() {
-        const matrixPackName = Helpers.getMatrixActionsPackName();
-
-        // Collect all sources for matrix actions.
-        const packActions = await Helpers.getPackActions(matrixPackName);
+    async _prepareMatrixActions() {
+        const packActions = await this._getMatrixPackActions();
         const actorActions = MatrixFlow.getMatrixActions(this.actor);
         // Assume above collections return action only.
         let actions = [...packActions, ...actorActions] as SR5Item<'action'>[];

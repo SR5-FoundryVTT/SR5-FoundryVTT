@@ -1,6 +1,7 @@
 {
-  "_id": "oGEjJfOWNu7ceD16",
-  "_item": "!items!oGEjJfOWNu7ceD16",
+  "_id": "KL5oClXgbbSm6tLr",
+  "_item": "!items!KL5oClXgbbSm6tLr",
+  "folder": null,
   "name": "Marker",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/caged-ball.svg",
@@ -116,71 +117,6 @@
       }
     }
   },
-  "effects": [
-    {
-      "name": "Reduce Sleaze",
-      "origin": "Item.jcc9or6rjlSw7xhn",
-      "img": null,
-      "type": "base",
-      "system": {
-        "applyTo": "targeted_actor",
-        "appliedByTest": false,
-        "onlyForEquipped": false,
-        "onlyForWireless": false,
-        "onlyForItemTest": false,
-        "selection_attributes": [],
-        "selection_categories": [],
-        "selection_limits": [],
-        "selection_skills": [],
-        "selection_tests": []
-      },
-      "changes": [
-        {
-          "key": "system.matrix.sleaze",
-          "mode": 0,
-          "value": "-1"
-        }
-      ],
-      "disabled": false,
-      "duration": {
-        "startTime": null,
-        "combat": null,
-        "seconds": null,
-        "rounds": null,
-        "turns": null,
-        "startRound": null,
-        "startTurn": null
-      },
-      "description": "",
-      "tint": "#ffffff",
-      "transfer": true,
-      "statuses": [],
-      "sort": 0,
-      "flags": {},
-      "_stats": {
-        "coreVersion": "13.346",
-        "systemId": "shadowrun5e",
-        "systemVersion": "0.30.0",
-        "lastModifiedBy": "gprTC3Md255Kv3Xm",
-        "modifiedTime": 1755292490568
-      },
-      "_id": "hT5slcfQsv0sjN2t"
-    }
-  ],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755292412806,
-    "modifiedTime": 1755292471646,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.KL5oClXgbbSm6tLr",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "effects": [],
+  "flags": {}
 }

@@ -1,6 +1,7 @@
 {
-  "_id": "7xtTu03WUzecSYiw",
-  "_key": "!items!7xtTu03WUzecSYiw",
+  "_id": "xwF64xDi2jiUVmc5",
+  "_key": "!items!xwF64xDi2jiUVmc5",
+  "folder": null,
   "name": "Catapult",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/importer/echo.svg",
@@ -116,72 +117,6 @@
       }
     }
   },
-  "effects": [
-    {
-      "name": "Reduce Firewall",
-      "origin": "Item.jcc9or6rjlSw7xhn",
-      "img": null,
-      "type": "base",
-      "system": {
-        "applyTo": "targeted_actor",
-        "appliedByTest": false,
-        "onlyForEquipped": false,
-        "onlyForWireless": false,
-        "onlyForItemTest": false,
-        "selection_attributes": [],
-        "selection_categories": [],
-        "selection_limits": [],
-        "selection_skills": [],
-        "selection_tests": []
-      },
-      "changes": [
-        {
-          "key": "system.matrix.firewall",
-          "mode": 0,
-          "value": "-1"
-        }
-      ],
-      "disabled": false,
-      "duration": {
-        "startTime": null,
-        "combat": null,
-        "seconds": null,
-        "rounds": null,
-        "turns": null,
-        "startRound": null,
-        "startTurn": null
-      },
-      "description": "",
-      "tint": "#ffffff",
-      "transfer": true,
-      "statuses": [],
-      "sort": 0,
-      "flags": {},
-      "_stats": {
-        "coreVersion": "13.346",
-        "systemId": "shadowrun5e",
-        "systemVersion": "0.30.0",
-        "createdTime": 1755294876332,
-        "modifiedTime": 1755294876332,
-        "lastModifiedBy": "gprTC3Md255Kv3Xm"
-      },
-      "_id": "0zx5ytbhhtf93FAW"
-    }
-  ],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755294811221,
-    "modifiedTime": 1755294953437,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.xwF64xDi2jiUVmc5",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "effects": [],
+  "flags": {}
 }

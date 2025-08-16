@@ -1,6 +1,7 @@
 {
-  "_id": "oSSyRnGjNRhwbMYg",
-  "_key": "!items!oSSyRnGjNRhwbMYg",
+  "_id": "dQeflPIJct1jEVfx",
+  "_key": "!items!dQeflPIJct1jEVfx",
+  "folder": null,
   "name": "Jammer",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/cpu.svg",
@@ -116,72 +117,6 @@
       }
     }
   },
-  "effects": [
-    {
-      "name": "Reduce Attack",
-      "origin": "Item.jcc9or6rjlSw7xhn",
-      "img": null,
-      "type": "base",
-      "system": {
-        "applyTo": "targeted_actor",
-        "appliedByTest": false,
-        "onlyForEquipped": false,
-        "onlyForWireless": false,
-        "onlyForItemTest": false,
-        "selection_attributes": [],
-        "selection_categories": [],
-        "selection_limits": [],
-        "selection_skills": [],
-        "selection_tests": []
-      },
-      "changes": [
-        {
-          "key": "system.matrix.attack",
-          "mode": 0,
-          "value": "-1"
-        }
-      ],
-      "disabled": false,
-      "duration": {
-        "startTime": null,
-        "combat": null,
-        "seconds": null,
-        "rounds": null,
-        "turns": null,
-        "startRound": null,
-        "startTurn": null
-      },
-      "description": "",
-      "tint": "#ffffff",
-      "transfer": true,
-      "statuses": [],
-      "sort": 0,
-      "flags": {},
-      "_stats": {
-        "coreVersion": "13.346",
-        "systemId": "shadowrun5e",
-        "systemVersion": "0.30.0",
-        "createdTime": 1755292186568,
-        "modifiedTime": 1755292204365,
-        "lastModifiedBy": "gprTC3Md255Kv3Xm"
-      },
-      "_id": "mPMNI9E3zMoxkIxT"
-    }
-  ],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755292025188,
-    "modifiedTime": 1755292052580,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.dQeflPIJct1jEVfx",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "effects": [],
+  "flags": {}
 }

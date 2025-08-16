@@ -1,6 +1,7 @@
 {
-  "_id": "Slz3bAMzVGObvjl8",
-  "_key": "!items!Slz3bAMzVGObvjl8",
+  "_id": "rz7mXCyM8YQjcvO1",
+  "_key": "!items!rz7mXCyM8YQjcvO1",
+  "folder": null,
   "name": "Binder",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/atomic-slashes.svg",
@@ -116,72 +117,6 @@
       }
     }
   },
-  "effects": [
-    {
-      "name": "Reduce Data Proc",
-      "origin": "Item.jcc9or6rjlSw7xhn",
-      "img": null,
-      "type": "base",
-      "system": {
-        "applyTo": "targeted_actor",
-        "appliedByTest": false,
-        "onlyForEquipped": false,
-        "onlyForWireless": false,
-        "onlyForItemTest": false,
-        "selection_attributes": [],
-        "selection_categories": [],
-        "selection_limits": [],
-        "selection_skills": [],
-        "selection_tests": []
-      },
-      "changes": [
-        {
-          "key": "system.matrix.data_processing",
-          "mode": 0,
-          "value": "-1"
-        }
-      ],
-      "disabled": false,
-      "duration": {
-        "startTime": null,
-        "combat": null,
-        "seconds": null,
-        "rounds": null,
-        "turns": null,
-        "startRound": null,
-        "startTurn": null
-      },
-      "description": "",
-      "tint": "#ffffff",
-      "transfer": true,
-      "statuses": [],
-      "sort": 0,
-      "flags": {},
-      "_stats": {
-        "coreVersion": "13.346",
-        "systemId": "shadowrun5e",
-        "systemVersion": "0.30.0",
-        "createdTime": 1755292140299,
-        "modifiedTime": 1755292163151,
-        "lastModifiedBy": "gprTC3Md255Kv3Xm"
-      },
-      "_id": "hT5slcfQsv0sjN2t"
-    }
-  ],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755291713036,
-    "modifiedTime": 1755291802360,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.rz7mXCyM8YQjcvO1",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "effects": [],
+  "flags": {}
 }

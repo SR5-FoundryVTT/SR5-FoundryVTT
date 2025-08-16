@@ -1,15 +1,15 @@
 {
-  "_id": "7CsaOjwsF1qEd9go",
-  "_items": "!items!7CsaOjwsF1qEd9go",
+  "_id": "ZTMuPy8dAeu6qRvc",
+  "_key": "!items!ZTMuPy8dAeu6qRvc",
   "folder": null,
-  "name": "Probe",
+  "name": "Sleuther",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/cpu.svg",
+  "img": "systems/shadowrun5e/dist/icons/redist/aprotect.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 248"
+      "source": ""
     },
     "importFlags": {
       "name": "",
@@ -85,7 +85,7 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "intuition",
+        "attribute": "logic",
         "attribute2": "firewall",
         "armor": false,
         "resist": {

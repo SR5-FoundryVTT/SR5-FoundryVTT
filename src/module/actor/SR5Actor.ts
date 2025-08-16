@@ -2183,6 +2183,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         })));
     }
 
+    get icType() {
+        if (this.isType('ic')) {
+            // FIXME cast to type IC but that didn't seem to work
+            return (this.system as any)?.icType ?? '';
+        }
+        return '';
+    }
+
     /**
      * Transparently build a set of roll data based on this actors type and status.
      *

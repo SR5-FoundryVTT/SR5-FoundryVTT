@@ -1,6 +1,7 @@
 {
-  "_id": "m2RBsKDc4102mn9D",
-  "_key": "!items!m2RBsKDc4102mn9D",
+  "_id": "JEsjfsfvsaxHt2co",
+  "_key": "!items!JEsjfsfvsaxHt2co",
+  "folder": null,
   "name": "Track",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/world.svg",
@@ -117,20 +118,5 @@
     }
   },
   "effects": [],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755294404367,
-    "modifiedTime": 1755294454015,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.JEsjfsfvsaxHt2co",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "flags": {}
 }

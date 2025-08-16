@@ -1,6 +1,7 @@
 {
-  "_id": "NGIcPgevHkRMZxap",
-  "_key": "!items!NGIcPgevHkRMZxap",
+  "_id": "dxVmVkI0a7Oah1Ju",
+  "_key": "!items!dxVmVkI0a7Oah1Ju",
+  "folder": null,
   "name": "Shocker",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/cpu.svg",
@@ -117,20 +118,5 @@
     }
   },
   "effects": [],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755295068866,
-    "modifiedTime": 1755295091314,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.dxVmVkI0a7Oah1Ju",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "flags": {}
 }

@@ -1,6 +1,7 @@
 {
-  "_id": "hep17OFRFQPAx5Y1",
-  "_key": "!items!hep17OFRFQPAx5Y1",
+  "_id": "RfjfXuY8b3KhE4b8",
+  "_key": "!items!RfjfXuY8b3KhE4b8",
+  "folder": null,
   "name": "Killer",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/digital-trace.svg",
@@ -118,20 +119,5 @@
     }
   },
   "effects": [],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755292286091,
-    "modifiedTime": 1755292371207,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.RfjfXuY8b3KhE4b8",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "flags": {}
 }

@@ -1,6 +1,7 @@
 {
-  "_id": "yYfqgiz9dYKqqvn6",
-  "_key": "!item!yYfqgiz9dYKqqvn6",
+  "_id": "jcc9or6rjlSw7xhn",
+  "_key": "!item!jcc9or6rjlSw7xhn",
+  "folder": null,
   "name": "Acid",
   "type": "action",
   "img": "icons/svg/acid.svg",
@@ -116,72 +117,6 @@
       }
     }
   },
-  "effects": [
-    {
-      "name": "Reduce Firewall",
-      "origin": "Item.jcc9or6rjlSw7xhn",
-      "_id": "WJ5y4dKLGiAuxQoR",
-      "img": null,
-      "type": "base",
-      "system": {
-        "applyTo": "targeted_actor",
-        "appliedByTest": false,
-        "onlyForEquipped": false,
-        "onlyForWireless": false,
-        "onlyForItemTest": false,
-        "selection_attributes": [],
-        "selection_categories": [],
-        "selection_limits": [],
-        "selection_skills": [],
-        "selection_tests": []
-      },
-      "changes": [
-        {
-          "key": "system.matrix.firewall",
-          "mode": 0,
-          "value": "-1"
-        }
-      ],
-      "disabled": false,
-      "duration": {
-        "startTime": null,
-        "combat": null,
-        "seconds": null,
-        "rounds": null,
-        "turns": null,
-        "startRound": null,
-        "startTurn": null
-      },
-      "description": "",
-      "tint": "#ffffff",
-      "transfer": true,
-      "statuses": [],
-      "sort": 0,
-      "flags": {},
-      "_stats": {
-        "coreVersion": "13.346",
-        "systemId": "shadowrun5e",
-        "systemVersion": "0.30.0",
-        "createdTime": 1755292082521,
-        "modifiedTime": 1755292123292,
-        "lastModifiedBy": "gprTC3Md255Kv3Xm"
-      }
-    }
-  ],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755291628033,
-    "modifiedTime": 1755291671600,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.jcc9or6rjlSw7xhn",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "effects": [],
+  "flags": {}
 }

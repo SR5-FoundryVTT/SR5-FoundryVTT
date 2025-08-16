@@ -1,6 +1,7 @@
 {
-  "_id": "O4CxErBh9j4fEaGZ",
-  "_key": "!items!O4CxErBh9j4fEaGZ",
+  "_id": "4mbZk7QT5X9irZK9",
+  "_key": "!items!4mbZk7QT5X9irZK9",
+  "folder": null,
   "name": "Crash",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/importer/complex_form.svg",
@@ -117,20 +118,5 @@
     }
   },
   "effects": [],
-  "flags": {},
-  "_stats": {
-    "coreVersion": "13.346",
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
-    "createdTime": 1755291883909,
-    "modifiedTime": 1755291949245,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
-    "exportSource": {
-      "worldId": "sr5-buffalo",
-      "uuid": "Item.4mbZk7QT5X9irZK9",
-      "coreVersion": "13.346",
-      "systemId": "shadowrun5e",
-      "systemVersion": "0.30.0"
-    }
-  }
+  "flags": {}
 }

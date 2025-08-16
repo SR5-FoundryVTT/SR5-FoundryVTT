@@ -1,15 +1,15 @@
 {
-  "_id": "7CsaOjwsF1qEd9go",
-  "_items": "!items!7CsaOjwsF1qEd9go",
+  "_id": "azxx0Iy5VgREjYN8",
+  "_key": "!items!azxx0Iy5VgREjYN8",
   "folder": null,
-  "name": "Probe",
+  "name": "Flicker",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/cpu.svg",
+  "img": "systems/shadowrun5e/dist/icons/cancel.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 248"
+      "source": "KC 67"
     },
     "importFlags": {
       "name": "",
@@ -85,7 +85,7 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "intuition",
+        "attribute": "logic",
         "attribute2": "firewall",
         "armor": false,
         "resist": {
