@@ -1,5 +1,6 @@
 import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
+import { RitualParser } from '../parser/spell/RitualParser';
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { SpellsSchema, Spell } from '../schema/SpellsSchema';
 import { SpellParserBase } from '../parser/spell/SpellParserBase';
@@ -14,6 +15,7 @@ export class SpellImporter extends DataImporter{
 
     static parserWrap = class {
         public async Parse(jsonData: Spell, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
+            const ritualParser = new RitualParser();
             const spellParserBase = new SpellParserBase();
             const combatSpellParser = new CombatSpellParser();
             const illusionSpellParser = new IllusionSpellParser();
@@ -25,6 +27,7 @@ export class SpellImporter extends DataImporter{
                                  : category === 'Detection'     ? detectionSpellParser
                                  : category === 'Illusion'      ? illusionSpellParser
                                  : category === 'Manipulation'  ? manipulationSpellParser
+                                 : category === 'Rituals'       ? ritualParser
                                                                 : spellParserBase;
 
             return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;

@@ -47,7 +47,7 @@ export class SpellParserBase extends Parser<'spell'> {
             system.range = 'los';
         else if (range === 'LOS (A)')
             system.range = 'los_a';
-        
+
         const type = jsonData.type._TEXT;
         if (type === 'P')
             system.type = 'physical';
