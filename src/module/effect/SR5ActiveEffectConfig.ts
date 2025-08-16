@@ -126,7 +126,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
         data.selection_limit_options = this._getLimitOptions();
 
         data.applyToOptions = this.prepareApplyToOptions();
-        data.hasChanges = this.prepareEffectHasChanges();
         data.isv11 = game.release.generation === 11;
 
         return data;
@@ -140,10 +139,18 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * @param options
      */
     override async _onRender(context, options) {
-        for (const input of this.element.querySelectorAll<HTMLSelectElement>('select[name="system.applyTo"]')) {
-            input.addEventListener('change', async (event) => {
-                await this.onApplyToChange(event, input);
+        const applyToSelect = this.element.querySelector<HTMLSelectElement>('select[name="system.applyTo"]')
+        if (applyToSelect) {
+            applyToSelect.addEventListener('change', async (event) => {
+                await this.onApplyToChange(event, applyToSelect);
             });
+            // if we have changes, add a tooltip to the select to indicate it as disabled
+            if (this.hasChanges) {
+                applyToSelect.setAttribute('data-tooltip', game.i18n.localize("SR5.Tooltips.Effect.AlterApplyToWithChanges"));
+                applyToSelect.setAttribute('disabled', 'true');
+            }
+        } else {
+            console.error("Shadowrun5e | Could not find the 'applyTo' select.");
         }
     }
 
@@ -237,7 +244,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * This should be used to prohibit changing of applyTo selections.
      * @returns true if changes are present, false otherwise.
      */
-    prepareEffectHasChanges(): boolean {
+    get hasChanges(): boolean {
         return this.document.changes.length > 0;
     }
 

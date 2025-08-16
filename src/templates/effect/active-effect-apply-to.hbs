@@ -1,5 +1,6 @@
 <section class="tab{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-    {{formGroup systemFields.applyTo value=source.system.applyTo options=applyToOptions disabled=hasChanges rootId=rootId}}
+    <!-- This select gets modified a little by the SR5ActiveEffectConfig class in _onRender -->
+    {{formGroup systemFields.applyTo value=source.system.applyTo options=applyToOptions rootId=rootId}}
 {{#ife applyTo "test_all"}}
     {{formGroup systemFields.selection_tests value=source.system.selection_tests options=selection_test_options rootId=rootId}}
     {{formGroup systemFields.selection_categories value=source.system.selection_categories options=selection_category_options rootId=rootId}}
