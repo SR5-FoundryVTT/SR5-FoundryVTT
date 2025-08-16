@@ -33,9 +33,8 @@ export const ModListEntry = () => ({
 
 export const OverrideModEntry = () => ({
     ...ModListEntry(),
-    // Min and Max will define alternative bahvior for the override mod entry
-    min: new BooleanField({ required: false, nullable: false, initial: false }),
-    max: new BooleanField({ required: false, nullable: false, initial: false }),
+    // Mode will define alternative behavior for the override mod entry
+    mode: new StringField({required: true, initial: 'replace', choices: ['replace', 'min', 'max']})
 });
 
 export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));

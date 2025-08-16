@@ -118,7 +118,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * 
      * This method is designed to handle application and report back if further application is needed.
      * 
-     * The modify mode is inteded to inject each change value into the mod array, while the total value is
+     * The modify mode is intended to inject each change value into the mod array, while the total value is
      * calculated later during document data prep.
      * 
      * @param effect
@@ -288,7 +288,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     static applyOverrideToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (modValue) {
-            modValue.override = { name: effect.name, value: Number(change.value), min: false, max: false };
+            modValue.override = { name: effect.name, value: Number(change.value), mode: 'replace' };
             modValue.value = Number(change.value);
 
             return true;
@@ -303,7 +303,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     static applyUpgradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (modValue) {
-            modValue.override = { name: effect.name, value: Number(change.value), min: true, max: false };
+            modValue.override = { name: effect.name, value: Number(change.value), mode: 'min' };
 
             return true;
         }
@@ -317,7 +317,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     static applyDowngradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (modValue) {
-            modValue.override = { name: effect.name, value: Number(change.value), min: false, max: true };
+            modValue.override = { name: effect.name, value: Number(change.value), mode: 'max' };
 
             return true;
         }

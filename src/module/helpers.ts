@@ -51,8 +51,8 @@ export class Helpers {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
-        // Some values will have their total overriden directly.
-        if (value.override && !value.override.min && !value.override.max) {
+        // Some values will have their total overridden directly.
+        if (value.override && value.override.mode === 'replace') {
             // Still apply a possible value range, even if override says otherwise.
             value.value = Helpers.applyValueRange(value.override.value, options);
             return value.value;
@@ -61,9 +61,10 @@ export class Helpers {
         value.value = parts.total + value.base;
 
         // Some values will apply min / max values to their totals.
-        if (value.override && value.override.min) {
+        if (value.override && value.override.mode === 'min') {
             value.value = Helpers.applyValueRange(value.value, { min: value.override.value });
-        } else if (value.override && value.override.max) {
+        } 
+        else if (value.override && value.override.mode === 'max') {
             value.value = Helpers.applyValueRange(value.value, { max: value.override.value });
         }
 

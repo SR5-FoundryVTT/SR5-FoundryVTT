@@ -147,7 +147,7 @@ export class TestDialog extends FormDialog {
                 // @ts-expect-error fvtt-types don't know about the null somehow
                 valueField.override = null;
             else
-                valueField.override = { name: 'SR5.ManualOverride', value: Number(value), min: false, max: false };
+                valueField.override = { name: 'SR5.ManualOverride', value: Number(value), mode: 'replace' };
         });
 
         // Second, apply generic values.
