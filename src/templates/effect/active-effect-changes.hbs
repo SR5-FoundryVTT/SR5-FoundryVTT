@@ -10,21 +10,21 @@
     </header>
     <ol class="scrollable" data-changes>
         {{#each source.changes as |change i|}}
-            {{#with ../fields.changes.element.fields as |changeFields|}}
+            {{#with @root.fields.changes.element.fields as |changeFields|}}
                 <li data-index="{{i}}">
-                    <div class="key autocomplete-key-{{../../source.system.applyTo}}">
+                    <div class="key autocomplete-key-{{@root.source.system.applyTo}}">
                         {{formInput changeFields.key name=(concat "changes." i ".key") value=change.key}}
                     </div>
-                    {{#ifne ../../source.system.applyTo "modifier"}}
+                    {{#ifne @root.source.system.applyTo "modifier"}}
                     <div class="mode">
                         {{formInput changeFields.mode name=(concat "changes." i ".mode") value=change.mode choices=@root.modes}}
                     </div>
-                    <div class="value autocomplete-value-{{../../source.system.applyTo}}">
+                    <div class="value autocomplete-value-{{@root.source.system.applyTo}}">
                         {{formInput changeFields.value name=(concat "changes." i ".value") value=change.value}}
                     </div>
                     <div class="priority">
                         {{formInput changeFields.priority name=(concat "changes." i ".priority") value=change.priority
-                                    placeholder=(lookup ../../priorities change.mode) disabled=true}}
+                                    placeholder=(lookup @root.priorities change.mode) disabled=true}}
                     </div>
                     {{/ifne}}
                     <div class="controls"><a data-action="deleteChange"><i class="fa-solid fa-trash"></i></a></div>

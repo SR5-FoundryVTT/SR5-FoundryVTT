@@ -2,8 +2,10 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5 } from '../config';
 import { ActionFlow } from '../item/flows/ActionFlow';
 import { Translation } from '../utils/strings';
+import { TagifyTags, TagifyValues } from '@/module/utils/sheets';
 
-const { ActiveEffectConfig } = foundry.applications.sheets;
+import ActiveEffectConfig = foundry.applications.sheets.ActiveEffectConfig;
+import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
 
 /**
  * Shadowrun system alters some behaviors of Active Effects, making a custom ActiveEffectConfig necessary.
@@ -28,10 +30,28 @@ const { ActiveEffectConfig } = foundry.applications.sheets;
  * situational modifiers and others still can behave differently.
  */
 
-export class SR5ActiveEffectConfig extends ActiveEffectConfig {
+type ApplyToOptions = { label: string, value: string }[];
+
+/**
+ * Data Object that gets provided to the templates for ActiveEffects
+ */
+type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
+    selection_test_options: TagifyValues;
+    selection_category_options: TagifyValues;
+    selection_attribute_options: TagifyValues;
+    selection_skill_options: TagifyValues;
+    selection_limit_options: TagifyValues;
+
+    applyToOptions: ApplyToOptions;
+    isv11: boolean;
+    system: ActiveEffectDM;
+    systemFields: typeof ActiveEffectDM.schema.fields;
+}
+
+export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEffectConfig<SR5ActiveEffectSheetData> {
 
     static override DEFAULT_OPTIONS = {
-        ...ActiveEffectConfig.DEFAULT_OPTIONS,
+        ...super.DEFAULT_OPTIONS,
         actions: {
             // override the onAdd so we can change the default mode to custom
             addChange: this.#onAddChange,
@@ -41,11 +61,11 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
     }
 
     static override TABS = {
-        ...ActiveEffectConfig.TABS,
+        ...super.TABS,
         sheet: {
-            ...ActiveEffectConfig.TABS.sheet,
+            ...super.TABS.sheet,
             tabs: [
-                ...ActiveEffectConfig.TABS.sheet.tabs,
+                ...super.TABS.sheet.tabs,
                 { id: 'applyTo', group: 'sheet', cssClass: '', label: 'SR5.ActiveEffect.ApplyTo', icon: 'fas fa-filter' },
                 { id: 'help', group: 'sheet', cssClass: '', label: 'SR5.Help', icon: 'fas fa-book' },
             ],
@@ -59,8 +79,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * @param options
      */
     protected override async _renderHTML(context, options) {
-        context.systemFields = this.document.system.schema.fields;
-        context.system = this.document.system;
         // push footer to the end of parts os it is rendered at the bottom
         if (options.parts.includes("footer")) {
             const index = options.parts.indexOf("footer");
@@ -91,7 +109,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * - use the ActiveEffectConfig Parts by default
      */
     static override PARTS = {
-        ...ActiveEffectConfig.PARTS,
+        ...super.PARTS,
         // override the changes tab so we can use autoinline properties
         changes: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-changes.hbs', scrollable: ["ol[data-changes]"]},
         // override the details tab so we can include our extra settings
@@ -105,18 +123,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * @param options
      */
     override async _prepareContext(options) {
-        const data = await super._prepareContext(options) as any;
-
-        data.applyTo = this.document.system.applyTo;
-        data.onlyForWireless = this.document.system.onlyForWireless;
-        data.onlyForEquipped = this.document.system.onlyForEquipped;
-        data.onlyForItemTest = this.document.system.onlyForItemTest;
-        // setup the data for the selections saves on the document
-        data.selection_tests = this.document.system.selection_tests;
-        data.selection_attributes = this.document.system.selection_attributes;
-        data.selection_categories = this.document.system.selection_categories;
-        data.selection_limits = this.document.system.selection_limits;
-        data.selection_skills = this.document.system.selection_skills;
+        const data = await super._prepareContext(options);
 
         // create the lists of options for each selection
         data.selection_test_options = this._getTestOptions();
@@ -127,6 +134,9 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
 
         data.applyToOptions = this.prepareApplyToOptions();
         data.isv11 = game.release.generation === 11;
+
+        data.systemFields = this.document.system.schema.fields;
+        data.system = this.document.system;
 
         return data;
     }
@@ -254,6 +264,7 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      */
     _getTestOptions() {
         // Tagify expects this format for localized tags.
+        // FIXME TS 'test' comes out as 'unknown' so we need to cast it to any here
         return Object.values(game.shadowrun5e.tests).map(((test: any) => ({
             label: test.label, id: test.name
         })));

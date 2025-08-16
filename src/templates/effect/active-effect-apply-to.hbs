@@ -1,7 +1,7 @@
 <section class="tab{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <!-- This select gets modified a little by the SR5ActiveEffectConfig class in _onRender -->
     {{formGroup systemFields.applyTo value=source.system.applyTo options=applyToOptions rootId=rootId}}
-{{#ife applyTo "test_all"}}
+{{#ife source.system.applyTo "test_all"}}
     {{formGroup systemFields.selection_tests value=source.system.selection_tests options=selection_test_options rootId=rootId}}
     {{formGroup systemFields.selection_categories value=source.system.selection_categories options=selection_category_options rootId=rootId}}
     {{formGroup systemFields.selection_skills value=source.system.selection_skills options=selection_skill_options rootId=rootId}}
@@ -9,7 +9,7 @@
     {{formGroup systemFields.selection_limits value=source.system.selection_limits options=selection_limit_options rootId=rootId}}
 {{/ife}}
 
-{{#ife applyTo "modifier"}}
+{{#ife source.system.applyTo "modifier"}}
     {{formGroup systemFields.onlyForItemTest value=source.system.onlyForItemTest rootId=rootId}}
 {{/ife}}
 </section>
