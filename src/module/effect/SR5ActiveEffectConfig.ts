@@ -6,6 +6,7 @@ import { TagifyTags, TagifyValues } from '@/module/utils/sheets';
 
 import ActiveEffectConfig = foundry.applications.sheets.ActiveEffectConfig;
 import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
 /**
  * Shadowrun system alters some behaviors of Active Effects, making a custom ActiveEffectConfig necessary.
@@ -56,7 +57,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             // override the onAdd so we can change the default mode to custom
             addChange: this.#onAddChange,
         },
-        classes: ["active-effect-config", "sr5v2"],
+        classes: ["active-effect-config", SR5_APPV2_CSS_CLASS],
         position: { width: 580 },
     }
 
