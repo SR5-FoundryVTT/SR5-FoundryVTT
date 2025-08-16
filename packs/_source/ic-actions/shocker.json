@@ -1,13 +1,14 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Patrol",
+  "_id": "NGIcPgevHkRMZxap",
+  "_key": "!items!NGIcPgevHkRMZxap",
+  "name": "Shocker",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/cyber-eye.svg",
+  "img": "systems/shadowrun5e/dist/icons/cpu.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 248"
+      "source": "DT 76"
     },
     "importFlags": {
       "name": "",
@@ -26,7 +27,7 @@
         "mod": [],
         "override": null,
         "temp": 0,
-        "attribute": "data_processing",
+        "attribute": "attack",
         "base_formula_operator": "add"
       },
       "mod": 0,
@@ -78,13 +79,13 @@
         "biofeedback": "none"
       },
       "opposed": {
-        "test": "OpposedTest",
+        "test": "MatrixDefenseTest",
         "type": "",
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "logic",
-        "attribute2": "sleaze",
+        "attribute": "initiation",
+        "attribute2": "firewall",
         "armor": false,
         "resist": {
           "test": "",
@@ -121,12 +122,12 @@
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755292558187,
-    "modifiedTime": 1755292628397,
+    "createdTime": 1755295068866,
+    "modifiedTime": 1755295091314,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.d3mon1mmBDfxdbS5",
+      "uuid": "Item.dxVmVkI0a7Oah1Ju",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"

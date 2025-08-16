@@ -1,8 +1,9 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Killer",
+  "_id": "oSSyRnGjNRhwbMYg",
+  "_key": "!items!oSSyRnGjNRhwbMYg",
+  "name": "Jammer",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/digital-trace.svg",
+  "img": "systems/shadowrun5e/dist/icons/cpu.svg",
   "system": {
     "description": {
       "value": "",
@@ -40,7 +41,6 @@
         }
       },
       "categories": [
-        "attack_matrix",
         "matrix"
       ],
       "spec": false,
@@ -57,10 +57,10 @@
         "mod": [],
         "override": null,
         "temp": 0,
-        "attribute": "attack",
+        "attribute": "",
         "base_formula_operator": "add",
         "type": {
-          "base": "matrix",
+          "base": "",
           "value": ""
         },
         "element": {
@@ -84,11 +84,11 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "intuition",
-        "attribute2": "firewall",
+        "attribute": "willpower",
+        "attribute2": "attack",
         "armor": false,
         "resist": {
-          "test": "MatrixResistTest",
+          "test": "",
           "skill": "",
           "mod": 0,
           "attribute": "",
@@ -116,18 +116,69 @@
       }
     }
   },
-  "effects": [],
+  "effects": [
+    {
+      "name": "Reduce Attack",
+      "origin": "Item.jcc9or6rjlSw7xhn",
+      "img": null,
+      "type": "base",
+      "system": {
+        "applyTo": "targeted_actor",
+        "appliedByTest": false,
+        "onlyForEquipped": false,
+        "onlyForWireless": false,
+        "onlyForItemTest": false,
+        "selection_attributes": [],
+        "selection_categories": [],
+        "selection_limits": [],
+        "selection_skills": [],
+        "selection_tests": []
+      },
+      "changes": [
+        {
+          "key": "system.matrix.attack",
+          "mode": 0,
+          "value": "-1"
+        }
+      ],
+      "disabled": false,
+      "duration": {
+        "startTime": null,
+        "combat": null,
+        "seconds": null,
+        "rounds": null,
+        "turns": null,
+        "startRound": null,
+        "startTurn": null
+      },
+      "description": "",
+      "tint": "#ffffff",
+      "transfer": true,
+      "statuses": [],
+      "sort": 0,
+      "flags": {},
+      "_stats": {
+        "coreVersion": "13.346",
+        "systemId": "shadowrun5e",
+        "systemVersion": "0.30.0",
+        "createdTime": 1755292186568,
+        "modifiedTime": 1755292204365,
+        "lastModifiedBy": "gprTC3Md255Kv3Xm"
+      },
+      "_id": "mPMNI9E3zMoxkIxT"
+    }
+  ],
   "flags": {},
   "_stats": {
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755292286091,
-    "modifiedTime": 1755292371207,
+    "createdTime": 1755292025188,
+    "modifiedTime": 1755292052580,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.RfjfXuY8b3KhE4b8",
+      "uuid": "Item.dQeflPIJct1jEVfx",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"

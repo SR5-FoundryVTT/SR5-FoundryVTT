@@ -1,13 +1,14 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Catapult",
+  "_id": "Slz3bAMzVGObvjl8",
+  "_key": "!items!Slz3bAMzVGObvjl8",
+  "name": "Binder",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/importer/echo.svg",
+  "img": "systems/shadowrun5e/dist/icons/atomic-slashes.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "DT 76"
+      "source": "SR5 248"
     },
     "importFlags": {
       "name": "",
@@ -75,7 +76,7 @@
           "attribute": "",
           "base_formula_operator": "add"
         },
-        "biofeedback": "none"
+        "biofeedback": "physical"
       },
       "opposed": {
         "test": "MatrixDefenseTest",
@@ -83,8 +84,8 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "intuition",
-        "attribute2": "firewall",
+        "attribute": "willpower",
+        "attribute2": "data_processing",
         "armor": false,
         "resist": {
           "test": "",
@@ -117,7 +118,7 @@
   },
   "effects": [
     {
-      "name": "Reduce Firewall",
+      "name": "Reduce Data Proc",
       "origin": "Item.jcc9or6rjlSw7xhn",
       "img": null,
       "type": "base",
@@ -135,7 +136,7 @@
       },
       "changes": [
         {
-          "key": "system.matrix.firewall",
+          "key": "system.matrix.data_processing",
           "mode": 0,
           "value": "-1"
         }
@@ -160,11 +161,11 @@
         "coreVersion": "13.346",
         "systemId": "shadowrun5e",
         "systemVersion": "0.30.0",
-        "createdTime": 1755294876332,
-        "modifiedTime": 1755294876332,
+        "createdTime": 1755292140299,
+        "modifiedTime": 1755292163151,
         "lastModifiedBy": "gprTC3Md255Kv3Xm"
       },
-      "_id": "0zx5ytbhhtf93FAW"
+      "_id": "hT5slcfQsv0sjN2t"
     }
   ],
   "flags": {},
@@ -172,12 +173,12 @@
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755294811221,
-    "modifiedTime": 1755294953437,
+    "createdTime": 1755291713036,
+    "modifiedTime": 1755291802360,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.xwF64xDi2jiUVmc5",
+      "uuid": "Item.rz7mXCyM8YQjcvO1",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"

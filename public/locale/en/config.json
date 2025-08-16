@@ -292,6 +292,10 @@
             "MatrixActionsPack": {
                 "label": "Matrix Actions",
                 "hint": "This compendium will be used for all matrix actions."
+            },
+            "ICActionsPack": {
+                "label": "IC Actions",
+                "hint": "This compendium will be used for IC actions."
             }
         },
         "Compendiums": {

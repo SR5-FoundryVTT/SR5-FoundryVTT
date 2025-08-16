@@ -1,13 +1,14 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Marker",
+  "_id": "YzItnKdk8fyboNVN",
+  "_key": "!items!YzItnKdk8fyboNVN",
+  "name": "Tar Baby",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/caged-ball.svg",
+  "img": "icons/svg/poison.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 248"
+      "source": "SR5 249"
     },
     "importFlags": {
       "name": "",
@@ -75,7 +76,7 @@
           "attribute": "",
           "base_formula_operator": "add"
         },
-        "biofeedback": "physical"
+        "biofeedback": "none"
       },
       "opposed": {
         "test": "MatrixDefenseTest",
@@ -83,8 +84,8 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "willpower",
-        "attribute2": "sleaze",
+        "attribute": "logic",
+        "attribute2": "firewall",
         "armor": false,
         "resist": {
           "test": "",
@@ -117,8 +118,8 @@
   },
   "effects": [
     {
-      "name": "Reduce Sleaze",
-      "origin": "Item.jcc9or6rjlSw7xhn",
+      "name": "Link-locked",
+      "origin": "Item.1tHEar7TdhGl9pjv",
       "img": null,
       "type": "base",
       "system": {
@@ -135,9 +136,9 @@
       },
       "changes": [
         {
-          "key": "system.matrix.sleaze",
-          "mode": 0,
-          "value": "-1"
+          "key": "# system.matrix.link_locked",
+          "mode": 5,
+          "value": "true"
         }
       ],
       "disabled": false,
@@ -160,10 +161,11 @@
         "coreVersion": "13.346",
         "systemId": "shadowrun5e",
         "systemVersion": "0.30.0",
-        "lastModifiedBy": "gprTC3Md255Kv3Xm",
-        "modifiedTime": 1755292490568
+        "createdTime": 1755294324837,
+        "modifiedTime": 1755294324837,
+        "lastModifiedBy": "gprTC3Md255Kv3Xm"
       },
-      "_id": "hT5slcfQsv0sjN2t"
+      "_id": "6Ypj8rx34LIsFgh8"
     }
   ],
   "flags": {},
@@ -171,12 +173,12 @@
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755292412806,
-    "modifiedTime": 1755292471646,
+    "createdTime": 1755294272440,
+    "modifiedTime": 1755294341456,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.KL5oClXgbbSm6tLr",
+      "uuid": "Item.FjPwjlnpmY8BR0fR",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"

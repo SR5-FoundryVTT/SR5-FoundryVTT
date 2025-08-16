@@ -1,13 +1,14 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Acid",
+  "_id": "m2RBsKDc4102mn9D",
+  "_key": "!items!m2RBsKDc4102mn9D",
+  "name": "Track",
   "type": "action",
-  "img": "icons/svg/acid.svg",
+  "img": "systems/shadowrun5e/dist/icons/world.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": ""
+      "source": "SR5 249"
     },
     "importFlags": {
       "name": "",
@@ -75,16 +76,16 @@
           "attribute": "",
           "base_formula_operator": "add"
         },
-        "biofeedback": "physical"
+        "biofeedback": "none"
       },
       "opposed": {
-        "test": "",
+        "test": "MatrixDefenseTest",
         "type": "",
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "",
-        "attribute2": "",
+        "attribute": "willpower",
+        "attribute2": "sleaze",
         "armor": false,
         "resist": {
           "test": "",
@@ -115,69 +116,18 @@
       }
     }
   },
-  "effects": [
-    {
-      "name": "Reduce Firewall",
-      "origin": "Item.jcc9or6rjlSw7xhn",
-      "_id": "WJ5y4dKLGiAuxQoR",
-      "img": null,
-      "type": "base",
-      "system": {
-        "applyTo": "targeted_actor",
-        "appliedByTest": false,
-        "onlyForEquipped": false,
-        "onlyForWireless": false,
-        "onlyForItemTest": false,
-        "selection_attributes": [],
-        "selection_categories": [],
-        "selection_limits": [],
-        "selection_skills": [],
-        "selection_tests": []
-      },
-      "changes": [
-        {
-          "key": "system.matrix.firewall",
-          "mode": 0,
-          "value": "-1"
-        }
-      ],
-      "disabled": false,
-      "duration": {
-        "startTime": null,
-        "combat": null,
-        "seconds": null,
-        "rounds": null,
-        "turns": null,
-        "startRound": null,
-        "startTurn": null
-      },
-      "description": "",
-      "tint": "#ffffff",
-      "transfer": true,
-      "statuses": [],
-      "sort": 0,
-      "flags": {},
-      "_stats": {
-        "coreVersion": "13.346",
-        "systemId": "shadowrun5e",
-        "systemVersion": "0.30.0",
-        "createdTime": 1755292082521,
-        "modifiedTime": 1755292123292,
-        "lastModifiedBy": "gprTC3Md255Kv3Xm"
-      }
-    }
-  ],
+  "effects": [],
   "flags": {},
   "_stats": {
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755291628033,
-    "modifiedTime": 1755291671600,
+    "createdTime": 1755294404367,
+    "modifiedTime": 1755294454015,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.jcc9or6rjlSw7xhn",
+      "uuid": "Item.JEsjfsfvsaxHt2co",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"

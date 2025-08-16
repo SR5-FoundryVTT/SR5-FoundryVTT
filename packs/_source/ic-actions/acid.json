@@ -1,13 +1,14 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Binder",
+  "_id": "yYfqgiz9dYKqqvn6",
+  "_key": "!item!yYfqgiz9dYKqqvn6",
+  "name": "Acid",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/atomic-slashes.svg",
+  "img": "icons/svg/acid.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 248"
+      "source": ""
     },
     "importFlags": {
       "name": "",
@@ -78,13 +79,13 @@
         "biofeedback": "physical"
       },
       "opposed": {
-        "test": "MatrixDefenseTest",
+        "test": "",
         "type": "",
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "willpower",
-        "attribute2": "data_processing",
+        "attribute": "",
+        "attribute2": "",
         "armor": false,
         "resist": {
           "test": "",
@@ -117,8 +118,9 @@
   },
   "effects": [
     {
-      "name": "Reduce Data Proc",
+      "name": "Reduce Firewall",
       "origin": "Item.jcc9or6rjlSw7xhn",
+      "_id": "WJ5y4dKLGiAuxQoR",
       "img": null,
       "type": "base",
       "system": {
@@ -135,7 +137,7 @@
       },
       "changes": [
         {
-          "key": "system.matrix.data_processing",
+          "key": "system.matrix.firewall",
           "mode": 0,
           "value": "-1"
         }
@@ -160,11 +162,10 @@
         "coreVersion": "13.346",
         "systemId": "shadowrun5e",
         "systemVersion": "0.30.0",
-        "createdTime": 1755292140299,
-        "modifiedTime": 1755292163151,
+        "createdTime": 1755292082521,
+        "modifiedTime": 1755292123292,
         "lastModifiedBy": "gprTC3Md255Kv3Xm"
-      },
-      "_id": "hT5slcfQsv0sjN2t"
+      }
     }
   ],
   "flags": {},
@@ -172,12 +173,12 @@
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755291713036,
-    "modifiedTime": 1755291802360,
+    "createdTime": 1755291628033,
+    "modifiedTime": 1755291671600,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.rz7mXCyM8YQjcvO1",
+      "uuid": "Item.jcc9or6rjlSw7xhn",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"

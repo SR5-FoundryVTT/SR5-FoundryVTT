@@ -1,8 +1,9 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Black",
+  "_id": "uAmdnncqLNM7CkDG",
+  "_key": "!items!uAmdnncqLNM7CkDG",
+  "name": "Scramble",
   "type": "action",
-  "img": "icons/svg/skull.svg",
+  "img": "systems/shadowrun5e/dist/icons/amplitude.svg",
   "system": {
     "description": {
       "value": "",
@@ -40,7 +41,6 @@
         }
       },
       "categories": [
-        "attack_matrix",
         "matrix"
       ],
       "spec": false,
@@ -57,10 +57,10 @@
         "mod": [],
         "override": null,
         "temp": 0,
-        "attribute": "attack",
+        "attribute": "",
         "base_formula_operator": "add",
         "type": {
-          "base": "matrix",
+          "base": "",
           "value": ""
         },
         "element": {
@@ -76,7 +76,7 @@
           "attribute": "",
           "base_formula_operator": "add"
         },
-        "biofeedback": "physical"
+        "biofeedback": "none"
       },
       "opposed": {
         "test": "MatrixDefenseTest",
@@ -84,11 +84,11 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "intuition",
+        "attribute": "willpower",
         "attribute2": "firewall",
         "armor": false,
         "resist": {
-          "test": "MatrixResistTest",
+          "test": "",
           "skill": "",
           "mod": 0,
           "attribute": "",
@@ -116,69 +116,18 @@
       }
     }
   },
-  "effects": [
-    {
-      "name": "Link-locked",
-      "origin": "Item.1tHEar7TdhGl9pjv",
-      "_id": "XH7o0UzSj24Ln4Cp",
-      "img": null,
-      "type": "base",
-      "system": {
-        "applyTo": "targeted_actor",
-        "appliedByTest": false,
-        "onlyForEquipped": false,
-        "onlyForWireless": false,
-        "onlyForItemTest": false,
-        "selection_attributes": [],
-        "selection_categories": [],
-        "selection_limits": [],
-        "selection_skills": [],
-        "selection_tests": []
-      },
-      "changes": [
-        {
-          "key": "# system.matrix.link_locked",
-          "mode": 5,
-          "value": "true"
-        }
-      ],
-      "disabled": false,
-      "duration": {
-        "startTime": null,
-        "combat": null,
-        "seconds": null,
-        "rounds": null,
-        "turns": null,
-        "startRound": null,
-        "startTurn": null
-      },
-      "description": "",
-      "tint": "#ffffff",
-      "transfer": true,
-      "statuses": [],
-      "sort": 0,
-      "flags": {},
-      "_stats": {
-        "coreVersion": "13.346",
-        "systemId": "shadowrun5e",
-        "systemVersion": "0.30.0",
-        "createdTime": 1755291048308,
-        "modifiedTime": 1755291074928,
-        "lastModifiedBy": "gprTC3Md255Kv3Xm"
-      }
-    }
-  ],
+  "effects": [],
   "flags": {},
   "_stats": {
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755290826792,
-    "modifiedTime": 1755291613739,
+    "createdTime": 1755293089604,
+    "modifiedTime": 1755293181812,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.1tHEar7TdhGl9pjv",
+      "uuid": "Item.uAmdnncqLNM7CkDG",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"

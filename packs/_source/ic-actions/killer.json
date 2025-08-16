@@ -1,13 +1,14 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Track",
+  "_id": "hep17OFRFQPAx5Y1",
+  "_key": "!items!hep17OFRFQPAx5Y1",
+  "name": "Killer",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/world.svg",
+  "img": "systems/shadowrun5e/dist/icons/digital-trace.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 249"
+      "source": "SR5 248"
     },
     "importFlags": {
       "name": "",
@@ -40,6 +41,7 @@
         }
       },
       "categories": [
+        "attack_matrix",
         "matrix"
       ],
       "spec": false,
@@ -56,10 +58,10 @@
         "mod": [],
         "override": null,
         "temp": 0,
-        "attribute": "",
+        "attribute": "attack",
         "base_formula_operator": "add",
         "type": {
-          "base": "",
+          "base": "matrix",
           "value": ""
         },
         "element": {
@@ -83,11 +85,11 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "willpower",
-        "attribute2": "sleaze",
+        "attribute": "intuition",
+        "attribute2": "firewall",
         "armor": false,
         "resist": {
-          "test": "",
+          "test": "MatrixResistTest",
           "skill": "",
           "mod": 0,
           "attribute": "",
@@ -121,12 +123,12 @@
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755294404367,
-    "modifiedTime": 1755294454015,
+    "createdTime": 1755292286091,
+    "modifiedTime": 1755292371207,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.JEsjfsfvsaxHt2co",
+      "uuid": "Item.RfjfXuY8b3KhE4b8",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"

@@ -1,13 +1,14 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Shocker",
+  "_id": "O4CxErBh9j4fEaGZ",
+  "_key": "!items!O4CxErBh9j4fEaGZ",
+  "name": "Crash",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/cpu.svg",
+  "img": "systems/shadowrun5e/dist/icons/importer/complex_form.svg",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "DT 76"
+      "source": "SR5 248"
     },
     "importFlags": {
       "name": "",
@@ -75,7 +76,7 @@
           "attribute": "",
           "base_formula_operator": "add"
         },
-        "biofeedback": "none"
+        "biofeedback": "physical"
       },
       "opposed": {
         "test": "MatrixDefenseTest",
@@ -83,7 +84,7 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "initiation",
+        "attribute": "logic",
         "attribute2": "firewall",
         "armor": false,
         "resist": {
@@ -121,12 +122,12 @@
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755295068866,
-    "modifiedTime": 1755295091314,
+    "createdTime": 1755291883909,
+    "modifiedTime": 1755291949245,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.dxVmVkI0a7Oah1Ju",
+      "uuid": "Item.4mbZk7QT5X9irZK9",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"

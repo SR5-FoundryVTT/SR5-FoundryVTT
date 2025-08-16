@@ -1,8 +1,9 @@
 {
-  "folder": "jZ9Ig1DRGs3lnBiT",
-  "name": "Jammer",
+  "_id": "UgIKBMVsA6V7DS7i",
+  "_key": "!items!UgIKBMVsA6V7DS7i",
+  "name": "Black",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/cpu.svg",
+  "img": "icons/svg/skull.svg",
   "system": {
     "description": {
       "value": "",
@@ -40,6 +41,7 @@
         }
       },
       "categories": [
+        "attack_matrix",
         "matrix"
       ],
       "spec": false,
@@ -56,10 +58,10 @@
         "mod": [],
         "override": null,
         "temp": 0,
-        "attribute": "",
+        "attribute": "attack",
         "base_formula_operator": "add",
         "type": {
-          "base": "",
+          "base": "matrix",
           "value": ""
         },
         "element": {
@@ -75,7 +77,7 @@
           "attribute": "",
           "base_formula_operator": "add"
         },
-        "biofeedback": "none"
+        "biofeedback": "physical"
       },
       "opposed": {
         "test": "MatrixDefenseTest",
@@ -83,11 +85,11 @@
         "description": "",
         "mod": 0,
         "skill": "",
-        "attribute": "willpower",
-        "attribute2": "attack",
+        "attribute": "intuition",
+        "attribute2": "firewall",
         "armor": false,
         "resist": {
-          "test": "",
+          "test": "MatrixResistTest",
           "skill": "",
           "mod": 0,
           "attribute": "",
@@ -117,8 +119,9 @@
   },
   "effects": [
     {
-      "name": "Reduce Attack",
-      "origin": "Item.jcc9or6rjlSw7xhn",
+      "name": "Link-locked",
+      "origin": "Item.1tHEar7TdhGl9pjv",
+      "_id": "XH7o0UzSj24Ln4Cp",
       "img": null,
       "type": "base",
       "system": {
@@ -135,9 +138,9 @@
       },
       "changes": [
         {
-          "key": "system.matrix.attack",
-          "mode": 0,
-          "value": "-1"
+          "key": "# system.matrix.link_locked",
+          "mode": 5,
+          "value": "true"
         }
       ],
       "disabled": false,
@@ -160,11 +163,10 @@
         "coreVersion": "13.346",
         "systemId": "shadowrun5e",
         "systemVersion": "0.30.0",
-        "createdTime": 1755292186568,
-        "modifiedTime": 1755292204365,
+        "createdTime": 1755291048308,
+        "modifiedTime": 1755291074928,
         "lastModifiedBy": "gprTC3Md255Kv3Xm"
-      },
-      "_id": "mPMNI9E3zMoxkIxT"
+      }
     }
   ],
   "flags": {},
@@ -172,12 +174,12 @@
     "coreVersion": "13.346",
     "systemId": "shadowrun5e",
     "systemVersion": "0.30.0",
-    "createdTime": 1755292025188,
-    "modifiedTime": 1755292052580,
+    "createdTime": 1755290826792,
+    "modifiedTime": 1755291613739,
     "lastModifiedBy": "gprTC3Md255Kv3Xm",
     "exportSource": {
       "worldId": "sr5-buffalo",
-      "uuid": "Item.dQeflPIJct1jEVfx",
+      "uuid": "Item.1tHEar7TdhGl9pjv",
       "coreVersion": "13.346",
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"
