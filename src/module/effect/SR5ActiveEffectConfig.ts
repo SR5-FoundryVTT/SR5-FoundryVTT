@@ -166,8 +166,6 @@ export class SR5ActiveEffectConfig extends ActiveEffectConfig {
      * Shadowrun mostly uses MODIFY, so we use that as default.
      *
      * - this here is the SR5ActiveEffectConfig, however not all the types work correctly so I used any
-     *
-     * @private
      */
     static async #onAddChange(this: any, event: PointerEvent, target: HTMLElement) {
         if (this.form) {

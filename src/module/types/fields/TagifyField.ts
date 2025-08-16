@@ -41,6 +41,10 @@ export class TagifyField<
         return input;
     }
 
+    /**
+     * Override array field's form support
+     * - array field by default does not support forms. we override _toInput to provide a form now
+     */
     static override get hasFormSupport() {
         return true;
     }
@@ -53,10 +57,15 @@ export class TagifyField<
         // parse out the value if it is a string
         if (typeof value === 'string') {
             try {
-                return JSON.parse(value) as AssignmentType;
+                const shouldBeArray = JSON.parse(value);
+                if (Array.isArray(shouldBeArray)) {
+                    return shouldBeArray as AssignmentType;
+                }
+                console.error("Shadowrun5e | Parsed string is not an array.", value)
+                return [] as AssignmentType;
             }
             catch (e) {
-                // TODO log error
+                console.error("Shadowrun5e | Could not parse string value as array.", e)
                 return [] as AssignmentType;
             }
         }
