@@ -298,8 +298,8 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * 
-     */
+     * Apply for the Upgrade mode but, if possible, apply to a ModifiableValue.
+    */
     static applyUpgradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
         if (modValue) {
@@ -312,7 +312,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * 
+     * Apply for the Downgrade mode but, if possible, apply to a ModifiableValue.
      */
     static applyDowngradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
