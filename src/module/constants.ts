@@ -87,7 +87,7 @@ export const LENGTH_UNIT = 'm';
 export const SKILL_DEFAULT_NAME = '';
 export const DEFAULT_ID_LENGTH = 16;
 
-export const SR5_APPV2_CSS_CLASS = "sr5v2";
+export const SR5_APPV2_CSS_CLASS = "sr5v2" as const;
 
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 export const SR = {
