@@ -10,6 +10,7 @@ import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
 import { DamageType } from '../types/item/Action';
 import { MatrixAttributesType } from '../types/template/Matrix';
+import { ResistTestData } from '@/module/tests/flows/ResistTestDataFlow';
 
 /**
  * General handling around everything matrix related.
@@ -145,9 +146,11 @@ export const MatrixFlow = {
             const alias = game.user?.name;
             const linkedTokens = actor.getActiveTokens(true) || [];
             const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
+            // if biofeedback was enabled by the attacker, it should deal damage in a failed attack action back
+            const biofeedback = against.data.action.damage.biofeedback;
 
             const templateData = {
-                damage: MatrixRules.failedAttackDamage(),
+                damage: MatrixRules.failedAttackDamage(biofeedback),
                 speaker: {
                     actor,
                     alias,
@@ -232,6 +235,23 @@ export const MatrixFlow = {
         });
         const messageData = { content };
         await ChatMessage.create(messageData);
+    },
+
+    /**
+     * Get the amount of damage an actor needs to resist as Biofeedback Damage
+     * - biofeedback comes from 2 sources: Matrix Damage and Physical (meatspace) damage
+     * - matrix damage becomes biofeedback when someone in VR takes matrix damage laced with Biofeedback
+     * - physical damage becomes biofeedback when a Drone takes damage and someone is Jumped Into it
+     * @param actor
+     * @param testData
+     */
+    getBiofeedbackResistDamage(actor: SR5Actor, testData: ResistTestData) {
+        const isMatrix = testData.modifiedDamage.type.value === 'matrix';
+        // if the biofeedback isn't matrix damage, halve the damage to as per SR5 266
+        const damageValue = isMatrix ? testData.modifiedDamage.value : Math.ceil(testData.modifiedDamage.value / 2);
+        // if the biofeedback isn't matrix damage, provide an empty string so it is based on the state of hotsim
+        const biofeedback = isMatrix ? testData.modifiedDamage.biofeedback : '';
+        return MatrixRules.createBiofeedbackDamage(damageValue, actor.isUsingHotSim, biofeedback);
     },
 
     /**
