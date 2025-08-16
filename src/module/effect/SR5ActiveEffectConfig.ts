@@ -2,7 +2,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5 } from '../config';
 import { ActionFlow } from '../item/flows/ActionFlow';
 import { Translation } from '../utils/strings';
-import { TagifyTags, TagifyValues } from '@/module/utils/sheets';
+import { TagifyValues } from '@/module/utils/sheets';
 
 import ActiveEffectConfig = foundry.applications.sheets.ActiveEffectConfig;
 import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
