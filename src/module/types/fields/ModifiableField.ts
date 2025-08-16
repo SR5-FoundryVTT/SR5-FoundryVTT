@@ -32,9 +32,6 @@ export class ModifiableField<
         SimpleMerge<Options, SchemaField.DefaultOptions>
     >
 > extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
-    /**
-     * Foundries custom mode is the systems Modify mode.
-     */
     override _applyChangeCustom(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
         if (SR5ActiveEffect.applyModifyToModifiableValue(change.effect, model, change, value, delta)) return undefined;
         return super._applyChangeCustom(value, delta, model, change);
@@ -54,5 +51,12 @@ export class ModifiableField<
     protected override _applyChangeDowngrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): InitializedType | undefined {
         if (SR5ActiveEffect.applyDowngradeToModifiableValue(change.effect, model, change, value, delta)) return undefined;
         return super._applyChangeDowngrade(value, delta, model, change);
+    }
+
+    /**
+     * Avoid breaking sheet rendering by assuring Foundry never applies any naive multiplication of an 'object'
+     */
+    protected override _applyChangeMultiply(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): InitializedType | undefined {
+        return undefined;
     }
 }
