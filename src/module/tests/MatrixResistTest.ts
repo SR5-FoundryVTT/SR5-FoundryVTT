@@ -69,7 +69,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     override get _resistTestClass(): any {
         // check if we can even take biofeedback damage
         const biofeedback = (this.persona?.canTakeBiofeedbackDamage ?? false);
-        if (biofeedback && this.data.modifiedDamage.biofeedback !== 'none'
+        if (biofeedback && this.data.modifiedDamage.biofeedback
                 && this.data.iconUuid === this.persona.uuid && this.data.modifiedDamage.value > 0) {
             return BiofeedbackResistTest;
         }

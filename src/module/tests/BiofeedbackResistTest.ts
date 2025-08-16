@@ -8,6 +8,8 @@ import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 import { DataDefaults } from '../data/DataDefaults';
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { DamageTypeType, MinimalActionType } from '../types/item/Action';
+import { MatrixRules } from '@/module/rules/MatrixRules';
+import { MatrixFlow } from '@/module/flows/MatrixFlow';
 
 // biofeedback is often caused by the results of another ResistTest
 export type BiofeedbackResistTestData = ResistTestData<ResistTestData> & {
@@ -124,26 +126,26 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
     }
 
     /**
-     * Prepare any ResistTest from given test data. This should come from a BiofeedbackDefenseTest
+     * Prepare any ResistTest from given test data. This should come from a Resist Test
      *
      */
     static override async _getResistActionTestData(opposedData: ResistTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<BiofeedbackResistTestData | undefined> {
         if (!document) {
-            console.error(`Shadowrun 5e | Can't resolve resist test values due to missing actor`, this);
+            console.error(`Shadowrun 5e | Can't resolve resist test values due to missing document`, this);
+            return;
+        }
+
+        const actor = document instanceof SR5Item ? document.actorOwner : document;
+        if (!actor) {
+            console.error(`Shadowrun5e | Can't perform a Biofeedback resist due to missing actor`, this);
             return;
         }
 
         // get the amount of damage taken after the roll, and divide that by 2 for the amount of bio feedback we will take
         const newData = foundry.utils.duplicate(opposedData) as ResistTestData;
-        const resistTotal = Math.ceil(newData.modifiedDamage.value/2);
-        newData.modifiedDamage = DataDefaults.createData('damage', {
-            base: resistTotal,
-            value: resistTotal,
-            type: {
-                value: 'matrix',
-                base: 'matrix'
-            }
-        });
+
+        newData.incomingDamage = MatrixFlow.getBiofeedbackResistDamage(actor, opposedData);
+        newData.modifiedDamage = newData.incomingDamage;
 
         // get most of our resist data from the ResistTestDataFlow test data
         const data = ResistTestDataFlow._getResistTestData(newData, 'SR5.Tests.BiofeedbackResistTest', previousMessageId);
