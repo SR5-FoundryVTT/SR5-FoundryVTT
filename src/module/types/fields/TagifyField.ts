@@ -56,6 +56,9 @@ export class TagifyField<
     override _cast(value) {
         // parse out the value if it is a string
         if (typeof value === 'string') {
+            if (value === '') {
+                return [] as AssignmentType;
+            }
             try {
                 const shouldBeArray = JSON.parse(value);
                 if (Array.isArray(shouldBeArray)) {
@@ -65,7 +68,7 @@ export class TagifyField<
                 return [] as AssignmentType;
             }
             catch (e) {
-                console.error("Shadowrun5e | Could not parse string value as array.", e)
+                console.error(`Shadowrun5e | Could not parse string value ${value} as array.`, e)
                 return [] as AssignmentType;
             }
         }
