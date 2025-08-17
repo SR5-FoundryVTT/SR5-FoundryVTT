@@ -93,6 +93,39 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         html.find('.open-matrix-device').on('click', this._onOpenMatrixDevice.bind(this));
 
         html.find('.targets-refresh').on('click', this._onTargetsRefresh.bind(this));
+
+        html.find('.setup-pan').on('click', this._addAllEquippedWirelessDevicesToPAN.bind(this));
+    }
+
+    /**
+     * Add All equipped wireless items on the character to their PAN
+     * @param event
+     */
+    async _addAllEquippedWirelessDevicesToPAN(event) {
+        event.stopPropagation();
+        const matrixDevice = this.actor.getMatrixDevice();
+        if (matrixDevice) {
+            console.debug('Shadowrun5e | Adding all equipped wireless devices to actor PAN ->', event);
+            ui.notifications.info(game.i18n.localize("SR5.AddDevicesToPAN.Starting"));
+            const allItems = this.actor.items;
+            const filteredItems: SR5Item[] = [];
+            for (const item of allItems) {
+                if (item.isMatrixDevice && item.isWireless() && item.isEquipped() && item.id !== matrixDevice.id) {
+                    filteredItems.push(item);
+                }
+            }
+            let i = 0;
+            const total = filteredItems.length;
+            for (const item of filteredItems) {
+                i++;
+                ui.notifications.info(game.i18n.localize(`SR5.AddDevicesToPAN.Adding`) + ` ${item.name} ${i}/${total}`);
+                if (item.hasMaster) {
+                    await item.disconnectFromNetwork();
+                }
+                await matrixDevice.addSlave(item);
+            }
+            ui.notifications.info(game.i18n.localize(`SR5.AddDevicesToPAN.FinishedAddingItems`));
+        }
     }
 
     /**
