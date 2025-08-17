@@ -831,6 +831,7 @@
         "MatrixAttrFirewall": "Firewall",
         "MatrixAttrSleaze": "Sleaze",
         "MatrixDefense": "Matrix Defense",
+        "MatrixFullDefenseAttribute": "Matrix Full Defense Attribute",
         "MatrixNetworkHackingApplication": {
             "Icons": "Icons",
             "Invite": "Ask for invite",
