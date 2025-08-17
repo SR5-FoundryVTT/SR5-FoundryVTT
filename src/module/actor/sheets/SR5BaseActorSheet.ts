@@ -1211,7 +1211,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         const marks = parseInt(event.currentTarget.value);
         await this.actor.setMarks(markedDocument, marks, { overwrite: true });
-        this.render();
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -1229,7 +1228,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (!markedDocument) return;
 
         await this.actor.setMarks(markedDocument, by);
-        this.render();
     }
 
     async _onMarksDelete(event) {
@@ -1247,7 +1245,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (!userConsented) return;
 
         await this.actor.clearMark(uuid);
-        this.render();
     }
 
     async _onMarksClearAll(event) {
@@ -1262,7 +1259,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (!userConsented) return;
 
         await this.actor.clearMarks();
-        this.render();
     }
 
     /**
