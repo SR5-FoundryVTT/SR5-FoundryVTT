@@ -22,6 +22,11 @@ export class Version0_30_0 extends VersionMigration {
             if (item.system?.mount_point === 'under_barrel')
                 item.system.mount_point = 'under';
         }
+
+        // migrate wireless from a boolean to a string
+        if (item.system?.technology?.wireless === true) {
+            item.system.technology.wireless = 'online';
+        }
     }
 
     override migrateActiveEffect(effect: any) {
