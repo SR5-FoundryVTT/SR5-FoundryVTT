@@ -202,6 +202,7 @@ declare module "fvtt-types/configuration" {
     namespace Hooks {
         interface HookConfig {
             sr5_afterPrepareTestDataWithAction: any;
+            sr5_afterDamageAppliedToActor: any;
             deleteActor: any;
             sr5_testPrepareBaseValues: any;
             sr5_testProcessResults: any;

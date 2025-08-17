@@ -744,7 +744,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (!this.isUsingVR) return false;
         // IC and Sprites can't take biofeedback damage
         return !this.isType('ic', 'sprite');
+    }
 
+    takesBiofeedbackDamageFrom(damage: DamageType) {
+        if (!this.canTakeBiofeedbackDamage) return false;
+        if (damage.type.value === 'matrix' && damage.biofeedback) {
+            return true;
+        }
+        // TODO determine when jumped in to take biofeedback damage?
+        return false;
     }
 
     /**
