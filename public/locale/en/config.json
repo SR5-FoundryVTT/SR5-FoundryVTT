@@ -180,6 +180,13 @@
         },
         "Add": "Add",
         "AddAmmo": "Add Ammo",
+        "AddDevicesToPan": {
+            "Adding": "Adding",
+            "Starting": "Starting to add equipped devices to PAN",
+            "FinishedAddingItems": "Finished adding devices to PAN",
+            "SetupPAN": "Add Devices to PAN",
+            "SetupPANTooltip": "Add all Equipped Wireless Devices to this character's Persona"
+        },
         "AddFifteenMinutesToOverwatch": "Roll 2d6 for 15 minutes in the matrix",
         "AddFiveToOverwatch": "+5 to OS",
         "AddMod": "Add Mod",

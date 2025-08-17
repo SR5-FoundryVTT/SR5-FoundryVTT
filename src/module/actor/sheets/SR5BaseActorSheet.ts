@@ -22,6 +22,7 @@ import { DescriptionType } from 'src/module/types/template/Description';
 import { ChatData } from 'src/module/item/ChatData';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
+import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -375,6 +376,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
         // Matrix Target - Connected Icons Visibility Switch
         html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
+
+        html.find('.setup-pan').on('click', this._addAllEquippedWirelessDevicesToPAN.bind(this));
     }
 
     /**
@@ -2070,6 +2073,33 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         await this.document.connectNetwork(network);
         this.render();
+    }
+
+    async _addAllEquippedWirelessDevicesToPAN(event) {
+        event.stopPropagation();
+        const matrixDevice = this.actor.getMatrixDevice();
+        if (matrixDevice) {
+            console.debug('Shadowrun5e | Adding all equipped wireless devices to actor PAN ->', event);
+            ui.notifications.info(game.i18n.localize("SR5.AddDevicesToPAN.Starting"));
+            const allItems = this.actor.items;
+            const filteredItems: SR5Item[] = [];
+            for (const item of allItems) {
+                if (item.isMatrixDevice && item.isWireless() && item.isEquipped() && item.id !== matrixDevice.id) {
+                    filteredItems.push(item);
+                }
+            }
+            let i = 0;
+            const total = filteredItems.length;
+            for (const item of filteredItems) {
+                i++;
+                ui.notifications.info(game.i18n.localize(`SR5.AddDevicesToPAN.Adding`) + ` ${item.name} ${i}/${total}`);
+                if (item.hasMaster) {
+                    await item.disconnectFromNetwork();
+                }
+                await matrixDevice.addSlave(item);
+            }
+            ui.notifications.info(game.i18n.localize(`SR5.AddDevicesToPAN.FinishedAddingItems`));
+        }
     }
 
     /**
