@@ -1210,7 +1210,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
-        return this.actor.setMarks(markedDocument, marks, { overwrite: true });
+        await this.actor.setMarks(markedDocument, marks, { overwrite: true });
+        this.render();
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -1227,7 +1228,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
         if (!markedDocument) return;
 
-        return this.actor.setMarks(markedDocument, by);
+        await this.actor.setMarks(markedDocument, by);
+        this.render();
     }
 
     async _onMarksDelete(event) {
@@ -1244,7 +1246,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        return this.actor.clearMark(uuid);
+        await this.actor.clearMark(uuid);
+        this.render();
     }
 
     async _onMarksClearAll(event) {
@@ -1259,6 +1262,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (!userConsented) return;
 
         await this.actor.clearMarks();
+        this.render();
     }
 
     /**
@@ -1275,7 +1279,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const target = fromUuidSync(uuid) as SR5Item;
         if (!target || !(target instanceof SR5Item)) return;
 
-        return this.actor.connectNetwork(target);
+        await this.actor.connectNetwork(target);
+        this.render();
     }
 
     async _onMarksPlaceMark(event) {
@@ -1289,7 +1294,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     async _onDisconnectNetwork(event) {
         event.stopPropagation();
 
-        return this.actor.disconnectNetwork();
+        await this.actor.disconnectNetwork();
+        this.render();
     }
 
     /**
@@ -2067,6 +2073,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (dialog.canceled) return;
 
         await this.document.connectNetwork(network);
+        this.render();
     }
 
     /**
