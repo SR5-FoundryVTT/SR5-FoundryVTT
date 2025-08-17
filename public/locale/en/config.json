@@ -24,8 +24,6 @@
         "FreshColor": "Highlight with Text Color Only",
         "FreshColorAndIcon": "Highlight with Text Color and Icon",
         "FreshIcon": "Highlight with Icon Only",
-        "GeneralActionsPackDescription": "This compendium will be used for all general, attribute only actions.",
-        "GeneralActionsPackName": "Override General Actions Pack",
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
@@ -35,8 +33,6 @@
         "ManualRollOnSuccessTestDescription": "Allow user to manually roll dice on tests and report back hits",
         "MarkImportsDescription": "Denote freshly imported items on actor sheets to highlight that they should be reviewed",
         "MarkImportsName": "Mark Fresh Imports",
-        "MatrixActionsPackDescription": "This compendium will be used for all matrix actions.",
-        "MatrixActionsPackName": "Override Matrix Actions Pack",
         "MustHaveRessourcesOnTest": "Stop Tests with missing resources",
         "MustHaveRessourcesOnTestDescription": "Only allow actors with all necessary resources to roll a test",
         "NoMarking": "Don't Mark Fresh Imports",
@@ -121,6 +117,47 @@
         "Active": "Active",
         "ActiveDefense": "Active Defense",
         "ActiveEffect": {
+            "FIELDS": {
+                "applyTo": {
+                    "label": "Apply-To",
+                    "hint": "Apply-To different Targets"
+                },
+                "applyByTest": {
+                    "label": "Apply-To Test via Item"
+                },
+                "onlyForEquipped": {
+                    "label": "Equipped Only",
+                    "hint": "Apply for equipped item only"
+                },
+                "onlyForItemTest": {
+                    "label": "Item Test Only",
+                    "hint": "Apply for parent item test only"
+                },
+                "onlyForWireless": {
+                    "label": "Wireless Only",
+                    "hint": "Apply for wireless active only"
+                },
+                "selection_attributes": {
+                    "label": "Attributes Filter",
+                    "hint": "Filter the test based on Attributes used"
+                },
+                "selection_categories": {
+                    "label": "Action Categories Filter",
+                    "hint": "Filter the test based on Action Category used"
+                },
+                "selection_limits": {
+                    "label": "Limits Filter",
+                    "hint": "Filter the test based on the Limit used"
+                },
+                "selection_skills": {
+                    "label": "Skills Filter",
+                    "hint": "Filter the test based on the Skills used"
+                },
+                "selection_tests": {
+                    "label": "Tests Filter",
+                    "hint": "Filter the test based on the Tests used"
+                }
+            },
             "ApplyTo": "Apply-To",
             "ApplyTos": {
                 "TargetedActor": "Targeted Actor",
@@ -130,17 +167,7 @@
             "Modes": {
                 "Modify": "Modify"
             },
-            "New": "New Effect",
-            "OnlyForEquipped": "Apply for equipped item only",
-            "OnlyForItemTest": "Apply for parent item test only",
-            "OnlyForWireless": "Apply for wireless active only",
-            "Test": {
-                "ActionCategories": "Action Categories Filter",
-                "Attributes": "Attributes Filter",
-                "Limits": "Limits Filter",
-                "Skills": "Skills Filter",
-                "Tests": "Tests Filter"
-            }
+            "New": "New Effect"
         },
         "ActiveSkills": "Active Skills",
         "ActorTypes": {
@@ -249,7 +276,15 @@
         "CompendiaSettings": {
             "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
             "Label": "Compendium Packs",
-            "Title": "System compendiums"
+            "Title": "System compendiums",
+            "GeneralActionsPack": {
+                "label": "General Actions",
+                "hint": "This compendium will be used for all general, attribute only actions."
+            },
+            "MatrixActionsPack": {
+                "label": "Matrix Actions",
+                "hint": "This compendium will be used for all matrix actions."
+            }
         },
         "Compendiums": {
             "sr5critter": "Critters & Spirits & Sprites",
@@ -1400,6 +1435,7 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
                 "ApplyTo": "Changes of this effect will apply to this target only",
+                "PriorityFieldDisabled": "Custom priority is not supported at this time",
                 "DocumentEffects": "Effects directly on this document",
                 "ItemEffects": "Effects collected from items on this document",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
