@@ -6,7 +6,6 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixDefenseTestData } from './MatrixDefenseTest';
 import { ResistTestData, ResistTestDataFlow } from './flows/ResistTestDataFlow';
-import { BiofeedbackResistTest } from './BiofeedbackResistTest';
 import { MinimalActionType } from '../types/item/Action';
 
 // matrix resist data is a mix of a bunch of data
@@ -64,33 +63,6 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     }
     override get failureLabel(): Translation {
         return 'SR5.TestResults.ResistedSomeDamage';
-    }
-
-    override get _resistTestClass(): any {
-        // check if we can even take biofeedback damage
-        const biofeedback = (this.persona?.canTakeBiofeedbackDamage ?? false);
-        if (biofeedback && this.data.modifiedDamage.biofeedback
-                && this.data.iconUuid === this.persona.uuid && this.data.modifiedDamage.value > 0) {
-            return BiofeedbackResistTest;
-        }
-        return super._resistTestClass;
-    }
-
-    /**
-     * After the test completes, check to see if a BiofeedbackResistTest is needed
-     */
-    override async afterTestComplete(): Promise<void> {
-        await super.afterTestComplete();
-
-        const testCls = this._resistTestClass;
-        if (testCls) {
-            // create a resist class if we fail to resist biofeedback
-            if (this.data && this.data.messageUuid) {
-                const data = await testCls._getResistActionTestData(this.data, this.persona, this.data.messageUuid)
-                const test = new testCls(data, {actor: this.persona}, this.data.options);
-                await test.execute();
-            }
-        }
     }
 
     static override _getDefaultTestAction(): Partial<MinimalActionType> {

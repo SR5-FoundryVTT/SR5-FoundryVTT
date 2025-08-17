@@ -10,6 +10,8 @@ import { OpposedTest } from '../tests/OpposedTest';
 import { SuccessTest } from '../tests/SuccessTest';
 import { DamageType } from '../types/item/Action';
 import { MatrixAttributesType } from '../types/template/Matrix';
+import { TestCreator } from '@/module/tests/TestCreator';
+import { BiofeedbackResistTest } from '@/module/tests/BiofeedbackResistTest';
 import { ResistTestData } from '@/module/tests/flows/ResistTestDataFlow';
 
 /**
@@ -147,7 +149,7 @@ export const MatrixFlow = {
             const linkedTokens = actor.getActiveTokens(true) || [];
             const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
             // if biofeedback was enabled by the attacker, it should deal damage in a failed attack action back
-            const biofeedback = against.data.action.damage.biofeedback;
+            const biofeedback = against.data.damage.biofeedback;
 
             const templateData = {
                 damage: MatrixRules.failedAttackDamage(biofeedback),
@@ -173,6 +175,31 @@ export const MatrixFlow = {
         const messageData = { content, speaker: templateData.speaker };
         await ChatMessage.create(messageData);
 
+    },
+
+    /**
+     * Determine if the actor should take bifoeedback damage from the damage taken
+     * @param actor
+     * @param damage
+     */
+    async determineBiofeedbackDamage(actor: SR5Actor, damage: DamageType) {
+        if (actor.takesBiofeedbackDamageFrom(damage)) {
+            const biofeedbackDamage = this.getBiofeedbackResistDamage(actor, damage);
+            const action = DataDefaults.createData('action_roll', {
+                    ...BiofeedbackResistTest._getDefaultTestAction(),
+                    test: 'BiofeedbackResistTest',
+                });
+            const data = TestCreator._prepareTestDataWithAction(action, actor, {
+                ...TestCreator._minimalTestData(),
+                action,
+                type: 'BiofeedbackResistTest',
+            }) as ResistTestData;
+            data.incomingDamage = biofeedbackDamage;
+            data.modifiedDamage = data.incomingDamage;
+
+            const test = TestCreator.fromTestData(data, {source: actor});
+            await test.execute();
+        }
     },
 
     /**
@@ -243,14 +270,14 @@ export const MatrixFlow = {
      * - matrix damage becomes biofeedback when someone in VR takes matrix damage laced with Biofeedback
      * - physical damage becomes biofeedback when a Drone takes damage and someone is Jumped Into it
      * @param actor
-     * @param testData
+     * @param damage
      */
-    getBiofeedbackResistDamage(actor: SR5Actor, testData: ResistTestData) {
-        const isMatrix = testData.modifiedDamage.type.value === 'matrix';
+    getBiofeedbackResistDamage(actor: SR5Actor, damage: DamageType) {
+        const isMatrix = damage.type.value === 'matrix';
         // if the biofeedback isn't matrix damage, halve the damage to as per SR5 266
-        const damageValue = isMatrix ? testData.modifiedDamage.value : Math.ceil(testData.modifiedDamage.value / 2);
+        const damageValue = isMatrix ? damage.value : Math.ceil(damage.value / 2);
         // if the biofeedback isn't matrix damage, provide an empty string so it is based on the state of hotsim
-        const biofeedback = isMatrix ? testData.modifiedDamage.biofeedback : '';
+        const biofeedback = isMatrix ? damage.biofeedback : '';
         return MatrixRules.createBiofeedbackDamage(damageValue, actor.isUsingHotSim, biofeedback);
     },
 

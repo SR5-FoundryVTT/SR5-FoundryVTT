@@ -1,5 +1,5 @@
 import { SR5 } from "./config";
-import { DamageType } from "./types/item/Action";
+import { BiofeedbackDamageType, DamageType } from './types/item/Action';
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
 import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
@@ -615,6 +615,7 @@ export class Helpers {
         type: DamageType['type']['value'],
         ap: number = 0,
         element: DamageType['element']['value'] = '',
+        biofeedback: BiofeedbackDamageType = '',
         sourceItem?: SR5Item
     ): DamageType {
         const damage = DataDefaults.createData('damage');
@@ -626,6 +627,7 @@ export class Helpers {
         damage.ap.value = ap;
         damage.element.base = element;
         damage.element.value = element;
+        damage.biofeedback = biofeedback;
 
         if (sourceItem?.actor) {
             damage.source = {
