@@ -370,11 +370,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
-
-        // Matrix Network
-        html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
-        // Matrix Target - Connected Icons Visibility Switch
-        html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
     }
 
     /**
@@ -2056,41 +2051,5 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      */
     get itemEffectApplyTos() {
         return ['actor', 'item', 'test_all', 'test_item', 'modifier'];
-    }
-
-    /**
-    * Allow the user to select a matrix network to connect to.
-    */
-    async _onConnectToMatrixNetwork(event) {
-        event.stopPropagation();
-
-        const dialog = new SelectMatrixNetworkDialog(this.document);
-        const network = await dialog.select();
-        if (dialog.canceled) return;
-
-        await this.document.connectNetwork(network);
-        this.render();
-    }
-
-    /**
-     * Within the list of avialable matrix targets, toggle visibility of sub-sections for connected icons
-     * for a single matrix target.
-     * 
-     * This is done by clicking on a specific icon by user input and will trigger:
-     * - switching out sheet display
-     * - provide a display of additional matrix icons underneath uuid
-     */
-    async _onToggleConnectedMatrixIcons(event) {
-        event.stopPropagation();
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        // Mark main icon as open or closed.
-        if (this._connectedIconsOpenClose[uuid]) delete this._connectedIconsOpenClose[uuid];
-        else this._connectedIconsOpenClose[uuid] = true;
-
-        // Trigger new icons to be shown or hidden.
-        this.render();
     }
 }
