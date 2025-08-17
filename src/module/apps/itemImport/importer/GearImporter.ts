@@ -12,25 +12,29 @@ export class GearImporter extends DataImporter {
     public readonly files = ['gear.xml'] as const;
 
     static parserWrap = class {
+        private readonly ammoParser: AmmoParser;
+        private readonly deviceParser: DeviceParser;
+        private readonly programParser: ProgramParser;
+        private readonly equipmentParser: EquipmentParser;
         private readonly categories: GearSchema['categories']['category'];
+
         constructor(categories: GearSchema['categories']['category']) {
             this.categories = categories;
+            this.ammoParser = new AmmoParser(this.categories);
+            this.deviceParser = new DeviceParser(this.categories);
+            this.programParser = new ProgramParser(this.categories);
+            this.equipmentParser = new EquipmentParser(this.categories);
         }
 
         public async Parse(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
-            const ammoParser = new AmmoParser(this.categories);
-            const deviceParser = new DeviceParser(this.categories);
-            const programParser = new ProgramParser(this.categories);
-            const equipmentParser = new EquipmentParser(this.categories);
-
             const category = jsonData.category._TEXT;
             const programTypes = ['Hacking Programs', 'Common Programs'];
             const deviceTypes = ['Commlinks', 'Cyberdecks', 'Rigger Command Consoles'];
 
-            const selectedParser = category === "Ammunition"       ? ammoParser
-                                 : deviceTypes.includes(category)  ? deviceParser
-                                 : programTypes.includes(category) ? programParser
-                                                                   : equipmentParser;
+            const selectedParser = category === "Ammunition"       ? this.ammoParser
+                                 : deviceTypes.includes(category)  ? this.deviceParser
+                                 : programTypes.includes(category) ? this.programParser
+                                                                   : this.equipmentParser;
 
             return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }

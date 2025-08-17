@@ -10,12 +10,11 @@ export class CritterPowerImporter extends DataImporter {
     public readonly files = ['critterpowers.xml'] as const;
 
     static parserWrap = class {
+        private readonly critterPowerParser = new CritterPowerParser();
+        private readonly spritePowerParser = new SpritePowerParser();
         public async Parse(jsonData: Power, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
-            const critterPowerParser = new CritterPowerParser();
-            const spritePowerParser = new SpritePowerParser();
-
             const isSpritePower = jsonData.category._TEXT !== "Emergent";
-            const selectedParser = isSpritePower ? critterPowerParser : spritePowerParser;
+            const selectedParser = isSpritePower ? this.critterPowerParser : this.spritePowerParser;
 
             return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }

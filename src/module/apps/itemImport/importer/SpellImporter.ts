@@ -13,22 +13,22 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 export class SpellImporter extends DataImporter{
     public readonly files = ['spells.xml'] as const;
 
-    static parserWrap = class {
-        public async Parse(jsonData: Spell, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
-            const ritualParser = new RitualParser();
-            const spellParserBase = new SpellParserBase();
-            const combatSpellParser = new CombatSpellParser();
-            const illusionSpellParser = new IllusionSpellParser();
-            const detectionSpellParser = new DetectionSpellParser();
-            const manipulationSpellParser = new ManipulationSpellParser();
+    protected static parserWrap = class {
+        private readonly ritualParser = new RitualParser();
+        private readonly spellParserBase = new SpellParserBase();
+        private readonly combatSpellParser = new CombatSpellParser();
+        private readonly illusionSpellParser = new IllusionSpellParser();
+        private readonly detectionSpellParser = new DetectionSpellParser();
+        private readonly manipulationSpellParser = new ManipulationSpellParser();
 
+        public async Parse(jsonData: Spell, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const category = jsonData.category._TEXT;
-            const selectedParser = category === 'Combat'        ? combatSpellParser
-                                 : category === 'Detection'     ? detectionSpellParser
-                                 : category === 'Illusion'      ? illusionSpellParser
-                                 : category === 'Manipulation'  ? manipulationSpellParser
-                                 : category === 'Rituals'       ? ritualParser
-                                                                : spellParserBase;
+            const selectedParser = category === 'Combat'        ? this.combatSpellParser
+                                 : category === 'Detection'     ? this.detectionSpellParser
+                                 : category === 'Illusion'      ? this.illusionSpellParser
+                                 : category === 'Manipulation'  ? this.manipulationSpellParser
+                                 : category === 'Rituals'       ? this.ritualParser
+                                                                : this.spellParserBase;
 
             return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }

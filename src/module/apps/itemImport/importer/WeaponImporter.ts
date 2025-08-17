@@ -12,15 +12,15 @@ export class WeaponImporter extends DataImporter {
     public readonly files = ['weapons.xml'] as const;
 
     static parserWrap = class {
-        public async Parse(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
-            const rangedParser = new RangedParser();
-            const meleeParser = new MeleeParser();
-            const thrownParser = new ThrownParser();
+        private readonly meleeParser = new MeleeParser();
+        private readonly rangedParser = new RangedParser();
+        private readonly thrownParser = new ThrownParser();
 
+        public async Parse(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const category = WeaponParserBase.GetWeaponType(jsonData);
-            const selectedParser = category === 'range' ? rangedParser
-                                 : category === 'melee' ? meleeParser
-                                                        : thrownParser;
+            const selectedParser = category === 'range' ? this.rangedParser
+                                 : category === 'melee' ? this.meleeParser
+                                                        : this.thrownParser;
 
             return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }

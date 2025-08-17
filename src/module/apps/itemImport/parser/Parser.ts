@@ -13,7 +13,6 @@ export type SystemType<T extends SystemEntityType> = ReturnType<Parser<T>["getBa
 
 export abstract class Parser<SubType extends SystemEntityType> {
     protected abstract readonly parseType: SubType;
-    protected folders: Record<string, Promise<Folder>> = {};
 
     private isActor(): this is Parser<SystemEntityType & Actor.SubType> {
         return Object.keys(CONFIG.Actor.dataModels).includes(this.parseType);
