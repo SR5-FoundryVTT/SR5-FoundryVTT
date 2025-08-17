@@ -180,7 +180,7 @@
         },
         "Add": "Add",
         "AddAmmo": "Add Ammo",
-        "AddDevicesToPan": {
+        "AddDevicesToPAN": {
             "Adding": "Adding",
             "Starting": "Starting to add equipped devices to PAN",
             "FinishedAddingItems": "Finished adding devices to PAN",
