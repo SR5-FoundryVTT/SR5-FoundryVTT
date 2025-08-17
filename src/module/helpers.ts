@@ -60,10 +60,11 @@ export class Helpers {
 
         value.value = parts.total + value.base;
 
-        // In case of multiple effect changes, prioritize downgrade as I want the universe to suffer.
+        // Apply both down- and upgrade, should multiple effect changes have been applied.
         if (value.downgrade) {
             value.value = Helpers.applyValueRange(value.value, { max: value.downgrade.value });
-        } else if (value.upgrade) {
+        }
+        if (value.upgrade) {
             value.value = Helpers.applyValueRange(value.value, { min: value.upgrade.value });
         } 
 
