@@ -34,7 +34,7 @@ export class SpellImporter extends DataImporter{
         }
     };
 
-    async Parse(jsonObject: SpellsSchema): Promise<void> {
+    async _parse(jsonObject: SpellsSchema): Promise<void> {
         IH.setTranslatedCategory('spells', jsonObject.categories.category);
 
         return SpellImporter.ParseItems<Spell>(

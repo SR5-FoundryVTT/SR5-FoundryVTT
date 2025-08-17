@@ -20,7 +20,7 @@ export class CritterPowerImporter extends DataImporter {
         }
     };
 
-    async Parse(jsonObject: CritterpowersSchema): Promise<void> {
+    async _parse(jsonObject: CritterpowersSchema): Promise<void> {
         IH.setTranslatedCategory('critterpowers', jsonObject.categories.category);
 
         return CritterPowerImporter.ParseItems<Power>(

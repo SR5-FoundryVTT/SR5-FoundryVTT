@@ -26,7 +26,7 @@ export class WeaponImporter extends DataImporter {
         }
     };
 
-    async Parse(jsonObject: WeaponsSchema): Promise<void> {
+    async _parse(jsonObject: WeaponsSchema): Promise<void> {
         IH.setTranslatedCategory('weapons', jsonObject.categories.category);
 
         return WeaponImporter.ParseItems<Weapon>(

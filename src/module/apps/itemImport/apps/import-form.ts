@@ -114,7 +114,7 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
      * - Dependencies: e.g., weapon mods must be imported before weapons.
      * - Performance: Reduce post-processing by importing in logical order.
      */
-    static readonly Importers: readonly DataImporter[] = [
+    static readonly Importers = [
         new WeaponModImporter(),
         new WeaponImporter(),
         new GearImporter(),
@@ -129,7 +129,7 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
         new EchoesImporter(),
         new AdeptPowerImporter(),
         new ArmorImporter(),
-    ];
+    ] as const satisfies readonly DataImporter[];
 
     /**
      * Prepares the context data for rendering the template.
@@ -252,8 +252,7 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
                     if (file === undefined)
                         throw new Error(`File ${fileName} not found`);
 
-                    const json = await DataImporter.xml2json(file);
-                    await importer.Parse(json);
+                    await importer.parse(file);
 
                     const duration = performance.now() - fetchStart;
                     console.debug(`Importing ${fileName} took ${duration.toFixed(2)} ms`);

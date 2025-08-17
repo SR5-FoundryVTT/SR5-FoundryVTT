@@ -9,7 +9,7 @@ type WareTypes = Bioware | Cyberware;
 export class WareImporter extends DataImporter {
     public readonly files = ['bioware.xml', 'cyberware.xml'] as const;
 
-    async Parse(jsonObject: BiowareSchema | CyberwareSchema): Promise<void> {
+    async _parse(jsonObject: BiowareSchema | CyberwareSchema): Promise<void> {
         const key = 'biowares' in jsonObject ? 'bioware' : 'cyberware';
 
         IH.setTranslatedCategory(key, jsonObject.categories.category);

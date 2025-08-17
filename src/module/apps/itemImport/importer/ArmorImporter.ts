@@ -7,7 +7,7 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 export class ArmorImporter extends DataImporter {
     public readonly files = ['armor.xml'] as const;
 
-    async Parse(jsonObject: ArmorSchema): Promise<void> {
+    async _parse(jsonObject: ArmorSchema): Promise<void> {
         IH.setTranslatedCategory('armor', jsonObject.categories.category);
 
         return ArmorImporter.ParseItems<Armor>(

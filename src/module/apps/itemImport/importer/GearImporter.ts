@@ -40,7 +40,7 @@ export class GearImporter extends DataImporter {
         }
     };
 
-    async Parse(jsonObject: GearSchema): Promise<void> {
+    async _parse(jsonObject: GearSchema): Promise<void> {
         IH.setTranslatedCategory('gear', jsonObject.categories.category);
 
         return GearImporter.ParseItems<Gear>(

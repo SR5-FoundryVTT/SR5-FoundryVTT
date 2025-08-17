@@ -5,7 +5,7 @@ import { AdeptPowerParser } from '../parser/powers/AdeptPowerParser';
 export class AdeptPowerImporter extends DataImporter {
     public readonly files = ['powers.xml'] as const;
 
-    async Parse(jsonObject: PowersSchema): Promise<void> {
+    async _parse(jsonObject: PowersSchema): Promise<void> {
         return AdeptPowerImporter.ParseItems<Power>(
             jsonObject.powers.power,
             {

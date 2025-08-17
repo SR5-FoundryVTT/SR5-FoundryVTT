@@ -7,7 +7,7 @@ import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 export class QualityImporter extends DataImporter {
     public readonly files = ['qualities.xml'] as const;
 
-    async Parse(jsonObject: QualitiesSchema): Promise<void> {
+    async _parse(jsonObject: QualitiesSchema): Promise<void> {
         IH.setTranslatedCategory('qualities', jsonObject.categories.category);
 
         return QualityImporter.ParseItems<Quality>(

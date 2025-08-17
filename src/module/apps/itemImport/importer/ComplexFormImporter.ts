@@ -6,7 +6,7 @@ import { ComplexformsSchema, Complexform } from '../schema/ComplexformsSchema';
 export class ComplexFormImporter extends DataImporter {
     public readonly files = ['complexforms.xml'] as const;
 
-    async Parse(jsonObject: ComplexformsSchema): Promise<void> {
+    async _parse(jsonObject: ComplexformsSchema): Promise<void> {
         return ComplexFormImporter.ParseItems<Complexform>(
             jsonObject.complexforms.complexform,
             {

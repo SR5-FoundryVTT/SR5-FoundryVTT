@@ -4,29 +4,41 @@ import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
 
 /**
- * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
- *
- * Generic type ItemDataType is the items data type DataImporter creates per entry in that Chummer5a data .xml file.
+ * The most basic Chummer item data importer, designed to handle one or more Chummer5a data <type>.xml files.
  */
 export abstract class DataImporter {
+    /**
+     * Whether to set icons for imported items.
+     */
     public static setIcons = true;
+
+    /**
+     * List of icon paths to use for imported items.
+     */
     public static iconList: string[] = [];
+
+    /**
+     * Whether to override existing documents in the compendium.
+     */
     public static overrideDocuments = true;
+
+    /**
+     * The list of Chummer XML files this importer can handle.
+     */
     public readonly abstract files: readonly ChummerFileXML[];
 
     /**
-     * Parse the specified jsonObject and return Item representations.
-     * @param chummerData The JSON data to parse.
-     * @returns An array of created objects.
+     * Parses the specified JSON object and creates item representations.
+     * @param chummerData - The JSON data to parse.
      */
-    public abstract Parse(chummerData: Schemas): Promise<void>;
+    protected abstract _parse(chummerData: Schemas): Promise<void>;
 
     /**
-     * Parse an XML string into a JSON object.
-     * @param xmlString The string to parse as XML.
-     * @returns A json object converted from the string.
+     * Parses an XML string into a JSON object.
+     * @param xmlString - The XML string to parse.
+     * @returns A JSON object converted from the XML string.
      */
-    public static async xml2json(xmlString: string): Promise<Schemas> {
+    private static async _xml2json(xmlString: string): Promise<Schemas> {
         const parser = new Parser({
             explicitArray: false,
             explicitCharkey: true,
@@ -34,6 +46,14 @@ export abstract class DataImporter {
         });
 
         return (await parser.parseStringPromise(xmlString))['chummer'];
+    }
+
+    /**
+     * Parses an XML string and processes it using the importer.
+     * @param xml - The XML string to parse and import.
+     */
+    public async parse(xml: string) {
+        return this._parse(await DataImporter._xml2json(xml));
     }
 
     /**

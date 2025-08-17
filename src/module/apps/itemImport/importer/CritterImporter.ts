@@ -36,7 +36,7 @@ export class CritterImporter extends DataImporter {
         }
     };
 
-    async Parse(chummerData: MetatypeSchema): Promise<void> {
+    async _parse(chummerData: MetatypeSchema): Promise<void> {
         IH.setTranslatedCategory('metatypes', chummerData.categories.category);
 
         // get metavariants as well
