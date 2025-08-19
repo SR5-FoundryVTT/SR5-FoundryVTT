@@ -149,7 +149,6 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         if (matrixDevice) {
             console.debug('Shadowrun5e | Adding all equipped wireless devices to actor PAN ->', event);
             const progressBar = ui.notifications.info(game.i18n.localize("SR5.AddDevicesToPAN.Starting"), { progress: true });
-            console.log('progressBar', progressBar);
             const allItems = this.actor.items;
             const filteredItems: SR5Item[] = [];
             for (const item of allItems) {
@@ -164,7 +163,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                 await item.disconnectFromNetwork();
                 progressBar.update({
                     pct: i / total,
-                    message: `${game.i18n.localize(`SR5.AddDevicesToPAN.Adding`)} (${item.name} ${i}/${total})`
+                    message: `(${i}/${total}) ${game.i18n.localize(`SR5.AddDevicesToPAN.Adding`)} ${item.name} `
                 })
                 await matrixDevice.addSlave(item);
             }
