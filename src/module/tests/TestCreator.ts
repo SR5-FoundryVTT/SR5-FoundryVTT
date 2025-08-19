@@ -445,7 +445,7 @@ export const TestCreator = {
         // Prepare pool values.
         if (action.skill) {
             // Grab the skill by its id (default skills), or its label (custom skills).
-            const skill = actor.getSkill(action.skill, {rollData}) ?? actor.getSkill(action.skill, {byLabel: true, rollData});
+            const skill = actor.getSkill(action.skill, { rollData }) ?? actor.getSkill(action.skill, {byLabel: true, rollData });
 
             // Notify user about their sins.
             if (skill && !SkillFlow.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
@@ -459,7 +459,7 @@ export const TestCreator = {
         }
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
-            const attribute = actor.getAttribute(action.attribute, rollData);
+            const attribute = actor.getAttribute(action.attribute, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
             // Apply matrix modifiers, when applicable
@@ -467,7 +467,7 @@ export const TestCreator = {
         }
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
-            const attribute = actor.getAttribute(action.attribute2, rollData);
+            const attribute = actor.getAttribute(action.attribute2, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
             // Apply matrix modifiers, when applicable

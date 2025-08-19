@@ -573,18 +573,18 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * For vehicles this will also return their vehicle stats.
 
      * @param name An attribute or other stats name.
+     * @param options
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
-    getAttribute(this:SR5Actor, name: string, options: {rollData?: Shadowrun.ShadowrunActorDataData} = {}): AttributeFieldType {
-        // First check vehicle stats, as they don't always exist.
-        const rollData = options.rollData || this.getRollData() as Shadowrun.ShadowrunActorDataData;
+    getAttribute(this:SR5Actor, name: string, options?: { rollData?: SR5Actor['system'] }): AttributeFieldType {
 
-        // TODO: does this need to change w.r.t. rollData?
-        const stats = this.getVehicleStats();
+        const rollData = options?.rollData ?? this.getRollData();
+        // First check vehicle stats, as they don't always exist.
+        const stats = rollData.vehicle_stats ?? this.getVehicleStats();
         if (stats?.[name]) return stats[name];
 
         // Second check general attributes.
-        const attributes = rollData.attributes;
+        const attributes = rollData.attributes ?? this.getAttributes();
         return attributes[name];
     }
 
@@ -817,11 +817,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param id Either the searched id, name or translated label of a skill
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
-    getSkill(this: SR5Actor, id: string, options: { byLabel?: boolean, rollData? : Shadowrun.ShadowrunActorDataData } = {byLabel: false}): SkillFieldType | undefined {
+    getSkill(this: SR5Actor, id: string, options?: { byLabel?: boolean, rollData?: SR5Actor['system'] }): SkillFieldType | undefined {
         if (options?.byLabel)
             return this.getSkillByLabel(id);
 
-        const skills = options.rollData?.skills ?? this.system.skills;
+        const rollData = options?.rollData ?? this.getRollData();
+
+        const skills = rollData?.skills ?? this.getSkills();
 
         // Find skill by direct id to key matching.
         if (skills.active.hasOwnProperty(id)) {
@@ -2178,7 +2180,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override getRollData(options: RollDataOptions = {}) {
         // Avoid changing actor system data as Foundry just returns it.
-        const rollData = foundry.utils.duplicate(super.getRollData());
+        const rollData = foundry.utils.deepClone(super.getRollData());
         return ActorRollDataFlow.getRollData(this, rollData, options);
     }
 

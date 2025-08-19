@@ -1,5 +1,6 @@
 import { RollDataOptions } from "../../item/Types";
 import { SR5Actor } from "../SR5Actor";
+import { AttributesType } from '@/module/types/template/Attributes';
 
 /**
  * Handling around actor roll data resolution.
@@ -26,15 +27,20 @@ export const ActorRollDataFlow = {
      * 
      * TODO: Hand over to a RiggingRules implementation.
      */
-    injectVehicleRiggerRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions) {
+    injectVehicleRiggerRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions = {}) {
         const driver = actor.getVehicleDriver()
-        const vehicleSystem = actor.system as Shadowrun.VehicleData;
-        const vehicleAttributes = actor.system.attributes as Shadowrun.AttributesData;
-        const driverSkills = driver?.system.skills as Shadowrun.CharacterSkills;
-        const driverAttributes = driver?.system.attributes as Shadowrun.AttributesData;
-        
-        if (vehicleSystem.controlMode == "rigger") {
-            const injectAttributes = ['intuition', 'agility'];
+        const vehicleSystem = actor.system;
+
+        const driverSkills = driver?.system.skills;
+        if (!driverSkills) return rollData;
+
+        const driverAttributes = driver?.system.attributes;
+        if (!driverAttributes) return rollData;
+
+        // if the driver is in control of the vehicle, inject the driver's attributes and skills
+        if (vehicleSystem.controlMode && ['rigger', 'remote', 'manual'].includes(vehicleSystem.controlMode)) {
+
+            const injectAttributes = ['intuition', 'reaction', 'logic', 'agility'];
             ActorRollDataFlow._injectAttributes(injectAttributes, driverAttributes, rollData, { bigger: false });
 
             const injectSkills = ['perception', 'sneaking', 'gunnery', 'pilot_aerospace', 'pilot_aircraft',
@@ -64,10 +70,11 @@ export const ActorRollDataFlow = {
      * @param names A list of attribute names to inject
      * @param attributes The list of source attribute to pull from
      * @param rollData The testData to inject attributes into
+     * @param options
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    _injectAttributes(names: string[], attributes: Shadowrun.AttributesData, rollData: Shadowrun.ShadowrunItemDataData, options: { bigger: boolean }) {
-        const targetAttributes = rollData.attributes as Shadowrun.AttributesData;
+    _injectAttributes(names: string[], attributes: AttributesType, rollData: SR5Actor['system'], options: { bigger: boolean }) {
+        const targetAttributes = rollData.attributes;
         for (const name of names) {
             const sourceAttribute = foundry.utils.duplicate(attributes[name]);
             const targetAttribute = targetAttributes[name];
@@ -86,12 +93,13 @@ export const ActorRollDataFlow = {
      * Also implements the 'use bigger value rule',if necessary.
      *
      * @param names A list of attribute names to inject
-     * @param attributes The list of source attribute to pull from
+     * @param skills
      * @param rollData The testData to inject attributes into
+     * @param options
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    _injectSkills(names: string[], skills: Shadowrun.CharacterSkills, rollData: Shadowrun.ShadowrunActorDataData, options: { bigger: boolean }) {
-        const targetAttributes = rollData.skills.active as Shadowrun.AttributesData;
+    _injectSkills(names: string[], skills: SR5Actor['system']['skills'], rollData: SR5Actor['system'], options: { bigger: boolean }) {
+        const targetAttributes = rollData.skills.active;
         for (const name of names) {
             const sourceAttribute = foundry.utils.duplicate(skills.active[name]);
             const targetAttribute = targetAttributes[name];
