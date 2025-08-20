@@ -1,6 +1,8 @@
 import { MatrixFlow } from '../../flows/MatrixFlow';
 import { MatrixTestDataFlow } from '../flows/MatrixTestDataFlow';
 import { SuccessTest } from '../SuccessTest';
+import { SR5Actor } from '@/module/actor/SR5Actor';
+import { DamageType } from '@/module/types/item/Action';
 
 /**
  * Matrix related Success Test hook implementations.
@@ -11,6 +13,7 @@ export const MatrixHooks = {
         Hooks.on('sr5_testProcessResults', MatrixHooks.onTestProcessResults_AddMatrixDamageForTargetMarks.bind(this));
         Hooks.on('sr5_testProcessResults', MatrixHooks.onTestProcessResults_AddOverwatchScore.bind(this));
         Hooks.on('sr5_afterTestComplete', MatrixHooks.onAfterTestComplete_HandleMatrixFailedAttack.bind(this));
+        Hooks.on('sr5_afterDamageAppliedToActor', MatrixHooks.onAfterDamageAppliedToActor_HandleBiofeedbackDamage.bind(this));
     },
 
     /**
@@ -44,5 +47,11 @@ export const MatrixHooks = {
      */
     onAfterTestComplete_HandleMatrixFailedAttack: async function(test: SuccessTest) {
         await MatrixFlow.determineMatrixFailedAttack(test);
+    },
+
+    /**
+     */
+    onAfterDamageAppliedToActor_HandleBiofeedbackDamage: async function(actor: SR5Actor, damage: DamageType) {
+        await MatrixFlow.determineBiofeedbackDamage(actor, damage);
     },
 }

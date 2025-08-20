@@ -106,6 +106,13 @@ export const SR5 = {
         matrix: 'SR5.DmgTypeMatrix'
     },
 
+    biofeedbackOptions: {
+        // create an empty string option, this should not be needed after appv2
+        '': '',
+        physical: 'SR5.DmgTypePhysical',
+        stun: 'SR5.DmgTypeStun',
+    },
+
     weaponRangeCategories: {
         manual: {
             label: 'SR5.Weapon.Range.Category.Manual',

@@ -4,7 +4,7 @@ import { DataDefaults } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { PartsList } from "../parts/PartsList";
-import { DamageType } from "../types/item/Action";
+import { BiofeedbackDamageType, DamageType } from '../types/item/Action';
 
 export class MatrixRules {
     /**
@@ -224,8 +224,31 @@ export class MatrixRules {
      * Determine the damage value dealt for failed Attack Actions
      *
      */
-    static failedAttackDamage(): DamageType {
-        return DataDefaults.createData('damage', {base: 1, value: 1, type: {base: 'matrix', value: 'matrix'}});
+    static failedAttackDamage(biofeedback: BiofeedbackDamageType = ''): DamageType {
+        return DataDefaults.createData('damage', {base: 1, value: 1, type: {base: 'matrix', value: 'matrix'}, biofeedback});
+    }
+
+    /**
+     * Biofeedback damage is dealt as Physical or Stun SR5 229
+     * - biofeedback is based on the incoming type of incoming biofeedback damage and if the target is in hotsim
+     * - for instance, physical biofeedback damage becomes stun if the target isn't in hotsim
+     */
+    static createBiofeedbackDamage(value: number, hotSim: boolean, biofeedback: BiofeedbackDamageType = ''): DamageType {
+        // if the biofeedback passed in isn't set, set it via the state of hotsim
+        if (!biofeedback) {
+            biofeedback = hotSim ? 'physical' : 'stun';
+        }
+        // if we aren't in hotsim, we will only ever take stun damage
+        // some attacks will specifically do stun damage, even when in hotsim
+        const actualBiofeedback = hotSim ? biofeedback : 'stun';
+        return DataDefaults.createData('damage', {
+            base: value,
+            value,
+            type: {
+                base: actualBiofeedback,
+                value: actualBiofeedback,
+            }
+        });
     }
 
     /**
@@ -235,10 +258,9 @@ export class MatrixRules {
      * @param hotSim Is the persona using a hot sim?
      */
     static dumpshockDamage(hotSim: boolean): DamageType {
-        const type = hotSim ? 'physical' : 'stun';
         const damage = 6;
 
-        return DataDefaults.createData('damage', {type: {base: type, value: type}, base: damage, value: damage});
+        return this.createBiofeedbackDamage(damage, hotSim);
     }
 
     static modifyDamageAfterHit(attackerHits: number, defenderHits: number, damage: DamageType): DamageType {

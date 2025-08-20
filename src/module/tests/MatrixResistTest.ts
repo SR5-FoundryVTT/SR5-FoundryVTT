@@ -6,7 +6,6 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixDefenseTestData } from './MatrixDefenseTest';
 import { ResistTestData, ResistTestDataFlow } from './flows/ResistTestDataFlow';
-import { BiofeedbackResistTest } from './BiofeedbackResistTest';
 import { MinimalActionType } from '../types/item/Action';
 
 // matrix resist data is a mix of a bunch of data
@@ -16,8 +15,6 @@ export type MatrixResistTestData = ResistTestData<MatrixDefenseTestData> & {
     personaUuid: string | undefined
     // The icon uuid. This would be the actual mark placement target. Can be a device, a persona device, a host or actor.
     iconUuid: string | undefined
-    // if the test has biofeedback damage
-    biofeedback: boolean | undefined;
 }
 
 /**
@@ -42,7 +39,6 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             data = MatrixTestDataFlow._prepareDataResist(data);
         }
         data = ResistTestDataFlow._prepareData(data);
-        data.biofeedback = true;
 
         return data;
     }
@@ -69,27 +65,6 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
         return 'SR5.TestResults.ResistedSomeDamage';
     }
 
-    override get _resistTestClass(): any {
-        if (this.persona && this.data.iconUuid === this.persona.uuid && this.data.biofeedback && this.data.modifiedDamage.value > 0) {
-            return BiofeedbackResistTest;
-        }
-        return super._resistTestClass;
-    }
-
-    override async afterTestComplete(): Promise<void> {
-        await super.afterTestComplete();
-
-        const testCls = this._resistTestClass;
-        if (testCls) {
-            // create a resist class if we fail to resist biofeedback
-            if (this.data && this.data.messageUuid) {
-                const data = await testCls._getResistActionTestData(this.data, this.persona, this.data.messageUuid)
-                const test = new testCls(data, {actor: this.persona}, this.data.options);
-                await test.execute();
-            }
-        }
-    }
-
     static override _getDefaultTestAction(): Partial<MinimalActionType> {
         return {
             'attribute': 'rating',
@@ -106,6 +81,9 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
         return ['resist', 'resist_matrix']
     }
 
+    /**
+     * Reduce the damage dealt by the number of hits we got
+     */
     override async processResults() {
         await super.processResults();
 
