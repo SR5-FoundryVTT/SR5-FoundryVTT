@@ -159,12 +159,11 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
             const total = filteredItems.length;
             for (const item of filteredItems) {
                 i++;
-                await item.disconnectFromNetwork();
+                await matrixDevice.addSlave(item);
                 progressBar.update({
                     pct: i / total,
                     message: `(${i}/${total}) ${game.i18n.localize(`SR5.AddDevicesToPAN.Adding`)} ${item.name} `
                 })
-                await matrixDevice.addSlave(item);
             }
             progressBar.remove();
             ui.notifications.info(game.i18n.localize(`SR5.AddDevicesToPAN.FinishedAddingItems`));
