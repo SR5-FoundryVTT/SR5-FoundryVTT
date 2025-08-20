@@ -69,7 +69,7 @@ export const DamageData = () => ({
         required: true,
         blank: true,
         initial: '',
-        choices: ["physical", "stun", ""],
+        choices: ["physical", "stun"],
     }),
     attribute: new StringField({ required: true }),
     source: new SchemaField({
