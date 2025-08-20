@@ -18,8 +18,34 @@ export const ActorRollDataFlow = {
      * @param options
      */
     getRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions) {
-        if (actor.isType('vehicle')) ActorRollDataFlow.injectVehicleRiggerRollData(actor, rollData, options);
+        if (actor.isType('vehicle')) ActorRollDataFlow.injectVehicleDriverRollData(actor, rollData, options);
+        if (actor.isUsingVR) ActorRollDataFlow.injectMentalAttributesAsPhysical(actor, rollData, options);
         return rollData;
+    },
+
+    /**
+     * Inject the Mental attributes values and labels into their physical attribute counterparts,
+     * these are defined on page 314 of SR5 -- it is the Astral Attributes Table but I believe that is the same as Matrix
+     * @param actor
+     * @param rollData
+     * @param options
+     */
+    injectMentalAttributesAsPhysical: (actor: SR5Actor, rollData: SR5Actor['system'], options: RollDataOptions = {}) => {
+        const attributes = rollData.attributes;
+        const attributeMapper = {
+            'agility': 'logic',
+            'body': 'willpower',
+            'reaction': 'intuition',
+            'strength': 'charisma',
+        }
+
+        for (const [key, value] of Object.entries(attributeMapper)) {
+            const a1 = attributes[key];
+            const a2 = attributes[value];
+
+            a1.value = a2.value;
+            a1.label = a2.label;
+        }
     },
 
     /**
@@ -27,18 +53,22 @@ export const ActorRollDataFlow = {
      * 
      * TODO: Hand over to a RiggingRules implementation.
      */
-    injectVehicleRiggerRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions = {}) {
+    injectVehicleDriverRollData: function(actor: SR5Actor, rollData: SR5Actor['system'], options: RollDataOptions = {}) {
         const driver = actor.getVehicleDriver()
+        if (!driver) return;
         const vehicleSystem = actor.system;
+        if (!vehicleSystem.controlMode) return;
 
-        const driverSkills = driver?.system.skills;
-        if (!driverSkills) return rollData;
+        const driverRollData = driver.getRollData();
 
-        const driverAttributes = driver?.system.attributes;
-        if (!driverAttributes) return rollData;
+        const driverSkills = driverRollData.skills;
+        if (!driverSkills) return;
+
+        const driverAttributes = driverRollData.attributes;
+        if (!driverAttributes) return;
 
         // if the driver is in control of the vehicle, inject the driver's attributes and skills
-        if (vehicleSystem.controlMode && ['rigger', 'remote', 'manual'].includes(vehicleSystem.controlMode)) {
+        if (['rigger', 'remote', 'manual'].includes(vehicleSystem.controlMode)) {
 
             const injectAttributes = ['intuition', 'reaction', 'logic', 'agility'];
             ActorRollDataFlow._injectAttributes(injectAttributes, driverAttributes, rollData, { bigger: false });
