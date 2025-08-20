@@ -1,60 +1,34 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
-export class ContactParser {
-    async parseContacts(chummerChar: ActorSchema, assignIcons: boolean = false) {
-        const chummerContacts = getArray(chummerChar.contacts?.contact);
-        const parsedContacts: Item.CreateData[] = [];
-        const iconList = await IconAssign.getIconFiles();
+export class ContactParser extends Parser<'contact'> {
+    protected readonly parseType = 'contact';
+    protected readonly compKey = null;
 
-        for (const chummerContact of chummerContacts) {
-            try {
-                const itemData = this.parseContact(chummerContact);
+    protected parseItem(item: BlankItem<'contact'>, itemData: ExtractItemType<'contacts', 'contact'>) {
+        const system = item.system;
+        item.name ||= '[Unnamed connection]';
 
-                // Assign the icon if enabled
-                if (assignIcons)
-                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
-
-                parsedContacts.push(itemData);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        return parsedContacts;
-    }
-
-    parseContact(chummerContact: Unwrap<NonNullable<ActorSchema['contacts']>['contact']>) {
-        const parserType = 'contact';
-        const system = DataDefaults.baseSystemData(parserType);
-        system.type = chummerContact.role || '';
+        system.type = itemData.role || '';
 
         // Group contacts are stored in chummer as 'Group(connectionRating)', e.g. 'Group(5)'
         // We handle group contacts as normal contacts until they are supported in the codebase.
-        if (chummerContact.connection.toLowerCase().includes('group')) {
-            system.connection = Number(chummerContact.connection
+        if (itemData.connection.toLowerCase().includes('group')) {
+            system.connection = Number(itemData.connection
                 .toLowerCase()
                 .replace('group(', '')
                 .replace(')', '')) || 0;
         }
         else {
-            system.connection = Number(chummerContact.connection) || 0;
+            system.connection = Number(itemData.connection) || 0;
         }
 
-        system.loyalty = Number(chummerContact.loyalty) || 0;
-        system.family = chummerContact.family === 'True';
-        system.blackmail = chummerContact.blackmail === 'True';
-        system.description = parseDescription(chummerContact);
+        system.loyalty = Number(itemData.loyalty) || 0;
+        system.family = itemData.family === 'True';
+        system.blackmail = itemData.blackmail === 'True';
 
-        const itemName = chummerContact.name ? chummerContact.name : '[Unnamed connection]';
 
         // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemName), parserType);
-
-        const itemData = createItemData(itemName, 'contact', system);
-        return itemData;
+        system.importFlags = genImportFlags(formatAsSlug(item.name), this.parseType);
     }
 }

@@ -100,12 +100,28 @@ export class ImportHelper {
 
         const docs =
             names.length === 1
-                ? [await pack.getDocument(ids[0])]
-                : await pack.getDocuments({ _id__in: ids });
+                ? [await pack.getDocument(ids[0])] as Item.Stored[]
+                : await pack.getDocuments({ _id__in: ids }) as Item.Stored[];
         return docs.map(doc => ({
             ...game.items.fromCompendium(doc) as RetrievedItem,
-            name_english: this.idToName[compKey]![doc._id!]
+            name_english: this.idToName[compKey]![doc._id]
         }));
+    }
+
+    public static async getItem(
+        compKey: CompendiumKey,
+        guid: string,
+        name: string,
+    ) {
+        const pack = game.packs?.get(
+            `world.${Constants.MAP_COMPENDIUM_KEY[compKey].pack}`
+        ) as CompendiumCollection<'Item'>;
+
+        if (!pack) return null;
+
+        const id = this.guidToId(guid);
+        const item = await pack.getDocument(id);
+        return item ? game.items.fromCompendium(item) as Item.CreateData : null;
     }
 
     /**

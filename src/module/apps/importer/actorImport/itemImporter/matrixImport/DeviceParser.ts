@@ -1,60 +1,38 @@
-import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions";
-import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 /**
  * Parses devices (commlinks, decks, and RCCs)
  */
-export class DeviceParser extends BaseGearParser {
+export class DeviceParser extends Parser<'device'> {
+    protected readonly parseType = 'device';
+    protected readonly compKey = null;
 
-    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): Item.CreateData {
-        const parserType = 'device';
-        const parsedGear = {
-            name: chummerGear.name || 'Unnamed',
-            type: parserType,
-            system: DataDefaults.baseSystemData(parserType)
-        } satisfies Item.CreateData;
+    protected parseItem(item: BlankItem<'device'>, itemData: ExtractItemType<'gears', 'gear'>) {
+        const system = item.system;
 
-        const system = parsedGear.system;
+        system.technology.rating = Number(itemData.devicerating) || 0;
 
-        system.technology = parseTechnology(chummerGear);
-        system.description = parseDescription(chummerGear);
+        system.atts.att1.value = Number(itemData.attack) || 0;
+        system.atts.att2.value = Number(itemData.sleaze) || 0;
+        system.atts.att3.value = Number(itemData.dataprocessing) || 0;
+        system.atts.att4.value = Number(itemData.firewall) || 0;
 
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(chummerGear.name), parserType);
-
-        parsedGear.system.technology.rating = Number(chummerGear.devicerating) || 0;
-
-        parsedGear.system.atts.att1.value = Number(chummerGear.attack) || 0;
-        parsedGear.system.atts.att2.value = Number(chummerGear.sleaze) || 0;
-        parsedGear.system.atts.att3.value = Number(chummerGear.dataprocessing) || 0;
-        parsedGear.system.atts.att4.value = Number(chummerGear.firewall) || 0;
-        
-        parsedGear.system.atts.att1.att = 'attack';
-        parsedGear.system.atts.att2.att = 'sleaze';
-        parsedGear.system.atts.att3.att = 'data_processing';
-        parsedGear.system.atts.att4.att = 'firewall';
-
+        system.atts.att1.att = 'attack';
+        system.atts.att2.att = 'sleaze';
+        system.atts.att3.att = 'data_processing';
+        system.atts.att4.att = 'firewall';
         // Map Chummer gear categories to internal system categories
         const categoryMap = {
-            'Cyberdecks': 'cyberdeck',
-            'Commlinks': 'commlink',
+            Cyberdecks: 'cyberdeck',
+            Commlinks: 'commlink',
             'Rigger Command Consoles': 'rcc',
-             // Chummer has prepaid commlinks set up as Entertainment category
-            'Entertainment': 'commlink',
+            Entertainment: 'commlink', // prepaid commlinks
         } as const;
-
-        const mappedCategory = categoryMap[chummerGear.category_english as keyof typeof categoryMap];
-        if (mappedCategory) {
-            parsedGear.system.category = mappedCategory;
-        }
+        system.category = categoryMap[itemData.category_english as keyof typeof categoryMap] ?? 'commlink';
 
         // Assign import flags
-        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
-        this.setSubType(parsedGear, parserType, parsedGear.system.category);
-
-        return parsedGear;
+        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
+        setSubType(system, this.parseType, system.category);
     }
 }

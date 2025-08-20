@@ -1,95 +1,59 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
-import { DataDefaults } from "../../../../../data/DataDefaults";
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
-import { SR5Item } from "src/module/item/SR5Item";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
-export class SpellParser {
-    async parseSpells(chummerChar: ActorSchema, assignIcons: boolean = false) {
-        const spells = getArray(chummerChar.spells?.spell).filter(chummerSpell => !chummerSpell.category_english.includes("Rituals"));
-        const parsedSpells: Item.CreateData[] = [];
-        const iconList = await IconAssign.getIconFiles();
+export class SpellParser extends Parser<'spell'> {
+    protected readonly parseType = 'spell';
+    protected readonly compKey = 'Spell';
 
-        for (const spell of spells) {
-            try {
-                if (spell.alchemy !== 'True') {
-                    const itemData = await this.parseSpell(spell);
+    protected parseItem(item: BlankItem<'spell'>, itemData: ExtractItemType<'spells', 'spell'>) {
+        const system = item.system;
 
-                    if (assignIcons)
-                        itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
+        this.prepareSystem(system, itemData)
 
-                    parsedSpells.push(itemData);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        return parsedSpells;
-    }
-
-    async parseSpell(chummerSpell: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
-        const parserType = 'spell';
-        const system = DataDefaults.baseSystemData(parserType);
-
-        this.prepareSystem(system, chummerSpell)
-
-        let description = '';
-        if (chummerSpell.descriptors) description = chummerSpell.descriptors;
-        if (chummerSpell.description) description += `\n${chummerSpell.description}`;
-        system.description.value = await foundry.applications.ux.TextEditor.implementation.enrichHTML(description);
-
-        this.parseDuration(system, chummerSpell)
+        this.parseDuration(system, itemData)
         this.prepareAction(system)
-        this.handleSpellTypeSpecifics(system, chummerSpell)
+        this.handleSpellTypeSpecifics(system, itemData)
 
         // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(chummerSpell.name_english), parserType);
-        setSubType(system, parserType, formatAsSlug(chummerSpell.category_english));
-
-        return createItemData(chummerSpell.name, parserType, system);
+        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
+        setSubType(system, this.parseType, formatAsSlug(itemData.category_english));
     }
 
-    prepareSystem(system: ReturnType<SR5Item<'spell'>['system']['toObject']>, chummerSpell: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
-        system.category = chummerSpell.category_english.toLowerCase().replace(/\s/g, '_') as any;
-        system.type = chummerSpell.type === 'M' ? 'mana' : 'physical';
+    private prepareSystem(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
+        system.category = itemData.category_english.toLowerCase().replace(/\s/g, '_') as any;
+        system.type = itemData.type === 'M' ? 'mana' : 'physical';
         system.range =
-            chummerSpell.range === 'T'
+            itemData.range === 'T'
                 ? 'touch'
-                : chummerSpell.range
+                : itemData.range
                         .toLowerCase()
                         .replace(/\s/g, '_')
                         .replace('(', '')
                         .replace(')', '') as any;
-        system.drain = parseInt(chummerSpell.dv.replace(/[A-Z]*/g, ''));
-        system.description = parseDescription(chummerSpell);
+        system.drain = parseInt(itemData.dv.replace(/[A-Z]*/g, ''));
     }
 
-    parseDuration(system: ReturnType<SR5Item<'spell'>['system']['toObject']>, chummerSpell: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
-        if (chummerSpell.duration.toLowerCase() === 's') {
+    private parseDuration(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
+        if (itemData.duration.toLowerCase() === 's')
             system.duration = 'sustained';
-        }
-        else if (chummerSpell.duration.toLowerCase() === 'i') {
+        else if (itemData.duration.toLowerCase() === 'i')
             system.duration = 'instant';
-        }
-        else if (chummerSpell.duration.toLowerCase() === 'p') {
+        else if (itemData.duration.toLowerCase() === 'p')
             system.duration = 'permanent';
-        }
     }
 
-    prepareAction(system: ReturnType<SR5Item<'spell'>['system']['toObject']>) {
+    private prepareAction(system: BlankItem<'spell'>['system']) {
         system.action.type = 'varies';
         system.action.skill = 'spellcasting';
         system.action.attribute = 'magic';
     }
 
-    handleSpellTypeSpecifics(system: ReturnType<SR5Item<'spell'>['system']['toObject']>, chummerSpell: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
-        const category = chummerSpell.category_english;
-        if (chummerSpell.descriptors) {
-            const desc = chummerSpell.descriptors.toLowerCase();
+    private handleSpellTypeSpecifics(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
+        const category = itemData.category_english;
+        if (itemData.descriptors) {
+            const desc = itemData.descriptors.toLowerCase();
             if (category.toLowerCase() === 'combat') {
-                this.handleCombatSpellSpecifics(system, desc, chummerSpell.damage)
+                this.handleCombatSpellSpecifics(system, desc, itemData.damage)
             }
             if (category.toLowerCase() === 'detection') {
                 this.handleDetectionSpellSpecifics(system, desc)
@@ -103,7 +67,7 @@ export class SpellParser {
         }
     }
 
-    handleCombatSpellSpecifics(system: ReturnType<SR5Item<'spell'>['system']['toObject']>, desc: string, damage: string) {
+    private handleCombatSpellSpecifics(system: BlankItem<'spell'>['system'], desc: string, damage: string) {
         if (desc.includes('indire')) {
             system.combat.type = 'indirect';
             system.action.opposed.type= 'defense';
@@ -124,7 +88,7 @@ export class SpellParser {
         }
     }
 
-    handleDetectionSpellSpecifics(system: ReturnType<SR5Item<'spell'>['system']['toObject']>, desc: string) {
+    private handleDetectionSpellSpecifics(system: BlankItem<'spell'>['system'], desc: string) {
         const split = desc.split(',');
         split.forEach((token) => {
             token = token || '';
@@ -146,7 +110,7 @@ export class SpellParser {
         }
     }
 
-    handleIllusionSpellSpecifics(system: ReturnType<SR5Item<'spell'>['system']['toObject']>, desc: string) {
+    private handleIllusionSpellSpecifics(system: BlankItem<'spell'>['system'], desc: string) {
         const split = desc.split(',');
         split.forEach((token) => {
             token = token || '';
@@ -170,7 +134,7 @@ export class SpellParser {
         }
     }
 
-    handleManipulationSpellSpecifics(system: ReturnType<SR5Item<'spell'>['system']['toObject']>, desc: string){
+    private handleManipulationSpellSpecifics(system: BlankItem<'spell'>['system'], desc: string){
         if (desc.includes('environmental'))
             system.manipulation.environmental = true;
         if (desc.includes('physical'))

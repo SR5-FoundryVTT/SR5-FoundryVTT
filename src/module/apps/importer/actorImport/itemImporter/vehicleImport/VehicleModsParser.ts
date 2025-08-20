@@ -1,51 +1,17 @@
-import { parseDescription, getArray, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
-type VehicleType = Unwrap<NonNullable<ActorSchema['vehicles']>['vehicle']>;
-type VehicleModType = Unwrap<NonNullable<VehicleType['mods']>['mod']>;
+export default class VehicleModsParser extends Parser<'modification'> {
+    protected readonly parseType = 'modification';
+    protected readonly compKey = 'Vehicle_Mod';
 
-export default class VehicleModsParser {
-    async parseMods(vehicle: VehicleType, assignIcons: boolean = false) {
-        const mods = getArray(vehicle.mods?.mod);
-        const parsed: Item.CreateData[] = [];
-
-        const iconList = await IconAssign.getIconFiles();
-        for (const toParse of mods) {
-            try {
-                const itemData = this.parseMod(toParse);
-
-                // Assign the icon if enabled
-                if (assignIcons)
-                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
-
-                parsed.push(itemData);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-       
-
-        return parsed;
-    }
-
-    parseMod(mod: VehicleModType) {
-        const parserType = 'modification';
-        const system = DataDefaults.baseSystemData(parserType);
+    protected parseItem(item: BlankItem<'modification'>, itemData: ExtractItemType<'vehicles', 'vehicle'>) {
+        const system = item.system;
 
         system.type = 'vehicle';
-        system.description = parseDescription(mod);
-        system.technology = parseTechnology(mod);
 
        // Assign import flags
-       system.importFlags = genImportFlags(formatAsSlug(mod.name_english), parserType);
-       setSubType(system, parserType, formatAsSlug(mod.category_english));
-
-        // Create the item
-        const itemData = createItemData(mod.name, parserType, system);
-
-        return itemData;
+       system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
+       setSubType(system, this.parseType, formatAsSlug(itemData.category_english));
     }
 }

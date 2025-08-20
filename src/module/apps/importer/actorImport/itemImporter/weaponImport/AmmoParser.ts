@@ -1,49 +1,37 @@
-import { formatAsSlug, genImportFlags, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions";
-import { BaseGearParser } from "../importHelper/BaseGearParser";
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 /**
  * Parses ammunition
  */
-export class AmmoParser extends BaseGearParser {
+export class AmmoParser extends Parser<'ammo'> {
+    protected readonly parseType = 'ammo';
+    protected readonly compKey = 'Ammo';
 
-    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): Item.CreateData {
-        const parserType = 'ammo';
-        const parsedGear = {
-            name: chummerGear.name || 'Unnamed',
-            type: parserType,
-            system: DataDefaults.baseSystemData(parserType)
-        } satisfies Item.CreateData;
+    protected parseItem(item: BlankItem<'ammo'>, itemData: ExtractItemType<'gears', 'gear'>) {
+        const system = item.system;
+        if (itemData.weaponbonusap)
+            system.ap = Number(itemData.weaponbonusap) || 0;
 
-        parsedGear.system.technology = parseTechnology(chummerGear);
-        parsedGear.system.description = parseDescription(chummerGear);
+        if (itemData.weaponbonusdamage) {
+            system.damage = Number(itemData.weaponbonusdamage_english) || 0;
 
-        if (chummerGear.weaponbonusap)
-            parsedGear.system.ap = Number(chummerGear.weaponbonusap) || 0;
-
-        if (chummerGear.weaponbonusdamage) {
-            parsedGear.system.damage = Number(chummerGear.weaponbonusdamage_english) || 0;
-
-            if (chummerGear.weaponbonusdamage.includes('S'))
-                parsedGear.system.damageType = 'stun';
-            else if (chummerGear.weaponbonusdamage.includes('M'))
-                parsedGear.system.damageType = 'matrix';
+            if (itemData.weaponbonusdamage.includes('S'))
+                system.damageType = 'stun';
+            else if (itemData.weaponbonusdamage.includes('M'))
+                system.damageType = 'matrix';
             else
-                parsedGear.system.damageType = 'physical';
+                system.damageType = 'physical';
 
-            parsedGear.system.element = (chummerGear.weaponbonusdamage_english || '').match(/\(e\)/)?.pop() === '(e)' ? 'electricity' : '';
+            system.element = (itemData.weaponbonusdamage_english || '').match(/\(e\)/)?.pop() === '(e)' ? 'electricity' : '';
         }
 
-        parsedGear.system.accuracy = Number(chummerGear.weaponbonusacc) || 0;
-        parsedGear.system.blast = { radius: 0, dropoff: 0 };
-        parsedGear.system.replaceDamage = false;
+        system.accuracy = Number(itemData.weaponbonusacc) || 0;
+        system.blast = { radius: 0, dropoff: 0 };
+        system.replaceDamage = false;
 
         // Assign import flags
-        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
-        this.setSubType(parsedGear, parserType, formatAsSlug(chummerGear.name_english.split(':')[0]));
-
-        return parsedGear;
+        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
+        setSubType(system, this.parseType, formatAsSlug(itemData.name_english.split(':')[0]));
     }
 }

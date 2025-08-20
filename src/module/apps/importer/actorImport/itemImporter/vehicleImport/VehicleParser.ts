@@ -27,9 +27,9 @@ export default class VehicleParser {
 
             const promises : Array<Promise<any>> = [];
             promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));
-            promises.push(new GearsParser().parseGears(getArray(vehicle.gears?.gear),  importOptions.assignIcons));
+            promises.push(new GearsParser().parseItems(getArray(vehicle.gears?.gear),  importOptions.assignIcons));
             promises.push(new MountedWeaponParser().parseWeapons(vehicle, importOptions.assignIcons))
-            promises.push(new VehicleModsParser().parseMods(vehicle, importOptions.assignIcons))
+            promises.push(new VehicleModsParser().parseItems(vehicle.mods?.mod, importOptions.assignIcons))
 
             let handling: string | undefined;
             let off_road_handling: string | undefined;

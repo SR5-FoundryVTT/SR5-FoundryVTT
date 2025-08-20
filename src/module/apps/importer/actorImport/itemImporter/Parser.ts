@@ -1,0 +1,121 @@
+import { ActorSchema } from '../ActorSchema';
+import * as IconAssign from '../../../iconAssigner/iconAssign';
+import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
+import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
+
+export type ItemSystems = SystemEntityType & Item.ConfiguredSubType;
+
+export type BaseType = {
+    guid: string;
+    name: string;
+    name_english?: string;
+    source?: string | null;
+    page?: string | null;
+    description?: string | null;
+    notes?: string | null;
+    rating?: string | null;
+    avail?: string | null;
+    qty?: string | null;
+    cost?: string | null;
+    equipped?: "True"|"False"|null;
+    conditionmonitor?: string | null;
+    conceal?: string | null;
+}
+
+type Unwrap<T> = T extends Array<infer U> ? U : T;
+export type ExtractItemType<
+    FieldKey extends keyof ActorSchema,
+    InnerKey extends keyof NonNullable<ActorSchema[FieldKey]>
+> = Unwrap<NonNullable<ActorSchema[FieldKey]>[InnerKey]>;
+
+export type BlankItem<T extends ItemSystems> = ReturnType<Parser<T>["createItem"]>;
+
+export abstract class Parser<T extends ItemSystems> {
+    protected abstract readonly parseType: T;
+    protected abstract readonly compKey: any;
+
+    protected createItem(data: BaseType) {
+        type FlagType = NonNullable<NonNullable<Item.CreateData['flags']>['shadowrun5e']>;
+        return {
+            name: data.name,
+            type: this.parseType,
+            img: null as string | null,
+            _id: foundry.utils.randomID(),
+            flags: { shadowrun5e: {} as FlagType },
+            system: DataDefaults.baseSystemData(this.parseType),
+        } satisfies Item.CreateData;
+    }
+
+    protected async getItem(guid: string, name: string) {
+        return IH.getItem(this.compKey, guid, name) as Promise<BlankItem<T> | null>;
+    }
+
+    protected parseDescription(item: BlankItem<T>, itemData: BaseType) {
+        const description = item.system.description;
+        description.value = itemData.notes ?? itemData.description ?? description.value;
+
+        if (itemData.source && itemData.page)
+            description.source = `${itemData.source} ${itemData.page}`;
+    }
+
+    protected parseTechnology(item: BlankItem<T>, itemData: BaseType) {
+        if (!('technology' in item.system)) return;
+        const technology = item.system.technology;
+
+        if (itemData.rating != null)
+            technology.rating = Number(itemData.rating) || 0;
+
+        if (itemData.avail != null)
+            technology.availability = itemData.avail;
+
+        if (itemData.qty != null)
+            technology.quantity = Number(itemData.qty) || 0;
+
+        if (itemData.cost != null)
+            technology.cost = Number(itemData.cost.replace(/[^\d.-]/g, "")) || 0;
+
+        if (itemData.equipped != null)
+            technology.equipped = itemData.equipped === "True";
+
+        if (itemData.conditionmonitor != null)
+            technology.condition_monitor.max = Number(itemData.conditionmonitor) || 0;
+
+        if (itemData.conceal != null)
+            technology.conceal.base = Number(itemData.conceal) || 0;
+    }
+
+    public async parseItems(itemsData: BaseType[] | BaseType | undefined, assignIcons: boolean = false) {
+        if (!itemsData) return [];
+
+        const iconList = await IconAssign.getIconFiles();
+        const parsedItems: BlankItem<T>[] = [];
+
+        for (const itemData of IH.getArray(itemsData)) {
+            try {
+                const fetchedItem = await this.getItem(itemData.guid, itemData.name);
+                const item = fetchedItem ?? this.createItem(itemData);
+                item._id = foundry.utils.randomID();
+
+                this.parseDescription(item, itemData);
+                this.parseTechnology(item, itemData);
+                this.parseItem(item, itemData);
+
+                const embeddedItems = await this.getEmbeddedItems(itemData);
+
+                if (embeddedItems.length)
+                    item.flags.shadowrun5e.embeddedItems = embeddedItems;
+
+                parsedItems.push(item);
+            } catch (error) {
+                console.error(`Error parsing item ${itemData.name}:`, error);
+            }
+        }
+
+        return parsedItems;
+    }
+
+    protected abstract parseItem(item: BlankItem<T>, itemData: BaseType): void;
+    protected async getEmbeddedItems(itemData: BaseType): Promise<Item.Source[]> {
+        return [] as Item.Source[];
+    }
+}

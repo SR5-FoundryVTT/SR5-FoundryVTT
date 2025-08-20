@@ -1,38 +1,23 @@
-import { parseDescription, createItemData, genImportFlags, formatAsSlug } from "./BaseParserFunctions";
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { genImportFlags, formatAsSlug } from "./BaseParserFunctions";
+import { BlankItem, ExtractItemType, Parser, ItemSystems } from "../Parser";
 
-export default class SimpleParser {
-    async parseCollection(parsingCollection: Unwrap<NonNullable<ActorSchema['metamagics']>['metamagic']>[], parserType: 'echo' | 'metamagic', assignIcons: boolean = false) {
-        const parsed: Item.CreateData[] = [];
-        const iconList = await IconAssign.getIconFiles();
+export class SimpleParser<Type extends ItemSystems> extends Parser<Type> {
+    protected readonly parseType: Type;
+    protected readonly compKey: string | null;
 
-        for (const toParse of parsingCollection) {
-            try {
-                const itemData = this.parseItem(toParse, parserType);
-
-                // Assign the icon if enabled
-                if (assignIcons)
-                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
-
-                parsed.push(itemData);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        return parsed;
+    constructor(parseType: Type, compKey: string | null = null) {
+        super();
+        this.parseType = parseType;
+        this.compKey = compKey;
     }
 
-    parseItem(toParse: Unwrap<NonNullable<ActorSchema['metamagics']>['metamagic']>, parserType: 'echo' | 'metamagic') {
-        const system = DataDefaults.baseSystemData(parserType);
-        system.description = parseDescription(toParse);
+    protected parseItem(
+        item: BlankItem<'echo' | 'metamagic' | "equipment">,
+        itemData: ExtractItemType<'metamagics', 'metamagic'> | ExtractItemType<'gears', 'gear'>
+    ) {
+        const system = item.system;
 
         // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(toParse.name_english), parserType);
-
-        return createItemData(toParse.fullname, parserType, system);
+        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
     }
 }

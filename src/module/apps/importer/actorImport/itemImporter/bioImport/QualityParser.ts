@@ -1,49 +1,19 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { SR5Item } from "src/module/item/SR5Item";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
-export class QualityParser {
+export class QualityParser extends Parser<'quality'> {
+    protected readonly parseType = 'quality';
+    protected readonly compKey = 'Quality';
 
-    async parseQualities(chummerChar: ActorSchema, assignIcons: boolean = false) {
-        const qualities = getArray(chummerChar.qualities?.quality);
-        const parsedQualities: Item.CreateData[] = [];
-        const iconList = await IconAssign.getIconFiles();
+    protected parseItem(item: BlankItem<'quality'>, itemData: ExtractItemType<'qualities', 'quality'>) {
+        const system = item.system;
 
-        for (const chummerQuality of qualities) {
-            try {
-                const itemData = this.parseQuality(chummerQuality);
-
-                // Assign the icon if enabled
-                if (assignIcons)
-                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
-
-                parsedQualities.push(itemData);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        return parsedQualities;
-    }
-
-    parseQuality(chummerQuality: Unwrap<NonNullable<ActorSchema['qualities']>['quality']>) {
-        const parserType = 'quality';
-        const system = DataDefaults.baseSystemData(parserType);
-        system.type = chummerQuality.qualitytype_english.toLowerCase() as any;
-        system.rating = Number(chummerQuality.extra) || 0;
-        system.karma = (Number(chummerQuality.bp) || 0) * Math.max(system.rating, 1);
-        system.description = parseDescription(chummerQuality);
+        system.type = itemData.qualitytype_english.toLowerCase() as any;
+        system.rating = Number(itemData.extra) || 0;
+        system.karma = (Number(itemData.bp) || 0) * Math.max(system.rating, 1);
 
         // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(chummerQuality.name_english), parserType);
-        setSubType(system, parserType, formatAsSlug(system.type)); // positive or negative
-
-        // Create the item
-        const quality = createItemData(chummerQuality.name, parserType, system);
-
-        return quality as unknown as ReturnType<SR5Item<'quality'>['toObject']>;
+        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
+        setSubType(system, this.parseType, formatAsSlug(system.type)); // positive or negative
     }
 }

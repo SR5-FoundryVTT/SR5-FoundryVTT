@@ -1,65 +1,32 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { ActorSchema } from "../../ActorSchema";
+import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 import { SR5 } from "../../../../../config";
-import { Unwrap } from "../ItemsParser";
 
-export class LifestyleParser {
-    async parseLifestyles(chummerChar: ActorSchema, assignIcons: boolean = false) {
-        const chummerLifestyles = getArray(chummerChar.lifestyles?.lifestyle);
-        const parsedLifestyle: Item.CreateData[] = [];
-        const iconList = await IconAssign.getIconFiles();
+export class LifestyleParser extends Parser<'lifestyle'> {
+    protected readonly parseType = 'lifestyle';
+    protected readonly compKey = null;
 
-        for (const chummerLifestyle of chummerLifestyles) {
-            try {
-                const itemData = this.parseLifestyle(chummerLifestyle);
-
-                // Assign the icon if enabled
-                if (assignIcons)
-                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
-
-                parsedLifestyle.push(itemData);
-            }
-             catch (e) {
-                console.error(e);
-            }
-        };
-
-        return parsedLifestyle;
-    }
-
-    parseLifestyle(chummerLifestyle: Unwrap<NonNullable<ActorSchema['lifestyles']>['lifestyle']>) {
-        const parserType = 'lifestyle';
-        const system = DataDefaults.baseSystemData(parserType);
+    protected parseItem(item: BlankItem<'lifestyle'>, itemData: ExtractItemType<'lifestyles', 'lifestyle'>) {
+        const system = item.system;
 
         // Advanced lifestyles and lifestyle qualities are not supported at the moment
         // Map the chummer lifestyle type to our sr5 foundry type.
-        const chummerLifestyleType = chummerLifestyle.baselifestyle.toLowerCase();
-        if ((chummerLifestyleType in SR5.lifestyleTypes)) {
+        const chummerLifestyleType = itemData.baselifestyle.toLowerCase();
+        if (SR5.lifestyleTypes[chummerLifestyleType]) {
             system.type = chummerLifestyleType;
-        }
-        else {
-            // This is necessary because of a typo in SR5 config.
-            if (chummerLifestyleType === 'luxury') {
-                system.type = 'luxory';
-            }
-            else {
-                system.type = 'other';
-            }
+        } else if (chummerLifestyleType === 'luxury') {
+            system.type = 'luxory'; // typo in SR5 config
+        } else {
+            system.type = 'other';
         }
 
-        system.cost = Number(chummerLifestyle.totalmonthlycost) || 0;
-        system.permanent = chummerLifestyle.purchased === 'True';
-        system.description = parseDescription(chummerLifestyle);
+        system.cost = Number(itemData.totalmonthlycost) || 0;
+        system.permanent = itemData.purchased === 'True';
 
         // The name of the lifestyle is optional, so we use a fallback here.
-        const itemName = chummerLifestyle.name ? chummerLifestyle.name : chummerLifestyle.baselifestyle;
+        item.name ||= itemData.baselifestyle;
 
         // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemName), parserType);
-
-        const itemData = createItemData(itemName, parserType, system);
-        return itemData;
+        system.importFlags = genImportFlags(formatAsSlug(item.name), this.parseType);
     }
 }

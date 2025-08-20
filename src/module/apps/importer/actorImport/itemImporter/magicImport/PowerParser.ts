@@ -1,50 +1,23 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
-export class PowerParser {
+export class PowerParser extends Parser<'adept_power'> {
+    protected readonly parseType = 'adept_power';
+    protected readonly compKey = 'adept_power';
 
-    async parsePowers(chummerChar: ActorSchema, assignIcons: boolean = false) {
-        const powers = getArray(chummerChar.powers?.power);
-        const parsedPowers: Item.CreateData[] = [];
-        const iconList = await IconAssign.getIconFiles();
+    protected parseItem(item: BlankItem<'adept_power'>, itemData: ExtractItemType<'powers', 'power'>) {
+        const system = item.system;
 
-        for (const chummerPower of powers) {
-            try {
-                const itemData = this.parsePower(chummerPower);
-
-                // Assign the icon if enabled
-                if (assignIcons)
-                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
-
-                parsedPowers.push(itemData);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        return parsedPowers;
-    }
-
-    parsePower(chummerPower: Unwrap<NonNullable<ActorSchema['powers']>['power']>) {
-        const parserType = 'adept_power';
-        const system = DataDefaults.baseSystemData('adept_power');
-        system.description = parseDescription(chummerPower);
-
-        system.level = parseInt(chummerPower.rating);
-        system.pp = parseFloat(chummerPower.totalpoints);
+        system.level = parseInt(itemData.rating);
+        system.pp = parseFloat(itemData.totalpoints);
 
         // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(chummerPower.fullname), parserType);
-        if (chummerPower.name !== chummerPower.fullname) {
-            setSubType(system, parserType, formatAsSlug(chummerPower.name));
+        system.importFlags = genImportFlags(formatAsSlug(itemData.fullname), this.parseType);
+        if (itemData.name !== itemData.fullname) {
+            setSubType(system, this.parseType, formatAsSlug(itemData.name));
             if (system.importFlags.subType) {
-                system.importFlags.name = formatAsSlug(chummerPower.extra);
+                system.importFlags.name = formatAsSlug(itemData.extra);
             }
         }
-
-        return createItemData(chummerPower.fullname, parserType, system);
     }
 }

@@ -1,59 +1,22 @@
-import { parseDescription, getArray, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { SR5Item } from "src/module/item/SR5Item";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
-export class RitualParser {
-    async parseRituals(chummerChar: ActorSchema, assignIcons: boolean = false) {
-        const items = getArray(chummerChar.spells?.spell).filter(chummerSpell => chummerSpell.category_english.includes("Rituals"));
-        const parsedItems: Item.CreateData[] = [];
-        const iconList = await IconAssign.getIconFiles();
+export class RitualParser extends Parser<'ritual'> {
+    protected readonly parseType = 'ritual';
+    protected readonly compKey = 'Spell';
 
-        for (const item of items) {
-            try {
-                if (item.alchemy.toLowerCase() !== 'true') {
-                    const itemData = this.parseRitual(item);
+    protected parseItem(item: BlankItem<'ritual'>, itemData: ExtractItemType<'spells', 'spell'>) {
+        const system = item.system;
 
-                    // Assign the icon if enabled
-                    if (assignIcons)
-                        itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
+        system.type = itemData.type === 'M' ? 'mana' : 'physical';
+        system.descriptors = itemData.descriptors;
 
-                    parsedItems.push(itemData);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        return parsedItems;
-    }
-
-    parseRitual(chummerRitual: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
-        const parserType = 'ritual';
-        const system = DataDefaults.baseSystemData(parserType);
-
-        this.prepareSystem(system, chummerRitual)
-        this.prepareAction(system)
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(chummerRitual.name_english), parserType);
-        setSubType(system, parserType, formatAsSlug(chummerRitual.category_english));
-
-        return createItemData(chummerRitual.name, parserType, system);
-    }
-
-    prepareSystem(system: ReturnType<SR5Item<'ritual'>['system']['toObject']>, chummerRitual: Unwrap<NonNullable<ActorSchema['spells']>['spell']>) {
-        system.type = chummerRitual.type === 'M' ? 'mana' : 'physical';
-        system.descriptors = chummerRitual.descriptors;
-        system.description = parseDescription(chummerRitual);
-    }
-
-
-    prepareAction(system: ReturnType<SR5Item<'ritual'>['system']['toObject']>) {
         system.action.type = 'varies';
         system.action.skill = 'ritual_spellcasting';
         system.action.attribute = 'magic';
+
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
+        setSubType(system, this.parseType, formatAsSlug(itemData.category_english));
     }
 }

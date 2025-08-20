@@ -1,61 +1,46 @@
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
-import { ParserSelector } from "./ParserSelector";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { ExtractItemType } from '../Parser';
+import { SimpleParser } from './SimpleParser';
+import { SinParser } from '../bioImport/SinParser';
+import { AmmoParser } from '../weaponImport/AmmoParser';
+import { DeviceParser } from '../matrixImport/DeviceParser';
+import { ProgramParser } from '../matrixImport/ProgramParser';
+import { ImportHelper as IH } from '@/module/apps/itemImport/helper/ImportHelper';
 
-/**
- * Parses all gear from a chummer character file and turns them into foundry sr item data objects
- */
+type ItemType = ExtractItemType<'gears', 'gear'>[] | ExtractItemType<'gears', 'gear'> | undefined;
+
 export class GearsParser {
+    async parseItems(itemsData: ItemType, assignIcons: boolean = false) {
+        const allGears = IH.getArray(itemsData);
+        const devices: typeof allGears = [];
+        const sins: typeof allGears = [];
+        const ammos: typeof allGears = [];
+        const programs: typeof allGears = [];
+        const gears: typeof allGears = [];
 
-    /**
-     * Parses all chummer gear entries
-     * @param chummerGears Array of chummer gear entries
-     */
-    async parseGears(chummerGears: Unwrap<NonNullable<ActorSchema['gears']>['gear']>[], assignIcons: boolean = false) {
-        const items: Item.CreateData[] = [];
-        const iconList = await IconAssign.getIconFiles();
+        const programCategories = ['Common Programs', 'Hacking Programs', 'Software'] as const;
+        const excludedNames = ['grenade', 'minigrenade', 'rocket'] as const;
 
-        for (const chummerGear of chummerGears) {
-            try {
-                // First filter out gear entries, that we do not want to handle.
-                if (!this.gearShouldBeParsed(chummerGear)) {
-                    return;
-                }
+        for (const g of allGears) {
+            if (excludedNames.some(prefix => (g.name_english || '').toLowerCase().startsWith(prefix))) continue;
 
-                const itemData = this.parseGearEntry(chummerGear);
-
-                // Assign the icon if enabled
-                if (assignIcons)
-                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
-
-                items.push(itemData);
-            }
-
-            catch (e) {
-                console.error(e);
-            }
-        };
-
-        return items;
-    }
-
-    private parseGearEntry(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>) {
-        const parserSelector = new ParserSelector();
-        const parser = parserSelector.select(chummerGear);
-        return parser.parse(chummerGear);
-    }
-
-    private gearShouldBeParsed(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): boolean {
-        // We do not handle grenades and rockets here since they are also in the weapons section with more info.
-        const englishGearName = (chummerGear.name_english).toLowerCase();
-        if (englishGearName.startsWith('grenade') ||
-            englishGearName.startsWith('minigrenade') ||
-            englishGearName.startsWith('rocket'))
-        {
-            return false;
+            if (g.iscommlink)
+                devices.push(g);
+            else if (g.issin)
+                sins.push(g);
+            else if (g.isammo)
+                ammos.push(g);
+            else if (programCategories.includes(g.category_english as any))
+                programs.push(g);
+            else
+                gears.push(g);
         }
 
-        return true;
+        return [
+            ...(await new AmmoParser().parseItems(ammos, assignIcons)),
+            ...(await new DeviceParser().parseItems(devices, assignIcons)),
+            ...(await new SinParser().parseItems(sins, assignIcons)),
+            ...(await new ProgramParser().parseItems(programs, assignIcons)),
+            ...(await new SimpleParser('equipment').parseItems(gears, assignIcons)),
+        ];
     }
 }

@@ -11,6 +11,6 @@ export default class MountedWeaponParser {
         const mods = getArray(vehicle.mods?.mod);
         const weapons = mods.filter(mod => mod.weapons != null).map(mod => getArray(mod.weapons?.weapon)).flat()
 
-        return new WeaponParser().parseWeaponArray(weapons, assignIcons)
+        return new WeaponParser().parseItems(weapons, assignIcons)
     }
 }

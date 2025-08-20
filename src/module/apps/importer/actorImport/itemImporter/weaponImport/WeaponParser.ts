@@ -1,12 +1,17 @@
-import { parseDescription, getArray, getValues, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
-import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { getValues, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
 import { DamageTypeType } from "src/module/types/item/Action";
 import { DataDefaults } from "src/module/data/DataDefaults";
-import { SR5Item } from "src/module/item/SR5Item";
 import { ActorSchema } from "../../ActorSchema";
 import { Unwrap } from "../ItemsParser";
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
+import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
+import { AccessoryParser } from "./AccessoryParser";
+import { ClipParser } from "./ClipParser";
 
-export class WeaponParser {
+export class WeaponParser extends Parser<'weapon'> {
+    protected readonly parseType = 'weapon';
+    protected readonly compKey = 'Weapon';
+
     private parseDamage(val: string) {
         const damage = {
             damage: 0,
@@ -46,54 +51,30 @@ export class WeaponParser {
     };
 
     async parseWeapons(chummerChar: ActorSchema | Unwrap<NonNullable<ActorSchema['vehicles']>['vehicle']>, assignIcons: boolean = false) {
-        return this.parseWeaponArray(getArray(chummerChar.weapons?.weapon), assignIcons)
+        return this.parseItems(IH.getArray(chummerChar.weapons?.weapon), assignIcons)
     }
 
-    async parseWeaponArray(weapons: Unwrap<NonNullable<ActorSchema['weapons']>['weapon']>[], assignIcons: boolean = false) {
-        const parsedWeapons: ReturnType<WeaponParser['parseWeapon']>[] = [];
-        const iconList = await IconAssign.getIconFiles();
-        for (const chummerWeapon of weapons) {
-            try {
-                const itemData = this.parseWeapon(chummerWeapon);
-
-                // Assign the icon if enabled
-                if (assignIcons)
-                    itemData.img = IconAssign.iconAssign(itemData.system.importFlags, iconList, itemData.system);
-
-                parsedWeapons.push(itemData);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        return parsedWeapons;
-    }
-
-    parseWeapon(chummerWeapon: Unwrap<NonNullable<ActorSchema['weapons']>['weapon']>) {
-        const parserType = 'weapon';
-        const system = DataDefaults.baseSystemData(parserType);
+    parseItem(item: BlankItem<'weapon'>, itemData: ExtractItemType<'weapons', 'weapon'>) {
+        const system = item.system;
 
         const action = system.action;
         const damage = system.action.damage;
 
-        system.description = parseDescription(chummerWeapon);
-        system.technology = parseTechnology(chummerWeapon);
-
-        damage.ap.base = Number(getValues(chummerWeapon.rawap)[0]) || 0;
+        damage.ap.base = Number(getValues(itemData.rawap)[0]) || 0;
 
         action.type = 'varies';
 
         // Transform Chummer skill naming schema to shadowrun5e naming schema.
         // NOTE: chummerWeapon.skill CAN be null. Don't rely on it.
-        if (chummerWeapon.skill) {
-            action.skill = chummerWeapon.skill.toLowerCase().replace(/\s/g, '_');
+        if (itemData.skill) {
+            action.skill = itemData.skill.toLowerCase().replace(/\s/g, '_');
         // Instead of direct skill, rely on a category mapping by the rules.
-        } else if (chummerWeapon.category?.toLowerCase().includes('exotic')) {
-            action.skill = chummerWeapon.category
+        } else if (itemData.category?.toLowerCase().includes('exotic')) {
+            action.skill = itemData.category
                 .toLowerCase()
                 .replace(' weapons', '')
                 .replace(/\s/g, '_');
-        } else if (chummerWeapon.category?.toLowerCase().includes('laser weapons')) {
+        } else if (itemData.category?.toLowerCase().includes('laser weapons')) {
             action.skill = 'exotic_range';
         }
 
@@ -102,18 +83,18 @@ export class WeaponParser {
         }
 
         action.attribute = 'agility';
-        action.limit.base = Number(getValues(chummerWeapon.rawaccuracy)[0]) || 0;
+        action.limit.base = Number(getValues(itemData.rawaccuracy)[0]) || 0;
 
-        if (chummerWeapon.type.toLowerCase() === 'melee') {
-            this.handleMeleeWeapon(chummerWeapon, system)
+        if (itemData.type.toLowerCase() === 'melee') {
+            this.handleMeleeWeapon(system, itemData)
         } 
 
-        if (chummerWeapon.type.toLowerCase() === 'ranged') {
-            this.handledRangedWeapon(chummerWeapon, system)
-        } else if (chummerWeapon.type.toLowerCase() === 'thrown') {
+        if (itemData.type.toLowerCase() === 'ranged') {
+            this.handledRangedWeapon(system, itemData)
+        } else if (itemData.type.toLowerCase() === 'thrown') {
             system.category = 'thrown';
-            const ranges = chummerWeapon.ranges[0]
-            if (ranges && ranges.short && ranges.medium && ranges.long && ranges.extreme) {
+            const ranges = IH.getArray(itemData.ranges)[0];
+            if (ranges?.short && ranges.medium && ranges.long && ranges.extreme) {
                 system.thrown = {
                     ...system.thrown,
                     ranges: {
@@ -130,7 +111,7 @@ export class WeaponParser {
 
         {
             //TODO change this to 'rawdamage' when mods can have damage value
-            const chummerDamage = this.parseDamage(chummerWeapon.damage_noammo_english);
+            const chummerDamage = this.parseDamage(itemData.damage_noammo_english);
             damage.base = chummerDamage.damage;
             damage.type.base = chummerDamage.type;
             if (chummerDamage.dropoff || chummerDamage.radius) {
@@ -145,7 +126,7 @@ export class WeaponParser {
         }
 
         // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(chummerWeapon.name_english), parserType);
+        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
 
         // Assign item subtype
         let subType = '';
@@ -154,37 +135,32 @@ export class WeaponParser {
             subType = formatAsSlug(system.category);
         }
         // exception for thrown weapons and explosives
-        const weaponCategory = formatAsSlug(chummerWeapon.category_english);
+        const weaponCategory = formatAsSlug(itemData.category_english);
         if (!(subType && ( weaponCategory === 'gear'))) {
             subType = weaponCategory;
         }
         // deal with explosives
-        if (weaponCategory === 'gear' && chummerWeapon.name_english.includes(':')) {
-            subType = formatAsSlug(chummerWeapon.name_english.split(':')[0]);
+        if (weaponCategory === 'gear' && itemData.name_english.includes(':')) {
+            subType = formatAsSlug(itemData.name_english.split(':')[0]);
         }
-        setSubType(system, parserType, subType);
 
-        // Create the item
-        const itemData = createItemData(chummerWeapon.name, 'weapon' as const, system);
-
-        this.handleClips(itemData, chummerWeapon)
-        this.handleAccessories(itemData, chummerWeapon) 
-        return itemData;
+        setSubType(system, this.parseType, subType);
     }
 
-    handleMeleeWeapon(
-        chummerWeapon: Unwrap<NonNullable<ActorSchema['weapons']>['weapon']>,
-        system: ReturnType<SR5Item<'weapon'>['system']['toObject']>
-    ) {
+    override async getEmbeddedItems(itemData: ExtractItemType<'weapons', 'weapon'>): Promise<Item.Source[]> {
+        return [
+            ...(await new AccessoryParser().parseItems(itemData.accessories?.accessory)),
+            ...(await new ClipParser(itemData).parseItems(itemData.accessories?.accessory)),
+        ] as Item.Source[];
+    }
+
+    handleMeleeWeapon(system: BlankItem<'weapon'>['system'], itemData: ExtractItemType<'weapons', 'weapon'>) {
         system.action.type = 'complex';
         system.category = 'melee';
-        system.melee.reach = Number(chummerWeapon.reach) || 0;
+        system.melee.reach = Number(itemData.reach) || 0;
     }
 
-    handledRangedWeapon(
-        chummerWeapon: Unwrap<NonNullable<ActorSchema['weapons']>['weapon']>,
-        system: ReturnType<SR5Item<'weapon'>['system']['toObject']>
-    ) {
+    handledRangedWeapon(system: BlankItem<'weapon'>['system'], itemData: ExtractItemType<'weapons', 'weapon'>) {
         system.category = 'range';
 
         if (system.action.skill.toLowerCase().includes('throw')) {
@@ -193,11 +169,11 @@ export class WeaponParser {
 
         const range = DataDefaults.createData('range_weapon');
         system.range = range;
-        range.rc.base = Number(getValues(chummerWeapon.rawrc)[0]) || 0;
+        range.rc.base = Number(getValues(itemData.rawrc)[0]) || 0;
 
-        if (chummerWeapon.mode) {
+        if (itemData.mode) {
             // HeroLab export doesn't have mode
-            const modes = chummerWeapon.mode_noammo!.toLowerCase();
+            const modes = itemData.mode_noammo!.toLowerCase();
             range.modes = {
                 single_shot: modes.includes('ss'),
                 semi_auto: modes.includes('sa'),
@@ -206,11 +182,11 @@ export class WeaponParser {
             };
         }
 
-        if (chummerWeapon.clips?.clip != null) {
+        if (itemData.clips?.clip != null) {
             const ammo = system.ammo;
             
             // HeroLab export doesn't have clips
-            const chummerClips = getArray(chummerWeapon.clips.clip);
+            const chummerClips = IH.getArray(itemData.clips.clip);
             const clips = chummerClips.filter(clip => !clip.name.toLowerCase().includes("inter"))
 
             ammo.spare_clips = {
@@ -226,8 +202,8 @@ export class WeaponParser {
             }
         }
 
-        const ranges = chummerWeapon.ranges[0]
-        if (ranges && ranges.short && ranges.medium && ranges.long && ranges.extreme) {
+        const ranges = IH.getArray(itemData.ranges)[0]
+        if (ranges?.short && ranges.medium && ranges.long && ranges.extreme) {
             const rangeData = {
                 short: parseInt(ranges.short.split('-')[1]),
                 medium: parseInt(ranges.medium.split('-')[1]),
@@ -247,86 +223,5 @@ export class WeaponParser {
             }
         }
 
-    }
-
-    handleClips(item: Item.CreateData, chummerWeapon: Unwrap<NonNullable<ActorSchema['weapons']>['weapon']>) {
-        if (chummerWeapon.clips?.clip != null) {
-            
-            // HeroLab export doesn't have clips
-            const chummerClips = getArray(chummerWeapon.clips.clip);
-            const clips = chummerClips.filter(clip => !clip.name.toLowerCase().includes("inter"))
-
-            const ammo: any[] = [];
-            clips.forEach((clip) => {
-                const ammobonus = clip.ammotype;
-                const systemAmmo = DataDefaults.baseSystemData('ammo', {
-                    accuracy: Number(ammobonus.weaponbonusacc) || 0,
-                    ap: Number(ammobonus.weaponbonusap) || 0,
-                    blast: {
-                        radius: 0,
-                        dropoff: 0
-                    },
-                    damage: Number(ammobonus.weaponbonusdamage_english.match(/(\d+)/)?.pop()) || 0,
-                    damageType: ammobonus.weaponbonusdamage_english.match(/S/)?.pop() === 'S' ? 'stun' : 'physical' ,
-                    element: ammobonus.weaponbonusdamage_english.match(/\(e\)/)?.pop() === '(e)' ? 'electricity' : '',
-                    importFlags: {
-                        isFreshImport: true
-                    },
-                    replaceDamage: false,
-                    technology: {
-                        equipped: clip.name === chummerWeapon.currentammo
-                    }
-                });
-                const currentAmmo = createItemData(clip.name, 'ammo', systemAmmo);
-                currentAmmo._id = foundry.utils.randomID();
-                ammo.push(currentAmmo);
-            });
-
-            if(!item.flags?.shadowrun5e?.embeddedItems) {
-                item.flags = {
-                    shadowrun5e: {
-                        embeddedItems: ammo
-                    }
-                }
-            } else {
-                item.flags.shadowrun5e.embeddedItems.push(...ammo)
-            }            
-        }
-    }
-
-    handleAccessories(itemData: Item.CreateData, chummerWeapon: Unwrap<NonNullable<ActorSchema['weapons']>['weapon']>) {
-        if (chummerWeapon.clips?.clip != null) {
-            
-            const chummerAccessories = getArray(chummerWeapon.accessories?.accessory);
-
-            const accessories: any[] = []
-            for (const item of chummerAccessories) {
-                const system = DataDefaults.baseSystemData('modification', {
-                    //TODO: check this
-                    mount_point: item.mount.toLowerCase() as any,
-                    type: 'weapon',
-                    dice_pool: 0,
-                    accuracy: Number(item.accuracy) || 0,
-                    rc: Number(item.rc) || 0,
-                    conceal: Number(item.conceal) || 0,
-                    technology: {
-                        equipped: true
-                    }
-                });
-                const current = createItemData(item.name, 'modification', system);
-                current._id = foundry.utils.randomID(16);
-                accessories.push(current);
-            }
-
-            if(!itemData.flags?.shadowrun5e?.embeddedItems) {
-                itemData.flags = {
-                    shadowrun5e: {
-                        embeddedItems: accessories
-                    }
-                }
-            } else {
-                itemData.flags.shadowrun5e.embeddedItems.push(...accessories)
-            }            
-        }
     }
 }

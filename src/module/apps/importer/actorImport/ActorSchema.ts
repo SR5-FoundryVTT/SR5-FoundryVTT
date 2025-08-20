@@ -693,6 +693,7 @@ export type ActorSchema = {
     }>;
     cyberwares: MaybeEmpty<{
         cyberware: OneOrMany<{
+            guid: string;
             name: string;
             name_english: string;
             category: string;
