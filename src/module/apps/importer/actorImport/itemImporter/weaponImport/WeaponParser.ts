@@ -51,7 +51,7 @@ export class WeaponParser extends Parser<'weapon'> {
     };
 
     async parseWeapons(chummerChar: ActorSchema | Unwrap<NonNullable<ActorSchema['vehicles']>['vehicle']>, assignIcons: boolean = false) {
-        return this.parseItems(IH.getArray(chummerChar.weapons?.weapon), assignIcons)
+        return this.parseItems(IH.getArray(chummerChar.weapons?.weapon))
     }
 
     parseItem(item: BlankItem<'weapon'>, itemData: ExtractItemType<'weapons', 'weapon'>) {
@@ -150,7 +150,7 @@ export class WeaponParser extends Parser<'weapon'> {
     override async getEmbeddedItems(itemData: ExtractItemType<'weapons', 'weapon'>): Promise<Item.Source[]> {
         return [
             ...(await new AccessoryParser().parseItems(itemData.accessories?.accessory)),
-            ...(await new ClipParser(itemData).parseItems(itemData.accessories?.accessory)),
+            ...(await new ClipParser(itemData).parseItems(itemData.clips?.clip)),
         ] as Item.Source[];
     }
 

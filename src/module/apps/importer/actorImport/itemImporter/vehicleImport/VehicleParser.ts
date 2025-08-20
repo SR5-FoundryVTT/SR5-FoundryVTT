@@ -26,10 +26,10 @@ export default class VehicleParser {
             const vehicleActor = (await SR5Actor.create({ name: vehicle.name, type: "vehicle" }) as SR5Actor<'vehicle'>);
 
             const promises : Array<Promise<any>> = [];
-            promises.push(new WeaponParser().parseWeapons(vehicle, importOptions.assignIcons));
-            promises.push(new GearsParser().parseItems(getArray(vehicle.gears?.gear),  importOptions.assignIcons));
-            promises.push(new MountedWeaponParser().parseWeapons(vehicle, importOptions.assignIcons))
-            promises.push(new VehicleModsParser().parseItems(vehicle.mods?.mod, importOptions.assignIcons))
+            promises.push(new WeaponParser().parseWeapons(vehicle));
+            promises.push(new GearsParser().parseItems(getArray(vehicle.gears?.gear)));
+            promises.push(new MountedWeaponParser().parseWeapons(vehicle))
+            promises.push(new VehicleModsParser().parseItems(vehicle.mods?.mod))
 
             let handling: string | undefined;
             let off_road_handling: string | undefined;

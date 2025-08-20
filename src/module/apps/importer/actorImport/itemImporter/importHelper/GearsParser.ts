@@ -9,7 +9,7 @@ import { ImportHelper as IH } from '@/module/apps/itemImport/helper/ImportHelper
 type ItemType = ExtractItemType<'gears', 'gear'>[] | ExtractItemType<'gears', 'gear'> | undefined;
 
 export class GearsParser {
-    async parseItems(itemsData: ItemType, assignIcons: boolean = false) {
+    async parseItems(itemsData: ItemType) {
         const allGears = IH.getArray(itemsData);
         const devices: typeof allGears = [];
         const sins: typeof allGears = [];
@@ -36,11 +36,11 @@ export class GearsParser {
         }
 
         return [
-            ...(await new AmmoParser().parseItems(ammos, assignIcons)),
-            ...(await new DeviceParser().parseItems(devices, assignIcons)),
-            ...(await new SinParser().parseItems(sins, assignIcons)),
-            ...(await new ProgramParser().parseItems(programs, assignIcons)),
-            ...(await new SimpleParser('equipment').parseItems(gears, assignIcons)),
+            ...(await new AmmoParser().parseItems(ammos)),
+            ...(await new DeviceParser().parseItems(devices)),
+            ...(await new SinParser().parseItems(sins)),
+            ...(await new ProgramParser().parseItems(programs)),
+            ...(await new SimpleParser('equipment').parseItems(gears)),
         ];
     }
 }

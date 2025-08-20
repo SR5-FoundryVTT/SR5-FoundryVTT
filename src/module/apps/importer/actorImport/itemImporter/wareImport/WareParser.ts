@@ -3,7 +3,7 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class WareParser extends Parser<'bioware' | 'cyberware'> {
     protected readonly parseType: 'bioware' | 'cyberware';
-    protected readonly compKey = 'cyberware';
+    protected readonly compKey = 'Ware';
 
     constructor(parseType: 'bioware' | 'cyberware') {
         super();

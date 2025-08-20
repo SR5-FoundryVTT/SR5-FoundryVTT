@@ -23,7 +23,8 @@ export class ChummerImportForm extends foundry.appv1.api.FormApplication {
         html.find('.submit-chummer-import').click(async (event) => {
             event.preventDefault();
 
-            const chummerFile = JSON.parse($('.chummer-text').val() as string);
+            const text = $('.chummer-text').val() as string;
+            const chummerFile = JSON.parse(text);
             const importOptions = {
                 assignIcons: $('.assignIcons').is(':checked'),
 

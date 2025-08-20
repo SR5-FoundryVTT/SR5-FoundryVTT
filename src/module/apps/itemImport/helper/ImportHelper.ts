@@ -109,18 +109,28 @@ export class ImportHelper {
     }
 
     public static async getItem(
-        compKey: CompendiumKey,
-        guid: string,
-        name: string,
+        compKey: CompendiumKey | null,
+        itemData: { chummerId: string | null; name: string; name_english?: string }
     ) {
+        if (!compKey) return null;
         const pack = game.packs?.get(
             `world.${Constants.MAP_COMPENDIUM_KEY[compKey].pack}`
         ) as CompendiumCollection<'Item'>;
-
         if (!pack) return null;
 
-        const id = this.guidToId(guid);
-        const item = await pack.getDocument(id);
+        let item: Item.Stored | undefined | null;
+
+        if (itemData.chummerId) {
+            const id = this.guidToId(itemData.chummerId);
+            item = await pack.getDocument(id);
+        }
+
+        if (!item)
+            item = pack.getName(itemData.name);
+
+        if (!item && itemData.name_english)
+            item = pack.getName(itemData.name_english);
+
         return item ? game.items.fromCompendium(item) as Item.CreateData : null;
     }
 

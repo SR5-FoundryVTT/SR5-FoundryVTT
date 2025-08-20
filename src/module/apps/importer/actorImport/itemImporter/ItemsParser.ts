@@ -29,62 +29,62 @@ export class ItemsParser {
      * @param {*} importOptions Additional import option that specify what items will be imported.
      */
     async parse(chummerChar: ActorSchema, importOptions: importOptionsType) {
-        const promises: Promise<any>[] = [];
+        const items: Item.CreateData[] = [];
         Object.freeze(chummerChar);
 
         if (importOptions.qualities)
-            promises.push(new QualityParser().parseItems(chummerChar.qualities?.quality, importOptions.assignIcons));
+            items.push(...await new QualityParser().parseItems(chummerChar.qualities?.quality));
 
         if (importOptions.weapons)
-            promises.push(new WeaponParser().parseWeapons(chummerChar, importOptions.assignIcons));
+            items.push(...await new WeaponParser().parseWeapons(chummerChar));
 
         if (importOptions.armor) {
-            promises.push(new ArmorParser().parseItems(chummerChar.armors?.armor, importOptions.assignIcons));
+            items.push(...await new ArmorParser().parseItems(chummerChar.armors?.armor));
             const otherArmors = IH.getArray(chummerChar.otherarmors?.otherarmor).map(armor => ({
                 ...armor,
                 name: armor.objectname,
                 name_english: armor.objectname_english,
                 source: armor.sourcename,
             }));
-            promises.push(new OtherArmorParser().parseItems(otherArmors, importOptions.assignIcons));
+            items.push(...await new OtherArmorParser().parseItems(otherArmors));
         }
 
         if (importOptions.cyberware) {
             const biowares = IH.getArray(chummerChar.cyberwares?.cyberware).filter(c => c.improvementsource === "Bioware");
             const cyberwares = IH.getArray(chummerChar.cyberwares?.cyberware).filter(c => c.improvementsource !== "Bioware");
-            promises.push(new WareParser('bioware').parseItems(biowares, importOptions.assignIcons));
-            promises.push(new WareParser('cyberware').parseItems(cyberwares, importOptions.assignIcons));
+            items.push(...await new WareParser('bioware').parseItems(biowares));
+            items.push(...await new WareParser('cyberware').parseItems(cyberwares));
         }
 
         if (importOptions.powers)
-            promises.push(new PowerParser().parseItems(chummerChar.powers?.power, importOptions.assignIcons))
+            items.push(...await new PowerParser().parseItems(chummerChar.powers?.power));
 
         if (importOptions.spells && chummerChar.spells?.spell) {
             const rituals = IH.getArray(chummerChar.spells.spell).filter(s => s.category_english === "Rituals" && s.alchemy !== 'True');
             const spells = IH.getArray(chummerChar.spells.spell).filter(s => s.category_english !== "Rituals" && s.alchemy !== 'True');
-            promises.push(new SpellParser().parseItems(spells, importOptions.assignIcons));
-            promises.push(new RitualParser().parseItems(rituals, importOptions.assignIcons));
+            items.push(...await new SpellParser().parseItems(spells));
+            items.push(...await new RitualParser().parseItems(rituals));
         }
 
         if (importOptions.contacts)
-            promises.push(new ContactParser().parseItems(chummerChar.contacts?.contact, importOptions.assignIcons));
+            items.push(...await new ContactParser().parseItems(chummerChar.contacts?.contact));
 
         if (importOptions.lifestyles)
-            promises.push(new LifestyleParser().parseItems(chummerChar.lifestyles?.lifestyle, importOptions.assignIcons));
+            items.push(...await new LifestyleParser().parseItems(chummerChar.lifestyles?.lifestyle));
 
         if (importOptions.metamagics) {
             const metamagics = IH.getArray(chummerChar.metamagics?.metamagic).filter(meta => meta.improvementsource === "Metamagic");
             const echoes = IH.getArray(chummerChar.metamagics?.metamagic).filter(meta => meta.improvementsource === "Echo");
-            promises.push(new SimpleParser("metamagic").parseItems(metamagics, importOptions.assignIcons));
-            promises.push(new SimpleParser("echo", "Spell").parseItems(echoes, importOptions.assignIcons));
+            items.push(...await new SimpleParser("metamagic").parseItems(metamagics));
+            items.push(...await new SimpleParser("echo", "Spell").parseItems(echoes));
         }
 
         if (importOptions.powers)
-            promises.push(new CritterPowerParser().parseItems(chummerChar.critterpowers?.critterpower, importOptions.assignIcons));
+            items.push(...await new CritterPowerParser().parseItems(chummerChar.critterpowers?.critterpower));
 
         if (importOptions.equipment)
-            promises.push(new GearsParser().parseItems(chummerChar.gears?.gear, importOptions.assignIcons));
+            items.push(...await new GearsParser().parseItems(chummerChar.gears?.gear));
 
-        return (await Promise.all(promises)).flat();
+        return items;
     }
 }

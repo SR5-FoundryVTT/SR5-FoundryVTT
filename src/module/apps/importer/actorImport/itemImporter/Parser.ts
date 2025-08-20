@@ -2,11 +2,14 @@ import { ActorSchema } from '../ActorSchema';
 import * as IconAssign from '../../../iconAssigner/iconAssign';
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
+import { CompendiumKey } from '@/module/apps/itemImport/importer/Constants';
+import { Sanitizer } from '@/module/sanitizer/Sanitizer';
 
 export type ItemSystems = SystemEntityType & Item.ConfiguredSubType;
 
 export type BaseType = {
-    guid: string;
+    suid?: string;
+    sourceid?: string;
     name: string;
     name_english?: string;
     source?: string | null;
@@ -20,7 +23,7 @@ export type BaseType = {
     equipped?: "True"|"False"|null;
     conditionmonitor?: string | null;
     conceal?: string | null;
-}
+};
 
 type Unwrap<T> = T extends Array<infer U> ? U : T;
 export type ExtractItemType<
@@ -32,12 +35,13 @@ export type BlankItem<T extends ItemSystems> = ReturnType<Parser<T>["createItem"
 
 export abstract class Parser<T extends ItemSystems> {
     protected abstract readonly parseType: T;
-    protected abstract readonly compKey: any;
+    protected abstract readonly compKey: CompendiumKey | null;
+    static iconList: string[] | undefined;
 
-    protected createItem(data: BaseType) {
+    protected createItem(itemData: BaseType) {
         type FlagType = NonNullable<NonNullable<Item.CreateData['flags']>['shadowrun5e']>;
         return {
-            name: data.name,
+            name: itemData.name ?? "Unnamed",
             type: this.parseType,
             img: null as string | null,
             _id: foundry.utils.randomID(),
@@ -46,8 +50,13 @@ export abstract class Parser<T extends ItemSystems> {
         } satisfies Item.CreateData;
     }
 
-    protected async getItem(guid: string, name: string) {
-        return IH.getItem(this.compKey, guid, name) as Promise<BlankItem<T> | null>;
+    protected async getItem(itemData: BaseType) {
+        const info = {
+            name: itemData.name,
+            name_english: itemData.name_english,
+            chummerId: itemData.suid ?? itemData.sourceid ?? null,
+        }
+        return IH.getItem(this.compKey, info) as Promise<BlankItem<T> | null>;
     }
 
     protected parseDescription(item: BlankItem<T>, itemData: BaseType) {
@@ -84,15 +93,14 @@ export abstract class Parser<T extends ItemSystems> {
             technology.conceal.base = Number(itemData.conceal) || 0;
     }
 
-    public async parseItems(itemsData: BaseType[] | BaseType | undefined, assignIcons: boolean = false) {
+    public async parseItems(itemsData: BaseType[] | BaseType | undefined) {
         if (!itemsData) return [];
 
-        const iconList = await IconAssign.getIconFiles();
         const parsedItems: BlankItem<T>[] = [];
 
         for (const itemData of IH.getArray(itemsData)) {
             try {
-                const fetchedItem = await this.getItem(itemData.guid, itemData.name);
+                const fetchedItem = await this.getItem(itemData);
                 const item = fetchedItem ?? this.createItem(itemData);
                 item._id = foundry.utils.randomID();
 
@@ -104,6 +112,20 @@ export abstract class Parser<T extends ItemSystems> {
 
                 if (embeddedItems.length)
                     item.flags.shadowrun5e.embeddedItems = embeddedItems;
+
+                if (Parser.iconList && !item.img)
+                    item.img = IconAssign.iconAssign(item.system.importFlags, Parser.iconList, item.system);
+
+                const schema = CONFIG["Item"].dataModels[item.type].schema;
+                const correctionLogs = Sanitizer.sanitize(schema, item.system);
+        
+                if (correctionLogs) {
+                    console.warn(
+                        `Document Sanitized on Actor Importer:\n` +
+                        `Name: ${item.name}; Type: ${item.type};\n`
+                    );
+                    console.table(correctionLogs);
+                }
 
                 parsedItems.push(item);
             } catch (error) {

@@ -7,10 +7,10 @@ type VehicleType = Unwrap<NonNullable<ActorSchema['vehicles']>['vehicle']>;
 
 export default class MountedWeaponParser {
 
-    async parseWeapons(vehicle: VehicleType, assignIcons: boolean = false) {
+    async parseWeapons(vehicle: VehicleType) {
         const mods = getArray(vehicle.mods?.mod);
         const weapons = mods.filter(mod => mod.weapons != null).map(mod => getArray(mod.weapons?.weapon)).flat()
 
-        return new WeaponParser().parseItems(weapons, assignIcons)
+        return new WeaponParser().parseItems(weapons)
     }
 }
