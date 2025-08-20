@@ -2,7 +2,6 @@ import { MatrixNetworkHackingApplication } from '../../apps/matrix/MatrixNetwork
 import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
-import { FormDialog } from '../../apps/dialogs/FormDialog';
 import { SR5Actor } from '../SR5Actor';
 import { MatrixFlow } from '../../flows/MatrixFlow';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';

@@ -254,6 +254,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         data.bindings = this._prepareKeybindings();
 
+        data.initiativePerception = this._prepareInitiativePerception();
+
         return data;
     }
 
@@ -370,6 +372,47 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
+
+        html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
+    }
+
+    /**
+     * Get the options for Initiative Perception
+     */
+    _prepareInitiativePerception() {
+        const initiative = this.actor.system.initiative.perception;
+        if (initiative === 'matrix') {
+            return this.actor.isUsingHotSim ? 'hot_sim' : 'cold_sim';
+        }
+        return initiative;
+    }
+
+    /**
+     * Handle Changing Initiative Perception
+     * - the select handles hot sim vs cold sim and doesn't match our dataset exactly
+     * - this is more of a band-aid until we do appv2
+     * @param event
+     */
+    async _onInitiativePerceptionChange(event) {
+        const newValue = event.currentTarget?.value;
+        if (newValue === 'meatspace' || newValue === 'magic') {
+            // meatspace and magic can be directly applied as the perception type
+            // disable VR as well
+            await this.actor.update({ system: {
+                    initiative: { perception: newValue, },
+                    matrix: { vr: false }
+                }});
+        } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
+            // if we are hot sim or cold sim, we are in VR and using matrix init perception
+            await this.actor.update({
+                system: {
+                    initiative: {
+                        perception: 'matrix',
+                    },
+                    matrix: { hot_sim: newValue === 'hot_sim', vr: true }
+                },
+            });
+        }
     }
 
     /**

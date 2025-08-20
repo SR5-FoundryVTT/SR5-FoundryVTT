@@ -70,24 +70,6 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet {
 
         html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
-        html.find('.matrix-toggle-hot-sim').on('click', this._onMatrixToggleMatrixPerception.bind(this));
-    }
-
-    private async _onMatrixToggleMatrixPerception(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const newState = this.actor.isUsingVR ? this.actor.isUsingHotSim ? 'ar' : 'hot_sim' : 'col_sim';
-
-        const update = {
-            system: {
-                matrix: {
-                    hot_sim: newState === 'hot_sim',
-                    vr: newState === 'hot_sim' || newState === 'col_sim',
-                }
-            }
-        }
-        await this.actor.update(update)
     }
 
     private async _onMatrixToggleRunningSilent(event) {
