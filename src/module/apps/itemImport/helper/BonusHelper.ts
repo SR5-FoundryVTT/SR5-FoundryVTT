@@ -56,8 +56,10 @@ export class BonusHelper {
     ): void {
         const changes = IH.getArray(effect.changes);
 
-        for (const change of changes)
+        for (const change of changes) {
             change.value = this.normalizeValue(sheet, change.value);
+            if (!change.mode) change.mode = BC.MODIFY;
+        }
 
         sheet.effects!.push({
             name: sheet.name,
