@@ -11,7 +11,7 @@ export const { CUSTOM, MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACT
 export type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: ActiveEffectMode; };
 
 export class BonusConstant {
-    public static skillGroupTable: Record<string, string[]> = {
+    public static skillGroupTable = {
         "Acting": ["con", "impersonation", "performance"],
         "Athletics": ["gymnastics", "running", "swimming", "flight"],
         "Biotech": ["biotechnology", "cybertechnology", "first_aid", "medicine"],
@@ -29,7 +29,7 @@ export class BonusConstant {
         "Tasking": ["compiling", "decompiling", "registering"],
     } as const;
 
-    public static skillCategoryTable: Record<string, string[]> = {
+    public static skillCategoryTable = {
         "Combat Active": ["archery", "automatics", "blades", "clubs", "exotic_melee", "exotic_range", "heavy_weapons", "longarms", "pistols", "throwing_weapons", "unarmed_combat"],
         "Physical Active": ["disguise", "diving", "escape_artist", "flight", "free_fall", "gymnastics", "palming", "perception", "running", "sneaking", "survival", "swimming", "tracking"],
         "Social Active": ["con", "etiquette", "impersonation", "instruction", "intimidation", "leadership", "negotiation", "performance"],
@@ -58,20 +58,20 @@ export class BonusConstant {
         damageresistance: {
             name: "Add Damage Resistance",
             changes: [{ key: "data.modifiers.mod" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "PhysicalResistTest" }] },
+            system: { applyTo: 'test_all', selection_tests: [{ value: "Physical Damage Resistance", id: "PhysicalResistTest" }] },
         },
         defensetest: { changes: [{ key: "system.modifiers.defense" }] },
         dodge: { changes: [{ key: "system.modifiers.defense" }] },
         drainresist: {
             name: "Add Drain Resistance",
             changes: [{ key: "data.modifiers.mod" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "DrainTest" }] },
+            system: { applyTo: 'test_all', selection_tests: [{ value: "Drain Resistance", id: "DrainTest" }] },
         },
         essencemax: { changes: [{ key: "system.attributes.essence.mod" }] },
         fadingresist: {
             name: "Add Fading Resistance",
             changes: [{ key: "data.modifiers.mod" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "FadeTest" }] },
+            system: { applyTo: 'test_all', selection_tests: [{ value: "Fading Resistance", id: "FadeTest" }] },
         },
         handling: { changes: [{ key: "system.vehicle_stats.handling.mod" }] },
         initiativedice: {
@@ -91,7 +91,7 @@ export class BonusConstant {
         physicalcmrecovery: {
             name: "Natural Recovery Physical",
             changes: [{ key: "data.modifiers.mod" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "NaturalRecoveryPhysicalTest" }] }
+            system: { applyTo: 'test_all', selection_tests: [{ value: "Physical Recovery", id: "NaturalRecoveryPhysicalTest" }] }
         },
         physicallimit: { changes: [{ key: "system.limits.physical.mod" }] },
         reach: { changes: [{ key: "system.modifiers.reach" }] },
@@ -101,12 +101,12 @@ export class BonusConstant {
         spellresistance: {
             name: "Add Spell Resistance",
             changes: [{ key: "data.modifiers.mod" } ],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "CombatSpellDefenseTest" }] }
+            system: { applyTo: 'test_all', selection_tests: [{ value: "Combat Spell Defense", id: "CombatSpellDefenseTest" }] }
         },
         stuncmrecovery: {
             name: "Natural Recovery Stun",
             changes: [{ key: "data.modifiers.mod" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "NaturalRecoveryStunTest" }] }
+            system: { applyTo: 'test_all', selection_tests: [{ value: "Stun Recovery", id: "NaturalRecoveryStunTest" }] }
         }
     } as const satisfies Partial< Record< keyof BonusSchema, AECreateData > >;
 }

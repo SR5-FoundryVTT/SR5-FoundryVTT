@@ -23,11 +23,11 @@ export class GearsParser {
         for (const g of allGears) {
             if (excludedNames.some(prefix => (g.name_english || '').toLowerCase().startsWith(prefix))) continue;
 
-            if (g.iscommlink)
+            if (g.iscommlink === "True")
                 devices.push(g);
-            else if (g.issin)
+            else if (g.issin === "True")
                 sins.push(g);
-            else if (g.isammo)
+            else if (g.isammo === "True")
                 ammos.push(g);
             else if (programCategories.includes(g.category_english as any))
                 programs.push(g);

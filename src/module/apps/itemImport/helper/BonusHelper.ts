@@ -1,7 +1,6 @@
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
 import * as BC from "./BonusConstant";
-import { DeepPartial } from "fvtt-types/utils";
 
 export class BonusHelper {
     private static isTrue(value: "" | { _TEXT: string }): boolean {
@@ -155,7 +154,7 @@ export class BonusHelper {
                     sheet, {
                         name: sheet.name + conditionTag,
                         changes: [{ key: "data.limit.mod", value: limitModifier.value._TEXT }],
-                        system: { applyTo: 'test_all', selection_limits: [{ id: normalName }] }
+                        system: { applyTo: 'test_all', selection_limits: [{ value: name, id: normalName }] }
                     }
                 );
             }
@@ -177,7 +176,7 @@ export class BonusHelper {
                     sheet, {
                         name: sheet.name + conditionTag,
                         changes: [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
-                        system: { applyTo: 'test_all', selection_attributes: [{ id: name }] }
+                        system: { applyTo: 'test_all', selection_attributes: [{ value: name.capitalize(), id: name }] }
                     }
                 );
             }
@@ -187,10 +186,11 @@ export class BonusHelper {
             for (const skillCategory of IH.getArray(bonus.skillcategory)) {
                 const conditionTag = skillCategory.condition ? "*" : "";
                 const excludedSkill = this.normalizeSkillName(skillCategory.exclude?._TEXT ?? "");
-                
-                const skills = BC.BonusConstant.skillCategoryTable[skillCategory.name._TEXT]
+
+                type Keys = keyof typeof BC.BonusConstant.skillCategoryTable;
+                const skills = BC.BonusConstant.skillCategoryTable[skillCategory.name._TEXT as Keys]
                                 .filter(skillId => !excludedSkill || skillId !== excludedSkill)
-                                .map(skillId => ({ id: skillId }))
+                                .map(skillId => ({ value: skillId.capitalize(), id: skillId }))
 
                 if (!skills?.length)
                     console.log("Error skillcategory:", skillCategory.name._TEXT);
@@ -210,9 +210,10 @@ export class BonusHelper {
                 const conditionTag = skillGroup.condition ? "*" : "";
                 const excludedSkill = this.normalizeSkillName(skillGroup.exclude?._TEXT ?? "");
 
-                const skills = BC.BonusConstant.skillGroupTable[skillGroup.name._TEXT]
+                type Keys = keyof typeof BC.BonusConstant.skillGroupTable;
+                const skills = BC.BonusConstant.skillGroupTable[skillGroup.name._TEXT as Keys]
                                 .filter(skillId => !excludedSkill || skillId !== excludedSkill)
-                                .map(skillId => ({ id: skillId }))
+                                .map(skillId => ({ value: skillId.capitalize(), id: skillId }))
 
                 this.createEffect(
                     sheet, {
@@ -234,7 +235,7 @@ export class BonusHelper {
                     sheet, {
                         name: sheet.name + conditionTag,
                         changes: [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
-                        system: { applyTo: 'test_all', selection_skills: [{ id: normalName }] }
+                        system: { applyTo: 'test_all', selection_skills: [{ value: name, id: normalName }] }
                     }
                 );
             }
