@@ -1,5 +1,5 @@
 import { SR5 } from "./config";
-import { DamageType } from "./types/item/Action";
+import { BiofeedbackDamageType, DamageType } from './types/item/Action';
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
 import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
@@ -615,6 +615,7 @@ export class Helpers {
         type: DamageType['type']['value'],
         ap: number = 0,
         element: DamageType['element']['value'] = '',
+        biofeedback: BiofeedbackDamageType = '',
         sourceItem?: SR5Item
     ): DamageType {
         const damage = DataDefaults.createData('damage');
@@ -626,6 +627,7 @@ export class Helpers {
         damage.ap.value = ap;
         damage.element.base = element;
         damage.element.value = element;
+        damage.biofeedback = biofeedback;
 
         if (sourceItem?.actor) {
             damage.source = {
@@ -961,7 +963,7 @@ export class Helpers {
      */
     static getGeneralActionsPackName(): Shadowrun.PackName {
         const overrideGeneralpackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) as Shadowrun.PackName;
-        return overrideGeneralpackName || SR5.packNames.generalActions as Shadowrun.PackName;
+        return overrideGeneralpackName || SR5.packNames.GeneralActionsPack as Shadowrun.PackName;
     }
 
     /**
@@ -969,7 +971,7 @@ export class Helpers {
      */
     static getMatrixActionsPackName(): Shadowrun.PackName {
         const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.MatrixActionsPack) as Shadowrun.PackName;
-        return overrideMatrixPackName || SR5.packNames.matrixActions as Shadowrun.PackName;
+        return overrideMatrixPackName || SR5.packNames.MatrixActionsPack as Shadowrun.PackName;
     }
 
     /**

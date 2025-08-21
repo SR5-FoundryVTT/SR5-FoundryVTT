@@ -106,6 +106,13 @@ export const SR5 = {
         matrix: 'SR5.DmgTypeMatrix'
     },
 
+    biofeedbackOptions: {
+        // create an empty string option, this should not be needed after appv2
+        '': '',
+        physical: 'SR5.DmgTypePhysical',
+        stun: 'SR5.DmgTypeStun',
+    },
+
     weaponRangeCategories: {
         manual: {
             label: 'SR5.Weapon.Range.Category.Manual',
@@ -880,8 +887,9 @@ export const SR5 = {
      * Names of FoundryVTT packs supplied by the system to be used as action sources.
      */
     packNames: {
-        'generalActions': 'general-actions',
-        'matrixActions': 'matrix-actions'
+        // packNames keys should match the name of the FLAG
+        'GeneralActionsPack': 'general-actions',
+        'MatrixActionsPack': 'matrix-actions',
     },
 
     programTypes: {

@@ -65,6 +65,12 @@ export const DamageData = () => ({
         }),
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
+    biofeedback: new StringField({
+        required: true,
+        blank: true,
+        initial: '',
+        choices: ["physical", "stun"],
+    }),
     attribute: new StringField({ required: true }),
     source: new SchemaField({
         actorId: new StringField({ required: true }),
@@ -159,11 +165,12 @@ export type OpposedTestType = ActionRollType['opposed'];
 export type ActionResultType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActionResultData>>;
 export type ResultActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ResultActionData>>;
 export type MinimalActionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MinimalActionData>>;
+export type BiofeedbackDamageType = DamageType['biofeedback'];
 
 export class Action extends ItemBase<ReturnType<typeof ActionData>> {
     static override defineSchema() {
         return ActionData();
     }
-};
+}
 
 console.log("ActionData", ActionData(), new Action());

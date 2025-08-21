@@ -2,7 +2,7 @@ import {DamageApplicationDialog} from "../../apps/dialogs/DamageApplicationDialo
 import {SR5Actor} from "../SR5Actor";
 import { Helpers } from '../../helpers';
 import { TestCreator } from '../../tests/TestCreator';
-import { DamageType } from "src/module/types/item/Action";
+import { BiofeedbackDamageType, DamageType } from 'src/module/types/item/Action';
 import { SR5Item } from "@/module/item/SR5Item";
 import { OverflowTrackType, TrackType } from "@/module/types/template/ConditionMonitors";
 import { ConditionType } from "@/module/types/template/Condition";
@@ -82,7 +82,8 @@ export class DamageApplicationFlow {
         const type = String(applyDamage.data('damageType')) as DamageType['type']['value'];
         const ap = Number(applyDamage.data('damageAp'));
         const element = String(applyDamage.data('damageElement')) as DamageElement;
-        const damage = Helpers.createDamageData(value, type, ap, element);
+        const biofeedback = String(applyDamage.data('damageBiofeedback')) as BiofeedbackDamageType;
+        const damage = Helpers.createDamageData(value, type, ap, element, biofeedback);
 
         const targets = Helpers.getSelectedActorsOrCharacter();
 
@@ -127,6 +128,7 @@ export class DamageApplicationFlow {
                 await DamageApplicationFlow.addPhysicalDamage(actor, damage);
                 break;
         }
+        Hooks.call("sr5_afterDamageAppliedToActor", actor, damage);
     }
 
     /**

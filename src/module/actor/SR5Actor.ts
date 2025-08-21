@@ -736,6 +736,26 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Get if this actor can take biofeedback damage
+     * - this takes into account VR status and actor type
+     */
+    get canTakeBiofeedbackDamage(): boolean {
+        // we can't take biofeedback damage if we aren't using VR
+        if (!this.isUsingVR) return false;
+        // IC and Sprites can't take biofeedback damage
+        return !this.isType('ic', 'sprite');
+    }
+
+    takesBiofeedbackDamageFrom(damage: DamageType) {
+        if (!this.canTakeBiofeedbackDamage) return false;
+        if (damage.type.value === 'matrix' && damage.biofeedback) {
+            return true;
+        }
+        // TODO determine when jumped in to take biofeedback damage?
+        return false;
+    }
+
+    /**
      * Determine if an actor can choose a special trait using the special field.
      */
     get hasSpecial(): boolean {
@@ -1145,7 +1165,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options 
      */
     async generalActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return this.packActionTest(SR5.packNames.generalActions as Shadowrun.PackName, actionName, options);
+        return this.packActionTest(SR5.packNames.GeneralActionsPack as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1155,7 +1175,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async matrixActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return this.packActionTest(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
+        return this.packActionTest(SR5.packNames.MatrixActionsPack as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1176,7 +1196,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async rollMatrixAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        return this.rollPackAction(SR5.packNames.matrixActions as Shadowrun.PackName, actionName, options);
+        return this.rollPackAction(SR5.packNames.MatrixActionsPack as Shadowrun.PackName, actionName, options);
     }
 
     /**
