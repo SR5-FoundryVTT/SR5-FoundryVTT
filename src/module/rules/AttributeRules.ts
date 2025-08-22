@@ -1,4 +1,5 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
+import { MinimalActionType } from '@/module/types/item/Action';
 
 export class AttributeRules {
 
@@ -28,21 +29,18 @@ export class AttributeRules {
     }
 
     /**
-     * Override the mental attributes of the actor to their physical counterpart
-     * @param rollData
+     * Change physical attributes of the test to use their Mental Attribute
+     * these are defined on SR5 pg #314 -- it is the Astral Attributes Table but I think it is shared across all things
+     * @param action
      */
-    static injectMentalAttributesToPhysicalAttributes(rollData: SR5Actor['system']) {
-        const attributes = rollData.attributes;
-        for (const [key, value] of Object.entries(this.PhysicalToMentalAttributeMap)) {
-            const a1 = attributes[key];
-            const a2 = attributes[value];
-
-            // override the label and value
-            // this doesn't actually change the "attribute used" exactly, but it appears to the user correctly
-            a1.value = a2.value;
-            a1.label = a2.label;
+    static replacePhysicalAttributesWithMentalAttributes(action: MinimalActionType) {
+        // check the attributes used by the action
+        if (this.PhysicalToMentalAttributeMap.hasOwnProperty(action.attribute)) {
+            action.attribute = this.PhysicalToMentalAttributeMap[action.attribute];
         }
-
+        if (this.PhysicalToMentalAttributeMap.hasOwnProperty(action.attribute2)) {
+            action.attribute2 = this.PhysicalToMentalAttributeMap[action.attribute2];
+        }
     }
 
     static PhysicalToMentalAttributeMap = {

@@ -20,19 +20,7 @@ export const ActorRollDataFlow = {
      */
     getRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions) {
         if (actor.isType('vehicle')) ActorRollDataFlow.injectVehicleDriverRollData(actor, rollData, options);
-        if (actor.isUsingVR) ActorRollDataFlow.injectMentalAttributesAsPhysical(actor, rollData, options);
         return rollData;
-    },
-
-    /**
-     * Inject the Mental attributes values and labels into their physical attribute counterparts,
-     * these are defined on page 314 of SR5 -- it is the Astral Attributes Table but I believe that is the same as Matrix
-     * @param actor
-     * @param rollData
-     * @param options
-     */
-    injectMentalAttributesAsPhysical: (actor: SR5Actor, rollData: SR5Actor['system'], options: RollDataOptions = {}) => {
-        AttributeRules.injectMentalAttributesToPhysicalAttributes(rollData);
     },
 
     /**
@@ -42,11 +30,9 @@ export const ActorRollDataFlow = {
     injectVehicleDriverRollData: function(actor: SR5Actor, rollData: SR5Actor['system'], options: RollDataOptions = {}) {
         const driver = actor.getVehicleDriver()
         if (!driver) return;
-        const vehicleSystem = actor.system;
-        if (!vehicleSystem.controlMode) return;
 
         // if the driver is in control of the vehicle, inject the driver's attributes and skills
-        if (['rigger', 'remote', 'manual'].includes(vehicleSystem.controlMode)) {
+        if (actor.isControlledByDriver()) {
             RiggingRules.modifyRollDataForDriver(driver.getRollData(), rollData);
         }
     },

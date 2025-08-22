@@ -413,6 +413,10 @@ export const TestCreator = {
      * @param data Any test implementations resulting basic test data.
      */
     _prepareTestDataWithAction: function(action: ActionRollType, document: SR5Actor|SR5Item, data: SuccessTestData, againstData?: any) {
+        // allow rule specific parts of the system to change the data that we pass in
+        // - this can be used to change the test skills or attributes before building a dice pool
+        Hooks.call('sr5_beforePrepareTestDataWithAction', action, document, againstData);
+
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 

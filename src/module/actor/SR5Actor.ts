@@ -1739,8 +1739,20 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.system.vehicle_stats;
     }
 
-    isRiggerControlled(this: SR5Actor) {
-        return this.system.controlMode === 'rigger'
+    /**
+     * Check if the actor is controlled by a driver
+     * @param controlModes (optional) - rigger, manual, or remote
+     *  - if not provided, will test against all 3
+     */
+    isControlledByDriver(this: SR5Actor, ...controlModes: Omit<SR5Actor['system']['controlMode'], 'autopilot'>[]) {
+        if (!this.isType('vehicle')) return false;
+        if (!this.hasDriver()) return false;
+        if (!this.system.controlMode) return false;
+        // if no control modes were provided, default to the 3 standard control modes
+        if (controlModes.length === 0) {
+            controlModes = ['rigger', 'manual', 'remote'];
+        }
+        return controlModes.includes(this.system.controlMode);
     }
 
     /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
