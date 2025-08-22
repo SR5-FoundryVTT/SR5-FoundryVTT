@@ -21,7 +21,8 @@ export const RiggingTestDataFlow = {
         const driver = vehicle.getVehicleDriver();
         if (!driver) return;
         const rating = driver.getControlRigRating();
-        if (rating > 0) {
+        // if the rating is greater than 0 and a limit is already in place, add the control rig
+        if (rating > 0 && test.data.limit.value > 0) {
             // add the control rig rating as a limit bonus to tests
             test.data.limit.mod.push({name: game.i18n.localize('SR5.ControlRig'), value: rating});
             Helpers.calcTotal(test.data.limit);
