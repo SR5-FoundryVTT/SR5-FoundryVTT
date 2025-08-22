@@ -2,6 +2,7 @@ import {PartsList} from "../parts/PartsList";
 import {SR} from "../constants";
 import { SkillFieldType } from "../types/template/Skills";
 import { SR5Actor } from '@/module/actor/SR5Actor';
+import { DataDefaults } from '@/module/data/DataDefaults';
 
 export class SkillRules {
 
@@ -87,7 +88,7 @@ export class SkillRules {
     static _injectActiveSkills(names: string[], skills: SR5Actor['system']['skills']['active'], rollData: SR5Actor['system'], options: { bigger: boolean }) {
         const targetSkills = rollData.skills.active;
         for (const name of names) {
-            const sourceSkill = foundry.utils.duplicate(skills[name]);
+            const sourceSkill =  DataDefaults.createData('skill_field', skills[name]);
             const targetSkill = targetSkills[name];
 
             if (options.bigger) {

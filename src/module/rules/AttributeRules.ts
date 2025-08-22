@@ -1,5 +1,6 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { MinimalActionType } from '@/module/types/item/Action';
+import { DataDefaults } from '@/module/data/DataDefaults';
 
 export class AttributeRules {
 
@@ -17,7 +18,7 @@ export class AttributeRules {
     static _injectAttributes(names: string[], attributes: SR5Actor['system']['attributes'], rollData: SR5Actor['system'], options: { bigger: boolean }) {
         const targetAttributes = rollData.attributes;
         for (const name of names) {
-            const sourceAttribute = foundry.utils.duplicate(attributes[name]);
+            const sourceAttribute = DataDefaults.createData('attribute_field', attributes[name]);
             const targetAttribute = targetAttributes[name];
 
             if (options.bigger) {
