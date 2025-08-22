@@ -44,7 +44,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet {
 
         // get the IC pack actions and filter by our type
         return (await Helpers.getPackActions(matrixPackName)).filter((action) => {
-            switch (this.actor.icType) {
+            switch (this.actor.icType()) {
                 case 'acid':
                     return action.name === "Acid";
                 case 'binder':

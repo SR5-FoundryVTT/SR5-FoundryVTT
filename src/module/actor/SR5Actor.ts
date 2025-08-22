@@ -2183,10 +2183,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         })));
     }
 
-    get icType() {
+    icType(this: SR5Actor) {
         if (this.isType('ic')) {
-            // FIXME cast to type IC but that didn't seem to work
-            return (this.system as any)?.icType ?? '';
+            return this.system?.icType ?? '';
         }
         return '';
     }
