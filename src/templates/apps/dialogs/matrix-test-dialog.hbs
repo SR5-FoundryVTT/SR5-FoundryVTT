@@ -3,6 +3,13 @@
         {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs'}}
         <hr/>
         <div>
+            {{#if test.data.marks}}
+            <div class="form-group">
+                <label>{{localize "SR5.Marks"}}</label>
+                <input name="test.data.marks" type="number" class="disabled-for-display"
+                       value="{{test.data.marks}}" min="1" max="3"/>
+            </div>
+            {{/if}}
             <div class="form-group">
                 <label>{{localize "SR5.SameGrid"}}</label>
                 <input type="checkbox" class="checkbox" name="test.data.sameGrid" {{checked test.data.sameGrid}}/>

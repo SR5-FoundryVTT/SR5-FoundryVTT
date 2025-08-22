@@ -954,6 +954,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         event.preventDefault();
 
         await this.item.disconnectFromNetwork();
+        this.render(false);
     }
 
     /**

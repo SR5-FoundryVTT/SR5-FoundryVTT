@@ -10,11 +10,17 @@ import { TestCreator } from './TestCreator';
 import { MatrixPlacementData } from './flows/MarkPlacementFlow';
 import { OpposedMatrixTestData } from './MatrixTest';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
+import { DamageType } from '@/module/types/item/Action';
+
+type OpposedBruteForceTestData = OpposedMatrixTestData & {
+    incomingDamage: DamageType;
+    modifiedDamage: DamageType;
+}
 
 /**
  * Implement the opposing test for Brute Force action. See SR5#238 'Brute Force'
  */
-export class OpposedBruteForceTest extends OpposedTest<OpposedMatrixTestData> {
+export class OpposedBruteForceTest extends OpposedTest<OpposedBruteForceTestData> {
     declare against: BruteForceTest;
     // The target icon to place a mark on.
     declare icon: SR5Actor | SR5Item;
@@ -65,8 +71,9 @@ export class OpposedBruteForceTest extends OpposedTest<OpposedMatrixTestData> {
 
         // Setup optional damage value
         const damage = Math.floor(this.againstNetHits.value / 2);
-        this.data.damage = DataDefaults.createData('damage', {base: damage, type: {base: 'matrix', value: 'matrix'}});
-        Helpers.calcTotal(this.data.damage);
+        this.data.modifiedDamage = DataDefaults.createData('damage', {base: damage, type: {base: 'matrix', value: 'matrix'}});
+        Helpers.calcTotal(this.data.modifiedDamage);
+        this.data.incomingDamage = this.data.modifiedDamage;
     }
 
     /**
