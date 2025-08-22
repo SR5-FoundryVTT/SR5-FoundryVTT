@@ -1739,6 +1739,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.system.vehicle_stats;
     }
 
+    isRiggerControlled(this: SR5Actor) {
+        return this.system.controlMode === 'rigger'
+    }
+
     /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
      *
      * @param uuid An actors id. Should be a character able to drive a vehicle
@@ -1773,6 +1777,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver) return;
         return driver;
+    }
+
+    getControlRigRating(): number {
+        const matrix = this.matrixData();
+        return matrix?.control_rig_rating ?? 0;
     }
 
     /**

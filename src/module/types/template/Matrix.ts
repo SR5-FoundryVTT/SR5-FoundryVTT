@@ -42,6 +42,7 @@ export const MatrixData = () => ({
     firewall: new ModifiableField(MatrixAttributeField()),
 
     condition_monitor: new SchemaField(ConditionData()),
+    control_rig_rating: new NumberField({ required: false, integer: true, initial: 0, min: 0 }),
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     name: new StringField({ required: true }),
     device: new StringField({ required: true }),

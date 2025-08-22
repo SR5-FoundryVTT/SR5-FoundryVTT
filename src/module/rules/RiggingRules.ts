@@ -1,14 +1,15 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { AttributeRules } from '@/module/rules/AttributeRules';
 import { SkillRules } from '@/module/rules/SkillRules';
+import { SuccessTestData } from '@/module/tests/SuccessTest';
 
-export class RiggingRules {
+export const RiggingRules = {
     /**
      * Modify the roll data by using the Driver's data
      * @param driverData
      * @param rollData
      */
-    static modifyRollDataForDriver(driverData: SR5Actor['system'], rollData: SR5Actor['system']) {
+    modifyRollDataForDriver(driverData: SR5Actor['system'], rollData: SR5Actor['system']) {
 
         const driverSkills = driverData.skills.active;
         if (!driverSkills) return;
@@ -23,5 +24,16 @@ export class RiggingRules {
             'pilot_exotic_vehicle', 'pilot_ground_craft', 'pilot_walker', 'pilot_water_craft'
         ];
         SkillRules._injectActiveSkills(injectSkills, driverSkills, rollData, { bigger: false });
-    }
+    },
+
+    /**
+     * Determine if the provided testData should be considered a matrix action when a Rigger is jumped in
+     * Defined in SR5 pg #266 "VR AND RIGGING"
+     * @param testData
+     */
+    isConsideredMatrixAction(testData: SuccessTestData): boolean {
+        if (testData.categories.includes('rigging')) return true;
+        if (['sensor', 'handling', 'speed'].includes(testData.action.limit.attribute)) return true;
+        return false;
+    },
 }
