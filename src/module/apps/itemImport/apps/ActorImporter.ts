@@ -51,55 +51,25 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
 
     override async _prepareContext(options?: any) {
         const baseContext = await super._prepareContext(options);
+        const compareOptions = { numeric: true, sensitivity: 'base' } satisfies Intl.CollatorOptions;
 
-        // Get all actor folders
-        const actorFolders = game.folders.filter(f => f.type === "Actor");
-
-        // Map folders to { id, path } with hierarchical sorting
-        const folders = actorFolders.map(folder => {
-            // Calculate depth: number of ancestors (direct parent is ancestors[0])
-            const depth = folder.ancestors.length;
-
-            // Create display name with dashes: "-" per level of depth
-            const indent = depth > 0 ? '─'.repeat(depth) + ' ' : '';
-            const displayName = `${indent}${folder.name}`;
-
-            // Sort key: array of ancestor folder names (from root to parent), then folder name
-            const sortKey = [
-                ...folder.ancestors.reverse().map(f => f.name), // Root first, then children
-                folder.name
-            ];
-
-            return {
+        const folders = game.folders
+            .filter(f => f.type === "Actor")
+            .map(folder => ({
                 id: folder.id,
-                path: displayName,
-                sortKey,
-                depth
-            };
-        });
+                path: `${folder.ancestors.length > 0 ? '─'.repeat(folder.ancestors.length) + ' ' : ''}${folder.name}`,
+                sortKey: [...folder.ancestors.reverse().map(a => a.name), folder.name]
+            }))
+            .sort((a, b) => {
+                const len = Math.min(a.sortKey.length, b.sortKey.length);
+                for (let i = 0; i < len; i++) {
+                    const cmp = a.sortKey[i].localeCompare(b.sortKey[i], undefined, compareOptions);
+                    if (cmp !== 0) return cmp;
+                }
+                return a.sortKey.length - b.sortKey.length;
+            })
+            .map(({ id, path }) => ({ id, path }));
 
-        // Sort hierarchically: compare each level of the path
-        folders.sort((a, b) => {
-            for (let i = 0; i < Math.min(a.sortKey.length, b.sortKey.length); i++) {
-                const cmp = a.sortKey[i].localeCompare(b.sortKey[i], undefined, {
-                    numeric: true,
-                    sensitivity: 'base'
-                });
-                if (cmp !== 0) return cmp;
-            }
-            // If one is a prefix of the other, shorter comes first (parent before child)
-            return a.sortKey.length - b.sortKey.length;
-        });
-
-        // Strip sortKey and depth for final output
-        const result = folders.map(f => ({
-            id: f.id,
-            path: f.path
-        }));
-
-        return {
-            ...baseContext,
-            folders: result
-        };
+        return { ...baseContext, folders };
     }
 }
