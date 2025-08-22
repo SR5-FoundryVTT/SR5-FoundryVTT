@@ -158,9 +158,9 @@
             "system": "shadowrun5e"
         },
         {
-            "name": "ic-actions",
+            "name": "sr5-ic-actions",
             "label": "SR5e IC Actions",
-            "path": "packs/ic-actions",
+            "path": "packs/sr5-ic-actions",
             "ownership": {
                 "PLAYER": "OBSERVER",
                 "TRUSTED": "OBSERVER",
@@ -202,7 +202,7 @@
             "packs": [
                 "system-macros",
                 "general-actions",
-                "ic-actions",
+                "sr5-ic-actions",
                 "matrix-actions"
             ]
         }
