@@ -24,8 +24,7 @@ export const ActorRollDataFlow = {
     },
 
     /**
-     * Inject values for vehicle actors and their different rigging modes.
-     * 
+     * Inject Driver's Attributes into the RollData if the vehicle is controlled by a driver
      */
     injectVehicleDriverRollData: function(actor: SR5Actor, rollData: SR5Actor['system'], options: RollDataOptions = {}) {
         const driver = actor.getVehicleDriver()

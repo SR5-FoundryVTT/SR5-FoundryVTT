@@ -25,10 +25,20 @@ export const RiggingTestDataFlow = {
             // add the control rig rating as a limit bonus to tests
             test.data.limit.mod.push({name: game.i18n.localize('SR5.ControlRig'), value: rating});
             Helpers.calcTotal(test.data.limit);
+        }
+    },
 
-            if (RiggingRules.isConsideredMatrixAction(test.data)) {
-                MatrixTestDataFlow.addMatrixModifiersToPool(driver, new PartsList(test.data.pool.mod), true);
-            }
+    /**
+     * Add Matrix Modifiers to a test that is being done by a Rigger in a Vehicle (Jumped In)
+     * @param test
+     */
+    addMatrixModifier: (test: SuccessTest) => {
+        const vehicle = test.actor;
+        if (!vehicle || !vehicle.isControlledByDriver('rigger')) return;
+        const driver = vehicle.getVehicleDriver();
+        if (!driver) return;
+        if (RiggingRules.isConsideredMatrixAction(test.data)) {
+            MatrixTestDataFlow.addMatrixModifiersToPool(driver, new PartsList(test.data.pool.mod), true);
         }
     },
 
