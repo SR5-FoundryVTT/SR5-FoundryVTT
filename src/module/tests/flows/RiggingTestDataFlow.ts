@@ -20,7 +20,7 @@ export const RiggingTestDataFlow = {
         const rating = driver.getControlRigRating();
         if (rating > 0) {
             // add the control rig rating as a limit bonus to tests
-            test.data.limit.mod.push({name: 'SR5.ControlRig', value: rating});
+            test.data.limit.mod.push({name: game.i18n.localize('SR5.ControlRig'), value: rating});
             Helpers.calcTotal(test.data.limit);
 
             if (RiggingRules.isConsideredMatrixAction(test.data)) {
