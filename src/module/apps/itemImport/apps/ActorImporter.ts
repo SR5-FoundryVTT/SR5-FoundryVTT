@@ -3,7 +3,7 @@ import AppV2 = foundry.applications.api.ApplicationV2;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
 
 type ImporterContext = {
-    folders: { id: string, path: string }[]
+    folders: { id: string, name: string }[]
 };
 
 export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<ImporterContext>) {
@@ -57,7 +57,7 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
             .filter(f => f.type === "Actor")
             .map(folder => ({
                 id: folder.id,
-                path: `${folder.ancestors.length > 0 ? '─'.repeat(folder.ancestors.length) + ' ' : ''}${folder.name}`,
+                name: `${'─'.repeat(folder.ancestors.length) + ' '}${folder.name}`.trim(),
                 sortKey: [...folder.ancestors.reverse().map(a => a.name), folder.name]
             }))
             .sort((a, b) => {
@@ -68,7 +68,7 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
                 }
                 return a.sortKey.length - b.sortKey.length;
             })
-            .map(({ id, path }) => ({ id, path }));
+            .map(({ id, name }) => ({ id, name }));
 
         return { ...baseContext, folders };
     }
