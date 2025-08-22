@@ -15,7 +15,8 @@ import { _combatantGetInitiativeFormula, SR5Combat } from './combat/SR5Combat';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
-import { Importer } from './apps/itemImport/apps/import-form';
+import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
+import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
@@ -146,6 +147,7 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(SR5Combat));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
+        Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
@@ -554,9 +556,14 @@ ___________________
         const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
         $(html).find('.directory-footer').append(button);
 
-        button.on('click', (event) => {
-            new Importer().render(true);
-        });
+        button.on('click', () => { void new BulkImporter().render({ force: true }); });
+    }
+
+    static renderActorDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
+        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
+        $(html).find('.directory-footer').append(button);
+
+        button.on('click', () => { void new ActorImporter().render({ force: true }); });
     }
 
     /**

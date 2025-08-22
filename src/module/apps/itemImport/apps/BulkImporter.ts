@@ -48,7 +48,7 @@ interface ImporterContext extends AppV2.RenderContext {
  *
  * Import various types of game data (weapons, spells, gear, etc.)
  */
-export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterContext>) {
+export class BulkImporter extends HandlebarsApplicationMixin(ApplicationV2<ImporterContext>) {
     /**
      * Default options for the application window.
      */
@@ -70,7 +70,7 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
      */
     static override PARTS = {
         content: {
-            template: "systems/shadowrun5e/dist/templates/apps/compendium-import.hbs",
+            template: "systems/shadowrun5e/dist/templates/apps/bulk-importer.hbs",
         },
     };
 
@@ -142,22 +142,22 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
         const baseContext = await super._prepareContext(options);
 
         // Destructure GitHub config for cleaner access
-        const { owner, repo, branch, version } = Importer.githubConfig;
+        const { owner, repo, branch, version } = BulkImporter.githubConfig;
 
         return {
             ...baseContext,
 
             // UI and import state
-            icons: Importer.setIcons,
+            icons: BulkImporter.setIcons,
             progress: {
-                message: Importer.progress.message,
-                pct: (Importer.progress.idx / Importer.progress.total * 100).toFixed(0),
+                message: BulkImporter.progress.message,
+                pct: (BulkImporter.progress.idx / BulkImporter.progress.total * 100).toFixed(0),
             },
-            importDone: Importer.importDone,
-            isImporting: Importer.isImporting,
-            zipFileName: Importer.zipFile?.name,
-            deleteCompendiums: Importer.deleteCompendiums,
-            overrideDocuments: Importer.overrideDocuments,
+            importDone: BulkImporter.importDone,
+            isImporting: BulkImporter.isImporting,
+            zipFileName: BulkImporter.zipFile?.name,
+            deleteCompendiums: BulkImporter.deleteCompendiums,
+            overrideDocuments: BulkImporter.overrideDocuments,
 
             // GitHub version info
             info: {
@@ -174,7 +174,7 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
      * @returns The file content as a string, or undefined if failed.
      */
     static async fetchGitHubFile(path: string): Promise<string | undefined> {
-        const { owner, repo, branch } = Importer.githubConfig;
+        const { owner, repo, branch } = BulkImporter.githubConfig;
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
 
         const attempts = 3;
@@ -211,7 +211,7 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
      * - Finalizes and notifies
      */
     async handleBulkImport() {
-        Importer.isImporting = true;
+        BulkImporter.isImporting = true;
         const start = performance.now();
 
         // Unlock all world compendiums for editing
@@ -219,26 +219,26 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
             await game.packs.get("world." + compendium.pack)?.configure({ locked: false });
 
         // Optionally delete existing compendiums
-        if (Importer.deleteCompendiums)
+        if (BulkImporter.deleteCompendiums)
             for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
                 await game.packs.get("world." + compendium.pack)?.deleteCompendium();
 
         // Load ZIP file if provided
-        const ZIP = Importer.zipFile ? await (new JSZip()).loadAsync(Importer.zipFile) : null;
+        const ZIP = BulkImporter.zipFile ? await (new JSZip()).loadAsync(BulkImporter.zipFile) : null;
 
         // Configure shared importer settings
-        DataImporter.setIcons = Importer.setIcons;
-        DataImporter.overrideDocuments = Importer.overrideDocuments;
+        DataImporter.setIcons = BulkImporter.setIcons;
+        DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
         DataImporter.iconList = await IconAssign.getIconFiles();
 
         // Set total progress count
-        Importer.progress.total = Importer.Importers.length;
+        BulkImporter.progress.total = BulkImporter.Importers.length;
         await this.render();
 
         // Process each importer
-        for (const importer of Importer.Importers) {
+        for (const importer of BulkImporter.Importers) {
             for (const fileName of importer.files) {
-                Importer.progress.message = `Importing: ${importer.constructor.name} ${fileName}`;
+                BulkImporter.progress.message = `Importing: ${importer.constructor.name} ${fileName}`;
                 await this.render();
 
                 try {
@@ -247,7 +247,7 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
                     // Load file: from ZIP or GitHub
                     const file = ZIP
                         ? await ZIP.file(fileName)?.async("string")
-                        : await Importer.fetchGitHubFile(`Chummer/data/${fileName}`);
+                        : await BulkImporter.fetchGitHubFile(`Chummer/data/${fileName}`);
 
                     if (file === undefined)
                         throw new Error(`File ${fileName} not found`);
@@ -261,7 +261,7 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
                     ui.notifications.error(`Error importing ${fileName}`);
                 }
 
-                Importer.progress.idx++;
+                BulkImporter.progress.idx++;
                 await this.render();
             }
         }
@@ -272,8 +272,8 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
 
         // Finalize and notify
         ui.notifications?.warn("SR5.Warnings.BulkImportPerformanceWarning", { localize: true });
-        Importer.isImporting = false;
-        Importer.importDone = true;
+        BulkImporter.isImporting = false;
+        BulkImporter.importDone = true;
         await this.render();
 
         console.debug(`Bulk import time: ${(performance.now() - start).toFixed(2)} ms`);
@@ -290,26 +290,26 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
         // Checkbox: Assign icons
         const setIcon = this.element.querySelector<HTMLSelectElement>("#setIcon");
         setIcon?.addEventListener("change", (event) => {
-            Importer.setIcons = (event.currentTarget as HTMLInputElement).checked;
+            BulkImporter.setIcons = (event.currentTarget as HTMLInputElement).checked;
         });
 
         // Checkbox: Delete compendiums before import
         const deleteCompendiums = this.element.querySelector<HTMLSelectElement>("#deleteCompendiums");
         deleteCompendiums?.addEventListener("change", (event) => {
-            Importer.deleteCompendiums = (event.currentTarget as HTMLInputElement).checked;
+            BulkImporter.deleteCompendiums = (event.currentTarget as HTMLInputElement).checked;
         });
 
         // Checkbox: Override existing documents
         const overrideDocuments = this.element.querySelector<HTMLSelectElement>("#overrideDocuments");
         overrideDocuments?.addEventListener("change", (event) => {
-            Importer.overrideDocuments = (event.currentTarget as HTMLInputElement).checked;
+            BulkImporter.overrideDocuments = (event.currentTarget as HTMLInputElement).checked;
         });
 
         // File input: Load ZIP file
         const zipFileInput = this.element.querySelector<HTMLInputElement>("#zipFileInput");
         zipFileInput?.addEventListener("change", (event) => {
             const input = event.currentTarget as HTMLInputElement;
-            Importer.zipFile = input.files?.[0] ?? null;
+            BulkImporter.zipFile = input.files?.[0] ?? null;
             void this.render();
         });
 
@@ -320,9 +320,9 @@ export class Importer extends HandlebarsApplicationMixin(ApplicationV2<ImporterC
         // Button: Reset import state
         const resetImport = this.element.querySelector<HTMLButtonElement>("#resetImport");
         resetImport?.addEventListener("click", () => {
-            Importer.progress = { idx: 0, total: 0, message: "" };
-            Importer.importDone = false;
-            Importer.zipFile = null;
+            BulkImporter.progress = { idx: 0, total: 0, message: "" };
+            BulkImporter.importDone = false;
+            BulkImporter.zipFile = null;
             void this.render();
         });
     }

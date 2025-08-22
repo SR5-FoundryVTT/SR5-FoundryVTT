@@ -4,6 +4,152 @@
 // Prevents CSS leakage into Foundry UI
 // ===================================
 
+// _chummer-import.scss
+.chummer-import {
+  /* --- THEME VARIABLES --- */
+  --ci-border-color: #ced4da;
+  --ci-border-radius: 6px;
+  --ci-spacing-unit: 6px;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: var(--ci-spacing-unit);
+    font-weight: 500;
+    margin-bottom: calc(var(--ci-spacing-unit) / 2);
+    white-space: nowrap;
+  }
+
+  textarea {
+    width: 100%;
+    padding: calc(var(--ci-spacing-unit) * 1.5);
+    border: 1px solid var(--ci-border-color);
+    border-radius: var(--ci-border-radius);
+    font-family: monospace;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    &::placeholder {
+      color: var(--ci-muted-text-color);
+      white-space: pre;
+      opacity: 0.9;
+    }
+  }
+
+  fieldset {
+    border: 1px solid var(--ci-border-color);
+    border-radius: var(--ci-border-radius);
+    padding: calc(var(--ci-spacing-unit) * 2);
+    margin: calc(var(--ci-spacing-unit) * 2) 0;
+
+    p {
+      margin: 0 0 var(--ci-spacing-unit) 0;
+      color: var(--ci-muted-text-color);
+      font-size: 0.9em;
+      transform: translateY(-5px);
+    }
+  }
+
+  legend {
+    font-weight: 600;
+    font-size: 1.1em;
+    padding: 0 var(--ci-spacing-unit);
+  }
+
+  /* Organized grid for import options */
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: var(--ci-spacing-unit) calc(var(--ci-spacing-unit) * 2);
+
+    label {
+      font-weight: normal;
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: calc(var(--ci-spacing-unit) / 2);
+    }
+
+    input[type="checkbox"] {
+      margin: 0;
+    }
+  }
+
+  input[type="checkbox"] {
+    accent-color: var(--ci-primary-color);
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Align folder dropdown and import button on same row */
+  .import-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ci-spacing-unit);
+    margin-top: calc(var(--ci-spacing-unit) * 2);
+
+    > label {
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    > select {
+      flex: 1 1 200px;
+      min-width: 180px;
+    }
+
+    > button {
+      flex-shrink: 0;
+      margin-left: auto; // Push button to the right if space allows
+    }
+  }
+
+  select,
+  button {
+    padding: var(--ci-spacing-unit) calc(var(--ci-spacing-unit) * 1.5);
+    font-size: 14px;
+    border: 1px solid var(--ci-border-color);
+    border-radius: var(--ci-border-radius);
+    height: 38px;
+  }
+
+  button {
+    background-color: var(--ci-primary-color);
+    color: white;
+    border-color: var(--ci-primary-color);
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover {
+      background-color: var(--ci-primary-hover);
+      border-color: var(--ci-primary-hover);
+    }
+  }
+
+  /* Focus styles */
+  textarea:focus,
+  select:focus,
+  button:focus-visible {
+    outline: none;
+    border-color: var(--ci-primary-color);
+    box-shadow: 0 0 0 4px var(--ci-focus-ring-color);
+  }
+
+  /* Error message */
+  #chummer-issues {
+    display: none; // default hidden
+    margin: var(--ci-spacing-unit) 0;
+    padding: var(--ci-spacing-unit);
+    color: var(--ci-error-color);
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: var(--ci-border-radius);
+  }
+}
 .chummer-import-modal {
   // 🔽 Local variables
   $primary: #5d7f9c;

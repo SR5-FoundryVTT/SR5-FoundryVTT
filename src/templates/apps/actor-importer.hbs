@@ -1,0 +1,50 @@
+<div class="chummer-import">
+  <label for="chummer-input">Paste Chummer JSON data here</label>
+  <textarea
+    id="chummer-input"
+    rows="8"
+    placeholder="HOW TO IMPORT:
+• Open Chummer in Career Mode.
+• Set Language to English.
+• Go to File → Export, choose JSON format.
+• Copy the entire JSON text.
+• Paste it into this box."
+  ></textarea>
+
+  <div id="chummer-issues" style="display: none;"></div>
+
+  <fieldset>
+    <legend>Import Options</legend>
+    <p>Select the data you wish to import from the file.</p>
+    <div class="options-grid">
+        <label><input type="checkbox" data-field="armor" checked /> Armors</label>
+        <label><input type="checkbox" data-field="contacts" checked /> Contacts</label>
+        <label><input type="checkbox" data-field="cyberware" checked /> Cyberware</label>
+        <label><input type="checkbox" data-field="gear" checked /> Equipment</label>
+        <label><input type="checkbox" data-field="lifestyles" checked /> Lifestyles</label>
+        <label><input type="checkbox" data-field="powers" checked /> Powers</label>
+        <label><input type="checkbox" data-field="qualities" checked /> Qualities</label>
+        <label><input type="checkbox" data-field="spells" checked /> Spells</label>
+        <label><input type="checkbox" data-field="vehicles" checked /> Vehicles</label>
+        <label><input type="checkbox" data-field="weapons" checked /> Weapons</label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Settings</legend>
+    <div class="options-grid">
+      <label><input type="checkbox" id="assign-icons" checked /> Automatically assign icons</label>
+    </div>
+  </fieldset>
+
+  <div class="import-actions">
+    <label for="chummer-folder-select">Import to folder:</label>
+    <select id="chummer-folder-select">
+        <option value=""></option>
+        {{#each folders as |folder|}}
+            <option value="{{folder.id}}">{{folder.path}}</option>
+        {{/each}}
+    </select>
+    <button type="button" id="chummer-import-button">Import Character</button>
+  </div>
+</div>
