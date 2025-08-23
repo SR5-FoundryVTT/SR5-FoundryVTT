@@ -2195,7 +2195,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override getRollData(options: RollDataOptions = {}) {
         // Avoid changing actor system data as Foundry just returns it.
-        const rollData = foundry.utils.duplicate(super.getRollData());
+        const rollData = this.system.toObject(false);
         return ActorRollDataFlow.getRollData(this, rollData, options);
     }
 

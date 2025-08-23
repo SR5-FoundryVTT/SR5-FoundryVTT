@@ -1393,7 +1393,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     override getRollData(options: RollDataOptions={}): any {
         // Foundry is simply passing down 'system', so we have to duplicate to avoid contamination.
-        const rollData = foundry.utils.deepClone(super.getRollData());
+        const rollData = this.system.toObject(false);
         return ItemRollDataFlow.getRollData(this, rollData, options);
     }
 
