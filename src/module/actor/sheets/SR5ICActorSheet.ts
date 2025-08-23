@@ -86,7 +86,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet {
                 case 'track':
                     return action.name === "Track";
                 default:
-                    console.warn('Shadowrun5e | Could not process IC Type', this.actor.icType)
+                    console.warn('Shadowrun5e | Could not process IC Type', this.actor.icType())
                     return false
             }
         });
