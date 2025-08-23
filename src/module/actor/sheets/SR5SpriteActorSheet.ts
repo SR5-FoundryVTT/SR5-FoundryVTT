@@ -19,6 +19,19 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
         ];
     }
 
+    // override default options to add an extra tabbing in the matrix tab
+    static override get defaultOptions() {
+        const defaultOptions = super.defaultOptions;
+        return foundry.utils.mergeObject(defaultOptions, {
+            tabs: [...defaultOptions.tabs,
+                {
+                    navSelector: '.tabs[data-group="sprite"]',
+                    contentSelector: '.tabsbody[data-group="sprite"]',
+                    initial: 'matrix-actions',
+                }]
+        });
+    }
+
     override activateListeners(html) {
         super.activateListeners(html);
 
