@@ -1,6 +1,9 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { MinimalActionType } from '@/module/types/item/Action';
 import { DataDefaults } from '@/module/data/DataDefaults';
+import { AttributesType, TechnologyAttributesType } from '@/module/types/template/Attributes';
+import { SR5Item } from '@/module/item/SR5Item';
+import { SR5 } from '@/module/config';
 
 export class AttributeRules {
 
@@ -12,12 +15,12 @@ export class AttributeRules {
      * @param names A list of attribute names to inject
      * @param attributes The list of source attribute to pull from
      * @param rollData The testData to inject attributes into
-     * @param options
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    static _injectAttributes(names: string[], attributes: SR5Actor['system']['attributes'], rollData: SR5Actor['system'], options: { bigger: boolean }) {
+    static injectAttributes(names: string[], attributes: AttributesType | TechnologyAttributesType, rollData: SR5Actor['system'], options: { bigger: boolean }) {
         const targetAttributes = rollData.attributes;
         for (const name of names) {
+            // create a copy of the attribute data or make new attribute data if it wasn't found
             const sourceAttribute = DataDefaults.createData('attribute_field', attributes[name]);
             const targetAttribute = targetAttributes[name];
 
@@ -27,6 +30,20 @@ export class AttributeRules {
                 targetAttributes[name] = sourceAttribute;
             }
         }
+    }
+
+    /**
+     * Inject an actors mental attributes into an items test data.
+     *
+     * This case implements SR5#237 'Matrix Actions' devices owned by characters.
+     * The special case 'a device is completely unattended' is ignored.
+     *
+     * @param actor Whatever actor to use for mental attributes
+     * @param rollData TestData that will get modified in place
+     */
+    static injectMentalAttributes(actor: SR5Actor, rollData: SR5Item['system']) {
+        if (!rollData.attributes) return;
+        this.injectAttributes(SR5.mentalAttributes, actor.getAttributes(), rollData)
     }
 
     /**

@@ -18,10 +18,10 @@ export class RiggingRules {
         if (!driverAttributes) return;
 
         const injectAttributes = ['intuition', 'reaction', 'logic', 'agility'];
-        AttributeRules._injectAttributes(injectAttributes, driverAttributes, rollData, { bigger: false });
+        AttributeRules.injectAttributes(injectAttributes, driverAttributes, rollData, { bigger: false });
 
         const injectSkills = ['perception', 'sneaking', 'gunnery', ...this.PilotSkills];
-        SkillRules._injectActiveSkills(injectSkills, driverSkills, rollData, { bigger: false });
+        SkillRules.injectActiveSkills(injectSkills, driverSkills, rollData, { bigger: false });
     };
 
     static PilotSkills = [

@@ -82,12 +82,12 @@ export class SkillRules {
      * @param names A list of attribute names to inject
      * @param skills Object of skills to use
      * @param rollData The testData to inject attributes into
-     * @param options
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    static _injectActiveSkills(names: string[], skills: SR5Actor['system']['skills']['active'], rollData: SR5Actor['system'], options: { bigger: boolean }) {
+    static injectActiveSkills(names: string[], skills: SR5Actor['system']['skills']['active'], rollData: SR5Actor['system'], options: { bigger: boolean }) {
         const targetSkills = rollData.skills.active;
         for (const name of names) {
+            // create a copy of the skill data or make new skill data if it wasn't found
             const sourceSkill =  DataDefaults.createData('skill_field', skills[name]);
             const targetSkill = targetSkills[name];
 

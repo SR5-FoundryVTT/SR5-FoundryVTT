@@ -1,9 +1,8 @@
 import { ActionRollType } from "@/module/types/item/Action";
 import { SR5Actor } from "../../actor/SR5Actor";
-import { SR5 } from "../../config";
 import { SR5Item } from "../SR5Item";
 import { RollDataOptions } from "../Types";
-import { AttributeFieldType, AttributesType, TechnologyAttributesType } from "@/module/types/template/Attributes";
+import { AttributeRules } from '@/module/rules/AttributeRules';
 
 type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: ActionRollType, testData?: any, againstData?: any) => undefined; 
 
@@ -44,43 +43,6 @@ export const ItemRollDataFlow = {
         return rollData;
     },
 
-    getRollDataForSlaveDevice(item: SR5Item, rollData: any, options: RollDataOptions) {
-
-    },
-    /**
-     * Inject an actors mental attributes into an items test data.
-     * 
-     * This case implements SR5#237 'Matrix Actions' devices owned by characters.
-     * The special case 'a device is completely unattended' is ignored.
-     * 
-     * @param actor Whatever actor to use for mental attributes
-     * @param rollData TestData that will get modified in place
-     */
-    injectOwnerMentalAttributes: (actor: SR5Actor, rollData: SR5Item['system']) => {
-        if (!rollData.attributes) return;
-
-        for (const name of SR5.mentalAttributes) {
-            rollData.attributes[name] = foundry.utils.duplicate(actor.getAttribute(name)) as AttributeFieldType;
-        }
-    },
-
-
-    /**
-     * Inject actors matrix attributes into an items test data.
-     * 
-     * Rule wise the persona icon is providing this attributes, within the system those attributes are copied to the
-     * actor and we can copy them from there.
-     * 
-     * @param actor The carrier of the persona icon
-     * @param rollData TestData that will get modified in place
-     */
-    injectOwnerRatingsForPAN: (actor: SR5Actor, rollData: SR5Item['system']) => {
-        if (!rollData.attributes) return;
-
-        const PANMatrixAttributes = ['data_processing', 'firewall'];
-        ItemRollDataFlow._injectAttributes(PANMatrixAttributes, actor.system.attributes, rollData, { bigger: true });
-    },
-
     /**
      * Change a devices ratings by those of the PAN master and device owner.
      * 
@@ -97,32 +59,8 @@ export const ItemRollDataFlow = {
         const attributes = master.system.attributes!;
 
         const injectAttributes = ['data_processing', 'firewall', 'rating'];
-        ItemRollDataFlow._injectAttributes(injectAttributes, attributes, rollData, { bigger: true });
-        if (actor) ItemRollDataFlow.injectOwnerMentalAttributes(actor, rollData);
-    },
-
-    /**
-     * Inject all attributes into testData that match the given attribute names list.
-     * 
-     * Also implements the 'use bigger value rule',if necessary.
-     * 
-     * @param names A list of attribute names to inject
-     * @param attributes The list of source attribute to pull from
-     * @param rollData The testData to inject attributes into
-     * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
-     */
-    _injectAttributes(names: string[], attributes: TechnologyAttributesType | AttributesType, rollData: SR5Item['system'], options: { bigger: boolean }) {
-        const targetAttributes = rollData.attributes!;
-        for (const name of names) {
-            const sourceAttribute = foundry.utils.duplicate(attributes[name]) as AttributeFieldType;
-            const targetAttribute = targetAttributes[name];
-
-            if (options.bigger) {
-                targetAttributes[name] = sourceAttribute.value > targetAttribute.value ? sourceAttribute : targetAttribute;
-            } else {
-                targetAttributes[name] = sourceAttribute;
-            }
-        }
+        AttributeRules.injectAttributes(injectAttributes, attributes, rollData, { bigger: true });
+        if (actor) AttributeRules.injectMentalAttributes(actor, rollData);
     },
 
     /**
@@ -159,7 +97,7 @@ export const ItemRollDataFlow = {
         // => Carried weapon
         // => Equipped persona icon
         else if (item.isMatrixDevice && actor) {
-            ItemRollDataFlow.injectOwnerMentalAttributes(actor, rollData);
+            AttributeRules.injectMentalAttributes(actor, rollData);
         }
 
     }

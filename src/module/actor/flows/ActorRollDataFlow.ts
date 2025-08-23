@@ -1,7 +1,6 @@
 import { RollDataOptions } from "../../item/Types";
 import { SR5Actor } from "../SR5Actor";
 import { RiggingRules } from '@/module/rules/RiggingRules';
-import { AttributeRules } from '@/module/rules/AttributeRules';
 
 /**
  * Handling around actor roll data resolution.
