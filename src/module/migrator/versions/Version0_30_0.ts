@@ -12,6 +12,12 @@ export class Version0_30_0 extends VersionMigration {
     // Handle Actor documents so they can be sanitized.
     override handlesActor(_actor: Readonly<any>) { return true; }
 
+    override migrateActor(_actor: any): void {
+        if (_actor.isType('ic')) {
+            migrateIcActor(_actor);
+        }
+    }
+
     override migrateItem(item: any) {
         // CLeanup from legacy / broken template data to DataModel.
         if (item.type === 'sin' && item.system?.licenses)
@@ -34,11 +40,10 @@ export class Version0_30_0 extends VersionMigration {
         if (item.system.technology) {
             migrateMatrixDeviceData(item);
         }
-    }
 
-    override migrateActor(actor: any) {
-        if (actor.isType('ic')) {
-            migrateIcActor(actor);
+        // migrate wireless from a boolean to a string
+        if (item.system?.technology?.wireless === true) {
+            item.system.technology.wireless = 'online';
         }
     }
 

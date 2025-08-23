@@ -120,6 +120,7 @@ import { MatrixICFlow } from './actor/flows/MatrixICFlow';
 import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
 import { MatrixNetworkFlow } from './item/flows/MatrixNetworkFlow';
 import { SocketMessage } from './sockets';
+import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -160,6 +161,7 @@ export class HooksManager {
         Hooks.on('quenchReady', quenchRegister);
 
         MatrixHooks.registerHooks();
+        TagifyHooks.registerHooks();
 
         RenderSettings.listen();
     }

@@ -2,7 +2,7 @@ import {DamageApplicationDialog} from "../../apps/dialogs/DamageApplicationDialo
 import {SR5Actor} from "../SR5Actor";
 import { Helpers } from '../../helpers';
 import { TestCreator } from '../../tests/TestCreator';
-import { DamageType } from "src/module/types/item/Action";
+import { BiofeedbackDamageType, DamageType } from 'src/module/types/item/Action';
 import { SR5Item } from "@/module/item/SR5Item";
 import { OverflowTrackType, TrackType } from "@/module/types/template/ConditionMonitors";
 import { ConditionType } from "@/module/types/template/Condition";
@@ -82,22 +82,31 @@ export class DamageApplicationFlow {
         const type = String(applyDamage.data('damageType')) as DamageType['type']['value'];
         const ap = Number(applyDamage.data('damageAp'));
         const element = String(applyDamage.data('damageElement')) as DamageElement;
-        const damage = Helpers.createDamageData(value, type, ap, element);
+        const biofeedback = String(applyDamage.data('damageBiofeedback')) as BiofeedbackDamageType;
+        const damage = Helpers.createDamageData(value, type, ap, element, biofeedback);
 
         const targets = Helpers.getSelectedActorsOrCharacter();
 
         // Should no selection be available try guessing.
         if (targets.length === 0) {
-            const messageId = html.data('messageId');
+            const messageId = $(html).data('messageId');
 
             const test = await TestCreator.fromMessage(messageId);
             if (!test) return
             await test.populateDocuments();
 
             // If targeting is available, use that.
-            // taM check this
-            if (test.hasTargets) (test.targets as TokenDocument[]).forEach(target => targets.push(target.actor as SR5Actor));
-            else targets.push(test.actor as SR5Actor);
+            if (test.hasTargets) {
+                (test.targets as TokenDocument[]).forEach(target => {
+                    targets.push(target.actor as SR5Actor)
+                });
+            }
+            // check if there is an icon, happens with matrix tests
+            else if ((test as any).icon) {
+                targets.push((test as any).icon);
+            } else {
+                targets.push(test.actor as SR5Actor);
+            }
         }
 
         // Abort if no targets could be collected.
@@ -127,6 +136,7 @@ export class DamageApplicationFlow {
                 await DamageApplicationFlow.addPhysicalDamage(actor, damage);
                 break;
         }
+        Hooks.call("sr5_afterDamageAppliedToActor", actor, damage);
     }
 
     /**
