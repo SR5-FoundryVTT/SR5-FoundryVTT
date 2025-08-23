@@ -10,20 +10,17 @@
         {{#if (overrideNone value)}}
         <div class="value-modifier-name">{{localize 'SR5.Total'}}</div>
         <div class="value-modifiers-total">{{value.value}}</div> 
-        {{/if}}
-        {{#if (overrideTotal value)}}
+        {{else if (overrideTotal value)}}   
         <div class="value-modifier-name value-modifiers-invalid-total">{{localize 'SR5.Total'}}</div>
         <div class="value-modifiers-total value-modifiers-invalid-total">?</div>
         <div class="value-modifier-name">{{localize value.override.name}}</div>
         <div class="value-modifiers-total">{{value.override.value}}</div>
-        {{/if}}
-        {{#if (overrideUpgrade value)}}
+        {{else if (overrideUpgrade value)}}
         <div class="value-modifier-name value-modifiers-invalid-total">{{localize 'SR5.Total'}}</div>
         <div class="value-modifiers-total value-modifiers-invalid-total">?</div>
         <div class="value-modifier-name">{{localize value.upgrade.name}}</div>
         <div class="value-modifiers-total">{{value.value}}</div>
-        {{/if}}
-        {{#if (overrideDowngrade value)}}
+        {{else if (overrideDowngrade value)}}
         <div class="value-modifier-name value-modifiers-invalid-total">{{localize 'SR5.Total'}}</div>
         <div class="value-modifiers-total value-modifiers-invalid-total">?</div>
         <div class="value-modifier-name">{{localize value.downgrade.name}}</div>
