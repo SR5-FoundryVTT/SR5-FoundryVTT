@@ -24,8 +24,8 @@
         </div>
     </header>
     <nav class="tabs" data-group="primary">
-        <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
-        <a class="item" data-tab="actor">{{localize "SR5.ActorTypes.IC"}}</a>
+        {{#if hasActions}}<a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>{{/if}}
+        <a class="item" data-tab="actor">{{localize "SR5.Labels.ActorSheet.Matrix"}}</a>
         {{#if hasInventory }}<a class="item" data-tab="inventory">{{localize "SR5.Gear"}}</a>{{/if}}
         <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
         <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>

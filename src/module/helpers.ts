@@ -997,6 +997,14 @@ export class Helpers {
     }
 
     /**
+     * Return the matrix action pack name to use, when the matrix actions pack is referenced.
+     */
+    static getICActionsPackName(): Shadowrun.PackName {
+        const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.ICActionsPack) as Shadowrun.PackName;
+        return overrideMatrixPackName || SR5.packNames.ICActionsPack as Shadowrun.PackName;
+    }
+
+    /**
      * Retrieve all actions from a given pack.
      *
      * Other item types in that pack will be ignored.

@@ -2183,6 +2183,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         })));
     }
 
+    icType(this: SR5Actor) {
+        if (this.isType('ic')) {
+            return this.system?.icType ?? '';
+        }
+        return '';
+    }
+
     /**
      * Transparently build a set of roll data based on this actors type and status.
      *
