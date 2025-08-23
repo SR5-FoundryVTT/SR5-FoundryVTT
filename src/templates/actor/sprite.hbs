@@ -51,7 +51,7 @@
         </div>
     </header>
     <nav class="tabs" data-group="primary">
-        <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
+        {{#if hasActions}}<a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>{{/if}}
         <a class="item" data-tab="skills">{{localize "SR5.Skill.Skills"}}</a>
         {{#if hasInventory }}<a class="item" data-tab="inventory">{{localize "SR5.Gear"}}</a>{{/if}}
         <a class="item" data-tab="spritepowers">{{localize "SR5.Labels.ActorSheet.Matrix"}}</a>
