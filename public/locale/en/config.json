@@ -180,6 +180,13 @@
         },
         "Add": "Add",
         "AddAmmo": "Add Ammo",
+        "AddDevicesToPAN": {
+            "Adding": "Adding",
+            "Starting": "Starting to add equipped devices to PAN",
+            "FinishedAddingItems": "Finished adding devices to PAN",
+            "SetupPAN": "Add Devices to PAN",
+            "SetupPANTooltip": "Add all Equipped Wireless Devices to this character's Persona"
+        },
         "AddFifteenMinutesToOverwatch": "Roll 2d6 for 15 minutes in the matrix",
         "AddFiveToOverwatch": "+5 to OS",
         "AddMod": "Add Mod",
@@ -285,6 +292,10 @@
             "MatrixActionsPack": {
                 "label": "Matrix Actions",
                 "hint": "This compendium will be used for all matrix actions."
+            },
+            "ICActionsPack": {
+                "label": "IC Actions",
+                "hint": "This compendium will be used for IC actions, filtered for each IC type"
             }
         },
         "Compendiums": {
@@ -579,7 +590,7 @@
                 "BlackIC": "Black IC",
                 "Blaster": "Blaster",
                 "Bloodhound": "Bloodhound",
-                "BlueGoo": "Blauer Schleim",
+                "BlueGoo": "Bloo Goo",
                 "Catapult": "Catapult",
                 "Crash": "Crash",
                 "Flicker": "Flicker",
@@ -709,6 +720,7 @@
                 "Icons": "Icons",
                 "MarkNetwork": "Mark Network",
                 "Matrix": "Matrix",
+                "MatrixActions": "Matrix Actions",
                 "Network": "Network",
                 "NoNetwork": "No Network",
                 "OwnerAbrv": "O",
@@ -824,6 +836,7 @@
         "MatrixAttrFirewall": "Firewall",
         "MatrixAttrSleaze": "Sleaze",
         "MatrixDefense": "Matrix Defense",
+        "MatrixFullDefenseAttribute": "Matrix Full Defense Attribute",
         "MatrixNetworkHackingApplication": {
             "Icons": "Icons",
             "Invite": "Ask for invite",
@@ -1047,6 +1060,11 @@
         "SameGrid": "Same Grid",
         "SecondAttribute": "Second Attribute",
         "SecondChance": "Second Chance",
+        "SelectMatrixNetworkDialog": {
+            "Title": "Select a Network",
+            "Connect": "Connect",
+            "Cancel": "Cancel"
+        },
         "SelectTokenMessage": "You must select a token first",
         "SelectedTargets": "Selected Targets",
         "SheetActor": "Actor sheet",
@@ -1419,7 +1437,10 @@
                 "MissingTechnomancer": "Drag&Drop Character or use compilation action",
                 "NPC": "Mark actor as NPC to get additional features",
                 "PlaceMark": "Action to be used to place marks on already marked targets",
-                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
+                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
+                "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
+                "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
+                "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed"
             },
             "Actor.DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
             "CallInAction": {

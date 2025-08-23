@@ -40,36 +40,38 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
      * Matrix related value resolutions based on owner, PAN, WAN, and direct connections.
      */
     describe('Matrix Tests', () => {
-        it('Calculate matrix device without owner', async () => {
+        it('Device without owner using its own attributes', async () => {
             const device = await factory.createItem({ type: 'device', system: { technology: { rating: 3 } } });
 
             assert.equal(device.system.technology.rating, 3);
             assert.equal(device.system.attributes.willpower.value, 3);
             assert.equal(device.system.attributes.firewall.value, 3);
 
-            const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
-            const test = await TestCreator.fromAction(action, device);
+            const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
+            const rollData = device.getRollData({action});
 
-            assert.equal(test?.pool.value, 6);
+            assert.equal(rollData.technology.rating, 3);
+            assert.equal(rollData.attributes.willpower.value, 3);
+            assert.equal(rollData.attributes.firewall.value, 3);
         });
 
-        it('Calculate matrix device with owner', async () => {
+        it('Device using owner attributes', async () => {
             const owner = await factory.createActor({ type: 'character', system: { attributes: { willpower: { base: 5 } } } });
             const devices = await owner.createEmbeddedDocuments('Item', [{ type: 'device', name: 'test', system: { technology: { rating: 3 } } }]);
             const device = devices[0] as SR5Item<'device'>;
 
-            assert.equal(device.system.technology.rating, 3);
-            assert.equal(device.system.attributes.willpower.value, 3);
-            assert.equal(device.system.attributes.firewall.value, 3);
-
             assert.equal(owner.system.attributes.willpower.value, 5);
 
-            const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
-            const test = await TestCreator.fromAction(action, device);
+            assert.equal(device.system.technology.rating, 3);
+            assert.equal(device.system.attributes.willpower.value, 3);
 
-            assert.equal(test?.pool.value, 8);
+            const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
+            const rollData = device.getRollData({action});
+
+            assert.equal(rollData.technology.rating, 3);
+            assert.equal(rollData.attributes.willpower.value, 5);
         });
-        it('Calculate matrix device inside a PAN', async () => {
+        it('Slaved Device in PAN using master attributes', async () => {
             const master = await factory.createItem({ type: 'device', system: { technology: { rating: 5 }, category: 'commlink' } });
             const slave = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3 } } });
 
@@ -78,26 +80,18 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
 
             await master.addSlave(slave);
 
-            const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
-            const test = await TestCreator.fromAction(action, slave);
+            const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
+            const rollData = slave.getRollData({action});
 
-            assert.equal(test?.pool.value, 8);
+            assert.equal(rollData.attributes.rating.value, 5);
+            assert.equal(rollData.attributes.firewall.value, 5);
         });
 
-        it('Calculate matrix device with an owner', async () => {
-            const owner = await createDecker();
-            const device = owner.items.contents[0];
-
-            // Owner rating is used for mental attributes.
-            const rollData = device.getRollData();
-            assert.equal(rollData.attributes.willpower.value, 5);
-        });
-
-        it('Calculate matrix device inside a PAN with a direct connection', async () => {
+        it('Slaved Device in PAN using own attributes due to direct connection' , async () => {
             // TODO: Remake with only test mockup data.
             const decker = await createDecker({ skills: { active: { hacking: { base: 5 } } } });
 
-            const action = DataDefaults.createData('action_roll', { attribute: 'logic', skill: 'hacking', test: 'BruteForceTest' });
+            const action = DataDefaults.createData('action_roll', { attribute: 'logic', skill: 'hacking', test: 'BruteForceTest', categories: ['matrix'] });
             const test = await TestCreator.fromAction(action, decker) as BruteForceTest;
 
             const master = await factory.createItem({ type: 'device', system: { technology: { rating: 5 }, category: 'commlink' } });
@@ -107,7 +101,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             // Assert initial wireless connection.
             test.data.directConnection = false;
 
-            let rollData = slave.getRollData({ againstData: test.data });
+            let rollData = slave.getRollData({ testData: test.data });
 
             // Master rating is used for firewall.
             assert.equal(rollData.attributes.firewall.value, 5);
@@ -115,51 +109,36 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             // Assert direct connection.
             test.data.directConnection = true;
 
-            rollData = slave.getRollData({ againstData: test.data });
+            rollData = slave.getRollData({ testData: test.data });
 
             // Slave rating is used for firewall.
             assert.equal(rollData.attributes.firewall.value, 3);
         });
 
-        it('Calculate matrix device inside a WAN without a direct connection', async () => {
+        it('Device in WAN using host attributes', async () => {
             const host = await factory.createItem({ type: 'device', system: { category: 'host', technology: { rating: 5 } } });
             const device = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3, master: host.uuid } } });
-            const rollData = device.getRollData();
+
+            const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
+
+            const rollData = device.getRollData({ action });
 
             assert.equal(rollData.attributes.firewall.value, 5);
         });
 
-        it('Calculate matrix device inside a WAN with a direct connection', async () => {
+        it('Device in WAN using own attributes due to direct connection', async () => {
             const host = await factory.createItem({ type: 'device', system: { category: 'host', technology: { rating: 5 } } });
             const device = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3, master: host.uuid } } });
 
-            const againstData = { directConnection: true };
-            const rollData = device.getRollData({ againstData });
+            const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
+            const testData = { directConnection: true, action };
+            
+            const rollData = device.getRollData({ testData });
 
             assert.equal(rollData.attributes.firewall.value, 3);
         });
 
         it('Calculate Decker in foundation');
-
-        // describe('Matrix testing for value sources depending on network used', () => {
-        //     it('A device within a PAN should use the masters / controllers values', async () => {
-        //         const device = await testItem.create({ type: 'device', 'system.technology.rating': 20 });
-        //         const controller = await testItem.create({ type: 'device', 'system.category': 'commlink', 'system.atts.att4.value': 5, 'system.technology.rating': 5 }) as SR5Item;
-
-        //         await controller.addNetworkDevice(device);
-
-        //         const action = DataDefaults.actionRollData({ attribute: 'willpower', attribute2: 'firewall' });
-        //         const data = await TestCreator._prepareTestDataWithAction(action, device, TestCreator._minimalTestData())
-
-        //         Helpers.calcTotal(data.pool);
-
-        //         assert.equal(data.pool.value, 40);
-        //     });
-
-        //     it('A device within a WAN should NOT use the host values', async () => {
-        //         assert.fail();
-        //     });
-        // });
     });
 
     /**

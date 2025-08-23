@@ -2183,10 +2183,17 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         })));
     }
 
+    icType(this: SR5Actor) {
+        if (this.isType('ic')) {
+            return this.system?.icType ?? '';
+        }
+        return '';
+    }
+
     /**
      * Transparently build a set of roll data based on this actors type and status.
      *
-     * Values for rolling can depend on other actors and items.
+     * Values for testing can depend on other actors and items.
      *
      * NOTE: Since getRollData is sync by default, we can´t retrieve compendium documents,
      *       resulting in fromUuidSync calls.
@@ -2194,8 +2201,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options System specific options influencing roll data.
      */
     override getRollData(options: RollDataOptions = {}) {
-        // Avoid changing actor system data as Foundry just returns it.
-        const rollData = foundry.utils.duplicate(super.getRollData());
+        // Create a system data copy to avoid cross-contamination
+        const rollData = this.system.toObject(false);
         return ActorRollDataFlow.getRollData(this, rollData, options);
     }
 

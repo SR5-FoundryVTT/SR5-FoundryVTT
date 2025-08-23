@@ -11,6 +11,13 @@
                     </div>
                     {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.hbs' }}{{/if}}
                     {{/if}}
+                    {{#if system.matrix.device}}
+                    <div class="list-item-content">
+                        <button type="button" class="display setup-pan" data-tooltip="{{localize 'SR5.AddDevicesToPAN.SetupPANTooltip'}}">
+                            {{localize "SR5.AddDevicesToPAN.SetupPAN"}}
+                        </button>
+                    </div>
+                    {{/if}}
                 </div>
                 {{#if isCharacter}}
                 <div class="list-item">

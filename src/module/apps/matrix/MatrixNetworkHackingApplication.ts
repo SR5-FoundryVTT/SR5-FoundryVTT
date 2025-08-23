@@ -155,6 +155,6 @@ export class MatrixNetworkHackingApplication extends Application {
         const network = fromUuidSync(uuid) as SR5Item | null;
         if (!network) return;
 
-        void MatrixNetworkFlow.AskForNetworkMarkInvite(this.actor, network);
+        await MatrixNetworkFlow.AskForNetworkMarkInvite(this.actor, network);
     }
 }

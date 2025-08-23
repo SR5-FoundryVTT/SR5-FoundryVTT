@@ -258,6 +258,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.CompendiaSettingsMenu": typeof SR5CompendiaSettings;
         "shadowrun5e.GeneralActionsPack": string;
         "shadowrun5e.MatrixActionsPack": string;
+        "shadowrun5e.ICActionsPack": string;
     }
 }
 

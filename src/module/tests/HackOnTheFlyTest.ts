@@ -31,14 +31,6 @@ export class HackOnTheFlyTest extends MatrixTest<MatrixPlacementData> {
         return modifiers;
     }
 
-    override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/brute-force-test-dialog.hbs';
-    }
-
-    override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/chat/matrix-test-message.hbs';
-    }
-
     override prepareTestModifiers() {
         super.prepareTestModifiers();
 

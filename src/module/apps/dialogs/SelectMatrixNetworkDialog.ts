@@ -28,11 +28,11 @@ export class SelectMatrixNetworkDialog extends FormDialog {
         return {
             title: game.i18n.localize('SR5.SelectMatrixNetworkDialog.Title'),
             buttons: {
-                move: {
-                    label: game.i18n.localize('SR5.MoveInventoryDialog.Move')
+                connect: {
+                    label: game.i18n.localize('SR5.SelectMatrixNetworkDialog.Connect')
                 },
                 cancel: {
-                    label: game.i18n.localize('SR5.MoveInventoryDialog.Cancel')
+                    label: game.i18n.localize('SR5.SelectMatrixNetworkDialog.Cancel')
                 }
             },
             default: 'cancel',

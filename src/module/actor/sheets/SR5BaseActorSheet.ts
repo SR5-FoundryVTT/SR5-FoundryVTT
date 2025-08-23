@@ -238,6 +238,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
+        data.hasActions = this._prepareHasActions(data);
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
 
@@ -253,6 +254,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             });
 
         data.bindings = this._prepareKeybindings();
+
+        data.initiativePerception = this._prepareInitiativePerception();
 
         return data;
     }
@@ -371,10 +374,46 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
 
-        // Matrix Network
-        html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
-        // Matrix Target - Connected Icons Visibility Switch
-        html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
+        html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
+    }
+
+    /**
+     * Get the options for Initiative Perception
+     */
+    _prepareInitiativePerception() {
+        const initiative = this.actor.system.initiative.perception;
+        if (initiative === 'matrix') {
+            return this.actor.isUsingHotSim ? 'hot_sim' : 'cold_sim';
+        }
+        return initiative;
+    }
+
+    /**
+     * Handle Changing Initiative Perception
+     * - the select handles hot sim vs cold sim and doesn't match our dataset exactly
+     * - this is more of a band-aid until we do appv2
+     * @param event
+     */
+    async _onInitiativePerceptionChange(event) {
+        const newValue = event.currentTarget?.value;
+        if (newValue === 'meatspace' || newValue === 'magic') {
+            // meatspace and magic can be directly applied as the perception type
+            // disable VR as well
+            await this.actor.update({ system: {
+                    initiative: { perception: newValue, },
+                    matrix: { vr: false }
+                }});
+        } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
+            // if we are hot sim or cold sim, we are in VR and using matrix init perception
+            await this.actor.update({
+                system: {
+                    initiative: {
+                        perception: 'matrix',
+                    },
+                    matrix: { hot_sim: newValue === 'hot_sim', vr: true }
+                },
+            });
+        }
     }
 
     /**
@@ -1092,6 +1131,14 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
 
     /**
+     * Prepare if this actor has an "Action" Items in their list of items
+     * @param data - sheet data
+     */
+    _prepareHasActions(data) {
+        return data.items.filter(item => item.type === 'action').length > 0;
+    }
+
+    /**
      * Enhance SR5Item data for display on actors sheets.
      *
      * @param item: The item to transform into a 'sheet item'
@@ -1210,7 +1257,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
-        return this.actor.setMarks(markedDocument, marks, { overwrite: true });
+        await this.actor.setMarks(markedDocument, marks, { overwrite: true });
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -1227,7 +1274,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
         if (!markedDocument) return;
 
-        return this.actor.setMarks(markedDocument, by);
+        await this.actor.setMarks(markedDocument, by);
     }
 
     async _onMarksDelete(event) {
@@ -1244,7 +1291,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        return this.actor.clearMark(uuid);
+        await this.actor.clearMark(uuid);
     }
 
     async _onMarksClearAll(event) {
@@ -1275,7 +1322,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const target = fromUuidSync(uuid) as SR5Item;
         if (!target || !(target instanceof SR5Item)) return;
 
-        return this.actor.connectNetwork(target);
+        await this.actor.connectNetwork(target);
+        this.render();
     }
 
     async _onMarksPlaceMark(event) {
@@ -1289,7 +1337,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     async _onDisconnectNetwork(event) {
         event.stopPropagation();
 
-        return this.actor.disconnectNetwork();
+        await this.actor.disconnectNetwork();
+        this.render();
     }
 
     /**
@@ -2054,40 +2103,5 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      */
     get itemEffectApplyTos() {
         return ['actor', 'item', 'test_all', 'test_item', 'modifier'];
-    }
-
-    /**
-    * Allow the user to select a matrix network to connect to.
-    */
-    async _onConnectToMatrixNetwork(event) {
-        event.stopPropagation();
-
-        const dialog = new SelectMatrixNetworkDialog(this.document);
-        const network = await dialog.select();
-        if (dialog.canceled) return;
-
-        await this.document.connectNetwork(network);
-    }
-
-    /**
-     * Within the list of avialable matrix targets, toggle visibility of sub-sections for connected icons
-     * for a single matrix target.
-     * 
-     * This is done by clicking on a specific icon by user input and will trigger:
-     * - switching out sheet display
-     * - provide a display of additional matrix icons underneath uuid
-     */
-    async _onToggleConnectedMatrixIcons(event) {
-        event.stopPropagation();
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        // Mark main icon as open or closed.
-        if (this._connectedIconsOpenClose[uuid]) delete this._connectedIconsOpenClose[uuid];
-        else this._connectedIconsOpenClose[uuid] = true;
-
-        // Trigger new icons to be shown or hidden.
-        this.render();
     }
 }
