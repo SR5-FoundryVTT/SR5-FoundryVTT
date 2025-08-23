@@ -85,32 +85,31 @@ export class Version0_30_0 extends VersionMigration {
     }
 }
 
+// pre v30 hosts stored marks as an object. As functionality to add marks is long past disabled, we can just delete marks.
 function migrateHostData(item: any) {
     const marksData = item.system.marks;
     if (!marksData) return
     if (Array.isArray(marksData)) return
 
-    // pre v30 hosts stored marks as an object. As functionality to add marks is long past disabled, we can just delete marks.
     item.system.marks = [];
 }
 
+// pre v30 characters stored marks as an object. As functionality to add marks is long past disabled, we can just delete marks.
 function migrateMarksActor(actor: any) {
     const marksData = actor.system.matrix.marks;
     if (!marksData) return
     if (Array.isArray(marksData)) return
 
-    // pre v30 characters stored marks as an object. As functionality to add marks is long past disabled, we can just delete marks.
     actor.system.marks = [];
 }
 
 
-/**
- * pre v30 wirelss was a simple boolean
- */
+// pre v30 wirelss was a simple boolean
 function migrateMatrixDeviceData(item: any) {
     item.system.technology.wireless = item.system.technology.wireless ? 'online' : 'offline';
 }
 
+// Matrix 1.0 changed naming of running silent
 function migrateActorRunningSilent(actor: any) {
     const runningSilent = actor.system?.matrix?.silent;
     actor.system.matrix.running_silent = runningSilent ?? false;
