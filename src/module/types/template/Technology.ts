@@ -24,7 +24,6 @@ export const TechnologyData = () => ({
         choices: ['online', 'silent', 'offline', 'none'],
     }),
     master: new DocumentUUIDField({ blank: true, required: true, nullable: false }),
-    networkController: new StringField({ required: false }),
 
     // === Calculated Values ===
     calculated: new SchemaField({
