@@ -6,6 +6,15 @@
             </a>
         </div>
         <div>
+            <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
+                {{#if system.matrix.running_silent}}
+                    {{localize "SR5.RunningSilent"}}
+                {{else}}
+                    {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
+                {{/if}}
+            </a>
+        </div>
+        <div>
             {{#if network}}
                 {{localize "SR5.Labels.ActorSheet.Network"}}: {{network.name}}
                 <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">

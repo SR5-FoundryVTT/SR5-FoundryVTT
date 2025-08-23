@@ -1,6 +1,5 @@
 import { Helpers } from '../../helpers';
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
-import { FormDialog, FormDialogOptions } from '@/module/apps/dialogs/FormDialog';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
@@ -63,66 +62,6 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet {
             'equipment',
             'modification'
         ];
-    }
-
-    override activateListeners(html) {
-        super.activateListeners(html);
-
-        html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
-        html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
-    }
-
-    private async _onMatrixToggleRunningSilent(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!this.actor.isMatrixActor) return;
-
-        const device = this.actor.matrixData()?.device;
-        if (!device) return;
-
-
-        const item = this.actor.items.get(device);
-        if (!item) return;
-
-        // iterate through the states of online -> silent -> offline
-        const newState = item.isRunningSilent() ? 'online' : 'silent';
-
-        // update the embedded item with the new wireless state
-        await this.actor.updateEmbeddedDocuments('Item', [{
-            '_id': device,
-            system: { technology: { wireless: newState } }
-        }]);
-    }
-
-    /**
-     * Handle the user request to reboot their main active matrix device or living persona.
-     * @param event Any pointer event
-     */
-    async _onRebootPersonaDevice(event: Event) {
-        const data = {
-            title: game.i18n.localize("SR5.RebootConfirmationDialog.Title"),
-            buttons: {
-                confirm: {
-                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Confirm')
-                },
-                cancel: {
-                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Cancel')
-                }
-            },
-            content: '',
-            default: 'cancel',
-            templateData: {},
-            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.hbs'
-        }
-        const options = {
-            classes: ['sr5', 'form-dialog'],
-        } as FormDialogOptions;
-        const dialog = new FormDialog(data, options);
-        await dialog.select();
-        if (dialog.canceled || dialog.selectedButton !== 'confirm') return;
-
-        await this.actor.rebootPersona();
     }
 
 
