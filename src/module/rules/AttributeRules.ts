@@ -17,18 +17,22 @@ export class AttributeRules {
      * @param rollData The testData to inject attributes into
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    static injectAttributes(names: string[], attributes: AttributesType | TechnologyAttributesType, rollData: SR5Actor['system'], options: { bigger: boolean }) {
+    static injectAttributes(names: readonly string[], attributes: AttributesType | TechnologyAttributesType, rollData: SR5Actor['system'] | SR5Item['system'], options: { bigger: boolean }) {
         const targetAttributes = rollData.attributes;
-        for (const name of names) {
-            // create a copy of the attribute data or make new attribute data if it wasn't found
-            const sourceAttribute = DataDefaults.createData('attribute_field', attributes[name]);
-            const targetAttribute = targetAttributes[name];
+        if (targetAttributes) {
+            for (const name of names) {
+                // create a copy of the attribute data or make new attribute data if it wasn't found
+                const sourceAttribute = DataDefaults.createData('attribute_field', attributes[name]);
+                const targetAttribute = targetAttributes[name];
 
-            if (options.bigger) {
-                targetAttributes[name] = sourceAttribute.value > targetAttribute.value ? sourceAttribute : targetAttribute;
-            } else {
-                targetAttributes[name] = sourceAttribute;
+                if (options.bigger) {
+                    targetAttributes[name] = sourceAttribute.value > targetAttribute.value ? sourceAttribute : targetAttribute;
+                } else {
+                    targetAttributes[name] = sourceAttribute;
+                }
             }
+        } else {
+            console.warn("Shadowrun5e | Could not find Attributes on provided Roll Data", rollData);
         }
     }
 
@@ -43,7 +47,7 @@ export class AttributeRules {
      */
     static injectMentalAttributes(actor: SR5Actor, rollData: SR5Item['system']) {
         if (!rollData.attributes) return;
-        this.injectAttributes(SR5.mentalAttributes, actor.getAttributes(), rollData)
+        this.injectAttributes(SR5.mentalAttributes, actor.getAttributes(), rollData, { bigger: false });
     }
 
     /**
