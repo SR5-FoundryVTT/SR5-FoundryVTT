@@ -1,6 +1,5 @@
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { SR5Item } from "@/module/item/SR5Item";
-import { BruteForceTest } from "@/module/tests/BruteForceTest";
 import { TestCreator } from "@/module/tests/TestCreator";
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
@@ -37,7 +36,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
         return decker;
     }
 
-    async function createTest(document: any) {
+    async function createTest(document: Parameters<typeof TestCreator.fromAction>[1]) {
         const action = DataDefaults.createData('action_roll', { categories: ['defense_matrix'], attribute: 'willpower', attribute2: 'firewall' });
         return await TestCreator.fromAction(action, document);
     }
@@ -97,7 +96,6 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
         });
 
         it('Calculate matrix device inside a PAN with a direct connection', async () => {
-            // TODO: Remake with only test mockup data.
             const decker = await createDecker({ skills: { active: { hacking: { base: 5 } } } });
 
             const action = DataDefaults.createData('action_roll', { categories: ['matrix'], attribute: 'logic', skill: 'hacking' });
