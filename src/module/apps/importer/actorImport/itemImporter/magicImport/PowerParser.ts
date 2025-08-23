@@ -15,8 +15,8 @@ export class PowerParser extends Parser<'adept_power'> {
         system.importFlags = genImportFlags(formatAsSlug(itemData.fullname), this.parseType);
         if (itemData.name !== itemData.fullname) {
             setSubType(system, this.parseType, formatAsSlug(itemData.name));
-            if (system.importFlags.subType) {
-                system.importFlags.name = formatAsSlug(itemData.extra);
+            if (system.importFlags.subType && itemData.extra_english) {
+                system.importFlags.name = formatAsSlug(itemData.extra_english);
             }
         }
     }

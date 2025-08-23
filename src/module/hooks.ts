@@ -575,11 +575,8 @@ ___________________
      */
     static async updateIcConnectedToHostItem(item: SR5Item, data: SR5Item['system'], id: string) {
         // Trigger type specific behaviour.
-        switch (item.type) {
-            case 'host':
-                await MatrixICFlow.handleUpdateItemHost(item);
-                break;
-        }
+        if (item.isType('host'))
+            await MatrixICFlow.handleUpdateItemHost(item);
     }
 
     /**

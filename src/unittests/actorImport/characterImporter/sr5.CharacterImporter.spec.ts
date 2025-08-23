@@ -13,9 +13,9 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
     const importOptions = {};
     const chummerFile = {
         characters: {
-            character: {} as ActorSchema,
+            character: {},
         },
-    };
+    } as ActorFile;
 
     describe('Chummer Character Importer', () => {
         it('Does nothing when no character found', async () => {

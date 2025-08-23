@@ -4,8 +4,12 @@ type OneOrMany<T> = T | Many<T>;
 type TruthyString = "True" | "False";
 
 export type ActorFile = {
+    "?xml": {
+        "@version": string;
+        "@encoding": string;
+    };
     characters: {
-        character: ActorSchema | Many<ActorSchema>;
+        character: OneOrMany<ActorSchema>;
     };
 }
 
@@ -16,8 +20,8 @@ export type ActorSchema = {
     metatype: string;
     metatype_english: string;
     metatype_guid: string;
-    metavariant: string;
-    metavariant_english: string;
+    metavariant: MaybeEmpty<string>;
+    metavariant_english: MaybeEmpty<string>;
     metavariant_guid: string;
     movement: string;
     walk: string;
@@ -36,9 +40,13 @@ export type ActorSchema = {
     priorityresources: string;
     primaryarm: string;
     name: string;
-    mainmugshotbase64: MaybeEmpty<string>;
-    hasothermugshots: TruthyString;
-    othermugshots: OneOrMany<string>;
+    mainmugshotbase64?: MaybeEmpty<string>;
+    hasothermugshots?: TruthyString;
+    othermugshots?: MaybeEmpty<{
+        mugshot: OneOrMany<{
+            stringbase64: string;
+        }>;
+    }>;
     gender: MaybeEmpty<string>;
     age: MaybeEmpty<string>;
     eyes: MaybeEmpty<string>;
@@ -62,7 +70,7 @@ export type ActorSchema = {
     cfplimit: string;
     ainormalprogramlimit: string;
     aiadvancedprogramlimit: string;
-    spellimit: string;
+    spelllimit: string;
     karma: string;
     totalkarma: string;
     special: string;
@@ -117,17 +125,26 @@ export type ActorSchema = {
         name: string;
         fullname: string;
         name_english: string;
+        fullname_english: string;
         extra: MaybeEmpty<string>;
-        spiritcombat: string;
-        spiritdetection: string;
-        spirithealth: string;
-        spiritillusion: string;
-        spiritmanipulation: string;
-        spiritform: string;
+        extra_english: MaybeEmpty<string>;
+        spiritcombat?: string;
+        spiritdetection?: string;
+        spirithealth?: string;
+        spiritillusion?: string;
+        spiritmanipulation?: string;
+        spiritform?: string;
+        spiritcombat_english?: string;
+        spiritdetection_english?: string;
+        spirithealth_english?: string;
+        spiritillusion_english?: string;
+        spiritmanipulation_english?: string;
+        spiritform_english?: string;
         drainattributes: string;
+        drainattributes_english: string;
         drainvalue: string;
-        source: string;
-        page: string;
+        source: MaybeEmpty<string>;
+        page: MaybeEmpty<string>;
     }>;
     dodge: string;
     armor: string;
@@ -163,9 +180,9 @@ export type ActorSchema = {
     initdice: string;
     initvalue: string;
     initbonus: string;
-    astralinit: string;
-    astralinitdice: string;
-    astralinitvalue: string;
+    astralinit?: string;
+    astralinitdice?: string;
+    astralinitvalue?: string;
     matrixarinit: string;
     matrixarinitdice: string;
     matrixarinitvalue: string;
@@ -183,7 +200,7 @@ export type ActorSchema = {
     depenabled: TruthyString;
     groupmember: TruthyString;
     groupname: MaybeEmpty<string>;
-    groupnotes: MaybeEmpty<string>;
+    groupnotes?: MaybeEmpty<string>;
     surprise: string;
     composure: string;
     judgeintentions: string;
@@ -253,9 +270,9 @@ export type ActorSchema = {
             spec: MaybeEmpty<string>;
             attribute: string;
             displayattribute: string;
-            notes: MaybeEmpty<string>;
-            source: string;
-            page: string;
+            notes?: MaybeEmpty<string>;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             attributemod: string;
             ratingmod: string;
             poolmod: string;
@@ -272,7 +289,7 @@ export type ActorSchema = {
                 }>;
             }>;
         }>;
-        skillgroup: OneOrMany<{
+        skillgroup?: OneOrMany<{
             guid: string;
             name: string;
             name_english: string;
@@ -302,34 +319,49 @@ export type ActorSchema = {
             forcedloyalty: string;
             blackmail: TruthyString;
             family: TruthyString;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     limitmodifiersphys: MaybeEmpty<{
         limitmodifier: OneOrMany<{
             guid: string;
+            fullname: string;
             name: string;
+            fullname_english: string;
             name_english: string;
-            condition: string;
-            notes: MaybeEmpty<string>;
+            bonus: string;
+            limit: string;
+            condition: MaybeEmpty<string>;
+            condition_english: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     limitmodifiersment: MaybeEmpty<{
         limitmodifier: OneOrMany<{
             guid: string;
+            fullname: string;
             name: string;
+            fullname_english: string;
             name_english: string;
+            bonus: string;
+            limit: string;
             condition: string;
-            notes: MaybeEmpty<string>;
+            condition_english: string;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     limitmodifierssoc: MaybeEmpty<{
         limitmodifier: OneOrMany<{
             guid: string;
+            fullname: string;
             name: string;
+            fullname_english: string;
             name_english: string;
+            bonus: string;
+            limit: string;
             condition: string;
-            notes: MaybeEmpty<string>;
+            condition_english: string;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     mentorspirits: MaybeEmpty<{
@@ -346,10 +378,13 @@ export type ActorSchema = {
             extra: MaybeEmpty<string>;
             extrachoice1: MaybeEmpty<string>;
             extrachoice2: MaybeEmpty<string>;
-            source: string;
-            page: string;
+            extra_english: MaybeEmpty<string>;
+            extrachoice1_english: MaybeEmpty<string>;
+            extrachoice2_english: MaybeEmpty<string>;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             mentormask: TruthyString;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     spells: MaybeEmpty<{
@@ -359,6 +394,7 @@ export type ActorSchema = {
             name: string;
             fullname: string;
             name_english: string;
+            fullname_english: string;
             descriptors: string;
             descriptors_english: string;
             description?: MaybeEmpty<string>;
@@ -378,8 +414,8 @@ export type ActorSchema = {
             limited: TruthyString;
             barehandedadept: TruthyString;
             dicepool: string;
-            source: string;
-            page: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             extra: MaybeEmpty<string>;
             notes?: MaybeEmpty<string>;
         }>;
@@ -390,16 +426,33 @@ export type ActorSchema = {
             sourceid: string;
             name: string;
             fullname: string;
-            extra: string;
+            name_english: string;
+            fullname_english: string;
+            extra: MaybeEmpty<string>;
+            extra_english: MaybeEmpty<string>;
             pointsperlevel: string;
             adeptway: string;
             rating: string;
             totalpoints: string;
-            action: string;
-            source: string;
-            page: string;
-            notes: MaybeEmpty<string>;
-            enhancements: MaybeEmpty<string>;
+            action: MaybeEmpty<string>;
+            action_english: MaybeEmpty<string>;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
+            enhancements: MaybeEmpty<{
+                enhancement: OneOrMany<{
+                    guid: string;
+                    sourceid: string;
+                    fullname: string;
+                    name: string;
+                    fullname_english: string;
+                    name_english: string;
+                    source: MaybeEmpty<string>;
+                    page: MaybeEmpty<string>;
+                    improvementsource: string;
+                    notes?: MaybeEmpty<string>;
+                }>;
+            }>;
         }>;
     }>;
     spirits: MaybeEmpty<{
@@ -424,10 +477,10 @@ export type ActorSchema = {
                 log: string;
                 ini: string;
             },
-            source: string;
-            page: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             type: string;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     complexforms: MaybeEmpty<{
@@ -437,12 +490,16 @@ export type ActorSchema = {
             name: string;
             fullname: string;
             name_english: string;
+            fullname_english: string;
             duration: string;
+            duration_english: string;
             fv: string;
+            fv_english: string;
             target: string;
-            source: string;
-            page: string;
-            notes: MaybeEmpty<string>;
+            target_english: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     aiprograms: MaybeEmpty<{
@@ -453,9 +510,9 @@ export type ActorSchema = {
             fullname: string;
             name_english: string;
             requiresprogram: string;
-            source: string;
-            page: string;
-            notes: MaybeEmpty<string>;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     martialarts: MaybeEmpty<{
@@ -465,8 +522,9 @@ export type ActorSchema = {
             name: string;
             fullname: string;
             name_english: string;
-            source: string;
-            page: string;
+            fullname_english: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             cost: string;
             martialarttechniques: MaybeEmpty<{
                 martialarttechnique: OneOrMany<{
@@ -474,12 +532,12 @@ export type ActorSchema = {
                     sourceid: string;
                     name: string;
                     name_english: string;
-                    source: string;
-                    page: string;
-                    notes: MaybeEmpty<string>;
+                    source: MaybeEmpty<string>;
+                    page: MaybeEmpty<string>;
+                    notes?: MaybeEmpty<string>;
                 }>
             }>;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     armors: MaybeEmpty<{
@@ -500,8 +558,8 @@ export type ActorSchema = {
             owncost: string;
             weight: string;
             ownweight: string;
-            source: string;
-            page: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             armorname: MaybeEmpty<string>;
             equipped: TruthyString;
             ratinglabel: string;
@@ -522,14 +580,14 @@ export type ActorSchema = {
                     owncost: string;
                     weight: string;
                     ownweight: string;
-                    source: string;
-                    page: string;
+                    source: MaybeEmpty<string>;
+                    page: MaybeEmpty<string>;
                     included: string;
                     equipped: TruthyString;
                     wirelesson: string;
                     gears: ActorSchema['gears'];
                     extra: MaybeEmpty<string>;
-                    notes: MaybeEmpty<string>;
+                    notes?: MaybeEmpty<string>;
                 }>;
             }>;
             gears: ActorSchema['gears'];
@@ -547,7 +605,7 @@ export type ActorSchema = {
             homenode: TruthyString;
             conditionmonitor: string;
             matrixcmfilled: string;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     weapons: MaybeEmpty<{
@@ -562,6 +620,7 @@ export type ActorSchema = {
             category_english: string;
             type: string;
             reach: string;
+            rawreach: string;
             accuracy: string;
             accuracy_noammo: string;
             accuracy_english: string;
@@ -590,14 +649,17 @@ export type ActorSchema = {
             ammo_english: string;
             maxammo: string;
             conceal: string;
+            rawconceal: string;
+            availablemounts: string;
+            availablemounts_english: string;
             avail: string;
             avail_english: string;
             cost: string;
             owncost: string;
             weight: string;
             ownweight: string;
-            source: string;
-            page: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             weaponname: MaybeEmpty<string>;
             location: MaybeEmpty<string>;
             attack: string;
@@ -620,7 +682,10 @@ export type ActorSchema = {
                     name_english: string;
                     mount: string;
                     extramount: string;
+                    addmount: MaybeEmpty<string>;
+                    damage: string;
                     rc: MaybeEmpty<string>;
+                    ap: string;
                     conceal: string;
                     avail: string;
                     ratinglabel: string;
@@ -629,10 +694,11 @@ export type ActorSchema = {
                     weight: string;
                     ownweight: string;
                     included: TruthyString;
-                    source: string;
-                    page: string;
+                    source: MaybeEmpty<string>;
+                    page: MaybeEmpty<string>;
                     accuracy: string;
-                    notes: MaybeEmpty<string>;
+                    gears?: ActorSchema['gears'];
+                    notes?: MaybeEmpty<string>;
                 }>;
             };
             ranges: OneOrMany<{
@@ -669,16 +735,16 @@ export type ActorSchema = {
                         weaponbonusap_english: string;
                         weaponbonusacc: string;
                         weaponbonusrange: string;
-                        weaponbonuspool: string;
-                        weaponbonussmartlinkpool: string;
+                        weaponbonuspool: MaybeEmpty<string>;
+                        weaponbonussmartlinkpool: MaybeEmpty<string>;
                         flechetteweaponbonusdamage: string;
                         flechetteweaponbonusdamage_english: string;
                         flechetteweaponbonusap: string;
                         flechetteweaponbonusap_english: string;
                         flechetteweaponbonusacc: string;
                         flechetteweaponbonusrange: string;
-                        flechetteweaponbonuspool: string;
-                        flechetteweaponbonussmartlinkpool: string;
+                        flechetteweaponbonuspool: MaybeEmpty<string>;
+                        flechetteweaponbonussmartlinkpool: MaybeEmpty<string>;
                         DV: string;
                         BonusRange: string;
                     };
@@ -686,14 +752,15 @@ export type ActorSchema = {
             }>;
             dicepool: string;
             dicepool_noammo: string;
-            skill: string;
+            skill: MaybeEmpty<string>;
             wirelesson: TruthyString;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     cyberwares: MaybeEmpty<{
         cyberware: OneOrMany<{
-            guid: string;
+            guid?: string;
+            sourceid?: string;
             name: string;
             name_english: string;
             category: string;
@@ -705,8 +772,8 @@ export type ActorSchema = {
             owncost: string;
             weight: string;
             ownweight: string;
-            source: string;
-            page: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             rating: string;
             minrating: string;
             maxrating: string;
@@ -716,7 +783,7 @@ export type ActorSchema = {
             grade: string;
             location: MaybeEmpty<string>;
             extra: MaybeEmpty<string>;
-            improvementsource: string;
+            improvementsource: MaybeEmpty<string>;
             isgeneware: TruthyString;
             attack: string;
             sleaze: string;
@@ -732,7 +799,7 @@ export type ActorSchema = {
             matrixcmfilled: string;
             gears?: ActorSchema['gears'];
             children: ActorSchema['cyberwares'];
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     qualities: MaybeEmpty<{
@@ -741,22 +808,23 @@ export type ActorSchema = {
             sourceid: string;
             name: string;
             name_english: string;
-            extra: string;
+            extra: MaybeEmpty<string>;
+            extra_english: MaybeEmpty<string>;
             bp: string;
             qualitytype: string;
             qualitytype_english: string;
-            qualitysource: string;
+            qualitysource: MaybeEmpty<string>;
             metagenic: TruthyString;
-            source: string;
-            page: string;
-            notes: MaybeEmpty<string>;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     lifestyles: MaybeEmpty<{
         lifestyle: OneOrMany<{
             guid: string;
             sourceid: string;
-            name: string;
+            name: MaybeEmpty<string>;
             city: MaybeEmpty<string>;
             district: MaybeEmpty<string>;
             borough: MaybeEmpty<string>;
@@ -772,8 +840,8 @@ export type ActorSchema = {
             bonuslp: string;
             baselifestyle: string;
             trustfund: TruthyString;
-            source: string;
-            page: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             qualities: MaybeEmpty<{
                 quality: OneOrMany<{
                     guid: string;
@@ -781,21 +849,21 @@ export type ActorSchema = {
                     name: string;
                     fullname: string;
                     formattedname: string;
-                    extra: string;
+                    extra: MaybeEmpty<string>;
                     lp: string;
                     cost: string;
                     lifestylequalitytype: string;
                     lifestylequalitytype_english: string;
-                    lifestylequalitysource: string;
+                    lifestylequalitysource: MaybeEmpty<string>;
                     free: TruthyString;
                     freebylifestyle: TruthyString;
                     isfreegrid: TruthyString;
-                    source: string;
-                    page: string;
-                    notes: MaybeEmpty<string>;
+                    source: MaybeEmpty<string>;
+                    page: MaybeEmpty<string>;
+                    notes?: MaybeEmpty<string>;
                 }>;
             }>;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     gears: MaybeEmpty<{
@@ -826,8 +894,8 @@ export type ActorSchema = {
             wirelesson: TruthyString;
             location: MaybeEmpty<string>;
             gearname: MaybeEmpty<string>;
-            source: string;
-            page: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             attack: string;
             sleaze: string;
             dataprocessing: string;
@@ -847,17 +915,17 @@ export type ActorSchema = {
             weaponbonusap_english?: string;
             weaponbonusacc?: string;
             weaponbonusrange?: string;
-            weaponbonuspool?: string;
-            weaponbonussmartlinkpool?: string;
+            weaponbonuspool?: MaybeEmpty<string>;
+            weaponbonussmartlinkpool?: MaybeEmpty<string>;
             flechetteweaponbonusdamage?: string;
             flechetteweaponbonusdamage_english?: string;
             flechetteweaponbonusap?: string;
             flechetteweaponbonusap_english?: string;
             flechetteweaponbonusacc?: string;
             flechetteweaponbonusrange?: string;
-            flechetteweaponbonuspool?: string;
-            flechetteweaponbonussmartlinkpool?: string;
-            notes: MaybeEmpty<string>;
+            flechetteweaponbonuspool?: MaybeEmpty<string>;
+            flechetteweaponbonussmartlinkpool?: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     drugs: MaybeEmpty<{
@@ -905,7 +973,7 @@ export type ActorSchema = {
                     name_english: string;
                 }>;
             }>;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     vehicles: MaybeEmpty<{
@@ -929,8 +997,8 @@ export type ActorSchema = {
             avail: string;
             cost: string;
             owncost: string;
-            source: string;
-            page: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             physicalcm: string;
             physicalcmfilled: string;
             vehiclename: MaybeEmpty<string>;
@@ -959,23 +1027,25 @@ export type ActorSchema = {
                     category_english: string;
                     limit: MaybeEmpty<string>;
                     slots: string;
-                    rating: string;
-                    ratinglabel: string;
+                    rating?: string;
+                    ratinglabel?: string;
                     avail: string;
                     cost: string;
                     owncost: string;
-                    source: string;
-                    wirelesson: TruthyString;
-                    page: string;
+                    source: MaybeEmpty<string>;
+                    wirelesson?: TruthyString;
+                    page: MaybeEmpty<string>;
+                    location?: MaybeEmpty<string>;
                     included: TruthyString;
                     weapons: ActorSchema['weapons'];
-                    cyberwares: ActorSchema['cyberwares'];
-                    notes: MaybeEmpty<string>;
+                    cyberwares?: ActorSchema['cyberwares'];
+                    notes?: MaybeEmpty<string>;
+                    mods?: null;
                 }>;
             }>;
             gears: ActorSchema['gears'];
             weapons: ActorSchema['weapons'];
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     initiationgrade: MaybeEmpty<{
@@ -986,7 +1056,7 @@ export type ActorSchema = {
             ordeal: TruthyString;
             schooling: TruthyString;
             technomancer: TruthyString;
-            notes: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
         metamagics: OneOrMany<MaybeEmpty<{
             metamagic: {
@@ -995,11 +1065,12 @@ export type ActorSchema = {
                 name: string;
                 fullname: string;
                 name_english: string;
-                source: string;
-                page: string;
+                fullname_english: string;
+                source: MaybeEmpty<string>;
+                page: MaybeEmpty<string>;
                 grade: string;
-                improvementsource: string;
-                notes: MaybeEmpty<string>;
+                improvementsource: MaybeEmpty<string>;
+                notes?: MaybeEmpty<string>;
             };
         }>>;
         arts: OneOrMany<MaybeEmpty<{
@@ -1009,10 +1080,11 @@ export type ActorSchema = {
                 name: string;
                 fullname: string;
                 name_english: string;
-                source: string;
-                page: string;
-                improvementsource: string;
-                notes: MaybeEmpty<string>;
+                fullname_english: string;
+                source: MaybeEmpty<string>;
+                page: MaybeEmpty<string>;
+                improvementsource: MaybeEmpty<string>;
+                notes?: MaybeEmpty<string>;
             };
         }>>;
         enhancements: OneOrMany<MaybeEmpty<{
@@ -1022,10 +1094,11 @@ export type ActorSchema = {
                 name: string;   
                 fullname: string;
                 name_english: string;
-                source: string;
-                page: string;
-                improvementsource: string;
-                notes: MaybeEmpty<string>;
+                fullname_english: string;
+                source: MaybeEmpty<string>;
+                page: MaybeEmpty<string>;
+                improvementsource: MaybeEmpty<string>;
+                notes?: MaybeEmpty<string>;
             };
         }>>;
     }>;
@@ -1036,11 +1109,12 @@ export type ActorSchema = {
             name: string;
             fullname: string;
             name_english: string;
-            source: string;
-            page: string;
+            fullname_english: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
             grade: string;
-            improvementsource: string;
-            notes: MaybeEmpty<string>;
+            improvementsource: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     arts: MaybeEmpty<{
@@ -1050,10 +1124,11 @@ export type ActorSchema = {
             name: string;
             fullname: string;
             name_english: string;
-            source: string;
-            page: string;
-            improvementsource: string;
-            notes: MaybeEmpty<string>;
+            fullname_english: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
+            improvementsource: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     enhancements: MaybeEmpty<{
@@ -1063,10 +1138,11 @@ export type ActorSchema = {
             name: string;   
             fullname: string;
             name_english: string;
-            source: string;
-            page: string;
-            improvementsource: string;
-            notes: MaybeEmpty<string>;
+            fullname_english: string;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
+            improvementsource: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     critterpowers: MaybeEmpty<{
@@ -1076,17 +1152,23 @@ export type ActorSchema = {
             name: string;
             fullname: string;
             name_english: string;
-            extra: string;
+            fullname_english: string;
+            extra: MaybeEmpty<string>;
+            extra_english: MaybeEmpty<string>;
             category: string;
             category_english: string;
             type: string;
-            action: string;
-            range: string;
-            duration: string;
+            type_english: string;
+            action: MaybeEmpty<string>;
+            action_english: MaybeEmpty<string>;
+            range: MaybeEmpty<string>;
+            range_english: MaybeEmpty<string>;
+            duration: MaybeEmpty<string>;
+            duration_english: MaybeEmpty<string>;
             karma: string;
-            source: string;
-            page: string;
-            notes: MaybeEmpty<string>;
+            source: MaybeEmpty<string>;
+            page: MaybeEmpty<string>;
+            notes?: MaybeEmpty<string>;
         }>;
     }>;
     sustainedobjects: MaybeEmpty<{
@@ -1106,19 +1188,17 @@ export type ActorSchema = {
             objectname: string;
             objectname_english: string;
             armor: string;
-            improvesource: string;
+            improvesource: MaybeEmpty<string>;
             enabled: TruthyString;
             customname: MaybeEmpty<string>;
             customgroup: MaybeEmpty<string>;
         }>;
     }>;
     calendar: MaybeEmpty<{
-        calendar: OneOrMany<{
+        week: OneOrMany<{
             guid: string;
             year: string;
-            month: string;
             week: string;
-            notes: MaybeEmpty<string>;
         }>;
     }>;
 }

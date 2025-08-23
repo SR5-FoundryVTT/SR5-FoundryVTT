@@ -8,17 +8,22 @@ export class CritterPowerParser extends Parser<'critter_power'> {
     protected parseItem(item: BlankItem<'critter_power'>, itemData: ExtractItemType<'critterpowers', 'critterpower'>) {
         const system = item.system;
 
-        system.rating = parseFloat(itemData.extra);
-        system.powerType = itemData.type === "P" ? 'physical' : 'mana';
-        system.range = itemData.range;
-        system.duration = itemData.duration;
+        if (itemData.extra_english)
+            system.rating = parseFloat(itemData.extra_english);
+
+        system.powerType = itemData.type_english === "P" ? 'physical' : 'mana';
+        if (itemData.range_english)
+            system.range = itemData.range_english;
+
+        if (itemData.duration_english)
+            system.duration = itemData.duration_english;
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(itemData.fullname), this.parseType);
         if (itemData.name_english !== itemData.fullname) {
             setSubType(system, this.parseType, formatAsSlug(itemData.name_english));
-            if (system.importFlags.subType)
-                system.importFlags.name = formatAsSlug(itemData.extra);
+            if (system.importFlags.subType && itemData.extra_english)
+                system.importFlags.name = formatAsSlug(itemData.extra_english);
         }
     }
 }

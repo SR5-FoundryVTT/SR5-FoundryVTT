@@ -110,7 +110,7 @@ export class ImportHelper {
 
     public static async getItem(
         compKey: CompendiumKey | null,
-        itemData: { chummerId: string | null; name: string; name_english?: string }
+        itemData: { chummerId: string | null; name: string | null; name_english?: string }
     ) {
         if (!compKey) return null;
         const pack = game.packs?.get(
@@ -125,7 +125,7 @@ export class ImportHelper {
             item = await pack.getDocument(id);
         }
 
-        if (!item)
+        if (!item && itemData.name)
             item = pack.getName(itemData.name);
 
         if (!item && itemData.name_english)

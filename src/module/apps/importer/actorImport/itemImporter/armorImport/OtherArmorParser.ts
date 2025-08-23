@@ -22,6 +22,8 @@ export class OtherArmorParser extends Parser<'armor'> {
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(itemData.objectname_english), this.parseType);
-        setSubType(system, this.parseType, formatAsSlug(itemData.improvesource));
+        if (itemData.improvesource) {
+            setSubType(system, this.parseType, formatAsSlug(itemData.improvesource));
+        }
     }
 }

@@ -10,7 +10,7 @@ export type ItemSystems = SystemEntityType & Item.ConfiguredSubType;
 export type BaseType = {
     suid?: string;
     sourceid?: string;
-    name: string;
+    name: string | null;
     name_english?: string;
     source?: string | null;
     page?: string | null;
