@@ -1767,7 +1767,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     isControlledByDriver(this: SR5Actor, ...controlModes: Exclude<Actor.SystemOfType<'vehicle'>['controlMode'], 'autopilot'>[]) {
         if (!this.isType('vehicle')) return false;
         if (!this.hasDriver()) return false;
-        if (!this.system.controlMode) return false;
         // if we're in autopilot, the driver is not in control
         if (this.system.controlMode === 'autopilot') return false;
         // if no control modes were provided, this assumes any control mode, we already checked autopilot so return true
