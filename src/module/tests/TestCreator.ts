@@ -413,6 +413,12 @@ export const TestCreator = {
      * @param data Any test implementations resulting basic test data.
      */
     _prepareTestDataWithAction: function(action: ActionRollType, document: SR5Actor|SR5Item, data: SuccessTestData, againstData?: any) {
+        // allow rule specific parts of the system to change the data that we pass in
+        // - this can be used to change the test skills or attributes before building a dice pool
+        // - one example is Gunnery, which should use Logic instead of Agility when remotely fired SR5 pg #183
+        // this is done before preparing the test data to ensure Active Effects get applied through Test Resolution correctly
+        Hooks.call('sr5_beforePrepareTestDataWithAction', action, document, againstData);
+
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 
@@ -445,7 +451,7 @@ export const TestCreator = {
         // Prepare pool values.
         if (action.skill) {
             // Grab the skill by its id (default skills), or its label (custom skills).
-            const skill = actor.getSkill(action.skill) ?? actor.getSkill(action.skill, {byLabel: true});
+            const skill = actor.getSkill(action.skill, { rollData }) ?? actor.getSkill(action.skill, {byLabel: true, rollData });
 
             // Notify user about their sins.
             if (skill && !SkillFlow.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
@@ -459,7 +465,7 @@ export const TestCreator = {
         }
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
-            const attribute = actor.getAttribute(action.attribute);
+            const attribute = actor.getAttribute(action.attribute, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
             // Apply matrix modifiers, when applicable
@@ -467,7 +473,7 @@ export const TestCreator = {
         }
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
-            const attribute = actor.getAttribute(action.attribute2);
+            const attribute = actor.getAttribute(action.attribute2, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
             // Apply matrix modifiers, when applicable
