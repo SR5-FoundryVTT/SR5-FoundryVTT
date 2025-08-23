@@ -163,12 +163,12 @@ export const ResistTestDataFlow = {
     },
 
     /**
-     * Create ActionData for another Resist Test, based on the provided ResstTestData
+     * Create ActionData for another Resist Test, based on the provided ResistTestData
+     * - this happens from biofeedback damage
      * @param testCls
      * @param opposedData
      * @param test
      */
-    // TODO use a better type for 'test'
     async _getResistAgainActionData(testCls: any, opposedData: ResistTestData, test: string): Promise<ActionRollType> {
         // The original action doesn't contain a complete set of ActionData.
         // Therefore we must create an empty dummy action.

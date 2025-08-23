@@ -4,7 +4,7 @@ import { SR5Item } from "../SR5Item";
 import { RollDataOptions } from "../Types";
 import { AttributeRules } from '@/module/rules/AttributeRules';
 
-type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: ActionRollType, testData?: any, againstData?: any) => undefined; 
+type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: ActionRollType, testData?: any) => undefined;
 
 /**
  * Handle value retrieval for SR5Item test data values.
@@ -21,12 +21,9 @@ export const ItemRollDataFlow = {
      *       the line.
      */
     getRollData(item: SR5Item, rollData: any, options: RollDataOptions) {
-
-        const action = options.action ?? undefined;
-        const testData = options.testData ?? undefined;
-        const againstData = options.againstData ?? undefined;
-
-        if (!againstData) return rollData;
+        const action = options?.againstData?.action ?? options?.testData?.action ?? options?.action;
+        const testData = options?.againstData ?? options?.testData;
+        if (!action) return rollData;
 
         // Change how roll data behaves based on the action categories used.
         const handlers: Record<string, ActionCategoryRollDataCallback> = {
@@ -34,10 +31,10 @@ export const ItemRollDataFlow = {
         };
 
         // Alter roll data for each action category used that provides different handling.
-        for (const category of againstData?.action?.categories ?? []) {
+        for (const category of action.categories ?? []) {
             const callback = handlers[category];
             if (!callback) continue;
-            callback(item, rollData, action, testData, againstData);
+            callback(item, rollData, action, testData);
         }
 
         return rollData;
@@ -52,7 +49,7 @@ export const ItemRollDataFlow = {
      * @param rollData The test data to be altered
      * @param directConnection true, a direct connection has been made. false, a wire-less connection is used.
      */
-    injectMasterRatingsForPAN: (master: SR5Item, actor: SR5Actor|undefined, rollData: SR5Item['system'], directConnection?: boolean) => {
+    injectMasterAttributesForPAN: (master: SR5Item, actor: SR5Actor|undefined, rollData: SR5Item['system'], directConnection?: boolean) => {
         // As per SR5#233, slaved devices can't use the masters ratings.
         if (directConnection) return;
 
@@ -90,7 +87,7 @@ export const ItemRollDataFlow = {
             }
             
             const directConnection = againstData?.directConnection ?? false;
-            ItemRollDataFlow.injectMasterRatingsForPAN(master, actor, rollData, directConnection)
+            ItemRollDataFlow.injectMasterAttributesForPAN(master, actor, rollData, directConnection)
         }
 
         // CASE - General Matrix Device with owner

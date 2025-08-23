@@ -6,18 +6,7 @@
         </a>
     </div>
     <div>
-        <a class="matrix-toggle-hot-sim" data-tooltip="SR5.MatrixPerceptionToggle">
-            {{#if system.matrix.hot_sim}}
-            {{localize "SR5.HotSim"}}
-            {{else if system.matrix.vr}}
-            {{localize "SR5.Labels.ActorSheet.ColdSim"}}
-            {{else}}
-            {{localize "SR5.Vision.AugmentedReality"}}
-            {{/if}}
-        </a>
-    </div>
-    <div>
-        <a class="matrix-toggle-running-silent" data-tooltip=" SR5.MatrixToggleRunningSilent">
+        <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
             {{#if system.matrix.running_silent}}
             {{localize "SR5.RunningSilent"}}
             {{else}}
@@ -26,7 +15,7 @@
         </a>
     </div>
     <div>
-        <a class="reboot-persona-device" data-tooltip="SR5.RebootPersonaAndClearAllMarks">
+        <a class="reboot-persona-device" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
             {{localize "SR5.Labels.Sheet.RebootDevice"}} <i class="item-icon fas fa-power-off"></i>
         </a>
     </div>

@@ -1384,16 +1384,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     /**
      * Transparently build a set of roll data based on this items type and network status.
      *
-     * This roll data can depend upon other actors and items.
+     * Values for testing can depend on other actors and items.
      *
      * NOTE: Since getRollData is sync by default, we can't retrieve compendium documents here, resulting in fromUuidSync calls down
      *       the line.
-     *
-     * TODO: Refactor this method using the Composition Pattern for each story.
      */
     override getRollData(options: RollDataOptions={}): any {
-        // Foundry is simply passing down 'system', so we have to duplicate to avoid contamination.
-        const rollData = foundry.utils.deepClone(super.getRollData());
+        // Create a system data copy to avoid cross-contamination
+        const rollData = this.system.toObject(false);
         return ItemRollDataFlow.getRollData(this, rollData, options);
     }
 
