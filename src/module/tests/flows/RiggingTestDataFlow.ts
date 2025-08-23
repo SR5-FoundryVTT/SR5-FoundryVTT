@@ -16,7 +16,7 @@ export const RiggingTestDataFlow = {
      * @param test
      */
     addControlRigModifier: (test: SuccessTest) => {
-        const vehicle = test.actor;
+        const vehicle = test.actor?.asType('vehicle');
         if (!vehicle || !vehicle.isControlledByDriver('rigger')) return;
         const driver = vehicle.getVehicleDriver();
         if (!driver) return;
@@ -34,7 +34,7 @@ export const RiggingTestDataFlow = {
      * @param test
      */
     addMatrixModifier: (test: SuccessTest) => {
-        const vehicle = test.actor;
+        const vehicle = test.actor?.asType('vehicle');
         if (!vehicle || !vehicle.isControlledByDriver('rigger')) return;
         const driver = vehicle.getVehicleDriver();
         if (!driver) return;

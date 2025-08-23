@@ -1744,14 +1744,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param controlModes (optional) - rigger, manual, or remote
      *  - if not provided, will test against all 3
      */
-    isControlledByDriver(this: SR5Actor, ...controlModes: Omit<SR5Actor['system']['controlMode'], 'autopilot'>[]) {
+    isControlledByDriver(this: SR5Actor, ...controlModes: Exclude<Actor.SystemOfType<'vehicle'>['controlMode'], 'autopilot'>[]) {
         if (!this.isType('vehicle')) return false;
         if (!this.hasDriver()) return false;
         if (!this.system.controlMode) return false;
-        // if no control modes were provided, default to the 3 standard control modes
-        if (controlModes.length === 0) {
-            controlModes = ['rigger', 'manual', 'remote'];
-        }
+        // if we're in autopilot, the driver is not in control
+        if (this.system.controlMode === 'autopilot') return false;
+        // if no control modes were provided, this assumes any control mode, we already checked autopilot so return true
+        if (controlModes.length === 0) return true;
+        // finally, verify the list provided includes our current control mode
         return controlModes.includes(this.system.controlMode);
     }
 
