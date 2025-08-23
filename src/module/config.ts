@@ -888,9 +888,9 @@ export const SR5 = {
      */
     packNames: {
         // packNames keys should match the name of the FLAG
-        'GeneralActionsPack': 'general-actions',
-        'MatrixActionsPack': 'matrix-actions',
-        'ICActionsPack': 'sr5-ic-actions',
+        'GeneralActionsPack': 'sr5e-general-actions',
+        'MatrixActionsPack': 'sr5e-matrix-actions',
+        'ICActionsPack': 'sr5e-ic-actions',
     },
 
     programTypes: {
