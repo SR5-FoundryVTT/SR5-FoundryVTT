@@ -27,7 +27,14 @@ export const ItemRollDataFlow = {
         const testData = options.testData ?? undefined;
         const againstData = options.againstData ?? undefined;
 
-        if (!againstData) return rollData;
+        const categories = againstData?.action?.categories ?? [];
+
+        // if we contain a defense_matrix category, add 'matrix' to the list of categories to process
+        if (!categories.includes('matrix') && action?.categories.includes('defense_matrix')) {
+            categories.push("matrix");
+        }
+
+        if (categories.length === 0) return rollData;
 
         // Change how roll data behaves based on the action categories used.
         const handlers: Record<string, ActionCategoryRollDataCallback> = {
@@ -35,7 +42,7 @@ export const ItemRollDataFlow = {
         };
 
         // Alter roll data for each action category used that provides different handling.
-        for (const category of againstData?.action?.categories ?? []) {
+        for (const category of categories) {
             const callback = handlers[category];
             if (!callback) continue;
             callback(item, rollData, action, testData, againstData);
@@ -139,6 +146,8 @@ export const ItemRollDataFlow = {
     matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: ActionRollType, testData?: any, againstData?: any) {
         const actor = item.actorOwner;
 
+        if (againstData?.directConnection) return;
+
         // CASE - Matrix Device is slaved inside a PAN or WAN
         // => Weapon slaved to owned commlink
         // => Camera slaved to host
@@ -151,8 +160,7 @@ export const ItemRollDataFlow = {
                 return rollData;
             }
             
-            const directConnection = againstData?.directConnection ?? false;
-            ItemRollDataFlow.injectMasterRatingsForPAN(master, actor, rollData, directConnection)
+            ItemRollDataFlow.injectMasterRatingsForPAN(master, actor, rollData, false)
         }
 
         // CASE - General Matrix Device with owner

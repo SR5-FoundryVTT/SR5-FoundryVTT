@@ -25,6 +25,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
         };
 
         const itemSystem = {
+            equipped: true,
             technology: { rating: 3 },
             category: 'cyberdeck',
             ...deckSystem
@@ -34,6 +35,11 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
         await decker.createEmbeddedDocuments('Item', [{ type: 'device', name: 'test', system: itemSystem }]);
 
         return decker;
+    }
+
+    async function createTest(document: any) {
+        const action = DataDefaults.createData('action_roll', { categories: ['defense_matrix'], attribute: 'willpower', attribute2: 'firewall' });
+        return await TestCreator.fromAction(action, document);
     }
 
     /**
@@ -47,8 +53,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             assert.equal(device.system.attributes.willpower.value, 3);
             assert.equal(device.system.attributes.firewall.value, 3);
 
-            const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
-            const test = await TestCreator.fromAction(action, device);
+            const test = await createTest(device);
 
             assert.equal(test?.pool.value, 6);
         });
@@ -64,8 +69,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
 
             assert.equal(owner.system.attributes.willpower.value, 5);
 
-            const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
-            const test = await TestCreator.fromAction(action, device);
+            const test = await createTest(device);
 
             assert.equal(test?.pool.value, 8);
         });
@@ -78,8 +82,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
 
             await master.addSlave(slave);
 
-            const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
-            const test = await TestCreator.fromAction(action, slave);
+            const test = await createTest(slave);
 
             assert.equal(test?.pool.value, 8);
         });
@@ -89,7 +92,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             const device = owner.items.contents[0];
 
             // Owner rating is used for mental attributes.
-            const rollData = device.getRollData();
+            const rollData = device.getRollData({againstData: { action: { categories: ['matrix']}}});
             assert.equal(rollData.attributes.willpower.value, 5);
         });
 
@@ -97,8 +100,8 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             // TODO: Remake with only test mockup data.
             const decker = await createDecker({ skills: { active: { hacking: { base: 5 } } } });
 
-            const action = DataDefaults.createData('action_roll', { attribute: 'logic', skill: 'hacking', test: 'BruteForceTest' });
-            const test = await TestCreator.fromAction(action, decker) as BruteForceTest;
+            const action = DataDefaults.createData('action_roll', { categories: ['matrix'], attribute: 'logic', skill: 'hacking' });
+            const test = await TestCreator.fromAction(action, decker) as any;
 
             const master = await factory.createItem({ type: 'device', system: { technology: { rating: 5 }, category: 'commlink' } });
             const slave = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3 } } });
@@ -124,7 +127,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
         it('Calculate matrix device inside a WAN without a direct connection', async () => {
             const host = await factory.createItem({ type: 'device', system: { category: 'host', technology: { rating: 5 } } });
             const device = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3, master: host.uuid } } });
-            const rollData = device.getRollData();
+            const rollData = device.getRollData({againstData: { action: { categories: ['matrix']}}});
 
             assert.equal(rollData.attributes.firewall.value, 5);
         });
@@ -133,7 +136,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             const host = await factory.createItem({ type: 'device', system: { category: 'host', technology: { rating: 5 } } });
             const device = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3, master: host.uuid } } });
 
-            const againstData = { directConnection: true };
+            const againstData = { directConnection: true, action: { categories: ['matrix'] }};
             const rollData = device.getRollData({ againstData });
 
             assert.equal(rollData.attributes.firewall.value, 3);
