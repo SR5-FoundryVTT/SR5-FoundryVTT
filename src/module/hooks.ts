@@ -553,15 +553,15 @@ ___________________
             return;
         }
 
-        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('.directory-footer').append(button);
+        const button = $('<button class="sr5 import-button"><i class="fa-solid fa-file-import"></i><span>Import Chummer Data</span></button>');
+        $(html).find('.header-actions').append(button);
 
         button.on('click', () => { void new BulkImporter().render({ force: true }); });
     }
 
     static renderActorDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
-        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('.directory-footer').append(button);
+        const button = $('<button class="sr5 import-button"><i class="fa-solid fa-file-import"></i><span>Import Actor</span></button>');
+        $(html).find('.header-actions').append(button);
 
         button.on('click', () => { void new ActorImporter().render({ force: true }); });
     }

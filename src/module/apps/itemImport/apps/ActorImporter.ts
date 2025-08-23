@@ -39,16 +39,6 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
         return "Chummer/Data Import";
     }
 
-    private getPath(folder: Folder): string {
-        if (folder.ancestors[0]) {
-            const parent = game.folders.get(folder.ancestors[0].id);
-            if (parent) {
-                return this.getPath(parent) + "/" + folder.name;
-            }
-        }
-        return folder.name;
-    }
-
     override async _prepareContext(options?: any) {
         const baseContext = await super._prepareContext(options);
         const compareOptions = { numeric: true, sensitivity: 'base' } satisfies Intl.CollatorOptions;
