@@ -16,6 +16,7 @@ export class Version0_30_0 extends VersionMigration {
         // Matrix 1.0 changes marks placed.
         if (['character', 'critter', 'ic', 'vehicle', 'sprite'].includes(_actor.type)) {
             migrateMarksActor(_actor);
+            migrateActorRunningSilent(_actor);
         }
     }
 
@@ -110,3 +111,7 @@ function migrateMatrixDeviceData(item: any) {
     item.system.technology.wireless = item.system.technology.wireless ? 'online' : 'offline';
 }
 
+function migrateActorRunningSilent(actor: any) {
+    const runningSilent = actor.system?.matrix?.silent;
+    actor.system.matrix.running_silent = runningSilent ?? false;
+}
