@@ -566,6 +566,8 @@ export type ActorSchema = {
             wirelesson: TruthyString;
             armormods: MaybeEmpty<{
                 armormod: OneOrMany<{
+                    guid: string;
+                    sourceid: string;
                     name: string;
                     fullname: string;
                     name_english: string;
