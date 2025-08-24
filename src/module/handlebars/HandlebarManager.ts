@@ -5,6 +5,7 @@ import { registerSkillLineHelpers } from './SkillLineHelpers';
 import { registerAppHelpers } from "./AppHelpers";
 import { registerBasicHelpers } from "./BasicHelpers";
 import { registerActorHelpers } from './ActorHelpers';
+import { registerModifierHelpers } from './ModifierHelpers';
 
 export class HandlebarManager {
     static async loadTemplates() {
@@ -17,5 +18,6 @@ export class HandlebarManager {
         registerSkillLineHelpers();
         registerAppHelpers();
         registerActorHelpers();
+        registerModifierHelpers();
     }
 }

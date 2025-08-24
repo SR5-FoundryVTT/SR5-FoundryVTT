@@ -86,18 +86,6 @@ export class Helpers {
         return value.value;
     }
 
-    static calcValue(value: DamageType): any {
-        if (value.override) {
-            value.value = value.override.value;
-
-            return value.value;
-        }
-
-        value.value = value.base;
-
-        return value.value;
-    }
-
     /** Round a number to a given degree.
      *
      * @param value Number to round with.

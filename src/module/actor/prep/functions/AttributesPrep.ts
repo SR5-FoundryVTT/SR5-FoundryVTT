@@ -5,7 +5,6 @@ import { PartsList } from '../../../parts/PartsList';
 import { ItemPrep } from './ItemPrep';
 import { SR5Actor } from '../../SR5Actor';
 import { AttributeFieldType } from 'src/module/types/template/Attributes';
-import { ModifiableValueType } from 'src/module/types/template/Base';
 import { SR5Item } from 'src/module/item/SR5Item';
 
 export class AttributesPrep {
@@ -81,6 +80,6 @@ export class AttributesPrep {
 
         ItemPrep.prepareWareEssenceLoss(system, items);
 
-        system.attributes.essence.value = Helpers.calcTotal(system.attributes.essence as ModifiableValueType);
+        system.attributes.essence.value = Helpers.calcTotal(system.attributes.essence);
     }
 }
