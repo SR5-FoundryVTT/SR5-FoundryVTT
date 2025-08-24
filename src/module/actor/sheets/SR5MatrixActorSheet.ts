@@ -8,6 +8,7 @@ import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
 import { FormDialog, FormDialogOptions } from '@/module/apps/dialogs/FormDialog';
+import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
@@ -57,12 +58,12 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
         // When target overview is shown, collect all matrix targets.
         // TODO: taMiF this is a bis of a mess and will need to be reusable across both targets and marked docs and different actor types.
-        const {targets} = MatrixFlow.getMatrixTargets(this.actor);
+        const {targets} = MatrixTargetingFlow.getTargets(this.actor);
 
         for (const target of targets) {
             // Collect connected icons, if user wants to see them.
             if (this._connectedIconsOpenClose[target.document.uuid]) {
-                target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
+                target.icons = MatrixTargetingFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.
@@ -461,7 +462,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                 // So we can simply overwrite all icons here without any filtering.
 
                 // TODO: taM check this
-                target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
+                target.icons = MatrixTargetingFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.
