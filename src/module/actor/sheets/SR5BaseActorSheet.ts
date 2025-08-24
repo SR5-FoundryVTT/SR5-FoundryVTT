@@ -238,6 +238,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
+        data.hasActions = this._prepareHasActions(data);
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
 
@@ -1127,6 +1128,14 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         }
 
         return false;
+    }
+
+    /**
+     * Prepare if this actor has an "Action" Items in their list of items
+     * @param data - sheet data
+     */
+    _prepareHasActions(data) {
+        return data.items.filter(item => item.type === 'action').length > 0;
     }
 
     /**

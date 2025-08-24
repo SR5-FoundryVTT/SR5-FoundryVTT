@@ -7,6 +7,7 @@ import { MatrixFlow } from '../../flows/MatrixFlow';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
+import { FormDialog, FormDialogOptions } from '@/module/apps/dialogs/FormDialog';
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
@@ -34,7 +35,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                     navSelector: '.tabs[data-group="matrix"]',
                     contentSelector: '.tabsbody[data-group="matrix"]',
                     initial: 'marks',
-                }]
+                }] as {navSelector: string, contentSelector: string, initial: string}[],
         });
     }
 
@@ -42,7 +43,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         const data = await super.getData(options) as MatrixActorSheetData;
 
         data.network = this.actor.network;
-        data.matrixActions = await this.getMatrixActions();
+        data.matrixActions = await this._prepareMatrixActions();
 
 
         this._prepareMatrixTargets(data);
@@ -100,6 +101,77 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
         // Matrix Target - Connected Icons Visibility Switch
         html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
+
+        html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
+        html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
+    }
+
+    /**
+     * Handle changing if an Actor is Running Silent
+     * @param event
+     * @private
+     */
+    private async _onMatrixToggleRunningSilent(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.actor.isMatrixActor) return;
+
+        const matrixData = this.actor.matrixData();
+        if (!matrixData) return;
+
+        if (matrixData.device) {
+            const device = matrixData.device;
+            const item = this.actor.items.get(device);
+            if (!item) return;
+
+            // toggle between online and silent based on running silent status
+            const newState = item.isRunningSilent() ? 'online' : 'silent';
+
+            // update the embedded item with the new wireless state
+            await this.actor.updateEmbeddedDocuments('Item', [{
+                '_id': device,
+                system: { technology: { wireless: newState } }
+            }]);
+        } else {
+            await this.actor.update({
+                system: {
+                    matrix: {
+                        running_silent: !matrixData.running_silent,
+                    }
+                }
+            })
+        }
+    }
+
+    /**
+     * Handle the user request to reboot their main active matrix device or living persona.
+     * @param event Any pointer event
+     */
+    async _onRebootPersonaDevice(event: Event) {
+        const data = {
+            title: game.i18n.localize("SR5.RebootConfirmationDialog.Title"),
+            buttons: {
+                confirm: {
+                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Confirm')
+                },
+                cancel: {
+                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Cancel')
+                }
+            },
+            content: '',
+            default: 'cancel',
+            templateData: {},
+            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.hbs'
+        }
+        const options = {
+            classes: ['sr5', 'form-dialog'],
+        } as FormDialogOptions;
+        const dialog = new FormDialog(data, options);
+        await dialog.select();
+        if (dialog.canceled || dialog.selectedButton !== 'confirm') return;
+
+        await this.actor.rebootPersona();
     }
 
     /**
@@ -179,6 +251,16 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         app.render(true);
     }
 
+    /**
+     * Get Matrix actions from the set compendia pack that the character should see
+     * @protected
+     */
+    protected async _getMatrixPackActions() {
+        const matrixPackName = Helpers.getMatrixActionsPackName();
+        // Collect all sources for matrix actions.
+        return await Helpers.getPackActions(matrixPackName);
+    }
+
 
     /**
      * Retrieve all matrix actions from the corresponding pack to be displayed.
@@ -187,11 +269,8 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      *
      * @returns Alphabetically sorted array of matrix actions.
      */
-    async getMatrixActions() {
-        const matrixPackName = Helpers.getMatrixActionsPackName();
-
-        // Collect all sources for matrix actions.
-        const packActions = await Helpers.getPackActions(matrixPackName);
+    async _prepareMatrixActions() {
+        const packActions = await this._getMatrixPackActions();
         const actorActions = MatrixFlow.getMatrixActions(this.actor);
         // Assume above collections return action only.
         let actions = [...packActions, ...actorActions] as SR5Item<'action'>[];

@@ -3,29 +3,38 @@ import { VersionMigration } from "../VersionMigration";
 /**
  * Version 0.29.0
  * 
- * Migrate Active Model to Data Model.
+ * - Migrate template data to DataModel.
+ * - Migrate old matrix data to matrix 1.0
  */
-
 export class Version0_30_0 extends VersionMigration {
     readonly TargetVersion = "0.30.0";
 
     // Handle Actor documents so they can be sanitized.
     override handlesActor(_actor: Readonly<any>) { return true; }
 
-    override migrateItem(item: any) {
-        if (item.type === 'sin' && item.system?.licenses)
-            item.system.licenses = Object.values(item.system.licenses);
+    override migrateActor(_actor: any): void {
+        if (['character', 'critter', 'ic', 'vehicle', 'sprite'].includes(_actor.type)) {
+            // Matrix 1.0 Running silent has been renamed.
+            const runningSilent = _actor.system?.matrix?.silent;
+            _actor.system.matrix.running_silent = runningSilent ?? false;
+        }
+    }
 
-        if (item.type === 'modification' && typeof item.system?.mount_point === 'string') {
-            item.system.mount_point = item.system.mount_point.toLowerCase();
+    override migrateItem(_item: any) {
+        // CLeanup from legacy / broken template data to DataModel.
+        if (_item.type === 'sin' && _item.system?.licenses)
+            _item.system.licenses = Object.values(_item.system.licenses);
 
-            if (item.system?.mount_point === 'under_barrel')
-                item.system.mount_point = 'under';
+        if (_item.type === 'modification' && typeof _item.system?.mount_point === 'string') {
+            _item.system.mount_point = _item.system.mount_point.toLowerCase();
+
+            if (_item.system?.mount_point === 'under_barrel')
+                _item.system.mount_point = 'under';
         }
 
-        // migrate wireless from a boolean to a string
-        if (item.system?.technology?.wireless === true) {
-            item.system.technology.wireless = 'online';
+        // Matrix 1.0 changes wireless from a checkbox to a choice.
+        if (_item.system.technology?.wireless) {
+            _item.system.technology.wireless = _item.system.technology.wireless ? 'online' : 'offline';
         }
     }
 
@@ -64,7 +73,7 @@ export class Version0_30_0 extends VersionMigration {
 
         if (flag.selection_skills)
             effect.system.selection_skills = JSON.parse(flag.selection_skills);
-        
+
         if (flag.selection_tests)
             effect.system.selection_tests = JSON.parse(flag.selection_tests);
 

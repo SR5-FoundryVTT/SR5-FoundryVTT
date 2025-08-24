@@ -1,5 +1,6 @@
 import { RollDataOptions } from "../../item/Types";
 import { SR5Actor } from "../SR5Actor";
+import { RiggingRules } from '@/module/rules/RiggingRules';
 
 /**
  * Handling around actor roll data resolution.
@@ -17,16 +18,21 @@ export const ActorRollDataFlow = {
      * @param options
      */
     getRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions) {
-        if (actor.isType('vehicle')) ActorRollDataFlow.injectAstralRollData(actor, rollData, options);
+        if (actor.isType('vehicle')) ActorRollDataFlow.injectVehicleDriverRollData(actor, rollData, options);
         return rollData;
     },
 
     /**
-     * Inject values for vehicle actors and their different rigging modes.
-     * 
-     * TODO: Hand over to a RiggingRules implementation.
+     * Inject Driver's Attributes into the RollData if the vehicle is controlled by a driver
      */
-    injectVehicleRiggerRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions) {   
+    injectVehicleDriverRollData: function(actor: SR5Actor, rollData: SR5Actor['system'], options: RollDataOptions = {}) {
+        const driver = actor.getVehicleDriver()
+        if (!driver) return;
+
+        // if the driver is in control of the vehicle, inject the driver's attributes and skills
+        if (actor.isControlledByDriver()) {
+            RiggingRules.modifyRollDataForDriver(driver.getRollData(), rollData);
+        }
     },
 
     /**
@@ -39,5 +45,5 @@ export const ActorRollDataFlow = {
      * @param options 
      */
     injectAstralRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions) {
-    }
+    },
 }

@@ -834,10 +834,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return ItemAvailabilityFlow.parseAvailibility(avail)
     }
 
-    getNetworkController(): string | undefined {
-        return this.getTechnologyData()?.networkController;
-    }
-
     async setMasterUuid(masterUuid: string | undefined): Promise<void> {
         await this.update({ system: { technology: { master: masterUuid } } });
     }

@@ -29,8 +29,10 @@ import { shadowrunSR5ItemDataPrep } from './sr5.ItemDataPrep.spec';
 import { vehicleImporterTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleImporter.spec';
 import { vehicleModParserTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleModImporter.spec';
 import { shadowrunMatrixTesting } from './sr5.MatrixTesting.spec';
+import { shadowrunDriver } from './sr5.Driver.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
+import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
 
 /**
  * Register FoundryVTT Quench test batches...
@@ -113,6 +115,12 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.inventory', shadowrunInventoryFlow, {
         displayName: 'SHADOWRUN5e: InventoryFlow Test',
     });
+    quench.registerBatch('shadowrun5e.flow.driver', shadowrunDriver, {
+        displayName: 'SHADOWRUN5e: Driver Flow Test',
+    })
+    quench.registerBatch('shadowrun5e.flow.rigger', shadowrunRiggerTesting, {
+        displayName: 'SHADOWRUN5e: Rigger Flow Testing',
+    })
     quench.registerBatch('shadowrun5e.flow.tests', shadowrunTesting, { displayName: 'SHADOWRUN5e: SuccessTest Test' });
     quench.registerBatch('shadowrun5e.flow.tests_attack', shadowrunAttackTesting, {
         displayName: 'SHADOWRUN5e: Attack Test',

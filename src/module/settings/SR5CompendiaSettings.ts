@@ -11,6 +11,7 @@ export default class SR5CompendiaSettings extends AbstractCompendiaSettings {
         return [
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.GeneralActionsPack),
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.MatrixActionsPack),
+            CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.ICActionsPack),
         ];
     }
 

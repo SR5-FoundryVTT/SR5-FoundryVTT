@@ -292,6 +292,10 @@
             "MatrixActionsPack": {
                 "label": "Matrix Actions",
                 "hint": "This compendium will be used for all matrix actions."
+            },
+            "ICActionsPack": {
+                "label": "IC Actions",
+                "hint": "This compendium will be used for IC actions, filtered for each IC type"
             }
         },
         "Compendiums": {
@@ -330,6 +334,7 @@
         "ContactType": "Type",
         "Contacts": "Contacts",
         "Continue": "Continue",
+        "ControlRig": "Control Rig",
         "Cost": "Cost",
         "Cover": "Cover",
         "Create": "Create {type}",
@@ -586,7 +591,7 @@
                 "BlackIC": "Black IC",
                 "Blaster": "Blaster",
                 "Bloodhound": "Bloodhound",
-                "BlueGoo": "Blauer Schleim",
+                "BlueGoo": "Bloo Goo",
                 "Catapult": "Catapult",
                 "Crash": "Crash",
                 "Flicker": "Flicker",
