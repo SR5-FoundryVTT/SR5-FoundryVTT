@@ -93,8 +93,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     _prepareVehicleFields(): VehicleSheetDataFields {
         const driver = this.actor.getVehicleDriver();
 
-        const masterLink = this.actor.getMasterUuid();
-        const master = masterLink ? MatrixNetworkFlow.resolveItemLink(masterLink) : undefined;
+        const master = this.actor.master || undefined;
 
         return {
             driver,

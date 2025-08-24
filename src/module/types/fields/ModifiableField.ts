@@ -38,17 +38,16 @@ export class ModifiableField<
     }
 
     protected override _applyChangeOverride(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        // Return value unchanged, as effects don´t alter the output value here but add to it.
-        if (SR5ActiveEffect.applyOverrideToModifiableValue(change.effect, model, change, value, delta)) return value;
+        if (SR5ActiveEffect.applyOverrideToModifiableValue(change.effect, model, change, value, delta)) return undefined;
         return super._applyChangeOverride(value, delta, model, change);
     }
 
-    protected override _applyChangeUpgrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): InitializedType | undefined {
+    protected override _applyChangeUpgrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
         if (SR5ActiveEffect.applyUpgradeToModifiableValue(change.effect, model, change, value, delta)) return undefined;
         return super._applyChangeUpgrade(value, delta, model, change);
     }
 
-    protected override _applyChangeDowngrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): InitializedType | undefined {
+    protected override _applyChangeDowngrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
         if (SR5ActiveEffect.applyDowngradeToModifiableValue(change.effect, model, change, value, delta)) return undefined;
         return super._applyChangeDowngrade(value, delta, model, change);
     }
@@ -56,7 +55,7 @@ export class ModifiableField<
     /**
      * Avoid breaking sheet rendering by assuring Foundry never applies any naive multiplication of an 'object'
      */
-    protected override _applyChangeMultiply(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): InitializedType | undefined {
+    protected override _applyChangeMultiply(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
         return undefined;
     }
 }

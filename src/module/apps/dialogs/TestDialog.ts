@@ -138,13 +138,12 @@ export class TestDialog extends FormDialog {
             if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
 
             // Remove from further automatic data merging.
-            delete data[key]
+            delete data[key];
 
             // Don't apply an unneeded override.
             if (valueField.value === value) return;
 
             if (value === null || value === '')
-                // @ts-expect-error fvtt-types don't know about the null somehow
                 valueField.override = null;
             else
                 valueField.override = { name: 'SR5.ManualOverride', value: Number(value) };

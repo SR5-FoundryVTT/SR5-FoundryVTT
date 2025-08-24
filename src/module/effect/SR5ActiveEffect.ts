@@ -287,14 +287,14 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     static applyOverrideToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
-        if (modValue) {
-            modValue.override = { name: effect.name, value: Number(change.value) };
-            modValue.value = Number(change.value);
+        if (!modValue) return false;
 
-            return true;
-        }
+        const value = Number(change.value);
+        if (isNaN(value)) return true;
 
-        return false;
+        modValue.override = { name: effect.name, value };
+
+        return true;
     }
 
     /**
@@ -303,13 +303,16 @@ export class SR5ActiveEffect extends ActiveEffect {
     */
     static applyUpgradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
-        if (modValue) {
-            const value = Number(change.value);
-            modValue.upgrade = modValue.upgrade?.value > value ? modValue.upgrade : { name: effect.name, value };
-            return true;
-        }
+        if (!modValue) return false;
 
-        return false;
+        const value = Number(change.value);
+        if (isNaN(value)) return true;
+
+        // Apply only the strongest (highest) upgrade
+        if (!modValue.upgrade || value > modValue.upgrade.value)
+            modValue.upgrade = { name: effect.name, value };
+
+        return true;
     }
 
     /**
@@ -318,13 +321,16 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     static applyDowngradeToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
-        if (modValue) {
-                const value = Number(change.value);
-                modValue.downgrade = modValue.downgrade?.value < value ? modValue.downgrade : { name: effect.name, value };
-            return true;
-        }
+        if (!modValue) return false;
 
-        return false;
+        const value = Number(change.value);
+        if (isNaN(value)) return true;
+
+        // Store only the strongest (lowest) cap
+        if (!modValue.downgrade || value < modValue.downgrade.value)
+            modValue.downgrade = { name: effect.name, value };
+
+        return true;
     }
 
     /**

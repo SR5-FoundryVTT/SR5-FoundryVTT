@@ -45,45 +45,43 @@ export class Helpers {
      * @param options min will a apply a minimum value, max will apply a maximum value.
      */
     static calcTotal(value: ModifiableValueType, options?: CalcTotalOptions): number {
+        // reset operation
+        value.mode = null;
+
+        // Some values will have their total overridden directly.
+        if (value.override) {
+            // Still apply a possible value range, even if override says otherwise.
+            value.value = Helpers.applyRange(value.override.value, options);
+            value.mode = 'override';
+            return value.value;
+        }
+
         const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
         if (!isNaN(value.temp) && Number(value.temp) !== 0) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
-        // Some values will have their total overridden directly.
-        if (value.override) {
-            // Still apply a possible value range, even if override says otherwise.
-            value.value = Helpers.applyValueRange(value.override.value, options);
-            return value.value;
-        }
-
         value.value = parts.total + value.base;
 
         // Apply both down- and upgrade, should multiple effect changes have been applied.
         if (value.downgrade) {
-            value.value = Helpers.applyValueRange(value.value, { max: value.downgrade.value });
+            const previousValue = value.value;
+            value.value = Helpers.applyRange(value.value, { max: value.downgrade.value });
+            if (value.value !== previousValue)
+                value.mode = 'downgrade';
         }
         if (value.upgrade) {
-            value.value = Helpers.applyValueRange(value.value, { min: value.upgrade.value });
-        } 
-
-        value.value = Helpers.roundTo(value.value, options?.roundDecimals);
-        value.value = Helpers.applyValueRange(value.value, options);
-
-        value.mod = parts.list;
-
-        return value.value;
-    }
-
-    static calcValue(value: DamageType): any {
-        if (value.override) {
-            value.value = value.override.value;
-
-            return value.value;
+            const previousValue = value.value;
+            value.value = Helpers.applyRange(value.value, { min: value.upgrade.value });
+            if (value.value !== previousValue)
+                value.mode = 'upgrade';
         }
 
-        value.value = value.base;
+        value.value = Helpers.roundTo(value.value, options?.roundDecimals);
+        value.value = Helpers.applyRange(value.value, options);
+
+        value.mod = parts.list;
 
         return value.value;
     }
@@ -102,14 +100,13 @@ export class Helpers {
      *
      * @param value
      * @param options Define the range the given value must be in (or none)
+     * @returns True if the value was modified, false otherwise
      */
-    static applyValueRange(value: number, options?: CalcTotalOptions): number {
-        if (typeof options?.min === 'number') {
+    static applyRange(value: number, options?: CalcTotalOptions) {
+        if (options?.min != null)
             value = Math.max(options.min, value);
-        }
-        if (typeof options?.max === 'number') {
+        if (options?.max != null)
             value = Math.min(options.max, value);
-        }
 
         return value;
     }
