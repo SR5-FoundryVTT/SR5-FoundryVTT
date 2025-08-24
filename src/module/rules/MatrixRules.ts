@@ -1,4 +1,5 @@
 import { SR5Actor } from "../actor/SR5Actor";
+import { SR5 } from "../config";
 import { SR } from "../constants";
 import { DataDefaults } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
@@ -312,17 +313,16 @@ export class MatrixRules {
 
     /**
      * Calculate the defense pool of a grid when a mark is placed on it
-     * 
      * See SR5#238 'Brute Force' and SR5#240 'Hack on the Fly'
-     * @param grid 
+     * @param grid The grid defending against a mark placement action.
      */
     static gridMarkPlacementDefensePool(grid: SR5Item<'grid'>) {
         if (!grid.isType('grid')) return;
 
         if (grid.system.category === 'local')
-            return { name: 'SR5.Labels.Matrix.LocalGrid', value: 4 }
+            return { name: SR5.gridCategories.local, value: 4 }
         else if (grid.system.category === 'global')
-            return { name: 'SR5.Labels.Matrix.GlobalGrid', value: 6 };
+            return { name: SR5.gridCategories.global, value: 6 };
         else
             return;
     }

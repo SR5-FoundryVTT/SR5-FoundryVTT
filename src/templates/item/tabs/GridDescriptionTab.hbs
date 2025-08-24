@@ -6,6 +6,12 @@
                 <label>{{localize "SR5.Labels.Sheet.Visible"}}</label>
                 <input class="display" type="checkbox" name="system.matrix.visible" {{checked system.matrix.visible}} data-dtype="Boolean" />
             </div>
+            <div class="flexrow nowrap">
+                <label>{{localize "SR5.Labels.Action.Category"}}</label>
+                <select name="system.category">
+                    {{selectOptions config.gridCategories selected=system.category localize=true}}
+                </select>
+            </div>
         </div>
     </div>
     {{> "systems/shadowrun5e/dist/templates/item/parts/description.hbs"}}
