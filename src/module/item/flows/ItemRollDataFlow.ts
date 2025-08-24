@@ -1,9 +1,8 @@
 import { ActionRollType } from "@/module/types/item/Action";
 import { SR5Actor } from "../../actor/SR5Actor";
-import { SR5 } from "../../config";
 import { SR5Item } from "../SR5Item";
 import { RollDataOptions } from "../Types";
-import { AttributeFieldType, AttributesType, TechnologyAttributesType } from "@/module/types/template/Attributes";
+import { AttributeRules } from '@/module/rules/AttributeRules';
 
 type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: ActionRollType, testData?: any) => undefined;
 
@@ -42,80 +41,6 @@ export const ItemRollDataFlow = {
     },
 
     /**
-     * Apply changes to roll data for matrix actions.
-     * 
-     * TODO: Provide the rule basis for this... move it to a Rule file?
-     * 
-     * @param item The source item to use for roll data.
-     * @param rollData The roll data of that source item.
-     * @param testData The current tests data.
-     * @param againstData The original tests data, when testData is an OpposedTest.
-     * @returns 
-     */
-    matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: ActionRollType, testData?: any) {
-        const actor = item.actorOwner;
-
-        // CASE - Matrix Device is slaved inside a PAN or WAN
-        // => Weapon slaved to owned commlink
-        // => Camera slaved to host
-        if (item.isMatrixDevice && item.isSlave) {
-            // don't inject master device data for resist tests
-            // TODO: Should use action categories some method instead of fixed test classs names
-            if (testData?.action?.test === 'MatrixResistTest') return;
-            const master = item.master;
-            if (!master) {
-                ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
-                return rollData;
-            }
-            
-            const directConnection = testData?.directConnection ?? false;
-            ItemRollDataFlow.injectMasterAttributesForPAN(master, actor, rollData, directConnection)
-        }
-
-        // CASE - General Matrix Device with owner
-        // => Carried weapon
-        // => Equipped persona icon
-        else if (item.isMatrixDevice && actor) {
-            ItemRollDataFlow.injectOwnerMentalAttributes(actor, rollData);
-        }
-
-    },
-
-    /**
-     * Inject an actors mental attributes into an items test data.
-     * 
-     * This case implements SR5#237 'Matrix Actions' devices owned by characters.
-     * The special case 'a device is completely unattended' is ignored.
-     * 
-     * @param actor Whatever actor to use for mental attributes
-     * @param rollData TestData that will get modified in place
-     */
-    injectOwnerMentalAttributes: (actor: SR5Actor, rollData: SR5Item['system']) => {
-        if (!rollData.attributes) return;
-
-        for (const name of SR5.mentalAttributes) {
-            rollData.attributes[name] = foundry.utils.duplicate(actor.getAttribute(name)) as AttributeFieldType;
-        }
-    },
-
-
-    /**
-     * Inject actors matrix attributes into an items test data.
-     * 
-     * Rule wise the persona icon is providing this attributes, within the system those attributes are copied to the
-     * actor and we can copy them from there.
-     * 
-     * @param actor The carrier of the persona icon
-     * @param rollData TestData that will get modified in place
-     */
-    injectOwnerRatingsForPAN: (actor: SR5Actor, rollData: SR5Item['system']) => {
-        if (!rollData.attributes) return;
-
-        const PANMatrixAttributes = ['data_processing', 'firewall'];
-        ItemRollDataFlow._injectAttributes(PANMatrixAttributes, actor.system.attributes, rollData, { bigger: true });
-    },
-
-    /**
      * Change a devices ratings by those of the PAN master and device owner.
      * 
      * This case implements SR5#233 'PANS and WANS', the PAN section.
@@ -131,31 +56,46 @@ export const ItemRollDataFlow = {
         const attributes = master.system.attributes!;
 
         const injectAttributes = ['data_processing', 'firewall', 'rating'];
-        ItemRollDataFlow._injectAttributes(injectAttributes, attributes, rollData, { bigger: true });
-        if (actor) ItemRollDataFlow.injectOwnerMentalAttributes(actor, rollData);
+        AttributeRules.injectAttributes(injectAttributes, attributes, rollData, { bigger: true });
+        if (actor) AttributeRules.injectMentalAttributes(actor, rollData);
     },
 
     /**
-     * Inject all attributes into testData that match the given attribute names list.
+     * Apply changes to roll data for matrix actions.
      * 
-     * Also implements the 'use bigger value rule',if necessary.
+     * TODO: Provide the rule basis for this... move it to a Rule file?
      * 
-     * @param names A list of attribute names to inject
-     * @param attributes The list of source attribute to pull from
-     * @param rollData The testData to inject attributes into
-     * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
+     * @param item The source item to use for roll data.
+     * @param rollData The roll data of that source item.
+     * @param testData The current tests data.
+     * @param againstData The original tests data, when testData is an OpposedTest.
+     * @returns 
      */
-    _injectAttributes(names: string[], attributes: TechnologyAttributesType | AttributesType, rollData: SR5Item['system'], options: { bigger: boolean }) {
-        const targetAttributes = rollData.attributes!;
-        for (const name of names) {
-            const sourceAttribute = foundry.utils.duplicate(attributes[name]) as AttributeFieldType;
-            const targetAttribute = targetAttributes[name];
+    matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: ActionRollType, testData?: any, againstData?: any) {
+        const actor = item.actorOwner;
 
-            if (options.bigger) {
-                targetAttributes[name] = sourceAttribute.value > targetAttribute.value ? sourceAttribute : targetAttribute;
-            } else {
-                targetAttributes[name] = sourceAttribute;
+        // CASE - Matrix Device is slaved inside a PAN or WAN
+        // => Weapon slaved to owned commlink
+        // => Camera slaved to host
+        if (item.isMatrixDevice && item.isSlave) {
+            // don't inject master device data for resist tests
+            if (testData?.action?.test === 'MatrixResistTest') return;
+            const master = item.master;
+            if (!master) {
+                ui.notifications?.error("SR5.Errors.MasterDeviceIsMissing", {localize: true});
+                return rollData;
             }
+            
+            const directConnection = againstData?.directConnection ?? false;
+            ItemRollDataFlow.injectMasterAttributesForPAN(master, actor, rollData, directConnection)
         }
-    },
+
+        // CASE - General Matrix Device with owner
+        // => Carried weapon
+        // => Equipped persona icon
+        else if (item.isMatrixDevice && actor) {
+            AttributeRules.injectMentalAttributes(actor, rollData);
+        }
+
+    }
 }

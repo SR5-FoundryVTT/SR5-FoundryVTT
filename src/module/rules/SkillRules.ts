@@ -1,7 +1,8 @@
 import {PartsList} from "../parts/PartsList";
-import {SR5} from "../config";
 import {SR} from "../constants";
 import { SkillFieldType } from "../types/template/Skills";
+import { SR5Actor } from '@/module/actor/SR5Actor';
+import { DataDefaults } from '@/module/data/DataDefaults';
 
 export class SkillRules {
 
@@ -71,5 +72,30 @@ export class SkillRules {
 
     static get SpecializationModifier(): number {
         return SR.skill.SPECIALIZATION_MODIFIER;
+    }
+
+    /**
+     * Inject all attributes into testData that match the given attribute names list.
+     *
+     * Also implements the 'use bigger value rule',if necessary.
+     *
+     * @param names A list of attribute names to inject
+     * @param skills Object of skills to use
+     * @param rollData The testData to inject attributes into
+     * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
+     */
+    static injectActiveSkills(names: string[], skills: SR5Actor['system']['skills']['active'], rollData: SR5Actor['system'], options: { bigger: boolean }) {
+        const targetSkills = rollData.skills.active;
+        for (const name of names) {
+            // create a copy of the skill data or make new skill data if it wasn't found
+            const sourceSkill =  DataDefaults.createData('skill_field', skills[name]);
+            const targetSkill = targetSkills[name];
+
+            if (options.bigger) {
+                targetSkills[name] = sourceSkill.value > targetSkill.value ? sourceSkill : targetSkill;
+            } else {
+                targetSkills[name] = sourceSkill;
+            }
+        }
     }
 }
