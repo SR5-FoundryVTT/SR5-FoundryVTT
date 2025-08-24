@@ -751,7 +751,9 @@
             },
             "Matrix": {
                 "TargetMainIcon": "Target Main Icon",
-                "TargetDevice": "Target Device"
+                "TargetDevice": "Target Device",
+                "LocalGrid": "Local Grid",
+                "GlobalGrid": "Global Grid"
             },
             "Message": {
                 "ClickToSelect": "Click to select on scene",

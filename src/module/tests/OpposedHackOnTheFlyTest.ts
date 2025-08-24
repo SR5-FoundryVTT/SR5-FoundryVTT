@@ -1,7 +1,7 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { Translation } from "../utils/strings";
-import { MatrixPlacementData } from "./flows/MarkPlacementFlow";
+import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 import { MatrixTestDataFlow } from "./flows/MatrixTestDataFlow";
 import { HackOnTheFlyTest } from "./HackOnTheFlyTest";
 import { OpposedMatrixTestData } from "./MatrixTest";
@@ -40,6 +40,11 @@ export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> 
 
     override async populateDocuments() {
         await MatrixTestDataFlow.populateOpposedDocuments(this);
+    }
+
+    override prepareBaseValues() {
+        super.prepareBaseValues();
+        MarkPlacementFlow.prepareGridDefensePool(this);
     }
 
     /**

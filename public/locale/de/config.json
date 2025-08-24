@@ -637,6 +637,12 @@
                 "Carried": "Mitgeführt",
                 "OpenInventory": "Inventar"
             },
+            "Matrix": {
+                "TargetMainIcon": "Target Main Icon",
+                "TargetDevice": "Target Device",
+                "LocalGrid": "Local Grid",
+                "GlobalGrid": "Global Grid"
+            },
             "Message": {
                 "ClickToSelect": "Klicke um in Szene auzuwählen",
                 "TestEffects": "Effekte angewendet"

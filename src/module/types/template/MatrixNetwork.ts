@@ -17,6 +17,5 @@ export const MatrixDeviceData = () => ({
 export const MatrixMasterData = () => ({
     ...MatrixDeviceData(),
 
-    // TODO: taMiF/marks Should this be the global data point for all matrix network visibilities?
     visible: new BooleanField()
 });

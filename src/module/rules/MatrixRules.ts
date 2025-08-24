@@ -217,7 +217,7 @@ export class MatrixRules {
      * See SR5#229-230 'User Mode' Virtual Reality sections.
      */
     static convergenceDamage(): DamageType {
-        return DataDefaults.createData('damage', {base: 12, value: 12, type: {base: 'matrix', value: 'matrix'}});
+        return DataDefaults.createData('damage', { base: 12, value: 12, type: { base: 'matrix', value: 'matrix' } });
     }
 
     /**
@@ -225,7 +225,7 @@ export class MatrixRules {
      *
      */
     static failedAttackDamage(biofeedback: BiofeedbackDamageType = ''): DamageType {
-        return DataDefaults.createData('damage', {base: 1, value: 1, type: {base: 'matrix', value: 'matrix'}, biofeedback});
+        return DataDefaults.createData('damage', { base: 1, value: 1, type: { base: 'matrix', value: 'matrix' }, biofeedback });
     }
 
     /**
@@ -277,7 +277,7 @@ export class MatrixRules {
         PartsList.AddUniquePart(modified.mod, 'SR5.Attacker', attackerHits);
         PartsList.AddUniquePart(modified.mod, 'SR5.Defender', -defenderHits);
 
-        modified.value = Helpers.calcTotal(modified, {min: 0});
+        modified.value = Helpers.calcTotal(modified, { min: 0 });
 
         return modified;
     }
@@ -287,9 +287,9 @@ export class MatrixRules {
      * @param weapon The equipped weapon used for the attack.
      * @param actor The actor performing the attack.
      */
-    static availableActiveDefenses (weapon: SR5Item, actor: SR5Actor): Shadowrun.ActiveDefenseData {
+    static availableActiveDefenses(weapon: SR5Item, actor: SR5Actor): Shadowrun.ActiveDefenseData {
         // General purpose active defenses. ()
-        const activeDefenses: Shadowrun.ActiveDefenseData  = {
+        const activeDefenses: Shadowrun.ActiveDefenseData = {
             full_defense: {
                 label: 'SR5.FullMatrixDefense',
                 value: actor.getMatrixFullDefenseAttribute()?.value,
@@ -308,5 +308,22 @@ export class MatrixRules {
         }
 
         return activeDefenses;
+    }
+
+    /**
+     * Calculate the defense pool of a grid when a mark is placed on it
+     * 
+     * See SR5#238 'Brute Force' and SR5#240 'Hack on the Fly'
+     * @param grid 
+     */
+    static gridMarkPlacementDefensePool(grid: SR5Item<'grid'>) {
+        if (!grid.isType('grid')) return;
+
+        if (grid.system.category === 'local')
+            return { name: 'SR5.Labels.Matrix.LocalGrid', value: 4 }
+        else if (grid.system.category === 'global')
+            return { name: 'SR5.Labels.Matrix.GlobalGrid', value: 6 };
+        else
+            return;
     }
 }
