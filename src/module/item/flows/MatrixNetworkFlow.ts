@@ -4,6 +4,7 @@ import { NetworkStorage } from "../../storage/NetworkStorage";
 import { Helpers } from "../../helpers";
 import { SocketMessage } from "../../sockets";
 import { FLAGS, SYSTEM_NAME } from "../../constants";
+import { Translation } from "@/module/utils/strings";
 
 /**
  * This flow handles everything involving how matrix devices are connected to network and what
@@ -446,5 +447,23 @@ export class MatrixNetworkFlow {
      */
     static allGrids() {
         return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid')) ?? [];
+    }
+
+    /**
+     * Transform the given document to a string type for sheet display.
+     *
+     * NOTE: This function is part of sheet rendering, so we fail silently, to not break sheet rendering.
+     * 
+     * @param document Any markable document
+     * @returns A translation key to be translated.
+     */
+    static getDocumentType(document: SR5Actor | SR5Item): Translation {
+        if (document instanceof SR5Item && document.type === 'host') return 'SR5.ItemTypes.Host';
+        if (document instanceof SR5Item && document.type === 'grid') return 'SR5.ItemTypes.Grid';
+        if (document instanceof SR5Item) return 'SR5.Device';
+
+        if (document instanceof SR5Actor && document.type === 'ic') return 'SR5.ActorTypes.IC';
+
+        return 'SR5.Labels.ActorSheet.Persona';
     }
 }

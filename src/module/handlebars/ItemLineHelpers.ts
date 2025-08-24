@@ -5,7 +5,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
 import { SR5Item } from '../item/SR5Item';
 import { SR5Actor } from "../actor/SR5Actor";
-import { MatrixSheetFlow } from "../flows/MatrixSheetFlow";
+import { MatrixNetworkFlow } from "../item/flows/MatrixNetworkFlow";
 
 /**
  * Typing around the legacy item list helper.
@@ -1034,7 +1034,7 @@ export const registerItemLineHelpers = () => {
      * Only used for the Item NetworksTab
      */
     Handlebars.registerHelper('NetworksItemRightSide', (item: SR5Item) => {
-        const type = MatrixSheetFlow.getDocumentType(item);
+        const type = MatrixNetworkFlow.getDocumentType(item);
         return [{
             text: {
                 text: game.i18n.localize(type),

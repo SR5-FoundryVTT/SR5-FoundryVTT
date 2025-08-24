@@ -1,7 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { MatrixNetworkFlow } from "../item/flows/MatrixNetworkFlow";
-import { MatrixSheetFlow } from "./MatrixSheetFlow";
 
 /**
  * Handles targeting in the matrix.
@@ -42,7 +41,7 @@ export const MatrixTargetingFlow = {
         const targets: Shadowrun.MatrixTargetDocument[] = []
 
         for (const slave of host.slaves) {
-            const type = MatrixSheetFlow.getDocumentType(slave);
+            const type = MatrixNetworkFlow.getDocumentType(slave);
             // For persona slaves get their possible token.
             // taM check this
             const token = 'getToken' in slave ? slave.getToken() : null;
@@ -78,7 +77,7 @@ export const MatrixTargetingFlow = {
                 // Skip actor tokens as they're collected separately.
                 if (slave instanceof SR5Actor && slave.getToken()) continue;
 
-                const type = MatrixSheetFlow.getDocumentType(slave);
+                const type = MatrixNetworkFlow.getDocumentType(slave);
 
                 targets.push({
                     name: slave.name,
@@ -113,7 +112,7 @@ export const MatrixTargetingFlow = {
                 // Filter out persona based on matrix rules.
                 if (!actor.matrixPersonaIsVisible(target)) continue;
 
-                const type = MatrixSheetFlow.getDocumentType(document as any);
+                const type = MatrixNetworkFlow.getDocumentType(document as any);
                 targets.push({
                     name: token.name,
                     document: token.actor,
@@ -169,7 +168,7 @@ export const MatrixTargetingFlow = {
                 token: null,
                 runningSilent: device.isRunningSilent(),
                 network: document.network?.name ?? '',
-                type: MatrixSheetFlow.getDocumentType(device),
+                type: MatrixNetworkFlow.getDocumentType(device),
                 icons: [],
                 marks: 0,
                 markId: null,

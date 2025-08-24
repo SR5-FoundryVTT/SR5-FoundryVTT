@@ -9,6 +9,7 @@ import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
 import { FormDialog, FormDialogOptions } from '@/module/apps/dialogs/FormDialog';
 import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
+import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
@@ -443,7 +444,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                         network: ActorMarksFlow.getDocumentNetwork(persona),
                         document: persona,
                         icons: [target],
-                        type: MatrixSheetFlow.getDocumentType(persona),
+                        type: MatrixNetworkFlow.getDocumentType(persona),
                         marks: 0,
                         markId: '',
                         // As a device is marked, the persona should be visible...
