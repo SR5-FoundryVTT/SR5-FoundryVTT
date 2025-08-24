@@ -49,6 +49,7 @@ import { SetMarksOptions } from '../storage/MarksStorage';
 import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
+import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -472,7 +473,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Reboot this actors living or device based persona.
      */
     async rebootPersona() {
-        return MatrixFlow.rebootPersona(this);
+        return MatrixRebootFlow.rebootPersona(this);
     }
 
     /**

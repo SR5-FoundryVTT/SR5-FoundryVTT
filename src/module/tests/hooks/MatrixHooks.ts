@@ -1,3 +1,4 @@
+import { OverwatchFlow } from '@/module/flows/OverwatchFlow';
 import { MatrixFlow } from '../../flows/MatrixFlow';
 import { MatrixTestDataFlow } from '../flows/MatrixTestDataFlow';
 import { SuccessTest } from '../SuccessTest';
@@ -38,7 +39,7 @@ export const MatrixHooks = {
      * @param test 
      */
     onTestProcessResults_AddOverwatchScore: async function(test: SuccessTest) {
-        await MatrixFlow.addOverwatchScoreFromIllegalMatrixAction(test);
+        await OverwatchFlow.addOverwatchScoreFromIllegalMatrixAction(test);
     },
 
     /**
