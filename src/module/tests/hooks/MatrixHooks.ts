@@ -4,6 +4,7 @@ import { MatrixTestDataFlow } from '../flows/MatrixTestDataFlow';
 import { SuccessTest } from '../SuccessTest';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { DamageType } from '@/module/types/item/Action';
+import { MatrixDamageFlow } from '@/module/flows/MatrixDamageFlow';
 
 /**
  * Matrix related Success Test hook implementations.
@@ -53,6 +54,6 @@ export const MatrixHooks = {
     /**
      */
     onAfterDamageAppliedToActor_HandleBiofeedbackDamage: async function(actor: SR5Actor, damage: DamageType) {
-        await MatrixFlow.determineBiofeedbackDamage(actor, damage);
+        await MatrixDamageFlow.determineBiofeedbackDamage(actor, damage);
     },
 }

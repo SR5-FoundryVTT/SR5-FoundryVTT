@@ -2,7 +2,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { MarksStorage } from "../storage/MarksStorage";
 import { DamageType } from "../types/item/Action";
-import { MatrixFlow } from "./MatrixFlow";
+import { MatrixDamageFlow } from "./MatrixDamageFlow";
 
 /**
  * Handle matrix reboot actions.
@@ -33,7 +33,7 @@ export const MatrixRebootFlow = {
         await actor.setOverwatchScore(0);
         await actor.clearMarks();
         await MarksStorage.clearRelations(actor.uuid);
-        const damage = MatrixFlow.getDumpshockDamage(actor);
+        const damage = MatrixDamageFlow.getDumpshockDamage(actor);
 
         await this.sendRebootDeviceMessage(actor, device, delay, damage);
     },
