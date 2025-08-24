@@ -79,8 +79,8 @@ export class MatrixNetworkHackingApplication extends Application {
         data.config = SR5;
 
         // Prepare available networks for selection.
-        data.grids = MatrixFlow.visibleGrids();
-        data.hosts = MatrixFlow.visibelHosts();
+        data.grids = MatrixNetworkFlow.visibleGrids();
+        data.hosts = MatrixNetworkFlow.visibleHosts();
 
         return data;
     }

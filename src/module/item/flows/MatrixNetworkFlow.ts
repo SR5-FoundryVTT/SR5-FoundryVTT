@@ -419,4 +419,32 @@ export class MatrixNetworkFlow {
     static async chatMessageListeners(message: ChatMessage, html, data) {
         $(html).find('.button[data-action="matrix-network-mark-invite"]').on('click', MatrixNetworkFlow.acknowledgeMarkInvite.bind(this));
     }
+
+    /**
+     * Collect visible hosts for selection.
+     */
+    static visibleHosts() {
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host') && item.matrixIconVisibleToPlayer()) ?? [];
+    }
+
+    /**
+     * Collect all hosts for selection.
+     */
+    static allHosts() {
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host')) ?? [];
+    }
+
+    /**
+     * Collect visible grids for selection.
+     */
+    static visibleGrids() {
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid') && item.matrixIconVisibleToPlayer()) ?? [];
+    }
+
+    /**
+     * Collect all grids for selection.
+     */
+    static allGrids() {
+        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid')) ?? [];
+    }
 }

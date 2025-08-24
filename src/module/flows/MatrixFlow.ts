@@ -116,33 +116,6 @@ export const MatrixFlow = {
         return actions.filter((action: SR5Item) => action.hasActionCategory('matrix'));
     },
 
-    /**
-     * Collect visible hosts for selection.
-     */
-    visibelHosts() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host') && item.matrixIconVisibleToPlayer()) ?? [];
-    },
-
-    /**
-     * Collect all hosts for selection.
-     */
-    allHosts() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host')) ?? [];
-    },
-
-    /**
-     * Collect visible grids for selection.
-     */
-    visibleGrids() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid') && item.matrixIconVisibleToPlayer()) ?? [];
-    },
-
-    /**
-     * Collect all grids for selection.
-     */
-    allGrids() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid')) ?? [];
-    },
 
     /**
      * Trasnform the given document to a string type for sheet display.
