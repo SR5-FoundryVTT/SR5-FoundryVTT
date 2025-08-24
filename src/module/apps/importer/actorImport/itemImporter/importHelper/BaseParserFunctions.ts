@@ -19,22 +19,6 @@ export function setSubType(parsedItem: ReturnType<SR5Item['system']['toObject']>
     }
 }
 
-export function createItemData<T extends Item.ConfiguredSubType>(
-    name: string,
-    type: T,
-    system: T extends any ? ReturnType<Extract<Item.SystemOfType<T>, { toObject: (...args: any[]) => any }>['toObject']> : never
-) {
-    return {
-        name,
-        _id: '',
-        img: null as string | null,
-        folder: '',
-        flags: {},
-        type,
-        system
-    };
-}
-
 // formatAsSlug and genImportFlags copied from original implementation in bulk importer DataImporter.ts
 /**
 * Reformat the name or subtype name so it matches the categories in config.ts

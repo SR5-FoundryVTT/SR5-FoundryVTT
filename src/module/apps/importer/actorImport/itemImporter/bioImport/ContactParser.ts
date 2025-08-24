@@ -7,8 +7,6 @@ export class ContactParser extends Parser<'contact'> {
 
     protected parseItem(item: BlankItem<'contact'>, itemData: ExtractItemType<'contacts', 'contact'>) {
         const system = item.system;
-        item.name ||= '[Unnamed connection]';
-
         system.type = itemData.role || '';
 
         // Group contacts are stored in chummer as 'Group(connectionRating)', e.g. 'Group(5)'

@@ -69,12 +69,12 @@ export class WeaponParser extends Parser<'weapon'> {
         if (itemData.skill) {
             action.skill = itemData.skill.toLowerCase().replace(/\s/g, '_');
         // Instead of direct skill, rely on a category mapping by the rules.
-        } else if (itemData.category?.toLowerCase().includes('exotic')) {
-            action.skill = itemData.category
+        } else if (itemData.category_english?.toLowerCase().includes('exotic')) {
+            action.skill = itemData.category_english
                 .toLowerCase()
                 .replace(' weapons', '')
                 .replace(/\s/g, '_');
-        } else if (itemData.category?.toLowerCase().includes('laser weapons')) {
+        } else if (itemData.category_english?.toLowerCase().includes('laser weapons')) {
             action.skill = 'exotic_range';
         }
 
@@ -157,7 +157,7 @@ export class WeaponParser extends Parser<'weapon'> {
     handleMeleeWeapon(system: BlankItem<'weapon'>['system'], itemData: ExtractItemType<'weapons', 'weapon'>) {
         system.action.type = 'complex';
         system.category = 'melee';
-        system.melee.reach = Number(itemData.reach) || 0;
+        system.melee.reach = Number(itemData.rawreach) || 0;
     }
 
     handledRangedWeapon(system: BlankItem<'weapon'>['system'], itemData: ExtractItemType<'weapons', 'weapon'>) {
@@ -187,7 +187,7 @@ export class WeaponParser extends Parser<'weapon'> {
             
             // HeroLab export doesn't have clips
             const chummerClips = IH.getArray(itemData.clips.clip);
-            const clips = chummerClips.filter(clip => !clip.name.toLowerCase().includes("inter"))
+            const clips = chummerClips.filter(clip => !clip.english_name.toLowerCase().includes("inter"))
 
             ammo.spare_clips = {
                 max: (clips?.length || 1) - 1,

@@ -17,7 +17,7 @@ export class ClipParser extends Parser<'ammo'> {
         const ammobonus = itemData.ammotype;
         const system = item.system;
 
-        system.ap = Number(ammobonus.weaponbonusap) || 0;
+        system.ap = Number(ammobonus.weaponbonusap_english) || 0;
         system.accuracy = Number(ammobonus.weaponbonusacc) || 0;
 
         if (ammobonus.weaponbonusdamage != null) {

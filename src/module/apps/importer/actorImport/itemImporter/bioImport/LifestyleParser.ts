@@ -24,7 +24,8 @@ export class LifestyleParser extends Parser<'lifestyle'> {
         system.permanent = itemData.purchased === 'True';
 
         // The name of the lifestyle is optional, so we use a fallback here.
-        item.name ||= itemData.baselifestyle;
+        if (item.name === Parser.DEFAULT_NAME)
+            item.name ||= itemData.baselifestyle;
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(item.name), this.parseType);

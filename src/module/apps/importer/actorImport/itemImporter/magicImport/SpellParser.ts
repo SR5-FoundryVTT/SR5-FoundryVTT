@@ -8,11 +8,11 @@ export class SpellParser extends Parser<'spell'> {
     protected parseItem(item: BlankItem<'spell'>, itemData: ExtractItemType<'spells', 'spell'>) {
         const system = item.system;
 
-        this.prepareSystem(system, itemData)
+        this.prepareSystem(system, itemData);
 
-        this.parseDuration(system, itemData)
-        this.prepareAction(system)
-        this.handleSpellTypeSpecifics(system, itemData)
+        this.parseDuration(system, itemData);
+        this.prepareAction(system);
+        this.handleSpellTypeSpecifics(system, itemData);
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
@@ -21,24 +21,25 @@ export class SpellParser extends Parser<'spell'> {
 
     private prepareSystem(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
         system.category = itemData.category_english.toLowerCase().replace(/\s/g, '_') as any;
-        system.type = itemData.type === 'M' ? 'mana' : 'physical';
+        system.type = itemData.type_english === 'M' ? 'mana' : 'physical';
         system.range =
-            itemData.range === 'T'
+            itemData.range_english === 'T'
                 ? 'touch'
-                : itemData.range
+                : itemData.range_english
                         .toLowerCase()
                         .replace(/\s/g, '_')
                         .replace('(', '')
                         .replace(')', '') as any;
-        system.drain = parseInt(itemData.dv.replace(/[A-Z]*/g, ''));
+        system.drain = parseInt(itemData.dv_english.replace(/[A-Z]*/g, ''));
     }
 
     private parseDuration(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
-        if (itemData.duration.toLowerCase() === 's')
+        const duration = itemData.duration_english.toLowerCase();
+        if (duration === 's')
             system.duration = 'sustained';
-        else if (itemData.duration.toLowerCase() === 'i')
+        else if (duration === 'i')
             system.duration = 'instant';
-        else if (itemData.duration.toLowerCase() === 'p')
+        else if (duration === 'p')
             system.duration = 'permanent';
     }
 
@@ -49,26 +50,26 @@ export class SpellParser extends Parser<'spell'> {
     }
 
     private handleSpellTypeSpecifics(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
-        const category = itemData.category_english;
-        if (itemData.descriptors) {
-            const desc = itemData.descriptors.toLowerCase();
-            if (category.toLowerCase() === 'combat') {
-                this.handleCombatSpellSpecifics(system, desc, itemData.damage)
+        const category = itemData.category_english.toLowerCase();
+        if (itemData.descriptors_english) {
+            const desc = itemData.descriptors_english.toLowerCase();
+            if (category === 'combat') {
+                this.handleCombatSpellSpecifics(system, desc, itemData.damage_english)
             }
-            if (category.toLowerCase() === 'detection') {
+            if (category === 'detection') {
                 this.handleDetectionSpellSpecifics(system, desc)
             }
-            if (category.toLowerCase() === 'illusion') {
+            if (category === 'illusion') {
                 this.handleIllusionSpellSpecifics(system, desc)
             }
-            if (category.toLowerCase() === 'manipulation') {
+            if (category === 'manipulation') {
                 this.handleManipulationSpellSpecifics(system, desc)
             }
         }
     }
 
     private handleCombatSpellSpecifics(system: BlankItem<'spell'>['system'], desc: string, damage: string) {
-        if (desc.includes('indire')) {
+        if (desc.includes('indirect')) {
             system.combat.type = 'indirect';
             system.action.opposed.type= 'defense';
         } else {

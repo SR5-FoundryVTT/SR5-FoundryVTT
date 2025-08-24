@@ -8,7 +8,7 @@ export class RitualParser extends Parser<'ritual'> {
     protected parseItem(item: BlankItem<'ritual'>, itemData: ExtractItemType<'spells', 'spell'>) {
         const system = item.system;
 
-        system.type = itemData.type === 'M' ? 'mana' : 'physical';
+        system.type = itemData.type_english === 'M' ? 'mana' : 'physical';
         system.descriptors = itemData.descriptors;
 
         system.action.type = 'varies';

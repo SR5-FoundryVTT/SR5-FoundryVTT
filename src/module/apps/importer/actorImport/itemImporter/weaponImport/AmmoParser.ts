@@ -10,15 +10,15 @@ export class AmmoParser extends Parser<'ammo'> {
 
     protected parseItem(item: BlankItem<'ammo'>, itemData: ExtractItemType<'gears', 'gear'>) {
         const system = item.system;
-        if (itemData.weaponbonusap)
-            system.ap = Number(itemData.weaponbonusap) || 0;
+        if (itemData.weaponbonusap_english)
+            system.ap = Number(itemData.weaponbonusap_english) || 0;
 
-        if (itemData.weaponbonusdamage) {
+        if (itemData.weaponbonusdamage_english) {
             system.damage = Number(itemData.weaponbonusdamage_english) || 0;
 
-            if (itemData.weaponbonusdamage.includes('S'))
+            if (itemData.weaponbonusdamage_english.includes('S'))
                 system.damageType = 'stun';
-            else if (itemData.weaponbonusdamage.includes('M'))
+            else if (itemData.weaponbonusdamage_english.includes('M'))
                 system.damageType = 'matrix';
             else
                 system.damageType = 'physical';

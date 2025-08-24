@@ -37,11 +37,12 @@ export abstract class Parser<T extends ItemSystems> {
     protected abstract readonly parseType: T;
     protected abstract readonly compKey: CompendiumKey | null;
     static iconList: string[] | undefined;
+    static readonly DEFAULT_NAME = "Unnamed";
 
     protected createItem(itemData: BaseType) {
         type FlagType = NonNullable<NonNullable<Item.CreateData['flags']>['shadowrun5e']>;
         return {
-            name: itemData.name ?? "Unnamed",
+            name: itemData.name ?? Parser.DEFAULT_NAME,
             type: this.parseType,
             img: null as string | null,
             _id: foundry.utils.randomID(),
