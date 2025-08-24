@@ -450,6 +450,7 @@ export const SR5 = {
     gridCategories: {
         local: 'SR5.Labels.Matrix.Local',
         global: 'SR5.Labels.Matrix.Global',
+        public: 'SR5.Labels.Matrix.Public'
     },
 
     durations: {

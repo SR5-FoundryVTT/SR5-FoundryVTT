@@ -753,7 +753,8 @@
                 "TargetMainIcon": "Target Main Icon",
                 "TargetDevice": "Target Device",
                 "Local": "Local",
-                "Global": "Global"
+                "Global": "Global",
+                "Public": "Public"
             },
             "Message": {
                 "ClickToSelect": "Click to select on scene",

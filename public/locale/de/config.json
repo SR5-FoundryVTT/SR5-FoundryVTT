@@ -640,8 +640,9 @@
             "Matrix": {
                 "TargetMainIcon": "Target Main Icon",
                 "TargetDevice": "Target Device",
-                "Local": "Local",
-                "Global": "Global"
+                "Local": "Lokal",
+                "Global": "Global",
+                "Public": "Öffentlich"
             },
             "Message": {
                 "ClickToSelect": "Klicke um in Szene auzuwählen",

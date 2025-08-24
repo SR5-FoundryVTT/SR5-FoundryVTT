@@ -324,6 +324,6 @@ export class MatrixRules {
         else if (grid.system.category === 'global')
             return { name: SR5.gridCategories.global, value: 6 };
         else
-            return;
+            return { name: SR5.gridCategories.public, value: 0 };
     }
 }
