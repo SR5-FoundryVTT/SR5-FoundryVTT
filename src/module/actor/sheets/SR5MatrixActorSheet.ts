@@ -420,7 +420,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                 //         network: persona.network?.name ?? '',
                 //         document: persona,
                 //         icons: [],
-                //         type: ActorMarksFlow.getDocumentType(persona),
+                //         type: MatrixFlow.getDocumentType(persona),
                 //         marks: target.marks,
                 //         markId: persona.uuid,
                 //         runningSilent: persona.isRunningSilent,
@@ -442,7 +442,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                         network: ActorMarksFlow.getDocumentNetwork(persona),
                         document: persona,
                         icons: [target],
-                        type: ActorMarksFlow.getDocumentType(persona),
+                        type: MatrixFlow.getDocumentType(persona),
                         marks: 0,
                         markId: '',
                         // As a device is marked, the persona should be visible...

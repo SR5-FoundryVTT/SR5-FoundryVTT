@@ -1,4 +1,3 @@
-import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
@@ -13,6 +12,7 @@ import { MatrixAttributesType } from '../types/template/Matrix';
 import { TestCreator } from '@/module/tests/TestCreator';
 import { BiofeedbackResistTest } from '@/module/tests/BiofeedbackResistTest';
 import { ResistTestData } from '@/module/tests/flows/ResistTestDataFlow';
+import { Translation } from '../utils/strings';
 
 /**
  * General handling around everything matrix related.
@@ -352,7 +352,7 @@ export const MatrixFlow = {
         const targets: Shadowrun.MatrixTargetDocument[] = []
 
         for (const slave of host.slaves) {
-            const type = ActorMarksFlow.getDocumentType(slave);
+            const type = this.getDocumentType(slave);
             // For persona slaves get their possible token.
             // taM check this
             const token = 'getToken' in slave ? slave.getToken() : null;
@@ -388,7 +388,7 @@ export const MatrixFlow = {
                 // Skip actor tokens as they're collected separately.
                 if (slave instanceof SR5Actor && slave.getToken()) continue;
 
-                const type = ActorMarksFlow.getDocumentType(slave);
+                const type = this.getDocumentType(slave);
 
                 targets.push({
                     name: slave.name,
@@ -424,7 +424,7 @@ export const MatrixFlow = {
                 if (!actor.matrixPersonaIsVisible(target)) continue;
 
                 // taM Check this
-                const type = ActorMarksFlow.getDocumentType(document as any);
+                const type = this.getDocumentType(document as any);
                 targets.push({
                     name: token.name,
                     document: token.actor,
@@ -480,7 +480,7 @@ export const MatrixFlow = {
                 token: null,
                 runningSilent: device.isRunningSilent(),
                 network: document.network?.name ?? '',
-                type: ActorMarksFlow.getDocumentType(device),
+                type: this.getDocumentType(device),
                 icons: [],
                 marks: 0,
                 markId: null,
@@ -516,5 +516,24 @@ export const MatrixFlow = {
      */
     allGrids() {
         return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid')) ?? [];
+    },
+
+    /**
+     * Trasnform the given document to a string type for sheet display.
+     *
+     * NOTE: This function is part of sheet rendering, so we fail silently, to not break sheet rendering.
+     * TODO: This method should live under MatrixFlow.ts or similar.
+     * 
+     * @param document Any markable document
+     * @returns A translation key to be translated.
+     */
+    getDocumentType(document: SR5Actor | SR5Item): Translation {
+        if (document instanceof SR5Item && document.type === 'host') return 'SR5.ItemTypes.Host';
+        if (document instanceof SR5Item && document.type === 'grid') return 'SR5.ItemTypes.Grid';
+        if (document instanceof SR5Item) return 'SR5.Device';
+
+        if (document instanceof SR5Actor && document.type === 'ic') return 'SR5.ActorTypes.IC';
+
+        return 'SR5.Labels.ActorSheet.Persona';
     }
-};
+}
