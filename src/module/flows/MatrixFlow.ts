@@ -1,5 +1,4 @@
 import { SR5Actor } from '../actor/SR5Actor';
-import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SR5Item } from '../item/SR5Item';
@@ -133,16 +132,6 @@ export const MatrixFlow = {
         const targets = network?.isType('host') ?
             MatrixFlow.prepareHostTargets(actor) :
             MatrixFlow.prepareGridTargets(actor);
-
-        // Filter types of target for clear separation.
-        // targets = targets.filter(target => !target.document);
-
-        // const actors = targets.filter(target => target.document instanceof SR5Actor);
-        // const items = targets.filter(target => target.document instanceof SR5Item);
-
-        // const personas = actors.filter(target => target.document.hasPersona);
-        // const ics = actors.filter(target => target.document.isIC());
-        // const devices = items.filter(target => !target.document);
 
         return { targets };
     },
@@ -332,7 +321,6 @@ export const MatrixFlow = {
      * Trasnform the given document to a string type for sheet display.
      *
      * NOTE: This function is part of sheet rendering, so we fail silently, to not break sheet rendering.
-     * TODO: This method should live under MatrixFlow.ts or similar.
      * 
      * @param document Any markable document
      * @returns A translation key to be translated.
