@@ -3,7 +3,7 @@ import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
 import { SR5Actor } from '../SR5Actor';
-import { MatrixFlow } from '../../flows/MatrixFlow';
+import { MatrixSheetFlow } from '../../flows/MatrixSheetFlow';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
@@ -272,7 +272,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      */
     async _prepareMatrixActions() {
         const packActions = await this._getMatrixPackActions();
-        const actorActions = MatrixFlow.getMatrixActions(this.actor);
+        const actorActions = MatrixSheetFlow.getMatrixActions(this.actor);
         // Assume above collections return action only.
         let actions = [...packActions, ...actorActions] as SR5Item<'action'>[];
 
@@ -443,7 +443,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                         network: ActorMarksFlow.getDocumentNetwork(persona),
                         document: persona,
                         icons: [target],
-                        type: MatrixFlow.getDocumentType(persona),
+                        type: MatrixSheetFlow.getDocumentType(persona),
                         marks: 0,
                         markId: '',
                         // As a device is marked, the persona should be visible...

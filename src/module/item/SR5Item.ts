@@ -27,7 +27,6 @@ import { ItemRollDataFlow } from './flows/ItemRollDataFlow';
 import { ItemMarksFlow } from './flows/ItemMarksFlow';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { AttributeFieldType } from '../types/template/Attributes';
-import { MatrixFlow } from '../flows/MatrixFlow';
 import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';

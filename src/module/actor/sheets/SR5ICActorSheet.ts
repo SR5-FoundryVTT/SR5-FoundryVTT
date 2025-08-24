@@ -1,7 +1,6 @@
 import {SR5Item} from "../../item/SR5Item";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
-import { MatrixFlow } from '@/module/flows/MatrixFlow';
 
 interface ICActorSheetData extends MatrixActorSheetData {
     disableMarksEdit: boolean;

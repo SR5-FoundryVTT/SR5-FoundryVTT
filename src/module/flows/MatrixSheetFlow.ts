@@ -3,9 +3,9 @@ import { SR5Item } from '../item/SR5Item';
 import { Translation } from '../utils/strings';
 
 /**
- * General handling around everything matrix related.
+ * Handling of sheet presentation around matrix data.
  */
-export const MatrixFlow = {
+export const MatrixSheetFlow = {
     /**
      * Collect all matrix actions of an actor.
      * @param actor The actor to collect matrix actions from.

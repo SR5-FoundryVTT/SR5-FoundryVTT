@@ -2,7 +2,7 @@ import { MarksStorage, SetMarksOptions } from "../../storage/MarksStorage";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
 import { MatrixMarksType } from "@/module/types/template/Matrix";
-import { MatrixFlow } from "@/module/flows/MatrixFlow";
+import { MatrixSheetFlow } from "@/module/flows/MatrixSheetFlow";
 
 /**
  * This flow handles everything around matrix mark management.
@@ -157,7 +157,7 @@ export const ActorMarksFlow = {
             if (persona && persona.getMatrixDevice()?.uuid === uuid) document = persona;
 
             const network = ActorMarksFlow.getDocumentNetwork(document);
-            const type = MatrixFlow.getDocumentType(document);
+            const type = MatrixSheetFlow.getDocumentType(document);
             // Store actual target uuid, as sometimes shown and marked icons can differ.
             const markId = uuid;
 
