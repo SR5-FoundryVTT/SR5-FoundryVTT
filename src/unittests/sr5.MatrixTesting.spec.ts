@@ -3,6 +3,7 @@ import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { BruteForceTest } from "@/module/tests/BruteForceTest";
 import { OpposedBruteForceTest } from "@/module/tests/OpposedBruteForceTest";
+import { SR5 } from '@/module/config';
 
 export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -24,7 +25,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
                 }
             });
 
-            const test = await TestCreator.fromPackAction('matrix-actions', 'brute_force', decker, testOptions) as BruteForceTest;
+            const test = await TestCreator.fromPackAction(SR5.packNames.MatrixActionsPack, 'brute_force', decker, testOptions) as BruteForceTest;
             test.data.iconUuid = host.uuid;
             await test.execute();
 
@@ -52,7 +53,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
                 }
             });
 
-            const test = await TestCreator.fromPackAction('matrix-actions', 'brute_force', decker, testOptions) as BruteForceTest;
+            const test = await TestCreator.fromPackAction(SR5.packNames.MatrixActionsPack, 'brute_force', decker, testOptions) as BruteForceTest;
             test.data.iconUuid = ic.uuid;
             await test.execute();
 

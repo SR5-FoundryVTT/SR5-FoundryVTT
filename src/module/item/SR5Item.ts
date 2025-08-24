@@ -834,10 +834,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return ItemAvailabilityFlow.parseAvailibility(avail)
     }
 
-    getNetworkController(): string | undefined {
-        return this.getTechnologyData()?.networkController;
-    }
-
     async setMasterUuid(masterUuid: string | undefined): Promise<void> {
         await this.update({ system: { technology: { master: masterUuid } } });
     }
@@ -1384,15 +1380,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     /**
      * Transparently build a set of roll data based on this items type and network status.
      *
-     * This roll data can depend upon other actors and items.
+     * Values for testing can depend on other actors and items.
      *
      * NOTE: Since getRollData is sync by default, we can't retrieve compendium documents here, resulting in fromUuidSync calls down
      *       the line.
-     *
-     * TODO: Refactor this method using the Composition Pattern for each story.
      */
     override getRollData(options: RollDataOptions={}): any {
-        // Foundry is simply passing down 'system', so we have to duplicate to avoid contamination.
+        // Create a system data copy to avoid cross-contamination
         const rollData = this.system.toObject(false);
         return ItemRollDataFlow.getRollData(this, rollData, options);
     }

@@ -63,6 +63,7 @@ export const FLAGS = {
     TokenUseRoutingLib: 'TokenUseRoutingLib',
     GeneralActionsPack: 'GeneralActionsPack',
     MatrixActionsPack: 'MatrixActionsPack',
+    ICActionsPack: 'ICActionsPack',
     UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
     MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',

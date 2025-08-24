@@ -1,4 +1,4 @@
-const { SchemaField, NumberField, ArrayField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, ArrayField, StringField, BooleanField } = foundry.data.fields;
 
 export const PhysicalAttribute = new StringField({
     choices: ['body', 'agility', 'reaction', 'strength'],
@@ -31,12 +31,18 @@ export const ModListEntry = () => ({
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
+export const OverrideModEntry = () => ({
+    ...ModListEntry(),
+});
+
 export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
 
 export const ModifiableValue = () => ({
     ...BaseValuePair(),
     mod: ModList(),
-    override: new SchemaField(ModListEntry(), { required: false, nullable: true, initial: null }),
+    override: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
+    downgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
+    upgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
     temp: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
