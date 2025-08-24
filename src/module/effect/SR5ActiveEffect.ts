@@ -287,14 +287,14 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     static applyOverrideToModifiableValue(effect: SR5ActiveEffect, model: DataModel.Any, change: ActiveEffect.ChangeData, current, delta) {
         const modValue = SR5ActiveEffect.getModifiableValue(model, change.key);
-        if (modValue) {
-            modValue.override = { name: effect.name, value: Number(change.value) };
-            modValue.value = Number(change.value);
+        if (!modValue) return false;
 
-            return true;
-        }
+        const value = Number(change.value);
+        if (isNaN(value)) return true;
 
-        return false;
+        modValue.override = { name: effect.name, value };
+
+        return true;
     }
 
     /**
@@ -306,7 +306,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (!modValue) return false;
 
         const value = Number(change.value);
-        if (isNaN(value)) return false;
+        if (isNaN(value)) return true;
 
         // Apply only the strongest (highest) upgrade
         if (!modValue.upgrade || value > modValue.upgrade.value)
@@ -324,7 +324,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (!modValue) return false;
 
         const value = Number(change.value);
-        if (isNaN(value)) return false;
+        if (isNaN(value)) return true;
 
         // Store only the strongest (lowest) cap
         if (!modValue.downgrade || value < modValue.downgrade.value)
