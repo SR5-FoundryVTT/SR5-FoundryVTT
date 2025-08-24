@@ -55,7 +55,7 @@ export const shadowrunDriver = (context: QuenchBatchContext) => {
             const vehicle = await createVehicle();
             await vehicle.addVehicleDriver(driver.uuid);
 
-            const test = await TestCreator.fromPackAction('general-actions', 'drone_pilot_vehicle', vehicle, testOptions);
+            const test = await TestCreator.fromPackAction('sr5e-general-actions', 'drone_pilot_vehicle', vehicle, testOptions);
             assert.notEqual(test, undefined);
             await test!.execute();
             assert.equal(test!.pool.value, 10);
@@ -67,7 +67,7 @@ export const shadowrunDriver = (context: QuenchBatchContext) => {
             await vehicle.update({system: {controlMode: 'manual'}});
             await vehicle.addVehicleDriver(driver.uuid);
 
-            const test = await TestCreator.fromPackAction('general-actions', 'drone_pilot_vehicle', vehicle, testOptions);
+            const test = await TestCreator.fromPackAction('sr5e-general-actions', 'drone_pilot_vehicle', vehicle, testOptions);
             assert.notEqual(test, undefined);
             await test!.execute();
             assert.equal(test!.pool.value, 8);
