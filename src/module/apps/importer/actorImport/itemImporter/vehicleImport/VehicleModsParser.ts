@@ -10,8 +10,8 @@ export default class VehicleModsParser extends Parser<'modification'> {
 
         system.type = 'vehicle';
 
-       // Assign import flags
-       system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
-       setSubType(system, this.parseType, formatAsSlug(itemData.category_english));
+        // Assign import flags
+        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
+        setSubType(system, this.parseType, formatAsSlug(itemData.category_english));
     }
 }

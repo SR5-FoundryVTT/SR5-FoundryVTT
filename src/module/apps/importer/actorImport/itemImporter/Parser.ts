@@ -12,6 +12,8 @@ export type BaseType = {
     sourceid?: string;
     name: string | null;
     name_english?: string;
+    fullname?: string;
+    fullname_english?: string;
     source?: string | null;
     page?: string | null;
     description?: string | null;
@@ -42,7 +44,7 @@ export abstract class Parser<T extends ItemSystems> {
     protected createItem(itemData: BaseType) {
         type FlagType = NonNullable<NonNullable<Item.CreateData['flags']>['shadowrun5e']>;
         return {
-            name: itemData.name ?? Parser.DEFAULT_NAME,
+            name: itemData.fullname ?? itemData.name ?? Parser.DEFAULT_NAME,
             type: this.parseType,
             img: null as string | null,
             _id: foundry.utils.randomID(),
@@ -105,14 +107,12 @@ export abstract class Parser<T extends ItemSystems> {
                 const item = fetchedItem ?? this.createItem(itemData);
                 item._id = foundry.utils.randomID();
 
+                item.name = itemData.fullname ?? itemData.name ?? Parser.DEFAULT_NAME;
                 this.parseDescription(item, itemData);
                 this.parseTechnology(item, itemData);
                 this.parseItem(item, itemData);
 
-                const embeddedItems = await this.getEmbeddedItems(itemData);
-
-                if (embeddedItems.length)
-                    item.flags.shadowrun5e.embeddedItems = embeddedItems;
+                item.flags.shadowrun5e.embeddedItems = await this.getEmbeddedItems(itemData);
 
                 if (Parser.iconList && !item.img)
                     item.img = IconAssign.iconAssign(item.system.importFlags, Parser.iconList, item.system);

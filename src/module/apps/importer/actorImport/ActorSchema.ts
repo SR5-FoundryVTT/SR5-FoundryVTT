@@ -123,8 +123,8 @@ export type ActorSchema = {
         sourceid: string;
         istechnomancertradition: string;
         name: string;
-        fullname: string;
         name_english: string;
+        fullname: string;
         fullname_english: string;
         extra: MaybeEmpty<string>;
         extra_english: MaybeEmpty<string>;
@@ -303,7 +303,7 @@ export type ActorSchema = {
     contacts: MaybeEmpty<{
         contact: OneOrMany<{
             guid: string;
-            name: string;
+            name: MaybeEmpty<string>;
             role: MaybeEmpty<string>;
             location: MaybeEmpty<string>;
             connection: string;
@@ -325,10 +325,10 @@ export type ActorSchema = {
     limitmodifiersphys: MaybeEmpty<{
         limitmodifier: OneOrMany<{
             guid: string;
-            fullname: string;
             name: string;
-            fullname_english: string;
             name_english: string;
+            fullname: string;
+            fullname_english: string;
             bonus: string;
             limit: string;
             condition: MaybeEmpty<string>;
@@ -339,10 +339,10 @@ export type ActorSchema = {
     limitmodifiersment: MaybeEmpty<{
         limitmodifier: OneOrMany<{
             guid: string;
-            fullname: string;
             name: string;
-            fullname_english: string;
             name_english: string;
+            fullname: string;
+            fullname_english: string;
             bonus: string;
             limit: string;
             condition: string;
@@ -353,10 +353,10 @@ export type ActorSchema = {
     limitmodifierssoc: MaybeEmpty<{
         limitmodifier: OneOrMany<{
             guid: string;
-            fullname: string;
             name: string;
-            fullname_english: string;
             name_english: string;
+            fullname: string;
+            fullname_english: string;
             bonus: string;
             limit: string;
             condition: string;
@@ -392,8 +392,8 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
             fullname_english: string;
             descriptors: string;
             descriptors_english: string;
@@ -425,8 +425,8 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
             fullname_english: string;
             extra: MaybeEmpty<string>;
             extra_english: MaybeEmpty<string>;
@@ -443,10 +443,10 @@ export type ActorSchema = {
                 enhancement: OneOrMany<{
                     guid: string;
                     sourceid: string;
-                    fullname: string;
                     name: string;
-                    fullname_english: string;
                     name_english: string;
+                    fullname: string;
+                    fullname_english: string;
                     source: MaybeEmpty<string>;
                     page: MaybeEmpty<string>;
                     improvementsource: string;
@@ -488,8 +488,8 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
             fullname_english: string;
             duration: string;
             duration_english: string;
@@ -507,8 +507,8 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
             requiresprogram: string;
             source: MaybeEmpty<string>;
             page: MaybeEmpty<string>;
@@ -520,8 +520,8 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
             fullname_english: string;
             source: MaybeEmpty<string>;
             page: MaybeEmpty<string>;
@@ -545,8 +545,9 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
+            fullname_english: string;
             category: string;
             category_english: string;
             armor: string;
@@ -569,8 +570,9 @@ export type ActorSchema = {
                     guid: string;
                     sourceid: string;
                     name: string;
-                    fullname: string;
                     name_english: string;
+                    fullname: string;
+                    fullname_english: string;
                     category: string;
                     category_english: string;
                     armor: string;
@@ -682,6 +684,8 @@ export type ActorSchema = {
                     sourceid: string;
                     name: string;
                     name_english: string;
+                    fullname: string;
+                    fullname_english: string;
                     mount: string;
                     extramount: string;
                     addmount: MaybeEmpty<string>;
@@ -765,6 +769,8 @@ export type ActorSchema = {
             sourceid?: string;
             name: string;
             name_english: string;
+            fullname: string;
+            fullname_english: string;
             category: string;
             category_english: string;
             ess: string;
@@ -810,6 +816,8 @@ export type ActorSchema = {
             sourceid: string;
             name: string;
             name_english: string;
+            fullname: string;
+            fullname_english: string;
             extra: MaybeEmpty<string>;
             extra_english: MaybeEmpty<string>;
             bp: string;
@@ -841,6 +849,7 @@ export type ActorSchema = {
             increment: string;
             bonuslp: string;
             baselifestyle: string;
+            baselifestyle_english: string;
             trustfund: TruthyString;
             source: MaybeEmpty<string>;
             page: MaybeEmpty<string>;
@@ -849,8 +858,11 @@ export type ActorSchema = {
                     guid: string;
                     sourceid: string;
                     name: string;
+                    name_english: string;
                     fullname: string;
+                    fullname_english: string;
                     formattedname: string;
+                    formattedname_english: string;
                     extra: MaybeEmpty<string>;
                     lp: string;
                     cost: string;
@@ -874,6 +886,8 @@ export type ActorSchema = {
             sourceid: string;
             name: string;
             name_english: string;
+            fullname: string;
+            fullname_english: string;
             category: string;
             category_english: string;
             ispersona: TruthyString;
@@ -938,6 +952,7 @@ export type ActorSchema = {
             name_english: string;
             category: string;
             category_english: string;
+            grade: string;
             qty: string;
             addictionthreshold: string;
             addictionrating: string;
@@ -945,6 +960,7 @@ export type ActorSchema = {
             initiativedice: string;
             speed: string;
             duration: string;
+            duration_english: string;
             crashdamage: string;
             avail: string;
             avail_english: string;
@@ -985,6 +1001,7 @@ export type ActorSchema = {
             name: string;
             name_english: string;
             fullname: string;
+            fullname_english: string;
             category: string;
             category_english: string;
             isdrone: TruthyString;
@@ -1025,6 +1042,7 @@ export type ActorSchema = {
                     name: string;
                     name_english: string;
                     fullname: string;
+                    fullname_english: string;
                     category: string;
                     category_english: string;
                     limit: MaybeEmpty<string>;
@@ -1065,8 +1083,8 @@ export type ActorSchema = {
                 guid: string;
                 sourceid: string;
                 name: string;
-                fullname: string;
                 name_english: string;
+                fullname: string;
                 fullname_english: string;
                 source: MaybeEmpty<string>;
                 page: MaybeEmpty<string>;
@@ -1080,8 +1098,8 @@ export type ActorSchema = {
                 guid: string;
                 sourceid: string;
                 name: string;
-                fullname: string;
                 name_english: string;
+                fullname: string;
                 fullname_english: string;
                 source: MaybeEmpty<string>;
                 page: MaybeEmpty<string>;
@@ -1094,8 +1112,8 @@ export type ActorSchema = {
                 guid: string;
                 sourceid: string;
                 name: string;   
-                fullname: string;
                 name_english: string;
+                fullname: string;
                 fullname_english: string;
                 source: MaybeEmpty<string>;
                 page: MaybeEmpty<string>;
@@ -1109,8 +1127,8 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
             fullname_english: string;
             source: MaybeEmpty<string>;
             page: MaybeEmpty<string>;
@@ -1124,8 +1142,8 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
             fullname_english: string;
             source: MaybeEmpty<string>;
             page: MaybeEmpty<string>;
@@ -1138,8 +1156,8 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;   
-            fullname: string;
             name_english: string;
+            fullname: string;
             fullname_english: string;
             source: MaybeEmpty<string>;
             page: MaybeEmpty<string>;
@@ -1152,8 +1170,8 @@ export type ActorSchema = {
             guid: string;
             sourceid: string;
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
             fullname_english: string;
             extra: MaybeEmpty<string>;
             extra_english: MaybeEmpty<string>;
@@ -1176,8 +1194,8 @@ export type ActorSchema = {
     sustainedobjects: MaybeEmpty<{
         sustainedobject: OneOrMany<{
             name: string;
-            fullname: string;
             name_english: string;
+            fullname: string;
             force: string;
             nethits: string;
             self: string;

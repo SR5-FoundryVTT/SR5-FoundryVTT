@@ -25,11 +25,12 @@ export default class VehicleParser {
         return Promise.all<SR5Actor>(vehicles.map<Promise<SR5Actor>>(async (vehicle) => {
             const vehicleActor = (await SR5Actor.create({ name: vehicle.name, type: "vehicle" }) as SR5Actor<'vehicle'>);
 
-            const promises : Array<Promise<any>> = [];
-            promises.push(new WeaponParser().parseWeapons(vehicle));
-            promises.push(new GearsParser().parseItems(getArray(vehicle.gears?.gear)));
-            promises.push(new MountedWeaponParser().parseWeapons(vehicle))
-            promises.push(new VehicleModsParser().parseItems(vehicle.mods?.mod))
+            const items: Item.CreateData[] = [
+                ...await new WeaponParser().parseWeapons(vehicle),
+                ...await new GearsParser().parseItems(vehicle.gears?.gear),
+                ...await new MountedWeaponParser().parseWeapons(vehicle),
+                ...await new VehicleModsParser().parseItems(vehicle.mods?.mod)
+            ];
 
             let handling: string | undefined;
             let off_road_handling: string | undefined;
@@ -79,7 +80,7 @@ export default class VehicleParser {
                 folder: actor.folder?.id
             });
 
-            await vehicleActor.createEmbeddedDocuments('Item', (await Promise.all(promises)).flat());
+            await vehicleActor.createEmbeddedDocuments('Item', items);
 
             return vehicleActor;
         }));
