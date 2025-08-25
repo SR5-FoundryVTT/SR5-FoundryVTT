@@ -1,6 +1,7 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5TestFactory } from './utils';
 import { TestCreator } from '@/module/tests/TestCreator';
+import { SR5 } from '@/module/config';
 
 export const shadowrunDriver = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -55,7 +56,7 @@ export const shadowrunDriver = (context: QuenchBatchContext) => {
             const vehicle = await createVehicle();
             await vehicle.addVehicleDriver(driver.uuid);
 
-            const test = await TestCreator.fromPackAction('sr5e-general-actions', 'drone_pilot_vehicle', vehicle, testOptions);
+            const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_pilot_vehicle', vehicle, testOptions);
             assert.notEqual(test, undefined);
             await test!.execute();
             assert.equal(test!.pool.value, 10);
@@ -67,7 +68,7 @@ export const shadowrunDriver = (context: QuenchBatchContext) => {
             await vehicle.update({system: {controlMode: 'manual'}});
             await vehicle.addVehicleDriver(driver.uuid);
 
-            const test = await TestCreator.fromPackAction('sr5e-general-actions', 'drone_pilot_vehicle', vehicle, testOptions);
+            const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_pilot_vehicle', vehicle, testOptions);
             assert.notEqual(test, undefined);
             await test!.execute();
             assert.equal(test!.pool.value, 8);
