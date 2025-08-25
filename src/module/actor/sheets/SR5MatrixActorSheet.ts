@@ -58,7 +58,6 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         data.selectedMatrixTarget = this.selectedMatrixTarget;
 
         // When target overview is shown, collect all matrix targets.
-        // TODO: taMiF this is a bis of a mess and will need to be reusable across both targets and marked docs and different actor types.
         const {targets} = MatrixTargetingFlow.getTargets(this.actor);
 
         for (const target of targets) {
@@ -413,24 +412,6 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
             // Handle persona icons.
             if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona) {
-                // Peresona device icons only show as personas, not as devices.
-                // const personaDevice = persona.getMatrixDevice() as SR5Item;
-                // if (target.document.uuid === personaDevice?.uuid) {
-                //     targets.push({
-                //         name: Helpers.getChatSpeakerName(persona),
-                //         token: persona.getToken(),
-                //         network: persona.network?.name ?? '',
-                //         document: persona,
-                //         icons: [],
-                //         type: MatrixFlow.getDocumentType(persona),
-                //         marks: target.marks,
-                //         markId: persona.uuid,
-                //         runningSilent: persona.isRunningSilent,
-                //         selected: this.selectedMatrixTarget === target.document.uuid
-                //     });
-                //     continue;
-                // }
-
                 // Attach device icon to their persona.
                 // Already in target list...
                 const personaTarget = targets.find(t => t.document.uuid === persona.uuid);
@@ -462,7 +443,6 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                 // An already marked icon will again show up when all icons are collected.
                 // So we can simply overwrite all icons here without any filtering.
 
-                // TODO: taM check this
                 target.icons = MatrixTargetingFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
