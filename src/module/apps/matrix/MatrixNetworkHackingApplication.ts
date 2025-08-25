@@ -1,6 +1,5 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5 } from "../../config";
-import { MatrixFlow } from "../../flows/MatrixFlow";
 import { Helpers } from "../../helpers";
 import { MatrixNetworkFlow } from "../../item/flows/MatrixNetworkFlow";
 import { SR5Item } from "../../item/SR5Item";
@@ -79,8 +78,8 @@ export class MatrixNetworkHackingApplication extends Application {
         data.config = SR5;
 
         // Prepare available networks for selection.
-        data.grids = MatrixFlow.visibleGrids();
-        data.hosts = MatrixFlow.visibelHosts();
+        data.grids = MatrixNetworkFlow.visibleGrids();
+        data.hosts = MatrixNetworkFlow.visibleHosts();
 
         return data;
     }

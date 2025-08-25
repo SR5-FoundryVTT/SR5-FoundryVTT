@@ -1,8 +1,8 @@
 import { MarksStorage, SetMarksOptions } from "../../storage/MarksStorage";
 import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
-import { Translation } from "../../utils/strings";
 import { MatrixMarksType } from "@/module/types/template/Matrix";
+import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 
 /**
  * This flow handles everything around matrix mark management.
@@ -157,7 +157,7 @@ export const ActorMarksFlow = {
             if (persona && persona.getMatrixDevice()?.uuid === uuid) document = persona;
 
             const network = ActorMarksFlow.getDocumentNetwork(document);
-            const type = ActorMarksFlow.getDocumentType(document);
+            const type = MatrixNetworkFlow.getDocumentType(document);
             // Store actual target uuid, as sometimes shown and marked icons can differ.
             const markId = uuid;
 
@@ -187,25 +187,6 @@ export const ActorMarksFlow = {
         if (document instanceof SR5Actor && document.hasNetwork) return document.network?.name ?? '';
 
         return '';
-    },
-
-    /**
-     * Trasnform the given document to a string type for sheet display.
-     *
-     * NOTE: This function is part of sheet rendering, so we fail silently, to not break sheet rendering.
-     * TODO: This method should live under MatrixFlow.ts or similar.
-     * 
-     * @param document Any markable document
-     * @returns A translation key to be translated.
-     */
-    getDocumentType(document: SR5Actor | SR5Item): Translation {
-        if (document instanceof SR5Item && document.type === 'host') return 'SR5.ItemTypes.Host';
-        if (document instanceof SR5Item && document.type === 'grid') return 'SR5.ItemTypes.Grid';
-        if (document instanceof SR5Item) return 'SR5.Device';
-
-        if (document instanceof SR5Actor && document.type === 'ic') return 'SR5.ActorTypes.IC';
-
-        return 'SR5.Labels.ActorSheet.Persona';
     },
 
     /**
