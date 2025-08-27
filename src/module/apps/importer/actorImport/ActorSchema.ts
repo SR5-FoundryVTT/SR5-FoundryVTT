@@ -734,7 +734,7 @@ export type ActorSchema = {
                     count: string;
                     location: MaybeEmpty<string>;
                     id: string;
-                    ammotype: {
+                    ammotype?: {
                         weaponbonusdamage: string;
                         weaponbonusdamage_english: string;
                         weaponbonusap: string;

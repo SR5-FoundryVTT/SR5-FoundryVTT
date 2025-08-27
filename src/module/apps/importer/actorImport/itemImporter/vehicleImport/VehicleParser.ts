@@ -1,88 +1,74 @@
-import { importOptionsType } from "../../characterImporter/CharacterImporter";
-import { getArray } from "../importHelper/BaseParserFunctions";
 import { WeaponParser } from "../weaponImport/WeaponParser";
 import { GearsParser } from "../importHelper/GearsParser";
 import MountedWeaponParser from "./MountedWeaponParser";
 import { SR5Actor } from '../../../../../actor/SR5Actor';
 import VehicleModsParser from "./VehicleModsParser";
-import { ActorSchema } from "../../ActorSchema";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
+import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
+import { ExtractItemType } from "../Parser";
+import { DataDefaults } from "@/module/data/DataDefaults";
 
-export default class VehicleParser {
+export interface BlankVehicle extends Actor.CreateData {
+    type: 'vehicle',
+    name: string,
+    items: Item.CreateData[],
+    effects: ActiveEffect.CreateData[],
+    system: ReturnType<typeof DataDefaults.baseSystemData<'vehicle'>>,
+};
 
-    async parseVehicles(actor: SR5Actor<'character'>, chummerChar: ActorSchema, importOptions: importOptionsType): Promise<Array<SR5Actor>|undefined> {
-        if(!importOptions.vehicles) {
-            return;
-        }
+export class VehicleParser {
+    private getStartObj(vehicle: ExtractItemType<'vehicles', 'vehicle'>): BlankVehicle {
+        return {
+            type: 'vehicle',
+            items: [],
+            effects: [],
+            system: DataDefaults.baseSystemData('vehicle'),
+            name: vehicle.fullname ?? vehicle.name ?? "Unnamed Vehicle",
+        };
+    }
 
-        if(!game.user?.can("ACTOR_CREATE")) {
-            ui.notifications?.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
-            return;
-        }
+    async parseVehicles(actor: Actor.Stored, vehicles: ExtractItemType<'vehicles', 'vehicle'>[]) {
+        const vehicleActors: BlankVehicle[] = [];
 
-        const vehicles = getArray(chummerChar.vehicles?.vehicle);
+        for (const vehicle of vehicles) {
+            const vehicleActorData = this.getStartObj(vehicle);
+            vehicleActorData.folder = actor.folder?.id ?? null;
 
-        return Promise.all<SR5Actor>(vehicles.map<Promise<SR5Actor>>(async (vehicle) => {
-            const vehicleActor = (await SR5Actor.create({ name: vehicle.name, type: "vehicle" }) as SR5Actor<'vehicle'>);
+            const system = vehicleActorData.system;
+            system.driver = actor.id!;
+            system.isDrone = vehicle.isdrone === "True";
 
-            const items: Item.CreateData[] = [
+            vehicleActorData.items = [
                 ...await new WeaponParser().parseWeapons(vehicle),
                 ...await new GearsParser().parseItems(vehicle.gears?.gear),
                 ...await new MountedWeaponParser().parseWeapons(vehicle),
                 ...await new VehicleModsParser().parseItems(vehicle.mods?.mod)
             ];
 
-            let handling: string | undefined;
-            let off_road_handling: string | undefined;
-            if(vehicle.handling.includes("/")) {
-                handling = vehicle.handling.split("/")[0];
-                off_road_handling =  vehicle.handling.split("/")[1]
-            } else {
-                handling = vehicle.handling
-                off_road_handling =  vehicle.handling
-            }
+            const [handling, off_road_handling] = vehicle.handling?.split('/') ?? [vehicle.handling, vehicle.handling];
+            const [speed, off_road_speed] = vehicle.speed?.split('/') ?? [vehicle.speed, vehicle.speed];
 
-            let speed;
-            let off_road_speed;
-            if(vehicle.speed.includes("/")) {
-                speed = vehicle.speed.split("/")[0];
-                off_road_speed =  vehicle.speed.split("/")[1]
-            } else {
-                speed = vehicle.speed
-                off_road_speed =  vehicle.speed
-            }
+            system.vehicle_stats.pilot.base = Number(vehicle.pilot) || 0;
+            system.vehicle_stats.handling.base = Number(handling) || 0;
+            system.vehicle_stats.off_road_handling.base = Number(off_road_handling) || 0;
+            system.vehicle_stats.speed.base = Number(speed) || 0;
+            system.vehicle_stats.off_road_speed.base = Number(off_road_speed) || 0;
+            system.vehicle_stats.acceleration.base = Number(vehicle.accel) || 0;
+            system.vehicle_stats.sensor.base = Number(vehicle.sensor) || 0;
+            system.vehicle_stats.seats.base = Number(vehicle.seats) || 0;
 
-            const system = {
-                driver: actor.id,
-                vehicle_stats: {
-                    pilot: { base: Number(vehicle.pilot) || 0 },
-                    handling: { base: Number(handling) || 0 },
-                    off_road_handling: { base: Number(off_road_handling) || 0 },
-                    speed: { base: Number(speed) || 0 },
-                    off_road_speed: { base: Number(off_road_speed) || 0 },
-                    acceleration: { base: Number(vehicle.accel) || 0 },
-                    sensor: { base: Number(vehicle.sensor) || 0 },
-                    seats: { base: Number(vehicle.seats) || 0 }
-                },
-                attributes: { body: { base: Number(vehicle.body) || 0 } },
-                armor: { base: Number(vehicle.armor) || 0 },
-                isDrone: vehicle.isdrone === "True"
-            };
+            system.attributes.body.base = Number(vehicle.body) || 0;
+            system.armor.base = Number(vehicle.armor) || 0;
 
             const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.vehicle.schema, system);
             if (consoleLogs) {
-                console.warn(`Document Sanitized on Import: Name: ${vehicle.name}\n`);
+                console.warn(`Vehicle Sanitized on Import: Name: ${vehicle.name}\n`);
                 console.table(consoleLogs);
             }
 
-            await vehicleActor.update({
-                system,
-                folder: actor.folder?.id
-            });
+            vehicleActors.push(vehicleActorData);
+        }
 
-            await vehicleActor.createEmbeddedDocuments('Item', items);
-
-            return vehicleActor;
-        }));
+        return vehicleActors;
     }
 }

@@ -14,8 +14,13 @@ export class ClipParser extends Parser<'ammo'> {
     }
 
     protected parseItem(item: BlankItem<'ammo'>, itemData: ClipType) {
-        const ammobonus = itemData.ammotype;
         const system = item.system;
+        const ammobonus = itemData.ammotype;
+
+        system.technology.quantity = Number(itemData.count) || 1;
+        system.technology.equipped = itemData.name === this.currentWeapon.currentammo;
+
+        if (!ammobonus) return;
 
         system.ap = Number(ammobonus.weaponbonusap_english) || 0;
         system.accuracy = Number(ammobonus.weaponbonusacc) || 0;
@@ -28,6 +33,5 @@ export class ClipParser extends Parser<'ammo'> {
             system.element = (ammobonus.weaponbonusdamage_english || '').match(/\(e\)/)?.pop() === '(e)' ? 'electricity' : '';
         }
 
-        system.technology.equipped = itemData.name === this.currentWeapon.currentammo;
     }
 }

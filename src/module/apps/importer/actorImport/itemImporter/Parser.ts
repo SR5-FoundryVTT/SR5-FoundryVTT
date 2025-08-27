@@ -21,10 +21,11 @@ export type BaseType = {
     rating?: string | null;
     avail?: string | null;
     qty?: string | null;
-    cost?: string | null;
+    owncost?: string | null;
     equipped?: "True"|"False"|null;
     conditionmonitor?: string | null;
     conceal?: string | null;
+    rawconceal?: string | null;
 };
 
 type Unwrap<T> = T extends Array<infer U> ? U : T;
@@ -83,8 +84,8 @@ export abstract class Parser<T extends ItemSystems> {
         if (itemData.qty != null)
             technology.quantity = Number(itemData.qty) || 0;
 
-        if (itemData.cost != null)
-            technology.cost = Number(itemData.cost.replace(/[^\d.-]/g, "")) || 0;
+        if (itemData.owncost != null)
+            technology.cost = Number(itemData.owncost.replace(/[^\d.-]/g, "")) || 0;
 
         if (itemData.equipped != null)
             technology.equipped = itemData.equipped === "True";
@@ -92,8 +93,8 @@ export abstract class Parser<T extends ItemSystems> {
         if (itemData.conditionmonitor != null)
             technology.condition_monitor.max = Number(itemData.conditionmonitor) || 0;
 
-        if (itemData.conceal != null)
-            technology.conceal.base = Number(itemData.conceal) || 0;
+        if (itemData.rawconceal != null || itemData.conceal != null)
+            technology.conceal.base = Number(itemData.rawconceal ?? itemData.conceal) || 0;
     }
 
     public async parseItems(itemsData: BaseType[] | BaseType | undefined) {

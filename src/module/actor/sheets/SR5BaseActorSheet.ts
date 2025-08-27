@@ -9,7 +9,6 @@ import { SR5Actor } from "../SR5Actor";
 import { KnowledgeSkillEditSheet } from "../../apps/skills/KnowledgeSkillEditSheet";
 import { LanguageSkillEditSheet } from "../../apps/skills/LanguageSkillEditSheet";
 import { MoveInventoryDialog } from "../../apps/dialogs/MoveInventoryDialog";
-import { ChummerImportForm } from '../../apps/chummer-import-form';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
@@ -357,7 +356,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
         html.find('.open-source').on('click', this._onOpenSource.bind(this));
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
-        html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
 
         // Misc. item type actions...
         html.find('.reload-ammo').on('click', async (event) => this._onReloadAmmo(event, false));
@@ -1973,19 +1971,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         const changedSlot = event.currentTarget.value;
 
         return item.changeMatrixAttributeSlot(changedSlot, attribute);
-    }
-
-    /**
-     * Open the Chummer Character import handling.
-     * @param event
-     */
-    _onShowImportCharacter(event) {
-        event.preventDefault();
-        const options = {
-            name: 'chummer-import',
-            title: 'Chummer Import',
-        };
-        new ChummerImportForm(this.actor, options).render(true);
     }
 
     _setupCustomCheckbox(html) {

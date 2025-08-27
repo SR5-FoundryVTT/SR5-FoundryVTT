@@ -1,4 +1,6 @@
 import { Parser } from 'xml2js';
+import { SR5Item } from '@/module/item/SR5Item';
+import { SR5Actor } from '@/module/actor/SR5Actor';
 import { ParseData, Schemas } from "../parser/Types";
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
@@ -141,7 +143,7 @@ export abstract class DataImporter {
 
         for (const [key, items] of itemMap.entries()) {
             const compendium = Constants.MAP_COMPENDIUM_KEY[key];
-            await (compendium.type === 'Actor' ? Actor : Item).create(items as any, { pack: "world." + compendium.pack, keepId: true });
+            await (compendium.type === 'Actor' ? SR5Actor : SR5Item).create(items as any, { pack: "world." + compendium.pack, keepId: true });
         }
 
         notification.remove();

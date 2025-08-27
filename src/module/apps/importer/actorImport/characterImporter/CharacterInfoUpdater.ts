@@ -1,10 +1,15 @@
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { InitiationParser } from "../itemImporter/magicImport/InitiationParser";
-import { SubmersionParser } from "../itemImporter/technoImport/SubmersionParser";
-import { ActorSchema } from "../ActorSchema";
-import { SR5Actor } from "src/module/actor/SR5Actor";
-import { SkillFieldType } from "src/module/types/template/Skills";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
+import { SkillFieldType } from "src/module/types/template/Skills";
+import { DataDefaults } from "src/module/data/DataDefaults";
+import { ActorSchema } from "../ActorSchema";
+
+export interface BlankCharacter extends Actor.CreateData {
+    type: 'character',
+    name: string,
+    items: Item.CreateData[],
+    effects: ActiveEffect.CreateData[],
+    system: ReturnType<typeof DataDefaults.baseSystemData<'character'>>,
+};
 
 /**
  * Parses all non-item character information from a chummer character object.
@@ -36,29 +41,23 @@ export class CharacterInfoUpdater {
 
     /**
      * Parses the actor data from the chummer file and returns an updated clone of the actor data.
-     * @param {*} actorSource The actor data (actor not actor.system) that is used as the basis for the import. Will not be changed.
+     * @param {*} actor The actor data (actor not actor.system) that is used as the basis for the import. Will not be changed.
      * @param {*} chummerChar The chummer character to parse.
      */
-    async update(actorSource: SR5Actor<'character'>, chummerChar: ActorSchema) {
-
-        const clonedActorSource = foundry.utils.duplicate(actorSource);
-
+    async update(actor: BlankCharacter, chummerChar: ActorSchema) {
         // Name is required, so we need to always set something (even if the chummer field is empty)
-        clonedActorSource.name = chummerChar.alias ?? chummerChar.name ?? '[Name not found]';
+        actor.name = chummerChar.alias ?? chummerChar.name ?? '[Name not found]';
 
-        this.importBasicData(clonedActorSource.system, chummerChar);
-        await this.importBio(clonedActorSource.system, chummerChar);
-        this.importAttributes(clonedActorSource.system, chummerChar)
-        this.importInitiative(clonedActorSource.system, chummerChar);
-        this.importSkills(clonedActorSource.system, chummerChar);
+        this.importBasicData(actor.system, chummerChar);
+        await this.importBio(actor.system, chummerChar);
+        this.importAttributes(actor.system, chummerChar);
+        this.importInitiative(actor.system, chummerChar);
+        this.importSkills(actor.system, chummerChar);
 
-        if(chummerChar.critterpowers?.critterpower)
-            clonedActorSource.system.is_critter = true;
-
-        return clonedActorSource;
+        actor.system.is_critter = chummerChar.critter === 'True';
     }
 
-    importBasicData(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
+    importBasicData(system: BlankCharacter['system'], chummerChar: ActorSchema) {
         if (chummerChar.metatype) {
             // Avoid i18n metatype field issues. Chummer metatype aren't lowercase but foundry system metatypes are.
             system.metatype = chummerChar.metatype_english.toLowerCase();
@@ -73,9 +72,12 @@ export class CharacterInfoUpdater {
 
         if (chummerChar.technomancer === 'True') {
             system.special = 'resonance';
-            
-            if (chummerChar.initiationgrade)
-                new SubmersionParser().parseSubmersions(chummerChar, system)
+
+            const initiationGrades = IH.getArray(chummerChar.initiationgrade?.initiationgrade);
+            const technoGrades = initiationGrades
+                .filter(grade => grade.technomancer === 'True')
+                .map(grade => Number(grade.grade) || 0);
+            system.technomancer.submersion = Math.max(0, ...technoGrades);
         } else if (chummerChar.magician === 'True' || chummerChar.adept === 'True') {
             system.special = 'magic';
 
@@ -95,12 +97,15 @@ export class CharacterInfoUpdater {
             if (filteredAttr)
                 system.magic.attribute = this.parseAttName(filteredAttr);
 
-            if (chummerChar.initiationgrade)
-                new InitiationParser().parseInitiation(chummerChar, system);
+            const initiationGrades = IH.getArray(chummerChar.initiationgrade?.initiationgrade);
+            const magicianGrades = initiationGrades
+                .filter(grade => grade.technomancer === 'False')
+                .map(grade => Number(grade.grade) || 0);
+            system.magic.initiation = Math.max(0, ...magicianGrades);
         }
     }
 
-    async importBio(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
+    async importBio(system: BlankCharacter['system'], chummerChar: ActorSchema) {
         system.description.value = '';
 
         // Adding the option async.true is necessary for the pdf-pager module not to cause an error on import.
@@ -120,7 +125,7 @@ export class CharacterInfoUpdater {
             system.description.value += await foundry.applications.ux.TextEditor.implementation.enrichHTML(chummerChar.notes + '<br/>');
     }
 
-    importAttributes(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
+    importAttributes(system: BlankCharacter['system'], chummerChar: ActorSchema) {
         if(!chummerChar.attributes) return;
 
         for (const att of chummerChar.attributes[1].attribute) {
@@ -138,7 +143,7 @@ export class CharacterInfoUpdater {
     }
 
     // TODO: These modifiers are very unclear in how they're used here and where they come from.
-    importInitiative(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
+    importInitiative(system: BlankCharacter['system'], chummerChar: ActorSchema) {
         system.modifiers.meat_initiative = Number(chummerChar.initbonus) || 0;
 
         // 'initdice' contains the total amount of initiative dice, not just the bonus.
@@ -147,7 +152,7 @@ export class CharacterInfoUpdater {
         system.modifiers.matrix_initiative_dice = (Number(chummerChar.matrixarinitdice) || 3) - 3;
     }
 
-    importSkills(system: SR5Actor<'character'>['system'], chummerChar: ActorSchema) {
+    importSkills(system: BlankCharacter['system'], chummerChar: ActorSchema) {
         const skills = IH.getArray(chummerChar.skills.skill);
 
         const languageSkills: typeof skills = [];
@@ -170,7 +175,7 @@ export class CharacterInfoUpdater {
         this.handleActiveSkills(system, activeSkills);
     }
 
-    handleActiveSkills(system: SR5Actor<'character'>['system'], activeSkills: ActorSchema['skills']['skill']) {
+    handleActiveSkills(system: BlankCharacter['system'], activeSkills: ActorSchema['skills']['skill']) {
 
         for (const skill of activeSkills) {
             let name = skill.name_english.toLowerCase().replace(/[\s-]/g, '_').trim();
@@ -195,7 +200,7 @@ export class CharacterInfoUpdater {
         }
     }
 
-    handleLanguageSkills(system: SR5Actor<'character'>['system'], languageSkills: ActorSchema['skills']['skill']) {
+    handleLanguageSkills(system: BlankCharacter['system'], languageSkills: ActorSchema['skills']['skill']) {
         system.skills.language.value = {}
 
         for (const skill of languageSkills) {
@@ -215,7 +220,7 @@ export class CharacterInfoUpdater {
         }
     }
 
-    handleKnowledgeSkills(system: SR5Actor<'character'>['system'], knowledgeSkills: ActorSchema['skills']['skill']) {
+    handleKnowledgeSkills(system: BlankCharacter['system'], knowledgeSkills: ActorSchema['skills']['skill']) {
         system.skills.knowledge.academic.value = {}
         system.skills.knowledge.interests.value = {}
         system.skills.knowledge.professional.value = {}

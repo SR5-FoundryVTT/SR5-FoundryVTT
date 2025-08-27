@@ -1,13 +1,15 @@
-import { CharacterInfoUpdater } from "./CharacterInfoUpdater"
+import { BlankCharacter, CharacterInfoUpdater } from "./CharacterInfoUpdater"
 import { ItemsParser } from "../itemImporter/ItemsParser";
-import VehicleParser from "../itemImporter/vehicleImport/VehicleParser";
+import { VehicleParser } from "../itemImporter/vehicleImport/VehicleParser";
 import { ActorFile } from "../ActorSchema";
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ImportHelper as IH } from "src/module/apps/itemImport/helper/ImportHelper";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
+import { DataDefaults } from "@/module/data/DataDefaults";
 
 export type importOptionsType = Partial<{
     assignIcons: boolean;
+    folderId: string | null;
 
     armor: boolean;
     contacts: boolean;
@@ -30,11 +32,15 @@ export class CharacterImporter {
 
     /**
      * Imports a chummer character into an existing actor. The actor will be updated. This might lead to duplicate items.
-     * @param {*} actor The actor that will be updated with the chummer character.
      * @param {*} chummerFile The complete chummer file as json object. The first character will be selected for import.
      * @param {*} importOptions Additional import option that specify what parts of the chummer file will be imported.
      */
-    async importChummerCharacter(actor: SR5Actor<'character'>, chummerFile: ActorFile, importOptions: importOptionsType) {
+    async import(chummerFile: ActorFile, importOptions: importOptionsType) {
+        if(!game.user?.can("ACTOR_CREATE")) {
+            ui.notifications?.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
+            return;
+        }
+
         console.log('Importing the following character file content:');
         console.log(chummerFile);
 
@@ -42,52 +48,36 @@ export class CharacterImporter {
         console.log(importOptions);
 
         if (!chummerFile.characters?.character) {
-            console.log('Did not find a valid character to import  - aborting import');
+            ui.notifications.error("No valid character found in Chummer file");
             return;
         }
 
-        await this.resetCharacter(actor)
-
-        // only import the first character in the file
         const chummerCharacter = IH.getArray(chummerFile.characters.character)[0];
-        const infoUpdater = new CharacterInfoUpdater();
-        const updatedActorData = await infoUpdater.update(actor, chummerCharacter);
-        const items = new ItemsParser().parse(chummerCharacter, importOptions);
 
-        void new VehicleParser().parseVehicles(actor, chummerCharacter, importOptions);
+        const character = {
+            effects: [],
+            type: 'character',
+            folder: importOptions.folderId ?? null,
+            system: DataDefaults.baseSystemData('character'),
+            items: await new ItemsParser().parse(chummerCharacter, importOptions),
+            name: chummerCharacter.alias ?? chummerCharacter.name ?? '[Name not found]',
+        } satisfies BlankCharacter;
 
-        const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.character.schema, updatedActorData.system);
+        await new CharacterInfoUpdater().update(character, chummerCharacter);
+
+        const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.character.schema, character.system);
         if (consoleLogs) {
             console.warn(`Document Sanitized on Import; Name: ${chummerCharacter.name}\n`);
             console.table(consoleLogs);
         }
 
-        await actor.update(updatedActorData as any);
-        await actor.createEmbeddedDocuments('Item', await items);
-    }
+        const actor = (await SR5Actor.create(character))!;
 
-    async resetCharacter(actor: SR5Actor<'character'>) {
-        const toDeleteItems = actor.items?.filter(item => item.type !== "action")
-            //filter items that were not imported
-            //first line is for legacy items, user need to delete these manually
-            .filter(item => item.system.importFlags.isImported)
-            .filter(item => item.effects.size === 0)
-            .map(item => item.id) as string[];
+        if (importOptions.vehicles) {
+            const vehicles = IH.getArray(chummerCharacter.vehicles?.vehicle);
+            const vehicleActors = await new VehicleParser().parseVehicles(actor, vehicles);
 
-        await actor.deleteEmbeddedDocuments("Item", toDeleteItems);
-
-        await actor.update({
-            system: {
-                skills: {
-                    language: { value: {} },
-                    knowledge: {
-                        academic: { value: {} },
-                        interests: { value: {} },
-                        professional: { value: {} },
-                        street: { value: {} }
-                    }
-                }
-            }
-        });
+            await SR5Actor.create(vehicleActors);
+        }
     }
 }

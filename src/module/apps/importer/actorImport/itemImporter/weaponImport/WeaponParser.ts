@@ -163,8 +163,26 @@ export class WeaponParser extends Parser<'weapon'> {
     handledRangedWeapon(system: BlankItem<'weapon'>['system'], itemData: ExtractItemType<'weapons', 'weapon'>) {
         system.category = 'range';
 
-        if (system.action.skill.toLowerCase().includes('throw')) {
+        if (system.action.skill.toLowerCase().includes('throw'))
             system.category = 'thrown';
+
+        system.ammo.current.value = Number(itemData.ammo_english.match(/\d+/)?.[0]) || 0;
+        system.ammo.current.max = system.ammo.current.value;
+
+        if (itemData.clips?.clip) {
+            const clipsArray = IH.getArray(itemData.clips.clip);
+            const currentClip = clipsArray.find(clip => clip.name === itemData.currentammo);
+            system.ammo.current.value = Number(currentClip?.count) || system.ammo.current.value;
+        }
+
+        if (system.ammo.current.max) {
+            const totalAmmo = Number(itemData.availableammo) || 0;
+            const currentAmmo = system.ammo.current.value;
+            const clipSize = system.ammo.current.max;
+
+            const spareClips = Math.max(0, Math.floor((totalAmmo - currentAmmo) / clipSize));
+            system.ammo.spare_clips.max = spareClips;
+            system.ammo.spare_clips.value = spareClips;
         }
 
         const range = DataDefaults.createData('range_weapon');
@@ -172,34 +190,13 @@ export class WeaponParser extends Parser<'weapon'> {
         range.rc.base = Number(getValues(itemData.rawrc)[0]) || 0;
 
         if (itemData.mode) {
-            // HeroLab export doesn't have mode
-            const modes = itemData.mode_noammo!.toLowerCase();
+            const modes = itemData.mode_english_noammo!.toLowerCase();
             range.modes = {
                 single_shot: modes.includes('ss'),
                 semi_auto: modes.includes('sa'),
                 burst_fire: modes.includes('bf'),
                 full_auto: modes.includes('fa'),
             };
-        }
-
-        if (itemData.clips?.clip != null) {
-            const ammo = system.ammo;
-            
-            // HeroLab export doesn't have clips
-            const chummerClips = IH.getArray(itemData.clips.clip);
-            const clips = chummerClips.filter(clip => !clip.english_name.toLowerCase().includes("inter"))
-
-            ammo.spare_clips = {
-                max: (clips?.length || 1) - 1,
-                value: (clips?.length || 1) - 1
-            }
-
-            const loadedClip = clips.filter(clip => clip.location === "loaded")[0]
-
-            ammo.current = {
-                max: Number(loadedClip?.count) || 0,
-                value: Number(loadedClip?.count) || 0
-            }
         }
 
         const ranges = IH.getArray(itemData.ranges)[0]

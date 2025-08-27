@@ -1,12 +1,18 @@
+import { CharacterImporter } from "../../importer/actorImport/characterImporter/CharacterImporter";
+import { SpiritImporter } from "../../importer/actorImport/spiritImporter/SpiritImporter";
 
 import AppV2 = foundry.applications.api.ApplicationV2;
+import { ActorFile } from "../../importer/actorImport/ActorSchema";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
 
-type ImporterContext = {
+interface ImporterContext extends AppV2.RenderContext {
     folders: { id: string, name: string }[]
 };
 
 export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<ImporterContext>) {
+    private static readonly characterImporter = new CharacterImporter();
+    private static readonly spiritImporter = new SpiritImporter();
+
     /**
      * Default options for the application window.
      */
@@ -61,5 +67,62 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
             .map(({ id, name }) => ({ id, name }));
 
         return { ...baseContext, folders };
+    }
+
+    private async handleActorImport(event) {
+        // Get the JSON input from the textarea
+        const textarea = document.getElementById('chummer-input') as HTMLTextAreaElement;
+        const jsonText = textarea?.value.trim();
+
+        if (!jsonText) {
+            ui.notifications?.warn("Please paste Chummer JSON data to import.");
+            return;
+        }
+
+        let chummerData: ActorFile;
+        try {
+            chummerData = JSON.parse(jsonText);
+        } catch (e) {
+            ui.notifications?.error("Invalid JSON. Please check your input.");
+            console.error("JSON Parse Error:", e);
+            return;
+        }
+
+        const getCheckboxValue = (selector: string): boolean =>
+            (document.querySelector(selector) as HTMLInputElement)?.checked ?? false;
+
+        const getInputValue = (selector: string): string | null =>
+            (document.querySelector(selector) as HTMLInputElement)?.value || null;
+
+        const importOptions = {
+            assignIcons: getCheckboxValue('#assign-icons'),
+            folderId: getInputValue('#chummer-folder-select'),
+
+            armor: getCheckboxValue('input[data-field="armor"]'),
+            contacts: getCheckboxValue('input[data-field="contacts"]'),
+            cyberware: getCheckboxValue('input[data-field="cyberware"]'),
+            gear: getCheckboxValue('input[data-field="gear"]'),
+            lifestyles: getCheckboxValue('input[data-field="lifestyles"]'),
+            powers: getCheckboxValue('input[data-field="powers"]'),
+            qualities: getCheckboxValue('input[data-field="qualities"]'),
+            spells: getCheckboxValue('input[data-field="spells"]'),
+            vehicles: getCheckboxValue('input[data-field="vehicles"]'),
+            weapons: getCheckboxValue('input[data-field="weapons"]'),
+        };
+
+        // Log everything for now (replace with actual import logic)
+        console.log("Parsed Chummer Data:", chummerData);
+        console.log("Import Options:", importOptions);
+
+        await ActorImporter.characterImporter.import(chummerData, importOptions);
+    }
+
+    protected override async _onRender(
+        ...[context, options]: Parameters<AppV2["_onRender"]>
+    ): Promise<void> {
+        await super._onRender(context, options);
+
+        const importBtn = this.element.querySelector<HTMLButtonElement>("#chummer-import-button");
+        importBtn?.addEventListener("click", (event) => { void this.handleActorImport(event);});
     }
 }

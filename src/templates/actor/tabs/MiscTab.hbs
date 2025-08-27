@@ -2,23 +2,24 @@
     <div class="inventory">
         <div class="split-container">
             <div class="scroll-area">
-                <div class="list-item">
-                    {{#if (or isCharacter isSpirit)}}
-                    <div class="list-item-content">
-                        <button type="button" class="display import-character">
-                            {{localize "SR5.ImportCharacter"}}
-                        </button>
+                {{#let hasContent=(or (and (or isCharacter isSpirit) (hasAnyFreshImports this.actor)) system.matrix.device)}}
+                    {{#if hasContent}}
+                    <div class="list-item">
+                        {{#if (or isCharacter isSpirit)}}
+                            {{#if (hasAnyFreshImports this.actor)}}
+                                {{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.hbs' }}
+                            {{/if}}
+                        {{/if}}
+                        {{#if system.matrix.device}}
+                        <div class="list-item-content">
+                            <button type="button" class="display setup-pan" data-tooltip="{{localize 'SR5.AddDevicesToPAN.SetupPANTooltip'}}">
+                                {{localize "SR5.AddDevicesToPAN.SetupPAN"}}
+                            </button>
+                        </div>
+                        {{/if}}
                     </div>
-                    {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.hbs' }}{{/if}}
                     {{/if}}
-                    {{#if system.matrix.device}}
-                    <div class="list-item-content">
-                        <button type="button" class="display setup-pan" data-tooltip="{{localize 'SR5.AddDevicesToPAN.SetupPANTooltip'}}">
-                            {{localize "SR5.AddDevicesToPAN.SetupPAN"}}
-                        </button>
-                    </div>
-                    {{/if}}
-                </div>
+                {{/let}}
                 {{#if isCharacter}}
                 <div class="list-item">
                     <div class="list-item-content">
