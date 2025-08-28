@@ -21,7 +21,13 @@ export class Version0_30_0 extends VersionMigration {
     }
 
     override migrateItem(_item: any) {
-        // CLeanup from legacy / broken template data to DataModel.
+        // Legacy items may still use `data` instead of `system`
+        if (_item.data) {
+            _item.system = _item.data;
+            delete _item.data;
+        }
+
+        // Cleanup from legacy / broken template data to DataModel.
         if (_item.type === 'sin' && _item.system?.licenses)
             _item.system.licenses = Object.values(_item.system.licenses);
 
@@ -33,7 +39,7 @@ export class Version0_30_0 extends VersionMigration {
         }
 
         // Matrix 1.0 changes wireless from a checkbox to a choice.
-        if (_item.system.technology?.wireless) {
+        if (_item.system?.technology?.wireless) {
             _item.system.technology.wireless = _item.system.technology.wireless ? 'online' : 'offline';
         }
     }
