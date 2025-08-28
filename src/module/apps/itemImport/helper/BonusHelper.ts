@@ -90,8 +90,7 @@ export class BonusHelper {
 
             if (cm.overflow) {
                 this.createEffect(
-                    sheet, { 
-                        name: "Override Physical Overflow Track",
+                    sheet, {
                         changes: [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, mode: BC.OVERRIDE }]
                     },
                 );
@@ -100,7 +99,6 @@ export class BonusHelper {
             if (cm.physical) {
                 this.createEffect(
                     sheet, {
-                        name: "Override Physical Track",
                         changes: [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, mode: BC.OVERRIDE }]
                     },
                 );
@@ -109,7 +107,6 @@ export class BonusHelper {
             if (cm.stun) {
                 this.createEffect(
                     sheet, {
-                        name: "Override Stun Track",
                         changes: [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: BC.OVERRIDE }]
                     }
                 );
@@ -118,7 +115,6 @@ export class BonusHelper {
             if (cm.threshold) {
                 this.createEffect(
                     sheet, {
-                        name: "Pain Tolerance",
                         changes: [{ key: "system.modifiers.wound_tolerance", value: cm.threshold._TEXT }]
                     },
                 );
@@ -127,7 +123,6 @@ export class BonusHelper {
             if (cm.thresholdoffset) {
                 this.createEffect(
                     sheet, {
-                        name: "High Pain Tolerance",
                         changes: [{ key: "system.modifiers.pain_tolerance_physical", value: cm.thresholdoffset._TEXT }]
                     }
                 );
@@ -136,7 +131,6 @@ export class BonusHelper {
             if (cm.sharedthresholdoffset) {
                 this.createEffect(
                     sheet, {
-                        name: "Shared Tolerance",
                         changes: [
                             { key: "system.modifiers.pain_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
                             { key: "system.modifiers.pain_tolerance_stun", value: cm.sharedthresholdoffset._TEXT },
@@ -155,7 +149,7 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.limit.mod", value: limitModifier.value._TEXT }],
+                        changes: [{ key: "data.limit", value: limitModifier.value._TEXT }],
                         system: { applyTo: 'test_all', selection_limits: [{ value: name, id: normalName }] }
                     }
                 );
@@ -164,20 +158,13 @@ export class BonusHelper {
 
         if (bonus.skillattribute) {
             for (const skill of IH.getArray(bonus.skillattribute)) {
-                const attributeTable: Record<string, string> = {
-                    "STR": "strength", "DEX": "dexterity", "AGI": "agility",
-                    "REA": "reaction", "WIL": "willpower", "LOG": "logic",
-                    "INT": "intuition", "CHA": "charisma", "EDG": "edge",
-                    "MAG": "magic", "RES": "ressonance", "ESS": "essence"
-                };
-
-                const name = attributeTable[skill.name._TEXT];
+                const name = BC.BonusConstant.attributeTable[skill.name._TEXT];
                 const conditionTag = skill.condition ? "*" : "";
 
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
+                        changes: [{ key: "data.modifiers", value: skill.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_attributes: [{ value: name.capitalize(), id: name }] }
                     }
                 );
@@ -200,7 +187,7 @@ export class BonusHelper {
                     this.createEffect(
                         sheet, {
                             name: sheet.name + conditionTag,
-                            changes: [{ key: "data.modifiers.mod", value: skillCategory.bonus._TEXT }],
+                            changes: [{ key: "data.modifiers", value: skillCategory.bonus._TEXT }],
                             system: { applyTo: 'test_all', selection_skills: skills }
                         }
                     );
@@ -220,8 +207,24 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.modifiers.mod", value: skillGroup.bonus._TEXT }],
+                        changes: [{ key: "data.modifiers", value: skillGroup.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_skills: skills }
+                    }
+                );
+            }
+        }
+
+        if (bonus.specificattribute) {
+            for (const attribute of IH.getArray(bonus.specificattribute)) {
+                if (attribute.val == null) continue;
+
+                const name = attribute.name._TEXT;
+                const normalName = BC.BonusConstant.attributeTable[name];
+
+                this.createEffect(
+                    sheet, {
+                        name: sheet.name,
+                        changes: [{ key: `system.attributes.${normalName}`, value: attribute.val._TEXT }],
                     }
                 );
             }
@@ -236,7 +239,7 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
+                        changes: [{ key: "data.modifiers", value: skill.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_skills: [{ value: name, id: normalName }] }
                     }
                 );
