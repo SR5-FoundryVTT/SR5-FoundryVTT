@@ -364,12 +364,13 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         const uuid = Helpers.listItemUuid(event);
         if (!uuid) return;
 
-        // Toggle selection on or off.
         if (this.selectedMatrixTarget === uuid) {
             this.selectedMatrixTarget = undefined;
         } else {
             this.selectedMatrixTarget = uuid;
         }
+
+        this.informAboutOfflineSelection();
 
         this.render();
     }
@@ -460,5 +461,19 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         }
 
         return targets;
+    }
+
+    /**
+     * Offline targets can be selected however later matrix actions may not be possible.
+     *
+     * Let users know about the limitations of selecting offline targets.
+     */
+    informAboutOfflineSelection() {
+        if (!this.selectedMatrixTarget) return;
+
+        const target = foundry.utils.fromUuidSync(this.selectedMatrixTarget);
+        if (!(target instanceof SR5Actor) || target?.hasPersona) return;
+
+        ui.notifications.error('SR5.Errors.MarksCantBePlacedWithoutPersona', {localize: true});
     }
 }

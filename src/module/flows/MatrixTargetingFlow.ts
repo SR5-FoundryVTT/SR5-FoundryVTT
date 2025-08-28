@@ -98,20 +98,17 @@ export const MatrixTargetingFlow = {
                 // Throw away unneeded tokens.
                 if (!token.actor) continue;
                 const target = token.actor;
-
                 /// Remove the actor itself from the list of targets.
                 if (target.uuid === actor.uuid) continue;
-
                 // Validate Foundry VTT visibility.
                 if (!game.user?.isGM && token.hidden) continue;
-
-                if (!target.hasPersona) continue;
                 // Filter out IC as they can't be targeted outside their host.
                 if (target.isType('ic')) continue;
+
                 // Filter out persona based on matrix rules.
                 if (!actor.matrixPersonaIsVisible(target)) continue;
 
-                const type = MatrixNetworkFlow.getDocumentType(document as any);
+                const type = MatrixNetworkFlow.getDocumentType(target);
                 targets.push({
                     name: token.name,
                     document: token.actor,

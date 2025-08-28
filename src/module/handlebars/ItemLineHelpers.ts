@@ -1127,7 +1127,7 @@ export const registerItemLineHelpers = () => {
             };
 
         const icons: any = [];
-        if (target.document instanceof SR5Actor && target.document.hasPersona) icons.push(toggleConnectedItemsIcon);
+        if (target.document instanceof SR5Actor) icons.push(toggleConnectedItemsIcon);
         return icons; 
     });
     Handlebars.registerHelper('MatrixTargetItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {

@@ -458,12 +458,16 @@ export class MatrixNetworkFlow {
      * @returns A translation key to be translated.
      */
     static getDocumentType(document: SR5Actor | SR5Item): Translation {
-        if (document instanceof SR5Item && document.type === 'host') return 'SR5.ItemTypes.Host';
-        if (document instanceof SR5Item && document.type === 'grid') return 'SR5.ItemTypes.Grid';
-        if (document instanceof SR5Item) return 'SR5.Device';
+        const isActor = document instanceof SR5Actor;
+        const isItem = document instanceof SR5Item;
+        if (isItem && document.type === 'host') return 'SR5.ItemTypes.Host';
+        if (isItem && document.type === 'grid') return 'SR5.ItemTypes.Grid';
+        if (isItem) return 'SR5.Device';
 
-        if (document instanceof SR5Actor && document.type === 'ic') return 'SR5.ActorTypes.IC';
+        if (isActor && document.type === 'ic') return 'SR5.ActorTypes.IC';
+        if (isActor && document.type === 'vehicle') return 'SR5.ActorTypes.Vehicle';
 
+        if (isActor && !document.hasPersona) return 'SR5.Labels.ActorSheet.Offline';
         return 'SR5.Labels.ActorSheet.Persona';
     }
 }
