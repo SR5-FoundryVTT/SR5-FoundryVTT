@@ -5,11 +5,9 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { ResistTestData, ResistTestDataFlow } from './flows/ResistTestDataFlow';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
-import { DataDefaults } from '../data/DataDefaults';
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { DamageTypeType, MinimalActionType } from '../types/item/Action';
-import { MatrixRules } from '@/module/rules/MatrixRules';
-import { MatrixFlow } from '@/module/flows/MatrixFlow';
+import { MatrixDamageFlow } from '../flows/MatrixDamageFlow';
 
 // biofeedback is often caused by the results of another ResistTest
 export type BiofeedbackResistTestData = ResistTestData<ResistTestData> & {
@@ -144,7 +142,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
         // get the amount of damage taken after the roll, and divide that by 2 for the amount of bio feedback we will take
         const newData = foundry.utils.duplicate(opposedData) as ResistTestData;
 
-        newData.incomingDamage = MatrixFlow.getBiofeedbackResistDamage(actor, opposedData.modifiedDamage);
+        newData.incomingDamage = MatrixDamageFlow.getBiofeedbackResistDamage(actor, opposedData.modifiedDamage);
         newData.modifiedDamage = newData.incomingDamage;
 
         // get most of our resist data from the ResistTestDataFlow test data

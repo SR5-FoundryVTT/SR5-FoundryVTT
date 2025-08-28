@@ -2,6 +2,8 @@ import { PartsList } from '../../parts/PartsList';
 import { MatrixRules } from '../../rules/MatrixRules';
 import { HackOnTheFlyTest } from '../HackOnTheFlyTest';
 import { MatrixTestData } from '../MatrixTest';
+import { OpposedBruteForceTest } from '../OpposedBruteForceTest';
+import { OpposedHackOnTheFlyTest } from '../OpposedHackOnTheFlyTest';
 import { BruteForceTest } from './../BruteForceTest';
 import { MatrixTestDataFlow } from './MatrixTestDataFlow';
 
@@ -11,6 +13,7 @@ export interface MatrixPlacementData extends MatrixTestData {
 }
 
 type MarkPlacementTests = BruteForceTest | HackOnTheFlyTest;
+type MarkPlacementDefenseTest = OpposedBruteForceTest | OpposedHackOnTheFlyTest;
 /**
  * Handle test flows for placing marks between different tests / actions.
  * 
@@ -56,4 +59,14 @@ export const MarkPlacementFlow = {
     validateBaseValues(test: MarkPlacementTests) {
         test.data.marks = MatrixRules.getValidMarksPlacementCount(test.data.marks);
     },
+
+    /**
+     * Grid networks have special pool calculation based on rules.
+     */
+    prepareGridDefensePool(test: MarkPlacementDefenseTest) {
+        if (!test.device?.isType('grid')) return;
+        const modifier = MatrixRules.gridMarkPlacementDefensePool(test.device);
+        if (!modifier) return;
+        test.pool.mod.push(modifier);
+    }
 }

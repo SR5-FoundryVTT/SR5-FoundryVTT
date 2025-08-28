@@ -726,6 +726,7 @@
                 "NoNetwork": "No Network",
                 "OwnerAbrv": "O",
                 "Persona": "Persona",
+                "Offline": "Offline",
                 "PersonalInventory": "On Person",
                 "ResetActorForNewRun": "New Run Reset",
                 "Rituals": "Rituals",
@@ -751,7 +752,10 @@
             },
             "Matrix": {
                 "TargetMainIcon": "Target Main Icon",
-                "TargetDevice": "Target Device"
+                "TargetDevice": "Target Device",
+                "Local": "Local",
+                "Global": "Global",
+                "Public": "Public"
             },
             "Message": {
                 "ClickToSelect": "Click to select on scene",

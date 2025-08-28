@@ -447,6 +447,12 @@ export const SR5 = {
         other: 'SR5.TargetOther',
     },
 
+    gridCategories: {
+        local: 'SR5.Labels.Matrix.Local',
+        global: 'SR5.Labels.Matrix.Global',
+        public: 'SR5.Labels.Matrix.Public'
+    },
+
     durations: {
         instant: 'SR5.DurationInstant',
         sustained: 'SR5.DurationSustained',

@@ -22,8 +22,7 @@ export const CompendiaSettingFlow = {
     getPackSettingConfiguration(id: PackType): PackSelectionConfig {
         // get the active pack name
         const packName = game.settings.get(SYSTEM_NAME, id) || SR5.packNames[id];
-        // get the list of world item packs
-        const worldItemPacks = game.packs.filter(p => p.metadata.type === 'Item' && p.metadata.packageType === 'world' && p.metadata.system === SYSTEM_NAME);
+        const itemPacks = game.packs.filter(p => p.metadata.type === 'Item' && p.metadata.packageType !== 'system' && p.metadata.system === SYSTEM_NAME);
         // get the default pack the system ships with
         const defaultPack = game.packs.find(p => p.metadata.name === SR5.packNames[id]);
         // if we can't find the default pack, error and send a basic data without any choices
@@ -43,8 +42,8 @@ export const CompendiaSettingFlow = {
         const packChoices = {
             [defaultPack.metadata.name]: defaultPack.metadata.label,
         }
-        // add all the world item packs to the options
-        for (const pack of worldItemPacks) {
+        // add all the item packs to the options
+        for (const pack of itemPacks) {
             packChoices[pack.metadata.name] = pack.metadata.label;
         }
         return {

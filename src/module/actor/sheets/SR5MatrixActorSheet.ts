@@ -3,11 +3,13 @@ import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
 import { SR5Actor } from '../SR5Actor';
-import { MatrixFlow } from '../../flows/MatrixFlow';
+import { MatrixSheetFlow } from '../../flows/MatrixSheetFlow';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
 import { FormDialog, FormDialogOptions } from '@/module/apps/dialogs/FormDialog';
+import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
+import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
@@ -56,13 +58,12 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         data.selectedMatrixTarget = this.selectedMatrixTarget;
 
         // When target overview is shown, collect all matrix targets.
-        // TODO: taMiF this is a bis of a mess and will need to be reusable across both targets and marked docs and different actor types.
-        const {targets} = MatrixFlow.getMatrixTargets(this.actor);
+        const {targets} = MatrixTargetingFlow.getTargets(this.actor);
 
         for (const target of targets) {
             // Collect connected icons, if user wants to see them.
             if (this._connectedIconsOpenClose[target.document.uuid]) {
-                target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
+                target.icons = MatrixTargetingFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.
@@ -271,7 +272,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      */
     async _prepareMatrixActions() {
         const packActions = await this._getMatrixPackActions();
-        const actorActions = MatrixFlow.getMatrixActions(this.actor);
+        const actorActions = MatrixSheetFlow.getMatrixActions(this.actor);
         // Assume above collections return action only.
         let actions = [...packActions, ...actorActions] as SR5Item<'action'>[];
 
@@ -363,12 +364,13 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         const uuid = Helpers.listItemUuid(event);
         if (!uuid) return;
 
-        // Toggle selection on or off.
         if (this.selectedMatrixTarget === uuid) {
             this.selectedMatrixTarget = undefined;
         } else {
             this.selectedMatrixTarget = uuid;
         }
+
+        this.informAboutOfflineSelection();
 
         this.render();
     }
@@ -411,24 +413,6 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
             // Handle persona icons.
             if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona) {
-                // Peresona device icons only show as personas, not as devices.
-                // const personaDevice = persona.getMatrixDevice() as SR5Item;
-                // if (target.document.uuid === personaDevice?.uuid) {
-                //     targets.push({
-                //         name: Helpers.getChatSpeakerName(persona),
-                //         token: persona.getToken(),
-                //         network: persona.network?.name ?? '',
-                //         document: persona,
-                //         icons: [],
-                //         type: ActorMarksFlow.getDocumentType(persona),
-                //         marks: target.marks,
-                //         markId: persona.uuid,
-                //         runningSilent: persona.isRunningSilent,
-                //         selected: this.selectedMatrixTarget === target.document.uuid
-                //     });
-                //     continue;
-                // }
-
                 // Attach device icon to their persona.
                 // Already in target list...
                 const personaTarget = targets.find(t => t.document.uuid === persona.uuid);
@@ -442,7 +426,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                         network: ActorMarksFlow.getDocumentNetwork(persona),
                         document: persona,
                         icons: [target],
-                        type: ActorMarksFlow.getDocumentType(persona),
+                        type: MatrixNetworkFlow.getDocumentType(persona),
                         marks: 0,
                         markId: '',
                         // As a device is marked, the persona should be visible...
@@ -460,8 +444,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                 // An already marked icon will again show up when all icons are collected.
                 // So we can simply overwrite all icons here without any filtering.
 
-                // TODO: taM check this
-                target.icons = MatrixFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
+                target.icons = MatrixTargetingFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.
@@ -478,5 +461,19 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         }
 
         return targets;
+    }
+
+    /**
+     * Offline targets can be selected however later matrix actions may not be possible.
+     *
+     * Let users know about the limitations of selecting offline targets.
+     */
+    informAboutOfflineSelection() {
+        if (!this.selectedMatrixTarget) return;
+
+        const target = foundry.utils.fromUuidSync(this.selectedMatrixTarget);
+        if (!(target instanceof SR5Actor) || target?.hasPersona) return;
+
+        ui.notifications.error('SR5.Errors.MarksCantBePlacedWithoutPersona', {localize: true});
     }
 }

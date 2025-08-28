@@ -7,7 +7,7 @@ import { BruteForceTest } from './BruteForceTest';
 import { OpposedTest } from "./OpposedTest";
 import { TestOptions } from './SuccessTest';
 import { TestCreator } from './TestCreator';
-import { MatrixPlacementData } from './flows/MarkPlacementFlow';
+import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlow';
 import { OpposedMatrixTestData } from './MatrixTest';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 import { DamageType } from '@/module/types/item/Action';
@@ -52,6 +52,11 @@ export class OpposedBruteForceTest extends OpposedTest<OpposedBruteForceTestData
 
     override async populateDocuments() {
         await MatrixTestDataFlow.populateOpposedDocuments(this);
+    }
+
+    override prepareBaseValues() {
+        super.prepareBaseValues();
+        MarkPlacementFlow.prepareGridDefensePool(this);
     }
 
     /**

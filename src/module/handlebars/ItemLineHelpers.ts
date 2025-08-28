@@ -5,7 +5,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
 import { SR5Item } from '../item/SR5Item';
 import { SR5Actor } from "../actor/SR5Actor";
-import { ActorMarksFlow } from "../actor/flows/ActorMarksFlow";
+import { MatrixNetworkFlow } from "../item/flows/MatrixNetworkFlow";
 
 /**
  * Typing around the legacy item list helper.
@@ -1034,7 +1034,7 @@ export const registerItemLineHelpers = () => {
      * Only used for the Item NetworksTab
      */
     Handlebars.registerHelper('NetworksItemRightSide', (item: SR5Item) => {
-        const type = ActorMarksFlow.getDocumentType(item);
+        const type = MatrixNetworkFlow.getDocumentType(item);
         return [{
             text: {
                 text: game.i18n.localize(type),
@@ -1090,7 +1090,6 @@ export const registerItemLineHelpers = () => {
      * @param action The matrix action used to render a single item line.
      */
     Handlebars.registerHelper('MatrixActionsItemRightSide', (action: SR5Item) => {
-        // TODO: taMiF/marks This was necessary as older template version seem to use system.action.category as a string, which FOundry doesn't override on migration.
         if (!action.system.action?.category.matrix) return [];
 
         // Either show owner only, a mark quantity or nothing, if 0 marks are needed.
@@ -1128,7 +1127,7 @@ export const registerItemLineHelpers = () => {
             };
 
         const icons: any = [];
-        if (target.document instanceof SR5Actor && target.document.hasPersona) icons.push(toggleConnectedItemsIcon);
+        if (target.document instanceof SR5Actor) icons.push(toggleConnectedItemsIcon);
         return icons; 
     });
     Handlebars.registerHelper('MatrixTargetItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {

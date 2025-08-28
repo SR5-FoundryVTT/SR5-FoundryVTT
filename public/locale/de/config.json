@@ -622,6 +622,8 @@
                 "ResetActorForNewRun": "Reset für neuen Run",
                 "Rituals": "Rituale",
                 "RollDroneInfiltration": "Heimlichkeit",
+                "Persona": "Persona",
+                "Offline": "Offline",
                 "RollDronePerception": "Wahrnehmung",
                 "RollPilotVehicleTest": "Manövrieren",
                 "SetMonitor": "Monitor muss manuell gesetzt werden",
@@ -636,6 +638,13 @@
                 "All": "Alle",
                 "Carried": "Mitgeführt",
                 "OpenInventory": "Inventar"
+            },
+            "Matrix": {
+                "TargetMainIcon": "Target Main Icon",
+                "TargetDevice": "Target Device",
+                "Local": "Lokal",
+                "Global": "Global",
+                "Public": "Öffentlich"
             },
             "Message": {
                 "ClickToSelect": "Klicke um in Szene auzuwählen",

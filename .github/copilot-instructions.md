@@ -42,7 +42,7 @@ The main layers are:
 
 Document classes provide the general API for all parts of the system to trigger functionality. These are FoundryVTT document classes that represent the various entities within the game world.
 Sheet classes wrap a document class and render its contents onto a web user interface using handlebarjs. These are FoundryVTT objects that extend the document classes and add additional functionality for the user interface.
-Flows wrap specific features or functions into a modularized file, either using objects or classes, allowing for better organization and reusability of code. Flows wrap both document and rule functionality.
+Flows wrap specific features or functions into a modularized file, either using objects or classes, allowing for better organization and reusability of code. Flows wrap both document and rule functionality. They can contain data manipulation and retrieval for other layers as well (documents, sheets); only rules shouldn't use flows.
 Rules wrap Shadowrun 5e specific rule implementations into a modularized file, either using objects or classes, allowing for better organization and reusability of code. Rules should contain as little FoundryVTT functionality as possible.
 
 Additionally there is a central data storage for inter document data exchange which is handled by the `DataStorage` class and `src/module/storage/storage.ts` combining multiple storage classes for data transfer.

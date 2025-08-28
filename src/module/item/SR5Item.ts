@@ -27,9 +27,9 @@ import { ItemRollDataFlow } from './flows/ItemRollDataFlow';
 import { ItemMarksFlow } from './flows/ItemMarksFlow';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { AttributeFieldType } from '../types/template/Attributes';
-import { MatrixFlow } from '../flows/MatrixFlow';
 import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
+import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -1373,7 +1373,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     async changeMatrixAttributeSlot(this: SR5Item, changedSlot: string, changedAttribute: Shadowrun.MatrixAttribute) {
         if (!this.system.atts) return;
-        const updateData = MatrixFlow.changeMatrixAttribute(this.system.atts, changedSlot, changedAttribute);
+        const updateData = MatrixDeviceFlow.changeMatrixAttribute(this.system.atts, changedSlot, changedAttribute);
         return this.update(updateData);
     }
 

@@ -1,6 +1,7 @@
 import { TestCreator } from "@/module/tests/TestCreator";
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import { SR5 } from '@/module/config';
 
 export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -57,7 +58,7 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             const driver = await createDriver();
             await vehicle.addVehicleDriver(driver.uuid);
 
-            const test = await TestCreator.fromPackAction('general-actions', 'drone_pilot_vehicle', vehicle, testOptions);
+            const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_pilot_vehicle', vehicle, testOptions);
             assert.notEqual(test, undefined);
             await test!.execute();
             // dicepool should be Intuition + Pilot + Hot Sim
@@ -71,7 +72,7 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             const driver = await createDriver();
             await vehicle.addVehicleDriver(driver.uuid);
 
-            const test = await TestCreator.fromPackAction('general-actions', 'drone_perception', vehicle, testOptions);
+            const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_perception', vehicle, testOptions);
             assert.notEqual(test, undefined);
             await test!.execute();
             // dicepool should be Intuition + Pilot + Hot Sim
