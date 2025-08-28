@@ -105,7 +105,6 @@ export const MatrixTargetingFlow = {
                 // Validate Foundry VTT visibility.
                 if (!game.user?.isGM && token.hidden) continue;
 
-                // TODO: taMiF/marks this will filter out targets without persona but active icons.
                 if (!target.hasPersona) continue;
                 // Filter out IC as they can't be targeted outside their host.
                 if (target.isType('ic')) continue;
