@@ -279,7 +279,7 @@ export class MatrixNetworkFlow {
     }
 
     /**
-     * Collect all Public networks.
+     * Collect all Public Grids
      *
      * @param options.players If true, only networks visible to players are returned.
      */
@@ -309,7 +309,7 @@ export class MatrixNetworkFlow {
             }
         }
 
-        // add public networks that aren't already in the list
+        // add public grids that aren't already in the list
         for (const network of this.getPublicGrids({players: true})) {
             if (!networks.includes(network)) {
                 networks.push(network);
