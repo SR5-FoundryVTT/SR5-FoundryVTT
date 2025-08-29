@@ -1,5 +1,7 @@
 /**
- * utility-types.ts
+ * Generated Automatically, DO NOT EDIT
+ *
+ * Check utils/generate_schemas.py for more info
  *
  * Shared TypeScript utility types for XML-to-TS schema generation.
  */

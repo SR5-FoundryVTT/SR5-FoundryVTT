@@ -1,4 +1,4 @@
-// AUTO‑GENERATED — DO NOT EDIT
+// AUTO‑GENERATED — DO NOT EDIT - Check utils/generate_schemas.py for more info
 
 import { Empty, Many, OneOrMany } from './Types';
 
@@ -80,6 +80,7 @@ export interface BonusSchema {
         name: { _TEXT: string; };
         val: { _TEXT: string; };
     };
+    availability?: { _TEXT: string; $: { condition: string; }; };
     biowareessmultiplier?: { _TEXT: string; };
     blackmarketdiscount?: Empty;
     blockskillcategorydefaulting?: Many<{ _TEXT: string; }>;
@@ -184,7 +185,7 @@ export interface BonusSchema {
     knowledgeskillpoints?: {
         val: { _TEXT: string; };
     };
-    lifestylecost?: OneOrMany<{ _TEXT: string; $?: { lifestyle: string; }; }>;
+    lifestylecost?: OneOrMany<{ _TEXT: string; $?: { condition: string; lifestyle: string; }; }>;
     limitcritterpowercategory?: { _TEXT: string; };
     limitmodifier?: OneOrMany<{
         condition?: { _TEXT: string; };

@@ -1,4 +1,4 @@
-// AUTO‑GENERATED — DO NOT EDIT
+// AUTO‑GENERATED — DO NOT EDIT - Check utils/generate_schemas.py for more info
 
 import { BonusSchema } from './BonusSchema';
 import { ConditionsSchema } from './ConditionsSchema';

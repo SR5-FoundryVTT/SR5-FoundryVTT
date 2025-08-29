@@ -14,13 +14,13 @@ from typing import DefaultDict, Dict, Set, Tuple, List, Union
 #URL constants
 OWNER = "chummer5a"
 REPO = "chummer5a"
-BRANCH = "ceda7c93e54d8ede7623caa7953c88ae559465da" #v5.255.977
+BRANCH = "99664f5ce3d5c1d9bdb4532537bcce8fc9c4c488" #v5.255.989
 
 OUT_DIR = (Path(__file__).parent / "../src/module/apps/itemImport/schema").resolve()
 FILES = [
-    'armor.xml', 'bioware.xml', 'complexforms.xml', 'critterpowers.xml',
+    'actions.xml', 'armor.xml', 'bioware.xml', 'complexforms.xml', 'critterpowers.xml',
     'critters.xml', 'cyberware.xml', 'echoes.xml', 'gear.xml', 'metatypes.xml',
-    'powers.xml', 'qualities.xml', 'spells.xml', 'vehicles.xml', 'weapons.xml'
+    'powers.xml', 'qualities.xml', 'spells.xml', 'vehicles.xml', 'weapons.xml',
 ]
 
 # -------------------------------------------------------------------

@@ -1,4 +1,4 @@
-// AUTO‑GENERATED — DO NOT EDIT
+// AUTO‑GENERATED — DO NOT EDIT - Check utils/generate_schemas.py for more info
 
 import { Empty, Many, OneOrMany } from './Types';
 
