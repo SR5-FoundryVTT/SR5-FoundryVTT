@@ -52,6 +52,7 @@ export const MatrixData = () => ({
     link_locked: new BooleanField(),
     hot_sim: new BooleanField(),
     running_silent: new BooleanField(),
+    public_grid_modifier: new NumberField({ required: true, nullable: false, integer: true, initial: -2 }),
     item: new AnyField({ required: false }),
     marks: MatrixMarksTarget(),
 });

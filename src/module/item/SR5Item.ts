@@ -1154,6 +1154,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.system.technology?.wireless !== 'none';
     }
 
+    isPublicGrid(this: SR5Item) {
+        return this.isType('grid') && this.system.category === 'public';
+    }
+
     isNetwork(this: SR5Item): this is SR5Item<'grid' | 'host'> {
         return this.isType('host', 'grid');
     }
