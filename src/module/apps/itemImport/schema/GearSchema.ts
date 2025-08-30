@@ -2,88 +2,89 @@
 
 import { BonusSchema } from './BonusSchema';
 import { ConditionsSchema } from './ConditionsSchema';
-import { Empty, Many, OneOrMany } from './Types';
+import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Gear {
     addoncategory?: OneOrMany<{ _TEXT: string; }>;
-    addweapon?: { _TEXT: string; $?: { rating: string; }; };
+    addweapon?: { _TEXT: string; $?: { rating: "{Rating}"; }; };
     allowgear?: {
-        name: Many<{ _TEXT: string; }>;
+        name: Many<{ _TEXT: "External Synthlink" | "Internal Synthlink"; }>;
     };
-    allowrename?: { _TEXT: string; };
-    ammoforweapontype?: { _TEXT: string; $?: { noextra: string; }; };
-    armorcapacity?: { _TEXT: string; };
-    attack?: { _TEXT: string; };
+    allowrename?: { _TEXT: "True"; };
+    ammoforweapontype?: { _TEXT: string; $?: { noextra: "True"; }; };
+    armorcapacity?: { _TEXT: IntegerString | string; };
+    attack?: { _TEXT: IntegerString | "{CHA}"; };
     attributearray?: { _TEXT: string; };
-    avail: { _TEXT: string; };
+    avail: { _TEXT: IntegerString | string; };
     bonus?: BonusSchema;
-    canformpersona?: { _TEXT: string; };
-    capacity?: { _TEXT: string; };
+    canformpersona?: { _TEXT: "Parent" | "Self"; };
+    capacity?: { _TEXT: IntegerString | string; };
     category: { _TEXT: string; };
-    cost: { _TEXT: string; };
-    costfor?: { _TEXT: string; };
-    dataprocessing?: { _TEXT: string; };
-    devicerating?: { _TEXT: string; };
-    firewall?: { _TEXT: string; };
+    cost: { _TEXT: IntegerString | string; };
+    costfor?: { _TEXT: IntegerString; };
+    dataprocessing?: { _TEXT: IntegerString | "Rating" | "{LOG}"; };
+    devicerating?: { _TEXT: IntegerString | "Rating" | "{RES}" | "{Rating}"; };
+    firewall?: { _TEXT: IntegerString | "Rating" | "{WIL}"; };
     flechetteweaponbonus?: {
-        ap?: { _TEXT: string; };
-        damage?: { _TEXT: string; };
-        damagetype: { _TEXT: string; };
+        ap?: { _TEXT: IntegerString; };
+        damage?: { _TEXT: IntegerString; };
+        damagetype: { _TEXT: "P(f)" | "S(e)"; };
     };
     forbidden?: ConditionsSchema;
     gears?: {
-        $?: { startcollapsed: string; };
+        $?: { startcollapsed: "True"; };
         usegear: OneOrMany<{
-            capacity?: { _TEXT: string; };
+            capacity?: { _TEXT: "2/[2]" | "[0]"; };
             category: { _TEXT: string; };
             gears?: {
                 usegear: {
-                    category: { _TEXT: string; };
-                    name: { _TEXT: string; };
+                    category: { _TEXT: "Software"; };
+                    name: { _TEXT: "Love Life Management"; };
                 };
             };
-            maxrating?: { _TEXT: string; };
-            name: { _TEXT: string; $?: { select: string; }; };
-            rating?: { _TEXT: string; };
+            maxrating?: { _TEXT: IntegerString; };
+            name: { _TEXT: string; $?: { select: "Bracelet" | "Lunchbox" | "Urban Brawl News" | "Wristband"; }; };
+            rating?: { _TEXT: IntegerString; };
         }>;
     };
     hide?: Empty;
     id: { _TEXT: string; };
-    isflechetteammo?: { _TEXT: string; };
-    matrixcmbonus?: { _TEXT: string; };
-    minrating?: { _TEXT: string; };
-    modattack?: { _TEXT: string; };
+    isflechetteammo?: { _TEXT: "True"; };
+    matrixcmbonus?: { _TEXT: IntegerString; };
+    minrating?: { _TEXT: IntegerString; };
+    modattack?: { _TEXT: IntegerString | "{Rating}"; };
     modattributearray?: { _TEXT: string; };
-    moddataprocessing?: { _TEXT: string; };
-    modfirewall?: { _TEXT: string; };
-    modsleaze?: { _TEXT: string; };
+    moddataprocessing?: { _TEXT: IntegerString | "{Rating}"; };
+    modfirewall?: { _TEXT: IntegerString | "{Rating}"; };
+    modsleaze?: { _TEXT: IntegerString | "{Rating}"; };
     name: { _TEXT: string; };
-    page: { _TEXT: string; };
-    programs?: { _TEXT: string; };
-    rating: { _TEXT: string; };
-    ratinglabel?: { _TEXT: string; };
+    page?: { _TEXT: IntegerString; };
+    programs?: { _TEXT: IntegerString | "Rating" | "{Rating}+2"; };
+    rating: { _TEXT: IntegerString | "{Parent Rating}"; };
+    ratinglabel?: { _TEXT: "Rating_Meters" | "Rating_SqMeters" | "String_Force" | "String_Force_Potency"; };
     required?: ConditionsSchema;
     requireparent?: Empty;
-    sleaze?: { _TEXT: string; };
-    source: { _TEXT: string; };
+    sleaze?: { _TEXT: IntegerString | "{INT}"; };
+    source?: { _TEXT: IntegerString | string; };
     weaponbonus?: {
-        accuracy?: { _TEXT: string; };
-        accuracyreplace?: { _TEXT: string; };
-        ap?: { _TEXT: string; };
-        apreplace?: { _TEXT: string; };
-        damage?: { _TEXT: string; };
+        accuracy?: { _TEXT: IntegerString; };
+        accuracyreplace?: { _TEXT: IntegerString; };
+        ap?: { _TEXT: IntegerString; };
+        apreplace?: { _TEXT: IntegerString; };
+        damage?: { _TEXT: IntegerString | "-2S(e)"; };
         damagereplace?: { _TEXT: string; };
-        damagetype?: { _TEXT: string; };
-        modereplace?: { _TEXT: string; };
-        smartlinkpool?: { _TEXT: string; };
-        userange?: { _TEXT: string; };
+        damagetype?: { _TEXT: "(M)" | "(S)" | "Acid" | "P(f)" | "S" | "S(e)"; };
+        modereplace?: { _TEXT: "SS"; };
+        smartlinkpool?: { _TEXT: IntegerString; };
+        userange?: { _TEXT: "Holdouts" | "Light Pistols"; };
     };
-    weight?: { _TEXT: string; };
+    weight?: { _TEXT: IntegerString | "Rating"; };
     translate?: { _TEXT: string; };
+    altpage?: { _TEXT: string; };
 };
 
 export interface GearSchema {
-    $: { xmlns: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
+    $: { xmlns: ""; "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"; "xsi:schemaLocation": "http://www.w3.org/2001/XMLSchema gear.xsd"; };
     categories: {
         category: Many<{ _TEXT: string; $?: { blackmarket: string; translate?: string; }; }>;
     };

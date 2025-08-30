@@ -1,29 +1,28 @@
 // AUTO‑GENERATED — DO NOT EDIT - Check utils/generate_schemas.py for more info
 
-import { BonusSchema } from './BonusSchema';
 import { ConditionsSchema } from './ConditionsSchema';
-import { Empty, Many, OneOrMany } from './Types';
+import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Accessory {
-    accessorycostmultiplier?: { _TEXT: string; };
-    accuracy?: { _TEXT: string; };
-    addmount?: { _TEXT: string; };
+    accessorycostmultiplier?: { _TEXT: IntegerString; };
+    accuracy?: { _TEXT: IntegerString; };
+    addmount?: { _TEXT: "Under"; };
     addunderbarrels?: {
-        weapon: { _TEXT: string; };
+        weapon: { _TEXT: "Krime Stun-O-Net" | "Underbarrel Shotgun"; };
     };
     allowgear?: {
-        gearcategory: Many<{ _TEXT: string; }>;
+        gearcategory: Many<{ _TEXT: "Autosofts" | "Commlinks" | "Custom" | "Vision Enhancements"; }>;
     };
-    ammobonus?: { _TEXT: string; };
-    ammoreplace?: { _TEXT: string; };
-    ammoslots?: { _TEXT: string; };
-    ap?: { _TEXT: string; };
-    avail: { _TEXT: string; };
-    conceal?: { _TEXT: string; };
-    cost: { _TEXT: string; };
-    damage?: { _TEXT: string; };
-    damagetype?: { _TEXT: string; };
-    extramount?: { _TEXT: string; };
+    ammobonus?: { _TEXT: IntegerString | "50 * Rating"; };
+    ammoreplace?: { _TEXT: IntegerString | "100(belt)" | "24(d)" | "2500(belt)" | "32(d)" | "40(c)" | "External Source"; };
+    ammoslots?: { _TEXT: IntegerString; };
+    ap?: { _TEXT: IntegerString; };
+    avail: { _TEXT: IntegerString | string; };
+    conceal?: { _TEXT: IntegerString | "Rating"; };
+    cost: { _TEXT: IntegerString | string; };
+    damage?: { _TEXT: IntegerString; };
+    damagetype?: { _TEXT: "P"; };
+    extramount?: { _TEXT: "Barrel" | "Side" | "Under/Barrel"; };
     forbidden?: ConditionsSchema;
     gears?: {
         usegear: OneOrMany<{
@@ -33,21 +32,22 @@ export interface Accessory {
     };
     hide?: Empty;
     id: { _TEXT: string; };
-    modifyammocapacity?: { _TEXT: string; };
+    modifyammocapacity?: { _TEXT: "* 3 div 4" | "+(Weapon * 0.5)"; };
     mount: Empty | { _TEXT: string; };
     name: { _TEXT: string; };
-    page: { _TEXT: string; };
-    rangemodifier?: { _TEXT: string; };
-    rating: { _TEXT: string; };
-    rc?: { _TEXT: string; };
-    rcdeployable?: { _TEXT: string; };
-    rcgroup?: { _TEXT: string; };
-    reach?: { _TEXT: string; };
-    replacerange?: { _TEXT: string; };
+    page?: { _TEXT: IntegerString; };
+    rangemodifier?: { _TEXT: IntegerString; };
+    rating: { _TEXT: IntegerString; };
+    rc?: { _TEXT: IntegerString; };
+    rcdeployable?: { _TEXT: "True"; };
+    rcgroup?: { _TEXT: IntegerString; };
+    reach?: { _TEXT: IntegerString; };
+    replacerange?: { _TEXT: "Heavy Pistols"; };
     required?: ConditionsSchema;
-    source: { _TEXT: string; };
-    specialmodification?: { _TEXT: string; };
+    source?: { _TEXT: IntegerString | string; };
+    specialmodification?: { _TEXT: "True"; };
     translate?: { _TEXT: string; };
+    altpage?: { _TEXT: string; };
 };
 
 export interface Weapon {
@@ -55,79 +55,80 @@ export interface Weapon {
         accessory: OneOrMany<{
             gears?: {
                 usegear: OneOrMany<{
-                    category: { _TEXT: string; };
-                    name: { _TEXT: string; $?: { select: string; }; };
-                    rating?: { _TEXT: string; };
+                    category: { _TEXT: "Autosofts" | "Commlinks" | "Sensors" | "Software" | "Vision Enhancements"; };
+                    name: { _TEXT: string; $?: { select: "Krime Ripper" | "Longarms"; }; };
+                    rating?: { _TEXT: IntegerString; };
                 }>;
             };
-            mount?: { _TEXT: string; };
+            mount?: { _TEXT: "Side" | "Stock" | "Top" | "Under"; };
             name: { _TEXT: string; };
-            rating?: { _TEXT: string; };
+            rating?: { _TEXT: IntegerString; };
         }>;
     };
     accessorymounts?: {
-        mount: OneOrMany<{ _TEXT: string; }>;
+        mount: OneOrMany<{ _TEXT: "Barrel" | "Side" | "Stock" | "Top" | "Under"; }>;
     };
-    accuracy: { _TEXT: string; };
+    accuracy: { _TEXT: IntegerString | string; };
     addweapon?: OneOrMany<{ _TEXT: string; }>;
-    allowaccessory?: { _TEXT: string; };
+    allowaccessory?: { _TEXT: "False" | "True"; };
     allowgear?: {
-        gearcategory: Many<{ _TEXT: string; }>;
+        gearcategory: Many<{ _TEXT: "Drugs" | "Toxins"; }>;
     };
-    alternaterange?: { _TEXT: string; };
-    ammo: { _TEXT: string; };
+    alternaterange?: { _TEXT: "Harpoon Gun (Underwater)" | "Shotguns (flechette)"; };
+    ammo: { _TEXT: IntegerString | string; };
     ammocategory?: { _TEXT: string; };
-    ammoslots?: { _TEXT: string; };
-    ap: { _TEXT: string; };
-    avail: { _TEXT: string; };
+    ammoslots?: { _TEXT: IntegerString; };
+    ap: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: IntegerString | string; };
     category: { _TEXT: string; };
-    conceal: { _TEXT: string; };
-    cost: { _TEXT: string; };
-    cyberware?: { _TEXT: string; };
-    damage: { _TEXT: string; };
+    conceal: { _TEXT: IntegerString; };
+    cost: { _TEXT: IntegerString | "{Rating}*20" | "{Rating}*50"; };
+    cyberware?: { _TEXT: "True"; };
+    damage: { _TEXT: IntegerString | string; };
     doubledcostaccessorymounts?: {
-        mount: { _TEXT: string; };
+        mount: { _TEXT: "Barrel"; };
     };
-    extramount?: { _TEXT: string; };
+    extramount?: { _TEXT: "Side" | "Under"; };
     hide?: Empty;
     id: { _TEXT: string; };
-    maxrating?: { _TEXT: string; };
-    mode: { _TEXT: string; };
-    mount?: { _TEXT: string; };
+    maxrating?: { _TEXT: IntegerString; };
+    mode: { _TEXT: IntegerString | string; };
+    mount?: { _TEXT: "Barrel" | "Under"; };
     name: { _TEXT: string; };
-    page: { _TEXT: string; };
+    page?: { _TEXT: IntegerString; };
     range?: { _TEXT: string; };
-    rc: { _TEXT: string; };
-    reach: { _TEXT: string; };
-    requireammo?: { _TEXT: string; };
+    rc: { _TEXT: IntegerString | "-"; };
+    reach: { _TEXT: IntegerString; };
+    requireammo?: { _TEXT: "False" | "microtorpedo"; };
     required?: ConditionsSchema;
-    shortburst?: { _TEXT: string; };
-    singleshot?: { _TEXT: string; };
+    shortburst?: { _TEXT: IntegerString; };
+    singleshot?: { _TEXT: IntegerString; };
     sizecategory?: { _TEXT: string; };
-    source: { _TEXT: string; };
+    source?: { _TEXT: IntegerString | string; };
     spec?: { _TEXT: string; };
-    spec2?: { _TEXT: string; };
-    type: { _TEXT: string; };
+    spec2?: { _TEXT: "Aerodynamic" | "Non-Aerodynamic" | "Revolvers" | "Semi-Automatics"; };
+    type: { _TEXT: "Melee" | "Ranged"; };
     underbarrels?: {
         underbarrel: OneOrMany<{ _TEXT: string; }>;
     };
     useskill?: { _TEXT: string; };
     useskillspec?: { _TEXT: string; };
     weapontype?: { _TEXT: string; };
-    weight?: { _TEXT: string; };
+    weight?: { _TEXT: IntegerString; };
     wirelessweaponbonus?: {
-        accuracy: { _TEXT: string; };
+        accuracy: { _TEXT: IntegerString; };
     };
     translate?: { _TEXT: string; };
+    altpage?: { _TEXT: string; };
 };
 
 export interface WeaponsSchema {
-    $: { xmlns: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
+    $: { xmlns: ""; "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"; "xsi:schemaLocation": "http://www.w3.org/2001/XMLSchema weapons.xsd"; };
     accessories: {
         accessory: Many<Accessory>;
     };
     categories: {
-        category: Many<{ _TEXT: string; $: { blackmarket: string; gunneryspec?: string; translate?: string; type: string; }; }>;
+        category: Many<{ _TEXT: string; $: { blackmarket: "Weapons"; gunneryspec?: "Artillery" | "Ballistic" | "Energy" | "Rocket"; translate?: string; type: string; }; }>;
     };
     weapons: {
         weapon: Many<Weapon>;

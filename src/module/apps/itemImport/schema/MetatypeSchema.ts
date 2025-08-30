@@ -1,75 +1,74 @@
 // AUTO‑GENERATED — DO NOT EDIT - Check utils/generate_schemas.py for more info
 
 import { BonusSchema } from './BonusSchema';
-import { ConditionsSchema } from './ConditionsSchema';
-import { Empty, Many, OneOrMany } from './Types';
+import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Metatype {
-    addweapon?: { _TEXT: string; };
-    agiaug: { _TEXT: string; };
-    agimax: { _TEXT: string; };
-    agimin: { _TEXT: string; };
-    armor?: { _TEXT: string; };
+    addweapon?: { _TEXT: "Claws (Sasquatch)"; };
+    agiaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F-1" | "F-2" | "F-3"; };
+    agimax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F-1" | "F-2" | "F-3"; };
+    agimin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F-1" | "F-2" | "F-3"; };
+    armor?: { _TEXT: IntegerString | "(F x 2)H" | "12H" | "6H" | "F" | "F*2"; };
     biowares?: {
-        bioware: Many<{ _TEXT: string; $?: { rating: string; }; }>;
+        bioware: Many<{ _TEXT: string; $?: { rating: IntegerString; }; }>;
     };
-    bodaug: { _TEXT: string; };
-    bodmax: { _TEXT: string; };
-    bodmin: { _TEXT: string; };
+    bodaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F+7" | "F-1" | "F-2" | "F-3"; };
+    bodmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F+7" | "F-1" | "F-2" | "F-3"; };
+    bodmin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F+7" | "F-1" | "F-2" | "F-3"; };
     bonus?: BonusSchema;
     category?: { _TEXT: string; };
-    chaaug: { _TEXT: string; };
-    chamax: { _TEXT: string; };
-    chamin: { _TEXT: string; };
+    chaaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F-1" | "F-2"; };
+    chamax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F-1" | "F-2"; };
+    chamin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F-1" | "F-2"; };
     complexforms?: {
-        complexform: OneOrMany<{ _TEXT: string; $?: { select: string; }; }>;
+        complexform: OneOrMany<{ _TEXT: string; $?: { select: "Attack" | "Data Processing" | "Firewall" | "Sleaze"; }; }>;
     };
-    depaug: { _TEXT: string; };
-    depmax: { _TEXT: string; };
-    depmin: { _TEXT: string; };
-    edgaug: { _TEXT: string; };
-    edgmax: { _TEXT: string; };
-    edgmin: { _TEXT: string; };
-    essaug: { _TEXT: string; };
-    essmax: { _TEXT: string; };
-    essmin: { _TEXT: string; };
+    depaug: { _TEXT: IntegerString; };
+    depmax: { _TEXT: IntegerString; };
+    depmin: { _TEXT: IntegerString; };
+    edgaug: { _TEXT: IntegerString | "F" | "F/2"; };
+    edgmax: { _TEXT: IntegerString | "F" | "F/2"; };
+    edgmin: { _TEXT: IntegerString | "F" | "F/2"; };
+    essaug: { _TEXT: IntegerString | "2D6" | "3D6" | "F" | "F-2"; };
+    essmax: { _TEXT: IntegerString | "2D6" | "3D6" | "F" | "F-2"; };
+    essmin: { _TEXT: IntegerString | "2D6" | "F" | "F-2"; };
     forcecreature?: Empty;
     forceislevels?: Empty;
     forms?: Empty;
     halveattributepoints?: Empty;
     id: { _TEXT: string; };
-    iniaug: { _TEXT: string; };
-    inimax: { _TEXT: string; };
-    inimin: { _TEXT: string; };
-    initiativedice?: { _TEXT: string; };
-    intaug: { _TEXT: string; };
-    intmax: { _TEXT: string; };
-    intmin: { _TEXT: string; };
-    karma?: { _TEXT: string; };
-    logaug: { _TEXT: string; };
-    logmax: { _TEXT: string; };
-    logmin: { _TEXT: string; };
-    magaug: { _TEXT: string; };
-    magmax: { _TEXT: string; };
-    magmin: { _TEXT: string; };
+    iniaug: { _TEXT: IntegerString | string; };
+    inimax: { _TEXT: IntegerString | string; };
+    inimin: { _TEXT: IntegerString | string; };
+    initiativedice?: { _TEXT: IntegerString; };
+    intaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-1" | "F-2"; };
+    intmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-1" | "F-2"; };
+    intmin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-1" | "F-2"; };
+    karma?: { _TEXT: IntegerString; };
+    logaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F-1" | "F-2"; };
+    logmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F-1" | "F-2"; };
+    logmin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F-1" | "F-2"; };
+    magaug: { _TEXT: IntegerString | "F"; };
+    magmax: { _TEXT: IntegerString | "F"; };
+    magmin: { _TEXT: IntegerString | "F"; };
     metavariants?: {
         metavariant: OneOrMany<Metatype>;
     };
-    movement?: { _TEXT: string; };
+    movement?: { _TEXT: "Special"; };
     name: { _TEXT: string; };
     optionalpowers?: {
         optionalpower: OneOrMany<{ _TEXT: string; $?: { select: string; }; }>;
     };
-    page: { _TEXT: string; };
+    page?: { _TEXT: IntegerString; };
     powers?: {
-        power: OneOrMany<{ _TEXT: string; $?: { rating?: string; select?: string; }; }>;
+        power: OneOrMany<{ _TEXT: string; $?: { rating?: IntegerString | "F"; select?: IntegerString | string; }; }>;
     };
     qualities?: {
         negative?: {
-            quality: OneOrMany<{ _TEXT: string; $?: { removable?: string; select?: string; }; }>;
+            quality: OneOrMany<{ _TEXT: string; $?: { removable?: "True"; select?: string; }; }>;
         };
         positive?: {
-            quality: OneOrMany<{ _TEXT: string; $?: { removable?: string; select?: string; }; }>;
+            quality: OneOrMany<{ _TEXT: string; $?: { removable?: "True"; select?: string; }; }>;
         };
     };
     qualityrestriction?: {
@@ -80,34 +79,35 @@ export interface Metatype {
             quality: Many<{ _TEXT: string; }>;
         };
     };
-    reaaug: { _TEXT: string; };
-    reamax: { _TEXT: string; };
-    reamin: { _TEXT: string; };
-    resaug: { _TEXT: string; };
-    resmax: { _TEXT: string; };
-    resmin: { _TEXT: string; };
-    run?: { _TEXT: string; $?: { alt: string; }; };
+    reaaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F-1" | "F-2"; };
+    reamax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F-1" | "F-2"; };
+    reamin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F-1" | "F-2"; };
+    resaug: { _TEXT: IntegerString | "F"; };
+    resmax: { _TEXT: IntegerString | "F"; };
+    resmin: { _TEXT: IntegerString | "F"; };
+    run?: { _TEXT: string; $?: { alt: "4/1/0"; }; };
     skills?: {
-        group?: OneOrMany<{ _TEXT: string; $: { rating: string; }; }>;
-        knowledge?: { _TEXT: string; $: { attribute: string; category: string; rating: string; }; };
-        skill: Many<{ _TEXT: string; $: { rating: string; select?: string; spec?: string; }; }>;
+        group?: OneOrMany<{ _TEXT: string; $: { rating: IntegerString | "F"; }; }>;
+        knowledge?: { _TEXT: "Animal Calls"; $: { attribute: "LOG"; category: "Professional"; rating: IntegerString; }; };
+        skill: Many<{ _TEXT: string; $: { rating: IntegerString | "F" | "F/2"; select?: "Noxious Breath" | "Thorns"; spec?: string; }; }>;
     };
-    source: { _TEXT: string; };
-    sprint?: { _TEXT: string; $?: { alt: string; }; };
-    straug: { _TEXT: string; };
-    strmax: { _TEXT: string; };
-    strmin: { _TEXT: string; };
-    walk?: { _TEXT: string; $?: { alt: string; }; };
-    wilaug: { _TEXT: string; };
-    wilmax: { _TEXT: string; };
-    wilmin: { _TEXT: string; };
+    source?: { _TEXT: string; };
+    sprint?: { _TEXT: string; $?: { alt: "1/1/0" | "2/1/0"; }; };
+    straug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F+6" | "F-1" | "F-2" | "F-3"; };
+    strmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F+6" | "F-1" | "F-2" | "F-3"; };
+    strmin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F+5" | "F+6" | "F-1" | "F-2" | "F-3"; };
+    walk?: { _TEXT: string; $?: { alt: "2/1/0" | "4/1/0"; }; };
+    wilaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+4" | "F-1" | "F-2"; };
+    wilmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+4" | "F-1" | "F-2"; };
+    wilmin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+4" | "F-1" | "F-2"; };
     translate?: { _TEXT: string; };
+    altpage?: { _TEXT: string; };
 };
 
 export interface MetatypeSchema {
-    $: { xmlns?: string; "xmlns:xsi": string; "xsi:schemaLocation": string; };
+    $: { xmlns?: ""; "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"; "xsi:schemaLocation": string; };
     categories: {
-        category: Many<{ _TEXT: string; }>;
+        category: Many<{ _TEXT: string; $?: { translate: string; }; }>;
     };
     metatypes: {
         metatype: Many<Metatype>;

@@ -14,3 +14,6 @@ export type Many<T> = T[];
 
 /** Either a single value or an array of values. */
 export type OneOrMany<T> = T | T[];
+
+/** Represents a string literal type for numeric values. */
+export type IntegerString = `${number}`;

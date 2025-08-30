@@ -63,9 +63,11 @@ export abstract class Parser<SubType extends SystemEntityType> {
         if ('bonus' in jsonData && jsonData.bonus)
             bonusPromise = BH.addBonus(entity as any, jsonData.bonus);
 
-        const page = jsonData.page._TEXT;
-        const source = jsonData.source._TEXT;
-        system.description = DataDefaults.createData('description', {source: `${source} ${page}`});
+        if (jsonData.page && jsonData.source) {
+            const page = jsonData.altpage?._TEXT ?? jsonData.page._TEXT;
+            const source = jsonData.source._TEXT;
+            system.description = DataDefaults.createData('description', {source: `${source} ${page}`});
+        }
 
         // Runtime branching
         if (this.isActor())

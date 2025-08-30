@@ -20,12 +20,12 @@ export class AmmoParser extends Parser<'ammo'> {
             system.damage = Number(bonusData.damage?._TEXT) || 0;
 
             const damageType = bonusData.damagetype?._TEXT ?? '';
-            if (damageType.includes('P'))
-                system.damageType = 'physical';
-            else if (damageType.includes('S'))
+            if (damageType.includes('S'))
                 system.damageType = 'stun';
             else if (damageType.includes('M'))
                 system.damageType = 'matrix';
+            else
+                system.damageType = 'physical';
         }
 
         return system;
