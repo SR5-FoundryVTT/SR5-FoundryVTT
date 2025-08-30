@@ -2,7 +2,7 @@ import { ModifiableField } from "../fields/ModifiableField";
 import { AttributeField } from "./Attributes";
 import { ConditionData } from "./Condition";
 
-const { SchemaField, NumberField, BooleanField, AnyField, StringField, ArrayField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, AnyField, StringField, ArrayField, DocumentUUIDField } = foundry.data.fields;
 
 const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing' | 'firewall', editable: boolean) => ({
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
@@ -35,6 +35,11 @@ export const MatrixMarksTarget = () => (
     }))
 );
 
+export const LastGridData = () => ({
+    uuid: new DocumentUUIDField()
+});
+
+// Intended for limited matrix actors, shared across all.
 export const MatrixData = () => ({
     attack: new ModifiableField(MatrixAttributeField()),
     sleaze: new ModifiableField(MatrixAttributeField()),
@@ -54,7 +59,8 @@ export const MatrixData = () => ({
     running_silent: new BooleanField(),
     item: new AnyField({ required: false }),
     marks: MatrixMarksTarget(),
-});
+    grid: new SchemaField(LastGridData())
+})
 
 export type MatrixType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixData>>;
 export type MatrixAttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixAttributes>>;

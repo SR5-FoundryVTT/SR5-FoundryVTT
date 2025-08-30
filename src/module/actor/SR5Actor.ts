@@ -700,14 +700,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param network Must be an item of matching type
      */
     async connectNetwork(network: SR5Item) {
-        // General connection handling.
         await MatrixNetworkFlow.addSlave(network, this);
 
-        // Actor type specific connection handling.
-        switch (this.type) {
-            case 'ic':
-                await MatrixICFlow.connectToHost(network, this);
-                break;
+        if (this.isType('ic')) {
+            await MatrixICFlow.connectToHost(network, this);
         }
     }
 
