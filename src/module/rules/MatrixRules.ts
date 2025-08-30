@@ -72,6 +72,10 @@ export class MatrixRules {
         return 0;
     }
 
+    /**
+     * Public Grid Modifier applies a -2 dice pool penalty to all matrix actions
+     * SR5 pg 233 - 234
+     */
     static publicGridModifier(): number {
         return -2;
     }
