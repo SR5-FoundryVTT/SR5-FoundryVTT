@@ -42,12 +42,16 @@ export abstract class DataImporter {
      */
     private static async _xml2json(xmlString: string): Promise<Schemas> {
         const parser = new Parser({
-            explicitArray: false,
-            explicitCharkey: true,
-            charkey: IH.CHAR_KEY,
+            trim: true,             // Remove whitespace around text nodes
+            attrkey: "$",           // Attributes will appear under the this key
+            charkey: "_TEXT",       // Text content will appear under the this key
+            emptyTag: () => null,   // Self-closing or empty tags value
+            explicitRoot: false,    // Skip wrapping the root in an extra object
+            explicitArray: false,   // Only create arrays when multiple elements exist
+            explicitCharkey: true,  // Always use the charKey key for text nodes
         });
 
-        return (await parser.parseStringPromise(xmlString))['chummer'];
+        return parser.parseStringPromise(xmlString);
     }
 
     /**
@@ -55,7 +59,8 @@ export abstract class DataImporter {
      * @param xml - The XML string to parse and import.
      */
     public async parse(xml: string) {
-        return this._parse(await DataImporter._xml2json(xml));
+        const schema = await DataImporter._xml2json(xml);
+        return this._parse(schema);
     }
 
     /**
