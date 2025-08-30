@@ -72,6 +72,10 @@ export class MatrixRules {
         return 0;
     }
 
+    static publicGridModifier(): number {
+        return -2;
+    }
+
     /**
      * Amount of marks that is valid in general for a target (includes zero marks)
      * @param marks The possibly faulty amount of marks

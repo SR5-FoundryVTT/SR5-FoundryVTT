@@ -46,6 +46,7 @@ import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
+import { MatrixRules } from '@/module/rules/MatrixRules';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -717,7 +718,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     getPublicGridModifier(this: SR5Actor) {
         const matrixData = this.matrixData();
-        if (!matrixData) return -2;
+        if (!matrixData) return MatrixRules.publicGridModifier();
         return matrixData.public_grid_modifier;
     }
 
