@@ -488,6 +488,7 @@ export class MatrixNetworkFlow {
      */
     static async storeLastUsedGrid(actor: SR5Actor, network: SR5Item<'grid'>) {
         if (actor.isType('ic')) return;
+        if (!network.isType('grid')) return;
         await actor.update({system: {matrix: {grid: {uuid: network.uuid}}}});
     }
 
