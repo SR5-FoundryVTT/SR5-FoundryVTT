@@ -12,7 +12,7 @@ export interface Gear {
     };
     allowrename?: { _TEXT: "True"; };
     ammoforweapontype?: { _TEXT: string; $?: { noextra: "True"; }; };
-    armorcapacity?: { _TEXT: IntegerString | string; };
+    armorcapacity?: { _TEXT: IntegerString | "Rating/[1]" | "[0]" | "[1]" | "[2]" | "[3]" | "[4]" | "[5]" | "[6]" | "[Rating]"; };
     attack?: { _TEXT: IntegerString | "{CHA}"; };
     attributearray?: { _TEXT: string; };
     avail: { _TEXT: IntegerString | string; };

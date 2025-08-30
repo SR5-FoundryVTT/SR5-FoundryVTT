@@ -36,7 +36,7 @@ export interface Quality {
     metagenic?: { _TEXT: "True"; };
     mutant?: { _TEXT: "True"; };
     name: { _TEXT: string; };
-    nameonpage?: { _TEXT: string; };
+    nameonpage?: { _TEXT: "Adepts" | "Aspected Magicians" | "Magicians" | "Mystic Adepts" | "Special Modifications"; };
     naturalweapons?: {
         naturalweapon: OneOrMany<{
             accuracy: { _TEXT: "Physical"; };

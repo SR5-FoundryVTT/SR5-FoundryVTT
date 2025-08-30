@@ -44,7 +44,7 @@ export interface Accessory {
     reach?: { _TEXT: IntegerString; };
     replacerange?: { _TEXT: "Heavy Pistols"; };
     required?: ConditionsSchema;
-    source?: { _TEXT: IntegerString | string; };
+    source?: { _TEXT: IntegerString | "BTB" | "CF" | "GH3" | "HT" | "KK" | "RG" | "SAG" | "SL" | "SLG2" | "SOTG" | "SR5"; };
     specialmodification?: { _TEXT: "True"; };
     translate?: { _TEXT: string; };
     altpage?: { _TEXT: string; };

@@ -20,7 +20,7 @@ export interface ConditionsSchema {
         magenabled?: Empty;
         metamagic?: { _TEXT: "Advanced Alchemy" | "Home Advantage" | "Patronage" | "Sacrifice"; };
         metamagicart?: { _TEXT: string; };
-        metatype?: { _TEXT: string; };
+        metatype?: { _TEXT: "Centaur" | "Dwarf" | "Elf" | "Human" | "Naga" | "Ork" | "Pixie" | "Sasquatch" | "Troll"; };
         power?: OneOrMany<{ _TEXT: string; }>;
         quality?: OneOrMany<{ _TEXT: string; }>;
         resenabled?: Empty;
@@ -81,12 +81,12 @@ export interface ConditionsSchema {
                 val: { _TEXT: IntegerString; };
             }>;
             spell?: { _TEXT: "Shapechange" | "[Critter] Form"; };
-            tradition?: { _TEXT: string; };
+            tradition?: { _TEXT: "Buddhism" | "Chaos Magic" | "Islam" | "Red Magic" | "Sioux" | "Wicca" | "Wuxing"; };
         }>;
         magenabled?: Empty;
         metamagic?: { _TEXT: "Spell Shaping"; };
         metamagicart?: { _TEXT: "Advanced Ritual Casting" | "Geomancy"; };
-        metatype?: OneOrMany<{ _TEXT: string; }>;
+        metatype?: OneOrMany<{ _TEXT: "A.I." | "Centaur" | "Dwarf" | "Elf" | "Human" | "Naga" | "Ork" | "Pixie" | "Sasquatch" | "Troll"; }>;
         metatypecategory?: { _TEXT: "Shapeshifter"; };
         power?: { _TEXT: string; };
         quality?: OneOrMany<{ _TEXT: string; }>;

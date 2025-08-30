@@ -83,12 +83,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         system.action.type = 'varies';
         system.action.attribute = 'agility';
 
-        let category = jsonData.category._TEXT;
-        // A single item does not meet normal rules, thanks Chummer!
-        // TODO: Check these rules after localization using a generic, non-english approach.
-        if (category === 'Hold-outs') {
-            category = 'Holdouts';
-        }
+        const category = jsonData.category._TEXT;
 
         system.category = WeaponParserBase.GetWeaponType(jsonData);
         system.subcategory = category.toLowerCase();

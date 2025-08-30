@@ -47,7 +47,7 @@ export interface Cyberware {
     modularmount?: { _TEXT: "ankle" | "elbow" | "hip" | "knee" | "shoulder" | "wrist"; };
     mountsto?: { _TEXT: "ankle" | "elbow" | "hip" | "knee" | "shoulder" | "wrist"; };
     name: { _TEXT: string; };
-    notes?: { _TEXT: string; };
+    notes?: { _TEXT: "Bone Lacing does not increase your BOD score, only tests for resisting damage."; };
     page?: { _TEXT: IntegerString; };
     pairbonus?: {
         conditionmonitor?: {
@@ -94,7 +94,7 @@ export interface Cyberware {
     required?: ConditionsSchema;
     requireparent?: Empty;
     selectside?: Empty;
-    source?: { _TEXT: IntegerString | string; };
+    source?: { _TEXT: IntegerString | "BB" | "CF" | "HS" | "HT" | "KC" | "LCD" | "NF" | "R5" | "SAG" | "SR5" | "TCT" | "TSG"; };
     subsystems?: {
         bioware?: OneOrMany<{
             forced?: { _TEXT: "Automatics" | "Locksmith" | "Pistols" | "Unarmed Combat"; };

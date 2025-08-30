@@ -6,13 +6,13 @@ import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Armor {
     addmodcategory?: { _TEXT: string; };
-    addweapon?: { _TEXT: string; };
+    addweapon?: { _TEXT: "Ares Briefcase Shield" | "Ballistic Shield" | "Riot Shield" | "Shiawase Arms Simoom"; };
     armor: { _TEXT: IntegerString | "Rating"; };
     armorcapacity: { _TEXT: IntegerString | "Rating"; };
     armoroverride?: { _TEXT: IntegerString; };
     avail: { _TEXT: IntegerString | string; };
     bonus?: BonusSchema;
-    category: { _TEXT: string; };
+    category: { _TEXT: "Armor" | "Cloaks" | "Clothing" | "High-Fashion Armor Clothing" | "Specialty Armor"; };
     cost: { _TEXT: IntegerString | string; };
     gears?: {
         usegear: OneOrMany<{
@@ -34,10 +34,10 @@ export interface Armor {
     selectmodsfromcategory?: {
         category: { _TEXT: string; };
     };
-    source?: { _TEXT: IntegerString | string; };
+    source?: { _TEXT: IntegerString | "BB" | "CA" | "HAMG" | "HS" | "HT" | "KC" | "NF" | "RF" | "RG" | "SAG" | "SL" | "SR5" | "TCT"; };
     wirelessbonus?: {
         limitmodifier?: {
-            condition: { _TEXT: string; };
+            condition: { _TEXT: "LimitCondition_ClimbingTests" | "LimitCondition_IntimidationVisible" | "LimitCondition_Visible"; };
             limit: { _TEXT: "Physical" | "Social"; };
             value: { _TEXT: IntegerString; };
         };
@@ -87,7 +87,7 @@ export interface ArmorSchema {
         armor: Many<Armor>;
     };
     categories: {
-        category: Many<{ _TEXT: string; $: { blackmarket: "Armor"; translate?: string; }; }>;
+        category: Many<{ _TEXT: "Armor" | "Cloaks" | "Clothing" | "High-Fashion Armor Clothing" | "Specialty Armor"; $: { blackmarket: "Armor"; translate?: string; }; }>;
     };
     modcategories: {
         category: Many<{ _TEXT: string; $: { blackmarket: "Armor" | "Armor,Electronics,Magic,Software"; translate?: string; }; }>;

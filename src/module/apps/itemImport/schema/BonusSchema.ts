@@ -327,7 +327,7 @@ export interface BonusSchema {
         disablespecializationeffects?: Empty;
         max?: { _TEXT: IntegerString; };
         skillcategories?: {
-            category: Many<{ _TEXT: string; }>;
+            category: Many<{ _TEXT: "Combat Active" | "Physical Active" | "Social Active" | "Technical Active" | "Vehicle Active"; }>;
         };
         val?: { _TEXT: IntegerString | "MAG" | "Rating"; };
     };
@@ -340,7 +340,7 @@ export interface BonusSchema {
     skillattribute?: OneOrMany<{
         $?: { precedence: IntegerString; };
         bonus: { _TEXT: IntegerString | "-Rating" | "Rating"; };
-        condition?: { _TEXT: string; };
+        condition?: { _TEXT: "Involving pattern recognition, evidence analysis, clue hunting, or solving puzzles"; };
         name: { _TEXT: "INT" | "LOG" | "MAG" | "WIL"; };
     }>;
     skillcategory?: OneOrMany<{
@@ -369,7 +369,7 @@ export interface BonusSchema {
         name: { _TEXT: "Academic" | "Professional" | "Technical Active"; };
         val: { _TEXT: IntegerString; };
     }>;
-    skilldisable?: OneOrMany<{ _TEXT: string; }>;
+    skilldisable?: OneOrMany<{ _TEXT: "Alchemy" | "Artificing" | "Binding" | "Ritual Spellcasting" | "Spellcasting" | "Summoning"; }>;
     skillgroup?: OneOrMany<{
         bonus: { _TEXT: IntegerString | "Rating"; };
         condition?: { _TEXT: string; };
@@ -402,7 +402,7 @@ export interface BonusSchema {
         $?: { precedence: IntegerString; };
         max?: { _TEXT: IntegerString | "Rating"; };
         min?: { _TEXT: IntegerString; };
-        name: { _TEXT: string; };
+        name: { _TEXT: "AGI" | "BOD" | "CHA" | "DEP" | "EDG" | "INT" | "LOG" | "MAG" | "REA" | "STR" | "WIL"; };
         val?: { _TEXT: IntegerString | "Rating"; };
     }>;
     specificskill?: OneOrMany<{

@@ -87,7 +87,7 @@ export interface Metatype {
     resmin: { _TEXT: IntegerString | "F"; };
     run?: { _TEXT: string; $?: { alt: "4/1/0"; }; };
     skills?: {
-        group?: OneOrMany<{ _TEXT: string; $: { rating: IntegerString | "F"; }; }>;
+        group?: OneOrMany<{ _TEXT: "Athletics" | "Close Combat" | "Conjuring" | "Influence" | "Outdoors" | "Sorcery"; $: { rating: IntegerString | "F"; }; }>;
         knowledge?: { _TEXT: "Animal Calls"; $: { attribute: "LOG"; category: "Professional"; rating: IntegerString; }; };
         skill: Many<{ _TEXT: string; $: { rating: IntegerString | "F" | "F/2"; select?: "Noxious Breath" | "Thorns"; spec?: string; }; }>;
     };
@@ -105,7 +105,7 @@ export interface Metatype {
 };
 
 export interface MetatypeSchema {
-    $: { xmlns?: ""; "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"; "xsi:schemaLocation": string; };
+    $: { xmlns?: ""; "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"; "xsi:schemaLocation": "http://www.w3.org/2001/XMLSchema critters.xsd" | "http://www.w3.org/2001/XMLSchema metatypes.xsd"; };
     categories: {
         category: Many<{ _TEXT: string; $?: { translate: string; }; }>;
     };

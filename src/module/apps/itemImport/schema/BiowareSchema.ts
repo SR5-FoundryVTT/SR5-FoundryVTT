@@ -15,7 +15,7 @@ export interface Bioware {
     };
     avail: { _TEXT: IntegerString | string; };
     bannedgrades?: {
-        grade: Many<{ _TEXT: string; }>;
+        grade: Many<{ _TEXT: "Alphaware" | "Omegaware" | "Standard" | "Standard (Burnout's Way)" | "Used" | "Used (Adapsin)"; }>;
     };
     blocksmounts?: { _TEXT: "ankle,knee,hip" | "wrist,elbow,shoulder"; };
     bonus?: BonusSchema;

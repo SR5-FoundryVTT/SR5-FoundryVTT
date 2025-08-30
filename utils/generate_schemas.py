@@ -22,7 +22,7 @@ REPO = "chummer5a"
 BRANCH = "99664f5ce3d5c1d9bdb4532537bcce8fc9c4c488"  # v5.255.989
 
 # String length threshold for inline union literals
-STRING_LIMIT = 80
+STRING_LIMIT = 100
 
 # Namespace prefixes used in XML processing
 NS_PREFIX = {

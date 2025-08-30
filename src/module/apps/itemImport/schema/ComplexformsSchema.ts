@@ -13,7 +13,7 @@ export interface Complexform {
     page?: { _TEXT: IntegerString; };
     required?: ConditionsSchema;
     source?: { _TEXT: "CF" | "DT" | "KC" | "SR5"; };
-    target: { _TEXT: string; };
+    target: { _TEXT: "Cyberware" | "Device" | "File" | "Host" | "IC" | "Icon" | "Persona" | "Self" | "Sprite"; };
     translate?: { _TEXT: string; };
     altpage?: { _TEXT: string; };
 };

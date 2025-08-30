@@ -26,7 +26,7 @@ export interface Mod {
     ratinglabel?: { _TEXT: "String_Hours" | "String_UpgradedRating"; };
     required?: ConditionsSchema;
     slots: { _TEXT: IntegerString | string; };
-    source?: { _TEXT: IntegerString | string; };
+    source?: { _TEXT: IntegerString | "BB" | "HT" | "KK" | "R5" | "RF" | "SAG" | "SFME" | "SHB" | "SHB3" | "SL" | "SR5" | "SS" | "TCT"; };
     subsystems?: {
         subsystem: Many<{ _TEXT: string; }>;
     };
@@ -92,7 +92,7 @@ export interface Vehicle {
     seats?: { _TEXT: IntegerString; };
     sensor: { _TEXT: IntegerString; };
     source?: { _TEXT: IntegerString | string; };
-    speed: { _TEXT: IntegerString | string; };
+    speed: { _TEXT: IntegerString | "1/1" | "1/4" | "1/7" | "2/3" | "2/5" | "3/4" | "3/6" | "4/3" | "4/4" | "4/5" | "5/3"; };
     weaponmodslots?: { _TEXT: IntegerString; };
     weaponmounts?: {
         weaponmount: OneOrMany<{
