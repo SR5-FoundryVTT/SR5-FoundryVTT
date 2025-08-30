@@ -218,17 +218,17 @@ export class MatrixNetworkFlow {
     static async disconnectNetwork(slave: SR5Actor | SR5Item) {
         const master = MatrixNetworkFlow.getMaster(slave);
         await NetworkStorage.removeFromNetworks(slave);
-
         await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
 
         // Reconnect to previously used grid, if any.
         if (slave instanceof SR5Item || !(master instanceof SR5Item)) return;
-
         await MatrixNetworkFlow.reconnectToLastGrid(slave, master);
     }
 
     /**
      * Reconnect a matrix actor to its last used grid after disconnecting from a host.
+     * 
+     * Apply SR5#239 'Enter/Exit Host' reconnect to last grid.
      * 
      * @param slave The matrix actor to reconnect.
      * @param master The item (typically a host) the actor is being disconnected from.
@@ -243,8 +243,7 @@ export class MatrixNetworkFlow {
         if (!matrixData?.grid.uuid) return;
 
         const grid = foundry.utils.fromUuidSync(matrixData.grid.uuid) as SR5Item<'grid'> | undefined;
-        if (!grid) return;
-
+        if (!grid || !grid.isType('grid')) return;
         await NetworkStorage.addSlave(grid, slave);
     }
 
