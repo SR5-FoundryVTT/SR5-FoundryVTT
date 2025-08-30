@@ -35,6 +35,10 @@ export const MatrixMarksTarget = () => (
     }))
 );
 
+export const LastGridData = () => ({
+    uuid: new DocumentUUIDField()
+});
+
 // Intended for limited matrix actors, shared across all.
 export const MatrixData = () => ({
     attack: new ModifiableField(MatrixAttributeField()),
@@ -55,7 +59,7 @@ export const MatrixData = () => ({
     running_silent: new BooleanField(),
     item: new AnyField({ required: false }),
     marks: MatrixMarksTarget(),
-    grid: new DocumentUUIDField()
+    grid: new SchemaField(LastGridData())
 })
 
 export type MatrixType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixData>>;
