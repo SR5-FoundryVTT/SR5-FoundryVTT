@@ -1,7 +1,6 @@
 import { ModifiableField } from "../fields/ModifiableField";
 import { AttributeField } from "./Attributes";
 import { ConditionData } from "./Condition";
-import { MatrixRules } from '@/module/rules/MatrixRules';
 
 const { SchemaField, NumberField, BooleanField, AnyField, StringField, ArrayField } = foundry.data.fields;
 
@@ -53,7 +52,6 @@ export const MatrixData = () => ({
     link_locked: new BooleanField(),
     hot_sim: new BooleanField(),
     running_silent: new BooleanField(),
-    public_grid_modifier: new NumberField({ required: true, nullable: false, integer: true, initial: MatrixRules.publicGridModifier() }),
     item: new AnyField({ required: false }),
     marks: MatrixMarksTarget(),
 });

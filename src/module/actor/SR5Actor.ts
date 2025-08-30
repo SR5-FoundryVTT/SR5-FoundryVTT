@@ -717,9 +717,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * - this function does not check IF we are connected, simply the dice pool modifier
      */
     getPublicGridModifier(this: SR5Actor) {
-        const matrixData = this.matrixData();
-        if (!matrixData) return MatrixRules.publicGridModifier();
-        return matrixData.public_grid_modifier;
+        if ('public_grid' in this.system.modifiers) {
+            const modifier = this.system.modifiers.public_grid;
+            return MatrixRules.publicGridModifier() + modifier;
+        }
+        return MatrixRules.publicGridModifier();
     }
 
     /**
