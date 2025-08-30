@@ -105,23 +105,20 @@ export abstract class DataImporter {
         const total = dataInput.length;
         const progressBar = ui.notifications.info(`Importing ${documentType}`, { progress: true });
 
-        const updateBar = (name: string, message: string) => {
-            current += 1;
-            progressBar.update({
-                pct: current / total,
-                message: `${documentType} (${current}/${total}) ${message}: ${name}`,
-            });
-        }
-
         for (const data of dataInput) {
             try {
+                current += 1;
+                progressBar.update({
+                    pct: current / total,
+                    message: `${documentType} (${current}/${total}) Parsing: ${data?.name?._TEXT || "Unknown"}`,
+                });
+
                 const id = IH.guidToId(data.id._TEXT);
                 const key = compendiumKey(data);
                 const compendium = compendiums[key] ??= (await IH.GetCompendium(key));
 
                 if (!this.overrideDocuments && compendium.index.has(id)) {
                     IH.setItem(key, data.name._TEXT, id);
-                    updateBar(data.name._TEXT, "Skipped");
                     continue;
                 }
 
@@ -131,14 +128,12 @@ export abstract class DataImporter {
                 item._id = id;
                 IH.setItem(key, data.name._TEXT, id);
 
-                updateBar(data.name._TEXT, "Parsed");
                 counter++;
 
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
             } catch (error) {
                 console.error(error);
-                updateBar(data?.name?._TEXT || "Unknown", "Failed");
                 ui.notifications?.error(`Failed parsing ${documentType}: ${data?.name?._TEXT ?? "Unknown"}`);
             }
         };
