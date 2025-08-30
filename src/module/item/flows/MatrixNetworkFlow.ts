@@ -71,6 +71,10 @@ export class MatrixNetworkFlow {
         console.debug(`Shadowrun5e | Added document ${slave?.name} to the master ${master?.name}`, master, slave);
 
         await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
+
+        if (slave instanceof SR5Actor && master.isType('grid')) {
+            await MatrixNetworkFlow.storeLastUsedGrid(slave, master);
+        }
     }
 
     /**
@@ -216,6 +220,32 @@ export class MatrixNetworkFlow {
         await NetworkStorage.removeFromNetworks(slave);
 
         await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
+
+        // Reconnect to previously used grid, if any.
+        if (slave instanceof SR5Item || !(master instanceof SR5Item)) return;
+
+        await MatrixNetworkFlow.reconnectToLastGrid(slave, master);
+    }
+
+    /**
+     * Reconnect a matrix actor to its last used grid after disconnecting from a host.
+     * 
+     * @param slave The matrix actor to reconnect.
+     * @param master A possible grid already connected to.
+     */
+    static async reconnectToLastGrid(slave: SR5Actor, master: SR5Item) {
+        // Let users disconnect from grids only.
+        if (!master.isNetwork() || !master.isType('host')) return;
+        // Disallow non-matrix actors from reconnecting
+        if (!slave.isMatrixActor) return;
+
+        const matrixData = slave.matrixData();
+        if (!matrixData?.grid) return;
+
+        const grid = foundry.utils.fromUuidSync(matrixData.grid) as SR5Item<'grid'> | undefined;
+        if (!grid) return;
+
+        await NetworkStorage.addSlave(grid, slave);
     }
 
     /**
@@ -447,6 +477,18 @@ export class MatrixNetworkFlow {
      */
     static allGrids() {
         return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid')) ?? [];
+    }
+
+    /**
+     * Store grid uuid on new connection to allow reconnecting to
+     * - reconnect to last grid on host disconnect
+     * - have a reference for checking for public grids within a host if necessary
+     * 
+     * See SR5#239 'Enter/Exit Host'
+     */
+    static async storeLastUsedGrid(actor: SR5Actor, network: SR5Item<'grid'>) {
+        if (actor.isType('ic')) return;
+        await actor.update({system: {matrix: {grid: network.uuid}}});
     }
 
     /**

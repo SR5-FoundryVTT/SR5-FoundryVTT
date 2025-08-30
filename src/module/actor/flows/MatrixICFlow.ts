@@ -16,7 +16,6 @@ export const MatrixICFlow = {
     async connectToHost(host: SR5Item, ic: SR5Actor) {
         // Allow call to drop out gracefully.
         if (!ic.isType('ic')) return;
-        // TODO: foundry-vtt-types v9
         const hostData = host.asType('host');
         if (!hostData) return;
 
