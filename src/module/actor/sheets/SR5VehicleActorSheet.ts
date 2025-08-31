@@ -96,10 +96,14 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
 
         const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
 
-        // Handle specific system drop events.
-        switch (dropData.type) {
-            case "Actor":
-                return this.actor.addVehicleDriver(dropData.uuid)
+        if (dropData.type === 'Actor') {
+            return this.actor.addVehicleDriver(dropData.uuid)
+        } else if (dropData.type === 'Item') {
+            // if an item is dropped on us that can be a Master, connect to it
+            const item = await fromUuid(dropData.uuid) as SR5Item | undefined;
+            if (item && item.canBeMaster) {
+                return await this.actor.connectNetwork(item);
+            }
         }
 
         // Handle none specific drop events.
@@ -140,6 +144,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
     async _handleRemoveVehicleDriver(event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
+        this.render();
     }
 
     async _onOpenOriginLink(event) {
@@ -158,6 +163,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
     async _onControllerRemove(event) {
         event.preventDefault();
 
-        return MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
+        await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
+        this.render();
     }
 }
