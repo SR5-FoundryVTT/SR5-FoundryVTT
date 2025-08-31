@@ -14,7 +14,7 @@ const THRESHOLD_PREFIX = "Threshold:";
 export class ActionParser extends Parser<'action'> {
     protected readonly parseType = 'action';
 
-    private readonly matrixAttrs = Object.keys(SR5.matrixAttributes) as (keyof typeof SR5.matrixAttributes)[];
+    private readonly attrs = Object.keys(SR5.attributes) as (keyof typeof SR5.attributes)[];
     private readonly limits = Object.keys(SR5.limits) as (keyof typeof SR5.limits)[];
     private readonly skills = Object.keys(SR5.activeSkills) as (keyof typeof SR5.activeSkills)[];
     private storedActions: Record<string, ActionRollType> = {};
@@ -32,9 +32,8 @@ export class ActionParser extends Parser<'action'> {
         if (jsonData.test) {
             const [dicePoolStr, opposedDicePoolStr] = jsonData.test.dice._TEXT.split(DICE_POOL_SEPARATOR);
             this.parseDicePool(system, action, dicePoolStr);
-            if (opposedDicePoolStr) {
+            if (opposedDicePoolStr)
                 this.parseOpposedPool(system, action, opposedDicePoolStr);
-            }
 
             if (jsonData.test.limit?._TEXT) {
                 const limit = IH.formatAsSlug(jsonData.test.limit._TEXT).replaceAll("-", "_");
@@ -45,9 +44,35 @@ export class ActionParser extends Parser<'action'> {
         // 3. Determine the specific test type based on various conditions
         this.setTestAction(action, jsonData);
 
+        if (jsonData.test?.bonusstring?._TEXT)
+            this.handleSpecial(action, jsonData.test.bonusstring._TEXT);
+
         // 4. Store the parsed action for potential reuse by other actions
         this.storedActions[jsonData.name._TEXT] = action;
         return system;
+    }
+
+    private handleSpecial(action: ActionRollType, bonusstring: string) {
+        const marks = Number(bonusstring.match(/Requires\s+(\d+)\s+marks?/i)?.[1]);
+        if (marks)
+            action.category.matrix.marks = marks;
+
+        if (bonusstring.includes("resist {Icon: Attack}")) {
+            action.damage.type.base = "matrix";
+            action.damage.attribute = "attack";
+
+            action.opposed.resist.test = "MatrixDefenseTest";
+
+            if (bonusstring.toLowerCase().includes("biofeedback")) {
+                action.opposed.resist.test = "BiofeedbackResistTest";
+
+                if (bonusstring.toLowerCase().includes("stun"))
+                    action.damage.biofeedback = "stun";
+            }
+        }
+
+        if (bonusstring.toLowerCase().includes("resist fading"))
+            action.followed.test = "FadeTest";
     }
 
     /**
@@ -78,9 +103,19 @@ export class ActionParser extends Parser<'action'> {
         if (components[0]) target.attribute  = Constants.attributeTable[components[0]];
         if (components[1]) target.attribute2 = Constants.attributeTable[components[1]];
 
+        if (dicePoolStr.trim() === "2 * {Icon: Rating}") {
+            target.attribute = "rating";
+            target.attribute2 = "rating";
+        }
+
+        if (components[0] && !target.attribute) {
+            const attrSlug = IH.formatAsSlug(components[0]).replaceAll("-", "_");
+            target.attribute = this.attrs.find(a => attrSlug.includes(a)) || "";
+        }
+
         if (components[1] && !target.attribute2) {
             const attrSlug = IH.formatAsSlug(components[1]).replaceAll("-", "_");
-            target.attribute2 = this.matrixAttrs.find(a => attrSlug.includes(a)) || "";
+            target.attribute2 = this.attrs.find(a => attrSlug.includes(a)) || "";
         }
 
         if (components[1] && !target.attribute2){
@@ -88,27 +123,34 @@ export class ActionParser extends Parser<'action'> {
             target.skill = this.skills.find(s => skillSlug.includes(s)) || "";
         }
 
-        // Parse constant modifier
-        const modifier = [...dicePoolStr.matchAll(/([+-]\s*\d+)/g)]
-            .map(m => Number(m[1].replaceAll(/\s+/g, "")))
-            .reduce((acc, curr) => acc + curr, 0);
-
         if (!isNaN(Number(components[0])))
             target.mod = Number(components[0]);
+
+        // Parse constant modifier
+        const modifier = [...dicePoolStr.replace("2 *", "").matchAll(/([+-]?\s*\d+)/g)]
+            .map(m => Number(m[1].replaceAll(/\s+/g, "")))
+            .reduce((acc, curr) => acc + curr, 0);
 
         if (modifier)
             target.mod += modifier;
 
         if (!target.attribute || !(target.attribute2 || target.skill)) {
             if (!target.attribute && components[0])
-                system.description.value += `\n[Cannot automate pool: ${components[0]}]`;
+                this.addException(system.description, components[0]);
             if (!(target.attribute2 || target.skill) && components[1])
-                system.description.value += `\n[Cannot automate pool: ${components[1]}]`;
-            console.warn(`Could not fully parse dice pool: ${dicePoolStr}`);
+                this.addException(system.description, components[1]);
         }
 
         for (const comp of components.slice(2))
-            system.description.value += `\n[Cannot automate pool: ${comp}]`;
+            this.addException(system.description, comp);
+    }
+
+    private addException(
+        description: ReturnType<typeof this.getBaseSystem>['description'],
+        exception: string
+    ) {
+        if (exception.includes("Improvement Value:")) return;
+        description.value += `\n\n[Cannot automate pool: {${exception}}]`;
     }
 
     /**
@@ -167,8 +209,13 @@ export class ActionParser extends Parser<'action'> {
             action.test = "ThrownAttackTest";
         } else if (action.skill === "summoning") {
             action.test = "SummonSpiritTest";
+            action.followed.test = "DrainTest";
             action.opposed.test = "OpposedSummonSpiritTest";
-        } else if (jsonData.test?.dice._TEXT.includes("Ranged Defense")) {
+        } else if (action.skill === "compiling") {
+            action.test = "CompileSpriteTest";
+            action.followed.test = "FadeTest";
+            action.opposed.test = "OpposedCompileSpriteTest";
+        }else if (jsonData.test?.dice._TEXT.includes("Ranged Defense")) {
             action.test = "RangedAttackTest";
         } else if (category === "Matrix" && name.includes("Defense")) {
             action.test = "MatrixDefenseTest";
