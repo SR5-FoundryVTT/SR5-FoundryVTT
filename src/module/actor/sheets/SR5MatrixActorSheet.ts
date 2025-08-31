@@ -21,7 +21,9 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     // Stores icons connected to the selected matrix target.
     selectedMatrixTargetIcons: Shadowrun.MatrixTargetDocument[];
     // Targets to be displayed in the matrix tab.
-    matrixTargets: Shadowrun.MatrixTargetDocument[]
+    matrixTargets: Shadowrun.MatrixTargetDocument[];
+    // the master device being used to connect to the matrix
+    matrixDevice: SR5Item | undefined;
 }
 
 export class SR5MatrixActorSheet extends SR5BaseActorSheet {
@@ -50,8 +52,17 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
         this._prepareMatrixTargets(data);
         await this._prepareMarkedDocuments(data);
+        this._prepareMatrixDevice(data);
 
         return data;
+    }
+
+    /**
+     * Add the currently equipped matrix device to the sheet data
+     * @param data
+     */
+    _prepareMatrixDevice(data: MatrixActorSheetData) {
+        data.matrixDevice = this.actor?.getMatrixDevice();
     }
 
     _prepareMatrixTargets(data: MatrixActorSheetData) {
