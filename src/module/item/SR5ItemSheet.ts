@@ -415,6 +415,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         html.find('input[name="system.technology.equipped"').on('change', this._onToggleEquippedDisableOtherDevices.bind(this))
 
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
+        html.find('.open-matrix-slave').on('click', this._onOpenSlave.bind(this));
 
         html.find('.power-optional-input').on('change', this._onPowerOptionalInputChanged.bind(this));
 
@@ -758,6 +759,26 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         if (!document) return;
 
         await this.item.removeSlave(document);
+    }
+
+    /**
+     * Open a document from a DOM node containing a dataset uuid.
+     *
+     * This is intended to let deckers open marked documents they're FoundryVTT user has permissions for.
+     *
+     * @param event Any interaction event
+     */
+    async _onOpenSlave(event) {
+        event.stopPropagation();
+
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
+
+        // Marked documents can´t live in packs.
+        const document = fromUuidSync(uuid) as SR5Item|SR5Actor;
+        if (!document) return;
+
+        await document.sheet?.render(true);
     }
 
     /**
