@@ -1165,4 +1165,18 @@ export class Helpers {
         if (a.name < b.name) return -1;
         return 0;
     }
+
+    /**
+     * Localizes a content name if a translation exists.
+     *
+     * Content tends to be the name on an item.
+     *
+     * @param name The content name to localize.
+     * @returns Sheet usable text, either translated or original name.
+     */
+    static localizeContent(name: string): string {
+        const label = `SR5.Content.${name}`;
+        const localized = game.i18n.localize(label);
+        return localized === label ? name : localized;        
+    }
 }

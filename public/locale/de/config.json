@@ -1247,7 +1247,9 @@
             "MeleeAttackTest": "Nahkampfangriff",
             "NaturalRecoveryPhysicalTest": "Natürliche körperliche Genesung",
             "NaturalRecoveryStunTest": "Natürliche geistige Genesung",
+            "OpposedBruteForceTest": "Widerstehe Brute Force",
             "OpposedCompileSpriteTest": "Widerstehe Kompilierung",
+            "OpposedHackOnTheFlyTest": "Widerstehe Eiliges Hacken",
             "OpposedRitualTest": "Besiegel das Ritual",
             "OpposedSummonSpiritTest": "Widerstehe Herbeirufung",
             "OpposedTest": "Vergleichende Probe",
@@ -1568,7 +1570,11 @@
             "Type": "Typ",
             "Weapon": "Waffen"
         },
-        "Wireless": "WiFi"
+        "Wireless": "WiFi",
+        "Content": {
+            "Brute Force": "Brute Force",
+            "Hack on the Fly": "Eiliges Hacken"
+        }
     },
     "TYPES": {
         "Actor": {

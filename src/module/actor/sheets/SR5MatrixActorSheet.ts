@@ -16,7 +16,7 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     markedDocuments: Shadowrun.MarkedDocument[]
     handledItemTypes: string[]
     network: SR5Item | null
-    matrixActions: SR5Item[]
+    matrixActions: {name: string, action: SR5Item}[]
     selectedMatrixTarget: string|undefined
     // Stores icons connected to the selected matrix target.
     selectedMatrixTargetIcons: Shadowrun.MatrixTargetDocument[];
@@ -268,7 +268,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      *
      * If a marked document is selected, only actions with a mark requirement will show.
      *
-     * @returns Alphabetically sorted array of matrix actions.
+     * @returns Sorted list of objects containg a localized name and action item for sheet display.
      */
     async _prepareMatrixActions() {
         const packActions = await this._getMatrixPackActions();
@@ -282,7 +282,14 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
             actions = actions.filter(action => (action.system.action.category.matrix?.marks ?? 0) <= marks);
         }
 
-        return actions.sort(Helpers.sortByName.bind(Helpers)) as SR5Item[];
+        // Prepare sorting and display of a possibly translated document name.
+        return actions.map(action => {
+                return {
+                    name: Helpers.localizeContent(action.name),
+                    action
+                };
+            })
+            .sort(Helpers.sortByName.bind(Helpers));
     }
 
     /**
