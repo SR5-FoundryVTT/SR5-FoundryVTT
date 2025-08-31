@@ -25,8 +25,10 @@ export class SR5TokenDocument extends TokenDocument {
      * @param args
      */
     override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
-        // ensure we disconnect from any networks before being deleted
-        await this.actor?.disconnectNetwork();
+        // ensure we disconnect from any networks before being a token actor is deleted
+        if (this.actor?.isToken) {
+            await this.actor?.disconnectNetwork();
+        }
         return super._preDelete(...args);
     }
 
