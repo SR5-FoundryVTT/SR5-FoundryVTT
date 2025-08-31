@@ -124,7 +124,17 @@ export const NetworkStorage = {
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuids = networks[masterUuid] ?? [];
-        return slaveUuids.map(uuid => fromUuidSync(Helpers.uuidFromStorage(uuid))) as (SR5Actor | SR5Item)[];
+        const slaves = [] as (SR5Actor | SR5Item)[];
+        for (const uuid of slaveUuids) {
+            const item = fromUuidSync(Helpers.uuidFromStorage(uuid));
+            // in case we have a stale id in storage, only add valid items
+            if (item) {
+                slaves.push(item as (SR5Actor | SR5Item));
+            } else {
+                console.warn(`Could not find item from id ${uuid}. Consider clearing all Networked Items for ${master?.name}`)
+            }
+        }
+        return slaves;
     },
 
     /**

@@ -21,6 +21,17 @@ export class SR5TokenDocument extends TokenDocument {
     }
 
     /**
+     * Handle system specific things when this token document is being deleted
+     * @param options
+     * @param user
+     */
+    override async _preDelete(options, user) {
+        // ensure we disconnect from any networks before being deleted
+        await this.actor?.disconnectNetwork();
+        return super._preDelete(options, user);
+    }
+
+    /**
      * This method measures the distance a Token moves through the provided waypoints.
      * If the token actor implements MovementActorData and the selected movement action is 'walk', it will change the movement
      * action for each waypoint according to the rules for walking/running/sprinting.

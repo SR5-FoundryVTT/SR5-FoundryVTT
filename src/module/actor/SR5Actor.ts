@@ -2232,4 +2232,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     getExtraMarkDamageModifier() {
         return 2;
     }
+
+    /**
+     * Handle system specific things when this actor is being deleted
+     * - NOTE that this does not apply to Token Actors. Those are handled through SR5TokenDocument
+     * @param options
+     * @param user
+     */
+    override async _preDelete(options, user) {
+        // NetworkStorage needs to be cleared of us before we are deleted
+        await this.disconnectNetwork();
+        return super._preDelete(options, user);
+    }
 }
