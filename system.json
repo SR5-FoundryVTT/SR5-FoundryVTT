@@ -12,7 +12,7 @@
     "version": "0.30.0",
     "compatibility": {
         "minimum": "13",
-        "verified": "13.346",
+        "verified": "13.347",
         "maximum": "13"
     },
     "documentTypes": {
