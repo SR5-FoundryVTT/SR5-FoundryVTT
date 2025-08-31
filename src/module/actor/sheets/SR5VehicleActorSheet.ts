@@ -1,14 +1,16 @@
 import {SR5Actor} from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
-import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
+import { SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { Helpers } from '@/module/helpers';
+import { MatrixRules } from '@/module/rules/MatrixRules';
 
 interface VehicleSheetDataFields {
     driver: SR5Actor|undefined
     master: SR5Item | undefined
 }
 
-export class SR5VehicleActorSheet extends SR5BaseActorSheet {
+export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
     /**
      * Vehicle actors will handle these item types specifically.
      *
@@ -57,6 +59,18 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         return data;
     }
 
+    protected override async _getMatrixPackActions() {
+        const matrixPackName = Helpers.getMatrixActionsPackName();
+
+        // filter out illegal actions from the matrix actions
+        return (await Helpers.getPackActions(matrixPackName)).filter((action) => {
+            return !MatrixRules.isIllegalAction(
+                        action.getAction()?.attribute as any,
+                        action.getAction()?.attribute2 as any,
+                        action.getAction()?.limit?.attribute as any);
+        });
+    }
+
     override activateListeners(html: JQuery) {
         super.activateListeners(html);
 
@@ -66,6 +80,8 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         // PAN/WAN
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
         html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
+
+        html.find('.connect-to-driver').on('click', this._onConnectToDriver.bind(this));
     }
 
     /**
@@ -99,6 +115,26 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
             driver,
             master,
         };
+    }
+
+    /**
+     * Connect to the PAN of the Driver
+     * @param event
+     */
+    async _onConnectToDriver(event) {
+        event.preventDefault();
+        const driver = this.actor.getVehicleDriver();
+        if (driver) {
+            const device = driver.getMatrixDevice();
+            if (device) {
+                await device.addSlave(this.actor);
+                this.render(false);
+            } else {
+                ui.notifications.error("No Device found on Driver")
+            }
+        } else {
+            ui.notifications.error("No Driver found")
+        }
     }
 
     async _handleRemoveVehicleDriver(event) {
