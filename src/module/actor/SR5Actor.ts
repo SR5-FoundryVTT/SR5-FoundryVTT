@@ -2239,8 +2239,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param args
      */
     override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
-        // NetworkStorage needs to be cleared of us before we are deleted
-        await this.disconnectNetwork();
+        await MatrixNetworkFlow.handleOnDeleteDocument(this);
         return super._preDelete(...args);
     }
 }

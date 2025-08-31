@@ -1,3 +1,5 @@
+import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
+
 export class SR5TokenDocument extends TokenDocument {
     /**
      * Used by measureMovementPath to track if a movement is being planned or executed.
@@ -27,7 +29,7 @@ export class SR5TokenDocument extends TokenDocument {
     override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
         // ensure we disconnect from any networks before being a token actor is deleted
         if (this.actor?.isToken) {
-            await this.actor?.disconnectNetwork();
+            await MatrixNetworkFlow.handleOnDeleteDocument(this.actor);
         }
         return super._preDelete(...args);
     }
