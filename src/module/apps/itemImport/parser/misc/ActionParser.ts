@@ -164,6 +164,8 @@ export class ActionParser extends Parser<'action'> {
         const components = [...opposedDicePoolStr.matchAll(/\{([^}]+)\}/g)].map(m => m[1]);
         const { opposed, threshold } = action;
 
+        action.opposed.test = "OpposedTest";
+
         if (components[0]?.includes(THRESHOLD_PREFIX)) {
             threshold.base = Number(components[0].replace(THRESHOLD_PREFIX, "").trim()) || 0;
         } else {
@@ -221,6 +223,8 @@ export class ActionParser extends Parser<'action'> {
             action.test = "MatrixDefenseTest";
         } else if (category === "Matrix" || action.opposed.test === "MatrixDefenseTest") {
             action.test = "MatrixTest";
+            if (action.test === "MatrixTest" && action.opposed.test === "OpposedTest")
+                action.opposed.test = "MatrixDefenseTest";
         }
 
         const cls = TestCreator._getTestClass(action.test);
