@@ -11,7 +11,7 @@ export type RetrievedItem = Item.Source & { name_english: string };
  * Designed to streamline data processing and reduce the impact of structural changes in external data sources.
  */
 export class ImportHelper {
-    private static readonly folders: Record<string, Promise<Folder>> = {};
+    static folders: Record<string, Promise<Folder>> = {};
     private static readonly categoryMap: Partial<Record<ChummerFile, Record<string, string>>> = {};
     private static readonly nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
     private static readonly idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};

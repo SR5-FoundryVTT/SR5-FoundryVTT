@@ -1,9 +1,10 @@
 import { Parser } from "../Parser";
-import { Action } from "../../schema/ActionsSchema";
-import { CompendiumKey, Constants } from "../../importer/Constants";
-import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { SR5 } from "@/module/config";
+import { Action } from "../../schema/ActionsSchema";
+import { TestCreator } from "@/module/tests/TestCreator";
 import { ActionRollType } from "@/module/types/item/Action";
+import { ImportHelper as IH } from "../../helper/ImportHelper";
+import { CompendiumKey, Constants } from "../../importer/Constants";
 
 // Define constants to avoid "magic strings"
 const DICE_POOL_SEPARATOR = 'v.';
@@ -30,9 +31,9 @@ export class ActionParser extends Parser<'action'> {
         // 2. Parse the test dice pools if they exist
         if (jsonData.test) {
             const [dicePoolStr, opposedDicePoolStr] = jsonData.test.dice._TEXT.split(DICE_POOL_SEPARATOR);
-            this.parseDicePool(action, dicePoolStr);
+            this.parseDicePool(system, action, dicePoolStr);
             if (opposedDicePoolStr) {
-                this.parseOpposedPool(action, opposedDicePoolStr);
+                this.parseOpposedPool(system, action, opposedDicePoolStr);
             }
 
             if (jsonData.test.limit?._TEXT) {
@@ -52,7 +53,11 @@ export class ActionParser extends Parser<'action'> {
     /**
      * Parses a dice pool string and applies its components (attributes, skill, modifier) to a target object.
      */
-    private parseDicePool(target: ActionRollType | ActionRollType['opposed'], dicePoolStr: string) {
+    private parseDicePool(
+        system: ReturnType<typeof this.getBaseSystem>,
+        target: ActionRollType | ActionRollType['opposed'],
+        dicePoolStr: string
+    ) {
         if (dicePoolStr === 'None') return;
 
         const components = [...dicePoolStr.matchAll(/\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g)].map(m => m[1]);
@@ -78,7 +83,7 @@ export class ActionParser extends Parser<'action'> {
             target.attribute2 = this.matrixAttrs.find(a => attrSlug.includes(a)) || "";
         }
 
-        if (components[1] && !target.attribute2 && !components[1]?.includes("Icon")) {
+        if (components[1] && !target.attribute2){
             const skillSlug = IH.formatAsSlug(components[1]).replaceAll("-", "_");
             target.skill = this.skills.find(s => skillSlug.includes(s)) || "";
         }
@@ -95,14 +100,25 @@ export class ActionParser extends Parser<'action'> {
             target.mod += modifier;
 
         if (!target.attribute || !(target.attribute2 || target.skill)) {
+            if (!target.attribute && components[0])
+                system.description.value += `\n[Cannot automate pool: ${components[0]}]`;
+            if (!(target.attribute2 || target.skill) && components[1])
+                system.description.value += `\n[Cannot automate pool: ${components[1]}]`;
             console.warn(`Could not fully parse dice pool: ${dicePoolStr}`);
         }
+
+        for (const comp of components.slice(2))
+            system.description.value += `\n[Cannot automate pool: ${comp}]`;
     }
 
     /**
      * Parses the opposed part of a test string.
      */
-    private parseOpposedPool(action: any, opposedDicePoolStr: string) {
+    private parseOpposedPool(
+        system: ReturnType<typeof this.getBaseSystem>,
+        action: ActionRollType,
+        opposedDicePoolStr: string
+    ) {
         const components = [...opposedDicePoolStr.matchAll(/\{([^}]+)\}/g)].map(m => m[1]);
         const { opposed, threshold } = action;
 
@@ -110,14 +126,14 @@ export class ActionParser extends Parser<'action'> {
             threshold.base = Number(components[0].replace(THRESHOLD_PREFIX, "").trim()) || 0;
         } else {
             // If it's not a threshold, it's a standard opposed dice pool
-            this.parseDicePool(opposed, opposedDicePoolStr);
+            this.parseDicePool(system, opposed, opposedDicePoolStr);
         }
     }
 
     /**
      * Sets the final 'test' property on the action based on its name, category, or skill.
      */
-    private setTestAction(action: any, jsonData: Action) {
+    private setTestAction(action: ActionRollType, jsonData: Action) {
         const name = jsonData.name._TEXT;
         const category = jsonData.category?._TEXT;
 
@@ -130,16 +146,13 @@ export class ActionParser extends Parser<'action'> {
             "Use Skill": "SkillTest",
         };
 
-        if (testMap[name]) {
-            action.test = testMap[name];
-            return;
-        }
-
-        // Handle more complex, conditional logic
         if (name.includes("Reckless Spellcasting")) {
             action.followed.mod = 3;
         }
-        if (name.includes("Spell Defense")) {
+
+        if (testMap[name]) {
+            action.test = testMap[name];
+        } else if (name.includes("Spell Defense")) {
             action.test = "CombatSpellDefenseTest";
         } else if (action.skill === "spellcasting") {
             action.test = "SpellCastingTest";
@@ -162,11 +175,23 @@ export class ActionParser extends Parser<'action'> {
         } else if (category === "Matrix" || action.opposed.test === "MatrixDefenseTest") {
             action.test = "MatrixTest";
         }
+
+        const cls = TestCreator._getTestClass(action.test);
+        if (cls) {
+            try {
+                const testCls = new cls(TestCreator._minimalTestData());
+                action.categories = testCls.testCategories;
+                action.modifiers = testCls.testModifiers;
+            } catch (error) {
+                console.error("Error creating test class:", error);
+            }
+        }
     }
 
     protected override async getFolder(jsonData: Action, compendiumKey: CompendiumKey): Promise<Folder> {
-        const matrix = jsonData.category?._TEXT === "Matrix";
-        const rootFolder = (matrix ? "Matrix " : "") + game.i18n.localize("TYPES.Item.action");
+        const matrix = this.storedActions[jsonData.name._TEXT]?.test?.includes("Matrix");
+        const matrixLabel = game.i18n.localize("SR5.Labels.ActorSheet.Matrix");
+        const rootFolder = game.i18n.localize("TYPES.Item.action") + (matrix ? ` (${matrixLabel})` : "");
         const subFolder = jsonData.type?._TEXT || "Unknown";
         return IH.getFolder(compendiumKey, rootFolder, subFolder);
     }

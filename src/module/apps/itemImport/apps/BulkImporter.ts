@@ -15,6 +15,7 @@ import { WareImporter } from "../importer/WareImporter";
 import { WeaponImporter } from "../importer/WeaponImporter";
 import { WeaponModImporter } from "../importer/WeaponModImporter";
 import { Constants } from "../importer/Constants";
+import { ImportHelper } from "../helper/ImportHelper";
 import * as IconAssign from "../../iconAssigner/iconAssign";
 import JSZip from "jszip";
 
@@ -229,6 +230,7 @@ export class BulkImporter extends HandlebarsApplicationMixin(ApplicationV2<Impor
         const ZIP = BulkImporter.zipFile ? await (new JSZip()).loadAsync(BulkImporter.zipFile) : null;
 
         // Configure shared importer settings
+        ImportHelper.folders = {};
         DataImporter.setIcons = BulkImporter.setIcons;
         DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
         DataImporter.iconList = await IconAssign.getIconFiles();

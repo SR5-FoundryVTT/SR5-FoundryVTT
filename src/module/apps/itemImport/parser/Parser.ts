@@ -46,8 +46,8 @@ export abstract class Parser<SubType extends SystemEntityType> {
         const entity = {
             name: jsonData.translate?._TEXT ?? jsonData.name._TEXT,
             type: this.parseType as any,
-            folder: (await this.getFolder(jsonData, compendiumKey)).id,
             system: this.getSanitizedSystem(jsonData),
+            folder: (await this.getFolder(jsonData, compendiumKey)).id,
         } satisfies Actor.CreateData | Item.CreateData;
 
         const system = entity.system;
