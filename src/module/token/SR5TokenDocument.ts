@@ -22,13 +22,12 @@ export class SR5TokenDocument extends TokenDocument {
 
     /**
      * Handle system specific things when this token document is being deleted
-     * @param options
-     * @param user
+     * @param args
      */
-    override async _preDelete(options, user) {
+    override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
         // ensure we disconnect from any networks before being deleted
         await this.actor?.disconnectNetwork();
-        return super._preDelete(options, user);
+        return super._preDelete(...args);
     }
 
     /**

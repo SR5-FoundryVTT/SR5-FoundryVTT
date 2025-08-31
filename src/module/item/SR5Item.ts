@@ -1426,10 +1426,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Handle system specific things before this item is deleted
-     * @param options
-     * @param user
+     * @param args
      */
-    override async _preDelete(options, user) {
+    override async _preDelete(...args: Parameters<Item["_preDelete"]>) {
         // check if we are our owners active matrix device
         if (this.isEquipped() && this.actorOwner?.getMatrixDevice() === this) {
             await this.actorOwner?.disconnectNetwork();
@@ -1438,6 +1437,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         await this.disconnectFromNetwork();
         // remove any matrix slaved items we have connected
         await this.removeAllSlaves();
-        return await super._preDelete(options, user);
+        return await super._preDelete(...args);
     }
 }

@@ -2236,12 +2236,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Handle system specific things when this actor is being deleted
      * - NOTE that this does not apply to Token Actors. Those are handled through SR5TokenDocument
-     * @param options
-     * @param user
+     * @param args
      */
-    override async _preDelete(options, user) {
+    override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
         // NetworkStorage needs to be cleared of us before we are deleted
         await this.disconnectNetwork();
-        return super._preDelete(options, user);
+        return super._preDelete(...args);
     }
 }
