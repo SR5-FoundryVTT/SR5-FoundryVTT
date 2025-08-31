@@ -566,7 +566,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Return the given attribute, no matter its source.
      *
-     * For characters and similar this will only return their attributes.
+     * For characters and similar this will check their attributes.
+     * For Matrix Users, it will return the matrix attribute.
      * For vehicles this will also return their vehicle stats.
 
      * @param name An attribute or other stats name.
@@ -580,11 +581,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const stats = rollData.vehicle_stats ?? this.getVehicleStats();
         if (stats?.[name]) return stats[name];
 
-        // second check matrix
+        // Second check matrix attributes
         const matrixData = rollData.matrix ?? this.matrixData();
         if (matrixData?.[name]) return matrixData[name];
 
-        // Second check general attributes.
+        // Finally, check general attributes.
         const attributes = rollData.attributes ?? this.getAttributes();
         return attributes[name];
     }
