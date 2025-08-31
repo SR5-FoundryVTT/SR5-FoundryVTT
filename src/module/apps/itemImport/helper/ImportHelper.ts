@@ -178,11 +178,11 @@ export class ImportHelper {
      * @param parent The parent folder, or `null` if the folder is at the root level.
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
-    private static async getCompendiumFolder(name: string, parent: Folder | null = null): Promise<Folder> {
+    private static async getCompendiumFolder(name: string, parent: Folder | null = null): Promise<Folder<'Compendium'>> {
         let folder = game.folders?.find(f => f.name === name && f.type === "Compendium" && f.folder === parent);
         if (!folder)
             folder = await Folder.create({ name, color: "#00cc00", folder: parent?.id ?? null, type: "Compendium" });
-        return folder!;
+        return folder as Folder<'Compendium'>;
     }
 
     /**
@@ -214,7 +214,7 @@ export class ImportHelper {
                 type,
                 name: pack,
                 label: game.i18n.localize(`SR5.Compendiums.${pack}`)
-            }, { folder: currentFolder?.id ?? null });
+            }, { folder: currentFolder.id });
         }
 
         return compendium;

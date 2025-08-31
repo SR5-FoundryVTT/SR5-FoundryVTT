@@ -66,7 +66,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         if (jsonData.page && jsonData.source) {
             const page = jsonData.altpage?._TEXT ?? jsonData.page._TEXT;
             const source = jsonData.source._TEXT;
-            system.description = DataDefaults.createData('description', {source: `${source} ${page}`});
+            system.description.source = `${source} ${page}`;
         }
 
         // Runtime branching

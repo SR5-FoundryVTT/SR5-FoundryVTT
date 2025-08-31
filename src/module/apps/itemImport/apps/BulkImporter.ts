@@ -1,3 +1,4 @@
+import { ActionImporter } from "../importer/ActionImporter";
 import { AdeptPowerImporter } from "../importer/AdeptPowerImporter";
 import { ArmorImporter } from "../importer/ArmorImporter";
 import { ComplexFormImporter } from "../importer/ComplexFormImporter";
@@ -129,6 +130,7 @@ export class BulkImporter extends HandlebarsApplicationMixin(ApplicationV2<Impor
         new EchoesImporter(),
         new AdeptPowerImporter(),
         new ArmorImporter(),
+        new ActionImporter(),
     ] as const satisfies readonly DataImporter[];
 
     /**

@@ -11,13 +11,6 @@ export const { CUSTOM: MODIFY, MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = C
 export type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: ActiveEffectMode; };
 
 export class BonusConstant {
-    public static readonly attributeTable = {
-        "BOD": "body", "AGI": "agility", "REA": "reaction",
-        "STR": "strength", "WIL": "willpower","LOG": "logic",
-        "INT": "intuition", "CHA": "charisma", "EDG": "edge",
-        "MAG": "magic", "RES": "ressonance", "ESS": "essence"
-    } as const;
-
     public static readonly skillGroupTable = {
         "Acting": ["con", "impersonation", "performance"],
         "Athletics": ["gymnastics", "running", "swimming", "flight"],

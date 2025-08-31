@@ -1,4 +1,4 @@
-
+import { ActionsSchema, Action } from "../schema/ActionsSchema";
 import { ArmorSchema, Armor, Mod as ArmorMod } from "../schema/ArmorSchema";
 import { Bioware, BiowareSchema } from "../schema/BiowareSchema";
 import { Power as CritterPower, CritterpowersSchema } from "../schema/CritterpowersSchema";
@@ -14,9 +14,9 @@ import { Vehicle, Mod as VehicleMod, Weaponmount, VehiclesSchema } from "../sche
 import { Accessory, Weapon, WeaponsSchema } from "../schema/WeaponsSchema";
 
 export type Schemas =
-    ArmorSchema | BiowareSchema | CritterpowersSchema | CyberwareSchema | ComplexformsSchema | EchoesSchema |
+    ActionsSchema | ArmorSchema | BiowareSchema | CritterpowersSchema | CyberwareSchema | ComplexformsSchema | EchoesSchema |
     GearSchema | MetatypeSchema | PowersSchema | QualitiesSchema | SpellsSchema | VehiclesSchema | WeaponsSchema;
 
 export type ParseData =
-    Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
+    Action | Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
     Power | Enhancement | Quality | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;

@@ -1,6 +1,7 @@
+import * as BC from "./BonusConstant";
+import { Constants } from "../importer/Constants";
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
-import * as BC from "./BonusConstant";
 
 export class BonusHelper {
     private static isTrue(value: "" | { _TEXT: string }): boolean {
@@ -158,7 +159,7 @@ export class BonusHelper {
 
         if (bonus.skillattribute) {
             for (const skill of IH.getArray(bonus.skillattribute)) {
-                const name = BC.BonusConstant.attributeTable[skill.name._TEXT];
+                const name = Constants.attributeTable[skill.name._TEXT];
                 const conditionTag = skill.condition ? "*" : "";
 
                 this.createEffect(
@@ -219,7 +220,7 @@ export class BonusHelper {
                 if (attribute.val == null) continue;
 
                 const name = attribute.name._TEXT;
-                const normalName = BC.BonusConstant.attributeTable[name];
+                const normalName = Constants.attributeTable[name];
 
                 this.createEffect(
                     sheet, {

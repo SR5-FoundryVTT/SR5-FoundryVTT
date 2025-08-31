@@ -31,6 +31,9 @@ export class Constants {
         'Modification':     { pack: 'sr5modification',    type: 'Item', folder: null, subFolder: null }, // Armor/Vehicle/weapon mods + ammo
         'Ware':             { pack: 'sr5ware',            type: 'Item', folder: null, subFolder: null }, // Bioware + Cyberware
         'Weapon':           { pack: 'sr5weapon',          type: 'Item', folder: null, subFolder: null }, // Weapons
+
+        // Miscs
+        'Misc':             { pack: 'sr5misc',            type: 'Item', folder: null, subFolder: null }, // Actions
     } as const satisfies Record<string, CompendiumConfig>;
 
     public static readonly MAP_COMPENDIUM_KEY = {
@@ -63,6 +66,9 @@ export class Constants {
         Gear:           this.MAP_COMPENDIUM_CONFIG.Gear,
         Weapon:         this.MAP_COMPENDIUM_CONFIG.Weapon,
         Weapon_Mod:     this.MAP_COMPENDIUM_CONFIG.Modification,
+
+        // Misc
+        Action:         this.MAP_COMPENDIUM_CONFIG.Misc
     } as const satisfies Record<string, CompendiumConfig>;
 
     public static readonly MAP_CATEGORY_TO_SKILL = {
@@ -126,69 +132,10 @@ export class Constants {
         'Flamethrowers': 'flamethrower',
     } as const satisfies Record<string, Exclude<keyof typeof SR5.weaponRangeCategories, "manual">> ;
 
-    public static readonly shadowrunBooks = [
-        { name: "Aetherology", code: "AET", default: true },
-        { name: "Assassin's Primer", code: "AP", default: true },
-        { name: "Better Than Bad", code: "BTB", default: true },
-        { name: "Bloody Business", code: "BLB", default: true },
-        { name: "Book of the Lost", code: "BOTL", default: true },
-        { name: "Bullets & Bandages", code: "BB", default: true },
-        { name: "Chrome Flesh", code: "CF", default: true },
-        { name: "Cutting Aces", code: "CA", default: true },
-        { name: "Dark Terrors", code: "DTR", default: true },
-        { name: "Data Trails", code: "DT", default: true },
-        { name: "Data Trails (Dissonant Echoes)", code: "DTD", default: false },
-        { name: "Datapuls Österreich (German-Only)", code: "DATG", default: false },
-        { name: "Datapuls SOTA 2080 (German-Only)", code: "SOTG", default: false },
-        { name: "Datapuls SOX 2080 (German-Only)", code: "SOXG", default: false },
-        { name: "Der Almanach - Gratisrollenspieltag 2019 (German-Only)", code: "GRST2019", default: false },
-        { name: "Forbidden Arcana", code: "FA", default: true },
-        { name: "Grimmes Erwachen (German-Only)", code: "GE", default: false },
-        { name: "Gun Heaven 3", code: "GH3", default: true },
-        { name: "Datapuls Hamburg (German-Only)", code: "HAMG", default: false },
-        { name: "Hard Targets", code: "HT", default: true },
-        { name: "Hong Kong Sourcebook", code: "HKS", default: false },
-        { name: "Howling Shadows", code: "HS", default: true },
-        { name: "Kill Code", code: "KC", default: true },
-        { name: "Krime Katalog", code: "KK", default: true },
-        { name: "Lockdown", code: "LCD", default: true },
-        { name: "No Future", code: "NF", default: true },
-        { name: "Nothing Personal", code: "NP", default: true },
-        { name: "Rigger 5.0", code: "R5", default: true },
-        { name: "Run Faster", code: "RF", default: true },
-        { name: "Run and Gun", code: "RG", default: true },
-        { name: "Parabotany (German-Only)", code: "PBG", default: false },
-        { name: "Parageology (German-Only)", code: "PGG", default: false },
-        { name: "Parazoology (German-Only)", code: "PZG", default: false },
-        { name: "Sail Away, Sweet Sister", code: "SASS", default: true },
-        { name: "Schattenhandbuch (German-Only)", code: "SHB", default: false },
-        { name: "Schattenhandbuch 2 (German-Only)", code: "SHB2", default: false },
-        { name: "Schattenhandbuch 3 (German-Only)", code: "SHB3", default: false },
-        { name: "Schattenhandbuch 4 (German-Only)", code: "SHB4", default: false },
-        { name: "Schattenload 2 (German-Only)", code: "SLG2", default: false },
-        { name: "Schattenload 3 (German-Only)", code: "SLG3", default: false },
-        { name: "Schattenload 7 (German-Only)", code: "SLG7", default: false },
-        { name: "Shadow Spells", code: "SSP", default: true },
-        { name: "Shadowrun 2050 (German-Only)", code: "2050", default: false },
-        { name: "Shadowrun 5th Edition", code: "SR5", default: true },
-        { name: "Shadowrun Missions 0803: 10 Block Tango", code: "SRM0803", default: true },
-        { name: "Shadowrun Missions 0804: Dirty Laundry", code: "SRM0804", default: true },
-        { name: "Shadowrun Quick-Start Rules", code: "QSR", default: true },
-        { name: "Shadows In Focus: Butte", code: "SFB", default: true },
-        { name: "Shadows In Focus: Casablanca-Rabat", code: "SFCR", default: true },
-        { name: "Shadows In Focus: Marroco", code: "SFMO", default: true },
-        { name: "Shadows In Focus: Metropole", code: "SFME", default: true },
-        { name: "Shadows In Focus: San Francisco Metroplex", code: "SFM", default: true },
-        { name: "Shadows In Focus: Sioux Nation: Counting Coup", code: "SFCC", default: true },
-        { name: "Splintered State", code: "SPS", default: true },
-        { name: "Sprawl Wilds", code: "SW", default: true },
-        { name: "State of the Art ADL (German-Only)", code: "SAG", default: false },
-        { name: "Stolen Souls", code: "SS", default: true },
-        { name: "Street Grimoire", code: "SG", default: true },
-        { name: "Street Grimoire Errata", code: "SGE", default: true },
-        { name: "Street Lethal", code: "SL", default: true },
-        { name: "The Complete Trog", code: "TCT", default: true },
-        { name: "The Seattle Gambit", code: "TSG", default: true },
-        { name: "The Vladivostok Gauntlet", code: "TVG", default: true }
-    ] as const;
+    public static readonly attributeTable = {
+        "BOD": "body", "AGI": "agility", "REA": "reaction",
+        "STR": "strength", "WIL": "willpower","LOG": "logic",
+        "INT": "intuition", "CHA": "charisma", "EDG": "edge",
+        "MAG": "magic", "RES": "ressonance", "ESS": "essence"
+    } as const;
 }
