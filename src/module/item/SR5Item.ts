@@ -1427,4 +1427,18 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         return super._preUpdate(changed, options, user);
     }
+
+    async deleteStorageReferences(this: SR5Item) {
+        await ItemMarksFlow.handleOnDeleteItem(this);
+        await MatrixNetworkFlow.handleOnDeleteDocument(this);
+    }
+
+    /**
+     * Handle system specific things before this item is deleted
+     * @param args
+     */
+    override async _preDelete(...args: Parameters<Item["_preDelete"]>) {
+        await this.deleteStorageReferences();
+        return await super._preDelete(...args);
+    }
 }

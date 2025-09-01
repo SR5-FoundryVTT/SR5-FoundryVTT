@@ -195,10 +195,8 @@ export class MatrixNetworkFlow {
      *       This can result in lingering network devices or masters, when no GM or device owner is active.
      *
      * @param document This can be a network master or device or neither.
-     * @param data The document data given by FoundryVTT deleteItem event
-     * @param id The document id
      */
-    static async handleOnDeleteDocument(document: SR5Actor | SR5Item, data: any, id: string) {
+    static async handleOnDeleteDocument(document: SR5Actor | SR5Item) {
         console.debug(`Shadowrun 5e | Checking for network on deleted item ${document.name}`, document);
         // A deleted master must be removed from all its devices.
         if (document instanceof SR5Item && document.canBeMaster) return MatrixNetworkFlow.removeAllSlaves(document);
