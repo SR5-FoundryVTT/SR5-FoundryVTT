@@ -36,7 +36,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         // Use the supplied original active test to create a reference.
         // If nothing was given create a default placeholder
         // Feed original / active test data into the class originally used for ease of access.
-        const AgainstCls = TestCreator._getTestClass(data.against.type) || SuccessTest;
+        const AgainstCls = TestCreator._getTestClass(data.against?.type) || SuccessTest;
         this.against = new AgainstCls(data.against || {});
     }
 

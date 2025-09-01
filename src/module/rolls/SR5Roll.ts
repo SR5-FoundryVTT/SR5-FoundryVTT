@@ -66,11 +66,11 @@ export class SR5Roll extends Roll<ShadowrunRollData> {
 
     // TODO: Rework this to work with the complex formula of SuccessTest.formula (total counts all cs and cf)
     get hits(): number {
-        return this.sides.filter(result => SR.die.success.some(v => v === result)).length;
+        return this.sides.filter(side => SR.die.success.includes(side)).length;
     }
 
     get glitches(): number {
-        return this.sides.filter(result => SR.die.glitch.some(v => v === result)).length;
+        return this.sides.filter(side => SR.die.glitch.includes(side)).length;
     }
 
     /**
