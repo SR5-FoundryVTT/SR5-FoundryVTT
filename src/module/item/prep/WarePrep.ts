@@ -47,7 +47,7 @@ export const WarePrep = {
         let availability = String(system.technology.availability ?? 0);
         let availParts = ItemAvailabilityFlow.parseAvailibility(availability);
         if (!availParts) {
-            availability += availMod > 0 ? ` (+${availMod})` : ` (${availMod})`;
+            availability += availMod ? (availMod > 0 ? ` (+${availMod})` : ` (${availMod})`) : '';
         } else {
             const { value } = ItemAvailabilityFlow.prepareAvailabilityValue(availability, system.technology.calculated.availability.adjusted, rating);
             availParts = ItemAvailabilityFlow.parseAvailibility(value);

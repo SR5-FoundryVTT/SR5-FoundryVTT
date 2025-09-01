@@ -1,10 +1,4 @@
-import { SR5Actor } from './actor/SR5Actor';
-import { DataDefaults } from './data/DataDefaults';
-import { SR5ActiveEffect } from './effect/SR5ActiveEffect';
-import { SR5Item } from './item/SR5Item';
 import { rollItemMacro, rollSkillMacro } from './macros';
-import { SR5Roll } from './rolls/SR5Roll';
-import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 import { SRStorage } from './storage/storage';
 
 // Tests - Attribute & Skill
@@ -51,40 +45,12 @@ import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
 import { SuccessTest } from './tests/SuccessTest';
 import { OpposedTest } from './tests/OpposedTest';
 
-// Test Creator
-import { TestCreator } from './tests/TestCreator';
-
 export const SR5Global = {
-    canvas: {},
-    /**
-     * System level Document implementations.
-     */
-    SR5Actor,
-    SR5Item,
-    SR5ActiveEffect,
     /**
      * Macro hooks used when something's dropped onto the hotbar.
      */
     rollItemMacro,
     rollSkillMacro,
-    /**
-     * Should you only really need dice handling, use this. If you need more complex testing behaviour,
-     * check the Test implementations.
-     */
-    SR5Roll,
-
-    /**
-     * You want to create a test from whatever source?
-     * Use this.
-     */
-    test: TestCreator,
-    data: DataDefaults,
-
-    /**
-     * You want to access or alter situational modifiers on any document?
-     * Use this.
-     */
-    modifiers: DocumentSituationModifiers,
 
     /**
      * .tests define what test implementation to use for each test type (key).
