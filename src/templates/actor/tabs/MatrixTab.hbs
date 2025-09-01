@@ -75,7 +75,7 @@
         </div>
     </div>
     <div>
-        {{#if system.matrix.device}}
+        {{#if system.matrix.condition_monitor.max}}
             {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
             name=(localize "SR5.ConditionMonitor")
             value=system.matrix.condition_monitor.value

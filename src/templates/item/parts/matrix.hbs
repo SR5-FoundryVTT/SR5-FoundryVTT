@@ -120,6 +120,7 @@
     </div>
     {{#ife this.type "device"}}
     {{#ifne this.system.category "rcc"}}
+    {{#ifne this.system.categiry "living_persona"}}
     <div class="form-line">
         <div class="label">
             <label>{{localize "SR5.Programs"}}</label>
@@ -128,6 +129,7 @@
             <input type="text" name="system.programs" value="{{system.programs}}" min="0" />
         </div>
     </div>
+    {{/ifne}}
     {{/ifne}}
     {{/ife}}
 </div>

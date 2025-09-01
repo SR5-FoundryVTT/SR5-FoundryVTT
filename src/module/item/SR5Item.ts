@@ -1150,6 +1150,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return (this as SR5Item).system.technology?.wireless === 'silent';
     }
 
+    isLivingPersona(this: SR5Item) {
+        return this.isType('device') && this.system.category === 'living_persona';
+    }
+
     canBeWireless(this: SR5Item): boolean {
         return this.system.technology?.wireless !== 'none';
     }

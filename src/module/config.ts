@@ -500,6 +500,7 @@ export const SR5 = {
         commlink: 'SR5.DeviceCatCommlink',
         cyberdeck: 'SR5.DeviceCatCyberdeck',
         rcc: 'SR5.DeviceCatRCC',
+        living_persona: 'SR5.LivingPersona',
     },
 
     cyberwareGrades: {

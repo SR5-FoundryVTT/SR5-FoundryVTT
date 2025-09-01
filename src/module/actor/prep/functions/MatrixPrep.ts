@@ -33,7 +33,7 @@ export class MatrixPrep {
         // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
         const device = items.find((item) => item.isEquipped() && item.isType('device')) as SR5Item<'device'>;
 
-        if (device) {
+        if (device && !device.isLivingPersona()) {
             matrix.device = device._id!;
 
             const conditionMonitor = device.getConditionMonitor();
@@ -63,6 +63,9 @@ export class MatrixPrep {
             matrix.attack.base = Helpers.calcTotal(attributes.charisma);
             matrix.sleaze.base = Helpers.calcTotal(attributes.intuition);
             matrix.name = game.i18n.localize('SR5.LivingPersona');
+            if (device && device.isLivingPersona()) {
+                matrix.device = device._id!;
+            }
         }
 
         // set matrix condition monitor to max if greater than
