@@ -18,6 +18,7 @@
         </div>
     </div>
     {{/ife}}
+    {{#ifne system.category 'living_persona'}}
     <div class="form-line">
         <div class="label">
             {{#ifin system.category (toArray "cyberdeck" "host")}}
@@ -120,7 +121,6 @@
     </div>
     {{#ife this.type "device"}}
     {{#ifne this.system.category "rcc"}}
-    {{#ifne this.system.categiry "living_persona"}}
     <div class="form-line">
         <div class="label">
             <label>{{localize "SR5.Programs"}}</label>
@@ -130,6 +130,6 @@
         </div>
     </div>
     {{/ifne}}
-    {{/ifne}}
     {{/ife}}
+    {{/ifne}}
 </div>
