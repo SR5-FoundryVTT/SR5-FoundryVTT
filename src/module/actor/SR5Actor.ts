@@ -46,6 +46,7 @@ import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
+import { MatrixRules } from '@/module/rules/MatrixRules';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -705,6 +706,18 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (this.isType('ic')) {
             await MatrixICFlow.connectToHost(network, this);
         }
+    }
+
+    /**
+     * The Dice Pool Modifier for being connected to a Public Grid
+     * - this function does not check IF we are connected, simply the dice pool modifier
+     */
+    getPublicGridModifier(this: SR5Actor) {
+        if ('public_grid' in this.system.modifiers) {
+            const modifier = this.system.modifiers.public_grid;
+            return MatrixRules.publicGridModifier() + modifier;
+        }
+        return MatrixRules.publicGridModifier();
     }
 
     /**

@@ -46,7 +46,7 @@ const SpriteData = () => ({
         "armor", "multi_defense", "reach", "defense", "defense_dodge", "defense_parry",
         "defense_block", "defense_melee", "defense_ranged", "soak", "recoil",
         // Magic/Matrix
-        "drain", "fade", "essence",
+        "drain", "fade", "essence", 'public_grid',
         // Miscellaneous
         "composure", "lift_carry", "judge_intentions", "memory", "global"
     )),
