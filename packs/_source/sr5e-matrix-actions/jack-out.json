@@ -19,7 +19,7 @@
     },
     "action": {
       "type": "simple",
-      "test": "SuccessTest",
+      "test": "MatrixTest",
       "categories": [
         "matrix"
       ],

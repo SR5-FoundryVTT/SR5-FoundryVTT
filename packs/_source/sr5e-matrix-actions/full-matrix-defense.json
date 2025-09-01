@@ -13,7 +13,7 @@
     },
     "action": {
       "type": "",
-      "test": "SuccessTest",
+      "test": "MatrixTest",
       "categories": [
         "matrix"
       ],

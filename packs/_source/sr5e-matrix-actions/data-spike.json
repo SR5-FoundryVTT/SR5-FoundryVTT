@@ -16,7 +16,7 @@
       "test": "MatrixTest",
       "categories": [
         "matrix",
-          "attack_matrix"
+        "attack_matrix"
       ],
       "attribute": "logic",
       "attribute2": "",
