@@ -9,7 +9,7 @@ import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest'
 import { Translation } from '@/module/utils/strings';
 
 /**
- * Implement the opposing test for Check Overwatch Score, pg
+ * Implement the opposing test for Check Overwatch Score, pg238
  */
 export class OpposedCheckOverwatchScoreTest extends OpposedTest<OpposedMatrixTestData> {
     declare against: CheckOverwatchScoreTest;
@@ -30,6 +30,7 @@ export class OpposedCheckOverwatchScoreTest extends OpposedTest<OpposedMatrixTes
 
     override prepareBaseValues() {
         super.prepareBaseValues();
+        // pool for the opposing test is always a fixed value
         this.data.pool = MatrixRules.checkOverwatchScoreOpposingDicePool();
         // get the overwatch score at the start so it isn't affected by the roll
         this.overwatchScore = this.against?.actor?.getOverwatchScore();
