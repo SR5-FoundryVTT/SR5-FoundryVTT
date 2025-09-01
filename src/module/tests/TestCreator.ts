@@ -262,7 +262,7 @@ export const TestCreator = {
         if (!opposed.source) return console.error(`Shadowrun 5e | Given test doesn't have a source actor`, opposed);
 
         const resistTestCls = TestCreator._getTestClass(opposedData.against.opposed.resist.test);
-        if (!resistTestCls) return console.error(`Shadowrun 5e | A ${opposedData.against.opposed.resist.test} has a unregistered follow up test configured`, this);
+        if (!resistTestCls) return console.error(`Shadowrun 5e | The resist test class '${opposedData.against.opposed.resist.test}' is not registered`, this);
 
         const data = TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.source, opposed.data.messageUuid);
         const documents = {source: opposed.source};
@@ -286,7 +286,7 @@ export const TestCreator = {
         if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
 
         const testCls = TestCreator._getTestClass(test.data.action.followed.test);
-        if (!testCls) return console.error(`Shadowrun 5e | A ${test.data.action.followed.test} has a unregistered follow up test configured`, this);
+        if (!testCls) return console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
 
         const data = TestCreator._minimalTestData();
         data.previousMessageId = test.data.messageUuid;
