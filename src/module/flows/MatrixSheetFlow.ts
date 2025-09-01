@@ -57,27 +57,25 @@ export const MatrixSheetFlow = {
     async toggleRunningSilent(actor: SR5Actor) {
         if (!actor.isMatrixActor) return;
 
-        const matrixData = actor.matrixData();
-        if (!matrixData) return;
+        // here we specifically get the device and don't check if it is a Living Persona
+        // If we have an equipped Living Persona, we want that to control our "Running Silent" status for best synchronicity
+        const device = actor.getMatrixDevice();
 
-        if (matrixData.device) {
-            const device = matrixData.device;
-            const item = actor.items.get(device);
-            if (!item) return;
-
+        if (device) {
             // toggle between online and silent based on running silent status
-            const newState = item.isRunningSilent() ? 'online' : 'silent';
+            const newState = device.isRunningSilent() ? 'online' : 'silent';
 
             // update the embedded item with the new wireless state
             await actor.updateEmbeddedDocuments('Item', [{
-                '_id': device,
+                '_id': device._id!,
                 system: { technology: { wireless: newState } }
             }]);
         } else {
+            // if the actor doesn't have a device, they may be a technomancer without a living persona device or is a Matrix only being
             await actor.update({
                 system: {
                     matrix: {
-                        running_silent: !matrixData.running_silent,
+                        running_silent: !actor.isRunningSilent(),
                     }
                 }
             })

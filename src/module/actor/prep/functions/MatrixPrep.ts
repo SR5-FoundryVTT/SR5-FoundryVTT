@@ -62,9 +62,16 @@ export class MatrixPrep {
             matrix.rating = Helpers.calcTotal(attributes.resonance);
             matrix.attack.base = Helpers.calcTotal(attributes.charisma);
             matrix.sleaze.base = Helpers.calcTotal(attributes.intuition);
-            matrix.name = game.i18n.localize('SR5.LivingPersona');
+            // if we have a Living Persona device, we want to use some of its data to make the sheet sync up best
             if (device && device.isLivingPersona()) {
                 matrix.device = device._id!;
+                // use the living persona item to determine if we are running silent
+                matrix.running_silent = device.isRunningSilent();
+                // use the name of the item rather than a localization of ours, allows for more customization
+                matrix.name = device.name;
+            } else {
+                // if we didn't have a Living Persona device, set the name to Living Persona as a basic thing
+                matrix.name = game.i18n.localize('SR5.LivingPersona');
             }
         }
 
