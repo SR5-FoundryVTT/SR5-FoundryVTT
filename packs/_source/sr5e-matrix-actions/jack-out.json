@@ -94,6 +94,12 @@
         "armor": false,
         "mod": 0
       },
+      "category": {
+        "matrix": {
+          "marks": 0,
+          "owner": true
+        }
+      },
       "modifiers": [
         "noise",
         "global",

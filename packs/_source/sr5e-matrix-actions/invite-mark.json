@@ -88,6 +88,12 @@
         "armor": false,
         "mod": 0
       },
+      "category": {
+        "matrix": {
+          "marks": 0,
+          "owner": true
+        }
+      },
       "modifiers": [],
       "alt_mod": 0,
       "dice_pool_mod": []
