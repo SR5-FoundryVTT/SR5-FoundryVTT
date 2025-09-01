@@ -91,10 +91,8 @@ export const ItemMarksFlow = {
      *       This can result in lingering network devices or masters, when no GM or device owner is active.
      *
      * @param item This can be a network master or device or neither.
-     * @param data The item data given by FoundryVTT deleteItem event
-     * @param id The item id
      */
-    async handleOnDeleteItem(item: SR5Item, data: SR5Item['system'], id: string) {
+    async handleOnDeleteItem(item: SR5Item) {
         console.debug(`Shadowrun 5e | Checking for marks for a deleted item ${item.name}`, item);
 
         await MarksStorage.clearRelations(item.uuid);

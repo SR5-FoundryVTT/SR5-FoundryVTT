@@ -6,8 +6,6 @@ import { SR5Actor } from '../SR5Actor';
 import { MatrixSheetFlow } from '../../flows/MatrixSheetFlow';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
-import { FormDialog, FormDialogOptions } from '@/module/apps/dialogs/FormDialog';
 import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 
@@ -21,7 +19,9 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     // Stores icons connected to the selected matrix target.
     selectedMatrixTargetIcons: Shadowrun.MatrixTargetDocument[];
     // Targets to be displayed in the matrix tab.
-    matrixTargets: Shadowrun.MatrixTargetDocument[]
+    matrixTargets: Shadowrun.MatrixTargetDocument[];
+    // the master device being used to connect to the matrix
+    matrixDevice: SR5Item | undefined;
 }
 
 export class SR5MatrixActorSheet extends SR5BaseActorSheet {
@@ -56,8 +56,17 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
         this._prepareMatrixTargets(data);
         await this._prepareMarkedDocuments(data);
+        this._prepareMatrixDevice(data);
 
         return data;
+    }
+
+    /**
+     * Add the currently equipped matrix device to the sheet data
+     * @param data
+     */
+    _prepareMatrixDevice(data: MatrixActorSheetData) {
+        data.matrixDevice = this.actor?.getMatrixDevice();
     }
 
     _prepareMatrixTargets(data: MatrixActorSheetData) {
@@ -103,11 +112,11 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         html.find('.targets-refresh').on('click', this._onTargetsRefresh.bind(this));
 
         html.find('.setup-pan').on('click', this._addAllEquippedWirelessDevicesToPAN.bind(this));
+        // Matrix Target - Connected Icons Visibility Switch
+        html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
 
         // Matrix Network
         html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
-        // Matrix Target - Connected Icons Visibility Switch
-        html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
 
         html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
@@ -121,34 +130,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
     private async _onMatrixToggleRunningSilent(event) {
         event.preventDefault();
         event.stopPropagation();
-
-        if (!this.actor.isMatrixActor) return;
-
-        const matrixData = this.actor.matrixData();
-        if (!matrixData) return;
-
-        if (matrixData.device) {
-            const device = matrixData.device;
-            const item = this.actor.items.get(device);
-            if (!item) return;
-
-            // toggle between online and silent based on running silent status
-            const newState = item.isRunningSilent() ? 'online' : 'silent';
-
-            // update the embedded item with the new wireless state
-            await this.actor.updateEmbeddedDocuments('Item', [{
-                '_id': device,
-                system: { technology: { wireless: newState } }
-            }]);
-        } else {
-            await this.actor.update({
-                system: {
-                    matrix: {
-                        running_silent: !matrixData.running_silent,
-                    }
-                }
-            })
-        }
+        await MatrixSheetFlow.toggleRunningSilent(this.actor);
     }
 
     /**
@@ -156,43 +138,21 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      * @param event Any pointer event
      */
     async _onRebootPersonaDevice(event: Event) {
-        const data = {
-            title: game.i18n.localize("SR5.RebootConfirmationDialog.Title"),
-            buttons: {
-                confirm: {
-                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Confirm')
-                },
-                cancel: {
-                    label: game.i18n.localize('SR5.RebootConfirmationDialog.Cancel')
-                }
-            },
-            content: '',
-            default: 'cancel',
-            templateData: {},
-            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.hbs'
-        }
-        const options = {
-            classes: ['sr5', 'form-dialog'],
-        } as FormDialogOptions;
-        const dialog = new FormDialog(data, options);
-        await dialog.select();
-        if (dialog.canceled || dialog.selectedButton !== 'confirm') return;
-
-        await this.actor.rebootPersona();
+        event.preventDefault();
+        event.stopPropagation();
+        await MatrixSheetFlow.promptRebootPersonaDevice(this.actor);
     }
 
     /**
      * Allow the user to select a matrix network to connect to.
      */
     async _onConnectToMatrixNetwork(event) {
+        event.preventDefault();
         event.stopPropagation();
 
-        const dialog = new SelectMatrixNetworkDialog(this.document);
-        const network = await dialog.select();
-        if (dialog.canceled) return;
-
-        await this.document.connectNetwork(network);
-        this.render();
+        if (await MatrixSheetFlow.promptConnectToMatrixNetwork(this.actor)) {
+            this.render();
+        }
     }
 
     /**

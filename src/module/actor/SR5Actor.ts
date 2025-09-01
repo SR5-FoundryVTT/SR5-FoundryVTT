@@ -46,6 +46,7 @@ import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
+import { MatrixRules } from '@/module/rules/MatrixRules';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -566,7 +567,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Return the given attribute, no matter its source.
      *
-     * For characters and similar this will only return their attributes.
+     * For characters and similar this will check their attributes.
+     * For Matrix Users, it will return the matrix attribute.
      * For vehicles this will also return their vehicle stats.
 
      * @param name An attribute or other stats name.
@@ -580,7 +582,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const stats = rollData.vehicle_stats ?? this.getVehicleStats();
         if (stats?.[name]) return stats[name];
 
-        // Second check general attributes.
+        // Second check matrix attributes
+        const matrixData = rollData.matrix ?? this.matrixData();
+        if (matrixData?.[name]) return matrixData[name];
+
+        // Finally, check general attributes.
         const attributes = rollData.attributes ?? this.getAttributes();
         return attributes[name];
     }
@@ -705,6 +711,18 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (this.isType('ic')) {
             await MatrixICFlow.connectToHost(network, this);
         }
+    }
+
+    /**
+     * The Dice Pool Modifier for being connected to a Public Grid
+     * - this function does not check IF we are connected, simply the dice pool modifier
+     */
+    getPublicGridModifier(this: SR5Actor) {
+        if ('public_grid' in this.system.modifiers) {
+            const modifier = this.system.modifiers.public_grid;
+            return MatrixRules.publicGridModifier() + modifier;
+        }
+        return MatrixRules.publicGridModifier();
     }
 
     /**
@@ -2232,5 +2250,26 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     getExtraMarkDamageModifier() {
         return 2;
+    }
+
+    /**
+     * Delete References to this actor and all owned items in the Storage areas
+     */
+    async deleteStorageReferences(this: SR5Actor) {
+        // when an actor is deleted, handle deleting all owned items
+        for (const item of this.items) {
+            await item.deleteStorageReferences();
+        }
+        await MatrixNetworkFlow.handleOnDeleteDocument(this);
+    }
+
+    /**
+     * Handle system specific things when this actor is being deleted
+     * - NOTE that this does not apply to Token Actors. Those are handled through SR5TokenDocument
+     * @param args
+     */
+    override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
+        await this.deleteStorageReferences()
+        return super._preDelete(...args);
     }
 }

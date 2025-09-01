@@ -31,14 +31,16 @@ export const MatrixTestDataFlow = {
         if (!action) return;
         if (!actor) return;
 
+        const directConnection = (test.data as MatrixTestData).directConnection ?? false;
+
         if (action.attribute && MatrixTestDataFlow.isMatrixAttribute(action.attribute))
-            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true);
+            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true, directConnection);
 
         if (action.attribute2 && MatrixTestDataFlow.isMatrixAttribute(action.attribute2))
-            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true);
+            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true, directConnection);
 
         if (action.limit.attribute && MatrixTestDataFlow.isMatrixAttribute(action.limit.attribute))
-            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true);
+            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true, directConnection);
     },
 
     /**
@@ -56,7 +58,7 @@ export const MatrixTestDataFlow = {
      */
     removeMatrixModifiers(test: SuccessTest) {
         const pool = new PartsList<number>(test.data.pool.mod);
-        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => pool.removePart(part));
+        ['SR5.HotSim', 'SR5.RunningSilent', 'SR5.PublicGrid'].forEach(part => pool.removePart(part));
     },
 
     /**
@@ -66,9 +68,10 @@ export const MatrixTestDataFlow = {
      * @param actor
      * @param pool
      * @param atts
+     * @param directConnection
      * @returns
      */
-    addMatrixModifiersToPool(actor: SR5Actor, pool: PartsList<number>, atts: any) {
+    addMatrixModifiersToPool(actor: SR5Actor, pool: PartsList<number>, atts: any, directConnection = false) {
         if (Helpers.isMatrix(atts)) {
             if (!("matrix" in actor.system)) return;
 
@@ -76,6 +79,10 @@ export const MatrixTestDataFlow = {
             const matrix = actor.system.matrix!;
             if (matrix.hot_sim) pool.addUniquePart('SR5.HotSim', 2);
             if (matrix.running_silent) pool.addUniquePart('SR5.RunningSilent', -2);
+
+            if (!directConnection && actor.network?.isPublicGrid()) {
+                pool.addUniquePart('SR5.PublicGrid', actor.getPublicGridModifier());
+            }
         }
     },
 

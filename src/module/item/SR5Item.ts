@@ -1158,6 +1158,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.system.technology?.wireless !== 'none';
     }
 
+    isPublicGrid(this: SR5Item) {
+        return this.isType('grid') && this.system.category === 'public';
+    }
+
     isNetwork(this: SR5Item): this is SR5Item<'grid' | 'host'> {
         return this.isType('host', 'grid');
     }
@@ -1426,5 +1430,19 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         }
 
         return super._preUpdate(changed, options, user);
+    }
+
+    async deleteStorageReferences(this: SR5Item) {
+        await ItemMarksFlow.handleOnDeleteItem(this);
+        await MatrixNetworkFlow.handleOnDeleteDocument(this);
+    }
+
+    /**
+     * Handle system specific things before this item is deleted
+     * @param args
+     */
+    override async _preDelete(...args: Parameters<Item["_preDelete"]>) {
+        await this.deleteStorageReferences();
+        return await super._preDelete(...args);
     }
 }
