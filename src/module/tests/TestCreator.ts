@@ -49,7 +49,7 @@ export const TestCreator = {
         data.limit.base = values.limit || 0;
 
         // Use the registered SuccessTest implementation.
-        const successTestCls = TestCreator._getTestClass('SuccessTest');
+        const successTestCls = TestCreator._getTestClass('SuccessTest')!;
         return new successTestCls(data, undefined, options);
     },
 
@@ -85,7 +85,7 @@ export const TestCreator = {
         }
 
         // Any action item will return a list of values to create the test pool from.
-        const cls = TestCreator._getTestClass(action.test);
+        const cls = TestCreator._getTestClass(action.test)!;
         const data = await TestCreator._getTestDataFromItemAction(cls, item, document);
         const documents = {item, actor: document};
         return new cls(data, documents, options);
@@ -112,7 +112,7 @@ export const TestCreator = {
         }
 
         // Any action item will return a list of values to create the test pool from.
-        const cls = TestCreator._getTestClass(action.test);
+        const cls = TestCreator._getTestClass(action.test)!;
         const data = TestCreator._prepareTestDataWithAction(action, document, TestCreator._minimalTestData());
         const actor = document instanceof SR5Actor ? document : undefined;
         const item = document instanceof SR5Item ? document : undefined;
@@ -200,9 +200,9 @@ export const TestCreator = {
      * @param testClsName The test class name to be used with the message test data.
      * @param options See TestOptions documentation.
      */
-    fromMessageAction: async function(id: string, testClsName: string, options: TestOptions={}): Promise<SuccessTest | undefined> {
+    fromMessageAction: async function(id: string, testClsName: string, options: TestOptions={}): Promise<void> {
         if (!game.user) return;
-        
+
         const message = game.messages?.get(id);
         if (!message) {
             console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
@@ -220,7 +220,7 @@ export const TestCreator = {
         if (!testClass) {
             console.error(`Shadowrun 5e | Couldn't find a registered test implementation for ${testClsName}`);
             return;
-        }   
+        }
 
         return testClass.executeMessageAction(testData.data, id, options);
     },
@@ -236,8 +236,7 @@ export const TestCreator = {
      * @param options Optional test options.
      */
     fromTestData: function(data: TestData, documents?: TestDocuments, options: TestOptions = {}): SuccessTest {
-        const type = data.type || 'SuccessTest';
-        const cls = TestCreator._getTestClass(type);
+        const cls = TestCreator._getTestClass(data.type ?? '') || SuccessTest;
         return new cls(data, documents, options);
     },
 
@@ -263,6 +262,7 @@ export const TestCreator = {
         if (!opposed.source) return console.error(`Shadowrun 5e | Given test doesn't have a source actor`, opposed);
 
         const resistTestCls = TestCreator._getTestClass(opposedData.against.opposed.resist.test);
+        if (!resistTestCls) return console.error(`Shadowrun 5e | A ${opposedData.against.opposed.resist.test} has a unregistered follow up test configured`, this);
 
         const data = TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.source, opposed.data.messageUuid);
         const documents = {source: opposed.source};
@@ -286,20 +286,19 @@ export const TestCreator = {
         if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
 
         const testCls = TestCreator._getTestClass(test.data.action.followed.test);
-        if (!testCls) return console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
+        if (!testCls) return console.error(`Shadowrun 5e | A ${test.data.action.followed.test} has a unregistered follow up test configured`, this);
 
         const data = TestCreator._minimalTestData();
-        data.title = testCls.title;
         data.previousMessageId = test.data.messageUuid;
         data.against = test.data;
 
         // Allow different elements of this to override action data.
         const action = TestCreator._mergeMinimalActionDataInOrder(
             DataDefaults.createData('action_roll', {test: testCls.name}),
-            await testCls._getDocumentTestAction(test.item, test.actor),
+            testCls._getDocumentTestAction(test.item, test.actor),
             testCls._getDefaultTestAction());
 
-        const testData = await testCls._prepareActionTestData(action, test.actor, data);
+        const testData = testCls._prepareActionTestData(action, test.actor, data);
         testData.following = test.data;
 
         const documents = {source: test.source, item: test.item, actor: test.actor};
@@ -328,11 +327,11 @@ export const TestCreator = {
      *
      * @param testName A Test class constructor name registered as a test.
      */
-    _getTestClass: function(testName: string): any | undefined {
-        if (!testName) return;
+    _getTestClass: function(testName: string): typeof SuccessTest<SuccessTestData> | undefined {
+        if (!testName) return undefined;
         if (!game.shadowrun5e.tests.hasOwnProperty(testName)) {
             console.error(`Shadowrun 5e | Tried getting a Test Class ${testName}, which isn't registered in: `, game.shadowrun5e.tests);
-            return;
+            return undefined;
         }
         return game.shadowrun5e.tests[testName];
     },

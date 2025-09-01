@@ -66,15 +66,12 @@ export class SR5Roll extends Roll<ShadowrunRollData> {
 
     // TODO: Rework this to work with the complex formula of SuccessTest.formula (total counts all cs and cf)
     get hits(): number {
-        return this.sides.reduce((hits, result) => SR.die.success.includes(result) ? hits + 1 : hits,
-                                 0);
+        return this.sides.filter(result => SR.die.success.some(v => v === result)).length;
     }
 
     get glitches(): number {
-        return this.sides.reduce((glitches, result) => SR.die.glitch.includes(result) ? glitches + 1 : glitches,
-                                 0);
+        return this.sides.filter(result => SR.die.glitch.some(v => v === result)).length;
     }
-
 
     /**
      * The amount of dice going into the throw (the pool used).

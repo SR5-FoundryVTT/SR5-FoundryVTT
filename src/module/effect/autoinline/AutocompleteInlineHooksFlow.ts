@@ -167,7 +167,7 @@ export const AutocompleteInlineHooksFlow =  {
             const OpposedTestClass = TestCreator._getTestClass(action.opposed.test) || OpposedTest;
             const successTest = new SuccessTestClass({});
             const opposedTest = new OpposedTestClass({against: successTest.data}, {actor: item.actor, item});
-            
+
             return {data: opposedTest.data};
         }
         return {};

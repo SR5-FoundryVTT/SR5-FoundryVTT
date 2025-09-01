@@ -26,11 +26,11 @@ import { DeepPartial } from "fvtt-types/utils";
 
 export interface TestDocuments {
     // Legacy field that used be the source document.
-    actor?: SR5Actor
+    actor?: SR5Actor | undefined | null
     // The action document the action has been taken from
-    item?: SR5Item
+    item?: SR5Item | undefined | null
     // The main document values have been taken from
-    source?: SR5Actor | SR5Item
+    source?: SR5Actor | SR5Item | undefined | null
     // Rolls already taken for this test.
     rolls?: SR5Roll[]
 }
@@ -115,6 +115,7 @@ export interface TestData {
 export interface SuccessTestData extends TestData {
     opposed: OpposedTestType
     values: SuccessTestValues
+    following: SuccessTestData
     // Scene Token Ids marked as targets of this test.
     targetActorsUuid: string[]
     targetUuids: string[]
@@ -123,7 +124,7 @@ export interface SuccessTestData extends TestData {
 export interface TestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     showMessage?: boolean // Show message when defined as true.
-    rollMode?: Roll.ConfiguredRollModes
+    rollMode?: foundry.dice.Roll.Mode
 }
 
 export interface SuccessTestMessageData {
@@ -189,10 +190,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Store given documents to avoid later fetching.
-        this.actor = documents?.actor;
-        this.item = documents?.item;
+        this.actor = documents?.actor ?? undefined;
+        this.item = documents?.item ?? undefined;
         // If no specific source document is given, fallback to actor.
-        this.source = documents?.source ?? documents?.actor;
+        this.source = documents?.source ?? documents?.actor ?? undefined;
         this.rolls = documents?.rolls || [];
 
         // User selected targets of this test.
@@ -1660,7 +1661,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         Helpers.calcTotal(data.pool, { min: 0 });
 
         if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits().value)) {
-            return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
+            ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
+            return;
         }
 
         // Fetch original tests documents.

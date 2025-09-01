@@ -640,19 +640,19 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            let test = await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            let test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
             await test.execute();
 
             // The first roll should have the effect applied
             assert.equal(test.pool.mod.reduce(reduceModifiersByName('Test Effect'), 0), 2);
 
             // Trigger the extended roll...
-            test = await test.executeAsExtended();
+            test = (await test.executeAsExtended())!;
             // ... assure effects aren't re applied but taken from the first roll.
             assert.equal(test.pool.mod.reduce(reduceModifiersByName('Test Effect'), 0), 2);
 
             actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action', system: { action: { extended : true  } } }]);
-            test = await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
 
             // This will trigger the first and all extended rolls...
             await test.execute();

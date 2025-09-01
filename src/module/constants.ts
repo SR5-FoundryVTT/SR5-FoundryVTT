@@ -10,7 +10,7 @@
  * Other than this file config.ts exists and only contains mappings between fixed names/ids and translation labels.
  *
  */
-export const SYSTEM_NAME = 'shadowrun5e' as const;
+export const SYSTEM_NAME = 'shadowrun5e';
 export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}`;
 export const FLAGS = {
     KEY_DATA_VERSION: 'systemMigrationVersion',
@@ -81,14 +81,14 @@ export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {
     'km': 1000,
     'kilometers': 1000,
     'kilometer': 1000,
-};
+} as const;
 
 export const DEFAULT_ROLL_NAME = 'Roll';
 export const LENGTH_UNIT = 'm';
 export const SKILL_DEFAULT_NAME = '';
 export const DEFAULT_ID_LENGTH = 16;
 
-export const SR5_APPV2_CSS_CLASS = "sr5v2" as const;
+export const SR5_APPV2_CSS_CLASS = "sr5v2";
 
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 export const SR = {
@@ -259,4 +259,4 @@ export const SR = {
         grey: { essence: 0.75, avail: 0, cost: 1.3 },
         used: { essence: 1.25, avail: -4, cost: 0.75 },
     }
-}
+} as const;

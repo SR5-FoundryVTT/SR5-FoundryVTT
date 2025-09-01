@@ -1,22 +1,24 @@
-import { Quench } from "@ethaks/fvtt-quench";
-import { SR5Item } from "../item/SR5Item";
-import { SR5Actor } from "../actor/SR5Actor";
-import { SR5ChatMessage } from "../chatMessage/SR5ChatMessage";
-import { SR5Combat } from "../combat/SR5Combat";
-import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
-import { SR5Roll } from "../rolls/SR5Roll";
-import { SR5Token } from "../token/SR5Token";
+import { Quench } from '@ethaks/fvtt-quench';
+
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import { SR5Actor } from '../actor/SR5Actor';
+import { SR5ChatMessage } from '../chatMessage/SR5ChatMessage';
+import { SR5Combat } from '../combat/SR5Combat';
+import { SR5Item } from '../item/SR5Item';
+import { SR5Roll } from '../rolls/SR5Roll';
+import { SR5Token } from '../token/SR5Token';
 
 import { Translation } from '../utils/strings';
 
-import { Character } from "./actor/Character";
-import { Critter } from "./actor/Critter";
-import { IC } from "./actor/IC";
-import { Spirit } from "./actor/Spirit";
-import { Sprite } from "./actor/Sprite";
-import { Vehicle } from "./actor/Vehicle";
+import { Character } from './actor/Character';
+import { Critter } from './actor/Critter';
+import { IC } from './actor/IC';
+import { Spirit } from './actor/Spirit';
+import { Sprite } from './actor/Sprite';
+import { Vehicle } from './actor/Vehicle';
 
-import { ActiveEffectDM } from "./effect/ActiveEffect";
+import { ActiveEffectDM } from './effect/ActiveEffect';
+
 import { Action } from './item/Action';
 import { AdeptPower } from './item/AdeptPower';
 import { Ammo } from './item/Ammo';
@@ -30,26 +32,30 @@ import { Cyberware } from './item/Cyberware';
 import { Device } from './item/Device';
 import { Echo } from './item/Echo';
 import { Equipment } from './item/Equipment';
-import { Grid } from "./item/Grid";
+import { Grid } from './item/Grid';
 import { Host } from './item/Host';
 import { Lifestyle } from './item/Lifestyle';
 import { Metamagic } from './item/Metamagic';
 import { Modification } from './item/Modification';
 import { Program } from './item/Program';
 import { Quality } from './item/Quality';
-import { Ritual } from "./item/Ritual";
+import { Ritual } from './item/Ritual';
 import { Sin } from './item/Sin';
 import { Spell } from './item/Spell';
 import { SpritePower } from './item/SpritePower';
 import { Weapon } from './item/Weapon';
-import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from "./flags/ItemFlags";
 
-import { RoutingLib } from "../integrations/routingLibIntegration";
-import SR5CompendiaSettings from "../settings/SR5CompendiaSettings";
-import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerceptionDetectionMode";
-import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
-import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
-import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
+import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from './flags/ItemFlags';
+
+import { RoutingLib } from '../integrations/routingLibIntegration';
+import SR5CompendiaSettings from '../settings/SR5CompendiaSettings';
+
+import AstralPerceptionDetectionMode from '../vision/astralPerception/astralPerceptionDetectionMode';
+import AugmentedRealityVisionDetectionMode from '../vision/augmentedReality/arDetectionMode';
+import LowlightVisionDetectionMode from '../vision/lowlightVision/lowlightDetectionMode';
+import ThermographicVisionDetectionMode from '../vision/thermographicVision/thermographicDetectionMode';
+
+import { SR5Global } from '../SR5global';
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -92,11 +98,7 @@ declare module "fvtt-types/configuration" {
     }
 
     interface ReadyGame {
-        shadowrun5e: {
-            inputDelay: number;
-            [key: string]: any;
-        };
-        action_manager?: any;
+        shadowrun5e: typeof SR5Global;
     }
 
     interface DataModelConfig {
