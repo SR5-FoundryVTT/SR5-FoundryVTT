@@ -2174,9 +2174,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: TestOptions) {
         // Determine actors to roll test with.
         // build documents based on the category, matrix can target individual icons
-        let documents = (againstData.categories.includes('matrix'))
-                                    ? await Helpers.getMatrixTestTargetDocuments(againstData as any)
-                                    : await Helpers.getOpposedTestTargets(againstData);
+        let documents = await Helpers.getOpposedTestTargets(againstData);
+        // if the test had matrix data, push in the matrix test targets to the front
+        if (againstData.categories.includes('matrix')) {
+            documents.unshift(...await Helpers.getMatrixTestTargetDocuments(againstData as any));
+        }
 
         // Inform user about tokens with deleted sidebar actors.
         // This can both happen for linked tokens immediately and unlinked tokens after reloading.
