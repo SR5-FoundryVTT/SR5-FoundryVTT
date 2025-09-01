@@ -57,18 +57,12 @@
                     <a class="item" data-tab="programs">{{localize "SR5.Programs"}}</a>
                     <a class="item" data-tab="targets">{{localize "SR5.Labels.ActorSheet.Icons"}}</a>
                     <a class="item" data-tab="marks">{{localize "SR5.Marks"}}</a>
-                    {{#if emerged}}
-                    <a class="item" data-tab="compilations">{{localize "SR5.Labels.ActorSheet.Compilations"}}</a>
-                    {{/if}}
                 </nav>
                 <div class="scroll-area scroll-area-matrix-hacking">
                     <section data-group='matrix' class="tabsbody">
                         {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/MarksTab.hbs'}}
                         {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs'}}
                         {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ProgramListTab.hbs'}}
-                        {{#if emerged}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.hbs'}}
-                        {{/if}}
                     </section>
                 </div>
             </div>
@@ -83,10 +77,30 @@
             id="matrix"
             }}
         {{/if}}
+        <!-- Add a TabSet if we are emerged to show Compilations and Complex Forms alongside the Matrix Actions -->
         {{#if emerged}}
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.hbs' }}
+            <nav class="tabs" data-group="matrix-right-side">
+                <a class="item" data-tab="matrix-actions">{{localize "SR5.Labels.ActorSheet.MatrixActions"}}</a>
+                <a class="item" data-tab="complex-forms">{{localize "SR5.ComplexForms"}}</a>
+                <a class="item" data-tab="compilations">{{localize "SR5.Labels.ActorSheet.Compilations"}}</a>
+            </nav>
+            <div class="scroll-area scroll-area-matrix-hacking">
+                <section data-group='matrix-right-side' class="tabsbody">
+                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='matrix-actions'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
+                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='complex-forms'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.hbs' }}
+                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='compilations'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.hbs'}}
+                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+                </section>
+            </div>
+        {{else}}
+            <!-- If we aren't emerged, we only need the normal actions list -->
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
         {{/if}}
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
     </div>
 </div>
 {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
