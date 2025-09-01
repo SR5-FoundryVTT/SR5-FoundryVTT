@@ -13,10 +13,8 @@
     },
     "action": {
       "type": "free",
-      "test": "MatrixTest",
-      "categories": [
-        "matrix"
-      ],
+      "test": "SuccessTest",
+      "categories": [],
       "attribute": "",
       "attribute2": "",
       "skill": "",
