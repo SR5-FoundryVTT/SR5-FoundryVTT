@@ -87,9 +87,11 @@ export class SkillRules {
     static injectSkills(names: string[], source: SR5Actor, rollData: SR5Actor['system'], options: { bigger: boolean }) {
         const targetSkills = rollData.skills.active;
         for (const name of names) {
-            // get the skill from the actor
-            const sourceSkill = source.getSkill(name);
+            // get the skill from the source, it may be undefined
+            let sourceSkill = source.getSkill(name);
             if (!sourceSkill) continue;
+            // if it is defined, duplicate it so we don't mess with the underlying data
+            sourceSkill = foundry.utils.deepClone(sourceSkill);
 
             const targetSkill = targetSkills[name];
 

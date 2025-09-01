@@ -15,18 +15,20 @@ export class AttributeRules {
      * @param rollData The testData to inject attributes into
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    static injectAttributes(names: readonly string[],
-                            source: SR5Actor | SR5Item,
-                            rollData: SR5Actor['system'] | SR5Item['system'],
-                            options: { bigger: boolean }) {
+    static injectAttributes(
+        names: readonly string[],
+        source: SR5Actor | SR5Item,
+        rollData: SR5Actor['system'] | SR5Item['system'],
+        options: { bigger: boolean }) {
         const targetAttributes = rollData.attributes;
         if (targetAttributes) {
             for (const name of names) {
-                // create a copy of the attribute data or make new attribute data if it wasn't found
-                const sourceAttribute = source.getAttribute(name);
-                const targetAttribute = targetAttributes[name];
-
+                // get the source attribute, but may be undefined
+                let sourceAttribute = source.getAttribute(name);
                 if (!sourceAttribute) continue;
+                // if it is defined, duplicate it so we don't mess with the underlying data
+                sourceAttribute = foundry.utils.deepClone(sourceAttribute);
+                const targetAttribute = targetAttributes[name];
 
                 if (options.bigger) {
                     targetAttributes[name] = sourceAttribute.value > targetAttribute.value ? sourceAttribute : targetAttribute;
