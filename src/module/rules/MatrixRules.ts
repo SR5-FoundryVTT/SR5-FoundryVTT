@@ -73,6 +73,14 @@ export class MatrixRules {
     }
 
     /**
+     * Public Grid Modifier applies a -2 dice pool penalty to all matrix actions
+     * SR5 pg 233 - 234
+     */
+    static publicGridModifier(): number {
+        return -2;
+    }
+
+    /**
      * Amount of marks that is valid in general for a target (includes zero marks)
      * @param marks The possibly faulty amount of marks
      * @returns A valid amount of marks

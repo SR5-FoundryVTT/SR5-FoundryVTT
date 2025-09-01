@@ -135,8 +135,6 @@ export class HooksManager {
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
-        Hooks.on('deleteItem', HooksManager.onDeleteItem.bind(HooksManager));
-        Hooks.on('deleteActor', HooksManager.onDeleteActor.bind(HooksManager));
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
@@ -407,21 +405,6 @@ ___________________
                 await MatrixICFlow.handleUpdateItemHost(item);
                 break;
         }
-    }
-
-    /**
-     * Collect all changes necessary when any item is deleted.
-     */
-    static async onDeleteItem(item: SR5Item, data: SR5Item['system'], id: string) {
-        await MatrixNetworkFlow.handleOnDeleteDocument(item, data, id);
-        await ItemMarksFlow.handleOnDeleteItem(item, data, id);
-    }
-
-    /**
-     * Collect all changes necessary when any actor is deleted.
-     */
-    static async onDeleteActor(actor: SR5Actor, data: SR5Actor['system'], id: string) {
-        return MatrixNetworkFlow.handleOnDeleteDocument(actor, data, id);
     }
 
     /**
