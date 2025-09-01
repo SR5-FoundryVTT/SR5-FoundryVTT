@@ -53,10 +53,9 @@ export const ItemRollDataFlow = {
         // As per SR5#233, slaved devices can't use the masters ratings.
         if (directConnection) return;
 
-        const attributes = master.system.attributes!;
-
         const injectAttributes = ['data_processing', 'firewall', 'rating'];
-        AttributeRules.injectAttributes(injectAttributes, attributes, rollData, { bigger: true });
+        // use the actor if it exists as they may have actor-targeted effects that change the attributes of the device
+        AttributeRules.injectAttributes(injectAttributes, actor ?? master, rollData, { bigger: true });
         if (actor) AttributeRules.injectMentalAttributes(actor, rollData);
     },
 

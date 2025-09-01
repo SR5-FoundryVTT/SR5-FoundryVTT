@@ -80,15 +80,17 @@ export class SkillRules {
      * Also implements the 'use bigger value rule',if necessary.
      *
      * @param names A list of attribute names to inject
-     * @param skills Object of skills to use
+     * @param source Actor to get the Skills from
      * @param rollData The testData to inject attributes into
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    static injectActiveSkills(names: string[], skills: SR5Actor['system']['skills']['active'], rollData: SR5Actor['system'], options: { bigger: boolean }) {
+    static injectSkills(names: string[], source: SR5Actor, rollData: SR5Actor['system'], options: { bigger: boolean }) {
         const targetSkills = rollData.skills.active;
         for (const name of names) {
-            // create a copy of the skill data or make new skill data if it wasn't found
-            const sourceSkill =  DataDefaults.createData('skill_field', skills[name]);
+            // get the skill from the actor
+            const sourceSkill = source.getSkill(name);
+            if (!sourceSkill) continue;
+
             const targetSkill = targetSkills[name];
 
             if (options.bigger) {

@@ -1362,7 +1362,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param name An attribute or other stats name.
      * @returns Either an AttributeField or undefined, if the attribute doesn't exist on this document.
      */
-    getAttribute(name: string, options: {rollData?: SR5Item['system']} = {}): AttributeFieldType | undefined {
+    getAttribute(name: string, options: { rollData?: SR5Item['system'] } = {}): AttributeFieldType | undefined {
         const rollData = options.rollData || this.getRollData();
         // Attributes for hosts work only within their own attributes.
         if (this.isType('host')) {
