@@ -725,7 +725,6 @@
                 "MatrixActions": "Matrix Actions",
                 "Network": "Network",
                 "NoNetwork": "No Network",
-                "Owner": "Owner",
                 "Persona": "Persona",
                 "Offline": "Offline",
                 "PersonalInventory": "On Person",
@@ -993,6 +992,7 @@
             "ResetScore": "Reset Overwatch Score"
         },
         "OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
+        "Owner": "Owner",
         "PP": "PP",
         "Parry": "Parry",
         "PartialCover": "Partial Cover",

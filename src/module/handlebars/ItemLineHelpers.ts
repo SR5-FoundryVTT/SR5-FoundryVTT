@@ -1083,7 +1083,7 @@ export const registerItemLineHelpers = () => {
                     cssClass: 'six',
                     text: game.i18n.localize('SR5.Marks'),
                 },
-            }
+            },
         ];
     });
     /**
@@ -1096,12 +1096,11 @@ export const registerItemLineHelpers = () => {
         // Either show owner only, a mark quantity or nothing, if 0 marks are needed.
         let needed: string|number = action.system.action?.category.matrix.marks ?? 0;
         needed = needed > 0 ? needed : '';
-        const owner = action.system.action?.category.matrix.owner ? game.i18n.localize('SR5.Labels.ActorSheet.Owner') : '';
+        const owner = action.system.action?.category.matrix.owner ? game.i18n.localize('SR5.Owner') : '';
 
         return [
             {
                 text: {
-                    cssClass: 'six',
                     text: owner || needed
                 },
             }
