@@ -12,6 +12,7 @@ import { OpposedBruteForceTest } from "../OpposedBruteForceTest";
 import { OpposedHackOnTheFlyTest } from "../OpposedHackOnTheFlyTest";
 import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
+import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 
 /**
  * Apply Matrix Rules to Success Test Data relating to matrix.
@@ -298,7 +299,7 @@ export const MatrixTestDataFlow = {
      * Devices might be related to a persona, in which case a persona will be present.
      * @param test The test to populate with documents.
      */
-    async populateOpposedDocuments(test: MatrixDefenseTest | OpposedBruteForceTest | OpposedHackOnTheFlyTest | OpposedCheckOverwatchScoreTest) {
+    async populateOpposedDocuments(test: MatrixDefenseTest | OpposedMatrixTest) {
         if (test.against?.data.iconUuid) {
             test.icon = await fromUuid(test.against.data.iconUuid) as SR5Item;
         }

@@ -1,26 +1,13 @@
-import { SR5Actor } from "../actor/SR5Actor";
-import { SR5Item } from "../item/SR5Item";
 import { Translation } from "../utils/strings";
-import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
-import { MatrixTestDataFlow } from "./flows/MatrixTestDataFlow";
+import { MarkPlacementFlow } from "./flows/MarkPlacementFlow";
 import { HackOnTheFlyTest } from "./HackOnTheFlyTest";
-import { OpposedMatrixTestData } from "./MatrixTest";
-import { OpposedTest } from "./OpposedTest";
-import { TestOptions } from "./SuccessTest";
+import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 
 /**
  * Implement the opposing test for Hack on the Fly action. See SR5#240 'Hack On The Fly'
  */
-export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> {
+export class OpposedHackOnTheFlyTest extends OpposedMatrixTest {
     declare against: HackOnTheFlyTest;
-    declare icon: SR5Actor | SR5Item;
-    declare device: SR5Item;
-    declare persona: SR5Actor;
-
-    override _prepareData(data: any, options?: TestOptions) {
-        data = super._prepareData(data, options);
-        return MatrixTestDataFlow._prepareOpposedData(data);
-    }
 
     override get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/opposing-mark-test-dialog.hbs';
@@ -36,10 +23,6 @@ export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> 
 
     override get failureLabel(): Translation {
         return "SR5.TestResults.HackOnTheFlySuccess";
-    }
-
-    override async populateDocuments() {
-        await MatrixTestDataFlow.populateOpposedDocuments(this);
     }
 
     override prepareBaseValues() {
@@ -59,9 +42,5 @@ export class OpposedHackOnTheFlyTest extends OpposedTest<OpposedMatrixTestData> 
         // Place a mark on the target
         const marks = this.against.data.marks;
         await this.against.actor.setMarks(this.icon, marks);
-    }
-
-    static override async executeMessageAction(againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
-        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }

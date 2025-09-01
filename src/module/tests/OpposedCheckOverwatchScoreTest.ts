@@ -1,32 +1,15 @@
-import { SR5Actor } from "../actor/SR5Actor";
-import { SR5Item } from "../item/SR5Item";
-import { MatrixTestDataFlow } from "./flows/MatrixTestDataFlow";
-import { MatrixTestData, OpposedMatrixTestData } from './MatrixTest';
-import { OpposedTest } from "./OpposedTest";
-import { TestOptions } from "./SuccessTest";
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { Translation } from '@/module/utils/strings';
+import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 
 /**
  * Implement the opposing test for Check Overwatch Score, pg238
  */
-export class OpposedCheckOverwatchScoreTest extends OpposedTest<OpposedMatrixTestData> {
+export class OpposedCheckOverwatchScoreTest extends OpposedMatrixTest {
     declare against: CheckOverwatchScoreTest;
-    declare icon: SR5Actor | SR5Item;
-    declare device: SR5Item;
-    declare persona: SR5Actor;
 
     overwatchScore: number | undefined;
-
-    override _prepareData(data: any, options?: TestOptions) {
-        data = super._prepareData(data, options);
-        return MatrixTestDataFlow._prepareOpposedData(data);
-    }
-
-    override async populateDocuments() {
-        await MatrixTestDataFlow.populateOpposedDocuments(this);
-    }
 
     override prepareBaseValues() {
         super.prepareBaseValues();
@@ -54,9 +37,5 @@ export class OpposedCheckOverwatchScoreTest extends OpposedTest<OpposedMatrixTes
             ...data,
             overwatchScore: this.overwatchScore
         }
-    }
-
-    static override async executeMessageAction(againstData: MatrixTestData, messageId: string, options: TestOptions): Promise<void> {
-        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }
