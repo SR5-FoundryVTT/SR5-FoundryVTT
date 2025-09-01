@@ -2234,12 +2234,23 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Delete References to this actor and all owned items in the Storage areas
+     */
+    async deleteStorageReferences(this: SR5Actor) {
+        // when an actor is deleted, handle deleting all owned items
+        for (const item of this.items) {
+            await item.deleteStorageReferences();
+        }
+        await MatrixNetworkFlow.handleOnDeleteDocument(this);
+    }
+
+    /**
      * Handle system specific things when this actor is being deleted
      * - NOTE that this does not apply to Token Actors. Those are handled through SR5TokenDocument
      * @param args
      */
     override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
-        await MatrixNetworkFlow.handleOnDeleteDocument(this);
+        await this.deleteStorageReferences()
         return super._preDelete(...args);
     }
 }

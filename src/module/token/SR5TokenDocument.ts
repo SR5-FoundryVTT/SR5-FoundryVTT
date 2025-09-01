@@ -29,7 +29,7 @@ export class SR5TokenDocument extends TokenDocument {
     override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
         // ensure we disconnect from any networks before being a token actor is deleted
         if (this.actor?.isToken) {
-            await MatrixNetworkFlow.handleOnDeleteDocument(this.actor);
+            await this.actor.deleteStorageReferences();
         }
         return super._preDelete(...args);
     }
