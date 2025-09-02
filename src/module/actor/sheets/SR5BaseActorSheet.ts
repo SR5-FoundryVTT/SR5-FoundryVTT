@@ -1012,6 +1012,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         // Check all items and using the item to inventory mapping add them to that inventory.
         for (const item of this.actor.items) {
             if (!item.id) continue;
+            if (this.actor.isLinkedItem(item)) continue;
 
             // Handled types are on the sheet outside the inventory.
             if (handledTypes.includes(item.type)) continue;

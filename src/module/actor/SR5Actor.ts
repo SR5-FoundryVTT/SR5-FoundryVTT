@@ -92,6 +92,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     // Quick access for all items of a type.
     itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>();
 
+    linkedItems = new Map<string, SR5Item>();
+
     constructor(data: Actor.CreateData, context?: Actor.ConstructionContext) {
         super(data, context);
 
@@ -128,6 +130,20 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override prepareData() {
         super.prepareData();
         this.prepareItemsForType();
+        this.prepareLinkedItems();
+    }
+
+    isLinkedItem(item: SR5Item): boolean {
+        return this.linkedItems.has(item.uuid);
+    }
+
+    prepareLinkedItems() {
+        this.linkedItems.clear();
+        for (const item of this.items) {
+            for (const linkedItem of item.getLinkedItems()) {
+                this.linkedItems.set(linkedItem.uuid, linkedItem);
+            }
+        }
     }
 
     /**
@@ -2270,5 +2286,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
         await this.deleteStorageReferences()
         return super._preDelete(...args);
+    }
+
+    async createItems(...items: SR5Item[]): Promise<SR5Item[]> {
+        return await this.createEmbeddedDocuments('Item', items) as SR5Item[];
     }
 }

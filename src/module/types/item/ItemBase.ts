@@ -1,10 +1,17 @@
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
-const { SchemaField } = foundry.data.fields;
+const { BooleanField, SchemaField, ArrayField, DocumentUUIDField, } = foundry.data.fields;
+
+export const LinkedItemData = () => ({
+    id: new DocumentUUIDField({ required: true, nullable: false }),
+    attached: new BooleanField({ required: true, initial: false })
+})
 
 export const BaseItemData = () => ({
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData()),
+    // linked_items
+    linked_items: new ArrayField(new SchemaField(LinkedItemData())),
 });
 
 /**

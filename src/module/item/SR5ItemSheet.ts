@@ -509,29 +509,6 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
             return;
         }
 
-        // CASE - Add items to a weapons modification / ammo
-        if (this.item.isType('weapon') && data.type === 'Item') {
-            let item;
-            // Case 1 - Data explicitly provided
-            if (data.data) {
-                if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
-                    return console.warn('Shadowrun 5e | Cant drop items onto themselves');
-                }
-                item = data;
-                // Case 2 - From a Compendium Pack
-            } else if (data.pack) {
-                item = await Helpers.getEntityFromCollection(data.pack, data.id);
-                // Case 3 - From a World Entity
-            } else {
-                item = await fromUuid(data.uuid);
-            }
-
-            // Provide readable error for failing item retrieval assumptions.
-            if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
-
-            return this.item.createNestedItem(item._source);
-        }
-
         // Add actors to WAN, both GRID and HOST
         if (this.item.isNetwork() && ['Item', 'Actor'].includes(data.type)) {
             const document = await fromUuid(data.uuid) as SR5Actor;
@@ -565,6 +542,43 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
             await this.item.addNewNetwork(item);
         }
+
+        // CASE - Add items to a weapons modification / ammo
+        if (this.item.isType('weapon') && data.type === 'Item') {
+            let item;
+            // Case 1 - Data explicitly provided
+            if (data.data) {
+                if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
+                    return console.warn('Shadowrun 5e | Cant drop items onto themselves');
+                }
+                item = data;
+                // Case 2 - From a Compendium Pack
+            } else if (data.pack) {
+                item = await Helpers.getEntityFromCollection(data.pack, data.id);
+                // Case 3 - From a World Entity
+            } else {
+                item = await fromUuid(data.uuid);
+            }
+
+            // Provide readable error for failing item retrieval assumptions.
+            if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
+            const targetActor = this.item.actorOwner;
+            if (targetActor) {
+                // we are both owned by the same actor, just update our list
+                if (item.actorOwner === targetActor) {
+                    if (await this.item.addLinkedItem(item)) return;
+                } else {
+                    // add the target item to the our actor, then set our uuid to the item
+                    const items = await targetActor.createEmbeddedDocuments('Item', [item], { renderSheet: false }) as SR5Item[];
+                    if (await this.item.addLinkedItem(items)) return;
+                }
+            } else {
+                // if we aren't part of an actor, just link to the item -- TODO this probably won't work
+                if (await this.item.addLinkedItem(item)) return;
+            }
+        }
+
+        super._onDrop(event);
     }
 
     _eventId(event) {
@@ -681,7 +695,8 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
             name, type,
             system: { type: 'weapon' }
         });
-        await this.item.createNestedItem(item.toObject());
+        const items = await this.actor?.createItems(item);
+        if (items) await this.item.addLinkedItem(items);
     }
 
     async _onAmmoReload(event, partialReload: boolean) {
@@ -713,7 +728,8 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
             type: type as Item.SubType
         };
         const item = new SR5Item(itemData);
-        await this.item.createNestedItem(item._source);
+        const items = await this.item.actor?.createEmbeddedDocuments('Item', [item]) as SR5Item[];
+        await this.item.addLinkedItem(items);
     }
 
     async _onClipEquip(clipType: AmmunitionType['clip_type']) {
