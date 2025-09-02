@@ -334,4 +334,12 @@ export class MatrixRules {
         else
             return { name: SR5.gridCategories.public, value: 0 };
     }
+
+    /**
+     * Get the amount of damage each extra mark does when getting attacked in the matrix
+     * - this is defined on Data Spike SR5 pg239
+     */
+    static getExtraMarkDamageModifier() {
+        return 2;
+    }
 }
