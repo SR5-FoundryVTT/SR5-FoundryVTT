@@ -2255,11 +2255,24 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Delete References to this actor and all owned items in the Storage areas
      */
     async deleteStorageReferences(this: SR5Actor) {
+        // If the actor being deleted has a lot of items, this can take some time
+        const progressBar = ui.notifications.info(`${this.name} - ${game.i18n.localize("SR5.Notifications.DeletingStorageReferences.Starting")}`, { progress: true });
+        // if we have a matrix device, delete it's storage references first, this speeds up deleting their PAN
+        await this.getMatrixDevice()?.deleteStorageReferences()
         // when an actor is deleted, handle deleting all owned items
+        let i = 0;
+        const total = this.items.size;
         for (const item of this.items) {
+            i++;
+            progressBar.update({
+                pct: i / total,
+                message: `(${i}/${total}) ${game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Item`)} ${item.name} `
+            })
             await item.deleteStorageReferences();
         }
         await MatrixNetworkFlow.handleOnDeleteDocument(this);
+        progressBar.remove();
+        ui.notifications.info(game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Finished`));
     }
 
     /**
