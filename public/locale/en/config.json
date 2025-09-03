@@ -683,7 +683,7 @@
             },
             "SuccessTestPrompt": {
                 "Hint": "Prompt to make a standard Success Test",
-                "Label": "Success Test"
+                "Label": "Prompt Success Test"
             }
         },
         "KnockedDown": "Knocked Down",

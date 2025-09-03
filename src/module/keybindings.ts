@@ -17,7 +17,7 @@ export const registerSystemKeybindings = () => {
     game.keybindings.register("shadowrun5e", "success-test-prompt", {
         name: "SR5.Keybinding.SuccessTestPrompt.Label",
         hint: "SR5.Keybinding.SuccessTestPrompt.Hint",
-        editable: [{ key: "KeyR", modifiers: [] }],
+        editable: [{ key: "KeyZ", modifiers: [] }],
         onDown: () => { game.shadowrun5e.test.promptSuccessTest(); }
     });
 
