@@ -1,10 +1,10 @@
-import { SR5Actor } from "../../actor/SR5Actor";
-import { SR5Item } from "../SR5Item";
-import { NetworkStorage } from "../../storage/NetworkStorage";
-import { Helpers } from "../../helpers";
-import { SocketMessage } from "../../sockets";
-import { FLAGS, SYSTEM_NAME } from "../../constants";
-import { Translation } from "@/module/utils/strings";
+import { SR5Actor } from '../../actor/SR5Actor';
+import { SR5Item } from '../SR5Item';
+import { NetworkStorage } from '../../storage/NetworkStorage';
+import { Helpers } from '../../helpers';
+import { SocketMessage } from '../../sockets';
+import { FLAGS, SYSTEM_NAME } from '../../constants';
+import { Translation } from '@/module/utils/strings';
 
 /**
  * This flow handles everything involving how matrix devices are connected to network and what
@@ -58,8 +58,9 @@ export class MatrixNetworkFlow {
      *
      * @param master
      * @param slave
+     * @param options.triggerUpdates - trigger updates on the documents to rerender sheets
      */
-    static async addSlave(master: SR5Item, slave: SR5Actor | SR5Item) {
+    static async addSlave(master: SR5Item, slave: SR5Actor | SR5Item, options: { triggerUpdate?: boolean } = { triggerUpdate: true }) {
         console.debug(`Shadowrun5e | Adding document ${slave?.name} to the master ${master?.name}`, master, slave);
         if (!master || !slave) return console.error('Shadowrun 5e | Either the networks master or device did not resolve.');
 
@@ -70,7 +71,9 @@ export class MatrixNetworkFlow {
 
         console.debug(`Shadowrun5e | Added document ${slave?.name} to the master ${master?.name}`, master, slave);
 
-        await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
+        if (options.triggerUpdate) {
+            await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
+        }
 
         if (slave instanceof SR5Actor && master.isType('grid')) {
             await MatrixNetworkFlow.storeLastUsedGrid(slave, master);

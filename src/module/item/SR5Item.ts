@@ -1245,9 +1245,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     /**
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
      * @param slave The matrix item to be connected.
+     * @param options.triggerUpdates - trigger updates to the documents to rerender the sheets
      */
-    async addSlave(slave: SR5Actor | SR5Item) {
-        await MatrixNetworkFlow.addSlave(this, slave);
+    async addSlave(slave: SR5Actor | SR5Item, options?: { triggerUpdate?: boolean }) {
+        await MatrixNetworkFlow.addSlave(this, slave, options);
     }
 
     /**
