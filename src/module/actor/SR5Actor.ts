@@ -2256,7 +2256,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async deleteStorageReferences(this: SR5Actor) {
         // If the actor being deleted has a lot of items, this can take some time
+        // display a progress bar of the items being "deleted" so the user knows something is happening at least
         const progressBar = ui.notifications.info(`${this.name} - ${game.i18n.localize("SR5.Notifications.DeletingStorageReferences.Starting")}`, { progress: true });
+
         // if we have a matrix device, delete it's storage references first, this speeds up deleting their PAN
         await this.getMatrixDevice()?.deleteStorageReferences()
         // when an actor is deleted, handle deleting all owned items
@@ -2265,14 +2267,19 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         for (const item of this.items) {
             progressBar.update({
                 pct: i / total,
-                message: `(${i+1}/${total}) ${game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Item`)} ${item.name} `
+                message: `(${i+1}/${total}) ${this.name} - ${game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Item`)} ${item.name} `
             })
             await item.deleteStorageReferences();
             i++;
         }
+        // display the progress bar at 100% while we finis cleaning up the actor
+        progressBar.update({
+            pct: 100,
+            message: game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Finished`),
+        });
         await MatrixNetworkFlow.handleOnDeleteDocument(this);
+        // remove the progress bar now, we don't need to keep it around
         progressBar.remove();
-        ui.notifications.info(game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Finished`));
     }
 
     /**
