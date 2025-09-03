@@ -680,6 +680,10 @@
             "ShowSituationModifiers": {
                 "Hint": "Open situation modifiers for selection",
                 "Label": "Situation Modifiers"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Prompt to make a standard Success Test",
+                "Label": "Success Test"
             }
         },
         "KnockedDown": "Knocked Down",
