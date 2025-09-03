@@ -3,6 +3,7 @@ import { DataStorage } from '../data/DataStorage';
 import { SR5Item } from '../item/SR5Item';
 import { MatrixRules } from '../rules/MatrixRules';
 import { MatrixMarksType } from '../types/template/Matrix';
+import { Helpers } from '@/module/helpers';
 
 /**
  * Options for the setMarks method.
@@ -89,9 +90,9 @@ export const MarksStorage = {
      * @param uuid Uuid for that document.
      */
     getMarksRelations(uuid: string): string[] {
-        uuid = MarksStorage._uuidForStorage(uuid);
+        const uuidForStorage = Helpers.uuidForStorage(uuid);
         const marksStorage = MarksStorage.getStorage();
-        return marksStorage[`${MarksStorage.key}.${uuid}`] ?? [];
+        return marksStorage[`${MarksStorage.key}.${uuidForStorage}`] ?? [];
     },
 
     /**
@@ -101,8 +102,8 @@ export const MarksStorage = {
      * @param marksData The raw marks data of the actor.
      */
     async storeRelations(uuid: string, marksData: MatrixMarksType) {
-        uuid = MarksStorage._uuidForStorage(uuid);
-        const key = `${MarksStorage.key}.${uuid}`;
+        const uuidForStorage = Helpers.uuidForStorage(uuid);
+        const key = `${MarksStorage.key}.${uuidForStorage}`;
         const marks = marksData.map(({uuid}) => uuid);
         await DataStorage.set(key, marks);
         await MarksStorage.cleanupOrphanedRelations();
@@ -115,7 +116,7 @@ export const MarksStorage = {
      */
     retrieveMarks(document: SR5Actor | SR5Item): string[] {
         const storage = MarksStorage.getStorage();
-        const uuid = MarksStorage._uuidForStorage(document.uuid);
+        const uuid = Helpers.uuidForStorage(document.uuid);
         return storage[uuid] ?? [];
     },
 
@@ -131,7 +132,7 @@ export const MarksStorage = {
 
         let changed = false;
         // Remove marks placed by.
-        const uuidForStorage = MarksStorage._uuidForStorage(uuid);
+        const uuidForStorage = Helpers.uuidForStorage(uuid);
         if (storage[uuidForStorage]) {
             changed = true;
             delete storage[uuidForStorage];
@@ -145,7 +146,7 @@ export const MarksStorage = {
             storage[uuidForStorage] = markRelations.filter(markedUuid => markedUuid !== uuid);
 
             // Update lokal marks placed on the main uuid.
-            const document = fromUuidSync(MarksStorage._uuidFromStorage(uuidForStorage)) as SR5Actor | SR5Item;
+            const document = fromUuidSync(Helpers.uuidFromStorage(uuidForStorage)) as SR5Actor | SR5Item;
             if (!document) continue;
 
             await document.clearMark(uuid);
@@ -164,26 +165,12 @@ export const MarksStorage = {
     async cleanupOrphanedRelations() {
         const storage = MarksStorage.getStorage();
         for (const uuidFromStorage of Object.keys(storage)) {
-            const uuid = MarksStorage._uuidFromStorage(uuidFromStorage);
+            const uuid = Helpers.uuidFromStorage(uuidFromStorage);
 
             const document = fromUuidSync(uuid);
             if (document) continue;
 
             await MarksStorage.clearRelations(uuid);
         }
-    },
-
-    /**
-     * Transform uuid into a format that can be stored as keys in Foundry without object splitting.
-     */
-    _uuidForStorage(uuid) {
-        return uuid.replace('.', '_');
-    },
-
-    /**
-     * Reforms a transformed uuid back into a usable format.
-     */
-    _uuidFromStorage(uuid) {
-        return uuid.replace('_', '.');
     },
 }
