@@ -971,6 +971,13 @@
         "NormalSkillButton": "Normal",
         "NormalSpellButton": "Normal",
         "NotExtended": "Not Extended",
+        "Notifications": {
+            "DeletingStorageReferences": {
+                "Start": "Deleting Network and MARK references",
+                "Item": "Clearing references to item",
+                "Finished": "Finished clearing references"
+            }
+        },
         "Notoriety": "Notoriety",
         "Nuyen": "Nuyen",
         "OpenOrigin": "Open item",
