@@ -129,12 +129,19 @@ export const MarksStorage = {
     async clearRelations(uuid: string) {
         const storage = MarksStorage.getStorage();
 
+        let changed = false;
         // Remove marks placed by.
         const uuidForStorage = MarksStorage._uuidForStorage(uuid);
-        delete storage[uuidForStorage];
+        if (storage[uuidForStorage]) {
+            changed = true;
+            delete storage[uuidForStorage];
+        }
 
         // Remove marks placed on.
         for (const [uuidForStorage, markRelations] of Object.entries(storage)) {
+            // if we don't include the id, skip this object
+            if (!markRelations.includes(uuid)) continue;
+            changed = true;
             storage[uuidForStorage] = markRelations.filter(markedUuid => markedUuid !== uuid);
 
             // Update lokal marks placed on the main uuid.
@@ -144,7 +151,9 @@ export const MarksStorage = {
             await document.clearMark(uuid);
         }
 
-        await DataStorage.set(MarksStorage.key, storage);
+        if (changed) {
+            await DataStorage.set(MarksStorage.key, storage);
+        }
     },
 
     /**

@@ -162,6 +162,8 @@ export class MatrixNetworkFlow {
         console.debug(`Shadowrun 5e | Removing all devices from network ${master.name}`);
 
         const slaves = NetworkStorage.getSlaves(master);
+        // if we don't have any slaves, skip the next parts
+        if (slaves.length === 0) return;
         await NetworkStorage.removeSlaves(master);
 
         // Since no document update occured, we have to trigger a update for cross session sheet re-render.

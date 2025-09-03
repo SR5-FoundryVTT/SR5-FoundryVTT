@@ -2263,12 +2263,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         let i = 0;
         const total = this.items.size;
         for (const item of this.items) {
-            i++;
             progressBar.update({
                 pct: i / total,
-                message: `(${i}/${total}) ${game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Item`)} ${item.name} `
+                message: `(${i+1}/${total}) ${game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Item`)} ${item.name} `
             })
             await item.deleteStorageReferences();
+            i++;
         }
         await MatrixNetworkFlow.handleOnDeleteDocument(this);
         progressBar.remove();
