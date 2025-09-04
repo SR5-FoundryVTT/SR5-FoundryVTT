@@ -10,18 +10,26 @@ import { ItemMarksFlow } from '@/module/item/flows/ItemMarksFlow';
 export const StorageFlow = {
 
     /**
-     * Delete References to actor actor and all owned items in the Storage areas
+     * Delete References to an actor or item in the Global Storage areas
      */
     async deleteStorageReferences(document: SR5Actor | SR5Item | null | undefined) {
         if (document instanceof SR5Actor) return this._deleteStorageReferencesActor(document);
         else if (document instanceof SR5Item) return this._deleteStorageReferencesItem(document);
     },
 
+    /**
+     * Delete references to items in storage
+     * @param item
+     */
     async _deleteStorageReferencesItem(item: SR5Item) {
         await ItemMarksFlow.handleOnDeleteItem(item);
         await MatrixNetworkFlow.handleOnDeleteDocument(item);
     },
 
+    /**
+     * Delete references to an actor and all their owned items
+     * @param actor
+     */
     async _deleteStorageReferencesActor(actor: SR5Actor) {
         // If the actor being deleted has a lot of items, actor can take some time
         // display a progress bar of the items being "deleted" so the user knows something is happening at least
@@ -45,6 +53,7 @@ export const StorageFlow = {
             pct: 1,
             message: `${actor.name} - ${game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Finished`)}`,
         });
+        // handle our own actual deletion
         await MatrixNetworkFlow.handleOnDeleteDocument(actor);
         // remove the progress bar now, we don't need to keep it around
         progressBar.remove();
