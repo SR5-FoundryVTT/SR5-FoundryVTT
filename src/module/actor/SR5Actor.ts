@@ -718,11 +718,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * - this function does not check IF we are connected, simply the dice pool modifier
      */
     getPublicGridModifier(this: SR5Actor) {
-        if ('public_grid' in this.system.modifiers) {
-            const modifier = this.system.modifiers.public_grid;
-            return MatrixRules.publicGridModifier() + modifier;
-        }
-        return MatrixRules.publicGridModifier();
+        const modifier = this.modifiers.totalFor('public_grid');
+        return MatrixRules.publicGridModifier() + modifier;
     }
 
     /**
@@ -2248,7 +2245,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Get the amount of damage each extra mark does when getting attacked in the matrix
      */
     getExtraMarkDamageModifier() {
-        return 2;
+        return MatrixRules.getExtraMarkDamageModifier() + this.modifiers.totalFor('mark_damage');
     }
 
     /**
