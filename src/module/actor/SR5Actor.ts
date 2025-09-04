@@ -584,7 +584,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Second check matrix attributes
         const matrixData = rollData.matrix ?? this.matrixData();
-        if (matrixData?.[name]) return matrixData[name];
+        if (matrixData?.[name]) {
+            const value = matrixData[name];
+            // if the matrix name is rating and the value is a number, make an attribute field from it
+            if (name === 'rating' && typeof value === 'number') {
+                return DataDefaults.createData('attribute_field', { label: 'SR5.Rating', value, base: value });
+            }
+            return matrixData[name];
+        }
 
         // Finally, check general attributes.
         const attributes = rollData.attributes ?? this.getAttributes();
