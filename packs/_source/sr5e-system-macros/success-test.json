@@ -1,0 +1,12 @@
+{
+  "_id": "ZWfyY8P4y1LEstU1",
+  "_key": "!macros!ZWfyY8P4y1LEstU1",
+  "name": "Success Test",
+  "type": "script",
+  "command": "game.shadowrun5e.test.promptSuccessTest()",
+  "img": "icons/svg/dice-target.svg",
+  "author": "gprTC3Md255Kv3Xm",
+  "scope": "global",
+  "folder": null,
+  "flags": {}
+}
