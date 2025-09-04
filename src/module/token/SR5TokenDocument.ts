@@ -1,4 +1,5 @@
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
+import { StorageFlow } from '@/module/flows/StorageFlow';
 
 export class SR5TokenDocument extends TokenDocument {
     /**
@@ -29,7 +30,7 @@ export class SR5TokenDocument extends TokenDocument {
     override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
         // ensure we disconnect from any networks before being a token actor is deleted
         if (this.actor?.isToken) {
-            await this.actor.deleteStorageReferences();
+            await StorageFlow.deleteStorageReferences(this.actor);
         }
         return super._preDelete(...args);
     }

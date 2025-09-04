@@ -47,6 +47,7 @@ import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { StorageFlow } from '@/module/flows/StorageFlow';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -2250,45 +2251,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     getExtraMarkDamageModifier() {
         return 2;
     }
-
-    /**
-     * Delete References to this actor and all owned items in the Storage areas
-     */
-    async deleteStorageReferences(this: SR5Actor) {
-        // If the actor being deleted has a lot of items, this can take some time
-        // display a progress bar of the items being "deleted" so the user knows something is happening at least
-        const progressBar = ui.notifications.info(`${this.name} - ${game.i18n.localize("SR5.Notifications.DeletingStorageReferences.Start")}`, { progress: true });
-
-        // if we have a matrix device, delete its storage references first, this speeds up deleting their PAN
-        await this.getMatrixDevice()?.deleteStorageReferences()
-        // when an actor is deleted, handle deleting all owned items
-        let i = 0;
-        const total = this.items.size;
-        for (const item of this.items) {
-            progressBar.update({
-                pct: i / total,
-                message: `(${i+1}/${total}) ${this.name} - ${game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Item`)} ${item.name}`
-            })
-            await item.deleteStorageReferences();
-            i++;
-        }
-        // display the progress bar at 100% while we finis cleaning up the actor
-        progressBar.update({
-            pct: 100,
-            message: `${this.name} - ${game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Finished`)}`,
-        });
-        await MatrixNetworkFlow.handleOnDeleteDocument(this);
-        // remove the progress bar now, we don't need to keep it around
-        progressBar.remove();
-    }
-
     /**
      * Handle system specific things when this actor is being deleted
      * - NOTE that this does not apply to Token Actors. Those are handled through SR5TokenDocument
      * @param args
      */
     override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
-        await this.deleteStorageReferences()
+        await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
     }
 }
