@@ -36,8 +36,14 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                 {
                     navSelector: '.tabs[data-group="matrix"]',
                     contentSelector: '.tabsbody[data-group="matrix"]',
-                    initial: 'marks',
-                }] as {navSelector: string, contentSelector: string, initial: string}[],
+                    initial: 'targets',
+                },
+                {
+                    navSelector: '.tabs[data-group="matrix-right-side"]',
+                    contentSelector: '.tabsbody[data-group="matrix-right-side"]',
+                    initial: 'matrix-actions',
+                },
+            ] as {navSelector: string, contentSelector: string, initial: string}[],
         });
     }
 

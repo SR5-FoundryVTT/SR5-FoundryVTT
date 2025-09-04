@@ -575,7 +575,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
-    getAttribute(this:SR5Actor, name: string, options?: { rollData?: SR5Actor['system'] }): AttributeFieldType {
+    getAttribute(name: string, options?: { rollData?: SR5Actor['system'] }): AttributeFieldType {
 
         const rollData = options?.rollData ?? this.getRollData();
         // First check vehicle stats, as they don't always exist.
@@ -1927,7 +1927,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Check if the current actor has a Matrix persona.
      */
     get hasPersona(): boolean {
-        return this.hasActorPersona || this.hasDevicePersona;
+        return this.hasActorPersona() || this.hasDevicePersona();
     }
 
     /**
@@ -1935,7 +1935,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns true, when the actor lives in the matrix.
      */
-    get hasActorPersona(): boolean {
+    hasActorPersona(this: SR5Actor): boolean {
         return this.isType('vehicle', 'ic') || this.isEmerged();
     }
 
@@ -1944,8 +1944,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns true, when the actor has an active persona.
      */
-    get hasDevicePersona(): boolean {
-        return this.getMatrixDevice() !== undefined;
+    hasDevicePersona(this: SR5Actor): boolean {
+        const device = this.getMatrixDevice();
+        return device !== undefined && !device.isLivingPersona();
     }
 
     /**
@@ -1954,8 +1955,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns true, when a technomancer uses their living persona
      */
-    get hasLivingPersona(): boolean {
-        return !this.hasDevicePersona && this.isEmerged();
+    hasLivingPersona(this: SR5Actor): boolean {
+        return !this.hasDevicePersona() && this.isEmerged();
     }
 
     /**

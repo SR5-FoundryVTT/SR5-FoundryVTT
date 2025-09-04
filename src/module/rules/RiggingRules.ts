@@ -6,22 +6,16 @@ import { SuccessTestData } from '@/module/tests/SuccessTest';
 export class RiggingRules {
     /**
      * Modify the roll data by using the Driver's data
-     * @param driverData
+     * @param driver - the Actor that is driving
      * @param rollData
      */
-    static modifyRollDataForDriver(driverData: SR5Actor['system'], rollData: SR5Actor['system']) {
-
-        const driverSkills = driverData.skills.active;
-        if (!driverSkills) return;
-
-        const driverAttributes = driverData.attributes;
-        if (!driverAttributes) return;
+    static modifyRollDataForDriver(driver: SR5Actor, rollData: SR5Actor['system']) {
 
         const injectAttributes = ['intuition', 'reaction', 'logic', 'agility'];
-        AttributeRules.injectAttributes(injectAttributes, driverAttributes, rollData, { bigger: false });
+        AttributeRules.injectAttributes(injectAttributes, driver, rollData, { bigger: false });
 
         const injectSkills = ['perception', 'sneaking', 'gunnery', ...this.PilotSkills];
-        SkillRules.injectActiveSkills(injectSkills, driverSkills, rollData, { bigger: false });
+        SkillRules.injectSkills(injectSkills, driver, rollData, { bigger: false });
     };
 
     static PilotSkills = [

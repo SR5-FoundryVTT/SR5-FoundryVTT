@@ -55,7 +55,7 @@ export const ActorMarksFlow = {
         }
 
         // Assure targeting of the persona device if necessary, if one is in use.
-        if (target instanceof SR5Actor && !target.hasActorPersona) {
+        if (target instanceof SR5Actor && !target.hasActorPersona()) {
             const matrixDevice = target.getMatrixDevice();
             if (!matrixDevice) {
                 ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedWithoutPersona'));

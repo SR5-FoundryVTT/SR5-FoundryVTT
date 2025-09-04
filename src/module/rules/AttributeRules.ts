@@ -1,7 +1,5 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { MinimalActionType } from '@/module/types/item/Action';
-import { DataDefaults } from '@/module/data/DataDefaults';
-import { AttributesType, TechnologyAttributesType } from '@/module/types/template/Attributes';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5 } from '@/module/config';
 
@@ -13,16 +11,23 @@ export class AttributeRules {
      * Also implements the 'use bigger value rule',if necessary.
      *
      * @param names A list of attribute names to inject
-     * @param attributes The list of source attribute to pull from
+     * @param source The Actor or Item to use as the source of attributes
      * @param rollData The testData to inject attributes into
      * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
      */
-    static injectAttributes(names: readonly string[], attributes: AttributesType | TechnologyAttributesType, rollData: SR5Actor['system'] | SR5Item['system'], options: { bigger: boolean }) {
+    static injectAttributes(
+        names: readonly string[],
+        source: SR5Actor | SR5Item,
+        rollData: SR5Actor['system'] | SR5Item['system'],
+        options: { bigger: boolean }) {
         const targetAttributes = rollData.attributes;
         if (targetAttributes) {
             for (const name of names) {
-                // create a copy of the attribute data or make new attribute data if it wasn't found
-                const sourceAttribute = DataDefaults.createData('attribute_field', attributes[name]);
+                // get the source attribute, but may be undefined
+                let sourceAttribute = source.getAttribute(name);
+                if (!sourceAttribute) continue;
+                // if it is defined, duplicate it so we don't mess with the underlying data
+                sourceAttribute = foundry.utils.deepClone(sourceAttribute);
                 const targetAttribute = targetAttributes[name];
 
                 if (options.bigger) {
@@ -47,7 +52,7 @@ export class AttributeRules {
      */
     static injectMentalAttributes(actor: SR5Actor, rollData: SR5Item['system']) {
         if (!rollData.attributes) return;
-        this.injectAttributes(SR5.mentalAttributes, actor.getAttributes(), rollData, { bigger: false });
+        this.injectAttributes(SR5.mentalAttributes, actor, rollData, { bigger: false });
     }
 
     /**

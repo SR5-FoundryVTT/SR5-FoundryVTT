@@ -45,16 +45,16 @@
             </div>
         </div>
         <div>
-            <nav class="tabs" data-group="sprite">
+            <nav class="tabs" data-group="matrix-right-side">
                 <a class="item" data-tab="matrix-actions">{{localize "SR5.Labels.ActorSheet.MatrixActions"}}</a>
                 <a class="item" data-tab="sprite-powers">{{localize "SR5.Labels.ActorSheet.SpritePowers"}}</a>
             </nav>
             <div class="scroll-area scroll-area-matrix-hacking">
-                <section data-group='sprite' class="tabsbody">
-                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='sprite' tabId='sprite-powers'}}
+                <section data-group='matrix-right-side' class="tabsbody">
+                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='sprite-powers'}}
                         {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.hbs' }}
                     {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
-                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='sprite' tabId='matrix-actions'}}
+                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='matrix-actions'}}
                         {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
                     {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
                 </section>

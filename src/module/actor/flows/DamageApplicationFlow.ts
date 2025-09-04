@@ -198,7 +198,7 @@ export class DamageApplicationFlow {
         if (damage.type.value !== 'matrix') return;
 
         // CASE - Technomancer with Living Persona.
-        if (actor.hasLivingPersona) {
+        if (actor.hasLivingPersona()) {
             damage = ResonsanceRules.convertMatrixDamage(damage);
             await DamageApplicationFlow.addStunDamage(actor, damage);
             return;

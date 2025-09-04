@@ -364,7 +364,7 @@ export const MatrixTestDataFlow = {
 
         test.persona = actor;
         // Retrieve the target icon document.
-        test.icon = actor.hasDevicePersona ?
+        test.icon = actor.hasDevicePersona() ?
             actor.getMatrixDevice() as SR5Item :
             actor;
 

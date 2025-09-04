@@ -18,6 +18,7 @@
         </div>
     </div>
     {{/ife}}
+    {{#ifne system.category 'living_persona'}}
     <div class="form-line">
         <div class="label">
             {{#ifin system.category (toArray "cyberdeck" "host")}}
@@ -130,4 +131,5 @@
     </div>
     {{/ifne}}
     {{/ife}}
+    {{/ifne}}
 </div>

@@ -31,7 +31,7 @@ export const ActorRollDataFlow = {
 
         // if the driver is in control of the vehicle, inject the driver's attributes and skills
         if (actor.isControlledByDriver()) {
-            RiggingRules.modifyRollDataForDriver(driver.getRollData(), rollData);
+            RiggingRules.modifyRollDataForDriver(driver, rollData);
         }
     },
 
