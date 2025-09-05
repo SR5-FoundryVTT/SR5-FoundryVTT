@@ -118,7 +118,6 @@ import { Weapon } from './types/item/Weapon';
 
 import { SRStorage } from './storage/storage';
 import { MatrixICFlow } from './actor/flows/MatrixICFlow';
-import { ItemMarksFlow } from './item/flows/ItemMarksFlow';
 import { MatrixNetworkFlow } from './item/flows/MatrixNetworkFlow';
 import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
@@ -155,8 +154,6 @@ export class HooksManager {
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
-        Hooks.on('deleteItem', HooksManager.onDeleteItem.bind(HooksManager));
-        Hooks.on('deleteActor', HooksManager.onDeleteActor.bind(HooksManager));
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
@@ -482,12 +479,6 @@ ___________________
                 new ChangelogApplication().render(true);
         }
 
-        // Connect chat dice icon to shadowrun basic success test roll.
-        const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-        $(document).on('click', diceIconSelector, await TestCreator.promptSuccessTest.bind(TestCreator));
-        const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
-        $(document).on('click', diceIconSelectorNew, await TestCreator.promptSuccessTest.bind(TestCreator));
-
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
         HooksManager.registerSocketListeners();
@@ -583,21 +574,6 @@ ___________________
     }
 
     /**
-     * Collect all changes necessary when any item is deleted.
-     */
-    static async onDeleteItem(item: SR5Item, data: SR5Item['system'], id: string) {
-        await MatrixNetworkFlow.handleOnDeleteDocument(item, data, id);
-        await ItemMarksFlow.handleOnDeleteItem(item, data, id);
-    }
-
-    /**
-     * Collect all changes necessary when any actor is deleted.
-     */
-    static async onDeleteActor(actor: SR5Actor, data: SR5Actor['system'], id: string) {
-        return MatrixNetworkFlow.handleOnDeleteDocument(actor, data, id);
-    }
-
-    /**
      * This method is used as a simple place to register socket hook handlers for the system.
      *
      * You can use the SocketMessage for sending messages using a socket event message id and generic data object.
@@ -646,6 +622,8 @@ ___________________
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
         await TeamworkTest.chatLogListeners(chatLog, html);
         await JournalEnrichers.chatlogRequestHooks(html);
+
+        this.renderSuccessTestPromptButton();
     }
 
     static configureVision() {
@@ -658,5 +636,33 @@ ___________________
 
     static configureTextEnrichers() {
         JournalEnrichers.setEnrichers();
+    }
+
+    /**
+     * Add a button to Prompt for a Success Test
+     */
+    static renderSuccessTestPromptButton() {
+        const id = 'sr5e-success-test-button-prompt';
+        const inner = `<i class="fas fa-dice"></i>`;
+        // look for an already rendered button and update the innerHTML of it just in case it changed (I'm not sure this is necessary)
+        const rendered = document.getElementById(id);
+        if (rendered) {
+            rendered.innerHTML = inner;
+        } else {
+            // create the button using custom attributes 
+            const button = document.createElement('button');
+            button.setAttribute('type', 'button');
+            button.setAttribute('id', id);
+            button.setAttribute('data-tooltip', 'SR5.Tests.SuccessTest');
+            // this class matches what the existing icons use
+            button.setAttribute('class', 'ui-control icon');
+            button.innerHTML = inner;
+            button.addEventListener('click', () => {
+                TestCreator.promptSuccessTest();
+            })
+            // target the roll-privacy div that holds the different Roll options (Public/Self/etc)
+            const element = document.getElementById('roll-privacy');
+            element?.prepend(button);
+        }
     }
 }

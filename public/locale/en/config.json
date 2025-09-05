@@ -681,6 +681,10 @@
             "ShowSituationModifiers": {
                 "Hint": "Open situation modifiers for selection",
                 "Label": "Situation Modifiers"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Prompt to make a standard Success Test",
+                "Label": "Prompt Success Test"
             }
         },
         "KnockedDown": "Knocked Down",
@@ -710,6 +714,7 @@
                 "CreateInventory": "Create inventory place",
                 "CritterPowers": "Critter Powers",
                 "ColdSim": "Cold Sim",
+                "ConnectToDriver": "Connect To Driver",
                 "DisplayingPersona": "Displaying Persona",
                 "DeviceRating": "Device Rating",
                 "DeviceSetup": "Device Setup",
@@ -922,6 +927,7 @@
             "JudgeIntentions": "J.Intentions",
             "LiftCarry": "Lift&Carry",
             "Marks": "Marks",
+            "MarkDamage": "Per Mark Damage",
             "MatrixDice": "Matrix Init Dice",
             "MatrixInit": "Matrix Init",
             "MatrixTrack": "Matrix Track",
@@ -935,6 +941,7 @@
             "PhysicalLimit": "Physical Limit",
             "PhysicalOverflowTrack": "Physical Overflow Track",
             "PhysicalTrack": "Physical Track",
+            "PublicGrid": "Public Grid",
             "Reach": "Reach",
             "Recoil": "Recoil",
             "Run": "Run",
@@ -1010,6 +1017,7 @@
         "ProgramType": "Type",
         "Programs": "Programs",
         "PublicAwareness": "Public Awareness",
+        "PublicGrid": "Public Grid",
         "PushTheLimit": "Push The Limit",
         "Qty": "Qty",
         "Quality": "Quality",
@@ -1498,6 +1506,7 @@
                 "global": "Modifies all tests pool, excluding damage reducing tests",
                 "judge_intentions": "Modifies judge intentions tests pool",
                 "lift_carry": "Modifies lift&carry tests pool",
+                "mark_damage": "Modifies the amount of damage taken per MARK done to you",
                 "matrix_initiative": "Modifies matrix initiative base",
                 "matrix_initiative_dice": "Modifies matrix initiative dice",
                 "matrix_track": "Modifies matrix damage track",
@@ -1511,6 +1520,7 @@
                 "physical_limit": "Modifies physical limit",
                 "physical_overflow_track": "Modifies physical overflow damage track",
                 "physical_track": "Modifies physical damage track",
+                "public_grid": "Modified the Public Grid modifier when connected to it",
                 "reach": "Modifies reach of melee attacks",
                 "recoil": "Modifies recoil tests pool",
                 "run": "Modifies running distance by multiples of the agility attribute",

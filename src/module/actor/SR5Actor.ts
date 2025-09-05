@@ -46,6 +46,7 @@ import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
+import { MatrixRules } from '@/module/rules/MatrixRules';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -566,21 +567,26 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Return the given attribute, no matter its source.
      *
-     * For characters and similar this will only return their attributes.
+     * For characters and similar this will check their attributes.
+     * For Matrix Users, it will return the matrix attribute.
      * For vehicles this will also return their vehicle stats.
 
      * @param name An attribute or other stats name.
      * @param options
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
-    getAttribute(this:SR5Actor, name: string, options?: { rollData?: SR5Actor['system'] }): AttributeFieldType {
+    getAttribute(name: string, options?: { rollData?: SR5Actor['system'] }): AttributeFieldType {
 
         const rollData = options?.rollData ?? this.getRollData();
         // First check vehicle stats, as they don't always exist.
         const stats = rollData.vehicle_stats ?? this.getVehicleStats();
         if (stats?.[name]) return stats[name];
 
-        // Second check general attributes.
+        // Second check matrix attributes
+        const matrixData = rollData.matrix ?? this.matrixData();
+        if (matrixData?.[name]) return matrixData[name];
+
+        // Finally, check general attributes.
         const attributes = rollData.attributes ?? this.getAttributes();
         return attributes[name];
     }
@@ -705,6 +711,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (this.isType('ic')) {
             await MatrixICFlow.connectToHost(network, this);
         }
+    }
+
+    /**
+     * The Dice Pool Modifier for being connected to a Public Grid
+     * - this function does not check IF we are connected, simply the dice pool modifier
+     */
+    getPublicGridModifier(this: SR5Actor) {
+        const modifier = this.modifiers.totalFor('public_grid');
+        return MatrixRules.publicGridModifier() + modifier;
     }
 
     /**
@@ -1912,7 +1927,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Check if the current actor has a Matrix persona.
      */
     get hasPersona(): boolean {
-        return this.hasActorPersona || this.hasDevicePersona;
+        return this.hasActorPersona() || this.hasDevicePersona();
     }
 
     /**
@@ -1920,7 +1935,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns true, when the actor lives in the matrix.
      */
-    get hasActorPersona(): boolean {
+    hasActorPersona(this: SR5Actor): boolean {
         return this.isType('vehicle', 'ic') || this.isEmerged();
     }
 
@@ -1929,8 +1944,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns true, when the actor has an active persona.
      */
-    get hasDevicePersona(): boolean {
-        return this.getMatrixDevice() !== undefined;
+    hasDevicePersona(this: SR5Actor): boolean {
+        const device = this.getMatrixDevice();
+        return device !== undefined && !device.isLivingPersona();
     }
 
     /**
@@ -1939,8 +1955,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns true, when a technomancer uses their living persona
      */
-    get hasLivingPersona(): boolean {
-        return !this.hasDevicePersona && this.isEmerged();
+    hasLivingPersona(this: SR5Actor): boolean {
+        return !this.hasDevicePersona() && this.isEmerged();
     }
 
     /**
@@ -2230,6 +2246,27 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Get the amount of damage each extra mark does when getting attacked in the matrix
      */
     getExtraMarkDamageModifier() {
-        return 2;
+        return MatrixRules.getExtraMarkDamageModifier() + this.modifiers.totalFor('mark_damage');
+    }
+
+    /**
+     * Delete References to this actor and all owned items in the Storage areas
+     */
+    async deleteStorageReferences(this: SR5Actor) {
+        // when an actor is deleted, handle deleting all owned items
+        for (const item of this.items) {
+            await item.deleteStorageReferences();
+        }
+        await MatrixNetworkFlow.handleOnDeleteDocument(this);
+    }
+
+    /**
+     * Handle system specific things when this actor is being deleted
+     * - NOTE that this does not apply to Token Actors. Those are handled through SR5TokenDocument
+     * @param args
+     */
+    override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
+        await this.deleteStorageReferences()
+        return super._preDelete(...args);
     }
 }

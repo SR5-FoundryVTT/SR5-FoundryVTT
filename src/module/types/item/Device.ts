@@ -7,7 +7,7 @@ export const DevicePartData = () => ({
     category: new StringField({
         required: true,
         initial: 'commlink',
-        choices: ['commlink', 'cyberdeck', 'rcc', 'host'],
+        choices: ['commlink', 'cyberdeck', 'rcc', 'host', 'living_persona'],
     }),
     atts: new SchemaField(MatrixAttributes(true)),
     slaves: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),

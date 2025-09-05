@@ -1231,7 +1231,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      */
     _prepareProgramCount(itemTypes: Record<string, Shadowrun.SheetItemData[]>): string {
         if (!itemTypes.program) return '';
-        if (!this.actor.hasDevicePersona) return '';
+        if (!this.actor.hasDevicePersona()) return '';
 
         const active = itemTypes.program.filter(program => program.system.technology?.equipped).length;
         const activeDevice = this.actor.getMatrixDevice();

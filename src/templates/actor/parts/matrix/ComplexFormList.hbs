@@ -1,22 +1,18 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix' tabId='complex-forms'}}
-<div class="matrix">
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
-            name=(localize 'SR5.ComplexForms')
-            itemId='complex_form'
-            icons=(ItemHeaderIcons 'complex_form')
-            rightSide=(ItemHeaderRightSide 'complex_form')
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        name=(localize 'SR5.ComplexForms')
+        itemId='complex_form'
+        icons=(ItemHeaderIcons 'complex_form')
+        rightSide=(ItemHeaderRightSide 'complex_form')
+}}
+{{#each itemType.complex_form as |item iid|}}
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+            img=item.img
+            name=item.name
+            itemId=item._id
+            icons=(ItemIcons item)
+            rightSide=(ItemRightSide item)
+            hasDesc="true"
+            hasRoll="true"
+            description=item.description.value
     }}
-    {{#each itemType.complex_form as |item iid|}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
-                img=item.img
-                name=item.name
-                itemId=item._id
-                icons=(ItemIcons item)
-                rightSide=(ItemRightSide item)
-                hasDesc="true"
-                hasRoll="true"
-                description=item.description.value
-        }}
-    {{/each}}
-</div>
-{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+{{/each}}

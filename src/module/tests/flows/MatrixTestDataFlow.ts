@@ -31,14 +31,16 @@ export const MatrixTestDataFlow = {
         if (!action) return;
         if (!actor) return;
 
+        const directConnection = (test.data as MatrixTestData).directConnection ?? false;
+
         if (action.attribute && MatrixTestDataFlow.isMatrixAttribute(action.attribute))
-            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true);
+            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true, directConnection);
 
         if (action.attribute2 && MatrixTestDataFlow.isMatrixAttribute(action.attribute2))
-            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true);
+            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true, directConnection);
 
         if (action.limit.attribute && MatrixTestDataFlow.isMatrixAttribute(action.limit.attribute))
-            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true);
+            MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true, directConnection);
     },
 
     /**
@@ -56,7 +58,7 @@ export const MatrixTestDataFlow = {
      */
     removeMatrixModifiers(test: SuccessTest) {
         const pool = new PartsList<number>(test.data.pool.mod);
-        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => pool.removePart(part));
+        ['SR5.HotSim', 'SR5.RunningSilent', 'SR5.PublicGrid'].forEach(part => pool.removePart(part));
     },
 
     /**
@@ -66,9 +68,10 @@ export const MatrixTestDataFlow = {
      * @param actor
      * @param pool
      * @param atts
+     * @param directConnection
      * @returns
      */
-    addMatrixModifiersToPool(actor: SR5Actor, pool: PartsList<number>, atts: any) {
+    addMatrixModifiersToPool(actor: SR5Actor, pool: PartsList<number>, atts: any, directConnection = false) {
         if (Helpers.isMatrix(atts)) {
             if (!("matrix" in actor.system)) return;
 
@@ -76,6 +79,10 @@ export const MatrixTestDataFlow = {
             const matrix = actor.system.matrix!;
             if (matrix.hot_sim) pool.addUniquePart('SR5.HotSim', 2);
             if (matrix.running_silent) pool.addUniquePart('SR5.RunningSilent', -2);
+
+            if (!directConnection && actor.network?.isPublicGrid()) {
+                pool.addUniquePart('SR5.PublicGrid', actor.getPublicGridModifier());
+            }
         }
     },
 
@@ -101,7 +108,16 @@ export const MatrixTestDataFlow = {
                 if (marks > 0) {
                     // add damage per mark on the target item
                     test.data.damage.mod = PartsList.AddUniquePart(test.data.damage.mod,
-                        "SR5.Marks", marks * targetItem.actor!.getExtraMarkDamageModifier());
+                        "SR5.Marks", marks * (targetItem.actor?.getExtraMarkDamageModifier() ?? MatrixRules.getExtraMarkDamageModifier()));
+                    test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
+                }
+                // if there wasn't a matrix device, see if we have marks placed on the actor itself
+            } else if (icon instanceof SR5Actor) {
+                const marks = actor.getMarksPlaced(icon.uuid);
+                if (marks > 0) {
+                    // add damage per mark on the target item
+                    test.data.damage.mod = PartsList.AddUniquePart(test.data.damage.mod,
+                        "SR5.Marks", marks * icon.getExtraMarkDamageModifier());
                     test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
                 }
             }
@@ -348,7 +364,7 @@ export const MatrixTestDataFlow = {
 
         test.persona = actor;
         // Retrieve the target icon document.
-        test.icon = actor.hasDevicePersona ?
+        test.icon = actor.hasDevicePersona() ?
             actor.getMatrixDevice() as SR5Item :
             actor;
 
