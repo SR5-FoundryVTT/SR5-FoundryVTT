@@ -1823,8 +1823,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     getControlRigRating(): number {
-        const matrix = this.matrixData();
-        return matrix?.control_rig_rating ?? 0;
+        return this.modifiers.totalFor('control_rig_rating');
     }
 
     /**

@@ -32,6 +32,8 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
                     hot_sim: true,
                     vr: true,
                     running_silent: false,
+                },
+                modifiers: {
                     control_rig_rating: 3,
                 }
             }
