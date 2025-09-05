@@ -980,7 +980,8 @@
                 "Adding": "Adding",
                 "Starting": "Starting to add equipped devices to PAN",
                 "FinishedAddingItems": "Finished adding devices to PAN. Please close and reopen any item sheets that changed connections."
-            }
+            },
+            "VehicleCannotBeOwnDriver": "A vehicle cannot be the Driver of itself (that's what Pilot is for)"
         },
         "Notoriety": "Notoriety",
         "Nuyen": "Nuyen",
@@ -1464,6 +1465,7 @@
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
                 "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
+                "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
@@ -1619,7 +1621,7 @@
             "IsDrone": "Is Drone",
             "IsOffRoad": "Is Off Road",
             "Maneuvering": "Maneuvering",
-            "MissingDriver": "Drag&Drop an actor as a driver",
+            "MissingDriver": "Drag&Drop an actor or Pick a token as a driver",
             "ModificationCategoryTypes": {
                 "body": "Body",
                 "cosmetic": "Cosmetic",

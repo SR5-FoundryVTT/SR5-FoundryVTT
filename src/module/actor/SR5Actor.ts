@@ -1792,6 +1792,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async addVehicleDriver(uuid: string) {
         if (!this.isType('vehicle')) return;
+        // don't allow adding yourself
+        if (uuid === this.uuid) {
+            ui.notifications?.warn('SR5.Notifications.VehicleCannotBeOwnDriver');
+            return;
+        }
 
         const driver = await fromUuid(uuid) as SR5Actor;
         if (!driver) return;
