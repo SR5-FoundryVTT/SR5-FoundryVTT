@@ -31,18 +31,23 @@ export const Attributes = () => ({
     edge: new ModifiableField(EdgeAttributeField()),
 });
 
-export const TechnologyAttributes = () => ({
-    willpower: new ModifiableField(AttributeField()),
-    logic: new ModifiableField(AttributeField()),
-    intuition: new ModifiableField(AttributeField()),
-    charisma: new ModifiableField(AttributeField()),
-
+// MatrixActorAttributes are all the attributes an actor should have to work in the matrix
+// this was going to be named MatrixAttributes but that's taken...
+export const MatrixActorAttributes = () => ({
     attack: new ModifiableField(AttributeField()),
     sleaze: new ModifiableField(AttributeField()),
     data_processing: new ModifiableField(AttributeField()),
     firewall: new ModifiableField(AttributeField()),
 
     rating: new ModifiableField(AttributeField()),
+})
+
+export const TechnologyAttributes = () => ({
+    willpower: new ModifiableField(AttributeField()),
+    logic: new ModifiableField(AttributeField()),
+    intuition: new ModifiableField(AttributeField()),
+    charisma: new ModifiableField(AttributeField()),
+    ...MatrixActorAttributes(),
 });
 
 export type AttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof Attributes>>;

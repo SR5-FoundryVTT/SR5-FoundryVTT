@@ -3,6 +3,7 @@ import { PartsList } from '../../../parts/PartsList';
 import { SR5 } from "../../../config";
 import { AttributesPrep } from "./AttributesPrep";
 import { SR5Item } from 'src/module/item/SR5Item';
+import { DataDefaults } from '@/module/data/DataDefaults';
 
 export class MatrixPrep {
     /**
@@ -46,13 +47,14 @@ export class MatrixPrep {
             matrix.item = device.system;
             matrix.running_silent = device.isRunningSilent();
             const deviceAtts = device.getASDF();
-            if (deviceAtts) {
-                // setup the actual matrix attributes for the actor
-                for (const [key, value] of Object.entries(deviceAtts)) {
-                    if (value && matrix[key]) {
-                        matrix[key].base = value.value;
-                        matrix[key].device_att = value.device_att;
-                    }
+            // setup the actual matrix attributes for the actor
+            for (const [key, value] of Object.entries(deviceAtts)) {
+                if (value) {
+                    // create a new attribute field from the current one, this also works if the matrix[key] field doesn't exist
+                    const att = DataDefaults.createData('attribute_field', matrix[key]);
+                    att.base = value.value;
+                    att['device_att'] = value.device_att;
+                    matrix[key] = att;
                 }
             }
         } // if we don't have a device, use living persona
@@ -79,6 +81,12 @@ export class MatrixPrep {
         if (matrix.condition_monitor.value > matrix.condition_monitor.max) {
             matrix.condition_monitor.value = matrix.condition_monitor.max;
         }
+
+        // Add Rating as an Attribute Field to the actor's Attributes
+        // this should only happen for character's and critters
+        const ratingAtt = DataDefaults.createData('attribute_field', { base: matrix.rating, hidden: true, });
+        AttributesPrep.prepareAttribute('rating', ratingAtt);
+        attributes['rating'] = ratingAtt;
     }
 
     /**

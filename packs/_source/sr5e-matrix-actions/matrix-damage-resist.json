@@ -16,8 +16,8 @@
       "categories": [
         "resist_matrix"
       ],
-      "attribute": "",
-      "attribute2": "",
+      "attribute": "rating",
+      "attribute2": "firewall",
       "skill": "",
       "armor": false,
       "spec": "",

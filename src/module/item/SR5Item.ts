@@ -971,8 +971,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             const atts = this.system.atts;
             if (atts) {
                 for (const [key, att] of Object.entries(atts)) {
-                    matrix[att.att].value = att.value;
-                    matrix[att.att].device_att = key;
+                    // only apply the atts if the value is over zero
+                    // this was causing the previous values to always be overwritten
+                    if (att.value > 0) {
+                        matrix[att.att].value = att.value;
+                        matrix[att.att].device_att = key;
+                    }
                 }
             }
         }

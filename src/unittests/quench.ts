@@ -33,6 +33,7 @@ import { shadowrunDriver } from './sr5.Driver.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
+import { shadowrunMatrixDamageResist } from '@/unittests/sr5.MatrixDamageResist.spec';
 
 /**
  * Register FoundryVTT Quench test batches...
@@ -127,6 +128,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.flow.test_value_resolution', shadowrunTestValueResolution, { displayName: 'SHADOWRUN5e: Test Value Resolution' });
     quench.registerBatch('shadowrun5e.flow.tests_matrix', shadowrunMatrixTesting, { displayName: 'SHADOWRUN5e: Matrix Test' });
+    quench.registerBatch('shadowrun5e.flow.tests_resist_matrix', shadowrunMatrixDamageResist, {
+        displayName: 'SHADOWRUN5e: Resist Matrix Test'
+    });
     quench.registerBatch('shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
     quench.registerBatch('shadowrun5e.parser.weapon', weaponParserBaseTesting, {
         displayName: 'SHADOWRUN5e: Data Importer Weapon Parsing',
