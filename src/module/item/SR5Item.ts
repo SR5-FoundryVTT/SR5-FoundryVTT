@@ -1150,8 +1150,16 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return (this as SR5Item).system.technology?.wireless === 'silent';
     }
 
+    isLivingPersona(this: SR5Item) {
+        return this.isType('device') && this.system.category === 'living_persona';
+    }
+
     canBeWireless(this: SR5Item): boolean {
         return this.system.technology?.wireless !== 'none';
+    }
+
+    isPublicGrid(this: SR5Item) {
+        return this.isType('grid') && this.system.category === 'public';
     }
 
     isNetwork(this: SR5Item): this is SR5Item<'grid' | 'host'> {
@@ -1354,7 +1362,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param name An attribute or other stats name.
      * @returns Either an AttributeField or undefined, if the attribute doesn't exist on this document.
      */
-    getAttribute(name: string, options: {rollData?: SR5Item['system']} = {}): AttributeFieldType | undefined {
+    getAttribute(name: string, options: { rollData?: SR5Item['system'] } = {}): AttributeFieldType | undefined {
         const rollData = options.rollData || this.getRollData();
         // Attributes for hosts work only within their own attributes.
         if (this.isType('host')) {
@@ -1422,5 +1430,19 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         }
 
         return super._preUpdate(changed, options, user);
+    }
+
+    async deleteStorageReferences(this: SR5Item) {
+        await ItemMarksFlow.handleOnDeleteItem(this);
+        await MatrixNetworkFlow.handleOnDeleteDocument(this);
+    }
+
+    /**
+     * Handle system specific things before this item is deleted
+     * @param args
+     */
+    override async _preDelete(...args: Parameters<Item["_preDelete"]>) {
+        await this.deleteStorageReferences();
+        return await super._preDelete(...args);
     }
 }

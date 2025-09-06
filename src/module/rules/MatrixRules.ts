@@ -73,6 +73,14 @@ export class MatrixRules {
     }
 
     /**
+     * Public Grid Modifier applies a -2 dice pool penalty to all matrix actions
+     * SR5 pg 233 - 234
+     */
+    static publicGridModifier(): number {
+        return -2;
+    }
+
+    /**
      * Amount of marks that is valid in general for a target (includes zero marks)
      * @param marks The possibly faulty amount of marks
      * @returns A valid amount of marks
@@ -325,5 +333,13 @@ export class MatrixRules {
             return { name: SR5.gridCategories.global, value: 6 };
         else
             return { name: SR5.gridCategories.public, value: 0 };
+    }
+
+    /**
+     * Get the amount of damage each extra mark does when getting attacked in the matrix
+     * - this is defined on Data Spike SR5 pg239
+     */
+    static getExtraMarkDamageModifier() {
+        return 2;
     }
 }

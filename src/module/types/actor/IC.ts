@@ -46,6 +46,7 @@ const ICData = () => ({
         "matrix_initiative",
         "matrix_initiative_dice",
         "matrix_track",
+        'mark_damage',
         "global"
     )),
 });

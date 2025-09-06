@@ -195,10 +195,8 @@ export class MatrixNetworkFlow {
      *       This can result in lingering network devices or masters, when no GM or device owner is active.
      *
      * @param document This can be a network master or device or neither.
-     * @param data The document data given by FoundryVTT deleteItem event
-     * @param id The document id
      */
-    static async handleOnDeleteDocument(document: SR5Actor | SR5Item, data: any, id: string) {
+    static async handleOnDeleteDocument(document: SR5Actor | SR5Item) {
         console.debug(`Shadowrun 5e | Checking for network on deleted item ${document.name}`, document);
         // A deleted master must be removed from all its devices.
         if (document instanceof SR5Item && document.canBeMaster) return MatrixNetworkFlow.removeAllSlaves(document);
@@ -308,6 +306,15 @@ export class MatrixNetworkFlow {
     }
 
     /**
+     * Collect all Public Grids
+     *
+     * @param options.players If true, only networks visible to players are returned.
+     */
+    static getPublicGrids(options = {players: false}): SR5Item[] {
+        return this.getGrids(options).filter(network => network.isPublicGrid());
+    }
+
+    /**
      * Collect networks to select based on GRIDs on character.
      * 
      * @param character Collect networks based on this character.
@@ -329,7 +336,12 @@ export class MatrixNetworkFlow {
             }
         }
 
-        // TODO: Add public GRIDs
+        // add public grids that aren't already in the list
+        for (const network of this.getPublicGrids({players: true})) {
+            if (!networks.includes(network)) {
+                networks.push(network);
+            }
+        }
 
         return networks;
     }

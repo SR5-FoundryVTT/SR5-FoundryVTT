@@ -1,45 +1,85 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='matrix'}}
-    <div>
-        {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.hbs"
-                name=(localize "SR5.Labels.ActorSheet.Matrix")
-        }}
-        <div class="attributes">
-            {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.hbs" }}
-            <div class="block">
-                <div class="block-line gap-4 border-bottom center">
-                    <label>
-                        {{localize "SR5.RunningSilent"}}
-                        <input
-                                type="checkbox"
-                                class="submit-checkbox"
-                                name="system.matrix.running_silent"
-                            {{checked system.matrix.running_silent}}
-                        />
-                    </label>
-                </div>
-                <div class="attribute">
-                    <div class="attribute-name">
-                        {{localize "SR5.ConditionMonitor"}}
-                    </div>
-                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
-                            value=system.matrix.condition_monitor.value
-                            max=system.matrix.condition_monitor.max
-                            id="matrix"
-                    }}
-                </div>
-            </div>
-            {{#each config.matrixAttributes as |label key|}}
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.hbs"
+    <div class="flexrow list-header item-section space-between">
+        <div class="RollId" data-roll-id="matrix.device-rating">
+            <a class="roll Roll">
+                {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
+            </a>
+        </div>
+        <div>
+            <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
+                {{#if system.matrix.running_silent}}
+                    {{localize "SR5.RunningSilent"}}
+                {{else}}
+                    {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
+                {{/if}}
+            </a>
+        </div>
+        <div>
+            <a class="reboot-persona-device" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
+                {{localize "SR5.Labels.Sheet.RebootDevice"}} <i class="item-icon fas fa-power-off"></i>
+            </a>
+        </div>
+    </div>
+    <div class="split-container">
+        <div>
+            <div class="attributes">
+                {{#each config.matrixAttributes as |label key|}}
+                    {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.hbs"
                         matrixAtt=(lookup ../system.matrix key)
                         isCyberdeck=../system.matrix.is_cyberdeck
                         key=key
                         label=label
                         matrixAttributes=../config/matrixAttributes
                         item=../system.matrix.item }}
-            {{/each}}
+                {{/each}}
+            </div>
+            <div class="inventory">
+                <div class="flexrow align-start list-header item-section space-between">
+                    <div>
+                        {{#if network}}
+                            {{localize "SR5.Labels.ActorSheet.Network"}}: <a class="open-matrix-device" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                            <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                                <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                            </a>
+                        {{else}}
+                            {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                            <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                        {{/if}}
+                    </div>
+                    {{#unless network}}
+                    {{#if vehicle.driver}}
+                    <div>
+                        <a class="connect-to-driver">
+                            {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}} <i class="item-icon fas fa-network-wired"></i>
+                        </a>
+                    </div>
+                    {{/if}}
+                    {{/unless}}
+                </div>
+                <div>
+                    <nav class="tabs" data-group="matrix">
+                        <a class="item" data-tab="programs">{{localize "SR5.Programs"}}</a>
+                        <a class="item" data-tab="targets">{{localize "SR5.Labels.ActorSheet.Icons"}}</a>
+                    </nav>
+                    <div class="scroll-area scroll-area-matrix-hacking">
+                        <section data-group='matrix' class="tabsbody">
+                            {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs'}}
+                            {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ProgramListTab.hbs'}}
+                        </section>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="inventory">
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.hbs' }}
+        <div>
+            {{#ifgt system.matrix.condition_monitor.max 0}}
+                {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
+                    name=(localize "SR5.ConditionMonitor")
+                    value=system.matrix.condition_monitor.value
+                    max=system.matrix.condition_monitor.max
+                    id="matrix"
+                }}
+            {{/ifgt}}
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
+        </div>
     </div>
 {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
