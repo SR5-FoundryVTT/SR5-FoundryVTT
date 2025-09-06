@@ -272,6 +272,14 @@ export class MatrixRules {
         return this.createBiofeedbackDamage(damage, hotSim);
     }
 
+    /**
+     * The Opposing Dice Pool used when checking overwatch score
+     * See SR5#238 "Check Overwatch Score"
+     */
+    static checkOverwatchScoreOpposingDicePool() {
+        return DataDefaults.createData('value_field', { base: 6 });
+    }
+
     static modifyDamageAfterHit(attackerHits: number, defenderHits: number, damage: DamageType): DamageType {
         const modified = foundry.utils.duplicate(damage) as DamageType;
 

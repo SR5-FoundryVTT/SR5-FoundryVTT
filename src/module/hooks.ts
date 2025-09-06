@@ -58,6 +58,8 @@ import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
 import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
 import { MatrixTest } from './tests/MatrixTest';
 import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
+import { CheckOverwatchScoreTest} from '@/module/tests/CheckOverwatchScoreTest';
+import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 
 import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
@@ -251,7 +253,9 @@ ___________________
                 HackOnTheFlyTest,
                 OpposedHackOnTheFlyTest,
                 MatrixResistTest,
-                BiofeedbackResistTest
+                BiofeedbackResistTest,
+                CheckOverwatchScoreTest,
+                OpposedCheckOverwatchScoreTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -283,7 +287,8 @@ ___________________
                 BruteForceTest,
                 HackOnTheFlyTest,
                 MatrixResistTest,
-                BiofeedbackResistTest
+                BiofeedbackResistTest,
+                CheckOverwatchScoreTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -300,7 +305,8 @@ ___________________
                 OpposedCompileSpriteTest,
                 OpposedRitualTest,
                 OpposedBruteForceTest,
-                OpposedHackOnTheFlyTest 
+                OpposedHackOnTheFlyTest,
+                OpposedCheckOverwatchScoreTest
             },
             /**
              * Subset of tests meant to be used as resist tests.

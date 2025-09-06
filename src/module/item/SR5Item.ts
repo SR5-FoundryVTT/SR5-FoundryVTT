@@ -30,6 +30,7 @@ import { AttributeFieldType } from '../types/template/Attributes';
 import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
+import { StorageFlow } from '@/module/flows/StorageFlow';
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -1249,9 +1250,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     /**
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
      * @param slave The matrix item to be connected.
+     * @param options.triggerUpdates - trigger updates to the documents to rerender the sheets
      */
-    async addSlave(slave: SR5Actor | SR5Item) {
-        await MatrixNetworkFlow.addSlave(this, slave);
+    async addSlave(slave: SR5Actor | SR5Item, options?: { triggerUpdate?: boolean }) {
+        await MatrixNetworkFlow.addSlave(this, slave, options);
     }
 
     /**
@@ -1432,17 +1434,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return super._preUpdate(changed, options, user);
     }
 
-    async deleteStorageReferences(this: SR5Item) {
-        await ItemMarksFlow.handleOnDeleteItem(this);
-        await MatrixNetworkFlow.handleOnDeleteDocument(this);
-    }
-
     /**
      * Handle system specific things before this item is deleted
      * @param args
      */
     override async _preDelete(...args: Parameters<Item["_preDelete"]>) {
-        await this.deleteStorageReferences();
+        await StorageFlow.deleteStorageReferences(this);
         return await super._preDelete(...args);
     }
 }

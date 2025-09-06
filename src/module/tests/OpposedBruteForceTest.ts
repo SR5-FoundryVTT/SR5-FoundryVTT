@@ -1,16 +1,12 @@
-import { SR5Item } from './../item/SR5Item';
-import { SR5Actor } from '../actor/SR5Actor';
 import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
 import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
-import { OpposedTest } from "./OpposedTest";
-import { TestOptions } from './SuccessTest';
 import { TestCreator } from './TestCreator';
-import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlow';
+import { MarkPlacementFlow } from './flows/MarkPlacementFlow';
 import { OpposedMatrixTestData } from './MatrixTest';
-import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 import { DamageType } from '@/module/types/item/Action';
+import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 
 type OpposedBruteForceTestData = OpposedMatrixTestData & {
     incomingDamage: DamageType;
@@ -20,19 +16,8 @@ type OpposedBruteForceTestData = OpposedMatrixTestData & {
 /**
  * Implement the opposing test for Brute Force action. See SR5#238 'Brute Force'
  */
-export class OpposedBruteForceTest extends OpposedTest<OpposedBruteForceTestData> {
+export class OpposedBruteForceTest extends OpposedMatrixTest<OpposedBruteForceTestData> {
     declare against: BruteForceTest;
-    // The target icon to place a mark on.
-    declare icon: SR5Actor | SR5Item;
-    // The target icon, if it's representing a device.
-    declare device: SR5Item;
-    // The target icon, if it's representing a persona.
-    declare persona: SR5Actor;
-
-    override _prepareData(data: any, options?: any) {
-        data = super._prepareData(data, options);
-        return MatrixTestDataFlow._prepareOpposedData(data);
-    }
 
     override get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/opposing-mark-test-dialog.hbs';
@@ -48,10 +33,6 @@ export class OpposedBruteForceTest extends OpposedTest<OpposedBruteForceTestData
 
     override get failureLabel(): Translation {
         return "SR5.TestResults.BruteForceSuccess";
-    }
-
-    override async populateDocuments() {
-        await MatrixTestDataFlow.populateOpposedDocuments(this);
     }
 
     override prepareBaseValues() {
@@ -92,9 +73,5 @@ export class OpposedBruteForceTest extends OpposedTest<OpposedBruteForceTestData
         const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
         if (!test) return;
         await test.execute();
-    }
-
-    static override async executeMessageAction(againstData: MatrixPlacementData, messageId: string, options: TestOptions): Promise<void> {
-        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }

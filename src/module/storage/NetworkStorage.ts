@@ -78,11 +78,17 @@ export const NetworkStorage = {
         const networks = NetworkStorage.getStorage();
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
 
+        let changed = false;
         for (const [uuid, slaves] of Object.entries(networks)) {
-            networks[uuid] = slaves.filter(uuid => uuid !== slaveUuid);
+            if (slaves.includes(slaveUuid)) {
+                changed = true;
+                networks[uuid] = slaves.filter(uuid => uuid !== slaveUuid);
+            }
         }
 
-        await DataStorage.set(NetworkStorage.key, networks);
+        if (changed) {
+            await DataStorage.set(NetworkStorage.key, networks);
+        }
     },
 
     /**

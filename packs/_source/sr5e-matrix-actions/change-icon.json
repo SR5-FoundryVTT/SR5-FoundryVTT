@@ -13,7 +13,7 @@
     },
     "action": {
       "type": "simple",
-      "test": "SuccessTest",
+      "test": "MatrixTest",
       "categories": [
         "matrix"
       ],
@@ -87,6 +87,12 @@
         "skill": "",
         "armor": false,
         "mod": 0
+      },
+      "category": {
+          "matrix": {
+              "marks": 0,
+              "owner": true
+          }
       },
       "modifiers": [],
       "alt_mod": 0,

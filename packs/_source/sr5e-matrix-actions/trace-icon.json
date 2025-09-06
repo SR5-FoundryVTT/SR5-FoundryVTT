@@ -11,11 +11,11 @@
     },
     "action": {
       "type": "complex",
-      "test": "SuccessTest",
+      "test": "MatrixTest",
       "categories": [
         "matrix"
       ],
-      "attribute": "logic",
+      "attribute": "intuition",
       "attribute2": "",
       "skill": "computer",
       "armor": false,
