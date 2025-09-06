@@ -49,13 +49,12 @@ export class MatrixPrep {
             const deviceAtts = device.getASDF();
             // setup the actual matrix attributes for the actor
             for (const [key, value] of Object.entries(deviceAtts)) {
-                if (value) {
-                    // create a new attribute field from the current one, this also works if the matrix[key] field doesn't exist
-                    const att = DataDefaults.createData('attribute_field', matrix[key]);
-                    att.base = value.value;
-                    att['device_att'] = value.device_att;
-                    matrix[key] = att;
-                }
+                if (!value) continue;
+                // create a new attribute field from the current one, this also works if the matrix[key] field doesn't exist
+                const att = DataDefaults.createData('attribute_field', matrix[key]);
+                att.base = value.value;
+                att['device_att'] = value.device_att;
+                matrix[key] = att;
             }
         } // if we don't have a device, use living persona
         else if (system.special === 'resonance') {
