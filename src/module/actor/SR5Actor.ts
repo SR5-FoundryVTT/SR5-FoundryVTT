@@ -92,7 +92,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     // Quick access for all items of a type.
     itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>();
-    actions: {matrix: SR5Item<'action'>[]} = {matrix: []};
 
     constructor(data: Actor.CreateData, context?: Actor.ConstructionContext) {
         super(data, context);
