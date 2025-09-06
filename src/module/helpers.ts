@@ -1077,12 +1077,17 @@ export class Helpers {
      */
     static transformToLabel(name: string) {
         return name
+            // Remove issues with splitting whitespaces.
             .trim()
+            // Normalize string
             .toLowerCase()
+            // PascalCase
             .split(' ')
             .map(word => {
                 return word.charAt(0).toUpperCase() + word.slice(1);
             })
-            .join('');
+            // Return and remove all non-alphanumerics
+            .join('')
+            .replace(/[^a-zA-Z0-9]/g, '');
     }
 }
