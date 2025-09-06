@@ -146,15 +146,13 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
         const iid = Helpers.listItemUuid(event);
         const document = await fromUuid(iid);
-        console.log('got document from id', iid, document);
         if (!document) return;
 
         if (document instanceof SR5Actor) {
-
             // if the actor has a matrix device, change the wireless state there
             const device = document.getMatrixDevice();
             if (device) {
-                // iterate through the states of online -> silent -> offline
+                // iterate through the states of online -> silent -> online
                 const newState =  device.isRunningSilent() ? 'online' : 'silent';
                 await this.actor.updateEmbeddedDocuments('Item', [
                     {
