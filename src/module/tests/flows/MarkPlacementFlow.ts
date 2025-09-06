@@ -46,7 +46,7 @@ export const MarkPlacementFlow = {
         const modifiers = new PartsList<number>(test.data.modifiers.mod);
 
         // Apply mark modifier
-        modifiers.addUniquePart('SR5.ModifierTypes.Marks', MatrixRules.getMarkPlacementModifier(test.data.marks));
+        modifiers.addUniquePart('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkPlacementModifier(test));
 
         MatrixTestDataFlow.prepareTestModifiers(test);
     },
@@ -68,5 +68,22 @@ export const MarkPlacementFlow = {
         const modifier = MatrixRules.gridMarkPlacementDefensePool(test.device);
         if (!modifier) return;
         test.pool.mod.push(modifier);
+    },
+
+    /**
+     * Get the correct modifier depending on the marks placed.
+     * 
+     * This can depend on local actor values or a default value.
+     */
+    getMarkPlacementModifier(test: MarkPlacementTests) {
+        const modifier = MatrixRules.getMarkPlacementModifier(test.data.marks);
+
+        // Allow users to modify the mark placement modifier through effects.
+        switch (test.data.marks) {
+            case 2: return modifier + (test.actor?.modifiers.totalFor('two_marks') ?? 0);
+            case 3: return modifier + (test.actor?.modifiers.totalFor('three_marks') ?? 0);
+        }
+
+        return modifier;
     }
 }
