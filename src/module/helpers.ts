@@ -1077,6 +1077,7 @@ export class Helpers {
      */
     static transformToLabel(name: string) {
         return name
+            .trim()
             .toLowerCase()
             .split(' ')
             .map(word => {
