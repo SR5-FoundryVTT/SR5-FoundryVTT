@@ -334,6 +334,12 @@
         "ContactType": "Type",
         "Contacts": "Contacts",
         "Continue": "Continue",
+        "Content": {
+            "Actions": {
+                "BruteForce": "Brute Force",
+                "HackOnTheFly": "Hack On The Fly"
+            }
+        },
         "ControlRig": "Control Rig",
         "Cost": "Cost",
         "Cover": "Cover",
@@ -533,7 +539,8 @@
             "MissingSkill": "The actor doesn't have the requested skill.",
             "NoAvailableActorFound": "No available actor was found for this action",
             "SkillWithoutAttribute": "The skill has no attribute configured.",
-            "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor"
+            "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor",
+            "TooManyActionsWithCategory": "You should have exactly one action with the category {category} on your actor"
         },
         "EssenceCost": "Essence",
         "Expand": "Expand",

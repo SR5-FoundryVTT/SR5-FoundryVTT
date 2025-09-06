@@ -255,6 +255,12 @@
         },
         "Contacts": "Kontakte",
         "Continue": "Fortsetzen",
+        "Content": {
+            "Actions": {
+                "BruteForce": "Brute Force",
+                "HackOnTheFly": "Eiliges Hacken"
+            }
+        },
         "Cost": "Kosten",
         "Cover": "Deckung",
         "Create": "Erstelle {type}",
@@ -446,7 +452,8 @@
             "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
             "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
             "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
-            "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden"
+            "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
+            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben."
         },
         "EssenceCost": "Essenz",
         "Expand": "Ausklappen",
@@ -1570,11 +1577,7 @@
             "Type": "Typ",
             "Weapon": "Waffen"
         },
-        "Wireless": "WiFi",
-        "Content": {
-            "Brute Force": "Brute Force",
-            "Hack on the Fly": "Eiliges Hacken"
-        }
+        "Wireless": "WiFi"
     },
     "TYPES": {
         "Actor": {

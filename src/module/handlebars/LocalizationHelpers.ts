@@ -1,4 +1,4 @@
-import { Helpers } from "../helpers";
+import { PackActionFlow } from "../item/flows/PackActionFlow";
 
 /**
  * Provide helpers for localization purposes.
@@ -14,6 +14,6 @@ export const registerLocalizationHelpers = () => {
      * @returns Either the localized value or the original name.
      */
     Handlebars.registerHelper('localizeContent', (name: string) => {
-        return Helpers.localizeContent(name);
+        return PackActionFlow.localizePackAction(name);
     });
 };
