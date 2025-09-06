@@ -1143,14 +1143,14 @@ export class Helpers {
      * Transform uuid into a format that can be stored as keys in Foundry without object splitting.
      */
     static uuidForStorage(uuid: string) {
-        return uuid.replace('.', '_');
+        return uuid.replaceAll('.', '_');
     }
 
     /**
      * Reforms a transformed uuid back into a usable format.
      */
     static uuidFromStorage(uuid: string) {
-        return uuid.replace('_', '.');
+        return uuid.replaceAll('_', '.');
     }
 
     /**

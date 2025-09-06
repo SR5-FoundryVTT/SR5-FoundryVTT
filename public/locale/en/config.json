@@ -180,13 +180,6 @@
         },
         "Add": "Add",
         "AddAmmo": "Add Ammo",
-        "AddDevicesToPAN": {
-            "Adding": "Adding",
-            "Starting": "Starting to add equipped devices to PAN",
-            "FinishedAddingItems": "Finished adding devices to PAN",
-            "SetupPAN": "Add Devices to PAN",
-            "SetupPANTooltip": "Add all Equipped Wireless Devices to this character's Persona"
-        },
         "AddFifteenMinutesToOverwatch": "Roll 2d6 for 15 minutes in the matrix",
         "AddFiveToOverwatch": "+5 to OS",
         "AddMod": "Add Mod",
@@ -738,6 +731,7 @@
                 "RollDronePerception": "Drone Perception",
                 "RollPilotVehicleTest": "Pilot Vehicle",
                 "SetMonitor": "Monitor must be set manually.",
+                "SetupPAN": "Add Devices to PAN",
                 "Spells": "Spells",
                 "SpiritConfiguration": "Spirit Configuration",
                 "SpriteConfiguration": "Sprite Configuration",
@@ -975,6 +969,18 @@
         "NormalSkillButton": "Normal",
         "NormalSpellButton": "Normal",
         "NotExtended": "Not Extended",
+        "Notifications": {
+            "DeletingStorageReferences": {
+                "Start": "Deleting Network and MARK references",
+                "Item": "Clearing references to item",
+                "Finished": "Finished clearing references"
+            },
+            "AddDevicesToPAN": {
+                "Adding": "Adding",
+                "Starting": "Starting to add equipped devices to PAN",
+                "FinishedAddingItems": "Finished adding devices to PAN. Please close and reopen any item sheets that changed connections."
+            }
+        },
         "Notoriety": "Notoriety",
         "Nuyen": "Nuyen",
         "OpenOrigin": "Open item",
@@ -1457,7 +1463,8 @@
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
                 "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
-                "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed"
+                "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
+                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
             "Actor.DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
             "CallInAction": {

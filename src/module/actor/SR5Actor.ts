@@ -47,6 +47,7 @@ import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 
 /**
@@ -2258,25 +2259,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     getExtraMarkDamageModifier() {
         return MatrixRules.getExtraMarkDamageModifier() + this.modifiers.totalFor('mark_damage');
     }
-
-    /**
-     * Delete References to this actor and all owned items in the Storage areas
-     */
-    async deleteStorageReferences(this: SR5Actor) {
-        // when an actor is deleted, handle deleting all owned items
-        for (const item of this.items) {
-            await item.deleteStorageReferences();
-        }
-        await MatrixNetworkFlow.handleOnDeleteDocument(this);
-    }
-
     /**
      * Handle system specific things when this actor is being deleted
      * - NOTE that this does not apply to Token Actors. Those are handled through SR5TokenDocument
      * @param args
      */
     override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
-        await this.deleteStorageReferences()
+        await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
     }
 }
