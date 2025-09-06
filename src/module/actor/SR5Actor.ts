@@ -1818,6 +1818,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.system.driver.length > 0;
     }
 
+    /**
+     * Get the Driver of a vehicle (if it is a vehicle)
+     * - TODO this is used to determine ownership of a vehicle, we may want to make an actual ownership field or something in the future
+     */
     getVehicleDriver(): SR5Actor | undefined {
         if (!this.isType('vehicle') || !this.hasDriver()) return;
 
@@ -1827,6 +1831,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return driver;
     }
 
+    /**
+     * Get the Technomancer that "owns" a sprite
+     * - this is used to determine ownership for technomancers
+     */
     getTechnomancer(this: SR5Actor): SR5Actor | undefined {
         if (!this.isType('sprite') || !this.hasTechnomancer()) return undefined;
         const actor = fromUuidSync(this.system.technomancerUuid);
