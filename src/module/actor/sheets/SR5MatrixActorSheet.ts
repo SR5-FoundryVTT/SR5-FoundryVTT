@@ -137,6 +137,45 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
         html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
+        html.find('.toggle-owned-icon-silent').on('click', this._onOwnedIconRunningSilentToggle.bind(this));
+    }
+
+    async _onOwnedIconRunningSilentToggle(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const iid = Helpers.listItemUuid(event);
+        const document = await fromUuid(iid);
+        console.log('got document from id', iid, document);
+        if (!document) return;
+
+        if (document instanceof SR5Actor) {
+
+            // if the actor has a matrix device, change the wireless state there
+            const device = document.getMatrixDevice();
+            if (device) {
+                // iterate through the states of online -> silent -> offline
+                const newState =  device.isRunningSilent() ? 'online' : 'silent';
+                await this.actor.updateEmbeddedDocuments('Item', [
+                    {
+                        '_id': device._id,
+                        system: { technology: { wireless: newState } }
+                    }
+                ])
+            } else {
+                // update the embedded item with the new wireless state
+                await document.update({
+                    system: { matrix: { running_silent: !document.isRunningSilent() } },
+                });
+                this.render();
+            }
+        } else if (document instanceof SR5Item) {
+            // iterate through the states of online -> silent -> online
+            const newState =  document.isRunningSilent() ? 'online' : 'silent';
+            // update the embedded item with the new wireless state
+            await document.update({ system: { technology: { wireless: newState } } });
+            this.render();
+        }
     }
 
     /**

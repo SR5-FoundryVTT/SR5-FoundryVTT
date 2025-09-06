@@ -1222,10 +1222,11 @@ export const registerItemLineHelpers = () => {
             };
 
         const wirelessIcon = {
+            cssClass: 'toggle-owned-icon-silent',
             icon: `${target.document.isRunningSilent()
                     ? 'fa-duotone fa-wifi-fair'
                     : 'fas fa-wifi'
-            } item-wireless-toggle`,
+            }`,
             title: game.i18n.localize(
                 target.document.isRunningSilent()
                     ? 'SR5.RunningSilent'
