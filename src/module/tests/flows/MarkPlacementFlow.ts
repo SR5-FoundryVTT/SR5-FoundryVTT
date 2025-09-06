@@ -80,8 +80,8 @@ export const MarkPlacementFlow = {
 
         // Allow users to modify the mark placement modifier through effects.
         switch (test.data.marks) {
-            case 2: return modifier + (test.actor?.modifiers.totalFor('two_marks') ?? 0);
-            case 3: return modifier + (test.actor?.modifiers.totalFor('three_marks') ?? 0);
+            case 2: return modifier + (test.actor?.modifiers.totalFor('place_two_marks') ?? 0);
+            case 3: return modifier + (test.actor?.modifiers.totalFor('place_three_marks') ?? 0);
         }
 
         return modifier;

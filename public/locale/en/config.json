@@ -1545,8 +1545,8 @@
                 "soak": "Modifies physical damage resist tests pool",
                 "social_limit": "Modifies social limit",
                 "stun_track": "Modifies stun damage track",
-                "two_marks": "Modifies the modifier to place two marks at the same time",
-                "three_marks": "Modifies the modifier to place three marks at the same time",
+                "place_two_marks": "Modifies the modifier to place two marks at the same time",
+                "place_three_marks": "Modifies the modifier to place three marks at the same time",
                 "walk": "Modifies walking distance by multiples of the agility attribute",
                 "wound_tolerance": "Modifies damage per wound modifier"
             },

@@ -1342,8 +1342,8 @@
                 "soak": "Modifiziert den Würfelpool von Schadenswiderstandsproben",
                 "social_limit": "Modifiziert das Soziale Limit",
                 "stun_track": "Modifiziert den Geistigen Monitor",
-                "two_marks": "Modifiziert den Modifikator um zwei Marken gleichzeitig zu setzen",
-                "three_marks": "Modifiziert den Modifikator um drei Marken gleichzeitig zu setzen",
+                "place_two_marks": "Modifiziert den Modifikator um zwei Marken gleichzeitig zu setzen",
+                "place_three_marks": "Modifiziert den Modifikator um drei Marken gleichzeitig zu setzen",
                 "walk": "Modifiziert die Gehreichweite um das Vielfache des Geschicklichkeits-Attributs",
                 "wound_tolerance": "Modifiziert die Schadensmenge pro Wundenmodifikator"
             },
