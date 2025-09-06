@@ -23,8 +23,8 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     matrixTargets: Shadowrun.MatrixTargetDocument[];
     // the master device being used to connect to the matrix
     matrixDevice: SR5Item | undefined;
-
-    ownedDevices: MatrixTargetDocument[];
+    // Matrix ICONs that are owned by this actor
+    ownedIcons: MatrixTargetDocument[];
 }
 
 export class SR5MatrixActorSheet extends SR5BaseActorSheet {
@@ -58,7 +58,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
 
         this._prepareMatrixTargets(data);
-        this._prepareOwnedDevices(data);
+        this._prepareOwnedIcons(data);
         await this._prepareMarkedDocuments(data);
         this._prepareMatrixDevice(data);
 
@@ -73,13 +73,13 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         data.matrixDevice = this.actor?.getMatrixDevice();
     }
 
-    _prepareOwnedDevices(data: MatrixActorSheetData) {
+    _prepareOwnedIcons(data: MatrixActorSheetData) {
         // When target overview is shown, collect all matrix targets.
-        const targets = MatrixTargetingFlow.prepareOwnDevices(this.actor);
+        const targets = MatrixTargetingFlow.prepareOwnIcons(this.actor);
 
         this._prepareSelectedMatrixTargets(targets);
 
-        data.ownedDevices = targets;
+        data.ownedIcons = targets;
     }
 
     _prepareMatrixTargets(data: MatrixActorSheetData) {

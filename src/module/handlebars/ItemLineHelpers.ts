@@ -1176,7 +1176,7 @@ export const registerItemLineHelpers = () => {
 
         // Handle document type specific icons.
         if (target.document instanceof SR5Item && target.document.isNetwork()) icons.unshift(connectNetworkIcon);
-        if (target.document instanceof SR5Actor && target.document.hasPersona) icons.push(toggleConnectedItemsIcon)
+        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices) icons.push(toggleConnectedItemsIcon)
 
         return icons;
     });
@@ -1211,11 +1211,30 @@ export const registerItemLineHelpers = () => {
      * @param target The matrix target to render.
      */
     Handlebars.registerHelper('MatrixOwnedItemIcons', (target: Shadowrun.MatrixTargetDocument) => {
-        const shareIcon = {
-            icon: 'fas fa-share-from-square'
-        }
+        const toggleConnectedItemsIcon = target.icons.length > 0 ?
+            {
+                icon: 'fas fa-square-chevron-down',
+                cssClass: 'toggle-connected-matrix-icons'
+            }:
+            {
+                icon: 'fas fa-square-chevron-up',
+                cssClass: 'toggle-connected-matrix-icons'
+            };
 
-        return [{}];
+        const wirelessIcon = {
+            icon: `${target.document.isRunningSilent()
+                    ? 'fa-duotone fa-wifi-fair'
+                    : 'fas fa-wifi'
+            } item-wireless-toggle`,
+            title: game.i18n.localize(
+                target.document.isRunningSilent()
+                    ? 'SR5.RunningSilent'
+                    : 'SR5.WirelessOnline')
+        }
+        if (target.document instanceof SR5Actor) {
+            return target.document.hasWirelessDevices ? [wirelessIcon, toggleConnectedItemsIcon] : [wirelessIcon];
+        }
+        return [wirelessIcon];
     });
 
     Handlebars.registerHelper('MatrixOwnedItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {

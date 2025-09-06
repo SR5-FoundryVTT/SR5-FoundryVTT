@@ -1,11 +1,11 @@
 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
-        name=(localize 'SR5.OwnedDevices')
-        itemId='target'
+        name=(localize 'SR5.Labels.ActorSheet.OwnedIcons')
+        itemId='owned-icons'
         rightSide=(TargetListHeaderRightSide)
         icons=(TargetListHeaderIcons)
 }}
-{{!-- Show main icons (personas) visible to this actor --}}
-{{#each ownedDevices}}
+{{!-- Show icons owned by this actor --}}
+{{#each ownedIcons}}
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
             img=(speakerImg this.document)
             name=(speakerName this.document)
@@ -16,4 +16,18 @@
             rightSide=(MatrixOwnedItemRightSide this)
             icons=(MatrixOwnedItemIcons this)
     }}
+    {{! -- Overview of icons connected to the main icon (devices of persona) -- }}
+    {{#each this.icons}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+            img=(speakerImg this.document)
+            name=(speakerName this.document)
+            itemCssClass='subcategory-item'
+            additionalCssClass=(MatrixTargetCssClass this)
+            itemImgCssClass='select-matrix-target'
+            itemNameCssClass='open-matrix-target'
+            itemUuid=this.document.uuid
+            rightSide=(MatrixOwnedItemRightSide this)
+            icons=(MatrixOwnedItemIcons this)
+        }}
+    {{/each}}
 {{/each}}

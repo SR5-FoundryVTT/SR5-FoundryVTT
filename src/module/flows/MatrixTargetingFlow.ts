@@ -65,23 +65,8 @@ export const MatrixTargetingFlow = {
         return targets;
     },
 
-    prepareOwnDevices(actor: SR5Actor): MatrixTargetDocument[] {
+    prepareOwnIcons(actor: SR5Actor): MatrixTargetDocument[] {
         const targets: MatrixTargetDocument[] = [];
-
-        for (const item of actor.wirelessDevices) {
-
-            const type = MatrixNetworkFlow.getDocumentType(item);
-
-            targets.push({
-                name: item.name,
-                document: item,
-                token: null,
-                runningSilent: item.isRunningSilent(),
-                network: this._getNetworkName(item.master),
-                type,
-                icons: []
-            });
-        }
 
         if (actor.getMatrixDevice()) {
             // go through the devices slaved to the actor's pan and see if any are actors, add those
@@ -101,6 +86,18 @@ export const MatrixTargetingFlow = {
                 }
             }
         }
+        // add ourselves to the front so that our own Persona sits at the top
+        const type = MatrixNetworkFlow.getDocumentType(actor);
+        targets.unshift({
+            name: actor.getToken()?.name ?? actor.name,
+            document: actor,
+            token: actor.getToken(),
+            runningSilent: actor.isRunningSilent(),
+            network: this._getNetworkName(actor.network),
+            type,
+            icons: []
+
+        })
 
         return targets;
     },
@@ -192,7 +189,6 @@ export const MatrixTargetingFlow = {
         const connectedIcons: Shadowrun.MarkedDocument[] = [];
 
         // Only persona icons should show connected icons.
-        // TODO: Don´t show this for IC, Spirits, Sprite
         if (!(document instanceof SR5Actor)) return connectedIcons;
 
         const personaDevice = document.getMatrixDevice();
