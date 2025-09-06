@@ -46,10 +46,9 @@ export const PackActionFlow = {
      */
     async getPackActions(packName: string): Promise<SR5Item<'action'>[]> {
         console.debug(`Shadowrun 5e | Trying to fetch all actions from pack ${packName}`);
-        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as unknown as CompendiumCollection<'Item'> | undefined;
         if (!pack) return [];
 
-        // @ts-expect-error foundry-vtt-types v10
         const packEntries = pack.index.filter(data => data.type === 'action');
 
         const documents: SR5Item<'action'>[] = [];
