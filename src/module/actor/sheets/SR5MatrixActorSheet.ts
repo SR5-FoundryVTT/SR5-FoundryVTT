@@ -304,7 +304,8 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
             actions = actions.filter(action => {
                 const {marks, owner} = action.system.action.category.matrix
                 if (owner) return ownedItem;
-                return marks <= marksPlaced;
+                // you can do actions that require marks on your own devices
+                return ownedItem || marks <= marksPlaced;
             });
         }
 
