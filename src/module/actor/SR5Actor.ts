@@ -584,10 +584,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const stats = rollData.vehicle_stats ?? this.getVehicleStats();
         if (stats?.[name]) return stats[name];
 
-        // Second check matrix attributes
-        const matrixData = rollData.matrix ?? this.matrixData();
-        if (matrixData?.[name]) return matrixData[name];
-
         // Finally, check general attributes.
         const attributes = rollData.attributes ?? this.getAttributes();
         return attributes[name];

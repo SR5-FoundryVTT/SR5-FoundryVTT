@@ -806,6 +806,8 @@
             "Soak": "Einstecken",
             "SocialLimit": "Soziales Limit",
             "StunTrack": "Geistiger Monitor",
+            "TwoMarks": "Zwei Marken",
+            "ThreeMarks": "Drei Marken",
             "Walk": "Gehen",
             "WoundTolerance": "Wunden-Toleranz",
             "Wounds": "Wunden"
@@ -1334,11 +1336,14 @@
                 "physical_limit": "Modifiziert das Körperliche Limit",
                 "physical_overflow_track": "Modifiziert den Körperlichen Überschuss-Monitor",
                 "physical_track": "Modifiziert den Körperlichen Monitor",
+                "public_grid": "Modifiziert den Öffentlichen Gitter Modifikator",
                 "reach": "Modifiziert die Reichweite von Nahkampfangriffen",
                 "run": "Modifiziert die Laufreichweite um das Vielfache des Geschicklichkeits-Attributs",
                 "soak": "Modifiziert den Würfelpool von Schadenswiderstandsproben",
                 "social_limit": "Modifiziert das Soziale Limit",
                 "stun_track": "Modifiziert den Geistigen Monitor",
+                "two_marks": "Modifiziert den Modifikator um zwei Marken gleichzeitig zu setzen",
+                "three_marks": "Modifiziert den Modifikator um drei Marken gleichzeitig zu setzen",
                 "walk": "Modifiziert die Gehreichweite um das Vielfache des Geschicklichkeits-Attributs",
                 "wound_tolerance": "Modifiziert die Schadensmenge pro Wundenmodifikator"
             },
