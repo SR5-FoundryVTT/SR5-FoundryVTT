@@ -548,6 +548,7 @@
         "FireMode": "Fire Mode",
         "Force": "Force",
         "FullDefense": "Full Defense",
+        "FullMatrixDefense": "Full Matrix Defense",
         "FullDefenseAttribute": "Full Defense Attribute",
         "GMRequest": {
             "General": "Your GM wants you to do a",
