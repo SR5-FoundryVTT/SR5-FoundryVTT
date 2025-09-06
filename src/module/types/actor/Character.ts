@@ -1,17 +1,18 @@
 import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData, ActorBase } from "./Common";
-import { Attributes, AttributeField } from "../template/Attributes";
+import { Attributes, AttributeField, MatrixActorAttributes } from '../template/Attributes';
 import { ModifiableValue, ValueMaxPair } from "../template/Base";
 import { Tracks } from "../template/ConditionMonitors";
 import { ActorArmorData } from "../template/Armor";
 import { Movement } from "../template/Movement";
 import { Initiative } from "../template/Initiative";
-import { MatrixData } from "../template/Matrix";
+import { MatrixData } from '../template/Matrix';
 import { VisibilityChecks } from "../template/Visibility";
 import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const CharacterAttributes = () => ({
     ...Attributes(),
+    ...MatrixActorAttributes(),
     initiation: new ModifiableField(AttributeField()),
     submersion: new ModifiableField(AttributeField()),
 });

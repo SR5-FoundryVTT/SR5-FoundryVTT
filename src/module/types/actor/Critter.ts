@@ -1,6 +1,6 @@
 import { ModifiableField } from "../fields/ModifiableField";
 import { ActorArmorData } from "../template/Armor";
-import { Attributes } from "../template/Attributes";
+import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 import { ModifiableValue, ValueMaxPair } from "../template/Base";
 import { Tracks } from "../template/ConditionMonitors";
 import { Initiative } from "../template/Initiative";
@@ -22,7 +22,10 @@ export const CritterData = () => ({
     special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane'], initial: 'mundane' }),
 
     // === Attributes & Limits ===
-    attributes: new SchemaField(Attributes()),
+    attributes: new SchemaField({
+        ...Attributes(),
+        ...MatrixActorAttributes(),
+    }),
     limits: new SchemaField(CharacterLimits()),
 
     // === Combat ===
