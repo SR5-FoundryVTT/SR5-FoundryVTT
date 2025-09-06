@@ -11,6 +11,8 @@ import { MatrixResistTest, MatrixResistTestData } from "../MatrixResistTest";
 import { OpposedBruteForceTest } from "../OpposedBruteForceTest";
 import { OpposedHackOnTheFlyTest } from "../OpposedHackOnTheFlyTest";
 import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
+import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
+import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 
 /**
  * Apply Matrix Rules to Success Test Data relating to matrix.
@@ -108,7 +110,16 @@ export const MatrixTestDataFlow = {
                 if (marks > 0) {
                     // add damage per mark on the target item
                     test.data.damage.mod = PartsList.AddUniquePart(test.data.damage.mod,
-                        "SR5.Marks", marks * targetItem.actor!.getExtraMarkDamageModifier());
+                        "SR5.Marks", marks * (targetItem.actor?.getExtraMarkDamageModifier() ?? MatrixRules.getExtraMarkDamageModifier()));
+                    test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
+                }
+                // if there wasn't a matrix device, see if we have marks placed on the actor itself
+            } else if (icon instanceof SR5Actor) {
+                const marks = actor.getMarksPlaced(icon.uuid);
+                if (marks > 0) {
+                    // add damage per mark on the target item
+                    test.data.damage.mod = PartsList.AddUniquePart(test.data.damage.mod,
+                        "SR5.Marks", marks * icon.getExtraMarkDamageModifier());
                     test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
                 }
             }
@@ -297,7 +308,7 @@ export const MatrixTestDataFlow = {
      * Devices might be related to a persona, in which case a persona will be present.
      * @param test The test to populate with documents.
      */
-    async populateOpposedDocuments(test: MatrixDefenseTest | OpposedBruteForceTest | OpposedHackOnTheFlyTest) {
+    async populateOpposedDocuments(test: MatrixDefenseTest | OpposedMatrixTest) {
         if (test.against?.data.iconUuid) {
             test.icon = await fromUuid(test.against.data.iconUuid) as SR5Item;
         }
@@ -355,7 +366,7 @@ export const MatrixTestDataFlow = {
 
         test.persona = actor;
         // Retrieve the target icon document.
-        test.icon = actor.hasDevicePersona ?
+        test.icon = actor.hasDevicePersona() ?
             actor.getMatrixDevice() as SR5Item :
             actor;
 

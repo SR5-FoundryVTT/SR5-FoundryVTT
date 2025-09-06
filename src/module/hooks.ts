@@ -57,6 +57,8 @@ import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
 import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
 import { MatrixTest } from './tests/MatrixTest';
 import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
+import { CheckOverwatchScoreTest} from '@/module/tests/CheckOverwatchScoreTest';
+import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 
 import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
@@ -249,7 +251,9 @@ ___________________
                 HackOnTheFlyTest,
                 OpposedHackOnTheFlyTest,
                 MatrixResistTest,
-                BiofeedbackResistTest
+                BiofeedbackResistTest,
+                CheckOverwatchScoreTest,
+                OpposedCheckOverwatchScoreTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -281,7 +285,8 @@ ___________________
                 BruteForceTest,
                 HackOnTheFlyTest,
                 MatrixResistTest,
-                BiofeedbackResistTest
+                BiofeedbackResistTest,
+                CheckOverwatchScoreTest
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -298,7 +303,8 @@ ___________________
                 OpposedCompileSpriteTest,
                 OpposedRitualTest,
                 OpposedBruteForceTest,
-                OpposedHackOnTheFlyTest 
+                OpposedHackOnTheFlyTest,
+                OpposedCheckOverwatchScoreTest
             },
             /**
              * Subset of tests meant to be used as resist tests.
@@ -477,12 +483,6 @@ ___________________
                 new ChangelogApplication().render(true);
         }
 
-        // Connect chat dice icon to shadowrun basic success test roll.
-        const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-        $(document).on('click', diceIconSelector, await TestCreator.promptSuccessTest.bind(TestCreator));
-        const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
-        $(document).on('click', diceIconSelectorNew, await TestCreator.promptSuccessTest.bind(TestCreator));
-
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
         HooksManager.registerSocketListeners();
@@ -624,6 +624,8 @@ ___________________
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
         await TeamworkTest.chatLogListeners(chatLog, html);
         await JournalEnrichers.chatlogRequestHooks(html);
+
+        this.renderSuccessTestPromptButton();
     }
 
     static configureVision() {
@@ -636,5 +638,33 @@ ___________________
 
     static configureTextEnrichers() {
         JournalEnrichers.setEnrichers();
+    }
+
+    /**
+     * Add a button to Prompt for a Success Test
+     */
+    static renderSuccessTestPromptButton() {
+        const id = 'sr5e-success-test-button-prompt';
+        const inner = `<i class="fas fa-dice"></i>`;
+        // look for an already rendered button and update the innerHTML of it just in case it changed (I'm not sure this is necessary)
+        const rendered = document.getElementById(id);
+        if (rendered) {
+            rendered.innerHTML = inner;
+        } else {
+            // create the button using custom attributes 
+            const button = document.createElement('button');
+            button.setAttribute('type', 'button');
+            button.setAttribute('id', id);
+            button.setAttribute('data-tooltip', 'SR5.Tests.SuccessTest');
+            // this class matches what the existing icons use
+            button.setAttribute('class', 'ui-control icon');
+            button.innerHTML = inner;
+            button.addEventListener('click', () => {
+                TestCreator.promptSuccessTest();
+            })
+            // target the roll-privacy div that holds the different Roll options (Public/Self/etc)
+            const element = document.getElementById('roll-privacy');
+            element?.prepend(button);
+        }
     }
 }

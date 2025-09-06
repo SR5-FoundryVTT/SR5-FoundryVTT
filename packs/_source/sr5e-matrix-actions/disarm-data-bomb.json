@@ -1,23 +1,23 @@
 {
-  "name": "Set Databomb",
+  "name": "Disarm Data Bomb",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/dist/icons/ice-bomb.svg",
+  "img": "systems/shadowrun5e/dist/icons/auto-repair.svg",
   "effects": [],
-  "_id": "OblwI4K8IscL5Crc",
+  "_id": "brwvXUwFFzQ31kKh",
   "system": {
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 242"
+      "source": "SR5 239"
     },
     "action": {
       "type": "complex",
-      "test": "SuccessTest",
+      "test": "MatrixTest",
       "categories": [
         "matrix"
       ],
-      "attribute": "logic",
+      "attribute": "intuition",
       "attribute2": "",
       "skill": "software",
       "armor": false,
@@ -28,7 +28,7 @@
       "limit": {
         "value": 0,
         "base": 0,
-        "attribute": "sleaze",
+        "attribute": "firewall",
         "mod": []
       },
       "threshold": {
@@ -93,11 +93,6 @@
         "global",
         "wounds"
       ],
-      "category": {
-        "matrix": {
-          "marks": 1
-        }
-      },
       "alt_mod": 0,
       "dice_pool_mod": []
     },
@@ -119,13 +114,13 @@
   "sort": 0,
   "_stats": {
     "systemId": "shadowrun5e",
-    "systemVersion": "0.30.0",
+    "systemVersion": "0.13.0",
     "coreVersion": "12.331",
     "createdTime": null,
-    "modifiedTime": 1742645759868,
-    "lastModifiedBy": "sr5ebuilder",
+    "modifiedTime": 1697731042787,
+    "lastModifiedBy": null,
     "compendiumSource": null,
     "duplicateSource": null
   },
-  "_key": "!items!OblwI4K8IscL5Crc"
+  "_key": "!items!brwvXUwFFzQ31kKh"
 }

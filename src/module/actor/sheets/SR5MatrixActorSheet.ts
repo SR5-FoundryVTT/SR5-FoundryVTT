@@ -36,8 +36,14 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                 {
                     navSelector: '.tabs[data-group="matrix"]',
                     contentSelector: '.tabsbody[data-group="matrix"]',
-                    initial: 'marks',
-                }] as {navSelector: string, contentSelector: string, initial: string}[],
+                    initial: 'targets',
+                },
+                {
+                    navSelector: '.tabs[data-group="matrix-right-side"]',
+                    contentSelector: '.tabsbody[data-group="matrix-right-side"]',
+                    initial: 'matrix-actions',
+                },
+            ] as {navSelector: string, contentSelector: string, initial: string}[],
         });
     }
 
@@ -239,8 +245,13 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
         // Reduce actions to those matching the marks on the selected target.
         if (this.selectedMatrixTarget) {
-            const marks = this.actor.getMarksPlaced(this.selectedMatrixTarget);
-            actions = actions.filter(action => (action.system.action.category.matrix?.marks ?? 0) <= marks);
+            const ownedItem = await this.actor.isOwnerOf(this.selectedMatrixTarget);
+            const marksPlaced = this.actor.getMarksPlaced(this.selectedMatrixTarget);
+            actions = actions.filter(action => {
+                const {marks, owner} = action.system.action.category.matrix
+                if (owner) return ownedItem;
+                return marks <= marksPlaced;
+            });
         }
 
         return actions.sort(Helpers.sortByName.bind(Helpers)) as SR5Item[];

@@ -13,7 +13,7 @@
     },
     "action": {
       "type": "complex",
-      "test": "SuccessTest",
+      "test": "MatrixTest",
       "categories": [
         "matrix"
       ],
@@ -95,7 +95,8 @@
       ],
       "category": {
         "matrix": {
-          "marks": 0
+          "marks": 0,
+          "owner": true
         }
       },
       "alt_mod": 0,

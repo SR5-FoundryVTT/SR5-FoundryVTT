@@ -272,6 +272,14 @@ export class MatrixRules {
         return this.createBiofeedbackDamage(damage, hotSim);
     }
 
+    /**
+     * The Opposing Dice Pool used when checking overwatch score
+     * See SR5#238 "Check Overwatch Score"
+     */
+    static checkOverwatchScoreOpposingDicePool() {
+        return DataDefaults.createData('value_field', { base: 6 });
+    }
+
     static modifyDamageAfterHit(attackerHits: number, defenderHits: number, damage: DamageType): DamageType {
         const modified = foundry.utils.duplicate(damage) as DamageType;
 
@@ -333,5 +341,13 @@ export class MatrixRules {
             return { name: SR5.gridCategories.global, value: 6 };
         else
             return { name: SR5.gridCategories.public, value: 0 };
+    }
+
+    /**
+     * Get the amount of damage each extra mark does when getting attacked in the matrix
+     * - this is defined on Data Spike SR5 pg239
+     */
+    static getExtraMarkDamageModifier() {
+        return 2;
     }
 }

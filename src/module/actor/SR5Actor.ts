@@ -48,6 +48,7 @@ import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
+import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -576,7 +577,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
-    getAttribute(this:SR5Actor, name: string, options?: { rollData?: SR5Actor['system'] }): AttributeFieldType {
+    getAttribute(name: string, options?: { rollData?: SR5Actor['system'] }): AttributeFieldType {
 
         const rollData = options?.rollData ?? this.getRollData();
         // First check vehicle stats, as they don't always exist.
@@ -719,11 +720,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * - this function does not check IF we are connected, simply the dice pool modifier
      */
     getPublicGridModifier(this: SR5Actor) {
-        if ('public_grid' in this.system.modifiers) {
-            const modifier = this.system.modifiers.public_grid;
-            return MatrixRules.publicGridModifier() + modifier;
-        }
-        return MatrixRules.publicGridModifier();
+        const modifier = this.modifiers.totalFor('public_grid');
+        return MatrixRules.publicGridModifier() + modifier;
     }
 
     /**
@@ -1931,7 +1929,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Check if the current actor has a Matrix persona.
      */
     get hasPersona(): boolean {
-        return this.hasActorPersona || this.hasDevicePersona;
+        return this.hasActorPersona() || this.hasDevicePersona();
     }
 
     /**
@@ -1939,7 +1937,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns true, when the actor lives in the matrix.
      */
-    get hasActorPersona(): boolean {
+    hasActorPersona(this: SR5Actor): boolean {
         return this.isType('vehicle', 'ic') || this.isEmerged();
     }
 
@@ -1948,8 +1946,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns true, when the actor has an active persona.
      */
-    get hasDevicePersona(): boolean {
-        return this.getMatrixDevice() !== undefined;
+    hasDevicePersona(this: SR5Actor): boolean {
+        const device = this.getMatrixDevice();
+        return device !== undefined && !device.isLivingPersona();
     }
 
     /**
@@ -1958,8 +1957,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns true, when a technomancer uses their living persona
      */
-    get hasLivingPersona(): boolean {
-        return !this.hasDevicePersona && this.isEmerged();
+    hasLivingPersona(this: SR5Actor): boolean {
+        return !this.hasDevicePersona() && this.isEmerged();
     }
 
     /**
@@ -2036,6 +2035,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     getMarksPlaced(uuid: string) {
         return ActorMarksFlow.getMarksPlaced(this, uuid);
+    }
+
+    /**
+     * Determine if this actor is the owner of the given UUID
+     * - this will check for items and for actors in the case of Vehicles/Drones
+     * @param uuid - uuid of the instance to check
+     */
+    async isOwnerOf(uuid: string): Promise<boolean> {
+        return ActorOwnershipFlow.isOwnerOf(this, uuid);
     }
 
     /**
@@ -2249,7 +2257,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Get the amount of damage each extra mark does when getting attacked in the matrix
      */
     getExtraMarkDamageModifier() {
-        return 2;
+        return MatrixRules.getExtraMarkDamageModifier() + this.modifiers.totalFor('mark_damage');
     }
     /**
      * Handle system specific things when this actor is being deleted
