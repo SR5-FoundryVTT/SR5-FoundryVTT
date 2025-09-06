@@ -1,6 +1,8 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { MatrixNetworkFlow } from "../item/flows/MatrixNetworkFlow";
+import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
+import { SR5Item } from '@/module/item/SR5Item';
 
 /**
  * Handles targeting in the matrix.
@@ -58,6 +60,46 @@ export const MatrixTargetingFlow = {
                 network: host.name || '',
                 icons: []
             });
+        }
+
+        return targets;
+    },
+
+    prepareOwnDevices(actor: SR5Actor): MatrixTargetDocument[] {
+        const targets: MatrixTargetDocument[] = [];
+
+        for (const item of actor.wirelessDevices) {
+
+            const type = MatrixNetworkFlow.getDocumentType(item);
+
+            targets.push({
+                name: item.name,
+                document: item,
+                token: null,
+                runningSilent: item.isRunningSilent(),
+                network: this._getNetworkName(item.master),
+                type,
+                icons: []
+            });
+        }
+
+        if (actor.getMatrixDevice()) {
+            // go through the devices slaved to the actor's pan and see if any are actors, add those
+            for (const slave of actor.getMatrixDevice()!.slaves) {
+                if (slave instanceof SR5Actor) {
+                    const type = MatrixNetworkFlow.getDocumentType(slave);
+                    const name = slave.getToken()?.name ?? slave.name;
+                    targets.push({
+                        name,
+                        document: slave,
+                        token: null,
+                        runningSilent: slave.isRunningSilent(),
+                        network: this._getNetworkName(slave.network),
+                        type,
+                        icons: []
+                    })
+                }
+            }
         }
 
         return targets;
@@ -163,7 +205,7 @@ export const MatrixTargetingFlow = {
                 document: device,
                 token: null,
                 runningSilent: device.isRunningSilent(),
-                network: document.network?.name ?? '',
+                network: this._getNetworkName(device.master),
                 type: MatrixNetworkFlow.getDocumentType(device),
                 icons: [],
                 marks: 0,
@@ -173,4 +215,24 @@ export const MatrixTargetingFlow = {
 
         return connectedIcons;
     },
+
+    /**
+     * Get the best name for a network for display purposes
+     * - if the network is a host or grid, use its name
+     * - if the network is a device, use the name of the actor it represents
+     * @param master
+     */
+    _getNetworkName(master: SR5Item | null | undefined) {
+        if (master) {
+            if (master.isType('host', 'grid')) {
+                return master.name;
+            }
+
+            if (master.isType('device') && master.persona) {
+                const actor = master.persona;
+                return actor.getToken()?.name ?? actor.name;
+            }
+        }
+        return '';
+    }
 }

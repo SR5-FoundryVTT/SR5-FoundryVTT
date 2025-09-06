@@ -1128,8 +1128,10 @@ export const registerItemLineHelpers = () => {
             };
 
         const icons: any = [];
-        if (target.document instanceof SR5Actor) icons.push(toggleConnectedItemsIcon);
-        return icons; 
+        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices) icons.push(toggleConnectedItemsIcon);
+
+        if (icons.length === 0) icons.push({});
+        return icons;
     });
     Handlebars.registerHelper('MatrixTargetItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {
         return [
@@ -1202,5 +1204,28 @@ export const registerItemLineHelpers = () => {
      */
     Handlebars.registerHelper('SpritePowerItemData', (optional: string) => {
         return {optional};
+    });
+
+    /**
+     * Return list of css classes to be used in the list of matrix targets.
+     * @param target The matrix target to render.
+     */
+    Handlebars.registerHelper('MatrixOwnedItemIcons', (target: Shadowrun.MatrixTargetDocument) => {
+        const shareIcon = {
+            icon: 'fas fa-share-from-square'
+        }
+
+        return [{}];
+    });
+
+    Handlebars.registerHelper('MatrixOwnedItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {
+        return [
+            {text: {
+                    text: game.i18n.localize(target.type)
+                }},
+            {text: {
+                    text: target.network
+                }},
+        ];
     });
 };

@@ -8,6 +8,7 @@ import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
+import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
@@ -22,6 +23,8 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     matrixTargets: Shadowrun.MatrixTargetDocument[];
     // the master device being used to connect to the matrix
     matrixDevice: SR5Item | undefined;
+
+    ownedDevices: MatrixTargetDocument[];
 }
 
 export class SR5MatrixActorSheet extends SR5BaseActorSheet {
@@ -55,6 +58,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
 
         this._prepareMatrixTargets(data);
+        this._prepareOwnedDevices(data);
         await this._prepareMarkedDocuments(data);
         this._prepareMatrixDevice(data);
 
@@ -69,12 +73,27 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         data.matrixDevice = this.actor?.getMatrixDevice();
     }
 
+    _prepareOwnedDevices(data: MatrixActorSheetData) {
+        // When target overview is shown, collect all matrix targets.
+        const targets = MatrixTargetingFlow.prepareOwnDevices(this.actor);
+
+        this._prepareSelectedMatrixTargets(targets);
+
+        data.ownedDevices = targets;
+    }
+
     _prepareMatrixTargets(data: MatrixActorSheetData) {
         data.selectedMatrixTarget = this.selectedMatrixTarget;
 
         // When target overview is shown, collect all matrix targets.
         const {targets} = MatrixTargetingFlow.getTargets(this.actor);
 
+        this._prepareSelectedMatrixTargets(targets);
+
+        data.matrixTargets = targets;
+    }
+
+    _prepareSelectedMatrixTargets(targets: MatrixTargetDocument[]) {
         for (const target of targets) {
             // Collect connected icons, if user wants to see them.
             if (this._connectedIconsOpenClose[target.document.uuid]) {
@@ -89,8 +108,6 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
             // Mark target as selected.
             target.selected = this.selectedMatrixTarget === target.document.uuid;
         }
-
-        data.matrixTargets = targets;
     }
 
     async _prepareMarkedDocuments(data: MatrixActorSheetData) {
