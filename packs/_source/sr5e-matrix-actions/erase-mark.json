@@ -13,7 +13,7 @@
     },
     "action": {
       "type": "complex",
-      "test": "SuccessTest",
+      "test": "MatrixTest",
       "categories": [
         "matrix"
       ],
@@ -87,6 +87,12 @@
         "skill": "",
         "armor": false,
         "mod": 0
+      },
+      "category": {
+        "matrix": {
+          "owner": false,
+          "marks": 3
+        }
       },
       "modifiers": [
         "noise",

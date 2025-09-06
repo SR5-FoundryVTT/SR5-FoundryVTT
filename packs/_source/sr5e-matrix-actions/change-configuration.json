@@ -14,9 +14,7 @@
     "action": {
       "type": "free",
       "test": "SuccessTest",
-      "categories": [
-        "matrix"
-      ],
+      "categories": [],
       "attribute": "",
       "attribute2": "",
       "skill": "",

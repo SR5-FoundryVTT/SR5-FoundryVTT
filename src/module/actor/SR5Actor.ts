@@ -47,6 +47,7 @@ import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -2033,6 +2034,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     getMarksPlaced(uuid: string) {
         return ActorMarksFlow.getMarksPlaced(this, uuid);
+    }
+
+    /**
+     * Determine if this actor is the owner of the given UUID
+     * - this will check for items and for actors in the case of Vehicles/Drones
+     * @param uuid - uuid of the instance to check
+     */
+    async isOwnerOf(uuid: string): Promise<boolean> {
+        return ActorOwnershipFlow.isOwnerOf(this, uuid);
     }
 
     /**

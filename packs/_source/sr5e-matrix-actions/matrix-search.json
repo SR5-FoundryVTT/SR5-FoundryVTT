@@ -19,7 +19,7 @@
     },
     "action": {
       "type": "varies",
-      "test": "SuccessTest",
+      "test": "MatrixTest",
       "categories": [
         "matrix"
       ],

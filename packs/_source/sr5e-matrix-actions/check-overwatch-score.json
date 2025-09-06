@@ -13,7 +13,7 @@
     },
     "action": {
       "type": "simple",
-      "test": "SuccessTest",
+      "test": "CheckOverwatchScoreTest",
       "categories": [
         "matrix"
       ],
@@ -64,7 +64,7 @@
       },
       "opposed": {
         "type": "custom",
-        "test": "",
+        "test": "OpposedCheckOverwatchScoreTest",
         "attribute": "",
         "attribute2": "",
         "skill": "",

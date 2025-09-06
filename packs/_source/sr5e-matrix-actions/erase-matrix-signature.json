@@ -1,10 +1,10 @@
 {
+  "_key": "!items!h3BIx7VKwI6c2Ufy",
+  "_id": "h3BIx7VKwI6c2Ufy",
   "name": "Erase Matrix Signature",
   "type": "action",
-  "flags": {},
   "img": "systems/shadowrun5e/dist/icons/invisible.svg",
   "effects": [],
-  "_id": "VeQ2QikoScb3bNk2",
   "system": {
     "description": {
       "value": "",
@@ -12,14 +12,14 @@
       "source": "SR5 239"
     },
     "action": {
-      "type": "",
-      "test": "SuccessTest",
+      "type": "complex",
+      "test": "MatrixTest",
       "categories": [
         "matrix"
       ],
-      "attribute": "",
+      "attribute": "resonance",
       "attribute2": "",
-      "skill": "",
+      "skill": "computer",
       "armor": false,
       "spec": false,
       "mod": 0,
@@ -28,8 +28,14 @@
       "limit": {
         "value": 0,
         "base": 0,
-        "attribute": "",
-        "mod": []
+        "attribute": "attack",
+        "mod": [],
+        "mode": null,
+        "override": null,
+        "downgrade": null,
+        "upgrade": null,
+        "temp": 0,
+        "base_formula_operator": "add"
       },
       "threshold": {
         "value": 0,
@@ -50,7 +56,14 @@
         "ap": {
           "value": 0,
           "base": 0,
-          "mod": []
+          "mod": [],
+          "mode": null,
+          "override": null,
+          "downgrade": null,
+          "upgrade": null,
+          "temp": 0,
+          "attribute": "",
+          "base_formula_operator": "add"
         },
         "base_formula_operator": "add",
         "attribute": "",
@@ -60,13 +73,19 @@
           "itemType": "",
           "itemName": ""
         },
-        "mod": []
+        "mod": [],
+        "mode": null,
+        "override": null,
+        "downgrade": null,
+        "upgrade": null,
+        "temp": 0,
+        "biofeedback": ""
       },
       "opposed": {
         "type": "",
-        "test": "",
-        "attribute": "",
-        "attribute2": "",
+        "test": "OpposedTest",
+        "attribute": "resonance",
+        "attribute2": "resonance",
         "skill": "",
         "armor": false,
         "mod": 0,
@@ -94,10 +113,20 @@
         "wounds"
       ],
       "alt_mod": 0,
-      "dice_pool_mod": []
+      "dice_pool_mod": [],
+      "category": {
+        "matrix": {
+          "owner": false,
+          "marks": 0
+        }
+      }
     },
     "result": {
-      "success": {}
+      "success": {
+        "matrix": {
+          "placeMarks": false
+        }
+      }
     },
     "importFlags": {
       "name": "",
@@ -107,20 +136,5 @@
       "isImported": false
     }
   },
-  "ownership": {
-    "default": 0
-  },
-  "folder": null,
-  "sort": 0,
-  "_stats": {
-    "systemId": "shadowrun5e",
-    "systemVersion": "0.13.0",
-    "coreVersion": "12.331",
-    "createdTime": null,
-    "modifiedTime": 1697731074619,
-    "lastModifiedBy": null,
-    "compendiumSource": null,
-    "duplicateSource": null
-  },
-  "_key": "!items!VeQ2QikoScb3bNk2"
+  "folder": null
 }
