@@ -1130,6 +1130,7 @@ export const registerItemLineHelpers = () => {
         const icons: any = [];
         if (target.document instanceof SR5Actor && target.document.hasWirelessDevices) icons.push(toggleConnectedItemsIcon);
 
+        // if there are no icons, add an empty object to the list so that the columns match up correctly
         if (icons.length === 0) icons.push({});
         return icons;
     });
