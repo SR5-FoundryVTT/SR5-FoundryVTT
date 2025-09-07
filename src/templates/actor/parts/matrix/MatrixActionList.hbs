@@ -6,11 +6,12 @@
     {{#each matrixActions}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
             name=this.name
-            itemId=this.uuid
+            itemId=this.action.uuid
+            img=this.action.img
             itemType="matrix-action"
             hasRoll="true"
             hasDesc="true"
-            rightSide=(MatrixActionsItemRightSide this)
+            rightSide=(MatrixActionsItemRightSide this.action)
         }}
     {{/each}}
 </div>

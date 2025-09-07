@@ -4,6 +4,7 @@ import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 import { SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
 
 interface VehicleSheetDataFields {
     driver: SR5Actor|undefined
@@ -60,10 +61,10 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
     }
 
     protected override async _getMatrixPackActions() {
-        const matrixPackName = Helpers.getMatrixActionsPackName();
+        const matrixPackName = PackActionFlow.getMatrixActionsPackName();
 
         // filter out illegal actions from the matrix actions
-        return (await Helpers.getPackActions(matrixPackName)).filter((action) => {
+        return (await PackActionFlow.getPackActions(matrixPackName)).filter((action) => {
             return !MatrixRules.isIllegalAction(
                         action.getAction()?.attribute as any,
                         action.getAction()?.attribute2 as any,

@@ -3,18 +3,19 @@ import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
 import { SR5Actor } from '../SR5Actor';
-import { MatrixSheetFlow } from '../../flows/MatrixSheetFlow';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
+import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
     markedDocuments: Shadowrun.MarkedDocument[]
     handledItemTypes: string[]
     network: SR5Item | null
-    matrixActions: SR5Item[]
+    matrixActions: {name: string, action: SR5Item}[]
     selectedMatrixTarget: string|undefined
     // Stores icons connected to the selected matrix target.
     selectedMatrixTargetIcons: Shadowrun.MatrixTargetDocument[];
@@ -52,7 +53,6 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
         data.network = this.actor.network;
         data.matrixActions = await this._prepareMatrixActions();
-
 
         this._prepareMatrixTargets(data);
         await this._prepareMarkedDocuments(data);
@@ -224,9 +224,9 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      * @protected
      */
     protected async _getMatrixPackActions() {
-        const matrixPackName = Helpers.getMatrixActionsPackName();
+        const matrixPackName = PackActionFlow.getMatrixActionsPackName();
         // Collect all sources for matrix actions.
-        return await Helpers.getPackActions(matrixPackName);
+        return await PackActionFlow.getPackActions(matrixPackName);
     }
 
 
@@ -235,14 +235,10 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      *
      * If a marked document is selected, only actions with a mark requirement will show.
      *
-     * @returns Alphabetically sorted array of matrix actions.
+     * @returns Sorted list of objects containg a localized name and action item for sheet display.
      */
     async _prepareMatrixActions() {
-        const packActions = await this._getMatrixPackActions();
-        const actorActions = MatrixSheetFlow.getMatrixActions(this.actor);
-        // Assume above collections return action only.
-        let actions = [...packActions, ...actorActions] as SR5Item<'action'>[];
-
+        let actions = await PackActionFlow.getActorMatrixActions(this.actor);
         // Reduce actions to those matching the marks on the selected target.
         if (this.selectedMatrixTarget) {
             const ownedItem = await this.actor.isOwnerOf(this.selectedMatrixTarget);
@@ -254,7 +250,14 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
             });
         }
 
-        return actions.sort(Helpers.sortByName.bind(Helpers)) as SR5Item[];
+        // Prepare sorting and display of a possibly translated document name.
+        return actions.map(action => {
+                return {
+                    name: PackActionFlow.localizePackAction(action.name),
+                    action
+                };
+            })
+            .sort(Helpers.sortByName.bind(Helpers));
     }
 
     /**

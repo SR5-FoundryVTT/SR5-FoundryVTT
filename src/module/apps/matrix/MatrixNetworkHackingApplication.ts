@@ -1,3 +1,4 @@
+import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5 } from "../../config";
 import { Helpers } from "../../helpers";
@@ -26,7 +27,7 @@ type MatrixPlacementTests = BruteForceTest | HackOnTheFlyTest;
 
 /**
  * This application collects all visible matrix networks for players to connect.
- * 
+ *
  */
 export class MatrixNetworkHackingApplication extends Application {
     // Actor used to retrieve the matrix persona.
@@ -87,29 +88,32 @@ export class MatrixNetworkHackingApplication extends Application {
     /**
      * Execute the chosen mark placement action test.
      */
-    async executeMarkPlacementActionTest(targetUuid: string, action: string) {
+    async executeMarkPlacementActionTest(targetUuid: string, category: string) {
         const target = await fromUuid(targetUuid) as SR5Actor | SR5Item;
         if (!target) {
             console.error('Shadowrun 5e | Could not find target with uuid', targetUuid);
             return;
         }
 
-        // Get test for that action.
-        const matrixPackName = Helpers.getMatrixActionsPackName();
-        const test = await TestCreator.fromPackAction(matrixPackName, action, this.actor) as MatrixPlacementTests;
+        const matrixActions = await PackActionFlow.getActorMatrixActions(this.actor);
+        const actions = matrixActions.filter(action => action.system.action.categories.includes(category));
+        if (actions.length !== 1) {
+            ui.notifications?.error(game.i18n.format('SR5.Errors.TooManyActionsWithCategory', {category: game.i18n.localize(SR5.actionCategories[category]) }));
+            return;
+        }
+        const action = actions[0];
+        const test = await TestCreator.fromItem(action, this.actor) as MatrixPlacementTests;
         if (!test) return;
 
-        this.close();
+        await this.close();
 
-        // Prepare test for placing a mark on the target.
-        // test.data.iconUuid = targetUuid;
-        test.addTarget(target);
+        await test.addTarget(target);
         await test.execute();
     }
 
     /**
      * User triggered placing mark by Brute Force. Execute the matching test action.
-     * 
+     *
      * @param event User clicked on something.
      */
     async handleBruteForce(event) {
@@ -118,14 +122,12 @@ export class MatrixNetworkHackingApplication extends Application {
 
         const targetUuid = Helpers.listItemUuid(event);
         if (!targetUuid) return;
-        const action = "Brute Force";
-
-        await this.executeMarkPlacementActionTest(targetUuid, action);
+        await this.executeMarkPlacementActionTest(targetUuid, 'brute_force');
     }
 
     /**
      * User triggered placing mark by Hack on The Fly. Execute the matching test action.
-     * 
+     *
      * @param event User clicked on something.
      */
     async handleHackOnTheFly(event) {
@@ -134,17 +136,15 @@ export class MatrixNetworkHackingApplication extends Application {
 
         const targetUuid = Helpers.listItemUuid(event);
         if (!targetUuid) return;
-        const action = "Hack on The Fly";
-
-        await this.executeMarkPlacementActionTest(targetUuid, action);
+        await this.executeMarkPlacementActionTest(targetUuid, 'hack_on_the_fly');
     }
 
     /**
      * User asks network for an voluntary mark.
-     * 
+     *
      * @param event User triggered event.
      */
-    async handleMarkInvite(event) { 
+    async handleMarkInvite(event) {
         event.preventDefault();
         event.stopPropagation();
 

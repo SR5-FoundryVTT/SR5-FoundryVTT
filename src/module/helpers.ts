@@ -1,4 +1,3 @@
-import { SR5 } from "./config";
 import { BiofeedbackDamageType, DamageType } from './types/item/Action';
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
@@ -28,16 +27,16 @@ interface CalcTotalOptions {
 export class Helpers {
     /**
      * Calculate the total value for a ModifiableValue shape.
-     * 
+     *
      * This can either be the sum of all modify values or the override total value as given.
-     * 
+     *
      * ActiveEffect modes are related to the expected data:
      * - Modify / Add => Will insert into the .mod array
      * - Override => Will create a .override value with no min and max
      * - Upgrade => Will create a .override value with min
      * - Downgrade => Will create a .override value with max
-     * 
-     * Depending on the override value it's possible that a overriden value can be 
+     *
+     * Depending on the override value it's possible that a overriden value can be
      * downgraded or upgraded but still be changed further by the options.min or options.max
      * params of the overall method. That way effect changes can't override system min/max borders.
      *
@@ -363,15 +362,15 @@ export class Helpers {
     }
 
     /**
-     * Measure the distance between two tokens on the canvas in length units, 
+     * Measure the distance between two tokens on the canvas in length units,
      * factoring in both 2D distance and 3D elevation difference.
-     * 
+     *
      * Depending on the scene distance unit the result will be converted.
-     * 
+     *
      * If wall-height is installed and using tokenHeight, it will be used for elevation.
-     * 
-     * @param tokenOrigin 
-     * @param tokenDest 
+     *
+     * @param tokenOrigin
+     * @param tokenDest
      * @returns Distance in scene distance unit
      */
     static measureTokenDistance(tokenOrigin: TokenDocument, tokenDest: TokenDocument): number {
@@ -392,7 +391,7 @@ export class Helpers {
         const elevationDifference = (tokenOrigin.elevation + originLOSHeight) - (tokenDest.elevation + destLOSHeight);
         const origin3D = new PIXI.Point(0, 0);
         const dest3D = new PIXI.Point(distanceInGridUnits2D.distance, elevationDifference);
-        
+
         const distanceInGridUnits3D = Math.round(Helpers.measurePointDistance(origin3D, dest3D));
 
         const sceneUnit = canvas.scene.grid.units;
@@ -401,9 +400,9 @@ export class Helpers {
 
     /**
      * Measure distance between two points on a grid in length units.
-     * 
-     * @param origin 
-     * @param destination 
+     *
+     * @param origin
+     * @param destination
      * @returns Distance without a unit.
      */
     static measurePointDistance(origin: PIXI.Point, destination: PIXI.Point): number {
@@ -414,13 +413,13 @@ export class Helpers {
 
     /**
      * Determine a tokens line of sight height.
-     * 
+     *
      * Default Foundry will use 0, while wall-height might have defined another value on the token.
-     * 
+     *
      * The auto height generation of wall-height isn't supported.
-     * 
-     * @param token 
-     * @returns 
+     *
+     * @param token
+     * @returns
      */
     static getTokenLOSHeight(token: TokenDocument): number {
         return token.flags['wall-height']?.tokenHeight ?? 0;
@@ -903,7 +902,7 @@ export class Helpers {
 
         if (data.type === 'Item')
             return game.items.get(data.id) as SR5Item;
-    
+
         return undefined;
     }
 
@@ -930,104 +929,6 @@ export class Helpers {
         }
 
         return true;
-    }
-
-    /**
-     * Pack document names don't necessarily match what is displayed in the UI.
-     *
-     * TODO: Why even do this? Does the ui actually not match to the pack document name?
-     * @param documentName A string to be transformed. Malformed values will result in empty strings.
-     * @returns
-     */
-    static packDocumentName(documentName?: string) {
-        // Fail gracefully.
-        documentName ??= '';
-        // eslint-disable-next-line
-        return documentName.toLowerCase().replace(new RegExp(' ', 'g'), '_')
-    }
-
-    /**
-     * Check packs for a given action.
-     *
-     * TODO: Use pack and action ids to avoid polluted user namespaces
-     * TODO: Allow for i18n to fetch a label from an action? Or predefine the title?
-     *
-     * @param packName The metadata name of the pack
-     * @param actionName The name of the action within that pack
-     */
-    static async getPackAction(packName: string, actionName: string): Promise<SR5Item | undefined> {
-        console.debug(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
-        const pack = game.packs.find(pack =>
-            pack.metadata.system === SYSTEM_NAME &&
-            (pack.metadata.name === packName || pack.metadata.label === packName));
-
-        if (!pack) return undefined;
-
-        // TODO: Use predefined ids instead of names...
-        // TODO: use replaceAll instead, which needs an change to es2021 at least for the ts compiler
-        actionName = Helpers.packDocumentName(actionName).toLocaleLowerCase();
-        // eslint-disable-next-line
-        const packEntry = pack.index.find(data => Helpers.packDocumentName(data.name) === actionName);
-        if (!packEntry) return undefined;
-
-        const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
-        if (!item || item.type !== 'action') return undefined;
-
-        console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
-        return item;
-    }
-
-    /**
-     * Returns the general actions pack name to use, when the general actions pack is referenced.
-     */
-    static getGeneralActionsPackName(): Shadowrun.PackName {
-        const overrideGeneralpackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) as Shadowrun.PackName;
-        return overrideGeneralpackName || SR5.packNames.GeneralActionsPack as Shadowrun.PackName;
-    }
-
-    /**
-     * Return the matrix action pack name to use, when the matrix actions pack is referenced.
-     */
-    static getMatrixActionsPackName(): Shadowrun.PackName {
-        const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.MatrixActionsPack) as Shadowrun.PackName;
-        return overrideMatrixPackName || SR5.packNames.MatrixActionsPack as Shadowrun.PackName;
-    }
-
-    /**
-     * Return the matrix action pack name to use, when the matrix actions pack is referenced.
-     */
-    static getICActionsPackName(): Shadowrun.PackName {
-        const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.ICActionsPack) as Shadowrun.PackName;
-        return overrideMatrixPackName || SR5.packNames.ICActionsPack as Shadowrun.PackName;
-    }
-
-    /**
-     * Retrieve all actions from a given pack.
-     *
-     * Other item types in that pack will be ignored.
-     *
-     * TODO: Allow filtering by categories?
-     * TODO: Generalize this to search for items and make the type paramater
-     *
-     * @param packName The item pack that contains actions.
-     */
-    static async getPackActions(packName: string): Promise<SR5Item[]> {
-        console.debug(`Shadowrun 5e | Trying to fetch all actions from pack ${packName}`);
-        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName);
-        if (!pack) return [];
-
-        // @ts-expect-error foundry-vtt-types v10
-        const packEntries = pack.index.filter(data => data.type === 'action');
-
-        const documents: SR5Item[] = [];
-        for (const packEntry of packEntries) {
-            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item;
-            if (!document) continue;
-            documents.push(document);
-        }
-
-        console.debug(`Shadowrun5e | Fetched all actions from pack ${packName}`, documents);
-        return documents;
     }
 
     /**
@@ -1062,10 +963,10 @@ export class Helpers {
 
     /**
      * Sanitize keys to not use characters used within FoundryVTT Document#update and expandObject methods.
-     * 
+     *
      * @param key The key, maybe containing prohibited characters
      * @param replace The characters to replaces prohibited characters with
-     * @returns key without 
+     * @returns key without
      */
     static sanitizeDataKey(key: string, replace: string=''): string {
         const spicyCharacters = ['.', '-='];
@@ -1095,17 +996,17 @@ export class Helpers {
                     allActors = allActors.concat(`
                             <option value="${t.id}">${t.name}</option>`);
                 });
-            const  dialog_content = `  
+            const  dialog_content = `
                 <select name ="actor">
                 ${allActors}
                 </select>`;
-    
+
             const choosenActor = await foundry.appv1.api.Dialog.prompt({
                 title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
                 content: dialog_content,
                 callback: (html) => html.find('select').val()
             }) as string;
-    
+
             return game.actors?.get(choosenActor) as SR5Actor;
         }
     }
@@ -1114,16 +1015,16 @@ export class Helpers {
      * A method to capitalize the first letter of a given string.
      * This allows to transform skill and attribute ids to the corresponding translation sub-keys
      * See @see getSkillTranslation @see getAttributeTranslaton
-     * @param string 
+     * @param string
      * @returns the string with a capitalized first letter
      */
     static capitalizeFirstLetter(string: string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
-    }  
+    }
 
     /**
      * Translates a skillId
-     * @param skill 
+     * @param skill
      * @returns translation
      */
     static getSkillTranslation(skill: string) : string {
@@ -1132,7 +1033,7 @@ export class Helpers {
 
     /**
      * Translate an attribute
-     * @param attribute 
+     * @param attribute
      * @returns translation
      */
     static getAttributeTranslation(attribute: string) : string {
@@ -1164,5 +1065,29 @@ export class Helpers {
         if (a.name > b.name) return 1;
         if (a.name < b.name) return -1;
         return 0;
+    }
+
+    /**
+     * Slugify a name to match it's label counterpart in the i18n files.
+     * For that it needs to be PascalCase and without spaces.
+     * 
+     * This can happen when displaying a packs document name translated on
+     * sheet, as the document name will be human readable and in English, while
+     * on sheet it should be match the display language.
+     */
+    static transformToLabel(name: string) {
+        return name
+            // Remove issues with splitting whitespaces.
+            .trim()
+            // Normalize string
+            .toLowerCase()
+            // PascalCase
+            .split(' ')
+            .map(word => {
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            })
+            // Return and remove all non-alphanumerics
+            .join('')
+            .replace(/[^a-zA-Z0-9]/g, '');
     }
 }

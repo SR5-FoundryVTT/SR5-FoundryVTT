@@ -1,6 +1,6 @@
 import {SR5Item} from "../../item/SR5Item";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
-import { Helpers } from '@/module/helpers';
+import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
 
 interface ICActorSheetData extends MatrixActorSheetData {
     disableMarksEdit: boolean;
@@ -39,10 +39,10 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet {
      * @returns Alphabetically sorted array of matrix actions.
      */
     protected override async _getMatrixPackActions() {
-        const matrixPackName = Helpers.getICActionsPackName();
+        const matrixPackName = PackActionFlow.getICActionsPackName();
 
         // get the IC pack actions and filter by our type
-        return (await Helpers.getPackActions(matrixPackName)).filter((action) => {
+        return (await PackActionFlow.getPackActions(matrixPackName)).filter((action) => {
             switch (this.actor.icType()) {
                 case 'acid':
                     return action.name === "Acid";
