@@ -1,6 +1,11 @@
 import AppV2 = foundry.applications.api.ApplicationV2;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
+/**
+ * A generic compendium browser application that allows users to view and search
+ * across multiple compendium packs simultaneously using checkboxes.
+ * @extends {HandlebarsApplicationMixin(ApplicationV2)}
+ */
 export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<any>) {
     /** The list of all discovered compendia. */
     private _packs: CompendiumCollection<any>[] = [];
@@ -11,8 +16,12 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     /** The current string being used to filter results. */
     private _searchQuery: string = "";
 
+    /** The cursor position in the search input to preserve during re-renders. */
     private _searchCursorPosition: number | null = null;
 
+    /**
+     * @param {object} [options={}] Application configuration options.
+     */
     constructor(options = {}) {
         super(options);
         this._packs = [...game.packs.values()] as CompendiumCollection<any>[];
@@ -21,6 +30,10 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         }
     }
 
+    /**
+     * Defines the default options for the Compendium Browser application window.
+     * @returns {object} The default application options.
+     */
     static override get DEFAULT_OPTIONS() {
         return {
             id: "compendium-browser",
@@ -34,41 +47,55 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
             },
             actions: {
                 togglePack: this.prototype._onTogglePack,
-                // search: this.prototype._onSearch,
                 clearSearch: this.prototype._onClearSearch,
             }
         };
     }
 
+    /**
+     * Defines the Handlebars template parts used by this application.
+     */
     static override PARTS = {
         content: {
             template: "systems/shadowrun5e/dist/templates/apps/compendium-browser.hbs",
         },
     };
 
+    /**
+     * The title of the application window.
+     * @returns {string} The window title.
+     */
     override get title() {
         return "Compendium Browser";
     }
     
+    /**
+     * Attach event listeners to the application's rendered HTML.
+     * @param {object} context The context object provided by the Application.
+     * @param {Parameters<AppV2["_onRender"]>[1]} options The options for rendering the Application.
+     */
     protected override async _onRender(context: object, options: Parameters<AppV2["_onRender"]>[1]): Promise<void> {
         await super._onRender(context, options);
         this.element.addEventListener("dragstart", this._onDrag.bind(this));
-        // Manually find the search input and attach a listener.
+        
         const searchInput = this.element.querySelector<HTMLInputElement>("#compendium-browser-search");
         if (searchInput) {
-            // Restore cursor position if it was saved.
             if (this._searchCursorPosition !== null) {
                 searchInput.focus();
                 searchInput.setSelectionRange(this._searchCursorPosition, this._searchCursorPosition);
-                this._searchCursorPosition = null; // Reset for the next render
+                this._searchCursorPosition = null;
             }
-            // Attach the listener for live updates.
             searchInput.addEventListener("input", event => {
                 this._onSearch(event, searchInput);
             });
         }
     }
 
+    /**
+     * Prepare the data object to be rendered by the Handlebars template.
+     * @param {Parameters<AppV2["_prepareContext"]>[0]} options Options for preparing the context.
+     * @returns {Promise<object>} The context object for the template, containing lists of packs and entries.
+     */
     override async _prepareContext(options: Parameters<AppV2["_prepareContext"]>[0]) {
         const activePacks = this._packs.filter(p => this._activePackIds.includes(p.collection));
         const indexes = await Promise.all(activePacks.map(pack => pack.getIndex()));
@@ -92,6 +119,10 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         };
     }
 
+    /**
+     * Handle the dragstart event for a compendium entry.
+     * @param {DragEvent} event The drag event.
+     */
     private _onDrag(event: DragEvent) {
         const target = event.target as HTMLElement | null;
         const { uuid } = target?.closest<HTMLElement>("[data-uuid]")?.dataset ?? {};
@@ -104,6 +135,11 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         }
     }
 
+    /**
+     * Handle ticking or unticking a compendium pack checkbox.
+     * @param {Event} event The triggering event.
+     * @param {HTMLInputElement} target The checkbox input element.
+     */
     private async _onTogglePack(event: Event, target: HTMLInputElement): Promise<void> {
         const packId = target.dataset.packId;
         if (!packId) return;
@@ -118,12 +154,20 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         await this.render();
     }
 
+    /**
+     * Handle the input event on the search field to live-filter the results.
+     * @param {Event} event The triggering input event.
+     * @param {HTMLInputElement} target The search input element.
+     */
     private async _onSearch(event: Event, target: HTMLInputElement): Promise<void> {
         this._searchCursorPosition = target.selectionStart;
         this._searchQuery = target.value;
         await this.render();
     }
 
+    /**
+     * Handle clicking the clear search button.
+     */
     private async _onClearSearch(): Promise<void> {
         this._searchQuery = "";
         await this.render();
