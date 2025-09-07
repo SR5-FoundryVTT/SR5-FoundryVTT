@@ -1512,7 +1512,6 @@
                 "astral_initiative_dice": "Modifies astral initiative dice",
                 "astral_limit": "Modifies astral limit",
                 "composure": "Modifies composure tests pool",
-                "control_rig_rating": "Rating of the actor's Control Rig",
                 "defense": "Modifies defense tests pool",
                 "defense_block": "Adds to the defense modifier for active blocking",
                 "defense_dodge": "Adds to the defense modifier for active dodging",

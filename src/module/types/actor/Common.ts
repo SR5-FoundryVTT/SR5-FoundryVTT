@@ -24,6 +24,15 @@ export const PhysicalCombatValues = () => ({
     recoil_compensation: new ModifiableField(ModifiableValue()),
 });
 
+/**
+ * Characters include extra configuration options not on all actor types
+ * @constructor
+ */
+export const CharacterValues = () => ({
+    ...PhysicalCombatValues(),
+    control_rig_rating: new ModifiableField(ModifiableValue()),
+})
+
 export const CharacterLimits = () => ({
     ...Limits(),
     ...AwakendLimits(),

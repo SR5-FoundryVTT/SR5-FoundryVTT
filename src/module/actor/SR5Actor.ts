@@ -1839,7 +1839,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     getControlRigRating(): number {
-        return this.modifiers.totalFor('control_rig_rating');
+        if (!this.isType('character')) return 0;
+        return Helpers.calcTotal(this.system.values.control_rig_rating);
     }
 
     /**
