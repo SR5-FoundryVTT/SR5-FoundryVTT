@@ -46,6 +46,7 @@ import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
+import { PackActionFlow } from '../item/flows/PackActionFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
@@ -264,7 +265,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Prepare simple to use hash maps to retrieve specific items quickly.
-     * 
+     *
      * The typical map would match the item type to their items on this actor.
      */
     prepareItemsForType() {
@@ -477,13 +478,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Given a persona actor, check if this persona is visible to this actor.
-     * 
+     *
      * This can change change based on distance, if the persona is running silent and if it's been found
      * throuhgh matrix perception or other means.
-     * 
+     *
      * TODO: Matrix Perception for silent personas
      * TODO: Visible through marks placed by silent persona on this actor
-     * 
+     *
      * @param persona The persona to check visibility for.
      */
     matrixPersonaIsVisible(persona: SR5Actor) {
@@ -507,7 +508,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // TODO: Compare running silent with tokens that have been percieved through a matrix perception
         // TODO: Compare running silent with tokens that have been found to have placed marks on this actor
-        return !targetMatrixData.running_silent;        
+        return !targetMatrixData.running_silent;
     }
 
     getFullDefenseAttribute(this: SR5Actor): AttributeFieldType | undefined {
@@ -1196,7 +1197,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async rollGeneralAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-            const generalPackName = Helpers.getGeneralActionsPackName();
+        const generalPackName = PackActionFlow.getGeneralActionsPackName();
         return this.rollPackAction(generalPackName, actionName, options);
     }
 
