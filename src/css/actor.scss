@@ -217,7 +217,14 @@
     .scroll-area-matrix-hacking {
         // I hate this. It's necessary to make the scrollbar work together with .scroll-area
         // Otherweise the height will grow out of the application bounds hide the overflow...
-        height: 390px;
+        height: 400px;
+    }
+
+    // Intended to be used in the matrix tab > icons/programs/marks subtab.
+    .scroll-area-matrix-icons {
+        // I hate this. It's necessary to make the scrollbar work together with .scroll-area
+        // Otherweise the height will grow out of the application bounds hide the overflow...
+        height: 330px;
     }
 
     // Use only to indicate interactibility within the HackingTab markslist.

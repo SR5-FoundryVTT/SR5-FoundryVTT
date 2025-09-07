@@ -12,7 +12,7 @@ export const RiggingTestDataFlow = {
 
     /**
      * Add modifiers to test for having a control rig
-     * - mainly defined on SR5 pg266
+     * - mainly defined on SR5 pg266, more explained on SR5 pg 452
      * @param test
      */
     addControlRigModifier: (test: SuccessTest) => {
@@ -26,6 +26,9 @@ export const RiggingTestDataFlow = {
             // add the control rig rating as a limit bonus to tests
             test.data.limit.mod.push({name: game.i18n.localize('SR5.ControlRig'), value: rating});
             Helpers.calcTotal(test.data.limit);
+            // SR5 pg 452 says you add the control rig rating to vehicle tests
+            test.data.pool.mod.push({name: game.i18n.localize('SR5.ControlRig'), value: rating});
+            Helpers.calcTotal(test.data.pool);
         }
     },
 

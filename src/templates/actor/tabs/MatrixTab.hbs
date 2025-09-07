@@ -63,12 +63,18 @@
                 <nav class="tabs" data-group="matrix">
                     <a class="item" data-tab="programs">{{localize "SR5.Programs"}}</a>
                     <a class="item" data-tab="targets">{{localize "SR5.Labels.ActorSheet.Icons"}}</a>
+                    {{#if markedDocuments}}
                     <a class="item" data-tab="marks">{{localize "SR5.Marks"}}</a>
+                    {{/if}}
+                    {{#if ownedIcons}}
+                    <a class="item" data-tab="owned-devices">{{localize "SR5.Owner"}}</a>
+                    {{/if}}
                 </nav>
-                <div class="scroll-area scroll-area-matrix-hacking">
+                <div class="scroll-area scroll-area-matrix-icons">
                     <section data-group='matrix' class="tabsbody">
                         {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/MarksTab.hbs'}}
                         {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/OwnedIconsTab.hbs'}}
                         {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ProgramListTab.hbs'}}
                     </section>
                 </div>

@@ -37,7 +37,11 @@ export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTe
 
     override _prepareData(data, options?): any {
         data = super._prepareData(data, options);
-        data = MatrixTestDataFlow._prepareOpposedData(data);
+        if (data.against) {
+            data = MatrixTestDataFlow._prepareOpposedData(data);
+        } else {
+            data = MatrixTestDataFlow._prepareData(data);
+        }
 
         data.activeDefense = '';
         data.activeDefenses = {};

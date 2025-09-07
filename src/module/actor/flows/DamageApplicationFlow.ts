@@ -9,6 +9,7 @@ import { ConditionType } from "@/module/types/template/Condition";
 import { CombatRules } from "@/module/rules/CombatRules";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ResonsanceRules } from "@/module/rules/ResonanceRules";
+
 type DamageElement = Item.SystemOfType<'weapon'>['action']['damage']['element']['base'];
 
 export class DamageApplicationFlow {
@@ -85,27 +86,40 @@ export class DamageApplicationFlow {
         const biofeedback = String(applyDamage.data('damageBiofeedback')) as BiofeedbackDamageType;
         const damage = Helpers.createDamageData(value, type, ap, element, biofeedback);
 
-        const targets = Helpers.getSelectedActorsOrCharacter();
+        const targets: (SR5Item | SR5Actor)[] = Helpers.getSelectedActorsOrCharacter();
 
         // Should no selection be available try guessing.
         if (targets.length === 0) {
             const messageId = $(html).data('messageId');
 
             const test = await TestCreator.fromMessage(messageId);
-            if (!test) return
-            await test.populateDocuments();
+            if (test) {
+                await test.populateDocuments();
 
-            // If targeting is available, use that.
-            if (test.hasTargets) {
-                (test.targets as TokenDocument[]).forEach(target => {
-                    targets.push(target.actor as SR5Actor)
-                });
-            }
-            // check if there is an icon, happens with matrix tests
-            else if ((test as any).icon) {
-                targets.push((test as any).icon);
+                // If targeting is available, use that.
+                if (test.hasTargets) {
+                    (test.targets as TokenDocument[]).forEach(target => {
+                        targets.push(target.actor as SR5Actor)
+                    });
+                }
+                // check if there is an icon, happens with matrix tests
+                else if ((test as any).icon) {
+                    targets.push((test as any).icon);
+                } else {
+                    targets.push(test.actor as SR5Actor);
+                }
             } else {
-                targets.push(test.actor as SR5Actor);
+                // didn't make a test, lets see if we can pull the document id for failed attack damage and other similar cases
+                const documentLink = $(html).find('a.chat-document-link');
+                if (documentLink) {
+                    const uuid = $(documentLink).data('uuid');
+                    if (uuid) {
+                        const document = await fromUuid(uuid);
+                        if (document && (document instanceof SR5Actor || document instanceof SR5Item)) {
+                            targets.push(document);
+                        }
+                    }
+                }
             }
         }
 

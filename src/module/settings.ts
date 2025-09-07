@@ -311,22 +311,11 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Override the default matrix actions pack
+     * Override the default IC actions pack
      */
     game.settings.register(SYSTEM_NAME, FLAGS.ICActionsPack, {
         name: 'SR5.CompendiaSettings.ICActionsPack.label',
         hint: 'SR5.CompendiaSettings.ICActionsPack.hint',
-        scope: 'world',
-        config: false,
-        type: String
-    });
-
-    /**
-     * Override the default matrix actions pack
-     */
-    game.settings.register(SYSTEM_NAME, FLAGS.ICActionsPack, {
-        name: 'SETTINGS.ICActionsPackName',
-        hint: 'SETTINGS.ICActionsPackDescription',
         scope: 'world',
         config: false,
         type: String

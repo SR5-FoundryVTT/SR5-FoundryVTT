@@ -46,6 +46,7 @@ import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
+import { PackActionFlow } from '../item/flows/PackActionFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
@@ -264,7 +265,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Prepare simple to use hash maps to retrieve specific items quickly.
-     * 
+     *
      * The typical map would match the item type to their items on this actor.
      */
     prepareItemsForType() {
@@ -477,13 +478,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Given a persona actor, check if this persona is visible to this actor.
-     * 
+     *
      * This can change change based on distance, if the persona is running silent and if it's been found
      * throuhgh matrix perception or other means.
-     * 
+     *
      * TODO: Matrix Perception for silent personas
      * TODO: Visible through marks placed by silent persona on this actor
-     * 
+     *
      * @param persona The persona to check visibility for.
      */
     matrixPersonaIsVisible(persona: SR5Actor) {
@@ -507,7 +508,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // TODO: Compare running silent with tokens that have been percieved through a matrix perception
         // TODO: Compare running silent with tokens that have been found to have placed marks on this actor
-        return !targetMatrixData.running_silent;        
+        return !targetMatrixData.running_silent;
     }
 
     getFullDefenseAttribute(this: SR5Actor): AttributeFieldType | undefined {
@@ -583,10 +584,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // First check vehicle stats, as they don't always exist.
         const stats = rollData.vehicle_stats ?? this.getVehicleStats();
         if (stats?.[name]) return stats[name];
-
-        // Second check matrix attributes
-        const matrixData = rollData.matrix ?? this.matrixData();
-        if (matrixData?.[name]) return matrixData[name];
 
         // Finally, check general attributes.
         const attributes = rollData.attributes ?? this.getAttributes();
@@ -1200,7 +1197,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async rollGeneralAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-            const generalPackName = Helpers.getGeneralActionsPackName();
+        const generalPackName = PackActionFlow.getGeneralActionsPackName();
         return this.rollPackAction(generalPackName, actionName, options);
     }
 
@@ -1792,6 +1789,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async addVehicleDriver(uuid: string) {
         if (!this.isType('vehicle')) return;
+        // don't allow adding yourself
+        if (uuid === this.uuid) {
+            ui.notifications?.warn('SR5.Notifications.VehicleCannotBeOwnDriver');
+            return;
+        }
 
         const driver = await fromUuid(uuid) as SR5Actor;
         if (!driver) return;
@@ -1799,7 +1801,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // NOTE: In THEORY almost all actor types can drive a vehicle.
         // ... drek, in theory a drone could drive another vehicle even...
 
-        await this.update({ system: { driver: driver.id } });
+        await this.update({ system: { driver: driver.uuid } });
     }
 
     async removeVehicleDriver() {
@@ -1813,18 +1815,33 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.system.driver.length > 0;
     }
 
+    /**
+     * Get the Driver of a vehicle (if it is a vehicle)
+     * - TODO this is used to determine ownership of a vehicle, we may want to make an actual ownership field or something in the future
+     */
     getVehicleDriver(): SR5Actor | undefined {
         if (!this.isType('vehicle') || !this.hasDriver()) return;
 
-        const driver = game.actors?.get(this.system.driver) as SR5Actor;
+        const driver = fromUuidSync(this.system.driver);
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
-        if (!driver) return;
+        if (!driver || !(driver instanceof SR5Actor)) return undefined;
         return driver;
     }
 
+    /**
+     * Get the Technomancer that "owns" a sprite
+     * - this is used to determine ownership for technomancers
+     */
+    getTechnomancer(this: SR5Actor): SR5Actor | undefined {
+        if (!this.isType('sprite') || !this.hasTechnomancer()) return undefined;
+        const actor = fromUuidSync(this.system.technomancerUuid);
+        if (actor && actor instanceof SR5Actor) return actor;
+        return undefined;
+    }
+
     getControlRigRating(): number {
-        const matrix = this.matrixData();
-        return matrix?.control_rig_rating ?? 0;
+        if (!this.isType('character')) return 0;
+        return Helpers.calcTotal(this.system.values.control_rig_rating);
     }
 
     /**
@@ -1889,6 +1906,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     async addTechnomancer(actor: SR5Actor) {
         if (!this.isType('sprite') || !actor.isType('character')) return;
             await this.update({ system: { technomancerUuid: actor.uuid } });
+    }
+
+    hasTechnomancer(this: SR5Actor) {
+        return this.isType('sprite') && !!this.system.technomancerUuid;
     }
 
     /**
@@ -1966,6 +1987,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     get wirelessDevices() {
         return this.items.filter(item => item.isMatrixDevice && item.isEquipped() && item.isWireless());
+    }
+
+    get hasWirelessDevices() {
+        return this.wirelessDevices.length > 0;
     }
 
     matrixData(this: SR5Actor) {

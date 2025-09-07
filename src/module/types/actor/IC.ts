@@ -1,11 +1,10 @@
 import { Tracks } from "../template/ConditionMonitors";
-import { AttributeField, Attributes } from "../template/Attributes";
+import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 import { ActorBase, CommonData, CreateModifiers } from "./Common";
 import { MatrixAttributes, MatrixData } from "../template/Matrix";
 import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
 import { MatrixLimits } from "../template/Limits";
-import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 // === Main Schema ===
@@ -25,7 +24,7 @@ const ICData = () => ({
     // === Attributes ===
     attributes: new SchemaField({
         ...Attributes(),
-        rating: new ModifiableField(AttributeField()),
+        ...MatrixActorAttributes(),
     }),
     limits: new SchemaField(MatrixLimits()),
 

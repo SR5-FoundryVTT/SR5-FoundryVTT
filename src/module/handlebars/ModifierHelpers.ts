@@ -5,6 +5,6 @@ import { ModifiableValueType } from "../types/template/Base"
  */
 export const registerModifierHelpers = () => {
     Handlebars.registerHelper('ModifierMode', (value: ModifiableValueType): 'override' | 'upgrade' | 'downgrade' | null => {
-        return value.mode;
+        return value?.mode ?? null;
     });
 }
