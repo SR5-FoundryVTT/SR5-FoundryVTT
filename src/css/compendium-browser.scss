@@ -239,4 +239,51 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
         font-style: italic;
         background: $bg-primary;
     }
+
+    /* Make the main filter container a flexbox */
+    .compendium-filters {
+        display: flex;
+        align-items: center;
+        gap: 15px; /* Space between checkbox area and search bar */
+        flex-wrap: wrap; /* Allow wrapping on smaller widths */
+    }
+
+    /* Container for the checkboxes */
+    .pack-selection {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap; /* Allow checkboxes to wrap */
+        flex-grow: 1; /* Allow it to take up space */
+    }
+
+    /* Individual checkbox label styling */
+    .pack-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: #252525;
+        border: 1px solid #5a5a5a;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .pack-checkbox:hover {
+        background: #3a3a3a;
+        border-color: #888;
+    }
+
+    /* Style for the actual checkbox */
+    .pack-checkbox input {
+        accent-color: #ffd700; /* Gold color for the checkmark */
+    }
+
+    /* Make the search bar take up remaining space but have a minimum size */
+    .search-bar {
+        flex-grow: 2; /* Take more space than the checkbox container */
+        min-width: 250px; /* Ensure it doesn't get too small */
+    }
 }

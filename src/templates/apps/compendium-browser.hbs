@@ -1,41 +1,67 @@
 <div class="sr5-compendium-browser">
-  <div class="compendium-filters">
-    <div class="search-bar">
-      <i class="search-icon fa-solid fa-magnifying-glass"></i>
-      <input type="text" placeholder="Search by name...">
-      <i class="clear-filter fa-solid fa-xmark"></i>
+    {{!-- 1. Filter Bar with Pack Checkboxes and Search Input --}}
+    <div class="compendium-filters">
+        <div class="pack-selection">
+            {{#each packs as |pack|}}
+            <label class="pack-checkbox">
+                <input 
+                    type="checkbox" 
+                    {{#if pack.isChecked}}checked{{/if}} 
+                    data-action="togglePack" 
+                    data-pack-id="{{pack.id}}">
+                <span>{{pack.label}}</span>
+            </label>
+            {{/each}}
+        </div>
+        <div class="search-bar">
+            <i class="search-icon fa-solid fa-magnifying-glass"></i>
+            <input 
+              type="text" 
+              name="search" 
+              id="compendium-browser-search"
+              value="{{searchQuery}}" 
+              placeholder="Search across selected packs...">
+            {{#if searchQuery}}
+            <a class="clear-filter" data-action="clearSearch" title="Clear Search">
+                <i class="fa-solid fa-xmark"></i>
+            </a>
+            {{/if}}
+        </div>
     </div>
-  </div>
 
-  <div class="compendium-results">
-    <div class="results-header">
-      <h2>Results</h2>
-      <div class="header-source">SOURCE</div>
-    </div>
-    <div class="compendium-list">
-      {{#if entries.length}}
-        {{#each entries as |entry id|}}
-          <div class="compendium-entry" data-uuid="{{entry.uuid}}" draggable="true">
-            <div class="result-row">
-              <div class="item-main" data-action="openDoc">
-                <div class="item-image">
-                  <img src="{{entry.img}}" alt="{{entry.name}}" loading="lazy">
+    {{!-- 2. Content Area - Reverted to the original vertical list structure --}}
+    <div class="compendium-results">
+        <div class="results-header">
+            <h2>Results</h2>
+            <div class="header-source">SOURCE</div>
+        </div>
+        <div class="compendium-list">
+            {{#if entries.length}}
+                {{#each entries as |entry|}}
+                    <div class="compendium-entry" data-uuid="{{entry.uuid}}" draggable="true">
+                        <div class="result-row">
+                            <div class="item-image">
+                                <img src="{{entry.img}}" alt="{{entry.name}}" loading="lazy">
+                            </div>
+                            <div class="item-details">
+                                <h3>{{entry.name}}</h3>
+                                {{#if entry.type}}
+                                <div class="item-type">{{entry.type}}</div>
+                                {{/if}}
+                            </div>
+                            <div class="item-meta">
+                                {{#if entry.system.description.source}}
+                                    <span class="item-source">{{entry.system.description.source}}</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            {{else}}
+                <div class="no-results">
+                    No documents found. Select a compendium pack or adjust your search.
                 </div>
-                <div class="item-details">
-                  <h3>{{entry.name}}</h3>
-                  <div class="item-type">{{entry.type}}</div>
-                </div>
-              </div>
-
-              <div class="item-meta" data-action="openSource">
-                <span class="item-source">{{entry.system.description.source}}</span>
-              </div>
-            </div>
-          </div>
-        {{/each}}
-      {{else}}
-        <div class="no-results">No items found. Try adjusting your filters.</div>
-      {{/if}}
+            {{/if}}
+        </div>
     </div>
-  </div>
 </div>
