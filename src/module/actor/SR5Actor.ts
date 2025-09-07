@@ -1789,6 +1789,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async addVehicleDriver(uuid: string) {
         if (!this.isType('vehicle')) return;
+        // don't allow adding yourself
+        if (uuid === this.uuid) {
+            ui.notifications?.warn('SR5.Notifications.VehicleCannotBeOwnDriver');
+            return;
+        }
 
         const driver = await fromUuid(uuid) as SR5Actor;
         if (!driver) return;
@@ -1796,7 +1801,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // NOTE: In THEORY almost all actor types can drive a vehicle.
         // ... drek, in theory a drone could drive another vehicle even...
 
-        await this.update({ system: { driver: driver.id } });
+        await this.update({ system: { driver: driver.uuid } });
     }
 
     async removeVehicleDriver() {
@@ -1810,18 +1815,33 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.system.driver.length > 0;
     }
 
+    /**
+     * Get the Driver of a vehicle (if it is a vehicle)
+     * - TODO this is used to determine ownership of a vehicle, we may want to make an actual ownership field or something in the future
+     */
     getVehicleDriver(): SR5Actor | undefined {
         if (!this.isType('vehicle') || !this.hasDriver()) return;
 
-        const driver = game.actors?.get(this.system.driver) as SR5Actor;
+        const driver = fromUuidSync(this.system.driver);
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
-        if (!driver) return;
+        if (!driver || !(driver instanceof SR5Actor)) return undefined;
         return driver;
     }
 
+    /**
+     * Get the Technomancer that "owns" a sprite
+     * - this is used to determine ownership for technomancers
+     */
+    getTechnomancer(this: SR5Actor): SR5Actor | undefined {
+        if (!this.isType('sprite') || !this.hasTechnomancer()) return undefined;
+        const actor = fromUuidSync(this.system.technomancerUuid);
+        if (actor && actor instanceof SR5Actor) return actor;
+        return undefined;
+    }
+
     getControlRigRating(): number {
-        const matrix = this.matrixData();
-        return matrix?.control_rig_rating ?? 0;
+        if (!this.isType('character')) return 0;
+        return Helpers.calcTotal(this.system.values.control_rig_rating);
     }
 
     /**
@@ -1886,6 +1906,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     async addTechnomancer(actor: SR5Actor) {
         if (!this.isType('sprite') || !actor.isType('character')) return;
             await this.update({ system: { technomancerUuid: actor.uuid } });
+    }
+
+    hasTechnomancer(this: SR5Actor) {
+        return this.isType('sprite') && !!this.system.technomancerUuid;
     }
 
     /**
@@ -1963,6 +1987,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     get wirelessDevices() {
         return this.items.filter(item => item.isMatrixDevice && item.isEquipped() && item.isWireless());
+    }
+
+    get hasWirelessDevices() {
+        return this.wirelessDevices.length > 0;
     }
 
     matrixData(this: SR5Actor) {

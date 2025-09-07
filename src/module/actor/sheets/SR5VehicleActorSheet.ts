@@ -77,6 +77,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
 
         // Vehicle Sheet related handlers...
         html.find('.driver-remove').on('click', this._handleRemoveVehicleDriver.bind(this));
+        html.find('.driver-pick').on('click', this._handlePickDriver.bind(this));
 
         // PAN/WAN
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
@@ -140,6 +141,18 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
         } else {
             ui.notifications.error("No Driver found")
         }
+    }
+
+    async _handlePickDriver(event) {
+        event.preventDefault();
+        const actors = Helpers.getControlledTokenActors();
+        if (actors.length > 0) {
+            // pick the first controlled actor
+            const actor = actors[0];
+            await this.actor.addVehicleDriver(actor.uuid);
+            this.render();
+        }
+
     }
 
     async _handleRemoveVehicleDriver(event) {

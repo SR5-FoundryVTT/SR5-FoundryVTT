@@ -32,7 +32,9 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
                     hot_sim: true,
                     vr: true,
                     running_silent: false,
-                    control_rig_rating: 3,
+                },
+                values: {
+                    control_rig_rating: { base: 3 },
                 }
             }
         });
@@ -61,8 +63,8 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_pilot_vehicle', vehicle, testOptions);
             assert.notEqual(test, undefined);
             await test!.execute();
-            // dicepool should be Intuition + Pilot + Hot Sim
-            assert.equal(test!.pool.value, 12);
+            // dicepool should be Intuition + Pilot + Hot Sim + Control Rig
+            assert.equal(test!.pool.value, 15);
             // limit should be Control Rig + Handling/Speed
             assert.equal(test!.limit.value, 6);
         });
@@ -75,8 +77,9 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_perception', vehicle, testOptions);
             assert.notEqual(test, undefined);
             await test!.execute();
-            // dicepool should be Intuition + Pilot + Hot Sim
-            assert.equal(test!.pool.value, 11);
+            // dicepool should be Intuition + Pilot + Hot Sim + Control Rig
+            // SR5 266 VR and Rigging -- I'm interpreting that to mean Sensor tests are Vehicle Tests
+            assert.equal(test!.pool.value, 14);
             // limit should be Sensor + Control Rig
             assert.equal(test!.limit.value, 7);
         });

@@ -1,4 +1,4 @@
-import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData, ActorBase } from "./Common";
+import { CommonData, CharacterLimits, CreateModifiers, MagicData, ActorBase, CharacterValues, } from "./Common";
 import { Attributes, AttributeField, MatrixActorAttributes } from '../template/Attributes';
 import { ModifiableValue, ValueMaxPair } from "../template/Base";
 import { Tracks } from "../template/ConditionMonitors";
@@ -36,7 +36,7 @@ const CharacterData = () => ({
     // === Combat ===
     armor: new ModifiableField(ActorArmorData()),
     initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
-    values: new SchemaField(PhysicalCombatValues()),
+    values: new SchemaField(CharacterValues()),
     wounds: new ModifiableField(ModifiableValue()),
 
     visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),

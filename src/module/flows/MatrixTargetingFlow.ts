@@ -1,6 +1,9 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { Helpers } from "../helpers";
 import { MatrixNetworkFlow } from "../item/flows/MatrixNetworkFlow";
+import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
+import { SR5Item } from '@/module/item/SR5Item';
+import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 
 /**
  * Handles targeting in the matrix.
@@ -59,6 +62,70 @@ export const MatrixTargetingFlow = {
                 icons: []
             });
         }
+
+        return targets;
+    },
+
+    /**
+     * Prepare a list of Matrix Targets that are all Owned Icons
+     * This is unrelated to the PAN -- this is based on whether the actor "owns" the item in terms of Shadowrun ownership
+     * @param actor
+     */
+    prepareOwnIcons(actor: SR5Actor): MatrixTargetDocument[] {
+        const targets: MatrixTargetDocument[] = [];
+
+        // gather all actors and find the actors that we have ownership of (shadowrun character ownership, not Foundry Player ownership)
+        const actors: SR5Actor[] =  game.actors.filter((a) => {
+            // we don't want to include our own persona in this list
+            if (a === actor) return false;
+            return a instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, a) && !a.getToken();
+        }) as SR5Actor[];
+
+        for (const slave of actors) {
+            const type = MatrixNetworkFlow.getDocumentType(slave);
+            const name = slave.getToken()?.name ?? slave.name;
+            targets.push({
+                name,
+                document: slave,
+                token: null,
+                runningSilent: slave.isRunningSilent(),
+                network: this._getNetworkName(slave.network),
+                type,
+                icons: []
+            })
+        }
+        if (canvas.scene?.tokens) {
+            // go through the canvas tokens and see if we own any of them
+            for (const token of canvas.scene.tokens) {
+                if (!token.actor) continue;
+                // again don't add ourselves, we do that later
+                if (token.actor.uuid === actor.uuid) continue;
+                if (token.actor instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, token.actor)) {
+                    const type = MatrixNetworkFlow.getDocumentType(token.actor);
+                    targets.push({
+                        name: token.name,
+                        document: token.actor,
+                        token,
+                        runningSilent: token.actor.isRunningSilent(),
+                        network: this._getNetworkName(token.actor.network),
+                        type,
+                        icons: []
+                    })
+                }
+            }
+        }
+        // add ourselves to the front so that our own Persona sits at the top
+        const type = MatrixNetworkFlow.getDocumentType(actor);
+        targets.unshift({
+            name: actor.getToken()?.name ?? actor.name,
+            document: actor,
+            token: actor.getToken(),
+            runningSilent: actor.isRunningSilent(),
+            network: this._getNetworkName(actor.network),
+            type,
+            icons: []
+
+        })
 
         return targets;
     },
@@ -150,7 +217,6 @@ export const MatrixTargetingFlow = {
         const connectedIcons: Shadowrun.MarkedDocument[] = [];
 
         // Only persona icons should show connected icons.
-        // TODO: Don´t show this for IC, Spirits, Sprite
         if (!(document instanceof SR5Actor)) return connectedIcons;
 
         const personaDevice = document.getMatrixDevice();
@@ -163,7 +229,7 @@ export const MatrixTargetingFlow = {
                 document: device,
                 token: null,
                 runningSilent: device.isRunningSilent(),
-                network: document.network?.name ?? '',
+                network: this._getNetworkName(device.master),
                 type: MatrixNetworkFlow.getDocumentType(device),
                 icons: [],
                 marks: 0,
@@ -173,4 +239,24 @@ export const MatrixTargetingFlow = {
 
         return connectedIcons;
     },
+
+    /**
+     * Get the best name for a network for display purposes
+     * - if the network is a host or grid, use its name
+     * - if the network is a device, use the name of the actor it represents
+     * @param master
+     */
+    _getNetworkName(master: SR5Item | null | undefined) {
+        if (master) {
+            if (master.isType('host', 'grid')) {
+                return master.name;
+            }
+
+            if (master.isType('device') && master.persona) {
+                const actor = master.persona;
+                return actor.getToken()?.name ?? actor.name;
+            }
+        }
+        return '';
+    }
 }

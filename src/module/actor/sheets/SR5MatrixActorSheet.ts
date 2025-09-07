@@ -4,11 +4,13 @@ import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
 import { SR5Actor } from '../SR5Actor';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
 import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
+
+import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
@@ -23,6 +25,8 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     matrixTargets: Shadowrun.MatrixTargetDocument[];
     // the master device being used to connect to the matrix
     matrixDevice: SR5Item | undefined;
+    // Matrix ICONs that are owned by this actor
+    ownedIcons: MatrixTargetDocument[];
 }
 
 export class SR5MatrixActorSheet extends SR5BaseActorSheet {
@@ -55,6 +59,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         data.matrixActions = await this._prepareMatrixActions();
 
         this._prepareMatrixTargets(data);
+        this._prepareOwnedIcons(data);
         await this._prepareMarkedDocuments(data);
         this._prepareMatrixDevice(data);
 
@@ -69,12 +74,27 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         data.matrixDevice = this.actor?.getMatrixDevice();
     }
 
+    _prepareOwnedIcons(data: MatrixActorSheetData) {
+        // When target overview is shown, collect all matrix targets.
+        const targets = MatrixTargetingFlow.prepareOwnIcons(this.actor);
+
+        this._prepareSelectedMatrixTargets(targets);
+
+        data.ownedIcons = targets;
+    }
+
     _prepareMatrixTargets(data: MatrixActorSheetData) {
         data.selectedMatrixTarget = this.selectedMatrixTarget;
 
         // When target overview is shown, collect all matrix targets.
         const {targets} = MatrixTargetingFlow.getTargets(this.actor);
 
+        this._prepareSelectedMatrixTargets(targets);
+
+        data.matrixTargets = targets;
+    }
+
+    _prepareSelectedMatrixTargets(targets: MatrixTargetDocument[]) {
         for (const target of targets) {
             // Collect connected icons, if user wants to see them.
             if (this._connectedIconsOpenClose[target.document.uuid]) {
@@ -89,8 +109,6 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
             // Mark target as selected.
             target.selected = this.selectedMatrixTarget === target.document.uuid;
         }
-
-        data.matrixTargets = targets;
     }
 
     async _prepareMarkedDocuments(data: MatrixActorSheetData) {
@@ -120,6 +138,43 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
         html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
+        html.find('.toggle-owned-icon-silent').on('click', this._onOwnedIconRunningSilentToggle.bind(this));
+    }
+
+    async _onOwnedIconRunningSilentToggle(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const iid = Helpers.listItemUuid(event);
+        const document = await fromUuid(iid);
+        if (!document) return;
+
+        if (document instanceof SR5Actor) {
+            // if the actor has a matrix device, change the wireless state there
+            const device = document.getMatrixDevice();
+            if (device) {
+                // iterate through the states of online -> silent -> online
+                const newState =  device.isRunningSilent() ? 'online' : 'silent';
+                await this.actor.updateEmbeddedDocuments('Item', [
+                    {
+                        '_id': device._id,
+                        system: { technology: { wireless: newState } }
+                    }
+                ])
+            } else {
+                // update the embedded item with the new wireless state
+                await document.update({
+                    system: { matrix: { running_silent: !document.isRunningSilent() } },
+                });
+                this.render();
+            }
+        } else if (document instanceof SR5Item) {
+            // iterate through the states of online -> silent -> online
+            const newState =  document.isRunningSilent() ? 'online' : 'silent';
+            // update the embedded item with the new wireless state
+            await document.update({ system: { technology: { wireless: newState } } });
+            this.render();
+        }
     }
 
     /**
@@ -246,7 +301,8 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
             actions = actions.filter(action => {
                 const {marks, owner} = action.system.action.category.matrix
                 if (owner) return ownedItem;
-                return marks <= marksPlaced;
+                // you can do actions that require marks on your own devices
+                return ownedItem || marks <= marksPlaced;
             });
         }
 

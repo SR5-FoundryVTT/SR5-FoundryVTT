@@ -1128,8 +1128,11 @@ export const registerItemLineHelpers = () => {
             };
 
         const icons: any = [];
-        if (target.document instanceof SR5Actor) icons.push(toggleConnectedItemsIcon);
-        return icons; 
+        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices) icons.push(toggleConnectedItemsIcon);
+
+        // if there are no icons, add an empty object to the list so that the columns match up correctly
+        if (icons.length === 0) icons.push({});
+        return icons;
     });
     Handlebars.registerHelper('MatrixTargetItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {
         return [
@@ -1174,7 +1177,7 @@ export const registerItemLineHelpers = () => {
 
         // Handle document type specific icons.
         if (target.document instanceof SR5Item && target.document.isNetwork()) icons.unshift(connectNetworkIcon);
-        if (target.document instanceof SR5Actor && target.document.hasPersona) icons.push(toggleConnectedItemsIcon)
+        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices) icons.push(toggleConnectedItemsIcon)
 
         return icons;
     });
@@ -1202,5 +1205,48 @@ export const registerItemLineHelpers = () => {
      */
     Handlebars.registerHelper('SpritePowerItemData', (optional: string) => {
         return {optional};
+    });
+
+    /**
+     * Return list of css classes to be used in the list of matrix targets.
+     * @param target The matrix target to render.
+     */
+    Handlebars.registerHelper('MatrixOwnedItemIcons', (target: Shadowrun.MatrixTargetDocument) => {
+        const toggleConnectedItemsIcon = target.icons.length > 0 ?
+            {
+                icon: 'fas fa-square-chevron-down',
+                cssClass: 'toggle-connected-matrix-icons'
+            }:
+            {
+                icon: 'fas fa-square-chevron-up',
+                cssClass: 'toggle-connected-matrix-icons'
+            };
+
+        const wirelessIcon = {
+            cssClass: 'toggle-owned-icon-silent',
+            icon: `${target.document.isRunningSilent()
+                    ? 'fa-duotone fa-wifi-fair'
+                    : 'fas fa-wifi'
+            }`,
+            title: game.i18n.localize(
+                target.document.isRunningSilent()
+                    ? 'SR5.RunningSilent'
+                    : 'SR5.WirelessOnline')
+        }
+        if (target.document instanceof SR5Actor) {
+            return target.document.hasWirelessDevices ? [wirelessIcon, toggleConnectedItemsIcon] : [wirelessIcon];
+        }
+        return [wirelessIcon];
+    });
+
+    Handlebars.registerHelper('MatrixOwnedItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {
+        return [
+            {text: {
+                    text: game.i18n.localize(target.type)
+                }},
+            {text: {
+                    text: target.network
+                }},
+        ];
     });
 };
