@@ -1,14 +1,14 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { ArmorValueData } from "./Armor";
-import { ActionRollData } from "./Action";
-import { TechnologyData } from "../template/Technology";
-const { SchemaField, NumberField, StringField } = foundry.data.fields;
+import { ArmorPartData } from "./Armor";
+import { ActionPartData } from "./Action";
+import { TechnologyPartData } from "../template/Technology";
+const { NumberField, StringField } = foundry.data.fields;
 
 const BiowareData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData()),
-    armor: new SchemaField(ArmorValueData()),
-    technology: new SchemaField(TechnologyData()),
+    ...ActionPartData(),
+    ...TechnologyPartData(),
+    ...ArmorPartData(),
 
     essence: new NumberField({ required: true, nullable: false, initial: 0 }),
     capacity: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),

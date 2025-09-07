@@ -1,16 +1,15 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { ActionRollData } from "./Action";
-const { SchemaField, StringField } = foundry.data.fields;
+import { ActionPartData } from "./Action";
+const { StringField } = foundry.data.fields;
 
 const RitualData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(
-        ActionRollData({
-            test: 'RitualSpellcastingTest',
-            opposedTest: 'OpposedRitualTest',
-            followedTest: 'DrainTest'
-        }),
-    ),
+    ...ActionPartData({
+        type: 'complex',
+        test: 'RitualSpellcastingTest',
+        opposedTest: 'OpposedRitualTest',
+        followedTest: 'DrainTest'
+    }),
 
     type: new StringField({ required: true }),
     descriptors: new StringField({ required: true }),

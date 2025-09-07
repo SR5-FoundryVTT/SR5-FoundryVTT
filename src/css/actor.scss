@@ -213,7 +213,36 @@
         overflow: auto;
     }
 
-        &.sheet.window-app {
+    // Intended to be used in the matrix tab and hacking subtab for all columns.
+    .scroll-area-matrix-hacking {
+        // I hate this. It's necessary to make the scrollbar work together with .scroll-area
+        // Otherweise the height will grow out of the application bounds hide the overflow...
+        height: 400px;
+    }
+
+    // Intended to be used in the matrix tab > icons/programs/marks subtab.
+    .scroll-area-matrix-icons {
+        // I hate this. It's necessary to make the scrollbar work together with .scroll-area
+        // Otherweise the height will grow out of the application bounds hide the overflow...
+        height: 330px;
+    }
+
+    // Use only to indicate interactibility within the HackingTab markslist.
+    .select-matrix-target {
+        @include clickable;
+    }
+
+    // Use only to indicate interactibility within the HackingTab markslist.
+    .open-matrix-target {
+        @include clickable;
+    }
+
+    // Used to switch between the different hacking targets.
+    .switch-matrix-hacking-target {
+        @include clickable;
+    }
+
+    &.sheet.window-app {
         box-shadow: 0 0 10px 0px rgba(235,181,49,0.3);
 
         & .window-header {

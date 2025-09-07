@@ -4,6 +4,7 @@ import { SR5Actor } from "src/module/actor/SR5Actor.js";
 import { ActorFile } from "../ActorSchema.js";
 import { importOptionsType } from "../characterImporter/CharacterImporter.js";
 import { getArray } from "../itemImporter/importHelper/BaseParserFunctions.js";
+import { Sanitizer } from "@/module/sanitizer/Sanitizer.js";
 
 
 /**
@@ -37,28 +38,35 @@ export class SpiritImporter {
 
         const chummerCharacter = getArray(chummerFile.characters.character)[0];
         const infoUpdater = new SpiritInfoUpdater();
-        const updatedActorData = infoUpdater.update(actor, chummerCharacter);
-        const items = new ItemsParser().parse(chummerCharacter, importOptions);
+        const updatedActorData = await infoUpdater.update(actor, chummerCharacter);
+        const items = await new ItemsParser().parse(chummerCharacter, importOptions);
 
-        await actor.update(await updatedActorData as any);
-        await actor.createEmbeddedDocuments('Item', await items);
+        const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.spirit.schema, updatedActorData.system);
+        if (consoleLogs) {
+            console.warn(`Document Sanitized on Import; Name: ${chummerCharacter.name}\n`);
+            console.table(consoleLogs);
+        }
+
+        await actor.update(updatedActorData as any);
+        await actor.createEmbeddedDocuments('Item', items);
     }
 
     async resetCharacter(actor: SR5Actor<'spirit'>) {
         const toDeleteItems = actor.items?.filter(item => item.type !== "action").map(item => item.id) as string[];
-        const deletedItems = actor.deleteEmbeddedDocuments("Item", toDeleteItems );
+        await actor.deleteEmbeddedDocuments("Item", toDeleteItems);
 
-        const removed = {
-            'system.skills.language.-=value' : null,
-            'system.skills.knowledge.academic.-=value' : null,
-            'system.skills.knowledge.interests.-=value' : null,
-            'system.skills.knowledge.professional.-=value' : null,
-            'system.skills.knowledge.street.-=value' : null
-        }
-        const removeSkills = actor.update(removed as any)
-
-        //await as late as possible to save time
-        await deletedItems
-        await removeSkills
+        await actor.update({
+            system: {
+                skills: {
+                    language: { value: {} },
+                    knowledge: {
+                        academic: { value: {} },
+                        interests: { value: {} },
+                        professional: { value: {} },
+                        street: { value: {} }
+                    }
+                }
+            }
+        });
     }
 }

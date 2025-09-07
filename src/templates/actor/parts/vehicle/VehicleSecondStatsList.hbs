@@ -9,7 +9,13 @@
         </a>
         <a class="close driver-remove"><i class="fas fa-times"></i></a>
         {{else}}
-        {{localize "SR5.Vehicle.MissingDriver"}}
+        <a class="driver-pick" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsDriver">
+            {{localize "SR5.Vehicle.MissingDriver"}}
+            <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
+                <i class="fa-light fa-square-dashed fa-stack-2x"></i>
+                <i class="fas fa-user fa-stack-1x"></i>
+            </span>
+        </a>
         {{/if}}
     </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
@@ -50,11 +56,18 @@
     <input type="checkbox" class="checkbox" name="system.isOffRoad" {{checked system.isOffRoad}} />
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Labels.Sheet.PAN") }}
-    {{#if vehicle.networkController}}
+    {{#if vehicle.master}}
     <span>
-        <a class="origin-link" draggable="false" data-origin-link="{{vehicle.networkController.uuid}}">{{vehicle.networkController.name}}</a>
+        <a class="origin-link" draggable="false" data-origin-link="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
         <a class="close controller-remove"><i class="fas fa-times"></i></a>
     </span>
+    {{else}}
+    {{#if vehicle.driver}}
+        <a class="connect-to-driver">
+            {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
+            <i class="fas fa-network-wired"></i>
+        </a>
+    {{/if}}
     {{/if}}
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
 

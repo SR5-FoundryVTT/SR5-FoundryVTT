@@ -1,7 +1,9 @@
 import { ModifiableValue } from "./Base";
 import { ConditionData } from "./Condition";
+import { MatrixMasterData } from "./MatrixNetwork";
+import { TechnologyAttributes } from "./Attributes";
 import { ModifiableField } from "../fields/ModifiableField";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField } = foundry.data.fields;
 
 export const TechnologyData = () => ({
     // === Basic Info ===
@@ -16,8 +18,12 @@ export const TechnologyData = () => ({
     condition_monitor: new SchemaField(ConditionData()),
 
     // === Wireless & Networking ===
-    wireless: new BooleanField({ required: true, initial: true }),
-    networkController: new StringField({ required: false }),
+    wireless: new StringField({
+        required: true,
+        initial: 'none',
+        choices: ['online', 'silent', 'offline', 'none'],
+    }),
+    master: new DocumentUUIDField({ blank: true, required: true, nullable: false }),
 
     // === Calculated Values ===
     calculated: new SchemaField({
@@ -34,6 +40,12 @@ export const TechnologyData = () => ({
             adjusted: new BooleanField({ initial: false }),
         }),
     }),
+});
+
+export const TechnologyPartData = () => ({
+    technology: new SchemaField(TechnologyData()),
+    attributes: new SchemaField(TechnologyAttributes()),
+    matrix: new SchemaField(MatrixMasterData())
 });
 
 export type TechnologyType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof TechnologyData>>;

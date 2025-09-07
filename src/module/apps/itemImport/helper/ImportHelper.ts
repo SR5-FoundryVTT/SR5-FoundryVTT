@@ -58,10 +58,10 @@ export class ImportHelper {
         type ItemType = CompendiumCollection<'Actor' | 'Item'>;
         const pack = game.packs?.get(Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[compKey]].pack) as ItemType;
 
-        return await pack.getDocuments({
+        return pack.getDocuments({
             name__in: this.getArray(name),
             ...(types ? { type__in: this.getArray(types) } : {})
-        }) as SR5Item[];
+        }) as Promise<SR5Item[]>;
     }
 
     /**

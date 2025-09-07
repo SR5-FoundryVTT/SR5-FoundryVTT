@@ -18,7 +18,7 @@ export interface TestDialogData extends FormDialogData {
 export interface TestDialogListener {
     query: string
     on: string
-    callback: (event: JQuery<HTMLElement>, dialog: TestDialog) => void
+    callback: (event: any, dialog: TestDialog) => void
 }
 
 /**
@@ -117,8 +117,8 @@ export class TestDialog extends FormDialog {
      * Callback for after the dialog has closed.
      * @param html
      */
-    override onAfterClose(html: JQuery<HTMLElement>): SuccessTestData {
-        return this.data.test.data;
+    override async onAfterClose(html: JQuery<HTMLElement>, buttonSelected?: string): Promise<SuccessTestData> {
+        return Promise.resolve(this.data.test.data);
     }
 
     /**
@@ -138,13 +138,12 @@ export class TestDialog extends FormDialog {
             if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
 
             // Remove from further automatic data merging.
-            delete data[key]
+            delete data[key];
 
             // Don't apply an unneeded override.
             if (valueField.value === value) return;
 
             if (value === null || value === '')
-                // @ts-expect-error fvtt-types don't know about the null somehow
                 valueField.override = null;
             else
                 valueField.override = { name: 'SR5.ManualOverride', value: Number(value) };

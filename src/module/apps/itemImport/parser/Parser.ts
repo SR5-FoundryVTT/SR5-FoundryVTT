@@ -21,6 +21,7 @@ import { Accessory, Weapon } from "../schema/WeaponsSchema";
 
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
+import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 
 export type ParseData =
     Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
@@ -33,12 +34,29 @@ export abstract class Parser<SubType extends SystemEntityType> {
     protected folders: Record<string, Promise<Folder>> = {};
 
     private isActor(): this is Parser<SystemEntityType & Actor.SubType> {
-        return Object.keys(game.model.Actor).includes(this.parseType);
+        return Object.keys(CONFIG.Actor.dataModels).includes(this.parseType);
     }
 
     protected abstract getFolder(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Folder>;
     protected async getItems(jsonData: ParseData): Promise<Item.Source[]> { return []; }
     protected getSystem(jsonData: ParseData) { return this.getBaseSystem(); }
+
+    private getSanitizedSystem(jsonData: ParseData) {
+        const system = this.getSystem(jsonData);
+        const schema = CONFIG[this.isActor() ? "Actor" : "Item"].dataModels[this.parseType].schema;
+        const correctionLogs = Sanitizer.sanitize(schema, system);
+
+        if (correctionLogs) {
+            console.warn(
+                `Document Sanitized on Import:\n` +
+                `Name: ${jsonData.name._TEXT};\n` +
+                `Type: ${this.isActor() ? "Actor" : "Item"}; SubType: ${this.parseType};\n`
+            );
+            console.table(correctionLogs);
+        }
+
+        return system;
+    }
 
     public async Parse(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Actor.CreateData | Item.CreateData> {
         const itemPromise = this.getItems(jsonData);
@@ -52,7 +70,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
             name: TH.getTranslation(name, options),
             type: this.parseType as any,
             folder: (await this.getFolder(jsonData, compendiumKey)).id,
-            system: this.getSystem(jsonData),
+            system: this.getSanitizedSystem(jsonData),
         } satisfies Actor.CreateData | Item.CreateData;
 
         const system = entity.system;

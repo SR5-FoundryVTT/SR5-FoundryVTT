@@ -2,30 +2,31 @@
     <div class="card-title card-header">
         <span class="test-name">{{localize title}}</span>
     </div>
-    {{#if speaker.actor}}
     <div class="card-title card-header">
         <div class="container container--fluid">
+            {{#if speaker.source}}
             <div class="container__row">
                 <div class="container__col">
                     <div class="document">
-                        <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speakerImg speaker.actor}}" class="entity-selectable" data-tooltip="{{speakerName speaker.actor}}"/></a>
-                            <h3 class="header-name"><a class="chat-document-link" data-uuid="{{speaker.actor.uuid}}">{{speakerName speaker.actor}}</a></h3>
+                        {{!-- TODO: token id handling, why not uuid? ??? --}}
+                        <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speakerImg speaker.source}}" class="entity-selectable" data-tooltip="{{speakerName speaker.source}}"/></a>
+                            <h3 class="header-name"><a class="chat-document-link" data-uuid="{{speaker.source.uuid}}">{{speakerName speaker.source}}</a></h3>
                     </div>
                 </div>
             </div>
+            {{/if}}
             {{#if item}}
             <div class="container__row">
                 <div class="container__col">
                     <div class="document">
                         <img src="{{item.img}}" data-tooltip="{{item.name}}"/>
-                        <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{item.name}}</a></h3>
+                        <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{localizeContent item.name}}</a></h3>
                     </div>
                 </div>
             </div>
             {{/if}}
         </div>
     </div>
-    {{/if}}
     <div class="card-main-content">
         {{#if test.hasAction}}
         <div class="card-content {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
@@ -145,8 +146,8 @@
             <div class="container__row">
                 <div class="container__col">
                     <div class="document">
-                        <a class="chat-select-link" data-token-id="{{this.id}}"><img src="{{speakerImg this.actor}}" class="entity-selectable" data-tooltip="SR5.Labels.Message.ClickToSelect"/></a>
-                         <h3 class="header-name"><a class="chat-document-link" data-uuid="{{this.uuid}}">{{speakerName this.actor}}</a></h3>
+                        <a class="chat-select-link" data-token-id="{{this.id}}"><img src="{{speakerImg this}}" class="entity-selectable" data-tooltip="SR5.Labels.Message.ClickToSelect"/></a>
+                         <h3 class="header-name"><a class="chat-document-link" data-uuid="{{this.uuid}}">{{speakerName this}}</a></h3>
                     </div>
                 </div>
             </div>
@@ -158,7 +159,7 @@
     <div class="card-buttons">
         {{#each opposedActions}}
         <div class="button opposed-action" data-action="{{this.test}}">
-            {{localize this.label}}
+            {{localize this.label}} {{#if ../test.data.opposed.mod}}{{../test.data.opposed.mod}}{{/if}}
         </div>
         {{/each}}
     </div>
@@ -172,11 +173,19 @@
         {{/each}}
     </div>
     {{/if}}
+    {{#if resistActions}}
+    <div class="card-buttons">
+        {{#each resistActions}}
+        <div class="button resist-action" data-action="{{this.test}}">
+            {{localize this.label}}
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
     {{#if resultActions}}
     <div class="card-content">
         <div class="left-side">
             {{#each resultActions}}
-            {{log this}}
             <div class="test-value">
                 <span class="value">{{localize this.label}}: </span>
                 <span class="value-result">

@@ -20,6 +20,8 @@ import { InventoryType } from 'src/module/types/actor/Common';
 import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import { DescriptionType } from 'src/module/types/template/Description';
 import { ChatData } from 'src/module/item/ChatData';
+import { ActorMarksFlow } from '../flows/ActorMarksFlow';
+import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -121,7 +123,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
     _scroll!: string;
+    // Indicate if specific sections on sheet should be opened or closed.
     _inventoryOpenClose: Record<string, boolean> = {};
+    _connectedIconsOpenClose: Record<string, boolean> = {};
 
     // Store the currently selected inventory.
     selectedInventory: string;
@@ -179,11 +183,11 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             height: 690,
             tabs: [
                 {
-                    navSelector: '.tabs',
-                    contentSelector: '.sheetbody',
+                    navSelector: '.tabs[data-group="primary"]',
+                    contentSelector: '.tabsbody[data-group="primary"]',
                     initial: 'skills',
                 },
-            ],
+            ] as {navSelector: string, contentSelector: string, initial: string}[],
         });
     }
 
@@ -213,6 +217,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
         const data = super.getData() as any;
         data.system = this.actor.toObject(false).system;
+        data.user = game.user;
 
         // Sheet related general purpose fields. These aren't persistent.
         data.config = SR5;
@@ -233,7 +238,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
+        data.hasActions = this._prepareHasActions(data);
         data.selectedInventory = this.selectedInventory;
+        data.program_count = this._prepareProgramCount(data.itemType);
 
         data.situationModifiers = this._prepareSituationModifiers();
 
@@ -247,6 +254,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             });
 
         data.bindings = this._prepareKeybindings();
+
+        data.initiativePerception = this._prepareInitiativePerception();
 
         return data;
     }
@@ -274,6 +283,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
         html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
         html.find('.item-enable-toggle').on('click', this._onListItemToggleEnabled.bind(this));
+        html.find('.item-wireless-toggle').on('click', this._onListItemToggleWireless.bind(this));
 
         // Item list description display handling...
         html.find('.hidden').hide();
@@ -307,6 +317,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
+        html.find('.marks-connect-network').on('click', this._onMarksConnectToNetwork.bind(this));
+        html.find('.marks-place-mark').on('click', this._onMarksPlaceMark.bind(this));
+        html.find('.disconnect-network').on('click', this._onDisconnectNetwork.bind(this))
 
         // Skill Filter handling...
         html.find('.skill-header').find('.item-name').on('click', this._onFilterUntrainedSkills.bind(this));
@@ -360,6 +373,47 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         // Reset Actor Run Data
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
+
+        html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
+    }
+
+    /**
+     * Get the options for Initiative Perception
+     */
+    _prepareInitiativePerception() {
+        const initiative = this.actor.system.initiative.perception;
+        if (initiative === 'matrix') {
+            return this.actor.isUsingHotSim ? 'hot_sim' : 'cold_sim';
+        }
+        return initiative;
+    }
+
+    /**
+     * Handle Changing Initiative Perception
+     * - the select handles hot sim vs cold sim and doesn't match our dataset exactly
+     * - this is more of a band-aid until we do appv2
+     * @param event
+     */
+    async _onInitiativePerceptionChange(event) {
+        const newValue = event.currentTarget?.value;
+        if (newValue === 'meatspace' || newValue === 'magic') {
+            // meatspace and magic can be directly applied as the perception type
+            // disable VR as well
+            await this.actor.update({ system: {
+                    initiative: { perception: newValue, },
+                    matrix: { vr: false }
+                }});
+        } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
+            // if we are hot sim or cold sim, we are in VR and using matrix init perception
+            await this.actor.update({
+                system: {
+                    initiative: {
+                        perception: 'matrix',
+                    },
+                    matrix: { hot_sim: newValue === 'hot_sim', vr: true }
+                },
+            });
+        }
     }
 
     /**
@@ -662,7 +716,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (!item) return;
         await this.actor.inventory.removeItem(item);
 
-        return await this.actor.deleteEmbeddedDocuments('Item', [iid]);
+        return this.actor.deleteEmbeddedDocuments('Item', [iid]);
     }
 
     async _onItemRoll(event) {
@@ -871,7 +925,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         }
 
         sheetData.system.modifiers = sorted as any;
-        sheetData.woundTolerance = 3 + modifiers.wound_tolerance;
+        sheetData.woundTolerance = 3 + ('wound_tolerance' in modifiers ? modifiers.wound_tolerance : 0);
     }
 
     _prepareActorAttributes(sheetData: SR5ActorSheetData) {
@@ -1077,19 +1131,29 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
 
     /**
+     * Prepare if this actor has an "Action" Items in their list of items
+     * @param data - sheet data
+     */
+    _prepareHasActions(data) {
+        return data.items.filter(item => item.type === 'action').length > 0;
+    }
+
+    /**
      * Enhance SR5Item data for display on actors sheets.
      *
      * @param item: The item to transform into a 'sheet item'
      */
-    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<SheetItemData> {
+    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<Shadowrun.SheetItemData> {
         // Copy derived schema data instead of source data (false)
-        const sheetItem = item.toObject(false) as unknown as SheetItemData;
+        const sheetItem = item.toObject(false) as unknown as Shadowrun.SheetItemData;
 
         const chatData = await item.getChatData();
         sheetItem.description = chatData.description;
 
         // Add additional chat data fields depending on item type.
-        sheetItem.properties = ChatData[item.type as SI](item).filter(Boolean);
+        sheetItem.properties = ChatData[item.type](item).filter(Boolean);
+
+        sheetItem.isBroken = item.isBroken;
 
         return sheetItem;
     }
@@ -1159,6 +1223,25 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         sheetData.hasFullDefense = this.actor.hasFullDefense;
     }
 
+    /**
+     * Count the currently active and max programs for sheet display in this style:
+     * 
+     * Only personas using a device will show this count.
+     * 
+     * @param itemTypes 
+     * @returns (<active>/<max>) or ''
+     */
+    _prepareProgramCount(itemTypes: Record<string, Shadowrun.SheetItemData[]>): string {
+        if (!itemTypes.program) return '';
+        if (!this.actor.hasDevicePersona()) return '';
+
+        const active = itemTypes.program.filter(program => program.system.technology?.equipped).length;
+        const activeDevice = this.actor.getMatrixDevice();
+        const max = activeDevice?.system.programs ?? 0;
+
+        return `(${active}/${max})`;
+    }
+
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
@@ -1167,16 +1250,14 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             return;
         }
 
-        const markId = event.currentTarget.dataset.markId;
-        if (!markId) return;
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
 
-        const markedDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedDocuments) return;
-        const { scene, target, item } = markedDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
+        if (!markedDocument) return;
 
         const marks = parseInt(event.currentTarget.value);
-        await this.actor.setMarks(target, marks, { scene, item, overwrite: true });
+        await this.actor.setMarks(markedDocument, marks, { overwrite: true });
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -1187,15 +1268,13 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             return;
         }
 
-        const markId = event.currentTarget.dataset.markId;
-        if (!markId) return;
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
 
-        const markedDocuments = Helpers.getMarkIdDocuments(markId);
-        if (!markedDocuments) return;
-        const { scene, target, item } = markedDocuments;
-        if (!scene || !target) return; // item can be undefined.
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
+        if (!markedDocument) return;
 
-        await this.actor.setMarks(target, by, { scene, item });
+        await this.actor.setMarks(markedDocument, by);
     }
 
     async _onMarksDelete(event) {
@@ -1206,13 +1285,13 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             return;
         }
 
-        const markId = event.currentTarget.dataset.markId;
-        if (!markId) return;
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.actor.clearMark(markId);
+        await this.actor.clearMark(uuid);
     }
 
     async _onMarksClearAll(event) {
@@ -1227,6 +1306,39 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         if (!userConsented) return;
 
         await this.actor.clearMarks();
+    }
+
+    /**
+     * When clicking on a specific mark, connect to the actor to this host/grid behind that.
+     * 
+     * @param event Any interaction action
+     */
+    async _onMarksConnectToNetwork(event) {
+        event.stopPropagation();
+
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
+
+        const target = fromUuidSync(uuid) as SR5Item;
+        if (!target || !(target instanceof SR5Item)) return;
+
+        await this.actor.connectNetwork(target);
+        this.render();
+    }
+
+    async _onMarksPlaceMark(event) {
+        console.error('IMPLEMENT PLACE MARK ON TARGET');
+    }
+
+    /**
+     * When clicking on the disconnect button for the connected network, disconnect from it.
+     * @param event Any interaction event.
+     */
+    async _onDisconnectNetwork(event) {
+        event.stopPropagation();
+
+        await this.actor.disconnectNetwork();
+        this.render();
     }
 
     /**
@@ -1597,6 +1709,33 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
 
     /**
+     * Toggle the Wireless state of an item, iterating through the different states
+     * @param event
+     */
+    async _onListItemToggleWireless(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        if (!item) return;
+
+        // iterate through the states of online -> silent -> offline
+        const newState = event.shiftKey ? 'none'
+                                        : item.isWireless()
+                                            ? item.isRunningSilent()
+                                                ? 'offline'
+                                                : 'silent'
+                                            : 'online';
+
+        // update the embedded item with the new wireless state
+        await this.actor.updateEmbeddedDocuments('Item', [{
+            '_id': iid,
+            system: { technology: { wireless: newState } }
+        }]);
+    }
+
+    /**
      * Change the enabled status of an item shown within a sheet item list.
      */
     async _onListItemToggleEnabled(event) {
@@ -1829,29 +1968,11 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             return;
         }
         // grab matrix attribute (sleaze, attack, etc.)
-        const att = event.currentTarget.dataset.att;
+        const attribute = event.currentTarget.dataset.att;
         // grab device attribute (att1, att2, ...)
-        const deviceAtt = event.currentTarget.value;
+        const changedSlot = event.currentTarget.value;
 
-        // get current matrix attribute on the device
-        const deviceData = item.system as Item.SystemOfType<'device'>;
-        const oldVal = deviceData.atts[deviceAtt].att;
-        const data = {
-            _id: iid,
-        };
-
-        // go through atts on device, setup matrix attributes on it
-        // This logic swaps the two slots when a new one is selected
-        for (let i = 1; i <= 4; i++) {
-            const tmp = `att${i}`;
-            const key = `system.atts.att${i}.att`;
-            if (tmp === deviceAtt) {
-                data[key] = att;
-            } else if (deviceData.atts[`att${i}`].att === att) {
-                data[key] = oldVal;
-            }
-        }
-        await this.actor.updateEmbeddedDocuments('Item', [data]);
+        return item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
 
     /**

@@ -2,7 +2,7 @@ import { ModifiableField } from "../fields/ModifiableField";
 import { AttributeField } from "./Attributes";
 import { ConditionData } from "./Condition";
 
-const { SchemaField, NumberField, BooleanField, AnyField, StringField, TypedObjectField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, AnyField, StringField, ArrayField, DocumentUUIDField } = foundry.data.fields;
 
 const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing' | 'firewall', editable: boolean) => ({
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
@@ -27,6 +27,19 @@ export const MatrixAttributeField = () => ({
     device_att: new StringField({ required: true }),
 });
 
+export const MatrixMarksTarget = () => (
+    new ArrayField(new SchemaField({
+        uuid: new StringField({ required: true }),
+        name: new StringField({ required: true }),
+        marks: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    }))
+);
+
+export const LastGridData = () => ({
+    uuid: new DocumentUUIDField()
+});
+
+// Intended for limited matrix actors, shared across all.
 export const MatrixData = () => ({
     attack: new ModifiableField(MatrixAttributeField()),
     sleaze: new ModifiableField(MatrixAttributeField()),
@@ -38,10 +51,16 @@ export const MatrixData = () => ({
     name: new StringField({ required: true }),
     device: new StringField({ required: true }),
     is_cyberdeck: new BooleanField(),
+    vr: new BooleanField(),
+    // Is this actors persona link locked?
+    link_locked: new BooleanField(),
     hot_sim: new BooleanField(),
     running_silent: new BooleanField(),
     item: new AnyField({ required: false }),
-    marks: new TypedObjectField(new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 })),
-});
+    marks: MatrixMarksTarget(),
+    grid: new SchemaField(LastGridData())
+})
 
 export type MatrixType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixData>>;
+export type MatrixAttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixAttributes>>;
+export type MatrixMarksType = MatrixType['marks'];

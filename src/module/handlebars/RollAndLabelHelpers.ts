@@ -14,7 +14,7 @@ export const registerRollAndLabelHelpers = () => {
 
     Handlebars.registerHelper('damageCode', function(damage: DamageType): SafeString {
         const typeCode = Handlebars.helpers.damageAbbreviation(damage.type.value);
-        let code = `${damage.value}${typeCode}`;
+        const code = `${damage.value}${typeCode}`;
         return new Handlebars.SafeString(code);
     });
 
@@ -65,6 +65,6 @@ export const registerRollAndLabelHelpers = () => {
         return value > 0 ?  `+${value}`: `${value}`;
     });
 
-    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName);
-    Handlebars.registerHelper('speakerImg', Helpers.getChatSpeakerImg);
+    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName.bind(Helpers));
+    Handlebars.registerHelper('speakerImg', Helpers.getChatSpeakerImg.bind(Helpers));
 };

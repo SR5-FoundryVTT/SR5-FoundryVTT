@@ -1,7 +1,8 @@
 import {PartsList} from "../parts/PartsList";
-import {SR5} from "../config";
 import {SR} from "../constants";
 import { SkillFieldType } from "../types/template/Skills";
+import { SR5Actor } from '@/module/actor/SR5Actor';
+import { DataDefaults } from '@/module/data/DataDefaults';
 
 export class SkillRules {
 
@@ -71,5 +72,34 @@ export class SkillRules {
 
     static get SpecializationModifier(): number {
         return SR.skill.SPECIALIZATION_MODIFIER;
+    }
+
+    /**
+     * Inject all attributes into testData that match the given attribute names list.
+     *
+     * Also implements the 'use bigger value rule',if necessary.
+     *
+     * @param names A list of attribute names to inject
+     * @param source Actor to get the Skills from
+     * @param rollData The testData to inject attributes into
+     * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
+     */
+    static injectSkills(names: string[], source: SR5Actor, rollData: SR5Actor['system'], options: { bigger: boolean }) {
+        const targetSkills = rollData.skills.active;
+        for (const name of names) {
+            // get the skill from the source, it may be undefined
+            let sourceSkill = source.getSkill(name);
+            if (!sourceSkill) continue;
+            // if it is defined, duplicate it so we don't mess with the underlying data
+            sourceSkill = foundry.utils.deepClone(sourceSkill);
+
+            const targetSkill = targetSkills[name];
+
+            if (options.bigger) {
+                targetSkills[name] = sourceSkill.value > targetSkill.value ? sourceSkill : targetSkill;
+            } else {
+                targetSkills[name] = sourceSkill;
+            }
+        }
     }
 }

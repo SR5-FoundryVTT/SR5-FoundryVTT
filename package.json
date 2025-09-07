@@ -34,6 +34,7 @@
     "scripts": {
         "watch": "gulp watch",
         "build:db": "node ./utils/packs.mjs package pack",
+        "unpack:db": "node ./utils/packs.mjs package unpack",
         "test": "tsc --project tsconfig.json --noEmit",
         "lint": "npx eslint .",
         "lint:fix": "npx eslint . --fix",

@@ -5,10 +5,8 @@ import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
 import { DataDefaults } from "../data/DataDefaults";
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
-import { MatrixRules } from "../rules/MatrixRules";
 import { TestCreator } from "../tests/TestCreator";
-import { NetworkDeviceFlow } from "./flows/NetworkDeviceFlow";
-import { HostDataPreparation } from "./prep/HostPrep";
+import { HostPrep } from "./prep/HostPrep";
 import RollEvent = Shadowrun.RollEvent;
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
@@ -17,29 +15,22 @@ import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 
-/**
- * WARN: I don't know why, but removing the usage of ActionResultFlow from SR5Item
- * causes esbuild (I assume) to re-order import dependencies resulting in vastly different orders of execution within transpiled bundle.js code, 
- * resulting OpposedTest not finding SuccessTest (undefined) when extending it.
- * 
- * ... I'd love to remove this, or even just comment it, but tree-shaking will do it's job.
- * 
- * Should you read this: Try it anyway and open any actor sheet. If it's not broken, the build issue must've been fixed somehow.
- * 
- * An esbuild update might fix this, but caused other issues at the time... Didn't fix it with esbuild@0.15.14 (20.11.2022)
- * NOTE: still not fixed with esbuild@0.19.5
- */
-import { ActionResultFlow } from './flows/ActionResultFlow';
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
-import { ActionResultType, ActionRollType } from '../types/item/Action';
+import { ActionResultType, ActionRollType, DamageType } from '../types/item/Action';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
 import { ConditionType } from '../types/template/Condition';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from '../types/flags/ItemFlags';
-import { MatrixType } from '../types/template/Matrix';
 import { Migrator } from '../migrator/Migrator';
-
-ActionResultFlow; // DON'T TOUCH!
+import { MatrixNetworkFlow } from './flows/MatrixNetworkFlow';
+import { ItemRollDataFlow } from './flows/ItemRollDataFlow';
+import { ItemMarksFlow } from './flows/ItemMarksFlow';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { AttributeFieldType } from '../types/template/Attributes';
+import { RollDataOptions } from './Types';
+import { SetMarksOptions } from '../storage/MarksStorage';
+import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
+import { StorageFlow } from '@/module/flows/StorageFlow';
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -84,7 +75,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // An embedded item will have an item as an actor, which might have an actor owner.
         // NOTE: This is very likely wrong and should be fixed during embedded item prep / creation. this.actor will only
         //       check what is set in the items options.actor during it's construction.
-        //@ts-expect-error
+        //@ts-expect-error // Typescript doesn't know that this.actor CAN be an item here...
         return this.actor.actorOwner;
     }
 
@@ -150,6 +141,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
+     * Determine if this action item has a specific action category configured.
+     */
+    hasActionCategory(category: Shadowrun.ActionCategories) {
+        const action = this.asType('action');
+        if (!action) return false;
+        return action.system.action.categories.includes(category);
+    }
+
+    /**
      * Determine if a blast area should be placed using FoundryVTT area templates.
      */
     get hasBlastTemplate(): boolean {
@@ -160,8 +160,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * This function is run on construction of the item and prepares all data for the item.
      */
     override prepareData(this: SR5Item) {
-        super.prepareData();
         this.prepareNestedItems();
+        super.prepareData();
+    }
+
+    override prepareBaseData(): void {
+        super.prepareBaseData();
 
         // Description labels might have changed since last data prep.
         // NOTE: this here is likely unused and heavily legacy.
@@ -175,7 +179,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const technology = this.getTechnologyData();
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
-            TechnologyPrep.prepareConceal(technology, equippedMods);            
+            TechnologyPrep.prepareConceal(technology, equippedMods);
+            TechnologyPrep.prepareMatrixAttributes(this.system);
+            TechnologyPrep.prepareMentalAttributes(this.system);
             TechnologyPrep.prepareAvailability(this, technology);
             TechnologyPrep.prepareCost(this, technology);
         }
@@ -192,13 +198,24 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Switch item data preparation between types...
         // ... this is ongoing work to clean up SR5item.prepareData
         if (this.isType('host'))
-            HostDataPreparation(this.system);
+            HostPrep.prepareBaseData(this.system);
         else if (this.isType('adept_power'))
             AdeptPowerPrep.prepareBaseData(this.system);
         else if (this.isType('sin'))
             SinPrep.prepareBaseData(this.system);
         else if (this.asType('bioware', 'cyberware'))
             WarePrep.prepareBaseData(this.system as Item.SystemOfType<'bioware' | 'cyberware'>);
+    }
+
+    override prepareDerivedData(this: SR5Item): void {
+        super.prepareDerivedData();
+
+        const technology = this.getTechnologyData();
+        if (technology)
+            TechnologyPrep.calculateAttributes(this.system.attributes!);
+
+        if (this.isType('host'))
+            HostPrep.prepareDerivedData(this.system);
     }
 
     async postItemCard() {
@@ -209,7 +226,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             previewTemplate: this.hasBlastTemplate,
             tests: this.getActionTests()
         };
-        return await createItemChatMessage(options);
+        return createItemChatMessage(options);
     }
 
     /**
@@ -221,21 +238,21 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         
         // Only show the item's description by user intention or by lack of testability.
         let dontRollTest = TestCreator.shouldPostItemDescription(event);
-        if (dontRollTest) return await this.postItemCard();
+        if (dontRollTest) return this.postItemCard();
         
         // Should be right here so that TestCreator.shouldPostItemDescription(event); can prevent execution beforehand. 
         if (!Hooks.call('SR5_CastItemAction', this)) return; 
 
         dontRollTest = !this.hasRoll;
 
-        if (dontRollTest) return await this.postItemCard();
+        if (dontRollTest) return this.postItemCard();
 
         if (!this.actor) return;
 
         const showDialog = !TestCreator.shouldHideDialog(event);
         const test = await TestCreator.fromItem(this, this.actor, { showDialog });
         await test?.execute();
-        return;
+        return undefined;
     }
 
     /**
@@ -368,7 +385,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (!this.isType('weapon')) return;
 
         const value = Math.max(0, this.system.ammo.current.value - fired);
-        return await this.update({ system: { ammo: { current: { value } } } });
+        return this.update({ system: { ammo: { current: { value } } } });
     }
 
     /**
@@ -496,6 +513,20 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         licenses.push(DataDefaults.createData('license'));
 
         await this.update({ system: { licenses } });
+    }
+
+    /**
+     * This method is used to add a new network to a SIN item.
+     * 
+     * @param item The network item to add to this SIN.
+     */
+    async addNewNetwork(item: SR5Item) {
+        const sin = this.asType('sin');
+        if (!sin) return;
+        if (!item.isNetwork()) return;
+
+        sin.system.networks.push(item.uuid);
+        await this.update({ system: { networks: sin.system.networks } });
     }
 
     isWeaponModification(): this is SR5Item<'modification'> & { system : { type: 'weapon' } } {
@@ -756,6 +787,32 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return !!action.damage.type.base;
     }
 
+    /**
+     * Apply damage to any type of technology item.
+     *
+     * @param damage Damage to be applied.
+     */
+    async addDamage(damage: DamageType) {
+        if (damage.type.value === 'matrix')
+            return this.addMatrixDamage(damage);
+    }
+
+    /**
+     * Apply matrix damage to a technology item.
+     *
+     * @param damage The matrix damage to be applied.
+     */
+    async addMatrixDamage(damage: DamageType) {
+        if (damage.type.value !== 'matrix') return;
+
+        const track = this.getConditionMonitor();
+        if (!track) return;
+
+        const toApply = Math.min(track.value + damage.value, track.max);
+
+        await this.update({ system: { technology: { condition_monitor: { value: toApply } } } });
+    }
+
     getAction(this: SR5Item): ActionRollType | undefined {
         return this.system.action;
     }
@@ -766,24 +823,20 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return action.extended;
     }
 
-    getTechnologyData(): SR5Item['system']['technology'] {
-        const systemTechnologyItems = [
-            'ammo', 'armor', 'device', 'equipment', 'modification',
-            'program', 'sin', 'bioware', 'cyberware', 'weapon',
-        ] as const;
-        return this.asType(...systemTechnologyItems)?.system.technology;
+    getTechnologyData(this: SR5Item) {
+        return this.system.technology;
+    }
+
+    getMasterUuid() {
+        return this.getTechnologyData()?.master;
     }
 
     parseAvailibility(avail: string) {
         return ItemAvailabilityFlow.parseAvailibility(avail)
     }
 
-    getNetworkController(): string | undefined {
-        return this.getTechnologyData()?.networkController;
-    }
-
-    async setNetworkController(networkController: string | undefined): Promise<void> {
-        await this.update({ system: { technology: { networkController } } });
+    async setMasterUuid(masterUuid: string | undefined): Promise<void> {
+        await this.update({ system: { technology: { master: masterUuid } } });
     }
 
     getRollName(): string {
@@ -865,7 +918,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const uuid = this.system.linkedActor;
 
         if (uuid && this.isType('contact') && foundry.utils.parseUuid(uuid).documentType === 'Actor')
-            return await fromUuid(uuid) as SR5Actor;
+            return fromUuid(uuid) as Promise<SR5Actor>;
 
         return undefined;
     }
@@ -919,6 +972,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             const atts = this.system.atts;
             if (atts) {
                 for (const [key, att] of Object.entries(atts)) {
+                    // only apply the atts if the value is over zero
+                    // this was causing the previous values to always be overwritten
+                    if (att.value <= 0) continue;
                     matrix[att.att].value = att.value;
                     matrix[att.att].device_att = key;
                 }
@@ -1003,52 +1059,55 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * A host type item can store IC actors to spawn in order, use this method to add into that.
-     * @param id An IC type actor id to fetch the actor with.
-     * @param pack Optional pack collection to fetch from
+     * @param ic: The IC actor to add to this host item.
      */
-    async addIC(id: string, pack: string | null = null) {
+    async addIC(ic: SR5Actor) {
         const host = this.asType('host');
-        if (!host || !id) return;
-
-        // Check if actor exists before adding.
-        const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors?.get(id)) as SR5Actor;
-        if (!actor || !actor.isType('ic')) {
-            console.error(`Provided actor id ${id} doesn't exist (with pack collection '${pack}') or isn't an IC type`);
-            return;
-        }
-
-        const icData = actor.asType('ic');
+        if (!host) return;
+        const icData = ic.asType('ic');
         if (!icData) return;
 
-        // Add IC to the hosts IC order
-        const sourceEntity = DataDefaults.createData('source_entity_field', {
-            id: actor.id as string,
-            name: actor.name,
-            type: 'Actor',
-            pack,
-            // Custom fields for IC
-            // @ts-expect-error foundry-vtt help?
-            system: { icType: icData.system.icType },
-        });
-        host.system.ic.push(sourceEntity);
-
-        await this.update({ system: { ic: host.system.ic } });
+        await MatrixNetworkFlow.addSlave(this, ic);
     }
 
     /**
      * A host type item can contain IC in an order. Use this function remove IC at the said position
      * @param index The position in the IC order to be removed
      */
-    async removeIC(index: number) {
-        if (isNaN(index) || index < 0) return;
-
+    async removeIC(ic: SR5Actor) {
         const host = this.asType('host');
         if (!host) return;
-        if (host.system.ic.length <= index) return;
+        const icData = ic.asType('ic');
+        if (!icData) return;
 
-        host.system.ic.splice(index, 1);
+        await MatrixNetworkFlow.removeSlave(this, ic);
+    }
 
-        await this.update({ system: { ic: host.system.ic } });
+    /**
+     * Get all active IC actors of a host
+     */
+    getIC() {
+        const host = this.asType('host');
+        if (!host) return [];
+
+        // return host.system.ic.map(uuid => fromUuidSync(uuid)) as SR5Actor[];
+        const slaves = MatrixNetworkFlow.getSlaves(this);
+        // We can´t use isIC as both devices and actors might be returned
+        return slaves.filter(slave => slave.type === 'ic');
+    }
+
+    /**
+     * Retrieve slaved devices but not slaved personas.
+     *
+     * @returns A list of slaved devices.
+     */
+    async getDevices() {
+        const host = this.asType('host');
+        if (!host) return [];
+
+        const slaves = MatrixNetworkFlow.getSlaves(this);
+        // TODO: There are more than only devices that can be matrix devices.
+        return slaves.filter(slave => slave.type === 'device') as SR5Item[];
     }
 
     get _isNestedItem(): boolean {
@@ -1087,202 +1146,262 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return super.update(data, options);
     }
 
+    isWireless(this: SR5Item): boolean {
+        return this.system.technology?.wireless === 'online' || this.isRunningSilent();
+    }
+
+    isRunningSilent(): boolean {
+        return (this as SR5Item).system.technology?.wireless === 'silent';
+    }
+
+    isLivingPersona(this: SR5Item) {
+        return this.isType('device') && this.system.category === 'living_persona';
+    }
+
+    canBeWireless(this: SR5Item): boolean {
+        return this.system.technology?.wireless !== 'none';
+    }
+
+    isPublicGrid(this: SR5Item) {
+        return this.isType('grid') && this.system.category === 'public';
+    }
+
+    isNetwork(this: SR5Item): this is SR5Item<'grid' | 'host'> {
+        return this.isType('host', 'grid');
+    }
+
+    /**
+     * Determine if an item has taken Matrix Damage
+     */
+    get isDamaged(): boolean {
+        const monitor = this.getConditionMonitor();
+        // if the monitor max isn't greater than 0, assume it isn't damaged
+        return monitor.max > 0 && monitor.value > 0;
+    }
+
+    /**
+     * Determine if an item's Matrix Condition Monitor is filled
+     */
+    get isBroken(): boolean {
+        const monitor = this.getConditionMonitor();
+        // if the monitor max isn't greater than 0, assume it isn't broken
+        return monitor.max > 0 && monitor.value >= monitor.max;
+    }
+
+    /**
+     * Determine if this item is part of a WAN / PAN network.
+     *
+     * @returns true, when item is part of any network, false if not.
+     */
+    get isSlave(): boolean {
+        if (!this.isMatrixDevice) return false;
+        return !!this.master;
+    }
+
+    /**
+     * Should this matrix item be visible to a player?
+     */
+    matrixIconVisibleToPlayer(this: SR5Item): boolean {
+        return this.system.matrix?.visible === true;
+    }
+
     /**
      * Place a Matrix Mark for this Item.
      *
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks Amount of marks to be placed.
      * @param options Additional options that may be needed.
-     * @param options.scene The scene the targeted actor lives on.
-     * @param options.item
      *
-     * TODO: It might be useful to create a 'MatrixDocument' class sharing matrix methods to avoid duplication between
-     *       SR5Item and SR5Actor.
      */
-    async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
-        if (!canvas.ready) return;
-
-        if (!this.isType('host')) {
-            console.error('Only Host item types can place matrix marks!');
-            return;
-        }
-
-        // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene as Scene;
-        const item = options?.item;
-
-        // Build the markId string. If no item has been given, there still will be a third split element.
-        // Use Helpers.deconstructMarkId to get the elements.
-        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
-        const host = this.asType('host');
-
-        if (!host) return;
-
-        const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
-        host.system.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
-
-        await this.update({ system: { marks: host.system.marks } });
-    }
-
-    getMarksById(markId: string): number {
-        const host = this.asType('host');
-        return host ? host.system.marks[markId] : 0;
-    }
-
-    getAllMarks(this: SR5Item): MatrixType['marks'] | undefined {
-        return this.system?.marks;
+    async setMarks(target: SR5Actor|SR5Item|undefined, marks: number, options?: SetMarksOptions) {
+        await ItemMarksFlow.setMarks(this, target, marks, options);
     }
 
     /**
-     * Receive the marks placed on either the given target as a whole or one it's owned items.
-     *
-     * @param target
-     * @param item
-     * @param options
-     *
-     * TODO: Check with technomancers....
-     *
-     * @return Will always return a number. At least zero, for no marks placed.
+     * Get the marks placed for a single target
+     * @param uuid The id of that target
+     * @returns Amount of marks
      */
-    getMarks(target: SR5Actor, item?: SR5Item, options?: { scene?: Scene }): number {
-        if (!canvas.ready) return 0;
-        if (!this.isType('host')) return 0;
+    getMarksPlaced(uuid: string): number {
+        return ItemMarksFlow.getMarksPlaced(this, uuid);
+    }
 
-        // Scene is optional.
-        const scene = options?.scene || canvas.scene as Scene;
-        item = item || target.getMatrixDevice();
-
-        const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);
-        const host = this.asType('host');
-
-        if (!host) return 0
-
-        return host.system.marks[markId] || 0;
+    /**
+     * Get all marks placed by this item.
+     * @returns The set of marks
+     */
+    get marksData() {
+        return ItemMarksFlow.getMarksData(this);
     }
 
     /**
      * Remove ALL marks placed by this item.
-     *
-     * TODO: Allow partial deletion based on target / item
+     * TODO: Use MarksFlow global storage
      */
     async clearMarks() {
-        const host = this.asType('host');
-        if (!host) return;
-
-        // Delete all markId properties from ActorData
-        const updateData = {}
-        for (const markId of Object.keys(host.system.marks)) {
-            updateData[`-=${markId}`] = null;
-        }
-
-        await this.update({ system: { marks: updateData } });
+        await ItemMarksFlow.clearMarks(this);
     }
 
     /**
-     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     * Remove marks placed on one target document.
+     * @param uuid Of the target document.
      */
-    async clearMark(markId: string) {
-        if (!this.isType('host')) return;
-
-        const updateData = {}
-        updateData[`-=${markId}`] = null;
-
-        await this.update({ system: { marks: updateData } });
+    async clearMark(uuid: string) {
+        await ItemMarksFlow.clearMark(this, uuid);
     }
 
     /**
      * Configure the given matrix item to be controlled by this item in a PAN/WAN.
-     * @param target The matrix item to be connected.
+     * @param slave The matrix item to be connected.
+     * @param options.triggerUpdates - trigger updates to the documents to rerender the sheets
      */
-    async addNetworkDevice(target: SR5Item | SR5Actor) {
-        // TODO: Add device to WAN network
-        // TODO: Add IC actor to WAN network
-        // TODO: setup networkController link on networked devices.
-        await NetworkDeviceFlow.addDeviceToNetwork(this, target);
+    async addSlave(slave: SR5Actor | SR5Item, options?: { triggerUpdate?: boolean }) {
+        await MatrixNetworkFlow.addSlave(this, slave, options);
     }
 
     /**
-     * Alias method for addNetworkDevice, both do the same.
-     * @param target
+    * In case this item is a network master, remove the slave from the network.
+    * @param slave The matrix item to be disconnected.
+    */
+    async removeSlave(slave: SR5Actor | SR5Item) {
+        await MatrixNetworkFlow.removeSlave(this, slave);
+    }
+
+    async removeAllSlaves() {
+        await MatrixNetworkFlow.removeAllSlaves(this);
+    }
+
+    /**
+     * Return all documents marked by this host and it's IC.
+     *
+     * For other items, fall back to no documents.
+     *
+     * @returns Foundry Documents with marks placed.
      */
-    async addNetworkController(target: SR5Item) {
-        await this.addNetworkDevice(target);
-    }
-
-    async removeNetworkDevice(index: number) {
-        const controllerData = this.asType('host', 'device');
-        if (!controllerData) return;
-
-        // Convert the index to a device link.
-        if (controllerData.system.networkDevices[index] === undefined) return;
-        const networkDeviceLink = controllerData.system.networkDevices[index];
-        await NetworkDeviceFlow.removeDeviceLinkFromNetwork(this, networkDeviceLink as any);
-    }
-
-    async removeAllNetworkDevices() {
-        const controllerData = this.asType('host', 'device');
-        if (!controllerData) return;
-
-        return await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
-    }
-
-    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
+    async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
         if (!this.isType('host')) return [];
 
-        const marks = this.getAllMarks();
-        if (!marks) return [];
+        const marksData = this.marksData;
+        if (!marksData) return [];
 
-        // Deconstruct all mark ids into documents.
-        return Object.entries(marks)
-            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
-            .map(([markId, marks]) => {
-                const markIdDocuments = Helpers.getMarkIdDocuments(markId)!;
-                return {...markIdDocuments, marks, markId};
-            })
+        return ActorMarksFlow.getMarkedDocuments(marksData);
     }
 
     /**
-     * Return the network controller item when connected to a PAN or WAN.
+     * Return the network master item when connected to a PAN or WAN.
+     *
+     * @returns The master item or undefined if not connected to a network.
      */
-    async networkController() {
+    get master() {
+        return MatrixNetworkFlow.getMaster(this);
+    }
+
+    /**
+     * Return the persona document for this matrix device.
+     *
+     * @returns
+     */
+    get persona() {
         const technologyData = this.getTechnologyData();
         if (!technologyData) return;
-        if (!technologyData.networkController) return;
 
-        return await NetworkDeviceFlow.resolveLink(technologyData.networkController as any) as SR5Item;
+        return this.actorOwner;
     }
 
     /**
      * Return all network device items within a possible PAN or WAN.
      */
-    async networkDevices() {
-        const controller = this.asType('device', 'host');;
-        if (!controller) return [];
-
-        return NetworkDeviceFlow.getNetworkDevices(this);
+    get slaves() {
+        return MatrixNetworkFlow.getSlaves(this);
     }
 
     /**
      * Only devices can control a network.
      */
-    get canBeNetworkController(): boolean {
-        return this.isType('device') || this.isType('host');
+    get canBeMaster(): boolean {
+        return this.isType('device', 'host', 'grid');
     }
 
     /**
      * Assume all items with that are technology (therefore have a rating) are active matrix devices.
      */
-    get canBeNetworkDevice(): boolean {
+    get canBeSlave(): boolean {
+        return this.isMatrixDevice;
+    }
+
+    /**
+     * Determine if this icon can be used as a matrix icon.
+     */
+    get canBeMatrixIcon(): boolean {
+        return this.isMatrixDevice;
+    }
+
+    get isMatrixDevice(): boolean {
         const technologyData = this.getTechnologyData();
         return !!technologyData;
+    }
+
+    /**
+     * Is this matrix device part of an active network?
+     */
+    get hasMaster(): boolean {
+        const technologyData = this.getTechnologyData();
+        if (!technologyData) return false;
+
+        return !!technologyData.master;
     }
 
     /**
      * Disconnect any kind of item from a PAN or WAN.
      */
     async disconnectFromNetwork() {
-        if (this.canBeNetworkController) await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
-        if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
+        if (this.canBeMaster) await MatrixNetworkFlow.removeAllSlaves(this);
+        if (this.canBeSlave) await MatrixNetworkFlow.removeSlaveFromMaster(this);
+    }
+
+    /**
+     * Return the given attribute, no matter its source.
+     *
+     * This might be an actual attribute or another value type used as one during testing.
+     *
+     * @param name An attribute or other stats name.
+     * @returns Either an AttributeField or undefined, if the attribute doesn't exist on this document.
+     */
+    getAttribute(name: string, options: { rollData?: SR5Item['system'] } = {}): AttributeFieldType | undefined {
+        const rollData = options.rollData || this.getRollData();
+        // Attributes for hosts work only within their own attributes.
+        if (this.isType('host')) {
+            const rollData = this.getRollData();
+            return rollData.attributes?.[name];
+        }
+
+        return rollData.attributes?.[name];
+    }
+
+    /**
+     * Change a matrix attribute to a new slot and switch it's place with the previous attribute residing there.
+     *
+     * @param changedSlot 'att1', ... 'att4'
+     * @param changedAttribute 'attack'
+     */
+    async changeMatrixAttributeSlot(this: SR5Item, changedSlot: string, changedAttribute: Shadowrun.MatrixAttribute) {
+        if (!this.system.atts) return;
+        const updateData = MatrixDeviceFlow.changeMatrixAttribute(this.system.atts, changedSlot, changedAttribute);
+        return this.update(updateData);
+    }
+
+    /**
+     * Transparently build a set of roll data based on this items type and network status.
+     *
+     * Values for testing can depend on other actors and items.
+     *
+     * NOTE: Since getRollData is sync by default, we can't retrieve compendium documents here, resulting in fromUuidSync calls down
+     *       the line.
+     */
+    override getRollData(options: RollDataOptions={}): any {
+        // Create a system data copy to avoid cross-contamination
+        const rollData = this.system.toObject(false);
+        return ItemRollDataFlow.getRollData(this, rollData, options);
     }
 
     override async _onCreate(changed, options, user) {
@@ -1292,6 +1411,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         // Don't kill DocumentData by applying empty objects. Also performance.
         if (!foundry.utils.isEmpty(applyData)) await this.update(applyData);
+    }
+    
+    /**
+     * Reset everything that needs to be reset between two runs.
+     */
+    async restRunData() {
+        return this.clearMarks();
     }
 
     /**
@@ -1309,5 +1435,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         }
 
         return super._preUpdate(changed, options, user);
+    }
+
+    /**
+     * Handle system specific things before this item is deleted
+     * @param args
+     */
+    override async _preDelete(...args: Parameters<Item["_preDelete"]>) {
+        await StorageFlow.deleteStorageReferences(this);
+        return await super._preDelete(...args);
     }
 }

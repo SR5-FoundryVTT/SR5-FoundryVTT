@@ -1,5 +1,5 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { TechnologyData } from "../template/Technology";
+import { TechnologyPartData } from "../template/Technology";
 const { SchemaField, NumberField, BooleanField } = foundry.data.fields;
 
 export const ArmorValueData = () => ({
@@ -14,10 +14,14 @@ export const ArmorValueData = () => ({
     hardened: new BooleanField(),
 });
 
+export const ArmorPartData = () => ({
+    armor: new SchemaField(ArmorValueData()),
+});
+
 export const ArmorData = () => ({
     ...BaseItemData(),
-    armor: new SchemaField(ArmorValueData()),
-    technology: new SchemaField(TechnologyData()),
+    ...TechnologyPartData(),
+    ...ArmorPartData(),
 });
 
 export class Armor extends ItemBase<ReturnType<typeof ArmorData>> {

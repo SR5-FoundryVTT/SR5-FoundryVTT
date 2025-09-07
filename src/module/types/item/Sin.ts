@@ -1,5 +1,5 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { TechnologyData } from "../template/Technology";
+import { TechnologyPartData } from "../template/Technology";
 const { HTMLField, SchemaField, ArrayField, NumberField, StringField } = foundry.data.fields;
 
 export const LicenseData = () => ({
@@ -8,11 +8,12 @@ export const LicenseData = () => ({
     description: new HTMLField(),
 });
 
-const SinData = () => ({
+export const SinData = () => ({
     ...BaseItemData(),
-    technology: new SchemaField(TechnologyData()),
+    ...TechnologyPartData(),
 
     licenses: new ArrayField(new SchemaField(LicenseData())),
+    networks: new ArrayField(new StringField({ required: true, nullable: false })),
 });
 
 export class Sin extends ItemBase<ReturnType<typeof SinData>> {

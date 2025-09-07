@@ -1,17 +1,18 @@
-import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData, ActorBase } from "./Common";
-import { Attributes, AttributeField } from "../template/Attributes";
+import { CommonData, CharacterLimits, CreateModifiers, MagicData, ActorBase, CharacterValues, } from "./Common";
+import { Attributes, AttributeField, MatrixActorAttributes } from '../template/Attributes';
 import { ModifiableValue, ValueMaxPair } from "../template/Base";
 import { Tracks } from "../template/ConditionMonitors";
 import { ActorArmorData } from "../template/Armor";
 import { Movement } from "../template/Movement";
 import { Initiative } from "../template/Initiative";
-import { MatrixData } from "../template/Matrix";
+import { MatrixData } from '../template/Matrix';
 import { VisibilityChecks } from "../template/Visibility";
 import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const CharacterAttributes = () => ({
     ...Attributes(),
+    ...MatrixActorAttributes(),
     initiation: new ModifiableField(AttributeField()),
     submersion: new ModifiableField(AttributeField()),
 });
@@ -25,6 +26,7 @@ const CharacterData = () => ({
     is_npc: new BooleanField(),
     npc: new SchemaField({ is_grunt: new BooleanField() }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    matrix_full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
     special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane'], initial: 'mundane' }),
 
     // === Attributes & Limits ===
@@ -34,7 +36,7 @@ const CharacterData = () => ({
     // === Combat ===
     armor: new ModifiableField(ActorArmorData()),
     initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
-    values: new SchemaField(PhysicalCombatValues()),
+    values: new SchemaField(CharacterValues()),
     wounds: new ModifiableField(ModifiableValue()),
 
     visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
@@ -76,7 +78,7 @@ const CharacterData = () => ({
         "armor", "multi_defense", "reach", "defense", "defense_dodge", "defense_parry",
         "defense_block", "defense_melee", "defense_ranged", "soak", "recoil",
         // Magic/Matrix
-        "drain", "fade", "essence",
+        "drain", "fade", "essence", "public_grid", 'mark_damage', "place_two_marks", "place_three_marks",
         // Miscellaneous
         "composure", "lift_carry", "judge_intentions", "memory", "global"
     )),

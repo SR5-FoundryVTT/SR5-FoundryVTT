@@ -30,6 +30,7 @@ import { Cyberware } from "../types/item/Cyberware";
 import { Device } from "../types/item/Device";
 import { Echo } from "../types/item/Echo";
 import { Equipment } from "../types/item/Equipment";
+import { Grid } from "../types/item/Grid";
 import { Lifestyle } from "../types/item/Lifestyle";
 import { Metamagic } from "../types/item/Metamagic";
 import { Modification } from "../types/item/Modification";
@@ -42,6 +43,7 @@ import { Spell } from "../types/item/Spell";
 import { SpritePower } from "../types/item/SpritePower";
 
 import { ActorArmorData } from "../types/template/Armor";
+import { CorrectionLog, Sanitizer } from "../sanitizer/Sanitizer";
 
 import DataSchema = foundry.data.fields.DataSchema;
 const { SchemaField } = foundry.data.fields;
@@ -67,6 +69,7 @@ const systemMap = {
     device: Device,
     echo: Echo,
     equipment: Equipment,
+    grid: Grid,
     host: Host,
     lifestyle: Lifestyle,
     metamagic: Metamagic,
@@ -154,8 +157,22 @@ export class DataDefaults {
      */
     static baseSystemData<EntityType extends SystemEntityType>(
         entity: EntityType,
-        createData: SystemConstructorArgs<EntityType> = {}
+        createData: SystemConstructorArgs<EntityType> = undefined
     ): ReturnType<SystemByType<EntityType>['toObject']> {
+        if (createData) {
+            let correctionLogs: CorrectionLog | null;
+            if (entity in CONFIG.Actor.dataModels)
+                correctionLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels[entity].schema, createData);
+            else if (entity in CONFIG.Item.dataModels)
+                correctionLogs = Sanitizer.sanitize(CONFIG.Item.dataModels[entity].schema, createData);
+            else
+                throw new Error(`No schema found for entity type: ${entity}`);
+
+            if (correctionLogs) {
+                console.warn(`Document Sanitized on Creation; Type: ${entity};\n`);
+                console.table(correctionLogs);
+            }
+        }
         return new (systemMap[entity] as any)(createData).toObject();
     }
 }

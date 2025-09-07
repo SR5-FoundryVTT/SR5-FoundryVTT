@@ -105,7 +105,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
         return this.activatePreviewListeners(layer);
     }
 
-    activatePreviewListeners(initialLayer: CanvasLayer): Promise<void> {
+    async activatePreviewListeners(initialLayer: CanvasLayer): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!canvas.ready) return;
 

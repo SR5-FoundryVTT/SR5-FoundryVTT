@@ -24,7 +24,7 @@
     "version": "0.30.0",
     "compatibility": {
         "minimum": "13",
-        "verified": "13.346",
+        "verified": "13.347",
         "maximum": "13"
     },
     "documentTypes": {
@@ -86,6 +86,9 @@
                 "htmlField": ["description.value"]
             },
             "equipment": {
+                "htmlField": ["description.value"]
+            },
+            "grid": {
                 "htmlField": ["description.value"]
             },
             "host": {
@@ -155,9 +158,9 @@
     ],
     "packs": [
         {
-            "name": "matrix-actions",
+            "name": "sr5e-matrix-actions",
             "label": "SR5e Matrix Actions",
-            "path": "packs/matrix-actions",
+            "path": "packs/sr5e-matrix-actions",
             "ownership": {
                 "PLAYER": "OBSERVER",
                 "TRUSTED": "OBSERVER",
@@ -167,9 +170,21 @@
             "system": "shadowrun5e"
         },
         {
-            "name": "general-actions",
+            "name": "sr5e-ic-actions",
+            "label": "SR5e IC Actions",
+            "path": "packs/sr5e-ic-actions",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
+        },
+        {
+            "name": "sr5e-general-actions",
             "label": "SR5e General Actions",
-            "path": "packs/general-actions",
+            "path": "packs/sr5e-general-actions",
             "ownership": {
                 "PLAYER": "OBSERVER",
                 "TRUSTED": "OBSERVER",
@@ -179,9 +194,9 @@
             "system": "shadowrun5e"
         },
         {
-            "name": "system-macros",
+            "name": "sr5e-system-macros",
             "label": "SR5e System Macros",
-            "path": "packs/system-macros",
+            "path": "packs/sr5e-system-macros",
             "ownership": {
                 "PLAYER": "OBSERVER",
                 "TRUSTED": "OBSERVER",
@@ -197,9 +212,10 @@
             "color": "#cc0000",
             "sorting": "m",
             "packs": [
-                "system-macros",
-                "general-actions",
-                "matrix-actions"
+                "sr5e-system-macros",
+                "sr5e-general-actions",
+                "sr5e-ic-actions",
+                "sr5e-matrix-actions"
             ]
         }
     ],

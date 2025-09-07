@@ -238,6 +238,8 @@ export const ChatData: { [K in Item.ConfiguredSubType]: (item: SR5Item<K>) => st
         return props;
     },
 
+    grid: (item: SR5Item<'grid'>) => { return []; },
+
     host: (item: SR5Item<'host'>) => { return []; },
 
     lifestyle: (item: SR5Item<'lifestyle'>) => {

@@ -1,11 +1,10 @@
 /**
  * Handle all rules related to Shadowrun 5 magic drain.
  */
-import {DataDefaults} from "../data/DataDefaults";
-import {Helpers} from "../helpers";
-import {PartsList} from "../parts/PartsList";
-import { DamageType } from "../types/item/Action";
-type DamageTypeType = Item.SystemOfType<'action'>['action']['damage']['type']['base'];
+import { Helpers } from "../helpers";
+import { PartsList } from "../parts/PartsList";
+import { DataDefaults } from "../data/DataDefaults";
+import { DamageType, DamageTypeType } from "../types/item/Action";
 
 export class DrainRules {
     /**

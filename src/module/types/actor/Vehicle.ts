@@ -68,7 +68,7 @@ const VehicleData = () => ({
 
     // === Driver & Networking ===
     driver: new StringField({ required: true }),
-    networkController: new StringField({ required: true }),
+    master: new StringField({ required: true }),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'matrix')),
@@ -95,7 +95,7 @@ const VehicleData = () => ({
         "armor", "multi_defense", "reach", "defense", "defense_dodge", "defense_parry",
         "defense_block", "defense_melee", "defense_ranged", "soak", "recoil",
         // Magic/Matrix
-        "drain", "fade", "essence",
+        "drain", "fade", "essence", "public_grid", "mark_damage",
         // Miscellaneous
         "composure", "lift_carry", "judge_intentions", "memory", "global"
     )),

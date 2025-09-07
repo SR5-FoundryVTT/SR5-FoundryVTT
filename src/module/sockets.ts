@@ -16,15 +16,24 @@ export class SocketMessage {
         return {type, data, userId}
     }
 
-    static async emit(type, data) {
+    static emit(type, data) {
         if (!game.socket) return;
 
         const message = SocketMessage._createMessage(type, data);
         console.trace('Shadowrun 5e | Emitting Shadowrun5e system socket message', message);
-        await game.socket.emit(SYSTEM_SOCKET, message);
+        game.socket.emit(SYSTEM_SOCKET, message);
     }
 
-    static async emitForGM(type, data) {
+    /**
+     * Execute this message in the context of an active GM user.
+     * This will be assured before the registered handleres are executed in a pre-call check.
+     * Only the GM user matching the id given in the message will receive the message.
+     * 
+     * @param type 
+     * @param data 
+     * @returns 
+     */
+    static emitForGM(type, data) {
         if (!game.socket || !game.user || !game.users) return;
         if (game.user.isGM) return console.error('Active user is GM! Aborting socket message...');
 
@@ -35,7 +44,7 @@ export class SocketMessage {
 
         const message = SocketMessage._createMessage(type, data, gmUser.id);
         console.trace('Shadowrun 5e | Emitting Shadowrun5e system socket message', message);
-        await game.socket.emit(SYSTEM_SOCKET, message);
+        game.socket.emit(SYSTEM_SOCKET, message);
     }
 
     /**

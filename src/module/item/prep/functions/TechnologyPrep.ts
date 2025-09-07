@@ -1,9 +1,13 @@
+import { SR5 } from "@/module/config";
 import { SR5Item } from "../../SR5Item";
 import { Helpers } from "../../../helpers";
 import { PartsList } from "../../../parts/PartsList";
-import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
 import { ItemCostFlow } from "../../flows/ItemCostFlow";
+import { DataDefaults } from "@/module/data/DataDefaults";
 import { TechnologyType } from "src/module/types/template/Technology";
+import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
+import { AttributesPrep } from "@/module/actor/prep/functions/AttributesPrep";
+import { TechnologyAttributesType } from "@/module/types/template/Attributes";
 
 /**
  * Item data preparation around the 'technology' template.json item template.
@@ -35,6 +39,65 @@ export const TechnologyPrep = {
 
         technology.conceal.mod = concealParts.list;
         technology.conceal.value = Helpers.calcTotal(technology.conceal);
+    },
+
+    /**
+     * All technology items use their device rating for mental attributes by default.
+     * See SR5#237 'Matrix Actions'.
+     * 
+     * These mental attributes might later be overwritten within SR5Item.getTestData.
+     * 
+     */
+    prepareMentalAttributes(system: SR5Item['system']) {
+        const attributes = system.attributes!;
+        const technology = system.technology!;
+
+        for (const name of SR5.mentalAttributes) {
+            // Rating can be undefined...
+            const rating = technology.rating ?? 0;
+            // Rating can be a string...
+            const base = Number(rating);
+            const label = SR5.attributes[name];
+
+            const attribute = DataDefaults.createData('attribute_field', { label, base });
+            attributes[name] = attribute;
+        }
+    },
+
+    /**
+     * All technology items use their device rating for their matrix attributes by default.
+     * See SR5#234 'Devices'.
+     */
+    prepareMatrixAttributes(system: SR5Item['system']) {
+        const attributes = system.attributes!;
+        const technology = system.technology!;
+        const attributesWithRating = ['data_processing', 'firewall'];
+
+        for (const name of Object.keys(SR5.matrixAttributes)) {
+            // Rating can be undefined...
+            const rating = attributesWithRating.includes(name) ? technology.rating ?? 0 : 0;
+            // Rating can be a string...
+            const base = Number(rating);
+            const label = SR5.attributes[name];
+
+            const attribute = DataDefaults.createData('attribute_field', { label, base });
+            attributes[name] = attribute;
+        }
+
+        // Add device rating as attribute to allow for rolls with it.
+        const rating = Number(technology.rating ?? 0);
+        const parts = new PartsList(attributes.rating.mod);
+        parts.addPart('SR5.Host.Rating', rating);
+    },
+
+    /**
+     * Calculate device attributes.
+     * @param attributes 
+     */
+    calculateAttributes: (attributes: TechnologyAttributesType) => {
+        for (const [name, attribute] of Object.entries(attributes)) {
+            AttributesPrep.calculateAttribute(name, attribute);
+        }
     },
 
     /**

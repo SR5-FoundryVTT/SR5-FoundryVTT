@@ -72,6 +72,7 @@
             "AddictionMental": "Mental Addiction",
             "AddictionPhysical": "Physical Addiction",
             "Attack": "Attack Actions",
+            "AttackMatrix": "Attack Matrix",
             "AttackMelee": "Attack Melee",
             "AttackRanged": "Attack Ranged",
             "AttackThrown": "Attack Thrown",
@@ -80,6 +81,7 @@
             "Compiling": "Compiling Actions",
             "ComplexForm": "Complex Form Actions",
             "Defense": "Defense Actions",
+            "DefenseMatrix": "Defense Matrix",
             "DefenseSuppression": "Defense Suppression",
             "Drain": "Drain Actions",
             "Fade": "Fade Actions",
@@ -90,7 +92,9 @@
             "RecoveryPhysical": "Recovery Physical",
             "RecoveryStun": "Recovery Stun",
             "Resist": "Resisting Actions",
+            "ResistBiofeedback": "Resist Biofeedback",
             "ResistDisease": "Resisting Disease",
+            "ResistMatrix": "Resist Matrix",
             "ResistToxin": "Resisting Toxin",
             "Resonance": "Resonance Actions",
             "Rigging": "Rigging Actions",
@@ -113,6 +117,47 @@
         "Active": "Active",
         "ActiveDefense": "Active Defense",
         "ActiveEffect": {
+            "FIELDS": {
+                "applyTo": {
+                    "label": "Apply-To",
+                    "hint": "Apply-To different Targets"
+                },
+                "applyByTest": {
+                    "label": "Apply-To Test via Item"
+                },
+                "onlyForEquipped": {
+                    "label": "Equipped Only",
+                    "hint": "Apply for equipped item only"
+                },
+                "onlyForItemTest": {
+                    "label": "Item Test Only",
+                    "hint": "Apply for parent item test only"
+                },
+                "onlyForWireless": {
+                    "label": "Wireless Only",
+                    "hint": "Apply for wireless active only"
+                },
+                "selection_attributes": {
+                    "label": "Attributes Filter",
+                    "hint": "Filter the test based on Attributes used"
+                },
+                "selection_categories": {
+                    "label": "Action Categories Filter",
+                    "hint": "Filter the test based on Action Category used"
+                },
+                "selection_limits": {
+                    "label": "Limits Filter",
+                    "hint": "Filter the test based on the Limit used"
+                },
+                "selection_skills": {
+                    "label": "Skills Filter",
+                    "hint": "Filter the test based on the Skills used"
+                },
+                "selection_tests": {
+                    "label": "Tests Filter",
+                    "hint": "Filter the test based on the Tests used"
+                }
+            },
             "ApplyTo": "Apply-To",
             "ApplyTos": {
                 "TargetedActor": "Targeted Actor",
@@ -122,17 +167,7 @@
             "Modes": {
                 "Modify": "Modify"
             },
-            "New": "New Effect",
-            "OnlyForEquipped": "Apply for equipped item only",
-            "OnlyForItemTest": "Apply for parent item test only",
-            "OnlyForWireless": "Apply for wireless active only",
-            "Test": {
-                "ActionCategories": "Action Categories Filter",
-                "Attributes": "Attributes Filter",
-                "Limits": "Limits Filter",
-                "Skills": "Skills Filter",
-                "Tests": "Tests Filter"
-            }
+            "New": "New Effect"
         },
         "ActiveSkills": "Active Skills",
         "ActorTypes": {
@@ -189,11 +224,13 @@
         "Barrel": "Barrel",
         "Base": "Base",
         "BaseValue": "Base Value",
+        "BiofeedbackDamage": "Biofeedback Damage",
         "Biography": "Bio",
         "BlastRadius": "Blast Radius",
         "Block": "Block",
         "Bonus": "Bonus",
         "Bonuses": "Bonuses",
+        "Broken": "BROKEN",
         "Bullet": "Round",
         "BulletCount": "Bullet Count",
         "Bullets": "Rounds",
@@ -237,6 +274,23 @@
         "Collapse": "Collapse",
         "CollapseAll": "Collapse All",
         "CommonProgram": "Common Program",
+        "CompendiaSettings": {
+            "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
+            "Label": "Compendium Packs",
+            "Title": "System compendiums",
+            "GeneralActionsPack": {
+                "label": "General Actions",
+                "hint": "This compendium will be used for all general, attribute only actions."
+            },
+            "MatrixActionsPack": {
+                "label": "Matrix Actions",
+                "hint": "This compendium will be used for all matrix actions."
+            },
+            "ICActionsPack": {
+                "label": "IC Actions",
+                "hint": "This compendium will be used for IC actions, filtered for each IC type"
+            }
+        },
         "Compendiums": {
             "sr5critter": "Critters & Spirits & Sprites",
             "sr5drone": "Drones & Vehicles",
@@ -259,6 +313,7 @@
         "ComplexForms": "Complex Forms",
         "Conceal": "Conceal",
         "ConditionMonitor": "Con. Mon.",
+        "Connection": "Connection",
         "Contact": {
             "Blackmail": "Blackmail",
             "Connection": "Connection",
@@ -269,8 +324,62 @@
             "Loyalty": "Loyalty",
             "Type": "Type"
         },
+        "ContactType": "Type",
         "Contacts": "Contacts",
         "Continue": "Continue",
+        "Content": {
+            "Actions": {
+                "Armor": "Armor",
+                "Biofeedback Resist": "Biofeedback Resist",
+                "BruteForce": "Brute Force",
+                "ChangeConfiguration": "Change Configuration",
+                "ChangeIcon": "Change Icon",
+                "CheckOverwatchScore": "Check Overwatch Score",
+                "Composure": "Composure",
+                "ControlDevice": "Control Device",
+                "CrackFile": "Crack File",
+                "CrackProgramme": "Crack Programme",
+                "DataSpike": "Data Spike",
+                "DisarmDatabomb": "Disarm Databomb",
+                "Drain": "Drain",
+                "DroneInfiltration": "Drone Infiltration",
+                "DronePerception": "Drone Perception",
+                "DronePilotVehicle": "Drone Pilot Vehicle",
+                "EditFile": "Edit File",
+                "EnterexitHost": "Enter/Exit Host",
+                "EraseMark": "Erase Mark",
+                "EraseMatrixSignature": "Erase Matrix Signature",
+                "Fade": "Fade",
+                "FormatDevice": "Format Device",
+                "FullMatrixDefense": "Full Matrix Defense",
+                "GridHop": "Grid Hop",
+                "HackOnTheFly": "Hack On The Fly",
+                "Hide": "Hide",
+                "InviteMark": "Invite Mark",
+                "JackOut": "Jack Out",
+                "JamSignals": "Jam Signals",
+                "JudgeIntentions": "Judge Intentions",
+                "JumpIntoRiggedDevice": "Jump Into Rigged Device",
+                "LiftCarry": "Lift Carry",
+                "MatrixDamageResist": "Matrix Damage Resist",
+                "MatrixDefenseTest": "Matrix Defense Test",
+                "MatrixPerception": "Matrix Perception",
+                "MatrixSearch": "Matrix Search",
+                "Memory": "Memory",
+                "NaturalRecoveryPhysical": "Natural Recovery Physical",
+                "NaturalRecoveryStun": "Natural Recovery Stun",
+                "PhysicalDamageResist": "Physical Damage Resist",
+                "PhysicalDefense": "Physical Defense",
+                "RebootDevice": "Reboot Device",
+                "SendMessage": "Send Message",
+                "SetDatabomb": "Set Databomb",
+                "Snoop": "Snoop",
+                "SpoofCommand": "Spoof Command",
+                "SwitchInterfaceMode": "Switch Interface Mode",
+                "TraceIcon": "Trace Icon"
+            }
+        },
+        "ControlRig": "Control Rig",
         "Cost": "Cost",
         "Cover": "Cover",
         "Create": "Create {type}",
@@ -377,6 +486,7 @@
         },
         "DicePool": "Pool",
         "DicePoolModifier": "Dice Pool Mod",
+        "DirectConnection": "Direct Connection",
         "DmgTypeMatrix": "Matrix",
         "DmgTypePhysical": "Physical",
         "DmgTypeStun": "Stun",
@@ -453,18 +563,23 @@
         "Equipment": "Equipment",
         "Equipped": "Equipped",
         "Errors": {
-            "CanOnlyAddTechnologyItemsToANetwork": "Only technology items can be added to a network.",
+            "CantConnectICToGrid": "IC actors can't be connected to a grid network",
+            "CantConnectToPAN": "Given document can't be added to PAN network",
+            "CantConnectToWAN": "Given document can't be added to WAN network",
             "CantEditAppliedItemEffects": "You can't edit an active effect that's been applied by an item.",
             "DefaultInventoryCantBeRemoved": "The default inventory can't be removed",
             "InventoryAlreadyExists": "An inventory with this name already exists.",
             "KeyNotModifyableByActiveEffect": "The active effect mode 'modify' can only affect mod properties.",
             "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed.",
-            "MarksCantBePlacedBy": "The active actor can't place marks.",
+            "MarksCantBePlacedBy": "Only personas can place marks.",
             "MarksCantBePlacedOn": "The chosen actor type can't receive any marks.",
+            "MarksCantBePlacedWithoutPersona": "The chosen actor doesn't have an active persona.",
+            "MasterDeviceIsMissing": "The master device is missing. Falling back to local device values.",
             "MissingSkill": "The actor doesn't have the requested skill.",
             "NoAvailableActorFound": "No available actor was found for this action",
             "SkillWithoutAttribute": "The skill has no attribute configured.",
-            "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor"
+            "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor",
+            "TooManyActionsWithCategory": "You should have exactly one action with the category {category} on your actor"
         },
         "EssenceCost": "Essence",
         "Expand": "Expand",
@@ -486,6 +601,7 @@
         "FireMode": "Fire Mode",
         "Force": "Force",
         "FullDefense": "Full Defense",
+        "FullMatrixDefense": "Full Matrix Defense",
         "FullDefenseAttribute": "Full Defense Attribute",
         "GMRequest": {
             "General": "Your GM wants you to do a",
@@ -499,6 +615,7 @@
         "GlitchCritical": "Critical Glitch!",
         "Glitches": "Glitches:",
         "GoodCover": "Good Cover",
+        "Grids": "Grids",
         "HackingProgram": "Hacking Program",
         "Help": "Help",
         "Hits": "Hits",
@@ -510,6 +627,7 @@
             "MissingIC": "Missing IC",
             "Rating": "Host Rating"
         },
+        "Hosts": "Hosts",
         "HotSim": "Hot Sim",
         "IC": {
             "MissingHost": "Drag&Drop a host item",
@@ -520,7 +638,7 @@
                 "BlackIC": "Black IC",
                 "Blaster": "Blaster",
                 "Bloodhound": "Bloodhound",
-                "BlueGoo": "Blauer Schleim",
+                "BlueGoo": "Bloo Goo",
                 "Catapult": "Catapult",
                 "Crash": "Crash",
                 "Flicker": "Flicker",
@@ -579,6 +697,7 @@
             "Device": "Device",
             "Echo": "Echo",
             "Equipment": "Equipment",
+            "Grid": "Grid",
             "Host": "Host",
             "Lifestyle": "Lifestyle",
             "Metamagic": "Metamagic",
@@ -608,6 +727,10 @@
             "ShowSituationModifiers": {
                 "Hint": "Open situation modifiers for selection",
                 "Label": "Situation Modifiers"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Prompt to make a standard Success Test",
+                "Label": "Prompt Success Test"
             }
         },
         "KnockedDown": "Knocked Down",
@@ -620,22 +743,43 @@
                 "ActiveTest": "Test",
                 "Category": "Category",
                 "DamageResistanceTest": "Damage Resistance Test",
+                "ForceReboot": "Force Reboot",
                 "Modifier": "Modifier",
                 "Modifiers": "Modifiers",
                 "OpposedTest": "Opposed Test",
                 "SpiritType": "Spirit Type",
                 "SpriteType": "Sprite Type"
             },
+            "Actions": {
+                "BruteForce": "Brute Force",
+                "HackontheFly": "Hack on the Fly"
+            },
             "ActorSheet": {
+                "AddNetwork": "Direct Connect Network",
+                "Compilations": "Compilations",
                 "CreateInventory": "Create inventory place",
                 "CritterPowers": "Critter Powers",
+                "ColdSim": "Cold Sim",
+                "ConnectToDriver": "Connect To Driver",
+                "DisplayingPersona": "Displaying Persona",
                 "DeviceRating": "Device Rating",
+                "DeviceSetup": "Device Setup",
                 "DisabledOptionCritterPowers": "Optional Critter Powers - Disabled",
                 "DisabledOptionSpritePowers": "Optional Sprite Powers - Disabled",
                 "EnabledOptionCritterPowers": "Optional Critter Powers - Enabled",
                 "EnabledOptionSpritePowers": "Optional Sprite Powers - Enabled",
+                "Hacking": "Hacking",
                 "ICConfiguration": "IC Configuration",
+                "Icons": "Icons",
+                "MarkedIcons": "Marked Icons",
+                "MarkNetwork": "Mark Network",
                 "Matrix": "Matrix",
+                "MatrixActions": "Matrix Actions",
+                "Network": "Network",
+                "NoNetwork": "No Network",
+                "Persona": "Persona",
+                "Offline": "Offline",
+                "OwnedIcons": "Owned Icons",
                 "PersonalInventory": "On Person",
                 "ResetActorForNewRun": "New Run Reset",
                 "Rituals": "Rituals",
@@ -643,6 +787,7 @@
                 "RollDronePerception": "Drone Perception",
                 "RollPilotVehicleTest": "Pilot Vehicle",
                 "SetMonitor": "Monitor must be set manually.",
+                "SetupPAN": "Add Devices to PAN",
                 "Spells": "Spells",
                 "SpiritConfiguration": "Spirit Configuration",
                 "SpriteConfiguration": "Sprite Configuration",
@@ -655,9 +800,23 @@
                 "Carried": "Carried",
                 "OpenInventory": "Inventory"
             },
+            "MarkPlacement": {
+                "PlaceOnDevice": "Place on device",
+                "PlaceOnMainIcon": "Place on persona/host"
+            },
+            "Matrix": {
+                "TargetMainIcon": "Target Main Icon",
+                "TargetDevice": "Target Device",
+                "Local": "Local",
+                "Global": "Global",
+                "Public": "Public"
+            },
             "Message": {
                 "ClickToSelect": "Click to select on scene",
-                "TestEffects": "Applied effects"
+                "OverwatchConvergence": "Overwatch Convergence",
+                "TargetedIcon": "Targeted Icon",
+                "TestEffects": "Applied effects",
+                "FailedAttackAction": "Failed a Matrix Attack Action"
             },
             "Sheet": {
                 "AddOne": "Add One",
@@ -666,7 +825,10 @@
                 "MissingNetworkDevices": "Drag&Drop a network device to add it",
                 "NetworkDevices": "Networked Devices",
                 "PAN": "PAN",
+                "RebootDevice": "Reboot",
                 "SubtractOne": "Subtract One",
+                "Type": "Type",
+                "Visible": "Visible",
                 "WAN": "WAN"
             },
             "Sidebar": {
@@ -702,6 +864,7 @@
         "LivingPersona": "Living Persona",
         "Load": "Load",
         "Loaded": "Loaded",
+        "Loyalty": "Loyalty",
         "MIGRATION": {
             "BeginMigration": "Begin Migration",
             "BeginNotification": "Beginning Shadowrun system migration from version",
@@ -731,9 +894,23 @@
         "MatrixAttrDataProc": "Data Proc.",
         "MatrixAttrFirewall": "Firewall",
         "MatrixAttrSleaze": "Sleaze",
+        "MatrixDefense": "Matrix Defense",
+        "MatrixFullDefenseAttribute": "Matrix Full Defense Attribute",
+        "MatrixNetworkHackingApplication": {
+            "Icons": "Icons",
+            "Invite": "Ask for invite",
+            "Title": "Connect to Network"
+        },
         "MatrixTarget": "Matrix Target",
         "MeleeWeaponAttack": "Melee Weapon Attack",
         "MentalLimit": "Mental Limit",
+        "Messages": {
+            "MarkInvitation": {
+                "AcceptInvite": "Accept",
+                "AskForInvite": "Asks for an mark invitation for:",
+                "InviteAccepted": "Feel free to join {networkName}, {userName}!"
+            }
+        },
         "Metamagic": "Metamagic",
         "Metamagics": "Metamagics",
         "Metatype": "Metatype",
@@ -778,6 +955,7 @@
             "AstralLimit": "Astral Limit",
             "BackgroundCount": "Background Count",
             "Composure": "Composure",
+            "ControlRigRating": "Control Rig Rating",
             "Defense": "Defense",
             "DefenseBlock": "Defense (Block)",
             "DefenseDodge": "Defense (Dodge)",
@@ -785,6 +963,7 @@
             "DefenseMulti": "Defense (Multi)",
             "DefenseParry": "Defense (Parry)",
             "DefenseRanged": "Defense (Ranged)",
+            "DifferentGrid": "Different Grid",
             "Drain": "Drain",
             "Environmental": "Environmental",
             "EnvironmentalLight": "Environmental (Light)",
@@ -796,6 +975,8 @@
             "Global": "Global",
             "JudgeIntentions": "J.Intentions",
             "LiftCarry": "Lift&Carry",
+            "Marks": "Marks",
+            "MarkDamage": "Per Mark Damage",
             "MatrixDice": "Matrix Init Dice",
             "MatrixInit": "Matrix Init",
             "MatrixTrack": "Matrix Track",
@@ -809,12 +990,15 @@
             "PhysicalLimit": "Physical Limit",
             "PhysicalOverflowTrack": "Physical Overflow Track",
             "PhysicalTrack": "Physical Track",
+            "PublicGrid": "Public Grid",
             "Reach": "Reach",
             "Recoil": "Recoil",
             "Run": "Run",
             "Soak": "Soak",
             "SocialLimit": "Social Limit",
             "StunTrack": "Stun Track",
+            "TwoMarks": "Two Marks",
+            "ThreeMarks": "Three Marks",
             "Walk": "Walk",
             "WoundTolerance": "Wound Tolerance",
             "Wounds": "Wounds"
@@ -834,6 +1018,8 @@
         "Mundane": "Mundane",
         "Name": "Name",
         "NetHits": "Net Hits",
+        "Network": "Network",
+        "Networks": "Networks",
         "New": "New",
         "NoCover": "No Cover",
         "NoSelectableToken": "Actor has no selectable token on canvas",
@@ -842,6 +1028,19 @@
         "NormalSkillButton": "Normal",
         "NormalSpellButton": "Normal",
         "NotExtended": "Not Extended",
+        "Notifications": {
+            "DeletingStorageReferences": {
+                "Start": "Deleting Network and MARK references",
+                "Item": "Clearing references to item",
+                "Finished": "Finished clearing references"
+            },
+            "AddDevicesToPAN": {
+                "Adding": "Adding",
+                "Starting": "Starting to add equipped devices to PAN",
+                "FinishedAddingItems": "Finished adding devices to PAN. Please close and reopen any item sheets that changed connections."
+            },
+            "VehicleCannotBeOwnDriver": "A vehicle cannot be the Driver of itself (that's what Pilot is for)"
+        },
         "Notoriety": "Notoriety",
         "Nuyen": "Nuyen",
         "OpenOrigin": "Open item",
@@ -864,14 +1063,15 @@
             "ResetScore": "Reset Overwatch Score"
         },
         "OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
+        "Owner": "Owner",
         "PP": "PP",
         "Parry": "Parry",
         "PartialCover": "Partial Cover",
         "Passive": "Passive",
+        "Personas": "Personas",
         "PhysicalLimit": "Physical Limit",
         "PhysicalOverflowTrack": "Physical Overflow Track",
         "PhysicalTrack": "Physical Track",
-        "PlaceMarks": "Place Marks",
         "PlaceTemplate": "Place Template",
         "PlusFifteenMinutes": "+15min",
         "PowerLevel": "Level",
@@ -882,6 +1082,7 @@
         "ProgramType": "Type",
         "Programs": "Programs",
         "PublicAwareness": "Public Awareness",
+        "PublicGrid": "Public Grid",
         "PushTheLimit": "Push The Limit",
         "Qty": "Qty",
         "Quality": "Quality",
@@ -899,9 +1100,16 @@
         "Rating": "Rating",
         "Reach": "Reach",
         "Reagent": "Reagents",
+        "RebootConfirmationDialog": {
+            "Cancel": "Cancel",
+            "Confirm": "Reboot",
+            "Description": "Are you sure you want to reboot this device?",
+            "Title": "Confirm Reboot"
+        },
         "RecklessSpellButton": "Reckless",
         "Recoil": "Recoil",
         "RecoilCompensation": "Recoil Comp.",
+        "Refresh": "Refresh",
         "RemoveBonus": "Remove Bonus",
         "RemoveSpecialization": "Remove Specialization",
         "Resist": "Resist",
@@ -925,10 +1133,17 @@
         "RtgAboveZero": "Rtg > 0",
         "Run": "Run",
         "RunningSilent": "Running Silent",
+        "RunningSilentControlledByDevice": "Running Silent is controlled by your active Matrix Device:",
         "RunningSpeed": "Running",
         "SIN": "SIN",
+        "SameGrid": "Same Grid",
         "SecondAttribute": "Second Attribute",
         "SecondChance": "Second Chance",
+        "SelectMatrixNetworkDialog": {
+            "Title": "Select a Network",
+            "Connect": "Connect",
+            "Cancel": "Cancel"
+        },
         "SelectTokenMessage": "You must select a token first",
         "SelectedTargets": "Selected Targets",
         "SheetActor": "Actor sheet",
@@ -1111,8 +1326,8 @@
                 "Caretaker": "Insect Caretaker",
                 "Ceramic": "Ceramic",
                 "Chindi": "Chindi",
-                "Corpse": "Corpse",
                 "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Corpse",
                 "Crawler": "Crawler (Demon)",
                 "Croki": "Croki",
                 "Detritus": "Detritus",
@@ -1170,8 +1385,8 @@
                 "Unbreakable": "Unbreakable",
                 "Vrygoths": "Vrygoths",
                 "VucubCaquix": "Vucub Caquix",
-                "Water": "Water",
                 "Watcher": "Watcher",
+                "Water": "Water",
                 "Worker": "Insect Worker",
                 "Wraith": "Wraith"
             }
@@ -1230,7 +1445,14 @@
             "AttackDodged": "Attack Dodged",
             "AttackDoesNoPhysicalDamageToVehicle": "Attack Hits But Does No Physical Damage To Vehicle",
             "AttackHits": "Attack Hits",
+            "AttackResisted": "Attack Resisted",
+            "BruteForceFailure": "Brute Force failed!",
+            "BruteForceSuccess": "Brute Force successful!",
+            "CheckOverwatchScoreSuccess": "Check Overwatch Score successful!",
+            "CheckOverwatchScoreFailure": "Check Overwatch Score failed!",
             "Failure": "Failure!",
+            "HackOnTheFlyFailure": "Hack on the Fly failed!",
+            "HackOnTheFlySuccess": "Hack on the Fly successful!",
             "ResistedAllDamage": "No Damage taken!",
             "ResistedSomeDamage": "Damage taken!",
             "Results": "Results",
@@ -1245,6 +1467,9 @@
         },
         "Tests": {
             "AttributeOnlyTest": "Attribute-Only Test",
+            "BiofeedbackResistTest": "Biofeedback Resist",
+            "BruteForceTest": "Brute Force",
+            "CheckOverwatchScoreTest": "Check Overwatch Score",
             "CombatSpellDefenseTest": "Combat Spell Defense",
             "CompileSpriteTest": "Compile Sprite",
             "ComplexFormTest": "Threading Complex Form",
@@ -1253,10 +1478,17 @@
             "DronePerceptionTest": "Drone Perception Test",
             "ExtendedTest": "Extended Test",
             "FadeTest": "Fade Test",
+            "HackOnTheFlyTest": "Hack on the Fly",
+            "MatrixDefenseTest": "Matrix Defense",
+            "MatrixResistTest": "Matrix Damage Resist",
+            "MatrixTest": "Matrix Test",
             "MeleeAttackTest": "Melee Weapon Attack",
             "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
             "NaturalRecoveryStunTest": "Natural Recovery Stun",
+            "OpposedBruteForceTest": "Oppose Brute Force",
+            "OpposedCheckOverwatchScoreTest": "Oppose Check Overwatch Score",
             "OpposedCompileSpriteTest": "Oppose Compilation",
+            "OpposedHackOnTheFlyTest": "Oppose Hack On The Fly",
             "OpposedRitualTest": "Seal the Ritual",
             "OpposedSummonSpiritTest": "Oppose Summoning",
             "OpposedTest": "Opposed Test",
@@ -1275,15 +1507,25 @@
         "Threshold": "Threshold",
         "ToggleActive": "Toggle Active",
         "ToggleEquip": "Toggle Equipped",
+        "ToggleWireless": "Toggle Wireless",
         "Tooltips": {
             "Actor": {
+                "ConnectNetwork": "Enter this host/grid",
                 "Critter": "Allow the use of critter powers",
+                "DisconnectNetwork": "Leave this host/grid",
                 "Grunt": "Apply grunt rules to this actor",
+                "MarkTarget": "Place additional marks on this target",
                 "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
                 "MissingSummoner": "Drag&Drop Character or use summoning action",
                 "MissingTechnomancer": "Drag&Drop Character or use compilation action",
                 "NPC": "Mark actor as NPC to get additional features",
-                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run"
+                "PlaceMark": "Action to be used to place marks on already marked targets",
+                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
+                "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
+                "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
+                "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
+                "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
+                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
             "Actor.DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
             "CallInAction": {
@@ -1300,6 +1542,7 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
                 "ApplyTo": "Changes of this effect will apply to this target only",
+                "PriorityFieldDisabled": "Custom priority is not supported at this time",
                 "DocumentEffects": "Effects directly on this document",
                 "ItemEffects": "Effects collected from items on this document",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
@@ -1311,10 +1554,10 @@
                 "ActionCategories": "Select action categories to use instead of the test's default categories. Using Active Effects you can use categories to modify test values",
                 "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",
                 "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
-                "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
                 "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
-                "DisabledForPreparedActor": "Disabled due to use of prepared actor",
-                "CostAdjustment": "Adjust actual cost based on the item rating"
+                "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
+                "CostAdjustment": "Adjust actual cost based on the item rating",
+                "DisabledForPreparedActor": "Disabled due to use of prepared actor"
             },
             "Modifiers": {
                 "armor": "Modifies total armor value",
@@ -1334,6 +1577,7 @@
                 "global": "Modifies all tests pool, excluding damage reducing tests",
                 "judge_intentions": "Modifies judge intentions tests pool",
                 "lift_carry": "Modifies lift&carry tests pool",
+                "mark_damage": "Modifies the amount of damage taken per MARK done to you",
                 "matrix_initiative": "Modifies matrix initiative base",
                 "matrix_initiative_dice": "Modifies matrix initiative dice",
                 "matrix_track": "Modifies matrix damage track",
@@ -1347,12 +1591,15 @@
                 "physical_limit": "Modifies physical limit",
                 "physical_overflow_track": "Modifies physical overflow damage track",
                 "physical_track": "Modifies physical damage track",
+                "public_grid": "Modifies the Public Grid modifier when connected to it",
                 "reach": "Modifies reach of melee attacks",
                 "recoil": "Modifies recoil tests pool",
                 "run": "Modifies running distance by multiples of the agility attribute",
                 "soak": "Modifies physical damage resist tests pool",
                 "social_limit": "Modifies social limit",
                 "stun_track": "Modifies stun damage track",
+                "place_two_marks": "Modifies the modifier to place two marks at the same time",
+                "place_three_marks": "Modifies the modifier to place three marks at the same time",
                 "walk": "Modifies walking distance by multiples of the agility attribute",
                 "wound_tolerance": "Modifies damage per wound modifier"
             },
@@ -1433,7 +1680,7 @@
             "IsDrone": "Is Drone",
             "IsOffRoad": "Is Off Road",
             "Maneuvering": "Maneuvering",
-            "MissingDriver": "Drag&Drop an actor as a driver",
+            "MissingDriver": "Drag&Drop an actor or Pick a token as a driver",
             "ModificationCategoryTypes": {
                 "body": "Body",
                 "cosmetic": "Cosmetic",
@@ -1477,6 +1724,7 @@
         "WalkingSpeed": "Walking",
         "Warnings": {
             "AlreadyExistingInventory": "An inventory with this name already exists",
+            "AlreadyJoinedNetwork": "{name} already joined this network",
             "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now.",
             "CantEditDefaultInventory": "The default inventory can't be renamed",
             "CantExtendTest": "Test type can't be extended.",
@@ -1497,6 +1745,7 @@
             "InvalidSummoningForce": "Force value chosen doesn't adhere to the rules",
             "NegativeLimitValue": "Limit values must positive numbers",
             "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
+            "OnlyGMCanDoThis": "Only a GM user can do this",
             "RitualInvalidForce": "Ritual force is invalid or greater then your lodges rating.",
             "RitualNotConcluded": "Ritual incomplete. Wait for ritual to oppose spellcasting to determine drain.",
             "RitualNotEnoughReagents": "Not enough reagents offered.",
@@ -1582,7 +1831,10 @@
             "Type": "Type",
             "Weapon": "Weapon"
         },
-        "Wireless": "Wireless"
+        "Wireless": "Wireless",
+        "WirelessOnline": "Online",
+        "WirelessOffline": "Offline",
+        "WirelessUnavailable": "Unavailable"
     },
     "TYPES": {
         "Actor": {
@@ -1607,6 +1859,7 @@
             "device": "Device",
             "echo": "Echo",
             "equipment": "Equipment",
+            "grid": "Grid",
             "host": "Host",
             "lifestyle": "Lifestyle",
             "metamagic": "Metamagic",

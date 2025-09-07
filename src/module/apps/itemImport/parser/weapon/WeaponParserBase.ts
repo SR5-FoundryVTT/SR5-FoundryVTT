@@ -2,15 +2,14 @@ import { SR5 } from '../../../../config';
 import { Parser, SystemType } from '../Parser';
 import { Weapon } from '../../schema/WeaponsSchema';
 import { RangeType } from 'src/module/types/item/Weapon';
-import { DamageType } from 'src/module/types/item/Action';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { CompendiumKey, Constants } from '../../importer/Constants';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
+import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
 
 import PhysicalAttribute = Shadowrun.PhysicalAttribute;
-type DamageTypeType = SystemType<'weapon'>['action']['damage']['type']['base'];
-type DamageElement = SystemType<'weapon'>['action']['damage']['element']['base'];
+type DamageElement = DamageType['element']['base'];
 
 export class WeaponParserBase extends Parser<'weapon'> {
     protected readonly parseType = 'weapon';
@@ -150,12 +149,12 @@ export class WeaponParserBase extends Parser<'weapon'> {
                 value: damageAp,
                 mod: [],
             },
-            attribute: damageAttribute,
             element: {
                 base: damageElement,
                 value: damageElement,
-            }
-        }
+            },
+            ...(damageAttribute && { attribute: damageAttribute })
+        } as const;
         return DataDefaults.createData('damage', partialDamageData);
     }
 

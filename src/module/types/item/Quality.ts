@@ -1,10 +1,10 @@
-import { ActionRollData } from "./Action";
+import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
-const { SchemaField, NumberField, StringField } = foundry.data.fields;
+const { NumberField, StringField } = foundry.data.fields;
 
 const QualityData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData()),
+    ...ActionPartData(),
 
     type: new StringField({
         required: true,

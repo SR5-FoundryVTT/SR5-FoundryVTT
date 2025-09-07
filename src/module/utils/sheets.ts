@@ -3,8 +3,6 @@
  */
 
 import Tagify from '@yaireo/tagify';
-import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import { SYSTEM_NAME } from '../constants';
 import { Translation } from './strings';
 
 // A single whitelist / dropdown / tag element

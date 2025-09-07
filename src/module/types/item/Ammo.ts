@@ -1,11 +1,11 @@
 import { BlastData } from "./Weapon";
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { TechnologyData } from "../template/Technology";
+import { TechnologyPartData } from "../template/Technology";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const AmmoData = () => ({
     ...BaseItemData(),
-    technology: new SchemaField(TechnologyData()),
+    ...TechnologyPartData(),
 
     element: new StringField({
         blank: true,

@@ -1,7 +1,7 @@
 export interface FormDialogData extends Dialog.Data<HTMLElement | JQuery> {
 	templateData: object;
 	templatePath: string;
-	onAfterClose?: Function;
+	onAfterClose?: (html: any, selectedButton?: string) => Promise<object>;
 }
 
 export interface FormDialogOptions extends Dialog.Options {
@@ -20,10 +20,10 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     selectedButton!: string;
     form!: HTMLFormElement;
 
-    _onAfterClose: Function;
+    _onAfterClose: (html: any, selectedButton?: string) => Promise<object>;
     _selectionPromise: Promise<object>;
-    _selectionResolve!: Function;
-    _selectionReject!: Function;
+    _selectionResolve!: (event: any) => void;
+    _selectionReject!: (event: any) => void;
     _templateData: object;
     _templatePath: string;
 
@@ -34,7 +34,7 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
         this._templateData = templateData;
         this._templatePath = templatePath;
 
-        this._onAfterClose = data.onAfterClose || this.onAfterClose;
+        this._onAfterClose = data.onAfterClose || this.onAfterClose.bind(this);
 
         this.selection = this._emptySelection();
 
@@ -131,10 +131,10 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     async select(): Promise<any> {
         await this.render(true);
 
-        if (this._selectionPromise === undefined || this.selection === undefined) {
+        if (this._selectionPromise === undefined || this.selection === undefined)
             return this._emptySelection();
-        }
-        return await this._selectionPromise;
+
+        return this._selectionPromise;
     }
 
     _emptySelection(): object {
@@ -185,8 +185,6 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
      * Based on FormDialog.options configuration apply changes to data.
      */
     async _onChangeInput(event) {
-        const el = event.target;
-
         if ( this.options.applyFormChangesOnSubmit ) {
             this.applyFormData();
             this.render();
@@ -196,5 +194,5 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     /**
      * Sub dialogs should override this method for custom handling of closing dialog.
      */
-    onAfterClose(html: JQuery<HTMLElement>) {}
+    async onAfterClose(html: JQuery<HTMLElement>, selectedButton?: string) { return {} as object; }
 }

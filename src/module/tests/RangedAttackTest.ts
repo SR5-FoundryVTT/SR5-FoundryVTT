@@ -44,7 +44,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         return [{
             query: '#reset-progressive-recoil',
             on: 'click',
-            callback: this._handleResetProgressiveRecoil
+            callback: this._handleResetProgressiveRecoil.bind(this)
         }]
     }
 
@@ -98,7 +98,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         const lastFireMode = this.item.getLastFireMode() || DataDefaults.createData('fire_mode');
         // Try pre-selection based on last fire mode.
         this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
-        if (this.data.fireModeSelected == -1) this.data.fireModeSelected = 0;
+        if (this.data.fireModeSelected === -1) this.data.fireModeSelected = 0;
         this._selectFireMode(this.data.fireModeSelected);
     }
 

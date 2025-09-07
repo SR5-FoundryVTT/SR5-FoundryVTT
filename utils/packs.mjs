@@ -69,11 +69,11 @@ function packageCommand() {
             const { action, pack, entry } = argv;
             switch (action) {
                 case 'clean':
-                    return await cleanPacks(pack, entry);
+                    return cleanPacks(pack, entry);
                 case 'pack':
-                    return await compilePacks(pack);
+                    return compilePacks(pack);
                 case 'unpack':
-                    return await extractPacks(pack, entry);
+                    return extractPacks(pack, entry);
             }
         },
     };

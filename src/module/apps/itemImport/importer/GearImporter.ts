@@ -35,7 +35,7 @@ export class GearImporter extends DataImporter {
                                  : programTypes.includes(category) ? programParser
                                                                    : equipmentParser;
 
-            return await selectedParser.Parse(jsonData, compendiumKey) as Item.CreateData;
+            return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }
     };
 
