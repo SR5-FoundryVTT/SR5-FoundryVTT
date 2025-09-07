@@ -46,7 +46,7 @@ export const PackActionFlow = {
      */
     async getPackActions(packName: string): Promise<SR5Item<'action'>[]> {
         console.debug(`Shadowrun 5e | Trying to fetch all actions from pack ${packName}`);
-        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as unknown as CompendiumCollection<'Item'> | undefined;
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName)as CompendiumCollection<'Item'> | undefined;
         if (!pack) return [];
 
         const packEntries = pack.index.filter(data => data.type === 'action');
