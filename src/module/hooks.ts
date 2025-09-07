@@ -124,6 +124,7 @@ import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
+import { CompendiumBrowser } from './apps/browser/CompendiumBrowser';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -377,6 +378,8 @@ ___________________
         // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
+        CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
+
         CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
 
         CONFIG.Item.dataModels["action"] = Action;
@@ -547,6 +550,10 @@ ___________________
      * @returns 
      */
     static renderCompendiumDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
+        const browser = $('<button class="sr5 import-button"><i class="fa-solid fa-book-open-reader"></i><span>Open Compendium Browser</span></button>');
+        $(html).find('.header-actions').append(browser);
+        browser.on('click', () => { void new CompendiumBrowser().render({ force: true }); });
+
         if (!game.user?.isGM) {
             return;
         }

@@ -1,0 +1,242 @@
+/* --- Shadowrun 5th Edition Compendium Browser (SCSS Version) --- */
+
+/* --- Variables --- */
+// Colors
+$bg-primary: #1a1a1a;
+$bg-secondary: #0d0d0d;
+$bg-tertiary: #252525;
+$bg-row-even: #1f1f1f;
+$bg-hover: #282828;
+
+$text-primary: #eee;
+$text-secondary: #ccc;
+$text-meta: #aaa;
+$text-placeholder: #888;
+
+$border-strong: #5a5a5a;
+$border-medium: #333;
+$border-subtle: #3a3a3a;
+
+$accent-gold: #ffd700;
+$accent-danger: #ff4d4d;
+
+// Fonts
+$font-primary: "Signika", system-ui, -apple-system, sans-serif;
+
+
+/* --- Main Container --- */
+.sr5-compendium-browser {
+    height: 100%;
+    padding: 10px;
+    background: $bg-primary;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: $text-primary;
+    font-family: $font-primary;
+
+    /* --- Filter Section --- */
+    .compendium-filters {
+        flex-shrink: 0;
+    }
+
+    .search-bar {
+        position: relative;
+        width: 100%;
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-placeholder;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 30px 10px 35px;
+            background: $bg-tertiary;
+            border: 1px solid $border-strong;
+            border-radius: 3px;
+            color: white;
+            font-size: 14px;
+            transition: all 0.2s ease-in-out;
+
+            &::placeholder {
+                color: $text-placeholder;
+            }
+
+            &:focus {
+                border-color: $accent-gold;
+                box-shadow: 0 0 5px rgba($accent-gold, 0.3);
+                outline: none;
+            }
+        }
+
+        .clear-filter {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            opacity: 0.6;
+            color: $text-meta;
+            font-weight: bold;
+            font-size: 18px;
+
+            &:hover {
+                opacity: 1;
+                color: $accent-danger;
+            }
+        }
+    }
+
+    /* --- Results Section --- */
+    .compendium-results {
+        background: $bg-secondary;
+        border-radius: 4px;
+        border: 1px solid $border-medium;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        min-height: 0;
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: $bg-tertiary;
+            border-bottom: 2px solid $border-strong;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: $accent-gold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+
+            h2 {
+                margin: 0;
+                font-size: 1.2em;
+                text-shadow: 0 0 5px rgba($accent-gold, 0.4);
+            }
+
+            .header-source {
+                font-size: 0.9em;
+            }
+        }
+
+        .compendium-list {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+
+            // Scrollbar Styling
+            &::-webkit-scrollbar {
+                width: 8px;
+            }
+            &::-webkit-scrollbar-track {
+                background: $bg-primary;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: $border-strong;
+                border-radius: 4px;
+
+                &:hover {
+                    background: lighten($border-strong, 5%);
+                }
+            }
+        }
+    }
+
+    /* --- Result Row & Children --- */
+    .compendium-entry {
+        &:nth-child(even) .result-row {
+            background: $bg-row-even;
+        }
+    }
+
+    .result-row {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid $border-subtle;
+        background: $bg-primary;
+        transition: background 0.15s ease;
+
+        &:hover {
+            background: $bg-hover;
+        }
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .item-main {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        min-width: 0;
+        cursor: pointer;
+        padding: 8px 0 8px 15px;
+    }
+
+    .item-meta {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-shrink: 0;
+        cursor: pointer;
+        font-size: 0.9em;
+        padding: 8px 15px 8px 0;
+    }
+
+    .item-image {
+        width: 30px;
+        height: 30px;
+        margin-right: 15px;
+        flex-shrink: 0;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border: none;
+        }
+    }
+
+    .item-details {
+        flex-grow: 1;
+        min-width: 0;
+
+        h3 {
+            margin: 0;
+            font-size: 1em;
+            color: white;
+            word-break: break-word;
+            font-weight: normal;
+        }
+
+        .item-type {
+            font-size: 0.8em;
+            color: $text-placeholder;
+            text-transform: capitalize;
+        }
+    }
+
+    .item-source {
+        color: $text-meta;
+        white-space: nowrap;
+    }
+
+    /* --- Utility Styles --- */
+    .no-results {
+        padding: 40px 20px;
+        text-align: center;
+        color: darken($text-placeholder, 5%);
+        font-style: italic;
+        background: $bg-primary;
+    }
+}
