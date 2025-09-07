@@ -7,7 +7,7 @@ const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fie
 
 export const BlastData = () => ({
     radius: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-    dropoff: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    dropoff: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
 const AmmunitionData = () => ({
@@ -45,7 +45,7 @@ export const RangeWeaponData = () => ({
 });
 
 const MeleeWeaponData = () => ({
-    reach: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    reach: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
 const ThrownWeaponData = () => ({
