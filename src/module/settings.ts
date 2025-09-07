@@ -311,7 +311,7 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Override the default matrix actions pack
+     * Override the default IC actions pack
      */
     game.settings.register(SYSTEM_NAME, FLAGS.ICActionsPack, {
         name: 'SR5.CompendiaSettings.ICActionsPack.label',
