@@ -1,3 +1,4 @@
+import { LinksHelpers } from "@/module/utils/links";
 import AppV2 = foundry.applications.api.ApplicationV2;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -20,7 +21,6 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     private _searchCursorPosition: number | null = null;
 
     /**
-     * @param {object} [options={}] Application configuration options.
      */
     constructor(options = {}) {
         super(options);
@@ -32,25 +32,24 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
 
     /**
      * Defines the default options for the Compendium Browser application window.
-     * @returns {object} The default application options.
      */
-    static override get DEFAULT_OPTIONS() {
-        return {
-            id: "compendium-browser",
-            tag: "form",
-            position: { width: 1050, height: 700 },
-            window: {
-                classes: ["compendium-browser"],
-                title: "Compendium Browser",
-                minimizable: true,
-                resizable: true
-            },
-            actions: {
-                togglePack: this.prototype._onTogglePack,
-                clearSearch: this.prototype._onClearSearch,
-            }
-        };
-    }
+    static override DEFAULT_OPTIONS = {
+        id: "compendium-browser",
+        tag: "form",
+        position: { width: 1050, height: 700 },
+        window: {
+            classes: ["compendium-browser"],
+            title: "Compendium Browser",
+            minimizable: true,
+            resizable: true
+        },
+        actions: {
+            clearSearch: this.prototype._onClearSearch.bind(this),
+            openDoc: this.#openDoc.bind(this),
+            openSource: this.#openSource.bind(this),
+            togglePack: this.prototype._onTogglePack.bind(this),
+        }
+    } as const;
 
     /**
      * Defines the Handlebars template parts used by this application.
@@ -63,16 +62,30 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
 
     /**
      * The title of the application window.
-     * @returns {string} The window title.
      */
     override get title() {
         return "Compendium Browser";
     }
-    
+
+    static async #openDoc(event: MouseEvent, target: HTMLElement) {
+        const el = target.closest<HTMLElement>("[data-uuid]");
+        const uuid = el?.dataset.uuid;
+        if (!uuid) return;
+
+        const doc = await fromUuid(uuid) as Actor | Item | null;
+        await doc?.sheet?.render(true);
+    }
+
+    static async #openSource(event: MouseEvent, target: HTMLElement) {
+        const el = target.closest<HTMLElement>("[data-action='openSource']");
+        const source = el?.textContent?.trim();
+        if (!source) return;
+
+        await LinksHelpers.openSource(source);
+    }
+
     /**
      * Attach event listeners to the application's rendered HTML.
-     * @param {object} context The context object provided by the Application.
-     * @param {Parameters<AppV2["_onRender"]>[1]} options The options for rendering the Application.
      */
     protected override async _onRender(context: object, options: Parameters<AppV2["_onRender"]>[1]): Promise<void> {
         await super._onRender(context, options);
@@ -80,30 +93,26 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         
         const searchInput = this.element.querySelector<HTMLInputElement>("#compendium-browser-search");
         if (searchInput) {
-            if (this._searchCursorPosition !== null) {
+            if (this._searchCursorPosition) {
                 searchInput.focus();
                 searchInput.setSelectionRange(this._searchCursorPosition, this._searchCursorPosition);
                 this._searchCursorPosition = null;
             }
-            searchInput.addEventListener("input", event => {
-                this._onSearch(event, searchInput);
-            });
+            searchInput.addEventListener("input", event =>  { void this._onSearch(event, searchInput); });
         }
     }
 
     /**
      * Prepare the data object to be rendered by the Handlebars template.
-     * @param {Parameters<AppV2["_prepareContext"]>[0]} options Options for preparing the context.
-     * @returns {Promise<object>} The context object for the template, containing lists of packs and entries.
      */
     override async _prepareContext(options: Parameters<AppV2["_prepareContext"]>[0]) {
         const activePacks = this._packs.filter(p => this._activePackIds.includes(p.collection));
-        const indexes = await Promise.all(activePacks.map(pack => pack.getIndex()));
-        let entries = indexes.flatMap(index => [...index.values()]);
+        const indexes = await Promise.all(activePacks.map(async pack => pack.getIndex()));
+        let entries = indexes.flatMap(index => [...index.values()]) as CompendiumCollection.IndexEntry<'Item'>[];
 
         if (this._searchQuery) {
             const query = this._searchQuery.toLowerCase();
-            entries = entries.filter((i: any) => i.name && i.name.toLowerCase().includes(query));
+            entries = entries.filter(i => i.name?.toLowerCase().includes(query));
         }
 
         const packsForFilters = this._packs.map(p => ({
@@ -121,7 +130,6 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
 
     /**
      * Handle the dragstart event for a compendium entry.
-     * @param {DragEvent} event The drag event.
      */
     private _onDrag(event: DragEvent) {
         const target = event.target as HTMLElement | null;
@@ -137,8 +145,6 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
 
     /**
      * Handle ticking or unticking a compendium pack checkbox.
-     * @param {Event} event The triggering event.
-     * @param {HTMLInputElement} target The checkbox input element.
      */
     private async _onTogglePack(event: Event, target: HTMLInputElement): Promise<void> {
         const packId = target.dataset.packId;
@@ -156,8 +162,6 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
 
     /**
      * Handle the input event on the search field to live-filter the results.
-     * @param {Event} event The triggering input event.
-     * @param {HTMLInputElement} target The search input element.
      */
     private async _onSearch(event: Event, target: HTMLInputElement): Promise<void> {
         this._searchCursorPosition = target.selectionStart;

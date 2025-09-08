@@ -40,19 +40,17 @@
                 {{#each entries as |entry|}}
                     <div class="compendium-entry" data-uuid="{{entry.uuid}}" draggable="true">
                         <div class="result-row">
-                            <div class="item-image">
-                                <img src="{{entry.img}}" alt="{{entry.name}}" loading="lazy">
+                            <div class="item-main" data-action="openDoc">
+                                <div class="item-image">
+                                    <img src="{{entry.img}}" alt="{{entry.name}}" loading="lazy"/>
+                                </div>
+                                <div class="item-details">
+                                    <h3>{{entry.name}}</h3>
+                                    <div class="item-type">{{entry.type}}</div>
+                                </div>
                             </div>
-                            <div class="item-details">
-                                <h3>{{entry.name}}</h3>
-                                {{#if entry.type}}
-                                <div class="item-type">{{entry.type}}</div>
-                                {{/if}}
-                            </div>
-                            <div class="item-meta">
-                                {{#if entry.system.description.source}}
-                                    <span class="item-source">{{entry.system.description.source}}</span>
-                                {{/if}}
+                            <div class="item-meta" data-action="openSource">
+                                {{entry.system.description.source}}
                             </div>
                         </div>
                     </div>
