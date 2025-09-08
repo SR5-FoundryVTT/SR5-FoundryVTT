@@ -1222,6 +1222,11 @@ export const registerItemLineHelpers = () => {
                 cssClass: 'toggle-connected-matrix-icons'
             };
 
+        const shareIcon = {
+            icon: 'fas fa-share',
+            cssClass: 'invite-mark',
+        }
+
         const wirelessIcon = {
             cssClass: 'toggle-owned-icon-silent',
             icon: `${target.document.isRunningSilent()
@@ -1234,9 +1239,9 @@ export const registerItemLineHelpers = () => {
                     : 'SR5.WirelessOnline')
         }
         if (target.document instanceof SR5Actor) {
-            return target.document.hasWirelessDevices ? [wirelessIcon, toggleConnectedItemsIcon] : [wirelessIcon];
+            return target.document.hasWirelessDevices ? [wirelessIcon, shareIcon, toggleConnectedItemsIcon] : [wirelessIcon, shareIcon];
         }
-        return [wirelessIcon];
+        return [wirelessIcon, shareIcon];
     });
 
     Handlebars.registerHelper('MatrixOwnedItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {

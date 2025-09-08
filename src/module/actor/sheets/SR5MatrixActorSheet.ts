@@ -155,7 +155,8 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         if (!document) return;
         if (!(document instanceof SR5Item || document instanceof SR5Actor)) return;
 
-        const test = await TestCreator.fromPackAction(SR5.packNames.MatrixActionsPack, 'invite_mark', document);
+        const test = await TestCreator.fromPackAction(SR5.packNames.MatrixActionsPack, 'invite_mark', this.actor);
+        test?.addTarget(document);
         await test?.execute();
     }
 
