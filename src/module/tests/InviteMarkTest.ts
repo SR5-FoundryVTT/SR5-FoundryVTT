@@ -76,7 +76,6 @@ export class InviteMarkTest extends MatrixTest<InviteMarkTestData> {
             acc[`${p.document.uuid}`] = p.name;
             return acc;
         }, {});
-        console.log('personas', this.persona);
     }
 
     override validateBaseValues() {
