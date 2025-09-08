@@ -124,6 +124,7 @@ import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
+import { InviteMarkTest } from '@/module/tests/InviteMarkTest';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -253,7 +254,8 @@ ___________________
                 MatrixResistTest,
                 BiofeedbackResistTest,
                 CheckOverwatchScoreTest,
-                OpposedCheckOverwatchScoreTest
+                OpposedCheckOverwatchScoreTest,
+                InviteMarkTest,
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -286,7 +288,8 @@ ___________________
                 HackOnTheFlyTest,
                 MatrixResistTest,
                 BiofeedbackResistTest,
-                CheckOverwatchScoreTest
+                CheckOverwatchScoreTest,
+                InviteMarkTest,
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -616,6 +619,7 @@ ___________________
         await TeamworkTest.chatMessageListeners(message, html);
         await JournalEnrichers.messageRequestHooks(html);
         await MatrixNetworkFlow.chatMessageListeners(message, html, data);
+        await InviteMarkTest.chatMessageListeners(message, html, data);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {

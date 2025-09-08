@@ -75,11 +75,7 @@ export const MatrixTargetingFlow = {
         const targets: MatrixTargetDocument[] = [];
 
         // gather all actors and find the actors that we have ownership of (shadowrun character ownership, not Foundry Player ownership)
-        const actors: SR5Actor[] =  game.actors.filter((a) => {
-            // we don't want to include our own persona in this list
-            if (a === actor) return false;
-            return a instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, a) && !a.getToken();
-        }) as SR5Actor[];
+        const actors = ActorOwnershipFlow.ownedActorIconsOf(actor);
 
         for (const slave of actors) {
             const type = MatrixNetworkFlow.getDocumentType(slave);
@@ -93,26 +89,6 @@ export const MatrixTargetingFlow = {
                 type,
                 icons: []
             })
-        }
-        if (canvas.scene?.tokens) {
-            // go through the canvas tokens and see if we own any of them
-            for (const token of canvas.scene.tokens) {
-                if (!token.actor) continue;
-                // again don't add ourselves, we do that later
-                if (token.actor.uuid === actor.uuid) continue;
-                if (token.actor instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, token.actor)) {
-                    const type = MatrixNetworkFlow.getDocumentType(token.actor);
-                    targets.push({
-                        name: token.name,
-                        document: token.actor,
-                        token,
-                        runningSilent: token.actor.isRunningSilent(),
-                        network: this._getNetworkName(token.actor.network),
-                        type,
-                        icons: []
-                    })
-                }
-            }
         }
         // add ourselves to the front so that our own Persona sits at the top
         const type = MatrixNetworkFlow.getDocumentType(actor);
@@ -220,7 +196,7 @@ export const MatrixTargetingFlow = {
         if (!(document instanceof SR5Actor)) return connectedIcons;
 
         const personaDevice = document.getMatrixDevice();
-        for (const device of document.wirelessDevices) {
+        for (const device of ActorOwnershipFlow.ownedItemIconsOf(document)) {
             // Persona devices don't have their own device icon.
             if (personaDevice && device.uuid === personaDevice.uuid) continue;
 

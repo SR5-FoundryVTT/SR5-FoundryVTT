@@ -11,6 +11,8 @@ import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import { TestCreator } from '@/module/tests/TestCreator';
+import { SR5 } from '@/module/config';
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
@@ -139,6 +141,22 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
         html.find('.toggle-owned-icon-silent').on('click', this._onOwnedIconRunningSilentToggle.bind(this));
+
+        html.find('.invite-mark').on('click', this._onOwnedIconInviteMark.bind(this))
+    }
+
+    async _onOwnedIconInviteMark(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const iid = Helpers.listItemUuid(event);
+        const document = await fromUuid(iid);
+        // only deal with an actor or item
+        if (!document) return;
+        if (!(document instanceof SR5Item || document instanceof SR5Actor)) return;
+
+        const test = await TestCreator.fromPackAction(SR5.packNames.MatrixActionsPack, 'invite_mark', document);
+        await test?.execute();
     }
 
     async _onOwnedIconRunningSilentToggle(event: MouseEvent) {

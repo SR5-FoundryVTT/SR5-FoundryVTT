@@ -1,0 +1,33 @@
+<form>
+    <div class="dialog-content-common">
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs'}}
+        <hr/>
+        <div>
+            <div class="form-group">
+                <label>{{localize "SR5.Marks"}}</label>
+                <input name="test.data.marks" type="number" class="disabled-for-display"
+                       value="{{test.data.marks}}" min="1" max="3"/>
+            </div>
+            {{#if test.controller}}
+                <div class="document">
+                    <img src="{{test.controller.img}}"/>
+                    {{test.controller.name}}
+                </div>
+            {{/if}}
+            {{#if test.icon}}
+                <!-- Icon targeted -->
+                <div class="form-group">
+                    <label>{{localize "SR5.Labels.Matrix.Icon"}}</label>
+                    <div>{{speakerName test.icon}}</div>
+                </div>
+            {{/if}}
+            <!-- Personas available to invite a Mark to -->
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.Matrix.TargetPersona">{{localize "SR5.Labels.Matrix.TargetPersona"}}</label>
+                <select name="test.data.targetPersonaUuid" class="target-persona">
+                    {{selectOptions test.personas selected=test.data.targetPersonaUuid }}
+                </select>
+            </div>
+        </div>
+    </div>
+</form>

@@ -807,9 +807,11 @@
             "Matrix": {
                 "TargetMainIcon": "Target Main Icon",
                 "TargetDevice": "Target Device",
+                "Icon": "Icon",
                 "Local": "Local",
                 "Global": "Global",
-                "Public": "Public"
+                "Public": "Public",
+                "TargetPersona": "Target Persona"
             },
             "Message": {
                 "ClickToSelect": "Click to select on scene",
@@ -1479,6 +1481,7 @@
             "ExtendedTest": "Extended Test",
             "FadeTest": "Fade Test",
             "HackOnTheFlyTest": "Hack on the Fly",
+            "InviteMarkTest": "Invite Mark",
             "MatrixDefenseTest": "Matrix Defense",
             "MatrixResistTest": "Matrix Damage Resist",
             "MatrixTest": "Matrix Test",

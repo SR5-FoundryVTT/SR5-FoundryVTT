@@ -7,6 +7,41 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
  */
 export const ActorOwnershipFlow = {
 
+    ownedActorIconsOf(actor: SR5Actor): SR5Actor[] {
+        const map = new Map<string, SR5Actor>();
+        // first collect all the actors on the scene
+        if (canvas.scene?.tokens) {
+            for (const token of canvas.scene.tokens) {
+                if (!token.actor) continue;
+                // don't add ourselves
+                if (token.actor.uuid === actor.uuid) continue;
+
+                if (token.actor instanceof SR5Actor
+                        && this._isOwnerOfActor(actor, token.actor)) {
+                    map.set(token.actor.uuid, token.actor);
+                }
+            }
+        }
+        // next, go over all game actors and get the ones our actor ows
+        for (const a of game.actors) {
+            if (a.uuid === actor.uuid || map.has(a.uuid)) continue;
+            if (a instanceof SR5Actor
+                    && ActorOwnershipFlow._isOwnerOfActor(actor, a)) {
+                map.set(a.uuid, a);
+            }
+        }
+        return Array.from(map.values());
+    },
+
+    ownedItemIconsOf(actor: SR5Actor): SR5Item[] {
+        // for now just return actor's items
+        return actor.wirelessDevices;
+    },
+
+    ownedIconsOf(actor: SR5Actor): (SR5Actor | SR5Item)[] {
+        return [...this.ownedItemIconsOf(actor), ...this.ownedActorIconsOf(actor)];
+    },
+
     /**
      * Determine if this actor is the owner of the given UUID
      * - this will check for items and for actors in the case of Vehicles/Drones

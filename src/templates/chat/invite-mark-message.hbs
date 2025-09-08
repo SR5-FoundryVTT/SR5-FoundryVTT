@@ -1,0 +1,37 @@
+{{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs'}}
+<div class="sr5 chat-card roll-card">
+    <div class="card-main-content">
+        <div class="card-content">
+            <div class="document">
+                <img src="{{speakerImg test.targetPersona}}" />
+                <a class="chat-document-link" data-uuid="{{test.targetPersona.uuid}}">{{speakerName test.targetPersona}}</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-buttons">
+        <div class="button"
+                data-action="invite-mark-accept"
+                data-source-id="{{test.icon.uuid}}"
+                data-target-id="{{test.targetPersona.uuid}}"
+                data-marks="{{test.data.marks}}">{{localize "SR5.Messages.MarkInvitation.AcceptInvite" }} ({{test.data.marks}})</div>
+    </div>
+</div>
+<div class="sr5 chat-card roll-card">
+    <div class="test-line">
+        <span class="test-name {{#if roll}}test-roll{{/if}}">
+            {{localize "SR5.Labels.Message.TargetedIcon"}}
+        </span>
+    </div>
+    <div class="card-title card-header">
+        <div class="container container--fluid">
+            <div class="container__row">
+                <div class="container__col">
+                    <div class="document">
+                        <a class="chat-select-link" data-token-id="{{test.icon.id}}"><img src="{{speakerImg test.icon}}" class="entity-selectable"/></a>
+                        <h3 class="header-name"><a class="chat-document-link" data-uuid="{{test.icon.uuid}}">{{speakerName test.icon}}</a></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

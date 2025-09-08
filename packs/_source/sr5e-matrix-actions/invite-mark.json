@@ -13,9 +13,9 @@
     },
     "action": {
       "type": "simple",
-      "test": "MatrixTest",
+      "test": "InviteMarkTest",
       "categories": [
-        "matrix"
+        "matrix", "invite_mark"
       ],
       "attribute": "",
       "attribute2": "",

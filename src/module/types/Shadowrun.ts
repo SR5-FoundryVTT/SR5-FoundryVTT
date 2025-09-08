@@ -57,6 +57,7 @@ declare namespace Shadowrun {
         | 'composure'
         | 'judge_intentions'
         | 'lift_carry'
+        | 'invite_mark'
         | 'memory'
         | 'physical_defense'
         | 'drone_pilot_vehicle'
@@ -91,6 +92,7 @@ declare namespace Shadowrun {
         'drain' | // resisting against drain
         'fade' | // resisting against fade
         'hack_on_the_fly' | // matrix hack on the fly action
+        'invite_mark' | // matrix invite mark action
         'magic' | // all magic actions in general
         'matrix' | // all  matrix actions in general
         'recovery_physical' | // natural recovery of physical damage
