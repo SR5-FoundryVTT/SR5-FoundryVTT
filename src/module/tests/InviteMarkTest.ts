@@ -47,6 +47,11 @@ export class InviteMarkTest extends MatrixTest<InviteMarkTestData> {
         event.stopPropagation();
         const target = await fromUuid(event.currentTarget.dataset.targetId);
         if (!target || !(target instanceof SR5Actor)) return;
+
+        if (!target.isOwner) {
+            ui.notifications.warn(`${game.i18n.localize('SR5.Notifications.UserNotOwnerOfActor')}`)
+            return;
+        }
         const source = await fromUuid(event.currentTarget.dataset.sourceId);
         if (!source || (!(source instanceof SR5Actor) && !(source instanceof SR5Item))) return;
         const marks = event.currentTarget.dataset.marks;
