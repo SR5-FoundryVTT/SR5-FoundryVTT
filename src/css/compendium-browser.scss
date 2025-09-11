@@ -25,21 +25,19 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
 
 
 /* --- Main Container --- */
-.sr5-compendium-browser {
+#compendium-browser .window-content {
     height: 100%;
     padding: 10px;
     background: $bg-primary;
     border-radius: 6px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
     color: $text-primary;
     font-family: $font-primary;
 
     /* --- Filter Section --- */
-    .compendium-filters {
-        flex-shrink: 0;
-    }
+    /* This is now the sidebar, see styles at the bottom */
 
     .search-bar {
         position: relative;
@@ -102,6 +100,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
         flex-direction: column;
         flex-grow: 1;
         min-height: 0;
+        min-width: 0;
 
         .results-header {
             display: flex;
@@ -240,20 +239,20 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
         background: $bg-primary;
     }
 
-    /* Make the main filter container a flexbox */
+    /* --- MODIFIED FILTER STYLES FOR SIDEBAR --- */
     .compendium-filters {
         display: flex;
-        align-items: center;
-        gap: 15px; /* Space between checkbox area and search bar */
-        flex-wrap: wrap; /* Allow wrapping on smaller widths */
+        flex-direction: column; /* Stacks items vertically */
+        gap: 15px;
+        width: 240px;          /* Gives the sidebar a fixed width */
+        flex-shrink: 0;        /* Prevents the sidebar from shrinking */
     }
 
     /* Container for the checkboxes */
     .pack-selection {
         display: flex;
         gap: 10px;
-        flex-wrap: wrap; /* Allow checkboxes to wrap */
-        flex-grow: 1; /* Allow it to take up space */
+        flex-wrap: wrap; /* Checkboxes will still wrap within the sidebar */
     }
 
     /* Individual checkbox label styling */
@@ -278,12 +277,6 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
 
     /* Style for the actual checkbox */
     .pack-checkbox input {
-        accent-color: #ffd700; /* Gold color for the checkmark */
-    }
-
-    /* Make the search bar take up remaining space but have a minimum size */
-    .search-bar {
-        flex-grow: 2; /* Take more space than the checkbox container */
-        min-width: 250px; /* Ensure it doesn't get too small */
+        accent-color: #ffd700;
     }
 }

@@ -1,0 +1,28 @@
+<div class="compendium-filters">
+    <div class="search-bar">
+        <i class="search-icon fa-solid fa-magnifying-glass"></i>
+        <input 
+            type="text" 
+            name="search" 
+            id="compendium-browser-search"
+            value="{{searchQuery}}" 
+            placeholder="Search item...">
+        {{#if searchQuery}}
+        <a class="clear-filter" data-action="clearSearch" title="Clear Search">
+            <i class="fa-solid fa-xmark"></i>
+        </a>
+        {{/if}}
+    </div>
+    <div class="pack-selection">
+        {{#each packs as |pack|}}
+        <label class="pack-checkbox">
+            <input 
+                type="checkbox" 
+                {{#if pack.isChecked}}checked{{/if}} 
+                data-action="togglePack" 
+                data-pack-id="{{pack.id}}">
+            <span>{{pack.label}}</span>
+        </label>
+        {{/each}}
+    </div>
+</div>

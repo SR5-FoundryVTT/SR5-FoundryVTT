@@ -40,9 +40,9 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     static override DEFAULT_OPTIONS = {
         id: "compendium-browser",
         tag: "form",
+        classes: ["compendium-browser"],
         position: { width: 1050, height: 700 },
         window: {
-            classes: ["compendium-browser"],
             title: "Compendium Browser",
             minimizable: true,
             resizable: true
@@ -53,14 +53,17 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
             openSource: this.#openSource.bind(this),
             togglePack: this.prototype._onTogglePack.bind(this),
         }
-    } as const;
+    };
 
     /**
      * Defines the Handlebars template parts used by this application.
      */
     static override PARTS = {
-        content: {
-            template: "systems/shadowrun5e/dist/templates/apps/compendium-browser.hbs",
+        filters: {
+            template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/filters.hbs",
+        },
+        results: {
+            template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/results.hbs",
         },
     };
 
@@ -242,26 +245,22 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
      * Handle the mouse moving over a result row to update the tooltip's position.
      */
     #onRowMouseMove(event: MouseEvent): void {
-        const child = this.#tooltipElement as HTMLElement | null;
-        if (!child) return;
+        if (!this.#tooltipElement) return;
 
         let top = event.clientY;
         let left = event.clientX;
-        
-        const tooltipWidth = child?.offsetWidth ?? 0;
-        const tooltipHeight = child?.offsetHeight ?? 0;
-        
-        // Prevent tooltip from going off the right edge of the screen
-        if (left + tooltipWidth > window.innerWidth) {
-            left = event.clientX - tooltipWidth;
-        }
-        // Prevent tooltip from going off the bottom edge of the screen
-        if (top + tooltipHeight > window.innerHeight) {
-            top = event.clientY - tooltipHeight;
-        }
 
-        this.#tooltipElement!.style.top = `${top}px`;
-        this.#tooltipElement!.style.left = `${left}px`;
+        const tooltipWidth = this.#tooltipElement.offsetWidth;
+        const tooltipHeight = this.#tooltipElement.offsetHeight;
+
+        // Prevent tooltip from going off the screen
+        if (left + tooltipWidth > window.innerWidth)
+            left = event.clientX - tooltipWidth;
+        if (top + tooltipHeight > window.innerHeight)
+            top = event.clientY - tooltipHeight;
+
+        this.#tooltipElement.style.top = `${top}px`;
+        this.#tooltipElement.style.left = `${left}px`;
     }
 
     /*
