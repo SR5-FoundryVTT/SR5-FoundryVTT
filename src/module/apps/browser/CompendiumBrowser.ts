@@ -2,14 +2,15 @@ import { LinksHelpers } from "@/module/utils/links";
 import AppV2 = foundry.applications.api.ApplicationV2;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
+type Context = AppV2.RenderContext & Record<string, any>;
+
 /**
  * A generic compendium browser application that allows users to view and search
  * across multiple compendium packs simultaneously using checkboxes.
- * @extends {HandlebarsApplicationMixin(ApplicationV2)}
  */
-export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<any>) {
+export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<Context>) {
     /** The list of all discovered compendia. */
-    private _packs: CompendiumCollection<any>[] = [];
+    private readonly _packs: CompendiumCollection<any>[] = [];
 
     /** An array of IDs for the currently selected compendium packs. */
     private _activePackIds: string[] = [];
@@ -20,13 +21,16 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     /** The cursor position in the search input to preserve during re-renders. */
     private _searchCursorPosition: number | null = null;
 
-    /**
-     */
-    constructor(options = {}) {
+    /** A reference to the tooltip DOM element. */
+    #tooltipElement: HTMLElement | null = null;
+    /** A timeout handle to manage the tooltip's hide delay. */
+    #tooltipTimeout: number | null = null;
+
+    constructor(options?: ConstructorParameters<typeof ApplicationV2>[0]) {
         super(options);
         this._packs = [...game.packs.values()] as CompendiumCollection<any>[];
         if (this._packs.length > 0) {
-            this._activePackIds.push(this._packs[0].collection);
+            this._activePackIds.push(this._packs[1].collection);
         }
     }
 
@@ -87,10 +91,10 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     /**
      * Attach event listeners to the application's rendered HTML.
      */
-    protected override async _onRender(context: object, options: Parameters<AppV2["_onRender"]>[1]): Promise<void> {
-        await super._onRender(context, options);
+    protected override async _onRender(...args: Parameters<AppV2<Context>["_onRender"]>): Promise<void> {
+        await super._onRender(...args);
         this.element.addEventListener("dragstart", this._onDrag.bind(this));
-        
+
         const searchInput = this.element.querySelector<HTMLInputElement>("#compendium-browser-search");
         if (searchInput) {
             if (this._searchCursorPosition) {
@@ -99,6 +103,14 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
                 this._searchCursorPosition = null;
             }
             searchInput.addEventListener("input", event =>  { void this._onSearch(event, searchInput); });
+        }
+
+        const resultsContainer = this.element.querySelector<HTMLElement>(".compendium-list");
+        if (resultsContainer) {
+            // We use event delegation on the container for efficiency
+            resultsContainer.addEventListener("mouseover", this.#onRowMouseEnter.bind(this));
+            resultsContainer.addEventListener("mouseout", this.#onRowMouseLeave.bind(this));
+            resultsContainer.addEventListener("mousemove", this.#onRowMouseMove.bind(this));
         }
     }
 
@@ -122,6 +134,7 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         }));
 
         return {
+            ...(await super._prepareContext(options)),
             packs: packsForFilters,
             entries: entries,
             searchQuery: this._searchQuery,
@@ -175,5 +188,95 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     private async _onClearSearch(): Promise<void> {
         this._searchQuery = "";
         await this.render();
+    }
+
+    /**
+     * Handle the mouse entering a result row to show the tooltip.
+     */
+    async #onRowMouseEnter(event: MouseEvent): Promise<void> {
+        const row = (event.target as HTMLElement)?.closest<HTMLElement>(".result-row");
+        if (!row) return;
+
+        // Clear any pending timeout to hide the tooltip
+        if (this.#tooltipTimeout) clearTimeout(this.#tooltipTimeout);
+
+        const entryElem = row.closest<HTMLElement>("[data-uuid]");
+        const uuid = entryElem?.dataset.uuid;
+        if (!uuid) return;
+
+        const item = await fromUuid(uuid) as Item;
+        if (!item) return;
+
+        // IMPORTANT: Update this path to your actual weapon card template
+        const templatePath = "systems/shadowrun5e/dist/templates/apps/compendium-browser/cards/weapon.hbs";
+        const content = await foundry.applications.handlebars.renderTemplate(templatePath, { item: item.toObject(false), system: item.toObject(false).system });
+
+        // Create the tooltip element if it doesn't exist
+        if (!this.#tooltipElement) {
+            this.#tooltipElement = document.createElement("aside");
+            this.#tooltipElement.className = "item-preview-tooltip";
+            document.body.append(this.#tooltipElement);
+        }
+
+        this.#tooltipElement.innerHTML = content;
+        this.#tooltipElement.style.display = "block";
+
+        // Position it immediately
+        this.#onRowMouseMove(event);
+    }
+
+    /**
+     * Handle the mouse leaving a result row to hide the tooltip.
+     */
+    #onRowMouseLeave(event: MouseEvent): void {
+        // Set a short timeout to hide/remove the tooltip. This prevents flickering.
+        this.#tooltipTimeout = window.setTimeout(() => {
+            if (this.#tooltipElement) {
+                this.#tooltipElement.remove();
+                this.#tooltipElement = null;
+            }
+        }, 50);
+    }
+
+    /**
+     * Handle the mouse moving over a result row to update the tooltip's position.
+     */
+    #onRowMouseMove(event: MouseEvent): void {
+        const child = this.#tooltipElement as HTMLElement | null;
+        if (!child) return;
+
+        let top = event.clientY;
+        let left = event.clientX;
+        
+        const tooltipWidth = child?.offsetWidth ?? 0;
+        const tooltipHeight = child?.offsetHeight ?? 0;
+        
+        // Prevent tooltip from going off the right edge of the screen
+        if (left + tooltipWidth > window.innerWidth) {
+            left = event.clientX - tooltipWidth;
+        }
+        // Prevent tooltip from going off the bottom edge of the screen
+        if (top + tooltipHeight > window.innerHeight) {
+            top = event.clientY - tooltipHeight;
+        }
+
+        this.#tooltipElement!.style.top = `${top}px`;
+        this.#tooltipElement!.style.left = `${left}px`;
+    }
+
+    /*
+     * Ensures the tooltip is removed when the application window is closed.
+     */
+    override async close(...args: Parameters<AppV2["close"]>) {
+        if (this.#tooltipTimeout)
+            clearTimeout(this.#tooltipTimeout);
+        this.#tooltipTimeout = null;
+
+        if (this.#tooltipElement) {
+            this.#tooltipElement.remove();
+            this.#tooltipElement = null;
+        }
+
+        return super.close(...args);
     }
 }
