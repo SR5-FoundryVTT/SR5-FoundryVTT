@@ -110,6 +110,25 @@ export const MarksStorage = {
     },
 
     /**
+     * Retrieve all placed on a single icon
+     * @returns map of
+     */
+    retrieveMarksOnIcon(iconUuid: string): Map<string, number> {
+        const map = new Map<string, number>();
+        const storage = MarksStorage.getStorage();
+        console.log('iconUuid', iconUuid);
+        for (const [key, value] of Object.entries(storage)) {
+            console.log('entry', key, value);
+            if (value.includes(iconUuid)) {
+                console.log('entry included');
+                const count = map.get(key) ?? 0;
+                map.set(Helpers.uuidFromStorage(key), count + 1);
+            }
+        }
+        return map;
+    },
+
+    /**
      * Retrieve all marks for a single actors from global storage.
      * @param document The actor to retrieve marks for
      * @returns The actors marks data

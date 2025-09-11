@@ -13,9 +13,10 @@
     },
     "action": {
       "type": "complex",
-      "test": "MatrixTest",
+      "test": "EraseMarkTest",
       "categories": [
-        "matrix"
+        "matrix",
+        "erase_mark"
       ],
       "attribute": "logic",
       "attribute2": "",
@@ -64,7 +65,7 @@
       },
       "opposed": {
         "type": "custom",
-        "test": "OpposedTest",
+        "test": "OpposedEraseMarkTest",
         "attribute": "willpower",
         "attribute2": "firewall",
         "skill": "",

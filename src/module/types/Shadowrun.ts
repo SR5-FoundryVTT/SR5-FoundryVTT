@@ -90,6 +90,7 @@ declare namespace Shadowrun {
         'defense_matrix' | // defending against matrix attacks
         'defense_suppression' | // defending against suppression attacks
         'drain' | // resisting against drain
+        'erase_mark' | // erase mark action
         'fade' | // resisting against fade
         'hack_on_the_fly' | // matrix hack on the fly action
         'invite_mark' | // matrix invite mark action

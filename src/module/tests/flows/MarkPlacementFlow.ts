@@ -85,5 +85,37 @@ export const MarkPlacementFlow = {
         }
 
         return modifier;
+    },
+
+    /**
+     * Prepare all test modifiers for the mark placement test based on user selection.
+     *
+     * @param test The initial test to modify.
+     */
+    prepareEraseTestModifiers(test: MarkPlacementTests) {
+
+        const modifiers = new PartsList<number>(test.data.modifiers.mod);
+
+        // Apply mark modifier
+        modifiers.addUniquePart('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkEraseModifier(test));
+
+        MatrixTestDataFlow.prepareTestModifiers(test);
+    },
+
+    /**
+     * Get the correct modifier depending on the marks erased
+     *
+     * This can depend on local actor values or a default value.
+     */
+    getMarkEraseModifier(test: MarkPlacementTests) {
+        const modifier = MatrixRules.getMarkEraseModifier(test.data.marks);
+
+        // Allow users to modify the mark placement modifier through effects.
+        switch (test.data.marks) {
+            case 2: return modifier + (test.actor?.modifiers.totalFor('erase_two_marks') ?? 0);
+            case 3: return modifier + (test.actor?.modifiers.totalFor('erase_three_marks') ?? 0);
+        }
+
+        return modifier;
     }
 }

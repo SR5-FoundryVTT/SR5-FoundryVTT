@@ -118,6 +118,21 @@ export class MatrixRules {
     }
 
     /**
+     * Return modifier for marks erased. See SR5#239 'Erase Mark'
+     * @param marks Mount of marks to be placed
+     */
+    static getMarkEraseModifier(marks: number): number {
+        marks = MatrixRules.getValidMarksPlacementCount(marks);
+
+        // Only handle cases with actual modifiers and otherwise return zero for a secure fallback.
+        switch (marks) {
+            case 2: return -4;
+            case 3: return -10;
+        }
+        return 0;
+    }
+
+    /**
      * Derive a hosts attributes ratings based on it's host rating. SR5#247 'Host Attributes'
      * @param hostRating
      */

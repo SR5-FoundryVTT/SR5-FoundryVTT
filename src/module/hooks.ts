@@ -125,6 +125,8 @@ import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
 import { InviteMarkTest } from '@/module/tests/InviteMarkTest';
+import { EraseMarkTest } from '@/module/tests/EraseMarkTest';
+import { OpposedEraseMarkTest } from '@/module/tests/OpposedEraseMarkTest';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -256,6 +258,8 @@ ___________________
                 CheckOverwatchScoreTest,
                 OpposedCheckOverwatchScoreTest,
                 InviteMarkTest,
+                EraseMarkTest,
+                OpposedEraseMarkTest,
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -290,6 +294,7 @@ ___________________
                 BiofeedbackResistTest,
                 CheckOverwatchScoreTest,
                 InviteMarkTest,
+                EraseMarkTest,
             },
             /**
              * Subset of tests meant to be used as opposed tests.
@@ -307,7 +312,8 @@ ___________________
                 OpposedRitualTest,
                 OpposedBruteForceTest,
                 OpposedHackOnTheFlyTest,
-                OpposedCheckOverwatchScoreTest
+                OpposedCheckOverwatchScoreTest,
+                OpposedEraseMarkTest,
             },
             /**
              * Subset of tests meant to be used as resist tests.

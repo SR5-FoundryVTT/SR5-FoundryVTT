@@ -79,6 +79,7 @@ const CharacterData = () => ({
         "defense_block", "defense_melee", "defense_ranged", "soak", "recoil",
         // Magic/Matrix
         "drain", "fade", "essence", "public_grid", 'mark_damage', "place_two_marks", "place_three_marks",
+        "erase_two_marks", "erase_three_marks",
         // Miscellaneous
         "composure", "lift_carry", "judge_intentions", "memory", "global"
     )),

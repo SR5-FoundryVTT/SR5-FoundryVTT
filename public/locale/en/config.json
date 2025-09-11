@@ -1452,6 +1452,8 @@
             "BruteForceSuccess": "Brute Force successful!",
             "CheckOverwatchScoreSuccess": "Check Overwatch Score successful!",
             "CheckOverwatchScoreFailure": "Check Overwatch Score failed!",
+            "EraseMarkFailure": "Erase Mark failed!",
+            "EraseMarkSuccess": "Erased Mark successful!",
             "Failure": "Failure!",
             "HackOnTheFlyFailure": "Hack on the Fly failed!",
             "HackOnTheFlySuccess": "Hack on the Fly successful!",
