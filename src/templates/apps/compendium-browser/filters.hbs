@@ -13,15 +13,14 @@
         </a>
         {{/if}}
     </div>
-    <div class="pack-selection">
-        {{#each packs as |pack|}}
-        <label class="pack-checkbox">
+    <div class="types">
+        {{#each types as |type|}}
+        <label class="type">
             <input 
                 type="checkbox" 
-                {{#if pack.isChecked}}checked{{/if}} 
                 data-action="togglePack" 
-                data-pack-id="{{pack.id}}">
-            <span>{{pack.label}}</span>
+                data-filter-id="{{type}}">
+            <span>{{type}}</span>
         </label>
         {{/each}}
     </div>

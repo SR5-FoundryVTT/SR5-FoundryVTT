@@ -21,6 +21,11 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     /** The cursor position in the search input to preserve during re-renders. */
     private _searchCursorPosition: number | null = null;
 
+    private static readonly typesPart = {
+        actors: [] as string[],
+        items: [] as string[],
+    };
+
     /** A reference to the tooltip DOM element. */
     #tooltipElement: HTMLElement | null = null;
     /** A timeout handle to manage the tooltip's hide delay. */
@@ -32,6 +37,9 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         if (this._packs.length > 0) {
             this._activePackIds.push(this._packs[1].collection);
         }
+
+        CompendiumBrowser.typesPart.actors = Object.keys(CONFIG.Actor.dataModels);
+        CompendiumBrowser.typesPart.items = Object.keys(CONFIG.Item.dataModels);
     }
 
     /**
@@ -111,9 +119,9 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         const resultsContainer = this.element.querySelector<HTMLElement>(".compendium-list");
         if (resultsContainer) {
             // We use event delegation on the container for efficiency
-            resultsContainer.addEventListener("mouseover", this.#onRowMouseEnter.bind(this));
-            resultsContainer.addEventListener("mouseout", this.#onRowMouseLeave.bind(this));
-            resultsContainer.addEventListener("mousemove", this.#onRowMouseMove.bind(this));
+            // resultsContainer.addEventListener("mouseover", this.#onRowMouseEnter.bind(this));
+            // resultsContainer.addEventListener("mouseout", this.#onRowMouseLeave.bind(this));
+            // resultsContainer.addEventListener("mousemove", this.#onRowMouseMove.bind(this));
         }
     }
 
@@ -139,6 +147,7 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         return {
             ...(await super._prepareContext(options)),
             packs: packsForFilters,
+            types: CompendiumBrowser.typesPart.items,
             entries: entries,
             searchQuery: this._searchQuery,
         };
@@ -163,15 +172,15 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
      * Handle ticking or unticking a compendium pack checkbox.
      */
     private async _onTogglePack(event: Event, target: HTMLInputElement): Promise<void> {
-        const packId = target.dataset.packId;
-        if (!packId) return;
+        const filterId = target.dataset.filterId;
+        if (!filterId) return;
 
         if (target.checked) {
-            if (!this._activePackIds.includes(packId)) {
-                this._activePackIds.push(packId);
+            if (!this._activePackIds.includes(filterId)) {
+                this._activePackIds.push(filterId);
             }
         } else {
-            this._activePackIds = this._activePackIds.filter(id => id !== packId);
+            this._activePackIds = this._activePackIds.filter(id => id !== filterId);
         }
         await this.render();
     }

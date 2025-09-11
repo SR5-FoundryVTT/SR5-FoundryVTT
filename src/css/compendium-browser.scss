@@ -36,9 +36,6 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
     color: $text-primary;
     font-family: $font-primary;
 
-    /* --- Filter Section --- */
-    /* This is now the sidebar, see styles at the bottom */
-
     .search-bar {
         position: relative;
         width: 100%;
@@ -132,7 +129,6 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             flex-direction: column;
             overflow-y: auto;
 
-            // Scrollbar Styling
             &::-webkit-scrollbar {
                 width: 8px;
             }
@@ -239,44 +235,97 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
         background: $bg-primary;
     }
 
-    /* --- MODIFIED FILTER STYLES FOR SIDEBAR --- */
+    /* --- FILTER SIDEBAR STYLES --- */
     .compendium-filters {
         display: flex;
-        flex-direction: column; /* Stacks items vertically */
-        gap: 15px;
-        width: 240px;          /* Gives the sidebar a fixed width */
-        flex-shrink: 0;        /* Prevents the sidebar from shrinking */
+        flex-direction: column;
+        width: 240px;
+        flex-shrink: 0;
     }
 
-    /* Container for the checkboxes */
-    .pack-selection {
+    .types {
         display: flex;
-        gap: 10px;
-        flex-wrap: wrap; /* Checkboxes will still wrap within the sidebar */
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px 5px 10px 8px;
+        border-top: 1px solid $border-medium;
+        margin-top: 15px;
+        flex-grow: 1;
+        min-height: 0;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: $border-strong;
+            border-radius: 4px;
+
+            &:hover {
+                background: lighten($border-strong, 10%);
+            }
+        }
     }
 
-    /* Individual checkbox label styling */
-    .pack-checkbox {
+    .type {
         display: flex;
         align-items: center;
-        gap: 5px;
-        background: #252525;
-        border: 1px solid #5a5a5a;
-        padding: 5px 10px;
-        border-radius: 4px;
+        gap: 10px;
+        padding: 2px 0;
         cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 13px;
-        white-space: nowrap;
-    }
+        color: $text-secondary;
+        font-size: 15px;
+        transition: color 0.2s ease;
 
-    .pack-checkbox:hover {
-        background: #3a3a3a;
-        border-color: #888;
-    }
+        &:hover {
+            color: $text-primary;
+        }
 
-    /* Style for the actual checkbox */
-    .pack-checkbox input {
-        accent-color: #ffd700;
+        input[type="checkbox"] {
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            background-color: #353238;
+            border: 1px solid #4a464f;
+
+            /* --- NEW: Override and disable Foundry's default icon --- */
+            &::before {
+                content: none !important;
+            }
+
+            &:hover {
+                border-color: $accent-gold;
+            }
+
+            /* --- MODIFIED: Use ::after for our checkmark --- */
+            &:checked {
+                background-color: $accent-gold;
+                border-color: $accent-gold;
+
+                &::after {
+                    content: '\f00c';
+                    font-weight: 900;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-25%, -50%);
+                    font-size: 12px;
+                    color: $bg-secondary;
+                }
+            }
+        }
+
+        span {
+            text-transform: capitalize;
+        }
     }
 }
