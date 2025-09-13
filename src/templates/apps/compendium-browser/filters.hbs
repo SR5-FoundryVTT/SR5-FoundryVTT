@@ -19,8 +19,9 @@
             <input 
                 type="checkbox" 
                 data-action="togglePack" 
-                data-filter-id="{{type}}">
-            <span>{{type}}</span>
+                data-type="{{type.id}}" 
+                {{#if type.selected}}checked{{/if}}>
+            <span>{{type.value}}</span>
         </label>
         {{/each}}
     </div>

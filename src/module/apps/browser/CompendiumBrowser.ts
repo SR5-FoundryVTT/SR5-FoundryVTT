@@ -1,14 +1,21 @@
 import { LinksHelpers } from "@/module/utils/links";
-import AppV2 = foundry.applications.api.ApplicationV2;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-type Context = AppV2.RenderContext & Record<string, any>;
+type Context = foundry.applications.api.ApplicationV2.RenderContext & Record<string, any>;
+type FilterEntry = { value: string, id: string, selected: boolean };
+
+const Base = HandlebarsApplicationMixin(ApplicationV2<Context>);
+type BaseType = InstanceType<typeof Base>;
 
 /**
  * A generic compendium browser application that allows users to view and search
  * across multiple compendium packs simultaneously using checkboxes.
  */
-export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<Context>) {
+export class CompendiumBrowser extends Base {
+    private activeTab: "Actor" | "Item" = "Item";
+
+    private allFilters: FilterEntry[] = [];
+
     /** The list of all discovered compendia. */
     private readonly _packs: CompendiumCollection<any>[] = [];
 
@@ -22,8 +29,7 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     private _searchCursorPosition: number | null = null;
 
     private static readonly typesPart = {
-        actors: [] as string[],
-        items: [] as string[],
+        
     };
 
     /** A reference to the tooltip DOM element. */
@@ -38,16 +44,17 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
             this._activePackIds.push(this._packs[1].collection);
         }
 
-        CompendiumBrowser.typesPart.actors = Object.keys(CONFIG.Actor.dataModels);
-        CompendiumBrowser.typesPart.items = Object.keys(CONFIG.Item.dataModels);
+        this.allFilters = Object.keys(CONFIG.Item.dataModels)
+                            .map(id => ({ value: game.i18n.localize(`TYPES.Item.${id}`), id, selected: false }))
+                            .sort((a, b) => a.value.localeCompare(b.value));
     }
 
     /**
      * Defines the default options for the Compendium Browser application window.
      */
     static override DEFAULT_OPTIONS = {
-        id: "compendium-browser",
         tag: "form",
+        id: "compendium-browser",
         classes: ["compendium-browser"],
         position: { width: 1050, height: 700 },
         window: {
@@ -56,10 +63,9 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
             resizable: true
         },
         actions: {
-            clearSearch: this.prototype._onClearSearch.bind(this),
-            openDoc: this.#openDoc.bind(this),
-            openSource: this.#openSource.bind(this),
-            togglePack: this.prototype._onTogglePack.bind(this),
+            clearSearch: async (...args: Parameters<CompendiumBrowser['_onClearSearch']>) => this.prototype._onClearSearch.apply(this, args),
+            openDoc: async (...args: Parameters<CompendiumBrowser['_openDoc']>) => this.prototype._openDoc.apply(this, args),
+            openSource: async (...args: Parameters<CompendiumBrowser['_openSource']>) => this.prototype._openSource.apply(this, args),
         }
     };
 
@@ -82,7 +88,15 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         return "Compendium Browser";
     }
 
-    static async #openDoc(event: MouseEvent, target: HTMLElement) {
+    /**
+     * Handle clicking the clear search button.
+     */
+    private async _onClearSearch() {
+        this._searchQuery = "";
+        void this.render({ parts: ["results", "filters"] });
+    }
+
+    private async _openDoc(event: MouseEvent, target: HTMLElement) {
         const el = target.closest<HTMLElement>("[data-uuid]");
         const uuid = el?.dataset.uuid;
         if (!uuid) return;
@@ -91,7 +105,7 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
         await doc?.sheet?.render(true);
     }
 
-    static async #openSource(event: MouseEvent, target: HTMLElement) {
+    private async _openSource(event: MouseEvent, target: HTMLElement) {
         const el = target.closest<HTMLElement>("[data-action='openSource']");
         const source = el?.textContent?.trim();
         if (!source) return;
@@ -102,55 +116,99 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     /**
      * Attach event listeners to the application's rendered HTML.
      */
-    protected override async _onRender(...args: Parameters<AppV2<Context>["_onRender"]>): Promise<void> {
-        await super._onRender(...args);
+    protected override _attachFrameListeners() {
+        super._attachFrameListeners();
         this.element.addEventListener("dragstart", this._onDrag.bind(this));
+    }
 
-        const searchInput = this.element.querySelector<HTMLInputElement>("#compendium-browser-search");
+    override _attachPartListeners(
+        ...[partId, htmlElement, options]: Parameters<BaseType["_attachPartListeners"]>
+    ) {
+        super._attachPartListeners(partId, htmlElement, options);
+        if (partId === "filters")
+            this.filterListeners(htmlElement);
+        // else if (partId === "results")
+        //     this.resultListeners(htmlElement);
+    }
+
+    private filterListeners(htmlElement: HTMLElement) {
+        const searchInput = htmlElement.querySelector<HTMLInputElement>("#compendium-browser-search");
         if (searchInput) {
             if (this._searchCursorPosition) {
                 searchInput.focus();
                 searchInput.setSelectionRange(this._searchCursorPosition, this._searchCursorPosition);
                 this._searchCursorPosition = null;
             }
-            searchInput.addEventListener("input", event =>  { void this._onSearch(event, searchInput); });
+            searchInput.addEventListener("input", event => this._onSearch(event, searchInput));
         }
 
-        const resultsContainer = this.element.querySelector<HTMLElement>(".compendium-list");
+        const searchFilter = htmlElement.querySelectorAll<HTMLElement>(".compendium-filters .types .type input[type='checkbox']");
+
+        for (const checkbox of searchFilter) {
+            checkbox.addEventListener("change", event => {
+                const target = event.target as HTMLInputElement;
+                const type = target.dataset.type;
+                if (type)
+                    this._onFilterChange(type, target.checked);
+            });
+        }
+    }
+
+    private resultListeners(htmlElement: HTMLElement) {
+        const resultsContainer = htmlElement.querySelector<HTMLElement>(".compendium-list");
         if (resultsContainer) {
             // We use event delegation on the container for efficiency
-            // resultsContainer.addEventListener("mouseover", this.#onRowMouseEnter.bind(this));
-            // resultsContainer.addEventListener("mouseout", this.#onRowMouseLeave.bind(this));
-            // resultsContainer.addEventListener("mousemove", this.#onRowMouseMove.bind(this));
+            resultsContainer.addEventListener("mouseover", this.#onRowMouseEnter.bind(this));
+            resultsContainer.addEventListener("mouseout", this.#onRowMouseLeave.bind(this));
+            resultsContainer.addEventListener("mousemove", this.#onRowMouseMove.bind(this));
         }
+    }
+
+    private _onFilterChange(type: string, selected: boolean) {
+        const typeEntry = this.allFilters.find(t => t.id === type);
+        if (typeEntry)
+            typeEntry.selected = selected;
+        void this.render({parts: ["results"]});
     }
 
     /**
      * Prepare the data object to be rendered by the Handlebars template.
      */
-    override async _prepareContext(options: Parameters<AppV2["_prepareContext"]>[0]) {
-        const activePacks = this._packs.filter(p => this._activePackIds.includes(p.collection));
+    override async _prepareContext(...args: Parameters<BaseType["_prepareContext"]>) {
+        return {
+            ...(await super._prepareContext(...args)),
+            types: this.allFilters,
+            searchQuery: this._searchQuery,
+        };
+    }
+
+    protected override async _preparePartContext(
+        ...[partId, context, options]: Parameters<BaseType["_preparePartContext"]>
+    ) {
+        await super._preparePartContext(partId, context, options);
+        if (partId === "results")
+            context.entries = await this.fetch();
+        return context;
+    }
+
+    private async fetch() {
+        const activePacks = this._packs.filter(p => p.visible && p.metadata.type === this.activeTab) as CompendiumCollection<'Actor' | 'Item'>[];
         const indexes = await Promise.all(activePacks.map(async pack => pack.getIndex()));
-        let entries = indexes.flatMap(index => [...index.values()]) as CompendiumCollection.IndexEntry<'Item'>[];
+        let entries = indexes.flatMap(index => [...index.values()]);
 
         if (this._searchQuery) {
             const query = this._searchQuery.toLowerCase();
             entries = entries.filter(i => i.name?.toLowerCase().includes(query));
         }
 
-        const packsForFilters = this._packs.map(p => ({
-            id: p.collection,
-            label: p.metadata.label,
-            isChecked: this._activePackIds.includes(p.collection),
-        }));
+        if (this.allFilters.some(f => f.selected)) {
+            const selectedTypes = this.allFilters.filter(f => f.selected).map(f => f.id);
+            entries = entries.filter(e => selectedTypes.includes(e.type as string));
+        }
 
-        return {
-            ...(await super._prepareContext(options)),
-            packs: packsForFilters,
-            types: CompendiumBrowser.typesPart.items,
-            entries: entries,
-            searchQuery: this._searchQuery,
-        };
+        entries.sort((a, b) => b.name ? a.name?.localeCompare(b.name) || 0 : -1);
+
+        return entries.slice(0, 100);
     }
 
     /**
@@ -169,37 +227,12 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     }
 
     /**
-     * Handle ticking or unticking a compendium pack checkbox.
-     */
-    private async _onTogglePack(event: Event, target: HTMLInputElement): Promise<void> {
-        const filterId = target.dataset.filterId;
-        if (!filterId) return;
-
-        if (target.checked) {
-            if (!this._activePackIds.includes(filterId)) {
-                this._activePackIds.push(filterId);
-            }
-        } else {
-            this._activePackIds = this._activePackIds.filter(id => id !== filterId);
-        }
-        await this.render();
-    }
-
-    /**
      * Handle the input event on the search field to live-filter the results.
      */
-    private async _onSearch(event: Event, target: HTMLInputElement): Promise<void> {
+    private _onSearch(event: Event, target: HTMLInputElement) {
         this._searchCursorPosition = target.selectionStart;
         this._searchQuery = target.value;
-        await this.render();
-    }
-
-    /**
-     * Handle clicking the clear search button.
-     */
-    private async _onClearSearch(): Promise<void> {
-        this._searchQuery = "";
-        await this.render();
+        void this.render({ parts: ["results"] });
     }
 
     /**
@@ -275,7 +308,7 @@ export class CompendiumBrowser extends HandlebarsApplicationMixin(ApplicationV2<
     /*
      * Ensures the tooltip is removed when the application window is closed.
      */
-    override async close(...args: Parameters<AppV2["close"]>) {
+    override async close(...args: Parameters<BaseType["close"]>) {
         if (this.#tooltipTimeout)
             clearTimeout(this.#tooltipTimeout);
         this.#tooltipTimeout = null;
