@@ -1,0 +1,62 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="scrollable">
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+                name=(localize "SR5.Labels.ActorSheet.CritterPowers")
+                itemId="critter_power"
+                icons=(ItemHeaderIcons "critter_power")
+                rightSide=(ItemHeaderRightSide "critter_power")
+            }}
+            {{#each itemType.critter_power as |item i|}} {{#if (or (not system.optional) (eq system.optional "standard"))}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
+                    img=item.img
+                    name=item.name
+                    itemId=item._id
+                    icons=(ItemIcons item)
+                    rightSide=(ItemRightSide item)
+                    hasDesc="true"
+                    hasRoll="true"
+                    description=item.description.value
+                }}
+            {{/if}} {{/each}}
+
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+                name=(localize "SR5.Labels.ActorSheet.EnabledOptionCritterPowers")
+                itemId="critter_power"
+                icons=(ItemHeaderIcons "critter_power")
+                rightSide=(ItemHeaderRightSide "critter_power")
+            }}
+            {{#each itemType.critter_power as |item i|}} {{#ife system.optional "enabled_option"}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
+                    img=item.img
+                    name=item.name
+                    itemId=item._id
+                    icons=(ItemIcons item)
+                    rightSide=(ItemRightSide item)
+                    hasDesc="true"
+                    hasRoll="true"
+                    description=item.description.value
+                }}
+            {{/ife}} {{/each}}
+
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+                name=(localize "SR5.Labels.ActorSheet.DisabledOptionCritterPowers")
+                itemId="critter_power"
+                icons=(ItemHeaderIcons "critter_power")
+                rightSide=(ItemHeaderRightSide "critter_power")
+            }}
+            {{#each itemType.critter_power as |item i|}} {{#ife system.optional "disabled_option"}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
+                    img=item.img
+                    name=item.name
+                    itemId=item._id
+                    icons=(ItemIcons item)
+                    rightSide=(ItemRightSide item)
+                    hasDesc="true"
+                    hasRoll="true"
+                    description=item.description.value
+                }}
+            {{/ife}} {{/each}}
+        </div>
+    </div>
+</section>

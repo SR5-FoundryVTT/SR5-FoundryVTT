@@ -1,0 +1,74 @@
+{{> 'systems/shadowrun5e/dist/templates/v2/common/header-block.hbs' name=(localize "SR5.Labels.ActorSheet.SpriteConfiguration") }}
+<div class="item-center">
+    <div class="list-item matrix">
+        <div class="list-item-content">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.Sprite.Technomancer"}}
+                </div>
+            </div>
+            <div class="item-right">
+                {{#if technomancer}}
+                    <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{technomancer.id}}" data-uuid="{{technomancer.uuid}}">
+                        <i class="fas fa-user"></i>{{technomancer.name}}
+                        <a class="close technomancer-remove"><i class="fas fa-times"></i></a>
+                    </a>
+                {{else}}
+                    <span data-tooltip="SR5.Tooltips.Actor.MissingTechnomancer">{{localize "SR5.Sprite.MissingTechnomancer"}}</span>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+    <div class="list-item matrix">
+        <div class="list-item-content">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.Sprite.Type"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div>
+                    <select name="system.spriteType" class="display">
+                        {{#select system.spriteType}} {{#each config.spriteTypes as |name type|}}
+                            <option value="{{type}}">{{localize name}}</option>
+                        {{/each}} {{/select}}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="list-item matrix">
+        <div class="list-item-content">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.Sprite.Level"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text">
+                    {{> 'systems/shadowrun5e/dist/templates/v2/common/value-input.hbs'
+                        cssClass="attribute-input"
+                        size="2"
+                        maxLength="2"
+                        value=system.level
+                        name="system.level"
+                    }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="list-item matrix">
+        <div class="list-item-content">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.Sprite.Registered"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text">
+                    <input type="checkbox" class="checkbox" name="system.registered" {{checked system.registered}}/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

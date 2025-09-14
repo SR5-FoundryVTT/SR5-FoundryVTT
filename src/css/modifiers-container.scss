@@ -53,3 +53,56 @@
         }
     }
 }
+
+.sr5v2 .value {
+    >.value-modifiers-container {
+        display: none;
+        visibility: hidden;
+
+        position: absolute;
+        /* We WILL be on top! */
+        z-index: 2147483647;
+
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    &:hover .value-modifiers-container {
+        display: block;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .value-modifiers {
+        display: grid;
+        grid-template-columns: 200px 50px;
+        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
+        border: 1px solid $dark;
+        padding: 0.5em 0.5em 0.5em 0.5em;
+        text-align: left;
+        font-weight: normal;
+
+        >.value-modifier-name {
+            font-weight: bold;
+        }
+
+        >.value-modifiers-base {
+            border-bottom: 1px solid $yellow;
+            color: $white;
+        }
+
+        >.value-modifiers-modifier {
+            color: $white;
+        }
+
+        >.value-modifiers-total {
+            font-weight: bold;
+            border-top: 1px double $yellow;
+            color: $white;
+        }
+
+        >.value-modifiers-invalid-total {
+            text-decoration: line-through;
+        }
+    }
+}

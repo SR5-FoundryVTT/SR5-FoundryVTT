@@ -1,8 +1,64 @@
 import { SR5Actor } from '../SR5Actor';
-import { SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 
+export type SpriteActorSheetData = MatrixActorSheetData & {
+    technmomancer: SR5Actor | null;
+    isSprite: boolean;
+}
 
-export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
+export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetData> {
+    static override DEFAULT_OPTIONS = {
+        classes: ['sprite'],
+        position: {
+            width: 930,
+            height: 690,
+        },
+        actions: {
+            removeTechnomancer: this.#onRemoveTechnomancer,
+        }
+    }
+
+    static override TABS = {
+        ...super.TABS,
+        primary: {
+            initial: 'skills',
+            tabs: [
+                { id: 'actions', label: 'Actions', cssClass: '' },
+                { id: 'skills', label: 'Skills', cssClass: '' },
+                { id: 'matrix', label: 'Matrix', cssClass: '' },
+                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'description', label: 'Description', cssClass: '' },
+                { id: 'misc', label: 'Misc', cssClass: '' },
+            ]
+        },
+        matrixRight: {
+            initial: 'matrixActions',
+            tabs: [
+                { id: 'matrixActions', label: 'Actions', cssClass: '', },
+                { id: 'spritePowers', label: 'Sprite Powers', cssClass: '', }
+            ]
+        }
+    }
+
+    static override PARTS = {
+        ...super.PARTS,
+        skills: {
+            template: this.templateBase('actor/tabs/sprite-skills'),
+            templates: this.actorSystemParts('active-skills', 'sprite-options')
+        },
+        description: {
+            template: this.templateBase('actor/tabs/description'),
+        },
+        matrix: {
+            template: this.templateBase('actor/tabs/sprite-matrix'),
+        },
+        spritePowers: {
+            template: this.templateBase('actor/tabs/matrix/sprite-powers'),
+        },
+        misc: {
+            template: this.templateBase('actor/tabs/character-misc'),
+        },
+    }
     /**
      * Sprite actors will handle these item types specifically.
      *
@@ -19,18 +75,14 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
         ];
     }
 
-    override activateListeners(html) {
-        super.activateListeners(html);
-
-        html.find('.technomancer-remove').on('click', this._onRemoveTechnomancer.bind(this));
-    }
-
-    override async getData(options: any) {
-        const data = await super.getData(options);
+    override async _prepareContext(options) {
+        const data = await super._prepareContext(options);
 
         // Collect sprite technomancer for easy interaction.
         if (this.document.isType('sprite') && this.document.system.technomancerUuid !== '')
-            data['technomancer'] = await fromUuid(this.document.system.technomancerUuid as any);
+            data['technomancer'] = await fromUuid(this.document.system.technomancerUuid);
+
+        data.isSprite = true;
 
         return data;
     }
@@ -38,7 +90,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
     /**
      * Sprites have support for dropping actors onto them.
      */
-    override async _onDrop(event: DragEvent) {
+    override async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -49,7 +101,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
         // Handle technomancer drops, ignore other actor drops as sprites can't handle them.
         if (dropData.type === 'Actor') {
             await this._addTechnomancerOnDrop(dropData);
-            return [];
+            return;
         }
 
         return super._onDrop(event);
@@ -70,7 +122,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
     /**
      * Remove the technomancer from the sprite.
      */
-    async _onRemoveTechnomancer(event: MouseEvent): Promise<void> {
+    static async #onRemoveTechnomancer(this: SR5SpriteActorSheet, event: MouseEvent) {
         event.preventDefault();
         event.stopPropagation();
 

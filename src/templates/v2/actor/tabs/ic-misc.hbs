@@ -1,0 +1,35 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="split-container">
+        <div>
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+                name=(localize 'SR5.Description')
+            }}
+            {{editor biographyHTML target="system.description.value" button=true editable=true engine="prosemirror" collaborate=false}}
+        </div>
+        <div>
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+                name=(localize 'SR5.Modifier')
+                itemId='modifiers'
+                rightSide=(ItemHeaderRightSide 'modifiers')
+            }}
+            <div class="scrollable">
+                {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}}
+                    {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localizeOb id ../config.actorModifiers) }}
+                    <div class="item-text rtg">
+                        <input
+                                class="display attribute-input"
+                                size="4"
+                                maxlength="3"
+                                type="text"
+                                name="system.modifiers.{{id}}"
+                                value="{{value}}"
+                                placeholder="None"
+                                data-dtype="Number"
+                        />
+                    </div>
+                    {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+                {{/ifne}} {{/each}}
+            </div>
+        </div>
+    </div>
+</section>

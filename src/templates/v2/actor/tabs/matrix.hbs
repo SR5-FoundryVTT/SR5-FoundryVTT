@@ -1,0 +1,79 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="flexrow list-header item-section space-between">
+            {{#if matrixDevice}}
+            <div>
+                <a class="open-matrix-device roll" data-uuid="{{matrixDevice.uuid}}">
+                    {{matrixDevice.name}}
+                </a>
+            </div>
+            {{/if}}
+            <div class="RollId" data-roll-id="matrix.device-rating">
+                <a class="roll Roll">
+                    {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
+                </a>
+            </div>
+            <div>
+                <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
+                    {{#if system.matrix.running_silent}}
+                    {{localize "SR5.RunningSilent"}}
+                    {{else}}
+                    {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
+                    {{/if}}
+                </a>
+            </div>
+            <div>
+                <a class="reboot-persona-device" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
+                    {{localize "SR5.Labels.Sheet.RebootDevice"}} <i class="item-icon fas fa-power-off"></i>
+                </a>
+            </div>
+        </div>
+        <div class="split-container">
+            <div>
+                <div class="attributes">
+                    {{#each config.matrixAttributes as |label key|}}
+                    {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute.hbs"
+                        matrixAtt=(lookup ../system.matrix key)
+                        isCyberdeck=../system.matrix.is_cyberdeck
+                        key=key
+                        label=label
+                        matrixAttributes=../config/matrixAttributes
+                        item=../system.matrix.item }}
+                    {{/each}}
+                </div>
+                <div class="flexrow align-start list-header item-section space-between">
+                    <div>
+                        {{#if network}}
+                        {{localize "SR5.Labels.ActorSheet.Network"}}: <a class="open-matrix-device" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                        <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                            <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                        </a>
+                        {{else}}
+                        {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                        <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                        {{/if}}
+                    </div>
+                    <div>
+                        <a class="show-matrix-network-hacking">
+                            {{localize "SR5.Labels.ActorSheet.MarkNetwork"}} <i class="item-icon fas fa-network-wired"></i>
+                        </a>
+                    </div>
+                </div>
+                {{tabGroup matrixLeftTabs}}
+                <section class="content matrix-left-tab-content"></section>
+            </div>
+            <div>
+                {{#if system.matrix.condition_monitor.max}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                        name=(localize "SR5.ConditionMonitor")
+                        value=system.matrix.condition_monitor.value
+                        max=system.matrix.condition_monitor.max
+                        id="matrix"
+                    }}
+                {{/if}}
+                {{tabGroup matrixRightTabs}}
+                <section class="content matrix-right-tab-content"></section>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,42 @@
+<div class="attributes no-border">
+    <div class="attribute row space-around">
+        <div class="Roll attribute-name" data-roll-id="composure">
+            {{localize "SR5.RollComposure"}}
+        </div>
+        <div class="Roll attribute-name" data-roll-id="judge-intentions">
+            {{localize "SR5.RollJudgeIntentions"}}
+        </div>
+        <div class="Roll attribute-name" data-roll-id="lift-carry">
+            {{localize "SR5.RollLiftCarry"}}
+        </div>
+        <div class="Roll attribute-name" data-roll-id="memory">
+            {{localize "SR5.RollMemory"}}
+        </div>
+        <div
+            data-tooltip="SR5.Roll"
+            class="attribute-name Roll fas fa-dice-six"
+            data-roll-id="prompt-roll"
+        ></div>
+        <div data-tooltip="SR5.Defense" class="attribute-name Roll" data-roll-id="defense">
+            {{localize "SR5.RollDefense"}}
+        </div>
+        <div data-tooltip="SR5.Soak" class="attribute-name Roll" data-roll-id="damage-resist">
+            {{localize "SR5.RollSoak"}}
+        </div>
+        <div class="attribute-name Roll" data-roll-id="armor">
+            {{localize "SR5.RollArmor"}} ({{system.armor.value}})
+        </div>
+
+        {{#if awakened}}
+            <div class="attribute-name Roll" data-roll-id="drain">
+                {{localize "SR5.RollDrain"}}
+            </div>
+        {{/if}}
+
+        {{#if emerged}}
+            <div class="attribute-name Roll" data-roll-id="fade">
+                {{localize "SR5.RollFade"}}
+            </div>
+        {{/if}}
+    </div>
+</div>

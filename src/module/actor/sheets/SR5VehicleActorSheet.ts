@@ -1,17 +1,20 @@
 import {SR5Actor} from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
 import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
-import { SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
 
-interface VehicleSheetDataFields {
-    driver: SR5Actor|undefined
-    master: SR5Item | undefined
+interface VehicleSheetDataFields extends MatrixActorSheetData {
+    isVehicle: boolean;
+    vehicle: {
+        driver: SR5Actor|undefined,
+        master: SR5Item | undefined
+    }
 }
 
-export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
+export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFields> {
     /**
      * Vehicle actors will handle these item types specifically.
      *
@@ -51,11 +54,13 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
         ];
     }
 
-    override async getData(options) {
-        const data = await super.getData(options);
+    override async _prepareContext(options) {
+        const data = await super._prepareContext(options);
 
         // Vehicle actor type specific fields.
         data.vehicle = this._prepareVehicleFields();
+
+        data.isVehicle = true;
 
         return data;
     }
@@ -72,8 +77,8 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
         });
     }
 
-    override activateListeners(html: JQuery) {
-        super.activateListeners(html);
+    override activateListeners_LEGACY(html) {
+        super.activateListeners_LEGACY(html);
 
         // Vehicle Sheet related handlers...
         html.find('.driver-remove').on('click', this._handleRemoveVehicleDriver.bind(this));
@@ -112,7 +117,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
         return super._onDrop(event);
     }
 
-    _prepareVehicleFields(): VehicleSheetDataFields {
+    _prepareVehicleFields() {
         const driver = this.actor.getVehicleDriver();
 
         const master = this.actor.master || undefined;
@@ -122,6 +127,43 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
             master,
         };
     }
+
+    static override TABS = {
+        ...super.TABS,
+        primary: {
+            initial: 'skills',
+            tabs: [
+                { id: 'actions', label: 'Actions', cssClass: '' },
+                { id: 'skills', label: 'Skills', cssClass: '' },
+                { id: 'inventory', label: 'Inventory', cssClass: '' },
+                { id: 'matrix', label: 'Matrix', cssClass: '' },
+                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'description', label: 'Description', cssClass: '' },
+                { id: 'misc', label: 'Misc', cssClass: '' },
+            ]
+        },
+    }
+
+    static override PARTS = {
+        ...super.PARTS,
+        matrix: {
+            template: this.templateBase('actor/tabs/vehicle-matrix'),
+        },
+        skills: {
+            template: this.templateBase('actor/tabs/vehicle-skills'),
+            templates: this.actorSystemParts(
+                'active-skills', 'vehicle-options',
+                'vehicle-rolls', 'vehicle-attributes'
+            )
+        },
+        description: {
+            template: this.templateBase('actor/tabs/description'),
+        },
+        inventory: {
+            template: this.templateBase('actor/tabs/inventory'),
+        },
+    }
+
 
     /**
      * Connect to the PAN of the Driver

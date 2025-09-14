@@ -1,0 +1,29 @@
+{{> 'systems/shadowrun5e/dist/templates/v2/common/header-block.hbs' name=(localize "SR5.Labels.ActorSheet.SpiritConfiguration") }}
+{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Spirit.Summoner") }}
+<div>
+    {{#if summoner}}
+    <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{summoner.id}}" data-uuid="{{summoner.uuid}}">
+        <i class="fas fa-user"></i>{{summoner.name}}
+        <a class="close summoner-remove"><i class="fas fa-times"></i></a>
+    </a>
+    {{else}}<span data-tooltip="SR5.Tooltips.Actor.MissingSummoner">{{localize "SR5.Spirit.MissingSummoner"}}</span>{{/if}}
+</div>
+{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Spirit.Type") }}
+<div>
+    <select name="system.spiritType" class="display">
+        {{selectOptions system.spiritType choices=config.spiritTypes}}
+    </select>
+</div>
+{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Spirit.Force") }}
+<div class="item-text">
+    {{> 'systems/shadowrun5e/dist/templates/v2/common/value-input.hbs' cssClass="attribute-input" size="2" maxLength="2" value=system.force
+    name="system.force" }}
+</div>
+{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Spirit.Bound") }}
+<div class="item-text">
+    <input type="checkbox" class="checkbox" name="system.bound" {{checked system.bound}} />
+</div>
+{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}

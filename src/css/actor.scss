@@ -298,3 +298,364 @@
     display: flex;
     flex-direction: column;
 }
+
+.sr5v2.actor {
+    // default window padding was pretty big, tone it down
+    .window-content {
+        padding: .25rem;
+    }
+
+    .actor-header {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: start;
+        justify-content: space-between;
+        padding: .25rem;
+        flex-shrink: 0;
+        font-size: 1rem;
+
+        .left-side {
+            display: flex;
+            flex-flow: row nowrap;
+        }
+
+        .right-side {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: end;
+
+            .right-side-row {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: end;
+                justify-content: center;
+                gap: 0.25rem;
+            }
+        }
+    }
+
+    .movement-container {
+        display: flex;
+        flex-flow: row nowrap;
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+        gap: .25rem;
+        align-items: center;
+        justify-content: start;
+    }
+
+    .initiative-container {
+        display: flex;
+        justify-content: end;
+        align-items: stretch;
+        align-content: stretch;
+        gap: .25rem;
+        padding: .25rem;
+        border-bottom: 1px solid $yellow;
+        border-left: 1px solid $yellow;
+        border-bottom-left-radius: .1rem;
+        overflow: hidden;
+
+        .presence-select {
+            min-width: 7rem;
+        }
+
+        .initiative-label {
+            color: $yellow;
+            text-align: center;
+            align-self: center;
+        }
+
+        .initiative-col {
+            display: flex;
+            flex-flow: column nowrap;
+            flex: 1;
+            justify-content: space-between;
+            align-content: end;
+        }
+
+        .initiative-center {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+        }
+
+        .initiative-end {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: end;
+        }
+    }
+
+    // add a footer to the sheet
+    .sheet-footer {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 2px;
+        align-items: center;
+        justify-content: start;
+        box-shadow: 0 -.25rem .5rem $black;
+        border-top: 1px solid $yellow;
+        padding-left: .1rem;
+        padding-top: .1rem;
+        flex-shrink: 0;
+        vertical-align: bottom;
+        font-size: 1rem
+    }
+
+    // start css for getting scroll working
+    // override the default scrollable class so it doesn't hide the scrollbar
+    // the default foundry css seemed to add weird padding that would actually hide the scrollbar
+    .scrollable {
+        margin-right: 0;
+        padding-right: 0;
+    }
+    .header-for-scrollable {
+        padding-right: var(--scroll-margin);
+        margin-right: var(--scroll-margin);
+    }
+    .tab {
+
+        // hide overflow of the tab, this should be provided to any tab that doesn't scroll
+        &.hide-overflow {
+            flex: 1;
+            overflow: hidden;
+        }
+        // fill the available space so that children can scroll correctly
+        .fill-container {
+            display: flex;
+            flex-flow: column nowrap;
+            flex: 1;
+            overflow: hidden;
+            height: 100%;
+        }
+        // split the available space into two side-by-side containers
+        .split-container {
+            display: flex;
+            flex-flow: row nowrap;
+            flex: 1;
+            overflow: hidden;
+            height: 100%;
+
+            // matrix tabs need to flex and hide overflow in order to have contents scroll
+            .matrix-left-tab-content,
+            .matrix-right-tab-content {
+                flex: 1;
+                overflow: hidden;
+                display: flex;
+            }
+            // children of the split container need to flex as a column, hide overflow to all scrolling within
+            > * {
+                display: flex;
+                flex-flow: column nowrap;
+                flex: 1;
+                overflow: hidden;
+            }
+            > *:not(:first-child) {
+                padding-left: 0.25rem;
+                border-left: $groove;
+            }
+            > *:not(:last-child) {
+                padding-right: 0.25rem;
+            }
+        }
+    }
+
+    // end of new css for getting scroll working
+    .name {
+        @include systemFonts;
+        background: $nameplate-background;
+        font-size: 200%;
+        margin-bottom: 0;
+        padding-left: 5px;
+        input[type=text].display {
+            background: none;
+        }
+    }
+    .limit-title {
+        font-size: 115%;
+    }
+    .attributes {
+        // border-top: $;
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        &.center {
+            justify-content: space-evenly;
+        }
+        &.no-border {
+            border-top: none;
+            border-bottom: none;
+        }
+        &.wrap {
+            flex-wrap: wrap;
+        }
+        .attribute {
+            @include title;
+
+            align-items: center;
+            color: $yellow;
+            display: flex;
+            flex-flow: column nowrap;
+            flex: 1 0 auto;
+            font-size: 100%;
+            justify-content: space-evenly;
+            min-width: 4em;
+            padding-top: 4px;
+            text-align: center;
+
+            &.no-border {
+                border-right: none;
+            }
+            &.no-grow {
+                flex-grow: 0;
+            }
+            &:hover {
+                .attribute-input-container.row {
+                    visibility: visible;
+                }
+            }
+            &.flex0 {
+                min-width: 0;
+                width: 0;
+            }
+            &.row {
+                flex-flow: row nowrap;
+                justify-content: center;
+                align-items: center;
+                align-content: center;
+                > .attribute-name {
+                    width: auto;
+                }
+                &.space-around {
+                    justify-content: space-around;
+                }
+                .attribute-input {
+                    transform: translateY(20%);
+                }
+            }
+            > .attribute-value {
+                > .attribute-value-total {
+                    color: white;
+                    font-size: 125%;
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+
+            > .attribute-name {
+                font-size: 115%;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 0;
+                &.icon {
+                    font-size: 0.75em;
+                }
+                &.roll {
+                    @include rollable;
+                }
+            }
+
+            .attribute-input-container {
+                text-align: center;
+                position: relative;
+                margin-bottom: 2px;
+                .mod {
+                    font-size: 0.75em;
+                    margin-top: -2px;
+                }
+                &.row {
+                    //visibility: hidden;
+                    display: flex;
+                    flex-flow: row;
+                }
+                > .attribute-input {
+                    text-align: center;
+                    margin: 2px;
+                }
+            }
+
+            .toggle-fresh-import-all-off {
+                font-size: 0.75em;
+                background-color: $bgrButton;
+            }
+
+            .toggle-fresh-import-all-on {
+                font-size: 0.75em;
+                background-color: $bgrButton;
+            }
+
+            .track {
+                display: flex;
+                flex-flow: row;
+                justify-content: space-evenly;
+                margin-bottom: 0.1em;
+                width: 100%;
+                &.center {
+                    justify-content: center;
+                    & > *:not(:first-child) {
+                        margin-left: 4px;
+                    }
+                    & > *:not(:last-child) {
+                        margin-right: 4px;
+                    }
+                }
+                &.between {
+                    justify-content: space-between;
+                }
+                .track-slash {
+                    width: 1.5em;
+                    transform: translateY(10%);
+                    flex: 0 0;
+                    &:after {
+                        content: '/';
+                    }
+                }
+                .track-plus {
+                    width: 1em;
+                    flex: 0 0;
+                    &:after {
+                        content: '+';
+                    }
+                }
+                .track-max-value {
+                    margin-bottom: 0;
+                    margin-left: 0.25em;
+                }
+            }
+        }
+    }
+    .limit {
+        @include systemFonts;
+        padding: 0 0.1em;
+        margin-top: -2px;
+        text-align: center;
+        font-size: 115%;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+    }
+
+    // Interaction Element for Skill Lists
+    .skill-header {
+        @include rollable;
+    }
+
+    // Use only to indicate interactibility within the HackingTab markslist.
+    .select-matrix-target {
+        @include clickable;
+    }
+
+    // Use only to indicate interactibility within the HackingTab markslist.
+    .open-matrix-target {
+        @include clickable;
+    }
+
+    // Used to switch between the different hacking targets.
+    .switch-matrix-hacking-target {
+        @include clickable;
+    }
+}

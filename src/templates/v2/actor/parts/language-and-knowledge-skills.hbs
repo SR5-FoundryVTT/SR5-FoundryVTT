@@ -1,0 +1,37 @@
+<div class="scrollable">
+    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+            name=(localize 'SR5.Languages')
+            icons=(SkillHeaderIcons 'language')
+            rightSide=(SkillHeaderRightSide 'language')
+    }}
+    {{#each system.skills.language.value as |skill sid|}}
+        {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
+                name=(localizeSkill skill)
+                itemNameCssClass="language-skill"
+                itemId=sid
+                itemType="skill"
+                icons=(SkillIcons 'language' skill)
+                rightSide=(SkillRightSide 'language' skill)
+                hasRoll="true"
+        }}
+    {{/each}}
+    {{#each system.skills.knowledge as |cat cid|}}
+    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+            name=(localizeOb cid ../config.knowledgeSkillCategories)
+            itemId=cid
+            icons=(SkillHeaderIcons 'knowledge')
+            rightSide=(SkillHeaderRightSide 'knowledge')
+    }}
+        {{#each cat.value as |skill sid|}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
+                    name=(localizeSkill skill)
+                    itemNameCssClass="knowledge-skill"
+                    itemId=(buildName part1=sid part2=cid)
+                    itemType="knowledgeskill"
+                    icons=(SkillIcons 'knowledge' skill)
+                    rightSide=(SkillRightSide 'knowledge' skill)
+                    hasRoll="true"
+            }}
+        {{/each}}
+    {{/each}}
+</div>

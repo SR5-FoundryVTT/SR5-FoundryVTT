@@ -1,0 +1,50 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="split-container">
+        <div>
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/ic-attributes.hbs' }}
+            {{tabGroup matrixLeftTabs}}
+            <section class="content matrix-left-tab-content"></section>
+        </div>
+        <div>
+            {{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs"
+                name=(localize "SR5.Labels.ActorSheet.ICConfiguration")
+            }}
+            {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.IC.Type") }}
+                <div>
+                    {{> "systems/shadowrun5e/dist/templates/v2/common/select.hbs"
+                        options=config.ic.types
+                        value=system.icType
+                        path="system.icType"
+                    }}
+                </div>
+            {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+            {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Host.Rating") }}
+                <div>
+                    {{> "systems/shadowrun5e/dist/templates/v2/common/value-input.hbs"
+                        cssClass="attribute-input"
+                        size="2"
+                        maxLength="2"
+                        value=system.host.rating
+                        name="system.host.rating"
+                        fieldType="Number"
+                        placeholder="0"
+                        disabled=(disabledHelper host)
+                    }}
+                </div>
+            {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+
+            {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.ItemTypes.Host") }}
+                <div>
+                    {{#if network }}
+                        <a class="content-link" draggable="true" data-link data-type="Item" data-id="{{network.id}}" data-uuid="{{network.uuid}}"><i class="fas fa-user">{{network.name}}</i></a>
+                        <a class="close entity-remove"><i class="fas fa-times"></i></a>
+                    {{else}}
+                        {{localize "SR5.IC.MissingHost"}}
+                    {{/if}}
+                </div>
+            {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+            {{tabGroup matrixRightTabs}}
+            <section class="content matrix-right-tab-content"></section>
+        </div>
+    </div>
+</section>

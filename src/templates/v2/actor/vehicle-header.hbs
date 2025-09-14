@@ -1,0 +1,25 @@
+<header class="flexrow">
+    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/profile-image.hbs'
+        height='90px'
+        width='90px'
+    }}
+    <div class="flexcol flex-end">
+        <div class="flexrow">
+            <div class="block">
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/name-input.hbs' }}
+            </div>
+            <div class="attributes center">
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/vehicle-movement.hbs' }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
+            </div>
+        </div>
+        <div class="attributes smooth">
+            <div class="block">
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                    id='physical'
+                    track = system.track.physical
+                }}
+            </div>
+        </div>
+    </div>
+</header>

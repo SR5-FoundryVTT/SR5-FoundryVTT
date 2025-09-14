@@ -1,0 +1,27 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="attributes">
+            {{#each config.matrixAttributes as |label key|}}
+                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute.hbs"
+                        matrixAtt=(lookup ../system.matrix key)
+                        key=key
+                        label=label
+                        matrixAttributes=../config/matrixAttributes
+                }}
+            {{/each}}
+            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                    attributeId='resonance'
+                    attribute=system.attributes.resonance
+            }}
+        </div>
+
+        <div class="split-container">
+            <div>
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/active-skills.hbs' }}
+            </div>
+            <div>
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/sprite-options.hbs' }}
+            </div>
+        </div>
+    </div>
+</section>

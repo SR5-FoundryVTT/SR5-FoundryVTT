@@ -1,0 +1,46 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="flexrow list-header item-section space-between">
+            <div class="RollId" data-roll-id="matrix.device-rating">
+                <a class="roll Roll">
+                    {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
+                </a>
+            </div>
+            <div>
+                <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
+                    {{#if system.matrix.running_silent}}
+                        {{localize "SR5.RunningSilent"}}
+                    {{else}}
+                        {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
+                    {{/if}}
+                </a>
+            </div>
+            <div>
+                {{#if network}}
+                    {{localize "SR5.Labels.ActorSheet.Network"}}: {{network.name}}
+                    <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                        <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                    </a>
+                {{else}}
+                    {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                    <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                {{/if}}
+            </div>
+            <div>
+                <a class="show-matrix-network-hacking">
+                    {{localize "SR5.Labels.ActorSheet.MarkNetwork"}} <i class="item-icon fas fa-network-wired"></i>
+                </a>
+            </div>
+        </div>
+        <div class="split-container">
+            <div>
+                {{tabGroup matrixLeftTabs}}
+                <section class="content matrix-left-tab-content"></section>
+            </div>
+            <div>
+                {{tabGroup matrixRightTabs}}
+                <section class="content matrix-right-tab-content"></section>
+            </div>
+        </div>
+    </div>
+</section>

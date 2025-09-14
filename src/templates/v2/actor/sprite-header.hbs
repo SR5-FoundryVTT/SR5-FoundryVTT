@@ -1,0 +1,51 @@
+<header class="flexrow">
+    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/profile-image.hbs'
+        height='90px'
+        width='90px'
+    }}
+    <div class="flexcol flex-end">
+        <div class="block">
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/name-input.hbs' }}
+        </div>
+        <div class="attributes smooth">
+            <div class="block">
+                {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                    value=system.matrix.condition_monitor.value
+                    max=system.matrix.condition_monitor.max
+                    id="matrix"
+                    name=(localize "SR5.DmgTypeMatrix")
+                }}
+            </div>
+        </div>
+    </div>
+    <div class="flexcol flex-end">
+        <header class="flexrow">
+            <div class="attributes center">
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
+            </div>
+        </header>
+        <div class="flexrow align-center">
+            <div class="attribute">
+                <div
+                    data-tooltip="SR5.Roll"
+                    class="attribute-name Roll fas fa-dice-six"
+                    style="color: #ebb531; font-size: 150%; align-self: center;"
+                    data-roll-id="prompt-roll"
+                ></div>
+            </div>
+            <div class="flex7">
+                {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Sprite.Services") }}
+                    <div class="item-text">
+                        {{> 'systems/shadowrun5e/dist/templates/v2/common/value-input.hbs'
+                            cssClass="attribute-input"
+                            size="2"
+                            maxLength="2"
+                            value=system.services
+                            name="system.services"
+                        }}
+                    </div>
+                {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+            </div>
+        </div>
+    </div>
+</header>

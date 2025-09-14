@@ -21,7 +21,10 @@ import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/t
 import { DescriptionType } from 'src/module/types/template/Description';
 import { ChatData } from 'src/module/item/ChatData';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
-import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+
+const { ActorSheetV2 } = foundry.applications.sheets;
+const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -103,13 +106,11 @@ export interface SR5BaseSheetDelays {
     skills: ReturnType<typeof setTimeout> | null;
 }
 
-
-
 /**
  * This class should not be used directly but be extended for each actor type.
  *
  */
-export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
+export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> extends HandlebarsApplicationMixin(ActorSheetV2)<T> {
     // What document description is shown on sheet. Allow displaying multiple descriptions at the same time.
     _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.
@@ -130,8 +131,10 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     // Store the currently selected inventory.
     selectedInventory: string;
 
-    constructor(object: SR5Actor, options?: Partial<ActorSheet.Options> | undefined) {
-        super(object, options);
+    _isEditMode = false;
+
+    constructor(options) {
+        super(options);
 
         // Preselect default inventory.
         this.selectedInventory = this.actor.defaultInventory.name;
@@ -176,48 +179,70 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * Extend and override the default options used by the 5e Actor Sheet
      * @returns {Object}
      */
-    static override get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ['sr5', 'sheet', 'actor'],
-            width: 930,
-            height: 690,
-            tabs: [
-                {
-                    navSelector: '.tabs[data-group="primary"]',
-                    contentSelector: '.tabsbody[data-group="primary"]',
-                    initial: 'skills',
-                },
-            ] as {navSelector: string, contentSelector: string, initial: string}[],
-        });
+    static override DEFAULT_OPTIONS: any = {
+        classes: [SR5_APPV2_CSS_CLASS, 'actor'],
+        window: {
+            resizable: true,
+        },
+        position: {
+            width: 950,
+            height: 600,
+        },
+        actions: {
+            toggleEditMode: SR5BaseActorSheet.#toggleEditMode,
+        }
     }
 
-    /**
-     * Decide which template to render both for actor types and user permissions.
-     *
-     *
-     * This could also be done within individual ActorType sheets, however, for ease of use, it's
-     * centralized here.
-     *
-     * @override
-     */
-    override get template() {
-        const path = 'systems/shadowrun5e/dist/templates';
+    static override TABS = {
+        primary: {
+            initial: 'actions',
+            tabs: [
+                { id: 'actions', label: 'Actions', cssClass: '' },
+                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'misc', label: 'Misc', cssClass: '' },
+            ]
+        },
+    }
 
-        // v10 actor.limited doesn't take GM into account, so we have to do it ourselves.
-        if (!game.user?.isGM && this.actor.limited) {
-            return `${path}/actor-limited/${this.actor.type}.hbs`;
-        }
+    static override PARTS = {
+        header: {
+            template: this.templateBase('actor/header'),
+            templates: this.actorSystemParts('movement', 'initiative'),
+        },
+        tabs: {
+            template: this.templateBase('actor/primary-tab-navigation'),
+        },
+        actions: {
+            template: this.templateBase('actor/tabs/actions'),
+        },
+        effects: {
+            template: this.templateBase('actor/tabs/effects'),
+        },
+        misc: {
+            template: this.templateBase('actor/tabs/misc'),
+        },
+        footer: {
+            template: this.templateBase('actor/footer'),
+        },
+    }
 
-        return `${path}/actor/${this.actor.type}.hbs`;
+    static templateBase(path: string) {
+        return `systems/shadowrun5e/dist/templates/v2/${path}.hbs`
+    }
+
+    static actorSystemParts(...parts: string[]) {
+        return parts.map(p => this.templateBase(`actor/parts/${p}`))
     }
 
     /** SheetData used by _all_ actor types! */
-    override async getData(options) {
+    override async _prepareContext(options) {
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
-        const data = super.getData() as any;
+        const data = await super._prepareContext(options) as any;
         data.system = this.actor.toObject(false).system;
+        data.systemFields = this.document.system.schema.fields;
         data.user = game.user;
+        data.actor = this.actor;
 
         // Sheet related general purpose fields. These aren't persistent.
         data.config = SR5;
@@ -238,7 +263,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
-        data.hasActions = this._prepareHasActions(data);
+        data.hasActions = this._prepareHasActions();
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
 
@@ -257,13 +282,53 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         data.initiativePerception = this._prepareInitiativePerception();
 
+        data.primaryTabs = this._prepareTabs('primary');
+
+        data.isEditMode = this._isEditMode;
+
+        console.log('contextData', data);
+
         return data;
     }
 
-    /** Listeners used by _all_ actor types! */
-    override activateListeners(html) {
-        super.activateListeners(html);
+    override async _preparePartContext(partId, context, options) {
+        const partContext = await super._preparePartContext(partId, context, options) as any;
+        if (partContext?.primaryTabs) {
+            if (partId in partContext.primaryTabs) {
+                partContext.tab = partContext.primaryTabs[partId];
+            }
+        }
 
+        return partContext;
+    }
+
+    /**
+     * Do any final preparations when rendering the sheet
+     * @param context
+     * @param options
+     */
+    protected override async _renderHTML(context, options) {
+        // push footer to the end of parts os it is rendered at the bottom
+        if (options.parts.includes("footer")) {
+            const index = options.parts.indexOf("footer");
+            options.parts.push(options.parts.splice(index, 1)[0]);
+        }
+        if (options.parts.includes("header")) {
+            const index = options.parts.indexOf("header");
+            if (index !== 0) {
+                options.parts.unshift(options.parts.splice(index, 1)[0]);
+            }
+        }
+        return await super._renderHTML(context, options);
+    }
+
+    override async _onRender(context, options) {
+        this.activateListeners_LEGACY($(this.element));
+        return super._onRender(context, options);
+    }
+
+    /** Listeners used by _all_ actor types! */
+    activateListeners_LEGACY(html) {
         Helpers.setupCustomCheckbox(this, html)
 
         // Active Effect management
@@ -377,6 +442,14 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
     }
 
+    static async #toggleEditMode(this: SR5BaseActorSheet, event: MouseEvent) {
+        console.log('toggleEditMode', this, event);
+        event.preventDefault();
+        event.stopPropagation();
+        this._isEditMode = !this._isEditMode;
+        await this.render();
+    }
+
     /**
      * Get the options for Initiative Perception
      */
@@ -456,7 +529,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * @override Default drag start handler to add Skill support
      * @param event
      */
-    override async _onDragStart(event) {
+    // TODO fix this
+    async _onDragStart(event) {
         // Create drag data
         const dragData = {
             actorId: this.actor.id,
@@ -522,8 +596,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
             // All default Foundry data transfer.
             default:
-                // Let default Foundry handler deal with default drag cases.
-                { super._onDragStart(event); return; }
         }
     }
 
@@ -531,7 +603,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param event
      */
-    override async _onDrop(event: DragEvent): Promise<unknown> {
+    // TODO fix this
+    async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -562,92 +635,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
             }
         }
-        // Keep upstream document created for actions base on it.
-        const documents = await (super._onDrop(event) as unknown as Promise<unknown>);
-
-        // Handle specific system drop events.
-        // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-
-        // Add any created items to the selected inventory.
-        if (Array.isArray(documents)) {
-            const items = documents.filter(document => document instanceof SR5Item);
-            await this.actor.inventory.addItems(this.selectedInventory, items);
-        }
-
-        return documents;
-    }
-
-    /**
-     * Enhance Foundry state restore on rerender by more user interaction state.
-     */
-    override async _render(...args) {
-        const focus = this._saveInputCursorPosition();
-        this._saveScrollPositions();
-
-        await super._render(...args);
-
-        this._restoreScrollPositions();
-        this._restoreInputCursorPosition(focus);
-    }
-
-    /**
-     * Use together with _restoreInputCursorPosition during render calls.
-     * Without this the cursor will always be on the first character, causing writing in reverse.
-     */
-    _saveInputCursorPosition(): any | null {
-        const focusList = $(this.element).find('input:focus');
-        return focusList.length ? focusList[0] : null;
-    }
-
-    /**
-     * Use together with _restoreInputCursorPosition during render calls.
-     */
-    _restoreInputCursorPosition(focus) {
-        if (focus?.name) {
-            if (!this.form) return;
-
-            const element = this.form[focus.name];
-            if (element) {
-                // Set general focus for allem input types.
-                element.focus();
-
-                // Set selection range for supported input types.
-                if (['checkbox', 'radio'].includes(element.type)) return;
-                // set the selection range on the focus formed from before (keeps track of cursor in input)
-                element.setSelectionRange?.(focus.selectionStart, focus.selectionEnd);
-            }
-        }
-
-    }
-
-    /**
-     * Used together with _restoreScrollPositions during render calls.
-     * @private
-     */
-    override _saveScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length) {
-            this._scroll = activeList.prop('scrollTop');
-        }
-    }
-
-    /**
-     * Used together with _storeScrollPositions during render calls.
-     * @private
-     */
-    override _restoreScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length && this._scroll != null) {
-            activeList.prop('scrollTop', this._scroll);
-        }
-    }
-
-    /**
-     * Return scroll area of the currently opened tab.
-     * @private
-     */
-    _findActiveList() {
-        return $(this.element).find('.tab.active .scroll-area');
     }
 
     async _onInventorySectionVisibilityChange(isOpen: boolean, event) {
@@ -1132,10 +1119,9 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     /**
      * Prepare if this actor has an "Action" Items in their list of items
-     * @param data - sheet data
      */
-    _prepareHasActions(data) {
-        return data.items.filter(item => item.type === 'action').length > 0;
+    _prepareHasActions() {
+        return this.actor.items.filter(item => item.type === 'action').length > 0;
     }
 
     /**
@@ -2004,7 +1990,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             setContent(this);
         });
         html.find('label.checkbox').click((event) => { setContent(event.currentTarget); });
-        html.find('.submit-checkbox').change(async (event) => this._onSubmit(event));
+        html.find('.submit-checkbox').change(async () => this.submit);
     }
 
     /**

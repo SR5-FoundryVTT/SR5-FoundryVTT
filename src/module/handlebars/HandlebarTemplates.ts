@@ -1,35 +1,33 @@
 export const preloadHandlebarsTemplates = async () => {
+    const v2Path = (...paths: string[]) => {
+        return paths.map(path => `systems/shadowrun5e/dist/templates/v2/${path}.hbs`);
+    }
+    const v2AP = (...paths: string[]) => {
+        return paths.map(path => `systems/shadowrun5e/dist/templates/v2/actor/parts/${path}.hbs`);
+    }
+
     const templatePaths = [
-        // actor tabs
-        'systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/BioTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/SpellsTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/DescriptionTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/NetworkTab.hbs',
-
-        'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.hbs',
-
-        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpritePowersTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ProgramListTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/MarksTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/OwnedIconsTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs',
-
-        'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.hbs',
-
-        'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.hbs',
-        'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.hbs',
-
+        // common templates
+        ...v2Path(
+            'common/header-block',
+            'common/horizontal-cells',
+            'common/list-header',
+            'common/list-item',
+            'common/name-line-block',
+            'common/profile-image',
+            'common/select',
+            'common/value-modifiers',
+            'common/value-input'
+        ),
+        ...v2AP(
+            'attribute',
+            'condition-monitor',
+            'fake-attribute',
+            'language-and-knowledge-skills',
+            'limits',
+            'matrix-attribute',
+            'special-attributes',
+        ),
         // item tabs
         'systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs',
         'systems/shadowrun5e/dist/templates/item/tabs/GridDescriptionTab.hbs',
@@ -37,59 +35,6 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/tabs/ActionTab.hbs',
         'systems/shadowrun5e/dist/templates/item/tabs/MiscellaneousTab.hbs',
         'systems/shadowrun5e/dist/templates/item/tabs/NetworksTab.hbs',
-
-        // uncategorized lists
-        'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/Initiative.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.hbs',
-        'systems/shadowrun5e/dist/templates/item/parts/import_flag_button.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/Movement.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/NameInput.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/ActionList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/ContactList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/SinAndLifestyleList.hbs',
-
-        // magic
-        'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/magic/MetamagicList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/magic/RitualList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/magic/SummoningList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpiritOptions.hbs',
-
-        // matrix
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/EchoList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/OwnedIcons.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/Targets.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs',
-
-        // attributes
-        'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/attributes/FakeAttribute.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/attributes/SpecialAttributeList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.hbs',
-
-        // skills
-        'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/skills/LanguageAndKnowledgeSkillList.hbs',
-
-        // vehicle
-        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleMovement.hbs',
-
-        // IC
-        'systems/shadowrun5e/dist/templates/actor/parts/ic/ICStats.hbs',
-        'systems/shadowrun5e/dist/templates/actor/parts/ic/ICConfiguration.hbs',
 
         // limited actor
         'systems/shadowrun5e/dist/templates/actor-limited/character.hbs',

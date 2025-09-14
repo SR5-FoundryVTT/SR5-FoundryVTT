@@ -1,0 +1,30 @@
+<div class="attributes">
+    {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            label="SR5.MatrixAttrAttack"
+            attribute=system.matrix.attack
+            attributeId="attack"
+            attributesPath="system.matrix"
+            disableBase=(disabledHelper host)
+    }}
+    {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            label="SR5.MatrixAttrSleaze"
+            attribute=system.matrix.sleaze
+            attributeId="sleaze"
+            attributesPath="system.matrix"
+            disableBase=(disabledHelper host)
+    }}
+    {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            label="SR5.MatrixAttrDataProc"
+            attribute=system.matrix.data_processing
+            attributeId="data_processing"
+            attributesPath="system.matrix"
+            disableBase=(disabledHelper host)
+    }}
+    {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            label="SR5.MatrixAttrFirewall"
+            attribute=system.matrix.firewall
+            attributeId="firewall"
+            attributesPath="system.matrix"
+            disableBase=(disabledHelper host)
+    }}
+</div>

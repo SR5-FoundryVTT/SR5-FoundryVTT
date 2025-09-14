@@ -1,0 +1,25 @@
+<div class="movement-container">
+    <i style="padding-right: .25rem;" class="fas fa-person-walking"></i>
+    <span data-tooltip="SR5.WalkingSpeed">{{system.movement.walk.value}}m</span>
+    <span>/</span>
+    <span data-tooltip="SR5.RunningSpeed">{{system.movement.run.value}}m</span>
+    {{#unless isVehicle}}
+    <span>/</span>
+    {{#if @root.isEditMode}}
+        <div style="max-width: 5rem">
+            <input
+                prefix="+"
+                size="2"
+                maxlength="2"
+                type="number"
+                name="system.movement.sprint"
+                value={{system.movement.sprint}} />
+        </div>
+    {{else}}
+        <span data-tooltip="SR5.SprintingBonus">
+        <i style="font-size: 0.75em;" class="fas fa-plus"></i>
+            {{system.movement.sprint}}
+    </span>
+    {{/if}}
+    {{/unless}}
+</div>

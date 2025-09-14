@@ -1,0 +1,18 @@
+{{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+        name=(localize 'SR5.Metamagics')
+        itemId='metamagic'
+        icons=(ItemHeaderIcons 'metamagic')
+        rightSide=(ItemHeaderRightSide 'metamagic')
+}}
+{{#each itemType.metamagic as |item i|}}
+    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
+            img=item.img
+            name=item.name
+            itemId=item._id
+            icons=(ItemIcons item)
+            rightSide=(ItemRightSide item)
+            hasDesc="true"
+            hasRoll="false"
+            description=item.description.value
+    }}
+{{/each}}

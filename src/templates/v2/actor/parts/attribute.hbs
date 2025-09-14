@@ -1,0 +1,41 @@
+<div class="attribute {{#if rollId}}RollId{{/if}}{{#if row}}row{{/if}} {{cssClass}}" data-{{dataName}}="{{dataId}}" {{#if rollId}}data-roll-id="{{rollId}}"{{/if}}>
+    <div class="attribute-name roll {{#if rollId}}Roll{{/if}}">
+        {{#if label}}
+            {{localize label}}
+        {{else}}
+            {{localize attribute.label}}
+        {{/if}}
+    </div>
+    {{#if @root.isEditMode}}
+        <div class="track center {{#if disableBase}}{{#if disableManual}}invisible{{/if}}{{/if}}">
+            <div class="attribute-input-container">
+                {{> 'systems/shadowrun5e/dist/templates/v2/common/value-input.hbs'
+                    cssClass="attribute-input short"
+                    title="SR5.BaseValue"
+                    size="2"
+                    maxLength="2"
+                    value=attribute.base
+                    name=(buildName part1=(fallbackValue attributesPath "system.attributes") part2=attributeId part3="base")
+                    disabled=(disabledHelper disableBase)
+                }}
+            </div>
+            <div class="track-plus"></div>
+            <div class="attribute-input-container">
+                {{> 'systems/shadowrun5e/dist/templates/v2/common/value-input.hbs'
+                    cssClass="attribute-input short"
+                    title="SR5.TemporaryModifiers"
+                    size="2"
+                    maxLength="2"
+                    value=attribute.temp
+                    name=(buildName part1=(fallbackValue attributesPath "system.attributes") part2=attributeId part3="temp")
+                    disabled=(disabledHelper disableManual)
+                }}
+            </div>
+        </div>
+    {{else}}
+        <div class="attribute-value value">
+            <span class="attribute-value-total">{{attribute.value}}</span>
+            {{> "systems/shadowrun5e/dist/templates/v2/common/value-modifiers.hbs" value=attribute}}
+        </div>
+    {{/if}}
+</div>

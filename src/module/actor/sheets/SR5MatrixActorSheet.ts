@@ -29,34 +29,18 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     ownedIcons: MatrixTargetDocument[];
 }
 
-export class SR5MatrixActorSheet extends SR5BaseActorSheet {
+export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorSheetData> extends SR5BaseActorSheet<T> {
     // Stores which document has been selected in the matrix tab.
     // We accept this selection to not be persistant across Foundry sessions.
     selectedMatrixTarget: string|undefined;
 
-    static override get defaultOptions() {
-        const defaultOptions = super.defaultOptions;
-        return foundry.utils.mergeObject(defaultOptions, {
-            tabs: [...defaultOptions.tabs,
-                {
-                    navSelector: '.tabs[data-group="matrix"]',
-                    contentSelector: '.tabsbody[data-group="matrix"]',
-                    initial: 'targets',
-                },
-                {
-                    navSelector: '.tabs[data-group="matrix-right-side"]',
-                    contentSelector: '.tabsbody[data-group="matrix-right-side"]',
-                    initial: 'matrix-actions',
-                },
-            ] as {navSelector: string, contentSelector: string, initial: string}[],
-        });
-    }
-
-    override async getData(options): Promise<any> {
-        const data = await super.getData(options) as MatrixActorSheetData;
+    override async _prepareContext(options) {
+        const data = await super._prepareContext(options);
 
         data.network = this.actor.network;
         data.matrixActions = await this._prepareMatrixActions();
+        data.matrixLeftTabs = this._prepareTabs('matrixLeft');
+        data.matrixRightTabs = this._prepareTabs('matrixRight');
 
         this._prepareMatrixTargets(data);
         this._prepareOwnedIcons(data);
@@ -64,6 +48,96 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         this._prepareMatrixDevice(data);
 
         return data;
+    }
+
+    static override TABS = {
+        ...super.TABS,
+        matrixLeft: {
+            initial: 'networkIcons',
+            tabs: [
+                { id: 'programs', label: 'Programs', cssClass: ''},
+                { id: 'networkIcons', label: 'Icons', cssClass: ''},
+                { id: 'markedIcons', label: 'Marked', cssClass: ''},
+                { id: 'ownedIcons', label: 'Owned', cssClass: ''},
+
+            ]
+        },
+        matrixRight: {
+            initial: 'matrixActions',
+            tabs: [
+                { id: 'matrixActions', label: 'Actions', cssClass: '', }
+            ]
+        }
+    }
+
+    /**
+     * Move tabs into a target and delete
+     * @param tabs
+     * @param parts
+     * @param target
+     * @protected
+     */
+    protected moveTabs(tabs: any, parts: any, target: any) {
+        for (const tab of tabs) {
+            const key = tab.id;
+            if (key in parts) {
+                target.append(parts[key]);
+                delete parts[key];
+            }
+        }
+    }
+
+    protected override async _renderHTML(content, options) {
+        const parts = await super._renderHTML(content, options);
+        const matrixLeftSideContent = parts.matrix.querySelector("section.content.matrix-left-tab-content");
+        if (matrixLeftSideContent) {
+            this.moveTabs(SR5MatrixActorSheet.TABS.matrixLeft.tabs, parts, matrixLeftSideContent);
+        }
+        const matrixRightSideContent = parts.matrix.querySelector("section.content.matrix-right-tab-content");
+        if (matrixRightSideContent) {
+            this.moveTabs(SR5MatrixActorSheet.TABS.matrixRight.tabs, parts, matrixRightSideContent);
+        }
+
+        return parts;
+    }
+
+    static override PARTS = {
+        ...super.PARTS,
+        matrix: {
+            template: this.templateBase('actor/tabs/matrix'),
+        },
+        matrixActions: {
+            template: this.templateBase('actor/tabs/matrix/matrix-actions'),
+        },
+        markedIcons: {
+            template: this.templateBase('actor/tabs/matrix/marked-icons'),
+        },
+        ownedIcons: {
+            template: this.templateBase('actor/tabs/matrix/owned-icons'),
+        },
+        networkIcons: {
+            template: this.templateBase('actor/tabs/matrix/network-icons'),
+        },
+        programs: {
+            template: this.templateBase('actor/tabs/matrix/programs'),
+        }
+    }
+
+    override async _preparePartContext(partId, context, options): Promise<any> {
+        const partContext = await super._preparePartContext(partId, context, options);
+
+        if (partContext?.matrixLeftTabs) {
+            if (partId in partContext.matrixLeftTabs) {
+                partContext.tab = partContext.matrixLeftTabs[partId];
+            }
+        }
+        if (partContext?.matrixRightTabs) {
+            if (partId in partContext.matrixRightTabs) {
+                partContext.tab = partContext.matrixRightTabs[partId];
+            }
+        }
+
+        return partContext;
     }
 
     /**
@@ -117,8 +191,8 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         data.markedDocuments = this._prepareMarkedDocumentTargets(markedDocuments);
     }
 
-    override activateListeners(html) {
-        super.activateListeners(html);
+    override activateListeners_LEGACY(html) {
+        super.activateListeners_LEGACY(html);
 
         html.find('.show-matrix-network-hacking').click(this._onShowMatrixNetworkHacking.bind(this));
         html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));

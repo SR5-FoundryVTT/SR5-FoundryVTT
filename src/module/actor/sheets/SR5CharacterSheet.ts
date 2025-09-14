@@ -8,10 +8,10 @@ export interface CharacterSheetData extends MatrixActorSheetData {
     woundTolerance: number
     handledItemTypes: string[]
     inventory: Record<string, any>
+    isCharacter: boolean;
 }
 
-
-export class SR5CharacterSheet extends SR5MatrixActorSheet {
+export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
     /**
      * Character actors will handle these item types specifically.
      *
@@ -41,6 +41,54 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet {
         ];
     }
 
+    static override TABS = {
+        ...super.TABS,
+        primary: {
+            initial: 'skills',
+            tabs: [
+                { id: 'actions', label: 'Actions', cssClass: '' },
+                { id: 'skills', label: 'Skills', cssClass: '' },
+                { id: 'inventory', label: 'Inventory', cssClass: '' },
+                { id: 'critter', label: 'Critter', cssClass: '' },
+                { id: 'magic', label: 'Magic', cssClass: '' },
+                { id: 'matrix', label: 'Matrix', cssClass: '' },
+                { id: 'social', label: 'Social', cssClass: '' },
+                { id: 'bio', label: 'Bio', cssClass: '' },
+                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'misc', label: 'Misc', cssClass: '' },
+            ]
+        },
+    }
+
+    static override PARTS = {
+        ...super.PARTS,
+        skills: {
+            template: this.templateBase('actor/tabs/character-skills'),
+            templates: this.actorSystemParts(
+                'active-skills', 'language-and-knowledge-skills',
+                'attributes', 'special-attributes'
+            )
+        },
+        magic: {
+            template: this.templateBase('actor/tabs/magic'),
+            templates: this.actorSystemParts(
+                'spells', 'rituals', 'summonings', 'adept-powers')
+        },
+        critter: {
+            template: this.templateBase('actor/tabs/critter'),
+        },
+        inventory: {
+            template: this.templateBase('actor/tabs/inventory'),
+        },
+        social: {
+            template: this.templateBase('actor/tabs/social'),
+        },
+        bio: {
+            template: this.templateBase('actor/tabs/bio'),
+            templates: this.actorSystemParts('metamagics', 'echoes')
+        },
+    }
+
     /**
      * Character actors will always show these item types.
      *
@@ -65,11 +113,13 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet {
     }
 
 
-    override async getData(options) {
-        const data = await super.getData(options) as CharacterSheetData;
+    override async _prepareContext(options) {
+        const data = await super._prepareContext(options);
 
         // Character actor types are matrix actors.
         super._prepareMatrixAttributes(data);
+
+        data.isCharacter = true;
         return data;
     }
 

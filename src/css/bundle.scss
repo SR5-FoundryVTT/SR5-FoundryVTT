@@ -1351,3 +1351,910 @@ input[type='text'].display {
 .SR5 tr p:not(th p) {
     padding-left: 10px; /* Padding on the left */
 }
+
+.sr5v2 {
+
+    // new SIN Layout
+    .license-section .list-item-content,
+    .license-section .list-item.item-section .list-item-content {
+        display: flex !important;
+        flex-direction: row;
+        justify-content: flex-start !important;
+        margin: 0 !important;
+        padding: 1px !important;
+    }
+
+    /* New or updated rules */
+    .license-section .item-text.rtg.rate,
+    .license-section .rtg-rate.item-text {
+        /* Updated */
+        margin-left: 0;
+        padding-left: 0;
+        text-align: left;
+        width: 22px; /* Updated */
+    }
+    //Header Rating
+    .license-section .item-text.rtg.rate-header {
+        max-width: 2em;
+        margin-left: -1em;
+    }
+    //Header detail
+    .detail {
+        margin-left: 1em !important;
+    }
+    //Rating width
+    .license-section .list-item .rtg-rate.item-text {
+        max-width: 2em;
+    }
+    //Item Name field size
+    .license-section .list-item .rtg-rate.item-text {
+        max-width: 1em;
+    }
+    .item-name-field {
+        max-width: 11em; /* Set to your desired max width */
+    }
+
+    .display.left.name-display {
+        width: 100%; /* Takes the maximum width of the parent */
+        max-width: 100%; /* Optional, ensures it doesn't go beyond parent */
+    }
+    // This class is only used for sin license descriptions and seems to be mostly a hack to get the description to better align with the license rating.
+    .display.desc-sin {
+        margin-left: 0.9em;
+    }
+    .license-section .list-item.item-section .item-left .item-text,
+    .license-section .list-item .item-left .item-text.item-name-header {
+        flex-basis: calc(15% - 1em);
+        text-align: left;
+    }
+
+    .item-text.item-name-header {
+        /* Set to your desired width */
+        max-width: 11em; /* Optional, ensures it doesn't go beyond the set width */
+    }
+
+    .license-section .list-item.item-section .item-text.rtg.rate,
+    .license-section .list-item .rtg-rate.item-text {
+        /* Updated */
+        flex-basis: calc(25% - 1em);
+        text-align: left;
+        width: 22px; /* Updated */
+    }
+
+    .license-section .list-item.item-section .item-text.desc.detail,
+    .license-section .list-item {
+        flex-basis: calc(25% - 1em);
+        text-align: left;
+    }
+
+    /* Specifics for the rtg-rate input field */
+    .license-section .list-item .rtg-rate.item-text input {
+        /* Updated */
+        width: 22px; /* Updated */
+    }
+
+    // Specific em
+    .license-section .sr5 .list-header .list-item-content .item-text.desc,
+    .license-section .sr5 .list-item .list-item-content .item-text.desc {
+        width: 30em;
+        margin-right: 5px;
+    }
+
+    .license-section .item-left {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .license-section .item-left .item-text {
+        align-self: flex-start;
+    }
+
+    .license-section .sr5 .list-item .list-item-content .item-text.desc {
+        width: 30em !important;
+        margin-left: -1em !important;
+        text-align: left;
+    }
+
+    a.inventory-remove.action-icon.roll {
+        padding: 0.5em;
+        padding-left: 0.1em;
+    }
+    a.inventory-edit.action-icon.roll {
+        padding: 0.5em;
+    }
+    span.selection-inventory {
+        display: flex;
+        margin: 0.2em;
+    }
+
+    /////////////////////////////////////////////////////////////
+
+    hr {
+        border-color: $yellow;
+    }
+
+    /**
+     * Elements used for inline editing
+     */
+    .inline-input-inventory {
+        display: none;
+    }
+
+    /**
+     * Elements used for linkable documents / entities.
+     *
+     * This is also present in foundry.scss, but is overwritten by Monks Enhanced Journals module.
+     * Let's force it within the SR5 context, while leaving it everywhere else.
+     */
+    .entity-link,
+    .content-link,
+    .inline-roll {
+        border: 0;
+        background: none;
+        color: $white !important;
+    }
+
+    .entity-link.content-link {
+        color: $white !important;
+    }
+
+    // An origin link is a uuid based entity link, without drag support.
+    .origin-link {
+        background: #ddd;
+        padding: 1px 4px;
+        border: 1px solid #4b4a44;
+        border-radius: 2px;
+        white-space: nowrap;
+        word-break: break-all;
+        color: $black;
+    }
+
+    .roll {
+        @include rollable;
+    }
+
+    .editor {
+        height: 95%;
+        width: 100%;
+    }
+
+    .editor .tox-edit-area {
+        background: $mce-background;
+    }
+
+    // Styling for any prosemirror editors within shadowrun applications.
+    .editor.prosemirror {
+        // handles dropdown menus, not select based.
+        .pm-dropdown {
+            color: $color;
+            background: rgba($black, 0.05);
+            border-radius: 0.3em;
+            border-color: $dark;
+
+            // Icons like chevron and ticks.
+            i,
+            i:hover {
+                color: $color;
+            }
+
+            // ul will contain menus and sub-menus and can be nested.
+            ul {
+                background-color: $dark;
+            }
+
+            // li represents each menu entry in both menus and sub-menus
+            ul > li:hover {
+                color: $color;
+                border-color: rgba($white, 0.1);
+                background: rgba($black, 0.05);
+            }
+        }
+
+        // HTML editing uses a class-less textarea
+        textarea {
+            color: $color;
+        }
+    }
+
+    .full-height {
+        height: 100%;
+    }
+
+    .parts-list {
+        font-size: 12px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        align-items: center;
+
+        &.vertical {
+            flex-flow: column nowrap;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .part {
+            white-space: nowrap;
+
+            .value {
+                font-weight: bold;
+            }
+
+            &.underline {
+                text-decoration: underline;
+            }
+        }
+
+        > * {
+            margin: 0 0.5em;
+        }
+    }
+
+    .no-break {
+        white-space: nowrap;
+    }
+
+    .description > .editor {
+        height: 95%;
+        min-height: 15em;
+        width: 100%;
+        color: $color;
+    }
+
+    img {
+        box-sizing: border-box;
+        border: 1px solid var(--color-border-dark);
+        border-radius: 2px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .profile-img {
+        padding: 0.25em;
+        min-width: 80px; // should also have a min width
+        max-width: 100px;
+        //border-right: $groove;
+        //border-bottom: $groove;
+    }
+
+    .sheet .editor-content {
+        color: $white;
+        height: 100%;
+        overflow-y: auto;
+        word-break: break-word;
+    }
+
+    .list-item.item-section.flexrow {
+        min-height: 36px;
+    }
+
+    label.item-text.item-name[for='select-inventory'] {
+        color: $yellow;
+    }
+
+    label.item-text.item-name {
+        color: $white;
+    }
+
+    .container {
+        max-width: $sheet-max-width;
+        margin: 0 auto;
+
+        &--fluid {
+            margin: 0;
+            max-width: 100%;
+        }
+
+        &__row {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        // Auto create grid style classes for a fixed max column grid
+        @for $i from 1 through $grid__cols {
+            &__col-#{$i} {
+                flex-basis: calc(100 / ($grid__cols / $i)) * 1%;
+                overflow: hidden;
+            }
+        }
+
+        &__col-half {
+            flex-basis: 50%;
+            overflow: hidden;
+        }
+
+        .element {
+            padding: 4px;
+        }
+    }
+
+    .document {
+        overflow: hidden;
+        white-space: nowrap;
+        display: flex;
+        align-content: center;
+
+        img {
+            height: 34px;
+        }
+
+        * {
+            display: inline-block;
+        }
+    }
+
+    .block {
+        display: flex;
+        flex-flow: column;
+        padding: 2px 4px;
+        justify-content: space-around;
+
+        .block-line {
+            display: flex;
+            flex-flow: row nowrap;
+            padding: 4px;
+
+            &.center {
+                justify-content: center;
+            }
+
+            &.border-bottom {
+                border-bottom: $groove;
+            }
+
+            &.gap-4 {
+                > :not(:first-child) {
+                    margin-left: 4px;
+                }
+
+                > :not(:last-child) {
+                    margin-right: 4px;
+                }
+            }
+        }
+    }
+
+    .horizontal-cell-input {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: start;
+        padding: 4px;
+
+        &.stun .cell {
+            box-shadow: 0 0 5px 1px rgba($stun, 0.5);
+        }
+
+        &.physical .cell {
+            box-shadow: 0 0 5px 1px rgba($physical, 0.5);
+        }
+
+        &.edge .cell {
+            box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+        }
+
+        &.matrix .cell {
+            box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
+        }
+
+        .roll {
+            width: 60px;
+            margin-right: 8px;
+        }
+
+        .cell-container {
+            display: flex;
+            flex-flow: row;
+            justify-content: stretch;
+
+            .cell {
+                cursor: pointer;
+                text-align: center;
+                font-size: 80%;
+                border: $groove;
+                color: $light-2;
+                border-radius: 4px;
+                background: $black;
+                min-width: 26px;
+                height: 18px;
+
+                &:not(:first-child) {
+                    margin-left: 2px;
+                }
+
+                &:not(:last-child) {
+                    margin-right: 2px;
+                }
+
+                &.filled {
+                    background: $light-2;
+                    border-color: $black;
+                    color: $black;
+                }
+
+                &:hover {
+                    border-color: $light;
+                }
+            }
+        }
+    }
+
+    .list-header,
+    .list-item {
+        font-size: var(--font-size-12);
+        padding: 0.1em 0.25em;
+        min-height: 26px;
+        margin: 0.1em;
+        margin-right: $groove-width;
+        margin-left: $groove-width;
+        &.matrix {
+            color: $white;
+        }
+        .has-desc {
+            @include rollable;
+        }
+
+        &.no-border {
+            border-bottom: none;
+        }
+
+        &.center {
+            justify-content: center;
+        }
+
+        &.space-evenly {
+            justify-content: space-evenly;
+        }
+
+        &.item-section {
+            background: black;
+            color: $yellow;
+            margin-right: 0;
+            margin-left: 0;
+            // background: rgba($grey, 0.2);
+            // padding: 0.25em;
+            // border-radius: 0.2em;
+            border-bottom: 1px solid $yellow;
+            border-radius: 0.2em;
+            padding-top: 5px;
+            &.sprite {
+                background: none;
+            }
+            &.faded {
+                color: $grey;
+            }
+            // &:first-child {
+            //     border-top: 1px solid $yellow;
+            // }
+
+            &.subcategory-header {
+                margin-left: 0.5em;
+                border-bottom: none;
+            }
+        }
+
+        &.subcategory-item {
+            margin-left: 0.5em;
+        }
+
+        .list-item-content {
+            //color: white;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            align-items: center;
+            align-content: center;
+
+            // vertically center the rows, using a table would have
+            // been better, but i pray for V2 or during the rework.
+            &:not(.list-header > .list-item-content) {
+                margin-top: 0.3125rem;
+            }
+
+            .item-center {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                align-self: center;
+            }
+
+            .item-left {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: flex-start;
+                align-items: center;
+                flex-grow: 1;
+                // Do not let long text overspill
+                overflow: hidden;
+            }
+
+            .item-right {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: flex-end;
+                align-items: center;
+            }
+
+            .item-img {
+                padding-right: 0.25em;
+                min-width: 28px; //needed for quality fix
+                max-width: 50px;
+
+                &.item-roll {
+                    @include rollable;
+
+                    &:hover {
+                        > img {
+                            content: url('assets/dice-solid.svg');
+                            filter: invert(1);
+                        }
+                    }
+                }
+
+                > img {
+                    margin: 0;
+                    transform: translateY(10%);
+                }
+
+                & + .item-name {
+                    border-left: none !important;
+                }
+            }
+
+            .item-input {
+                width: 9.5em;
+            }
+
+            .item-icons {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: space-evenly;
+                align-items: center;
+                color: $grey;
+                font-size: 12px;
+                height: 100%;
+            }
+
+            .item-text {
+                width: 6em; // This will allow item header / line columns to align up.
+                margin: 0 0.1rem;
+                flex: 1 0 auto;
+                text-align: center;
+                height: 100%;
+                border: $light;
+                padding-right: 10px;
+
+                &.is-broken {
+                    color: $crimson;
+                }
+                &.is-damaged {
+                    color: $yellow;
+                }
+
+                &.faded {
+                    color: $grey;
+                }
+
+                &.center {
+                    display: flex;
+                    flex-flow: row;
+                    justify-content: space-around;
+                    align-items: center;
+                    align-content: center;
+                }
+
+                &.item-name {
+                    text-align: left;
+                    display: grid;
+                    width: auto;
+
+                    &.fresh-import {
+                        color: $freshImportColor;
+                    }
+                    &.mods-label {
+                        color: $white;
+                    }
+                }
+
+                &.element {
+                    width: 7em;
+                }
+
+                &.radius {
+                    width: 4em;
+                }
+
+                &.dropoff {
+                    width: 4em;
+                }
+
+                &.rtg {
+                    min-width: 3em;
+                    max-width: 4em;
+                    &.active-skills-rating {
+                        padding-right: 1em;
+                    }
+                }
+
+                &.input {
+                    text-align: right;
+                    width: 9.5em;
+                    &.defense {
+                        //Moves the selector Box for defense to the left to align
+                        width: 13.5em;
+                    }
+                }
+
+                &.desc {
+                    width: 16em;
+                }
+                .content-inner {
+                    color: $white;
+                }
+            }
+
+            .skill-item {
+                width: 8em;
+            }
+
+            .skill-spec-item {
+                width: 15em;
+            }
+
+            &.skill-header {
+                @include rollable;
+            }
+        }
+        .selected-list-item {
+            color: $edge;
+        }
+    }
+
+    .list-item:nth-of-type(even) {
+        background: rgba($white, 0.03);
+    }
+
+    .list-item-description {
+        .item-desc {
+            padding: 0.25em;
+            font-size: 1em;
+            width: 100%;
+
+            .props {
+                display: flex;
+                flex-flow: wrap row;
+                padding: 0.25em 0;
+
+                > * {
+                    flex-shrink: 0;
+                    border-right: $groove;
+                    border-bottom: $groove;
+                    padding: 0.25em 0.5em;
+                    margin: 0.1em 0.25em;
+                    box-shadow: 0.2em 0.2em 0.3em $black;
+                }
+            }
+
+            .description {
+                //border-right: $light 2px solid;
+                // border-top: $light 2px solid;
+                margin: 0.5em 0.25em;
+                padding: 0.5em;
+                // margin-right: 0.5em;
+                //padding-right: 0.5em;
+            }
+        }
+        .item-desc:after {
+            content: '';
+            clear: both;
+            display: table;
+        }
+    }
+
+    .quality .list-item-content .item-text.item-name {
+        min-width: 5em;
+        max-width: 15em;
+        display: contents;
+    }
+    .modified-target-damage {
+        margin-top: $large-distance;
+        margin-bottom: $large-distance;
+        display: grid;
+        grid-template-columns: 40px auto auto;
+
+        .modified-target-damage-cell {
+            display: flex;
+            align-items: center;
+            margin-bottom: $small-distance;
+        }
+    }
+
+    .important {
+        font-weight: bold;
+    }
+
+    button.display.import-character {
+        color: $color;
+        border-color: $black;
+        background: $dark-sunken;
+        border-radius: 0.3em;
+        text-align: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+
+        &.light {
+            color: $black;
+            background: $light;
+        }
+    }
+    button.display.show-hidden-skills {
+        color: $color;
+        border-color: $black;
+        background: rgb(70, 7, 7);
+        border-radius: 0.3em;
+        text-align: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+
+        &.light {
+            color: $black;
+            background: $light;
+        }
+    }
+
+    button.display.reset-actor-run-data {
+        color: $color;
+        border-color: $black;
+        background: rgb(70, 7, 7);
+        border-radius: 0.3em;
+        text-align: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+
+        &.light {
+            color: $black;
+            background: $light;
+        }
+    }
+
+    /** CSS for the Environmental Modifier Application Window
+     *
+     */
+    button.env-modifier {
+        text-align: left;
+        font-size: var(--font-size-13) !important;
+        line-height: normal;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .env-modifier-active {
+        border-radius: 8px;
+        //box-shadow: $dark-sunken-box-shadow;
+        background-color: $darkred; //$dark-sunken;
+        color: $yellow;
+    }
+
+    .env-modifier-total {
+        font-weight: bold;
+    }
+
+    td.env-modifier-level {
+        padding-right: 6px;
+    }
+
+    .skill-roll-not-defaultable {
+        font-style: italic;
+    }
+
+    /** Input element for inventory name editing */
+    input#input-inventory {
+        // Otherwise the other classes used will break styling.
+        width: auto;
+    }
+
+    .document-name {
+        @include systemFonts;
+        font-size: var(--font-size-18);
+        font-weight: bold;
+    }
+
+    .cell-input-roll {
+        color: $yellow;
+    }
+
+    // Intended to affect icons only within the url/pdf source controls.
+    .source-button i.fas {
+        color: $pdfColor;
+    }
+
+    // TODO remove these
+    .flexcol {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        > * {
+            flex: 0;
+        }
+    }
+
+    .flexcol-rev {
+        display: flex;
+        flex-direction: column-reverse;
+        flex-wrap: nowrap;
+
+        > * {
+            flex: 0;
+        }
+    }
+
+    .flexrow {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .flex5 {
+        flex: 5;
+    }
+    .flex6 {
+        flex: 6;
+    }
+    .flex7 {
+        flex: 7;
+    }
+    .flex8 {
+        flex: 8;
+    }
+    .flex9 {
+        flex: 9;
+    }
+
+    .nowrap {
+        flex-wrap: nowrap;
+    }
+
+    .align-start {
+        align-items: flex-start;
+    }
+
+    .center {
+        justify-content: center;
+    }
+
+    .flex-end {
+        justify-content: flex-end;
+    }
+
+    .space-between {
+        justify-content: space-between;
+    }
+
+    .space-around {
+        justify-content: space-around;
+    }
+
+    .align-center {
+        align-items: center;
+    }
+}

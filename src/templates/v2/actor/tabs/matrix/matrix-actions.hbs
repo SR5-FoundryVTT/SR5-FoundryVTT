@@ -1,0 +1,22 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+            name=(localize 'SR5.Labels.ActorSheet.MatrixActions')
+            rightSide=(MatrixActionsHeaderRightSide)
+            itemCssClass='header-for-scrollable'
+        }}
+        <div class="scrollable">
+        {{#each @root.matrixActions}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
+                name=this.name
+                itemId=this.action.uuid
+                img=this.action.img
+                itemType="matrix-action"
+                hasRoll="true"
+                hasDesc="true"
+                rightSide=(MatrixActionsItemRightSide this.action)
+            }}
+        {{/each}}
+        </div>
+    </div>
+</section>
