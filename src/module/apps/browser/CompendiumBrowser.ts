@@ -40,9 +40,7 @@ export class CompendiumBrowser extends Base {
             this._activePackIds.push(this._packs[1].collection);
         }
 
-        this.allFilters = Object.keys(CONFIG.Item.dataModels)
-                            .map(id => ({ value: game.i18n.localize(`TYPES.Item.${id}`), id, selected: false }))
-                            .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang));
+        this.setFilters();
     }
 
     /**
@@ -52,8 +50,9 @@ export class CompendiumBrowser extends Base {
         tag: "form",
         id: "compendium-browser",
         classes: ["compendium-browser"],
-        position: { width: 1050, height: 700 },
+        position: { width: 900, height: 750 },
         window: {
+            icon: "fa-solid fa-book-open-reader",
             title: "Compendium Browser",
             minimizable: true,
             resizable: true
@@ -86,22 +85,32 @@ export class CompendiumBrowser extends Base {
             tabs: [
                 {
                     id: "Actor",
-                    icon: "fas fa-user",
+                    icon: "fa-solid fa-user",
                     label: "Actors",
                 },
                 {
                     id: "Item",
-                    icon: "fas fa-box",
+                    icon: "fa-solid fa-suitcase",
                     label: "Items",
                 }
             ],
         },
     };
 
+    private setFilters() {
+        this.allFilters = Object.keys(CONFIG[this.activeTab].dataModels)
+            .map(id => ({ value: game.i18n.localize(`TYPES.${this.activeTab}.${id}`), id, selected: false }))
+            .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang));
+    }
+
     override changeTab(
         ...[tab, group, options]: Parameters<BaseType["changeTab"]>
     ) {
         super.changeTab(tab, group, options);
+        this.activeTab = tab as "Actor" | "Item";
+        this.setFilters();
+
+        void this.render({ parts: ["filters", "results"] });
     }
 
     /**
@@ -177,16 +186,6 @@ export class CompendiumBrowser extends Base {
         }
     }
 
-    private resultListeners(htmlElement: HTMLElement) {
-        const resultsContainer = htmlElement.querySelector<HTMLElement>(".compendium-list");
-        if (resultsContainer) {
-            // We use event delegation on the container for efficiency
-            resultsContainer.addEventListener("mouseover", this.#onRowMouseEnter.bind(this));
-            resultsContainer.addEventListener("mouseout", this.#onRowMouseLeave.bind(this));
-            resultsContainer.addEventListener("mousemove", this.#onRowMouseMove.bind(this));
-        }
-    }
-
     private _onFilterChange(type: string, selected: boolean) {
         const typeEntry = this.allFilters.find(t => t.id === type);
         if (typeEntry)
@@ -200,7 +199,6 @@ export class CompendiumBrowser extends Base {
     override async _prepareContext(...args: Parameters<BaseType["_prepareContext"]>) {
         return {
             ...(await super._prepareContext(...args)),
-            types: this.allFilters,
             searchQuery: this._searchQuery,
         };
     }
@@ -211,6 +209,10 @@ export class CompendiumBrowser extends Base {
         await super._preparePartContext(partId, context, options);
         if (partId === "results")
             context.entries = await this.fetch();
+        if (partId === "filters") {
+            context.activeTab = this.activeTab;
+            context.types = this.allFilters;
+        }
         return context;
     }
 
@@ -258,6 +260,16 @@ export class CompendiumBrowser extends Base {
         this._searchCursorPosition = target.selectionStart;
         this._searchQuery = target.value;
         void this.render({ parts: ["results"] });
+    }
+
+    private resultListeners(htmlElement: HTMLElement) {
+        const resultsContainer = htmlElement.querySelector<HTMLElement>(".compendium-list");
+        if (resultsContainer) {
+            // We use event delegation on the container for efficiency
+            resultsContainer.addEventListener("mouseover", this.#onRowMouseEnter.bind(this));
+            resultsContainer.addEventListener("mouseout", this.#onRowMouseLeave.bind(this));
+            resultsContainer.addEventListener("mousemove", this.#onRowMouseMove.bind(this));
+        }
     }
 
     /**
