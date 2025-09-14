@@ -28,16 +28,12 @@ export class CompendiumBrowser extends Base {
     /** The cursor position in the search input to preserve during re-renders. */
     private _searchCursorPosition: number | null = null;
 
-    private static readonly typesPart = {
-        
-    };
-
     /** A reference to the tooltip DOM element. */
     #tooltipElement: HTMLElement | null = null;
     /** A timeout handle to manage the tooltip's hide delay. */
     #tooltipTimeout: number | null = null;
 
-    constructor(options?: ConstructorParameters<typeof ApplicationV2>[0]) {
+    constructor(options?: ConstructorParameters<typeof Base>[0]) {
         super(options);
         this._packs = [...game.packs.values()] as CompendiumCollection<any>[];
         if (this._packs.length > 0) {
@@ -46,7 +42,7 @@ export class CompendiumBrowser extends Base {
 
         this.allFilters = Object.keys(CONFIG.Item.dataModels)
                             .map(id => ({ value: game.i18n.localize(`TYPES.Item.${id}`), id, selected: false }))
-                            .sort((a, b) => a.value.localeCompare(b.value));
+                            .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang));
     }
 
     /**
@@ -73,6 +69,9 @@ export class CompendiumBrowser extends Base {
      * Defines the Handlebars template parts used by this application.
      */
     static override PARTS = {
+        tabs: {
+            template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/tabs.hbs",
+        },
         filters: {
             template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/filters.hbs",
         },
@@ -80,6 +79,30 @@ export class CompendiumBrowser extends Base {
             template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/results.hbs",
         },
     };
+
+    static override TABS = {
+        tabs: {
+            initial: "Item",
+            tabs: [
+                {
+                    id: "Actor",
+                    icon: "fas fa-user",
+                    label: "Actors",
+                },
+                {
+                    id: "Item",
+                    icon: "fas fa-box",
+                    label: "Items",
+                }
+            ],
+        },
+    };
+
+    override changeTab(
+        ...[tab, group, options]: Parameters<BaseType["changeTab"]>
+    ) {
+        super.changeTab(tab, group, options);
+    }
 
     /**
      * The title of the application window.
@@ -192,7 +215,9 @@ export class CompendiumBrowser extends Base {
     }
 
     private async fetch() {
-        const activePacks = this._packs.filter(p => p.visible && p.metadata.type === this.activeTab) as CompendiumCollection<'Actor' | 'Item'>[];
+        const activePacks = this._packs.filter(
+            p => p.visible && p.metadata.type === this.activeTab
+        ) as CompendiumCollection<'Actor' | 'Item'>[];
         const indexes = await Promise.all(activePacks.map(async pack => pack.getIndex()));
         let entries = indexes.flatMap(index => [...index.values()]);
 
@@ -206,7 +231,7 @@ export class CompendiumBrowser extends Base {
             entries = entries.filter(e => selectedTypes.includes(e.type as string));
         }
 
-        entries.sort((a, b) => b.name ? a.name?.localeCompare(b.name) || 0 : -1);
+        entries.sort((a, b) => b.name ? a.name?.localeCompare(b.name, game.i18n.lang) || 0 : -1);
 
         return entries.slice(0, 100);
     }

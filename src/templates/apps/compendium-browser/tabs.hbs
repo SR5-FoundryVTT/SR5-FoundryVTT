@@ -1,0 +1,7 @@
+<nav class="tabs" data-group="tabs">
+    {{#each tabs as |tab|}}
+    <a class="{{#if tab.active}}active{{/if}}" data-group="tabs" data-tab="{{tab.id}}" data-action="tab">
+        <i class="{{ tab.icon }}"></i> {{ tab.label }}
+    </a>
+    {{/each}}
+</nav>
