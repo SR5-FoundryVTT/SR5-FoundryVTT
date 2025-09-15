@@ -76,6 +76,7 @@ export class Spirit extends ActorBase<ReturnType<typeof SpiritData>> {
     static override defineSchema() {
         return SpiritData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Actor.Spirit"];
 }
 
 console.log("SpiritData", SpiritData(), new Spirit());

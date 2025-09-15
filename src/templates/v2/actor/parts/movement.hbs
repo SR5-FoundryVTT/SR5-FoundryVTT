@@ -6,15 +6,7 @@
     {{#unless isVehicle}}
     <span>/</span>
     {{#if @root.isEditMode}}
-        <div style="max-width: 5rem">
-            <input
-                prefix="+"
-                size="2"
-                maxlength="2"
-                type="number"
-                name="system.movement.sprint"
-                value={{system.movement.sprint}} />
-        </div>
+        {{formInput systemFields.movement.fields.sprint value=system.movement.sprint classes="short" rootId=rootId}}
     {{else}}
         <span data-tooltip="SR5.SprintingBonus">
         <i style="font-size: 0.75em;" class="fas fa-plus"></i>

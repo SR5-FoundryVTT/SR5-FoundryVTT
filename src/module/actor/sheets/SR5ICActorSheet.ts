@@ -65,7 +65,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         },
         matrix: {
             template: this.templateBase('actor/tabs/ic-matrix'),
-            templates: this.actorSystemParts('active-skills', 'ic-attributes')
+            templates: this.actorSystemParts('active-skills', 'ic-attributes', 'ic-options')
         },
         matrixActions: {
             template: this.templateBase('actor/tabs/matrix/matrix-actions'),

@@ -54,6 +54,7 @@ export class IC extends ActorBase<ReturnType<typeof ICData>> {
     static override defineSchema() {
         return ICData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Actor.IC"];
 }
 
 console.log("ICData", ICData(), new IC());

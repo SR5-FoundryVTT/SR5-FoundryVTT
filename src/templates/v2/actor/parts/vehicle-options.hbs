@@ -1,113 +1,95 @@
-{{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs" name=(localize "SR5.Labels.ActorSheet.VehicleConfiguration")}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.Driver") }}
-<div>
-    {{#if vehicle.driver}}
-    <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
-        <i class="fas fa-user"></i>
-        {{vehicle.driver.name}}
-    </a>
-    <a class="close driver-remove"><i class="fas fa-times"></i></a>
-    {{else}}
-    <a class="driver-pick" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsDriver">
-        {{localize "SR5.Vehicle.MissingDriver"}}
-        <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
-            <i class="fa-light fa-square-dashed fa-stack-2x"></i>
-            <i class="fas fa-user fa-stack-1x"></i>
+<div class="fill-container">
+    {{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs" name=(localize "SR5.Labels.ActorSheet.VehicleConfiguration")}}
+    <section class="scrollable standard-form">
+        <div class="form-group">
+            <label>
+                {{localize "SR5.Vehicle.Driver"}}
+            </label>
+            <div class="form-fields">
+                {{#if vehicle.driver}}
+                <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
+                    <i class="fas fa-user"></i>
+                    {{vehicle.driver.name}}
+                </a>
+                <a class="close driver-remove"><i class="fas fa-times"></i></a>
+                {{else}}
+                <a class="driver-pick" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsDriver">
+                    {{localize "SR5.Vehicle.MissingDriver"}}
+                    <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
+                        <i class="fa-light fa-square-dashed fa-stack-2x"></i>
+                        <i class="fas fa-user fa-stack-1x"></i>
+                    </span>
+                </a>
+                {{/if}}
+            </div>
+        </div>
+        <div class="form-group">
+            <label>
+                {{localize "SR5.Labels.Sheet.PAN"}}
+            </label>
+            <div class="form-fields">
+                {{#if vehicle.master}}
+                <span>
+                    <a class="origin-link" draggable="false" data-origin-link="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
+                    <a class="close controller-remove"><i class="fas fa-times"></i></a>
+                </span>
+                {{else}}
+                {{#if vehicle.driver}}
+                <a class="connect-to-driver">
+                    <i class="fas fa-network-wired"></i>
+                    {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
+                </a>
+                {{/if}}
+                {{/if}}
+            </div>
+        </div>
+
+        {{formGroup systemFields.vehicleType value=source.system.vehicleType disabled=@root.isPlayMode }}
+        {{formGroup systemFields.vehicle.fields.controlMode value=source.system.vehicle.controlMode disabled=@root.isPlayMode }}
+        {{formGroup systemFields.vehicle.fields.environment value=source.system.vehicle.environment disabled=@root.isPlayMode }}
+        {{formGroup systemFields.isDrone value=source.system.isDrone disabled=@root.isPlayMode }}
+        {{formGroup systemFields.isOffRoad value=source.system.isOffRoad disabled=@root.isPlayMode }}
+
+        {{#if system.isDrone}}
+        {{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs" name=(localize "SR5.ModPoints")}}
+        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.ModPoints") }}
+        <span style="white-space: nowrap">
+            {{calcModPointSlots items}} / {{calcModificationSlotsAvailable actor}}
         </span>
-    </a>
-    {{/if}}
+        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+        {{else}}
+        {{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs" name=(localize "SR5.ModificationCategories")}}
+        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.body") }}
+        <span style="white-space: nowrap">
+            {{calcModificationCategorySlots items "body"}} / {{calcModificationSlotsAvailable actor}}
+        </span>
+        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.cosmetic") }}
+        <span style="white-space: nowrap">
+            {{calcModificationCategorySlots items "cosmetic"}} / {{calcModificationSlotsAvailable actor}}
+        </span>
+        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.electromagnetic") }}
+        <span style="white-space: nowrap">
+            {{calcModificationCategorySlots items "electromagnetic"}} / {{calcModificationSlotsAvailable actor}}
+        </span>
+        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.power_train") }}
+        <span style="white-space: nowrap">
+            {{calcModificationCategorySlots items "power_train"}} / {{calcModificationSlotsAvailable actor}}
+        </span>
+        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.protection") }}
+        <span style="white-space: nowrap">
+            {{calcModificationCategorySlots items "protection"}} / {{calcModificationSlotsAvailable actor}}
+        </span>
+        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.weapons") }}
+        <span style="white-space: nowrap">
+            {{calcModificationCategorySlots items "weapons"}} / {{calcModificationSlotsAvailable actor}}
+        </span>
+        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+        {{/if}}
+    </section>
 </div>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.Type") }}
-<div>
-    {{> "systems/shadowrun5e/dist/templates/v2/common/select.hbs"
-                options=config.vehicle.types
-                value=system.vehicleType
-                path="system.vehicleType"
-    }}
-</div>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ControlMode") }}
-<div>
-    {{> "systems/shadowrun5e/dist/templates/v2/common/select.hbs"
-                options=config.vehicle.control_modes
-                value=system.controlMode
-                path="system.controlMode"
-    }}
-</div>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ChaseEnvironment") }}
-<div>
-    {{> "systems/shadowrun5e/dist/templates/v2/common/select.hbs"
-                options=config.vehicle.environments
-                value=system.environment
-                path="system.environment"
-    }}
-</div>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.IsDrone") }}
-<input type="checkbox" class="checkbox" name="system.isDrone" {{checked system.isDrone}} />
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.IsOffRoad") }}
-<input type="checkbox" class="checkbox" name="system.isOffRoad" {{checked system.isOffRoad}} />
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Labels.Sheet.PAN") }}
-{{#if vehicle.master}}
-<span>
-    <a class="origin-link" draggable="false" data-origin-link="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
-    <a class="close controller-remove"><i class="fas fa-times"></i></a>
-</span>
-{{else}}
-{{#if vehicle.driver}}
-    <a class="connect-to-driver">
-        {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
-        <i class="fas fa-network-wired"></i>
-    </a>
-{{/if}}
-{{/if}}
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-
-{{#if system.isDrone}}
-{{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs" name=(localize "SR5.ModPoints")}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.ModPoints") }}
-<span style="white-space: nowrap">
-    {{calcModPointSlots items}} / {{calcModificationSlotsAvailable actor}}
-</span>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{else}}
-{{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs" name=(localize "SR5.ModificationCategories")}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.body") }}
-<span style="white-space: nowrap">
-    {{calcModificationCategorySlots items "body"}} / {{calcModificationSlotsAvailable actor}}
-</span>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.cosmetic") }}
-<span style="white-space: nowrap">
-    {{calcModificationCategorySlots items "cosmetic"}} / {{calcModificationSlotsAvailable actor}}
-</span>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.electromagnetic") }}
-<span style="white-space: nowrap">
-    {{calcModificationCategorySlots items "electromagnetic"}} / {{calcModificationSlotsAvailable actor}}
-</span>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.power_train") }}
-<span style="white-space: nowrap">
-    {{calcModificationCategorySlots items "power_train"}} / {{calcModificationSlotsAvailable actor}}
-</span>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.protection") }}
-<span style="white-space: nowrap">
-    {{calcModificationCategorySlots items "protection"}} / {{calcModificationSlotsAvailable actor}}
-</span>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.weapons") }}
-<span style="white-space: nowrap">
-    {{calcModificationCategorySlots items "weapons"}} / {{calcModificationSlotsAvailable actor}}
-</span>
-{{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-{{/if}}
 

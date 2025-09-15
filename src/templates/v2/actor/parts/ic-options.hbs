@@ -1,0 +1,22 @@
+<div class="fill-container">
+    {{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs"
+        name=(localize "SR5.Labels.ActorSheet.ICConfiguration")
+    }}
+    <section class="standard-form scrollable">
+        <div class="form-group">
+            <label>
+                {{localize "SR5.ItemTypes.Host"}}
+            </label>
+            <div class="form-fields">
+                {{#if network }}
+                    <a class="content-link" draggable="true" data-link data-type="Item" data-id="{{network.id}}" data-uuid="{{network.uuid}}"><i class="fas fa-user">{{network.name}}</i></a>
+                    <a class="close entity-remove"><i class="fas fa-times"></i></a>
+                {{else}}
+                    {{localize "SR5.IC.MissingHost"}}
+                {{/if}}
+            </div>
+        </div>
+        {{formGroup systemFields.icType value=system.icType rootId=rootId}}
+        {{formGroup systemFields.host.fields.rating value=system.host.rating rootId=rootId}}
+    </section>
+</div>

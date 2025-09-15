@@ -1,47 +1,27 @@
-<div class="attribute {{cssClass}} RollId" data-roll-id="matrix.attribute.{{key}}">
-    <div class="attribute-name Roll" data-attribute="{{key}}">
+<div class="attribute">
+    <a class="attribute-label">
         {{localize label}}
-    </div>
+    </a>
     {{#if @root.isEditMode}}
-        <div class="track center">
-            {{#if isCyberdeck}}
-                <div class="attribute-input-container">
-                    <select class="display matrix-att-selector" name="matrix-{{key}}" data-att="{{key}}">
-                        {{#select matrixAtt.device_att}}
-                            {{#each item.atts as |att key|}}
-                                <option value="{{key}}" data-tooltip="{{lookup ../matrixAttributes att.att}}">{{att.value}}</option>
-                            {{/each}}
-                        {{/select}}
-                    </select>
-                </div>
-            {{else}}
-                <div class="attribute-input-container">
-                    {{> "systems/shadowrun5e/dist/templates/v2/common/value-input.hbs"
-                        cssClass="attribute-input short"
-                        title="SR5.BaseValue"
-                        size="2"
-                        maxLength="2"
-                        value=matrixAtt.base
-                        disabled="true"
-                    }}
-                </div>
-            {{/if}}
-            <div class="track-plus"></div>
-            <div class="attribute-input-container">
-                {{> "systems/shadowrun5e/dist/templates/v2/common/value-input.hbs"
-                    cssClass="attribute-input short"
-                    title="SR5.TemporaryModifiers"
-                    size="2"
-                    maxLength="2"
-                    value=matrixAtt.temp
-                    name=(buildName part1="system.matrix" part2=key part3="temp")
-                }}
-            </div>
-        </div>
+    <div class="attribute-value">
+        {{#if isCyberdeck}}
+        <select class="matrix-att-selector short" name="matrix-{{key}}" data-att="{{key}}">
+            {{!selectOptions value=matrixAtt.device_att choices=item.atts }}
+        {{#select matrixAtt.device_att}}
+        {{#each item.atts as |att key|}}
+            <option value="{{key}}" data-tooltip="{{lookup ../matrixAttributes att.att}}">{{att.value}}</option>
+        {{/each}}
+        {{/select}}
+        </select>
+        {{else}}
+        <span>{{matrixAtt.base}}</span>
+        {{/if}}
+        <i style="font-size: 0.75rem" class="fas fa-plus"></i>
+        {{formInput attributeField.fields.temp value=matrixAtt.temp classes="short" rootId=rootId }}
+    </div>
     {{else}}
-        <div class="attribute-value value">
-            <span class="attribute-value-total">{{matrixAtt.value}}</span>
-            {{> "systems/shadowrun5e/dist/templates/v2/common/value-modifiers.hbs" value=matrixAtt}}
-        </div>
+    <div class="attribute-value">
+        <span class="attribute-value-total">{{matrixAtt.value}}</span>
+    </div>
     {{/if}}
 </div>

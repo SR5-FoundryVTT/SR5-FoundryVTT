@@ -7,8 +7,8 @@
                     src="{{actor.img}}"
                     data-edit="img"
                     data-tooltip="{{actor.name}}"
-                    height="{{height}}"
-                    width="{{width}}"
+                    height="90px"
+                    width="90px"
                 />
             </div>
         </div>
@@ -37,22 +37,22 @@
             <div class="attributes smooth" id="tracks">
                 <div class="block">
                     {{#if (or isIC isSprite)}}
-                            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
-                                id='matrix'
-                                track = system.track.matrix
-                            }}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                            id='matrix'
+                            track = system.track.matrix
+                        }}
                     {{/if}}
                     {{#if (or isCharacter isSpirit)}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
-                        id='stun'
-                        track = system.track.stun
-                    }}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                            id='stun'
+                            track = system.track.stun
+                        }}
                     {{/if}}
                     {{#unless (or isIC isSprite)}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
-                        id='physical'
-                        track = system.track.physical
-                    }}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                            id='physical'
+                            track = system.track.physical
+                        }}
                     {{/unless}}
                 </div>
             </div>
@@ -71,7 +71,7 @@
                 <label>{{localize "SR5.Sprite.Services"}}:</label>
             {{/if}}
             {{#if @root.isEditMode}}
-                {{formGroup systemFields.services value=system.services rootId=rootId}}
+                {{formInput systemFields.services value=system.services classes="short" rootId=rootId}}
             {{else}}
                 {{system.services}}
             {{/if}}

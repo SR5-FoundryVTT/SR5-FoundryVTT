@@ -170,6 +170,96 @@
             "New": "New Effect"
         },
         "ActiveSkills": "Active Skills",
+        "Actor": {
+            "Character": {
+                "FIELDS": {
+
+                }
+            },
+            "IC": {
+                "FIELDS": {
+                    "icType": {
+                        "label": "IC Type",
+                        "hint": "Type of IC"
+                    },
+                    "host": {
+                        "label": "Host",
+                        "hint": "Type of IC",
+                        "rating": {
+                            "label": "Rating",
+                            "hint": "Rating of the Host we are running on"
+                        }
+                    }
+                }
+            },
+            "Spirit": {
+                "FIELDS": {
+                    "spiritType": {
+                        "label": "Spirit Type",
+                        "hint": "Type of the Spirit"
+                    },
+                    "force": {
+                        "label": "Force",
+                        "hint": "Force of the Spirit"
+                    },
+                    "services": {
+                        "label": "Services",
+                        "hint": "Number of Services the Spirit has"
+                    },
+                    "bound": {
+                        "label": "Bound",
+                        "hint": "If the Spirit is Bound"
+                    }
+                }
+            },
+            "Sprite": {
+                "FIELDS": {
+                    "spriteType": {
+                        "label": "Sprite Type",
+                        "hint": "Type of the Sprite"
+                    },
+                    "level": {
+                        "label": "Level",
+                        "hint": "Level of the Sprite"
+                    },
+                    "services": {
+                        "label": "Services",
+                        "hint": "Number of Services the Sprite has"
+                    },
+                    "registered": {
+                        "label": "Registered",
+                        "hint": "If the Sprite is Registered"
+                    }
+                }
+            },
+            "Vehicle": {
+                "FIELDS": {
+                    "control_mode": {
+                        "label": "Control Mode"
+                    },
+                    "isDrone": {
+                        "label": "Is Drone?",
+                        "hint": "If this vehicle is a Drone"
+                    },
+                    "isOffRoad": {
+                        "label": "Is Off Road?",
+                        "hint": "If this vehicle is currently Off Road"
+                    },
+                    "vehicleType": {
+                        "label": "Vehicle Type",
+                        "hint": "Type of the Vehicle"
+                    }
+                },
+                "vehicleTypes": {
+                    "aerospace": "Space Craft",
+                    "air": "Air Craft",
+                    "exotic": "Exotic Craft",
+                    "ground": "Ground Craft",
+                    "walker": "Walker",
+                    "water": "Water Craft"
+                }
+            }
+        },
         "ActorTypes": {
             "Character": "Character",
             "Critter": "Critter",

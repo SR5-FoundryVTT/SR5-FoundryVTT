@@ -2,78 +2,59 @@
 <div class="attributes">
     {{#unless system.vehicle_stats.handling.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-            rollId="vehicle-stat.handling"
-            attributeId="handling"
             attribute=system.vehicle_stats.handling
-            attributesPath="system.vehicle_stats"
+            attributeField=systemFields.vehicle_stats.fields.handling
         }}
     {{/unless}}
     {{#unless system.vehicle_stats.off_road_handling.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-            rollId="vehicle-stat.off_road_handling"
-            attributeId="off_road_handling"
             attribute=system.vehicle_stats.off_road_handling
-            attributesPath="system.vehicle_stats"
+            attributeField=systemFields.vehicle_stats.fields.off_road_handling
         }}
     {{/unless}}
     {{#unless system.vehicle_stats.speed.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-            rollId="vehicle-stat.speed"
-            attributeId="speed"
             attribute=system.vehicle_stats.speed
-            attributesPath="system.vehicle_stats"
+            attributeField=systemFields.vehicle_stats.fields.speed
         }}
     {{/unless}}
     {{#unless system.vehicle_stats.off_road_speed.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-            rollId="vehicle-stat.off_road_speed"
-            attributeId="off_road_speed"
             attribute=system.vehicle_stats.off_road_speed
-            attributesPath="system.vehicle_stats"
+            attributeField=systemFields.vehicle_stats.fields.off_road_speed
         }}
     {{/unless}}
     {{#unless system.vehicle_stats.acceleration.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-            rollId="vehicle-stat.acceleration"
-            attributeId="acceleration"
             attribute=system.vehicle_stats.acceleration
-            attributesPath="system.vehicle_stats"
+            attributeField=systemFields.vehicle_stats.fields.acceleration
         }}
     {{/unless}}
     {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-        rollId="attribute.body"
-        attributeId="body"
         attribute=system.attributes.body
+        attributeField=systemFields.attributes.fields.body
     }}
     {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-        rollId="armor"
-        attributeId="armor"
-        attribute=system.armor
-        attributesPath="system"
         label="SR5.Armor"
+        attribute=system.armor
+        attributeField=systemFields.armor
     }}
     {{#unless system.vehicle_stats.pilot.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-            rollId="vehicle-stat.pilot"
-            attributeId="pilot"
             attribute=system.vehicle_stats.pilot
-            attributesPath="system.vehicle_stats"
+            attributeField=systemFields.vehicle_stats.fields.pilot
         }}
     {{/unless}}
     {{#unless system.vehicle_stats.sensor.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-            rollId="vehicle-stat.sensor"
-            attributeId="sensor"
             attribute=system.vehicle_stats.sensor
-            attributesPath="system.vehicle_stats"
+            attributeField=systemFields.vehicle_stats.fields.sensor
         }}
     {{/unless}}
     {{#unless system.vehicle_stats.seats.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-            rollId="vehicle-stat.seats"
-            attributeId="seats"
             attribute=system.vehicle_stats.seats
-            attributesPath="system.vehicle_stats"
+            attributeField=systemFields.vehicle_stats.fields.seats
         }}
     {{/unless}}
 </div>

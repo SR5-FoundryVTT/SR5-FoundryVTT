@@ -285,6 +285,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.primaryTabs = this._prepareTabs('primary');
 
         data.isEditMode = this._isEditMode;
+        data.isPlayMode = !this._isEditMode;
 
         console.log('contextData', data);
 
@@ -446,6 +447,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         console.log('toggleEditMode', this, event);
         event.preventDefault();
         event.stopPropagation();
+        if (this._isEditMode) await this.submit();
         this._isEditMode = !this._isEditMode;
         await this.render();
     }

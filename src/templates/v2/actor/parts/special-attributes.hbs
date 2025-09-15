@@ -4,48 +4,31 @@
     }}
     <div class="attributes center">
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-                cssClass='no-grow'
-                rollId="attribute.edge"
-                attributeId='edge'
                 attribute=system.attributes.edge
+                attributeField=@root.systemFields.attributes.fields.edge
         }}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-                cssClass='no-grow'
-                rollId="attribute.essence"
-                attributeId='essence'
                 attribute=system.attributes.essence
-                disableBase=true
+                attributeField=@root.systemFields.attributes.fields.essence
         }}
         {{#if awakened}}
             {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-                cssClass='no-grow'
-                rollId="attribute.magic"
-                attributeId='magic'
                 attribute=system.attributes.magic
-                disableBase=(not awakened)
-                disableManual=(not awakened)
+                attributeField=@root.systemFields.attributes.fields.magic
         }}
             {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/fake-attribute.hbs"
-                cssClass='no-grow'
-                baseInputName="system.magic.initiation"
-                rollId="attribute.initiation"
                 attribute=system.attributes.initiation
+                attributeField=@root.systemFields.attributes.fields.initiation
         }}
         {{/if}}
         {{#if emerged}}
             {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-                cssClass='no-grow'
-                rollId="attribute.resonance"
-                attributeId='resonance'
                 attribute=system.attributes.resonance
-                disableBase=(not emerged)
-                disableManual=(not emerged)
+                attributeField=@root.systemFields.attributes.fields.resonance
         }}
             {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/fake-attribute.hbs"
-                cssClass='no-grow'
-                baseInputName="system.technomancer.submersion"
-                rollId="attribute.submersion"
                 attribute=system.attributes.submersion
+                attributeField=@root.systemFields.attributes.fields.submersion
         }}
         {{/if}}
     </div>

@@ -88,6 +88,7 @@ export class Character extends ActorBase<ReturnType<typeof CharacterData>> {
     static override defineSchema() {
         return CharacterData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Actor.Character"];
 }
 
 console.log("CharacterData:", CharacterData(), new Character());

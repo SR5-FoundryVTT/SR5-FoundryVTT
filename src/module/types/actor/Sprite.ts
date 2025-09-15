@@ -10,7 +10,19 @@ const SpriteData = () => ({
     // === Core Identity ===
     ...CommonData(),
     attributes: new SchemaField({...Attributes(), ...MatrixActorAttributes() }),
-    spriteType: new StringField({ required: true }),
+    spriteType: new StringField({
+        required: true,
+        choices: {
+            courier: 'Courier',
+            crack: 'Crack',
+            data: 'Data',
+            fault: 'Fault',
+            machine: 'Machine',
+            companion: 'Companion',
+            generalist: 'Generalist'
+        },
+        initial: 'data',
+    }),
     special: new StringField({ required: true, initial: "resonance", readonly: true }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
 
@@ -56,6 +68,7 @@ export class Sprite extends ActorBase<ReturnType<typeof SpriteData>> {
     static override defineSchema() {
         return SpriteData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Actor.Sprite"];
 }
 
 console.log("SpriteData", SpriteData(), new Sprite());

@@ -1,11 +1,10 @@
 {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/limits.hbs" }}
 <div class="attributes">
-    {{#each system.attributes as |attribute a|}} {{#unless attribute.hidden}}
+    {{#each system.attributes as |attribute attributeId|}} {{#unless attribute.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-                rollId=(concatStrings "attribute." a)
-                attributeId=a
                 attribute=attribute
-                disableBase=../autoBase
+                attributeField=(objValue @root.systemFields.attributes.fields attributeId)
+                rootId=@root.rootId
         }}
     {{/unless}} {{/each}}
 </div>
