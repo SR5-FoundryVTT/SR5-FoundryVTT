@@ -4,6 +4,7 @@ import { DescriptionData } from "../template/Description";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
 import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
+import { AttributeChoices } from '@/module/types/template/Attributes';
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
@@ -14,7 +15,7 @@ export const CharacterSkills = () => ({
 
 
 export const MagicData = () => ({
-    attribute: new StringField({ required: true, initial: "logic" }), // Drain attribute
+    attribute: new StringField({ required: true, initial: "logic", choices: AttributeChoices() }), // Drain attribute
     projecting: new BooleanField(),
     initiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });

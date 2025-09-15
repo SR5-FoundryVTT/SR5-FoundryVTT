@@ -44,9 +44,9 @@
             </div>
         </div>
 
-        {{formGroup systemFields.vehicleType value=source.system.vehicleType disabled=@root.isPlayMode }}
-        {{formGroup systemFields.vehicle.fields.controlMode value=source.system.vehicle.controlMode disabled=@root.isPlayMode }}
-        {{formGroup systemFields.vehicle.fields.environment value=source.system.vehicle.environment disabled=@root.isPlayMode }}
+        {{formGroup systemFields.vehicleType value=source.system.vehicleType disabled=@root.isPlayMode localize=true }}
+        {{formGroup systemFields.vehicle.fields.controlMode value=source.system.vehicle.controlMode disabled=@root.isPlayMode localize=true }}
+        {{formGroup systemFields.vehicle.fields.environment value=source.system.vehicle.environment disabled=@root.isPlayMode localize=true }}
         {{formGroup systemFields.isDrone value=source.system.isDrone disabled=@root.isPlayMode }}
         {{formGroup systemFields.isOffRoad value=source.system.isOffRoad disabled=@root.isPlayMode }}
 

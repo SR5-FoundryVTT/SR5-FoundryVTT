@@ -1,5 +1,5 @@
 import { CommonData, CharacterLimits, CreateModifiers, MagicData, ActorBase, CharacterValues, } from "./Common";
-import { Attributes, AttributeField, MatrixActorAttributes } from '../template/Attributes';
+import { Attributes, AttributeField, MatrixActorAttributes, AttributeChoices } from '../template/Attributes';
 import { ModifiableValue, ValueMaxPair } from "../template/Base";
 import { Tracks } from "../template/ConditionMonitors";
 import { ActorArmorData } from "../template/Armor";
@@ -21,13 +21,29 @@ const CharacterData = () => ({
     ...CommonData(),
 
     // === Core Identity ===
-    metatype: new StringField({ required: true }),
+    metatype: new StringField({
+        required: true,
+        initial: 'human',
+        choices: {
+            human: 'SR5.Character.Types.Human',
+            elf: 'SR5.Character.Types.Elf',
+            ork: 'SR5.Character.Types.Ork',
+            dwarf: 'SR5.Character.Types.Dwarf',
+            troll: 'SR5.Character.Types.Troll',
+        }}),
     is_critter: new BooleanField(),
     is_npc: new BooleanField(),
     npc: new SchemaField({ is_grunt: new BooleanField() }),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
-    matrix_full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
-    special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane'], initial: 'mundane' }),
+    full_defense_attribute: new StringField({ required: true, initial: "willpower", choices: AttributeChoices() }),
+    matrix_full_defense_attribute: new StringField({ required: true, initial: "willpower", choices: AttributeChoices() }),
+    special: new StringField({ required: true,
+        choices: {
+            magic: 'SR5.Awakened',
+            resonance: 'SR5.Emerged',
+            mundane: 'SR5.Mundane'
+        },
+        initial: 'mundane'
+    }),
 
     // === Attributes & Limits ===
     attributes: new SchemaField(CharacterAttributes()),
@@ -49,7 +65,7 @@ const CharacterData = () => ({
     magic: new SchemaField(MagicData()),
     matrix: new SchemaField(MatrixData()),
     technomancer: new SchemaField({
-        attribute: new StringField({ required: true, initial: "willpower" }), // fade attribute
+        attribute: new StringField({ required: true, initial: "willpower", choices: AttributeChoices() }), // fade attribute
         submersion: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     }),
 
@@ -88,7 +104,7 @@ export class Character extends ActorBase<ReturnType<typeof CharacterData>> {
     static override defineSchema() {
         return CharacterData();
     }
-    static override LOCALIZATION_PREFIXES = ["SR5.Actor.Character"];
+    static override LOCALIZATION_PREFIXES = ["SR5.Character", "SR5.Actor"];
 }
 
 console.log("CharacterData:", CharacterData(), new Character());

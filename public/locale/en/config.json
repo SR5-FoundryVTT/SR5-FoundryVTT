@@ -171,92 +171,204 @@
         },
         "ActiveSkills": "Active Skills",
         "Actor": {
-            "Character": {
-                "FIELDS": {
-
-                }
-            },
-            "IC": {
-                "FIELDS": {
-                    "icType": {
-                        "label": "IC Type",
-                        "hint": "Type of IC"
+            "FIELDS": {
+                "modifiers": {
+                    "walk": {
+                        "label": "Walk",
+                        "hint": "Modifies walking distance by multiples of the agility attribute"
                     },
-                    "host": {
-                        "label": "Host",
-                        "hint": "Type of IC",
-                        "rating": {
-                            "label": "Rating",
-                            "hint": "Rating of the Host we are running on"
-                        }
-                    }
-                }
-            },
-            "Spirit": {
-                "FIELDS": {
-                    "spiritType": {
-                        "label": "Spirit Type",
-                        "hint": "Type of the Spirit"
+                    "run": {
+                        "label": "Run",
+                        "hint": "Modifies running distance by multiples of the agility attribute"
                     },
-                    "force": {
-                        "label": "Force",
-                        "hint": "Force of the Spirit"
+                    "physical_limit": {
+                        "label": "Physical Limit",
+                        "hint": "Modifies physical limit"
                     },
-                    "services": {
-                        "label": "Services",
-                        "hint": "Number of Services the Spirit has"
+                    "astral_limit": {
+                        "label": "Astral Limit",
+                        "hint": "Modifies astral limit"
                     },
-                    "bound": {
-                        "label": "Bound",
-                        "hint": "If the Spirit is Bound"
-                    }
-                }
-            },
-            "Sprite": {
-                "FIELDS": {
-                    "spriteType": {
-                        "label": "Sprite Type",
-                        "hint": "Type of the Sprite"
+                    "social_limit": {
+                        "label": "Social Limit",
+                        "hint": "Modifies social limit"
                     },
-                    "level": {
-                        "label": "Level",
-                        "hint": "Level of the Sprite"
+                    "mental_limit": {
+                        "label": "Mental Limit",
+                        "hint": "Modifies mental limit"
                     },
-                    "services": {
-                        "label": "Services",
-                        "hint": "Number of Services the Sprite has"
+                    "astral_initiative": {
+                        "label": "Astral Initiative",
+                        "hint": "Modifies astral initiative base"
                     },
-                    "registered": {
-                        "label": "Registered",
-                        "hint": "If the Sprite is Registered"
-                    }
-                }
-            },
-            "Vehicle": {
-                "FIELDS": {
-                    "control_mode": {
-                        "label": "Control Mode"
+                    "astral_initiative_dice": {
+                        "label": "Astral Initiative Dice",
+                        "hint": "Modifies astral initiative dice"
                     },
-                    "isDrone": {
-                        "label": "Is Drone?",
-                        "hint": "If this vehicle is a Drone"
+                    "matrix_initiative": {
+                        "label": "Matrix Initiative",
+                        "hint": "Modifies matrix initiative base"
                     },
-                    "isOffRoad": {
-                        "label": "Is Off Road?",
-                        "hint": "If this vehicle is currently Off Road"
+                    "matrix_initiative_dice": {
+                        "label": "Matrix Initiative Dice",
+                        "hint": "Modifies matrix initiative dice"
                     },
-                    "vehicleType": {
-                        "label": "Vehicle Type",
-                        "hint": "Type of the Vehicle"
+                    "meat_initiative": {
+                        "label": "Meatspace Initiative",
+                        "hint": "Modifies physical initiative base"
+                    },
+                    "meat_initiative_dice": {
+                        "label": "Meatspace Initiative Dice",
+                        "hint": "Modifies physical initiative dice"
+                    },
+                    "stun_track": {
+                        "label": "Stun Track",
+                        "hint": "Modifies stun damage track"
+                    },
+                    "matrix_track": {
+                        "label": "Matrix Track",
+                        "hint": "Modifies matrix damage track"
+                    },
+                    "physical_track": {
+                        "label": "Physical Track",
+                        "hint": "Modifies physical damage track"
+                    },
+                    "physical_overflow_track": {
+                        "label": "Physical Overflow Track",
+                        "hint": "Modifies physical overflow damage track"
+                    },
+                    "wound_tolerance": {
+                        "label": "Wound Tolerance",
+                        "hint": "Modifies damage per wound modifier"
+                    },
+                    "pain_tolerance_stun": {
+                        "label": "Pain Tolerance (Stun)",
+                        "hint": "Modifies damage to be ignored before first wound modifier"
+                    },
+                    "pain_tolerance_physical": {
+                        "label": "Pain Tolerance (Physical)",
+                        "hint": "Modifies damage to be ignored before first wound modifier"
+                    },
+                    "armor": {
+                        "label": "Armor",
+                        "hint": "Modifies total armor value"
+                    },
+                    "multi_defense": {
+                        "label": "Multi-Defense",
+                        "hint": "Modifies defense tests pool for multiple defenses per combat turn"
+                    },
+                    "reach": {
+                        "label": "Reach",
+                        "hint": "Modifies reach of melee attacks"
+                    },
+                    "defense": {
+                        "label": "Defense",
+                        "hint": "Modifies defense tests pool"
+                    },
+                    "defense_dodge": {
+                        "label": "Defense (Dodge)",
+                        "hint": "Adds to the defense modifier for active dodging"
+                    },
+                    "defense_parry": {
+                        "label": "Defense (Parry)",
+                        "hint": "Adds to the defense modifier for active parrying"
+                    },
+                    "defense_block": {
+                        "label": "Defense (Block)",
+                        "hint": "Adds to the defense modifier for active blocking"
+                    },
+                    "defense_melee": {
+                        "label": "Defense (Melee)",
+                        "hint": "Adds to the defense modifier for melee defense"
+                    },
+                    "defense_ranged": {
+                        "label": "Defense (Ranged)",
+                        "hint": "Adds to the defense modifier for ranged attack"
+                    },
+                    "soak": {
+                        "label": "Soak",
+                        "hint": "Modifies physical damage resist tests pool"
+                    },
+                    "recoil": {
+                        "label": "Recoil",
+                        "hint": "Modifies recoil tests pool"
+                    },
+                    "drain": {
+                        "label": "Drain",
+                        "hint": "Modifies drain tests pool"
+                    },
+                    "fade": {
+                        "label": "Fade",
+                        "hint": "Modifies fade tests pool"
+                    },
+                    "essence": {
+                        "label": "Essence",
+                        "hint": "Modifies essence attribute"
+                    },
+                    "public_grid": {
+                        "label": "Public Grid",
+                        "hint": "Modifies the Public Grid modifier when connected to it"
+                    },
+                    "mark_damage": {
+                        "label": "Mark Damage",
+                        "hint": "Modifies the amount of damage taken per MARK done to you"
+                    },
+                    "place_two_marks": {
+                        "label": "Place Two Marks",
+                        "hint": "Modifies the modifier to place two marks at the same time"
+                    },
+                    "place_three_marks": {
+                        "label": "Place Three Marks",
+                        "hint": "Modifies the modifier to place three marks at the same time"
+                    },
+                    "composure": {
+                        "label": "Composure",
+                        "hint": "Modifies composure tests pool"
+                    },
+                    "lift_carry": {
+                        "label": "Lift/Carry",
+                        "hint": "Modifies lift&carry tests pool"
+                    },
+                    "judge_intentions": {
+                        "label": "Judge Intentions",
+                        "hint": "Modifies judge intentions tests pool"
+                    },
+                    "memory": {
+                        "label": "Memory",
+                        "hint": "Modifies memory tests pool"
+                    },
+                    "global": {
+                        "label": "Global",
+                        "hint": "Modifies all tests pool, excluding damage reducing tests"
                     }
                 },
-                "vehicleTypes": {
-                    "aerospace": "Space Craft",
-                    "air": "Air Craft",
-                    "exotic": "Exotic Craft",
-                    "ground": "Ground Craft",
-                    "walker": "Walker",
-                    "water": "Water Craft"
+                "category_visibility": {
+                    "default": {
+                        "label": "Show Empty Categories",
+                        "hint": "If empty Tabs and Inventory Categories should be visible"
+                    }
+                },
+                "full_defense_attribute": {
+                    "label": "Full Defense Attribute",
+                    "hint": "Attribute to use when using the Full Defense interrupt action"
+                },
+                "magic": {
+                    "label": "Magic",
+                    "attribute": {
+                        "label": "Drain Attribute",
+                        "hint": "Attribute the Mage/Adept uses when resisting Drain"
+                    }
+                },
+                "technomancer": {
+                    "label": "Technomancer",
+                    "attribute": {
+                        "label": "Fade Attribute",
+                        "hint": "Attribute the Technomancer uses when resisting Fade"
+                    }
+                },
+                "special": {
+                    "label": "Awakened/Emerged",
+                    "hint": "Select if the character is Awakened (mage/adept) or Emerged (technomancer)"
                 }
             }
         },
@@ -348,6 +460,56 @@
             "Title": "Shadowrun5e Update"
         },
         "Character": {
+            "FIELDS": {
+                "metatype": {
+                    "label": "Metatype",
+                    "hint": "Metatype of the Character. If an NPC, this will adjust attributes"
+                },
+                "nuyen": {
+                    "label": "Nuyen",
+                    "hint": "Amount of Nuyen this Character has"
+                },
+                "karma": {
+                    "value": {
+                        "label": "Current Karma",
+                        "hint": "Amount of Karma this Character has available"
+                    },
+                    "max": {
+                        "label": "Career Karma",
+                        "hint": "Amount of Karma this Character has accumulated"
+                    }
+                },
+                "notoriety": {
+                    "label": "Notoriety",
+                    "hint": "The negative side of the character’s reputation"
+                },
+                "public_awareness": {
+                    "label": "Public Awareness",
+                    "hint": "How well the character is known among the media, authorities, and public at large"
+                },
+                "street_cred": {
+                    "label": "Street Cred",
+                    "hint": "A character’s lifetime accomplishments"
+                },
+                "matrix_full_defense_attribute": {
+                    "label": "Matrix Full Defense Attribute",
+                    "hint": "Attribute to add when making a Matrix Full Defense Action"
+                },
+                "is_critter": {
+                    "label": "Is Critter",
+                    "hint": "Allow the use of critter powers"
+                },
+                "is_npc": {
+                    "label": "Is NPC",
+                    "hint": "Mark actor as NPC to get additional features"
+                },
+                "npc": {
+                    "is_grunt": {
+                        "label": "Is Grunt",
+                        "hint": "Apply grunt rules to this actor"
+                    }
+                }
+            },
             "Modifiers": {
                 "NPCMetatypeAttribute": "NPC Metatype Attribute"
             },
@@ -720,6 +882,20 @@
         "Hosts": "Hosts",
         "HotSim": "Hot Sim",
         "IC": {
+            "FIELDS": {
+                "icType": {
+                    "label": "IC Type",
+                    "hint": "Type of IC"
+                },
+                "host": {
+                    "label": "Host",
+                    "hint": "Type of IC",
+                    "rating": {
+                        "label": "Rating",
+                        "hint": "Rating of the Host we are running on"
+                    }
+                }
+            },
             "MissingHost": "Drag&Drop a host item",
             "Type": "Type",
             "Types": {
@@ -1389,6 +1565,28 @@
             "TypePhysical": "Physical"
         },
         "Spirit": {
+            "FIELDS": {
+                "spiritType": {
+                    "label": "Spirit Type",
+                    "hint": "Type of the Spirit"
+                },
+                "force": {
+                    "label": "Force",
+                    "hint": "Force of the Spirit"
+                },
+                "services": {
+                    "label": "Services",
+                    "hint": "Number of Services the Spirit has"
+                },
+                "bound": {
+                    "label": "Bound",
+                    "hint": "If the Spirit is Bound"
+                },
+                "summonerUuid": {
+                    "label": "Summoner",
+                    "hint": "Mage who summoned this Spirit"
+                }
+            },
             "Bound": "Bound",
             "Force": "Force",
             "MissingSummoner": "No active summoner",
@@ -1482,6 +1680,28 @@
             }
         },
         "Sprite": {
+            "FIELDS": {
+                "spriteType": {
+                    "label": "Sprite Type",
+                    "hint": "Type of the Sprite"
+                },
+                "level": {
+                    "label": "Level",
+                    "hint": "Level of the Sprite"
+                },
+                "services": {
+                    "label": "Services",
+                    "hint": "Number of Services the Sprite has"
+                },
+                "registered": {
+                    "label": "Registered",
+                    "hint": "If the Sprite is Registered"
+                },
+                "technomancerUuid": {
+                    "label": "Technomancer",
+                    "hint": "Technomancer who compiled this Sprite"
+                }
+            },
             "Level": "Level",
             "MissingTechnomancer": "No active technomancer",
             "Registered": "Registered",
@@ -1601,14 +1821,11 @@
         "Tooltips": {
             "Actor": {
                 "ConnectNetwork": "Enter this host/grid",
-                "Critter": "Allow the use of critter powers",
                 "DisconnectNetwork": "Leave this host/grid",
-                "Grunt": "Apply grunt rules to this actor",
                 "MarkTarget": "Place additional marks on this target",
                 "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
                 "MissingSummoner": "Drag&Drop Character or use summoning action",
                 "MissingTechnomancer": "Drag&Drop Character or use compilation action",
-                "NPC": "Mark actor as NPC to get additional features",
                 "PlaceMark": "Action to be used to place marks on already marked targets",
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
@@ -1648,50 +1865,6 @@
                 "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
                 "CostAdjustment": "Adjust actual cost based on the item rating",
                 "DisabledForPreparedActor": "Disabled due to use of prepared actor"
-            },
-            "Modifiers": {
-                "armor": "Modifies total armor value",
-                "astral_initiative": "Modifies astral initiative base",
-                "astral_initiative_dice": "Modifies astral initiative dice",
-                "astral_limit": "Modifies astral limit",
-                "composure": "Modifies composure tests pool",
-                "defense": "Modifies defense tests pool",
-                "defense_block": "Adds to the defense modifier for active blocking",
-                "defense_dodge": "Adds to the defense modifier for active dodging",
-                "defense_melee": "Adds to the defense modifier for melee defense",
-                "defense_parry": "Adds to the defense modifier for active parrying",
-                "defense_ranged": "Adds to the defense modifier for ranged attack",
-                "drain": "Modifies drain tests pool",
-                "essence": "Modifies essence attribute",
-                "fade": "Modifies fade tests pool",
-                "global": "Modifies all tests pool, excluding damage reducing tests",
-                "judge_intentions": "Modifies judge intentions tests pool",
-                "lift_carry": "Modifies lift&carry tests pool",
-                "mark_damage": "Modifies the amount of damage taken per MARK done to you",
-                "matrix_initiative": "Modifies matrix initiative base",
-                "matrix_initiative_dice": "Modifies matrix initiative dice",
-                "matrix_track": "Modifies matrix damage track",
-                "meat_initiative": "Modifies physical initiative base",
-                "meat_initiative_dice": "Modifies physical initiative dice",
-                "memory": "Modifies memory tests pool",
-                "mental_limit": "Modifies mental limit",
-                "multi_defense": "Modifies defense tests pool for multiple defenses per combat turn",
-                "pain_tolerance_physical": "Modifies damage to be ignored before first wound modifier",
-                "pain_tolerance_stun": "Modifies damage to be ignored before first wound modifier",
-                "physical_limit": "Modifies physical limit",
-                "physical_overflow_track": "Modifies physical overflow damage track",
-                "physical_track": "Modifies physical damage track",
-                "public_grid": "Modifies the Public Grid modifier when connected to it",
-                "reach": "Modifies reach of melee attacks",
-                "recoil": "Modifies recoil tests pool",
-                "run": "Modifies running distance by multiples of the agility attribute",
-                "soak": "Modifies physical damage resist tests pool",
-                "social_limit": "Modifies social limit",
-                "stun_track": "Modifies stun damage track",
-                "place_two_marks": "Modifies the modifier to place two marks at the same time",
-                "place_three_marks": "Modifies the modifier to place three marks at the same time",
-                "walk": "Modifies walking distance by multiples of the agility attribute",
-                "wound_tolerance": "Modifies damage per wound modifier"
             },
             "RangedAttack": {
                 "Recoil": "Progressive Recoil",
@@ -1752,6 +1925,23 @@
         "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
         "Value": "Value",
         "Vehicle": {
+            "FIELDS": {
+                "control_mode": {
+                    "label": "Control Mode"
+                },
+                "isDrone": {
+                    "label": "Is Drone?",
+                    "hint": "If this vehicle is a Drone"
+                },
+                "isOffRoad": {
+                    "label": "Is Off Road?",
+                    "hint": "If this vehicle is currently Off Road"
+                },
+                "vehicleType": {
+                    "label": "Vehicle Type",
+                    "hint": "Type of the Vehicle"
+                }
+            },
             "ChaseEnvironment": "Chase Environment",
             "Clearsight": "Clearsight",
             "ControlMode": "Control Mode",

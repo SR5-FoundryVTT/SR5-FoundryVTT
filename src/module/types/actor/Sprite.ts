@@ -12,19 +12,18 @@ const SpriteData = () => ({
     attributes: new SchemaField({...Attributes(), ...MatrixActorAttributes() }),
     spriteType: new StringField({
         required: true,
-        choices: {
-            courier: 'Courier',
-            crack: 'Crack',
-            data: 'Data',
-            fault: 'Fault',
-            machine: 'Machine',
-            companion: 'Companion',
-            generalist: 'Generalist'
-        },
         initial: 'data',
+        choices: {
+            courier: 'SR5.Sprite.Types.Courier',
+            crack: 'SR5.Sprite.Types.Crack',
+            data: 'SR5.Sprite.Types.Data',
+            fault: 'SR5.Sprite.Types.Fault',
+            machine: 'SR5.Sprite.Types.Machine',
+            companion: 'SR5.Sprite.Types.Companion',
+            generalist:'SR5.Sprite.Types.Generalist',
+        },
     }),
     special: new StringField({ required: true, initial: "resonance", readonly: true }),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
 
     // === Matrix & Host ===
     matrix: new SchemaField(MatrixData()),
@@ -68,7 +67,7 @@ export class Sprite extends ActorBase<ReturnType<typeof SpriteData>> {
     static override defineSchema() {
         return SpriteData();
     }
-    static override LOCALIZATION_PREFIXES = ["SR5.Actor.Sprite"];
+    static override LOCALIZATION_PREFIXES = ["SR5.Sprite", "SR5.Actor"];
 }
 
 console.log("SpriteData", SpriteData(), new Sprite());

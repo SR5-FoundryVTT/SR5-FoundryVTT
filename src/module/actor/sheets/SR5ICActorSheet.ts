@@ -51,11 +51,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
     static override PARTS: any = {
         header: {
             template: this.templateBase('actor/header'),
-            templates: this.actorSystemParts(
-                'movement', 'vehicle-movement',
-                'initiative',
-                'common-rolls', 'vehicle-rolls'
-            )
+            templates: this.actorSystemParts('initiative', 'common-rolls')
         },
         tabs: {
             template: this.templateBase('actor/primary-tab-navigation'),
@@ -80,7 +76,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
             template: this.templateBase('actor/tabs/effects'),
         },
         misc: {
-            template: this.templateBase('actor/tabs/ic-misc'),
+            template: this.templateBase('actor/tabs/misc'),
         },
         footer: {
             template: this.templateBase('actor/footer'),
@@ -112,7 +108,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
                     return action.name === "Binder";
                 case 'bloodhound':
                     return action.name === "Track" || action.name === 'Patrol';
-                case 'blue_gloo':
+                case 'blue_goo':
                     return action.name === 'Blue Goo';
                 case 'black_ic':
                     return action.name === "Black";

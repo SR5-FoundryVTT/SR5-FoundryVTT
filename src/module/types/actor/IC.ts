@@ -11,7 +11,32 @@ const { SchemaField, NumberField, StringField } = foundry.data.fields;
 const ICData = () => ({
     // === Core Identity ===
     ...CommonData(),
-    icType: new StringField({ required: true }),
+    icType: new StringField({ required: true,
+        initial:'patrol',
+        choices: {
+            acid: "SR5.IC.Types.Acid",
+            binder: "SR5.IC.Types.Binder",
+            black_ic: "SR5.IC.Types.BlackIC",
+            blaster: "SR5.IC.Types.Blaster",
+            bloodhound: "SR5.IC.Types.Bloodhound",
+            blue_goo: "SR5.IC.Types.BlueGoo",
+            catapult: "SR5.IC.Types.Catapult",
+            crash: "SR5.IC.Types.Crash",
+            flicker: "SR5.IC.Types.Flicker",
+            jammer: "SR5.IC.Types.Jammer",
+            killer: "SR5.IC.Types.Killer",
+            marker: "SR5.IC.Types.Marker",
+            patrol: "SR5.IC.Types.Patrol",
+            probe: "SR5.IC.Types.Probe",
+            scramble: "SR5.IC.Types.Scramble",
+            shocker: "SR5.IC.Types.Shocker",
+            sleuther: "SR5.IC.Types.Sleuther",
+            sparky: "SR5.IC.Types.Sparky",
+            tar_baby: "SR5.IC.Types.TarBaby",
+            track: "SR5.IC.Types.Track"
+
+        }
+    }),
     special: new StringField({ required: true, initial: 'mundane', readonly: true }),
 
     // === Matrix & Host ===
@@ -54,7 +79,7 @@ export class IC extends ActorBase<ReturnType<typeof ICData>> {
     static override defineSchema() {
         return ICData();
     }
-    static override LOCALIZATION_PREFIXES = ["SR5.Actor.IC"];
+    static override LOCALIZATION_PREFIXES = ["SR5.IC", "SR5.Actor"];
 }
 
 console.log("ICData", ICData(), new IC());

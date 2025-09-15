@@ -55,9 +55,6 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         spritePowers: {
             template: this.templateBase('actor/tabs/matrix/sprite-powers'),
         },
-        misc: {
-            template: this.templateBase('actor/tabs/character-misc'),
-        },
     }
     /**
      * Sprite actors will handle these item types specifically.

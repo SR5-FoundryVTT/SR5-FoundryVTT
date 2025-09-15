@@ -147,7 +147,8 @@ export class SpiritInfoUpdater {
             return;
         }
 
-        system.spiritType = type;
+        // TODO shawn fix typing
+        system.spiritType = type as any;
     }
 }
 

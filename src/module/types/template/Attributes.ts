@@ -2,6 +2,22 @@ import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
+export const AttributeChoices = () => ({
+    body: 'SR5.AttrBody',
+    agility: "SR5.AttrAgility",
+    reaction: "SR5.AttrReaction",
+    strength: "SR5.AttrStrength",
+    willpower: "SR5.AttrWillpower",
+    logic: "SR5.AttrLogic",
+    intuition: "SR5.AttrIntuition",
+    charisma: "SR5.AttrCharisma",
+    magic: "SR5.AttrMagic",
+    resonance: "SR5.AttrResonance",
+    essence: "SR5.AttrEssence",
+
+    edge: "SR5.AttrEdge",
+})
+
 export const AttributeField = () => ({
     ...ModifiableValue(),
     hidden: new BooleanField(),
