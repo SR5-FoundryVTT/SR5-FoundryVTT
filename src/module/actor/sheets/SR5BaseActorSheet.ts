@@ -18,8 +18,6 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
 import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
-import { DescriptionType } from 'src/module/types/template/Description';
-import { ChatData } from 'src/module/item/ChatData';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
@@ -29,19 +27,12 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
  */
-export interface SheetItemData {
-    type: string,
-    name: string,
-    system: SR5Item['system'],
-    properties: string[],
-    description: DescriptionType
-}
 
 export interface InventorySheetDataByType {
     type: string;
     label: string;
     isOpen: boolean;
-    items: SheetItemData[];
+    items: SR5Item[];
 }
 
 export interface InventorySheetData {
@@ -185,7 +176,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             resizable: true,
         },
         position: {
-            width: 950,
+            width: 700,
             height: 600,
         },
         actions: {
@@ -1005,8 +996,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             // Handled types are on the sheet outside the inventory.
             if (handledTypes.includes(item.type)) continue;
 
-            const sheetItem = await this._prepareSheetItem(item);
-
             // Determine what inventory the item sits in.
             const inventory = itemIdInventory[item.id] || this.actor.defaultInventory;
             // Build inventory list this item should be shown an.
@@ -1026,7 +1015,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     };
                 }
 
-                inventorySheet.types[item.type].items.push(sheetItem);
+                inventorySheet.types[item.type].items.push(item);
             })
         }
 
@@ -1056,8 +1045,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * 
      * @param inventories 
      */
-    _prepareSortedCategorizedSpells(spellSheets: SheetItemData[]) {
-        const sortedSpells : Record<string, SheetItemData[]> = {};
+    _prepareSortedCategorizedSpells(spellSheets: SR5Item[]) {
+        const sortedSpells : Record<string, SR5Item[]> = {};
         const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
 
         // Add all spell types in system.
@@ -1127,26 +1116,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
-     * Enhance SR5Item data for display on actors sheets.
-     *
-     * @param item: The item to transform into a 'sheet item'
-     */
-    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<Shadowrun.SheetItemData> {
-        // Copy derived schema data instead of source data (false)
-        const sheetItem = item.toObject(false) as unknown as Shadowrun.SheetItemData;
-
-        const chatData = await item.getChatData();
-        sheetItem.description = chatData.description;
-
-        // Add additional chat data fields depending on item type.
-        sheetItem.properties = ChatData[item.type](item).filter(Boolean);
-
-        sheetItem.isBroken = item.isBroken;
-
-        return sheetItem;
-    }
-
-    /**
      * Prepare items for easy type by type display on actors sheets with lists per item type.
      *
      * NOTE: This method uses sheet item types, instead of item types. A sheet item type allows
@@ -1155,8 +1124,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      * @returns Sorted item lists per sheet item type.
      */
-    async _prepareItemTypes(data): Promise<Record<string, SheetItemData[]>> {
-        const itemsByType: Record<string, SheetItemData[]> = {};
+    async _prepareItemTypes(data): Promise<Record<string, SR5Item[]>> {
+        const itemsByType: Record<string, SR5Item[]> = {};
 
         // Most sheet items are raw item types, some are sub types.
         // These are just for display purposes and has been done for call_in_action items.
@@ -1173,11 +1142,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Add existing items to their sheet types as sheet items
         for (const item of this.actor.items) {
-            const sheetItem = await this._prepareSheetItem(item);
-            itemsByType[sheetItem.type].push(sheetItem);
+            itemsByType[item.type].push(item);
 
-            if (item.isSummoning) itemsByType['summoning'].push(sheetItem);
-            if (item.isCompilation) itemsByType['compilation'].push(sheetItem);
+            if (item.isSummoning) itemsByType['summoning'].push(item);
+            if (item.isCompilation) itemsByType['compilation'].push(item);
         }
 
         // Sort items for each sheet type.
@@ -1219,7 +1187,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param itemTypes 
      * @returns (<active>/<max>) or ''
      */
-    _prepareProgramCount(itemTypes: Record<string, Shadowrun.SheetItemData[]>): string {
+    _prepareProgramCount(itemTypes: Record<string, SR5Item[]>): string {
         if (!itemTypes.program) return '';
         if (!this.actor.hasDevicePersona()) return '';
 

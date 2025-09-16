@@ -1,61 +1,25 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
+        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+            label="SR5.Labels.ActorSheet.CritterPowers"
+            type="critter_power" }}
         <div class="scrollable">
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-                name=(localize "SR5.Labels.ActorSheet.CritterPowers")
-                itemId="critter_power"
-                icons=(ItemHeaderIcons "critter_power")
-                rightSide=(ItemHeaderRightSide "critter_power")
-            }}
-            {{#each itemType.critter_power as |item i|}} {{#if (or (not system.optional) (eq system.optional "standard"))}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                    img=item.img
-                    name=item.name
-                    itemId=item._id
-                    icons=(ItemIcons item)
-                    rightSide=(ItemRightSide item)
-                    hasDesc="true"
-                    hasRoll="true"
-                    description=item.description.value
-                }}
+            {{#each itemType.critter_power}} {{#if (or (not this.system.optional) (eq this.system.optional "standard"))}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
             {{/if}} {{/each}}
 
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-                name=(localize "SR5.Labels.ActorSheet.EnabledOptionCritterPowers")
-                itemId="critter_power"
-                icons=(ItemHeaderIcons "critter_power")
-                rightSide=(ItemHeaderRightSide "critter_power")
-            }}
-            {{#each itemType.critter_power as |item i|}} {{#ife system.optional "enabled_option"}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                    img=item.img
-                    name=item.name
-                    itemId=item._id
-                    icons=(ItemIcons item)
-                    rightSide=(ItemRightSide item)
-                    hasDesc="true"
-                    hasRoll="true"
-                    description=item.description.value
-                }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+                label="SR5.Labels.ActorSheet.EnabledOptionCritterPowers"
+                type="critter_power" }}
+            {{#each itemType.critter_power}} {{#ife this.system.optional "enabled_option"}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
             {{/ife}} {{/each}}
 
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-                name=(localize "SR5.Labels.ActorSheet.DisabledOptionCritterPowers")
-                itemId="critter_power"
-                icons=(ItemHeaderIcons "critter_power")
-                rightSide=(ItemHeaderRightSide "critter_power")
-            }}
-            {{#each itemType.critter_power as |item i|}} {{#ife system.optional "disabled_option"}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                    img=item.img
-                    name=item.name
-                    itemId=item._id
-                    icons=(ItemIcons item)
-                    rightSide=(ItemRightSide item)
-                    hasDesc="true"
-                    hasRoll="true"
-                    description=item.description.value
-                }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+                label="SR5.Labels.ActorSheet.DisabledOptionCritterPowers"
+                type="critter_power" }}
+            {{#each itemType.critter_power}} {{#ife this.system.optional "disabled_option"}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
             {{/ife}} {{/each}}
         </div>
     </div>

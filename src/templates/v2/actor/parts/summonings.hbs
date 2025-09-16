@@ -1,18 +1,6 @@
-{{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-        name=(localize 'SR5.CallInAction.Summoning')
-        itemId='summoning'
-        icons=(ItemHeaderIcons 'summoning')
-        rightSide=(ItemHeaderRightSide 'summoning')
-}}
-{{#each itemType.summoning as |item i|}}
-    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-            img=item.img
-            name=item.name
-            itemId=item._id
-            icons=(ItemIcons item)
-            rightSide=(ItemRightSide item)
-            hasDesc="true"
-            hasRoll="true"
-            description=item.description.value
-    }}
+{{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+        label='SR5.CallInAction.Summoning'
+        type='summoning' }}
+{{#each itemType.summoning}}
+    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
 {{/each}}

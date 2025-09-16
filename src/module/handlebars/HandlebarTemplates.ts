@@ -17,7 +17,9 @@ export const preloadHandlebarsTemplates = async () => {
             'common/profile-image',
             'common/select',
             'common/value-modifiers',
-            'common/value-input'
+            'common/value-input',
+            'common/effect-list-item',
+            'common/effect-list-header',
         ),
         ...v2AP(
             'attribute',
@@ -28,6 +30,8 @@ export const preloadHandlebarsTemplates = async () => {
             'skill',
             'matrix-attribute',
             'special-attributes',
+            'list-item',
+            'list-header'
         ),
         // item tabs
         'systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs',

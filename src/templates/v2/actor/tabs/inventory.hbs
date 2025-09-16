@@ -1,70 +1,57 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        <div class="list-item item-section flexrow header-for-scrollable">
-            <div class="list-item-content">
-                <div class="item-left">
-                    <span class="selection-inventory">
-                        <label class="item-text item-name" for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
-                        <select id="select-inventory">
-                            {{#each inventories as |inventory name|}}
-                            <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>
-                            {{/each}}
-                        </select>
-                        <a class="inventory-edit action-icon roll">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a class="inventory-remove action-icon roll">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </span>
-                    <span class="inline-input-inventory">
-                        <input type="text" id="input-inventory" class="display text left" value="{{inventory.name}}"/>
-                        <a class="roll action-icon inventory-input-save">
-                            <i class="fas fa-check"></i>
-                        </a>
-                        <a class="roll action-icon inventory-input-cancel">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </span>
-                </div>
-                <div class="item-right">
-                    <div class="item-text item-icons">
-                        <a class="inventory-inline-create" data-tooltip="SR5.Labels.ActorSheet.CreateInventory">
-                            <i class="item-icon fas fa-plus"></i>
-                            {{localize "SR5.Add"}}
-                        </a>
-                        <a class="inventory-collapse" data-tooltip="SR5.CollapseAll">
-                            <i class="item-icon fas fa-chevrons-up"></i>
-                        </a>
-                        <a class="inventory-expand" data-tooltip="SR5.ExpandAll">
-                            <i class="item-icon fas fa-chevrons-down"></i>
-                        </a>
-                    </div>
-                </div>
+        <div class="new-list-item new-list-item-header header-for-scrollable">
+            <div class="new-list-item-label-container">
+                <span class="selection-inventory">
+                    <label class="item-text item-name" for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
+                    <select id="select-inventory">
+                        {{#each inventories as |inventory name|}}
+                        <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>
+                        {{/each}}
+                    </select>
+                    <a class="inventory-edit action-icon roll">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a class="inventory-remove action-icon roll">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </span>
+                <span class="inline-input-inventory">
+                    <input type="text" id="input-inventory" class="display text left" value="{{inventory.name}}"/>
+                    <a class="roll action-icon inventory-input-save">
+                        <i class="fas fa-check"></i>
+                    </a>
+                    <a class="roll action-icon inventory-input-cancel">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+            </div>
+            <div class="new-list-item-icons">
+                <a class="inventory-inline-create" data-tooltip="SR5.Labels.ActorSheet.CreateInventory">
+                    <i class="item-icon fas fa-plus"></i>
+                    {{localize "SR5.Add"}}
+                </a>
+                <a class="inventory-collapse" data-tooltip="SR5.CollapseAll">
+                    <i class="item-icon fas fa-chevrons-up"></i>
+                </a>
+                <a class="inventory-expand" data-tooltip="SR5.ExpandAll">
+                    <i class="item-icon fas fa-chevrons-down"></i>
+                </a>
             </div>
         </div>
         <div class="scrollable">
             {{#each inventory.types as |section type|}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-                        itemCssClass=(ift (not section.isOpen) 'faded')
-                        name=(localize section.label)
-                        itemId=section.type
-                        icons=(InventoryHeaderIcons section)
-                        rightSide=(ItemHeaderRightSide section.type)
+                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs"
+                    label=section.label
+                    isOpen=section.isOpen
+                    type=type
+                    rootId=@root.rootId
                 }}
                 {{#if section.isOpen }}
                     {{#each section.items}}
-                        {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                                img=this.img
-                                name=this.name
-                                itemId=this._id
-                                icons=(InventoryItemIcons this)
-                                rightSide=(ItemRightSide this)
-                                hasDesc="true"
-                                hasRoll="true"
-                                isBroken=this.isBroken
-                                description=this.description.value
-                                properties=this.properties
+                        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs"
+                            item=this
+                            rootId=@root.rootId
                         }}
                     {{/each}}
                 {{/if}}

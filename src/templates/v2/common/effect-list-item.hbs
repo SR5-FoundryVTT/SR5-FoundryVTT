@@ -1,0 +1,69 @@
+{{!-- list-item expects an SR5Item to be passed in as 'item' --}}
+<div class="new-list-item-container">
+    <div class="new-list-item">
+        <div class="new-list-item-label-container">
+            {{#if item.img}}
+                <img src="{{item.img}}" class="new-list-item-image" height="24px" width="24px" />
+            {{/if}}
+            {{#if system.importFlags.isFreshImport}}
+                {{#if (itemMarking "ICON")}}
+                    {{#if (itemMarking "COLOR")}}
+                        <div class="item-img">
+                            <img src="systems/shadowrun5e/dist/icons/checklist.svg" data-tooltip="SR5.IsFreshImport" height="24px" width="24px"/>
+                        </div>
+                    {{else}}
+                        <div class="item-img">
+                            <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" data-tooltip="SR5.IsFreshImport" height="24px" width="24px"/>
+                        </div>
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+            <label
+                class="{{#if (isBroken item)}}faded {{/if}}
+                    {{#if system.importFlags.isFreshImport}}
+                        {{#if (itemMarking "COLOR")}}fresh-import{{/if}}
+                    {{/if}}" >
+                {{!-- allow overriding the name if provided --}}
+                <a data-action="showItemDescription" data-item-id="{{item.uuid}}">
+                    {{#if name}}
+                        {{name}}
+                    {{else}}
+                        {{item.name}}
+                    {{/if}}
+                </a>
+            </label>
+        </div>
+
+        <div class="new-list-item-col">
+            {{localizeOb item.system.applyTo @root.config.effectApplyTo}}
+        </div>
+
+        <div class="new-list-item-col">
+            {{effectDurationLabel item}}
+        </div>
+
+        <div class="new-list-item-icons">
+            <a data-tooltip="SR5.ToggleActive" data-action="toggleEffect" data-item-id="{{item.uuid}}">
+                <i class="{{#if item.disabled}}far fa-circle{{else}}fas fa-check-circle{{/if}}"></i>
+            </a>
+            {{#if @root.isEditMode}}
+            <a data-tooltip="SR5.EditItem" data-action="editEffect" data-item-id="{{item.uuid}}">
+                <i class="fas fa-pen-to-square"></i>
+            </a>
+            {{/if}}
+            {{#if isItemEffect}}
+            <a data-tooltip="SR5.OpenSource" data-action="openEffectSource" data-item-id="{{item.uuid}}">
+                <i class="fas fa-file"></i>
+            </a>
+            {{else if @root.isEditMode}}
+            <a data-tooltip="SR5.DeleteItem" data-action="deleteEffect" data-item-id="{{item.uuid}}">
+                <i class="fas fa-trash"></i>
+            </a>
+            {{/if}}
+
+        </div>
+    </div>
+    <div class="new-list-item-description">
+
+    </div>
+</div>

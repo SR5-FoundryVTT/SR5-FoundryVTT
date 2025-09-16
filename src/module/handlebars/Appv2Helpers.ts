@@ -32,6 +32,6 @@ export const registerAppv2Helpers = () => {
             nav.appendChild(link);
         }
         return new Handlebars.SafeString(nav.outerHTML);
-    })
+    });
 
 }

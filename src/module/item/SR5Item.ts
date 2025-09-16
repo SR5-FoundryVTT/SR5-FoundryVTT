@@ -1147,11 +1147,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     isWireless(this: SR5Item): boolean {
-        return this.system.technology?.wireless === 'online' || this.isRunningSilent();
+        return this.isMatrixDevice &&
+            (this.system.technology?.wireless === 'online' || this.isRunningSilent());
     }
 
     isRunningSilent(): boolean {
-        return (this as SR5Item).system.technology?.wireless === 'silent';
+        return this.isMatrixDevice && (this as SR5Item).system.technology?.wireless === 'silent';
     }
 
     isLivingPersona(this: SR5Item) {
@@ -1159,7 +1160,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     canBeWireless(this: SR5Item): boolean {
-        return this.system.technology?.wireless !== 'none';
+        return this.isMatrixDevice && this.system.technology?.wireless !== 'none';
     }
 
     isPublicGrid(this: SR5Item) {

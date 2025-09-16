@@ -1,67 +1,28 @@
 <section class="tab scrollable{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-            name=(localize 'SR5.Labels.ActorSheet.SpritePowers')
-            itemId='sprite_power'
-            itemType='sprite_power'
-            itemData=(SpritePowerItemData 'standard')
-            icons=(ItemHeaderIcons 'sprite_power')
-            rightSide=(ItemHeaderRightSide 'sprite_power')
-        }}
+        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+            label='SR5.Labels.ActorSheet.SpritePowers'
+            type='sprite_power' }}
+
             <div class="scrollable">
-                {{#each itemType.sprite_power as |item i|}} {{#if (or (not system.optional) (eq system.optional "standard"))}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                        img=item.img
-                        name=item.name
-                        itemId=item._id
-                        icons=(ItemIcons item)
-                        rightSide=(ItemRightSide item)
-                        hasDesc="true"
-                        hasRoll="true"
-                        description=item.description.value
-                    }}
+                {{#each itemType.sprite_power}} {{#if (or (not this.system.optional) (eq this.system.optional "standard"))}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
                 {{/if}} {{/each}}
 
                 {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-                    name=(localize 'SR5.Labels.ActorSheet.EnabledOptionSpritePowers')
-                    itemId='sprite_power'
-                    itemType='sprite_power'
-                    itemData=(SpritePowerItemData 'enabled_option')
-                    icons=(ItemHeaderIcons 'sprite_power')
-                    rightSide=(ItemHeaderRightSide 'sprite_power')
-                }}
-                {{#each itemType.sprite_power as |item i|}} {{#ife system.optional "enabled_option"}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                        img=item.img
-                        name=item.name
-                        itemId=item._id
-                        icons=(ItemIcons item)
-                        rightSide=(ItemRightSide item)
-                        hasDesc="true"
-                        hasRoll="true"
-                        description=item.description.value
-                    }}
+                    label='SR5.Labels.ActorSheet.EnabledOptionSpritePowers'
+                    type='sprite_power' }}
+
+                {{#each itemType.sprite_power}} {{#ife this.system.optional "enabled_option"}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
                 {{/ife}} {{/each}}
 
-                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-                    name=(localize 'SR5.Labels.ActorSheet.DisabledOptionSpritePowers')
-                    itemId='sprite_power'
-                    itemType='sprite_power'
-                    itemData=(SpritePowerItemData 'disabled_option')
-                    icons=(ItemHeaderIcons 'sprite_power')
-                    rightSide=(ItemHeaderRightSide 'sprite_power')
-                }}
-                {{#each itemType.sprite_power as |item i|}} {{#ife system.optional "disabled_option"}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                        img=item.img
-                        name=item.name
-                        itemId=item._id
-                        icons=(ItemIcons item)
-                        rightSide=(ItemRightSide item)
-                        hasDesc="true"
-                        hasRoll="true"
-                        description=item.description.value
-                    }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+                    label='SR5.Labels.ActorSheet.DisabledOptionSpritePowers'
+                    type='sprite_power' }}
+
+                {{#each itemType.sprite_power}} {{#ife this.system.optional "disabled_option"}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs' item=this }}
                 {{/ife}} {{/each}}
             </div>
     </div>

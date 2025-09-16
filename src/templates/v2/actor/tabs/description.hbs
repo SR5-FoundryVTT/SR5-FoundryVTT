@@ -1,5 +1,5 @@
 <section class="tab{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
                         name=(localize 'SR5.Description')
                         itemId='biography'}}
     {{editor biographyHTML target="system.description.value" button=true

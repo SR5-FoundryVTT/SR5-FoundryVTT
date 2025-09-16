@@ -39,7 +39,6 @@
     .header-for-scrollable {
         // TODO figure out how to make this use --scroll-margin
         padding-right: 0.75rem !important;
-        margin-right: 0.75rem !important;
     }
     .tab {
 
@@ -263,6 +262,98 @@
             flex-flow: row nowrap;
             justify-content: end;
         }
+    }
+
+    .new-list-item-container {
+        display: flex;
+        flex-flow: column nowrap;
+
+        .new-list-item {
+            flex: 1;
+        }
+
+        .new-list-item-description {
+            flex: 1;
+            display: flex;
+        }
+
+        &:nth-of-type(even) {
+            background: rgba($white, 0.03);
+        }
+    }
+
+    .new-list-item {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-between;
+        align-items: center;
+        align-content: center;
+        font-size: 12px;
+        width: 100%;
+        padding: 0.25rem;
+
+        &.new-list-item-header {
+            border-bottom: 1px solid $yellow;
+            border-top: 1px solid $yellow;
+            background: rgba($black, 0.9);
+
+            .new-list-item-label-container {
+                color: $yellow !important;
+            }
+        }
+
+        &:nth-of-type(even) {
+            &:not(.new-list-item-header) {
+                background: rgba($white, 0.03);
+            }
+        }
+
+        .new-list-item-label-container {
+            display: flex;
+            flex-flow: row nowrap;
+            flex: 4;
+            font-size: 1rem;
+            color: $white;
+            gap: .25rem;
+
+            .selection-inventory {
+                display: flex;
+                flex-flow: row;
+                justify-content: start;
+                align-items: center;
+            }
+        }
+
+        .new-list-item-col {
+            display: flex;
+            flex-flow: row;
+            flex: 2;
+            justify-content: center;
+            align-items: center;
+            gap: 0.1rem;
+            font-size: 0.8rem;
+        }
+
+        .new-list-item-qty {
+            display: flex;
+            flex-flow: row nowrap;
+            flex: 1;
+            justify-content: center;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .new-list-item-icons {
+            display: flex;
+            flex-flow: row nowrap;
+            flex: 1;
+            font-size: 0.8rem;
+            justify-content: center;
+            align-items: center;
+            gap: 0.25rem;
+            padding-right: 0.25rem;
+        }
+
     }
 
     // skills formatting can be used by active, knowledge, and language skills

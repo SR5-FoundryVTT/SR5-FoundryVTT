@@ -1,24 +1,11 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-            name=(concatStrings (localize 'SR5.Programs') " " program_count)
-            itemId='program'
-            icons=(ItemHeaderIcons 'program')
-            rightSide=(ItemHeaderRightSide 'program')
-            itemCssClass='header-for-scrollable'
-        }}
+        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+            label=(concatStrings (localize 'SR5.Programs') " " @root.program_count)
+            type='program' }}
         <div class="scrollable">
-        {{#each itemType.program as |item iid|}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                img=item.img
-                name=item.name
-                itemId=item._id
-                icons=(ItemIcons item)
-                rightSide=(ItemRightSide item)
-                hasDesc="true"
-                hasRoll="true"
-                description=item.description.value
-            }}
+        {{#each itemType.program}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
         {{/each}}
         </div>
     </div>

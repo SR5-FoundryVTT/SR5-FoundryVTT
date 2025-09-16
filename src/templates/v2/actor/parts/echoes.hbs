@@ -1,18 +1,6 @@
 {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-        name=(localize 'SR5.Echoes')
-        itemId='echo'
-        icons=(ItemHeaderIcons 'echo')
-        rightSide=(ItemHeaderRightSide 'echo')
-}}
-{{#each itemType.echo as |item i|}}
-    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-            img=item.img
-            name=item.name
-            itemId=item._id
-            icons=(ItemIcons item)
-            rightSide=(ItemRightSide item)
-            hasDesc="true"
-            hasRoll="false"
-            description=item.description.value
-    }}
+        label='SR5.Echoes'
+        type='echo' }}
+{{#each itemType.echo}}
+    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs' item=this }}
 {{/each}}

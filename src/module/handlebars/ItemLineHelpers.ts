@@ -6,6 +6,8 @@ import { formatStrict } from '../utils/strings';
 import { SR5Item } from '../item/SR5Item';
 import { SR5Actor } from "../actor/SR5Actor";
 import { MatrixNetworkFlow } from "../item/flows/MatrixNetworkFlow";
+import { SheetFlow } from '@/module/flows/SheetFlow';
+import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 
 /**
  * Typing around the legacy item list helper.
@@ -38,130 +40,68 @@ interface ItemListRightSide {
 }
 
 export const registerItemLineHelpers = () => {
-    Handlebars.registerHelper('InventoryHeaderIcons', function (section: InventorySheetDataByType) {
-        var icons = Handlebars.helpers['ItemHeaderIcons'](section.type) as object[];
 
-        icons.push(section.isOpen
-            ? {
-                icon: 'fas fa-square-chevron-up',
-                title: game.i18n.localize('SR5.Collapse'),
-                cssClass: 'item-toggle',
-                // Add HTML data attributes using a key<string>:value<string> structure
-                data: {}
-            }
-            : {
-                icon: 'fas fa-square-chevron-down',
-                title: game.i18n.localize('SR5.Expand'),
-                cssClass: 'item-toggle',
-                // Add HTML data attributes using a key<string>:value<string> structure
-                data: {}
-            }
-        );
-
-        return icons;
+    Handlebars.registerHelper('hasRoll', function (item: SR5Item, options) {
+        return item?.hasRoll ?? false;
     })
 
-    Handlebars.registerHelper('ItemHeaderIcons', function (type: string) {
-        const PlusIcon = 'fas fa-plus';
-        const AddText = game.i18n.localize('SR5.Add');
-        const addIcon = {
-            icon: PlusIcon,
-            text: AddText,
-            title: formatStrict('SR5.Create', { type: 'SR5.Item' }),
-            cssClass: 'item-create',
-            // Add HTML data attributes using a key<string>:value<string> structure
-            data: {}
-        };
-        switch (type) {
-            case 'lifestyle':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Lifestyle' });
-                return [addIcon];
-            case 'contact':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Contact' });
-                return [addIcon];
-            case 'sin':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.SIN' });
-                return [addIcon];
-            case 'license':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.License' });
-                return [addIcon];
-            case 'quality':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Quality' });
-                return [addIcon];
-            case 'adept_power':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.AdeptPower' });
-                return [addIcon];
-            case 'action':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Action' });
-                return [addIcon];
-            case 'spell':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Spell' });
-                return [addIcon];
-            case 'ritual':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Ritual' });
-                return [addIcon];
-            case 'gear':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Gear' });
-                return [addIcon];
-            case 'complex_form':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ComplexForm' });
-                return [addIcon];
-            case 'program':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Program' });
-                return [addIcon];
-            case 'weapon':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Weapon' });
-                return [addIcon];
-            case 'armor':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Armor' });
-                return [addIcon];
-            case 'ammo':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Ammo' });
-                return [addIcon];
-            case 'modification':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Modification' });
-                return [addIcon];
-            case 'device':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Device' });
-                return [addIcon];
-            case 'equipment':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Equipment' });
-                return [addIcon];
-            case 'cyberware':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Cyberware' });
-                return [addIcon];
-            case 'bioware':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Bioware' });
-                return [addIcon];
-            case 'critter_power':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.CritterPower' });
-                return [addIcon];
-            case 'sprite_power':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.ItemTypes.SpritePower' });
-                return [addIcon];
-            case 'echo':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Echo' });
-                return [addIcon];
-            case 'metamagic':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Metamagic' });
-                return [addIcon];
-            case 'summoning':
-                // NOTE: summoning is not an actual item type. It's a call_in_action sub type
-                addIcon.title = game.i18n.localize('SR5.CallInAction.CreateSummoning');
-                return [addIcon];
-            case 'compilation':
-                // NOTE: compilation is not an actual item type. It's a call_in_action sub type
-                addIcon.title = game.i18n.localize('SR5.CallInAction.CreateCompilation');
-                return [addIcon];
-            case 'effect':
-                addIcon.title = formatStrict('SR5.Create', { type: 'SR5.Effect' });
-                addIcon.cssClass = 'effect-control';
-                addIcon.data = { action: 'create' };
-                return [addIcon];
-            default:
-                return [];
+    Handlebars.registerHelper('isBroken', function (item: SR5Item, options) {
+        return item?.isMatrixDevice && item.isBroken;
+    })
+
+    Handlebars.registerHelper('canBeWireless', function (item: SR5Item, options) {
+        return item?.canBeWireless() ?? false;
+    })
+    Handlebars.registerHelper('isWireless', function (item: SR5Item, options) {
+        return item?.isWireless() ?? false;
+    })
+
+    Handlebars.registerHelper('isRunningSilent', function (item: SR5Item, options) {
+        return item?.isRunningSilent() ?? false;
+    })
+
+    Handlebars.registerHelper('hasSource', function (item: SR5Item, options) {
+        console.log(item, options);
+        // todo figure out source for active effects and actors
+        const source = (item instanceof SR5Item) ? item.getSource() ?? '' : ''
+        return source !== '';
+    })
+
+    Handlebars.registerHelper('isOwner', function (item: SR5Item, options) {
+        console.log('isOwner', item, options);
+        const owner = options.hash.owner;
+        if (!owner || !(owner instanceof SR5Actor)) return false;
+        return ActorOwnershipFlow._isOwnerOfItem(owner, item);
+    })
+
+    Handlebars.registerHelper('isMatrixAction', function (item: SR5Item, options) {
+        return item.isType('action') && item.hasActionCategory('matrix');
+    })
+
+    Handlebars.registerHelper('marksRequired', function (item: SR5Item, options) {
+        const neededMarks: number = item.getAction()?.category.matrix.marks ?? 0;
+        const needed = neededMarks > 0 ? `${neededMarks}` : '';
+        const owner = item.getAction()?.category.matrix.owner ? game.i18n.localize('SR5.Owner') : '';
+        return new Handlebars.SafeString(needed || owner);
+    })
+
+    Handlebars.registerHelper('createItemHeaderLabel', function (type: string) {
+        return new Handlebars.SafeString(SheetFlow._getCreateItemText(type));
+    })
+
+    Handlebars.registerHelper('effectDurationLabel', function (effect: SR5ActiveEffect) {
+        const getDurationLabel = () => {
+            if (effect.duration.seconds) return `${effect.duration.seconds}s`;
+            if (effect.duration.rounds && effect.duration.turns) return `${effect.duration.rounds}r, ${effect.duration.turns}t`;
+            if (effect.duration.rounds) return `${effect.duration.rounds}r`;
+            if (effect.duration.turns) return `${effect.duration.turns}t`;
+
+            return '';
         }
-    });
+        return new Handlebars.SafeString(getDurationLabel());
+    })
+
+   ///////////////////////////////////////////////////////////////////////////////////////////////
 
     Handlebars.registerHelper('InventoryIcons', function (name: string) {
         const addItemIcon = {
@@ -357,40 +297,6 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             text: game.i18n.localize('SR5.Value')
-                        }
-                    }
-                ]
-            case 'itemEffects':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.ActiveEffect.ApplyTo')
-                        }
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Duration')
-                        }
-                    },
-                    {
-                        text: {
-                            // Used as a placeholder for effect line icons.
-                            // This way the header column is empty (as no +Add makes sense)
-                            // However the line column contains the normal interaction icons.
-                            text: ''
-                        }
-                    }
-                ]
-            case 'effects':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.ActiveEffect.ApplyTo')
-                        }
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Duration')
                         }
                     }
                 ]
@@ -732,6 +638,7 @@ export const registerItemLineHelpers = () => {
             return [];
         });
 
+    // TODO delete
     Handlebars.registerHelper('ItemIcons', function (itemStored: Item.Stored) {
         const item = new SR5Item(itemStored as SR5Item);
         const editIcon = {
@@ -796,6 +703,7 @@ export const registerItemLineHelpers = () => {
         ];
     });
 
+    // TODO delete
     Handlebars.registerHelper('InventoryItemIcons', function (itemStored: Item.Stored) {
         const item = new SR5Item(itemStored as SR5Item);
         const moveIcon = {
@@ -850,61 +758,6 @@ export const registerItemLineHelpers = () => {
         }
 
         return icons;
-    });
-
-    /**
-     * Helper specifically for active effect icons.
-     *
-     * Add HTML data attributes using a key<string>:value<string> structure for each icon.
-     */
-    Handlebars.registerHelper('EffectIcons', function (effect) {
-        const editIcon = {
-            icon: 'fas fa-edit effect-control',
-            title: game.i18n.localize('SR5.EditItem'),
-            data: { action: 'edit' }
-        };
-        const removeIcon = {
-            icon: 'fas fa-trash effect-control',
-            title: game.i18n.localize('SR5.DeleteItem'),
-            data: { action: 'delete' }
-        };
-        const disableIcon = {
-            icon: `${effect.disabled ? 'far fa-circle' : 'fas fa-check-circle'} effect-control`,
-            title: game.i18n.localize('SR5.ToggleActive'),
-            data: { action: "toggle" }
-        };
-        const openOriginIcon = {
-            icon: 'fas fa-file effect-control',
-            title: game.i18n.localize('SR5.OpenOrigin'),
-            data: { action: "open-origin" }
-        }
-        // Disallow changes to effects that aren't of direct origin.
-        let icons = [disableIcon, editIcon, removeIcon];
-        if (effect.isOriginOwned) icons = [openOriginIcon, ...icons];
-        return icons;
-    });
-
-    /**
-     * Helper specifically for active effect icons sourced from an actors items to display in list form.
-     */
-    Handlebars.registerHelper('ItemEffectIcons', function (effect) {
-        const openOriginIcon = {
-            icon: 'fas fa-file item-effect-control',
-            title: game.i18n.localize('SR5.OpenOrigin'),
-            data: { action: "open-origin" }
-        }
-        const disableIcon = {
-            icon: `${effect.disabled ? 'far fa-circle' : 'fas fa-check-circle'} item-effect-control`,
-            title: game.i18n.localize('SR5.ToggleActive'),
-            data: { action: "toggle" }
-        };
-        const editIcon = {
-            icon: 'fas fa-edit item-effect-control',
-            title: game.i18n.localize('SR5.EditItem'),
-            data: { action: 'edit' }
-        };
-
-        return [openOriginIcon, disableIcon, editIcon];
     });
 
     // Allow Matrix Marks to be changed on the spot on a Sheet.
@@ -1071,40 +924,6 @@ export const registerItemLineHelpers = () => {
             cssClass: 'matrix-network-hackonthefly',
             title: game.i18n.localize('SR5.Labels.Actions.HackontheFly'),
         }]
-    });
-
-    /**
-     * Section - Character Matrix Actions.
-     */
-    Handlebars.registerHelper('MatrixActionsHeaderRightSide', () => {
-        return [
-            {
-                text: {
-                    cssClass: 'six',
-                    text: game.i18n.localize('SR5.Marks'),
-                },
-            },
-        ];
-    });
-    /**
-     * Section - Character Matrix Actions.
-     * @param action The matrix action used to render a single item line.
-     */
-    Handlebars.registerHelper('MatrixActionsItemRightSide', (action: SR5Item) => {
-        if (!action.system.action?.category.matrix) return [];
-
-        // Either show owner only, a mark quantity or nothing, if 0 marks are needed.
-        let needed: string|number = action.system.action?.category.matrix.marks ?? 0;
-        needed = needed > 0 ? needed : '';
-        const owner = action.system.action?.category.matrix.owner ? game.i18n.localize('SR5.Owner') : '';
-
-        return [
-            {
-                text: {
-                    text: owner || needed
-                },
-            }
-        ];
     });
 
     /**

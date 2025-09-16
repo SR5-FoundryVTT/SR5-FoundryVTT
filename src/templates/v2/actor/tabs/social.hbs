@@ -2,63 +2,30 @@
     <div class="split-container">
         <div>
             <div class="scrollable">
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-                name=(localize 'SR5.SIN')
-                itemId='sin'
-                icons=(ItemHeaderIcons 'sin')
-                rightSide=(ItemHeaderRightSide 'sin')
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+                label='SR5.SIN'
+                type='sin'
             }}
-            {{#each itemType.sin as |item i|}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                    img=item.img
-                    name=item.name
-                    itemId=item._id
-                    icons=(ItemIcons item)
-                    rightSide=(ItemRightSide item)
-                    hasDesc="true"
-                    hasRoll="true"
-                    description=item.description.value
-                }}
+            {{#each itemType.sin}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
             {{/each}}
             {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-                name=(localize 'SR5.Lifestyles')
-                itemId='lifestyle'
-                icons=(ItemHeaderIcons 'lifestyle')
-                rightSide=(ItemHeaderRightSide 'lifestyle')
+                label='SR5.Lifestyles'
+                type='lifestyle'
             }}
-            {{#each itemType.lifestyle as |item i|}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                    img=item.img
-                    name=item.name
-                    itemId=item._id
-                    icons=(ItemIcons item)
-                    rightSide=(ItemRightSide item)
-                    hasDesc="true"
-                    hasRoll="true"
-                    description=item.description.value
-                }}
+            {{#each itemType.lifestyle}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
             {{/each}}
             </div>
         </div>
         <div>
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-                name=(localize 'SR5.Contacts')
-                itemId='contact'
-                icons=(ItemHeaderIcons 'contact')
-                rightSide=(ItemHeaderRightSide 'contact')
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+                label='SR5.Contacts'
+                type='contact'
             }}
             <div class="scrollable">
-                {{#each itemType.contact as |item i|}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                        img=item.img
-                        name=item.name
-                        itemId=item._id
-                        icons=(ItemIcons item)
-                        rightSide=(ItemRightSide item)
-                        hasDesc="true"
-                        hasRoll="true"
-                        description=item.description.value
-                    }}
+                {{#each itemType.contact}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
                 {{/each}}
             </div>
         </div>
