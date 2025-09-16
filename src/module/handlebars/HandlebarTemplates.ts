@@ -25,6 +25,7 @@ export const preloadHandlebarsTemplates = async () => {
             'fake-attribute',
             'language-and-knowledge-skills',
             'limits',
+            'skill',
             'matrix-attribute',
             'special-attributes',
         ),

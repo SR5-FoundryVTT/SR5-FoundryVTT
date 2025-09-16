@@ -1,32 +1,38 @@
-{{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
-        name=(localize 'SR5.ActiveSkills')
-        itemCssClass="skill-header"
-        icons=(SkillHeaderIcons 'active')
-        rightSide=(SkillHeaderRightSide 'active' filters)
-}}
-<div class="list-item">
-    <div class="item-text skill-spec-item">
+<div class="fill-container skills">
+    <div class="skill skill-header header-for-scrollable">
+        <label>{{localize "SR5.ActiveSkills"}}</label>
+        {{#if @root.isPlayMode}}
+        <div class="skill-specializations">{{localize "SR5.Specializations"}}</div>
+        {{/if}}
+        <div class="skill-value">
+            <span>{{localize "SR5.Rtg"}}</span>
+        </div>
+        <div class="skill-icons">
+            {{#if @root.isEditMode}}
+                <a  data-action="addActiveSkill">
+                    <i class="fas fa-plus"></i>
+                    {{localize "SR5.Add"}}
+                </a>
+            {{/if}}
+        </div>
+    </div>
+    <div>
         <input
-                id="filter-skills"
-                class="display text left"
-                type="text"
-                value="{{filters.skills}}"
-                name="filters.skills"
-                placeholder="{{localize 'SR5.Filter'}}..."
+            id="filter-skills"
+            class="display text left"
+            type="text"
+            value="{{filters.skills}}"
+            name="filters.skills"
+            placeholder="{{localize 'SR5.Filter'}}..."
         />
     </div>
-</div>
-<div class="scrollable">
-    {{#each system.skills.active as |skill sid|}}
-        {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs'
-                name=(localizeSkill skill)
-                itemNameCssClass="skill-roll"
-                itemId=sid
-                itemType="skill"
-                icons=(SkillIcons 'active' skill)
-                rightSide=(SkillRightSide 'active' skill)
-                hasRoll="true"
-                additionalCssClass=(SkillAdditionCssClass skill)
-        }}
-    {{/each}}
+    <section class="scrollable">
+        {{#each system.skills.active as |skill sid|}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/skill.hbs'
+                skillPath=(concat "system.skills.active." sid)
+                skill=skill
+                rootId=@root.rootId
+            }}
+        {{/each}}
+    </section>
 </div>

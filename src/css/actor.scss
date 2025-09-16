@@ -1,279 +1,5 @@
 @import 'config';
 
-.sr5.actor {
-    min-height: 690px;
-    min-width: 870px;
-    .window-content {
-        border: none;
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
-    .wholesheet {
-        height: 100%;
-        display: flex;
-        flex-flow: column nowrap;
-        overflow: hidden;
-    }
-    .name {
-        @include systemFonts;
-        background: $nameplate-background;
-        font-size: 200%;
-        margin-bottom: 0;
-        padding-left: 5px;
-        input[type=text].display {
-            background: none;
-        }
-    }
-    .sheetbody {
-        overflow: hidden;
-        flex: 1;
-    }
-    .limit-title {
-        font-size: 115%;
-    }
-    .attributes {
-        // border-top: $;
-        display: flex;
-        flex-flow: row;
-        flex-wrap: nowrap;
-        justify-content: space-between;
-        &.center {
-            justify-content: space-evenly;
-        }
-        &.no-border {
-            border-top: none;
-            border-bottom: none;
-        }
-        &.wrap {
-            flex-wrap: wrap;
-        }
-        .attribute {
-            @include title;
-
-            align-items: center;
-            color: $yellow;
-            display: flex;
-            flex-flow: column nowrap;
-            flex: 1 0 auto;
-            font-size: 100%;
-            justify-content: space-evenly;
-            min-width: 4em;
-            padding-top: 4px;
-            text-align: center;
-
-            &.no-border {
-                border-right: none;
-            }
-            &.no-grow {
-                flex-grow: 0;
-            }
-            &:hover {
-                .attribute-input-container.row {
-                    visibility: visible;
-                }
-            }
-            &.flex0 {
-                min-width: 0;
-                width: 0;
-            }
-            &.row {
-                flex-flow: row nowrap;
-                justify-content: center;
-                align-items: center;
-                align-content: center;
-                > .attribute-name {
-                    width: auto;
-                }
-                &.space-around {
-                    justify-content: space-around;
-                }
-                .attribute-input {
-                    transform: translateY(20%);
-                }
-            }
-            > .attribute-value {
-                > .attribute-value-total {
-                    color: white;
-                    font-size: 125%;
-                    width: 100%;
-                    text-align: center;
-                }
-            }
-
-            > .attribute-name {
-                font-size: 115%;
-                width: 100%;
-                text-align: center;
-                margin-bottom: 0;
-                &.icon {
-                    font-size: 0.75em;
-                }
-                &.roll {
-                    @include rollable;
-                }
-            }
-
-            .attribute-input-container {
-                text-align: center;
-                position: relative;
-                margin-bottom: 2px;
-                .mod {
-                    font-size: 0.75em;
-                    margin-top: -2px;
-                }
-                &.row {
-                    //visibility: hidden;
-                    display: flex;
-                    flex-flow: row;
-                }
-                > .attribute-input {
-                    text-align: center;
-                    margin: 2px;
-                }
-            }
-
-            .toggle-fresh-import-all-off {
-                font-size: 0.75em;
-                background-color: $bgrButton;
-            }
-
-            .toggle-fresh-import-all-on {
-                font-size: 0.75em;
-                background-color: $bgrButton;
-            }
-
-            .track {
-                display: flex;
-                flex-flow: row;
-                justify-content: space-evenly;
-                margin-bottom: 0.1em;
-                width: 100%;
-                &.center {
-                    justify-content: center;
-                    & > *:not(:first-child) {
-                        margin-left: 4px;
-                    }
-                    & > *:not(:last-child) {
-                        margin-right: 4px;
-                    }
-                }
-                &.between {
-                    justify-content: space-between;
-                }
-                .track-slash {
-                    width: 1.5em;
-                    transform: translateY(10%);
-                    flex: 0 0;
-                    &:after {
-                        content: '/';
-                    }
-                }
-                .track-plus {
-                    width: 1em;
-                    flex: 0 0;
-                    &:after {
-                        content: '+';
-                    }
-                }
-                .track-max-value {
-                    margin-bottom: 0;
-                    margin-left: 0.25em;
-                }
-            }
-        }
-    }
-    .limit {
-        @include systemFonts;
-        padding: 0 0.1em;
-        margin-top: -2px;
-        text-align: center;
-        font-size: 115%;
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: center;
-        align-items: center;
-        align-content: center;
-    }
-
-    // Interaction Element for Skill Lists
-    .skill-header {
-        @include rollable;
-    }
-
-    // Sprite sheet power tab list had broken flex/block relations, causing missing a scrollbar.
-    // Other actor sheet tabs miss-use the 'inventory' class. To not further miss-use it,
-    // this hacky class pierces through .sr5 .tab .tabbody > * flex:0 and broken scroll-area
-    // formatting in general to have a localized solution for the sprite power list.
-    // If you're looking at this, and have a better solution, please burn this in the fires of hell.
-    .scroll-area-sprite-power {
-        display: block;
-        flex: 1 !important;
-        height: 100%;
-        width: 100%;
-        overflow: auto;
-    }
-
-    // Intended to be used in the matrix tab and hacking subtab for all columns.
-    .scroll-area-matrix-hacking {
-        // I hate this. It's necessary to make the scrollbar work together with .scroll-area
-        // Otherweise the height will grow out of the application bounds hide the overflow...
-        height: 400px;
-    }
-
-    // Intended to be used in the matrix tab > icons/programs/marks subtab.
-    .scroll-area-matrix-icons {
-        // I hate this. It's necessary to make the scrollbar work together with .scroll-area
-        // Otherweise the height will grow out of the application bounds hide the overflow...
-        height: 330px;
-    }
-
-    // Use only to indicate interactibility within the HackingTab markslist.
-    .select-matrix-target {
-        @include clickable;
-    }
-
-    // Use only to indicate interactibility within the HackingTab markslist.
-    .open-matrix-target {
-        @include clickable;
-    }
-
-    // Used to switch between the different hacking targets.
-    .switch-matrix-hacking-target {
-        @include clickable;
-    }
-
-    &.sheet.window-app {
-        box-shadow: 0 0 10px 0px rgba(235,181,49,0.3);
-
-        & .window-header {
-            border-bottom: none;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
-            background-repeat: repeat;
-            background-size: 100% 20px auto;
-            flex: 0 0 20px;
-            padding: 0 3px 0 0;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-
-            & a {
-            display: inline-flex;
-            padding: 6px 0 0 0;
-            font-size: 0px;
-            color: rgb(100, 100, 100);
-
-            & .fa-solid,
-                & .fas {
-                    font-size: 12px;
-                }
-            }
-
-            & .window-title {
-            font-size: 0;
-            }
-        }
-    }
-}
-
 .sr5 #filter-skills.display.text.left {
     font-size: 15px;
 }
@@ -294,117 +20,13 @@
     }
 }
 
-.sr5 .flexcol-skills {
-    display: flex;
-    flex-direction: column;
-}
-
 .sr5v2.actor {
     // default window padding was pretty big, tone it down
     .window-content {
         padding: .25rem;
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.png") repeat;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
         background-repeat: repeat;
         background-size: 100% 20px auto;
-    }
-
-    .actor-header {
-        display: flex;
-        flex-flow: row nowrap;
-        align-items: start;
-        justify-content: space-between;
-        padding: .25rem;
-        flex-shrink: 0;
-        font-size: 1rem;
-
-        .left-side {
-            display: flex;
-            flex-flow: row nowrap;
-        }
-
-        .right-side {
-            display: flex;
-            flex-flow: column nowrap;
-            align-items: end;
-
-            .right-side-row {
-                display: flex;
-                flex-flow: row nowrap;
-                align-items: end;
-                justify-content: center;
-                gap: 0.25rem;
-            }
-        }
-    }
-
-    .movement-container {
-        display: flex;
-        flex-flow: row nowrap;
-        padding-top: .25rem;
-        padding-bottom: .25rem;
-        gap: .25rem;
-        align-items: center;
-        justify-content: start;
-    }
-
-    .initiative-container {
-        display: flex;
-        justify-content: end;
-        align-items: stretch;
-        align-content: stretch;
-        gap: .25rem;
-        padding: .25rem;
-        border-bottom: 1px solid $yellow;
-        border-left: 1px solid $yellow;
-        border-bottom-left-radius: .1rem;
-        overflow: hidden;
-
-        .presence-select {
-            min-width: 7rem;
-        }
-
-        .initiative-label {
-            color: $yellow;
-            text-align: center;
-            align-self: center;
-        }
-
-        .initiative-col {
-            display: flex;
-            flex-flow: column nowrap;
-            flex: 1;
-            justify-content: space-between;
-            align-content: end;
-        }
-
-        .initiative-center {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: center;
-        }
-
-        .initiative-end {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: end;
-        }
-    }
-
-    // add a footer to the sheet
-    .sheet-footer {
-        display: flex;
-        flex-flow: row nowrap;
-        gap: 2px;
-        align-items: center;
-        justify-content: start;
-        margin-top: .25rem;
-        box-shadow: 0 -.25rem .5rem $black;
-        border-top: 1px solid $yellow;
-        padding-left: .1rem;
-        padding-top: .1rem;
-        flex-shrink: 0;
-        vertical-align: bottom;
-        font-size: 1rem
     }
 
     // start css for getting scroll working
@@ -415,8 +37,9 @@
         padding-right: 0;
     }
     .header-for-scrollable {
-        padding-right: var(--scroll-margin);
-        margin-right: var(--scroll-margin);
+        // TODO figure out how to make this use --scroll-margin
+        padding-right: 0.75rem !important;
+        margin-right: 0.75rem !important;
     }
     .tab {
 
@@ -514,6 +137,7 @@
     }
 
     input[type="number"].short {
+        min-width: 2rem;
         max-width: 2rem;
         max-height: 1.25rem;
         font-size: 1rem;
@@ -555,5 +179,175 @@
                 font-size: 1.25rem;
             }
         }
+    }
+
+    .actor-header {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: start;
+        justify-content: space-between;
+        padding: .25rem;
+        flex-shrink: 0;
+        font-size: 1rem;
+
+        .left-side {
+            display: flex;
+            flex-flow: row nowrap;
+        }
+
+        .right-side {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: end;
+
+            .right-side-row {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: end;
+                justify-content: center;
+                gap: 0.25rem;
+            }
+        }
+    }
+
+    .movement-container {
+        display: flex;
+        flex-flow: row nowrap;
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+        gap: .25rem;
+        align-items: center;
+        justify-content: start;
+    }
+
+    // display initiative information and allow for
+    .initiative-container {
+        display: flex;
+        justify-content: end;
+        align-items: stretch;
+        align-content: stretch;
+        gap: .25rem;
+        padding: .25rem;
+        border-bottom: 1px solid $yellow;
+        border-left: 1px solid $yellow;
+        border-bottom-left-radius: .1rem;
+        overflow: hidden;
+
+        // this selects things like cold sim, hot sim, meatspace, astral
+        .presence-select {
+            min-width: 7rem;
+        }
+
+        .initiative-label {
+            color: $yellow;
+            text-align: center;
+            align-self: center;
+        }
+
+        .initiative-col {
+            display: flex;
+            flex-flow: column nowrap;
+            flex: 1;
+            justify-content: space-between;
+            align-content: end;
+        }
+
+        .initiative-center {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+        }
+
+        .initiative-end {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: end;
+        }
+    }
+
+    // skills formatting can be used by active, knowledge, and language skills
+    .skills {
+        display: flex;
+        flex-flow: column nowrap;
+
+        .skill-header {
+            border-bottom: 1px solid $yellow;
+            background: rgba($black, 0.9);
+            color: $yellow !important;
+            > label {
+                color: $yellow !important;
+            }
+        }
+
+        .skill {
+            display: flex;
+            flex-flow: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0.1rem 0.25rem;
+
+            &:nth-of-type(even) {
+                &:not(.skill-header) {
+                    background: rgba($white, 0.03);
+                }
+            }
+
+            &.skill-roll-not-defaultable {
+                font-style: italic;
+            }
+
+            > label {
+                flex: 4;
+                font-size: 1rem;
+                color: $white;
+            }
+
+            .skill-specializations {
+                flex: 3;
+                display: flex;
+                flex-flow: row;
+                justify-content: center;
+                align-items: center;
+                gap: 0.1rem;
+                font-size: 0.8rem;
+            }
+
+            .skill-value {
+                flex: 2;
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: center;
+                align-items: center;
+                gap: 0.25rem;
+            }
+
+            .skill-icons {
+                flex: 1;
+                font-size: 0.8rem;
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: center;
+                align-items: center;
+                gap: 0.25rem;
+            }
+        }
+    }
+
+    // add a footer to the sheet
+    .sheet-footer {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 2px;
+        align-items: center;
+        justify-content: start;
+        margin-top: .25rem;
+        box-shadow: 0 -.25rem .5rem $black;
+        border-top: 1px solid $yellow;
+        padding-left: .1rem;
+        padding-top: .1rem;
+        flex-shrink: 0;
+        vertical-align: bottom;
+        font-size: 1rem
     }
 }

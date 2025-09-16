@@ -1,13 +1,13 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/attributes.hbs' }}
+        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/attributes.hbs' rootId=rootId }}
         <div class="split-container">
             <div>
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/active-skills.hbs' }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/active-skills.hbs' rootId=rootId }}
             </div>
             <div>
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/special-attributes.hbs' }}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/language-and-knowledge-skills.hbs' }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/special-attributes.hbs' rootId=rootId }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/language-and-knowledge-skills.hbs' rootId=rootId }}
             </div>
         </div>
     </div>

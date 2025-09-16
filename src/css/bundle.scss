@@ -2162,10 +2162,6 @@ input[type='text'].display {
         padding-right: 6px;
     }
 
-    .skill-roll-not-defaultable {
-        font-style: italic;
-    }
-
     /** Input element for inventory name editing */
     input#input-inventory {
         // Otherwise the other classes used will break styling.
