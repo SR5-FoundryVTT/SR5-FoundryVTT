@@ -56,11 +56,64 @@ export class CompendiumBrowser extends Base {
     private activeTab: "Actor" | "Item" = "Item";
     private allFilters: FilterEntry[] = [];
     private readonly _packs: CompendiumCollection<any>[] = [];
-    private _activePackIds: string[] = [];
+    private readonly _activePackIds: string[] = [];
     private _searchQuery: string = "";
     private _searchCursorPosition: number | null = null;
     #tooltipElement: HTMLElement | null = null;
     #tooltipTimeout: number | null = null;
+    private readonly results = {
+        throttle: false,
+        height: 50,
+        entries: [] as CompendiumCollection.IndexEntry<"Item" | "Actor">[],
+    };
+
+    private async _scrollResults(event: Event) {
+        const target = event.target as HTMLElement | null;
+        if (this.results.throttle || !target?.matches('.compendium-list')) return;
+        const { scrollTop, clientHeight } = target;
+        const entriesPerScreen = Math.ceil(clientHeight / this.results.height);
+
+        const startIndex = Math.max(0, Math.floor(scrollTop / this.results.height) - 2 * entriesPerScreen);
+        const endIndex = Math.min(this.results.entries.length, startIndex + 4 * entriesPerScreen);
+
+        await this.renderResults(startIndex, endIndex);
+    }
+
+    private async renderResults(indexStart: number, indexEnd: number) {
+        if (this.results.throttle) return;
+        this.results.throttle = true;
+
+        const container = this.element.querySelector<HTMLElement>(".compendium-list");
+        if (!container) return;
+
+        const toRender: Element[] = [];
+
+        const topPadDiv = document.createElement('div');
+        topPadDiv.className = 'top-pad';
+        topPadDiv.style.height = `${indexStart * this.results.height}px`;
+        toRender.push(topPadDiv);
+
+        indexStart = Math.max(0, indexStart);
+        indexEnd = Math.min(this.results.entries.length, indexEnd);
+        for (let idx = indexStart; idx < indexEnd; idx++) {
+            const entry = this.results.entries[idx];
+            const html = await foundry.applications.handlebars.renderTemplate(
+                "systems/shadowrun5e/dist/templates/apps/compendium-browser/entries.hbs",
+                { entry }
+            );
+            const template = document.createElement("template");
+            template.innerHTML = html;
+            toRender.push(template.content.firstElementChild!);
+        }
+
+        const bottomPadDiv = document.createElement('div');
+        bottomPadDiv.className = 'bottom-pad';
+        bottomPadDiv.style.height = `${(this.results.entries.length - indexEnd) * this.results.height}px`;
+        toRender.push(bottomPadDiv);
+
+        container.replaceChildren(...toRender);
+        this.results.throttle = false;
+    }
 
     // --- Lifecycle Methods ---
 
@@ -98,11 +151,12 @@ export class CompendiumBrowser extends Base {
         ...[partId, context, options]: Parameters<BaseType["_preparePartContext"]>
     ) {
         await super._preparePartContext(partId, context, options);
-        if (partId === "results") context.entries = await this.fetch();
         if (partId === "filters") {
             context.activeTab = this.activeTab;
             context.types = this.allFilters;
         }
+        if (partId === "results")
+            void this.fetch().then(async () => this.renderResults(0, 50));
         return context;
     }
 
@@ -137,13 +191,13 @@ export class CompendiumBrowser extends Base {
     protected override _attachFrameListeners() {
         super._attachFrameListeners();
         this.element.addEventListener("dragstart", this._onDrag.bind(this));
+        this.element.addEventListener("scroll", (event) => { void this._scrollResults(event); }, { capture: true, passive: true });
     }
 
     /** Delegates listener attachment to specific methods based on which part of the template is rendered. */
     override _attachPartListeners(...[partId, htmlElement, options]: Parameters<BaseType["_attachPartListeners"]>) {
         super._attachPartListeners(partId, htmlElement, options);
         if (partId === "filters") this.filterListeners(htmlElement);
-        // else if (partId === "results") this.resultListeners(htmlElement);
     }
 
     /**
@@ -167,18 +221,6 @@ export class CompendiumBrowser extends Base {
                 const type = target.dataset.type;
                 if (type) this._onFilterChange(type, target.checked);
             });
-        }
-    }
-
-    /**
-     * Attaches mouse event listeners to the results list container for tooltip handling.
-     */
-    private resultListeners(htmlElement: HTMLElement) {
-        const resultsContainer = htmlElement.querySelector<HTMLElement>(".compendium-list");
-        if (resultsContainer) {
-            resultsContainer.addEventListener("mouseover", this.#onRowMouseEnter.bind(this));
-            resultsContainer.addEventListener("mouseout", this.#onRowMouseLeave.bind(this));
-            resultsContainer.addEventListener("mousemove", this.#onRowMouseMove.bind(this));
         }
     }
 
@@ -226,6 +268,7 @@ export class CompendiumBrowser extends Base {
         const uuid = el?.dataset.uuid;
         if (!uuid) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const doc = (await fromUuid(uuid)) as Actor | Item | null;
         await doc?.sheet?.render(true);
     }
@@ -241,74 +284,13 @@ export class CompendiumBrowser extends Base {
         await LinksHelpers.openSource(source);
     }
 
-    /**
-     * Handles the mouse entering a result row to show an item preview tooltip.
-     */
-    async #onRowMouseEnter(event: MouseEvent): Promise<void> {
-        const row = (event.target as HTMLElement)?.closest<HTMLElement>(".result-row");
-        if (!row) return;
-
-        if (this.#tooltipTimeout) clearTimeout(this.#tooltipTimeout);
-
-        const uuid = row.closest<HTMLElement>("[data-uuid]")?.dataset.uuid;
-        if (!uuid) return;
-
-        const item = (await fromUuid(uuid)) as Item;
-        if (!item) return;
-
-        const templatePath = "systems/shadowrun5e/dist/templates/apps/compendium-browser/cards/weapon.hbs";
-        const content = await foundry.applications.handlebars.renderTemplate(templatePath, {
-            item: item.toObject(false),
-            system: item.toObject(false).system,
-        });
-
-        if (!this.#tooltipElement) {
-            this.#tooltipElement = document.createElement("aside");
-            this.#tooltipElement.className = "item-preview-tooltip";
-            document.body.append(this.#tooltipElement);
-        }
-
-        this.#tooltipElement.innerHTML = content;
-        this.#tooltipElement.style.display = "block";
-        this.#onRowMouseMove(event);
-    }
-
-    /**
-     * Handles the mouse leaving a result row, hiding the tooltip after a short delay.
-     */
-    #onRowMouseLeave(event: MouseEvent): void {
-        this.#tooltipTimeout = window.setTimeout(() => {
-            if (this.#tooltipElement) {
-                this.#tooltipElement.remove();
-                this.#tooltipElement = null;
-            }
-        }, 50);
-    }
-
-    /**
-     * Handles the mouse moving over a row, updating the tooltip's position.
-     */
-    #onRowMouseMove(event: MouseEvent): void {
-        if (!this.#tooltipElement) return;
-
-        let top = event.clientY;
-        let left = event.clientX;
-        const tooltipWidth = this.#tooltipElement.offsetWidth;
-        const tooltipHeight = this.#tooltipElement.offsetHeight;
-
-        if (left + tooltipWidth > window.innerWidth) left = event.clientX - tooltipWidth;
-        if (top + tooltipHeight > window.innerHeight) top = event.clientY - tooltipHeight;
-
-        this.#tooltipElement.style.top = `${top}px`;
-        this.#tooltipElement.style.left = `${left}px`;
-    }
-
     // --- Core Logic & Helpers ---
 
     /**
      * Asynchronously fetches, filters, and sorts compendium entries based on current state.
      */
     private async fetch() {
+        this.results.throttle = true;
         const activePacks = this._packs.filter(
             p => p.visible && p.metadata.type === this.activeTab
         ) as CompendiumCollection<"Actor" | "Item">[];
@@ -325,9 +307,20 @@ export class CompendiumBrowser extends Base {
             entries = entries.filter(e => selectedTypes.includes(e.type as string));
         }
 
-        entries.sort((a, b) => b.name!.localeCompare(a.name!, game.i18n.lang));
+        entries = entries.map(entry => ({...entry, type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`)}));
 
-        return entries.slice(0, 100);
+        entries.sort((a, b) => a.name!.localeCompare(b.name!, game.i18n.lang));
+        this.results.entries = entries;
+
+        if (entries.length === 0) {
+            const loading = this.element.querySelector<HTMLElement>(".compendium-list .loading");
+            const noResults = this.element.querySelector<HTMLElement>(".compendium-list .no-results");
+            if (loading) loading.hidden = true;
+            if (noResults) noResults.hidden = false;
+            return;
+        }
+
+        this.results.throttle = false;
     }
 
     /** Populates and sorts the `allFilters` array based on the document types of the active tab. */

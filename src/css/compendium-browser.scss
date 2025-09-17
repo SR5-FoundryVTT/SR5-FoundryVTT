@@ -216,17 +216,16 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
         }
 
         .compendium-entry {
-            &:nth-child(even) .result-row {
-                background: $bg-row-even;
-            }
-        }
-
-        .result-row {
             display: flex;
             align-items: center;
             border-bottom: 1px solid $border-subtle;
             background: $bg-primary;
             transition: background 0.15s ease;
+            min-height: 50px;
+
+            &:nth-child(even) {
+                background: $bg-row-even;
+            }
 
             &:hover { background: $bg-hover; }
             &:last-child { border-bottom: none; }
@@ -237,7 +236,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                 flex-grow: 1;
                 min-width: 0;
                 cursor: pointer;
-                padding: 8px 0 8px 15px;
+                padding: 0 15px;
 
                 .item-image {
                     width: 30px;
@@ -264,7 +263,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     .item-type {
                         font-size: 0.8em;
                         color: $text-placeholder;
-                        text-transform: capitalize;
+                        padding-top: 3px;
                     }
                 }
             }
@@ -283,6 +282,14 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                 color: $text-meta;
                 white-space: nowrap;
             }
+        }
+
+        .loading {
+            padding: 40px 20px;
+            text-align: center;
+            color: darken($text-placeholder, 5%);
+            font-style: italic;
+            background: $bg-primary;
         }
 
         .no-results {

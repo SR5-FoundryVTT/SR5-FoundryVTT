@@ -4,29 +4,11 @@
         <div class="header-source">SOURCE</div>
     </div>
     <div class="compendium-list">
-        {{#if entries.length}}
-            {{#each entries as |entry|}}
-                <div class="compendium-entry" data-uuid="{{entry.uuid}}" draggable="true">
-                    <div class="result-row">
-                        <div class="item-main" data-action="openDoc">
-                            <div class="item-image">
-                                <img src="{{entry.img}}" alt="{{entry.name}}" loading="lazy"/>
-                            </div>
-                            <div class="item-details">
-                                <h3>{{entry.name}}</h3>
-                                <div class="item-type">{{entry.type}}</div>
-                            </div>
-                        </div>
-                        <div class="item-meta" data-action="openSource">
-                            {{entry.system.description.source}}
-                        </div>
-                    </div>
-                </div>
-            {{/each}}
-        {{else}}
-            <div class="no-results">
-                No documents found. Select a compendium pack or adjust your search.
-            </div>
-        {{/if}}
+        <div class="loading">
+            <i class="fa-solid fa-spinner fa-spin-pulse"></i>
+        </div>
+        <div class="no-results" hidden>
+            No documents found.
+        </div>
     </div>
 </div>
