@@ -1,0 +1,47 @@
+{{!-- list-item expects an SR5Item to be passed in as 'item' --}}
+<div class="new-list-item-container">
+    <div class="new-list-item">
+        <div class="new-list-item-label-container">
+            <label>
+                {{!-- allow overriding the name if provided --}}
+                <a data-action="openMarkedDocument" data-item-id="{{item.uuid}}">
+                    {{#if name}}
+                        {{name}}
+                    {{else}}
+                        {{item.name}}
+                    {{/if}}
+                </a>
+            </label>
+        </div>
+
+        <div class="new-list-item-col">
+            {{localize item.type}}
+        </div>
+
+        <div class="new-list-item-col">
+            {{item.network}}
+        </div>
+
+        <div class="new-list-item-quantity">
+            {{#if @root.isEditMode}}
+                <input type="number" class="item-mark-input" value="{{item.marks}}" min="0" max="999">
+            {{else}}
+                {{item.marks}}
+            {{/if}}
+        </div>
+
+        <div class="new-list-item-icons">
+            <a data-action="addOnMark" data-tooltip="SR5.Label.Sheet.AddOne"data-item-id="{{item.uuid}}">
+                <i class="fas fa-plus"></i>
+            </a>
+            <a data-action="removeOneMark" data-tooltip="SR5.Label.Sheet.AddOne" data-item-id="{{item.uuid}}">
+                <i class="fas fa-minus"></i>
+            </a>
+            <a data-action="" data-item-id="{{item.uuid}}">
+                <i class="fas fa-trash"></i>
+            </a>
+        </div>
+    </div>
+    <div class="new-list-item-description">
+    </div>
+</div>

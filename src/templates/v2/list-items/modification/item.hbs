@@ -1,0 +1,54 @@
+{{!-- list-item expects an SR5Item to be passed in as 'item' --}}
+<div class="new-list-item-container">
+    <div class="new-list-item">
+        <div class="new-list-item-label-container">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
+            <label
+                class="{{#if system.importFlags.isFreshImport}}
+                        {{#if (itemMarking "COLOR")}}fresh-import{{/if}}
+                    {{/if}}">
+                {{!-- allow overriding the name if provided --}}
+                <a data-action="showItemDescription" data-item-id="{{item.uuid}}">
+                    {{#if name}}
+                        {{name}}
+                    {{else}}
+                        {{item.name}}
+                    {{/if}}
+                </a>
+            </label>
+        </div>
+
+        <div class="new-list-item-col">
+            {{localizeOb item.system.modifcation_category @root.config.modificationCategories}}
+        </div>
+
+        <div class="new-list-item-col">
+            {{item.system.slots}}
+        </div>
+
+        <div class="new-list-item-icons">
+            {{#if (isOwner item owner=@root.actor)}}
+            {{!-- Add Icons for what the Owner of an item can do --}}
+
+                {{#if @root.isEditMode}}
+                    <a data-action="editItem" data-item-id="{{item.uuid}}">
+                        <i class="fas fa-pen-to-square"></i>
+                    </a>
+                    <a data-action="deleteItem" data-item-id="{{item.uuid}}">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                {{/if}}
+            {{/if}}
+
+            {{#if (hasSource item)}}
+                <a data-tooltip="SR5.OpenSource" data-action="openItemSource" data-item-id="{{item.uuid}}">
+                    <i class="fas fa-file"></i>
+                </a>
+            {{/if}}
+        </div>
+    </div>
+    <div class="new-list-item-description">
+        {{{item.system.description.value}}}
+    </div>
+</div>

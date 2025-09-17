@@ -71,21 +71,29 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         },
         magic: {
             template: this.templateBase('actor/tabs/magic'),
-            templates: this.actorSystemParts(
-                'spells', 'rituals', 'summonings', 'adept-powers')
+            templates: [
+                ...this.actorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
+                ...this.listItem('spell', 'ritual', 'call_in_action', 'adept_power')
+                ]
         },
         critter: {
             template: this.templateBase('actor/tabs/critter'),
+            templates: this.listItem('critter_power')
         },
         inventory: {
             template: this.templateBase('actor/tabs/inventory'),
+            templates: this.listItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon')
         },
         social: {
             template: this.templateBase('actor/tabs/social'),
+            templates: this.listItem('sin', 'lifestyle', 'contact')
         },
         bio: {
             template: this.templateBase('actor/tabs/bio'),
-            templates: this.actorSystemParts('metamagics', 'echoes')
+            templates: [
+                    ... this.actorSystemParts('metamagics', 'echoes'),
+                    ...this.listItem('metamagic', 'echo', 'quality'),
+                ]
         },
     }
 

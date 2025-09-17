@@ -41,7 +41,7 @@
         </div>
         <div class="scrollable">
             {{#each inventory.types as |section type|}}
-                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs"
+                {{> (concatStrings "systems/shadowrun5e/dist/templates/v2/list-items/" type "/header.hbs")
                     label=section.label
                     isOpen=section.isOpen
                     type=type
@@ -49,7 +49,7 @@
                 }}
                 {{#if section.isOpen }}
                     {{#each section.items}}
-                        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs"
+                        {{> (concatStrings "systems/shadowrun5e/dist/templates/v2/list-items/" type "/item.hbs")
                             item=this
                             rootId=@root.rootId
                         }}

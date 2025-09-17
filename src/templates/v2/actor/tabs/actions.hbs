@@ -1,12 +1,12 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/action/header.hbs'
             label='SR5.Actions'
             type='action'
         }}
         <div class="scrollable">
             {{#each itemType.action}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/action/item.hbs' item=this }}
             {{/each}}
         </div>
     </div>

@@ -39,6 +39,15 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
             ]
         }
     }
+    protected override async _renderHTML(content, options) {
+        const parts = await super._renderHTML(content, options);
+        const matrixRightSideContent = parts.matrix.querySelector("section.content.matrix-right-tab-content");
+        if (matrixRightSideContent) {
+            this.moveTabs(SR5SpriteActorSheet.TABS.matrixRight.tabs, parts, matrixRightSideContent);
+        }
+
+        return parts;
+    }
 
     static override PARTS = {
         ...super.PARTS,
@@ -54,6 +63,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         },
         spritePowers: {
             template: this.templateBase('actor/tabs/matrix/sprite-powers'),
+            templates: this.listItem('sprite_power')
         },
     }
     /**

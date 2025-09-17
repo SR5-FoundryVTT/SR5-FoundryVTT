@@ -1,7 +1,7 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="split-container">
         <div>
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/basic-list-header.hbs'
                     label='SR5.Biography'
                     type='biography' }}
             {{editor biographyHTML target="system.description.value" button=true
@@ -9,11 +9,11 @@
         </div>
         <div>
             <div class="scrollable">
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/quality/header.hbs'
                         label='SR5.Quality'
                         type='quality' }}
                 {{#each itemType.quality}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/quality/item.hbs' item=this }}
                 {{/each}}
 
                 {{#ife actor.type 'character'}}

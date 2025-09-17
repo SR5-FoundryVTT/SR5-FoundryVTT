@@ -1,0 +1,68 @@
+{{!-- list-item expects an SR5Item to be passed in as 'item' --}}
+<div class="new-list-item-container">
+    <div class="new-list-item">
+        <div class="new-list-item-label-container">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
+            <label
+                class="{{#if (isBroken item)}}faded {{/if}}
+                    {{#if system.importFlags.isFreshImport}}
+                        {{#if (itemMarking "COLOR")}}fresh-import{{/if}}
+                    {{/if}}"
+            >
+                {{!-- allow overriding the name if provided --}}
+                <a data-action="showItemDescription" data-item-id="{{item.uuid}}">
+                    {{#if name}}
+                        {{name}}
+                    {{else}}
+                        {{item.name}}
+                    {{/if}}
+                </a>
+            </label>
+        </div>
+
+        <div class="new-list-item-col">
+        {{#if (usesAmmo item)}}
+            {{#iflt item.system.ammo.current.value item.system.ammo.current.max}}
+                <button type="button" data-action="weaponFullReload" data-item-id="{{item.uuid}}">
+                    {{localize "SR5.Weapon.Reload"}} ({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})
+                </button>
+                {{#ifgt item.system.ammo.partial_reload_value 0}}
+                <button type="button" data-action="weaponPartialReload" data-item-id="{{item.uuid}}">
+                    {{localize "SR5.Weapon.PartialReload"}} (+{{item.system.ammo.partial_reload_value}})
+                </button>
+                {{/ifgt}}
+            {{else}}
+                <span>
+                    {{localize 'SR5.AmmoFull'}}
+                </span>
+            {{/iflt}}
+        {{/if}}
+        </div>
+
+        <div class="new-list-item-icons">
+            {{#if (isOwner item owner=@root.actor)}}
+            {{!-- Add Icons for what the Owner of an item can do --}}
+
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
+                {{#if @root.isEditMode}}
+                    <a data-action="editItem" data-item-id="{{item.uuid}}">
+                        <i class="fas fa-pen-to-square"></i>
+                    </a>
+                    <a data-action="deleteItem" data-item-id="{{item.uuid}}">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                {{/if}}
+            {{/if}}
+
+            {{#if (hasSource item)}}
+                <a data-tooltip="SR5.OpenSource" data-action="openItemSource" data-item-id="{{item.uuid}}">
+                    <i class="fas fa-file"></i>
+                </a>
+            {{/if}}
+        </div>
+    </div>
+    <div class="new-list-item-description">
+        {{{item.system.description.value}}}
+    </div>
+</div>

@@ -78,6 +78,10 @@ export const registerItemLineHelpers = () => {
         return item.isType('action') && item.hasActionCategory('matrix');
     })
 
+    Handlebars.registerHelper('isEquipped', function (item: SR5Item, options) {
+        return item.isEquipped();
+    })
+
     Handlebars.registerHelper('marksRequired', function (item: SR5Item, options) {
         const neededMarks: number = item.getAction()?.category.matrix.marks ?? 0;
         const needed = neededMarks > 0 ? `${neededMarks}` : '';
@@ -99,6 +103,16 @@ export const registerItemLineHelpers = () => {
             return '';
         }
         return new Handlebars.SafeString(getDurationLabel());
+    })
+
+    Handlebars.registerHelper('isFreshImport', function (document, options) {
+        if (!(document instanceof SR5Item)) return false;
+        return document.system
+    })
+
+    Handlebars.registerHelper('usesAmmo', function (item, options) {
+        if (!(item instanceof SR5Item)) return false;
+        return item.usesAmmo();
     })
 
    ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +175,6 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
-            case 'weapon':
             case 'armor':
             case 'device':
             case 'equipment':
@@ -191,37 +204,6 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             text: game.i18n.localize('SR5.Fade'),
-                        },
-                    },
-                ];
-            case 'adept_power':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.PowerType'),
-                        },
-                    },
-                ];
-            case 'spell':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Spell.Type'),
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Spell.Range'),
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Duration'),
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Drain'),
                         },
                     },
                 ];
@@ -436,64 +418,6 @@ export const registerItemLineHelpers = () => {
             case 'cyberware':
             case 'bioware':
                 return [...technologyItems, qtyInput];
-            case 'weapon': {
-                const system = item.system as Item.SystemOfType<'weapon'>;
-                // Both Ranged and Melee Weapons can have ammo.
-                if (system.category === 'range' || (system.category === 'melee' && system.ammo?.current.max > 0)) {
-                    const count = system.ammo?.current.value ?? 0;
-                    const max = system.ammo?.current.max ?? 0;
-                    const partialReloadRounds = system.ammo?.partial_reload_value ?? -1;
-
-                    const reloadLinks: ItemListRightSide[] = technologyItems.slice();
-
-                    // Show reload on both no ammo configured and partially consumed clips.
-                    const textReload = count < max ?
-                        `${game.i18n.localize('SR5.Weapon.Reload')} ` :
-                        `${game.i18n.localize('SR5.AmmoFull')}`;
-                        
-                    const cssClassReload = 'no-break';
-                    
-                    reloadLinks.push({
-                        text: {
-                            title: `${game.i18n.localize('SR5.Weapon.AmmoCount')}: `,
-                            text: textReload,
-                            cssClass: cssClassReload,
-                        },
-                    });
-
-                    if (count < max) {
-                        const textFullReload = `${game.i18n.localize('SR5.Weapon.FullReload')} (${count}/${max})`;
-                        const cssClassFullReload = 'no-break reload-ammo roll';
-
-                        reloadLinks.push({
-                            button: {
-                                short: true,
-                                text: textFullReload,
-                                cssClass: cssClassFullReload,
-                            },
-                        });
-                    }       
-
-                    if(count < max && partialReloadRounds > 0) {
-                        const textPartialReload = `${game.i18n.localize('SR5.Weapon.PartialReload')} (+${partialReloadRounds})`;
-                        const cssClassPartialReload = 'no-break partial-reload-ammo roll';
-
-                        reloadLinks.push({
-                            button: {
-                                short: true,
-                                text: textPartialReload,
-                                cssClass: cssClassPartialReload,
-                            },
-                        });
-                    }       
-
-                    reloadLinks.push(qtyInput)
-                    
-                    return reloadLinks;
-                } else {
-                    return [...technologyItems, qtyInput];
-                }
-            }
             case 'quality':
                 return [
                     {
@@ -508,37 +432,6 @@ export const registerItemLineHelpers = () => {
                     }
                 ];
 
-            case 'adept_power':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize(SR5.adeptPower.types[item.system.type ?? '']),
-                        },
-                    },
-                ];
-            case 'spell':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize(SR5.spellTypes[item.system.type ?? '']),
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize(SR5.spellRanges[(item.system as Item.SystemOfType<'spell'>).range ?? '']),
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize(SR5.durations[item.system.duration ?? '']),
-                        },
-                    },
-                    {
-                        text: {
-                            text: Number(item.system.drain),
-                        },
-                    },
-                ];
             case 'critter_power':
                 return [
                     {

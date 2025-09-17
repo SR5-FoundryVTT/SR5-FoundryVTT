@@ -205,9 +205,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         },
         actions: {
             template: this.templateBase('actor/tabs/actions'),
+            templates: this.listItem('action'),
         },
         effects: {
             template: this.templateBase('actor/tabs/effects'),
+            templates: this.listItem('effect'),
         },
         misc: {
             template: this.templateBase('actor/tabs/misc'),
@@ -223,6 +225,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static actorSystemParts(...parts: string[]) {
         return parts.map(p => this.templateBase(`actor/parts/${p}`))
+    }
+
+    static listItem(...parts: string[]) {
+        return parts.reduce<string[]>(( items, p) => {
+            items.push(this.templateBase(`list-items/${p}/header`));
+            items.push(this.templateBase(`list-items/${p}/item`));
+            return items;
+        }, [])
     }
 
     /** SheetData used by _all_ actor types! */

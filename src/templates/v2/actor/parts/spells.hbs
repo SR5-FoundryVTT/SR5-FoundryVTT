@@ -1,51 +1,51 @@
-{{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+{{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/header.hbs'
         label='SR5.Spell.Spells'
         type='spell' }}
 {{#each spells.notfound}}
-    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/item.hbs' item=this }}
 {{/each}}
 
 {{#if spells.combat}}
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/header.hbs'
                 label='SR5.Spell.CatCombat'
                 type='combatspells' }}
         {{#each spells.combat}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/item.hbs' item=this }}
         {{/each}}
 {{/if}}
 
 {{#if spells.detection}}
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/header.hbs'
                 label='SR5.Spell.CatDetection'
                 type='detectionspells' }}
         {{#each spells.detection}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/item.hbs' item=this }}
         {{/each}}
 {{/if}}
 
 {{#if spells.health}}
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/header.hbs'
                 label='SR5.Spell.CatHealth'
                 type='healthspells' }}
         {{#each spells.health}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/item.hbs' item=this }}
         {{/each}}
 {{/if}}
 
 {{#if spells.illusion}}
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/header.hbs'
                 label='SR5.Spell.CatIllusion'
                 type='illusionspells' }}
         {{#each spells.illusion}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/item.hbs' item=this }}
         {{/each}}
 {{/if}}
 
 {{#if spells.manipulation}}
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/header.hbs'
                 label='SR5.Spell.CatManipulation'
                 type='manipulationspells' }}
         {{#each spells.manipulation}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/item.hbs' item=this }}
         {{/each}}
 {{/if}}

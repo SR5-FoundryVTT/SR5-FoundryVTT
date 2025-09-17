@@ -20,6 +20,11 @@ export const preloadHandlebarsTemplates = async () => {
             'common/value-input',
             'common/effect-list-item',
             'common/effect-list-header',
+            'common/import-flag',
+            'common/basic-list-header',
+            'common/basic-list-item',
+            'list-items/item-roll-image',
+            'list-items/wireless-icon'
         ),
         ...v2AP(
             'attribute',

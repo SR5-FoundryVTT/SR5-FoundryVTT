@@ -1,28 +1,28 @@
-<section class="tab scrollable{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/header.hbs'
             label='SR5.Labels.ActorSheet.SpritePowers'
             type='sprite_power' }}
 
             <div class="scrollable">
                 {{#each itemType.sprite_power}} {{#if (or (not this.system.optional) (eq this.system.optional "standard"))}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/item.hbs' item=this }}
                 {{/if}} {{/each}}
 
-                {{> 'systems/shadowrun5e/dist/templates/v2/common/list-header.hbs'
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/header.hbs'
                     label='SR5.Labels.ActorSheet.EnabledOptionSpritePowers'
                     type='sprite_power' }}
 
                 {{#each itemType.sprite_power}} {{#ife this.system.optional "enabled_option"}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-item.hbs' item=this }}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/item.hbs' item=this }}
                 {{/ife}} {{/each}}
 
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/list-header.hbs'
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/header.hbs'
                     label='SR5.Labels.ActorSheet.DisabledOptionSpritePowers'
                     type='sprite_power' }}
 
                 {{#each itemType.sprite_power}} {{#ife this.system.optional "disabled_option"}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/common/list-item.hbs' item=this }}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/item.hbs' item=this }}
                 {{/ife}} {{/each}}
             </div>
     </div>

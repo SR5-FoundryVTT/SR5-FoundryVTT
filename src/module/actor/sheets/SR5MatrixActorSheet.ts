@@ -108,18 +108,23 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         },
         matrixActions: {
             template: this.templateBase('actor/tabs/matrix/matrix-actions'),
+            templates: this.listItem('action'),
         },
         markedIcons: {
             template: this.templateBase('actor/tabs/matrix/marked-icons'),
+            templates: this.listItem('marked_icon'),
         },
         ownedIcons: {
             template: this.templateBase('actor/tabs/matrix/owned-icons'),
+            templates: this.listItem('owned_icon'),
         },
         networkIcons: {
             template: this.templateBase('actor/tabs/matrix/network-icons'),
+            templates: this.listItem('network_icon'),
         },
         programs: {
             template: this.templateBase('actor/tabs/matrix/programs'),
+            templates: this.listItem('program'),
         }
     }
 
