@@ -287,16 +287,14 @@ export class CompendiumBrowser extends Base {
 
         entries.sort((a, b) => a.name!.localeCompare(b.name!, game.i18n.lang));
         this.results.entries = entries;
+        this.results.throttle = false;
 
         if (entries.length === 0) {
             const loading = this.element.querySelector<HTMLElement>(".compendium-list .loading");
             const noResults = this.element.querySelector<HTMLElement>(".compendium-list .no-results");
             if (loading) loading.hidden = true;
             if (noResults) noResults.hidden = false;
-            return;
         }
-
-        this.results.throttle = false;
     }
 
     /**
