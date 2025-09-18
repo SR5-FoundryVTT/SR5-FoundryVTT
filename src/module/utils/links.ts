@@ -40,21 +40,20 @@ export class LinksHelpers {
         }
     }
 
+    // Field used to validate Foundry document UUIDs
+    private static readonly uuidField = new foundry.data.fields.DocumentUUIDField({ required: true });
+
     /**
-     * Determine if a given string is a valid Foundry document UUID.
-     * Uses the core `foundry.utils.parseUuid` utility for reliable detection.
+     * Check if the given string is a valid FoundryVTT document UUID.
+     * Uses Foundry's built-in DocumentUUIDField validation.
      *
-     * @param candidate The string that might be a UUID.
-     * @returns true, if the candidate is a valid UUID.
+     * @param candidate The string to check.
+     * @returns true if the candidate is a valid UUID, false otherwise.
      */
-    static isUuid(candidate: string | undefined) {
+    static isUuid(candidate: string | undefined): boolean {
         if (!candidate) return false;
 
-        try {
-            return !!foundry.utils.parseUuid(candidate).collection;
-        } catch (error) {
-            return false;
-        }
+        return this.uuidField.validate(candidate) === undefined;
     }
 
     /**
