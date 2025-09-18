@@ -1,7 +1,3 @@
-export interface PDFPager {
-    openPDFByCode: (pdfcode: string, options?: { page?: number; pdfcode?: string; showUuid?: boolean }) => void;
-}
-
 /**
  * Utils used for opening links
  */
@@ -75,7 +71,7 @@ export class LinksHelpers {
      */
     static openSourcePDF(source: string | undefined) {
         // Check for pdfpager module hook: https://github.com/farling42/fvtt-pdf-pager
-        if (!('pdfpager' in ui)) {
+        if (!ui.pdfpager) {
             ui.notifications.warn('SR5.DIALOG.MissingModuleContent', { localize: true });
             return;
         }
@@ -87,7 +83,7 @@ export class LinksHelpers {
 
         const [code, page] = source.split(' ');
 
-        (ui.pdfpager as PDFPager).openPDFByCode(code, { page: parseInt(page) });
+        ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
     }
 
     /**
