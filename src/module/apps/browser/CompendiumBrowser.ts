@@ -264,7 +264,9 @@ export class CompendiumBrowser extends Base {
      * Asynchronously fetches, filters, and sorts compendium entries based on current state.
      */
     private async fetch() {
+        if (this.results.throttle) return;
         this.results.throttle = true;
+
         const activePacks = this._packs.filter(
             (p) => p.visible && p.metadata.type === this.activeTab
         ) as CompendiumCollection<"Actor" | "Item">[];
