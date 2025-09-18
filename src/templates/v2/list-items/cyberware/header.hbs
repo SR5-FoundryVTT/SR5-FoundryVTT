@@ -1,21 +1,20 @@
 <div class="new-list-item new-list-item-header">
     <div class="new-list-item-label-container">
-        <a data-action="toggleExpanded"
-           data-tooltip="{{#if isOpen}}SR5.Collapse{{else}}SR5.Expand{{/if}}"
-           data-item-type="{{type}}">
-            <i class="{{#if isOpen}}fas fa-square-chevron-down{{else}}fas fa-square-chevron-right{{/if}}"></i>
-        </a>
         <label>
             {{localize label}}
         </label>
     </div>
 
+    <div class="new-list-item-col">
+        <span>{{localize "SR5.Rating"}}</span>
+    </div>
+
     <div class="new-list-item-icons">
-        <a data-action="addItem"
-           data-tooltip="{{createItemHeaderLabel type}}"
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+        <a data-action="toggleExpanded"
+           data-tooltip="{{#if isOpen}}SR5.Collapse{{else}}SR5.Expand{{/if}}"
            data-item-type="{{type}}">
-            {{localize "SR5.Add"}}
-            <i class="fas fa-plus"></i>
+            <i class="{{#if isOpen}}fas fa-square-chevron-down{{else}}fas fa-square-chevron-right{{/if}}"></i>
         </a>
     </div>
 </div>

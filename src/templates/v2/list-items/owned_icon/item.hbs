@@ -1,38 +1,33 @@
-{{!-- list-item expects an SR5Item to be passed in as 'item' --}}
-<div class="new-list-item-container">
+{{!-- expects an SR5Item to be passed in as 'item' --}}
+<div class="new-list-item-container {{cssClass}}">
     <div class="new-list-item">
         <div class="new-list-item-label-container">
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
-            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-            <label
-                class="{{#if system.importFlags.isFreshImport}}
-                        {{#if (itemMarking "COLOR")}}fresh-import{{/if}}
-                    {{/if}}">
-                {{!-- allow overriding the name if provided --}}
-                <a data-action="showItemDescription" data-item-id="{{item.uuid}}">
-                    {{#if name}}
-                        {{name}}
-                    {{else}}
-                        {{item.name}}
-                    {{/if}}
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
+            <label>
+                <a data-action="showItemDescription" data-item-id="{{item.document.uuid}}">
+                    {{item.name}}
                 </a>
             </label>
         </div>
 
         <div class="new-list-item-col">
-            {{localize item.type}}
+            <span>
+                {{matrixIconType item.document.type}}
+            </span>
         </div>
 
         <div class="new-list-item-col">
-            {{item.network}}
+            <span>
+                {{item.network}}
+            </span>
         </div>
 
         <div class="new-list-item-icons">
             {{!-- Add Icons for what the Owner of an item can do --}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item.document }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connected-icons-toggle.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">
-
     </div>
 </div>

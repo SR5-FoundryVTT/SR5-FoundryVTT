@@ -45,23 +45,10 @@
 
         <div class="new-list-item-icons">
             {{#if (isOwner item owner=@root.actor)}}
-            {{!-- Add Icons for what the Owner of an item can do --}}
-
-                {{#if @root.isEditMode}}
-                    <a data-action="editItem" data-item-id="{{item.uuid}}">
-                        <i class="fas fa-pen-to-square"></i>
-                    </a>
-                    <a data-action="deleteItem" data-item-id="{{item.uuid}}">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                {{/if}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
             {{/if}}
 
-            {{#if (hasSource item)}}
-                <a data-tooltip="SR5.OpenSource" data-action="openItemSource" data-item-id="{{item.uuid}}">
-                    <i class="fas fa-file"></i>
-                </a>
-            {{/if}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">

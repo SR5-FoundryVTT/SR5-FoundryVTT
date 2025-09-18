@@ -15,12 +15,14 @@
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/item.hbs' item=this }}
             {{/ife}} {{/each}}
 
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/header.hbs'
-                label="SR5.Labels.ActorSheet.DisabledOptionCritterPowers"
-                type="critter_power" }}
-            {{#each itemType.critter_power}} {{#ife this.system.optional "disabled_option"}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/item.hbs' item=this }}
-            {{/ife}} {{/each}}
+            {{#if @root.isEditMode}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/header.hbs'
+                    label="SR5.Labels.ActorSheet.DisabledOptionCritterPowers"
+                    type="critter_power" }}
+                {{#each itemType.critter_power}} {{#ife this.system.optional "disabled_option"}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/item.hbs' item=this }}
+                {{/ife}} {{/each}}
+            {{/if}}
         </div>
     </div>
 </section>

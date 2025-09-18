@@ -47,13 +47,21 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         },
         magic: {
             template: this.templateBase('actor/tabs/spirit-magic'),
-            templates: this.actorSystemParts('spells', 'rituals')
+            templates: [
+                    ...this.actorSystemParts('spells', 'rituals'),
+                    ...this.listItem('spell', 'ritual')
+                ]
         },
         critter: {
             template: this.templateBase('actor/tabs/critter'),
+            templates: this.listItem('critter_power')
         },
         bio: {
             template: this.templateBase('actor/tabs/bio'),
+            templates: [
+                ... this.actorSystemParts('metamagics'),
+                ...this.listItem('metamagic', 'quality'),
+            ]
         },
     }
 

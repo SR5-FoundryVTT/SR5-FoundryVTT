@@ -268,13 +268,19 @@
         display: flex;
         flex-flow: column nowrap;
 
+        &.new-list-item-subcategory {
+            padding-left: .5rem;
+        }
+
         .new-list-item {
             flex: 1;
         }
 
         .new-list-item-description {
-            flex: 1;
             display: none;
+            flex: 1;
+            border-top: $groove;
+            border-bottom: 2px solid $yellow;
         }
 
         &:nth-of-type(even) {
@@ -311,7 +317,7 @@
         .new-list-item-label-container {
             display: flex;
             flex-flow: row nowrap;
-            flex: 4;
+            flex: 3;
             color: $white;
             gap: .25rem;
             font-size: 0.9rem;
@@ -332,32 +338,30 @@
             align-items: center;
             gap: 0.1rem;
             font-size: 0.8rem;
-        }
 
-        .new-list-item-quantity {
-            display: flex;
-            flex-flow: row nowrap;
-            flex: 1;
-            justify-content: center;
-            align-items: center;
-            gap: 0.25rem;
-            max-width: 4rem;
-            min-width: 4rem;
-
-            .item-quantity-input {
+            input[type="number"] {
+                max-width: 4rem;
                 max-height: 1.25rem;
             }
+
+            &.mark-input-col {
+                flex: none;
+                width: 4rem;
+                font-size: 1rem;
+                gap: 0.25rem;
+            }
+
         }
 
         .new-list-item-icons {
             display: flex;
-            flex-flow: row;
+            flex-flow: row nowrap;
             flex: 1;
             font-size: 0.8rem;
             justify-content: end;
             align-items: center;
-            gap: 0.5rem;
-            padding-right: 1rem;
+            gap: 0.25rem;
+            padding-right: .5rem;
         }
 
     }

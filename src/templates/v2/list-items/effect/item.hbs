@@ -1,5 +1,6 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container">
+    {{log item}}
     <div class="new-list-item">
         <div class="new-list-item-label-container">
             {{#if item.img}}
@@ -47,6 +48,7 @@
         </div>
     </div>
     <div class="new-list-item-description">
-
+        {{log effect}}
+        {{{effect.data.description}}}
     </div>
 </div>

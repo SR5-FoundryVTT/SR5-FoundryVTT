@@ -11,20 +11,20 @@ export const preloadHandlebarsTemplates = async () => {
         ...v2Path(
             'common/header-block',
             'common/horizontal-cells',
-            'common/list-header',
-            'common/list-item',
             'common/name-line-block',
             'common/profile-image',
             'common/select',
             'common/value-modifiers',
             'common/value-input',
-            'common/effect-list-item',
-            'common/effect-list-header',
             'common/import-flag',
-            'common/basic-list-header',
-            'common/basic-list-item',
+            'list-items/connected-icons-toggle',
+            'list-items/edit-delete-icons',
+            'list-items/equip-icon',
+            'list-items/header-add-icon',
             'list-items/item-roll-image',
-            'list-items/wireless-icon'
+            'list-items/matrix-icon-image',
+            'list-items/open-source-icon',
+            'list-items/wireless-icon',
         ),
         ...v2AP(
             'attribute',
@@ -35,8 +35,6 @@ export const preloadHandlebarsTemplates = async () => {
             'skill',
             'matrix-attribute',
             'special-attributes',
-            'list-item',
-            'list-header'
         ),
         // item tabs
         'systems/shadowrun5e/dist/templates/item/tabs/GridNetworkTab.hbs',
@@ -127,9 +125,6 @@ export const preloadHandlebarsTemplates = async () => {
         // Test chat messages and their parts
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs',
-
-        // Modifier management parts
-        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
 
         // Application - Matrix Network Hacking
         'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs',

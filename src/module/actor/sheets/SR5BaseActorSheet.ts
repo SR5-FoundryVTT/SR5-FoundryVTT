@@ -102,8 +102,6 @@ export interface SR5BaseSheetDelays {
  *
  */
 export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> extends HandlebarsApplicationMixin(ActorSheetV2)<T> {
-    // What document description is shown on sheet. Allow displaying multiple descriptions at the same time.
-    _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.
     _filters: SR5SheetFilters = {
         skills: '', // filter based on user input and skill name/label.
@@ -117,7 +115,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     _scroll!: string;
     // Indicate if specific sections on sheet should be opened or closed.
     _inventoryOpenClose: Record<string, boolean> = {};
-    _connectedIconsOpenClose: Record<string, boolean> = {};
 
     // Store the currently selected inventory.
     selectedInventory: string;
@@ -181,6 +178,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         },
         actions: {
             toggleEditMode: SR5BaseActorSheet.#toggleEditMode,
+            showItemDescription: SR5BaseActorSheet._onListItemToggleDescriptionVisibility,
+            openItemSource: SR5BaseActorSheet._onOpenSource,
         }
     }
 
@@ -354,7 +353,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Item list description display handling...
         html.find('.hidden').hide();
-        html.find('.has-desc').on('click', this._onListItemToggleDescriptionVisibility.bind(this));
 
         // General item test rolling...
         html.find('.item-roll').on('click', this._onItemRoll.bind(this));
@@ -422,7 +420,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
-        html.find('.open-source').on('click', this._onOpenSource.bind(this));
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
         html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
 
@@ -445,11 +442,17 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     static async #toggleEditMode(this: SR5BaseActorSheet, event: MouseEvent) {
-        console.log('toggleEditMode', this, event);
         event.preventDefault();
         event.stopPropagation();
         if (this._isEditMode) await this.submit();
         this._isEditMode = !this._isEditMode;
+        await this.render();
+    }
+
+    static async #showItemDescription(this: SR5BaseActorSheet, event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
         await this.render();
     }
 
@@ -1601,13 +1604,17 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.showHiddenSkills();
     }
 
-    async _onOpenSource(event) {
+    static async _onOpenSource(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const field = $(event.currentTarget).parents('.list-item');
-        const iid = $(field).data().itemId;
-        const item = this.actor.items.get(iid);
+        const iid = event.target.dataset.itemId;
+        const item = await fromUuid(iid);
+        console.log('openSource', this, event, item);
         if (item) {
-            await item.openSource();
+            if (item instanceof SR5Item) {
+                await item.openSource();
+            } else if (item instanceof SR5ActiveEffect) {
+                await item.renderSourceSheet();
+            }
         }
     }
     /**
@@ -1734,16 +1741,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * Show / hide the items description within a sheet item l ist.
      */
-    async _onListItemToggleDescriptionVisibility(event) {
+    static async _onListItemToggleDescriptionVisibility(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const item = $(event.currentTarget).parents('.list-item');
-        const iid = item.data().itemId;
-        const field = item.find('.list-item-description');
+        // find the list-item parent so we can find the child item
+        const item = $(event.target).parents('.new-list-item-container');
+        const field = $(item).find('.new-list-item-description');
         field.toggle();
-        if (iid) {
-            if (field.is(':visible')) this._shownDesc.push(iid);
-            else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
-        }
     }
 
     /**

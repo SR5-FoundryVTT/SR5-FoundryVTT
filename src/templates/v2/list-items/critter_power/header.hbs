@@ -1,10 +1,5 @@
 <div class="new-list-item new-list-item-header">
     <div class="new-list-item-label-container">
-        <a data-action="toggleExpanded"
-           data-tooltip="{{#if isOpen}}SR5.Collapse{{else}}SR5.Expand{{/if}}"
-           data-item-type="{{type}}">
-            <i class="{{#if isOpen}}fas fa-square-chevron-down{{else}}fas fa-square-chevron-right{{/if}}"></i>
-        </a>
         <label>
             {{localize label}}
         </label>
@@ -14,21 +9,16 @@
         <span>{{localize "SR5.CritterPower.Type"}}</span>
     </div>
     <div class="new-list-item-col">
-        <span>{{localize "SR5."}}</span>
+        <span>{{localize "SR5.Range"}}</span>
     </div>
     <div class="new-list-item-col">
-        <span>{{localizeOb item.system.duration @root.config.critterPower.durations}}</span>
+        <span>{{localize "SR5.Duration"}}</span>
     </div>
     <div class="new-list-item-col">
-        <span>{{item.system.rating}}</span>
+        <span>{{localize "SR5.Rating"}}</span>
     </div>
 
     <div class="new-list-item-icons">
-        <a data-action="addItem"
-           data-tooltip="{{createItemHeaderLabel type}}"
-           data-item-type="{{type}}">
-            {{localize "SR5.Add"}}
-            <i class="fas fa-plus"></i>
-        </a>
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
     </div>
 </div>

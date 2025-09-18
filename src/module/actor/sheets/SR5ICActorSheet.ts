@@ -58,6 +58,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         },
         actions: {
             template: this.templateBase('actor/tabs/actions'),
+            templates: this.listItem('action'),
         },
         matrix: {
             template: this.templateBase('actor/tabs/ic-matrix'),
@@ -65,15 +66,19 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         },
         matrixActions: {
             template: this.templateBase('actor/tabs/matrix/matrix-actions'),
+            templates: this.listItem('action'),
         },
         markedIcons: {
             template: this.templateBase('actor/tabs/matrix/marked-icons'),
+            templates: this.listItem('marked_icon'),
         },
         networkIcons: {
             template: this.templateBase('actor/tabs/matrix/network-icons'),
+            templates: this.listItem('network_icon'),
         },
         effects: {
             template: this.templateBase('actor/tabs/effects'),
+            templates: this.listItem('effect'),
         },
         misc: {
             template: this.templateBase('actor/tabs/misc'),

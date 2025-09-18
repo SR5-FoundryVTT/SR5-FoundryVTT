@@ -1,9 +1,6 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="split-container">
         <div>
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/basic-list-header.hbs'
-                    label='SR5.Biography'
-                    type='biography' }}
             {{editor biographyHTML target="system.description.value" button=true
                      editable=true engine="prosemirror" collaborate=false}}
         </div>

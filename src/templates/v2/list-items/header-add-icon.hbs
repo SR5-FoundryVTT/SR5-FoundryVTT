@@ -1,0 +1,8 @@
+{{#if @root.isEditMode}}
+<a data-action="addItem"
+   data-tooltip="{{createItemHeaderLabel this}}"
+   data-item-type="{{this}}">
+    {{localize "SR5.Add"}}
+    <i class="fas fa-plus"></i>
+</a>
+{{/if}}

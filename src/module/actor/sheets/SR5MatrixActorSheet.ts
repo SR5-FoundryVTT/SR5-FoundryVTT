@@ -11,6 +11,7 @@ import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
@@ -33,6 +34,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     // Stores which document has been selected in the matrix tab.
     // We accept this selection to not be persistant across Foundry sessions.
     selectedMatrixTarget: string|undefined;
+    _connectedIconsOpenClose: Record<string, boolean> = {};
 
     override async _prepareContext(options) {
         const data = await super._prepareContext(options);
@@ -48,6 +50,40 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         this._prepareMatrixDevice(data);
 
         return data;
+    }
+
+    /*
+    override activateListeners_LEGACY(html) {
+        super.activateListeners_LEGACY(html);
+
+        html.find('.show-matrix-network-hacking').click(this._onShowMatrixNetworkHacking.bind(this));
+        html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
+
+        html.find('.select-matrix-target').on('click', this._onSelectMatrixTarget.bind(this));
+        html.find('.open-matrix-target').on('click', this._onOpenMarkedDocument.bind(this));
+        html.find('.open-matrix-device').on('click', this._onOpenMatrixDevice.bind(this));
+
+        html.find('.targets-refresh').on('click', this._onTargetsRefresh.bind(this));
+
+        html.find('.setup-pan').on('click', this._addAllEquippedWirelessDevicesToPAN.bind(this));
+        // Matrix Target - Connected Icons Visibility Switch
+        html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
+
+        // Matrix Network
+        html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
+
+        html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
+        html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
+        html.find('.toggle-owned-icon-silent').on('click', this._onOwnedIconRunningSilentToggle.bind(this));
+    }
+
+     */
+
+    static override DEFAULT_OPTIONS: any = {
+        actions: {
+            toggleConnectedMatrixIcons: SR5MatrixActorSheet._onToggleConnectedMatrixIcons,
+        }
+
     }
 
     static override TABS = {
@@ -196,35 +232,11 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         data.markedDocuments = this._prepareMarkedDocumentTargets(markedDocuments);
     }
 
-    override activateListeners_LEGACY(html) {
-        super.activateListeners_LEGACY(html);
-
-        html.find('.show-matrix-network-hacking').click(this._onShowMatrixNetworkHacking.bind(this));
-        html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
-
-        html.find('.select-matrix-target').on('click', this._onSelectMatrixTarget.bind(this));
-        html.find('.open-matrix-target').on('click', this._onOpenMarkedDocument.bind(this));
-        html.find('.open-matrix-device').on('click', this._onOpenMatrixDevice.bind(this));
-
-        html.find('.targets-refresh').on('click', this._onTargetsRefresh.bind(this));
-
-        html.find('.setup-pan').on('click', this._addAllEquippedWirelessDevicesToPAN.bind(this));
-        // Matrix Target - Connected Icons Visibility Switch
-        html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
-
-        // Matrix Network
-        html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
-
-        html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
-        html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
-        html.find('.toggle-owned-icon-silent').on('click', this._onOwnedIconRunningSilentToggle.bind(this));
-    }
-
-    async _onOwnedIconRunningSilentToggle(event: MouseEvent) {
+    static async _onOwnedIconRunningSilentToggle(this: SR5MatrixActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
 
-        const iid = Helpers.listItemUuid(event);
+        const iid = event.target?.dataset?.itemId;
         const document = await fromUuid(iid);
         if (!document) return;
 
@@ -261,7 +273,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @param event
      * @private
      */
-    private async _onMatrixToggleRunningSilent(event) {
+    private static  async _onMatrixToggleRunningSilent(this: SR5MatrixActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
         await MatrixSheetFlow.toggleRunningSilent(this.actor);
@@ -271,7 +283,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * Handle the user request to reboot their main active matrix device or living persona.
      * @param event Any pointer event
      */
-    async _onRebootPersonaDevice(event: Event) {
+    static async _onRebootPersonaDevice(this: SR5MatrixActorSheet,event: Event) {
         event.preventDefault();
         event.stopPropagation();
         await MatrixSheetFlow.promptRebootPersonaDevice(this.actor);
@@ -280,7 +292,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     /**
      * Allow the user to select a matrix network to connect to.
      */
-    async _onConnectToMatrixNetwork(event) {
+    static async _onConnectToMatrixNetwork(this: SR5MatrixActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -297,10 +309,11 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * - switching out sheet display
      * - provide a display of additional matrix icons underneath uuid
      */
-    async _onToggleConnectedMatrixIcons(event) {
+    static async _onToggleConnectedMatrixIcons(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
+        console.log('Toggle connected matrix icons', event);
 
-        const uuid = Helpers.listItemUuid(event);
+        const uuid = event.target.dataset.itemId;
         if (!uuid) return;
 
         // Mark main icon as open or closed.
@@ -427,10 +440,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      *
      * @param event Any interaction event
      */
-    async _onOpenMatrixDevice(event) {
+    static async _onOpenMatrixDevice(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
-        const uuid = Helpers.eventUuid(event);
+        const uuid = event.target.dataset.itemId;
         if (!uuid) return;
 
         // Marked documents can´t live in packs.
@@ -447,10 +460,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      *
      * @param event Any interaction event
      */
-    async _onOpenMarkedDocument(event) {
+    static async _onOpenMarkedDocument(this: SR5MatrixActorSheet,event) {
         event.stopPropagation();
 
-        const uuid = Helpers.listItemUuid(event)
+        const uuid = event.target.dataset.itemId;
         if (!uuid) return;
 
         // Marked documents can´t live in packs.
@@ -468,10 +481,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      *
      * @param event Any interaction event
      */
-    async _onSelectMatrixTarget(event) {
+    static async _onSelectMatrixTarget(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
-        const uuid = Helpers.listItemUuid(event);
+        const uuid = event.target.dataset.itemId;
         if (!uuid) return;
 
         if (this.selectedMatrixTarget === uuid) {
@@ -488,7 +501,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     /**
      * Manual user interaction to refresh list of show matrix targets.
      */
-    async _onTargetsRefresh(event) {
+    static async _onTargetsRefresh(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
         this.render();

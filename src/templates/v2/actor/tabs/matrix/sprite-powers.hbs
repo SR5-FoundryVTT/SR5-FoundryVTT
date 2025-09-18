@@ -17,13 +17,15 @@
                     {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/item.hbs' item=this }}
                 {{/ife}} {{/each}}
 
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/header.hbs'
-                    label='SR5.Labels.ActorSheet.DisabledOptionSpritePowers'
-                    type='sprite_power' }}
+                {{#if @root.isEditMode}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/header.hbs'
+                        label='SR5.Labels.ActorSheet.DisabledOptionSpritePowers'
+                        type='sprite_power' }}
 
-                {{#each itemType.sprite_power}} {{#ife this.system.optional "disabled_option"}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/item.hbs' item=this }}
-                {{/ife}} {{/each}}
+                    {{#each itemType.sprite_power}} {{#ife this.system.optional "disabled_option"}}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/sprite_power/item.hbs' item=this }}
+                    {{/ife}} {{/each}}
+                {{/if}}
             </div>
     </div>
 </section>

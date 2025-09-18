@@ -161,6 +161,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         },
         inventory: {
             template: this.templateBase('actor/tabs/inventory'),
+            templates: this.listItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon')
         },
     }
 

@@ -7,7 +7,7 @@ export type SpriteActorSheetData = MatrixActorSheetData & {
 }
 
 export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetData> {
-    static override DEFAULT_OPTIONS = {
+    static override DEFAULT_OPTIONS: any = {
         classes: ['sprite'],
         position: {
             width: 930,
