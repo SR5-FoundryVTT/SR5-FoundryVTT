@@ -74,7 +74,7 @@ export class CompendiumBrowser extends Base {
         const entriesPerScreen = Math.ceil(clientHeight / this.results.height);
 
         const startIndex = Math.max(0, Math.floor(scrollTop / this.results.height) - 2 * entriesPerScreen);
-        const endIndex = Math.min(this.results.entries.length, startIndex + 4 * entriesPerScreen);
+        const endIndex = Math.min(this.results.entries.length, startIndex + 5 * entriesPerScreen);
 
         await this.renderResults(startIndex, endIndex);
     }
@@ -92,6 +92,16 @@ export class CompendiumBrowser extends Base {
         topPadDiv.className = 'top-pad';
         topPadDiv.style.height = `${indexStart * this.results.height}px`;
         toRender.push(topPadDiv);
+
+        // Ensure that we always start rendering from an odd index to maintain consistent row styling
+        if (indexStart % 2 === 0) {
+            const topOddPadDiv = document.createElement('div');
+            topOddPadDiv.className = 'top-pad';
+            topOddPadDiv.style.height = `0px`;
+            toRender.push(topOddPadDiv);
+        }
+
+        console.log({ indexStart, indexEnd, total: this.results.entries.length });
 
         indexStart = Math.max(0, indexStart);
         indexEnd = Math.min(this.results.entries.length, indexEnd);
