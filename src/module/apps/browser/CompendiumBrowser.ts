@@ -55,75 +55,19 @@ export class CompendiumBrowser extends Base {
 
     private activeTab: "Actor" | "Item" = "Item";
     private allFilters: FilterEntry[] = [];
-    private readonly _packs: CompendiumCollection<any>[] = [];
+    private readonly _packs: CompendiumCollection<any>[];
     private readonly _activePackIds: string[] = [];
     private _searchQuery: string = "";
     private _searchCursorPosition: number | null = null;
     #tooltipElement: HTMLElement | null = null;
     #tooltipTimeout: number | null = null;
+
+    // State for virtual scrolling
     private readonly results = {
         throttle: false,
-        height: 50,
+        height: 50, // Estimated height of a single result row
         entries: [] as CompendiumCollection.IndexEntry<"Item" | "Actor">[],
     };
-
-    private async _scrollResults(event: Event) {
-        const target = event.target as HTMLElement | null;
-        if (this.results.throttle || !target?.matches('.compendium-list')) return;
-        const { scrollTop, clientHeight } = target;
-        const entriesPerScreen = Math.ceil(clientHeight / this.results.height);
-
-        const startIndex = Math.max(0, Math.floor(scrollTop / this.results.height) - 2 * entriesPerScreen);
-        const endIndex = Math.min(this.results.entries.length, startIndex + 5 * entriesPerScreen);
-
-        await this.renderResults(startIndex, endIndex);
-    }
-
-    private async renderResults(indexStart: number, indexEnd: number) {
-        if (this.results.throttle) return;
-        this.results.throttle = true;
-
-        const container = this.element.querySelector<HTMLElement>(".compendium-list");
-        if (!container) return;
-
-        const toRender: Element[] = [];
-
-        const topPadDiv = document.createElement('div');
-        topPadDiv.className = 'top-pad';
-        topPadDiv.style.height = `${indexStart * this.results.height}px`;
-        toRender.push(topPadDiv);
-
-        // Ensure that we always start rendering from an odd index to maintain consistent row styling
-        if (indexStart % 2 === 0) {
-            const topOddPadDiv = document.createElement('div');
-            topOddPadDiv.className = 'top-pad';
-            topOddPadDiv.style.height = `0px`;
-            toRender.push(topOddPadDiv);
-        }
-
-        console.log({ indexStart, indexEnd, total: this.results.entries.length });
-
-        indexStart = Math.max(0, indexStart);
-        indexEnd = Math.min(this.results.entries.length, indexEnd);
-        for (let idx = indexStart; idx < indexEnd; idx++) {
-            const entry = this.results.entries[idx];
-            const html = await foundry.applications.handlebars.renderTemplate(
-                "systems/shadowrun5e/dist/templates/apps/compendium-browser/entries.hbs",
-                { entry }
-            );
-            const template = document.createElement("template");
-            template.innerHTML = html;
-            toRender.push(template.content.firstElementChild!);
-        }
-
-        const bottomPadDiv = document.createElement('div');
-        bottomPadDiv.className = 'bottom-pad';
-        bottomPadDiv.style.height = `${(this.results.entries.length - indexEnd) * this.results.height}px`;
-        toRender.push(bottomPadDiv);
-
-        container.replaceChildren(...toRender);
-        this.results.throttle = false;
-    }
 
     // --- Lifecycle Methods ---
 
@@ -165,13 +109,15 @@ export class CompendiumBrowser extends Base {
             context.activeTab = this.activeTab;
             context.types = this.allFilters;
         }
-        if (partId === "results")
+        if (partId === "results") {
+            // Fetch results and then render the initial visible set
             void this.fetch().then(async () => this.renderResults(0, 50));
+        }
         return context;
     }
 
     /**
-     * Handles cleanup when the application is closed, ensuring the tooltip is removed.
+     * Handles cleanup when the application is closed.
      */
     override async close(...args: Parameters<BaseType["close"]>) {
         if (this.#tooltipTimeout) clearTimeout(this.#tooltipTimeout);
@@ -195,9 +141,9 @@ export class CompendiumBrowser extends Base {
         void this.render({ parts: ["filters", "results"] });
     }
 
-    // --- Event Listeners & Handlers ---
+    // --- Event Listener Setup ---
 
-    /** Attaches listeners to the main application frame, such as for drag-and-drop functionality. */
+    /** Attaches listeners to the main application frame, such as for drag-and-drop and scrolling. */
     protected override _attachFrameListeners() {
         super._attachFrameListeners();
         this.element.addEventListener("dragstart", this._onDrag.bind(this));
@@ -216,17 +162,18 @@ export class CompendiumBrowser extends Base {
     private filterListeners(htmlElement: HTMLElement) {
         const searchInput = htmlElement.querySelector<HTMLInputElement>("#compendium-browser-search");
         if (searchInput) {
+            // Restore cursor position after re-render
             if (this._searchCursorPosition) {
                 searchInput.focus();
                 searchInput.setSelectionRange(this._searchCursorPosition, this._searchCursorPosition);
                 this._searchCursorPosition = null;
             }
-            searchInput.addEventListener("input", event => this._onSearch(event, searchInput));
+            searchInput.addEventListener("input", (event) => this._onSearch(event, searchInput));
         }
 
         const typeCheckboxes = htmlElement.querySelectorAll<HTMLInputElement>(".types .type input[type='checkbox']");
         for (const checkbox of typeCheckboxes) {
-            checkbox.addEventListener("change", event => {
+            checkbox.addEventListener("change", (event) => {
                 const target = event.target as HTMLInputElement;
                 const type = target.dataset.type;
                 if (type) this._onFilterChange(type, target.checked);
@@ -234,29 +181,7 @@ export class CompendiumBrowser extends Base {
         }
     }
 
-    /** Handles the click event for the 'clear search' button, resetting the query. */
-    private async _onClearSearch() {
-        this._searchQuery = "";
-        void this.render({ parts: ["results", "filters"] });
-    }
-
-    /**
-     * Handles the `input` event on the search field to update the query and re-render results.
-     */
-    private _onSearch(event: Event, target: HTMLInputElement) {
-        this._searchCursorPosition = target.selectionStart;
-        this._searchQuery = target.value;
-        void this.render({ parts: ["results"] });
-    }
-
-    /**
-     * Handles the `change` event for a type filter checkbox.
-     */
-    private _onFilterChange(type: string, selected: boolean) {
-        const typeEntry = this.allFilters.find(t => t.id === type);
-        if (typeEntry) typeEntry.selected = selected;
-        void this.render({ parts: ["results"] });
-    }
+    // --- Event Handlers ---
 
     /**
      * Handles the `dragstart` event for a compendium entry row.
@@ -271,6 +196,30 @@ export class CompendiumBrowser extends Base {
     }
 
     /**
+     * Handles the `input` event on the search field to update the query and re-render results.
+     */
+    private _onSearch(event: Event, target: HTMLInputElement) {
+        this._searchCursorPosition = target.selectionStart;
+        this._searchQuery = target.value;
+        void this.render({ parts: ["results"] });
+    }
+
+    /** Handles the click event for the 'clear search' button, resetting the query. */
+    private async _onClearSearch() {
+        this._searchQuery = "";
+        void this.render({ parts: ["results", "filters"] });
+    }
+
+    /**
+     * Handles the `change` event for a type filter checkbox.
+     */
+    private _onFilterChange(type: string, selected: boolean) {
+        const typeEntry = this.allFilters.find((t) => t.id === type);
+        if (typeEntry) typeEntry.selected = selected;
+        void this.render({ parts: ["results"] });
+    }
+
+    /**
      * Handles a click on a result row to open the corresponding document sheet.
      */
     private async _openDoc(event: MouseEvent, target: HTMLElement) {
@@ -278,7 +227,6 @@ export class CompendiumBrowser extends Base {
         const uuid = el?.dataset.uuid;
         if (!uuid) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const doc = (await fromUuid(uuid)) as Actor | Item | null;
         await doc?.sheet?.render(true);
     }
@@ -294,7 +242,23 @@ export class CompendiumBrowser extends Base {
         await LinksHelpers.openSource(source);
     }
 
-    // --- Core Logic & Helpers ---
+    /**
+     * Handles scroll events to implement virtual scrolling for the results list.
+     */
+    private async _scrollResults(event: Event) {
+        const target = event.target as HTMLElement | null;
+        if (this.results.throttle || !target?.matches(".compendium-list")) return;
+        const { scrollTop, clientHeight } = target;
+        const entriesPerScreen = Math.ceil(clientHeight / this.results.height);
+
+        // Calculate the range of entries to render, including a buffer above and below the visible area
+        const startIndex = Math.max(0, Math.floor(scrollTop / this.results.height) - 2 * entriesPerScreen);
+        const endIndex = Math.min(this.results.entries.length, startIndex + 5 * entriesPerScreen);
+
+        await this.renderResults(startIndex, endIndex);
+    }
+
+    // --- Core Data & Rendering Logic ---
 
     /**
      * Asynchronously fetches, filters, and sorts compendium entries based on current state.
@@ -302,22 +266,22 @@ export class CompendiumBrowser extends Base {
     private async fetch() {
         this.results.throttle = true;
         const activePacks = this._packs.filter(
-            p => p.visible && p.metadata.type === this.activeTab
+            (p) => p.visible && p.metadata.type === this.activeTab
         ) as CompendiumCollection<"Actor" | "Item">[];
-        const indexes = await Promise.all(activePacks.map(async pack => pack.getIndex()));
-        let entries = indexes.flatMap(index => [...index.values()]);
+        const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
+        let entries = indexes.flatMap((index) => [...index.values()]);
 
         if (this._searchQuery) {
             const query = this._searchQuery.toLowerCase();
-            entries = entries.filter(i => i.name?.toLowerCase().includes(query));
+            entries = entries.filter((i) => i.name?.toLowerCase().includes(query));
         }
 
-        if (this.allFilters.some(f => f.selected)) {
-            const selectedTypes = this.allFilters.filter(f => f.selected).map(f => f.id);
-            entries = entries.filter(e => selectedTypes.includes(e.type as string));
+        if (this.allFilters.some((f) => f.selected)) {
+            const selectedTypes = this.allFilters.filter((f) => f.selected).map((f) => f.id);
+            entries = entries.filter((e) => selectedTypes.includes(e.type as string));
         }
 
-        entries = entries.map(entry => ({...entry, type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`)}));
+        entries = entries.map((entry) => ({ ...entry, type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`) }));
 
         entries.sort((a, b) => a.name!.localeCompare(b.name!, game.i18n.lang));
         this.results.entries = entries;
@@ -333,10 +297,61 @@ export class CompendiumBrowser extends Base {
         this.results.throttle = false;
     }
 
+    /**
+     * Renders a slice of the results for virtual scrolling.
+     */
+    private async renderResults(indexStart: number, indexEnd: number) {
+        if (this.results.throttle) return;
+        this.results.throttle = true;
+
+        const container = this.element.querySelector<HTMLElement>(".compendium-list");
+        if (!container) return;
+
+        const toRender: Element[] = [];
+
+        // Create a top padding div to simulate the height of all items before the rendered slice
+        const topPadDiv = document.createElement("div");
+        topPadDiv.className = "top-pad";
+        topPadDiv.style.height = `${indexStart * this.results.height}px`;
+        toRender.push(topPadDiv);
+
+        // Ensure that we always start rendering from an odd index to maintain consistent row styling
+        if (indexStart % 2 === 0) {
+            const topOddPadDiv = document.createElement("div");
+            topOddPadDiv.className = "top-pad";
+            topOddPadDiv.style.height = `0px`;
+            toRender.push(topOddPadDiv);
+        }
+
+        console.log({ indexStart, indexEnd, total: this.results.entries.length });
+
+        indexStart = Math.max(0, indexStart);
+        indexEnd = Math.min(this.results.entries.length, indexEnd);
+        for (let idx = indexStart; idx < indexEnd; idx++) {
+            const entry = this.results.entries[idx];
+            const html = await foundry.applications.handlebars.renderTemplate(
+                "systems/shadowrun5e/dist/templates/apps/compendium-browser/entries.hbs",
+                { entry }
+            );
+            const template = document.createElement("template");
+            template.innerHTML = html;
+            toRender.push(template.content.firstElementChild!);
+        }
+
+        // Create a bottom padding div to simulate the height of all items after the rendered slice
+        const bottomPadDiv = document.createElement("div");
+        bottomPadDiv.className = "bottom-pad";
+        bottomPadDiv.style.height = `${(this.results.entries.length - indexEnd) * this.results.height}px`;
+        toRender.push(bottomPadDiv);
+
+        container.replaceChildren(...toRender);
+        this.results.throttle = false;
+    }
+
     /** Populates and sorts the `allFilters` array based on the document types of the active tab. */
     private setFilters() {
         this.allFilters = Object.keys(CONFIG[this.activeTab].dataModels)
-            .map(id => ({ value: game.i18n.localize(`TYPES.${this.activeTab}.${id}`), id, selected: false }))
+            .map((id) => ({ value: game.i18n.localize(`TYPES.${this.activeTab}.${id}`), id, selected: false }))
             .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang));
     }
 }
