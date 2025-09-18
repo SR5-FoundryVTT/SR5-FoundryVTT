@@ -1,5 +1,4 @@
 export interface PDFPager {
-    getPDFByCode: (pdfcode: string) => Promise<JournalEntryPage | undefined>;
     openPDFByCode: (pdfcode: string, options?: { page?: number; pdfcode?: string; showUuid?: boolean }) => void;
 }
 
