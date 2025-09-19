@@ -1,5 +1,6 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
+        {{#if @root.isEditMode}}
         <div class="new-list-item new-list-item-header header-for-scrollable">
             <div class="new-list-item-label-container">
                 <span class="selection-inventory">
@@ -39,6 +40,7 @@
                 </a>
             </div>
         </div>
+        {{/if}}
         <div class="scrollable">
             {{#each inventory.types as |section type|}}
                 {{> (concatStrings "systems/shadowrun5e/dist/templates/v2/list-items/" type "/header.hbs")

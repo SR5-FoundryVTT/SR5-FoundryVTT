@@ -64,10 +64,10 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         ...super.PARTS,
         skills: {
             template: this.templateBase('actor/tabs/character-skills'),
-            templates: this.actorSystemParts(
-                'active-skills', 'language-and-knowledge-skills',
-                'attributes', 'special-attributes'
-            )
+            templates: [
+                ...this.actorSystemParts('active-skills', 'language-and-knowledge-skills', 'attributes', 'special-attributes' ),
+                ...this.listItem('skill')
+            ]
         },
         magic: {
             template: this.templateBase('actor/tabs/magic'),

@@ -1,21 +1,10 @@
-<div class="fill-container skills">
-    <div class="skill skill-header header-for-scrollable">
-        <label>{{localize "SR5.ActiveSkills"}}</label>
-        {{#if @root.isPlayMode}}
-        <div class="skill-specializations">{{localize "SR5.Specializations"}}</div>
-        {{/if}}
-        <div class="skill-value">
-            <span>{{localize "SR5.Rtg"}}</span>
-        </div>
-        <div class="skill-icons">
-            {{#if @root.isEditMode}}
-                <a  data-action="addActiveSkill">
-                    <i class="fas fa-plus"></i>
-                    {{localize "SR5.Add"}}
-                </a>
-            {{/if}}
-        </div>
-    </div>
+<div class="fill-container">
+    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'
+        label="SR5.ActiveSkills"
+        headerAction="filterTrainedSkills"
+        addAction="addActiveSkill"
+        cssClass="active-skills-header header-for-scrollable"
+    }}
     <div>
         <input
             id="filter-skills"
@@ -28,10 +17,10 @@
     </div>
     <section class="scrollable">
         {{#each system.skills.active as |skill sid|}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/skill.hbs'
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
                 skillPath=(concat "system.skills.active." sid)
                 skill=skill
-                rootId=@root.rootId
+                id=sid
             }}
         {{/each}}
     </section>

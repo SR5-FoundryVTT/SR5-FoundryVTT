@@ -322,6 +322,14 @@
             gap: .25rem;
             font-size: 0.9rem;
 
+            img.new-list-item-image-roll {
+                &:hover {
+                    content: url('assets/dice-solid.svg');
+                    filter: invert(1);
+                }
+
+            }
+
             .selection-inventory {
                 display: flex;
                 flex-flow: row;
@@ -345,10 +353,14 @@
             }
 
             &.mark-input-col {
-                flex: none;
-                width: 4rem;
+                flex: 1;
                 font-size: 1rem;
                 gap: 0.25rem;
+            }
+
+            &.skill-rating-col {
+                flex: 1;
+                font-size: 1rem;
             }
 
         }
@@ -423,15 +435,6 @@
                 gap: 0.25rem;
             }
 
-            .skill-icons {
-                flex: 1;
-                font-size: 0.8rem;
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: center;
-                align-items: center;
-                gap: 0.25rem;
-            }
         }
     }
 

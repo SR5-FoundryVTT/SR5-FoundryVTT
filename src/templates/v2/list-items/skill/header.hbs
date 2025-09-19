@@ -1,0 +1,27 @@
+<div class="new-list-item new-list-item-header {{cssClass}}"
+     {{#if headerAction}}
+     data-action="{{headerAction}}"
+     {{/if}}
+>
+    <div class="new-list-item-label-container">
+        <label>{{localize label}}</label>
+    </div>
+    {{#if @root.isPlayMode}}
+    <div class="new-list-item-col">
+        <span>{{localize "SR5.Specializations"}}</span>
+    </div>
+    {{/if}}
+    <div class="new-list-item-col skill-rating-col">
+        <span>{{localize "SR5.Rtg"}}</span>
+    </div>
+    {{#if @root.isEditMode}}
+    <div class="new-list-item-icons skill-icons">
+        {{#if addAction}}
+                <a data-action="{{addAction}}">
+                    <i class="fas fa-plus"></i>
+                    {{localize "SR5.Add"}}
+                </a>
+        {{/if}}
+    </div>
+    {{/if}}
+</div>

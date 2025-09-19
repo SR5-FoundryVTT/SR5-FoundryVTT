@@ -1,7 +1,9 @@
 {{#if (hasRoll this)}}
-    <a data-action="rollItem" data-item-id="{{this.uuid}}">
+    <a>
         <img src="{{this.img}}"
-             class="new-list-item-image"
+             data-action="rollItem"
+             data-item-id="{{this.uuid}}"
+             class="new-list-item-image new-list-item-image-roll"
              height="24px"
              width="24px"
              data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}"

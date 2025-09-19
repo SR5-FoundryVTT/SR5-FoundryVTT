@@ -43,12 +43,6 @@ export interface InventorySheetData {
 
 export type InventoriesSheetData = Record<string, InventorySheetData>;
 
-// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
-// Should multiple instances be open, Foundry will cause cross talk between skills and actors,
-// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong system.
-let globalSkillAppId: number = -1;
-
-
 /**
  * Sort a list of items by name in ascending alphabetical order.
  *
@@ -177,9 +171,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             height: 600,
         },
         actions: {
-            toggleEditMode: SR5BaseActorSheet.#toggleEditMode,
-            showItemDescription: SR5BaseActorSheet._onListItemToggleDescriptionVisibility,
             openItemSource: SR5BaseActorSheet._onOpenSource,
+            openSkillSource: SR5BaseActorSheet._onOpenSourceSkill,
+            rollItem: SR5BaseActorSheet._onItemRoll,
+            rollSkill: SR5BaseActorSheet._onRollSkill,
+            rollSkillSpec: SR5BaseActorSheet._onRollSkillSpec,
+            filterTrainedSkills: SR5BaseActorSheet._onFilterUntrainedSkills,
+            showItemDescription: SR5BaseActorSheet._onListItemToggleDescriptionVisibility,
+            toggleEditMode: SR5BaseActorSheet.#toggleEditMode,
         }
     }
 
@@ -355,7 +354,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.hidden').hide();
 
         // General item test rolling...
-        html.find('.item-roll').on('click', this._onItemRoll.bind(this));
         html.find('.Roll').on('click', this._onRoll.bind(this));
 
         // Actor inventory handling....
@@ -387,18 +385,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.disconnect-network').on('click', this._onDisconnectNetwork.bind(this))
 
         // Skill Filter handling...
-        html.find('.skill-header').find('.item-name').on('click', this._onFilterUntrainedSkills.bind(this));
-        html.find('.skill-header').find('.skill-spec-item').on('click', this._onFilterUntrainedSkills.bind(this));
-        html.find('.skill-header').find('.rtg').on('click', this._onFilterUntrainedSkills.bind(this));
         html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
 
         // Skill CRUD handling...
-        html.find('.skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
-        html.find('.knowledge-skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
-        html.find('.language-skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
-        html.find('.skill-edit').on('click', this._onShowEditSkill.bind(this));
-        html.find('.knowledge-skill-edit').on('click', this._onShowEditKnowledgeSkill.bind(this));
-        html.find('.language-skill-edit').on('click', this._onShowEditLanguageSkill.bind(this));
         html.find('.add-knowledge').on('click', this._onAddKnowledgeSkill.bind(this));
         html.find('.add-language').on('click', this._onAddLanguageSkill.bind(this));
         html.find('.add-active').on('click', this._onAddActiveSkill.bind(this));
@@ -411,12 +400,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Conditon monitor test rolling...
         html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
-
-        // Skill test rolling...
-        html.find('.skill-roll').on('click', this._onRollSkill.bind(this));
-        html.find('.knowledge-skill').on('click', this._onRollSkill.bind(this));
-        html.find('.language-skill').on('click', this._onRollSkill.bind(this));
-        html.find('.skill-spec-roll').on('click', this._onRollSkillSpec.bind(this));
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
@@ -712,12 +695,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return this.actor.deleteEmbeddedDocuments('Item', [iid]);
     }
 
-    async _onItemRoll(event) {
+    static async _onItemRoll(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
+        const iid = event.target.dataset.itemId;
+        const item = await fromUuid(iid);
 
-        if (!item) return;
+        if (!item || !(item instanceof SR5Item)) return;
         if (!Hooks.call('SR5_PreActorItemRoll', this.actor, item)) return;
         await item.castAction(event);
     }
@@ -1401,7 +1384,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /** Setup untrained skill filter within getData */
-    async _onFilterUntrainedSkills(event) {
+    static async _onFilterUntrainedSkills(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
         await this.render();
@@ -1424,26 +1407,23 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }, game.shadowrun5e.inputDelay);
     }
 
-    async _onRollSkill(event) {
+    static async _onRollSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const itemId = Helpers.listItemId(event);
-        // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
-        const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
-        if (!skillId) { console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`); return; }
+        const skillId = event.target.dataset.skill;
         return this.actor.rollSkill(skillId, { event });
     }
 
-    async _onRollSkillSpec(event) {
+    static async _onRollSkillSpec(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const itemId = Helpers.listItemId(event);
         // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
-        const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
+        // const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
+        const skillId = event.target.dataset.skill;
         return this.actor.rollSkill(skillId, { event, specialization: true });
     }
 
-    async _onOpenSourceSkill(event) {
+    static async _onOpenSourceSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const [skillId,] = Helpers.listItemId(event).split('.');
+        const skillId = event.target.dataset.skill;
 
         const skill = this.actor.getSkill(skillId);
         if (!skill) {
@@ -1453,71 +1433,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         LinksHelpers.openSource(skill.link);
     }
 
-    async _onShowEditSkill(event) {
-        event.preventDefault();
-        const skill = Helpers.listItemId(event);
-
-        if (!skill) {
-            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`); return;
-        }
-
-        // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skill);
-    }
-
-    /** Keep track of each SkillEditSheet instance and close before opening another.
-     *
-     * @param skillEditFormImplementation Any extending class! of SkillEditSheet
-     * @param actor
-     * @param options
-     * @param args Collect arguments of the different renderWithSkill implementations.
-     */
-    async _showSkillEditForm(skillEditFormImplementation, actor: SR5Actor, options: object, ...args) {
-        await this._closeOpenSkillApp();
-
-        const skillEditForm = new skillEditFormImplementation(actor, options, ...args);
-        globalSkillAppId = skillEditForm.appId;
-        await skillEditForm.render(true);
-    }
-
-    _onShowEditKnowledgeSkill(event) {
-        event.preventDefault();
-        const [skill, category] = Helpers.listItemId(event).split('.');
-
-        if (!skill || !category) {
-            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`); return;
-        }
-
-        void this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, { event }, skill, category);
-    }
-
-    async _onShowEditLanguageSkill(event) {
-        event.preventDefault();
-        const skill = Helpers.listItemId(event);
-
-        if (!skill) {
-            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`); return;
-        }
-
-        // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event }, skill);
-    }
-
-    async _closeOpenSkillApp() {
-        if (globalSkillAppId !== -1) {
-            if (ui.windows[globalSkillAppId]) {
-                await ui.windows[globalSkillAppId].close();
-            }
-            globalSkillAppId = -1;
-        }
-    }
-
     async _onAddLanguageSkill(event) {
         event.preventDefault();
         const skillId = await this.actor.addLanguageSkill({ name: '' });
         if (!skillId) return;
-
-        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event }, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
@@ -1535,8 +1454,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const category = Helpers.listHeaderId(event) as KnowledgeSkillCategory;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
-
-        await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, { event }, skillId, category);
     }
 
     async _onRemoveKnowledgeSkill(event) {
@@ -1557,8 +1474,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         const skillId = await this.actor.addActiveSkill();
         if (!skillId) return;
-
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skillId);
     }
 
     async _onRemoveActiveSkill(event: Event) {

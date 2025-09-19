@@ -1,50 +1,30 @@
-<div class="scrollable skills">
-    <div class="skill skill-header">
-        <label>{{localize "SR5.Languages"}}</label>
-        {{#if @root.isPlayMode}}
-            <div class="skill-specializations">{{localize "SR5.Specializations"}}</div>
-        {{/if}}
-        <div class="skill-value">
-            <span>{{localize "SR5.Rtg"}}</span>
-        </div>
-        <div class="skill-icons">
-            {{#if @root.isEditMode}}
-                <a data-action="addLanguageSkill">
-                    <i class="fas fa-plus" ></i>
-                </a>
-            {{/if}}
-        </div>
-    </div>
+<div class="scrollable">
+    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'
+        label="SR5.Languages"
+        addAction="addLanguageSkill" }}
     {{#each system.skills.language.value as |skill sid|}}
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/skill.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
             skillPath=(concat "system.skills.language.value." sid)
             skill=skill
+            id=sid
             rootId=@root.rootId
         }}
     {{/each}}
     {{#each system.skills.knowledge as |cat cid|}}
-    <div class="skill skill-header">
-        <label>{{localizeOb cid @root.config.knowledgeSkillCategories}}</label>
-        {{#if @root.isPlayMode}}
-            <div class="skill-specializations">{{localize "SR5.Specializations"}}</div>
-        {{/if}}
-        <div class="skill-value">
-            <span>{{localize "SR5.Rtg"}}</span>
-        </div>
-        <div class="skill-icons">
-            {{#if @root.isEditMode}}
-                <a data-action="addKnowledgeSkill" data-knowledge="cid">
-                    <i class="fas fa-plus"></i>
-                </a>
-            {{/if}}
-        </div>
-    </div>
+    {{!-- Skip over empty knowledge categories during play mode --}}
+    {{#if (or @root.isEditMode (not (empty cat.value)))}}
+    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'
+        label=(localizeOb cid @root.config.knowledgeSkillCategories)
+        addSkillType=cid
+        addAction="addKnowledgeSkill" }}
     {{#each cat.value as |skill sid|}}
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/skill.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
             skillPath=(concat (concat (concat "system.skills.knowledge." cid) ".value") sid)
             skill=skill
+            id=sid
             rootId=@root.rootId
         }}
     {{/each}}
+    {{/if}}
     {{/each}}
 </div>
