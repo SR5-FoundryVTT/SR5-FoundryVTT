@@ -276,7 +276,7 @@ declare global {
 
     interface UI {
         pdfpager?: {
-            openPDFByCode: (pdfcode: string, options?: { page?: number; pdfcode?: string; showUuid?: boolean }) => void;
+            openPDFByCode: (pdfcode: string, options?: { page?: number; uuid?: string }) => void;
         }
     }
 }
