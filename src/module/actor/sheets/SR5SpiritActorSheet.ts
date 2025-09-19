@@ -40,10 +40,11 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         ...super.PARTS,
         skills: {
             template: this.templateBase('actor/tabs/spirit-skills'),
-            templates: this.actorSystemParts(
-                'active-skills', 'spirit-options',
-                'attributes', 'special-attributes'
-            )
+            templates: [
+                ...this.actorSystemParts('active-skills', 'spirit-options',
+                                'attributes', 'special-attributes'),
+                ...this.listItem('skill')
+            ]
         },
         magic: {
             template: this.templateBase('actor/tabs/spirit-magic'),

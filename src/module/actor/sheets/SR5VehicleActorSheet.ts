@@ -151,10 +151,10 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         },
         skills: {
             template: this.templateBase('actor/tabs/vehicle-skills'),
-            templates: this.actorSystemParts(
+            templates: [...this.actorSystemParts(
                 'active-skills', 'vehicle-options',
                 'vehicle-rolls', 'vehicle-attributes'
-            )
+            ), ...this.listItem('skill')]
         },
         description: {
             template: this.templateBase('actor/tabs/description'),

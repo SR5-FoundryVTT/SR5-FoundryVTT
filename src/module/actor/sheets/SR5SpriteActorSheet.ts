@@ -53,7 +53,10 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         ...super.PARTS,
         skills: {
             template: this.templateBase('actor/tabs/sprite-skills'),
-            templates: this.actorSystemParts('active-skills', 'sprite-options')
+            templates: [
+                ...this.actorSystemParts('active-skills', 'sprite-options'),
+                ...this.listItem('skill')
+            ]
         },
         description: {
             template: this.templateBase('actor/tabs/description'),

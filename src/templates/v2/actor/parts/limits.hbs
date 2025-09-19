@@ -1,12 +1,10 @@
 {{!-- Expected to be put in a row --}}
-<div class="list-item item-section space-evenly flexrow">    
+<div class="new-list-item new-list-item-header">
     {{#each system.limits as |limit id|}} {{#unless limit.hidden}}
-        <div class="limit">
-            <div class="limit-row value">
-                <span class="limit-title">{{localize limit.label}}</span>
-                <span class="limit-value" value="{{limit.value}}">{{limit.value}}</span>
-                {{> "systems/shadowrun5e/dist/templates/v2/common/value-modifiers.hbs" value=limit}}
-            </div>
+        <div class="new-list-item-col">
+            <label>
+                {{localize limit.label}}&nbsp;{{limit.value}}
+            </label>
         </div>
     {{/unless}} {{/each}}
 </div>

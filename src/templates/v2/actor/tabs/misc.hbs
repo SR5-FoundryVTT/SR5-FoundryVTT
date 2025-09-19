@@ -5,33 +5,39 @@
                 {{#if isIC}}
                     {{editor biographyHTML target="system.description.value" button=true editable=true engine="prosemirror" collaborate=false}}
                 {{else}}
-                    <div class="list-item">
-                        <div class="list-item-content">
-                            <button type="button" class="display reset-actor-run-data" data-tooltip="SR5.Tooltips.Actor.ResetActorForNewRun">
-                                {{localize "SR5.Labels.ActorSheet.ResetActorForNewRun"}}
-                            </button>
-                            {{#if hasSkills}}
+                    <div>
+                        <button type="button" class="display reset-actor-run-data" data-tooltip="SR5.Tooltips.Actor.ResetActorForNewRun">
+                            {{localize "SR5.Labels.ActorSheet.ResetActorForNewRun"}}
+                        </button>
+                    </div>
+                    {{#if hasSkills}}
+                        <div>
                             <button type="button" class="display show-hidden-skills">
                                 {{localize "SR5.RestoreDefaultSkills"}}
                             </button>
-                            {{#if (or isCharacter isSpirit)}}
+                        </div>
+                    {{#if (or isCharacter isSpirit)}}
+                        <div>
                             <button type="button" class="display import-character">
                                 {{localize "SR5.ImportCharacter"}}
                             </button>
-                            {{/if}}
-                            {{#if (hasAnyFreshImports this.actor)}}
+                        </div>
+                    {{/if}}
+                    {{#if (hasAnyFreshImports this.actor)}}
+                        <div>
                             <button class="display import-character toggle-fresh-import-all-off"
                                     data-tooltip="SR5.MarkImportsTooltip">
                                 {{localize 'SR5.MarkImportsReviewed'}}
                             </button>
-                            {{/if}}
-                            {{#if system.matrix.device}}
+                        </div>
+                    {{/if}}
+                    {{#if system.matrix.device}}
+                        <div>
                             <button type="button" class="display setup-pan" data-tooltip="{{localize 'SR5.Tooltips.Actor.SetupPAN'}}">
                                 {{localize "SR5.Labels.ActorSheet.SetupPAN"}}
                             </button>
-                            {{/if}}
                         </div>
-                    </div>
+                    {{/if}}
                     {{/if}}
                     {{#if isCharacter}}
                         {{formGroup systemFields.nuyen value=source.system.nuyen rootId=rootId disabled=@root.isPlayMode }}
@@ -121,20 +127,11 @@
             </div>
 
             <!-- Modifier Section -->
-            <div class="list-item item-section header-for-scrollable">
-                <div class="list-item-content">
-                    <div class="item-left">
-                        <label>
-                            <div class="item-text item-name">
-                                {{localize "SR5.Modifier"}}
-                            </div>
-                        </label>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text rtg">
-                            {{localize "SR5.Value"}}
-                        </div>
-                    </div>
+            <div class="new-list-item new-list-item-header header-for-scrollable">
+                <div class="new-list-item-label-container">
+                    <label>
+                        {{localize "SR5.Modifier"}}
+                    </label>
                 </div>
             </div>
             <section class="scrollable standard-form">

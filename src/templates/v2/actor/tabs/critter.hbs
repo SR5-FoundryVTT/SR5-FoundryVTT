@@ -4,18 +4,20 @@
             label="SR5.Labels.ActorSheet.CritterPowers"
             type="critter_power" }}
         <div class="scrollable">
-            {{#each itemType.critter_power}} {{#if (or (not this.system.optional) (eq this.system.optional "standard"))}}
+            {{#each itemType.critter_power}}
+                {{#if (or (and @root.isPlayMode (eq this.system.optional "enabled_option"))
+                          (or (not this.system.optional) (eq this.system.optional "standard")))}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/item.hbs' item=this }}
             {{/if}} {{/each}}
 
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/header.hbs'
-                label="SR5.Labels.ActorSheet.EnabledOptionCritterPowers"
-                type="critter_power" }}
-            {{#each itemType.critter_power}} {{#ife this.system.optional "enabled_option"}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/item.hbs' item=this }}
-            {{/ife}} {{/each}}
-
             {{#if @root.isEditMode}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/header.hbs'
+                    label="SR5.Labels.ActorSheet.EnabledOptionCritterPowers"
+                    type="critter_power" }}
+                {{#each itemType.critter_power}} {{#ife this.system.optional "enabled_option"}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/item.hbs' item=this }}
+                {{/ife}} {{/each}}
+
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/header.hbs'
                     label="SR5.Labels.ActorSheet.DisabledOptionCritterPowers"
                     type="critter_power" }}

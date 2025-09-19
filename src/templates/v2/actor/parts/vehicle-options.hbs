@@ -1,94 +1,144 @@
 <div class="fill-container">
-    {{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs" name=(localize "SR5.Labels.ActorSheet.VehicleConfiguration")}}
-    <section class="scrollable standard-form">
-        <div class="form-group">
-            <label>
-                {{localize "SR5.Vehicle.Driver"}}
-            </label>
-            <div class="form-fields">
-                {{#if vehicle.driver}}
-                <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
-                    <i class="fas fa-user"></i>
-                    {{vehicle.driver.name}}
-                </a>
-                <a class="close driver-remove"><i class="fas fa-times"></i></a>
-                {{else}}
-                <a class="driver-pick" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsDriver">
-                    {{localize "SR5.Vehicle.MissingDriver"}}
-                    <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
-                        <i class="fa-light fa-square-dashed fa-stack-2x"></i>
-                        <i class="fas fa-user fa-stack-1x"></i>
+    <div class="new-list-item new-list-item-header">
+        <div class="new-list-item-label-container">
+            {{localize "SR5.Labels.ActorSheet.VehicleConfiguration"}}
+        </div>
+    </div>
+    <section class="scrollable">
+        <div class="standard-form">
+            <div class="form-group">
+                <label>
+                    {{localize "SR5.Vehicle.Driver"}}
+                </label>
+                <div class="form-fields">
+                    {{#if vehicle.driver}}
+                    <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
+                        <i class="fas fa-user"></i>
+                        {{vehicle.driver.name}}
+                    </a>
+                    <a class="close driver-remove"><i class="fas fa-times"></i></a>
+                    {{else}}
+                    <a class="driver-pick" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsDriver">
+                        {{localize "SR5.Vehicle.MissingDriver"}}
+                        <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
+                            <i class="fa-light fa-square-dashed fa-stack-2x"></i>
+                            <i class="fas fa-user fa-stack-1x"></i>
+                        </span>
+                    </a>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="form-group">
+                <label>
+                    {{localize "SR5.Labels.Sheet.PAN"}}
+                </label>
+                <div class="form-fields">
+                    {{#if vehicle.master}}
+                    <span>
+                        <a class="origin-link" draggable="false" data-origin-link="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
+                        <a class="close controller-remove"><i class="fas fa-times"></i></a>
                     </span>
-                </a>
-                {{/if}}
+                    {{else}}
+                    {{#if vehicle.driver}}
+                    <a class="connect-to-driver">
+                        <i class="fas fa-network-wired"></i>
+                        {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
+                    </a>
+                    {{/if}}
+                    {{/if}}
+                </div>
             </div>
+            {{formGroup systemFields.vehicleType value=source.system.vehicleType disabled=@root.isPlayMode localize=true }}
+            {{formGroup systemFields.controlMode value=source.system.vehicle.controlMode disabled=@root.isPlayMode localize=true }}
+            {{formGroup systemFields.environment value=source.system.vehicle.environment disabled=@root.isPlayMode localize=true }}
+            {{formGroup systemFields.isDrone value=source.system.isDrone disabled=@root.isPlayMode }}
+            {{formGroup systemFields.isOffRoad value=source.system.isOffRoad disabled=@root.isPlayMode }}
         </div>
-        <div class="form-group">
-            <label>
-                {{localize "SR5.Labels.Sheet.PAN"}}
-            </label>
-            <div class="form-fields">
-                {{#if vehicle.master}}
-                <span>
-                    <a class="origin-link" draggable="false" data-origin-link="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
-                    <a class="close controller-remove"><i class="fas fa-times"></i></a>
-                </span>
+
+        <div class="new-list-item new-list-item-header">
+            <div class="new-list-item-label-container">
+                {{#if system.isDrone}}
+                    <label>{{localize "SR5.ModPoints"}}</label>
                 {{else}}
-                {{#if vehicle.driver}}
-                <a class="connect-to-driver">
-                    <i class="fas fa-network-wired"></i>
-                    {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
-                </a>
-                {{/if}}
+                    <label>{{localize "SR5.ModificationCategories"}}</label>
                 {{/if}}
             </div>
         </div>
-
-        {{formGroup systemFields.vehicleType value=source.system.vehicleType disabled=@root.isPlayMode localize=true }}
-        {{formGroup systemFields.vehicle.fields.controlMode value=source.system.vehicle.controlMode disabled=@root.isPlayMode localize=true }}
-        {{formGroup systemFields.vehicle.fields.environment value=source.system.vehicle.environment disabled=@root.isPlayMode localize=true }}
-        {{formGroup systemFields.isDrone value=source.system.isDrone disabled=@root.isPlayMode }}
-        {{formGroup systemFields.isOffRoad value=source.system.isOffRoad disabled=@root.isPlayMode }}
-
         {{#if system.isDrone}}
-        {{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs" name=(localize "SR5.ModPoints")}}
-        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.ModPoints") }}
-        <span style="white-space: nowrap">
-            {{calcModPointSlots items}} / {{calcModificationSlotsAvailable actor}}
-        </span>
-        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+
+        <div class="new-list-item">
+            <div class="new-list-item-label-container">
+                <label>{{localize "SR5.ModPoints"}}</label>
+            </div>
+            <div class="new-list-item-col">
+                <span style="white-space: nowrap">
+                   {{calcModPointSlots items}} / {{calcModificationSlotsAvailable actor}}
+                </span>
+            </div>
+        </div>
+
         {{else}}
-        {{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs" name=(localize "SR5.ModificationCategories")}}
-        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.body") }}
-        <span style="white-space: nowrap">
-            {{calcModificationCategorySlots items "body"}} / {{calcModificationSlotsAvailable actor}}
-        </span>
-        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.cosmetic") }}
-        <span style="white-space: nowrap">
-            {{calcModificationCategorySlots items "cosmetic"}} / {{calcModificationSlotsAvailable actor}}
-        </span>
-        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.electromagnetic") }}
-        <span style="white-space: nowrap">
-            {{calcModificationCategorySlots items "electromagnetic"}} / {{calcModificationSlotsAvailable actor}}
-        </span>
-        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.power_train") }}
-        <span style="white-space: nowrap">
-            {{calcModificationCategorySlots items "power_train"}} / {{calcModificationSlotsAvailable actor}}
-        </span>
-        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.protection") }}
-        <span style="white-space: nowrap">
-            {{calcModificationCategorySlots items "protection"}} / {{calcModificationSlotsAvailable actor}}
-        </span>
-        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
-        {{#> "systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs" name=(localize "SR5.Vehicle.ModificationCategoryTypes.weapons") }}
-        <span style="white-space: nowrap">
-            {{calcModificationCategorySlots items "weapons"}} / {{calcModificationSlotsAvailable actor}}
-        </span>
-        {{/"systems/shadowrun5e/dist/templates/v2/common/name-line-block.hbs"}}
+
+        <div class="new-list-item">
+            <div class="new-list-item-label-container">
+                <label>{{localize "SR5.Vehicle.ModificationCategoryTypes.body"}}</label>
+            </div>
+            <div class="new-list-item-col">
+                <span style="white-space: nowrap">
+                    {{calcModificationCategorySlots items "body"}} / {{calcModificationSlotsAvailable actor}}
+                </span>
+            </div>
+        </div>
+        <div class="new-list-item">
+            <div class="new-list-item-label-container">
+                <label>{{localize "SR5.Vehicle.ModificationCategoryTypes.cosmetic"}}</label>
+            </div>
+            <div class="new-list-item-col">
+                <span style="white-space: nowrap">
+                    {{calcModificationCategorySlots items "cosmetic"}} / {{calcModificationSlotsAvailable actor}}
+                </span>
+            </div>
+        </div>
+        <div class="new-list-item">
+            <div class="new-list-item-label-container">
+                <label>{{localize "SR5.Vehicle.ModificationCategoryTypes.electromagnetic"}}</label>
+            </div>
+            <div class="new-list-item-col">
+                <span style="white-space: nowrap">
+                    {{calcModificationCategorySlots items "electromagnetic"}} / {{calcModificationSlotsAvailable actor}}
+                </span>
+            </div>
+        </div>
+        <div class="new-list-item">
+            <div class="new-list-item-label-container">
+                <label>{{localize "SR5.Vehicle.ModificationCategoryTypes.power_train"}}</label>
+            </div>
+            <div class="new-list-item-col">
+                <span style="white-space: nowrap">
+                    {{calcModificationCategorySlots items "power_train"}} / {{calcModificationSlotsAvailable actor}}
+                </span>
+            </div>
+        </div>
+        <div class="new-list-item">
+            <div class="new-list-item-label-container">
+                <label>{{localize "SR5.Vehicle.ModificationCategoryTypes.protection"}}</label>
+            </div>
+            <div class="new-list-item-col">
+                <span style="white-space: nowrap">
+                    {{calcModificationCategorySlots items "protection"}} / {{calcModificationSlotsAvailable actor}}
+                </span>
+            </div>
+        </div>
+        <div class="new-list-item">
+            <div class="new-list-item-label-container">
+                <label>{{localize "SR5.Vehicle.ModificationCategoryTypes.weapons"}}</label>
+            </div>
+            <div class="new-list-item-col">
+                <span style="white-space: nowrap">
+                    {{calcModificationCategorySlots items "weapons"}} / {{calcModificationSlotsAvailable actor}}
+                </span>
+            </div>
+        </div>
         {{/if}}
     </section>
 </div>

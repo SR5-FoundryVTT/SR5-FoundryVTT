@@ -1,7 +1,11 @@
 <div>
-    {{> "systems/shadowrun5e/dist/templates/v2/common/header-block.hbs"
-            name=(localize "SR5.SpecialAttributes")
-    }}
+    <div class="new-list-item new-list-item-header">
+        <div class="new-list-item-label-container">
+            <label>
+                {{localize "SR5.SpecialAttributes"}}
+            </label>
+        </div>
+    </div>
     <div class="attributes center">
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
                 attribute=system.attributes.edge

@@ -1,6 +1,8 @@
-<section class="tab{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
+        <div>
         {{editor biographyHTML target="system.description.value" button=true
                  editable=true engine="prosemirror" collaborate=false}}
+        </div>
     </div>
 </section>
