@@ -75,6 +75,16 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
         html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
         html.find('.toggle-owned-icon-silent').on('click', this._onOwnedIconRunningSilentToggle.bind(this));
+
+        // Matrix data handling...
+        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
+        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
+        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
+        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
+        html.find('.marks-connect-network').on('click', this._onMarksConnectToNetwork.bind(this));
+        html.find('.marks-place-mark').on('click', this._onMarksPlaceMark.bind(this));
+        html.find('.disconnect-network').on('click', this._onDisconnectNetwork.bind(this))
     }
 
      */
@@ -82,6 +92,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     static override DEFAULT_OPTIONS: any = {
         actions: {
             toggleConnectedMatrixIcons: SR5MatrixActorSheet._onToggleConnectedMatrixIcons,
+            openMarkedDocument: SR5MatrixActorSheet._onOpenMarkedDocument,
         }
 
     }
@@ -599,4 +610,104 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
         ui.notifications.error('SR5.Errors.MarksCantBePlacedWithoutPersona', {localize: true});
     }
+
+    async _onMarksQuantityChange(event) {
+        event.stopPropagation();
+
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
+        }
+
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
+
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
+        if (!markedDocument) return;
+
+        const marks = parseInt(event.currentTarget.value);
+        await this.actor.setMarks(markedDocument, marks, { overwrite: true });
+    }
+
+    async _onMarksQuantityChangeBy(event, by: number) {
+        event.stopPropagation();
+
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
+        }
+
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
+
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
+        if (!markedDocument) return;
+
+        await this.actor.setMarks(markedDocument, by);
+    }
+
+    async _onMarksDelete(event) {
+        event.stopPropagation();
+
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
+        }
+
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.actor.clearMark(uuid);
+    }
+
+    async _onMarksClearAll(event) {
+        event.stopPropagation();
+
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
+        }
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.actor.clearMarks();
+    }
+
+    /**
+     * When clicking on a specific mark, connect to the actor to this host/grid behind that.
+     *
+     * @param event Any interaction action
+     */
+    async _onMarksConnectToNetwork(event) {
+        event.stopPropagation();
+
+        const uuid = Helpers.listItemUuid(event);
+        if (!uuid) return;
+
+        const target = fromUuidSync(uuid) as SR5Item;
+        if (!target || !(target instanceof SR5Item)) return;
+
+        await this.actor.connectNetwork(target);
+        this.render();
+    }
+
+    async _onMarksPlaceMark(event) {
+        console.error('IMPLEMENT PLACE MARK ON TARGET');
+    }
+
+    /**
+     * When clicking on the disconnect button for the connected network, disconnect from it.
+     * @param event Any interaction event.
+     */
+    async _onDisconnectNetwork(event) {
+        event.stopPropagation();
+
+        await this.actor.disconnectNetwork();
+        this.render();
+    }
+
 }

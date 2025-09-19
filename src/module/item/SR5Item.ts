@@ -984,7 +984,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return matrix;
     }
 
+    canBeEquipped(this: SR5Item): boolean {
+        // currently only technology items with technology can be equipped
+        return !!this.getTechnologyData();
+    }
+
     isEquipped(this: SR5Item): boolean {
+        if (this.isType('critter_power', 'sprite_power')) {
+            return this.system.optional !== 'disabled_option';
+        }
         return this.system.technology?.equipped ?? false;
     }
 

@@ -1,8 +1,12 @@
 {{#if @root.isEditMode}}
-    <a data-action="editItem" data-item-id="{{this.uuid}}">
-        <i class="fas fa-pen-to-square"></i>
+    <a>
+        <i data-action="editItem"
+           data-item-id="{{this.uuid}}"
+           class="fas fa-pen-to-square"></i>
     </a>
-    <a data-action="deleteItem" data-item-id="{{this.uuid}}">
-        <i class="fas fa-trash"></i>
+    <a>
+        <i data-action="deleteItem"
+           data-item-id="{{this._id}}"
+           class="fas fa-trash"></i>
     </a>
 {{/if}}

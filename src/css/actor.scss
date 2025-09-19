@@ -303,7 +303,15 @@
             border-top: 1px solid $yellow;
             background: rgba($black, 0.9);
 
-            .new-list-item-label-container {
+            &.collapsible-header:hover {
+                @include clickable;
+
+                .new-list-item-label-container {
+                    @include linkHovered;
+                }
+            }
+
+            .new-list-item-label-container:not(.label-collapsed) {
                 color: $yellow !important;
             }
         }
@@ -326,6 +334,12 @@
                 &:hover {
                     content: url('assets/dice-solid.svg');
                     filter: invert(1);
+                }
+
+            }
+            img.new-list-item-image-info {
+                &:hover {
+                    content: url('icons/files.svg');
                 }
 
             }

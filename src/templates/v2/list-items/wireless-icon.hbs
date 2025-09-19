@@ -1,19 +1,23 @@
 {{#if (canBeWireless this)}}
     {{#if (isBroken this)}}
-        <a data-tooltip="SR5.Broken" data-action="repairBrokenItem" data-item-id="{{this.uuid}}">
-            <i class="fas fa-link-slash"></i>
-        </a>
-    {{else if (isRunningSilent this)}}
-        <a data-action="toggleItemWireless" data-item-id="{{this.uuid}}">
-            <i class="fa-duotone fa-wifi-fair"></i>
-        </a>
-    {{else if (isWireless this)}}
-        <a data-action="toggleItemWireless" data-item-id="{{this.uuid}}">
-            <i class="fas fa-wifi"></i>
+        <a>
+            <i data-tooltip="SR5.Broken"
+               data-action="repairBrokenItem"
+               data-item-id="{{this.uuid}}"
+               class="fas fa-link-slash"></i>
         </a>
     {{else}}
-        <a data-action="toggleItemWireless" data-item-id="{{this.uuid}}">
-            <i class="fas fa-wifi-slash"></i>
+        <a>
+            <i data-action="toggleItemWireless"
+               data-item-id="{{this.uuid}}"
+        {{#if (isRunningSilent this)}}
+               class="fa-duotone fa-wifi-fair"
+        {{else if (isWireless this)}}
+               class="fas fa-wifi"
+        {{else}}
+               class="fas fa-wifi-slash"
+        {{/if}}
+            ></i>
         </a>
     {{/if}}
 {{/if}}

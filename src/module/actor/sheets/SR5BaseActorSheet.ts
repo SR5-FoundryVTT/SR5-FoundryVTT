@@ -168,7 +168,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             height: 600,
         },
         actions: {
-            openItemSource: SR5BaseActorSheet._onOpenSource,
+            commonRoll: SR5BaseActorSheet._onRoll,
+
             openSkillSource: SR5BaseActorSheet._onOpenSourceSkill,
             rollItem: SR5BaseActorSheet._onItemRoll,
             rollSkill: SR5BaseActorSheet._onRollSkill,
@@ -176,6 +177,17 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             filterTrainedSkills: SR5BaseActorSheet._onFilterUntrainedSkills,
             showItemDescription: SR5BaseActorSheet._onListItemToggleDescriptionVisibility,
             toggleEditMode: SR5BaseActorSheet.#toggleEditMode,
+
+            addItem: SR5BaseActorSheet._onItemCreate,
+            editItem: SR5BaseActorSheet._onItemEdit,
+            deleteItem: SR5BaseActorSheet._onItemDelete,
+
+            openItemSource: SR5BaseActorSheet._onOpenSource,
+
+            equipItem: SR5BaseActorSheet._onListItemToggleEquipped,
+            toggleItemWireless: SR5BaseActorSheet._onListItemToggleWireless,
+            toggleExpanded: SR5BaseActorSheet._onInventorySectionVisiblitySwitch
+
         }
     }
 
@@ -332,31 +344,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find(".effect-control").on('click', async event => onManageActiveEffect(event, this.actor));
         html.find(".item-effect-control").on('click', async event => onManageItemActiveEffect(event));
 
-        // Inventory visibility switch
-        html.find('.item-toggle').on('click', this._onInventorySectionVisiblitySwitch.bind(this));
-
-        // General item CRUD management...
-        html.find('.item-create').on('click', this._onItemCreate.bind(this));
-        html.find('.item-edit').on('click', this._onItemEdit.bind(this));
-        html.find('.item-delete').on('click', this._onItemDelete.bind(this));
-
         // General item header/list actions...
         html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
         html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
-        html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
-        html.find('.item-enable-toggle').on('click', this._onListItemToggleEnabled.bind(this));
-        html.find('.item-wireless-toggle').on('click', this._onListItemToggleWireless.bind(this));
 
         // Item list description display handling...
         html.find('.hidden').hide();
 
-        // General item test rolling...
-        html.find('.Roll').on('click', this._onRoll.bind(this));
-
         // Actor inventory handling....
         html.find('.inventory-inline-create').on('click', this._onInventoryCreate.bind(this));
-        html.find('.inventory-collapse').on('click', this._onInventorySectionVisibilityChange.bind(this, false));
-        html.find('.inventory-expand').on('click', this._onInventorySectionVisibilityChange.bind(this, true));
         html.find('.inventory-remove').on('click', this._onInventoryRemove.bind(this));
         html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
         html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
@@ -370,16 +366,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
         html.find('.horizontal-cell-input .cell').on('contextmenu', this._onClearConditionTrack.bind(this));
-
-        // Matrix data handling...
-        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
-        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
-        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
-        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
-        html.find('.marks-connect-network').on('click', this._onMarksConnectToNetwork.bind(this));
-        html.find('.marks-place-mark').on('click', this._onMarksPlaceMark.bind(this));
-        html.find('.disconnect-network').on('click', this._onDisconnectNetwork.bind(this))
 
         // Skill Filter handling...
         html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
@@ -623,25 +609,25 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    async _onInventorySectionVisibilityChange(isOpen: boolean, event) {
+    static async _onInventorySectionVisiblitySwitch(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        this._setInventoryVisibility(isOpen);
+        const listHeader = $(event.target).closest('.new-list-item-header');
+        const type = listHeader.data().itemType;
+
+        console.log('type', type);
+        console.log('inventoryOpenClose', this._inventoryOpenClose);
+
+        const current = this._inventoryOpenClose[type] ?? true;
+
+        this._setInventoryTypeVisibility(type, !current);
         this.render();
     }
 
-    async _onInventorySectionVisiblitySwitch(event) {
-        event.preventDefault();
-        const type = Helpers.listHeaderId(event);
-
-        this._setInventoryTypeVisibility(type, !this._inventoryOpenClose[type]);
-        this.render();
-    }
-
-    _setInventoryVisibility(isOpen: boolean) {
+    _setInventoryVisibility(this: SR5BaseActorSheet, isOpen: boolean) {
         Object.keys(CONFIG.Item.typeLabels).forEach(type => { this._setInventoryTypeVisibility(type, isOpen); });
     }
 
-    _setInventoryTypeVisibility(type: string, isOpen: boolean) {
+    _setInventoryTypeVisibility(this: SR5BaseActorSheet, type: string, isOpen: boolean) {
         this._inventoryOpenClose[type] = isOpen
     }
 
@@ -651,16 +637,17 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param event 
      * @param data Optional additional data to be injected into the create item data.
      */
-    async _onItemCreate(event, data = {}) {
+    static async _onItemCreate(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const type = event.currentTarget.closest('.list-header').dataset.itemId;
+        console.log('onItemCreate', this, event);
+        const type = event.target.dataset.itemType ?? $(event.target).closest('a').data().itemType;
 
         // Unhide section it it was
         this._setInventoryTypeVisibility(type, true);
 
         // TODO: Add translation for item names...
         const itemData = {
-            ...data, type,
+            type,
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`
         };
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
@@ -671,20 +658,24 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
     }
 
-    async _onItemEdit(event) {
+    static async _onItemEdit(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (item) await item.sheet?.render(true);
+        const iid = event.target.dataset.itemId;
+        const item = await fromUuid(iid);
+        if (item && item instanceof SR5Item) await item.sheet?.render(true);
     }
 
-    async _onItemDelete(event) {
+    static async _onItemDelete(this: SR5BaseActorSheet, event) {
         event.preventDefault();
+
+        console.log('event', event);
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const iid = Helpers.listItemId(event);
+        // deleting items use the item's _id property instead of uuid
+        // this may need to change at some point to allow deleting linked items
+        const iid = event.target.dataset.itemId;
         const item = this.actor.items.get(iid);
         if (!item) return;
         await this.actor.inventory.removeItem(item);
@@ -707,13 +698,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event Must contain a currentTarget with a rollId dataset
      */
-    async _onRoll(event) {
+    static async _onRoll(this: SR5BaseActorSheet, event) {
         event.preventDefault();
 
         // look for roll id data in the current line
-        let rollId = $(event.currentTarget).data()?.rollId as string;
-        // if that doesn't exist, look for a prent with RollId name
-        rollId = rollId ?? $(event.currentTarget).parent('.RollId').data().rollId;
+        const rollId = event.target.dataset.rollId;
 
         const split = rollId.split('.');
         const options = { event };
@@ -1190,106 +1179,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         return `(${active}/${max})`;
     }
-
-    async _onMarksQuantityChange(event) {
-        event.stopPropagation();
-
-        if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
-            return;
-        }
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
-        if (!markedDocument) return;
-
-        const marks = parseInt(event.currentTarget.value);
-        await this.actor.setMarks(markedDocument, marks, { overwrite: true });
-    }
-
-    async _onMarksQuantityChangeBy(event, by: number) {
-        event.stopPropagation();
-
-        if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
-            return;
-        }
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
-        if (!markedDocument) return;
-
-        await this.actor.setMarks(markedDocument, by);
-    }
-
-    async _onMarksDelete(event) {
-        event.stopPropagation();
-
-        if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
-            return;
-        }
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        await this.actor.clearMark(uuid);
-    }
-
-    async _onMarksClearAll(event) {
-        event.stopPropagation();
-
-        if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
-            return;
-        }
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        await this.actor.clearMarks();
-    }
-
-    /**
-     * When clicking on a specific mark, connect to the actor to this host/grid behind that.
-     * 
-     * @param event Any interaction action
-     */
-    async _onMarksConnectToNetwork(event) {
-        event.stopPropagation();
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        const target = fromUuidSync(uuid) as SR5Item;
-        if (!target || !(target instanceof SR5Item)) return;
-
-        await this.actor.connectNetwork(target);
-        this.render();
-    }
-
-    async _onMarksPlaceMark(event) {
-        console.error('IMPLEMENT PLACE MARK ON TARGET');
-    }
-
-    /**
-     * When clicking on the disconnect button for the connected network, disconnect from it.
-     * @param event Any interaction event.
-     */
-    async _onDisconnectNetwork(event) {
-        event.stopPropagation();
-
-        await this.actor.disconnectNetwork();
-        this.render();
-    }
-
     /**
      * Prepare skills with sorting and filtering given by this sheet.
      * 
@@ -1574,36 +1463,45 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * Change the equipped status of an item shown within a sheet item list.
      */
-    async _onListItemToggleEquipped(event) {
+    static async _onListItemToggleEquipped(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (!item) return;
+        const iid = event.target.dataset.itemId;
+        const item = await fromUuid(iid);
+        if (!item || !(item instanceof SR5Item) || item.actorOwner !== this.actor) return;
 
-        // Handle the equipped state.
-        if (item.isType('device')) {
-            await this.document.equipOnlyOneItemOfType(item);
-        } else {
-            await this.actor.updateEmbeddedDocuments('Item', [{
-                _id: iid,
-                system: { technology: { equipped: !item.isEquipped() } }
-            }]);
+        if (item.isType('critter_power') || item.isType('sprite_power')) {
+            switch (item.system.optional) {
+                case 'standard':
+                    return;
+                case 'enabled_option':
+                    await item.update({ system: { optional: 'disabled_option', enabled: false } });
+                    break;
+                case 'disabled_option':
+                    await item.update({ system: { optional: 'enabled_option', enabled: true } });
+                    break;
+            }
+        } else if (item.canBeEquipped()) {
+            // Handle the equipped state.
+            if (item.isType('device')) {
+                await this.document.equipOnlyOneItemOfType(item);
+            } else {
+                await item.update({ system: { technology: { equipped: !item.isEquipped() }}})
+            }
+            this.actor.render(false);
         }
-
-        this.actor.render(false);
     }
 
     /**
      * Toggle the Wireless state of an item, iterating through the different states
      * @param event
      */
-    async _onListItemToggleWireless(event: MouseEvent) {
+    static async _onListItemToggleWireless(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
 
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (!item) return;
+        const iid = event.target.dataset.itemId;
+        const item = await fromUuid(iid);
+        if (!item || !(item instanceof SR5Item)) return;
 
         // iterate through the states of online -> silent -> offline
         const newState = event.shiftKey ? 'none'
@@ -1614,40 +1512,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                                             : 'online';
 
         // update the embedded item with the new wireless state
-        await this.actor.updateEmbeddedDocuments('Item', [{
-            '_id': iid,
-            system: { technology: { wireless: newState } }
-        }]);
-    }
-
-    /**
-     * Change the enabled status of an item shown within a sheet item list.
-     */
-    async _onListItemToggleEnabled(event) {
-        event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (!item) return;
-        if (!item.isType('critter_power') && !item.isType('sprite_power')) return;
-
-        switch (item.system.optional) {
-            case 'standard':
-                return;
-            case 'enabled_option':
-                await this.actor.updateEmbeddedDocuments('Item', [{
-                    _id: iid,
-                    system: { optional: 'disabled_option', enabled: false }
-                }]);
-                break;
-            case 'disabled_option':
-                await this.actor.updateEmbeddedDocuments('Item', [{
-                    _id: iid,
-                    system: { optional: 'enabled_option', enabled: true }
-                }]);
-                break;
-        }
-
-        this.actor.render(false);
+        await item.update({ system: { technology: { wireless: newState } } });
     }
 
     /**

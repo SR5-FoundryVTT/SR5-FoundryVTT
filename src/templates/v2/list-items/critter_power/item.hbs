@@ -31,6 +31,9 @@
 
         <div class="new-list-item-icons">
             {{#if (isOwner item owner=@root.actor)}}
+                {{#unless (eq item.system.optional "standard")}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
+                {{/unless}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
             {{/if}}
 
