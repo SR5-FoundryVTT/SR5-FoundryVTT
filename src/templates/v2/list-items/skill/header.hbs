@@ -17,10 +17,11 @@
     {{#if @root.isEditMode}}
     <div class="new-list-item-icons skill-icons">
         {{#if addAction}}
-                <a data-action="{{addAction}}">
-                    <i class="fas fa-plus"></i>
-                    {{localize "SR5.Add"}}
-                </a>
+            <a data-action="{{addAction}}"
+               data-skill-type="{{addSkillType}}">
+                <i class="fas fa-plus"></i>
+                {{localize "SR5.Add"}}
+            </a>
         {{/if}}
     </div>
     {{/if}}

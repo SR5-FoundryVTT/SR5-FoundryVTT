@@ -3,7 +3,7 @@
         label="SR5.ActiveSkills"
         headerAction="filterTrainedSkills"
         addAction="addActiveSkill"
-        cssClass="active-skills-header header-for-scrollable"
+        cssClass="active-skills-header header-for-scrollable collapsible-header"
     }}
     <div>
         <input
@@ -20,6 +20,7 @@
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
                 skillPath=(concat "system.skills.active." sid)
                 skill=skill
+                removeAction="removeActiveSkill"
                 id=sid
             }}
         {{/each}}

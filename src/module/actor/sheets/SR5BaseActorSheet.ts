@@ -15,7 +15,6 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
 import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
-import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -168,26 +167,35 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             height: 600,
         },
         actions: {
-            commonRoll: SR5BaseActorSheet._onRoll,
+            commonRoll: SR5BaseActorSheet.#rollById,
 
-            openSkillSource: SR5BaseActorSheet._onOpenSourceSkill,
-            rollItem: SR5BaseActorSheet._onItemRoll,
-            rollSkill: SR5BaseActorSheet._onRollSkill,
-            rollSkillSpec: SR5BaseActorSheet._onRollSkillSpec,
-            filterTrainedSkills: SR5BaseActorSheet._onFilterUntrainedSkills,
-            showItemDescription: SR5BaseActorSheet._onListItemToggleDescriptionVisibility,
+            openSkillSource: SR5BaseActorSheet.#openSkillSource,
+            rollAttribute: SR5BaseActorSheet.#rollAttribute,
+            rollItem: SR5BaseActorSheet.#rollItem,
+            rollSkill: SR5BaseActorSheet.#rollSkill,
+            rollSkillSpec: SR5BaseActorSheet.#rollSkillSpec,
+            filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
+            showItemDescription: SR5BaseActorSheet.#toggleListItemDescription,
             toggleEditMode: SR5BaseActorSheet.#toggleEditMode,
+            addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
+            addLanguageSkill: SR5BaseActorSheet.#createLanguageSkill,
+            addActiveSkill: SR5BaseActorSheet.#createActiveSkill,
+            removeKnowledgeSkill: SR5BaseActorSheet.#deleteKnowledgeSkill,
+            removeLanguageSkill: SR5BaseActorSheet.#deleteLanguageSkill,
+            removeActiveSkill: SR5BaseActorSheet.#deleteActiveSkill,
 
-            addItem: SR5BaseActorSheet._onItemCreate,
-            editItem: SR5BaseActorSheet._onItemEdit,
-            deleteItem: SR5BaseActorSheet._onItemDelete,
+            addItem: SR5BaseActorSheet.#createItem,
+            editItem: SR5BaseActorSheet.#editItem,
+            deleteItem: SR5BaseActorSheet.#deleteItem,
 
-            openItemSource: SR5BaseActorSheet._onOpenSource,
+            openItemSource: SR5BaseActorSheet.#openSource,
 
-            equipItem: SR5BaseActorSheet._onListItemToggleEquipped,
-            toggleItemWireless: SR5BaseActorSheet._onListItemToggleWireless,
-            toggleExpanded: SR5BaseActorSheet._onInventorySectionVisiblitySwitch
+            equipItem: SR5BaseActorSheet.#onToggleEquippedItem,
+            toggleItemWireless: SR5BaseActorSheet.#toggleWirelessState,
+            toggleExpanded: SR5BaseActorSheet.#toggleInventoryVisibility,
 
+            weaponFullReload: SR5BaseActorSheet.#reloadAmmo,
+            weaponPartialReload: SR5BaseActorSheet.#partialReloadAmmo,
         }
     }
 
@@ -370,17 +378,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Skill Filter handling...
         html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
 
-        // Skill CRUD handling...
-        html.find('.add-knowledge').on('click', this._onAddKnowledgeSkill.bind(this));
-        html.find('.add-language').on('click', this._onAddLanguageSkill.bind(this));
-        html.find('.add-active').on('click', this._onAddActiveSkill.bind(this));
-        html.find('.remove-knowledge').on('click', this._onRemoveKnowledgeSkill.bind(this));
-        html.find('.remove-language').on('click', this._onRemoveLanguageSkill.bind(this));
-        html.find('.remove-active').on('click', this._onRemoveActiveSkill.bind(this));
-
-        // Attribute test rolling...
-        html.find('.attribute-roll').on('click', this._onRollAttribute.bind(this));
-
         // Conditon monitor test rolling...
         html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
 
@@ -389,9 +386,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
         html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
 
-        // Misc. item type actions...
-        html.find('.reload-ammo').on('click', async (event) => this._onReloadAmmo(event, false));
-        html.find('.partial-reload-ammo').on('click', async (event) => this._onReloadAmmo(event, true));
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Situation modifiers application
@@ -609,7 +603,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    static async _onInventorySectionVisiblitySwitch(this: SR5BaseActorSheet, event) {
+    static async #toggleInventoryVisibility(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const listHeader = $(event.target).closest('.new-list-item-header');
         const type = listHeader.data().itemType;
@@ -637,7 +631,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param event 
      * @param data Optional additional data to be injected into the create item data.
      */
-    static async _onItemCreate(this: SR5BaseActorSheet, event) {
+    static async #createItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         console.log('onItemCreate', this, event);
         const type = event.target.dataset.itemType ?? $(event.target).closest('a').data().itemType;
@@ -658,17 +652,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
     }
 
-    static async _onItemEdit(this: SR5BaseActorSheet, event) {
+    static async #editItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const iid = event.target.dataset.itemId;
         const item = await fromUuid(iid);
         if (item && item instanceof SR5Item) await item.sheet?.render(true);
     }
 
-    static async _onItemDelete(this: SR5BaseActorSheet, event) {
+    static async #deleteItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-
-        console.log('event', event);
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -683,7 +675,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return this.actor.deleteEmbeddedDocuments('Item', [iid]);
     }
 
-    static async _onItemRoll(this: SR5BaseActorSheet, event) {
+    static async #rollItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const iid = event.target.dataset.itemId;
         const item = await fromUuid(iid);
@@ -698,7 +690,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event Must contain a currentTarget with a rollId dataset
      */
-    static async _onRoll(this: SR5BaseActorSheet, event) {
+    static async #rollById(this: SR5BaseActorSheet, event) {
         event.preventDefault();
 
         // look for roll id data in the current line
@@ -1270,7 +1262,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /** Setup untrained skill filter within getData */
-    static async _onFilterUntrainedSkills(this: SR5BaseActorSheet, event) {
+    static async #filterUntrainedSkills(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
         await this.render();
@@ -1293,23 +1285,23 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }, game.shadowrun5e.inputDelay);
     }
 
-    static async _onRollSkill(this: SR5BaseActorSheet, event) {
+    static async #rollSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const skillId = event.target.dataset.skill;
+        const skillId = $(event.target).closest('a').data().skill;
         return this.actor.rollSkill(skillId, { event });
     }
 
-    static async _onRollSkillSpec(this: SR5BaseActorSheet, event) {
+    static async #rollSkillSpec(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
         // const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
-        const skillId = event.target.dataset.skill;
+        const skillId = $(event.target).closest('a').data().skill;
         return this.actor.rollSkill(skillId, { event, specialization: true });
     }
 
-    static async _onOpenSourceSkill(this: SR5BaseActorSheet, event) {
+    static async #openSkillSource(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const skillId = event.target.dataset.skill;
+        const skillId = $(event.target).closest('a').data().skill;
 
         const skill = this.actor.getSkill(skillId);
         if (!skill) {
@@ -1319,36 +1311,36 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         LinksHelpers.openSource(skill.link);
     }
 
-    async _onAddLanguageSkill(event) {
+    static async #createLanguageSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const skillId = await this.actor.addLanguageSkill({ name: '' });
-        if (!skillId) return;
+        await this.actor.addLanguageSkill({ name: '' });
     }
 
-    async _onRemoveLanguageSkill(event) {
+    static async #deleteLanguageSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = Helpers.listItemId(event);
+        const skillId = $(event.target).closest('a').data().skill;
         await this.actor.removeLanguageSkill(skillId);
     }
 
-    async _onAddKnowledgeSkill(event) {
+    static async #createKnowledgeSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const category = Helpers.listHeaderId(event) as KnowledgeSkillCategory;
+        const category = $(event.target).closest('a').data().skillType;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
     }
 
-    async _onRemoveKnowledgeSkill(event) {
+    static async #deleteKnowledgeSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const [skillId, category] = Helpers.listItemId(event).split('.') as [string, KnowledgeSkillCategory];
+        const skillId = $(event.target).closest('a').data().skill;
+        const category = $(event.target).closest('a').data().category;
         await this.actor.removeKnowledgeSkill(skillId, category);
     }
 
@@ -1356,26 +1348,27 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event The HTML event from which the action resulted.
      */
-    async _onAddActiveSkill(event: Event) {
+    static async #createActiveSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const skillId = await this.actor.addActiveSkill();
-        if (!skillId) return;
+        await this.actor.addActiveSkill();
     }
 
-    async _onRemoveActiveSkill(event: Event) {
+    static async #deleteActiveSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = Helpers.listItemId(event);
+        const skillId = $(event.target).closest('a').data().skill;
         await this.actor.removeActiveSkill(skillId);
     }
 
-    async _onRollAttribute(event) {
+    static async #rollAttribute(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const attribute = event.currentTarget.closest('.attribute').dataset.attribute;
-        return this.actor.rollAttribute(attribute, { event });
+        const attribute = $(event.target).closest('a').data().attributeId;
+        if (attribute) {
+            await this.actor.rollAttribute(attribute, { event });
+        }
     }
 
     /**
@@ -1405,7 +1398,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.showHiddenSkills();
     }
 
-    static async _onOpenSource(this: SR5BaseActorSheet, event) {
+    static async #openSource(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const iid = event.target.dataset.itemId;
         const item = await fromUuid(iid);
@@ -1463,7 +1456,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * Change the equipped status of an item shown within a sheet item list.
      */
-    static async _onListItemToggleEquipped(this: SR5BaseActorSheet, event) {
+    static async #onToggleEquippedItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const iid = event.target.dataset.itemId;
         const item = await fromUuid(iid);
@@ -1495,7 +1488,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Toggle the Wireless state of an item, iterating through the different states
      * @param event
      */
-    static async _onListItemToggleWireless(this: SR5BaseActorSheet, event) {
+    static async #toggleWirelessState(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -1518,7 +1511,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * Show / hide the items description within a sheet item l ist.
      */
-    static async _onListItemToggleDescriptionVisibility(this: SR5BaseActorSheet, event) {
+    static async #toggleListItemDescription(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         // find the list-item parent so we can find the child item
         const item = $(event.target).parents('.new-list-item-container');
@@ -1684,16 +1677,18 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.stopPropagation();
     }
 
-    /**
-     * Initiative a reload from a sheet event.
-     *
-     * @param event
-     */
-    async _onReloadAmmo(event, partialReload: boolean) {
+    static async #reloadAmmo(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (item) return item.reloadAmmo(partialReload);
+        const iid = event.target.dataset.itemId;
+        const item = await fromUuid(iid);
+        if (item && item instanceof SR5Item) return item.reloadAmmo(false);
+    }
+
+    static async #partialReloadAmmo(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const iid = event.target.dataset.itemId;
+        const item = await fromUuid(iid);
+        if (item && item instanceof SR5Item) return item.reloadAmmo(true);
     }
 
     /**

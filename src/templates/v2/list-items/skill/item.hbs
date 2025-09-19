@@ -3,26 +3,23 @@
         <div class="new-list-item-label-container">
             <label>
                 {{#if @root.isEditMode}}
-                <a>
-                    <i data-action="showItemDescription" class="far fa-file-pen"></i>
+                <a data-action="showItemDescription">
+                    <i class="far fa-file-pen"></i>
                 </a>
                 {{/if}}
                 {{#if skill.link}}
-                <a>
-                    <i class="fas fa-file"
-                       data-action="openSkillSource"
-                       data-skill="{{id}}"
-                       data-tooltip="SR5.OpenSource"></i>
+                <a data-action="openSkillSource"
+                   data-skill="{{id}}"
+                   data-tooltip="SR5.OpenSource">
+                    <i class="fas fa-file"></i>
                 </a>
                 {{/if}}
-                <a
-                    {{#if @root.isEditMode}}
-                    data-action="showItemDescription"
-                    {{else}}
-                    data-action="rollSkill"
-                    {{/if}}
-                    data-skill="{{id}}"
-                >{{localizeSkill skill}}</a>
+                <a {{#if @root.isEditMode}}
+                   data-action="showItemDescription"
+                   {{else}}
+                   data-action="rollSkill"
+                   {{/if}}
+                   data-skill="{{id}}">{{localizeSkill skill}}</a>
             </label>
         </div>
         {{#if @root.isPlayMode}}
@@ -42,11 +39,11 @@
         </div>
         {{#if @root.isEditMode}}
         <div class="new-list-item-icons">
-            <a>
-                <i class="fas fa-trash"
-                   data-action="deleteSkill"
-                   data-skill="{{id}}"
-                   data-tooltip="SR5.DeleteSkill"></i>
+            <a data-action="{{removeAction}}"
+               data-skill="{{id}}"
+               data-category="{{removeCategory}}"
+               data-tooltip="SR5.DeleteSkill">
+                <i class="fas fa-trash"></i>
             </a>
         </div>
         {{/if}}
@@ -79,7 +76,7 @@
                         />
                     </div>
                     <div class="new-list-item-icons">
-                        <a class="remove-spec">
+                        <a>
                             <i data-action="removeSkillSpecialization"
                                data-tooltip="SR5.RemoveSpecialization"
                                data-spec="{{id}}"

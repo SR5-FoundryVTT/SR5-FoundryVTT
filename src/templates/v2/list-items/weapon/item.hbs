@@ -24,13 +24,13 @@
         <div class="new-list-item-col">
         {{#if (usesAmmo item)}}
             {{#iflt item.system.ammo.current.value item.system.ammo.current.max}}
-                <button type="button" data-action="weaponFullReload" data-item-id="{{item.uuid}}">
+                <a data-action="weaponFullReload" data-item-id="{{item.uuid}}">
                     {{localize "SR5.Weapon.Reload"}} ({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})
-                </button>
+                </a>
                 {{#ifgt item.system.ammo.partial_reload_value 0}}
-                <button type="button" data-action="weaponPartialReload" data-item-id="{{item.uuid}}">
+                <a data-action="weaponPartialReload" data-item-id="{{item.uuid}}">
                     {{localize "SR5.Weapon.PartialReload"}} (+{{item.system.ammo.partial_reload_value}})
-                </button>
+                </a>
                 {{/ifgt}}
             {{else}}
                 <span>
