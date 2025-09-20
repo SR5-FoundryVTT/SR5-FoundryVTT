@@ -1695,6 +1695,26 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (item && item instanceof SR5Item) return item.reloadAmmo(true);
     }
 
+    protected override _prepareTabs(group: string) {
+        const retVal = super._prepareTabs(group);
+        if (group === 'primary') {
+            // remove actions tab if the actor does not have any
+            if (!this._prepareHasActions()) {
+                delete retVal['actions'];
+            }
+        }
+        return retVal;
+    }
+
+    protected override _configureRenderParts(options) {
+        const retVal = super._configureRenderParts(options);
+        if (!this._prepareHasActions()) {
+            // remove actions tab if the actor does not have any
+            delete retVal['actions'];
+        }
+        return retVal;
+    }
+
     /**
      * Sync matrix attribute changes (order) made on the actor sheet into item data of the selected cyberdeck.
      *

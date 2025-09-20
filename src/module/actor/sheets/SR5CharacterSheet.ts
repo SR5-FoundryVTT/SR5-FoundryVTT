@@ -60,6 +60,34 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         },
     }
 
+    _hasCritterPowers() {
+        return this.actor.items.filter(item => item.type === 'critter_power').length > 0;
+    }
+
+    protected override _prepareTabs(group: string) {
+        const retVal = super._prepareTabs(group);
+        if (group === 'primary') {
+            if (!this._hasCritterPowers()) {
+                delete retVal['critter'];
+            }
+            if (!this.actor.isAwakened()) {
+                delete retVal['magic'];
+            }
+        }
+        return retVal;
+    }
+
+    protected override _configureRenderParts(options) {
+        const retVal = super._configureRenderParts(options);
+        if (!this._hasCritterPowers()) {
+            delete retVal['critter'];
+        }
+        if (!this.actor.isAwakened()) {
+            delete retVal['magic'];
+        }
+        return retVal;
+    }
+
     static override PARTS = {
         ...super.PARTS,
         skills: {
