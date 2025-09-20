@@ -7,6 +7,24 @@ type Context = foundry.applications.api.ApplicationV2.RenderContext & Record<str
 type FilterEntry = { value: string; id: string; selected: boolean };
 const Base = HandlebarsApplicationMixin(ApplicationV2<Context>);
 type BaseType = InstanceType<typeof Base>;
+type Pack = CompendiumCollection<"Actor" | "Item">;
+
+type PackNode = {
+    id: string;
+    name: string;
+    path: string;
+    selected: boolean;
+    isFolder?: false;
+};
+
+type FolderNode = {
+    name: string;
+    path: string;
+    isFolder: true;
+    collapsed: boolean;
+    selectionState: "none" | "some" | "all";
+    children: (FolderNode | PackNode)[];
+};
 
 /**
  * A generic compendium browser application that allows users to view and search
@@ -32,6 +50,7 @@ export class CompendiumBrowser extends Base {
             openDoc: async (...args: Parameters<CompendiumBrowser["_openDoc"]>) => this.prototype._openDoc.apply(this, args),
             openSource: async (...args: Parameters<CompendiumBrowser["_openSource"]>) =>
                 this.prototype._openSource.apply(this, args),
+            toggleCollapse: CompendiumBrowser.onToggleCollapse.bind(this),
         },
     };
 
@@ -39,6 +58,7 @@ export class CompendiumBrowser extends Base {
         tabs: { template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/tabs.hbs" },
         filters: { template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/filters.hbs" },
         results: { template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/results.hbs" },
+        settings: { template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/settings.hbs" },
     };
 
     static override TABS = {
@@ -47,13 +67,14 @@ export class CompendiumBrowser extends Base {
             tabs: [
                 { id: "Actor", icon: "fa-solid fa-user", label: "Actors" },
                 { id: "Item", icon: "fa-solid fa-suitcase", label: "Items" },
+                { id: "Config", icon: "fa-solid fa-gear", label: "Settings" },
             ],
         },
     };
 
     // --- Instance State ---
 
-    private activeTab: "Actor" | "Item" = "Item";
+    private activeTab: "Actor" | "Item" | "Config" = "Item";
     private allFilters: FilterEntry[] = [];
     private readonly _packs: CompendiumCollection<any>[];
     private readonly _activePackIds: string[] = [];
@@ -88,6 +109,12 @@ export class CompendiumBrowser extends Base {
         return "Compendium Browser";
     }
 
+    private static onToggleCollapse(event: MouseEvent, target: HTMLElement) {
+        event.preventDefault();
+        event.stopPropagation();
+        target.closest<HTMLElement>(".collapsible")?.classList.toggle("collapsed");
+    }
+
     /**
      * Prepares the base context object for rendering the application.
      */
@@ -109,11 +136,132 @@ export class CompendiumBrowser extends Base {
             context.activeTab = this.activeTab;
             context.types = this.allFilters;
         }
-        if (partId === "results") {
-            // Fetch results and then render the initial visible set
-            void this.fetch().then(async () => this.renderResults(0, 50));
-        }
         return context;
+    }
+
+    protected override _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
+        const result = super._onRender(context, options);
+
+        if (this.activeTab === "Config") {
+            void this._renderSettings().then(() => {});
+        } else {
+            // Fetch results and then render the initial visible set
+            void this.fetch().then(async () => this.prepareResults(0, 50));
+        }
+
+        return result;
+    }
+
+    private async _renderSettings() {
+        // 1. Build the data tree
+        const tree = this._buildPackTree();
+
+        console.log(tree);
+
+        // 2. Prepare context for Handlebars
+        const context = { tree };
+
+        // 3. Render the main template
+        const html = await foundry.applications.handlebars.renderTemplate(
+            "systems/shadowrun5e/dist/templates/apps/compendium-browser/settings.hbs",
+            context
+        );
+
+        // 4. Inject into the DOM
+        const container = this.element.querySelector<HTMLElement>(".compendium-settings");
+        if (!container) return;
+        
+        const content = document.createElement("div");
+        content.innerHTML = html;
+        container.replaceChildren(...content.firstElementChild!.children);
+
+        // 5. Update checkbox indeterminate states, which can't be done in Handlebars
+        this._updateIndeterminateStates(container, tree);
+    }
+
+    /** Builds the hierarchical tree of folders and packs. */
+    private _buildPackTree(): FolderNode {
+        const packs = game.packs
+            .filter((p): p is CompendiumCollection<'Actor' | 'Item'> => p.visible && ["Actor", "Item"].includes(p.metadata.type))
+            .map(p => ({
+                pack: p,
+                path: p.folder ? [...p.folder.ancestors.reverse().map(f => f.name), p.folder.name, p.metadata.label] : [p.metadata.label],
+            }))
+            .sort((a, b) => a.path.join("/").localeCompare(b.path.join("/")));
+
+        const root: FolderNode = { name: "__root__", path: "", isFolder: true, collapsed: false, selectionState: "none", children: [] };
+        const folderMap = new Map<string, FolderNode>([["", root]]);
+
+        for (const { pack, path } of packs) {
+            // Ensure all parent folders exist in the tree
+            for (let i = 0; i < path.length - 1; i++) {
+                const folderPath = path.slice(0, i + 1).join("/");
+                if (!folderMap.has(folderPath)) {
+                    const parentPath = path.slice(0, i).join("/");
+                    const parentNode = folderMap.get(parentPath)!;
+                    const folderNode: FolderNode = {
+                        name: path[i],
+                        path: folderPath,
+                        isFolder: true,
+                        collapsed: false,
+                        selectionState: "none",
+                        children: [],
+                    };
+                    parentNode.children.push(folderNode);
+                    folderMap.set(folderPath, folderNode);
+                }
+            }
+
+            // Add the pack itself to its parent folder
+            const parentPath = path.slice(0, path.length - 1).join("/");
+            const parentNode = folderMap.get(parentPath)!;
+            parentNode.children.push({
+                id: pack.collection,
+                name: pack.metadata.label,
+                path: path.join("/"),
+                selected: this._activePackIds.includes(pack.collection),
+            });
+        }
+        
+        // Recursively calculate selection states after the tree is built
+        this._updateFolderSelectionState(root);
+        return root;
+    }
+
+    /** Recursively updates the selection state of a folder based on its children. */
+    private _updateFolderSelectionState(folder: FolderNode): "none" | "some" | "all" {
+        let checkedCount = 0;
+        let childCount = 0;
+
+        for (const child of folder.children) {
+            if (child.isFolder) {
+                const childState = this._updateFolderSelectionState(child);
+                if (childState === "all") checkedCount++;
+                if (childState === "some") checkedCount += 0.5; // Treat indeterminate as half
+            } else {
+                if (child.selected) checkedCount++;
+            }
+            childCount++;
+        }
+
+        if (checkedCount === 0) folder.selectionState = "none";
+        else if (checkedCount === childCount) folder.selectionState = "all";
+        else folder.selectionState = "some";
+        
+        return folder.selectionState;
+    }
+
+    /** Updates the visual indeterminate state of checkboxes in the DOM. */
+    private _updateIndeterminateStates(container: HTMLElement, node: FolderNode | PackNode) {
+        if (!node.isFolder) return;
+
+        const checkbox = container.querySelector<HTMLInputElement>(`input[data-path="${node.path}"]`);
+        if (checkbox) {
+            checkbox.indeterminate = node.selectionState === "some";
+        }
+        for (const child of node.children) {
+            this._updateIndeterminateStates(container, child);
+        }
     }
 
     /**
@@ -136,9 +284,9 @@ export class CompendiumBrowser extends Base {
      */
     override changeTab(...[tab, group, options]: Parameters<BaseType["changeTab"]>) {
         super.changeTab(tab, group, options);
-        this.activeTab = tab as "Actor" | "Item";
+        this.activeTab = tab as "Actor" | "Item" | "Config";
         this.setFilters();
-        void this.render({ parts: ["filters", "results"] });
+        void this.render({ parts: ["filters", "results", "settings"] });
     }
 
     // --- Event Listener Setup ---
@@ -154,6 +302,15 @@ export class CompendiumBrowser extends Base {
     override _attachPartListeners(...[partId, htmlElement, options]: Parameters<BaseType["_attachPartListeners"]>) {
         super._attachPartListeners(partId, htmlElement, options);
         if (partId === "filters") this.filterListeners(htmlElement);
+
+        if (this.activeTab === "Config") {
+            if (partId === "results")
+                htmlElement.classList.add("hidden");
+            else if (partId === "settings")
+                htmlElement.classList.remove("hidden");
+        } else if (partId === "settings") {
+            htmlElement.classList.add("hidden");
+        }
     }
 
     /**
@@ -255,7 +412,7 @@ export class CompendiumBrowser extends Base {
         const startIndex = Math.max(0, Math.floor(scrollTop / this.results.height) - 2 * entriesPerScreen);
         const endIndex = Math.min(this.results.entries.length, startIndex + 5 * entriesPerScreen);
 
-        await this.renderResults(startIndex, endIndex);
+        await this.prepareResults(startIndex, endIndex);
     }
 
     // --- Core Data & Rendering Logic ---
@@ -300,7 +457,7 @@ export class CompendiumBrowser extends Base {
     /**
      * Renders a slice of the results for virtual scrolling.
      */
-    private async renderResults(indexStart: number, indexEnd: number) {
+    private async prepareResults(indexStart: number, indexEnd: number) {
         if (this.results.throttle) return;
         this.results.throttle = true;
 
@@ -350,6 +507,11 @@ export class CompendiumBrowser extends Base {
 
     /** Populates and sorts the `allFilters` array based on the document types of the active tab. */
     private setFilters() {
+        if (this.activeTab === "Config") {
+            this.allFilters = [];
+            return;
+        }
+
         this.allFilters = Object.keys(CONFIG[this.activeTab].dataModels)
             .map((id) => ({ value: game.i18n.localize(`TYPES.${this.activeTab}.${id}`), id, selected: false }))
             .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang));

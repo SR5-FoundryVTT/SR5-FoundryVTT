@@ -303,5 +303,96 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                 background: $bg-primary;
             }
         }
+
+        .compendium-settings {
+            display: grid;
+            gap: 25px;
+            padding: 10px;
+            overflow-y: hidden;
+
+            /* Hide the settings panel by default unless managed by a listener */
+            &.hidden {
+                display: none;
+            }
+
+            .pack-group {
+                display: flex;
+                flex-direction: column;
+                background-color: $bg-secondary;
+                border: 1px solid $border-medium;
+                border-radius: 5px;
+                padding: 15px;
+                overflow-y: hidden;
+            }
+
+            .group-title {
+                font-weight: bold;
+                color: $accent-gold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                padding-bottom: 8px;
+                margin: 0 0 10px 0;
+                border-bottom: 2px solid $border-strong;
+                font-size: 1.2em;
+                text-align: center;
+            }
+
+            .pack-list {
+                padding-left: 0;
+                overflow-y: auto;
+            }
+
+            .pack-row {
+                display: flex;
+                flex-direction: column;
+                
+                > label {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5em;
+                    cursor: pointer;
+                    padding-left: calc(var(--depth, 0) * 30px);
+                    border-radius: 3px;
+                    
+                    &:hover {
+                        background-color: rgba(255, 255, 255, 0.1);
+                    }
+                }
+
+                // Add this new rule for the container
+                .children-container {
+                    overflow: hidden;
+                    // Default (expanded) state
+                    max-height: 1000px; /* A large value that the content will not exceed */
+                    transition: max-height 0.3s ease-out;
+                }
+            }
+
+            .folder {
+                > label {
+                    font-weight: bold;
+                }
+            }
+            
+            .collapse-toggle {
+                cursor: pointer;
+                width: 1em;
+                text-align: center;
+                i {
+                    transition: transform 0.2s ease-in-out;
+                }
+            }
+
+            .collapsed {
+                .children-container {
+                    max-height: 0;
+                    transition: max-height 0.25s ease-in;
+                }
+
+                > label .collapse-toggle i {
+                    transform: rotate(-90deg);
+                }
+            }
+        }
     }
 }

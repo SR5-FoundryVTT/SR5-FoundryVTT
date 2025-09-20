@@ -1,0 +1,15 @@
+<div class="pack-row {{#if children}}collapsible{{/if}}" style="padding-left: calc({{depth}} * 1em);">
+    <label>
+        <input
+            type="checkbox"
+            {{#if selected}}checked{{/if}}>
+        <span>{{name}}</span>
+    </label>
+    {{#if pack.children}}
+        <label data-action="toggleCollapse">
+            <span class="roboto-upper">{{ localize label }}</span>
+            <i class="fa-solid fa-caret-down" inert></i>
+        </label>
+        <div class="pack-row"></div>    
+    {{/if}}
+</div>
