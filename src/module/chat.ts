@@ -31,10 +31,9 @@ const createChatData = async (template: string, templateData) => {
         },
         item: templateData.item,
         content: html,
-        rollMode: game.settings.get(CORE_NAME, CORE_FLAGS.RollMode)
+        rollMode: game.settings.get(CORE_NAME, 'rollMode')!
     };
 
-    // @ts-expect-error
     ChatMessage.applyRollMode(chatData, chatData.rollMode);
 
     return chatData;
@@ -42,7 +41,7 @@ const createChatData = async (template: string, templateData) => {
 
 export async function createItemChatMessage(options) {
     const templateData = createChatTemplateData(options);
-    return await createChatMessage('systems/shadowrun5e/dist/templates/rolls/item-card.html', templateData);
+    return createChatMessage('systems/shadowrun5e/dist/templates/rolls/item-card.hbs', templateData);
 }
 
 function createChatTemplateData(options) {

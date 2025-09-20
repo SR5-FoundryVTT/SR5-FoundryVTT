@@ -4,7 +4,7 @@ import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { Translation } from '../utils/strings';
 
 export interface SkillTestData extends SuccessTestData {
-    attribute: string
+    attribute: Shadowrun.ActorAttribute
     limitSelection: string
 }
 
@@ -30,7 +30,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      * Allow users to alter detailed skill values.
      */
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/skill-test-dialog.hbs';
     }
 
     /**
@@ -47,7 +47,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
     override _prepareData(data: any, options: TestOptions) {
         data = super._prepareData(data, options);
 
-        data.action = data.action || DataDefaults.actionRollData();
+        data.action = data.action || DataDefaults.createData('action_roll');
 
         // Preselect based on action.
         data.attribute = data.action.attribute;
@@ -60,9 +60,10 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      * Skill test provides a selection for attribute and limit during TestDialog.
      */
     override prepareBaseValues() {
-        super.prepareBaseValues();
         this.prepareAttributeSelection();
         this.prepareLimitSelection();
+
+        super.prepareBaseValues();
     }
 
     /**
@@ -79,17 +80,14 @@ export class SkillTest extends SuccessTest<SkillTestData> {
 
         if (!usedAttribute || !lastUsedAttribute) return; 
 
-
         const pool = new PartsList<number>(this.pool.mod);
 
         // Replace previous attribute with new one, without changing other modifiers
         pool.removePart(lastUsedAttribute.label);
-        this.actor._removeMatrixParts(pool);
         pool.addPart(usedAttribute.label, usedAttribute.value);
 
-        if (this.actor._isMatrixAttribute(selectedAttribute)) this.actor._addMatrixParts(pool, true);
-
         this.lastUsedAttribute = selectedAttribute;
+        this.data.action.attribute = selectedAttribute;
     }
 
     /**
@@ -100,22 +98,20 @@ export class SkillTest extends SuccessTest<SkillTestData> {
 
         // Remove last used limit and its modifiers and replace with new selection.
         const useSelection = this.data.limitSelection !== this.data.action.limit.attribute;
-        const selectedLimit = useSelection ? this.data.limitSelection : this.data.action.limit.attribute;
+        const selectedLimit = useSelection ? this.data.limitSelection : this.data.action.limit.attribute!;
         const usedLimit = this.actor.getLimit(selectedLimit);
         const lastUsedLimit = this.actor.getLimit(this.lastUsedLimit);
 
         if (!usedLimit || !lastUsedLimit) return;
 
         const limit = new PartsList<number>(this.limit.mod);
-        const pool = new PartsList<number>(this.pool.mod);
 
         // Replace previous limit with new one, without changing other modifiers.
         limit.removePart(lastUsedLimit.label);
         limit.addPart(usedLimit.label, usedLimit.value);
-        this.actor._removeMatrixParts(pool);
-
-        if (limit && this.actor._isMatrixAttribute(selectedLimit)) this.actor._addMatrixParts(pool, true);
 
         this.lastUsedLimit = selectedLimit;
+
+        this.data.action.limit.attribute = selectedLimit as Shadowrun.ActorAttribute;
     }
 }

@@ -1,0 +1,17 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    {{> "systems/shadowrun5e/dist/templates/item/parts/header.hbs"}}
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
+        <a class="item" data-tab="action">{{localize "SR5.Action"}}</a>
+        {{#if showMiscTab}}<a class="item" data-tab="miscellaneous">{{localize "SR5.Miscellaneous"}}</a>{{/if}}
+        <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
+    </nav>
+    <section class="sheetbody">
+        <div class="tab" data-group="primary" data-tab="description">
+            {{> "systems/shadowrun5e/dist/templates/item/parts/description.hbs" }}
+        </div>
+        {{#if showMiscTab}}{{> "systems/shadowrun5e/dist/templates/item/tabs/MiscellaneousTab.hbs" }}{{/if}}
+        {{> "systems/shadowrun5e/dist/templates/item/tabs/ActionTab.hbs" }}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs" }}
+    </section>
+</form>

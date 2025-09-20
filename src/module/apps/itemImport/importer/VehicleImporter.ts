@@ -1,7 +1,6 @@
 import { DataImporter } from './DataImporter';
 import { VehicleParser } from '../parser/vehicle/VehicleParser';
 import { VehiclesSchema, Vehicle } from '../schema/VehiclesSchema';
-import { CompendiumKey } from './Constants';
 
 export class VehicleImporter extends DataImporter {
     public files = ["vehicles.xml"];
@@ -11,7 +10,7 @@ export class VehicleImporter extends DataImporter {
     }
 
     async Parse(jsonObject: VehiclesSchema): Promise<void> {
-        return VehicleImporter.ParseItems<Vehicle, Shadowrun.VehicleActorData>(
+        return VehicleImporter.ParseItems<Vehicle>(
             jsonObject.vehicles.vehicle,
             {
                 compendiumKey: (jsonData: Vehicle) => {

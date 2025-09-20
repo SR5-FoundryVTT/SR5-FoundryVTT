@@ -1,7 +1,8 @@
-import SkillField = Shadowrun.SkillField;
 import {PartsList} from "../parts/PartsList";
-import {SR5} from "../config";
 import {SR} from "../constants";
+import { SkillFieldType } from "../types/template/Skills";
+import { SR5Actor } from '@/module/actor/SR5Actor';
+import { DataDefaults } from '@/module/data/DataDefaults';
 
 export class SkillRules {
 
@@ -14,7 +15,7 @@ export class SkillRules {
      * @param skill Any legacy or custom skill
      * @returns true, if a roll for the given skill must default.
      */
-    static mustDefaultToRoll(skill: SkillField): boolean {
+    static mustDefaultToRoll(skill: SkillFieldType): boolean {
         return skill.value === 0;
     }
     /**
@@ -23,7 +24,7 @@ export class SkillRules {
      * @param skill Check for this skills ability to be defaulted.
      * @return true will allow for a SuccessTest / role to proceed.
      */
-    static allowDefaultingRoll(skill: SkillField): boolean {
+    static allowDefaultingRoll(skill: SkillFieldType): boolean {
         // Check for skill defaulting at the base, since modifiers or bonus can cause a positive pool, while
         // still defaulting.
         return skill.canDefault;
@@ -35,7 +36,7 @@ export class SkillRules {
      * @param skill Check for this skills ability to be rolled.
      * @return true will allow for a SuccessTest / role to proceed.
      */
-    static allowRoll(skill: SkillField): boolean {
+    static allowRoll(skill: SkillFieldType): boolean {
         return !SkillRules.mustDefaultToRoll(skill) || SkillRules.allowDefaultingRoll(skill);
     }
 
@@ -53,7 +54,7 @@ export class SkillRules {
      * @param options
      * @param options.specialization If true will add the default specialization bonus onto the level.
      */
-    static level(skill: SkillField, options = {specialization: false}): number {
+    static level(skill: SkillFieldType, options = {specialization: false}): number {
         if (this.mustDefaultToRoll(skill)) {
             return SkillRules.defaultingModifier;
         }
@@ -71,5 +72,34 @@ export class SkillRules {
 
     static get SpecializationModifier(): number {
         return SR.skill.SPECIALIZATION_MODIFIER;
+    }
+
+    /**
+     * Inject all attributes into testData that match the given attribute names list.
+     *
+     * Also implements the 'use bigger value rule',if necessary.
+     *
+     * @param names A list of attribute names to inject
+     * @param source Actor to get the Skills from
+     * @param rollData The testData to inject attributes into
+     * @param options.bigger If true, the bigger value will be used, if false the source value will always be used.
+     */
+    static injectSkills(names: string[], source: SR5Actor, rollData: SR5Actor['system'], options: { bigger: boolean }) {
+        const targetSkills = rollData.skills.active;
+        for (const name of names) {
+            // get the skill from the source, it may be undefined
+            let sourceSkill = source.getSkill(name);
+            if (!sourceSkill) continue;
+            // if it is defined, duplicate it so we don't mess with the underlying data
+            sourceSkill = foundry.utils.deepClone(sourceSkill);
+
+            const targetSkill = targetSkills[name];
+
+            if (options.bigger) {
+                targetSkills[name] = sourceSkill.value > targetSkill.value ? sourceSkill : targetSkill;
+            } else {
+                targetSkills[name] = sourceSkill;
+            }
+        }
     }
 }

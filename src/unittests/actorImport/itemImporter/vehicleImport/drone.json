@@ -87,7 +87,7 @@
             "name_english": "Shiawase Arms Monsoon",
             "category": "Sturmgewehre",
             "category_english": "Assault Rifles",
-            "type": "Ranged",
+            "type": "Range",
             "reach": "0",
             "accuracy": "5 (7)",
             "accuracy_noammo": "5 (7)",

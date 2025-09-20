@@ -25,31 +25,37 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
     // These element grabs rely heavily on HTML structure within the templates.
     const icon = event.currentTarget;    
     const item = event.currentTarget.closest('.list-item-effect');
-    const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId) : null;
+    const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId)! : null;
+
     // The HTML dataset must be defined
     switch (icon.dataset.action) {
-        case "create":
-            return owner.createEmbeddedDocuments('ActiveEffect', [{
-                label: game.i18n.localize("SR5.ActiveEffect.New"),
-                // icon: "icons/svg/aura.svg",
+        case "create": {
+            const effect = [{
+                name: game.i18n.localize("SR5.ActiveEffect.New"),
                 origin: owner.uuid
-            }]);
+            }];
 
+            if (owner instanceof Item && owner._isNestedItem) {
+                effect[0]._id = foundry.utils.randomID();
+                const sr5Effect = new SR5ActiveEffect(effect[0], { parent: owner });
+                return owner.createNestedActiveEffect(sr5Effect);
+            }
+
+            return owner.createEmbeddedDocuments('ActiveEffect', effect);
+        }
         case "edit":
-            return effect.sheet.render(true);
+            return effect?.sheet.render(true);
 
-        case "delete":
+        case "delete": {
             const userConsented = await Helpers.confirmDeletion();
             if (!userConsented) return;
 
-            return effect.delete();
-
+            return effect?.delete();
+        }
         case "toggle":
-            return effect.toggleDisabled();
+            return effect?.toggleDisabled();
         case "open-origin":
-            return effect.renderSourceSheet();
-        default:
-            return;
+            return effect?.renderSourceSheet();
     }
 }
 
@@ -78,8 +84,6 @@ export async function onManageItemActiveEffect(event: MouseEvent) {
             return effect.toggleDisabled();
         case "open-origin":
             return effect.parent?.sheet?.render(true);
-        default:
-            return;
     }
 }
 
@@ -142,7 +146,7 @@ export function *allApplicableDocumentEffects(document: SR5Actor|SR5Item, option
     const applyTo = options.applyTo ?? [];
 
     for (const effect of document.effects) {
-        if (applyTo.length > 0 && !applyTo.includes(effect.applyTo)) continue;
+        if (applyTo.length > 0 && !applyTo.includes(effect.system.applyTo)) continue;
         yield effect;
     }
 }
@@ -161,7 +165,7 @@ export function *allApplicableItemsEffects(document: SR5Actor|SR5Item, options: 
 
     for (const item of document.items) {
         for (const effect of item.effects) {
-            if (applyTo.length > 0 && !applyTo.includes(effect.applyTo)) continue ;
+            if (applyTo.length > 0 && !applyTo.includes(effect.system.applyTo)) continue ;
             yield effect;
         }
 
@@ -170,7 +174,7 @@ export function *allApplicableItemsEffects(document: SR5Actor|SR5Item, options: 
 
         for (const nestedItem of item.items) {
             for (const effect of nestedItem.effects) {
-                if (applyTo.length > 0 && !applyTo.includes(effect.applyTo)) continue;
+                if (applyTo.length > 0 && !applyTo.includes(effect.system.applyTo)) continue;
                 yield effect;
             }
         }

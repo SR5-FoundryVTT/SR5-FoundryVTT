@@ -1,0 +1,18 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='magic'}}
+    <div class="inventory">
+        <div class="scroll-area">
+            {{#if contentVisibility.adept_power_list}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.hbs' }}
+            {{/if}}
+            {{#if contentVisibility.spell_list}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.hbs' }}
+            {{/if}}
+            {{#if contentVisibility.ritual_list}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/RitualList.hbs' }}
+            {{/if}}
+            {{#if contentVisibility.summoning_list}}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/SummoningList.hbs' }}
+            {{/if}}
+        </div>
+    </div>
+{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}

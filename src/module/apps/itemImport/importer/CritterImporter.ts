@@ -1,12 +1,11 @@
+import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { SpiritParser } from '../parser/metatype/SpiritParser';
 import { SpriteParser } from '../parser/metatype/SpriteParser';
 import { CritterParser } from '../parser/metatype/CritterParser';
 import { MetatypeSchema, Metatype } from "../schema/MetatypeSchema";
-import { CompendiumKey } from './Constants';
 
-type CrittersDataTypes = Shadowrun.CharacterActorData | Shadowrun.SpiritActorData | Shadowrun.SpriteActorData;
 
 export class CritterImporter extends DataImporter {
     public files = ['critters.xml'];
@@ -30,7 +29,7 @@ export class CritterImporter extends DataImporter {
             return false;
         }
 
-        public static async Parse(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<CrittersDataTypes> {
+        public static async Parse(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Actor.CreateData> {
             const critterParser = new CritterParser();
             const spiritParser = new SpiritParser();
             const spriteParser = new SpriteParser();
@@ -38,7 +37,7 @@ export class CritterImporter extends DataImporter {
             const selectedParser = jsonData.category?._TEXT === 'Sprites' ? spriteParser
                                  : this.isSpirit(jsonData) ? spiritParser : critterParser;
 
-            return await selectedParser.Parse(jsonData, compendiumKey);
+            return selectedParser.Parse(jsonData, compendiumKey) as Promise<Actor.CreateData>;
         }
     };
 
@@ -55,7 +54,7 @@ export class CritterImporter extends DataImporter {
             }));
         });
 
-        return CritterImporter.ParseItems<Metatype, CrittersDataTypes>(
+        return CritterImporter.ParseItems<Metatype>(
             [...baseMetatypes, ...metavariants],
             {
                 compendiumKey: (jsonData: Metatype) => {

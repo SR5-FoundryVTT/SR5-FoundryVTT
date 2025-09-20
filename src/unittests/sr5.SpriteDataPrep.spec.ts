@@ -1,43 +1,31 @@
-import { SR5Item } from '../module/item/SR5Item';
-import { SR5Actor } from './../module/actor/SR5Actor';
-import { SR5TestingDocuments } from './utils';
+import { SR5TestFactory } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const factory = new SR5TestFactory();
+    const { describe, it, after } = context;
+    const assert: Chai.AssertStatic = context.assert;
 
-    let testActor;
-    let testItem;
-
-    before(async () => {
-        testActor = new SR5TestingDocuments(SR5Actor);
-        testItem = new SR5TestingDocuments(SR5Item);
-    })
-
-    after(async () => {
-        await testActor.teardown();
-        await testItem.teardown();
-    })
+    after(async () => { factory.destroy(); });
 
     describe('SpriteDataPrep', () => {
         it('Sprites are always resonat', async () => {
-            const sprite = await testActor.create({ type: 'sprite' });
+            const sprite = await factory.createActor({ type: 'sprite' });
             assert.strictEqual(sprite.system.special, 'resonance');
         });
 
         it('visibility checks', async () => {
-            const actor = await testActor.create({ type: 'sprite' });
-            assert.strictEqual(actor.system.visibilityChecks.astral.hasAura, false);
-            assert.strictEqual(actor.system.visibilityChecks.astral.astralActive, false);
-            assert.strictEqual(actor.system.visibilityChecks.astral.affectedBySpell, false);
-            assert.strictEqual(actor.system.visibilityChecks.meat.hasHeat, false);
-            assert.strictEqual(actor.system.visibilityChecks.matrix.hasIcon, true);
-            assert.strictEqual(actor.system.visibilityChecks.matrix.runningSilent, false);
+            const sprite = await factory.createActor({ type: 'sprite' });
+            assert.strictEqual(sprite.system.visibilityChecks.astral.hasAura, false);
+            assert.strictEqual(sprite.system.visibilityChecks.astral.astralActive, false);
+            assert.strictEqual(sprite.system.visibilityChecks.astral.affectedBySpell, false);
+            assert.strictEqual(sprite.system.visibilityChecks.meat.hasHeat, false);
+            assert.strictEqual(sprite.system.visibilityChecks.matrix.hasIcon, true);
+            assert.strictEqual(sprite.system.visibilityChecks.matrix.runningSilent, false);
         });
 
         it('Sprites default/override values by example type', async () => {
-            const actor = await testActor.create({ type: 'sprite', 'system.spriteType': 'courier' }) as SR5Actor;
-            let sprite = actor.asSprite() as Shadowrun.SpriteActorData;
+            const sprite = await factory.createActor({ type: 'sprite', system: { spriteType: 'courier' } });
 
             assert.strictEqual(sprite.system.matrix.sleaze.base, 3);
             assert.strictEqual(sprite.system.matrix.data_processing.base, 1);
@@ -46,13 +34,10 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(sprite.system.initiative.matrix.base.base, 1);
 
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
             assert.strictEqual(sprite.system.skills.active.hacking.base, 0);
 
-            await actor.update({
-                'system.level': 6
-            });
-
-            sprite = actor.asSprite() as Shadowrun.SpriteActorData;
+            await sprite.update({ system: { level: 6 } });
 
             assert.strictEqual(sprite.system.level, 6);
 
@@ -70,13 +55,10 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
         })
 
         it('Matrix condition monitor track calculation with modifiers', async () => {
-            const actor = await testActor.create({ type: 'sprite' }) as SR5Actor;
-
-            let sprite = actor.asSprite() as Shadowrun.SpriteActorData;
+            const sprite = await factory.createActor({ type: 'sprite' });
             assert.equal(sprite.system.matrix.condition_monitor.max, 8);
 
-            await actor.update({ 'system.modifiers.matrix_track': 1 });
-            sprite = actor.asSprite() as Shadowrun.SpriteActorData;
+            await sprite.update({ system: { modifiers: { matrix_track: 1 } } });
             assert.equal(sprite.system.matrix.condition_monitor.max, 9);
         });
     });

@@ -1,125 +1,79 @@
-/// <reference path="../Shadowrun.ts" />
+import { ModifiableValue } from "../template/Base";
+import { ImportFlagData } from "../template/ImportFlags";
+import { DescriptionData } from "../template/Description";
+import { ModifiableField } from "../fields/ModifiableField";
+import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
+import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
+const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
-declare namespace Shadowrun {
-    export interface CommonData extends DescriptionPartData {
-        attributes: Attributes
-        limits: Limits
-        skills: CharacterSkills
-        special: SpecialTrait
-        initiative: Initiative
-        modifiers: Modifiers
-        situation_modifiers: SituationModifiersSourceData
-        values: CommonValues
-        /**
-         * Actor inventories allow to show items separated out into different places / inventories.
-         */
-        inventories: InventoriesData
-        visibilityChecks: VisibilityChecks
-        category_visibility: CategoryVisibility
-    }
+export const CharacterSkills = () => ({
+    active: Skills(),
+    language: new SchemaField(KnowledgeSkillList('intuition')),
+    knowledge: new SchemaField(KnowledgeSkills()),
+});
 
-    export interface MagicData {
-        attribute: ActorAttribute,
-        projecting: boolean,
-        initiation: number
-    }
 
-    export interface MatrixData {
-        dice: BaseValuePair<number> & ModifiableValue
-        base: BaseValuePair<number> & ModifiableValue
+export const MagicData = () => ({
+    attribute: new StringField({ required: true, initial: "logic" }), // Drain attribute
+    projecting: new BooleanField(),
+    initiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+});
 
-        attack: MatrixAttributeField
-        sleaze: MatrixAttributeField
-        data_processing: MatrixAttributeField
-        firewall: MatrixAttributeField
+export const PhysicalCombatValues = () => ({
+    recoil: new ModifiableField(ModifiableValue()),
+    recoil_compensation: new ModifiableField(ModifiableValue()),
+});
 
-        condition_monitor: ConditionData
-        rating: number
-        name: string
-        device: string
-        is_cyberdeck: boolean
-        hot_sim: boolean
-        running_silent: boolean
-        item?: any
-        marks: MatrixMarks
-    }
+/**
+ * Characters include extra configuration options not on all actor types
+ * @constructor
+ */
+export const CharacterValues = () => ({
+    ...PhysicalCombatValues(),
+    control_rig_rating: new ModifiableField(ModifiableValue()),
+})
 
-    // A interchangeable list of device attributes.
-    export interface MatrixAttributes {
-        att1: DeviceAttribute;
-        att2: DeviceAttribute;
-        att3: DeviceAttribute;
-        att4: DeviceAttribute;
-    }
+export const CharacterLimits = () => ({
+    ...Limits(),
+    ...AwakendLimits(),
+    ...MatrixLimits(),
+});
 
-    export interface MatrixAttributeField extends AttributeField {
-        // Track which device attribute has been selected. Can be att1 through att4.
-        device_att: string
-    }
+export const CreateModifiers = <T extends readonly string[]>(...keys: T) => {
+    const field = () => new NumberField({ required: true, nullable: false, integer: true, initial: 0 });
+    return Object.fromEntries(
+        keys.map(modifier => [modifier, field()])
+    ) as { [K in T[number]]: ReturnType<typeof field> };
+};
 
-    export interface MatrixTrackActorData {
-        track: MatrixTracks
-    }
+const InventoryData = () => ({
+    name: new StringField({ required: true }),
+    type: new StringField({ required: true }),
+    itemIds: new ArrayField(new StringField({ required: true })),
+    showAll: new BooleanField({ initial: true }),
+    label: new StringField({ required: true }),
+});
 
-    export interface CategoryVisibility {
-        default: boolean
-    }
+export const CommonData = () => ({
+    description: new SchemaField(DescriptionData()),
+    importFlags: new SchemaField(ImportFlagData()),
 
-    export interface NPCData {
-        is_grunt: boolean
-        professional_rating: number
-    }
+    skills: new SchemaField(CharacterSkills()),
 
-    /**
-     * Matrix Marks are stored using a single string to identify the target, scene and item id the marks have been placed
-     * on.
-     */
-    export interface MatrixMarks extends Record<string, number>{}
+    situation_modifiers: new SchemaField({
+        environmental: new SchemaField({ active: new ObjectField({ initial: {} }) }),
+        noise: new SchemaField({ active: new ObjectField({ initial: {} }) }),
+        background_count: new SchemaField({ active: new ObjectField({ initial: {} }) }),
+    }),
+    inventories: new TypedObjectField(
+        new SchemaField(InventoryData()),
+        { initial: { "All": { name: "All", type: "all", itemIds: [], showAll: true, label: "SR5.Labels.Inventory.All" } } }
+    ),
+    category_visibility: new SchemaField(
+        { default: new BooleanField({ initial: true }) }
+    ),
+});
 
-    export type InventoriesData = Record<string, InventoryData>
-    /**
-     * An inventory is a set of items with a name.
-     */
-    export interface InventoryData {
-        name: string  // Internal name.
-        label: string // Displayed name, can be the same as 'name' when user created.
-        itemIds: string[] // Item ids to show within this inventory.
-        showAll?: boolean // When set to true, show all items from all inventories.
-    }
+export type InventoryType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof InventoryData>>;
 
-    /**
-     * Contains modifable values held by each actor, differs per type.
-     */
-    export interface CommonValues {string: ModifiableValue}
-    
-    /**
-     * Values used for physical combat actors only
-     */
-    export interface PhysicalCombatValues extends CommonValues {
-        // The current amount of progressive recoil (bullets fired) without any compensation.
-        recoil: ModifiableValue
-        // The base amount of recoil compensation of an actor, without recoil reducing it.
-        recoil_compensation: ModifiableValue
-    }
-
-    export interface VisibilityChecks {
-        astral : AstralVisibility
-        meat: MeatSpaceVisibility
-        matrix: MatrixVisibility
-    }
-
-    export interface MeatSpaceVisibility {
-        hasHeat: boolean
-    }
-
-    export interface AstralVisibility {
-        hasAura: boolean,
-        astralActive : boolean,
-        affectedBySpell: boolean
-    }
-
-    export interface MatrixVisibility {
-        hasIcon: boolean,
-        runningSilent: boolean
-    }
-}
+export abstract class ActorBase<DS extends ReturnType<typeof CommonData>> extends foundry.abstract.TypeDataModel<DS, Actor.Implementation> {}

@@ -1,9 +1,6 @@
 import { SR5ActiveEffect } from "../SR5ActiveEffect";
 import { SuccessTest } from "../../tests/SuccessTest";
-import { ActiveEffectData } from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/module.mjs";
 import { SR5Actor } from "../../actor/SR5Actor";
-import { OpposedTest } from "../../tests/OpposedTest";
-import { SR5Item } from "../../item/SR5Item";
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
 import { SocketMessage } from "../../sockets";
 import { FLAGS } from "../../constants";
@@ -49,7 +46,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             // Collect all changes of effect left.
             changes.push(...effect.changes.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
-                // Make sure FoundryVTT key migration doesn't affect us here.
+                // Foundry changes data. references in changes to system. But tests use data.
                 c.key = c.key.replace('system.', 'data.');
                 c.effect = effect;
                 c.priority = c.priority ?? (c.mode * 10);
@@ -84,7 +81,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      */
     _skipEffectForTestLimitations(effect: SR5ActiveEffect) {
         // Filter effects that don't apply to this test.
-        const tests = effect.selectionTests;
+        const tests = effect.system.selection_tests.map(test => test.id);
         // Opposed tests use the same item as the success test but normally don't apply effects from it.
         // However if an effect defines a test, it should apply to it.
         if (tests.length === 0 && this.test.opposing) return true;
@@ -93,18 +90,18 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Check for action categories
         // Both the effect and test can both define multiple categories.
         // One match is enough.
-        const categories = effect.selectionCategories;
+        const categories = effect.system.selection_categories.map(test => test.id) as Shadowrun.ActionCategories[];
         const testCategories = this.test.data.categories;
         if (categories.length > 0 && !categories.find(category => testCategories.includes(category))) return true;
 
         // Check for test skill.
-        const skills = effect.selectionSkills;
+        const skills = effect.system.selection_skills.map(test => test.id);
         const skillId = this.test.data.action.skill;
         const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
         if (skills.length > 0 && !skills.includes(skillName)) return true;
 
         // Check for test attributes used.
-        const attributes = effect.selectionAttributes;
+        const attributes = effect.system.selection_attributes.map(test => test.id);
         const attribute = this.test.data.action.attribute;
         const attribute2 = this.test.data.action.attribute2;
         if (attributes.length > 0 && attribute && !attributes.includes(attribute)) return true;
@@ -112,8 +109,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (attributes.length > 0 && !attribute && !attribute2) return true;
 
         // Check for test limits used.
-        const limits = effect.selectionLimits;
-        const limit = this.test.data.action.limit.attribute;
+        const limits = effect.system.selection_limits.map(test => test.id);
+        const limit = this.test.data.action.limit.attribute!;
         if (limits.length > 0 && !limits.includes(limit)) return true;
 
         return false;
@@ -155,25 +152,25 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         if (actor === undefined || this.test.item === undefined) return;
 
-        const effectsData: ActiveEffectData[] = [];
-        for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
-            const effectData = effect.toObject() as ActiveEffectData;
+            const effectsData: SR5ActiveEffect[] = [];
+            for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
+                const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
-            // Transform all dynamic values to static values.
-            effectData.changes = effectData.changes.map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change);
-                return change;
-            });
+                // Transform all dynamic values to static values.
+                effectData.changes = effectData.changes.map(change => {
+                    SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as ActiveEffect.ChangeData);
+                    return change;
+                });
 
-            effectsData.push(effectData);
-        }
+                effectsData.push(effectData);
+            }
 
         for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
-            const effectData = effect.toObject() as ActiveEffectData;
+            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
             // Transform all dynamic values to static values.
             effectData.changes = effectData.changes.map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change);
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as ActiveEffect.ChangeData);
                 return change;
             });
 
@@ -190,13 +187,12 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param actor The actor to create the effects on.
      * @param effectsData The effects data to be applied;
      */
-    static async _createTargetedEffectsAsGM(actor: SR5Actor, effectsData: ActiveEffectData[]) {
+    static async _createTargetedEffectsAsGM(actor: SR5Actor, effectsData: SR5ActiveEffect[]) {
         const alias = game.user?.name;
         const linkedTokens = actor.getActiveTokens(true) || [];
         const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
 
-        // @ts-expect-error
-        const effects = await actor.createEmbeddedDocuments('ActiveEffect', effectsData) as SR5ActiveEffect[];
+        const effects = await actor.createEmbeddedDocuments('ActiveEffect', effectsData as unknown as ActiveEffect.CreateData[]) as SR5ActiveEffect[];
 
         const templateData = {
             effects,
@@ -220,7 +216,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param actor The actor to create the effects on.
      * @param effectsData The effects data to be applied;
      */
-    async _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: ActiveEffectData[]) {
+    async _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: SR5ActiveEffect[]) {
         await SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, { actorUuid: actor.uuid, effectsData });
     }
 
@@ -240,7 +236,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         const actor = await fromUuid(message.data.actorUuid) as SR5Actor;
 
-        return await SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, message.data.effectsData);
+        return SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, message.data.effectsData);
     }
 
     /**
@@ -279,8 +275,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     *allApplicableEffectsToTargetActor(): Generator<SR5ActiveEffect> {
         if (!this.test.item) return;
 
-        for (const effect of this.test.item.effects as unknown as SR5ActiveEffect[]) {
-            if (effect.applyTo === 'targeted_actor') yield effect;
+        for (const effect of this.test.item.effects) {
+            if (effect.system.applyTo === 'targeted_actor') yield effect;
         }
     }
 }

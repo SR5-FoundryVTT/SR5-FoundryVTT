@@ -10,7 +10,7 @@ export class AdeptPowerImporter extends DataImporter {
     }
 
     async Parse(jsonObject: PowersSchema): Promise<void> {
-        return AdeptPowerImporter.ParseItems<Power, Shadowrun.AdeptPowerItemData>(
+        return AdeptPowerImporter.ParseItems<Power>(
             jsonObject.powers.power,
             {
                 compendiumKey: () => "Adept_Power",

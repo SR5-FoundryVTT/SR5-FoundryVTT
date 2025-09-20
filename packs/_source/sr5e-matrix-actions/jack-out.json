@@ -1,0 +1,138 @@
+{
+  "name": "Jack Out",
+  "type": "action",
+  "flags": {
+    "shadowrun5e": {
+      "action": {
+        "hits": 1
+      }
+    }
+  },
+  "img": "icons/svg/door-exit.svg",
+  "effects": [],
+  "_id": "wqBonUcDlt2i6E4l",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5 240"
+    },
+    "action": {
+      "type": "simple",
+      "test": "MatrixTest",
+      "categories": [
+        "matrix"
+      ],
+      "attribute": "willpower",
+      "attribute2": "",
+      "skill": "hardware",
+      "armor": false,
+      "spec": false,
+      "mod": null,
+      "mod_description": "",
+      "roll_mode": "",
+      "limit": {
+        "value": 0,
+        "base": 0,
+        "attribute": "firewall",
+        "mod": []
+      },
+      "threshold": {
+        "value": 0,
+        "base": 0
+      },
+      "extended": false,
+      "damage": {
+        "type": {
+          "value": "",
+          "base": ""
+        },
+        "element": {
+          "value": "",
+          "base": ""
+        },
+        "value": 0,
+        "base": 0,
+        "ap": {
+          "value": 0,
+          "base": 0,
+          "mod": []
+        },
+        "base_formula_operator": "add",
+        "attribute": "",
+        "source": {
+          "actorId": "",
+          "itemId": "",
+          "itemType": "",
+          "itemName": ""
+        },
+        "mod": []
+      },
+      "opposed": {
+        "type": "custom",
+        "test": "OpposedTest",
+        "attribute": "logic",
+        "attribute2": "attack",
+        "skill": "",
+        "armor": false,
+        "mod": 0,
+        "description": "",
+        "resist": {
+          "test": "",
+          "skill": "",
+          "attribute": "",
+          "attribute2": "",
+          "armor": false,
+          "mod": 0
+        }
+      },
+      "followed": {
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0
+      },
+      "category": {
+        "matrix": {
+          "marks": 0,
+          "owner": true
+        }
+      },
+      "modifiers": [
+        "noise",
+        "global",
+        "wounds"
+      ],
+      "alt_mod": 0,
+      "dice_pool_mod": []
+    },
+    "result": {
+      "success": {}
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false,
+      "isImported": false
+    }
+  },
+  "ownership": {
+    "default": 0
+  },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.13.0",
+    "coreVersion": "12.331",
+    "createdTime": null,
+    "modifiedTime": 1697731181026,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!wqBonUcDlt2i6E4l"
+}

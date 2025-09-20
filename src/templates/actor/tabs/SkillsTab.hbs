@@ -1,0 +1,16 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='skills'}}
+    <div>
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.hbs' }}
+    </div>
+    <div class="inventory">
+        <div class="split-container">
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.hbs' }}
+            <div>
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/attributes/SpecialAttributeList.hbs' }}
+                <div class="flexcontainer-skills">
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/skills/LanguageAndKnowledgeSkillList.hbs' }}
+                </div>
+            </div>
+        </div>
+    </div>
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}

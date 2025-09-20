@@ -1,37 +1,30 @@
-/// <reference path="../Shadowrun.ts" />
-declare namespace Shadowrun {
-    export interface DeviceData extends
-        DevicePartData,
-        DescriptionPartData,
-        ImportFlags,
-        TechnologyPartData {
+import { BaseItemData, ItemBase } from "./ItemBase";
+import { MatrixAttributes } from "../template/Matrix";
+import { TechnologyPartData } from "../template/Technology";
+const { SchemaField, ArrayField, StringField, DocumentUUIDField, NumberField } = foundry.data.fields;
 
-    }
+export const DevicePartData = () => ({
+    category: new StringField({
+        required: true,
+        initial: 'commlink',
+        choices: ['commlink', 'cyberdeck', 'rcc', 'host', 'living_persona'],
+    }),
+    atts: new SchemaField(MatrixAttributes(true)),
+    slaves: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),
+});
 
-    // This category is used for both Device and Host item types to differentiate attribute handling.
-    export type DeviceCategory = 'commlink' | 'cyberdeck' | 'rcc' | 'host' | '';
+export const DeviceData = () => ({
+    ...BaseItemData(),
+    ...DevicePartData(),
+    ...TechnologyPartData(),
 
-    export interface DevicePartData {
-        category: DeviceCategory
-        atts: MatrixAttributes
-        networkDevices: string[]
-    }
+    programs: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+});
 
-    export interface DeviceAttribute {
-        // The actual value of the device attribute.
-        value: number;
-        // The attribute name of the device attribute.
-        att: MatrixAttribute;
-        // Is used to determine if a device attribute should be editable on the sheet.
-        editable: boolean
-    }
-
-    // PAN / WAN networking
-    export type NetworkDeviceType = 'Token' | 'Actor' | 'Host';
-    export interface NetworkDeviceLink {
-        sceneId: string|undefined,
-        ownerId: string|undefined,
-        targetId: string,
-        type: NetworkDeviceType
+export class Device extends ItemBase<ReturnType<typeof DeviceData>> {
+    static override defineSchema() {
+        return DeviceData();
     }
 }
+
+console.log("DeviceData", DeviceData(), new Device());

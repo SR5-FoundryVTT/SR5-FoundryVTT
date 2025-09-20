@@ -3,8 +3,6 @@
  */
 
 import Tagify from '@yaireo/tagify';
-import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import { SYSTEM_NAME } from '../constants';
 import { Translation } from './strings';
 
 // A single whitelist / dropdown / tag element
@@ -88,14 +86,6 @@ export function createTagifyOnInput(element: HTMLInputElement, values: TagifyVal
     if (onChangeCallback) $(element).on('change', onChangeCallback);
 
     return tagify;
-}
-
-const tagsToIds = (tags: TagifyTags) => tags.map(tag => tag.id);
-export const tagifyFlagsToIds = (effect: SR5ActiveEffect, flag: string): string[] => {
-    const value = effect.getFlag(SYSTEM_NAME, flag);
-    if (!value) return [];
-    const tags = JSON.parse(value as string);
-    return tagsToIds(tags);
 }
 
 /**

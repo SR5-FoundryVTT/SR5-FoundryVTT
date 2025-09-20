@@ -45,15 +45,16 @@ export type ModifierTypes = Partial<keyof typeof SR5['modifierTypes']>;
  * all types for a document.
  */
 export class SituationModifier {
-    type: Shadowrun.SituationModifierType;
+    type: Shadowrun.SituationModifierType | undefined;
     // A reference to the modifiers this handler is used within.
     modifiers?: DocumentSituationModifiers
     // The original source modifier data. This shouldn't be altered.
     source: SourceModifierData
     // The applied modifier data, originating from the original source data.
-    applied: Modifier
-
-    globalActivesApplied: boolean;
+    // @ts-expect-error Applied can by undefined, though it will be set before use.
+    //                  Defining it as unapplied, trickles type issues all over the place...
+    //                  It also needs in a falsible state, so the #apply method functions correctly.
+    applied: Modifier;
 
     // The effects flow for this modifier.
     effects: SituationModifierEffectsFlow<this>;
@@ -124,7 +125,6 @@ export class SituationModifier {
      * Determine if the source data has an active modifier set for this situational modifier.
      */
     get hasActive(): boolean {
-        //@ts-expect-error TODO: foundry-vtt-types v10
         return !foundry.utils.isEmpty(this.source.active);
     }
 

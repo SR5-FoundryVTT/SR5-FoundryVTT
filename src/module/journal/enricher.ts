@@ -17,15 +17,14 @@ export class JournalEnrichers {
         const closing = "(\\]|\\))";
         const threshold = "\\s*(\\d*)"; 
 
-        //@ts-expect-error
         CONFIG.TextEditor.enrichers.push(
             {
                 pattern: new RegExp(`\\@(${JournalEnrichers.actorKeywords.join("|")})${opening}([a-z]+)${threshold}${closing}`, "g"),
                 enricher: (match, options) => {
                     const type = match[1]
-                    const rollEntity = match[3] as string
+                    const rollEntity = match[3]
                     const threshold = match[4]
-                    let rollEntityName = JournalEnrichers.getRollEntityTranslation(type, rollEntity);
+                    const rollEntityName = JournalEnrichers.getRollEntityTranslation(type, rollEntity);
                     
                     return $(`<a class="sr5-roll-request" data-request="${type}" data-skill="${rollEntity}" data-threshold=${threshold}><em class="fas fa-dice"></em>${rollEntityName} ${threshold}</a>`)[0]
                 }
@@ -52,15 +51,15 @@ export class JournalEnrichers {
             const rollType = element.dataset.request
             const rollTypeName = "SR5.GMRequest." + rollType;
             const rollEntity = element.dataset.skill
-            let rollEntityName = JournalEnrichers.getRollEntityTranslation(rollType, rollEntity);
+            const rollEntityName = JournalEnrichers.getRollEntityTranslation(rollType, rollEntity);
             const threshold = element.dataset.threshold
 
             const templateData = {
                 rollType: rolls[rollType],
-                rollTypeName: rollTypeName,
-                rollEntity: rollEntity,
-                rollEntityName: rollEntityName,
-                threshold: threshold
+                rollTypeName,
+                rollEntity,
+                rollEntityName,
+                threshold
             }
 
             JournalEnrichers.createChatMessage(templateData);
@@ -86,41 +85,38 @@ export class JournalEnrichers {
     }
 
     static async chatlogRequestHooks(html) {
-          // setup chat listener messages for each message as some need the message context instead of chatlog context.
-          // @ts-expect-error TODO: querySelectorAll?
-          $(html).find('.chat-message').each(async (index, element) => {
+        const elements = $(html).find('.chat-message').toArray();
+
+        for (const element of elements) {
             const id = $(element).data('messageId');
             const message = game.messages?.get(id);
-            if (!message) return;
+            if (!message) continue;
 
-            await this.messageRequestHooks(element)
-        });
+            await this.messageRequestHooks(element);
+        }
     }
 
     static async messageRequestHooks(html) {
         $(html).find('.sr5-requestAnswer').on('click', async (ev) => {
             const element = ev.currentTarget
 
-            const rollType = element.dataset.request
-            const rollEntity = element.dataset.rollentity
-            // @ts-expect-error TODO: foundryvtt 13
-            const threshold = parseInt(element.dataset.threshold)
+            const rollType = element.dataset.request!;
+            const rollEntity = element.dataset.rollentity;
+            const threshold = parseInt(element.dataset.threshold!);
 
-            let actor = await Helpers.chooseFromAvailableActors()
+            const actor = await Helpers.chooseFromAvailableActors();
 
-            if(actor == undefined) {
+            if (actor) {
                 //in a normal running game this should not happen
+                actor[rollType](rollEntity, {threshold: {base: threshold, value: threshold} })
+            } else {
                 ui.notifications?.error('SR5.Errors.NoAvailableActorFound', {localize: true});
-                return
             }
-
-            // @ts-expect-error TODO: foundryvtt 13
-           actor[rollType](rollEntity, {threshold: {base: threshold, value: threshold} })
         })
     }
 
     static async createChatMessage (templateData) {
-        const html = await renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.html', templateData);
+        const html = await renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.hbs', templateData);
     
         const chatData = {
             user: game.user?.id,

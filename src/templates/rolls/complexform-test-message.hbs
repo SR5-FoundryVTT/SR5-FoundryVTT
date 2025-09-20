@@ -1,0 +1,12 @@
+{{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs'}}
+<div class="sr5 chat-card roll-card">
+    <div class="card-content">
+        <div class="left-side">
+            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
+            name=(localize "SR5.IncomingFade")
+            damage=test.data.fadeDamage
+            showAP=true
+            }}
+        </div>
+    </div>
+</div>

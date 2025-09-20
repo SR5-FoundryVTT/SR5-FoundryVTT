@@ -20,7 +20,7 @@ export class DeleteConfirmationDialog extends FormDialog {
             },
             default: 'cancel',
             templateData: {},
-            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/delete-confirmation-dialog.html'
+            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/delete-confirmation-dialog.hbs'
         }
     }
 

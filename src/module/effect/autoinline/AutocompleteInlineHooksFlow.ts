@@ -1,4 +1,3 @@
-import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from "../../item/SR5Item";
 import { OpposedTest } from "../../tests/OpposedTest";
 import { SuccessTest } from "../../tests/SuccessTest";
@@ -21,9 +20,8 @@ export const AutocompleteInlineHooksFlow =  {
      */
     setupHook: () => {
         // Module might not be installed.
-        const aipModule = game.modules.get("autocomplete-inline-properties");
+        const aipModule = game.modules.get("autocomplete-inline-properties") as any;
         if (!aipModule) return;
-        // @ts-expect-error
         // API might be missing.
         const api = aipModule.API;
         if (!api) return;
@@ -36,16 +34,16 @@ export const AutocompleteInlineHooksFlow =  {
             sheetClasses: [{
                 name: "SR5ActiveEffectConfig",
                 fieldConfigs: [
-                    { selector: `.tab[data-tab="effects"] .autocomplete-key-actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
-                    { selector: `.tab[data-tab="effects"] .autocomplete-key-targeted_actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
-                    { selector: `.tab[data-tab="effects"] .autocomplete-key-test_all input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
-                    { selector: `.tab[data-tab="effects"] .autocomplete-key-test_item input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
-                    { selector: `.tab[data-tab="effects"] .autocomplete-key-modifier input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterModifiersData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-targeted_actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-test_all input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-test_item input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-modifier input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterModifiersData},
 
-                    { selector: `.tab[data-tab="effects"] .autocomplete-value-actor input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
-                    { selector: `.tab[data-tab="effects"] .autocomplete-value-targeted_actor input[type="text"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
-                    { selector: `.tab[data-tab="effects"] .autocomplete-value-test_all input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
-                    { selector: `.tab[data-tab="effects"] .autocomplete-value-test_item input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-actor input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-targeted_actor input[type="text"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-test_all input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-test_item input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                 ]
             }]
         };
@@ -60,7 +58,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @returns Either a SR5Actor or SR5Item source object.
      */
     valueGetterActor: (EffectConfig: SR5ActiveEffectConfig) => {
-        const effect = EffectConfig.object;
+        const effect = EffectConfig.document;
         if (!effect.parent) return {};
         return effect.parent?.toObject();
     },
@@ -72,13 +70,14 @@ export const AutocompleteInlineHooksFlow =  {
      * @returns A test object for the autocomplete module to use.
      */
     keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
-        const effect = EffectConfig.object;
+        const effect = EffectConfig.document;
+        const testsId = effect.system.selection_tests.map(test => test.id);
 
         // For  effects targeting specific tests, we can provide a merge of all tests data.
-        if (effect.selectionTests.length > 0) {
+        if (testsId.length > 0) {
             const actor = effect.actor;
             const testData = {};
-            for (const TestClassName of effect.selectionTests) {
+            for (const TestClassName of testsId) {
                 if (!TestClassName) return {};
                 const TestClass = TestCreator._getTestClass(TestClassName);
                 if (!TestClass) return {};
@@ -101,6 +100,8 @@ export const AutocompleteInlineHooksFlow =  {
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;
             return {data: new SuccessTestClass({}, {actor: item.actor, item}).data};
         }
+
+        return {};
     },
 
     /**
@@ -109,7 +110,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig 
      */
     valueGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
-        const effect = EffectConfig.object;
+        const effect = EffectConfig.document;
         if (!effect.parent) return {};
 
         // Autocomplete inline properties module doesn't support get-er properties.
@@ -156,10 +157,10 @@ export const AutocompleteInlineHooksFlow =  {
      * @returns A opposed test instance for autocomplete module to use.
      */
     valueGetterTargetedActorData: (EffectConfig: SR5ActiveEffectConfig) => {
-        const effect = EffectConfig.object;
+        const effect = EffectConfig.document;
 
         if (effect.parent instanceof SR5Item) {
-            const item = effect.parent as SR5Item;
+            const item = effect.parent;
             const action = item.getAction();
             if (!action) return {};                
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;
@@ -169,5 +170,6 @@ export const AutocompleteInlineHooksFlow =  {
             
             return {data: opposedTest.data};
         }
+        return {};
     }
 }

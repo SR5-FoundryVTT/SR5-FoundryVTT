@@ -8,24 +8,22 @@ import {LimitsPrep} from './functions/LimitsPrep';
 import {MovementPrep} from './functions/MovementPrep';
 import {WoundsPrep} from './functions/WoundsPrep';
 import {AttributesPrep} from './functions/AttributesPrep';
-import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
-import CritterData = Shadowrun.CritterData;
 import { GruntPrep } from './functions/GruntPrep';
+import { SR5Item } from 'src/module/item/SR5Item';
 
 
 export class CritterPrep {
-    static prepareBaseData(system: CritterData) {
-        ModifiersPrep.prepareModifiers(system);
+    static prepareBaseData(system: Actor.SystemOfType<'critter'>) {
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
         SkillsPrep.prepareSkillData(system);
     }
 
-    static prepareDerivedData(system: CritterData, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'critter'>, items: SR5Item[]) {
         AttributesPrep.prepareAttributes(system);
         AttributesPrep.prepareEssence(system, items);
-        
+
         SkillsPrep.prepareSkills(system);
 
         ItemPrep.prepareArmor(system, items);

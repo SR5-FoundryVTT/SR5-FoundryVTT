@@ -7,29 +7,28 @@ import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
 import { Helpers } from '../../helpers';
 import { PartsList } from "../../parts/PartsList";
-import { SR5ItemDataWrapper } from "../../data/SR5ItemDataWrapper";
 import { SkillFlow } from "../flows/SkillFlow";
-import SpiritType = Shadowrun.SpiritType;
-import SpiritData = Shadowrun.SpiritData;
 import { CharacterPrep } from './CharacterPrep';
 import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 import { SR5 } from '../../config';
 import { SR } from '../../constants';
+import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
+import { SR5Item } from 'src/module/item/SR5Item';
+import { AttributesType } from 'src/module/types/template/Attributes';
 
 
 export class SpiritPrep {
-    static prepareBaseData(system: SpiritData) {
+    static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
         SpiritPrep.prepareSpiritSpecial(system);
         SkillsPrep.prepareSkillData(system);
 
-        ModifiersPrep.prepareModifiers(system);
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
     }
 
-    static prepareDerivedData(system: SpiritData, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
         SpiritPrep.prepareSpiritBaseData(system);
 
         // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.
@@ -54,16 +53,16 @@ export class SpiritPrep {
         CharacterPrep.prepareRecoilCompensation(system);
     }
 
-    static prepareSpiritSpecial(data: SpiritData) {
+    static prepareSpiritSpecial(system: Actor.SystemOfType<'spirit'>) {
         // Spirits will always be awakened.
-        data.special = 'magic';
+        // system.special = 'magic';
     }
 
-    static prepareSpiritBaseData(data: SpiritData) {
-        const overrides = this.getSpiritStatModifiers(data.spiritType);
+    static prepareSpiritBaseData(system: Actor.SystemOfType<'spirit'>) {
+        const overrides = this.getSpiritStatModifiers(system.spiritType);
 
         if (overrides) {
-            const { attributes, skills, initiative, force, modifiers } = data;
+            const { attributes, skills, initiative, force, modifiers } = system;
 
             // set the base of attributes to the provided force
             for (const [attId, value] of Object.entries(overrides.attributes)) {
@@ -102,24 +101,25 @@ export class SpiritPrep {
      * @param skills The list of active skills of the sprite.
      * @returns A prepared SkillField without levels.
      */
-    static prepareActiveSkill(skillId: string, skills: Shadowrun.Skills): Shadowrun.SkillField {
+    static prepareActiveSkill(skillId: string, skills: SkillsType): SkillFieldType {
         if (skills[skillId]) return skills[skillId];
 
         const label = SR5.activeSkills[skillId];
         const attribute = SR5.activeSkillAttribute[skillId];
 
-        return DataDefaults.skillData({ label, attribute, canDefault: false })
+        return DataDefaults.createData('skill_field', { label, attribute, canDefault: false })
     }
 
     /**
      * Prepare armor values for spirit rules. These have some additional caveats in comparison to characters.
      */
-    static prepareSpiritArmor(system: SpiritData) {
+    static prepareSpiritArmor(system: Actor.SystemOfType<'spirit'>) {
         const { armor, attributes } = system;
         const armorModParts = new PartsList<number>(armor.mod);
 
         armor.base = (attributes.essence.value ?? 0) * 2;
-        if (system.modifiers['armor']) armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), system.modifiers['armor']);
+        if (system.modifiers['armor'])
+            armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), system.modifiers['armor']);
         armor.value = Helpers.calcTotal(armor);
         armor.hardened = true;
     }
@@ -127,11 +127,12 @@ export class SpiritPrep {
     /**
      * get the attribute and initiative modifiers and skills
      */
-    static getSpiritStatModifiers(spiritType: SpiritType) {
+    static getSpiritStatModifiers(spiritType: string) {
         if (!spiritType) return;
 
         const overrides = {
             // value of 0 for attribute makes it equal to the Force
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             attributes: {
                 body: 0,
                 agility: 0,
@@ -143,7 +144,7 @@ export class SpiritPrep {
                 charisma: 0,
                 magic: 0,
                 essence: 0,
-            } as Partial<Record<keyof Shadowrun.Attributes, number>>,
+            } as Partial<Record<keyof AttributesType, number>>,
             // modifiers for after the Force x init_mult + (init_dice)d6 calculation
             init: 0,
             astral_init: 0,
@@ -873,7 +874,7 @@ export class SpiritPrep {
      * 
      * @param system The spirit system data to prepare
      */
-    static prepareAttributesWithForce(system: Shadowrun.SpiritData) {
+    static prepareAttributesWithForce(system: Actor.SystemOfType<'spirit'>) {
         const { attributes, force } = system;
 
         // Allow value to be understandable when displayed.

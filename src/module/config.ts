@@ -72,6 +72,9 @@ export const SR5 = {
         rating: 'SR5.Rating',
     },
 
+    mentalAttributes: ['charisma', 'intuition', 'logic', 'willpower'],
+    physicalAttributes: ['agility', 'body', 'reaction', 'strength'],
+
     /**
      * All labels for all limits used across all actor and item types.
      */
@@ -101,6 +104,13 @@ export const SR5 = {
         physical: 'SR5.DmgTypePhysical',
         stun: 'SR5.DmgTypeStun',
         matrix: 'SR5.DmgTypeMatrix'
+    },
+
+    biofeedbackOptions: {
+        // create an empty string option, this should not be needed after appv2
+        '': '',
+        physical: 'SR5.DmgTypePhysical',
+        stun: 'SR5.DmgTypeStun',
     },
 
     weaponRangeCategories: {
@@ -437,6 +447,12 @@ export const SR5 = {
         other: 'SR5.TargetOther',
     },
 
+    gridCategories: {
+        local: 'SR5.Labels.Matrix.Local',
+        global: 'SR5.Labels.Matrix.Global',
+        public: 'SR5.Labels.Matrix.Public'
+    },
+
     durations: {
         instant: 'SR5.DurationInstant',
         sustained: 'SR5.DurationSustained',
@@ -484,6 +500,7 @@ export const SR5 = {
         commlink: 'SR5.DeviceCatCommlink',
         cyberdeck: 'SR5.DeviceCatCyberdeck',
         rcc: 'SR5.DeviceCatRCC',
+        living_persona: 'SR5.LivingPersona',
     },
 
     cyberwareGrades: {
@@ -612,6 +629,7 @@ export const SR5 = {
         'addiction_mental': "SR5.ActionCategory.AddictionMental",
         'addiction_physical': "SR5.ActionCategory.AddictionPhysical",
         'addiction': "SR5.ActionCategory.Addiction",
+        'attack_matrix': "SR5.ActionCategory.AttackMatrix",
         'attack_melee': "SR5.ActionCategory.AttackMelee",
         'attack_ranged': "SR5.ActionCategory.AttackRanged", 
         'attack_thrown': "SR5.ActionCategory.AttackThrown",
@@ -620,8 +638,9 @@ export const SR5 = {
         "climbing": "SR5.ActionCategory.Climbing",
         'compiling': "SR5.ActionCategory.Compiling",
         'complex_form': "SR5.ActionCategory.ComplexForm",
+        'defense': "SR5.ActionCategory.Defense",
+        'defense_matrix': "SR5.ActionCategory.DefenseMatrix",
         'defense_suppression': "SR5.ActionCategory.DefenseSuppression",
-        'defense': "SR5.ActionCategory.Defense", 
         'drain': "SR5.ActionCategory.Drain",
         'fade': "SR5.ActionCategory.Fade", 
         'hack_on_the_fly': "SR5.ActionCategory.HackOnTheFly",
@@ -630,8 +649,10 @@ export const SR5 = {
         'recovery_physical': "SR5.ActionCategory.RecoveryPhysical",
         'recovery_stun': "SR5.ActionCategory.RecoveryStun",
         'recovery': "SR5.ActionCategory.Recovery",
+        'resist_biofeedback': "SR5.ActionCategory.ResistBiofeedback",
         'resist_disease': "SR5.ActionCategory.ResistDisease",
         'resist_toxin': "SR5.ActionCategory.ResistToxin",
+        'resist_matrix': "SR5.ActionCategory.ResistMatrix",
         'resist': "SR5.ActionCategory.Resist",
         'resonance': "SR5.ActionCategory.Resonance",
         'rigging': "SR5.ActionCategory.Rigging",
@@ -717,6 +738,7 @@ export const SR5 = {
         global: 'SR5.ModifierTypes.Global',
         judge_intentions: 'SR5.ModifierTypes.JudgeIntentions',
         lift_carry: 'SR5.ModifierTypes.LiftCarry',
+        mark_damage: 'SR5.ModifierTypes.MarkDamage',
         matrix_initiative_dice: 'SR5.ModifierTypes.MatrixDice',
         matrix_initiative: 'SR5.ModifierTypes.MatrixInit',
         matrix_track: 'SR5.ModifierTypes.MatrixTrack',
@@ -730,11 +752,15 @@ export const SR5 = {
         physical_limit: 'SR5.ModifierTypes.PhysicalLimit',
         physical_overflow_track: 'SR5.ModifierTypes.PhysicalOverflowTrack',
         physical_track: 'SR5.ModifierTypes.PhysicalTrack',
+        public_grid: 'SR5.ModifierTypes.PublicGrid',
         reach: 'SR5.ModifierTypes.Reach',
+        recoil: 'SR5.ModifierTypes.Recoil',
         run: 'SR5.ModifierTypes.Run',
         soak: 'SR5.ModifierTypes.Soak',
         social_limit: 'SR5.ModifierTypes.SocialLimit',
         stun_track: 'SR5.ModifierTypes.StunTrack',
+        place_two_marks: "SR5.ModifierTypes.TwoMarks",
+        place_three_marks: "SR5.ModifierTypes.ThreeMarks",
         walk: 'SR5.ModifierTypes.Walk',
         wound_tolerance: 'SR5.ModifierTypes.WoundTolerance',
     },
@@ -759,6 +785,7 @@ export const SR5 = {
         fade: 'SR5.Tooltips.Modifiers.fade',
         global: 'SR5.Tooltips.Modifiers.global',
         judge_intentions: 'SR5.Tooltips.Modifiers.judge_intentions',
+        mark_damage: 'SR5.Tooltips.Modifiers.mark_damage',
         lift_carry: 'SR5.Tooltips.Modifiers.lift_carry',
         matrix_initiative_dice: 'SR5.Tooltips.Modifiers.matrix_initiative_dice',
         matrix_initiative: 'SR5.Tooltips.Modifiers.matrix_initiative',
@@ -773,11 +800,15 @@ export const SR5 = {
         physical_limit: 'SR5.Tooltips.Modifiers.physical_limit',
         physical_overflow_track: 'SR5.Tooltips.Modifiers.physical_overflow_track',
         physical_track: 'SR5.Tooltips.Modifiers.physical_track',
+        public_grid: 'SR5.Tooltips.Modifiers.public_grid',
         reach: 'SR5.Tooltips.Modifiers.reach',
+        recoil: 'SR5.Tooltips.Modifiers.recoil',
         run: 'SR5.Tooltips.Modifiers.run',
         soak: 'SR5.Tooltips.Modifiers.soak',
         social_limit: 'SR5.Tooltips.Modifiers.social_limit',
         stun_track: 'SR5.Tooltips.Modifiers.stun_track',
+        place_two_marks: 'SR5.Tooltips.Modifiers.place_two_marks',
+        place_three_marks: 'SR5.Tooltips.Modifiers.place_three_marks',
         walk: 'SR5.Tooltips.Modifiers.walk',
         wound_tolerance: 'SR5.Tooltips.Modifiers.wound_tolerance',
     },
@@ -798,10 +829,10 @@ export const SR5 = {
         multi_defense: 'SR5.ModifierTypes.DefenseMulti',
         drain: 'SR5.ModifierTypes.Drain',
         environmental: 'SR5.ModifierTypes.Environmental',
-        ['environmental.light']: 'SR5.ModifierTypes.EnvironmentalLight',
-        ['environmental.visibility']: 'SR5.ModifierTypes.EnvironmentalVisibility',
-        ['environmental.wind']: 'SR5.ModifierTypes.EnvironmentalWind',
-        ['environmental.range']: 'SR5.ModifierTypes.EnvironmentalRange',
+        'environmental.light': 'SR5.ModifierTypes.EnvironmentalLight',
+        'environmental.visibility': 'SR5.ModifierTypes.EnvironmentalVisibility',
+        'environmental.wind': 'SR5.ModifierTypes.EnvironmentalWind',
+        'environmental.range': 'SR5.ModifierTypes.EnvironmentalRange',
         background_count: 'SR5.ModifierTypes.BackgroundCount',
         noise: 'SR5.ModifierTypes.Noise',
         fade: 'SR5.ModifierTypes.Fade',
@@ -871,8 +902,10 @@ export const SR5 = {
      * Names of FoundryVTT packs supplied by the system to be used as action sources.
      */
     packNames: {
-        'generalActions': 'general-actions',
-        'matrixActions': 'matrix-actions'
+        // packNames keys should match the name of the FLAG
+        'GeneralActionsPack': 'sr5e-general-actions',
+        'MatrixActionsPack': 'sr5e-matrix-actions',
+        'ICActionsPack': 'sr5e-ic-actions',
     },
 
     programTypes: {
@@ -1149,6 +1182,13 @@ export const SR5 = {
         'full_auto': 'SR5.Weapon.Mode.FullAuto'
     },
 
+    wirelessModes: {
+        'online': 'SR5.WirelessOnline',
+        'silent': 'SR5.RunningSilent',
+        'offline': 'SR5.WirelessOffline',
+        'none': 'SR5.WirelessUnavailable'
+    },
+
     /**
      * The preconfigured default Shadowrun firemodes according to SR5#180
      *
@@ -1229,7 +1269,7 @@ export const SR5 = {
         action: 'complex',
         mode: 'full_auto'
     }
-    ] as Shadowrun.FireModeData[],
+    ],
 
     /**
      * Active/AdvancedEffect apply To types and their labels.
@@ -1466,7 +1506,7 @@ export const SR5 = {
         weapon: {
             // Options before : in name are 'Grenade', 'Minigrenade', 'Rocket', 'Missile', 'Torpedo Grenade', 'Micro-Torpedo'
             'melee': '',
-            'ranged': '',
+            'range': '',
             'thrown': '',
             'assault-cannons': '',
             'assault-rifles': '',

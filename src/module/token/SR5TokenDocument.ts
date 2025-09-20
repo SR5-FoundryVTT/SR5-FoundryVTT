@@ -1,45 +1,38 @@
-import MovementActorData = Shadowrun.MovementActorData;
-
-interface Waypoint {
-    x: number;
-    y: number;
-    cost?: number;
-    action: string;
-}
-
-interface MeasureMovementOptions {}
-
-interface MeasurementWaypoint {
-    cost: number;
-}
-
-interface MovementMeasurement {
-    waypoints: MeasurementWaypoint[];
-}
-
-declare global {
-    interface TokenDocument {
-        movementAction: string;
-        movementHistory: Waypoint[];
-        measureMovementPath(waypoints: Waypoint[], options: MeasureMovementOptions): MovementMeasurement;
-    }
-}
+import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
+import { StorageFlow } from '@/module/flows/StorageFlow';
 
 export class SR5TokenDocument extends TokenDocument {
-
     /**
      * Used by measureMovementPath to track if a movement is being planned or executed.
      * @private
      */
     #movementInProgress = false;
 
-    override async _preUpdate(changed, options, user) {
+    override async _preUpdate(
+        changed: TokenDocument.UpdateData,
+        options: TokenDocument.Database.PreUpdateOptions,
+        user: User.Implementation
+    ) {
         this.#movementInProgress = true;
+        let result: boolean | void;
         try {
-            await super._preUpdate(changed, options, user);
+            result = await super._preUpdate(changed, options, user);
         } finally {
             this.#movementInProgress = false;
         }
+        return result;
+    }
+
+    /**
+     * Handle system specific things when this token document is being deleted
+     * @param args
+     */
+    override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
+        // ensure we disconnect from any networks before being a token actor is deleted
+        if (this.actor?.isToken) {
+            await StorageFlow.deleteStorageReferences(this.actor);
+        }
+        return super._preDelete(...args);
     }
 
     /**
@@ -60,10 +53,13 @@ export class SR5TokenDocument extends TokenDocument {
      * @param waypoints
      * @param options
      */
-    override measureMovementPath(waypoints: Waypoint[], options = {}) {
+    override measureMovementPath(
+        waypoints: TokenDocument.MeasuredMovementWaypoint[],
+        options?: TokenDocument.MeasureMovementPathOptions
+    ) {
         const measurement = super.measureMovementPath(waypoints, options);
 
-        const characterMovementData = (this.actor?.system as MovementActorData)?.movement;
+        const characterMovementData = this.actor?.system.movement;
         if (characterMovementData && this.movementAction === 'walk' && !this.#movementInProgress) {
             const movementHistory = this.movementHistory;
             let usedMovementCost = 0;

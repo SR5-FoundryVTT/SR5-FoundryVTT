@@ -7,7 +7,7 @@ import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
 
 
-interface SituationalModifiersTemplateData extends FormApplication.Data<{}> {
+interface SituationalModifiersTemplateData extends foundry.appv1.api.FormApplication.FormApplicationData<FormApplication.Options, Record<string, unknown>> {
     targetType: string
     targetName: string
     modifiers: DocumentSituationModifiers
@@ -139,7 +139,7 @@ class MagicModifiersHandler extends ModifiersHandler {
         console.log(`${SYSTEM_NAME} | Magic modifier HUD on renderTokenHUD`);
 
         // Don't add awakened modifiers to token hud for mundane actors.
-        if (!actor.isAwakened) return;
+        if (!actor.isAwakened()) return;
 
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
@@ -217,7 +217,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
 
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
-        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied.total}</div>`);
+        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied!.total}</div>`);
         const modifierDescription = $(`<div class="modifier-description open-recoil-modifier">${game.i18n.localize("SR5.ModifierTypes.Recoil")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'recoil'));
 
@@ -236,7 +236,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
  * - environmental
  * - ...
  */
-export class SituationModifiersApplication extends FormApplication {
+export class SituationModifiersApplication extends foundry.appv1.api.FormApplication {
     // Static Handlers contain the class references used for both static method calls and to setup the instance handlers.
     static _staticHandlers: typeof ModifiersHandler[] = [
         MatrixModifiersHandler, 
@@ -304,15 +304,18 @@ export class SituationModifiersApplication extends FormApplication {
         // Update all modifiers before displaying.
         this.modifiers.applyAll();
 
+        const baseData = await super.getData(options);
+
+        // please help
         return {
-            ...await super.getData(options),
-            
+            ...(baseData as foundry.appv1.api.FormApplication.FormApplicationData<FormApplication.Options, {}>),
+
             targetType: this._targetTypeLabel,
             targetName: this.target.name || 'Unknown target',
 
             modifiers: this.modifiers,
             environmentalLevels: this.modifiers.environmental.levels
-        }
+        };
     }
 
     override activateListeners(html: JQuery<HTMLElement>): void {
@@ -349,16 +352,14 @@ export class SituationModifiersApplication extends FormApplication {
         const sourceKey = valueElement.attr('name') as string;
         const appliedKey = sourceKey.includes('source') ? sourceKey.replace('source', 'applied') : sourceKey;
 
-        const currentValue = foundry.utils.getProperty(this, appliedKey) ?? 0;
+        const currentValue = foundry.utils.getProperty(this, appliedKey) as number ?? 0;
         if (isNaN(currentValue)) 
             return console.error('Shadowrun5e | Expected data property is not a number', sourceKey, currentValue);
-            
-        const value = currentValue + delta;
 
         const formData = {
-            [sourceKey]: value
+            [sourceKey]: Number(currentValue) + delta
         }
-        
+
         // Update source data and update display information.
         await this._updateObject(event, formData);
         this.modifiers.applyAll();
@@ -421,7 +422,7 @@ export class SituationModifiersApplication extends FormApplication {
             name: 'situational-modifiers-application',
             title: 'CONTROLS.SR5.SituationalModifiers',
             icon: 'fas fa-list',
-            onClick: SituationModifiersApplication.openForCurrentScene,
+            onClick: SituationModifiersApplication.openForCurrentScene.bind(SituationModifiersApplication),
             button: true
         }
     }
@@ -431,7 +432,7 @@ export class SituationModifiersApplication extends FormApplication {
      * Add buttons to both show and open global modifiers currently applied to this token when showing the
      * tokenHUD.
      */
-    static onRenderTokenHUD(app: TokenHUD, html: JQuery, data: any) {
+    static onRenderTokenHUD(app: foundry.applications.hud.TokenHUD, html: JQuery, data: any) {
         if (!data._id) return;
 
         // Generate general structure for ModifierHandlers to connect to.

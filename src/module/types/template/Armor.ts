@@ -1,12 +1,15 @@
-declare namespace Shadowrun {
-    export type ActorArmorData = BaseValuePair<number> & ModifiableValue & LabelField
+import { ModifiableValue } from "./Base";
+const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
-    export type ActorArmor = ActorArmorData & {
-        fire: number,
-        electric: number,
-        cold: number,
-        acid: number,
-        label?: string,
-        hardened: boolean
-    }
-}
+export const ActorArmorData = () => ({
+    ...ModifiableValue(),
+    acid: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    cold: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    electricity: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    fire: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    hardened: new BooleanField(),
+    label: new StringField({ required: true }),
+    radiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+});
+
+export type ActorArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ActorArmorData>>;

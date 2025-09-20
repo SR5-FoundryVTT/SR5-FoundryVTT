@@ -82,9 +82,9 @@ export class DocumentSituationModifiers {
     // The source data stored on the document.
     source: SituationModifiersSourceData;
     // The applied data from the document and it's apply chain.
-    applied: SituationModifiersData;
+    applied!: SituationModifiersData;
     // Handlers for the different modifier categories.
-    _modifiers: {
+    _modifiers!: {
         noise: NoiseModifier,
         background_count: BackgroundCountModifier,
         environmental: EnvironmentalModifier,
@@ -110,7 +110,6 @@ export class DocumentSituationModifiers {
 
         // Map all modifier types to their respectiv implementation.
         this._prepareModifiers();
-        
     }
 
     /**
@@ -254,8 +253,8 @@ export class DocumentSituationModifiers {
     static async clearAllOn(document: ModifiableDocumentTypes) {
         if (document instanceof SR5Actor) {
             // Overwrite all selections with default values.
-            await document.update({'system.-=situation_modifiers': null}, {render: false});
-            await document.update({'system.situation_modifiers': DocumentSituationModifiers._defaultModifiers});
+            //@ts-expect-error Does fvtt support == operator?
+            await document.update({ system: { '==situation_modifiers': DocumentSituationModifiers._defaultModifiers } });
         } else {
             await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
             await document.setFlag(SYSTEM_NAME, FLAGS.Modifier, DocumentSituationModifiers._defaultModifiers);
@@ -361,8 +360,9 @@ export class DocumentSituationModifiers {
      */
     static async setDocumentModifiers(document: ModifiableDocumentTypes, modifiers: SituationModifiersSourceData) {
         if (document instanceof SR5Actor) {
-            // Overwrite the whole modifier object.
-            await document.update({'system.==situation_modifiers': modifiers});
+            // Disable diffing to overwrite the whole object.
+            // @ts-expect-error fvtt doesn't support == operator
+            await document.update({ system: { "==situation_modifiers": modifiers } });
         } else {
             // Due to active selection merging by Foundry mergeObject, we need to delete first.
             await document.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
@@ -400,6 +400,8 @@ export class DocumentSituationModifiers {
         if (canvas.scene.id !== scene.id) return;
 
         // Use current scene for ease of access to tokens
-        canvas.scene.tokens.forEach(token => token.actor?.getSituationModifiers().clearAll());
+        for (const token of canvas.scene.tokens) {
+            await token.actor?.getSituationModifiers().clearAll();
+        }
     }
 }

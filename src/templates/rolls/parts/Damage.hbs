@@ -1,0 +1,27 @@
+<div class="test-value">
+        <span class="value">{{name}}: </span>
+        <span class="value-result">
+            <span class="button apply-damage"
+              data-damage-value="{{damage.value}}"
+              data-damage-type="{{damage.type.value}}"
+              data-damage-element="{{damage.element.value}}"
+              data-damage-ap="{{damage.ap.value}}"
+              data-damage-biofeedback="{{damage.biofeedback}}"
+              >
+                {{damageCode damage}}
+
+                {{#if damage.element.value}}
+                <i class="{{elementIcon damage.element.value}} icon"
+                   data-tooltip="{{damage.element.value}}"></i>
+                {{/if}}
+                {{#if damage.biofeedback}}
+                    <i class="far fa-heart-circle-bolt icon"
+                       data-tooltip="{{localize 'SR5.BiofeedbackDamage'}}"></i>
+                {{/if}}
+                {{#if damage.ap.value}} {{#if showAP}}
+                    <span class="key">{{localize "SR5.AP"}}</span>
+                    <span class="value">{{damage.ap.value}}</span>
+                {{/if}}{{/if}}
+            </span>
+        </span>
+</div>

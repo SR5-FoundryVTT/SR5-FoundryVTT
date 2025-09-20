@@ -1,0 +1,77 @@
+<form class="{{cssClass}}" autocomplete="off">
+    {{#if isGM}}
+    <div class="inventory">
+        <div class="scroll-area">
+            <div class="list-item item-section">
+                <div class="list-item-content">
+                    <div class="item-left">
+                        <div class="item-text item-name">
+                            {{localize "SR5.ActorTypes.Character"}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-icons item-text">
+                            <a class="roll overwatch-score-add-actor" data-tooltip="SR5.OverwatchScoreTracker.AddSelect">
+                                <i class="fas fa-plus"></i>
+                                {{localize "SR5.Add"}}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{#each scores}}
+            <div class="list-item" data-uuid="{{this.actor.uuid}}">
+                <div class="list-item-content">
+                    <div class="item-left">
+                        {{#if this.actor.img}}
+                            <div class="item-img">
+                                <img
+                                    src="{{this.actor.img}}"
+                                    data-tooltip="{{this.actor.name}}"
+                                    height="24px"
+                                    width="24px"
+                                />
+                            </div>
+                        {{/if}}
+                        <div class="item-text item-name">
+                            {{this.actor.name}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-text">
+                            <input
+                                class="display overwatch-score-input"
+                                size="3"
+                                type="text"
+                                value="{{this.score}}"
+                                data-dtype="Number"
+                                placeholder="0"
+                            />
+                        </div>
+                        <div class="item-text rtg"></div>
+                        <div class="item-text" style="white-space: nowrap">
+                            <span class="overwatch-score-add roll" data-tooltip="SR5.AddOneToOverwatch" data-amount="1">+1</span>
+                            <span> / </span>
+                            <span class="overwatch-score-add roll" data-tooltip="SR5.AddFiveToOverwatch" data-amount="5">+5</span>
+                            <span> / </span>
+                            <span class="roll overwatch-score-roll-15-minutes" data-tooltip="SR5.AddFifteenMinutesToOverwatch">
+                                {{localize "SR5.PlusFifteenMinutes"}}
+                            </span>
+                        </div>
+                        <div class="item-text rtg"></div>
+                        <div class="item-text item-icons">
+                            <i class="roll fas fa-power-off overwatch-score-reset" data-tooltip="SR5.OverwatchScoreTracker.ResetScore"></i>
+                            <i class="roll fas fa-trash overwatch-score-delete" data-tooltip="SR5.OverwatchScoreTracker.DeleteScore"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+    {{else}}
+    <div>
+        <p>{{localize "SR5.OverwatchScoreTracker.GMOnly"}}</p>
+    </div>
+    {{/if}}
+</form>

@@ -1,11 +1,9 @@
-import { DataImporter } from './DataImporter';
-import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
-import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
-import { SpritePowerParser } from '../parser/powers/SpritePowerParser';
-import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
 import { CompendiumKey } from './Constants';
-
-type CritterPowerType = Shadowrun.CritterPowerItemData | Shadowrun.SpritePowerItemData;
+import { DataImporter } from './DataImporter';
+import { SpritePowerParser } from '../parser/powers/SpritePowerParser';
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
+import { CritterpowersSchema, Power } from '../schema/CritterpowersSchema';
 
 export class CritterPowerImporter extends DataImporter {
     public files = ['critterpowers.xml'];
@@ -15,19 +13,19 @@ export class CritterPowerImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        public async Parse(jsonData: Power, compendiumKey: CompendiumKey): Promise<CritterPowerType> {
+        public async Parse(jsonData: Power, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const critterPowerParser = new CritterPowerParser();
             const spritePowerParser = new SpritePowerParser();
 
             const isSpritePower = jsonData.category._TEXT !== "Emergent";
             const selectedParser = isSpritePower ? critterPowerParser : spritePowerParser;
 
-            return await selectedParser.Parse(jsonData, compendiumKey);
+            return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }
     };
 
     async Parse(jsonObject: CritterpowersSchema): Promise<void> {
-        return CritterPowerImporter.ParseItems<Power, CritterPowerType>(
+        return CritterPowerImporter.ParseItems<Power>(
             jsonObject.powers.power,
             {
                 compendiumKey: () => "Critter_Power",

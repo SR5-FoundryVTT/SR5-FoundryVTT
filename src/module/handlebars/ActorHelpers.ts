@@ -1,7 +1,7 @@
 import { MonitorRules } from './../rules/MonitorRules';
 import { SR5Item } from './../item/SR5Item';
 import { SR5Actor } from './../actor/SR5Actor';
-import ModificationCategoryType = Shadowrun.ModificationCategoryType;
+type ModificationCategoryType = Item.SystemOfType<'modification'>['modification_category'];
 
 export const registerActorHelpers = () => {
     /** 
@@ -28,14 +28,14 @@ export const registerActorHelpers = () => {
     * @param items The items to be considered
     * @param modificationCategory The modification category 
     */
-    Handlebars.registerHelper('calcModificationCategorySlots', (items: [SR5Item], modificationCategory: ModificationCategoryType): number => {        
+    Handlebars.registerHelper('calcModificationCategorySlots', (items: SR5Item<'modification'>[], modificationCategory: ModificationCategoryType): number => {
         if (!Array.isArray(items) || !items.length) { return 0 }        
         let slotSum = 0;
         
         for (const item of items) {
             if (item.system.modification_category === modificationCategory) {
                 // If item's technology exists and quantity has been defined, use the item's quantity. Else use 1.
-                const quantity = (item.system.technology !== undefined) && (item.system.technology.quantity !== '') ? item.system.technology.quantity : 1;
+                const quantity = item.system.technology?.quantity || 1;
                 slotSum += (item.system.slots || 0) * quantity;
             }
         }
@@ -61,15 +61,18 @@ export const registerActorHelpers = () => {
     * 
     * @param items The items to be considered
     */
-    Handlebars.registerHelper('calcModPointSlots', (items: [SR5Item]): number => {
+    Handlebars.registerHelper('calcModPointSlots', (items: [SR5Item<'modification'>]): number => {
         if (!Array.isArray(items) || !items.length) { return 0 }
-        var dronestring = 'drone';
-        const slotSum = items.reduce((arr, item) => {            
-            if (item.system.type == dronestring) { return arr += item.system.slots ? item.system.slots : 0 } else { return arr };            
-        }, 0)
+        const dronestring = 'drone';
+        const slotSum = items.reduce((arr, item) => {
+            if (item.system.type === dronestring) { 
+                arr += item.system.slots ? item.system.slots : 0 
+                return arr;
+            } else {
+                return arr;
+            }
+        }, 0);
 
         return slotSum;
     });
-
-
 }

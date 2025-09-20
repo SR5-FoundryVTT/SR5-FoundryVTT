@@ -36,8 +36,8 @@ export class DefenseModifier extends SituationModifier {
         }
 
         // Based on opposed weapon category, add appropriate defense modifier.
-        if (test.against.item?.isRangedWeapon) defense += actor.modifiers.totalFor('defense_ranged');
-        if (test.against.item?.isMeleeWeapon) defense += actor.modifiers.totalFor('defense_melee');
+        if (test.against.item?.isRangedWeapon()) defense += actor.modifiers.totalFor('defense_ranged');
+        if (test.against.item?.isMeleeWeapon()) defense += actor.modifiers.totalFor('defense_melee');
 
         return defense;
     }

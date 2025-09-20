@@ -1,0 +1,29 @@
+{{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs'}}
+<div class="sr5 chat-card roll-card">
+    <div class="card-content can-wrap">
+        <div class="left-side">
+            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
+            name=(localize "SR5.Incoming")
+            damage=test.data.incomingDamage
+            showAP=true
+            }}
+        </div>
+        <div class="right-side">
+            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
+            name=(localize "SR5.Modified")
+            damage=test.data.modifiedDamage
+            showAP=true
+            }}
+        </div>
+    </div>
+    <div class="card-content">
+        <div class="left-side">
+            {{#if test.data.knockedDown}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Target"}}: </span>
+                <span class="value">{{localize "SR5.KnockedDown"}}</span>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>

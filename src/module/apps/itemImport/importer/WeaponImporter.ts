@@ -1,3 +1,4 @@
+import { CompendiumKey } from './Constants';
 import { DataImporter } from './DataImporter';
 import { MeleeParser } from '../parser/weapon/MeleeParser';
 import { RangedParser } from '../parser/weapon/RangedParser';
@@ -5,8 +6,6 @@ import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { WeaponsSchema, Weapon } from '../schema/WeaponsSchema';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
-import WeaponItemData = Shadowrun.WeaponItemData;
-import { CompendiumKey } from './Constants';
 
 export class WeaponImporter extends DataImporter {
     public files = ['weapons.xml'];
@@ -16,7 +15,7 @@ export class WeaponImporter extends DataImporter {
     }
 
     static parserWrap = class {
-        public async Parse(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<WeaponItemData> {
+        public async Parse(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
             const rangedParser = new RangedParser();
             const meleeParser = new MeleeParser();
             const thrownParser = new ThrownParser();
@@ -26,18 +25,18 @@ export class WeaponImporter extends DataImporter {
                                  : category === 'melee' ? meleeParser
                                                         : thrownParser;
 
-            return await selectedParser.Parse(jsonData, compendiumKey);
+            return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }
     };
 
     async Parse(jsonObject: WeaponsSchema): Promise<void> {
-        return WeaponImporter.ParseItems<Weapon, WeaponItemData>(
+        return WeaponImporter.ParseItems<Weapon>(
             jsonObject.weapons.weapon,
             {
                 compendiumKey: () => "Weapon",
                 parser: new WeaponImporter.parserWrap(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
                 },
                 errorPrefix: "Failed Parsing Weapon"
             }

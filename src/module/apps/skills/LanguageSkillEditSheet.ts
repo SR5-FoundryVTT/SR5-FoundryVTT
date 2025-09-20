@@ -1,5 +1,4 @@
 import { SkillEditSheet } from './SkillEditSheet';
-import SkillEditFormData = Shadowrun.SkillEditFormData;
 
 export class LanguageSkillEditSheet extends SkillEditSheet {
     override _updateString() {
@@ -11,7 +10,7 @@ export class LanguageSkillEditSheet extends SkillEditSheet {
             editable_name: true,
             editable_canDefault: false,
             editable_attribute: false
-        } as SkillEditFormData);
+        });
     }
 
     /** @override */

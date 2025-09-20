@@ -21,9 +21,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  * - cancel template preview on right click
  * 
  */
-export default class Template extends MeasuredTemplate {
-    override x: number;
-    override y: number;
+export default class Template extends foundry.canvas.placeables.MeasuredTemplate {
     // The source item of this template.
     // NOTE: This is never really used.
     item?: SR5Item;
@@ -40,7 +38,7 @@ export default class Template extends MeasuredTemplate {
     /**
      * The initially active CanvasLayer to re-activate after the workflow is complete.
      */
-    #initialLayer: CanvasLayer;
+    #initialLayer: CanvasLayer | undefined;
 
     /* -------------------------------------------- */
 
@@ -59,7 +57,7 @@ export default class Template extends MeasuredTemplate {
      * @returns Template instance. Not drawn on scene.
      */
     static fromItem(item: SR5Item, onComplete?: () => void): Template | undefined {
-        if (!canvas.scene) return;
+        if (!canvas.scene) return undefined;
 
         // Either use blast data or default values.
         const blast = item.getBlastData();
@@ -73,13 +71,14 @@ export default class Template extends MeasuredTemplate {
             direction: 0,
             x: 0,
             y: 0,
-            fillColor: game.user?.color,
+            fillColor: game.user?.color?.toRGBA(1),
             distance: blast?.radius || 1, // Adhere to DataModel validation.
             dropoff: blast?.dropoff || 0
         };
 
         // Use overwritten MeasuredTemplate class to create a new instance.
         const cls = CONFIG.MeasuredTemplate.documentClass;
+        //@ts-expect-error please help
         const template = new cls(templateData, { parent: canvas.scene });
         const object = new this(template);
 
@@ -94,54 +93,67 @@ export default class Template extends MeasuredTemplate {
      * Draw a preview of this Template instance on the currently active scene.
      */
     async drawPreview() {
-        if (!canvas.ready || !this.layer.preview) return;
+        if (!canvas.ready || !canvas.templates) return;
 
-        const initialLayer = canvas.activeLayer;
-        if (!initialLayer) return;
-
+        const layer = canvas.templates;
         await this.draw();
-        this.layer.activate();
-        this.layer.preview.addChild(this);
-        return this.activatePreviewListeners(initialLayer);
+
+        const previewGroup = new PIXI.Container();
+        layer.addChild(previewGroup);
+        previewGroup.addChild(this);
+
+        return this.activatePreviewListeners(layer);
     }
 
-    activatePreviewListeners(initialLayer: CanvasLayer) {
+    async activatePreviewListeners(initialLayer: CanvasLayer): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (!canvas.ready || !canvas.stage || !canvas.app) return;
+            if (!canvas.ready) return;
 
             this.#initialLayer = initialLayer;
+
+            // Store listeners
             this.#events = {
-                cancel: this._onCancelPlacement.bind(this),
-                confirm: this._onConfirmPlacement.bind(this),
                 move: this._onMovePlacement.bind(this),
-                resolve,
-                reject,
-                rotate: this._onRotatePlacement.bind(this)
+                confirm: this._onConfirmPlacement.bind(this),
+                cancel: this._onCancelPlacement.bind(this),
+                rotate: this._onRotatePlacement.bind(this),
+                resolve: resolve,
+                reject: reject
             };
 
-            // Activate listeners
-            canvas.stage?.on("mousemove", this.#events.move);
-            canvas.stage?.on("mousedown", this.#events.confirm);
-            canvas.app.view.oncontextmenu = this.#events.cancel;
-            canvas.app.view.onwheel = this.#events.rotate;
+            const canvasElement = canvas.app!.renderer!.view! as HTMLCanvasElement;
+
+            // Use canvas.view to attach DOM events
+            canvasElement.addEventListener("mousemove", this.#events.move);
+            canvasElement.addEventListener("mousedown", this.#events.confirm);
+            canvasElement.addEventListener("contextmenu", this.#events.cancel);
+            canvasElement.addEventListener("wheel", this.#events.rotate, { passive: false });
         });
     }
     /**
      * Shared code for when template placement ends by being confirmed or canceled.
     * @param {Event} event  Triggering event that ended the placement.
     */
-    async _finishPlacement(event) {
-        if (!canvas.stage || !canvas.app) return;
+    async _finishPlacement(event: PointerEvent) {
+        if (!canvas.ready) return;
 
-        // @ts-expect-error TEST
-        this.layer._onDragLeftCancel(event);
-        canvas.stage.off("mousemove", this.#events.move);
-        canvas.stage.off("mousedown", this.#events.confirm);
-        canvas.app.view.oncontextmenu = null;
-        canvas.app.view.onwheel = null;
-        this.#initialLayer.activate();
+        // Remove this template from the preview
+        this.destroy();
 
-        if (this.onComplete) this.onComplete();
+        // Detach event listeners from the canvas DOM element
+        const canvasElement = canvas.app!.renderer!.view! as HTMLCanvasElement;
+        canvasElement.removeEventListener("mousemove", this.#events.move);
+        canvasElement.removeEventListener("mousedown", this.#events.confirm);
+        canvasElement.removeEventListener("contextmenu", this.#events.cancel);
+        canvasElement.removeEventListener("wheel", this.#events.rotate);
+
+        // Reactivate previous layer, if necessary
+        if (this.#initialLayer) {
+            (canvas as any)._setActiveLayer(this.#initialLayer);
+        }
+
+        // Run the completion callback
+        this.onComplete?.();
     }
 
     /* -------------------------------------------- */
@@ -155,11 +167,8 @@ export default class Template extends MeasuredTemplate {
         const now = Date.now(); // Apply a 20ms throttle
         if (now - this.#moveTime <= 20) return;
         const center = event.data.getLocalPosition(this.layer);
-        // @ts-expect-error TODO: foundry-vtt-types v11
-        const interval = canvas.grid.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
-        // @ts-expect-error TODO: foundry-vtt-types v11
-        const snapped = canvas.grid.getSnappedPosition(center.x, center.y, interval);
-        // @ts-expect-error TODO: foundry-vtt-types v11
+        const interval = canvas.grid!.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
+        const snapped = canvas.grid!.getSnappedPosition(center.x, center.y, interval);
         this.document.updateSource({ x: snapped.x, y: snapped.y });
         this.refresh();
         this.#moveTime = now;
@@ -174,12 +183,9 @@ export default class Template extends MeasuredTemplate {
     _onRotatePlacement(event) {
         if (event.ctrlKey) event.preventDefault(); // Avoid zooming the browser window
         event.stopPropagation();
-        // @ts-expect-error TODO: foundry-vtt-types v11
-        const delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
+        const delta = canvas.grid!.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
         const snap = event.shiftKey ? delta : 5;
-        // @ts-expect-error TODO: foundry-vtt-types v11
         const update = { direction: this.document.direction + (snap * Math.sign(event.deltaY)) };
-        // @ts-expect-error TODO: foundry-vtt-types v11
         this.document.updateSource(update);
         this.refresh();
     }
@@ -192,14 +198,10 @@ export default class Template extends MeasuredTemplate {
      */
     async _onConfirmPlacement(event) {
         await this._finishPlacement(event);
-        // @ts-expect-error TODO: foundry-vtt-types v11
-        const interval = canvas.grid.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
-        // @ts-expect-error TODO: foundry-vtt-types v11
-        const destination = canvas.grid.getSnappedPosition(this.document.x, this.document.y, interval);
-        // @ts-expect-error TODO: foundry-vtt-types v11
+        const interval = canvas.grid!.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
+        const destination = canvas.grid!.getSnappedPosition(this.document.x, this.document.y, interval);
         this.document.updateSource(destination);
-        // @ts-expect-error TODO: foundry-vtt-types v11
-        this.#events.resolve(canvas.scene.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]));
+        this.#events.resolve(canvas.scene!.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]));
     }
 
     /* -------------------------------------------- */

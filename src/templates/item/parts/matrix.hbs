@@ -1,0 +1,135 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    {{#ife type "device"}}
+    <div class="form-line">
+        <div class="label">
+            <label>
+                {{localize "SR5.DeviceType"}}
+            </label>
+        </div>
+        <div class="inputs">
+            <select name="system.category">
+                {{#select system.category}} {{#each config.deviceCategories as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    {{/ife}}
+    {{#ifne system.category 'living_persona'}}
+    <div class="form-line">
+        <div class="label">
+            {{#ifin system.category (toArray "cyberdeck" "host")}}
+            <select class="matrix-att-selector" name="system.atts.att1.att" data-att="att1">
+                {{#select system.atts.att1.att}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            {{else}}
+            <label>{{localize (lookup config.matrixAttributes system.atts.att1.att)}}</label>
+            {{/ifin}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="system.atts.att1.value"
+                value="{{system.atts.att1.value}}"
+                data-dtype="Number"
+                placeholder="1"
+                {{#if (not system.atts.att1.editable)}}disabled{{/if}}
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{#ifin system.category (toArray "cyberdeck" "host")}}
+            <select class="matrix-att-selector" name="system.atts.att2.att" data-att="att2">
+                {{#select system.atts.att2.att}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            {{else}}
+            <label>{{localize (lookup config.matrixAttributes system.atts.att2.att)}}</label>
+            {{/ifin}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="system.atts.att2.value"
+                value="{{system.atts.att2.value}}"
+                data-dtype="Number"
+                placeholder="1"
+                {{#if (not system.atts.att2.editable)}}disabled{{/if}}
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{#ifin system.category (toArray "cyberdeck" "host")}}
+            <select class="matrix-att-selector" name="system.atts.att3.att" data-att="att3">
+                {{#select system.atts.att3.att}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            {{else}}
+            <label>{{localize (lookup config.matrixAttributes system.atts.att3.att)}}</label>
+            {{/ifin}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="system.atts.att3.value"
+                value="{{system.atts.att3.value}}"
+                data-dtype="Number"
+                placeholder="1"
+                {{#if (not system.atts.att3.editable)}}disabled{{/if}}
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{#ifin system.category (toArray "cyberdeck" "host")}}
+            <select class="matrix-att-selector" name="system.atts.att4.att" data-att="att4">
+                {{#select system.atts.att4.att}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            {{else}}
+            <label>{{localize (lookup config.matrixAttributes system.atts.att4.att)}}</label>
+            {{/ifin}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="system.atts.att4.value"
+                value="{{system.atts.att4.value}}"
+                data-dtype="Number"
+                placeholder="1"
+                {{#if (not system.atts.att4.editable)}}disabled{{/if}}
+            />
+        </div>
+    </div>
+    {{#ife this.type "device"}}
+    {{#ifne this.system.category "rcc"}}
+    <div class="form-line">
+        <div class="label">
+            <label>{{localize "SR5.Programs"}}</label>
+        </div>
+        <div class="inputs">
+            <input type="text" name="system.programs" value="{{system.programs}}" min="0" />
+        </div>
+    </div>
+    {{/ifne}}
+    {{/ife}}
+    {{/ifne}}
+</div>

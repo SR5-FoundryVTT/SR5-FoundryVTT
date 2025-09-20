@@ -2,23 +2,23 @@ import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { ComplexFormTest, ComplexFormTestData } from "./ComplexFormTest";
 import { Helpers } from "../helpers";
 import { FadeRules } from "../rules/FadeRules";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { DataDefaults } from "../data/DataDefaults";
+import { DamageType, MinimalActionType } from "../types/item/Action";
+import { DeepPartial } from "fvtt-types/utils";
 
 export interface FadeTestData extends SuccessTestData {
-    incomingFade: DamageData
-    modifiedFade: DamageData
+    incomingFade: DamageType
+    modifiedFade: DamageType
 
     against: ComplexFormTestData
 }
 
 export class FadeTest extends SuccessTest<FadeTestData> {
-    against: ComplexFormTest
+    declare against: ComplexFormTest;
 
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
@@ -29,7 +29,7 @@ export class FadeTest extends SuccessTest<FadeTestData> {
             data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
         // This test is part of either a standalone test or created with its own data (i.e. edge reroll).
         } else {
-            data.incomingFade = data.incomingFade ?? DataDefaults.damageData();
+            data.incomingFade = data.incomingFade ?? DataDefaults.createData('damage');
             data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
         }
 
@@ -37,33 +37,29 @@ export class FadeTest extends SuccessTest<FadeTestData> {
     }
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/fade-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/fade-test-dialog.hbs';
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/fade-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/fade-test-message.hbs';
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
-        return {
-            'attribute2': 'resonance'
-        };
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
+        return { attribute2: 'resonance' };
     }
     
-    static override async _getDocumentTestAction(item: SR5Item, actor: SR5Actor) {
-        const documentAction = await super._getDocumentTestAction(item, actor);
+    static override _getDocumentTestAction(item: SR5Item, actor: SR5Actor<'character'>) {
+        const documentAction = super._getDocumentTestAction(item, actor);
 
-        const character = actor.asCharacter();
-
-        if (!character || !actor.isEmerged) {
+        if (!actor.isType('character') || !actor.isEmerged()) {
             console.error(`Shadowrun 5e | A ${this.name} expected an emerged actor but got this`, actor);
             return documentAction;
         }
 
         // Get technomancer fade attribute
-        const attribute = character.system.technomancer.attribute;
+        const attribute = actor.system.technomancer.attribute;
         foundry.utils.mergeObject(documentAction, {attribute});
-        
+
         return documentAction;
     }
 

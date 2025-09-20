@@ -4,27 +4,22 @@ import {AttributesPrep} from "./functions/AttributesPrep";
 import {PartsList} from "../../parts/PartsList";
 import {SR5} from "../../config";
 import {MatrixPrep} from "./functions/MatrixPrep";
-import ICData = Shadowrun.ICData;
-import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import {DataDefaults} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
-import DeviceAttribute = Shadowrun.DeviceAttribute;
 import {SkillsPrep} from "./functions/SkillsPrep";
+import { SR5Item } from "src/module/item/SR5Item";
 
 
 export class ICPrep {
-    static prepareBaseData(system: ICData) {
+    static prepareBaseData(system: Actor.SystemOfType<'ic'>) {
         ModifiersPrep.clearAttributeMods(system);
-        ModifiersPrep.clearLimitMods(system);
         SkillsPrep.prepareSkillData(system);
 
-        ICPrep.addMissingTracks(system);
-        ICPrep.prepareModifiers(system);
         ICPrep.hideMeatAttributes(system);
         ICPrep.addHostAttributes(system);
     }
 
-    static prepareDerivedData(system: ICData, items: SR5ItemDataWrapper[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'ic'>, items: SR5Item[]) {
         ICPrep.prepareMatrixAttributes(system);
 
         SkillsPrep.prepareSkills(system);
@@ -41,51 +36,26 @@ export class ICPrep {
         InitiativePrep.prepareCurrentInitiative(system);
     }
 
-    /**
-     * On initial actor creation the matrix track will be missing.
-     *
-     * This is intentional as not to pollute template.json with actor type specific data.
-     *
-     */
-    static addMissingTracks(system: ICData) {
-        // Newly created actors SHOULD have this by template.
-        // Legacy actors MIGHT not have it, therefore make sure it's there.
-        const track = system.track || {};
-        if (!track.matrix) track.matrix = DataDefaults.trackData();
-        system.track = track;
-    }
-
-    /**
-     * Add IC modifiers only to the misc tab.
-     * @param system
-     */
-    static prepareModifiers(system: ICData) {
-        let modifiers = ModifiersPrep.commonModifiers as string[];
-        modifiers = modifiers.concat(ModifiersPrep.matrixModifiers as string[]);
-        ModifiersPrep.setupModifiers(system, modifiers);
-    }
-
-    static prepareMatrix(system: ICData) {
+    static prepareMatrix(system: Actor.SystemOfType<'ic'>) {
         system.matrix.rating = MatrixRules.getICDeviceRating(system.host.rating);
     }
 
-    static prepareMatrixTrack(system: ICData) {
+    static prepareMatrixTrack(system: Actor.SystemOfType<'ic'>) {
         const { modifiers, track, matrix } = system;
 
         // Prepare internal matrix condition monitor values
         // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
-        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating as number);
+        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating);
 
         // Prepare user visible matrix track values
-        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating as number);
+        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating);
         track.matrix.mod = PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
     }
 
-    static prepareMatrixInit(system: ICData) {
+    static prepareMatrixInit(system: Actor.SystemOfType<'ic'>) {
         const { initiative, modifiers, host } = system;
-
 
         // Set current initiative to matrix
         initiative.perception = 'matrix';
@@ -101,11 +71,10 @@ export class ICPrep {
     /**
      * For connected hosts overwrite matrix attributes with the hosts attributes, otherwise leave as is.
      */
-    static prepareHostAttributes(system: ICData) {
-        if (!system.host.id || !system.host.atts) return;
+    static prepareHostAttributes(system: Actor.SystemOfType<'ic'>) {
+        if (!system.host.atts) return;
 
-        Object.keys(system.host.atts).forEach(deviceAttribute => {
-            const attribute: DeviceAttribute = system.host.atts[deviceAttribute];
+        Object.entries(system.host.atts).forEach(([deviceAttribute, attribute]) => {
             system.matrix[attribute.att].base = attribute.value;
             system.matrix[attribute.att].device_att = deviceAttribute;
         });
@@ -114,7 +83,7 @@ export class ICPrep {
     /**
      * Hide all meat attributes from display
      */
-    static hideMeatAttributes(system: ICData) {
+    static hideMeatAttributes(system: Actor.SystemOfType<'ic'>) {
         const { attributes } = system;
 
         for (const attribute of Object.values(attributes)) {
@@ -127,11 +96,11 @@ export class ICPrep {
      * 
      * As the rating attribute is only derived, it's not included in base data or template.json.
      */
-    static addHostAttributes(system: ICData) {
-        system.attributes['rating'] = DataDefaults.attributeData({label: 'SR5.Rating'});
+    static addHostAttributes(system: Actor.SystemOfType<'ic'>) {
+        system.attributes['rating'] = DataDefaults.createData('attribute_field', {label: 'SR5.Rating'});
     }
 
-    static prepareMeatAttributes(system: ICData) {
+    static prepareMeatAttributes(system: Actor.SystemOfType<'ic'>) {
         const { attributes, host } = system;
 
         for (const id of Object.keys(SR5.attributes)) {
@@ -156,7 +125,7 @@ export class ICPrep {
     /**
      * Calculate all matrix attributes without the meat attributes
      */
-    static prepareMatrixAttributes(system: ICData) {
+    static prepareMatrixAttributes(system: Actor.SystemOfType<'ic'>) {
         const { matrix } = system;
 
         for (const id of Object.keys(SR5.matrixAttributes)) {
@@ -166,5 +135,4 @@ export class ICPrep {
             AttributesPrep.prepareAttribute(id, attribute);
         }
     }
-
 }

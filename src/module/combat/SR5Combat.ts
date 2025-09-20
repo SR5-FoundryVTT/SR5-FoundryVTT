@@ -12,14 +12,14 @@ import SocketMessageData = Shadowrun.SocketMessageData;
  *       stepping over other actors that already had their action phase in the current initiative pass.
  *       @PDF SR5#160 'Changing Initiative'
  */
-export class SR5Combat extends Combat {
+export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends Combat<SubType> {
     // Overwrite foundry-vtt-types v9 combatTrackerSettings type definitions.
     override get settings() {
         return super.settings as { resource: string, skipDefeated: boolean };
     }
 
     get initiativePass(): number {
-        return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) as number || SR.combat.INITIAL_INI_PASS;
+        return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) || SR.combat.INITIAL_INI_PASS;
     }
 
     static async setInitiativePass(combat: SR5Combat, pass: number) {
@@ -31,10 +31,10 @@ export class SR5Combat extends Combat {
      * Use the given actors token to get the combatant.
      * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
      */
-    getActorCombatant(actor: SR5Actor): undefined | Combatant {
+    getActorCombatant(actor: SR5Actor) {
         const token = actor.getToken();
-        if (!token) return;
-        return this.getCombatantByToken(token.id as string);
+        if (!token) return null;
+        return this.getCombatantByToken(token.id!);
     }
 
     /**
@@ -48,33 +48,27 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
                 icon: '<i class="fas fa-caret-down"></i>',
                 callback: async (li) => {
-                    const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
-                    if (combatant) {
-                        const combat: SR5Combat = game.combat as unknown as SR5Combat;
-                        await combat.adjustInitiative(combatant, -1);
-                    }
+                    const combatant = game.combat?.combatants.get(li.data('combatant-id'));
+                    if (combatant)
+                        await game.combat?.adjustInitiative(combatant, -1);
                 },
             },
             {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
                 icon: '<i class="fas fa-angle-down"></i>',
                 callback: async (li) => {
-                    const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
-                    if (combatant) {
-                        const combat: SR5Combat = game.combat as unknown as SR5Combat;
-                        await combat.adjustInitiative(combatant, -5);
-                    }
+                    const combatant = game.combat?.combatants.get(li.data('combatant-id'));
+                    if (combatant)
+                        await game.combat?.adjustInitiative(combatant, -5);
                 },
             },
             {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
                 icon: '<i class="fas fa-angle-double-down"></i>',
                 callback: async (li) => {
-                    const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
-                    if (combatant) {
-                        const combat: SR5Combat = game.combat as unknown as SR5Combat;
-                        await combat.adjustInitiative(combatant, -10);
-                    }
+                    const combatant = game.combat?.combatants.get(li.data('combatant-id'));
+                    if (combatant)
+                        await game.combat?.adjustInitiative(combatant, -10);
                 },
             },
         );
@@ -116,7 +110,7 @@ export class SR5Combat extends Combat {
      * @param combatId
      */
     static async handleIniPass(combatId: string) {
-        const combat = game.combats?.get(combatId) as unknown as SR5Combat;
+        const combat = game.combats?.get(combatId);
         if (!combat) return;
 
         const initiativePass = combat.initiativePass + 1;
@@ -148,7 +142,7 @@ export class SR5Combat extends Combat {
      * @param combatId
      */
     static async handleNextRound(combatId: string) {
-        const combat = game.combats?.get(combatId) as unknown as SR5Combat;
+        const combat = game.combats?.get(combatId);
         if (!combat) return;
         await combat.resetAll();
         await SR5Combat.setInitiativePass(combat, SR.combat.INITIAL_INI_PASS);
@@ -171,7 +165,7 @@ export class SR5Combat extends Combat {
         if (!game.user?.isGM)
             await this._createNewActionPhaseSocketMessage();
         else
-            await SR5Combat.handleActionPhase(this.id as string);
+            await SR5Combat.handleActionPhase(this.id!);
     }
 
     /**
@@ -182,7 +176,7 @@ export class SR5Combat extends Combat {
      * @param combatId Combat with the current combatant entering it's next action phase.
      */
     static async handleActionPhase(combatId: string) {
-        const combat = game.combats?.get(combatId) as SR5Combat;
+        const combat = game.combats?.get(combatId);
         if (!combat) return;
 
         const combatant = combat.combatant;
@@ -192,11 +186,14 @@ export class SR5Combat extends Combat {
         await combatant.actor?.removeDefenseMultiModifier();
 
         const turnsSinceLastAttackSetting = combatant.getFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack);
-        if (foundry.utils.getType(turnsSinceLastAttackSetting) !== 'number') return await combatant.actor?.clearProgressiveRecoil();
+        if (foundry.utils.getType(turnsSinceLastAttackSetting) !== 'number')
+            return combatant.actor?.clearProgressiveRecoil();
 
         const turnsSinceLastAttack = Number(turnsSinceLastAttackSetting);
-        if (turnsSinceLastAttack > 0) await combatant.actor?.clearProgressiveRecoil();
-        else await combatant.setFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack, 1);
+        if (turnsSinceLastAttack > 0)
+            await combatant.actor?.clearProgressiveRecoil();
+        else
+            await combatant.setFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack, 1);
     }
 
     /**
@@ -204,7 +201,7 @@ export class SR5Combat extends Combat {
      */
     override setupTurns(): any[] {
         const turns = super.setupTurns();
-        return turns.sort(SR5Combat.sortByRERIC);
+        return turns.sort(SR5Combat.sortByRERIC.bind(SR5Combat));
     }
 
     /**
@@ -241,7 +238,7 @@ export class SR5Combat extends Combat {
                 Number(actor.getEdge().value),
                 Number(actor.findAttribute('reaction')?.value),
                 Number(actor.findAttribute('intuition')?.value),
-                new Roll('1d2').evaluate({ async: false }).total as number,
+                Math.floor(Math.random() * 2)
             ];
         };
 
@@ -260,11 +257,10 @@ export class SR5Combat extends Combat {
      * Return the position in the current ini pass of the next undefeated combatant.
      */
     get nextUndefeatedTurnPosition(): number {
-        for (let [turnInPass, combatant] of this.turns.entries()) {
+        for (const [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            // @ts-expect-error
-            if (!combatant.defeated && combatant.initiative > 0) {
+            if (!combatant.defeated && combatant.initiative && combatant.initiative > 0) {
                 return turnInPass;
             }
         }
@@ -277,11 +273,10 @@ export class SR5Combat extends Combat {
      */
     get nextViableTurnPosition(): number {
         // Start at the next position after the current one.
-        for (let [turnInPass, combatant] of this.turns.entries()) {
+        for (const [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
             if (this.turn !== null && turnInPass <= this.turn) continue;
-            // @ts-expect-error
-            if (combatant.initiative > 0) {
+            if (combatant.initiative && combatant.initiative > 0) {
                 return turnInPass;
             }
         }
@@ -312,41 +307,38 @@ export class SR5Combat extends Combat {
      *  Reset the Foundry pass and don't raise the Foundry turn.
      *
      * Retrigger Initiative Rolls on each new Foundry round.
-     *
-     *
-     * * @Override
      */
-    override async nextTurn(): Promise<this | undefined> {
+    override async nextTurn(): Promise<this> {
         // Maybe advance to the next round/init pass
-        let nextRound = this.round;
-        let initiativePass = this.initiativePass;
+        const nextRound = this.round;
+        const initiativePass = this.initiativePass;
         // Get the next viable turn position.
-        let nextTurn = this.settings?.skipDefeated ?
+        const nextTurn = this.settings?.skipDefeated ?
             this.nextUndefeatedTurnPosition :
             this.nextViableTurnPosition;
 
         // Start of the combat Handling
         if (nextRound === 0 && initiativePass === 0) {
             await this.startCombat();
-            return;
+            return this;
         }
 
         // Just step from one combatant to the next!
         if (nextTurn < this.turns.length) {
             await this.update({ turn: nextTurn });
             await this.handleActionPhase();
-            return;
+            return this;
         }
 
         // Initiative Pass Handling. Owner permissions are needed to change the initiative pass.
         if (!game.user?.isGM && this.doIniPass(nextTurn)) {
             await this._createDoIniPassSocketMessage();
-            return;
+            return this;
         }
 
         if (game.user?.isGM && this.doIniPass(nextTurn)) {
             await SR5Combat.handleIniPass(this.id as string);
-            return;
+            return this;
         }
 
 
@@ -388,9 +380,7 @@ export class SR5Combat extends Combat {
         return this;
     }
 
-    //@ts-expect-error TODO: foundry-vtt-types v11
-    override _playCombatSound(name: string) {
-    //@ts-expect-error TODO: foundry-vtt-types v11
+    override _playCombatSound(name: "startEncounter" | "nextUp" | "yourTurn") {
         super._playCombatSound(name)
     }
 
@@ -438,7 +428,7 @@ export class SR5Combat extends Combat {
     }
 
     static _getSystemInitiativeBaseFormula() {
-        return String(CONFIG.Combat.initiative.formula || game.system.data.initiative);
+        return String(CONFIG.Combat.initiative.formula || game.system.initiative);
     }
 
     static _getSystemInitiativeFormula(initiativePass: number): string {
@@ -454,7 +444,7 @@ export class SR5Combat extends Combat {
             return;
         }
 
-        return await SR5Combat.handleNextRound(message.data.id);
+        return SR5Combat.handleNextRound(message.data.id);
     }
 
     static async _handleDoInitPassSocketMessage(message: SocketMessageData) {
@@ -463,7 +453,7 @@ export class SR5Combat extends Combat {
             return;
         }
 
-        return await SR5Combat.handleIniPass(message.data.id);
+        return SR5Combat.handleIniPass(message.data.id);
     }
 
     /**
@@ -476,7 +466,7 @@ export class SR5Combat extends Combat {
             return;
         }
 
-        return await SR5Combat.handleActionPhase(message.data.id);
+        return SR5Combat.handleActionPhase(message.data.id);
     }
 
     async _createDoNextRoundSocketMessage() {
@@ -491,9 +481,10 @@ export class SR5Combat extends Combat {
         await SocketMessage.emitForGM(FLAGS.DoNewActionPhase, { id: this.id });
     }
 
-    override delete(...args): Promise<this | undefined> {
+    override async delete(...args): Promise<this | undefined> {
         // Remove all combat related modifiers.
-        this.combatants.contents.forEach(combatant => combatant.actor?.removeDefenseMultiModifier());
+        for (const combatant of this.combatants)
+            await combatant.actor?.removeDefenseMultiModifier();
         return super.delete(...args);
     }
 }
@@ -505,7 +496,7 @@ export class SR5Combat extends Combat {
  *
  *  During initiative roll modify the initiative result depending on the current combats initiative pass.
  */
-export function _combatantGetInitiativeFormula() {
+export function _combatantGetInitiativeFormula(this: any) {
     const combat = this.parent;
     return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }

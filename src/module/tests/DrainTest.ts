@@ -2,16 +2,17 @@ import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellCastingTestData} from "./SpellCastingTest";
 import {DrainRules} from "../rules/DrainRules";
 import {Helpers} from "../helpers";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
-import GenericValueField = Shadowrun.GenericValueField;
 import { Translation } from '../utils/strings';
 import { DataDefaults } from "../data/DataDefaults";
+import { DamageType, MinimalActionType } from "../types/item/Action";
+import { DeepPartial } from "fvtt-types/utils";
+import { SR5Item } from "../item/SR5Item";
+import { SR5Actor } from "../actor/SR5Actor";
 
 export interface DrainTestData extends SuccessTestData {
-    incomingDrain: DamageData
-    modifiedDrain: DamageData
+    incomingDrain: DamageType
+    modifiedDrain: DamageType
 
     against: SpellCastingTestData
 }
@@ -34,7 +35,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
             data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
         // This test is part of either a standalone test or created with its own data (i.e. edge reroll).
         } else {
-            data.incomingDrain = data.incomingDrain ?? DataDefaults.damageData();
+            data.incomingDrain = data.incomingDrain ?? DataDefaults.createData('damage');
             data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
         }
 
@@ -42,14 +43,14 @@ export class DrainTest extends SuccessTest<DrainTestData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/drain-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/drain-test-dialog.hbs';
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.hbs';
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
         return {
             'attribute2': 'willpower'
         };
@@ -70,8 +71,8 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         return ['global', 'drain']
     }
 
-    static override async _getDocumentTestAction(item, actor) {
-        const documentAction = await super._getDocumentTestAction(item, actor);
+    static override _getDocumentTestAction(item: SR5Item, actor: SR5Actor): DeepPartial<MinimalActionType> {
+        const documentAction = super._getDocumentTestAction(item, actor);
 
         if (!actor.isAwakened) {
             console.error(`Shadowrun 5e | A ${this.name} expected an awakened actor but got this`, actor);
@@ -79,7 +80,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         }
 
         // Get magic school attribute.
-        const attribute = actor.system.magic.attribute;
+        const attribute = actor.system.magic!.attribute;
         foundry.utils.mergeObject(documentAction, {attribute});
 
         // Return the school attribute based on actor configuration.
@@ -92,12 +93,11 @@ export class DrainTest extends SuccessTest<DrainTestData> {
     override calculateBaseValues() {
         super.calculateBaseValues();
 
-        Helpers.calcValue<typeof this.data.incomingDrain.type.base>(this.data.incomingDrain.type as GenericValueField);
-
         // Copy to get all values changed by user (override) but also remove all.
-        this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain);
+        this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain) as DamageType;
         this.data.modifiedDrain.base = Helpers.calcTotal(this.data.incomingDrain, {min: 0});
-        delete this.data.modifiedDrain.override;
+        //@ts-expect-error fvtt-types doesn't know about non-required field.
+        this.data.modifiedDrain.override = undefined;
     }
 
     /**

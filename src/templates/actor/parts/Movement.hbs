@@ -1,0 +1,42 @@
+{{#> "systems/shadowrun5e/dist/templates/common/Attribute.hbs" cssClass="no-grow"}}
+    <div class="attribute-name">
+        {{localize "SR5.Movement"}}
+    </div>
+    <div class="track">
+        <div class="attribute-input-container value">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+                    cssClass="attribute-input"
+                    title="SR5.WalkingSpeed"
+                    size="2"
+                    maxLength="2"
+                    value=system.movement.walk.value
+                    disabled="true"
+            }}
+            {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" value=system.movement.walk}}
+        </div>
+        <div class="track-slash"></div>
+        <div class="attribute-input-container value">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+                    cssClass="attribute-input"
+                    title="SR5.RunningSpeed"
+                    size="2"
+                    maxLength="2"
+                    value=system.movement.run.value
+                    disabled="true"
+            }}
+            {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" value=system.movement.run}}
+        </div>
+        <div class="track-slash"></div>
+        <div class="input attribute-input-container">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+                    cssClass="attribute-input"
+                    title="SR5.RunningSpeed"
+                    size="2"
+                    maxLength="2"
+                    value=system.movement.sprint
+                    name="system.movement.sprint"
+            }}
+            <span class="unit"> + </span>
+        </div>
+    </div>
+{{/"systems/shadowrun5e/dist/templates/common/Attribute.hbs"}}

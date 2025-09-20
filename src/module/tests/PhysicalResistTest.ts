@@ -1,23 +1,19 @@
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DataDefaults} from "../data/DataDefaults";
+import {SuccessTest, TestOptions} from "./SuccessTest";
 import {PartsList} from "../parts/PartsList";
 import {CombatRules} from "../rules/CombatRules";
 import {Helpers} from "../helpers";
 import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
 import {SoakFlow} from "../actor/flows/SoakFlow";
-import DamageData = Shadowrun.DamageData;
-import MinimalActionData = Shadowrun.MinimalActionData;
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
+import { ResistTestData, ResistTestDataFlow } from "./flows/ResistTestDataFlow";
+import { BiofeedbackResistTest } from "./BiofeedbackResistTest";
+import { SR5Actor } from "../actor/SR5Actor";
+import { SR5Item } from "../item/SR5Item";
+import { MatrixResistTestData } from "./MatrixResistTest";
+import { MinimalActionType } from "../types/item/Action";
 
-
-export interface PhysicalResistTestData extends SuccessTestData {
-    // The original test this resistance is taking its data from.
-    following: PhysicalDefenseTestData
-    // The damage BEFORE this test is done.
-    incomingDamage: DamageData
-    // The damage AFTER this test is done.
-    modifiedDamage: DamageData
+export interface PhysicalResistTestData extends ResistTestData<PhysicalDefenseTestData> {
     // Determine if an actor should be knockedDown after a defense.
     knockedDown: boolean
 }
@@ -37,16 +33,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
     override _prepareData(data: PhysicalResistTestData, options): any {
         data = super._prepareData(data, options);
-
-        // Is this test part of a followup test chain? defense => resist
-        if (data.following) {
-            data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.damageData());
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
-        // This test is part of either a standalone resist or created with its own data (i.e. edge reroll).
-        } else {
-            data.incomingDamage = data.incomingDamage ?? DataDefaults.damageData();
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage);
-        }
+        data = ResistTestDataFlow._prepareData(data);
 
         const armor = this.actor?.getArmor();
         if(armor?.hardened){
@@ -60,11 +47,11 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.html';
+        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.hbs';
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-resist-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-resist-test-dialog.hbs';
     }
 
     /**
@@ -74,7 +61,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         return false;
     }
 
-    static override _getDefaultTestAction(): Partial<MinimalActionData> {
+    static override _getDefaultTestAction(): Partial<MinimalActionType> {
         return {
             'attribute': 'body',
             'armor': true
@@ -108,22 +95,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
     override calculateBaseValues() {
         super.calculateBaseValues();
-
-        // Calculate damage values in case of user dialog interaction.
-        Helpers.calcTotal(this.data.incomingDamage, {min: 0});
-        Helpers.calcTotal(this.data.incomingDamage.ap);
-
-        // Remove user override and resulting incoming damage as base.
-        this.data.modifiedDamage = foundry.utils.duplicate(this.data.incomingDamage);
-        this.data.modifiedDamage.base = this.data.incomingDamage.value;
-        this.data.modifiedDamage.mod = [];
-        delete this.data.modifiedDamage.override;
-        this.data.modifiedDamage.ap.base = this.data.incomingDamage.ap.value;
-        this.data.modifiedDamage.ap.mod = [];
-        delete this.data.modifiedDamage.ap.override;
-
-        Helpers.calcTotal(this.data.modifiedDamage);
-        Helpers.calcTotal(this.data.modifiedDamage.ap);
+        ResistTestDataFlow.calculateBaseValues(this.data);
     }
 
     override get canSucceed() {
@@ -141,7 +113,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         return this.data.incomingDamage.value <= this.hits.value;
     }
 
-    private successConditions: PhysicalResistSuccessCondition[] = [
+    private readonly successConditions: PhysicalResistSuccessCondition[] = [
         {
             test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
             label: "SR5.TestResults.SoakBlockedByHardenedArmor",
@@ -199,5 +171,35 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
         // Handle Knock Down Rules with legacy flow handling.
         this.data.knockedDown = new SoakFlow().knocksDown(this.data.modifiedDamage, this.actor);
+    }
+
+    /**
+     * Prepare any ResistTest from given test data. This should come from a MatrixDefenseTest
+     *
+     */
+    static override async _getResistActionTestData(opposedData: PhysicalDefenseTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<MatrixResistTestData | undefined> {
+        if (!opposedData.against?.opposed.resist) {
+            console.error(`Shadowrun 5e | Supplied test data doesn't contain a resist action`, opposedData, this);
+            return;
+        }
+        if (!document) {
+            console.error(`Shadowrun 5e | Can't resolve resist test values due to missing actor`, this);
+            return;
+        }
+        // get most of our resist data from the ResistTestDataFlow test data
+        const data = ResistTestDataFlow._getResistTestData(opposedData, 'SR5.Tests.PhysicalResistTest', previousMessageId);
+        const action = await ResistTestDataFlow._getResistActionData(this, opposedData, 'PhysicalResistTest');
+        return this._prepareActionTestData(action, document, data) as MatrixResistTestData;
+    }
+
+    /**
+     * Execute actions triggered by a tests chat message.
+     *
+     * This can be used to trigger resist tests.
+     */
+    static override async executeMessageAction(againstData: PhysicalDefenseTestData, messageId: string, options: TestOptions) {
+        // Determine documents to roll test with.
+        const documents = await Helpers.getTestTargetDocuments(againstData)
+        await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
     }
 }

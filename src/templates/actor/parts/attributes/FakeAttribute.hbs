@@ -1,0 +1,36 @@
+{{#> "systems/shadowrun5e/dist/templates/common/Attribute.hbs" dataName="attribute" dataId=attributeId}}
+    <div class="attribute-name roll {{#if rollId}}Roll{{/if}}">
+        {{#if label}}
+            {{localize label}}
+        {{else}}
+            {{localize attribute.label}}
+        {{/if}}
+    </div>
+    <div class="attribute-value value">
+        <span class="attribute-value-total">{{attribute.value}}</span>
+        {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" value=attribute}}
+    </div>
+    <div class="track center {{#if disableBase}}{{#if disableManual}}invisible{{/if}}{{/if}}">
+        <div class="attribute-input-container">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+                    cssClass="attribute-input short"
+                    title="SR5.BaseValue"
+                    size="2"
+                    maxLength="2"
+                    value=attribute.base
+                    name=baseInputName
+            }}
+        </div>
+        <!--
+        <div class="track-plus"></div>
+        <div class="attribute-input-container">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+                    cssClass="attribute-input short"
+                    title="SR5.TemporaryModifiers"
+                    size="2"
+                    maxLength="2"
+                    disabled=true
+            }}
+        </div> -->
+    </div>
+{{/"systems/shadowrun5e/dist/templates/common/Attribute.hbs"}}

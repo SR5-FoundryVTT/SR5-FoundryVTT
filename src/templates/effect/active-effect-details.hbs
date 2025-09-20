@@ -1,0 +1,15 @@
+<section class="tab scrollable{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    {{formGroup fields.tint value=source.tint rootId=rootId placeholder="#ffffff"}}
+    {{formGroup fields.description value=source.description rootId=rootId}}
+    {{formGroup fields.disabled value=source.disabled rootId=rootId}}
+
+    {{#if isActorEffect}}
+        {{formGroup fields.origin value=source.origin rootId=rootId disabled=true}}
+    {{/if}}
+    {{#if isItemEffect}}
+        {{formGroup systemFields.onlyForEquipped value=source.system.onlyForEquipped rootId=rootId}}
+        {{formGroup systemFields.onlyForWireless value=source.system.onlyForWireless rootId=rootId}}
+    {{/if}}
+
+    {{formGroup fields.statuses value=source.statuses options=statuses rootId=rootId classes="statuses"}}
+</section>

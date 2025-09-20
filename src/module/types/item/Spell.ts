@@ -1,57 +1,81 @@
-declare namespace Shadowrun {
-    export interface SpellData extends
-        SpellPartData,
-        DescriptionPartData,
-        ImportFlags,
-        ActionPartData {
+import { ActionPartData } from "./Action";
+import { BaseItemData, ItemBase } from "./ItemBase";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
-    }
+const SpellData = () => ({
+    ...BaseItemData(),
+    ...ActionPartData({followedTest: 'DrainTest'}),
 
-    export interface CombatSpellData {
-        type: CombatSpellType;
-    }
-    export interface DetectionSpellData {
-        type: DetectionSpellType;
-        passive: boolean;
-        extended: boolean;
-    }
-    export interface IllusionSpellData {
-        type: IllusionSpellType;
-        sense: IllusionSpellSense;
-    }
-    export interface ManipulationSpellData {
-        damaging: boolean;
-        mental: boolean;
-        environmental: boolean;
-        physical: boolean;
-    }
-    export interface RitualSpellData {
-        ritual: {
-            type: string;
-        }
-    }
-    export interface SpellPartData {
-        type: SpellType;
-        category: SpellCateogry;
-        drain: number;
-        range: SpellRange;
-        duration: SpellDuration;
-        extended: boolean;
+    type: new StringField({
+        blank: true,
+        required: true,
+        choices: ['physical', 'mana']
+    }),
+    category: new StringField({
+        blank: true,
+        required: true,
+        choices: ['combat', 'detection', 'enchantment', 'health', 'illusion', 'manipulation', 'ritual'] // what to do with enchantment (from chummer)?
+    }),
+    drain: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    range: new StringField({
+        blank: true,
+        required: true,
+        choices: ['touch', 'los', 'los_a']
+    }),
+    duration: new StringField({
+        blank: true,
+        required: true,
+        choices: ['instant', 'sustained', 'permanent']
+    }),
 
-        combat: CombatSpellData;
-        detection: DetectionSpellData;
-        illusion: IllusionSpellData;
-        manipulation: ManipulationSpellData;
-        ritual: RitualSpellData;
-    }
+    extended: new BooleanField({ initial: false }),
+    combat: new SchemaField({
+        type: new StringField({
+            blank: true,
+            required: true,
+            choices: ['direct', 'indirect']
+        }),
+    }),
+    detection: new SchemaField({
+        type: new StringField({
+            blank: true,
+            required: true,
+            choices: ['directional', 'psychic', 'area']
+        }),
+        passive: new BooleanField(),
+        extended: new BooleanField(), // do we need this?
+    }),
+    illusion: new SchemaField({
+        type: new StringField({
+            blank: true,
+            required: true,
+            choices: ['obvious', 'realistic']
+        }),
+        sense: new StringField({
+            blank: true,
+            required: true,
+            choices: ['single-sense', 'multi-sense']
+        }),
+    }),
+    manipulation: new SchemaField({
+        damaging: new BooleanField(),
+        mental: new BooleanField(),
+        environmental: new BooleanField(),
+        physical: new BooleanField(),
+    }),
+    ritual: new SchemaField({
+        type: new StringField({
+            blank: true,
+            required: true,
+            choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter']
+        }),
+    }),
+});
 
-    export type CombatSpellType = 'direct' | 'indirect' | '';
-    export type DetectionSpellType = 'directional' | 'psychic' | 'area' | '';
-    export type IllusionSpellType = 'obvious' | 'realistic' | '';
-    export type IllusionSpellSense = 'single-sense' | 'multi-sense' | '';
-    export type SpellCateogry = 'combat' | 'detection' | 'health' | 'illusion' | 'manipulation' | 'ritual' | '';
-    export type SpellType = 'physical' | 'mana' | '';
-    export type SpellRange = 'touch' | 'los' | 'los_a' | '';
-    export type SpellDuration = 'instant' | 'sustained' | 'permanent' | '';
-    export type RitualType = 'anchored' | 'material_link' | 'minion' | 'spell' | 'spotter' | '';
+export class Spell extends ItemBase<ReturnType<typeof SpellData>> {
+    static override defineSchema() {
+        return SpellData();
+    }
 }
+
+console.log("SpellData", SpellData(), new Spell());

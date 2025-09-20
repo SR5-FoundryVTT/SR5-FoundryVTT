@@ -3,22 +3,22 @@ import {PartsList} from "../parts/PartsList";
 
 export interface AttributeOnlyTestData extends SuccessTestData {
     // Selection for attributes used. attribute1 will be preselected.
-    attribute1: string
-    attribute2: string
+    attribute1: Shadowrun.ActorAttribute
+    attribute2: Shadowrun.ActorAttribute
 }
 
 
 /**
  * Handle custom attribute-only tests as defined in SR5#152.
  *
- * Attribute-Only Tests don't alter default SuccessTests rule wise but only Foundry behaviour wise.
+ * Attribute-Only Tests don't alter default SuccessTests rule wise but only Foundry behavior wise.
  * Main difference is the user ability to change attributes before rolling dice.
  */
 export class AttributeOnlyTest extends SuccessTest {
-    override data: AttributeOnlyTestData
+    declare data: AttributeOnlyTestData;
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/attribute-only-test-dialog.html';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/attribute-only-test-dialog.hbs';
     }
     override _prepareData(data, options): any {
         data = super._prepareData(data, options);
@@ -32,7 +32,6 @@ export class AttributeOnlyTest extends SuccessTest {
 
     override prepareBaseValues() {
         this.prepareAttributeSelection();
-
         super.prepareBaseValues();
     }
 
@@ -51,7 +50,7 @@ export class AttributeOnlyTest extends SuccessTest {
         if (attribute2) pool.addPart(attribute2.label, attribute2.value);
 
         // Rebuild attribute specific modifiers previously added in TestCreate#_prepareTestDataWithAction
-        if (attribute1 && this.actor._isMatrixAttribute(this.data.attribute1)) this.actor._addMatrixParts(pool, true);
-        if (attribute2 && this.actor._isMatrixAttribute(this.data.attribute2)) this.actor._addMatrixParts(pool, true);
+        this.data.action.attribute = this.data.attribute1;
+        this.data.action.attribute2 = this.data.attribute2;
     }
 }

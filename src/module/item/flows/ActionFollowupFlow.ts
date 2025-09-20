@@ -6,16 +6,16 @@ import { TestCreator } from "../../tests/TestCreator";
  * This would be triggered from a chat message interaction, with the chat message containing the test to follow up on.
  */
 export const ActionFollowupFlow = {
-    chatLogListeners: async (message: ChatLog, html, data) => {
-        // setup chat listener messages for each message as some need the message context instead of chatlog context.
-        // @ts-expect-error TODO: .querySelectorAll ?
-        $(html).find('.chat-message').each(async (index, element) => {
+    chatLogListeners: async (chatLog: ChatLog, html, data) => {
+        const elements = $(html).find('.chat-message').toArray();
+
+        for (const element of elements) {
             const id = $(element).data('messageId');
             const message = game.messages?.get(id);
-            if (!message) return;
+            if (!message) continue;
 
-            await ActionFollowupFlow.chatMessageListeners(message, element, message.toObject())
-        });
+            await ActionFollowupFlow.chatMessageListeners(message, element, message.toObject());
+        }
     },
 
     chatMessageListeners: async (message: ChatMessage, html, data) => {
@@ -38,6 +38,6 @@ export const ActionFollowupFlow = {
         await test.populateDocuments();
 
         // NOTE: Async but at the functions end.
-        test.executeFollowUpTest();
+        void test.executeFollowUpTest();
     }
 };

@@ -11,7 +11,7 @@ import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../e
  */
 export class SituationModifierEffectsFlow<T extends SituationModifier> {
     modifier: T;
-    applyHandlers: Record<string, Function> = {};
+    applyHandlers: Record<string, (modifier: any, test?: SuccessTest) => void> = {};
 
     constructor(modifier: T) {
         this.modifier = modifier;
@@ -39,7 +39,7 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
         for (const effect of this.allApplicableEffects()) {
             if (!effect.active) continue;
             // Special case for modifier effects: Some only apply to tests of their parent item.
-            if (effect.onlyForItemTest && (test === undefined || effect.parent !== test?.item)) continue;
+            if (effect.system.onlyForItemTest && (test === undefined || effect.parent !== test?.item)) continue;
 
             changes.push(...effect.changes.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
@@ -67,6 +67,7 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             console.debug('Shadowrun 5e | ... applying modifier handler', this.modifier, handler, test);
             handler(this.modifier, test);
         }
+        return false;
     }
 
     /**

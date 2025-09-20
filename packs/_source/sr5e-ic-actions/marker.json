@@ -1,0 +1,122 @@
+{
+  "_id": "KL5oClXgbbSm6tLr",
+  "_key": "!items!KL5oClXgbbSm6tLr",
+  "folder": null,
+  "name": "Marker",
+  "type": "action",
+  "img": "systems/shadowrun5e/dist/icons/caged-ball.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5 248"
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isImported": false,
+      "isFreshImport": false
+    },
+    "action": {
+      "attribute": "rating",
+      "attribute2": "rating",
+      "armor": false,
+      "limit": {
+        "value": 0,
+        "base": 0,
+        "mod": [],
+        "override": null,
+        "temp": 0,
+        "attribute": "attack",
+        "base_formula_operator": "add"
+      },
+      "mod": 0,
+      "skill": "",
+      "test": "MatrixTest",
+      "type": "complex",
+      "category": {
+        "matrix": {
+          "owner": false,
+          "marks": 0
+        }
+      },
+      "categories": [
+        "matrix"
+      ],
+      "spec": false,
+      "mod_description": "",
+      "threshold": {
+        "value": 0,
+        "base": 0
+      },
+      "extended": false,
+      "modifiers": [],
+      "damage": {
+        "value": 0,
+        "base": 0,
+        "mod": [],
+        "override": null,
+        "temp": 0,
+        "attribute": "",
+        "base_formula_operator": "add",
+        "type": {
+          "base": "",
+          "value": ""
+        },
+        "element": {
+          "base": "",
+          "value": ""
+        },
+        "ap": {
+          "value": 0,
+          "base": 0,
+          "mod": [],
+          "override": null,
+          "temp": 0,
+          "attribute": "",
+          "base_formula_operator": "add"
+        },
+        "biofeedback": "physical"
+      },
+      "opposed": {
+        "test": "MatrixDefenseTest",
+        "type": "",
+        "description": "",
+        "mod": 0,
+        "skill": "",
+        "attribute": "willpower",
+        "attribute2": "sleaze",
+        "armor": false,
+        "resist": {
+          "test": "",
+          "skill": "",
+          "mod": 0,
+          "attribute": "",
+          "attribute2": "",
+          "armor": false
+        }
+      },
+      "followed": {
+        "test": "",
+        "mod": 0,
+        "skill": "",
+        "attribute": "",
+        "attribute2": "",
+        "armor": false
+      },
+      "alt_mod": 0,
+      "dice_pool_mod": [],
+      "roll_mode": ""
+    },
+    "result": {
+      "success": {
+        "matrix": {
+          "placeMarks": false
+        }
+      }
+    }
+  },
+  "effects": [],
+  "flags": {}
+}

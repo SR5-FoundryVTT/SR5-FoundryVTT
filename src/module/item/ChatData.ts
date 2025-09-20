@@ -1,9 +1,7 @@
 
-import { Helpers } from '../helpers';
-import DeviceData = Shadowrun.DeviceData;
-import { SR5Item } from './SR5Item';
-import AmmoData = Shadowrun.AmmoData;
 import { SR5 } from "../config";
+import { SR5Item } from './SR5Item';
+import { Helpers } from '../helpers';
 import { Translation } from '../utils/strings';
 
 /**
@@ -17,20 +15,11 @@ import { Translation } from '../utils/strings';
  * These info boxes will be shown in a few places, most notibly the chat message but also
  * - actor sheets
  */
-export const ChatData = {
-    call_in_action: (system: Shadowrun.CallInActionData, labels, props) => {
-        switch (system.actor_type) {
-            case 'sprite':
-                if (system.sprite.type) props.push(`${game.i18n.localize("SR5.Compilation.SpriteType")} ${game.i18n.localize(SR5.spriteTypes[system.sprite.type])}`);
-                if (system.sprite.level) props.push(`${game.i18n.localize('SR5.Level')} ${system.sprite.level}`);
-                return;
-            case 'spirit':
-                if (system.spirit.type) props.push(`${game.i18n.localize("SR5.Summoning.SpiritType")} ${game.i18n.localize(SR5.spiritTypes[system.spirit.type])}`);
-                if (system.spirit.force) props.push(`${game.i18n.localize('SR5.Force')} ${system.spirit.force}`);
-                return;
-        }
-    },
-    action: (system, labels, props) => {
+export const ChatData: { [K in Item.ConfiguredSubType]: (item: SR5Item<K>) => string[] } = {
+    action: (item: SR5Item<'action'>) => {
+        const props: string[] = [];
+        const { system, labels } = item;
+
         if (system.action) {
             const labelStringList: string[] = [];
             if (system.action.skill) {
@@ -86,7 +75,7 @@ export const ChatData = {
                 const { damage } = system.action;
                 let damageString = '';
                 let elementString = '';
-                let operator = SR5.actionDamageFormulaOperators[damage.base_formula_operator] ?? '';
+                let operator = SR5.actionDamageFormulaOperators[damage.base_formula_operator!] ?? '';
                 let attribute = damage.attribute ? `${game.i18n.localize(SR5.attributes[damage.attribute])} ${operator} ` : '';
                 if (damage.value || attribute) {
                     const type = damage.type.value ? game.i18n.localize(SR5.damageTypes[damage.type.value]).toUpperCase().charAt(0) : '';
@@ -108,51 +97,40 @@ export const ChatData = {
                 if (elementString) props.push(elementString);
 
                 const ap = damage.ap;
-                operator = SR5.actionDamageFormulaOperators[ap.base_formula_operator] ?? '';
+                operator = SR5.actionDamageFormulaOperators[ap.base_formula_operator!] ?? '';
                 attribute = ap.attribute ? `${game.i18n.localize(SR5.attributes[ap.attribute])} ${operator} ` : '';
                 if (ap.value || attribute) {
                     props.push(`${game.i18n.localize('SR5.AP')} ${attribute}${damage.ap.value}`);
                 }
             }
         }
+
+        return props;
     },
 
-    sin: (system, labels, props) => {
-        // Avoid displaying rating null (empty input field) and rating 0.
-        if (system.technology.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
-        system.licenses.forEach((license) => {
-            if (license.rtg) props.push(`${license.name} ${game.i18n.localize('SR5.Rating').charAt(0)}${license.rtg}`);
-        });
-    },
-
-    contact: (system, labels, props) => {
-        props.push(system.type);
-        props.push(`${game.i18n.localize('SR5.Contact.Connection')} ${system.connection}`);
-        props.push(`${game.i18n.localize('SR5.Contact.Loyalty')} ${system.loyalty}`);
-        if (system.blackmail) {
-            props.push(game.i18n.localize('SR5.Contact.Blackmail'));
-        }
-        if (system.family) {
-            props.push(game.i18n.localize('SR5.Contact.Family'));
-        }            
-    },
-
-    lifestyle: (system, labels, props) => {
-        props.push(game.i18n.localize(SR5.lifestyleTypes[system.type]));
-        if (system.cost) props.push(`¥${system.cost}`);
-        if (system.comforts) props.push(`${game.i18n.localize('SR5.LifestyleComforts')} ${system.comforts}`);
-        if (system.security) props.push(`${game.i18n.localize('SR5.LifestyleSecurity')} ${system.security}`);
-        if (system.neighborhood) props.push(`${game.i18n.localize('SR5.LifestyleNeighborhood')} ${system.neighborhood}`);
-        if (system.guests) props.push(`${game.i18n.localize('SR5.LifestyleGuests')} ${system.guests}`);
-    },
-
-    adept_power: (system, labels, props) => {
-        ChatData.action(system, labels, props);
+    adept_power: (item: SR5Item<'adept_power'>) => {
+        const system = item.system;
+        const props = [...ChatData.action(item as any)];
         props.push(`${game.i18n.localize('SR5.PP')} ${system.pp}`);
         props.push(Helpers.label(game.i18n.localize(SR5.adeptPower.types[system.type])));
+        return props;
     },
 
-    armor: (system, labels, props) => {
+    ammo: (item: SR5Item<'ammo'>) => {
+        const system = item.system;
+        const props: string[] = [];
+        if (system.damageType) props.push(`${game.i18n.localize("SR5.DamageType")} ${game.i18n.localize(SR5.damageTypes[system.damageType])}`);
+        if (system.damage) props.push(`${game.i18n.localize("SR5.DamageValue")} ${system.damage}`);
+        if (system.element) props.push(`${game.i18n.localize("SR5.Element")} ${game.i18n.localize(SR5.elementTypes[system.element])}`);
+        if (system.ap) props.push(`${game.i18n.localize("SR5.AP")} ${system.ap}`);
+        if (system.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${system.blast.radius}m`);
+        if (system.blast.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} ${system.blast.dropoff}/m`);
+        return props;
+    },
+
+    armor: (item: SR5Item<'armor'>) => {
+        const system = item.system;
+        const props: string[] = [];
         if (system.armor) {
             if (system.armor.value) props.push(`${game.i18n.localize('SR5.Armor')} ${system.armor.mod ? '+' : ''}${system.armor.value}`);
             if (system.armor.acid) props.push(`${game.i18n.localize('SR5.ElementAcid')} ${system.armor.acid}`);
@@ -161,23 +139,58 @@ export const ChatData = {
             if (system.armor.electricity) props.push(`${game.i18n.localize('SR5.ElementElectricity')} ${system.armor.electricity}`);
             if (system.armor.radiation) props.push(`${game.i18n.localize('SR5.ElementRadiation')} ${system.armor.radiation}`);
         }
+        return props;
     },
 
-    ammo: (system, labels, props) => {
-        if (system.damageType) props.push(`${game.i18n.localize("SR5.DamageType")} ${game.i18n.localize(SR5.damageTypes[system.damageType])}`);
-        if (system.damage) props.push(`${game.i18n.localize("SR5.DamageValue")} ${system.damage}`);
-        if (system.element) props.push(`${game.i18n.localize("SR5.Element")} ${game.i18n.localize(SR5.elementTypes[system.element])}`);
-        if (system.ap) props.push(`${game.i18n.localize("SR5.AP")} ${system.ap}`);
-        if (system.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${system.blast.radius}m`);
-        if (system.blast.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} ${system.blast.dropoff}/m`);
+    bioware: (item: SR5Item<'bioware'>) => {
+        const system = item.system;
+        const props: string[] = [...ChatData.action(item as any), ...ChatData.armor(item as any)];
+        if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.technology.calculated.essence.value}`);
+        return props;
     },
 
-    program: (system, labels, props) => {
-        props.push(game.i18n.localize(SR5.programTypes[system.type]));
+    call_in_action: (item: SR5Item<'call_in_action'>) => {
+        const props: string[] = [];
+        const system = item.system;
+        if (system.actor_type === 'sprite') {
+            if (system.sprite.type) props.push(`${game.i18n.localize("SR5.Compilation.SpriteType")} ${game.i18n.localize(SR5.spriteTypes[system.sprite.type])}`);
+            if (system.sprite.level) props.push(`${game.i18n.localize('SR5.Level')} ${system.sprite.level}`);
+        } else if (system.actor_type === 'spirit') {
+            if (system.spirit.type) props.push(`${game.i18n.localize("SR5.Summoning.SpiritType")} ${game.i18n.localize(SR5.spiritTypes[system.spirit.type])}`);
+            if (system.spirit.force) props.push(`${game.i18n.localize('SR5.Force')} ${system.spirit.force}`);
+        }
+        return props;
     },
 
-    complex_form: (system, labels, props) => {
-        ChatData.action(system, labels, props);
+    contact: (item: SR5Item<'contact'>) => {
+        const props: string[] = [];
+        const system = item.system;
+        props.push(system.type);
+        props.push(`${game.i18n.localize('SR5.Contact.Connection')} ${system.connection}`);
+        props.push(`${game.i18n.localize('SR5.Contact.Loyalty')} ${system.loyalty}`);
+        if (system.blackmail) {
+            props.push(game.i18n.localize('SR5.Contact.Blackmail'));
+        }
+        if (system.family) {
+            props.push(game.i18n.localize('SR5.Contact.Family'));
+        }
+        return props;
+    },
+
+    critter_power: (item: SR5Item<'critter_power'>) => {
+        const props: string[] = [];
+        const system = item.system;
+        props.push(game.i18n.localize(SR5.critterPower.types[system.powerType]));
+        props.push(game.i18n.localize(SR5.critterPower.durations[system.duration]));
+        props.push(game.i18n.localize(SR5.critterPower.ranges[system.range]));
+        if (system.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
+        return [...props, ...ChatData.action(item as any)];
+    },
+
+    complex_form: (item: SR5Item<'complex_form'>) => {
+        const props = ChatData.action(item as any);
+
+        const system = item.system;
         props.push(game.i18n.localize(SR5.matrixTargets[system.target]));
         props.push(`${system.duration}`);
 
@@ -185,22 +198,21 @@ export const ChatData = {
         if (fade > 0) props.push(`${game.i18n.localize('SR5.Fade')} ${game.i18n.localize('SR5.Level').charAt(0)}+${fade}`);
         else if (fade < 0) props.push(`${game.i18n.localize('SR5.Fade')} ${game.i18n.localize('SR5.Level').charAt(0)}${fade}`);
         else props.push(`${game.i18n.localize('SR5.Fade')} ${game.i18n.localize('SR5.Level').charAt(0)}`);
+
+        return props;
     },
 
-    cyberware: (system, labels, props) => {
-        ChatData.action(system, labels, props);
-        ChatData.armor(system, labels, props);
+    cyberware: (item: SR5Item<'cyberware'>) => {
+        const system = item.system;
+        const props = [...ChatData.action(item as any), ...ChatData.armor(item as any)];
         if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.technology.calculated.essence.value}`);
+        return props;
     },
 
-    bioware: (system, labels, props) => {
-        ChatData.action(system, labels, props);
-        ChatData.armor(system, labels, props);
-        if (system.essence) props.push(`${game.i18n.localize('SR5.AttrEssence').substring(0, 3)} ${system.technology.calculated.essence.value}`);
-    },
-
-    device: (system: DeviceData, labels, props) => {
-        if (system.technology && system.technology.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
+    device: (item: SR5Item<'device'>) => {
+        const system = item.system;
+        const props: string[] = [];
+        if (system.technology?.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
         // Show ALL matrix ratings for these devices
         if (system.category === 'cyberdeck' || system.category === 'rcc') {
             for (const attribute of Object.values(system.atts)) {
@@ -214,37 +226,74 @@ export const ChatData = {
                 if (attribute.value) props.push(`${Helpers.label(`${game.i18n.localize(SR5.matrixAttributes[attribute.att])}`)} ${attribute.value}`);
             }
         }
+        return props;
     },
 
-    equipment: (system, labels, props) => {
-        ChatData.action(system, labels, props);
-        if (system.technology && system.technology.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
+    echo: (item: SR5Item<'echo'>) => { return []; },
+
+    equipment: (item: SR5Item<'equipment'>) => {
+        const props = ChatData.action(item as any);
+        const system = item.system;
+        if (system.technology?.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
+        return props;
     },
 
-    quality: (system, labels, props) => {
-        ChatData.action(system, labels, props);
+    grid: (item: SR5Item<'grid'>) => { return []; },
 
+    host: (item: SR5Item<'host'>) => { return []; },
+
+    lifestyle: (item: SR5Item<'lifestyle'>) => {
+        const system = item.system;
+        const props: string[] = [];
+        props.push(game.i18n.localize(SR5.lifestyleTypes[system.type]));
+        if (system.cost) props.push(`¥${system.cost}`);
+        if (system.comforts) props.push(`${game.i18n.localize('SR5.LifestyleComforts')} ${system.comforts}`);
+        if (system.security) props.push(`${game.i18n.localize('SR5.LifestyleSecurity')} ${system.security}`);
+        if (system.neighborhood) props.push(`${game.i18n.localize('SR5.LifestyleNeighborhood')} ${system.neighborhood}`);
+        if (system.guests) props.push(`${game.i18n.localize('SR5.LifestyleGuests')} ${system.guests}`);
+        return props;
+    },
+
+    metamagic: (item: SR5Item<'metamagic'>) => { return []; },
+
+    modification: (item: SR5Item<'modification'>) => { return []; },
+    
+    program: (item: SR5Item<'program'>) => {
+        return [game.i18n.localize(SR5.programTypes[item.system.type])];
+    },
+
+    quality: (item: SR5Item<'quality'>) => {
+        const system = item.system;
+        const props = ChatData.action(item as any);
         props.push(Helpers.label(game.i18n.localize(SR5.qualityTypes[system.type])));
         if (system.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
+        return props;
     },
 
-    sprite_power: (system, labels, props) => {
-        // add action data
-        ChatData.action(system, labels, props);
+    ritual: (item: SR5Item<'ritual'>) => {
+        const system = item.system;
+        const props: string[] = [];
+        props.push(game.i18n.localize(SR5.spellTypes[system.type]));
+        props.push(system.descriptors);
+
+        return [...props, ...ChatData.action(item as any)];
     },
 
-    critter_power: (system, labels, props) => {
-        props.push(game.i18n.localize(SR5.critterPower.types[system.powerType]));
-        props.push(game.i18n.localize(SR5.critterPower.durations[system.duration]));
-        props.push(game.i18n.localize(SR5.critterPower.ranges[system.range]));
-        if (system.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.rating}`);
-
-        // add action data
-        ChatData.action(system, labels, props);
+    sin: (item: SR5Item<'sin'>) => {
+        const system = item.system;
+        const props: string[] = [];
+        // Avoid displaying rating null (empty input field) and rating 0.
+        if (system.technology.rating) props.push(`${game.i18n.localize('SR5.Rating')} ${system.technology.rating}`);
+        system.licenses.forEach((license) => {
+            if (license.rtg) props.push(`${license.name} ${game.i18n.localize('SR5.Rating').charAt(0)}${license.rtg}`);
+        });
+        return props;
     },
 
     // add properties for spell data, follow order in book
-    spell: (system, labels, props) => {
+    spell: (item: SR5Item<'spell'>) => {
+        const system = item.system;
+        const props: string[] = [];
         // first category and type
         props.push(game.i18n.localize(SR5.spellCategories[system.category]), game.i18n.localize(SR5.spellTypes[system.type]));
 
@@ -252,6 +301,7 @@ export const ChatData = {
         if (system.category === 'combat') {
             props.push(game.i18n.localize(SR5.combatSpellTypes[system.combat.type]));
         } else if (system.category === 'health') {
+            /* empty */
         } else if (system.category === 'illusion') {
             props.push(game.i18n.localize(SR5.illusionSpellTypes[system.illusion.type]));
             props.push(game.i18n.localize(SR5.illusionSpellSenses[system.illusion.sense]));
@@ -269,7 +319,7 @@ export const ChatData = {
         props.push(game.i18n.localize(SR5.spellRanges[system.range]));
 
         // add action data
-        ChatData.action(system, labels, props);
+        props.push(...ChatData.action(item as any));
 
         // add duration data
         props.push(game.i18n.localize(SR5.durations[system.duration]));
@@ -280,18 +330,18 @@ export const ChatData = {
         else if (drain < 0) props.push(game.i18n.format('SR5.QuickInfo.DrainForce', {sign: '', drain}));
         else props.push(game.i18n.format('SR5.QuickInfo.DrainForce', {sign: '', drain: ''}));
 
-        labels.roll = 'Cast';
+        item.labels.roll = 'Cast';
+        return props;
     },
 
-    ritual: (system, labels, props) => {
-        props.push(game.i18n.localize(SR5.spellTypes[system.type]));
-        props.push(system.descriptors);
-
-        ChatData.action(system, labels, props);
+    sprite_power: (item: SR5Item<'sprite_power'>) => {
+        // add action data
+        return ChatData.action(item as any);
     },
 
-    weapon: (system, labels, props, item: SR5Item) => {
-        ChatData.action(system, labels, props);
+    weapon: (item: SR5Item<'weapon'>) => {
+        const system = item.system;
+        const props = ChatData.action(item as any);
         for (let i = 0; i < props.length; i++) {
             const prop = props[i];
             if (prop.includes('Limit')) {
@@ -300,14 +350,14 @@ export const ChatData = {
         }
 
         const equippedAmmo = item.getEquippedAmmo();
-        if (equippedAmmo && system.ammo && system.ammo.current?.max) {
+        if (equippedAmmo && system.ammo?.current?.max) {
             if (equippedAmmo) {
-                const ammoData = equippedAmmo.system as AmmoData;
+                const ammoData = equippedAmmo.system;
                 const { current, spare_clips } = system.ammo;
                 if (equippedAmmo.name) props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
                 if (ammoData.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${ammoData.blast.radius}m`);
                 if (ammoData.blast.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} ${ammoData.blast.dropoff}/m`);
-                if (spare_clips && spare_clips.max) props.push(`${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${spare_clips.max})`);
+                if (spare_clips?.max) props.push(`${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${spare_clips.max})`);
             }
         }
 
@@ -373,5 +423,7 @@ export const ChatData = {
                 props.push(`${mod.name}`);
             });
         }
+
+        return props;
     },
 };

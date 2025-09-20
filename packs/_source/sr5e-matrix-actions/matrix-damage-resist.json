@@ -1,0 +1,124 @@
+{
+  "_id": "ZBQo18L3WsmBLnKs",
+  "_key": "!items!ZBQo18L3WsmBLnKs",
+  "name": "Matrix Damage Resist",
+  "type": "action",
+  "img": "systems/shadowrun5e/dist/icons/importer/quality/negative.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "action": {
+      "type": "",
+      "test": "MatrixResistTest",
+      "categories": [
+        "resist_matrix"
+      ],
+      "attribute": "rating",
+      "attribute2": "firewall",
+      "skill": "",
+      "armor": false,
+      "spec": "",
+      "mod": 0,
+      "mod_description": "",
+      "roll_mode": "",
+      "limit": {
+        "value": 0,
+        "base": 0,
+        "attribute": ""
+      },
+      "threshold": {
+        "value": 0,
+        "base": 0
+      },
+      "extended": false,
+      "damage": {
+        "type": {
+          "value": "",
+          "base": ""
+        },
+        "element": {
+          "value": "",
+          "base": ""
+        },
+        "value": 0,
+        "base": 0,
+        "ap": {
+          "value": 0,
+          "base": 0
+        },
+        "base_formula_operator": "add",
+        "attribute": "",
+        "source": {
+          "actorId": "",
+          "itemId": "",
+          "itemType": "",
+          "itemName": ""
+        }
+      },
+      "opposed": {
+        "type": "",
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0,
+        "description": "",
+        "resist": {
+          "test": "",
+          "skill": "",
+          "attribute": "",
+          "attribute2": "",
+          "armor": false,
+          "mod": 0
+        }
+      },
+      "followed": {
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0
+      },
+      "modifiers": [],
+      "category": {
+        "matrix": {
+          "owner": false,
+          "marks": 0
+        }
+      }
+    },
+    "result": {
+      "success": {}
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false,
+      "isImported": false
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "_stats": {
+    "coreVersion": "13.346",
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.30.0",
+    "createdTime": 1753649477699,
+    "modifiedTime": 1753649575111,
+    "lastModifiedBy": "gprTC3Md255Kv3Xm",
+    "exportSource": {
+      "worldId": "sr5-buffalo",
+      "uuid": "Item.JEDjokdhO6DBcNZi",
+      "coreVersion": "13.346",
+      "systemId": "shadowrun5e",
+      "systemVersion": "0.30.0"
+    }
+  }
+}

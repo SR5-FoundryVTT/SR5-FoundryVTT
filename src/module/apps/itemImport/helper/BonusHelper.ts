@@ -1,33 +1,27 @@
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
-import { SR5ActiveEffect } from '../../../effect/SR5ActiveEffect'
-import { ItemDataSource } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/itemData';
 import * as BC from "./BonusConstant";
-
-import EffectTagsData = Shadowrun.EffectTagsData;
-import EffectChangeData = Shadowrun.EffectChangeData;
-import EffectOptionsData = Shadowrun.EffectOptionsData;
-import EffectDurationData = Shadowrun.EffectDurationData;
-import { SR5Item } from "../../../item/SR5Item";
-import { CharacterSheetData } from "../../../actor/sheets/SR5CharacterSheet";
+import { DeepPartial } from "fvtt-types/utils";
 
 export class BonusHelper {
     private static isTrue(value: "" | { _TEXT: string }): boolean {
         return value === "" || value._TEXT === "True";
     }
 
-    private static normalizeValue(sheet: BC.ShadowrunSheetData, value: string | number): string | number {
+    private static normalizeValue(sheet: BC.DocCreateData, value: string | number): string {
         if (typeof value === 'number')
-            return value;
+            return value.toString();
 
         if (value.includes("Rating")) {
             let path = "";
 
-            if ('rating' in sheet.system)
+            const system = sheet.system!;
+
+            if ('rating' in system)
                 path = "(@system.rating)";
-            else if ('technology' in sheet.system && 'rating' in sheet.system.technology)
+            else if ('technology' in system && system.technology && 'rating' in system.technology)
                 path = "(@system.technology.rating)";
-            else if ('level' in sheet.system)
+            else if ('level' in system)
                 path = "(@system.level)";
 
             if (!path)
@@ -58,51 +52,35 @@ export class BonusHelper {
     }
 
     private static createEffect(
-        sheet: BC.ShadowrunSheetData,
-        overrides: Partial<EffectOptionsData>,
-        changes: BC.EffectChangeParameter[],
-        flags?: Partial<EffectTagsData>
+        sheet: BC.DocCreateData,
+        effect: BC.AECreateData
     ): void {
-        const defaultEffect = {
+        const changes = IH.getArray(effect.changes);
+
+        for (const change of changes)
+            change.value = this.normalizeValue(sheet, change.value);
+
+        sheet.effects!.push({
             name: sheet.name,
             img: sheet.img,
-            transfer: true,
-        };
-
-        const effect = {
-            ...defaultEffect,
-            ...overrides,
-            changes: changes.map(change  => ({
-                key: change.key,
-                value: this.normalizeValue(sheet, change.value),
-                mode: change.mode ?? BC.CUSTOM,
-                priority: change.priority ?? change.mode ?? 0
-            })),
-            ...(flags && {
-                flags: {
-                    shadowrun5e: {
-                        applyTo: 'test_all' as Shadowrun.EffectApplyTo,
-                        ...flags,
-                    },
-                },
-            }),
-        };
-
-        sheet.effects?.push(effect);
+            ...effect,
+        });
     }
 
-    public static async addBonus(sheet: BC.ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
+    public static async addBonus(sheet: BC.DocCreateData, bonus: BonusSchema) : Promise<void> {
         await this.addEffects(sheet, bonus);
     }
 
-    private static async addEffects(sheet: BC.ShadowrunSheetData, bonus: BonusSchema) : Promise<void> {
+    private static async addEffects(sheet: BC.DocCreateData, bonus: BonusSchema) : Promise<void> {
         sheet.effects ??= [];
 
-        for (const [key, effect] of Object.entries(BC.BonusConstant.simpleEffects)) {
-            if (bonus[key]) {
-                const value = bonus[key]._TEXT as string;
-                const { overrides, tags, ...change } = effect;
-                this.createEffect( sheet, overrides || {}, [{ ...change, value }], tags);
+        for (const [key, data] of Object.entries(bonus)) {
+            const baseEffect = BC.BonusConstant.simpleEffects[key] as BC.AECreateData | undefined;
+            if (baseEffect) {
+                const applyEffect = foundry.utils.deepClone(baseEffect);
+                for (const change of applyEffect.changes ?? [])
+                    change.value = data._TEXT as string;
+                this.createEffect(sheet, applyEffect);
             }
         }
 
@@ -111,46 +89,58 @@ export class BonusHelper {
 
             if (cm.overflow) {
                 this.createEffect(
-                    sheet, { name: "Override Physical Overflow Track"},
-                    [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, mode: BC.OVERRIDE }],
+                    sheet, { 
+                        name: "Override Physical Overflow Track",
+                        changes: [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, mode: BC.OVERRIDE }]
+                    },
                 );
             }
 
             if (cm.physical) {
                 this.createEffect(
-                    sheet, { name: "Override Physical Track" },
-                    [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, mode: BC.OVERRIDE }],
+                    sheet, {
+                        name: "Override Physical Track",
+                        changes: [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, mode: BC.OVERRIDE }]
+                    },
                 );
             }
 
             if (cm.stun) {
                 this.createEffect(
-                    sheet, { name: "Override Stun Track" },
-                    [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: BC.OVERRIDE }],
+                    sheet, {
+                        name: "Override Stun Track",
+                        changes: [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: BC.OVERRIDE }]
+                    }
                 );
             }
 
             if (cm.threshold) {
                 this.createEffect(
-                    sheet, { name: "Pain Tolerance" },
-                    [{ key: "system.modifiers.wound_tolerance", value: cm.threshold._TEXT }],
+                    sheet, {
+                        name: "Pain Tolerance",
+                        changes: [{ key: "system.modifiers.wound_tolerance", value: cm.threshold._TEXT }]
+                    },
                 );
             }
 
             if (cm.thresholdoffset) {
                 this.createEffect(
-                    sheet, { name: "High Pain Tolerance" },
-                    [{ key: "system.modifiers.pain_tolerance_physical", value: cm.thresholdoffset._TEXT }],
+                    sheet, {
+                        name: "High Pain Tolerance",
+                        changes: [{ key: "system.modifiers.pain_tolerance_physical", value: cm.thresholdoffset._TEXT }]
+                    }
                 );
             }
 
             if (cm.sharedthresholdoffset) {
                 this.createEffect(
-                    sheet, { name: "Shared Tolerance" },
-                    [
-                        { key: "system.modifiers.pain_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
-                        { key: "system.modifiers.pain_tolerance_stun", value: cm.sharedthresholdoffset._TEXT },
-                    ],
+                    sheet, {
+                        name: "Shared Tolerance",
+                        changes: [
+                            { key: "system.modifiers.pain_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
+                            { key: "system.modifiers.pain_tolerance_stun", value: cm.sharedthresholdoffset._TEXT },
+                        ]
+                    }
                 );
             }
         }
@@ -162,9 +152,11 @@ export class BonusHelper {
                 const conditionTag = limitModifier.condition ? "*" : "";
 
                 this.createEffect(
-                    sheet, { name: sheet.name + conditionTag },
-                    [{ key: "data.limit.mod", value: limitModifier.value._TEXT }],
-                    { selection_limits: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`} 
+                    sheet, {
+                        name: sheet.name + conditionTag,
+                        changes: [{ key: "data.limit.mod", value: limitModifier.value._TEXT }],
+                        system: { applyTo: 'test_all', selection_limits: [{ id: normalName }] }
+                    }
                 );
             }
         }
@@ -182,9 +174,11 @@ export class BonusHelper {
                 const conditionTag = skill.condition ? "*" : "";
 
                 this.createEffect(
-                    sheet, { name: sheet.name + conditionTag },
-                    [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
-                    { selection_attributes: `[{\"value\":\"${name.capitalize()}\",\"id\":\"${name}\"}]`}
+                    sheet, {
+                        name: sheet.name + conditionTag,
+                        changes: [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
+                        system: { applyTo: 'test_all', selection_attributes: [{ id: name }] }
+                    }
                 );
             }
         }
@@ -196,15 +190,17 @@ export class BonusHelper {
                 
                 const skills = BC.BonusConstant.skillCategoryTable[skillCategory.name._TEXT]
                                 .filter(skillId => !excludedSkill || skillId !== excludedSkill)
-                                .map(skillId => ({ value: skillId.replace("_", " ").capitalize(), id: skillId }))
+                                .map(skillId => ({ id: skillId }))
 
-                if (!skills || !skills.length)
+                if (!skills?.length)
                     console.log("Error skillcategory:", skillCategory.name._TEXT);
                 else
                     this.createEffect(
-                        sheet, { name: sheet.name + conditionTag },
-                        [{ key: "data.modifiers.mod", value: skillCategory.bonus._TEXT }],
-                        { selection_skills: JSON.stringify(skills) }
+                        sheet, {
+                            name: sheet.name + conditionTag,
+                            changes: [{ key: "data.modifiers.mod", value: skillCategory.bonus._TEXT }],
+                            system: { applyTo: 'test_all', selection_skills: skills }
+                        }
                     );
             }
         }
@@ -216,12 +212,14 @@ export class BonusHelper {
 
                 const skills = BC.BonusConstant.skillGroupTable[skillGroup.name._TEXT]
                                 .filter(skillId => !excludedSkill || skillId !== excludedSkill)
-                                .map(skillId => ({ value: skillId.replace("_", " ").capitalize(), id: skillId }))
+                                .map(skillId => ({ id: skillId }))
 
                 this.createEffect(
-                    sheet, { name: sheet.name + conditionTag },
-                    [{ key: "data.modifiers.mod", value: skillGroup.bonus._TEXT }],
-                    { selection_skills: JSON.stringify(skills) }
+                    sheet, {
+                        name: sheet.name + conditionTag,
+                        changes: [{ key: "data.modifiers.mod", value: skillGroup.bonus._TEXT }],
+                        system: { applyTo: 'test_all', selection_skills: skills }
+                    }
                 );
             }
         }
@@ -233,9 +231,11 @@ export class BonusHelper {
                 const conditionTag = skill.condition ? "*" : "";
 
                 this.createEffect(
-                    sheet, { name: sheet.name + conditionTag },
-                    [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
-                    { selection_skills: `[{\"value\":\"${name}\",\"id\":\"${normalName}\"}]`}
+                    sheet, {
+                        name: sheet.name + conditionTag,
+                        changes: [{ key: "data.modifiers.mod", value: skill.bonus._TEXT }],
+                        system: { applyTo: 'test_all', selection_skills: [{ id: normalName }] }
+                    }
                 );
             }
         }

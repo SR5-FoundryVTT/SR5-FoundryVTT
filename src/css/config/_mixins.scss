@@ -10,6 +10,12 @@
     }
 }
 
+@mixin clickable {
+    &:hover {
+        cursor: pointer;
+    }
+}
+
 @mixin systemFonts {
     font-family: $systemFonts;
 }

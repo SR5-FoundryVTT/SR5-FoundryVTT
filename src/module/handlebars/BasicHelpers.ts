@@ -1,11 +1,16 @@
 import { Helpers } from '../helpers';
-import {SafeString} from "handlebars";
-import SkillField = Shadowrun.SkillField;
-import {SR5Actor} from "../actor/SR5Actor";
-import {SYSTEM_NAME} from "../constants";
+import { SafeString } from "handlebars";
+import { SYSTEM_NAME } from "../constants";
+import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
+import { SkillFieldType } from '../types/template/Skills';
 
 export const registerBasicHelpers = () => {
+    /**
+     * Localization helper for mapping a key to a key-localization mapping.
+     * 
+     * This is used for mapping an Item type to it's localization label and other similar mappings.
+     */
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj) strId = obj[strId];
         return game.i18n.localize(strId);
@@ -18,7 +23,7 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
-    Handlebars.registerHelper('localizeSkill', function (skill: SkillField): string {
+    Handlebars.registerHelper('localizeSkill', function (skill: SkillFieldType): string {
         return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
         // NOTE: Below is code to append a shortened attribute name to the skill name. It's been removed for readability.
         //       But still might useful for someone.
@@ -60,37 +65,37 @@ export const registerBasicHelpers = () => {
         if (v2 === 0) return 0;
         return v1 / v2;
     });
-    Handlebars.registerHelper('hasprop', function (obj, prop, options) {
+    Handlebars.registerHelper('hasprop', function (this: any, obj, prop, options) {
         if (obj.hasOwnProperty(prop)) {
             return options.fn(this);
         } else return options.inverse(this);
     });
-    Handlebars.registerHelper('ifin', function (val, arr, options) {
+    Handlebars.registerHelper('ifin', function (this: any, val, arr, options) {
         if (arr.includes(val)) return options.fn(this);
         else return options.inverse(this);
     });
     // if greater than
-    Handlebars.registerHelper('ifgt', function (v1, v2, options) {
+    Handlebars.registerHelper('ifgt', function (this: any, v1, v2, options) {
         if (v1 > v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if less than
-    Handlebars.registerHelper('iflt', function (v1, v2, options) {
+    Handlebars.registerHelper('iflt', function (this: any, v1, v2, options) {
         if (v1 < v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if less than or equal
-    Handlebars.registerHelper('iflte', function (v1, v2, options) {
+    Handlebars.registerHelper('iflte', function (this: any, v1, v2, options) {
         if (v1 <= v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if not equal
-    Handlebars.registerHelper('ifne', function (v1, v2, options) {
+    Handlebars.registerHelper('ifne', function (this: any, v1, v2, options) {
         if (v1 !== v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if equal
-    Handlebars.registerHelper('ife', function (v1, v2, options) {
+    Handlebars.registerHelper('ife', function (this: any, v1, v2, options) {
         if (v1 === v2) return options.fn(this);
         else return options.inverse(this);
     });
@@ -103,7 +108,8 @@ export const registerBasicHelpers = () => {
     Handlebars.registerHelper('empty', function (value) {
         if (foundry.utils.getType(value) === 'Array') return value.length === 0;
         if (foundry.utils.getType(value) === 'Object') return Object.keys(value).length === 0;
-        if (foundry.utils.getType(value) === 'String') return value.length === 0;
+        if (foundry.utils.getType(value) === 'string') return value.length === 0;
+        return false; // for all other types, we assume it's not empty
     });
     Handlebars.registerHelper('not', function (v1) {
         return !v1;
@@ -136,7 +142,7 @@ export const registerBasicHelpers = () => {
     });
     Handlebars.registerHelper('disabledHelper', function (value) {
         const val = Boolean(value);
-        return val ? val : undefined;
+        return val || undefined;
     });
     // TODO: This helper doesn't work... Don't know why, but it doesn't.
     Handlebars.registerHelper('localizeShortened', function (label: string, length: number, options: any): SafeString {
@@ -146,7 +152,7 @@ export const registerBasicHelpers = () => {
     /**
      * Given an object return the value for a given key.
      */
-    Handlebars.registerHelper('objValue', function(obj: Object, key: string) {
+    Handlebars.registerHelper('objValue', function(obj: Record<string, unknown>, key: string) {
         return obj[key] ||  '';
     });
 
@@ -165,10 +171,10 @@ export const registerBasicHelpers = () => {
      */
     Handlebars.registerHelper('itemMarking', function(element: string) {
         const mark = game.settings.get(SYSTEM_NAME, 'MarkImports');
-        if (element == 'ANY' && mark != 'NONE') {
+        if (element === 'ANY' && mark !== 'NONE') {
             return true;
         }
-        if (mark == element || mark == 'BOTH') {
+        if (mark === element || mark === 'BOTH') {
             return true;
         }
         return false;
@@ -178,7 +184,7 @@ export const registerBasicHelpers = () => {
      * Check whether an actor has any items that are freshly imported
      */
     Handlebars.registerHelper('hasAnyFreshImports', function(actor: SR5Actor) {
-        if (game.settings.get(SYSTEM_NAME, 'MarkImports') != 'NONE') {
+        if (game.settings.get(SYSTEM_NAME, 'MarkImports') !== 'NONE') {
             const allItems = actor.items;
             for (const item of allItems) {
                 if (item.system.importFlags) {

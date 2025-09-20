@@ -4,12 +4,11 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { Bioware, BiowareSchema } from '../../schema/BiowareSchema';
 import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import { Cyberware, CyberwareSchema } from '../../schema/CyberwareSchema';
-import Ware = Shadowrun.WareItemData;
 
-export class WareParser extends Parser<Ware> {
-    protected override parseType: string;
+export class WareParser extends Parser<'bioware' | 'cyberware'> {
+    protected readonly parseType: 'bioware' | 'cyberware';
     protected categories: (BiowareSchema | CyberwareSchema)['categories']['category'];
-    
+
     constructor(
         parseType: 'bioware' | 'cyberware',
         categories: (BiowareSchema | CyberwareSchema)['categories']['category']
@@ -17,7 +16,7 @@ export class WareParser extends Parser<Ware> {
         super(); this.parseType = parseType; this.categories = categories;
     }
 
-    protected override getSystem(jsonData: Bioware | Cyberware): Ware['system'] {
+    protected override getSystem(jsonData: Bioware | Cyberware) {
         const system = this.getBaseSystem();
 
         const essence = (jsonData.ess._TEXT || '0').match(/[0-9]\.?[0-9]*/g);

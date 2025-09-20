@@ -1,0 +1,36 @@
+<div class="item-header">
+    <div class="item-image">
+        <img src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" width="80" height="80"/>
+    </div>
+    <div class="item-info">
+        <div class="flexrow">
+            <div class="item-name">
+                <input type="text" class="display text" name="name" value="{{item.name}}" placeholder='{{localize "SR5.ItemName"}}' />
+            </div>
+            <div class="item-type">
+                {{localizeOb item.type config.itemTypes}}
+            </div>
+        </div>
+        <div class="flexrow">
+            <div class="source">
+                <div class="source-button roll open-source" data-tooltip="SR5.OpenSource">
+                    {{#if sourceIsURL}}
+                    <i class="fas fa-link"></i> 
+                    {{else if sourceIsPDF}}
+                    <i class="fas fa-file-pdf"></i> 
+                    {{else if sourceIsUuid}}
+                    <i class="fas fa-file"></i> 
+                    {{/if}}
+                </div>
+                <input
+                    class="display text"
+                    type="text"
+                    name="system.description.source"
+                    value="{{system.description.source}}"
+                    placeholder='{{localize "SR5.Source"}}'
+                />
+            </div>
+            {{#if system.importFlags.isFreshImport}}{{#if (itemMarking "ANY")}}{{> 'systems/shadowrun5e/dist/templates/item/parts/import_flag_button.hbs' }}{{/if}}{{/if}}
+        </div>
+    </div>
+</div>

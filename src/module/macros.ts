@@ -7,8 +7,9 @@ import { SR5Item } from './item/SR5Item';
  * @returns {Promise}
  */
 import {Helpers} from "./helpers";
-import SkillField = Shadowrun.SkillField;
 import {SR5Actor} from "./actor/SR5Actor";
+import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
+import { SkillFieldType } from './types/template/Skills';
 
 /**
  * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.
@@ -23,19 +24,18 @@ export async function createItemMacro(dropData, slot) {
     if (!(item instanceof SR5Item)) return console.error(`Shadowrun 5e | Macro Drop expected an item document but got a different document type`, item);
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    let macro = game.macros.contents.find((m) => m.name === item.name);
+    let macro = game.macros.contents.find((m: Macro.Stored<"script" | "chat">) => m.name === item.name) as Macro;
     if (!macro) {
         macro = await Macro.create(
             {
-                //@ts-expect-error
                 name: item.name,
                 type: 'script',
                 img: item.img,
                 command: command,
-                flags: { 'shadowrun5e.itemMacro': true },
+                flags: { shadowrun5e: { itemMacro: true } },
             },
             { renderSheet: false },
-        );
+        ) as Macro;
     }
 
     if (macro) game.user?.assignHotbarMacro(macro, slot);
@@ -69,7 +69,7 @@ export function rollItemMacro(itemName) {
  * @param data A data object for skill macros.
  * @param slot The hotbar slot to use.
  */
-export async function createSkillMacro(data: {skillId: string, skill: SkillField}, slot) {
+export async function createSkillMacro(data: {skillId: string, skill: SkillFieldType}, slot) {
     if (!game.macros || !game.user) return;
 
     const {skillId, skill} = data;
@@ -95,7 +95,7 @@ export async function createSkillMacro(data: {skillId: string, skill: SkillField
  *
  * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
  */
-export async function rollSkillMacro(skillLabel) {
+export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData>| void> {
     if (!game || !game.actors) return;
     if (!skillLabel) return;
 
@@ -105,6 +105,6 @@ export async function rollSkillMacro(skillLabel) {
     const actor =  (game.actors.tokens[speaker.token as string] || game.actors.get(speaker.actor as string)) as SR5Actor
 
     if (!actor) return;
-    return await actor.rollSkill(skillLabel, {byLabel: true});
+    return actor.rollSkill(skillLabel, {byLabel: true});
     // TODO: Macro for skills may need their own TestCreate.fromSkillMacro... as they need getSkill('Label', {byLabel: true});
 }

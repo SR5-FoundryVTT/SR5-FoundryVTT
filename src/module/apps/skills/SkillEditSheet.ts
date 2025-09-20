@@ -1,9 +1,9 @@
-import SkillEditFormData = Shadowrun.SkillEditFormData;
-import {SR5Actor} from "../../actor/SR5Actor";
-import {SR5} from "../../config";
+import { SR5 } from "../../config";
+import { SR5Actor } from "../../actor/SR5Actor";
 import { LinksHelpers } from "../../utils/links";
-import { parseDropData } from "../../utils/sheets";
 import { Translation } from '../../utils/strings';
+import { parseDropData } from "../../utils/sheets";
+
 
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
@@ -26,7 +26,7 @@ export class SkillEditSheet extends DocumentSheet {
         return foundry.utils.mergeObject(options, {
             id: 'skill-editor',
             classes: ['sr5', 'sheet', 'skill-edit-window'],
-            template: 'systems/shadowrun5e/dist/templates/apps/skill-edit.html',
+            template: 'systems/shadowrun5e/dist/templates/apps/skill-edit.hbs',
             width: 300,
             height: 'auto',
             submitOnClose: true,
@@ -59,32 +59,32 @@ export class SkillEditSheet extends DocumentSheet {
 
         // process specializations
         const specsRegex = /skill\.specs\.(\d+)/;
-        const specs = Object.entries(formData).reduce((running, [key, val]: [string, any]) => {
+        const specs = Object.entries(formData).reduce<any[]>((running, [key, val]: [string, any]) => {
             const found = key.match(specsRegex);
-            if (found && found[0]) {
+            if (found?.[0]) {
                 running.push(val);
             }
             return running;
-        }, [] as any[]);
+        }, []);
 
         // process bonuses
         const bonusKeyRegex = /skill\.bonus\.(\d+).key/;
         const bonusValueRegex = /skill\.bonus\.(\d+).value/;
-        const bonus = Object.entries(formData).reduce((running, [key, value]: [string, any]) => {
+        const bonus = Object.entries(formData).reduce<any[]>((running, [key, value]: [string, any]) => {
             const foundKey = key.match(bonusKeyRegex);
             const foundVal = key.match(bonusValueRegex);
-            if (foundKey && foundKey[0] && foundKey[1]) {
+            if (foundKey?.[0] && foundKey[1]) {
                 const index = foundKey[1];
                 if (running[index] === undefined) running[index] = {};
                 running[index].key = value;
-            } else if (foundVal && foundVal[0] && foundVal[1]) {
+            } else if (foundVal?.[0] && foundVal[1]) {
                 const index = foundVal[1];
                 if (running[index] === undefined) running[index] = {};
                 running[index].value = value;
             }
 
             return running;
-        }, [] as any[]);
+        }, []);
 
         updateData[this._updateString()] = {
             specs,
@@ -100,10 +100,7 @@ export class SkillEditSheet extends DocumentSheet {
         if (event.currentTarget.name === 'skill.base') updateData[this._updateString()].base = base;
     }
 
-
-    /** @override */
-    // @ts-expect-error // SkillEditSheet vs DocumentSheet typing, I don't quite get it...
-    async _updateObject(event, formData) {
+    override async _updateObject(event, formData) {
         // Without an actual input field used, avoid a unneeded update...
         // ...the update would happen due to how _onUpdateObject works.
         if (event.currentTarget) {
@@ -116,13 +113,15 @@ export class SkillEditSheet extends DocumentSheet {
     override activateListeners(html) {
         super.activateListeners(html);
 
+        // Assure a application form is available.
+        //         // Assure a application form is available.
+        if (!this.form) return;
+
         /**
          * Drag and Drop Handling
          */
-        //@ts-expect-error
         this.form.ondragover = (event) => this._onDragOver(event);
-        //@ts-expect-error
-        this.form.ondrop = (event) => this._onDrop(event);
+        this.form.ondrop = async (event) => this._onDrop(event);
 
         $(html).find('.open-source').on('click', this._onOpenSource.bind(this));
         $(html).find('.add-spec').on('click', this._addNewSpec.bind(this));
@@ -138,7 +137,7 @@ export class SkillEditSheet extends DocumentSheet {
         if (!skill) return;
         const { bonus = [] } = skill;
         // add blank line for new bonus
-        updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: 0 }];
+        updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: '' }];
         await this.document.update(updateData);
     }
 
@@ -217,17 +216,15 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
-    // @ts-expect-error // Missing DocumentSheetData typing
-    getData(): SkillEditFormData {
-        const data = super.getData();
+    override getData() {
+        const data = super.getData() as any;
 
-        //@ts-expect-error TODO: foundry-vtt-types v10'
         // skill property will hold a direct skill reference
         data['skill'] = foundry.utils.getProperty(data.data, this._updateString());
         data['editable_name'] = this._allowSkillNameEditing();
         data['editable_canDefault'] = true;
         data['editable_attribute'] = true;
         data['attributes'] = this._getSkillAttributesForSelect();
-        return data as unknown as SkillEditFormData;
+        return data;
     }
 }

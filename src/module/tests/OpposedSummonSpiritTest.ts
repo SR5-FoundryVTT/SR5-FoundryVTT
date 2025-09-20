@@ -19,7 +19,7 @@ interface OpposedSummonSpiritTestData extends OpposedTestData {
  * The summoner is the active actor and the spirit is the opposed actor.
  */
 export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTestData> {
-    public override against: SummonSpiritTest
+    declare against: SummonSpiritTest;
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Due to summoning, the active actor for this test will be created during execution.
@@ -48,7 +48,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/opposed-actor-creator-message.html'
+        return 'systems/shadowrun5e/dist/templates/rolls/opposed-actor-creator-message.hbs'
     }
 
     /**
@@ -91,7 +91,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      */
     override async processSuccess() {
         await this.updateSummonTestForFollowup();
-        await this.cleanupAfterExecutionCancel();
+        await this._cleanUpAfterDialogCancel();
     }
 
     override get successLabel(): Translation {
@@ -125,12 +125,14 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
     async finalizeSummonedSpirit() {
         if (!this.actor) return;
 
-        const summoner = this.against.actor as Actor;        
+        const summoner = this.against.actor as SR5Actor;        
 
         const updateData = {
-            'system.services': this.deriveSpiritServices(),
-            'system.summonerUuid': summoner.uuid
-        }
+            system: {
+                services: this.deriveSpiritServices(),
+                summonerUuid: summoner.uuid
+            }
+        };
 
         this._addOwnershipToUpdateData(updateData);
 
@@ -143,7 +145,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      * @param updateData The update data to add the permission to, that's applied to the spirit actor. 
      */
     _addOwnershipToUpdateData(updateData: object) {
-        const summoner = this.against.actor as Actor;
+        const summoner = this.against.actor as SR5Actor;
 
         // Set permissions for all users using the summoner as main character.
         const users = game.users?.filter(user => user.character?.uuid === summoner.uuid);
@@ -153,7 +155,6 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
         users.forEach(user => {
             if (user.isGM) return;
             // #TODO: Add a setting to define that this should be done and what permission it should be done with.
-            //@ts-expect-error v10
             ownership[user.id] = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
         })
         updateData['ownership'] = ownership
@@ -172,7 +173,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
             // Reuse a prepared actor...
             const preparedActor = await this.getPreparedSpiritActor();
             if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared spirit actor');
-            await preparedActor.update({ 'system.summonerUuid': summoner.uuid });
+            await preparedActor.update({ system: { summonerUuid: summoner.uuid } });
             
         } else {
             // Create a new spirit actor from scratch...
@@ -196,7 +197,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      * @returns 
      */
     async getPreparedSpiritActor(): Promise<SR5Actor|null> {
-        return await fromUuid(this.against.data.preparedSpiritUuid) as SR5Actor;
+        return fromUuid(this.against.data.preparedSpiritUuid) as Promise<SR5Actor>;
     }
 
     /**
@@ -204,9 +205,9 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      * 
      * When user cancels the dialog, the spirits has been created. Remove it.
      */
-    override async cleanupAfterExecutionCancel() {
+    override async _cleanUpAfterDialogCancel() {
         if (!this.data.summonedSpiritUuid) return;
-        const actor = await fromUuid(this.data.summonedSpiritUuid);
+        const actor = await fromUuid(this.data.summonedSpiritUuid as any) as SR5Actor | null;
         await actor?.delete();
         delete this.actor;
     }

@@ -91,7 +91,6 @@ export const DataStorage = {
      * @param message.data.value The set method value param
      */
     _handleSetDataStorageSocketMessage: async function (message: Shadowrun.SocketMessageData) {
-        if (!game.user?.isGM) return;
         await DataStorage._setAsGM(message.data.key, message.data.value);
     }
 }
