@@ -1,0 +1,17 @@
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+    name=(localize 'SR5.Labels.ActorSheet.MatrixActions')
+    rightSide=(MatrixActionsHeaderRightSide)
+}}
+<div class="{{#unless noScroll}}scroll-area scroll-area-matrix-hacking{{/unless}} matrix-hacking-actions">
+    {{#each matrixActions}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+            name=this.name
+            itemId=this.action.uuid
+            img=this.action.img
+            itemType="matrix-action"
+            hasRoll="true"
+            hasDesc="true"
+            rightSide=(MatrixActionsItemRightSide this.action)
+        }}
+    {{/each}}
+</div>

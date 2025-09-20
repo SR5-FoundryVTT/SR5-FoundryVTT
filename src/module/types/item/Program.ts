@@ -1,10 +1,10 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { TechnologyData } from "../template/Technology";
-const { SchemaField, StringField } = foundry.data.fields;
+import { TechnologyPartData } from "../template/Technology";
+const { StringField } = foundry.data.fields;
 
 const ProgramData = () => ({
     ...BaseItemData(),
-    technology: new SchemaField(TechnologyData()),
+    ...TechnologyPartData(),
 
     type: new StringField({
         required: true,

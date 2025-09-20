@@ -1,12 +1,22 @@
-{{#if test.actor}}
+{{! The value source document }}
+{{#if test.source}}
+{{#if test.data.sourceDocumentIsActor}}
 <div class="document">
-    <img src="{{speakerImg test.actor}}"/>
-    <a class="content-link" data-type="Actor" data-link data-id="{{test.actor.id}}" data-uuid="{{test.actor.uuid}}">{{speakerName test.actor}}</a>
+    <img src="{{speakerImg test.source}}"/>
+    <a class="content-link" data-type="Actor" data-link data-id="{{test.source.id}}" data-uuid="{{test.source.uuid}}">{{speakerName test.source}}</a>
 </div>
+{{else}}
+<div class="document">
+    <img src="{{test.source.img}}"/>
+    <a class="entity-link content-link" data-type="Item"
+        data-id="{{test.source.id}}" data-uuid="{{test.source.uuid}}">{{test.source.name}}</a>
+</div>
+{{/if}}
+{{/if}}
+{{! The action source document }}
 {{#if test.item}}
 <div class="document">
     <img src="{{test.item.img}}"/>
-    <a class="content-link" data-type="Item" data-link data-id="{{test.item.id}}" data-uuid="{{test.item.uuid}}">{{test.item.name}}</a>
+    <a class="content-link" data-type="Item" data-link data-id="{{test.item.id}}" data-uuid="{{test.item.uuid}}">{{localizeContent test.item.name}}</a>
 </div>
-{{/if}}
 {{/if}}

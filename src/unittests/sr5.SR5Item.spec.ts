@@ -42,7 +42,6 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
         });
 
         describe('Testing related data injection', () => {
-            // TODO: taMiF => these seem to have trouble with not injecting into changedata in _preUpdate but with applying diffs to system
             it('Correctly add defense tests to spells', async () => {
                 const item = await factory.createItem({type: 'spell'});
 

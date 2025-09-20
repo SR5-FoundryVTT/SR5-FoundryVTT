@@ -10,7 +10,7 @@ const ContactData = () => ({
     family: new BooleanField(),
     blackmail: new BooleanField(),
     group: new BooleanField(),
-    linkedActor: new DocumentUUIDField(),
+    linkedActor: new DocumentUUIDField({ blank: true, required: true, nullable: false }),
 });
 
 export class Contact extends ItemBase<ReturnType<typeof ContactData>> {

@@ -62,6 +62,12 @@ export const FLAGS = {
     TokenRulerOpacity: 'TokenRulerOpacity',
     TokenUseRoutingLib: 'TokenUseRoutingLib',
     RuleRG2TargetSizeModifiers: 'RuleRG2TargetSizeModifiers',
+    GeneralActionsPack: 'GeneralActionsPack',
+    MatrixActionsPack: 'MatrixActionsPack',
+    ICActionsPack: 'ICActionsPack',
+    UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
+    MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
+    CompendiaSettingsMenu: 'CompendiaSettingsMenu',
 } as const;
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -82,6 +88,8 @@ export const DEFAULT_ROLL_NAME = 'Roll';
 export const LENGTH_UNIT = 'm';
 export const SKILL_DEFAULT_NAME = '';
 export const DEFAULT_ID_LENGTH = 16;
+
+export const SR5_APPV2_CSS_CLASS = "sr5v2" as const;
 
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 export const SR = {

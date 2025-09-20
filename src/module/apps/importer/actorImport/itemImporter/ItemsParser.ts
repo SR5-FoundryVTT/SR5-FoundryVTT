@@ -79,7 +79,9 @@ export class ItemsParser {
             promises.push(new SimpleParser().parseCollection(echoes, "echo", importOptions.assignIcons));
         }
 
-        promises.push(new CritterPowerParser().parseCritterPowers(chummerChar, importOptions.assignIcons))
+        if (importOptions.powers) {
+            promises.push(new CritterPowerParser().parseCritterPowers(chummerChar, importOptions.assignIcons))
+        }
 
         return (await Promise.all(promises)).flat();
     }

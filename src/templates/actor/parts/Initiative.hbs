@@ -1,19 +1,20 @@
 {{#> "systems/shadowrun5e/dist/templates/common/Attribute.hbs"}}
     <div class="track">
         <div class="attribute-name">
-            <select name="system.initiative.perception" class="display">
-                {{#select system.initiative.perception}}
-                    {{#if system.initiative.meatspace}}
-                        <option value="meatspace">{{localize "SR5.InitCatMeatspace"}}</option>
-                    {{/if}}
+            <select name="initiative-select" class="display">
+                {{#select initiativePerception}}
+                {{#if system.initiative.meatspace}}
+                    <option value="meatspace">{{localize "SR5.InitCatMeatspace"}}</option>
+                {{/if}}
 
-                    {{#ife system.special 'magic'}}
-                        <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
-                    {{/ife}}
+                {{#ife system.special 'magic'}}
+                    <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
+                {{/ife}}
 
-                    {{#if system.initiative.matrix}}
-                        <option value="matrix">{{localize "SR5.InitCatMatrix"}}</option>
-                    {{/if}}
+                {{#if system.initiative.matrix}}
+                    <option value="hot_sim">{{localize "SR5.HotSim"}}</option>
+                    <option value="cold_sim">{{localize "SR5.Labels.ActorSheet.ColdSim"}}</option>
+                {{/if}}
                 {{/select}}
             </select>
         </div>

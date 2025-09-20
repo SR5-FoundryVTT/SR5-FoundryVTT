@@ -1,0 +1,129 @@
+{
+  "name": "Data Spike",
+  "type": "action",
+  "flags": {},
+  "img": "systems/shadowrun5e/dist/icons/bubbling-beam.svg",
+  "effects": [],
+  "_id": "i7KB3290ZAUkhNj2",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5 239"
+    },
+    "action": {
+      "type": "complex",
+      "test": "MatrixTest",
+      "categories": [
+        "matrix",
+        "attack_matrix"
+      ],
+      "attribute": "logic",
+      "attribute2": "",
+      "skill": "cybercombat",
+      "armor": false,
+      "spec": false,
+      "mod": null,
+      "mod_description": "",
+      "roll_mode": "",
+      "limit": {
+        "value": 0,
+        "base": 0,
+        "attribute": "attack",
+        "mod": []
+      },
+      "threshold": {
+        "value": 0,
+        "base": 0
+      },
+      "extended": false,
+      "damage": {
+        "type": {
+          "value": "matrix",
+          "base": "matrix"
+        },
+        "element": {
+          "value": "",
+          "base": ""
+        },
+        "value": 0,
+        "base": 0,
+        "ap": {
+          "value": 0,
+          "base": 0,
+          "mod": [],
+          "base_formula_operator": "add",
+          "attribute": ""
+        },
+        "base_formula_operator": "add",
+        "attribute": "attack",
+        "source": {
+          "actorId": "",
+          "itemId": "",
+          "itemType": "",
+          "itemName": ""
+        },
+        "mod": []
+      },
+      "opposed": {
+        "type": "custom",
+        "test": "MatrixDefenseTest",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0,
+        "description": "",
+        "resist": {
+          "test": "MatrixResistTest",
+          "skill": "",
+          "attribute": "",
+          "attribute2": "",
+          "armor": false,
+          "mod": 0
+        }
+      },
+      "followed": {
+        "test": "",
+        "attribute": "",
+        "attribute2": "",
+        "skill": "",
+        "armor": false,
+        "mod": 0
+      },
+      "modifiers": [
+        "noise",
+        "global",
+        "wounds"
+      ],
+      "alt_mod": 0,
+      "dice_pool_mod": []
+    },
+    "result": {
+      "success": {}
+    },
+    "importFlags": {
+      "name": "",
+      "type": "",
+      "subType": "",
+      "isFreshImport": false,
+      "isImported": false
+    }
+  },
+  "ownership": {
+    "default": 0
+  },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.13.0",
+    "coreVersion": "12.331",
+    "createdTime": null,
+    "modifiedTime": 1697731034189,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!i7KB3290ZAUkhNj2"
+}

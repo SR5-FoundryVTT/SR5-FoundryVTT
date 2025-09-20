@@ -30,7 +30,7 @@ export class SpellImporter extends DataImporter{
                                  : category === 'Manipulation'  ? manipulationSpellParser
                                                                 : spellParserBase;
 
-            return await selectedParser.Parse(jsonData, compendiumKey) as Item.CreateData;
+            return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }
     };
 

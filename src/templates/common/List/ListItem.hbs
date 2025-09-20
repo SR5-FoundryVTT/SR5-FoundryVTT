@@ -1,8 +1,8 @@
-<div class="{{#if itemHeader}}list-header{{else}}list-item{{/if}} {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}" data-item-type="{{itemType}}"{{/if}} {{#each itemData}}data-{{@key}}="{{this}}"{{/each}}>
+<div class="{{#if itemHeader}}list-header{{else}}list-item{{/if}} {{itemCssClass}}" {{#if itemUuid}}data-uuid="{{itemUuid}}"{{/if}} {{#if itemId}}data-item-id="{{itemId}}" data-item-type="{{itemType}}"{{/if}} {{#each itemData}}data-{{@key}}="{{this}}"{{/each}}>
     <div class="list-item-content">
         <div class="item-left">
             {{#if img}}
-                <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">                    
+                <div class="item-img {{#unless isBroken}}{{#if hasRoll}}item-roll{{/if}} roll{{/unless}} {{itemImgCssClass}}">
                     <img src="{{img}}" {{#if hasRoll}}data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}" data-tooltip-direction="LEFT"{{/if}} height="24px" width="24px"/>
                 </div>
             {{/if}}
@@ -20,6 +20,7 @@
             {{/if}}
             {{/if}}
             <div class="item-text item-name
+                {{#if isBroken}}faded{{/if}}
                 {{#if system.importFlags.isFreshImport}}{{#if (itemMarking "COLOR")}}fresh-import{{/if}}{{/if}}
                 {{#if hasDesc}}has-desc{{/if}}
                 {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}}

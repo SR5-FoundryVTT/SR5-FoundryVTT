@@ -11,9 +11,10 @@ declare namespace Shadowrun {
         'armor' |
         'composure'|
         'defense'|
-        'defense_dodge' |
-        'defense_parry' |
         'defense_block' |
+        'defense_dodge' |
+        'defense_matrix' |
+        'defense_parry' |
         'multi_defense'|
         'drain'|
         'environmental'|

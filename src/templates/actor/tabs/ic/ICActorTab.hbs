@@ -1,11 +1,20 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='actor'}}
     <div>
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ic/ICStats.hbs' }}
     </div>
     <div class="inventory">
         <div class="split-container">
             <div>
-                {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.hbs' }}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/ic/ICStats.hbs' }}
+                <nav class="tabs" data-group="matrix">
+                    <a class="item" data-tab="targets">{{localize "SR5.Labels.ActorSheet.Icons"}}</a>
+                    <a class="item" data-tab="marks">{{localize "SR5.Marks"}}</a>
+                </nav>
+                <div class="scroll-area scroll-area-matrix-hacking">
+                    <section data-group='matrix' class="tabsbody">
+                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/MarksTab.hbs'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs'}}
+                    </section>
+                </div>
             </div>
             <div class="flexcol">
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/ic/ICConfiguration.hbs' }}

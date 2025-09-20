@@ -1,0 +1,13 @@
+<div class="standard-form">
+{{#each packs as |entry|}}
+    <div class="form-group">
+        <label for="{{entry.id}}">{{localize entry.field.label}}</label>
+        <div class="form-fields">
+            <select id="{{entry.id}}" name="{{entry.id}}" class="compendium-select">
+                {{selectOptions entry.choices selected=entry.value localize=true sort=true}}
+            </select>
+        </div>
+        <p class="hint">{{localize entry.field.hint}}</p>
+    </div>
+{{/each}}
+</div>

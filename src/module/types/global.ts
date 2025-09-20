@@ -30,6 +30,7 @@ import { Cyberware } from './item/Cyberware';
 import { Device } from './item/Device';
 import { Echo } from './item/Echo';
 import { Equipment } from './item/Equipment';
+import { Grid } from "./item/Grid";
 import { Host } from './item/Host';
 import { Lifestyle } from './item/Lifestyle';
 import { Metamagic } from './item/Metamagic';
@@ -44,6 +45,11 @@ import { Weapon } from './item/Weapon';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from "./flags/ItemFlags";
 
 import { RoutingLib } from "../integrations/routingLibIntegration";
+import SR5CompendiaSettings from "../settings/SR5CompendiaSettings";
+import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerceptionDetectionMode";
+import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
+import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
+import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -70,6 +76,19 @@ declare module "fvtt-types/configuration" {
 
     interface SystemNameConfig {
         name: "shadowrun5e";
+    }
+
+    namespace CONFIG.Canvas {
+        interface DetectionModes {
+            astralPerception: AstralPerceptionDetectionMode;
+            thermographic: ThermographicVisionDetectionMode;
+            lowlight: LowlightVisionDetectionMode;
+            augmentedReality: AugmentedRealityVisionDetectionMode;
+        }
+
+        interface VisionModes {
+            astralPerception: foundry.canvas.perception.VisionMode;
+        }
     }
 
     interface ReadyGame {
@@ -109,6 +128,7 @@ declare module "fvtt-types/configuration" {
             device: typeof Device;
             echo: typeof Echo;
             equipment: typeof Equipment;
+            grid: typeof Grid;
             host: typeof Host;
             lifestyle: typeof Lifestyle;
             metamagic: typeof Metamagic;
@@ -133,6 +153,7 @@ declare module "fvtt-types/configuration" {
         ChatMessage: {
             shadowrun5e: {
                 TestData?: any;
+                MatrixNetworkMarkInvite: {actorUuid: string, targetUuid: string};
             }
         };
         Combat: {
@@ -180,6 +201,14 @@ declare module "fvtt-types/configuration" {
 
     namespace Hooks {
         interface HookConfig {
+            sr5_beforePrepareTestDataWithAction: any;
+            sr5_afterPrepareTestDataWithAction: any;
+            sr5_afterDamageAppliedToActor: any;
+            deleteActor: any;
+            sr5_testPrepareBaseValues: any;
+            sr5_testProcessResults: any;
+            sr5_afterTestComplete: any;
+            sr5_processTagifyElements: any;
             "routinglib.ready": () => void;
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
@@ -227,6 +256,10 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.TokenRulerColorRunning": foundry.data.fields.ColorField<{ initial: '0000FF' }>;
         "shadowrun5e.TokenRulerColorSprinting": foundry.data.fields.ColorField<{ initial: 'FF0000' }>;
         "shadowrun5e.TokenRulerOpacity": foundry.data.fields.NumberField<{ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 }>;
+        "shadowrun5e.CompendiaSettingsMenu": typeof SR5CompendiaSettings;
+        "shadowrun5e.GeneralActionsPack": string;
+        "shadowrun5e.MatrixActionsPack": string;
+        "shadowrun5e.ICActionsPack": string;
     }
 }
 
@@ -240,5 +273,11 @@ declare global {
         localize(stringId: Translation): string;
 
         format(stringId: Translation, data?: Record<string, unknown>): string;
+    }
+
+    interface UI {
+        pdfpager?: {
+            openPDFByCode: (pdfcode: string, options?: { page?: number; uuid?: string }) => void;
+        }
     }
 }

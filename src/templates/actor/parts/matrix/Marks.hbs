@@ -1,44 +1,32 @@
-<div class="matrix">
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
-            name=(localize 'SR5.Marks')
-            itemId='mark'
-            rightSide=(MarkListHeaderRightSide)
-            icons=(MarkListHeaderIcons)
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        name=(localize 'SR5.Labels.ActorSheet.MarkedIcons')
+        itemId='mark'
+        rightSide=(MarkListHeaderRightSide)
+        icons=(MarkListHeaderIcons)
+}}
+{{#each markedDocuments}}
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+            img=(speakerImg this.document)
+            name=(speakerName this.document)
+            additionalCssClass=(MatrixTargetCssClass this)
+            itemImgCssClass='select-matrix-target'
+            itemNameCssClass='open-matrix-target'
+            itemUuid=this.document.uuid
+            rightSide=(MatrixMarkedDocumentItemRightSide this)
+            icons=(MatrixMarkedDocumentItemIcons this)
     }}
-    {{#each markedDocuments}}
-        {{!-- Don't use the ListItem Handlebar helper as to avoid it's item drag&drop functionality. --}}
-        <div class="list-item" data-mark-id="{{this.markId}}">
-            <div class="item-left">
-                <div class="item-img">
-                    <img src="{{this.target.img}}"
-                         data-tooltip="{{this.target.name}}"
-                         height="24px"
-                         width="24px"/>
-                </div>
-                <div class="item-text item-name">{{this.target.name}}</div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{this.scene.name}}
-                </div>
-                <div class="item-text">
-                    {{this.item.name}}
-                </div>
-                <div class="item-text">
-                    <input class="display marks-qty" size="1" type="text" data-dtype="Number" placeholder="1" value="{{this.marks}}" data-mark-id="{{this.markId}}"/>
-                </div>
-                <div class="item-text item-icons">
-                    <a class="" data-tooltip="SR5.Labels.Sheet.AddOne">
-                        <i class="item-icon fas fa-plus marks-add-one" data-mark-id="{{this.markId}}"></i>
-                    </a>
-                    <a class="" data-tooltip="SR5.Labels.Sheet.SubtractOne">
-                        <i class="item-icon fas fa-minus marks-remove-one" data-mark-id="{{this.markId}}"></i>
-                    </a>
-                    <a class="" data-tooltip="SR5.Del">
-                        <i class="item-icon fas fa-trash marks-delete" data-mark-id="{{this.markId}}"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
+    {{! -- Overview of icons connected to the main icon (devices of persona) -- }}
+    {{#each this.icons}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                img=(speakerImg this.document)
+                name=(speakerName this.document)
+                itemCssClass='subcategory-item'
+                additionalCssClass=(MatrixTargetCssClass this)
+                itemImgCssClass='select-matrix-target'
+                itemNameCssClass='open-matrix-target'
+                itemUuid=this.document.uuid
+                rightSide=(MatrixMarkedDocumentItemRightSide this)
+                icons=(MatrixMarkedDocumentItemIcons this)
+        }}
     {{/each}}
-</div>
+{{/each}}

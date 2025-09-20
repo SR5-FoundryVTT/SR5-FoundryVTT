@@ -1,3 +1,64 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='spritepowers'}}
-{{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.hbs' }}
+    <div class="flexrow list-header item-section space-between">
+        <div class="RollId" data-roll-id="matrix.device-rating">
+            <a class="roll Roll">
+                {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
+            </a>
+        </div>
+        <div>
+            <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
+                {{#if system.matrix.running_silent}}
+                    {{localize "SR5.RunningSilent"}}
+                {{else}}
+                    {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
+                {{/if}}
+            </a>
+        </div>
+        <div>
+            {{#if network}}
+                {{localize "SR5.Labels.ActorSheet.Network"}}: {{network.name}}
+                <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                    <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                </a>
+            {{else}}
+                {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
+                <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+            {{/if}}
+        </div>
+        <div>
+            <a class="show-matrix-network-hacking">
+                {{localize "SR5.Labels.ActorSheet.MarkNetwork"}} <i class="item-icon fas fa-network-wired"></i>
+            </a>
+        </div>
+    </div>
+    <div class="split-container">
+        <div>
+            <nav class="tabs" data-group="matrix">
+                <a class="item" data-tab="targets">{{localize "SR5.Labels.ActorSheet.Icons"}}</a>
+                <a class="item" data-tab="marks">{{localize "SR5.Marks"}}</a>
+            </nav>
+            <div class="scroll-area scroll-area-matrix-icons">
+                <section data-group='matrix' class="tabsbody">
+                    {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/MarksTab.hbs'}}
+                    {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs'}}
+                </section>
+            </div>
+        </div>
+        <div>
+            <nav class="tabs" data-group="matrix-right-side">
+                <a class="item" data-tab="matrix-actions">{{localize "SR5.Labels.ActorSheet.MatrixActions"}}</a>
+                <a class="item" data-tab="sprite-powers">{{localize "SR5.Labels.ActorSheet.SpritePowers"}}</a>
+            </nav>
+            <div class="scroll-area scroll-area-matrix-hacking">
+                <section data-group='matrix-right-side' class="tabsbody">
+                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='sprite-powers'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.hbs' }}
+                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='matrix-actions'}}
+                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
+                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+                </section>
+            </div>
+        </div>
+    </div>
 {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}

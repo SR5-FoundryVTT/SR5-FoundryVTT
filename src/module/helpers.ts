@@ -1,5 +1,4 @@
-import { DamageType } from "./types/item/Action";
-import TargetedDocument = Shadowrun.TargetedDocument;
+import { BiofeedbackDamageType, DamageType } from './types/item/Action';
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
 import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
@@ -13,6 +12,7 @@ import { AttributeFieldType } from "./types/template/Attributes";
 import { SkillFieldType, SkillsType } from "./types/template/Skills";
 import { ModifiedDamageType } from "./types/rolls/ActorRolls";
 import { RangeTemplateType } from "./types/template/Weapon";
+import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
 
 type OneOrMany<T> = T | T[];
 
@@ -26,41 +26,61 @@ interface CalcTotalOptions {
 
 export class Helpers {
     /**
-     * Calculate the total value for a data object
-     * - stores the total value and returns it
-     * @param value
+     * Calculate the total value for a ModifiableValue shape.
+     *
+     * This can either be the sum of all modify values or the override total value as given.
+     *
+     * ActiveEffect modes are related to the expected data:
+     * - Modify / Add => Will insert into the .mod array
+     * - Override => Will create a .override value with no min and max
+     * - Upgrade => Will create a .override value with min
+     * - Downgrade => Will create a .override value with max
+     *
+     * Depending on the override value it's possible that a overriden value can be
+     * downgraded or upgraded but still be changed further by the options.min or options.max
+     * params of the overall method. That way effect changes can't override system min/max borders.
+     *
+     * @param value The ModifiableValue shape.
      * @param options min will a apply a minimum value, max will apply a maximum value.
      */
     static calcTotal(value: ModifiableValueType, options?: CalcTotalOptions): number {
+        // reset operation
+        value.mode = null;
+
+        // Some values will have their total overridden directly.
+        if (value.override) {
+            // Still apply a possible value range, even if override says otherwise.
+            value.value = Helpers.applyRange(value.override.value, options);
+            value.mode = 'override';
+            return value.value;
+        }
+
         const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
         if (!isNaN(value.temp) && Number(value.temp) !== 0) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
-        // If the given value has an override defined, use that as a value, while keeping the base and mod values.
-        if (value.override) {
-            // Still apply a possible value range, even if override says otherwise.
-            value.value = Helpers.applyValueRange(value.override.value, options);
-            return value.value;
+        value.value = parts.total + value.base;
+
+        // Apply both down- and upgrade, should multiple effect changes have been applied.
+        if (value.downgrade) {
+            const previousValue = value.value;
+            value.value = Helpers.applyRange(value.value, { max: value.downgrade.value });
+            if (value.value !== previousValue)
+                value.mode = 'downgrade';
+        }
+        if (value.upgrade) {
+            const previousValue = value.value;
+            value.value = Helpers.applyRange(value.value, { min: value.upgrade.value });
+            if (value.value !== previousValue)
+                value.mode = 'upgrade';
         }
 
-        value.value = Helpers.roundTo(parts.total + value.base, options?.roundDecimals);
-        value.value = Helpers.applyValueRange(value.value, options);
+        value.value = Helpers.roundTo(value.value, options?.roundDecimals);
+        value.value = Helpers.applyRange(value.value, options);
 
         value.mod = parts.list;
-
-        return value.value;
-    }
-
-    static calcValue(value: DamageType): any {
-        if (value.override) {
-            value.value = value.override.value;
-
-            return value.value;
-        }
-
-        value.value = value.base;
 
         return value.value;
     }
@@ -79,14 +99,13 @@ export class Helpers {
      *
      * @param value
      * @param options Define the range the given value must be in (or none)
+     * @returns True if the value was modified, false otherwise
      */
-    static applyValueRange(value: number, options?: CalcTotalOptions): number {
-        if (typeof options?.min === 'number') {
+    static applyRange(value: number, options?: CalcTotalOptions) {
+        if (options?.min != null)
             value = Math.max(options.min, value);
-        }
-        if (typeof options?.max === 'number') {
+        if (options?.max != null)
             value = Math.min(options.max, value);
-        }
 
         return value;
     }
@@ -95,8 +114,16 @@ export class Helpers {
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
+    static listItemUuid(event): string {
+        return event.currentTarget.closest('.list-item').dataset.uuid;
+    }
+
     static listHeaderId(event): string {
         return event.currentTarget.closest('.list-header').dataset.itemId;
+    }
+
+    static eventUuid(event): string {
+        return event.currentTarget?.dataset?.uuid ?? '';
     }
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
@@ -335,15 +362,15 @@ export class Helpers {
     }
 
     /**
-     * Measure the distance between two tokens on the canvas in length units, 
+     * Measure the distance between two tokens on the canvas in length units,
      * factoring in both 2D distance and 3D elevation difference.
-     * 
+     *
      * Depending on the scene distance unit the result will be converted.
-     * 
+     *
      * If wall-height is installed and using tokenHeight, it will be used for elevation.
-     * 
-     * @param tokenOrigin 
-     * @param tokenDest 
+     *
+     * @param tokenOrigin
+     * @param tokenDest
      * @returns Distance in scene distance unit
      */
     static measureTokenDistance(tokenOrigin: TokenDocument, tokenDest: TokenDocument): number {
@@ -364,7 +391,7 @@ export class Helpers {
         const elevationDifference = (tokenOrigin.elevation + originLOSHeight) - (tokenDest.elevation + destLOSHeight);
         const origin3D = new PIXI.Point(0, 0);
         const dest3D = new PIXI.Point(distanceInGridUnits2D.distance, elevationDifference);
-        
+
         const distanceInGridUnits3D = Math.round(Helpers.measurePointDistance(origin3D, dest3D));
 
         const sceneUnit = canvas.scene.grid.units;
@@ -373,9 +400,9 @@ export class Helpers {
 
     /**
      * Measure distance between two points on a grid in length units.
-     * 
-     * @param origin 
-     * @param destination 
+     *
+     * @param origin
+     * @param destination
      * @returns Distance without a unit.
      */
     static measurePointDistance(origin: PIXI.Point, destination: PIXI.Point): number {
@@ -386,13 +413,13 @@ export class Helpers {
 
     /**
      * Determine a tokens line of sight height.
-     * 
+     *
      * Default Foundry will use 0, while wall-height might have defined another value on the token.
-     * 
+     *
      * The auto height generation of wall-height isn't supported.
-     * 
-     * @param token 
-     * @returns 
+     *
+     * @param token
+     * @returns
      */
     static getTokenLOSHeight(token: TokenDocument): number {
         return token.flags['wall-height']?.tokenHeight ?? 0;
@@ -464,53 +491,93 @@ export class Helpers {
         return actors;
     }
 
+    static async getMatrixTestTargetDocuments(testData: MatrixTestData | OpposedMatrixTestData): Promise<(SR5Item | SR5Actor | TokenDocument)[]> {
+        const documents = await this.getTestTargetDocuments(testData);
+
+        if (testData.iconUuid) {
+            const document = await fromUuid(testData.iconUuid) as SR5Item | SR5Actor | TokenDocument;
+
+            if (document instanceof SR5Item) {
+                documents.unshift(document);
+            }
+
+            if (document instanceof SR5Actor) {
+                documents.unshift(document);
+            }
+        }
+
+        return documents;
+    }
+
     /**
      * Given a SuccessTestData subset fetch all target actors.
      *
+     * TODO: TEST this whole function with all use cases....
+     * TODO: CHECK THIS ASSUMPTION?
      * BEWARE: A target will always be token based BUT linked actors provide an actor uuid instead of
      * pointing to their token actors.
-     * 
+     *
      * @param testData The test data containing target uuids.
+     * @returns A list of documents targeted by the original test.
      */
-    static async getTestTargetActors(testData: SuccessTestData): Promise<SR5Actor[]> {
-        const actors: SR5Actor[] = [];
-        for (const uuid of testData.targetActorsUuid) {
-            const tokenOrActor = await fromUuid(uuid as any);
-            // Assume given target to be an actor.
-            let actor = tokenOrActor;
+    static async getTestTargetDocuments(testData: SuccessTestData): Promise<(SR5Actor | SR5Item | TokenDocument)[]> {
+        const documents: (SR5Actor | SR5Item | TokenDocument)[] = [];
+        for (const uuid of testData.targetUuids) {
+            const document = await fromUuid(uuid);
 
-            // In case of a Token, extract it's synthetic actor.
-            if (tokenOrActor instanceof TokenDocument) {
-                if (!tokenOrActor.actor) continue;
-                actor = tokenOrActor.actor;
-            }
-
-            // Avoid fromUuid pulling an unwanted Document type.
-            if (!(actor instanceof SR5Actor)) {
-                console.error(`Shadowrun5e | testData with targets containt UUID ${uuid} which doesn't provide an actor or syntheic actor`, tokenOrActor);
+            if (document instanceof SR5Item) {
+                documents.push(document);
                 continue;
             }
 
-            actors.push(actor);
+            if (document instanceof SR5Actor) {
+                documents.push(document);
+                continue;
+            }
+
+            // In case of a Token, extract it's synthetic actor.
+            if (document instanceof TokenDocument) {
+                if (!document.actor) continue;
+                documents.push(document.actor);
+            }
+
+            // Inform about unexpected document types.
+            console.error(`Shadowrun5e | testData with targets containt UUID ${uuid} which doesn't provide an actor or syntheic actor`, document);
         }
-        return actors;
+        return documents;
     }
+
     /**
      * Check given test for actors to use for opposed tests.
      *
      * @param testData The test to use for actor selection
      * @returns A list of actors that should be used for an opposed test.
      */
-    static async getOpposedTestActors(testData: SuccessTestData): Promise<SR5Actor[]> {
+    static async getOpposedTestTargets(testData: SuccessTestData): Promise<(SR5Actor | SR5Item | TokenDocument)[]> {
         const overwriteSelectionWithTarget = game.settings.get(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection) as boolean;
 
         // Honor user preference of using test targets, if any are set.
-        if (overwriteSelectionWithTarget && testData.targetActorsUuid.length > 0) {
-            return await Helpers.getTestTargetActors(testData);
+        if (overwriteSelectionWithTarget && testData.targetUuids.length > 0) {
+            return Helpers.getTestTargetDocuments(testData);
         }
 
         // Otherwise fallback to default behavior
         return Helpers.getSelectedActorsOrCharacter();
+    }
+
+    /**
+     * Get Matrix targets from a test
+     * @param testData
+     */
+    static async getOpposedMatrixTestTargets(testData: MatrixTestData): Promise<(SR5Item | SR5Actor | TokenDocument)[]> {
+        const overwriteSelectionWithTarget = game.settings.get(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection) as boolean;
+
+        // Honor user preference of using test targets, if any are set.
+        if (overwriteSelectionWithTarget && testData.iconUuid !== '')
+            return Helpers.getMatrixTestTargetDocuments(testData);
+
+        // Otherwise fallback to default behavior
+        return Helpers.getOpposedTestTargets(testData);
     }
 
     static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateType {
@@ -525,17 +592,20 @@ export class Helpers {
      * This can be relevant for when GMs either manually or by module change the tokens name, while the actors name
      * is untouched and might even be detrimental to share with players.
      *
-     * @param actor
+     * @param document Any document that can be targeted by a Success Test
+     * @returns A string representing this documents name.
      */
-    static getChatSpeakerName(actor: SR5Actor): string {
-        if (!actor) return '';
+    static getChatSpeakerName(document: SR5Actor | SR5Item | TokenDocument): string {
+        if (!document) return '';
+
+        if (document instanceof SR5Item) return document.name;
 
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = actor.getToken();
+        const token = document instanceof TokenDocument ? document : document.getToken();
 
         if (useTokenNameForChatOutput && token) return token.name;
 
-        return actor.name;
+        return document.name;
     }
 
     /**
@@ -543,17 +613,19 @@ export class Helpers {
      *
      * The use token name setting is also respected.
      *
-     * @param actor Either an actual or a virtual actor, taken from a token.
+     * @param document Any document that can be targeted by a Success Test
      * @returns A path pointing to an image.
      */
-    static getChatSpeakerImg(actor: SR5Actor): string {
-        if (!actor) return '';
+    static getChatSpeakerImg(document: SR5Actor | SR5Item | TokenDocument): string {
+        if (!document) return '';
+
+        if (document instanceof SR5Item) return document.img!;
 
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = actor.getToken();
+        const token = document instanceof TokenDocument ? document : document.getToken();
 
         if (useTokenForChatOutput && token) return token.texture.src || '';
-        return actor.img || '';
+        return 'img' in document ? document.img || '' : '';
     }
 
     static createDamageData(
@@ -561,6 +633,7 @@ export class Helpers {
         type: DamageType['type']['value'],
         ap: number = 0,
         element: DamageType['element']['value'] = '',
+        biofeedback: BiofeedbackDamageType = '',
         sourceItem?: SR5Item
     ): DamageType {
         const damage = DataDefaults.createData('damage');
@@ -572,6 +645,7 @@ export class Helpers {
         damage.ap.value = ap;
         damage.element.base = element;
         damage.element.value = element;
+        damage.biofeedback = biofeedback;
 
         if (sourceItem?.actor) {
             damage.source = {
@@ -818,17 +892,17 @@ export class Helpers {
         if (!game.actors || !game.items) return undefined;
 
         if (data.pack && data.type === 'Actor')
-            return await Helpers.getEntityFromCollection(data.pack, data.id) as SR5Actor;
+            return Helpers.getEntityFromCollection(data.pack, data.id) as Promise<SR5Actor>;
 
         if (data.pack && data.type === 'Item')
-            return await Helpers.getEntityFromCollection(data.pack, data.id) as SR5Item;
+            return Helpers.getEntityFromCollection(data.pack, data.id) as Promise<SR5Item>;
 
         if (data.type === 'Actor')
             return game.actors.get(data.id) as SR5Actor;
 
         if (data.type === 'Item')
             return game.items.get(data.id) as SR5Item;
-    
+
         return undefined;
     }
 
@@ -839,72 +913,7 @@ export class Helpers {
      */
     static async getEntityFromCollection(collection: string, id: string): Promise<ClientDocument | null | undefined> {
         const pack = game.packs.find((p) => p.collection === collection);
-        return await pack?.getDocument(id);
-    }
-
-    /**
-     * A markId is valid if:
-     * - It's scene still exists
-     * - The token still exists on that scene
-     * - And a possible owned item still exists on that documents actor.
-     */
-    static isValidMarkId(markId: string): boolean {
-        if (!game.scenes) return false;
-
-        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
-
-        const scene = game.scenes.get(sceneId);
-        if (!scene) return false;
-
-        const tokenDocument = scene.tokens.get(targetId);
-        if (!tokenDocument) return false;
-
-        const actor = tokenDocument.actor;
-        // Some targets are allowed without a targeted owned item.
-        if (itemId && !actor?.items.get(itemId)) return false;
-
-        return true;
-    }
-
-    /**
-     * Build a markId string. See Helpers.deconstructMarkId for usage.
-     *
-     * @param sceneId Optional id in a markId
-     * @param targetId Mandatory id in a markId
-     * @param itemId Optional id in a markId
-     * @param separator Should you want to change the default separator used. Make sure not to use a . since Foundry will split the key into objects.
-     */
-    static buildMarkId(sceneId: string, targetId: string, itemId: string | undefined, separator = '/'): string {
-        return [sceneId, targetId, itemId || ''].join(separator);
-    }
-
-    /**
-     * Deconstruct the given markId string.
-     *
-     * @param markId 'sceneId.targetId.itemId' with itemId being optional
-     * @param separator Should you want to change the default separator used
-     */
-    static deconstructMarkId(markId: string, separator = '/'): [sceneId: string, targetId: string, itemId: string] {
-        const ids = markId.split(separator);
-
-        if (ids.length !== 3) {
-            console.error('A mark id must always be of length 3');
-        }
-
-        return ids as [string, string, string];
-    }
-
-    static getMarkIdDocuments(markId: string): TargetedDocument | undefined {
-        if (!game.scenes || !game.items) return undefined;
-
-        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
-
-        const scene = game.scenes.get(sceneId);
-        if (!scene) return undefined;
-        const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
-        const item = target?.actor?.items?.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
-
-        return { scene, target, item };
+        return pack?.getDocument(id);
     }
 
     /**
@@ -920,33 +929,6 @@ export class Helpers {
         }
 
         return true;
-    }
-
-    /**
-     * Check packs for a given action.
-     *
-     * TODO: Use pack and action ids to avoid polluted user namespaces
-     * TODO: Allow for i18n to fetch a label from an action? Or predefine the title?
-     *
-     * @param packName The metadata name of the pack
-     * @param actionName The name of the action within that pack
-     */
-    static async getPackAction(packName, actionName): Promise<SR5Item | undefined> {
-        console.debug(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
-        const pack = game.packs.find(pack =>
-            pack.metadata.system === SYSTEM_NAME &&
-            pack.metadata.name === packName);
-        if (!pack) return undefined;
-
-        // TODO: Use predefined ids instead of names...
-        const packEntry = pack.index.find(data => data.name?.toLowerCase().replace(/ /g, '_') === actionName.toLowerCase());
-        if (!packEntry) return undefined;
-
-        const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
-        if (!item || item.type !== 'action') return undefined;
-
-        console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
-        return item;
     }
 
     /**
@@ -981,10 +963,10 @@ export class Helpers {
 
     /**
      * Sanitize keys to not use characters used within FoundryVTT Document#update and expandObject methods.
-     * 
+     *
      * @param key The key, maybe containing prohibited characters
      * @param replace The characters to replaces prohibited characters with
-     * @returns key without 
+     * @returns key without
      */
     static sanitizeDataKey(key: string, replace: string=''): string {
         const spicyCharacters = ['.', '-='];
@@ -1014,17 +996,17 @@ export class Helpers {
                     allActors = allActors.concat(`
                             <option value="${t.id}">${t.name}</option>`);
                 });
-            const  dialog_content = `  
+            const  dialog_content = `
                 <select name ="actor">
                 ${allActors}
                 </select>`;
-    
+
             const choosenActor = await foundry.appv1.api.Dialog.prompt({
                 title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
                 content: dialog_content,
                 callback: (html) => html.find('select').val()
             }) as string;
-    
+
             return game.actors?.get(choosenActor) as SR5Actor;
         }
     }
@@ -1033,16 +1015,16 @@ export class Helpers {
      * A method to capitalize the first letter of a given string.
      * This allows to transform skill and attribute ids to the corresponding translation sub-keys
      * See @see getSkillTranslation @see getAttributeTranslaton
-     * @param string 
+     * @param string
      * @returns the string with a capitalized first letter
      */
     static capitalizeFirstLetter(string: string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
-    }  
+    }
 
     /**
      * Translates a skillId
-     * @param skill 
+     * @param skill
      * @returns translation
      */
     static getSkillTranslation(skill: string) : string {
@@ -1051,10 +1033,61 @@ export class Helpers {
 
     /**
      * Translate an attribute
-     * @param attribute 
+     * @param attribute
      * @returns translation
      */
     static getAttributeTranslation(attribute: string) : string {
         return game.i18n.localize(`SR5.Attr${this.capitalizeFirstLetter(attribute)}` as Translation)
+    }
+
+    /**
+     * Transform uuid into a format that can be stored as keys in Foundry without object splitting.
+     */
+    static uuidForStorage(uuid: string) {
+        return uuid.replaceAll('.', '_');
+    }
+
+    /**
+     * Reforms a transformed uuid back into a usable format.
+     */
+    static uuidFromStorage(uuid: string) {
+        return uuid.replaceAll('_', '.');
+    }
+
+    /**
+     * Sort a list of documents by name in ascending alphabetical order.
+     *
+     * @param a Any type of document data
+     * @param b Any type of document data
+     * @returns
+     */
+    static sortByName(a: {name: string}, b: {name: string}) {
+        if (a.name > b.name) return 1;
+        if (a.name < b.name) return -1;
+        return 0;
+    }
+
+    /**
+     * Slugify a name to match it's label counterpart in the i18n files.
+     * For that it needs to be PascalCase and without spaces.
+     * 
+     * This can happen when displaying a packs document name translated on
+     * sheet, as the document name will be human readable and in English, while
+     * on sheet it should be match the display language.
+     */
+    static transformToLabel(name: string) {
+        return name
+            // Remove issues with splitting whitespaces.
+            .trim()
+            // Normalize string
+            .toLowerCase()
+            // PascalCase
+            .split(' ')
+            .map(word => {
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            })
+            // Return and remove all non-alphanumerics
+            .join('')
+            .replace(/[^a-zA-Z0-9]/g, '');
     }
 }

@@ -3,11 +3,10 @@ import { SR5TestFactory } from './utils';
 import { SR5Actor } from '../module/actor/SR5Actor';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CombatRules } from '../module/rules/CombatRules';
-import { DamageType } from 'src/module/types/item/Action';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { FireModeRules } from '../module/rules/FireModeRules';
-type DamageTypeType = Item.SystemOfType<'action'>['action']['damage']['type']['base'];
-type DamageElementType = Item.SystemOfType<'action'>['action']['damage']['element']['base'];
+import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
+type DamageElementType = DamageType['element']['base'];
 
 export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -186,7 +185,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         const getVehicleWithArmor = async (armorValue: number): Promise<SR5Actor> => {
             const armor = DataDefaults.createData('armor', { value: armorValue, base: armorValue });
-            return await factory.createActor({ type: 'vehicle', system: { armor } });
+            return factory.createActor({ type: 'vehicle', system: { armor } });
         }
 
         const getDamage = (

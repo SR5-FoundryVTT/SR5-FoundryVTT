@@ -1,13 +1,13 @@
-import { ActionRollData } from "./Action";
+import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { TechnologyData } from "../template/Technology";
+import { TechnologyPartData } from "../template/Technology";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ValueMaxPair, ModifiableValue } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const BlastData = () => ({
     radius: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-    dropoff: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    dropoff: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
 const AmmunitionData = () => ({
@@ -45,7 +45,7 @@ export const RangeWeaponData = () => ({
 });
 
 const MeleeWeaponData = () => ({
-    reach: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    reach: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
 const ThrownWeaponData = () => ({
@@ -55,8 +55,8 @@ const ThrownWeaponData = () => ({
 
 const WeaponData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData({opposedTest: 'PhysicalDefenseTest', resistTest: 'PhysicalResistTest'})),
-    technology: new SchemaField(TechnologyData()),
+    ...ActionPartData({ opposedTest: "PhysicalDefenseTest", resistTest: "PhysicalDefenseTest" }),
+    ...TechnologyPartData(),
 
     category: new StringField({
         blank: true,

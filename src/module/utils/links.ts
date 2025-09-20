@@ -1,10 +1,6 @@
-import { SR5Actor } from "../actor/SR5Actor";
-import { SR5Item } from "../item/SR5Item";
-
 /**
  * Utils used for opening links
  */
-
 export class LinksHelpers {
     /**
      * Determine if the given string contains a PDF pattern.
@@ -13,59 +9,47 @@ export class LinksHelpers {
      */
     static isPDF(candidate: string | undefined): boolean {
         if (!candidate) return false;
-        return candidate.split(' ').length === 2;
+        const pdfPattern = /^\S+ \d+$/i;
+        return pdfPattern.test(candidate);
     }
+
     /**
-     * Determine if given string contains a url pattern.
+     * Determine if the given string is a valid URL.
+     * Excludes PDF patterns and Foundry document UUIDs.
      * 
-     * Parsing an url is expensive and doing so on UUIDs for JournalEntryPages will kill the browser :)
-     * Therefore we assume what is not anything else, might be a url.
-     * 
-     * @param candidate The string that might contain a url
-     * @returns true, when candidate contains a url pattern
+     * @param candidate The string that might be a URL.
+     * @returns true if the candidate is a valid URL.
      */
     static isURL(candidate: string | undefined): boolean {
         if (!candidate) return false;
 
-        // Start in order of little performance expence
+        // Exclude PDF and UUID patterns first
         if (LinksHelpers.isPDF(candidate)) return false;
         if (LinksHelpers.isUuid(candidate)) return false;
 
-        return true;
+        try {
+            // eslint-disable-next-line no-new
+            new URL(candidate, window.location.origin);
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 
+    // Field used to validate Foundry document UUIDs
+    private static readonly uuidField = new foundry.data.fields.DocumentUUIDField({ required: true });
+
     /**
-     * Determine if given string contains a valid uuid pattern.
-     * 
-     * FoundryVTT doesn't provide a method to check if a string is a valid uuid.
-     * We assume a uuid will end on a 16 digit id and will contain at least one dot.
-     * 
-     * @param candidate A string containing a Document.uuid
-     * @returns true, when candidate contains a valid uuid pattern
+     * Check if the given string is a valid FoundryVTT document UUID.
+     * Uses Foundry's built-in DocumentUUIDField validation.
+     *
+     * @param candidate The string to check.
+     * @returns true if the candidate is a valid UUID, false otherwise.
      */
-    static isUuid(candidate: string | undefined) {
+    static isUuid(candidate: string | undefined): boolean {
         if (!candidate) return false;
 
-        try {
-            return !!foundry.utils.parseUuid(candidate).collection;
-          } catch (error) {
-            return false;
-          }
-    }
-
-    /**
-     * Resolve given uuid for better handling for different document types.
-     * @param source 
-     */
-    static async resolveUuid(source: string) {
-        const resolvedUuid = foundry.utils.parseUuid(source);
-
-        const uuid = resolvedUuid.uuid.split('#')[0];
-        const anchor = resolvedUuid.uuid.split('#')[1];
-
-        const document = await fromUuid(uuid as any);
-        
-        return { document, resolvedUuid, anchor }
+        return this.uuidField.validate(candidate) === undefined;
     }
 
     /**
@@ -74,11 +58,12 @@ export class LinksHelpers {
      * This is meant to allow for wikis to be used as sources.
      */
     static openSourceURL(source: string | undefined) {
-        if (source === '') {
-            ui.notifications?.error('SR5.SourceFieldEmptyError', { localize: true });
+        if (!source) {
+            ui.notifications.error('SR5.SourceFieldEmptyError', { localize: true });
+            return;
         }
 
-        window.open(source);
+        window.open(source, '_blank');
     }
 
     /**
@@ -86,19 +71,19 @@ export class LinksHelpers {
      */
     static openSourcePDF(source: string | undefined) {
         // Check for pdfpager module hook: https://github.com/farling42/fvtt-pdf-pager
-        if (!('pdfpager' in ui)) {
-            ui.notifications?.warn('SR5.DIALOG.MissingModuleContent', { localize: true });
+        if (!ui.pdfpager) {
+            ui.notifications.warn('SR5.DIALOG.MissingModuleContent', { localize: true });
             return;
         }
 
         if (!source) {
-            ui.notifications?.error('SR5.SourceFieldEmptyError', { localize: true });
+            ui.notifications.error('SR5.SourceFieldEmptyError', { localize: true });
             return;
         }
 
         const [code, page] = source.split(' ');
 
-        (ui.pdfpager as any).openPDFByCode(code, { page: parseInt(page) });
+        ui.pdfpager.openPDFByCode(code, { page: parseInt(page) });
     }
 
     /**
@@ -106,25 +91,30 @@ export class LinksHelpers {
      * 
      * @param source 
      */
-    static async openSourceByUuid(source: string|undefined) {
+    static async openSourceByUuid(source: string | undefined) {
         if (!source) return;
-        const { document, resolvedUuid, anchor } = await LinksHelpers.resolveUuid(source);
+
+        const resolvedUuid = foundry.utils.parseUuid(source);
+
+        type docType = foundry.abstract.Document.ImplementationFor<CONST.ALL_DOCUMENT_TYPES>;
+        const uuid = resolvedUuid.uuid.split('#')[0];
+        const anchor = resolvedUuid.uuid.split('#')[1] as string | undefined;
+        const document = await fromUuid(uuid) as docType | null;
 
         if (!document) {
-            ui.notifications?.error('SR5.SourceFieldEmptyError', { localize: true });
+            ui.notifications.error('SR5.SourceFieldEmptyError', { localize: true });
             return;
         }
 
         try {
-            if (document instanceof SR5Item || document instanceof SR5Actor || document instanceof JournalEntry) {
-                document.sheet?.render(true);
-            } else if (document instanceof JournalEntryPage) {
-                document.parent?.sheet?.render(true);
-            } else {
-                ui.notifications?.error(`The document has no associated sheet.`);
-            }
+            if (document instanceof JournalEntryPage && document.parent)
+                await document.parent.sheet?.render(true, { anchor, pageId: document.id });
+            else if ("sheet" in document && document.sheet)
+                await document.sheet.render(true);
+            else
+                ui.notifications.error(`The document has no associated sheet.`);
         } catch (error) {
-            ui.notifications?.error(`Error opening the sheet for UUID: ${resolvedUuid.uuid}`, error as any);
+            ui.notifications.error(`Error opening the sheet for UUID: ${resolvedUuid.uuid}`, error as any);
         }
     }
 
@@ -132,14 +122,11 @@ export class LinksHelpers {
      * Use the items source field and try different means of opening it.
      */
     static async openSource(source: string | undefined) {
-        if (LinksHelpers.isPDF(source)) {
+        if (LinksHelpers.isPDF(source))
             return LinksHelpers.openSourcePDF(source);
-        }
-        if (LinksHelpers.isUuid(source)) {
-            return await LinksHelpers.openSourceByUuid(source);
-        }
-        if (LinksHelpers.isURL(source)) {
+        if (LinksHelpers.isUuid(source))
+            return LinksHelpers.openSourceByUuid(source);
+        if (LinksHelpers.isURL(source))
             return LinksHelpers.openSourceURL(source);
-        }
     }
 }

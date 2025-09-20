@@ -1,0 +1,23 @@
+<div class="item-form">
+    <div class="header">
+        {{localize "SR5.ActionCategory.Matrix"}}
+    </div>
+    <div class="form-line">
+        <div class="label">{{localize "SR5.Owner"}}</div>
+        <div class="inputs">
+            <input type="checkbox"
+                   name="system.action.category.matrix.owner"
+                    {{checked system.action.category.matrix.owner}} />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">{{localize "SR5.Marks"}}</div>
+        <div class="inputs">
+            <input type="number"
+                   name="system.action.category.matrix.marks"
+                   value="{{system.action.category.matrix.marks}}"
+                   min="0" max="3"
+                   {{#if system.action.category.matrix.owner}}disabled{{/if}}/>
+        </div>
+    </div>
+</div>

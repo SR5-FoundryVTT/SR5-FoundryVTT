@@ -1,8 +1,7 @@
 import {DataDefaults} from "../data/DataDefaults";
 import {Helpers} from "../helpers";
 import {PartsList} from "../parts/PartsList";
-import { DamageType } from "../types/item/Action";
-type DamageTypeType = Item.SystemOfType<'action'>['action']['damage']['type']['base'];
+import { DamageType, DamageTypeType } from "../types/item/Action";
 
 export const FadeRules = {
 

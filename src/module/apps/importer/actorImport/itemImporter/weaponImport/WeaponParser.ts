@@ -1,7 +1,7 @@
 import { parseDescription, getArray, getValues, parseTechnology, createItemData, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
 import * as IconAssign from '../../../../iconAssigner/iconAssign';
+import { DamageTypeType } from "src/module/types/item/Action";
 import { DataDefaults } from "src/module/data/DataDefaults";
-import { DamageType } from "src/module/types/item/Action";
 import { SR5Item } from "src/module/item/SR5Item";
 import { ActorSchema } from "../../ActorSchema";
 import { Unwrap } from "../ItemsParser";
@@ -10,7 +10,7 @@ export class WeaponParser {
     private parseDamage(val: string) {
         const damage = {
             damage: 0,
-            type: '' as DamageType['type']['base'],
+            type: '' as DamageTypeType,
             radius: 0,
             dropoff: 0,
         };
@@ -300,7 +300,7 @@ export class WeaponParser {
             const chummerAccessories = getArray(chummerWeapon.accessories?.accessory);
 
             const accessories: any[] = []
-            chummerAccessories.forEach((item) => {
+            for (const item of chummerAccessories) {
                 const system = DataDefaults.baseSystemData('modification', {
                     //TODO: check this
                     mount_point: item.mount.toLowerCase() as any,
@@ -314,9 +314,9 @@ export class WeaponParser {
                     }
                 });
                 const current = createItemData(item.name, 'modification', system);
-                current._id = randomID(16)
+                current._id = foundry.utils.randomID(16);
                 accessories.push(current);
-            });
+            }
 
             if(!itemData.flags?.shadowrun5e?.embeddedItems) {
                 itemData.flags = {

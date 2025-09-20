@@ -1,4 +1,3 @@
-
 declare namespace Shadowrun {
     export interface SocketMessageData {
         type: string,
@@ -6,18 +5,17 @@ declare namespace Shadowrun {
         userId?: string
     }
 
-    export interface SocketAddNetworkControllerMessageData extends SocketMessageData {
+    export interface SocketAddMasterMessageData extends SocketMessageData {
         data: {
-            controllerLink: `Actor.${string}` | `Item.${string}` | `Token.${string}`,
-            networkDeviceLink: `Actor.${string}` | `Item.${string}` | `Token.${string}`
+            masterLink: string,
+            slaveLink: string
         }
     }
 
-    export interface SocketRemoveControllerFromDeviceSocketMessageData extends SocketMessageData {
+    export interface SocketRemoveMasterSocketMessageData extends SocketMessageData {
         data: {
-            networkDeviceLink: string
+            slaveLink: string
         }
     }
-
-    export type SocketMessageHooks = Record<string, Function[]>
+    export type SocketMessageHooks = Record<string, ((message: any) => any)[]>
 }

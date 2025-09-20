@@ -5,13 +5,14 @@ declare namespace Shadowrun {
     export type MentalAttribute = 'logic' | 'intuition' | 'charisma' | 'willpower';
     export type SpecialAttribute = 'edge' | 'essence' | 'magic' | 'resonance';
     export type MatrixAttribute = 'attack' | 'sleaze' | 'data_processing' | 'firewall';
+    export type TechnicalAttribute = 'rating';
 
     export type SpaceTypes = 'meatspace' | 'astral' | 'matrix';
 
     /**
      * Any valid attribute that an actor can have.
      */
-    export type ActorAttribute = PhysicalAttribute | MentalAttribute | SpecialAttribute | MatrixAttribute | '';
+    export type ActorAttribute = PhysicalAttribute | MentalAttribute | SpecialAttribute | MatrixAttribute | TechnicalAttribute | '';
 
     /**
      * A list of mods to apply to a value.
@@ -50,6 +51,7 @@ declare namespace Shadowrun {
         | 'drain'
         | 'natural_recovery_stun'
         | 'natural_recovery_physical'
+        | 'resist_matrix'
         | 'armor'
         | 'fade'
         | 'composure'
@@ -59,7 +61,8 @@ declare namespace Shadowrun {
         | 'physical_defense'
         | 'drone_pilot_vehicle'
         | 'drone_perception'
-        | 'drone_infiltration';
+        | 'drone_infiltration'
+        | string; // Allow document names to be given...
 
     /**
      * What kind of action is being performed.
@@ -73,6 +76,7 @@ declare namespace Shadowrun {
         'addiction_mental' | // resisting against mental addiction
         'addiction_physical' | // resisting against physical addiction
         'addiction' | // resisting against addiction in general
+        'attack_matrix' | // matrix attacks, like data spike or IC attacks
         'attack_melee' | // attacks made with melee weapons
         'attack_ranged' | // attacks made with ranged weapons
         'attack_thrown' | // attacks made with thrown weapons
@@ -81,8 +85,9 @@ declare namespace Shadowrun {
         'climbing' | // using climbing skills
         'compiling' | // technomancer compiling sprites action
         'complex_form' | // technomancer threading complex form action
-        'defense_suppression' | // defending against suppression attacks
         'defense' | // defending in general, includes all other defense types
+        'defense_matrix' | // defending against matrix attacks
+        'defense_suppression' | // defending against suppression attacks
         'drain' | // resisting against drain
         'fade' | // resisting against fade
         'hack_on_the_fly' | // matrix hack on the fly action
@@ -92,8 +97,10 @@ declare namespace Shadowrun {
         'recovery_stun' | // natural recovery of stun damage
         'recovery' | // natural recovery in general, includes all other recovery types
         'resist' | // resisting damage after getting hit
+        'resist_biofeedback' | // resisting against biofeedback damage
         'resist_disease' | // resisting against diseases
         'resist_toxin' | // resisting against toxins
+        'resist_matrix' | // resisting against matrix damage
         'resonance' | // all resonance actions in general
         'rigging' | // all rigging actions in general
         'social' | // all social skill actions

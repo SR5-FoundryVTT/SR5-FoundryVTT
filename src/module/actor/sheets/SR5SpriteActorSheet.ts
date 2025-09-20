@@ -1,8 +1,8 @@
-import { SR5Actor } from "../SR5Actor";
-import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
+import { SR5Actor } from '../SR5Actor';
+import { SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 
 
-export class SR5SpriteActorSheet extends SR5BaseActorSheet {
+export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
     /**
      * Sprite actors will handle these item types specifically.
      *
@@ -19,7 +19,7 @@ export class SR5SpriteActorSheet extends SR5BaseActorSheet {
         ];
     }
 
-    override activateListeners(html: any): void {
+    override activateListeners(html) {
         super.activateListeners(html);
 
         html.find('.technomancer-remove').on('click', this._onRemoveTechnomancer.bind(this));

@@ -9,12 +9,18 @@ import SchemaField = foundry.data.fields.SchemaField;
  * A ModifiableSchemaField is a SchemaField that represents a ModifiableValue type, which 
  * holds further system functionality.
  * 
- * A ModifiableValue holds att least these properties:
- * - base
- * - value
- * - mod
- * - override
- * - temp
+ * Foundry will hand over authority over applying value changes to SchemaFields, when the document
+ * is using a DataModel schema.
+ * 
+ * ModifiableField alteres default Foundry mode behavior to allow the system to show the whole 
+ * value resolution instead of just altering the total modified value.
+ */
+/**
+ * A ModifiableField extends functionality for the ModifiableValue type for ActiveEffect change application
+ * by allowing for more granular control over how changes are applied and displayed.
+ * 
+ * This is directly related to SR5ActiveEffect and its legacy application, both sharing the same application
+ * logic.
  */
 export class ModifiableField<
     Fields extends ReturnType<typeof ModifiableValue>,
@@ -26,38 +32,30 @@ export class ModifiableField<
         SimpleMerge<Options, SchemaField.DefaultOptions>
     >
 > extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
-    /**
-     * When applying a effect change, inject custom application logic for ModifiableValues.
-     *
-     * Modify will inject into custom data, when system ModifiableValue-fields are found, which will later be used for
-     * value transparancy and calcution. .
-     * 
-     * @param value 
-     * @param delta 
-     * @param model 
-     * @param change 
-     * @returns 
-     */
     override _applyChangeCustom(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
         if (SR5ActiveEffect.applyModifyToModifiableValue(change.effect, model, change, value, delta)) return undefined;
         return super._applyChangeCustom(value, delta, model, change);
     }
 
-    /**
-     * When applying a effect change, inject custom application logic for ModifiableValues.
-     * 
-     * Override will create custom data, when system ModifiableValue-fields are found, which will late be used for
-     * value transparancy and calculation.
-     * 
-     * @param value 
-     * @param delta 
-     * @param model 
-     * @param change 
-     * @returns 
-     */
     protected override _applyChangeOverride(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        // Return value unchanged, as effects don´t alter the output value here but add to it.
-        if (SR5ActiveEffect.applyOverrideToModifiableValue(change.effect, model, change, value, delta)) return value;
+        if (SR5ActiveEffect.applyOverrideToModifiableValue(change.effect, model, change, value, delta)) return undefined;
         return super._applyChangeOverride(value, delta, model, change);
+    }
+
+    protected override _applyChangeUpgrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        if (SR5ActiveEffect.applyUpgradeToModifiableValue(change.effect, model, change, value, delta)) return undefined;
+        return super._applyChangeUpgrade(value, delta, model, change);
+    }
+
+    protected override _applyChangeDowngrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        if (SR5ActiveEffect.applyDowngradeToModifiableValue(change.effect, model, change, value, delta)) return undefined;
+        return super._applyChangeDowngrade(value, delta, model, change);
+    }
+
+    /**
+     * Avoid breaking sheet rendering by assuring Foundry never applies any naive multiplication of an 'object'
+     */
+    protected override _applyChangeMultiply(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        return undefined;
     }
 }

@@ -4,6 +4,8 @@ import { InventorySheetDataByType } from '../actor/sheets/SR5BaseActorSheet';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { formatStrict } from '../utils/strings';
 import { SR5Item } from '../item/SR5Item';
+import { SR5Actor } from "../actor/SR5Actor";
+import { MatrixNetworkFlow } from "../item/flows/MatrixNetworkFlow";
 
 /**
  * Typing around the legacy item list helper.
@@ -421,6 +423,19 @@ export const registerItemLineHelpers = () => {
             },
         };
 
+        const cmField = {
+                text: {
+                    text: item.isBroken ? game.i18n.localize('SR5.Broken') : `[${item.getConditionMonitor().value}/${item.getConditionMonitor().max}]`,
+                    cssClass: item.isBroken ? 'is-broken' :  item.isDamaged ? 'is-damaged' : '',
+            }
+        }
+
+        const technologyItems: ItemListRightSide[] = [];
+
+        if (item.getConditionMonitor().max > 0 && item.getConditionMonitor().value > 0) {
+            technologyItems.push(cmField);
+        }
+
         switch (item.type) {
             case 'action': {
                 const system = item.system as Item.SystemOfType<'action'>;
@@ -481,7 +496,6 @@ export const registerItemLineHelpers = () => {
             case 'armor':
             case 'ammo':
                 return [qtyInput];
-            //@ts-expect-error
             case 'modification':
                 if (item.isType('modification') && item.system.type === 'vehicle') {
                     return [
@@ -510,11 +524,12 @@ export const registerItemLineHelpers = () => {
                         qtyInput,
                     ];
                 }
+                break;
             case 'device':
             case 'equipment':
             case 'cyberware':
             case 'bioware':
-                return [qtyInput];
+                return [...technologyItems, qtyInput];
             case 'weapon': {
                 const system = item.system as Item.SystemOfType<'weapon'>;
                 // Both Ranged and Melee Weapons can have ammo.
@@ -523,7 +538,7 @@ export const registerItemLineHelpers = () => {
                     const max = system.ammo?.current.max ?? 0;
                     const partialReloadRounds = system.ammo?.partial_reload_value ?? -1;
 
-                    const reloadLinks: ItemListRightSide[] = [];
+                    const reloadLinks: ItemListRightSide[] = technologyItems.slice();
 
                     // Show reload on both no ammo configured and partially consumed clips.
                     const textReload = count < max ?
@@ -570,7 +585,7 @@ export const registerItemLineHelpers = () => {
                     
                     return reloadLinks;
                 } else {
-                    return [qtyInput];
+                    return [...technologyItems, qtyInput];
                 }
             }
             case 'quality':
@@ -677,7 +692,6 @@ export const registerItemLineHelpers = () => {
             /**
              * Call In Actions differ depending on called in actor type.
              */
-            //@ts-expect-error
             case 'call_in_action':
                 if (item.system.actor_type === 'spirit') {
                     const summoningData = item.system as Item.SystemOfType<'call_in_action'>;
@@ -714,11 +728,9 @@ export const registerItemLineHelpers = () => {
                         }
                     ]
                 }
-
-            default:
-                return [];
-        }
-    });
+            }
+            return [];
+        });
 
     Handlebars.registerHelper('ItemIcons', function (itemStored: Item.Stored) {
         const item = new SR5Item(itemStored as SR5Item);
@@ -794,6 +806,23 @@ export const registerItemLineHelpers = () => {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
         };
+        const brokenIcon = {
+            icon: 'fa-regular fa-link-slash',
+            title: game.i18n.localize('SR5.Broken')
+        }
+        const wirelessIcon = {
+            icon: `${item.isWireless() ?
+                        item.isRunningSilent()
+                            ? 'fa-duotone fa-wifi-fair'
+                            : 'fas fa-wifi'
+                        : 'fa-duotone fa-wifi-slash'
+                    } item-wireless-toggle`,
+            title: game.i18n.localize(item.isWireless()
+                                        ? item.isRunningSilent()
+                                            ? 'SR5.RunningSilent'
+                                            : 'SR5.WirelessOnline'
+                                        : 'SR5.WirelessOffline')
+        }
         const removeIcon = {
             icon: 'fas fa-trash item-delete',
             title: game.i18n.localize('SR5.DeleteItem'),
@@ -809,8 +838,16 @@ export const registerItemLineHelpers = () => {
 
         const icons = [pdfIcon, moveIcon, editIcon, removeIcon];
 
-        if (item.isType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon'))
-            icons.unshift(equipIcon);
+        if (item.isType('program', 'armor', 'device', 'equipment', 'cyberware', 'bioware', 'weapon')) {
+            if (!item.isBroken) {
+                if (item.canBeWireless())
+                    icons.unshift(wirelessIcon)
+
+                icons.unshift(equipIcon);
+            } else {
+                icons.unshift(brokenIcon);
+            }
+        }
 
         return icons;
     });
@@ -898,16 +935,19 @@ export const registerItemLineHelpers = () => {
         return [incrementIcon, decrementIcon];
     });
 
+    /**
+     * Only used for the Matrix HackingTab Mark List
+     */
     Handlebars.registerHelper('MarkListHeaderRightSide', () => {
         return [
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Scene'),
+                    text: game.i18n.localize('SR5.Labels.Sheet.Type'),
                 },
             },
             {
                 text: {
-                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                    text: game.i18n.localize('SR5.Labels.ActorSheet.Network'),
                 },
             },
             {
@@ -915,6 +955,24 @@ export const registerItemLineHelpers = () => {
                     text: game.i18n.localize('SR5.Qty'),
                 },
             }]
+    });
+
+    /**
+     * Only used for the Matrix HackingTab Target List
+     */
+    Handlebars.registerHelper('TargetListHeaderRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Labels.Sheet.Type'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Labels.ActorSheet.Network'),
+                },
+            }
+        ]
     });
 
     Handlebars.registerHelper('MarkListHeaderIcons', () => {
@@ -926,7 +984,16 @@ export const registerItemLineHelpers = () => {
         }];
     });
 
-    Handlebars.registerHelper('NetworkDevicesListRightSide', () => {
+    Handlebars.registerHelper('TargetListHeaderIcons', () => {
+        return [{
+            icon: 'fas fa-refresh',
+            title: game.i18n.localize('SR5.Refresh'),
+            text: game.i18n.localize('SR5.Refresh'),
+            cssClass: 'targets-refresh'
+        }];
+    });
+
+    Handlebars.registerHelper('SlavesListRightSide', () => {
         return [
             {
                 text: {
@@ -940,7 +1007,7 @@ export const registerItemLineHelpers = () => {
             }]
     })
 
-    Handlebars.registerHelper('NetworkDevicesListHeaderIcons', () => {
+    Handlebars.registerHelper('SlavesListHeaderIcons', () => {
         return [{
             icon: 'fas fa-trash',
             title: game.i18n.localize('SR5.Labels.Sheet.ClearNetwork'),
@@ -954,6 +1021,183 @@ export const registerItemLineHelpers = () => {
     })
 
     /**
+     * Only used for the Item NetworksTab
+     */
+    Handlebars.registerHelper('NetworksHeaderRightSide', () => {
+        return [{
+            text: {
+                text: game.i18n.localize('SR5.Labels.Sheet.Type'),
+            },
+        }]
+    });
+    /**
+     * Only used for the Item NetworksTab
+     */
+    Handlebars.registerHelper('NetworksItemRightSide', (item: SR5Item) => {
+        const type = MatrixNetworkFlow.getDocumentType(item);
+        return [{
+            text: {
+                text: game.i18n.localize(type),
+            },
+        }]
+    });
+    /**
+     * Only used for the Item NetworksTab
+     */
+    Handlebars.registerHelper('NetworksItemIcons', () => {
+        return [{
+            icon: 'fas fa-trash item-delete',
+            cssClass: 'sin-remove-network',
+            title: game.i18n.localize('SR5.DeleteItem'),
+        }]
+    });
+
+    /**
+     * Application - Matrix Network Hacking
+     */
+    Handlebars.registerHelper('MatrixNetworksItemIcons', () => {
+        return [{
+            icon: 'fas fa-door-open',
+            cssClass: 'matrix-network-invite',
+            title: game.i18n.localize('SR5.MatrixNetworkHackingApplication.Invite'),
+        },
+        {
+            icon: 'fas fa-explosion',
+            cssClass: 'matrix-network-bruteforce',
+            title: game.i18n.localize('SR5.Labels.Actions.BruteForce'),
+        },
+        {
+            icon: 'fas fa-microchip',
+            cssClass: 'matrix-network-hackonthefly',
+            title: game.i18n.localize('SR5.Labels.Actions.HackontheFly'),
+        }]
+    });
+
+    /**
+     * Section - Character Matrix Actions.
+     */
+    Handlebars.registerHelper('MatrixActionsHeaderRightSide', () => {
+        return [
+            {
+                text: {
+                    cssClass: 'six',
+                    text: game.i18n.localize('SR5.Marks'),
+                },
+            },
+        ];
+    });
+    /**
+     * Section - Character Matrix Actions.
+     * @param action The matrix action used to render a single item line.
+     */
+    Handlebars.registerHelper('MatrixActionsItemRightSide', (action: SR5Item) => {
+        if (!action.system.action?.category.matrix) return [];
+
+        // Either show owner only, a mark quantity or nothing, if 0 marks are needed.
+        let needed: string|number = action.system.action?.category.matrix.marks ?? 0;
+        needed = needed > 0 ? needed : '';
+        const owner = action.system.action?.category.matrix.owner ? game.i18n.localize('SR5.Owner') : '';
+
+        return [
+            {
+                text: {
+                    text: owner || needed
+                },
+            }
+        ];
+    });
+
+    /**
+     * Return list of css classes to be used in the list of matrix targets.
+     * @param target The matrix target to render.
+     */
+    Handlebars.registerHelper('MatrixTargetCssClass', (target: Shadowrun.MatrixTargetDocument) => {
+        const classes: string[] = [];
+        if (target.selected) classes.push('selected-list-item');
+        return classes;
+    });
+    Handlebars.registerHelper('MatrixTargetItemIcons', (target: Shadowrun.MatrixTargetDocument) => {
+        const toggleConnectedItemsIcon = target.icons.length > 0 ?
+            {
+                icon: 'fas fa-square-chevron-down',
+                cssClass: 'toggle-connected-matrix-icons'
+            }:
+            {
+                icon: 'fas fa-square-chevron-up',
+                cssClass: 'toggle-connected-matrix-icons'
+            };
+
+        const icons: any = [];
+        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices) icons.push(toggleConnectedItemsIcon);
+
+        // if there are no icons, add an empty object to the list so that the columns match up correctly
+        if (icons.length === 0) icons.push({});
+        return icons;
+    });
+    Handlebars.registerHelper('MatrixTargetItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {
+        return [
+            {text: {
+                    text: game.i18n.localize(target.type)
+            }},
+            {text: {
+                    text: target.network
+            }},
+        ];
+    });
+    Handlebars.registerHelper('MatrixMarkedDocumentItemIcons', (target: Shadowrun.MarkedDocument) => {
+        const toggleConnectedItemsIcon = target.icons.length > 0 ?
+            {
+                icon: 'fas fa-square-chevron-down',
+                cssClass: 'toggle-connected-matrix-icons'
+            }:
+            {
+                icon: 'fas fa-square-chevron-up',
+                cssClass: 'toggle-connected-matrix-icons'
+            };
+        const connectNetworkIcon = 
+            {
+                icon: 'fas fa-right-to-bracket',
+                cssClass: 'marks-connect-network'
+            };
+
+        const icons = [
+            {
+                icon: 'fas fa-plus',
+                cssClass: 'marks-add-one'
+            },
+            {
+                icon: 'fas fa-minus', 
+                cssClass: 'marks-remove-one'
+            },
+            {
+                icon: 'fas fa-trash', 
+                cssClass: 'marks-delete'
+            }
+        ];
+
+        // Handle document type specific icons.
+        if (target.document instanceof SR5Item && target.document.isNetwork()) icons.unshift(connectNetworkIcon);
+        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices) icons.push(toggleConnectedItemsIcon)
+
+        return icons;
+    });
+    Handlebars.registerHelper('MatrixMarkedDocumentItemRightSide', (target: Shadowrun.MarkedDocument) => {
+        return [
+            {text: {
+                    text: game.i18n.localize(target.type)
+            }},
+            {text: {
+                    text: target.network
+            }},
+            {input: {
+                type: 'number',
+                value: target.marks,
+                cssClass: 'marks-qty',
+            }}
+        ];
+    });
+
+    /**
      * Sprite Power Tabs on the sprite actor need a way to differentiate between different sections based on the
      * sprite power values.
      * 
@@ -961,5 +1205,48 @@ export const registerItemLineHelpers = () => {
      */
     Handlebars.registerHelper('SpritePowerItemData', (optional: string) => {
         return {optional};
+    });
+
+    /**
+     * Return list of css classes to be used in the list of matrix targets.
+     * @param target The matrix target to render.
+     */
+    Handlebars.registerHelper('MatrixOwnedItemIcons', (target: Shadowrun.MatrixTargetDocument) => {
+        const toggleConnectedItemsIcon = target.icons.length > 0 ?
+            {
+                icon: 'fas fa-square-chevron-down',
+                cssClass: 'toggle-connected-matrix-icons'
+            }:
+            {
+                icon: 'fas fa-square-chevron-up',
+                cssClass: 'toggle-connected-matrix-icons'
+            };
+
+        const wirelessIcon = {
+            cssClass: 'toggle-owned-icon-silent',
+            icon: `${target.document.isRunningSilent()
+                    ? 'fa-duotone fa-wifi-fair'
+                    : 'fas fa-wifi'
+            }`,
+            title: game.i18n.localize(
+                target.document.isRunningSilent()
+                    ? 'SR5.RunningSilent'
+                    : 'SR5.WirelessOnline')
+        }
+        if (target.document instanceof SR5Actor) {
+            return target.document.hasWirelessDevices ? [wirelessIcon, toggleConnectedItemsIcon] : [wirelessIcon];
+        }
+        return [wirelessIcon];
+    });
+
+    Handlebars.registerHelper('MatrixOwnedItemRightSide', (target: Shadowrun.MatrixTargetDocument) => {
+        return [
+            {text: {
+                    text: game.i18n.localize(target.type)
+                }},
+            {text: {
+                    text: target.network
+                }},
+        ];
     });
 };

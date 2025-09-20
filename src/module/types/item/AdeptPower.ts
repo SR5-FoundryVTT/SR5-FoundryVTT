@@ -1,13 +1,12 @@
-import { ArmorValueData } from "./Armor";
-import { ActionRollData } from "./Action";
+import { ArmorPartData } from "./Armor";
+import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const AdeptPowerData = () => ({
     ...BaseItemData(),
-
-    action: new SchemaField(ActionRollData()),
-    armor: new SchemaField(ArmorValueData()),
+    ...ActionPartData(),
+    ...ArmorPartData(),
 
     pp: new NumberField({ required: true, nullable: false, initial: 0, min: 0 }),
     type: new StringField({ required: true, initial: 'passive', choices: ['active', 'passive'] }),

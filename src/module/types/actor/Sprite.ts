@@ -1,5 +1,5 @@
 import { MatrixData } from "../template/Matrix";
-import { Attributes } from "../template/Attributes";
+import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
 import { Limits, MatrixLimits } from "../template/Limits";
@@ -9,7 +9,7 @@ const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fie
 const SpriteData = () => ({
     // === Core Identity ===
     ...CommonData(),
-    attributes: new SchemaField(Attributes()),
+    attributes: new SchemaField({...Attributes(), ...MatrixActorAttributes() }),
     spriteType: new StringField({ required: true }),
     special: new StringField({ required: true, initial: "resonance", readonly: true }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
@@ -46,7 +46,7 @@ const SpriteData = () => ({
         "armor", "multi_defense", "reach", "defense", "defense_dodge", "defense_parry",
         "defense_block", "defense_melee", "defense_ranged", "soak", "recoil",
         // Magic/Matrix
-        "drain", "fade", "essence",
+        "drain", "fade", "essence", 'public_grid', 'mark_damage',
         // Miscellaneous
         "composure", "lift_carry", "judge_intentions", "memory", "global"
     )),

@@ -1,9 +1,9 @@
 import { SR5Actor } from "../actor/SR5Actor";
 
 export interface DefeatedStatus {
-    unconscious: Boolean,
-    dying: Boolean,
-    dead: Boolean,
+    unconscious: boolean,
+    dying: boolean,
+    dead: boolean,
 }
 
 export const ConditionRules = {

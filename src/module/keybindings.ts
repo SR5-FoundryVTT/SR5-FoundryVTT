@@ -14,6 +14,13 @@ export const registerSystemKeybindings = () => {
         onDown: () => { SituationModifiersApplication.openForKeybinding(); },
     });
 
+    game.keybindings.register("shadowrun5e", "success-test-prompt", {
+        name: "SR5.Keybinding.SuccessTestPrompt.Label",
+        hint: "SR5.Keybinding.SuccessTestPrompt.Hint",
+        editable: [{ key: "KeyZ", modifiers: [] }],
+        onDown: () => { game.shadowrun5e.test.promptSuccessTest(); }
+    });
+
     game.keybindings.register("shadowrun5e", "show-overwatch-tracker-app", {
         name: "SR5.Keybinding.OverwatchScoreTracker.Label",
         hint: "SR5.Keybinding.OverwatchScoreTracker.Hint",

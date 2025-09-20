@@ -237,7 +237,7 @@ export class Import extends Application {
                 if (!response.ok)
                     throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
 
-                return await response.text();
+                return response.text();
             } catch (err) {
                 if (i === attempts - 1) throw err;
                 console.warn(`Retrying fetch from git after failure... (${i + 1}/${attempts})`, err);

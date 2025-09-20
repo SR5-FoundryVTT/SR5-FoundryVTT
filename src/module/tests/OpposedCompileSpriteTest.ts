@@ -86,7 +86,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      */
     override async processSuccess() {
         await this.updateCompilationTestForFollowup();
-        await this.cleanupAfterExecutionCancel();
+        await this._cleanUpAfterDialogCancel();
     }
 
     override get successLabel(): Translation {
@@ -102,7 +102,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      * 
      * When user cancels the dialog, the sprite has been created. Remove it.
      */
-    override async cleanupAfterExecutionCancel() {
+    override async _cleanUpAfterDialogCancel() {
         if (!this.data.compiledSpriteUuid) return;
         const actor = await fromUuid(this.data.compiledSpriteUuid as any) as SR5Actor;
         await actor?.delete();
@@ -200,6 +200,6 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      * @returns 
      */
     async getPreparedSpriteActor(): Promise<SR5Actor | null> {
-        return await fromUuid(this.data.compiledSpriteUuid as string) as SR5Actor;
+        return fromUuid(this.data.compiledSpriteUuid as string) as Promise<SR5Actor>;
     }
 }

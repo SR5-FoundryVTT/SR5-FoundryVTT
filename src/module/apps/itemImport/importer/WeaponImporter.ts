@@ -25,7 +25,7 @@ export class WeaponImporter extends DataImporter {
                                  : category === 'melee' ? meleeParser
                                                         : thrownParser;
 
-            return await selectedParser.Parse(jsonData, compendiumKey) as Item.CreateData;
+            return selectedParser.Parse(jsonData, compendiumKey) as Promise<Item.CreateData>;
         }
     };
 

@@ -7,7 +7,7 @@ import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
 
 
-interface SituationalModifiersTemplateData extends foundry.appv1.api.FormApplication.FormApplicationData<FormApplication.Options, {}> {
+interface SituationalModifiersTemplateData extends foundry.appv1.api.FormApplication.FormApplicationData<FormApplication.Options, Record<string, unknown>> {
     targetType: string
     targetName: string
     modifiers: DocumentSituationModifiers
@@ -422,7 +422,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
             name: 'situational-modifiers-application',
             title: 'CONTROLS.SR5.SituationalModifiers',
             icon: 'fas fa-list',
-            onClick: SituationModifiersApplication.openForCurrentScene,
+            onClick: SituationModifiersApplication.openForCurrentScene.bind(SituationModifiersApplication),
             button: true
         }
     }

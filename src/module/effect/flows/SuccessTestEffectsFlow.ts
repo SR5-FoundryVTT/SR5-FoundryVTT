@@ -1,8 +1,6 @@
 import { SR5ActiveEffect } from "../SR5ActiveEffect";
 import { SuccessTest } from "../../tests/SuccessTest";
 import { SR5Actor } from "../../actor/SR5Actor";
-import { OpposedTest } from "../../tests/OpposedTest";
-import { SR5Item } from "../../item/SR5Item";
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
 import { SocketMessage } from "../../sockets";
 import { FLAGS } from "../../constants";
@@ -238,7 +236,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         const actor = await fromUuid(message.data.actorUuid) as SR5Actor;
 
-        return await SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, message.data.effectsData);
+        return SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, message.data.effectsData);
     }
 
     /**

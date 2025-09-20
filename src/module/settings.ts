@@ -1,6 +1,7 @@
 // game settings for shadowrun 5e
 
 import { FLAGS, SYSTEM_NAME } from './constants';
+import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
 export const registerSystemSettings = () => {
     /**
@@ -293,5 +294,50 @@ export const registerSystemSettings = () => {
         scope: 'world',
         config: true,
         type: new foundry.data.fields.AlphaField({ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 } as const),
+    });
+
+    /**
+     * Select compendia to use for system porpuses like different action packs
+     */
+    game.settings.registerMenu(SYSTEM_NAME, FLAGS.CompendiaSettingsMenu, {
+        name: 'SR5.CompendiaSettings.Title',
+        hint: 'SR5.CompendiaSettings.Description',
+        label: 'SR5.CompendiaSettings.Label',
+        icon: 'fas fa-book',
+        type: SR5CompendiaSettings,
+        restricted: true, // Don't show to non GMs
+    });
+
+    /**
+     * Override the default general actions pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.GeneralActionsPack, {
+        name: 'SR5.CompendiaSettings.GeneralActionsPack.label',
+        hint: 'SR5.CompendiaSettings.GeneralActionsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String,
+    });
+
+    /**
+     * Override the default matrix actions pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.MatrixActionsPack, {
+        name: 'SR5.CompendiaSettings.MatrixActionsPack.label',
+        hint: 'SR5.CompendiaSettings.MatrixActionsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
+    });
+
+    /**
+     * Override the default IC actions pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.ICActionsPack, {
+        name: 'SR5.CompendiaSettings.ICActionsPack.label',
+        hint: 'SR5.CompendiaSettings.ICActionsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
     });
 };

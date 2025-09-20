@@ -1,10 +1,10 @@
-import { ActionRollData } from "./Action";
+import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpellData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData({followedTest: 'DrainTest'})),
+    ...ActionPartData({followedTest: 'DrainTest'}),
 
     type: new StringField({
         blank: true,

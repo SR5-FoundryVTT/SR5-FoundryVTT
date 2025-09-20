@@ -1,10 +1,9 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { ActionRollData } from "./Action";
-const { SchemaField } = foundry.data.fields;
+import { ActionPartData } from "./Action";
 
 const MetamagicData = () => ({
     ...BaseItemData(),
-    action: new SchemaField(ActionRollData()),
+    ...ActionPartData(),
 });
 
 export class Metamagic extends ItemBase<ReturnType<typeof MetamagicData>> {
