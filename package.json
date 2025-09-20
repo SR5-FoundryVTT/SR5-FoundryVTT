@@ -43,7 +43,6 @@
         "lint:fix": "npx eslint . --fix",
         "lint:errors": "npx eslint . --quiet",
         "lint:errors:fix": "npx eslint . --quiet --fix",
-        "prettier": "prettier --write .",
         "prepare": "husky",
         "lint-staged": "lint-staged"
     },
