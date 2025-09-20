@@ -16,36 +16,42 @@ export type PackSelectionConfig = {
 
 export const CompendiaSettingFlow = {
     /**
-     * Generate the required object for choosing a Compendium pack for actions/items
+     * Generate the required object for choosing a Compendium pack for actions/items.
+     * This version robustly finds all available packs for choices, but keeps the
+     * original logic for determining the value.
      * @param id - the FLAG to use to get the pack data, this should also be defined in SR5.packNames
      */
     getPackSettingConfiguration(id: PackType): PackSelectionConfig {
         // get the active pack name
         const packName = game.settings.get(SYSTEM_NAME, id) || SR5.packNames[id];
+
+        // Find all other compatible item packs
         const itemPacks = game.packs.filter(p => p.metadata.type === 'Item' && p.metadata.packageType !== 'system' && p.metadata.system === SYSTEM_NAME);
-        // get the default pack the system ships with
+
+        // Find the system's default pack
         const defaultPack = game.packs.find(p => p.metadata.name === SR5.packNames[id]);
-        // if we can't find the default pack, error and send a basic data without any choices
-        if (!defaultPack) {
-            console.error(`SR5CompendiaSettings: Could not find default compendium pack ${id}. Please reinstall the system.`);
-            return {
-                id,
-                field: {
-                    label: `SR5.CompendiaSettings.${id}.label`,
-                    hint: `SR5.CompendiaSettings.${id}.hint`,
-                },
-                value: '',
-                choices: {},
-            };
+
+        // Create an object for name/label pairs, starting empty.
+        const packChoices = {};
+
+        // If the default pack exists, add it to our choices.
+        if (defaultPack) {
+            packChoices[defaultPack.metadata.name] = defaultPack.metadata.label;
+        } else {
+            // If it doesn't exist, simply log a warning instead of stopping execution.
+            console.warn(`The default compendium pack '${SR5.packNames[id]}' was not found looking for other packs.`);
         }
-        // create an object for name/label pairs, starting with the default pack name
-        const packChoices = {
-            [defaultPack.metadata.name]: defaultPack.metadata.label,
-        }
-        // add all the item packs to the options
+
+        // Add all the other item packs to the options.
         for (const pack of itemPacks) {
             packChoices[pack.metadata.name] = pack.metadata.label;
         }
+
+        // If, after all checks, no packs were found, add a final warning.
+        if (Object.keys(packChoices).length === 0) {
+            console.warn(`Could not find any compatible compendium packs for '${id}'. The setting will be empty. Please reinstall the System.`);
+        }
+        
         return {
             id,
             field: {
