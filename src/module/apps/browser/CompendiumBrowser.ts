@@ -45,11 +45,9 @@ export class CompendiumBrowser extends Base {
             resizable: true,
         },
         actions: {
-            clearSearch: async (...args: Parameters<CompendiumBrowser["_onClearSearch"]>) =>
-                this.prototype._onClearSearch.apply(this, args),
-            openDoc: async (...args: Parameters<CompendiumBrowser["_openDoc"]>) => this.prototype._openDoc.apply(this, args),
-            openSource: async (...args: Parameters<CompendiumBrowser["_openSource"]>) =>
-                this.prototype._openSource.apply(this, args),
+            clearSearch: function (this: CompendiumBrowser) { this._onClearSearch(); },
+            openDoc: CompendiumBrowser._openDoc.bind(this),
+            openSource: CompendiumBrowser._openSource.bind(this),
             toggleCollapse: CompendiumBrowser.onToggleCollapse.bind(this),
         },
     };
@@ -379,7 +377,7 @@ export class CompendiumBrowser extends Base {
     /**
      * Handles a click on a result row to open the corresponding document sheet.
      */
-    private async _openDoc(event: MouseEvent, target: HTMLElement) {
+    private static async _openDoc(event: MouseEvent, target: HTMLElement) {
         const el = target.closest<HTMLElement>("[data-uuid]");
         const uuid = el?.dataset.uuid;
         if (!uuid) return;
@@ -391,7 +389,7 @@ export class CompendiumBrowser extends Base {
     /**
      * Handles a click on the source element within a result row to open the sourcebook reference.
      */
-    private async _openSource(event: MouseEvent, target: HTMLElement) {
+    private static async _openSource(event: MouseEvent, target: HTMLElement) {
         const el = target.closest<HTMLElement>("[data-action='openSource']");
         const source = el?.textContent?.trim();
         if (!source) return;

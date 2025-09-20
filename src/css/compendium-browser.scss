@@ -307,7 +307,6 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
         .compendium-settings {
             display: grid;
             gap: 25px;
-            padding: 10px;
             overflow-y: hidden;
 
             /* Hide the settings panel by default unless managed by a listener */

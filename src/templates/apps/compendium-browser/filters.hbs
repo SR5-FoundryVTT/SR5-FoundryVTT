@@ -7,11 +7,9 @@
             id="compendium-browser-search"
             value="{{searchQuery}}" 
             placeholder="Search {{activeTab}}...">
-        {{#if searchQuery}}
         <a class="clear-filter" data-action="clearSearch" title="Clear Search">
             <i class="fa-solid fa-xmark"></i>
         </a>
-        {{/if}}
     </div>
     <div class="types">
         {{#each types as |type|}}
