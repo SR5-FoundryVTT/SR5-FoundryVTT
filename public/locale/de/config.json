@@ -55,7 +55,8 @@
         "TokenRulerColorWalking": "Token-Bewegung: Farbe für Gehrate",
         "TokenRulerColorWalkingDescription": "Die Farbe für Distanzen innerhalb der Gehrate.",
         "TokenRulerOpacity": "Token-Bewegung: Deckkraft",
-        "TokenRulerOpacityDescription": "Wie transparent die How opaque the token ruler measurements are displayed. (0 = fully transparent, 1 = fully opaque)",
+        "TokenRulerOpacityDescription": "Wie transparent die Token-Messungen angezeigt werden. (0 = vollständig transparent, 1 = vollständig undurchsichtig)",
+        "TokenUseRoutingLib": "Verwende RoutingLib Modul",
         "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
         "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden",
         "UseImportIconOverridesDescription": "Beim Importieren von Items die gleichen Symbole für verschiedene Itemtypen verwenden, wenn dies sinnvoll ist. Deaktivieren wenn benutzerdefinierte Symbole verwendet werden.",
@@ -71,6 +72,7 @@
             "AddictionMental": "Abhängigkeit Geistig",
             "AddictionPhysical": "Abhängigkeit Physisch",
             "Attack": "Angriffs-Handlungen",
+            "AttackMatrix": "Matrixangriff",
             "AttackMelee": "Nahkampf-Handlungen",
             "AttackRanged": "Fernkampf-Handlungen",
             "AttackThrown": "Wurfwaffen-Handlungen",
@@ -79,6 +81,7 @@
             "Compiling": "Kompilier-Handlungen",
             "ComplexForm": "Komplexe Form-Handlungen",
             "Defense": "Verteidgungs-Handlungen",
+            "DefenseMatrix": "Matrixverteidigung",
             "DefenseSuppression": "Verteidigung gegen Sperrfeuer",
             "Drain": "Entzugs-Handlungen",
             "Fade": "Schwund-Handlungen",
@@ -89,6 +92,7 @@
             "RecoveryPhysical": "Genesung Physisch",
             "RecoveryStun": "Genesung Geistig",
             "Resist": "Widerstehen-Handlungen",
+            "ResistBiofeedback": "Biofeedback Widerstand",
             "ResistDisease": "Krankheit widerstehen",
             "ResistToxin": "Gift widerstehen",
             "Resonance": "Resonanz-Handlungen",
@@ -118,20 +122,52 @@
                 "TestItem": "Probe aus Item"
             },
             "CannotAddTestViaItemToActor": "Einem Akteur kann kein Active Effect vom Typ 'Probe aus Item' hinzugefügt werden.",
+            "FIELDS": {
+                "applyByTest": {
+                    "hint": "Anwenden auf Test des Items",
+                    "label": "Anwenden auf Test"
+                },
+                "applyTo": {
+                    "hint": "Anwenden auf verschiedene Ziele",
+                    "label": "Anwenden auf"
+                },
+                "onlyForEquipped": {
+                    "hint": "Nur auf ausgerüstetes Item anwenden",
+                    "label": "Nur ausgerüstet"
+                },
+                "onlyForItemTest": {
+                    "hint": "Nur auf Test des übergeordneten Items anwenden",
+                    "label": "Nur auf Item-Test"
+                },
+                "onlyForWireless": {
+                    "hint": "Nur auf drahtlose online-Items anwenden",
+                    "label": "Nur online"
+                },
+                "selection_attributes": {
+                    "hint": "Nur für Tests mit diesen Attribute",
+                    "label": "Attributs-Filter"
+                },
+                "selection_categories": {
+                    "hint": "Nur für Tests mit diesen Handlungskategorien",
+                    "label": "Handlungs-Kategorien Filter"
+                },
+                "selection_limits": {
+                    "hint": "Nur für Tests mit diesen Limits",
+                    "label": "Limit-Filter"
+                },
+                "selection_skills": {
+                    "hint": "Nur für Tests mit diesen Fertigkeiten",
+                    "label": "Fertigkeits-Filter"
+                },
+                "selection_tests": {
+                    "hint": "Nur für Tests mit diesen Proben",
+                    "label": "Proben-Filter"
+                }
+            },
             "Modes": {
                 "Modify": "Modifizieren"
             },
-            "New": "Neuer Effekt",
-            "OnlyForEquipped": "Nur bei ausgerüstetem Item anwenden",
-            "OnlyForItemTest": "Nur bei Tests des Items anwenden",
-            "OnlyForWireless": "Nur bei aktivem WiFi anwenden",
-            "Test": {
-                "ActionCategories": "Handlungs-Filter",
-                "Attributes": "Attributs-Filter",
-                "Limits": "Limits-Filter",
-                "Skills": "Fertigkeits-Filter",
-                "Tests": "Proben-Filter"
-            }
+            "New": "Neuer Effekt"
         },
         "ActiveSkills": "Aktionsfertigkeiten",
         "ActorTypes": {
@@ -189,10 +225,12 @@
         "Base": "Basis",
         "BaseValue": "Basiswert",
         "Biography": "Biographie",
+        "BiofeedbackDamage": "Biofeedback Schaden",
         "BlastRadius": "Sprengradius",
         "Block": "Blocken",
         "Bonus": "Bonus",
         "Bonuses": "Boni",
+        "Broken": "KAPUTT",
         "Bullet": "Kugel",
         "BulletCount": "Kugeln",
         "Bullets": "Kugeln",
@@ -236,6 +274,23 @@
         "Collapse": "Einklappen",
         "CollapseAll": "Alles einklappen",
         "CommonProgram": "Standardprogramm",
+        "CompendiaSettings": {
+            "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",
+            "GeneralActionsPack": {
+                "hint": "Dieses Kompendium wird für alle allgemeinen, attributbasierte Proben verwendet.",
+                "label": "Allgemeine Handlungen"
+            },
+            "ICActionsPack": {
+                "hint": "Dieses Kompendium wird für IC-Proben verwendet, gefiltert nach IC-Typ",
+                "label": "IC Handlungen"
+            },
+            "Label": "Compendium Packs",
+            "MatrixActionsPack": {
+                "hint": "Dieses Kompendium wird für alle Matrix-Handlungen verwendet.",
+                "label": "Matrix Handlungen"
+            },
+            "Title": "System Kompendien"
+        },
         "Compilation": {
             "DropSprite": "Sprite ablegen",
             "FixedSprite": "Sprite vorb.",
@@ -245,16 +300,18 @@
         "ComplexForms": "Komplexe Formen",
         "Conceal": "Tarnbarkeit",
         "ConditionMonitor": "Zustandsmonitor",
+        "Connection": "Verbindung",
         "Contact": {
             "Blackmail": "Erpressung",
             "Connection": "Einfluss",
+            "DropActor": "Drag&Drop' einen Akteur um ihn mit dieser Verbindung zu verbinden",
             "Family": "Familie",
             "Group": "Gruppe",
             "Loyalty": "Loyalität",
             "Type": "Typ"
         },
+        "ContactType": "Typ",
         "Contacts": "Kontakte",
-        "Continue": "Fortsetzen",
         "Content": {
             "Actions": {
                 "Armor": "Panzerung",
@@ -307,6 +364,8 @@
                 "TraceIcon": "Icon Aufspüren"
             }
         },
+        "Continue": "Fortsetzen",
+        "ControlRig": "Riggerkontrolle",
         "Cost": "Kosten",
         "Cover": "Deckung",
         "Create": "Erstelle {type}",
@@ -357,6 +416,8 @@
         "CyberwareGradeAlpha": "Alphaware",
         "CyberwareGradeBeta": "Betaware",
         "CyberwareGradeDelta": "Deltaware",
+        "CyberwareGradeGamma": "Gammaware",
+        "CyberwareGradeGrey": "Greyware",
         "CyberwareGradeStandard": "Standard",
         "CyberwareGradeUsed": "Gebraucht",
         "DIALOG": {
@@ -487,7 +548,9 @@
         "Equipment": "Ausrüstung",
         "Equipped": "Ausgerüstet",
         "Errors": {
-            "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden.",
+            "CantConnectICToGrid": "IC-Akteure können nicht mit einem Gitter-Netzwerk verbunden werden.",
+            "CantConnectToPAN": "Das ausgewählte Dokument kann nicht zu einem PAN-Netzwerk hinzugefügt werden.",
+            "CantConnectToWAN": "Das ausgewählte Dokument kann nicht zu einem WAN-Netzwerk hinzugefügt werden.",
             "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
             "DefaultInventoryCantBeRemoved": "Das Standardinventar kann nicht entfernt werden.",
             "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
@@ -495,6 +558,8 @@
             "MarkCouldNotBePlaced": "Interner Fehler: Die Marken konnten nicht platziert werden.",
             "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
             "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
+            "MarksCantBePlacedWithoutPersona": "Der ausgewählte Akteur hat keine aktive Persona.",
+            "MasterDeviceIsMissing": "Das Mastergerät fehlt. Es werden lokale Gerätewerte verwendet.",
             "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
             "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
             "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
@@ -522,6 +587,7 @@
         "Force": "Kraft",
         "FullDefense": "Volle Abwehr",
         "FullDefenseAttribute": "Attribut für Volle Abwehr",
+        "FullMatrixDefense": "Volle Matrixabwehr",
         "GMRequest": {
             "General": "Your GM wants you to do a",
             "RollAttribute": "Attribute Check",
@@ -534,6 +600,7 @@
         "GlitchCritical": "Kritischer Patzer!",
         "Glitches": "Patzer:",
         "GoodCover": "Gute Deckung",
+        "Grids": "Gitter",
         "HackingProgram": "Hackingprogramm",
         "Help": "Hilfe",
         "Hits": "Erfolge",
@@ -614,6 +681,7 @@
             "Device": "Gerät",
             "Echo": "Echo",
             "Equipment": "Ausrüstung",
+            "Grid": "Gitter",
             "Host": "Host",
             "Lifestyle": "Lebensstil",
             "Metamagic": "Metamagic",
@@ -643,6 +711,10 @@
             "ShowSituationModifiers": {
                 "Hint": "Öffne Situationsmodifikatoren für aktuelle Auswahl",
                 "Label": "Situationsmodifikatoren"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Öffnet Dialog für eine Erfolgsprobe",
+                "Label": "Erfolgsprobe auslösen"
             }
         },
         "KnockedDown": "Niedergeschlagen",
@@ -655,31 +727,48 @@
                 "ActiveTest": "Probe",
                 "Category": "Kategorie",
                 "DamageResistanceTest": "Schadenswiderstandsprobe",
+                "ForceReboot": "Erzwinge Neustart",
                 "Modifier": "Modifikator",
                 "Modifiers": "Modifikatoren",
                 "OpposedTest": "Vergleichende Probe",
                 "SpiritType": "Geister-Art",
                 "SpriteType": "Sprite-Art"
             },
+            "Actions": {
+                "BruteForce": "Brute Force",
+                "HackontheFly": "Eiliges Hacken"
+            },
             "ActorSheet": {
+                "AddNetwork": "Netzwerk Verbinden",
+                "ColdSim": "Kaltes SIM",
+                "Compilations": "Kompilieren",
+                "ConnectToDriver": "Fahrer verbinden",
                 "CreateInventory": "Erstelle Inventar-Ort",
                 "CritterPowers": "Critterkräfte",
                 "DeviceRating": "Gerätestufe",
+                "DeviceSetup": "Gerät einr.",
                 "DisabledOptionCritterPowers": "Optionale Critter Kräfte - Inaktiv",
                 "DisabledOptionSpritePowers": "Optionale Sprite Kräfte - Inaktiv",
+                "DisplayingPersona": "Persona anzeigen",
                 "EnabledOptionCritterPowers": "Optionale Critter Kräfte - Aktiv",
                 "EnabledOptionSpritePowers": "Optionale Sprite Kräfte - Aktiv",
+                "Hacking": "Hacken",
                 "ICConfiguration": "IC-Konfiguration",
+                "Icons": "Icons",
+                "MarkNetwork": "Markiere Netzwerk",
+                "MarkedIcons": "Markierte Icons",
                 "Matrix": "Matrix",
+                "Offline": "Offline",
+                "OwnedIcons": "Icons im Besitz",
+                "Persona": "Persona",
                 "PersonalInventory": "Am Körper",
                 "ResetActorForNewRun": "Reset für neuen Run",
                 "Rituals": "Rituale",
                 "RollDroneInfiltration": "Heimlichkeit",
-                "Persona": "Persona",
-                "Offline": "Offline",
                 "RollDronePerception": "Wahrnehmung",
                 "RollPilotVehicleTest": "Manövrieren",
                 "SetMonitor": "Monitor muss manuell gesetzt werden",
+                "SetupPAN": "Geräte zum PAN hinzufügen",
                 "Spells": "Zaubersprüche",
                 "SpiritConfiguration": "Geist-Konfiguration",
                 "SpriteConfiguration": "Sprite-Konfiguration",
@@ -692,15 +781,22 @@
                 "Carried": "Mitgeführt",
                 "OpenInventory": "Inventar"
             },
+            "MarkPlacement": {
+                "PlaceOnDevice": "Platziere auf Gerät",
+                "PlaceOnMainIcon": "Platziere auf Persona/Host"
+            },
             "Matrix": {
-                "TargetMainIcon": "Target Main Icon",
-                "TargetDevice": "Target Device",
-                "Local": "Lokal",
                 "Global": "Global",
-                "Public": "Öffentlich"
+                "Local": "Lokal",
+                "Public": "Öffentlich",
+                "TargetDevice": "Target Device",
+                "TargetMainIcon": "Target Main Icon"
             },
             "Message": {
-                "ClickToSelect": "Klicke um in Szene auzuwählen",
+                "ClickToSelect": "Klicke um in Szene auszuwählen",
+                "FailedAttackAction": "Fehlgeschlagene Matrix-Angriffsaktion",
+                "OverwatchConvergence": "Overwatch-Fokusierung",
+                "TargetedIcon": "Ziel-Icon",
                 "TestEffects": "Effekte angewendet"
             },
             "Sheet": {
@@ -710,7 +806,10 @@
                 "MissingNetworkDevices": "Drag&Drop um ein Netzwerkgerät zuzufügen.",
                 "NetworkDevices": "Geräte im Netzwerk",
                 "PAN": "PAN",
+                "RebootDevice": "Neustarten",
                 "SubtractOne": "Eine entfernen",
+                "Type": "Typ",
+                "Visible": "Sichtbar",
                 "WAN": "WAN"
             },
             "Sidebar": {
@@ -746,6 +845,7 @@
         "LivingPersona": "Lebende Persona",
         "Load": "Laden",
         "Loaded": "Geladen",
+        "Loyalty": "Loyalität",
         "MIGRATION": {
             "BeginMigration": "Starte Migration",
             "BeginNotification": "Starte Shadowrun-System-Migration von Version",
@@ -775,9 +875,23 @@
         "MatrixAttrDataProc": "Datenverarb.",
         "MatrixAttrFirewall": "Firewall",
         "MatrixAttrSleaze": "Schleicher",
+        "MatrixDefense": "Matrix Verteidigung",
+        "MatrixFullDefenseAttribute": "Matrix Vollverteidigungsattribut",
+        "MatrixNetworkHackingApplication": {
+            "Icons": "Icons",
+            "Invite": "Einladung anfordern",
+            "Title": "Mit Netzwerk verbinden"
+        },
         "MatrixTarget": "Matrixziel",
         "MeleeWeaponAttack": "Nahkampfangriff",
         "MentalLimit": "Geistiges Limit",
+        "Messages": {
+            "MarkInvitation": {
+                "AcceptInvite": "Annehmen",
+                "AskForInvite": "Fragt nach einer Markeneinladung für:",
+                "InviteAccepted": "Willkommen im Netzwerk {networkName}, {userName}!"
+            }
+        },
         "Metamagic": "Metamagie",
         "Metamagics": "Metamagie",
         "Metatype": "Metatyp",
@@ -822,6 +936,7 @@
             "AstralLimit": "Astrales Limit",
             "BackgroundCount": "Hintergrundstrahlung",
             "Composure": "Selbstbeherrschung",
+            "ControlRigRating": "Riggerkontrollstufe",
             "Defense": "Verteidigung",
             "DefenseBlock": "Verteidigung (Blocken)",
             "DefenseDodge": "Verteidigung (Ausweichen)",
@@ -829,6 +944,7 @@
             "DefenseMulti": "Verteidigung (Volle Abwehr)",
             "DefenseParry": "Verteidigung (Parieren)",
             "DefenseRanged": "Verteidigung (Fernkampf)",
+            "DifferentGrid": "Anderes Gitter",
             "Drain": "Entzug",
             "Environmental": "Umwelt",
             "EnvironmentalLight": "Umwelt (Licht)",
@@ -840,6 +956,8 @@
             "Global": "Global",
             "JudgeIntentions": "Menschenkenntnis",
             "LiftCarry": "Heben&Tragen",
+            "MarkDamage": "Schaden pro Marke",
+            "Marks": "Marken",
             "MatrixDice": "Matrix-Initiative-Würfel",
             "MatrixInit": "Matrix-Initiative-Wert",
             "MatrixTrack": "Matrix-Monitor",
@@ -853,14 +971,15 @@
             "PhysicalLimit": "Körperliches Limit",
             "PhysicalOverflowTrack": "Körperlicher Überschuss-Monitor",
             "PhysicalTrack": "Körperlicher Monitor",
+            "PublicGrid": "Öffentliches Gitter",
             "Reach": "Reichweite",
             "Recoil": "Rückstoß",
             "Run": "Laufen",
             "Soak": "Einstecken",
             "SocialLimit": "Soziales Limit",
             "StunTrack": "Geistiger Monitor",
-            "TwoMarks": "Zwei Marken",
             "ThreeMarks": "Drei Marken",
+            "TwoMarks": "Zwei Marken",
             "Walk": "Gehen",
             "WoundTolerance": "Wunden-Toleranz",
             "Wounds": "Wunden"
@@ -880,6 +999,8 @@
         "Mundane": "Mundan",
         "Name": "Name",
         "NetHits": "Nettoerfolge",
+        "Network": "Netzwerk",
+        "Networks": "Netzwerke",
         "New": "Neu:",
         "NoCover": "Keine Deckung",
         "NoSelectableToken": "Charakter hat kein auswählbares Token auf der Karte",
@@ -888,6 +1009,19 @@
         "NormalSkillButton": "Normal",
         "NormalSpellButton": "Normal",
         "NotExtended": "Nicht Ausgedehnt",
+        "Notifications": {
+            "AddDevicesToPAN": {
+                "Adding": "Hinzufügen",
+                "FinishedAddingItems": "Geräte wurden erfolgreich zum PAN hinzugefügt. Bitte schließen und öffnen Sie alle betroffenen Items erneut.",
+                "Starting": "Beginne mit dem Hinzufügen der ausgestatteten Geräte zum PAN"
+            },
+            "DeletingStorageReferences": {
+                "Finished": "Referenzen wurden erfolgreich gelöscht.",
+                "Item": "Lösche Referenzen zu Item",
+                "Start": "Lösche Netzwerk und Marken Referenzen"
+            },
+            "VehicleCannotBeOwnDriver": "Ein Fahrzeug kann nicht der Fahrer von sich selbst sein (dafür ist der Pilot da)"
+        },
         "Notoriety": "Schlechter Ruf",
         "Nuyen": "Nuyen",
         "OpenOrigin": "Öffne Item",
@@ -910,10 +1044,12 @@
             "ResetScore": "Setze Overwatch-Wert zurück"
         },
         "OverwatchScoreTrackerTitle": "Mr. Johnsons Baby-Monitor",
+        "Owner": "Besitzer",
         "PP": "KP",
         "Parry": "Parieren",
         "PartialCover": "Teildeckung",
         "Passive": "Passiv",
+        "Personas": "Personas",
         "PhysicalLimit": "Körperliches Limit",
         "PhysicalOverflowTrack": "Körperlicher Überschuss-Monitor",
         "PhysicalTrack": "Körperlicher Monitor",
@@ -928,6 +1064,7 @@
         "ProgramType": "Typ",
         "Programs": "Programme",
         "PublicAwareness": "Prominenz",
+        "PublicGrid": "Öffentliches Gitter",
         "PushTheLimit": "Grenzen sprengen",
         "Qty": "Menge",
         "Quality": "Vorteile/Nachteile",
@@ -945,9 +1082,16 @@
         "Rating": "Stufe",
         "Reach": "Reichweite",
         "Reagent": "Reagenzien",
+        "RebootConfirmationDialog": {
+            "Cancel": "Abbrechen",
+            "Confirm": "Neustart",
+            "Description": "Sind Sie sicher, dass Sie dieses Gerät neu starten möchten?",
+            "Title": "Neustart bestätigen"
+        },
         "RecklessSpellButton": "Schnell",
         "Recoil": "Rückstoß",
         "RecoilCompensation": "Rückstoßkomp.",
+        "Refresh": "Aktualisieren",
         "RemoveBonus": "Entferne Bonus",
         "RemoveSpecialization": "Entferne Spezialisierung",
         "Resist": "Widerstehen",
@@ -971,10 +1115,17 @@
         "RtgAboveZero": "Stf > 0",
         "Run": "Laufen",
         "RunningSilent": "Auf Schleichfahrt",
+        "RunningSilentControlledByDevice": "Schleichtfahrt wird vom aktiven Matrixgerät gesteuert:",
         "RunningSpeed": "Rennen",
         "SIN": "SIN",
+        "SameGrid": "Gleiches Gitter",
         "SecondAttribute": "Zweites Attribut",
         "SecondChance": "Zweite Chance",
+        "SelectMatrixNetworkDialog": {
+            "Cancel": "Abbrechen",
+            "Connect": "Verbinden",
+            "Title": "Netzwerk auswählen"
+        },
         "SelectTokenMessage": "Bitte zuerst ein Token auswählen",
         "SelectedTargets": "Ausgew. Ziele",
         "SheetActor": "Acteur-Blatt",
@@ -1157,8 +1308,8 @@
                 "Caretaker": "Insekt: Pfleger",
                 "Ceramic": "Keramik",
                 "Chindi": "Chindi",
-                "Corpse": "Leiche",
                 "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Leiche",
                 "Crawler": "Crawler (Dämon)",
                 "Croki": "Croki",
                 "Detritus": "Geröll",
@@ -1216,8 +1367,8 @@
                 "Unbreakable": "Unzerbrechlich",
                 "Vrygoths": "Vrygoths",
                 "VucubCaquix": "Vucub Caquix",
-                "Water": "Wasser",
                 "Watcher": "Beobachter",
+                "Water": "Wasser",
                 "Worker": "Insekt: Arbeiter",
                 "Wraith": "Wraith"
             }
@@ -1276,7 +1427,14 @@
             "AttackDodged": "Ausgewichen",
             "AttackDoesNoPhysicalDamageToVehicle": "Angriff trifft, verursacht aber keinen körperlichen Schaden am Fahrzeug",
             "AttackHits": "Treffer",
+            "AttackResisted": "Angriff widerstanden",
+            "BruteForceFailure": "Brute Force fehlgeschlagen!",
+            "BruteForceSuccess": "Brute Force erfolgreich!",
+            "CheckOverwatchScoreFailure": "Overwatch Wert prüfen fehlgeschlagen!",
+            "CheckOverwatchScoreSuccess": "Overwatch Wert prüfen erfolgreich!",
             "Failure": "Misserfolg!",
+            "HackOnTheFlyFailure": "Eiliges Hacken fehlgeschlagen!",
+            "HackOnTheFlySuccess": "Eiliges Hacken erfolgreich!",
             "ResistedAllDamage": "Kein Schaden!",
             "ResistedSomeDamage": "Schaden!",
             "Results": "Ergebnis",
@@ -1291,6 +1449,9 @@
         },
         "Tests": {
             "AttributeOnlyTest": "Attributsprobe",
+            "BiofeedbackResistTest": "Biofeedback Widerstehen",
+            "BruteForceTest": "Brute Force",
+            "CheckOverwatchScoreTest": "Prüfe Overwatch-Wert",
             "CombatSpellDefenseTest": "Kampfzauber-Verteidigung",
             "CompileSpriteTest": "Sprite kompilieren",
             "ComplexFormTest": "Komplexe Form weben",
@@ -1299,10 +1460,15 @@
             "DronePerceptionTest": "Wahrnehmung",
             "ExtendedTest": "Ausgedehnte Probe",
             "FadeTest": "Schwundwiderstand",
+            "HackOnTheFlyTest": "Eiliges Hacken",
+            "MatrixDefenseTest": "Matrix Verteidigung",
+            "MatrixResistTest": "Matrix Schadenswiderstand",
+            "MatrixTest": "Matrix Probe",
             "MeleeAttackTest": "Nahkampfangriff",
             "NaturalRecoveryPhysicalTest": "Natürliche körperliche Genesung",
             "NaturalRecoveryStunTest": "Natürliche geistige Genesung",
             "OpposedBruteForceTest": "Widerstehe Brute Force",
+            "OpposedCheckOverwatchScoreTest": "Widerstehe Overwatch-Wert prüfen",
             "OpposedCompileSpriteTest": "Widerstehe Kompilierung",
             "OpposedHackOnTheFlyTest": "Widerstehe Eiliges Hacken",
             "OpposedRitualTest": "Besiegel das Ritual",
@@ -1323,16 +1489,25 @@
         "Threshold": "Schwellenwert",
         "ToggleActive": "De/aktivieren",
         "ToggleEquip": "Anlegen/Ablegen",
+        "ToggleWireless": "Kabel(los)",
         "Tooltips": {
             "Actor": {
+                "ConnectNetwork": "Betrete Host / Gitter",
                 "Critter": "Ermöglicht die Nutzung von Critterkräften",
-                "DefaultCategoryVisibility": "Zeige Item Sektionen selbst dann, wenn sie leer sind.",
+                "DisconnectNetwork": "Verlasse Host/ Gitter",
                 "Grunt": "Nutze Schergen-Regeln für Akteur",
+                "MarkTarget": "Platziere Marken auf diesem Ziel",
+                "MatrixConnectionToggle": "Ändere den Matrix-Verbindung: Erweiterte Realität, Kalte Sim oder Heiße Sim",
+                "MatrixRunningSilentToggle": "Wechsle zwischen Schleichfahrt und Anzeige der Persona",
                 "Metatype": "Ein NSC-Akteur bekommt automatische Attributemodifikatoren abhängig vom Metatyp",
                 "MissingSummoner": "Drag&Drop Charakter oder nutze Beschwörungs-Aktion",
                 "MissingTechnomancer": "Drag&Drop Charakter oder nutze Kompilierungs-Aktion",
                 "NPC": "Makriere Akteur als NSC und ermöglicht weitere NSC-Funktionen",
-                "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück"
+                "PickControlledTokenAsDriver": "Wähle das aktuell kontrollierte Token als Fahrer aus",
+                "PlaceMark": "Handlung zum Platzieren von Marken auf bereits markierten Zielen",
+                "RebootPersonaAndClearAllMarks": "Starte deine Persona neu und entferne alle von dir platzierten Marken",
+                "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück",
+                "SetupPAN": "Füge alle ausgerüsteten Wireless-Geräte zum PAN dieses Charakters hinzu"
             },
             "CallInAction": {
                 "ActorType": "Herbeizurufender Akteurtyp"
@@ -1342,6 +1517,9 @@
                 "PreparedSprite": "Benutze einen vorbereiteten Sprite-Akteur statt eines generisch Erstellten.",
                 "SpriteType": "Art des kompilierten Sprites"
             },
+            "Contact": {
+                "LinkActor": "Ziehe einen Akteur per Drag&Drop, um diesen mit diesem Kontakt zu verknüpfen"
+            },
             "Effect": {
                 "AlterApplyToWithChanges": "Entferne Änderungen, bevor du änderst, worauf sich der Effekt bezieht.",
                 "ApplyTo": "Änderungen mit diesem Effekt gelten nur für dieses Ziel.",
@@ -1350,14 +1528,16 @@
                 "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
                 "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
                 "OnlyForItemTest": "Dieser Effekt gilt nur für Proben dieses Items.",
-                "OnlyForWireless": "Dieser Effekt gilt nur für Items, bei denen WiFi aktiviert ist."
+                "OnlyForWireless": "Dieser Effekt gilt nur für Items, bei denen WiFi aktiviert ist.",
+                "PriorityFieldDisabled": "Eigene Pioritäten werden im Moment nicht unterstützt."
             },
             "Item": {
                 "ActionCategories": "Überschreibe alle Standardkategorien der Probe mit dieser Auswahl. Mit einem Active Effect können dadurch die Werte der Action modifiziert werden.",
                 "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",
                 "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
-                "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
                 "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
+                "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
+                "CostAdjustment": "Berechne die tatsächlichen Kosten basierend auf der Stufe",
                 "DisabledForPreparedActor": "Deaktiviert da ein vorbereiteter Akteur verwendet wird"
             },
             "Modifiers": {
@@ -1378,6 +1558,7 @@
                 "global": "Modifiziert den Würfelpool aller Proben, außer Schaden reduzierender Proben",
                 "judge_intentions": "Modifiziert den Würfelpool von Menschenkenntnisproben",
                 "lift_carry": "Modifiziert den Würfelpool von Tragen&Heben-Proben",
+                "mark_damage": "Modifiziert die zugefügte Schadensmenge pro Marke",
                 "matrix_initiative": "Modifiziert die Basis der Matrix Initiative",
                 "matrix_initiative_dice": "Modifiziert die Würfel der Matrix Initiative",
                 "matrix_track": "Modifiziert den Matrix-Monitor",
@@ -1391,14 +1572,15 @@
                 "physical_limit": "Modifiziert das Körperliche Limit",
                 "physical_overflow_track": "Modifiziert den Körperlichen Überschuss-Monitor",
                 "physical_track": "Modifiziert den Körperlichen Monitor",
+                "place_three_marks": "Modifiziert den Modifikator um drei Marken gleichzeitig zu setzen",
+                "place_two_marks": "Modifiziert den Modifikator um zwei Marken gleichzeitig zu setzen",
                 "public_grid": "Modifiziert den Öffentlichen Gitter Modifikator",
                 "reach": "Modifiziert die Reichweite von Nahkampfangriffen",
+                "recoil": "Modifiziert Rückstoß",
                 "run": "Modifiziert die Laufreichweite um das Vielfache des Geschicklichkeits-Attributs",
                 "soak": "Modifiziert den Würfelpool von Schadenswiderstandsproben",
                 "social_limit": "Modifiziert das Soziale Limit",
                 "stun_track": "Modifiziert den Geistigen Monitor",
-                "place_two_marks": "Modifiziert den Modifikator um zwei Marken gleichzeitig zu setzen",
-                "place_three_marks": "Modifiziert den Modifikator um drei Marken gleichzeitig zu setzen",
                 "walk": "Modifiziert die Gehreichweite um das Vielfache des Geschicklichkeits-Attributs",
                 "wound_tolerance": "Modifiziert die Schadensmenge pro Wundenmodifikator"
             },
@@ -1523,6 +1705,7 @@
         "WalkingSpeed": "Gehen",
         "Warnings": {
             "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
+            "AlreadyJoinedNetwork": "bereits mit dem Netzwerk {name} verbunden",
             "BulkImportPerformanceWarning": "Wenn du eine große Anzahl von Items importiert hast, kann Foundry langsam laufen, bis du deinen Browser aktualisierst. Es wird empfohlen, jetzt zu aktualisieren.",
             "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
             "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",
@@ -1543,6 +1726,7 @@
             "InvalidSummoningForce": "Gewählte Kraft hält sich nicht an die Regeln",
             "NegativeLimitValue": "Limit-Werte müssen über Null liegen",
             "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer.",
+            "OnlyGMCanDoThis": "Nur ein GM-Benutzer kann dies tun",
             "RitualInvalidForce": "Ritual-Kraft ist zu klein oder größer als die des Refugiums",
             "RitualNotConcluded": "Ritual unvollständig. Warte auf Gegenprobe des Rituals, um Entzug zu bestimmen.",
             "RitualNotEnoughReagents": "nicht genug Reagenzien geopfert.",
@@ -1628,7 +1812,10 @@
             "Type": "Typ",
             "Weapon": "Waffen"
         },
-        "Wireless": "WiFi"
+        "Wireless": "WiFi",
+        "WirelessOffline": "Offline",
+        "WirelessOnline": "Online",
+        "WirelessUnavailable": "Kabel"
     },
     "TYPES": {
         "Actor": {
