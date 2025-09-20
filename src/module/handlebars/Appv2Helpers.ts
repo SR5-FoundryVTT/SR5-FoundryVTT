@@ -31,6 +31,9 @@ export const registerAppv2Helpers = () => {
             }
             nav.appendChild(link);
         }
+        if (Object.values(tabs).length <= 1) {
+            nav.classList.add('hidden');
+        }
         return new Handlebars.SafeString(nav.outerHTML);
     });
 

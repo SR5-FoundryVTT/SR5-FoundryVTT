@@ -3,7 +3,7 @@
     <div class="new-list-item">
         <div class="new-list-item-label-container">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
-            <label>
+            <label class="{{#if item.selected}}new-list-item-selected{{/if}}">
                 <a data-action="showItemDescription" data-item-id="{{item.documnet.uuid}}">
                     {{item.name}}
                 </a>
@@ -27,5 +27,8 @@
         </div>
     </div>
     <div class="new-list-item-description">
+        <a data-action="openMatrixDocument" data-item-id="{{item.document.uuid}}">
+            <i class="fas fa-page"></i>&nbsp;{{localize "SR5.Labels.ActorSheet.OpenSourceDocument"}}
+        </a>
     </div>
 </div>

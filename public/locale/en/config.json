@@ -1023,6 +1023,7 @@
             },
             "ActorSheet": {
                 "AddNetwork": "Direct Connect Network",
+                "AddOneMark": "Add One Mark",
                 "Compilations": "Compilations",
                 "CreateInventory": "Create inventory place",
                 "CritterPowers": "Critter Powers",
@@ -1046,8 +1047,10 @@
                 "NoNetwork": "No Network",
                 "Persona": "Persona",
                 "Offline": "Offline",
+                "OpenSourceDocument": "Open Source",
                 "OwnedIcons": "Owned Icons",
                 "PersonalInventory": "On Person",
+                "RemoveOneMark": "Remove One Mark",
                 "ResetActorForNewRun": "New Run Reset",
                 "Rituals": "Rituals",
                 "RollDroneInfiltration": "Drone Infiltration",

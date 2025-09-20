@@ -681,6 +681,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const item = await fromUuid(iid);
 
         if (!item || !(item instanceof SR5Item)) return;
+        await this._handleRollItem(item, event);
+    }
+
+    async _handleRollItem(item: SR5Item, event) {
         if (!Hooks.call('SR5_PreActorItemRoll', this.actor, item)) return;
         await item.castAction(event);
     }

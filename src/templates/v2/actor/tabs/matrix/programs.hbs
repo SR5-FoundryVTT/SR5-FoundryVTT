@@ -1,7 +1,7 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/program/header.hbs'
-            label=(concatStrings (localize 'SR5.Programs') " " @root.program_count)
+            label='SR5.Programs'
             type='program' }}
         <div class="scrollable">
         {{#each itemType.program}}

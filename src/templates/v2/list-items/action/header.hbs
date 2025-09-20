@@ -19,7 +19,9 @@
     </div>
     {{/if}}
 
+    {{#if @root.isEditMode}}
     <div class="new-list-item-icons">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
     </div>
+    {{/if}}
 </div>

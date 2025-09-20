@@ -19,21 +19,20 @@
             </label>
         </div>
 
-        <div class="new-list-item-col">
+        <div class="new-list-item-icons">
             <button type="button">
                 {{#if (isEquipped item)}}{{localize "SR5.Loaded"}}{{else}}{{localize "SR5.Load"}} >>{{/if}}
             </button>
-        </div>
-
-        <div class="new-list-item-icons">
             {{#if (isOwner item owner=@root.actor)}}
             {{!-- Add Icons for what the Owner of an item can do --}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
             {{/if}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">
+        <a data-action="openItemSource" data-item-id="{{item.uuid}}">
+            <i class="fas fa-page"></i>&nbsp;{{localize "SR5.Labels.ActorSheet.OpenSourceDocument"}}
+        </a>
         {{{item.system.description.value}}}
     </div>
 </div>

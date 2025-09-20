@@ -330,6 +330,10 @@
             gap: .25rem;
             font-size: 0.9rem;
 
+            .new-list-item-selected {
+                color: $yellow;
+            }
+
             img.new-list-item-image-roll {
                 &:hover {
                     content: url('assets/dice-solid.svg');
