@@ -1,0 +1,38 @@
+<div class="sheet-header">
+    <img src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" width="80" height="80"/>
+    <div class="sheet-header-labels">
+        <input type="text" class="name" name="name" value="{{item.name}}" placeholder='{{localize "SR5.ItemName"}}' />
+        <div class="sheet-header-source">
+            <div class="source-button roll open-source" data-tooltip="SR5.OpenSource">
+                {{#if sourceIsURL}}
+                    <i class="fas fa-link"></i>
+                {{else if sourceIsPDF}}
+                    <i class="fas fa-file-pdf"></i>
+                {{else if sourceIsUuid}}
+                    <i class="fas fa-file"></i>
+                {{/if}}
+            </div>
+            <input
+                class="display text"
+                type="text"
+                name="system.description.source"
+                value="{{system.description.source}}"
+                placeholder='{{localize "SR5.Source"}}'
+            />
+            {{#if system.importFlags.isFreshImport}}
+                {{#if (itemMarking "ANY")}}
+                    {{> 'systems/shadowrun5e/dist/templates/item/parts/import_flag_button.hbs' }}
+                {{/if}}
+            {{/if}}
+        </div>
+        {{#if system.technology.condition_monitor.max}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                name=(localize "SR5.ConditionMonitor")
+                value=system.technology.condition_monitor.value
+                max=system.technology.condition_monitor.max
+                id='matrix'
+                disabled=system.technology.condition_monitor.disabled
+            }}
+        {{/if}}
+    </div>
+</div>

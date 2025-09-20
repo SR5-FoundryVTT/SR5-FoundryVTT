@@ -14,4 +14,6 @@ export const BaseItemData = () => ({
  * Subclasses should extend this class to inherit default schema structure and standardized
  * data migration logic for shared item properties across the system.
  */
-export abstract class ItemBase<DS extends ReturnType<typeof BaseItemData>> extends foundry.abstract.TypeDataModel<DS, Item.Implementation> {}
+export abstract class ItemBase<DS extends ReturnType<typeof BaseItemData>> extends foundry.abstract.TypeDataModel<DS, Item.Implementation> {
+    static override LOCALIZATION_PREFIXES = ["SR5.Item"];
+}

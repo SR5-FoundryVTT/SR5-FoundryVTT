@@ -222,37 +222,59 @@
             }
         }
     }
+}
+
+.sr5v2.item {
 
     /** Header Removal **/
 
-    &.sheet.window-app {
-        box-shadow: 0 0 10px 0px rgba(235,181,49,0.3);
+    // default window padding was pretty big, tone it down
+    .window-content {
+        padding: .25rem;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+        background-repeat: repeat;
+        background-size: 100% 20px auto;
+    }
 
-        & .window-header {
-            border-bottom: none;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
-            background-repeat: repeat;
-            background-size: 100% 20px auto;
-            flex: 0 0 20px;
-            padding: 0 3px 0 0;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-
-            & a {
-            display: inline-flex;
-            padding: 6px 0 0 0;
-            font-size: 0px;
-            color: rgb(100, 100, 100);
-
-            & .fa-solid,
-                & .fas {
-                    font-size: 12px;
-                }
-            }
-
-            & .window-title {
-            font-size: 0;
+    .sheet-header {
+        display: flex;
+        flex-flow: row;
+        justify-content: start;
+        align-items: end;
+        padding: .25rem;
+        width: 100%;
+        .sheet-header-labels {
+            flex: 1;
+        }
+        .sheet-header-source {
+            display: flex;
+            flex-flow: row nowrap;
+        }
+        .name {
+            @include systemFonts;
+            background: $nameplate-background;
+            padding-left: 5px;
+            input[type=text] {
+                background: none;
             }
         }
     }
+
+    // add a footer to the sheet
+    .sheet-footer {
+        display: flex;
+        flex-flow: row;
+        gap: 2px;
+        align-items: center;
+        justify-content: start;
+        margin-top: .25rem;
+        box-shadow: 0 -.25rem .5rem $black;
+        border-top: 1px solid $yellow;
+        padding-left: .1rem;
+        padding-top: .1rem;
+        flex-shrink: 0;
+        vertical-align: bottom;
+        font-size: 1rem
+    }
+
 }

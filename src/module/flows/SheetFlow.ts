@@ -60,7 +60,7 @@ export const SheetFlow = {
             case 'effect':
                 return formatStrict('SR5.Create', { type: 'SR5.Effect' });
             default:
-                return formatStrict('SR5.Create', { type : 'SR5.Item' });
+                return formatStrict('SR5.Create', { type : 'SR5.FOUNDRY.Item' });
         }
 
     },

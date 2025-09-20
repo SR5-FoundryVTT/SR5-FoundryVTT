@@ -17,9 +17,9 @@ interface SR5CallInActionSheetData extends SR5BaseItemSheetData {
  * This shows creation / call in of different type of actor types by an actor
  * 'creator' or 'caller'. Summoner/Conjurer, Technomancer, etc.
  */
-export class SR5CallInActionSheet extends SR5ItemSheet {
-    override async getData(options: any): Promise<SR5CallInActionSheetData> {
-        const data = await super.getData(options) as SR5BaseItemSheetData;
+export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData> {
+    override async _prepareContext(options): Promise<SR5CallInActionSheetData> {
+        const data = await super._prepareContext(options);
 
         const system = data.system as Item.SystemOfType<'call_in_action'>;
 
@@ -58,8 +58,8 @@ export class SR5CallInActionSheet extends SR5ItemSheet {
         if (actor.isType('sprite')) await this.updatePreparedSprite(actor);
     }
 
-    override activateListeners(html: any): void {
-        super.activateListeners(html);
+    override activateListeners_LEGACY(html: any): void {
+        super.activateListeners_LEGACY(html);
 
         html.find('.spirit-remove').click(this.handleSpiritRemove.bind(this));
         html.find('.sprite-remove').click(this.handleSpriteRemove.bind(this));

@@ -11,32 +11,18 @@ import { AmmunitionType, RangeType } from '../types/item/Weapon';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { MatrixRules } from '../rules/MatrixRules';
 import { SINFlow } from './flows/SINFlow';
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
-/**
- * FoundryVTT ItemSheetData typing
- */
-interface FoundryItemSheetData {
-    // Item type
-    type: string
-    // Legacy Item Document Data
-    data: SR5Item
-    // Item Document System Data
-    system: SR5Item['system']
-    // A descriptive document  reference
-    item: SR5Item
-    document: SR5Item
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
+import RenderContext = foundry.applications.sheets.ItemSheet.RenderContext;
 
-    cssClass: string
-    editable: boolean
-    limited: boolean
-    owner: boolean
-    title: string
-}
+const { ItemSheet } = foundry.applications.sheets;
+const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
  * Shadowrun 5e ItemSheetData typing shared across all item types
  */
-export interface SR5BaseItemSheetData extends FoundryItemSheetData {
+export interface SR5BaseItemSheetData extends RenderContext {
     // SR5-FoundryVTT configuration
     config: typeof SR5
     effects: SR5ActiveEffect[]
@@ -101,25 +87,102 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
-    private _shownDesc: any[] = [];
-    private _scroll: string | undefined;
+export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends HandlebarsApplicationMixin(ItemSheet)<T> {
 
-    /**
-     * Extend and override the default options used by the Simple Item Sheet
-     * @returns {Object}
-     */
-    static override get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: Array.from(['sr5', 'sheet', 'item']),
-            width: 735,
-            height: 450,
-            tabs: Array.from([{ navSelector: '.tabs', contentSelector: '.sheetbody' }]),
-        });
+    static override DEFAULT_OPTIONS = {
+        classes: [SR5_APPV2_CSS_CLASS, 'item'],
+        window: {
+            resizable: true,
+        },
     }
 
-    override get template() {
-        return `systems/shadowrun5e/dist/templates/item/${this.item.type}.hbs`;
+    static override PARTS = {
+        header: {
+            template: this.templateBase('item/header'),
+        },
+        tabs: {
+            template: this.templateBase('common/primary-tab-group'),
+        },
+        description: {
+            template: this.templateBase('item/tabs/description'),
+        },
+        technology: {
+            template: this.templateBase('item/tabs/technology'),
+        },
+        contact: {
+            template: this.templateBase('item/tabs/contact'),
+        },
+        effects: {
+            template: this.templateBase('item/tabs/effects'),
+            templates: this.listItem('effect'),
+        },
+        footer: {
+            template: this.templateBase('item/footer'),
+        },
+    }
+
+    static override TABS = {
+        primary: {
+            initial: 'description',
+            tabs: [
+                { id: 'description', label: 'Description', cssClass: '' },
+                { id: 'contact', label: 'Contact', cssClass: '' },
+                { id: 'technology', label: 'Technology', cssClass: '' },
+                { id: 'effects', label: 'Effects', cssClass: '' }
+            ]
+        }
+    }
+
+    // TODO move to SR5Mixin
+    static templateBase(path: string) {
+        return `systems/shadowrun5e/dist/templates/v2/${path}.hbs`
+    }
+
+    static itemSystemParts(...parts: string[]) {
+        return parts.map(p => this.templateBase(`item/parts/${p}`))
+    }
+
+    static listItem(...parts: string[]) {
+        return parts.reduce<string[]>(( items, p) => {
+            items.push(this.templateBase(`list-items/${p}/header`));
+            items.push(this.templateBase(`list-items/${p}/item`));
+            return items;
+        }, [])
+    }
+
+    protected override _prepareTabs(group: string) {
+        const retVal = super._prepareTabs(group);
+        if (group === 'primary') {
+            if (!this.item.getTechnologyData()) {
+                delete retVal['technology'];
+            }
+            if (!this.item.isType('contact')) {
+                delete retVal['contact'];
+            }
+        }
+        return retVal;
+    }
+
+    protected override _configureRenderParts(options) {
+        const retVal = super._configureRenderParts(options);
+        if (!this.item.getTechnologyData()) {
+            delete retVal['technology'];
+        }
+        if (!this.item.isType('contact')) {
+            delete retVal['contact'];
+        }
+        return retVal;
+    }
+
+    override async _preparePartContext(partId, context, options) {
+        const partContext = await super._preparePartContext(partId, context, options) as any;
+        if (partContext?.primaryTabs) {
+            if (partId in partContext.primaryTabs) {
+                partContext.tab = partContext.primaryTabs[partId];
+            }
+        }
+
+        return partContext;
     }
 
     /* -------------------------------------------- */
@@ -128,14 +191,8 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      * Prepare data for rendering the Item sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
-    override async getData(options): Promise<any> {
-        const data = super.getData(options) as unknown as SR5ItemSheetData;
-
-        // Rework v9 style data mapping to v10 style, while waiting for foundry-vtt-types to be update to v10.
-        data.type = data.data.type;
-        data.system = data.item.system;
-        //@ts-expect-error // TODO: remove TODO: foundry-vtt-types v10
-        data.data = data.item.system;
+    override async _prepareContext(options) {
+        const data = await super._prepareContext(options) as any;
         const itemData = this.item.toObject(false).system as SR5Item['system'];
 
         const linkedActor = await this.item.getLinkedActor();
@@ -233,7 +290,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         data['limits'] = this._getSortedLimitsForSelect();
 
         data['effects'] = prepareSortedEffects(this.item.effects.contents);
-        data['itemEffects'] = prepareSortedItemEffects(this.object);
+        data['itemEffects'] = prepareSortedItemEffects(this.item);
 
         if (this.item.isType('host')) {
             data['markedDocuments'] = await this.item.getAllMarkedDocuments();
@@ -289,6 +346,13 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         // What sections should be shown on the misc. tab?
         data.miscMatrixPart = this.item.hasActionCategory('matrix');
 
+        data.primaryTabs = this._prepareTabs('primary');
+        data.system = this.item.toObject(false).system;
+        data.item = this.item;
+        data.systemFields = this.item.system.schema.fields;
+        data.isEditMode = true;
+        data.isPlayMode = false;
+
         return {
             ...data,
             linkedActor
@@ -333,24 +397,17 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
     /* -------------------------------------------- */
 
+    override async _onRender(context, options) {
+        this.activateListeners_LEGACY($(this.element));
+        return super._onRender(context, options);
+    }
+
     /**
      * Activate event listeners using the prepared sheet HTML
      * @param html -  The prepared HTML object ready to be rendered into the DOM
      */
-    override activateListeners(html) {
-        super.activateListeners(html);
-
+    activateListeners_LEGACY(html) {
         Helpers.setupCustomCheckbox(this, html);
-
-        /**
-         * Drag and Drop Handling
-         */
-        //@ts-expect-error
-        this.form.ondragover = (event) => {
-            this._onDragOver(event);
-        }
-        //@ts-expect-error
-        this.form.ondrop = (event) => this._onDrop(event);
 
         // Active Effect management
         html.find(".effect-control").click(event => onManageActiveEffect(event, this.item));
@@ -445,7 +502,8 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         }
     }
 
-    override async _onDragStart(event) {
+    // TODO fix
+    async _onDragStart(event) {
         const element = event.currentTarget;
         if (element) {
             // Create drag data object to use
@@ -475,11 +533,11 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
                     }
             }
         }
-        return super._onDragStart(event);
     }
 
 
-    override async _onDrop(event) {
+    // TODO fix
+    async _onDrop(event) {
         if (!game.items || !game.actors || !game.scenes) return;
 
         event.preventDefault();
@@ -536,7 +594,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         if (this.item.isNetwork() && ['Item', 'Actor'].includes(data.type)) {
             const document = await fromUuid(data.uuid) as SR5Actor;
             if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
-            await this.object.addSlave(document);
+            await this.item.addSlave(document);
             return;
         }
 
@@ -544,7 +602,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         if (this.item.isType('device') && ['Item', 'Actor'].includes(data.type)) {
             const document = await fromUuid(data.uuid) as SR5Item | SR5Actor;
             if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
-            await this.object.addSlave(document);
+            await this.item.addSlave(document);
             return;
         }
 
@@ -872,38 +930,6 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         });
     }
 
-    /**
-     * @private
-     */
-    override async _render(force = false, options = {}) {
-        // NOTE: This is for a timing bug. See function doc for code removal. Good luck, there be dragons here. - taM
-        // this.fixStaleRenderedState();
-
-        this._saveScrollPositions();
-        await super._render(force, options);
-        this._restoreScrollPositions();
-    }
-
-    /**
-     * @private
-     */
-    override _restoreScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length && this._scroll != null) {
-            activeList.prop('scrollTop', this._scroll);
-        }
-    }
-
-    /**
-     * @private
-     */
-    override _saveScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length) {
-            this._scroll = activeList.prop('scrollTop');
-        }
-    }
-
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
@@ -997,13 +1023,8 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
     async _onListItemToggleDescriptionVisibility(event) {
         event.preventDefault();
         const item = $(event.currentTarget).parents('.list-item');
-        const iid = $(item).data().item;
         const field = item.find('.list-item-description');
         field.toggle();
-        if (iid) {
-            if (field.is(':visible')) this._shownDesc.push(iid);
-            else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
-        }
     }
 
     /**
@@ -1073,7 +1094,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      */
     _prepareShowMiscTab() {
         // Currently, only action items use this tab.
-        const action = this.object.asType('action');
+        const action = this.item.asType('action');
         if (!action) return false;
 
         const relevantCategories: Shadowrun.ActionCategories[] = ['matrix'];

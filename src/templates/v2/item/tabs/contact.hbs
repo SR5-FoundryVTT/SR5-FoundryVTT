@@ -1,0 +1,29 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="standard-form scrollable">
+            <div class="formgroup">
+                <label>
+                    {{localize "SR5.Contact.LinkedActor"}}
+                </label>
+                <div class="form-fields">
+                    {{#if linkedActor}}
+                        <a class="content-link" draggable="false" data-link data-type="Actor" data-id="{{linkedActor.id}}"
+                           data-uuid="{{linkedActor.uuid}}">
+                            <i class="fas fa-user"></i>
+                            {{linkedActor.name}}
+                        </a>
+                        <a data-action="removeLinkedActor"><i class="fas fa-times"></i></a>
+                    {{else}}
+                        {{localize "SR5.Contact.DropActor"}}
+                    {{/if}}
+                </div>
+            </div>
+            {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.connection value=system.connection rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.loyalty value=system.loyalty rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.family value=system.family rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.blackmail value=system.blackmail rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.group value=system.group rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+</section>

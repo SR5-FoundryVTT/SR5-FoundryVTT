@@ -216,7 +216,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             templates: this.actorSystemParts('movement', 'initiative'),
         },
         tabs: {
-            template: this.templateBase('actor/primary-tab-navigation'),
+            template: this.templateBase('common/primary-tab-group'),
         },
         actions: {
             template: this.templateBase('actor/tabs/actions'),

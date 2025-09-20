@@ -1,4 +1,4 @@
-<div class="new-list-item new-list-item-header">
+<div class="new-list-item new-list-item-header {{cssClass}}">
     <div class="new-list-item-label-container">
         <label>
             {{localize label}}
@@ -17,10 +17,5 @@
         {{#unless isItemEffect}}
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
         {{/unless}}
-        <a data-action="toggleExpanded"
-           data-tooltip="{{#if isOpen}}SR5.Collapse{{else}}SR5.Expand{{/if}}"
-           data-item-type="{{type}}">
-            <i class="{{#if isOpen}}fas fa-square-chevron-up{{else}}fas fa-square-chevron-down{{/if}}"></i>
-        </a>
     </div>
 </div>

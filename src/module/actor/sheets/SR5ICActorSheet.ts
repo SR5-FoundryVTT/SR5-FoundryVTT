@@ -54,7 +54,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
             templates: this.actorSystemParts('initiative', 'common-rolls')
         },
         tabs: {
-            template: this.templateBase('actor/primary-tab-navigation'),
+            template: this.templateBase('common/primary-tab-group'),
         },
         actions: {
             template: this.templateBase('actor/tabs/actions'),

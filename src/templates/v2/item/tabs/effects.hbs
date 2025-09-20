@@ -5,16 +5,16 @@
             cssClass="header-for-scrollable" }}
         <div class="scrollable">
             {{#each effects}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/item.hbs' item=this }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/item.hbs' item=this }}
             {{/each}}
             <!-- Owned Item Effects. Actor only. -->
             {{#if itemEffects}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/header.hbs'
-                label='SR5.Labels.Sheet.ItemEffects'
-                isItemEffect=true }}
-            {{#each itemEffects}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/item.hbs' item=this isItemEffect=true }}
-            {{/each}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/header.hbs'
+                    label='SR5.Labels.Sheet.ItemEffects'
+                    isItemEffect=true }}
+                {{#each itemEffects}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/item.hbs' item=this isItemEffect=true }}
+                {{/each}}
             {{/if}}
         </div>
     </div>

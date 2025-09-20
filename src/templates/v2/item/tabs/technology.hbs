@@ -1,0 +1,21 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        {{log systemFields}}
+        <div class="scrollable standard-form">
+            {{#if systemFields.grade}}
+                {{formGroup systemFields.grade value=system.grade rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+            {{#if systemFields.essence}}
+                {{formGroup systemFields.essence value=system.essence rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+            {{#if systemFields.capacity}}
+                {{formGroup systemFields.capacity value=system.capacity rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+            {{#if source.system.technology}}
+                {{formGroup systemFields.technology.fields.rating value=source.system.technology.rating rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.technology.fields.quantity value=source.system.technology.quantity rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.technology.fields.conceal.fields.base value=source.system.technology.conceal.base rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+        </div>
+    </div>
+</section>

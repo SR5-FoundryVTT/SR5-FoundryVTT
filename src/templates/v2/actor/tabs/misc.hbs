@@ -79,52 +79,33 @@
             </section>
         </div>
         <div>
+            <!-- Situational Modifiers Section -->
+            {{#if situationModifiers}}
             <div>
-                <!-- Situational Modifiers Section -->
-                {{#if situationModifiers}}
-                <div class="list-item item-section wrap-collapsible">
-                    <input id="collapsible-situation-modifiers" class="toggle" type="checkbox" checked>
-                    <div class="list-item-content">
-                        <div class="item-left">
-                            <label for="collapsible-situation-modifiers" class="lbl-toggle">
-                                <div class="item-text item-name">
-                                    {{localize "SR5.SituationalModifiersApplication.Title"}}
-                                </div>
-                            </label>
-                        </div>
-                        <div class="item-right">
-                            <div class="item-text rtg">
-                                {{localize "SR5.Value"}}
-                            </div>
-                        </div>
+                <div class="new-list-item new-list-item-header">
+                    <div class="new-list-item-label-container">
+                        <label>
+                            {{localize "SR5.SituationalModifiersApplication.Title"}}
+                        </label>
                     </div>
-                    <div class="collapsible-content">
-                        <div class="content-inner">
-                            <div class="mods">
-                                {{#each situationModifiers}}
-                                {{#if (not this.hidden)}}
-                                <div class="list-item">
-                                    <div class="list-item-content">
-                                        <div class="item-left">
-                                            <div class="item-text item-name mods-label show-situation-modifiers-application">
-                                                {{localize this.label}}
-                                            </div>
-                                        </div>
-                                        <div class="item-right">
-                                            <div class="item-text rtg">
-                                                {{this.value}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {{/if}}
-                                {{/each}}
-                            </div>
-                        </div>
+                    <div class="new-list-item-col">
+                        <span>{{localize "SR5.Value"}}</span>
                     </div>
                 </div>
+                {{#each situationModifiers}}
+                {{#if (not this.hidden)}}
+                    <div class="new-list-item">
+                        <div class="new-list-item-label-container">
+                            <label>{{localize this.label}}</label>
+                        </div>
+                        <div class="new-list-item-col">
+                            <span>{{this.value}}</span>
+                        </div>
+                    </div>
                 {{/if}}
+                {{/each}}
             </div>
+            {{/if}}
 
             <!-- Modifier Section -->
             <div class="new-list-item new-list-item-header header-for-scrollable">

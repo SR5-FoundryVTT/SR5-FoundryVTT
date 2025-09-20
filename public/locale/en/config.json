@@ -948,7 +948,26 @@
         "IsFreshImport": "This item was imported from Chummer and needs manual review.",
         "IsGrunt": "Grunt",
         "IsNPC": "NPC",
-        "Item": "Item",
+        "Item": {
+            "FIELDS": {
+                "technology": {
+                    "rating": {
+                        "label": "Rating",
+                        "hint": "The Device Rating of the item, this factors into matrix actions."
+                    },
+                    "quantity": {
+                        "label": "Quantity",
+                        "hint": "The amount of items this Item represents"
+                    },
+                    "conceal": {
+                        "base" : {
+                            "label": "Conceal",
+                            "hint": "How hidden this device is to other people"
+                        }
+                    }
+                }
+            }
+        },
         "ItemMod": "Item Mod",
         "ItemName": "Item Name",
         "ItemTypes": {
