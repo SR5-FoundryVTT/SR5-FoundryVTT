@@ -19,7 +19,7 @@ export class AdeptPower extends ItemBase<ReturnType<typeof AdeptPowerData>> {
     static override defineSchema() {
         return AdeptPowerData();
     }
-    static override LOCALIZATION_PREFIXES = ["SR5.AdeptPower"];
+    static override LOCALIZATION_PREFIXES = ["SR5.AdeptPower", "SR5.Item"];
 }
 
 console.log("AdeptPowerData", AdeptPowerData(), new AdeptPower());

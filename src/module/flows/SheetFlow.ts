@@ -5,43 +5,43 @@ export const SheetFlow = {
     _getCreateItemText(type: string): string {
         switch (type) {
             case 'lifestyle':
-                return formatStrict('SR5.Create', { type: 'SR5.Lifestyle' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Lifestyle' });
             case 'contact':
                 return  formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Contact' });
             case 'sin':
-                return formatStrict('SR5.Create', { type: 'SR5.SIN' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Sin' });
             case 'license':
-                return formatStrict('SR5.Create', { type: 'SR5.License' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.License' });
             case 'quality':
-                return formatStrict('SR5.Create', { type: 'SR5.Quality' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Quality' });
             case 'adept_power':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.AdeptPower' });
             case 'action':
-                return formatStrict('SR5.Create', { type: 'SR5.Action' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Action' });
             case 'spell':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Spell' });
             case 'ritual':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Ritual' });
             case 'gear':
-                return formatStrict('SR5.Create', { type: 'SR5.Gear' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Gear' });
             case 'complex_form':
-                return formatStrict('SR5.Create', { type: 'SR5.ComplexForm' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.ComplexForm' });
             case 'program':
-                return formatStrict('SR5.Create', { type: 'SR5.Program' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Program' });
             case 'weapon':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Weapon' });
             case 'armor':
-                return formatStrict('SR5.Create', { type: 'SR5.Armor' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Armor' });
             case 'ammo':
-                return formatStrict('SR5.Create', { type: 'SR5.Ammo' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Ammo' });
             case 'modification':
-                return formatStrict('SR5.Create', { type: 'SR5.Modification' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Modification' });
             case 'device':
-                return formatStrict('SR5.Create', { type: 'SR5.Device' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Device' });
             case 'equipment':
-                return formatStrict('SR5.Create', { type: 'SR5.Equipment' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Equipment' });
             case 'cyberware':
-                return formatStrict('SR5.Create', { type: 'SR5.Cyberware' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Cyberware' });
             case 'bioware':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Bioware' });
             case 'critter_power':
@@ -49,9 +49,9 @@ export const SheetFlow = {
             case 'sprite_power':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.SpritePower' });
             case 'echo':
-                return formatStrict('SR5.Create', { type: 'SR5.Echo' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Echo' });
             case 'metamagic':
-                return formatStrict('SR5.Create', { type: 'SR5.Metamagic' });
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Metamagic' });
             case 'summoning':
                 // NOTE: summoning is not an actual item type. It's a call_in_action sub type
                 return game.i18n.localize('SR5.CallInAction.CreateSummoning');
@@ -101,7 +101,10 @@ export const SheetFlow = {
             delete parts['quality'];
         }
         if (!item.isType('adept_power')) {
-            delete parts['adept_power'];
+            delete parts['adeptPower'];
+        }
+        if (!item.isType('armor')) {
+            delete parts['armor'];
         }
     }
 

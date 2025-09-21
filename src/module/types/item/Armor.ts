@@ -28,6 +28,7 @@ export class Armor extends ItemBase<ReturnType<typeof ArmorData>> {
     static override defineSchema() {
         return ArmorData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Armor", "SR5.Item"];
 }
 
 export type ArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ArmorData>>;

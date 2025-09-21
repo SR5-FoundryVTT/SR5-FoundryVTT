@@ -132,7 +132,7 @@ export const ChatData: { [K in Item.ConfiguredSubType]: (item: SR5Item<K>) => st
         const system = item.system;
         const props: string[] = [];
         if (system.armor) {
-            if (system.armor.value) props.push(`${game.i18n.localize('SR5.Armor')} ${system.armor.mod ? '+' : ''}${system.armor.value}`);
+            if (system.armor.value) props.push(`${game.i18n.localize('SR5.Armor.label')} ${system.armor.mod ? '+' : ''}${system.armor.value}`);
             if (system.armor.acid) props.push(`${game.i18n.localize('SR5.ElementAcid')} ${system.armor.acid}`);
             if (system.armor.cold) props.push(`${game.i18n.localize('SR5.ElementCold')} ${system.armor.cold}`);
             if (system.armor.fire) props.push(`${game.i18n.localize('SR5.ElementFire')} ${system.armor.fire}`);

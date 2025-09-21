@@ -21,7 +21,7 @@ export class Quality extends ItemBase<ReturnType<typeof QualityData>> {
         return QualityData();
     }
 
-    static override LOCALIZATION_PREFIXES = ["SR5.Quality"];
+    static override LOCALIZATION_PREFIXES = ["SR5.Quality", "SR5.Item"];
 }
 
 console.log("QualityData", QualityData(), new Quality());

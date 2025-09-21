@@ -680,7 +680,7 @@ export const SR5 = {
     // Gear modification types. :) Not modifiers.
     modificationTypes: {
         weapon: 'SR5.Weapon.Weapon',
-        armor: 'SR5.Armor',
+        armor: 'SR5.Armor.label',
         vehicle: 'SR5.Vehicle.Vehicle',
         drone: 'SR5.Vehicle.Drone'
     },

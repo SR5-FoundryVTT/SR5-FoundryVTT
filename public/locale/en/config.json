@@ -459,7 +459,45 @@
         "AmmoGelRounds": "Gel Rounds",
         "Aoe": "AoE",
         "ApplyWounds": "Apply Wounds",
-        "Armor": "Armor",
+        "Armor": {
+            "label": "Armor",
+            "FIELDS": {
+                "armor": {
+                    "value": {
+                        "label": "Armor Value",
+                        "hint": "Amount of Armor that this item provides"
+                    },
+                    "mod": {
+                        "label": "Accessory",
+                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)"
+                    },
+                    "hardened": {
+                        "label": "Hardened Armor",
+                        "hint": "If this Armor is Hardened"
+                    },
+                    "acid": {
+                        "label": "Acid Resistance",
+                        "hint": "Extra Armor against attacks with Acid"
+                    },
+                    "electricity": {
+                        "label": "Nonconductivity",
+                        "hint": "Extra Armor against attacks with Electricity"
+                    },
+                    "cold": {
+                        "label": "Insulation",
+                        "hint": "Extra Armor against attacks with Cold"
+                    },
+                    "fire": {
+                        "label": "Fire Resistance",
+                        "hint": "Extra Armor against attacks with Fire"
+                    },
+                    "radiation": {
+                        "label": "Radiation Resistance",
+                        "hint": "Extra Armor against attacks with Radiation"
+                    }
+                }
+            }
+        },
         "ArmorHardened": "Hardened",
         "ArmorHardenedFull": "Hardened Armor",
         "ArmorValue": "Armor Value",
@@ -1197,8 +1235,10 @@
             "Device": "Device",
             "Echo": "Echo",
             "Equipment": "Equipment",
+            "Gear": "Gear",
             "Grid": "Grid",
             "Host": "Host",
+            "License": "License",
             "Lifestyle": "Lifestyle",
             "Metamagic": "Metamagic",
             "Modification": "Modification",
