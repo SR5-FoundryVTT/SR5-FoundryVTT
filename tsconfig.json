@@ -1,5 +1,5 @@
 {
-    "include": [ "src/**/*", "src/module/types/global.ts" ],
+    "include": ["src/**/*", "src/module/types/global.ts"],
     "exclude": ["node_modules", "**/*.spec.ts"],
     "name": "shadowrun5e",
     "compilerOptions": {
@@ -26,6 +26,7 @@
         "checkJs": false /* Enable error reporting in type-checked JavaScript files. */,
 
         /* Emit */
+        "noEmit": true /* default to not emitting */,
         "outDir": "dist" /* Specify an output folder for all emitted files. */,
         // "sourceMap": true,
 
