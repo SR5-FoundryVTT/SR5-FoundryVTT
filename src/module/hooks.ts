@@ -61,7 +61,6 @@ import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 
-import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
 import { registerSystemKeybindings } from './keybindings';
@@ -130,7 +129,7 @@ import { SocketMessageFlow } from './flows/SocketMessageFlow';
 export const SR5CONFIG = SR5;
 
 export class HooksManager {
-    static registerHooks() {
+    static async registerHooks() {
         console.log('Shadowrun 5e | Registering system hooks');
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
@@ -160,7 +159,10 @@ export class HooksManager {
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant.bind(SR5Combat));
 
-        Hooks.on('quenchReady', quenchRegister);
+        if (import.meta.env.MODE !== 'production') {
+            const quench = await import('../unittests/quench');
+            Hooks.on('quenchReady', quench.quenchRegister);
+        }
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();

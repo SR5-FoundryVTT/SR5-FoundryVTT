@@ -4,6 +4,8 @@
     "name": "shadowrun5e",
     "compilerOptions": {
         "target": "ESNext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+        "module": "esnext",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "useDefineForClassFields": true /* Emit ECMAScript-standard-compliant class fields. */,
         "moduleDetection": "auto" /* Control what method is used to detect module-format JS files. */,
 
