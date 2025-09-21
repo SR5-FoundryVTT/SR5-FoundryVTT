@@ -72,6 +72,7 @@ export class CompendiumBrowser extends Base {
 
     private activeTab: "Actor" | "Item" | "Config" = "Item";
     private allFilters: FilterEntry[] = [];
+    private _packs: CompendiumCollection<'Actor' | 'Item'>[];
     private packBlackList: string[] = [];
     private _searchQuery: string = "";
     private _searchCursorPosition: number | null = null;
@@ -92,6 +93,9 @@ export class CompendiumBrowser extends Base {
      */
     constructor(options?: ConstructorParameters<typeof Base>[0]) {
         super(options);
+        this._packs = game.packs.filter((p): p is CompendiumCollection<'Actor' | 'Item'> =>
+            p.visible && ["Actor", "Item"].includes(p.metadata.type)
+        );
         this.setFilters();
     }
 
@@ -170,8 +174,8 @@ export class CompendiumBrowser extends Base {
 
     /** Builds the hierarchical tree of folders and packs. */
     private _buildPackTree(): FolderNode {
-        const packs = game.packs
-            .filter((p): p is CompendiumCollection<'Actor' | 'Item'> => p.visible && ["Actor", "Item"].includes(p.metadata.type))
+        let packs = this._packs
+            .filter((p) => p.visible && ["Actor", "Item"].includes(p.metadata.type))
             .map(p => ({
                 pack: p,
                 path: p.folder ? [...p.folder.ancestors.reverse(), p.folder] : [],
@@ -181,6 +185,9 @@ export class CompendiumBrowser extends Base {
                 const bPath = [...b.path.map(folder => folder.name), b.pack.metadata.label];
                 return aPath.join("/").localeCompare(bPath.join("/"));
             });
+
+        if (this._searchQuery)
+            packs = packs.filter(({ pack }) => pack.metadata.label.toLowerCase().includes(this._searchQuery.toLowerCase()));
 
         const root: FolderNode = {
             name: "__root__", id: "__root__", type: "Folder", collapsed: false, selectionState: "none", children: []
@@ -233,9 +240,22 @@ export class CompendiumBrowser extends Base {
                 const type = target.dataset.type as "folder" | "pack";
                 if (type === "pack") {
                     if (target.checked)
-                        this.packBlackList = this.packBlackList.filter((p) => !p.startsWith(id!));
+                        this.packBlackList = this.packBlackList.filter((p) => p !== id!);
                     else
                         this.packBlackList.push(id!);
+                } else {
+                    const toRemove = !target.checked && !target.classList.contains('indeterminate');
+
+                    for (const pack of this._packs) {
+                        if (pack.folder == null) continue;
+                        if ([pack.folder, ...pack.folder.ancestors].some(f => f.id === id)) {
+                            if (toRemove) {
+                                this.packBlackList.push(pack.collection);
+                            } else {
+                                this.packBlackList = this.packBlackList.filter((p) => p !== pack.collection);
+                            }
+                        }
+                    }
                 }
                 void this.render({ parts: ["settings"] });
                 console.log(this, id, type);
@@ -370,13 +390,13 @@ export class CompendiumBrowser extends Base {
     private _onSearch(event: Event, target: HTMLInputElement) {
         this._searchCursorPosition = target.selectionStart;
         this._searchQuery = target.value;
-        void this.render({ parts: ["results"] });
+        void this.render({ parts: [this.activeTab === "Config" ? "settings" : "results"] });
     }
 
     /** Handles the click event for the 'clear search' button, resetting the query. */
-    private async _onClearSearch() {
+    private _onClearSearch() {
         this._searchQuery = "";
-        void this.render({ parts: ["results", "filters"] });
+        void this.render({ parts: ["filters", this.activeTab === "Config" ? "settings" : "results"] });
     }
 
     /**
@@ -385,7 +405,7 @@ export class CompendiumBrowser extends Base {
     private _onFilterChange(type: string, selected: boolean) {
         const typeEntry = this.allFilters.find((t) => t.id === type);
         if (typeEntry) typeEntry.selected = selected;
-        void this.render({ parts: ["results"] });
+        void this.render({ parts: [this.activeTab === "Config" ? "settings" : "results"] });
     }
 
     /**
@@ -436,9 +456,9 @@ export class CompendiumBrowser extends Base {
         if (this.results.throttle) return;
         this.results.throttle = true;
 
-        const activePacks = game.packs.filter(
+        const activePacks = this._packs.filter(
             (p) => p.visible && p.metadata.type === this.activeTab
-        ) as CompendiumCollection<"Actor" | "Item">[];
+        );
         const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
         let entries = indexes.flatMap((index) => [...index.values()]);
 
