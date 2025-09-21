@@ -12,13 +12,13 @@ type PackNode = {
     id: string;
     name: string;
     selected: boolean;
-    isFolder?: false;
+    type: "Actor" | "Item";
 };
 
 type FolderNode = {
     id: string;
     name: string;
-    isFolder: true;
+    type: "Folder";
     collapsed: boolean;
     selectionState: "none" | "some" | "all";
     children: (FolderNode | PackNode)[];
@@ -182,7 +182,10 @@ export class CompendiumBrowser extends Base {
                 return aPath.join("/").localeCompare(bPath.join("/"));
             });
 
-        const root: FolderNode = { name: "__root__", id: "__root__", isFolder: true, collapsed: false, selectionState: "none", children: [] };
+        const root: FolderNode = {
+            name: "__root__", id: "__root__", type: "Folder", collapsed: false, selectionState: "none", children: []
+        };
+
         const folderMap = new Map<string, FolderNode>([["", root]]);
 
         for (const { pack, path } of packs) {
@@ -196,7 +199,7 @@ export class CompendiumBrowser extends Base {
                         id: folderId,
                         name: path[i].name,
                         children: [],
-                        isFolder: true,
+                        type: "Folder",
                         collapsed: false,
                         selectionState: "none",
                     };
@@ -210,6 +213,7 @@ export class CompendiumBrowser extends Base {
             const parentNode = folderMap.get(parentId)!;
             parentNode.children.push({
                 id: pack.collection,
+                type: pack.metadata.type,
                 name: pack.metadata.label,
                 selected: !this.packBlackList.includes(pack.collection),
             });
@@ -245,7 +249,7 @@ export class CompendiumBrowser extends Base {
         let childCount = 0;
 
         for (const child of folder.children) {
-            if (child.isFolder) {
+            if (child.type === "Folder") {
                 const childState = this._updateFolderSelectionState(child);
                 if (childState === "all") checkedCount++;
                 if (childState === "some") checkedCount += 0.5;
@@ -264,13 +268,11 @@ export class CompendiumBrowser extends Base {
 
     /** Updates the visual indeterminate state of checkboxes in the DOM. */
     private _updateIndeterminateStates(container: HTMLElement, node: FolderNode) {
-        if (!node.isFolder) return;
-
         const checkbox = container.querySelector<HTMLInputElement>(`input[data-id="${node.id}"]`);
         if (checkbox && node.selectionState === "some")
             checkbox.classList.add('indeterminate');
 
-        for (const child of node.children.filter((n): n is FolderNode => !!n.isFolder))
+        for (const child of node.children.filter((n): n is FolderNode => n.type === "Folder"))
             this._updateIndeterminateStates(container, child);
     }
 

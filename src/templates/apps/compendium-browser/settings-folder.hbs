@@ -1,24 +1,30 @@
 {{#each nodes as |node|}}
     <div 
-        class="pack-row {{#if node.isFolder}}folder collapsible{{/if}} {{#if node.collapsed}}collapsed{{/if}}" 
+        class="pack-row {{#if (eq node.type "Folder")}}folder collapsible{{/if}} {{#if node.collapsed}}collapsed{{/if}}" 
         style="--depth: {{../depth}};"
     >
         <label>
             <input 
                 type="checkbox" 
                 data-id="{{node.id}}"
-                data-type="{{#if node.isFolder}}folder{{else}}pack{{/if}}"
+                data-type="{{#if (eq node.type "Folder")}}folder{{else}}pack{{/if}}"
                 {{#if (eq node.selectionState "some")}}class="indeterminate"{{/if}}
                 {{#if (or node.selected (eq node.selectionState "all") (eq node.selectionState "some"))}}checked{{/if}}>
-            {{#if node.isFolder}}
+
+            {{#if (eq node.type "Folder")}}
                 <a class="collapse-toggle" data-action="toggleCollapse"><i class="fa-solid fa-caret-down"></i></a>
             {{/if}}
+
+            {{#if (eq node.type "Folder")}}<i class="fa-solid fa-folder"></i>{{/if}}
+            {{#if (eq node.type "Item")}}<i class="fa-solid fa-suitcase"></i>{{/if}}
+            {{#if (eq node.type "Actor")}}<i class="fa-solid fa-user"></i>{{/if}}
+
             <span>{{node.name}}</span>
         </label>
-        <div class="children-container">
-            {{#if node.isFolder}}
+        {{#if (eq node.type "Folder")}}
+            <div class="children-container">
                 {{> 'systems/shadowrun5e/dist/templates/apps/compendium-browser/settings-folder.hbs' nodes=node.children depth=(sum ../depth 1)}}
-            {{/if}}
-        </div>
+            </div>
+        {{/if}}
     </div>
 {{/each}}
