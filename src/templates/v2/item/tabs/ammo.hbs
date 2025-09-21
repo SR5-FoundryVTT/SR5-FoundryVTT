@@ -1,0 +1,21 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <section class="standard-form scrollable">
+            {{formGroup systemFields.damage value=system.damage rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.damageType
+                        value=system.damageType
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemfields.element
+                        value=system.element
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.replaceDamage value=system.replaceDamage rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.ap value=system.ap rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.replaceAP value=system.replaceAP rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemfields.accuracy value=system.accuracy rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.blast.fields.radius value=system.blast.radius rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.blast.fields.dropoff value=system.blast.dropoff rootId=@root.rootId disabled=@root.isPlayMode}}
+        </section>
+    </div>
+</section>

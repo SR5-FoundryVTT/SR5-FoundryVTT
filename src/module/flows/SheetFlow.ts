@@ -94,6 +94,9 @@ export const SheetFlow = {
             delete parts['damage'];
             delete parts['opposed'];
         }
+        if (!item.isType('ammo')) {
+            delete parts['ammo'];
+        }
     }
 
 }

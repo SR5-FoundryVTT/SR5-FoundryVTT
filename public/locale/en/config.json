@@ -394,7 +394,49 @@
             }
         },
         "Agent": "Agent",
-        "Ammo": "Ammo",
+        "Ammo": {
+            "label": "Ammo",
+            "FIELDS": {
+                "damage": {
+                    "label": "Damage",
+                    "hint": "Damage dealt by this ammo. This may be added to the Weapon's Damage or replace it"
+                },
+                "damageType": {
+                    "label": "Damage type",
+                    "hint": "Type of damage dealt by this Ammo."
+                },
+                "element": {
+                    "label": "Element",
+                    "hint": "Element the damage of this Element does."
+                },
+                "replaceDamage": {
+                    "label": "Replace Damage",
+                    "hint": "If this Ammo should replace the Damage of the weapon"
+                },
+                "ap": {
+                    "label": "AP",
+                    "hint": "Armor Penetration of this Ammo. This may be added to the Weapon's AP or replace it"
+                },
+                "replaceAP": {
+                    "label": "Replace AP",
+                    "hint": "If this Ammo should replace the AP of the Weapon"
+                },
+                "accuracy": {
+                    "label": "Accuracy",
+                    "hint": "Accuracy modifier of this Ammo"
+                },
+                "blast": {
+                    "radius": {
+                        "label": "Blast Radius",
+                        "hint": "Blast Radius of this Ammo, in Meters"
+                    },
+                    "dropoff": {
+                        "label": "Blast Dropoff",
+                        "hint": "Blast Dropoff modifies the Damage per Meter"
+                    }
+                }
+            }
+        },
         "AmmoFull": "Ammo Full",
         "AmmoGelRounds": "Gel Rounds",
         "Aoe": "AoE",
