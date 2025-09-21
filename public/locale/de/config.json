@@ -224,8 +224,8 @@
         "Barrel": "Laufmontiert",
         "Base": "Basis",
         "BaseValue": "Basiswert",
-        "Biography": "Biographie",
         "BiofeedbackDamage": "Biofeedback Schaden",
+        "Biography": "Biographie",
         "BlastRadius": "Sprengradius",
         "Block": "Blocken",
         "Bonus": "Bonus",
@@ -291,6 +291,19 @@
             },
             "Title": "System Kompendien"
         },
+        "Compendiums": {
+            "Folders": {
+                "Root": "SR5e Importe"
+            },
+            "sr5critter": "Critter & Geister & Sprites",
+            "sr5drone": "Drohnen & Fahrzeuge",
+            "sr5gear": "Rüstungen & Ausrüstungen",
+            "sr5magic": "Zauber & Komplexe Formen",
+            "sr5modification": "Modifikationen",
+            "sr5trait": "Qualitäten & Kräfte",
+            "sr5ware": "Bioware & Cyberware",
+            "sr5weapon": "Waffen"
+        },
         "Compilation": {
             "DropSprite": "Sprite ablegen",
             "FixedSprite": "Sprite vorb.",
@@ -307,6 +320,7 @@
             "DropActor": "Drag&Drop' einen Akteur um ihn mit dieser Verbindung zu verbinden",
             "Family": "Familie",
             "Group": "Gruppe",
+            "LinkedActor": "Akteur",
             "Loyalty": "Loyalität",
             "Type": "Typ"
         },
@@ -757,8 +771,8 @@
                 "Icons": "Icons",
                 "MarkNetwork": "Markiere Netzwerk",
                 "MarkedIcons": "Markierte Icons",
-                "MatrixActions": "Matrix Handlungen",
                 "Matrix": "Matrix",
+                "MatrixActions": "Matrix Handlungen",
                 "Offline": "Offline",
                 "OwnedIcons": "Icons im Besitz",
                 "Persona": "Persona",
