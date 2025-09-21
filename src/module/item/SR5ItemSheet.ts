@@ -111,6 +111,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/description'),
             scrollable: ['scrollable']
         },
+        adeptPower: {
+            template: SheetFlow.templateBase('item/tabs/adept_power'),
+            scrollable: ['scrollable']
+        },
         technology: {
             template: SheetFlow.templateBase('item/tabs/technology'),
             scrollable: ['scrollable']
@@ -155,6 +159,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             initial: 'description',
             tabs: [
                 { id: 'description', label: 'Description', cssClass: '' },
+                { id: 'adeptPower', label: 'AdeptPower', cssClass: '' },
                 { id: 'contact', label: 'Contact', cssClass: '' },
                 { id: 'technology', label: 'Technology', cssClass: '' },
                 { id: 'quality', label: 'Quality', cssClass: '' },

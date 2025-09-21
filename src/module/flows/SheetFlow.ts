@@ -100,6 +100,9 @@ export const SheetFlow = {
         if (!item.isType('quality')) {
             delete parts['quality'];
         }
+        if (!item.isType('adept_power')) {
+            delete parts['adept_power'];
+        }
     }
 
 }

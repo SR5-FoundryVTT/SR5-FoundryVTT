@@ -391,6 +391,24 @@
             "Types": {
                 "Active": "Active",
                 "Passive": "Passive"
+            },
+            "FIELDS": {
+                "pp": {
+                    "label": "Power Points",
+                    "hint": "Number of Power Points this Power Costs"
+                },
+                "type": {
+                    "label": "Power Type",
+                    "hint": "Type of Adept Power"
+                },
+                "drain": {
+                    "label": "Drain",
+                    "hint": "If this Adept Power incurs Drain after use"
+                },
+                "level": {
+                    "label": "Level",
+                    "hint": "Level of this Adept Power (if applicable)"
+                }
             }
         },
         "Agent": "Agent",
