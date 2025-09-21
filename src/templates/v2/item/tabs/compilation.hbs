@@ -1,0 +1,30 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="standard-form scrollable">
+            {{formGroup systemFields.sprite.fields.type
+                        value=system.sprite.type
+                        localize=true
+                        rootId=@root.rootId disabled=(or @root.isPlayMode sprite)}}
+            {{formGroup systemFields.sprite.fields.level
+                        value=system.sprite.level
+                        rootId=@root.rootId disabled=(or @root.isPlayMode sprite)}}
+
+            <div class="form-group">
+                <label>{{localize "SR5.Compilation.FixedSprite"}}</label>
+                <div class="form-fields">
+                    {{#if sprite}}
+                        <span>
+                            <a class="origin-link" draggable="false" data-origin-link="{{sprite.uuid}}">{{sprite.name}}</a>
+                            <a class="close sprite-remove"><i class="fas fa-times"></i></a>
+                        </span>
+                    {{else}}
+                        <span>{{localize "SR5.Compilation.DropSprite"}}</span>
+                    {{/if}}
+                </div>
+                <p class="hint">
+                    {{localize "SR5.Tooltips.CompilationTest.PreparedSprite"}}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

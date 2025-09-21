@@ -119,6 +119,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/adept_power'),
             scrollable: ['scrollable']
         },
+        compilation: {
+            template: SheetFlow.templateBase('item/tabs/compilation'),
+            scrollable: ['scrollable']
+        },
+        summoning: {
+            template: SheetFlow.templateBase('item/tabs/summoning'),
+            scrollable: ['scrollable']
+        },
         technology: {
             template: SheetFlow.templateBase('item/tabs/technology'),
             scrollable: ['scrollable']
@@ -166,6 +174,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'adeptPower', label: 'AdeptPower', cssClass: '' },
                 { id: 'armor', label: 'Armor', cssClass: '' },
                 { id: 'contact', label: 'Contact', cssClass: '' },
+                { id: 'compilation', label: 'Compilation', cssClass: '' },
+                { id: 'summoning', label: 'Summoning', cssClass: '' },
                 { id: 'technology', label: 'Technology', cssClass: '' },
                 { id: 'quality', label: 'Quality', cssClass: '' },
                 { id: 'action', label: 'Action', cssClass: '' },

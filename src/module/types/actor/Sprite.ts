@@ -4,6 +4,7 @@ import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
 import { Limits, MatrixLimits } from "../template/Limits";
 import { ActorBase, CommonData, CreateModifiers } from "./Common";
+import { SR5 } from '@/module/config';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpriteData = () => ({
@@ -13,15 +14,7 @@ const SpriteData = () => ({
     spriteType: new StringField({
         required: true,
         initial: 'data',
-        choices: {
-            courier: 'SR5.Sprite.Types.Courier',
-            crack: 'SR5.Sprite.Types.Crack',
-            data: 'SR5.Sprite.Types.Data',
-            fault: 'SR5.Sprite.Types.Fault',
-            machine: 'SR5.Sprite.Types.Machine',
-            companion: 'SR5.Sprite.Types.Companion',
-            generalist:'SR5.Sprite.Types.Generalist',
-        },
+        choices: SR5.spriteTypes,
     }),
     special: new StringField({ required: true, initial: "resonance", readonly: true }),
 

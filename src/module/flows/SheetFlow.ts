@@ -106,6 +106,12 @@ export const SheetFlow = {
         if (!item.isType('armor')) {
             delete parts['armor'];
         }
+        if (!item.isCompilation) {
+            delete parts['compilation'];
+        }
+        if (!item.isSummoning) {
+            delete parts['summoning'];
+        }
     }
 
 }

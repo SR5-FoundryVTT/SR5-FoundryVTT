@@ -545,7 +545,29 @@
             "Compilation": "Compilation",
             "CreateCompilation": "Create compilation action",
             "CreateSummoning": "Create summoning action",
-            "Summoning": "Summoning"
+            "Summoning": "Summoning",
+            "FIELDS": {
+                "spirit": {
+                    "type": {
+                        "label": "Spirit Type",
+                        "hint": "Type of Spirit to Summon. Disabled if a Spirit Actor is set"
+                    },
+                    "force": {
+                        "label": "Spirit Force",
+                        "hint": "Force of Spirit to Summon. Disabled if a Spirit Actor is set"
+                    }
+                },
+                "sprite": {
+                    "type": {
+                        "label": "Sprite Type",
+                        "hint": "Type of Sprite to Compile. Disabled if a Sprite Actor is set"
+                    },
+                    "level": {
+                        "label": "Sprite Force",
+                        "hint": "Level of Sprite to Summon. Disabled if a Sprite Actor is set"
+                    }
+                }
+            }
         },
         "CanDefault": "Can Default",
         "Capacity": "Capacity",

@@ -1,0 +1,30 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="standard-form scrollable">
+            {{formGroup systemFields.spirit.fields.type
+                        value=system.spirit.type
+                        localize=true
+                        rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
+            {{formGroup systemFields.spirit.fields.force
+                        value=system.spirit.force
+                        rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
+
+            <div class="form-group">
+                <label>{{localize "SR5.Summoning.FixedSpirit"}}</label>
+                <div class="form-fields">
+                    {{#if spirit}}
+                        <span>
+                            <a class="origin-link" draggable="false" data-origin-link="{{spirit.uuid}}">{{spirit.name}}</a>
+                            <a class="close spirit-remove"><i class="fas fa-times"></i></a>
+                        </span>
+                    {{else}}
+                        <span>{{localize "SR5.Summoning.DropSpirit"}}</span>
+                    {{/if}}
+                </div>
+                <p class="hint">
+                    {{localize "SR5.Tooltips.SummoningTest.PreparedSpirit"}}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

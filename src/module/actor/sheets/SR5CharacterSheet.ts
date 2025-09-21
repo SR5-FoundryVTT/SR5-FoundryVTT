@@ -59,6 +59,14 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                 { id: 'misc', label: 'Misc', cssClass: '' },
             ]
         },
+        matrixRight: {
+            initial: 'matrixActions',
+            tabs: [
+                { id: 'matrixActions', label: 'Actions', cssClass: '', },
+                { id: 'complexForms', label: 'ComplexForms', cssClass: '', },
+                { id: 'compilations', label: 'Compilations', cssClass: '', }
+            ]
+        }
     }
 
     _hasCritterPowers() {
@@ -75,6 +83,12 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                 delete retVal['magic'];
             }
         }
+        if (group === 'matrixRight') {
+            if (!this.actor.isEmerged()) {
+                delete retVal['complexForms'];
+                delete retVal['compilations'];
+            }
+        }
         return retVal;
     }
 
@@ -85,6 +99,10 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         }
         if (!this.actor.isAwakened()) {
             delete retVal['magic'];
+        }
+        if (!this.actor.isEmerged()) {
+            delete retVal['complexForms'];
+            delete retVal['compilations'];
         }
         return retVal;
     }
@@ -105,6 +123,16 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                 ...SheetFlow.actorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
                 ...SheetFlow.listItem('spell', 'ritual', 'call_in_action', 'adept_power')
                 ],
+            scrollable: ['scrollable']
+        },
+        complexForms: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/complex-forms'),
+            templates: SheetFlow.listItem('complex_form'),
+            scrollable: ['scrollable']
+        },
+        compilations: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/compilations'),
+            templates: SheetFlow.listItem('call_in_action'),
             scrollable: ['scrollable']
         },
         critter: {
@@ -199,6 +227,16 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         };
 
         await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
+    }
+
+    protected override async _renderHTML(content, options) {
+        const parts = await super._renderHTML(content, options);
+        const matrixRightSideContent = parts.matrix.querySelector("section.content.matrix-right-tab-content");
+        if (matrixRightSideContent) {
+            this.moveTabs(SR5CharacterSheet.TABS.matrixRight.tabs, parts, matrixRightSideContent);
+        }
+
+        return parts;
     }
 
 }
