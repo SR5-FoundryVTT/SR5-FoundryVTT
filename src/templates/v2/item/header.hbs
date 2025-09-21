@@ -21,7 +21,7 @@
             />
             {{#if system.importFlags.isFreshImport}}
                 {{#if (itemMarking "ANY")}}
-                    {{> 'systems/shadowrun5e/dist/templates/item/parts/import_flag_button.hbs' }}
+                    <button class="toggle-fresh-import-off" data-tooltip="SR5.MarkImportedItemTooltip">{{localize 'SR5.MarkImportedItemReviewed'}}</button>
                 {{/if}}
             {{/if}}
         </div>
