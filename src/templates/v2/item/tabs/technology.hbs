@@ -1,6 +1,5 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{log systemFields}}
         <div class="scrollable standard-form">
             {{#if systemFields.grade}}
                 {{formGroup systemFields.grade value=system.grade rootId=@root.rootId disabled=@root.isPlayMode}}

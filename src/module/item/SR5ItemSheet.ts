@@ -92,9 +92,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     static override DEFAULT_OPTIONS = {
         classes: [SR5_APPV2_CSS_CLASS, 'item'],
-        window: {
-            resizable: true,
-        },
+        position: {
+            width: 500,
+            height: 300,
+        }
     }
 
     static override PARTS = {
@@ -118,6 +119,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/contact'),
             scrollable: ['scrollable']
         },
+        action: {
+            template: SheetFlow.templateBase('item/tabs/action'),
+            scrollable: ['scrollable']
+        },
         effects: {
             template: SheetFlow.templateBase('item/tabs/effects'),
             templates: SheetFlow.listItem('effect'),
@@ -136,6 +141,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'description', label: 'Description', cssClass: '' },
                 { id: 'contact', label: 'Contact', cssClass: '' },
                 { id: 'technology', label: 'Technology', cssClass: '' },
+                { id: 'action', label: 'Action', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' }
             ]
         }
@@ -144,24 +150,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     protected override _prepareTabs(group: string) {
         const retVal = super._prepareTabs(group);
         if (group === 'primary') {
-            if (!this.item.getTechnologyData()) {
-                delete retVal['technology'];
-            }
-            if (!this.item.isType('contact')) {
-                delete retVal['contact'];
-            }
+            SheetFlow._cleanItemParts(this.item, retVal);
         }
         return retVal;
     }
 
     protected override _configureRenderParts(options) {
         const retVal = super._configureRenderParts(options);
-        if (!this.item.getTechnologyData()) {
-            delete retVal['technology'];
-        }
-        if (!this.item.isType('contact')) {
-            delete retVal['contact'];
-        }
+        SheetFlow._cleanItemParts(this.item, retVal);
         return retVal;
     }
 

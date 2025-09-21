@@ -34,18 +34,25 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
 
         protected _isEditMode = false;
 
-        override async _preparePartContext(partId, context, options) {
-            const partContext = await super._preparePartContext(partId, context, options);
-            partContext.isEditMode = this._isEditMode;
-            partContext.isPlayMode = !this._isEditMode;
+        async _prepareContext(options) {
+            // @ts-ignore
+            const context = await super._prepareContext(options);
+            context.isEditMode = this._isEditMode;
+            context.isPlayMode = !this._isEditMode;
             if (this.document) {
-                if (!partContext.system) {
-                    partContext.system = this.document.toObject(false).system;
+                if (!context.system) {
+                    context.system = this.document.toObject(false).system;
                 }
-                partContext.systemFields = this.document.system.schema.fields;
+                context.systemFields = this.document.system.schema.fields;
             }
 
-            partContext.user = game.user;
+            context.user = game.user;
+
+            return context;
+        }
+
+        override async _preparePartContext(partId, context, options) {
+            const partContext = await super._preparePartContext(partId, context, options);
 
             if (partContext?.primaryTabs) {
                 if (partId in partContext.primaryTabs) {
@@ -98,7 +105,6 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         async _postRender(context, options) {
             // @ts-ignore
             await super._postRender(context, options);
-            console.log('postRender', context, options);
             // once we render, process the Tagify Elements to we rendered
             Hooks.call('sr5_processTagifyElements', this.element);
 

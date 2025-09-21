@@ -1,4 +1,5 @@
 import { formatStrict } from '@/module/utils/strings';
+import { SR5Item } from '@/module/item/SR5Item';
 
 export const SheetFlow = {
     _getCreateItemText(type: string): string {
@@ -79,6 +80,18 @@ export const SheetFlow = {
             items.push(this.templateBase(`list-items/${p}/item`));
             return items;
         }, [])
+    },
+
+    _cleanItemParts(item: SR5Item, parts: Record<string, any>) {
+        if (!item.getTechnologyData()) {
+            delete parts['technology'];
+        }
+        if (!item.isType('contact')) {
+            delete parts['contact'];
+        }
+        if (!item.getAction()) {
+            delete parts['action'];
+        }
     }
 
 }

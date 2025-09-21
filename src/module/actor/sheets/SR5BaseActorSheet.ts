@@ -238,8 +238,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
         const data = await super._prepareContext(options) as any;
         data.actor = this.actor;
-        // todo this shouldn't be required but something in this is accessing the system
-        data.system = this.document.toObject(false).system;
 
         // Sheet related general purpose fields. These aren't persistent.
         data.config = SR5;

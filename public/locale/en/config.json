@@ -950,6 +950,72 @@
         "IsNPC": "NPC",
         "Item": {
             "FIELDS": {
+                "action": {
+                    "categories": {
+                        "label": "Categories",
+                        "hint": "Action Categories that this test incorporates. These actions can be targeted with Active Effects"
+                    },
+                    "modifiers": {
+                        "label": "Modifiers",
+                        "hint": "Action Modifiers that affect this test."
+                    },
+                    "test": {
+                        "label": "Test Type",
+                        "hint": "Specific type of test to use for this Action"
+                    },
+                    "type": {
+                        "label": "Action Type",
+                        "hint": "Type of action that this skill uses"
+                    },
+                    "extended": {
+                        "label": "Extended Test",
+                        "hint": "If this is an Extended Test"
+                    },
+                    "skill": {
+                        "label": "Skill",
+                        "hint": "Skill used by this action. Leave blank if no skill is used"
+                    },
+                    "spec": {
+                        "label": "Specialization",
+                        "hint": "If the skill specialization modifier should be applied to this action"
+                    },
+                    "attribute": {
+                        "label": "Attribute",
+                        "hint": "The Attribute used by the test"
+                    },
+                    "attribute2": {
+                        "label": "Other Attribute",
+                        "hint": "The Other Attribute used by this test"
+                    },
+                    "armor": {
+                        "label": "Armor",
+                        "hint": "If the actor's Armor should be added to the test"
+                    },
+                    "mod": {
+                        "label": "Modifier",
+                        "hint": "Any modifiers applied to the test"
+                    },
+                    "limit": {
+                        "base": {
+                            "label": "Limit Value",
+                            "hint": "Limit value used for the test. This is added if a specific limit is selected"
+                        },
+                        "attribute": {
+                            "label": "Limit",
+                            "hint": "The Specific Limit on the Actor used for the test."
+                        }
+                    },
+                    "threshold": {
+                        "base": {
+                            "label": "Threshold Value",
+                            "hint": "The Threshold that the test needs to reach"
+                        }
+                    },
+                    "roll_mode": {
+                        "label": "Roll Mode",
+                        "hint": "The Roll Mode of the test. Leave blank if it should use the user-selected Roll Mode"
+                    }
+                },
                 "technology": {
                     "rating": {
                         "label": "Rating",

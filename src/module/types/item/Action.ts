@@ -1,7 +1,9 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
-const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foundry.data.fields;
+import { TagifyAltField } from '@/module/types/fields/TagifyAltField';
+import { SR5 } from '@/module/config';
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const ResultActionData = () => ({
     action: new StringField({
@@ -97,14 +99,14 @@ export const ActionRollData = (
 ) => ({
     ...MinimalActionData(),
     test: new StringField({ required: true, initial: test }),
-    type: new StringField({ required: true, initial: type }),
+    type: new StringField({ required: true, initial: type, blank: true, choices: SR5.actionTypes }),
     category: new SchemaField(ActionCategory()),
-    categories: new ArrayField(new StringField({ required: true })),
+    categories: new TagifyAltField(new StringField({ required: true })),
     spec: new BooleanField(),
     mod_description: new StringField({ required: true }),
     threshold: new SchemaField(BaseValuePair()),
     extended: new BooleanField({ initial: false }),
-    modifiers: new ArrayField(new StringField({ required: true })),
+    modifiers: new TagifyAltField(new StringField({ required: true })),
     damage: new ModifiableField(DamageData()),
     opposed: new SchemaField({
         test: new StringField({ required: true, initial: opposedTest }),

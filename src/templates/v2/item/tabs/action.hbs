@@ -1,0 +1,65 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="standard-form scrollable">
+            {{formGroup systemFields.action.fields.test
+                        value=system.action.test
+                        options=(tests2Array activeTests)
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{#if (eq item.type 'action')}}
+                {{formGroup systemFields.action.fields.categories
+                            value=system.action.categories
+                            options=config.actionCategories
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+            {{formGroup systemFields.action.fields.type
+                        value=system.action.type
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{#if system.action.type}}
+                {{formGroup systemFields.action.fields.modifiers
+                            value=system.action.modifiers
+                            options=config.modifierTypes
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.action.fields.extended
+                            value=system.action.extended
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.action.fields.skill
+                            value=system.action.skill
+                            options=(config2Array activeSkills)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.action.fields.spec value=system.action.spec rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.action.fields.attribute
+                            value=system.action.attribute
+                            options=(config2Array attributes)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.action.fields.attribute2
+                            value=system.action.attribute2
+                            options=(config2Array attributes)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.action.fields.armor value=system.action.armor rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.action.fields.mod value=system.action.mod rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{#ifne item.type "spell"}}{{#ifne item.type "complex_form"}}
+                    {{formGroup systemFields.action.fields.limit.fields.attribute
+                                value=system.action.limit.attribute
+                                options=(config2Array limits)
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.action.fields.limit.fields.base
+                                value=system.action.limit.base
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.action.fields.threshold.fields.base
+                                value=system.action.threshold.base
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.action.fields.roll_mode
+                                value=system.action.roll_mode
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/ifne}}{{/ifne}}
+            {{/if}}
+
+        </div>
+    </div>
+</section>
