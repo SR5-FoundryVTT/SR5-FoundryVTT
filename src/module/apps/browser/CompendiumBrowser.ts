@@ -7,19 +7,17 @@ type Context = foundry.applications.api.ApplicationV2.RenderContext & Record<str
 type FilterEntry = { value: string; id: string; selected: boolean };
 const Base = HandlebarsApplicationMixin(ApplicationV2<Context>);
 type BaseType = InstanceType<typeof Base>;
-type Pack = CompendiumCollection<"Actor" | "Item">;
 
 type PackNode = {
     id: string;
     name: string;
-    path: string;
     selected: boolean;
     isFolder?: false;
 };
 
 type FolderNode = {
+    id: string;
     name: string;
-    path: string;
     isFolder: true;
     collapsed: boolean;
     selectionState: "none" | "some" | "all";
@@ -74,8 +72,7 @@ export class CompendiumBrowser extends Base {
 
     private activeTab: "Actor" | "Item" | "Config" = "Item";
     private allFilters: FilterEntry[] = [];
-    private readonly _packs: CompendiumCollection<any>[];
-    private readonly _activePackIds: string[] = [];
+    private packBlackList: string[] = [];
     private _searchQuery: string = "";
     private _searchCursorPosition: number | null = null;
     #tooltipElement: HTMLElement | null = null;
@@ -95,10 +92,6 @@ export class CompendiumBrowser extends Base {
      */
     constructor(options?: ConstructorParameters<typeof Base>[0]) {
         super(options);
-        this._packs = [...game.packs.values()] as CompendiumCollection<any>[];
-        if (this._packs.length > 0) {
-            this._activePackIds.push(this._packs[1].collection);
-        }
         this.setFilters();
     }
 
@@ -141,7 +134,7 @@ export class CompendiumBrowser extends Base {
         const result = super._onRender(context, options);
 
         if (this.activeTab === "Config") {
-            void this._renderSettings().then(() => {});
+            void this._renderSettings().then(() => this.settingsListeners(this.element));
         } else {
             // Fetch results and then render the initial visible set
             void this.fetch().then(async () => this.prepareResults(0, 50));
@@ -183,47 +176,69 @@ export class CompendiumBrowser extends Base {
             .filter((p): p is CompendiumCollection<'Actor' | 'Item'> => p.visible && ["Actor", "Item"].includes(p.metadata.type))
             .map(p => ({
                 pack: p,
-                path: p.folder ? [...p.folder.ancestors.reverse().map(f => f.name), p.folder.name, p.metadata.label] : [p.metadata.label],
+                path: p.folder ? [...p.folder.ancestors.reverse(), p.folder] : [],
             }))
-            .sort((a, b) => a.path.join("/").localeCompare(b.path.join("/")));
+            .sort((a, b) => {
+                const aPath = [...a.path.map(folder => folder.name), a.pack.metadata.label];
+                const bPath = [...b.path.map(folder => folder.name), b.pack.metadata.label];
+                return aPath.join("/").localeCompare(bPath.join("/"));
+            });
 
-        const root: FolderNode = { name: "__root__", path: "", isFolder: true, collapsed: false, selectionState: "none", children: [] };
+        const root: FolderNode = { name: "__root__", id: "__root__", isFolder: true, collapsed: false, selectionState: "none", children: [] };
         const folderMap = new Map<string, FolderNode>([["", root]]);
 
         for (const { pack, path } of packs) {
             // Ensure all parent folders exist in the tree
-            for (let i = 0; i < path.length - 1; i++) {
-                const folderPath = path.slice(0, i + 1).join("/");
-                if (!folderMap.has(folderPath)) {
-                    const parentPath = path.slice(0, i).join("/");
-                    const parentNode = folderMap.get(parentPath)!;
+            for (let i = 0; i < path.length; i++) {
+                const folderId = path[i].id!;
+                if (!folderMap.has(folderId)) {
+                    const parentId = i > 0 ? path[i - 1].id! : "";
+                    const parentNode = folderMap.get(parentId)!;
                     const folderNode: FolderNode = {
-                        name: path[i],
-                        path: folderPath,
+                        id: folderId,
+                        name: path[i].name,
+                        children: [],
                         isFolder: true,
                         collapsed: false,
                         selectionState: "none",
-                        children: [],
                     };
                     parentNode.children.push(folderNode);
-                    folderMap.set(folderPath, folderNode);
+                    folderMap.set(folderId, folderNode);
                 }
             }
 
             // Add the pack itself to its parent folder
-            const parentPath = path.slice(0, path.length - 1).join("/");
-            const parentNode = folderMap.get(parentPath)!;
+            const parentId = path.length ? path[path.length - 1].id! : "";
+            const parentNode = folderMap.get(parentId)!;
             parentNode.children.push({
                 id: pack.collection,
                 name: pack.metadata.label,
-                path: path.join("/"),
-                selected: this._activePackIds.includes(pack.collection),
+                selected: !this.packBlackList.includes(pack.collection),
             });
         }
         
         // Recursively calculate selection states after the tree is built
         this._updateFolderSelectionState(root);
         return root;
+    }
+
+    private settingsListeners(htmlElement: HTMLElement) {
+        const checkboxes = htmlElement.querySelectorAll<HTMLInputElement>(".pack-row label input[type='checkbox']");
+        for (const checkbox of checkboxes) {
+            checkbox.addEventListener("change", (event) => {
+                const target = event.target as HTMLInputElement;
+                const id = target.dataset.id;
+                const type = target.dataset.type as "folder" | "pack";
+                if (type === "pack") {
+                    if (target.checked)
+                        this.packBlackList = this.packBlackList.filter((p) => !p.startsWith(id!));
+                    else
+                        this.packBlackList.push(id!);
+                }
+                void this.render({ parts: ["settings"] });
+                console.log(this, id, type);
+            });
+        }
     }
 
     /** Recursively updates the selection state of a folder based on its children. */
@@ -235,7 +250,7 @@ export class CompendiumBrowser extends Base {
             if (child.isFolder) {
                 const childState = this._updateFolderSelectionState(child);
                 if (childState === "all") checkedCount++;
-                if (childState === "some") checkedCount += 0.5; // Treat indeterminate as half
+                if (childState === "some") checkedCount += 0.5;
             } else {
                 if (child.selected) checkedCount++;
             }
@@ -250,16 +265,15 @@ export class CompendiumBrowser extends Base {
     }
 
     /** Updates the visual indeterminate state of checkboxes in the DOM. */
-    private _updateIndeterminateStates(container: HTMLElement, node: FolderNode | PackNode) {
+    private _updateIndeterminateStates(container: HTMLElement, node: FolderNode) {
         if (!node.isFolder) return;
 
-        const checkbox = container.querySelector<HTMLInputElement>(`input[data-path="${node.path}"]`);
-        if (checkbox) {
-            checkbox.indeterminate = node.selectionState === "some";
-        }
-        for (const child of node.children) {
+        const checkbox = container.querySelector<HTMLInputElement>(`input[data-id="${node.id}"]`);
+        if (checkbox && node.selectionState === "some")
+            checkbox.classList.add('indeterminate');
+
+        for (const child of node.children.filter((n): n is FolderNode => !!n.isFolder))
             this._updateIndeterminateStates(container, child);
-        }
     }
 
     /**
@@ -422,7 +436,7 @@ export class CompendiumBrowser extends Base {
         if (this.results.throttle) return;
         this.results.throttle = true;
 
-        const activePacks = this._packs.filter(
+        const activePacks = game.packs.filter(
             (p) => p.visible && p.metadata.type === this.activeTab
         ) as CompendiumCollection<"Actor" | "Item">[];
         const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));

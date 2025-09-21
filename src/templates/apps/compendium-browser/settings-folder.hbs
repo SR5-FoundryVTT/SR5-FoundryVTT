@@ -1,15 +1,15 @@
 {{#each nodes as |node|}}
-    {{!-- Render the current folder or pack row --}}
     <div 
         class="pack-row {{#if node.isFolder}}folder collapsible{{/if}} {{#if node.collapsed}}collapsed{{/if}}" 
         style="--depth: {{../depth}};"
-        data-path="{{node.path}}"
     >
         <label>
             <input 
                 type="checkbox" 
-                data-path="{{node.path}}"
-                {{#if (eq node.selectionState "all")}}checked{{/if}}>
+                data-id="{{node.id}}"
+                data-type="{{#if node.isFolder}}folder{{else}}pack{{/if}}"
+                {{#if (eq node.selectionState "some")}}class="indeterminate"{{/if}}
+                {{#if (or node.selected (eq node.selectionState "all") (eq node.selectionState "some"))}}checked{{/if}}>
             {{#if node.isFolder}}
                 <a class="collapse-toggle" data-action="toggleCollapse"><i class="fa-solid fa-caret-down"></i></a>
             {{/if}}

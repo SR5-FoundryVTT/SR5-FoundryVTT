@@ -352,9 +352,67 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     cursor: pointer;
                     padding-left: calc(var(--depth, 0) * 30px);
                     border-radius: 3px;
-                    
+                   
                     &:hover {
                         background-color: rgba(255, 255, 255, 0.1);
+                    }
+
+                    input[type="checkbox"] {
+                        // Base styles (mostly from your provided code, with slight adjustments)
+                        -webkit-appearance: none;
+                        appearance: none;
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 3px; // Slightly increase radius for a softer look
+                        cursor: pointer;
+                        position: relative;
+                        display: inline-block; // Ensure proper sizing and text flow
+                        vertical-align: middle; // Align with surrounding text
+                        transition: all 0.2s ease; // Smooth transitions for all properties
+                        background-color: #353238;
+                        border: 1px solid #4a464f;
+                        flex-shrink: 0; // Prevent checkbox from shrinking in flex containers
+
+                        // We'll use ::after for both checkmark and indeterminate state
+                        // ::before is usually for an outer ring or different effect,
+                        // so we'll remove content: none !important for ::before and define ::after
+                        &::after {
+                            font-weight: 900;
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-25%, -34%);
+                            font-size: 12px;
+                            color: $bg-secondary; // Color of the icon
+                            transition: transform 0.2s ease, opacity 0.2s ease; // Smooth icon appearance
+                            line-height: 1; // Prevent extra spacing
+                        }
+
+                        &:hover {
+                            border-color: $accent-gold;
+                        }
+
+                        // State when CHECKED (fully selected)
+                        &:checked {
+                            background-color: $accent-gold;
+                            border-color: $accent-gold;
+
+                            &::after {
+                                content: '\f00c';
+                                transform: translate(-25%, -34%);
+                            }
+                        }
+
+                        &.indeterminate:checked {
+                            background-color: #5d595f;
+                            border-color: #5d595f;
+                            
+                            &::after {
+                                content: '—';
+                                transform: translate(-32%, -34%); // Show dash
+                                color: #FFFFFF;
+                            }
+                        }
                     }
                 }
 
