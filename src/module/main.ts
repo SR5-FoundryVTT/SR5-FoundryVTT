@@ -7,4 +7,4 @@ import { HooksManager } from './hooks';
 /* -------------------------------------------- */
 
 HandlebarManager.registerHelpers();
-await HooksManager.registerHooks();
+HooksManager.registerHooks();
