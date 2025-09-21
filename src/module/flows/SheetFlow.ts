@@ -65,4 +65,20 @@ export const SheetFlow = {
 
     },
 
+    templateBase(path: string) {
+        return `systems/shadowrun5e/dist/templates/v2/${path}.hbs`
+    },
+
+    actorSystemParts(...parts: string[]) {
+        return parts.map(p => this.templateBase(`actor/parts/${p}`))
+    },
+
+    listItem(...parts: string[]) {
+        return parts.reduce<string[]>(( items, p) => {
+            items.push(this.templateBase(`list-items/${p}/header`));
+            items.push(this.templateBase(`list-items/${p}/item`));
+            return items;
+        }, [])
+    }
+
 }

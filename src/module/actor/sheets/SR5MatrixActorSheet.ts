@@ -11,6 +11,7 @@ import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
@@ -39,13 +40,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const data = await super._prepareContext(options);
 
         data.network = this.actor.network;
-        data.matrixActions = await this._prepareMatrixActions();
         data.matrixLeftTabs = this._prepareTabs('matrixLeft');
         data.matrixRightTabs = this._prepareTabs('matrixRight');
-
-        this._prepareMatrixTargets(data);
-        this._prepareOwnedIcons(data);
-        await this._prepareMarkedDocuments(data);
         this._prepareMatrixDevice(data);
 
         return data;
@@ -126,32 +122,48 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     static override PARTS = {
         ...super.PARTS,
         matrix: {
-            template: this.templateBase('actor/tabs/matrix'),
+            template: SheetFlow.templateBase('actor/tabs/matrix'),
+            scrollable: ['scrollable']
         },
         matrixActions: {
-            template: this.templateBase('actor/tabs/matrix/matrix-actions'),
-            templates: this.listItem('action'),
+            template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
+            templates: SheetFlow.listItem('action'),
+            scrollable: ['scrollable']
         },
         markedIcons: {
-            template: this.templateBase('actor/tabs/matrix/marked-icons'),
-            templates: this.listItem('marked_icon'),
+            template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),
+            templates: SheetFlow.listItem('marked_icon'),
+            scrollable: ['scrollable']
         },
         ownedIcons: {
-            template: this.templateBase('actor/tabs/matrix/owned-icons'),
-            templates: this.listItem('owned_icon'),
+            template: SheetFlow.templateBase('actor/tabs/matrix/owned-icons'),
+            templates: SheetFlow.listItem('owned_icon'),
+            scrollable: ['scrollable']
         },
         networkIcons: {
-            template: this.templateBase('actor/tabs/matrix/network-icons'),
-            templates: this.listItem('network_icon'),
+            template: SheetFlow.templateBase('actor/tabs/matrix/network-icons'),
+            templates: SheetFlow.listItem('network_icon'),
+            scrollable: ['scrollable']
         },
         programs: {
-            template: this.templateBase('actor/tabs/matrix/programs'),
-            templates: this.listItem('program'),
+            template: SheetFlow.templateBase('actor/tabs/matrix/programs'),
+            templates: SheetFlow.listItem('program'),
+            scrollable: ['scrollable']
         }
     }
 
-    override async _preparePartContext(partId, context, options): Promise<any> {
-        const partContext = await super._preparePartContext(partId, context, options);
+    override async _preparePartContext(partId, context, options) {
+        const partContext = await super._preparePartContext(partId, context, options) as any;
+
+        if (partId === 'matrixActions') {
+            partContext.matrixActions = await this._prepareMatrixActions();
+        } else if (partId === 'ownedIcons') {
+            this._prepareOwnedIcons(partContext);
+        } else if (partId === 'networkIcons') {
+            this._prepareMatrixTargets(partContext);
+        } else if (partId === 'markedIcons') {
+            await this._prepareMarkedDocuments(partContext);
+        }
 
         if (partContext?.matrixLeftTabs) {
             if (partId in partContext.matrixLeftTabs) {

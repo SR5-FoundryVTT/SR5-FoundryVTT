@@ -1,5 +1,6 @@
 import { SR5Actor } from "../SR5Actor";
 import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 
 export class SR5SpiritActorSheet extends SR5BaseActorSheet {
@@ -39,30 +40,34 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     static override PARTS = {
         ...super.PARTS,
         skills: {
-            template: this.templateBase('actor/tabs/spirit-skills'),
+            template: SheetFlow.templateBase('actor/tabs/spirit-skills'),
             templates: [
-                ...this.actorSystemParts('active-skills', 'spirit-options',
+                ...SheetFlow.actorSystemParts('active-skills', 'spirit-options',
                                 'attributes', 'special-attributes'),
-                ...this.listItem('skill')
-            ]
+                ...SheetFlow.listItem('skill')
+            ],
+            scrollable: ['scrollable']
         },
         magic: {
-            template: this.templateBase('actor/tabs/spirit-magic'),
+            template: SheetFlow.templateBase('actor/tabs/spirit-magic'),
             templates: [
-                    ...this.actorSystemParts('spells', 'rituals'),
-                    ...this.listItem('spell', 'ritual')
-                ]
+                    ...SheetFlow.actorSystemParts('spells', 'rituals'),
+                    ...SheetFlow.listItem('spell', 'ritual')
+                ],
+            scrollable: ['scrollable']
         },
         critter: {
-            template: this.templateBase('actor/tabs/critter'),
-            templates: this.listItem('critter_power')
+            template: SheetFlow.templateBase('actor/tabs/critter'),
+            templates: SheetFlow.listItem('critter_power'),
+            scrollable: ['scrollable']
         },
         bio: {
-            template: this.templateBase('actor/tabs/bio'),
+            template: SheetFlow.templateBase('actor/tabs/bio'),
             templates: [
-                ... this.actorSystemParts('metamagics'),
-                ...this.listItem('metamagic', 'quality'),
-            ]
+                ...SheetFlow.actorSystemParts('metamagics'),
+                ...SheetFlow.listItem('metamagic', 'quality'),
+            ],
+            scrollable: ['scrollable']
         },
     }
 

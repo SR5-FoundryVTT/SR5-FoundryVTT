@@ -1,5 +1,6 @@
 import { SR5Actor } from '../SR5Actor';
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 export type SpriteActorSheetData = MatrixActorSheetData & {
     technmomancer: SR5Actor | null;
@@ -52,21 +53,25 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
     static override PARTS = {
         ...super.PARTS,
         skills: {
-            template: this.templateBase('actor/tabs/sprite-skills'),
+            template: SheetFlow.templateBase('actor/tabs/sprite-skills'),
             templates: [
-                ...this.actorSystemParts('active-skills', 'sprite-options'),
-                ...this.listItem('skill')
-            ]
+                ...SheetFlow.actorSystemParts('active-skills', 'sprite-options'),
+                ...SheetFlow.listItem('skill')
+            ],
+            scrollable: ['scrollable']
         },
         description: {
-            template: this.templateBase('actor/tabs/description'),
+            template: SheetFlow.templateBase('actor/tabs/description'),
+            scrollable: ['scrollable']
         },
         matrix: {
-            template: this.templateBase('actor/tabs/sprite-matrix'),
+            template: SheetFlow.templateBase('actor/tabs/sprite-matrix'),
+            scrollable: ['scrollable']
         },
         spritePowers: {
-            template: this.templateBase('actor/tabs/matrix/sprite-powers'),
-            templates: this.listItem('sprite_power')
+            template: SheetFlow.templateBase('actor/tabs/matrix/sprite-powers'),
+            templates: SheetFlow.listItem('sprite_power'),
+            scrollable: ['scrollable']
         },
     }
     /**

@@ -15,9 +15,10 @@ import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 import RenderContext = foundry.applications.sheets.ItemSheet.RenderContext;
+import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 const { ItemSheet } = foundry.applications.sheets;
-const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
  * Shadowrun 5e ItemSheetData typing shared across all item types
@@ -87,7 +88,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends HandlebarsApplicationMixin(ItemSheet)<T> {
+export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
 
     static override DEFAULT_OPTIONS = {
         classes: [SR5_APPV2_CSS_CLASS, 'item'],
@@ -98,26 +99,33 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     static override PARTS = {
         header: {
-            template: this.templateBase('item/header'),
+            template: SheetFlow.templateBase('item/header'),
+            scrollable: ['scrollable']
         },
         tabs: {
-            template: this.templateBase('common/primary-tab-group'),
+            template: SheetFlow.templateBase('common/primary-tab-group'),
+            scrollable: ['scrollable']
         },
         description: {
-            template: this.templateBase('item/tabs/description'),
+            template: SheetFlow.templateBase('item/tabs/description'),
+            scrollable: ['scrollable']
         },
         technology: {
-            template: this.templateBase('item/tabs/technology'),
+            template: SheetFlow.templateBase('item/tabs/technology'),
+            scrollable: ['scrollable']
         },
         contact: {
-            template: this.templateBase('item/tabs/contact'),
+            template: SheetFlow.templateBase('item/tabs/contact'),
+            scrollable: ['scrollable']
         },
         effects: {
-            template: this.templateBase('item/tabs/effects'),
-            templates: this.listItem('effect'),
+            template: SheetFlow.templateBase('item/tabs/effects'),
+            templates: SheetFlow.listItem('effect'),
+            scrollable: ['scrollable']
         },
         footer: {
-            template: this.templateBase('item/footer'),
+            template: SheetFlow.templateBase('item/footer'),
+            scrollable: ['scrollable']
         },
     }
 
@@ -131,23 +139,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'effects', label: 'Effects', cssClass: '' }
             ]
         }
-    }
-
-    // TODO move to SR5Mixin
-    static templateBase(path: string) {
-        return `systems/shadowrun5e/dist/templates/v2/${path}.hbs`
-    }
-
-    static itemSystemParts(...parts: string[]) {
-        return parts.map(p => this.templateBase(`item/parts/${p}`))
-    }
-
-    static listItem(...parts: string[]) {
-        return parts.reduce<string[]>(( items, p) => {
-            items.push(this.templateBase(`list-items/${p}/header`));
-            items.push(this.templateBase(`list-items/${p}/item`));
-            return items;
-        }, [])
     }
 
     protected override _prepareTabs(group: string) {
@@ -172,17 +163,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             delete retVal['contact'];
         }
         return retVal;
-    }
-
-    override async _preparePartContext(partId, context, options) {
-        const partContext = await super._preparePartContext(partId, context, options) as any;
-        if (partContext?.primaryTabs) {
-            if (partId in partContext.primaryTabs) {
-                partContext.tab = partContext.primaryTabs[partId];
-            }
-        }
-
-        return partContext;
     }
 
     /* -------------------------------------------- */
@@ -347,11 +327,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data.miscMatrixPart = this.item.hasActionCategory('matrix');
 
         data.primaryTabs = this._prepareTabs('primary');
-        data.system = this.item.toObject(false).system;
         data.item = this.item;
-        data.systemFields = this.item.system.schema.fields;
-        data.isEditMode = true;
-        data.isPlayMode = false;
 
         return {
             ...data,
@@ -476,7 +452,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         html.find('.power-optional-input').on('change', this._onPowerOptionalInputChanged.bind(this));
 
-        this._activateTagifyListeners(html);
+        // this._activateTagifyListeners(html);
     }
 
     /**

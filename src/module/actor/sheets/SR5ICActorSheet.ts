@@ -1,6 +1,7 @@
 import {SR5Item} from "../../item/SR5Item";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 interface ICActorSheetData extends MatrixActorSheetData {
     disableMarksEdit: boolean;
@@ -50,41 +51,51 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
 
     static override PARTS: any = {
         header: {
-            template: this.templateBase('actor/header'),
-            templates: this.actorSystemParts('initiative', 'common-rolls')
+            template: SheetFlow.templateBase('actor/header'),
+            templates: SheetFlow.actorSystemParts('initiative', 'common-rolls'),
+            scrollable: ['scrollable']
         },
         tabs: {
-            template: this.templateBase('common/primary-tab-group'),
+            template: SheetFlow.templateBase('common/primary-tab-group'),
+            scrollable: ['scrollable']
         },
         actions: {
-            template: this.templateBase('actor/tabs/actions'),
-            templates: this.listItem('action'),
+            template: SheetFlow.templateBase('actor/tabs/actions'),
+            templates: SheetFlow.listItem('action'),
+            scrollable: ['scrollable']
         },
         matrix: {
-            template: this.templateBase('actor/tabs/ic-matrix'),
-            templates: this.actorSystemParts('active-skills', 'ic-attributes', 'ic-options')
+            template: SheetFlow.templateBase('actor/tabs/ic-matrix'),
+            templates: SheetFlow.actorSystemParts('active-skills', 'ic-attributes', 'ic-options'),
+            scrollable: ['scrollable']
         },
         matrixActions: {
-            template: this.templateBase('actor/tabs/matrix/matrix-actions'),
-            templates: this.listItem('action'),
+            template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
+            templates: SheetFlow.listItem('action'),
+            scrollable: ['scrollable']
         },
         markedIcons: {
-            template: this.templateBase('actor/tabs/matrix/marked-icons'),
-            templates: this.listItem('marked_icon'),
+            template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),
+            templates: SheetFlow.listItem('marked_icon'),
+            scrollable: ['scrollable']
         },
         networkIcons: {
-            template: this.templateBase('actor/tabs/matrix/network-icons'),
-            templates: this.listItem('network_icon'),
+            template: SheetFlow.templateBase('actor/tabs/matrix/network-icons'),
+            templates: SheetFlow.listItem('network_icon'),
+            scrollable: ['scrollable']
         },
         effects: {
-            template: this.templateBase('actor/tabs/effects'),
-            templates: this.listItem('effect'),
+            template: SheetFlow.templateBase('actor/tabs/effects'),
+            templates: SheetFlow.listItem('effect'),
+            scrollable: ['scrollable']
         },
         misc: {
-            template: this.templateBase('actor/tabs/misc'),
+            template: SheetFlow.templateBase('actor/tabs/misc'),
+            scrollable: ['scrollable']
         },
         footer: {
-            template: this.templateBase('actor/footer'),
+            template: SheetFlow.templateBase('actor/footer'),
+            scrollable: ['scrollable']
         },
     }
 

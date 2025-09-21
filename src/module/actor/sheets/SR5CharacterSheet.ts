@@ -1,5 +1,6 @@
 import { Helpers } from '../../helpers';
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
@@ -91,37 +92,43 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
     static override PARTS = {
         ...super.PARTS,
         skills: {
-            template: this.templateBase('actor/tabs/character-skills'),
+            template: SheetFlow.templateBase('actor/tabs/character-skills'),
             templates: [
-                ...this.actorSystemParts('active-skills', 'language-and-knowledge-skills', 'attributes', 'special-attributes' ),
-                ...this.listItem('skill')
-            ]
+                ...SheetFlow.actorSystemParts('active-skills', 'language-and-knowledge-skills', 'attributes', 'special-attributes' ),
+                ...SheetFlow.listItem('skill')
+            ],
+            scrollable: ['scrollable']
         },
         magic: {
-            template: this.templateBase('actor/tabs/magic'),
+            template: SheetFlow.templateBase('actor/tabs/magic'),
             templates: [
-                ...this.actorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
-                ...this.listItem('spell', 'ritual', 'call_in_action', 'adept_power')
-                ]
+                ...SheetFlow.actorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
+                ...SheetFlow.listItem('spell', 'ritual', 'call_in_action', 'adept_power')
+                ],
+            scrollable: ['scrollable']
         },
         critter: {
-            template: this.templateBase('actor/tabs/critter'),
-            templates: this.listItem('critter_power')
+            template: SheetFlow.templateBase('actor/tabs/critter'),
+            templates: SheetFlow.listItem('critter_power'),
+            scrollable: ['scrollable']
         },
         inventory: {
-            template: this.templateBase('actor/tabs/inventory'),
-            templates: this.listItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon')
+            template: SheetFlow.templateBase('actor/tabs/inventory'),
+            templates: SheetFlow.listItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon'),
+            scrollable: ['scrollable']
         },
         social: {
-            template: this.templateBase('actor/tabs/social'),
-            templates: this.listItem('sin', 'lifestyle', 'contact')
+            template: SheetFlow.templateBase('actor/tabs/social'),
+            templates: SheetFlow.listItem('sin', 'lifestyle', 'contact'),
+            scrollable: ['scrollable']
         },
         bio: {
-            template: this.templateBase('actor/tabs/bio'),
+            template: SheetFlow.templateBase('actor/tabs/bio'),
             templates: [
-                    ... this.actorSystemParts('metamagics', 'echoes'),
-                    ...this.listItem('metamagic', 'echo', 'quality'),
-                ]
+                    ...SheetFlow.actorSystemParts('metamagics', 'echoes'),
+                    ...SheetFlow.listItem('metamagic', 'echo', 'quality'),
+                ],
+            scrollable: ['scrollable']
         },
     }
 

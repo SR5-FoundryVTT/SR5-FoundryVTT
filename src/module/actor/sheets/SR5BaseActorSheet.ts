@@ -15,10 +15,11 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
 import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
-import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+
+import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 const { ActorSheetV2 } = foundry.applications.sheets;
-const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -91,7 +92,7 @@ export interface SR5BaseSheetDelays {
  * This class should not be used directly but be extended for each actor type.
  *
  */
-export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> extends HandlebarsApplicationMixin(ActorSheetV2)<T> {
+export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> extends SR5ApplicationMixin(ActorSheetV2)<T> {
     // If something needs filtering, store those filters here.
     _filters: SR5SheetFilters = {
         skills: '', // filter based on user input and skill name/label.
@@ -101,15 +102,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     _delays: SR5BaseSheetDelays = {
         skills: null
     }
-    // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
-    _scroll!: string;
     // Indicate if specific sections on sheet should be opened or closed.
     _inventoryOpenClose: Record<string, boolean> = {};
 
     // Store the currently selected inventory.
     selectedInventory: string;
-
-    _isEditMode = false;
 
     constructor(options) {
         super(options);
@@ -158,10 +155,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @returns {Object}
      */
     static override DEFAULT_OPTIONS: any = {
-        classes: [SR5_APPV2_CSS_CLASS, 'actor'],
-        window: {
-            resizable: true,
-        },
+        classes: ['actor'],
         position: {
             width: 700,
             height: 600,
@@ -175,8 +169,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollSkill: SR5BaseActorSheet.#rollSkill,
             rollSkillSpec: SR5BaseActorSheet.#rollSkillSpec,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
-            showItemDescription: SR5BaseActorSheet.#toggleListItemDescription,
-            toggleEditMode: SR5BaseActorSheet.#toggleEditMode,
             addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
             addLanguageSkill: SR5BaseActorSheet.#createLanguageSkill,
             addActiveSkill: SR5BaseActorSheet.#createActiveSkill,
@@ -212,42 +204,32 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static override PARTS = {
         header: {
-            template: this.templateBase('actor/header'),
-            templates: this.actorSystemParts('movement', 'initiative'),
+            template: SheetFlow.templateBase('actor/header'),
+            templates: SheetFlow.actorSystemParts('movement', 'initiative'),
+            scrollable: ['scrollable']
         },
         tabs: {
-            template: this.templateBase('common/primary-tab-group'),
+            template: SheetFlow.templateBase('common/primary-tab-group'),
+            scrollable: ['scrollable']
         },
         actions: {
-            template: this.templateBase('actor/tabs/actions'),
-            templates: this.listItem('action'),
+            template: SheetFlow.templateBase('actor/tabs/actions'),
+            templates: SheetFlow.listItem('action'),
+            scrollable: ['scrollable']
         },
         effects: {
-            template: this.templateBase('actor/tabs/effects'),
-            templates: this.listItem('effect'),
+            template: SheetFlow.templateBase('actor/tabs/effects'),
+            templates: SheetFlow.listItem('effect'),
+            scrollable: ['scrollable']
         },
         misc: {
-            template: this.templateBase('actor/tabs/misc'),
+            template: SheetFlow.templateBase('actor/tabs/misc'),
+            scrollable: ['scrollable']
         },
         footer: {
-            template: this.templateBase('actor/footer'),
+            template: SheetFlow.templateBase('actor/footer'),
+            scrollable: ['scrollable']
         },
-    }
-
-    static templateBase(path: string) {
-        return `systems/shadowrun5e/dist/templates/v2/${path}.hbs`
-    }
-
-    static actorSystemParts(...parts: string[]) {
-        return parts.map(p => this.templateBase(`actor/parts/${p}`))
-    }
-
-    static listItem(...parts: string[]) {
-        return parts.reduce<string[]>(( items, p) => {
-            items.push(this.templateBase(`list-items/${p}/header`));
-            items.push(this.templateBase(`list-items/${p}/item`));
-            return items;
-        }, [])
     }
 
     /** SheetData used by _all_ actor types! */
@@ -255,10 +237,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
         const data = await super._prepareContext(options) as any;
-        data.system = this.actor.toObject(false).system;
-        data.systemFields = this.document.system.schema.fields;
-        data.user = game.user;
         data.actor = this.actor;
+        // todo this shouldn't be required but something in this is accessing the system
+        data.system = this.document.toObject(false).system;
 
         // Sheet related general purpose fields. These aren't persistent.
         data.config = SR5;
@@ -300,43 +281,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         data.primaryTabs = this._prepareTabs('primary');
 
-        data.isEditMode = this._isEditMode;
-        data.isPlayMode = !this._isEditMode;
-
-        console.log('contextData', data);
-
         return data;
-    }
-
-    override async _preparePartContext(partId, context, options) {
-        const partContext = await super._preparePartContext(partId, context, options) as any;
-        if (partContext?.primaryTabs) {
-            if (partId in partContext.primaryTabs) {
-                partContext.tab = partContext.primaryTabs[partId];
-            }
-        }
-
-        return partContext;
-    }
-
-    /**
-     * Do any final preparations when rendering the sheet
-     * @param context
-     * @param options
-     */
-    protected override async _renderHTML(context, options) {
-        // push footer to the end of parts os it is rendered at the bottom
-        if (options.parts.includes("footer")) {
-            const index = options.parts.indexOf("footer");
-            options.parts.push(options.parts.splice(index, 1)[0]);
-        }
-        if (options.parts.includes("header")) {
-            const index = options.parts.indexOf("header");
-            if (index !== 0) {
-                options.parts.unshift(options.parts.splice(index, 1)[0]);
-            }
-        }
-        return await super._renderHTML(context, options);
     }
 
     override async _onRender(context, options) {
@@ -399,14 +344,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
 
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
-    }
-
-    static async #toggleEditMode(this: SR5BaseActorSheet, event: MouseEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (this._isEditMode) await this.submit();
-        this._isEditMode = !this._isEditMode;
-        await this.render();
     }
 
     static async #showItemDescription(this: SR5BaseActorSheet, event: MouseEvent) {
@@ -1513,17 +1450,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
-     * Show / hide the items description within a sheet item l ist.
-     */
-    static async #toggleListItemDescription(this: SR5BaseActorSheet, event) {
-        event.preventDefault();
-        // find the list-item parent so we can find the child item
-        const item = $(event.target).parents('.new-list-item-container');
-        const field = $(item).find('.new-list-item-description');
-        field.toggle();
-    }
-
-    /**
      * Create an inventory place on the actor for gear organization.
      */
     async _onInventoryCreate(event) {
@@ -1751,25 +1677,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             title: 'Chummer Import',
         };
         new ChummerImportForm(this.actor, options).render(true);
-    }
-
-    _setupCustomCheckbox(html) {
-        const setContent = (el) => {
-            const checkbox = $(el).children('input[type=checkbox]');
-            const checkmark = $(el).children('.checkmark');
-            if ($(checkbox).prop('checked')) {
-                $(checkmark).addClass('fa-check-circle');
-                $(checkmark).removeClass('fa-circle');
-            } else {
-                $(checkmark).addClass('fa-circle');
-                $(checkmark).removeClass('fa-check-circle');
-            }
-        };
-        html.find('label.checkbox').each(function (this: any) {
-            setContent(this);
-        });
-        html.find('label.checkbox').click((event) => { setContent(event.currentTarget); });
-        html.find('.submit-checkbox').change(async () => this.submit);
     }
 
     /**

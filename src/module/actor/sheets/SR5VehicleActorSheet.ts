@@ -5,6 +5,7 @@ import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 interface VehicleSheetDataFields extends MatrixActorSheetData {
     isVehicle: boolean;
@@ -147,21 +148,25 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     static override PARTS = {
         ...super.PARTS,
         matrix: {
-            template: this.templateBase('actor/tabs/vehicle-matrix'),
+            template: SheetFlow.templateBase('actor/tabs/vehicle-matrix'),
+            scrollable: ['scrollable']
         },
         skills: {
-            template: this.templateBase('actor/tabs/vehicle-skills'),
-            templates: [...this.actorSystemParts(
+            template: SheetFlow.templateBase('actor/tabs/vehicle-skills'),
+            templates: [...SheetFlow.actorSystemParts(
                 'active-skills', 'vehicle-options',
                 'vehicle-rolls', 'vehicle-attributes'
-            ), ...this.listItem('skill')]
+            ), ...SheetFlow.listItem('skill')],
+            scrollable: ['scrollable']
         },
         description: {
-            template: this.templateBase('actor/tabs/description'),
+            template: SheetFlow.templateBase('actor/tabs/description'),
+            scrollable: ['scrollable']
         },
         inventory: {
-            template: this.templateBase('actor/tabs/inventory'),
-            templates: this.listItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon')
+            template: SheetFlow.templateBase('actor/tabs/inventory'),
+            templates: SheetFlow.listItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon'),
+            scrollable: ['scrollable']
         },
     }
 

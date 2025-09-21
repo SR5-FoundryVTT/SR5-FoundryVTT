@@ -1842,6 +1842,7 @@
         "ToggleEquip": "Toggle Equipped",
         "ToggleWireless": "Toggle Wireless",
         "Tooltips": {
+            "ToggleEditMode": "Toggle Edit Mode",
             "Actor": {
                 "ConnectNetwork": "Enter this host/grid",
                 "DisconnectNetwork": "Leave this host/grid",
