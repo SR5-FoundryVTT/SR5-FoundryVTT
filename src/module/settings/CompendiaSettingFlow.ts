@@ -19,6 +19,9 @@ export const CompendiaSettingFlow = {
      * Generate the required object for choosing a Compendium pack for actions/items.
      * This version robustly finds all available packs for choices, but keeps the
      * original logic for determining the value.
+     * Even if the system pack is not found, which can happen on multi foundry instances running at the same time, 
+     * we still provide a selection of otherwise available packs.
+     *
      * @param id - the FLAG to use to get the pack data, this should also be defined in SR5.packNames
      */
     getPackSettingConfiguration(id: PackType): PackSelectionConfig {
