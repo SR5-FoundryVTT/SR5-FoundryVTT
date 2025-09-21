@@ -127,33 +127,33 @@
         }
     },
     "scripts": [],
-    "esmodules": ["dist/bundle.js"],
-    "styles": ["dist/bundle.css"],
+    "esmodules": ["bundle.js"],
+    "styles": ["bundle.css"],
     "languages": [
         {
             "lang": "en",
             "name": "English",
-            "path": "dist/locale/en/config.json"
+            "path": "locale/en/config.json"
         },
         {
             "lang": "de",
             "name": "Deutsch",
-            "path": "dist/locale/de/config.json"
+            "path": "locale/de/config.json"
         },
         {
             "lang": "pt-BR",
             "name": "Português (Brasil)",
-            "path": "dist/locale/pt-BR/config.json"
+            "path": "locale/pt-BR/config.json"
         },
         {
             "lang": "fr",
             "name": "Français",
-            "path": "dist/locale/fr/config.json"
+            "path": "locale/fr/config.json"
         },
         {
             "lang": "ko",
             "name": "Korean",
-            "path": "dist/locale/ko/config.json"
+            "path": "locale/ko/config.json"
         }
     ],
     "packs": [
@@ -211,12 +211,7 @@
             "name": "Shadowrun 5e",
             "color": "#cc0000",
             "sorting": "m",
-            "packs": [
-                "sr5e-system-macros",
-                "sr5e-general-actions",
-                "sr5e-ic-actions",
-                "sr5e-matrix-actions"
-            ]
+            "packs": ["sr5e-system-macros", "sr5e-general-actions", "sr5e-ic-actions", "sr5e-matrix-actions"]
         }
     ],
     "relationships": [
