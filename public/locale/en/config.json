@@ -1570,7 +1570,23 @@
         "PublicGrid": "Public Grid",
         "PushTheLimit": "Push The Limit",
         "Qty": "Qty",
-        "Quality": "Quality",
+        "Quality": {
+            "label": "Quality",
+            "FIELDS": {
+                "type": {
+                    "label": "Quality Type",
+                    "hint": "The Type of Quality this represents (Positive/Negative/Life Module)"
+                },
+                "karma": {
+                    "label": "Karma",
+                    "hint": "Amount of Karma this Quality is worth"
+                },
+                "rating": {
+                    "label": "Rating",
+                    "hint": "Rating of this Quality"
+                }
+            }
+        },
         "QualityType": "Type",
         "QualityTypeLifeModule": "Life Module",
         "QualityTypeNegative": "Negative",

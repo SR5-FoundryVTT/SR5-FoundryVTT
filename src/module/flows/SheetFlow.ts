@@ -97,6 +97,9 @@ export const SheetFlow = {
         if (!item.isType('ammo')) {
             delete parts['ammo'];
         }
+        if (!item.isType('quality')) {
+            delete parts['quality'];
+        }
     }
 
 }
