@@ -995,6 +995,50 @@
                         "label": "Modifier",
                         "hint": "Any modifiers applied to the test"
                     },
+                    "damage": {
+                        "type": {
+                            "base": {
+                                "label": "Damage Type",
+                                "hint": "Type of Damage that this action does"
+                            }
+                        },
+                        "base": {
+                            "label": "Base Damage",
+                            "hint": "The base amount of Damage that this action does"
+                        },
+                        "base_formula_operator": {
+                            "label": "Operator",
+                            "hint": "How the Damage base value should affect the Attribute"
+                        },
+                        "attribute": {
+                            "label": "Damage Attribute",
+                            "hint": "Attribute to use with the Damage calculation"
+                        },
+                        "biofeedback": {
+                            "label": "Biofeedback",
+                            "hint": "If this action deals Biofeedback damage as well. This can be targeted with Active Effects"
+                        },
+                        "element": {
+                            "base": {
+                                "label": "Element",
+                                "hint": "The Element the type of damage is. Leave blank for no element."
+                            }
+                        },
+                        "ap": {
+                            "base": {
+                                "label": "AP",
+                                "hint": "Armor Penetration of the Damage"
+                            },
+                            "base_formula_operator": {
+                                "label": "Operator",
+                                "hint": "How the AP base value should affect the Attribute"
+                            },
+                            "attribute": {
+                                "label": "AP Attribute",
+                                "hint": "Attribute to use with the AP calculation"
+                            }
+                        }
+                    },
                     "limit": {
                         "base": {
                             "label": "Limit Value",

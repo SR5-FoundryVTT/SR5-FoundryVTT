@@ -1,0 +1,54 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="standard-form scrollable">
+            {{formGroup systemFields.action.fields.damage.fields.type.fields.base
+                        value=system.action.damage.type.base
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{#if system.action.damage.type.base}}
+                {{#unless (eq item.type 'spell')}}
+                    {{formGroup systemFields.action.fields.damage.fields.base
+                                value=system.action.damage.base
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.damage.fields.base_formula_operator
+                                value=system.action.damage.base_formula_operator
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.damage.fields.attribute
+                                value=system.action.damage.attribute
+                                options=(config2Array attributes)
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/unless}}
+
+                {{#if (eq system.action.damage.type.base "matrix")}}
+                    {{formGroup systemFields.action.fields.damage.fields.biofeedback
+                                value=system.action.damage.biofeedback
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else}}
+                    {{formGroup systemFields.action.fields.damage.fields.element.fields.base
+                                value=system.action.damage.element.base
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{#unless (eq item.type 'spell')}}
+                        {{formGroup systemFields.action.fields.damage.fields.ap.fields.base
+                                    value=system.action.damage.ap.base
+                                    rootId=@root.rootId disabled=@root.isPlayMode}}
+                        {{formGroup systemFields.action.fields.damage.fields.ap.fields.base_formula_operator
+                                    value=system.action.damage.ap.base_formula_operator
+                                    rootId=@root.rootId disabled=@root.isPlayMode}}
+                        {{formGroup systemFields.action.fields.damage.fields.ap.fields.attribute
+                                    value=system.action.damage.ap.attribute
+                                    options=(config2Array attributes)
+                                    localize=true
+                                    rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{/unless}}
+                {{/if}}
+            {{/if}}
+        </div>
+    </div>
+</section>

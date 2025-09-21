@@ -46,24 +46,24 @@ export const DamageData = () => ({
         base: new StringField({
             blank: true,
             required: true,
-            choices: ["physical", "matrix", "stun", ""]
+            choices: SR5.damageTypes,
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: ["physical", "matrix", "stun", ""]
+            choices: SR5.damageTypes,
         }),
     }),
     element: new SchemaField({
         base: new StringField({
             blank: true,
             required: true,
-            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+            choices: SR5.elementTypes,
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+            choices: SR5.elementTypes
         }),
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
@@ -71,7 +71,7 @@ export const DamageData = () => ({
         required: true,
         blank: true,
         initial: '',
-        choices: ["physical", "stun"],
+        choices: SR5.biofeedbackOptions,
     }),
     attribute: new StringField({ required: true }),
     source: new SchemaField({

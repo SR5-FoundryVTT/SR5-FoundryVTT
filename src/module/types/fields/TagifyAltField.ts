@@ -72,6 +72,7 @@ export class TagifyAltField<
      * @param value
      */
     override _cast(value) {
+        if (Array.isArray(value) && value.length === 0) return super._cast(value);
         // parse out the value if it is a string
         if (typeof value === 'string') {
             if (value === '') {

@@ -107,8 +107,6 @@ export const SR5 = {
     },
 
     biofeedbackOptions: {
-        // create an empty string option, this should not be needed after appv2
-        '': '',
         physical: 'SR5.DmgTypePhysical',
         stun: 'SR5.DmgTypeStun',
     },

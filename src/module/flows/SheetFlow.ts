@@ -91,6 +91,7 @@ export const SheetFlow = {
         }
         if (!item.getAction()) {
             delete parts['action'];
+            delete parts['damage'];
         }
     }
 

@@ -1,3 +1,5 @@
+import { SR5 } from '@/module/config';
+
 const { SchemaField, NumberField, ArrayField, StringField } = foundry.data.fields;
 
 export const PhysicalAttribute = new StringField({
@@ -57,7 +59,7 @@ export const ModifiableValueLinked = () => ({
     base_formula_operator: new StringField({
         required: false,
         initial: 'add',
-        choices: ['add', 'subtract', 'multiply', 'divide']
+        choices: SR5.actionDamageFormulaOperators,
     }),
 });
 
