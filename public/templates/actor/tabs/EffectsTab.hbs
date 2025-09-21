@@ -1,8 +1,8 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='effects'}}
+{{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabId='effects'}}
     <div class="inventory">
         <div class="scroll-area">
         <!-- Local Document Effects. Actor and Item. -->
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
             name=(localize 'SR5.Effects')
             itemCssClass='list-item-effect'
             rightSide=(ItemHeaderRightSide 'effects')
@@ -10,7 +10,7 @@
             tooltip=(localize 'SR5.Tooltips.Effect.DocumentEffects')
         }}
         {{#each effects}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
             img=(firstDefined this.img this.icon)
             name=this.name
             itemId=this.id
@@ -24,14 +24,14 @@
         {{/each}}
         <!-- Owned Item Effects. Actor only. -->
         {{#if itemEffects}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
             name=(localize 'SR5.Labels.Sheet.ItemEffects')
             tooltip=(localize 'SR5.Tooltips.Effect.ItemEffects')
             itemCssClass='list-item-effect'
             rightSide=(ItemHeaderRightSide 'itemEffects')
         }}
         {{#each itemEffects}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
             img=(firstDefined this.img this.icon)
             name=this.sheetName
             itemId=this.uuid
@@ -46,4 +46,4 @@
         {{/if}}
         </div>
     </div>
-{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+{{/'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}

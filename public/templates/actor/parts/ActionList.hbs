@@ -1,5 +1,5 @@
 <div class="scroll-area">
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+    {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
             name=(localize 'SR5.Actions')
             itemId='action'
             icons=(ItemHeaderIcons 'action')
@@ -7,7 +7,7 @@
             itemId='action'
     }}
     {{#each itemType.action as |item iid|}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                 img=item.img
                 name=item.name
                 itemId=item._id

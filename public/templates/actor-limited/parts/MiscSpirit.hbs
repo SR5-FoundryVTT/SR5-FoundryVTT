@@ -1,4 +1,4 @@
-{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+{{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
         name=(localize 'SR5.Miscellaneous')
         itemId='miscellaneous'
         icons=(ItemHeaderIcons 'miscellaneous')
@@ -11,7 +11,7 @@
     </div>
     <div class="item-right">
         <div>
-            {{> "systems/shadowrun5e/dist/templates/common/Select.hbs"
+            {{> "systems/shadowrun5e/templates/common/Select.hbs"
                     options=config.spiritTypes
                     value=data.spiritType
                     path="data.spiritType"

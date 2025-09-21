@@ -1,4 +1,4 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='matrix'}}
+{{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabId='matrix'}}
 <div class="flexrow list-header item-section space-between">
     {{#if matrixDevice}}
     <div>
@@ -31,7 +31,7 @@
     <div>
         <div class="attributes">
             {{#each config.matrixAttributes as |label key|}}
-            {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.hbs"
+            {{> "systems/shadowrun5e/templates/actor/parts/matrix/MatrixAttribute.hbs"
             matrixAtt=(lookup ../system.matrix key)
             isCyberdeck=../system.matrix.is_cyberdeck
             key=key
@@ -72,10 +72,10 @@
                 </nav>
                 <div class="scroll-area scroll-area-matrix-icons">
                     <section data-group='matrix' class="tabsbody">
-                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/MarksTab.hbs'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/OwnedIconsTab.hbs'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ProgramListTab.hbs'}}
+                        {{> 'systems/shadowrun5e/templates/actor/tabs/matrix/MarksTab.hbs'}}
+                        {{> 'systems/shadowrun5e/templates/actor/tabs/matrix/TargetsTab.hbs'}}
+                        {{> 'systems/shadowrun5e/templates/actor/tabs/matrix/OwnedIconsTab.hbs'}}
+                        {{> 'systems/shadowrun5e/templates/actor/tabs/matrix/ProgramListTab.hbs'}}
                     </section>
                 </div>
             </div>
@@ -83,7 +83,7 @@
     </div>
     <div>
         {{#if system.matrix.condition_monitor.max}}
-            {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
+            {{> 'systems/shadowrun5e/templates/common/HorizontalCellInput.hbs'
             name=(localize "SR5.ConditionMonitor")
             value=system.matrix.condition_monitor.value
             max=system.matrix.condition_monitor.max
@@ -99,21 +99,21 @@
             </nav>
             <div class="scroll-area scroll-area-matrix-hacking">
                 <section data-group='matrix-right-side' class="tabsbody">
-                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='matrix-actions'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
-                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
-                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='complex-forms'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.hbs' }}
-                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
-                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='compilations'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/CompilationList.hbs'}}
-                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+                    {{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='matrix-actions'}}
+                        {{> 'systems/shadowrun5e/templates/actor/parts/matrix/MatrixActionList.hbs' }}
+                    {{/ 'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}
+                    {{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='complex-forms'}}
+                        {{> 'systems/shadowrun5e/templates/actor/parts/matrix/ComplexFormList.hbs' }}
+                    {{/ 'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}
+                    {{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='compilations'}}
+                        {{> 'systems/shadowrun5e/templates/actor/parts/matrix/CompilationList.hbs'}}
+                    {{/ 'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}
                 </section>
             </div>
         {{else}}
             <!-- If we aren't emerged, we only need the normal actions list -->
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
+            {{> 'systems/shadowrun5e/templates/actor/parts/matrix/MatrixActionList.hbs' }}
         {{/if}}
     </div>
 </div>
-{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+{{/ 'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}

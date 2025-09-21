@@ -4,7 +4,7 @@
   "folder": null,
   "name": "Probe",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/cpu.svg",
+  "img": "systems/shadowrun5e/icons/cpu.svg",
   "system": {
     "description": {
       "value": "",

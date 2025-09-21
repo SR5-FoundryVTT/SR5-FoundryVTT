@@ -7,7 +7,7 @@ export class ChummerImportForm extends foundry.appv1.api.FormApplication {
         options.id = 'chummer-import';
         options.classes = ['shadowrun5e'];
         options.title = 'Chummer/Hero Lab Import';
-        options.template = 'systems/shadowrun5e/dist/templates/apps/import.hbs';
+        options.template = 'systems/shadowrun5e/templates/apps/import.hbs';
         options.width = 600;
         options.height = 'auto';
         return options;

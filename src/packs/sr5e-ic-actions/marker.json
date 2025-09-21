@@ -4,7 +4,7 @@
   "folder": null,
   "name": "Marker",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/caged-ball.svg",
+  "img": "systems/shadowrun5e/icons/caged-ball.svg",
   "system": {
     "description": {
       "value": "",

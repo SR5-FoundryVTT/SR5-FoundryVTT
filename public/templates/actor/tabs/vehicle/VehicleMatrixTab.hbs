@@ -1,4 +1,4 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='matrix'}}
+{{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabId='matrix'}}
     <div class="flexrow list-header item-section space-between">
         <div class="RollId" data-roll-id="matrix.device-rating">
             <a class="roll Roll">
@@ -24,7 +24,7 @@
         <div>
             <div class="attributes">
                 {{#each config.matrixAttributes as |label key|}}
-                    {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.hbs"
+                    {{> "systems/shadowrun5e/templates/actor/parts/matrix/MatrixAttribute.hbs"
                         matrixAtt=(lookup ../system.matrix key)
                         isCyberdeck=../system.matrix.is_cyberdeck
                         key=key
@@ -63,8 +63,8 @@
                     </nav>
                     <div class="scroll-area scroll-area-matrix-icons">
                         <section data-group='matrix' class="tabsbody">
-                            {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs'}}
-                            {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/ProgramListTab.hbs'}}
+                            {{> 'systems/shadowrun5e/templates/actor/tabs/matrix/TargetsTab.hbs'}}
+                            {{> 'systems/shadowrun5e/templates/actor/tabs/matrix/ProgramListTab.hbs'}}
                         </section>
                     </div>
                 </div>
@@ -72,14 +72,14 @@
         </div>
         <div>
             {{#ifgt system.matrix.condition_monitor.max 0}}
-                {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
+                {{> 'systems/shadowrun5e/templates/common/HorizontalCellInput.hbs'
                     name=(localize "SR5.ConditionMonitor")
                     value=system.matrix.condition_monitor.value
                     max=system.matrix.condition_monitor.max
                     id="matrix"
                 }}
             {{/ifgt}}
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
+            {{> 'systems/shadowrun5e/templates/actor/parts/matrix/MatrixActionList.hbs' }}
         </div>
     </div>
-{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+{{/ 'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}

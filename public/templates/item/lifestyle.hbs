@@ -1,5 +1,5 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
-    {{> "systems/shadowrun5e/dist/templates/item/parts/header.hbs" }}
+    {{> "systems/shadowrun5e/templates/item/parts/header.hbs" }}
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="lifestyle">{{localize "SR5.Description"}}</a>
         <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
@@ -9,12 +9,12 @@
             <div class="tabbody">
                 <div class="inventory">
                     <div class="scroll-area">
-                        {{> "systems/shadowrun5e/dist/templates/item/parts/lifestyle.hbs"
+                        {{> "systems/shadowrun5e/templates/item/parts/lifestyle.hbs"
                         header="Lifestyle"}}
                     </div>
                 </div>
             </div>
         </div>
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/EffectsTab.hbs"}}
     </section>
 </form>

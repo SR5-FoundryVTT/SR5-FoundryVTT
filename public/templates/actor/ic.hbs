@@ -1,16 +1,16 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     <header class="flexrow">
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.hbs' height='90px' width='90px' }}
+        {{> 'systems/shadowrun5e/templates/actor/parts/ProfileImage.hbs' height='90px' width='90px' }}
         <div class="flexcol flex-end">
             <div class="flexrow">
-                <div class="block">{{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.hbs' }}</div>
+                <div class="block">{{> 'systems/shadowrun5e/templates/actor/parts/NameInput.hbs' }}</div>
                 <div class="attributes smooth">
-                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.hbs' }}
+                    {{> 'systems/shadowrun5e/templates/actor/parts/Initiative.hbs' }}
                 </div>
             </div>
             <div class="attributes smooth">
                 <div class="block">
-                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.hbs'
+                    {{> 'systems/shadowrun5e/templates/actor/parts/ConditionMonitor.hbs'
                         id='matrix'
                         track = system.track.matrix
                     }}
@@ -31,10 +31,10 @@
         <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
     </nav>
     <section class="sheetbody tabsbody" data-group="primary">
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.hbs"}} 
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.hbs"}} 
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.hbs"}} 
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs"}} 
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/ActionsTab.hbs"}} 
+        {{> "systems/shadowrun5e/templates/actor/tabs/ic/ICActorTab.hbs"}} 
+        {{> "systems/shadowrun5e/templates/actor/tabs/InventoryTab.hbs"}} 
+        {{> "systems/shadowrun5e/templates/actor/tabs/EffectsTab.hbs"}} 
+        {{> "systems/shadowrun5e/templates/actor/tabs/ic/ICMiscTab.hbs"}}
     </section>
 </form>

@@ -1,5 +1,5 @@
-{{> 'systems/shadowrun5e/dist/templates/common/HeaderBlock.hbs' name=(localize "SR5.Labels.ActorSheet.SpiritConfiguration") }}
-{{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Summoner") }}
+{{> 'systems/shadowrun5e/templates/common/HeaderBlock.hbs' name=(localize "SR5.Labels.ActorSheet.SpiritConfiguration") }}
+{{#> "systems/shadowrun5e/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Summoner") }}
 <div>
     {{#if summoner}}
     <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{summoner.id}}" data-uuid="{{summoner.uuid}}">
@@ -8,8 +8,8 @@
     </a>
     {{else}}<span data-tooltip="SR5.Tooltips.Actor.MissingSummoner">{{localize "SR5.Spirit.MissingSummoner"}}</span>{{/if}}
 </div>
-{{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Type") }}
+{{/"systems/shadowrun5e/templates/common/NameLineBlock.hbs"}}
+{{#> "systems/shadowrun5e/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Type") }}
 <div>
     <select name="system.spiritType" class="display">
         <option value=""></option>
@@ -18,15 +18,15 @@
         {{/each}} {{/select}}
     </select>
 </div>
-{{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Force") }}
+{{/"systems/shadowrun5e/templates/common/NameLineBlock.hbs"}}
+{{#> "systems/shadowrun5e/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Force") }}
 <div class="item-text">
-    {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs' cssClass="attribute-input" size="2" maxLength="2" value=system.force
+    {{> 'systems/shadowrun5e/templates/common/ValueInput.hbs' cssClass="attribute-input" size="2" maxLength="2" value=system.force
     name="system.force" }}
 </div>
-{{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
-{{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Bound") }}
+{{/"systems/shadowrun5e/templates/common/NameLineBlock.hbs"}}
+{{#> "systems/shadowrun5e/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Bound") }}
 <div class="item-text">
     <input type="checkbox" class="checkbox" name="system.bound" {{checked system.bound}} />
 </div>
-{{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
+{{/"systems/shadowrun5e/templates/common/NameLineBlock.hbs"}}

@@ -80,7 +80,7 @@ export const OverwatchFlow = {
      */
     async sendOverwatchConvergenceMessage(templateData) {
         const content = await foundry.applications.handlebars.renderTemplate(
-            'systems/shadowrun5e/dist/templates/chat/overwatch-convergence-message.hbs',
+            'systems/shadowrun5e/templates/chat/overwatch-convergence-message.hbs',
             templateData,
         );
         const messageData = { content, speaker: templateData.speaker };

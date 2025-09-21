@@ -1,5 +1,5 @@
 <div class="flexcol">
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+    {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
             name=(localize 'SR5.ActiveSkills')
             itemCssClass="skill-header"
             icons=(SkillHeaderIcons 'active')
@@ -19,7 +19,7 @@
     </div>
     <div class="scroll-area left light-border-right-skills">
         {{#each system.skills.active as |skill sid|}}
-            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+            {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                     name=(localizeSkill skill)
                     itemNameCssClass="skill-roll"
                     itemId=sid

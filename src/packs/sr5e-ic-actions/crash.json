@@ -4,7 +4,7 @@
   "folder": null,
   "name": "Crash",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/importer/complex_form.svg",
+  "img": "systems/shadowrun5e/icons/importer/complex_form.svg",
   "system": {
     "description": {
       "value": "",

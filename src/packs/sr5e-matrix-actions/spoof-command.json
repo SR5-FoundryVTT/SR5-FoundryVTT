@@ -2,7 +2,7 @@
   "name": "Spoof Command",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/dist/icons/circuitry.svg",
+  "img": "systems/shadowrun5e/icons/circuitry.svg",
   "effects": [],
   "_id": "yap4ROqNxoIxKeU6",
   "system": {

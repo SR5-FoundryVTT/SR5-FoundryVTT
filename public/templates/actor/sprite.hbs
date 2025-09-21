@@ -1,16 +1,16 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     <header class="flexrow">
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.hbs'
+        {{> 'systems/shadowrun5e/templates/actor/parts/ProfileImage.hbs'
             height='90px'
             width='90px'
         }}
         <div class="flexcol flex-end">
             <div class="block">
-                {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.hbs' }}
+                {{> 'systems/shadowrun5e/templates/actor/parts/NameInput.hbs' }}
             </div>
             <div class="attributes smooth">
                 <div class="block">
-                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
+                    {{> 'systems/shadowrun5e/templates/common/HorizontalCellInput.hbs'
                             value=system.matrix.condition_monitor.value
                             max=system.matrix.condition_monitor.max
                             id="matrix"
@@ -22,7 +22,7 @@
         <div class="flexcol flex-end">
             <header class="flexrow">
                 <div class="attributes center">
-                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.hbs' }}
+                    {{> 'systems/shadowrun5e/templates/actor/parts/Initiative.hbs' }}
                 </div>
             </header>
             <div class="flexrow align-center">
@@ -35,9 +35,9 @@
                     ></div>
                 </div>
                 <div class="flex7">
-                    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Sprite.Services") }}
+                    {{#> "systems/shadowrun5e/templates/common/NameLineBlock.hbs" name=(localize "SR5.Sprite.Services") }}
                     <div class="item-text">
-                        {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+                        {{> 'systems/shadowrun5e/templates/common/ValueInput.hbs'
                                 cssClass="attribute-input"
                                 size="2"
                                 maxLength="2"
@@ -45,7 +45,7 @@
                                 name="system.services"
                         }}
                     </div>
-                    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
+                    {{/"systems/shadowrun5e/templates/common/NameLineBlock.hbs"}}
                 </div>
             </div>
         </div>
@@ -60,12 +60,12 @@
         <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
     </nav>
     <section class="sheetbody tabsbody" data-group="primary">
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpritePowersTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/DescriptionTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/ActionsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/InventoryTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/matrix/SpriteSkillsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/matrix/SpritePowersTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/DescriptionTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/EffectsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/MiscTab.hbs"}}
     </section>
 </form>

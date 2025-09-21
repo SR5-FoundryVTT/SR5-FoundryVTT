@@ -1,8 +1,8 @@
 <div class="flexcol">
-    {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.hbs" }}
+    {{> "systems/shadowrun5e/templates/actor/parts/attributes/Limits.hbs" }}
     <div class="attributes">
         {{#each system.attributes as |attribute a|}} {{#unless attribute.hidden}}
-            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.hbs"
+            {{> "systems/shadowrun5e/templates/actor/parts/attributes/Attribute.hbs"
                     rollId=(concatStrings "attribute." a)
                     attributeId=a
                     attribute=attribute

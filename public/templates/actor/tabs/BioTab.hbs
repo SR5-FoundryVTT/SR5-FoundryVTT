@@ -1,8 +1,8 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='bio'}}
+{{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabId='bio'}}
     <div class="inventory">
         <div class="split-container">
             <div>
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                         name=(localize 'SR5.Biography')
                         itemId='biography'
                         icons=(ItemHeaderIcons 'biography')
@@ -12,14 +12,14 @@
             </div>
             <div class="scroll-area">
                 <div class="quality"> <!--For Quality specific space-->
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                         name=(localize 'SR5.Quality')
                         itemId='quality'
                         icons=(ItemHeaderIcons 'quality')
                         rightSide=(ItemHeaderRightSide 'quality')
                 }}
                 {{#each itemType.quality as |item i|}}
-                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                    {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                             img=item.img
                             name=item.name
                             itemId=item._id
@@ -33,14 +33,14 @@
               
                 {{#ife actor.type 'character'}}
                     {{#if awakened}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/MetamagicList.hbs' }}
+                        {{> 'systems/shadowrun5e/templates/actor/parts/magic/MetamagicList.hbs' }}
                     {{/if}}
                     {{#if emerged}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/EchoList.hbs' }}
+                        {{> 'systems/shadowrun5e/templates/actor/parts/matrix/EchoList.hbs' }}
                     {{/if}}
                 {{/ife}}
                 </div>  
             </div>
         </div>
     </div>
-{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' }}
+{{/'systems/shadowrun5e/templates/common/TabWrapper.hbs' }}

@@ -1,11 +1,11 @@
-{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+{{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
         name=(localize 'SR5.Labels.ActorSheet.Rituals')
         itemId='ritual'
         icons=(ItemHeaderIcons 'ritual')
         rightSide=(ItemHeaderRightSide 'ritual')
 }}
 {{#each itemType.ritual as |item i|}}
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+    {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
             img=item.img
             name=item.name
             itemId=item._id

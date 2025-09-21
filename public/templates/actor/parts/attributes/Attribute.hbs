@@ -1,4 +1,4 @@
-{{#> "systems/shadowrun5e/dist/templates/common/Attribute.hbs" dataName="attribute" dataId=attributeId}}
+{{#> "systems/shadowrun5e/templates/common/Attribute.hbs" dataName="attribute" dataId=attributeId}}
     <div class="attribute-name roll {{#if rollId}}Roll{{/if}}">
         {{#if label}}
             {{localize label}}
@@ -8,11 +8,11 @@
     </div>
     <div class="attribute-value value">
         <span class="attribute-value-total">{{attribute.value}}</span>
-        {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" value=attribute}}
+        {{> "systems/shadowrun5e/templates/common/ValueModifiers.hbs" value=attribute}}
     </div>
     <div class="track center {{#if disableBase}}{{#if disableManual}}invisible{{/if}}{{/if}}">
         <div class="attribute-input-container">
-            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+            {{> 'systems/shadowrun5e/templates/common/ValueInput.hbs'
                     cssClass="attribute-input short"
                     title="SR5.BaseValue"
                     size="2"
@@ -24,7 +24,7 @@
         </div>
         <div class="track-plus"></div>
         <div class="attribute-input-container">
-            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+            {{> 'systems/shadowrun5e/templates/common/ValueInput.hbs'
                     cssClass="attribute-input short"
                     title="SR5.TemporaryModifiers"
                     size="2"
@@ -37,7 +37,7 @@
         {{!--
         {{#if (partsTotal attribute.mod)}}
         <div class="attribute-input-container">
-            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+            {{> 'systems/shadowrun5e/templates/common/ValueInput.hbs'
                     cssClass="attribute-input short"
                     title="SR5.AutoModifiers"
                     size="2"
@@ -49,4 +49,4 @@
         {{/if}}
         --}}
     </div>
-{{/"systems/shadowrun5e/dist/templates/common/Attribute.hbs"}}
+{{/"systems/shadowrun5e/templates/common/Attribute.hbs"}}

@@ -37,7 +37,7 @@ export class SelectMatrixNetworkDialog extends FormDialog {
             },
             default: 'cancel',
             templateData: { networks },
-            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/select-network-dialog.hbs',
+            templatePath: 'systems/shadowrun5e/templates/apps/dialogs/select-network-dialog.hbs',
             onAfterClose: async html => {
                 const uuid = html.find('input[name="networks"]:checked').val();
                 return fromUuidSync(uuid);

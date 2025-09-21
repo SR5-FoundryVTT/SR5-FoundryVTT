@@ -1,20 +1,20 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     <header class="flexrow">
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.hbs'
+        {{> 'systems/shadowrun5e/templates/actor/parts/ProfileImage.hbs'
             height='90px'
             width='90px'
         }}
         <div class="flexcol flex-end">
             <div class="block">
-                {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.hbs' }}
+                {{> 'systems/shadowrun5e/templates/actor/parts/NameInput.hbs' }}
             </div>
             <div class="attributes smooth">
                 <div class="block">
-                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.hbs'
+                    {{> 'systems/shadowrun5e/templates/actor/parts/ConditionMonitor.hbs'
                         id='stun'
                         track = system.track.stun
                     }}
-                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/ConditionMonitor.hbs'
+                    {{> 'systems/shadowrun5e/templates/actor/parts/ConditionMonitor.hbs'
                         id='physical'
                         track = system.track.physical
                     }}
@@ -23,13 +23,13 @@
         </div>
         <div class="flexcol flex-end">
             <div class="attributes center">
-                {{> 'systems/shadowrun5e/dist/templates/actor/parts/Movement.hbs' }}
-                {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.hbs' }}
+                {{> 'systems/shadowrun5e/templates/actor/parts/Movement.hbs' }}
+                {{> 'systems/shadowrun5e/templates/actor/parts/Initiative.hbs' }}
             </div>
             <div>
-                {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Services") }}
+                {{#> "systems/shadowrun5e/templates/common/NameLineBlock.hbs" name=(localize "SR5.Spirit.Services") }}
                     <div class="item-text">
-                        {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+                        {{> 'systems/shadowrun5e/templates/common/ValueInput.hbs'
                                 cssClass="attribute-input"
                                 size="2"
                                 maxLength="2"
@@ -37,7 +37,7 @@
                                 name="system.services"
                         }}
                     </div>
-                {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs"}}
+                {{/"systems/shadowrun5e/templates/common/NameLineBlock.hbs"}}
             </div>
         </div>
     </header>
@@ -86,13 +86,13 @@
         <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
     </nav>
     <section class="sheetbody tabsbody" data-group="primary">
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/SpellsTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/BioTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/ActionsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/spirit/SpiritSkillsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/InventoryTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/CritterPowersTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/SpellsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/BioTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/EffectsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/MiscTab.hbs"}}
     </section>
 </form>

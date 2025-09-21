@@ -1,4 +1,4 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='inventory'}}
+{{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabId='inventory'}}
     <div class="inventory">
         <div class="list-item item-section flexrow">
             <div class="list-item-content">
@@ -46,7 +46,7 @@
         <div class="scroll-area scroll-area-inventory">
             {{#each inventory.types as |section type|}}
                 <div class="custom-section-heading">
-                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                    {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                             itemCssClass=(ift (not section.isOpen) 'faded')
                             name=(localize section.label)
                             itemId=section.type
@@ -57,7 +57,7 @@
                 {{#if section.isOpen }}
                     {{#each section.items}}
                         <div class="custom-item-element">
-                            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                            {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                                     img=this.img
                                     name=this.name
                                     itemId=this._id
@@ -75,4 +75,4 @@
             {{/each}}
         </div>
     </div>
-{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+{{/'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}

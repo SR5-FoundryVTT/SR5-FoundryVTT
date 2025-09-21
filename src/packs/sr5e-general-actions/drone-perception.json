@@ -1,7 +1,7 @@
 {
   "name": "Drone Perception",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/redist/radar.svg",
+  "img": "systems/shadowrun5e/icons/redist/radar.svg",
   "effects": [],
   "folder": null,
   "sort": 0,

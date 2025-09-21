@@ -1,5 +1,5 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
-    {{> "systems/shadowrun5e/dist/templates/item/parts/header.hbs" }}
+    {{> "systems/shadowrun5e/templates/item/parts/header.hbs" }}
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
         <!--<a class="item" data-tab="info">{{localize "SR5.Information"}}</a>-->
@@ -8,7 +8,7 @@
     <section class="sheetbody">
         <div class="tab" data-group="primary" data-tab="description">
             <div class="flexrow align-start nowrap full-height">
-                {{> "systems/shadowrun5e/dist/templates/item/parts/description.hbs"}}
+                {{> "systems/shadowrun5e/templates/item/parts/description.hbs"}}
             </div>
         </div>
         <!--
@@ -22,6 +22,6 @@
             </div>
         </div>
         -->
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/EffectsTab.hbs"}}
     </section>
 </form>

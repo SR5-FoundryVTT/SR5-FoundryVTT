@@ -1,11 +1,11 @@
-{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+{{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
         name=(localize 'SR5.Labels.ActorSheet.MarkedIcons')
         itemId='mark'
         rightSide=(MarkListHeaderRightSide)
         icons=(MarkListHeaderIcons)
 }}
 {{#each markedDocuments}}
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+    {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
             img=(speakerImg this.document)
             name=(speakerName this.document)
             additionalCssClass=(MatrixTargetCssClass this)
@@ -17,7 +17,7 @@
     }}
     {{! -- Overview of icons connected to the main icon (devices of persona) -- }}
     {{#each this.icons}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                 img=(speakerImg this.document)
                 name=(speakerName this.document)
                 itemCssClass='subcategory-item'

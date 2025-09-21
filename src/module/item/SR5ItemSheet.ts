@@ -119,7 +119,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
     }
 
     override get template() {
-        return `systems/shadowrun5e/dist/templates/item/${this.item.type}.hbs`;
+        return `systems/shadowrun5e/templates/item/${this.item.type}.hbs`;
     }
 
     /* -------------------------------------------- */

@@ -10,11 +10,11 @@ export class OpposedHackOnTheFlyTest extends OpposedMatrixTest {
     declare against: HackOnTheFlyTest;
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/opposing-mark-test-dialog.hbs';
+        return 'systems/shadowrun5e/templates/apps/dialogs/opposing-mark-test-dialog.hbs';
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/opposing-mark-test-message.hbs';
+        return 'systems/shadowrun5e/templates/rolls/opposing-mark-test-message.hbs';
     }
 
     override get successLabel(): Translation {

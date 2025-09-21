@@ -1,5 +1,5 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
-    {{> "systems/shadowrun5e/dist/templates/item/parts/header.hbs"}}
+    {{> "systems/shadowrun5e/templates/item/parts/header.hbs"}}
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
         <a class="item" data-tab="host">{{localize "SR5.ItemTypes.Host"}}</a>
@@ -29,7 +29,7 @@
                         </div>
                     </div>
                 </div>
-                {{> "systems/shadowrun5e/dist/templates/item/parts/description.hbs"}}
+                {{> "systems/shadowrun5e/templates/item/parts/description.hbs"}}
             </div>
         </div>
         <div class="tab" data-group="primary" data-tab="host">
@@ -37,10 +37,10 @@
                 <div class="inventory">
                     <div class="scroll-area">
                         <!-- Input for Host Matrix Attributes -->
-                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                        {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                                 name=(localize "SR5.Host.Attributes")
                         }}
-                        {{> "systems/shadowrun5e/dist/templates/item/parts/matrix.hbs"}}
+                        {{> "systems/shadowrun5e/templates/item/parts/matrix.hbs"}}
                         <!-- Selection for Custom Matrix Attributes -->
                         <div class="item-form">
                             <div class="form-line">
@@ -50,12 +50,12 @@
                         </div>
                         {{#if false}}
                         <!-- Disabled possible future feature of IC deploy order -->
-                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+                        {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                                 name=(localize "SR5.Host.ICOrder")
                         }}
                         <!-- List of IC connected to host -->
                         {{#each system.ic as | ic |}}
-                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListEntityItem.hbs'
+                        {{> 'systems/shadowrun5e/templates/common/List/ListEntityItem.hbs'
                                 id=ic.id
                                 linkName=ic.name
                                 pack=pack
@@ -64,7 +64,7 @@
                                 position=@index
                                 missingLabel="SR5.Host.MissingIC"
                         }}
-                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                        {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                             name=ic.name
                             itemId=ic.id
                             itemType="actor"
@@ -72,7 +72,7 @@
                             itemNameCssClass="skill-roll"
                         }}
                         {{else}}
-                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                        {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                                     name=(localize "SR5.Host.DropICActor")
                         }}
                         {{/each}}
@@ -82,9 +82,9 @@
             </div>
         </div>
         <div class="tab" data-group="primary" data-tab="marks">
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.hbs' }}
+            {{> 'systems/shadowrun5e/templates/actor/parts/matrix/Marks.hbs' }}
         </div>
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/NetworkTab.hbs"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/NetworkTab.hbs"}}
+        {{> "systems/shadowrun5e/templates/actor/tabs/EffectsTab.hbs"}}
     </section>
 </form>

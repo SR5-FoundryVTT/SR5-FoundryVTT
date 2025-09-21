@@ -1,25 +1,25 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='skills'}}
+{{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabId='skills'}}
     <div class="inventory">
         <div class="attributes">
             {{#each config.matrixAttributes as |label key|}}
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.hbs"
+                {{> "systems/shadowrun5e/templates/actor/parts/matrix/MatrixAttribute.hbs"
                         matrixAtt=(lookup ../system.matrix key)
                         key=key
                         label=label
                         matrixAttributes=../config/matrixAttributes
                 }}
             {{/each}}
-            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.hbs"
+            {{> "systems/shadowrun5e/templates/actor/parts/attributes/Attribute.hbs"
                     attributeId='resonance'
                     attribute=system.attributes.resonance
             }}
         </div>
         <div class="split-container">
 
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.hbs' }}
+            {{> 'systems/shadowrun5e/templates/actor/parts/skills/ActiveSkillList.hbs' }}
             <!--Here needs to go the Sprite Config-->
                 <div class= "item-section center sprite"> <!--Here starts the selector sprite-->
-                    {{> 'systems/shadowrun5e/dist/templates/common/HeaderBlock.hbs' name=(localize "SR5.Labels.ActorSheet.SpriteConfiguration") }}
+                    {{> 'systems/shadowrun5e/templates/common/HeaderBlock.hbs' name=(localize "SR5.Labels.ActorSheet.SpriteConfiguration") }}
                     <div class="item-center">
                         <div class="list-item matrix">
                             <div class="list-item-content">
@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="item-right">
                                     <div class="item-text">
-                                        {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.hbs'
+                                        {{> 'systems/shadowrun5e/templates/common/ValueInput.hbs'
                                                 cssClass="attribute-input"
                                                 size="2"
                                                 maxLength="2"
@@ -97,4 +97,4 @@
             </div>
         </div>
     </div>
-{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+{{/ 'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}

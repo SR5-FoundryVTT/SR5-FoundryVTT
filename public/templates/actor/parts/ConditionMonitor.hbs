@@ -1,4 +1,4 @@
-{{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
+{{> 'systems/shadowrun5e/templates/common/HorizontalCellInput.hbs'
         name=(localize track.label)
         value=track.value
         max=track.max
@@ -9,7 +9,7 @@
 }}
 {{#if track.overflow}}
     {{#ife track.value track.max}}
-        {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs'
+        {{> 'systems/shadowrun5e/templates/common/HorizontalCellInput.hbs'
                 name=(localize "SR5.Overflow")
                 value=track.overflow.value
                 max=track.overflow.max

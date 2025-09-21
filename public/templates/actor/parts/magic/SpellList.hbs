@@ -1,11 +1,11 @@
-{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+{{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
         name=(localize 'SR5.Spell.Spells')
         itemId='spell'
         icons=(ItemHeaderIcons 'spell')
         rightSide=(ItemHeaderRightSide 'spell')
 }}
 {{#each spells.notfound as |item i|}}
-    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+    {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
             img=item.img
             name=item.name
             itemCssClass='subcategory-item'
@@ -19,7 +19,7 @@
 {{/each}}
 
 {{#if spells.combat}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                 name=(localize 'SR5.Spell.CatCombat')
                 itemCssClass='subcategory-header'
                 itemId='combatspells'
@@ -27,7 +27,7 @@
                 rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.combat as |item i|}}
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                         img=item.img
                         name=item.name
                         itemCssClass='subcategory-item'
@@ -42,7 +42,7 @@
 {{/if}}
 
 {{#if spells.detection}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                 name=(localize 'SR5.Spell.CatDetection')
                 itemCssClass='subcategory-header'
                 itemId='detectionspells'
@@ -50,7 +50,7 @@
                 rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.detection as |item i|}}
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                         img=item.img
                         name=item.name
                         itemCssClass='subcategory-item'
@@ -65,7 +65,7 @@
 {{/if}}
 
 {{#if spells.health}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                 name=(localize 'SR5.Spell.CatHealth')
                 itemCssClass='subcategory-header'
                 itemId='healthspells'
@@ -73,7 +73,7 @@
                 rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.health as |item i|}}
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                         img=item.img
                         name=item.name
                         itemCssClass='subcategory-item'
@@ -88,7 +88,7 @@
 {{/if}}
 
 {{#if spells.illusion}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                 name=(localize 'SR5.Spell.CatIllusion')
                 itemCssClass='subcategory-header'
                 itemId='illusionspells'
@@ -96,7 +96,7 @@
                 rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.illusion as |item i|}}
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                         img=item.img
                         name=item.name
                         itemCssClass='subcategory-item'
@@ -111,7 +111,7 @@
 {{/if}}
 
 {{#if spells.manipulation}}
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs'
+        {{> 'systems/shadowrun5e/templates/common/List/ListHeader.hbs'
                 name=(localize 'SR5.Spell.CatManipulation')
                 itemCssClass='subcategory-header'
                 itemId='manipulationspells'
@@ -119,7 +119,7 @@
                 rightSide=(ItemHeaderRightSide 'spell')
         }}
         {{#each spells.manipulation as |item i|}}
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs'
+                {{> 'systems/shadowrun5e/templates/common/List/ListItem.hbs'
                         img=item.img
                         name=item.name
                         itemCssClass='subcategory-item'

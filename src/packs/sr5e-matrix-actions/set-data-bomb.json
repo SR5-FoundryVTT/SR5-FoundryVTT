@@ -2,7 +2,7 @@
   "name": "Set Data Bomb",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/dist/icons/ice-bomb.svg",
+  "img": "systems/shadowrun5e/icons/ice-bomb.svg",
   "effects": [],
   "_id": "OblwI4K8IscL5Crc",
   "system": {

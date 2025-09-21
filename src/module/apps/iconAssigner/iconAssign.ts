@@ -11,7 +11,7 @@ export async function getIconFiles(): Promise<string[]> {
     }
 
     // Icon locations
-    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/dist/icons/importer/";
+    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/icons/importer/";
     const folderList = await FilePicker.browse("data", imgFolder).then(picker => picker.dirs);
     let fileList = await FilePicker.browse("data", imgFolder).then(picker => picker.files);
 
@@ -30,7 +30,7 @@ export function iconAssign(
 ): string {
 
     const defaultImg = "icons/svg/item-bag.svg";
-    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) || "systems/shadowrun5e/dist/icons/importer/";
+    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) || "systems/shadowrun5e/icons/importer/";
     const imgExtensionOptions = ['.svg', '.webp', '.png', '.jpg', '.jpeg', '.avif'];
     const imgName = importFlags.name;
     const imgType = importFlags.type;

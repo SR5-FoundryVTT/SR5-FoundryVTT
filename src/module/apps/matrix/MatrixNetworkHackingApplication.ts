@@ -43,7 +43,7 @@ export class MatrixNetworkHackingApplication extends Application {
     }
 
     override get template() {
-        return 'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/app.hbs';
+        return 'systems/shadowrun5e/templates/apps/matrix-network-hacking/app.hbs';
     }
 
     static override get defaultOptions() {

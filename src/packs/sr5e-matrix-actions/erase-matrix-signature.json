@@ -3,7 +3,7 @@
   "_id": "h3BIx7VKwI6c2Ufy",
   "name": "Erase Matrix Signature",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/invisible.svg",
+  "img": "systems/shadowrun5e/icons/invisible.svg",
   "effects": [],
   "system": {
     "description": {

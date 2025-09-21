@@ -1,4 +1,4 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='spritepowers'}}
+{{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabId='spritepowers'}}
     <div class="flexrow list-header item-section space-between">
         <div class="RollId" data-roll-id="matrix.device-rating">
             <a class="roll Roll">
@@ -39,8 +39,8 @@
             </nav>
             <div class="scroll-area scroll-area-matrix-icons">
                 <section data-group='matrix' class="tabsbody">
-                    {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/MarksTab.hbs'}}
-                    {{> 'systems/shadowrun5e/dist/templates/actor/tabs/matrix/TargetsTab.hbs'}}
+                    {{> 'systems/shadowrun5e/templates/actor/tabs/matrix/MarksTab.hbs'}}
+                    {{> 'systems/shadowrun5e/templates/actor/tabs/matrix/TargetsTab.hbs'}}
                 </section>
             </div>
         </div>
@@ -51,14 +51,14 @@
             </nav>
             <div class="scroll-area scroll-area-matrix-hacking">
                 <section data-group='matrix-right-side' class="tabsbody">
-                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='sprite-powers'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.hbs' }}
-                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
-                    {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='matrix-actions'}}
-                        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixActionList.hbs' }}
-                    {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+                    {{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='sprite-powers'}}
+                        {{> 'systems/shadowrun5e/templates/actor/parts/matrix/SpritePowerList.hbs' }}
+                    {{/ 'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}
+                    {{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabGroup='matrix-right-side' tabId='matrix-actions'}}
+                        {{> 'systems/shadowrun5e/templates/actor/parts/matrix/MatrixActionList.hbs' }}
+                    {{/ 'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}
                 </section>
             </div>
         </div>
     </div>
-{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+{{/ 'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}

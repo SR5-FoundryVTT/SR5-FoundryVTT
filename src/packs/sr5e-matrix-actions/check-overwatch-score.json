@@ -2,7 +2,7 @@
   "name": "Check Overwatch Score",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/dist/icons/anarchy.svg",
+  "img": "systems/shadowrun5e/icons/anarchy.svg",
   "effects": [],
   "_id": "JTqDLs0NbxpBzso1",
   "system": {

@@ -1,4 +1,4 @@
-{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs' tabId='misc'}}
+{{#> 'systems/shadowrun5e/templates/common/TabWrapper.hbs' tabId='misc'}}
     <div class="inventory">
         <div class="split-container">
             <div class="scroll-area">
@@ -9,7 +9,7 @@
                             {{localize "SR5.ImportCharacter"}}
                         </button>
                     </div>
-                    {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/dist/templates/actor/parts/ToggleImportFlags.hbs' }}{{/if}}
+                    {{#if (hasAnyFreshImports this.actor)}}{{> 'systems/shadowrun5e/templates/actor/parts/ToggleImportFlags.hbs' }}{{/if}}
                     {{/if}}
                     {{#if system.matrix.device}}
                     <div class="list-item-content">
@@ -409,4 +409,4 @@
             </div>
         </div>
     </div>
-{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs'}}
+{{/'systems/shadowrun5e/templates/common/TabWrapper.hbs'}}
