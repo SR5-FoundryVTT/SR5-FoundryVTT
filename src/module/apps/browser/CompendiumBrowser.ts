@@ -130,8 +130,8 @@ export class CompendiumBrowser extends Base {
         return context;
     }
 
-    protected override _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
-        const result = super._onRender(context, options);
+    protected override async _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
+        await super._onRender(context, options);
 
         if (this.activeTab === "Config") {
             void this._renderSettings().then(() => this.settingsListeners(this.element));
@@ -139,8 +139,6 @@ export class CompendiumBrowser extends Base {
             // Fetch results and then render the initial visible set
             void this.fetch().then(async () => this.prepareResults(0, 50));
         }
-
-        return result;
     }
 
     private async _renderSettings() {
