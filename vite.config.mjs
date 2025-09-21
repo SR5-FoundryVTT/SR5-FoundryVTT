@@ -24,4 +24,11 @@ export default defineConfig({
         lib: { entry: './src/module/main.ts' },
     },
     css: { preprocessorOptions: { scss: { api: 'modern-compiler' } } },
+    // tsconfigPaths works for normal imports, but dynamic imports (for code-splitting)
+    // don’t resolve aliases correctly, for whatever reason, so we need an explicit alias here
+    resolve: {
+        alias: {
+            '@': '/src',
+        },
+    },
 });

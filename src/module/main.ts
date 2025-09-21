@@ -6,5 +6,5 @@ import { HooksManager } from './hooks';
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
 
-HooksManager.registerHooks();
+await HooksManager.registerHooks();
 HandlebarManager.registerHelpers();
