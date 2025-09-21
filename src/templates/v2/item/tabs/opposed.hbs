@@ -1,0 +1,66 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="split-container">
+        <div>
+            <div class="standard-form scrollable">
+                {{formGroup systemFields.action.fields.opposed.fields.test
+                            value=system.action.opposed.test
+                            options=(tests2Array opposedTests)
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{#if system.action.opposed.test}}
+                    {{formGroup systemFields.action.fields.opposed.fields.skill
+                                value=system.action.opposed.skill
+                                options=(config2Array activeSkills)
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.opposed.fields.attribute
+                                value=system.action.opposed.attribute
+                                options=(config2Array attributes)
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.opposed.fields.attribute2
+                                value=system.action.opposed.attribute2
+                                options=(config2Array attributes)
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.opposed.fields.armor
+                                value=system.action.opposed.armor
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.opposed.fields.mod
+                                value=system.action.opposed.mod
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/if}}
+            </div>
+        </div>
+        <div>
+            <div class="standard-form scrollable">
+                {{formGroup systemFields.action.fields.opposed.fields.resist.fields.test
+                            value=system.action.opposed.resist.test
+                            options=(tests2Array resistTests)
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{#if system.action.opposed.resist.test}}
+                    {{formGroup systemFields.action.fields.opposed.fields.resist.fields.attribute
+                                value=system.action.opposed.resist.attribute
+                                options=(config2Array attributes)
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.opposed.fields.resist.fields.attribute2
+                                value=system.action.opposed.resist.attribute2
+                                options=(config2Array attributes)
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.opposed.fields.resist.fields.armor
+                                value=system.action.opposed.resist.armor
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</section>

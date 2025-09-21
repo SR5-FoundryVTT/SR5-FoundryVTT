@@ -127,6 +127,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/damage'),
             scrollable: ['scrollable']
         },
+        opposed: {
+            template: SheetFlow.templateBase('item/tabs/opposed'),
+            scrollable: ['scrollable']
+        },
         effects: {
             template: SheetFlow.templateBase('item/tabs/effects'),
             templates: SheetFlow.listItem('effect'),
@@ -147,6 +151,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'technology', label: 'Technology', cssClass: '' },
                 { id: 'action', label: 'Action', cssClass: '' },
                 { id: 'damage', label: 'Damage', cssClass: '' },
+                { id: 'opposed', label: 'Opposed', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' }
             ]
         }

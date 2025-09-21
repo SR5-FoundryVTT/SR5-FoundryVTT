@@ -1058,6 +1058,50 @@
                     "roll_mode": {
                         "label": "Roll Mode",
                         "hint": "The Roll Mode of the test. Leave blank if it should use the user-selected Roll Mode"
+                    },
+                    "opposed": {
+                        "test": {
+                            "label": "Opposed Test",
+                            "hint": "The Test that the target of the action needs to take"
+                        },
+                        "skill": {
+                            "label": "Skill",
+                            "hint": "Skill used by Opposed Test. Leave blank if no skill is used"
+                        },
+                        "attribute": {
+                            "label": "Attribute",
+                            "hint": "The Attribute used by the Opposed Test"
+                        },
+                        "attribute2": {
+                            "label": "Other Attribute",
+                            "hint": "The Other Attribute used by this Opposed Test"
+                        },
+                        "armor": {
+                            "label": "Armor",
+                            "hint": "If the actor's Armor should be added to the Opposed Test"
+                        },
+                        "mod": {
+                            "label": "Modifier",
+                            "hint": "Any modifiers applied to the Opposed Test"
+                        },
+                        "resist": {
+                            "test": {
+                                "label": "Resist Test",
+                                "hint": "Test the target takes to resist damage after the Opposed Test"
+                            },
+                            "attribute": {
+                                "label": "Attribute",
+                                "hint": "The Attribute used by the Resist Test"
+                            },
+                            "attribute2": {
+                                "label": "Other Attribute",
+                                "hint": "The Other Attribute used by this Resist Test"
+                            },
+                            "armor": {
+                                "label": "Armor",
+                                "hint": "If the actor's Armor should be added to the Resist Test"
+                            }
+                        }
                     }
                 },
                 "technology": {
