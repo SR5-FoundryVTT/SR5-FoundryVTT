@@ -14,9 +14,6 @@
 // - To add new sheets/components/config files, forward them here.
 // -----------------------------------------------------------------------------
 
-// remove once we start using foundry to register fonts.
-@forward 'fonts';
-
 // layout section, atomic classes for use in .html/.hbs files
 @forward 'layout/display';
 @forward 'layout/flex';
