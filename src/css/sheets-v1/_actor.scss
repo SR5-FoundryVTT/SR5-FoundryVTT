@@ -1,0 +1,322 @@
+@use '../config';
+
+.sr5.actor {
+    min-height: config.$actor-sheet-min-height;
+    min-width: config.$actor-sheet-min-width;
+
+    .window-content {
+        border: none;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+    .wholesheet {
+        height: 100%;
+        display: flex;
+        flex-flow: column nowrap;
+        overflow: hidden;
+    }
+    .name {
+        background: linear-gradient(to right, var(--sr5-action-subtle) 30%, transparent 100%) no-repeat;
+        @include config.font-size(28); // bastardization, this sets the height of the container not the font size!
+        margin-bottom: 0;
+        padding-left: 5px;
+        position: relative;
+
+        &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2px;
+            width: 0%;
+            background-color: var(--sr5-accent);
+            transition: width 300ms ease;
+            transform-origin: left center;
+        }
+
+        &:has(input:focus)::after {
+          width: 100%;
+        }
+
+        input[type=text].display {
+            background: none;
+        }
+    }
+    .sheetbody {
+        overflow: hidden;
+        flex: 1;
+    }
+    .limit-title {
+        @include config.font-size(16);
+    }
+    .attributes {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        &.center {
+            justify-content: space-evenly;
+        }
+        &.no-border {
+            border-top: none;
+            border-bottom: none;
+        }
+        &.wrap {
+            flex-wrap: wrap;
+        }
+        .attribute {
+            font-weight: 600;
+
+            align-items: center;
+            color: var(--sr5-accent);
+            display: flex;
+            flex-flow: column nowrap;
+            flex: 1 0 auto;
+            @include config.font-size(14);
+            justify-content: space-evenly;
+            min-width: 4em;
+            padding-top: 4px;
+            text-align: center;
+
+            &.no-border {
+                border-right: none;
+            }
+            &.no-grow {
+                flex-grow: 0;
+            }
+            &:hover {
+                .attribute-input-container.row {
+                    visibility: visible;
+                }
+            }
+            &.flex0 {
+                min-width: 0;
+                width: 0;
+            }
+            &.row {
+                flex-flow: row nowrap;
+                justify-content: center;
+                align-items: center;
+                align-content: center;
+                > .attribute-name {
+                    width: auto;
+                }
+                &.space-around {
+                    justify-content: space-around;
+                }
+                .attribute-input {
+                    transform: translateY(20%);
+                }
+            }
+            > .attribute-value {
+                > .attribute-value-total {
+                    color: var(--sr5-text);
+                    @include config.font-size(18);
+                    font-weight: 700;
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+
+            > .attribute-name {
+                @include config.font-size(16);
+                width: 100%;
+                text-align: center;
+                margin-bottom: 0;
+                &.icon {
+                    @include config.font-size(12);
+                }
+                &.roll {
+                    @include config.hover-transition($color: var(--sr5-accent-subtle));
+                }
+            }
+
+            .attribute-input-container {
+                text-align: center;
+                position: relative;
+                margin-bottom: 2px;
+                .mod {
+                    @include config.font-size(12);
+                    margin-top: -2px;
+                }
+                &.row {
+                    //visibility: hidden;
+                    display: flex;
+                    flex-flow: row;
+                }
+                > .attribute-input {
+                    max-width: 30px;
+                    text-align: center;
+                    margin: 2px;
+                }
+            }
+
+            .toggle-fresh-import-all-off {
+                @include config.font-size(12);
+                background-color: var(--sr5-action-strong);
+            }
+
+            .toggle-fresh-import-all-on {
+                @include config.font-size(12);
+                background-color: var(--sr5-action-strong);
+            }
+
+            .track {
+                display: flex;
+                flex-flow: row;
+                justify-content: space-evenly;
+                margin-bottom: 0.1em;
+                width: 100%;
+
+                &.center {
+                    justify-content: center;
+                    gap: 0.5rem;
+                }
+                &.between {
+                    justify-content: space-between;
+                }
+                .track-slash {
+                    width: 1.5em;
+                    transform: translateY(10%);
+                    flex: 0 0;
+                    &:after {
+                        content: '/';
+                    }
+                }
+                .track-plus {
+                    width: 1em;
+                    flex: 0 0;
+                    &:after {
+                        content: '+';
+                    }
+                }
+                .track-max-value {
+                    margin-bottom: 0;
+                    margin-left: 0.25em;
+                }
+            }
+        }
+    }
+    .limit {
+        padding: 0 0.1em;
+        margin-top: -2px;
+        text-align: center;
+        @include config.font-size(16);
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+    }
+
+    // Interaction Element for Skill Lists
+    .skill-header {
+        @include config.hover-transition($color: var(--sr5-action));
+    }
+
+    // Sprite sheet power tab list had broken flex/block relations, causing missing a scrollbar.
+    // Other actor sheet tabs miss-use the 'inventory' class. To not further miss-use it,
+    // this hacky class pierces through .sr5 .tab .tabbody > * flex:0 and broken scroll-area
+    // formatting in general to have a localized solution for the sprite power list.
+    // If you're looking at this, and have a better solution, please burn this in the fires of hell.
+    .scroll-area-sprite-power {
+        display: block;
+        flex: 1 !important;
+        height: 100%;
+        width: 100%;
+        overflow: auto;
+    }
+
+        &.sheet.window-app {
+            background: var(--sr5-backdrop);
+            border: 1px solid var(--sr5-border-default-subtle);
+            @include config.shadow-elevation(10);
+
+        & .window-header {
+            border-bottom: none;
+            background: transparent;
+            background-repeat: repeat;
+            background-size: 100% 20px auto;
+            flex: 0 0 20px;
+            padding: 0 3px 0 0;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+
+            & a {
+            display: inline-flex;
+            padding: 6px 0 0 0;
+            font-size: 0;
+            color: var(--sr5-neutral-subtle);
+
+            & .fa-solid,
+                & .fas {
+                    @include config.font-size(12);
+                }
+            }
+
+            & .window-title {
+            font-size: 0;
+            }
+        }
+    }
+}
+
+.sr5 #filter-skills {
+    @include config.font-size(14);
+    border: 1px solid var(--sr5-border-default);
+    width: 100%;
+}
+
+.sr5 .list-item:has(#filter-skills) {
+    padding: 0;
+}
+
+//
+// Skill Editing Application
+//
+.sr5.skill-edit-window {
+    min-height: 200px;
+    min-width: 370px;
+    display: inline-block;
+    background: var(--sr5-backdrop);
+    border: 1px solid var(--sr5-border-default);
+    padding-block: 0.25rem 0;
+
+    .window-header, .window-content {
+        border: none;
+    }
+
+    h4 {
+        @include config.use-font($weight: 600);
+    }
+
+    .wholesheet {
+        .inventory > .list-item.item-section {
+            background: transparent;
+            border: none;
+        }
+
+        .list-item.item-section:nth-child(odd):not(:first-child) {
+            border-top: 1px solid var(--sr5-border-variant);
+        }
+
+        .list-item.item-section:nth-child(even) {
+            border: none;
+        }
+
+        .item-text .open-source {
+            justify-self: end;
+        }
+    }
+}
+
+.sr5 .flexcol-skills {
+    display: flex;
+    flex-direction: column;
+}
+
+// got to hack specifitivity, restore box-shadow behaviour
+// explicitly
+div input.attribute-input {
+    box-shadow: inset 0 0 6px oklch(from var(--sr5-border-default) l c h / 0.1);
+}

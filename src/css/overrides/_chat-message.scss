@@ -1,0 +1,70 @@
+// -----------------------------------------------------------------------------
+// Chat Message Styles SCSS File
+//
+// Purpose:
+// - Provides custom styling overrides for Foundry VTT chat message elements
+// - Applies consistent theming to message headers, content blocks, and inline links
+//
+// Usage:
+// - Targets `.chat-message` and its children within FoundryVTT's chat log
+// - Relies on theme variables and config mixins for consistent appearance
+//
+// Notes:
+// - Font and color styles must currently be re-applied within each message
+// - If all system content includes an `.sr5` tag, we could wrap styles with
+//   a parent selector using `:has(.sr5)` to remove potential side-effects
+//   and the content from the overrides folder.
+// -----------------------------------------------------------------------------
+
+@use '../config';
+
+.chat-message {
+    @include config.use-font($weight: 600);
+    color: var(--sr5-text);
+    background: var(--sr5-backdrop);
+    border: 1px solid var(--sr5-border-default);
+
+    .message-header {
+        color: var(--sr5-text-subtle);
+
+        a {
+            @include config.hover-transition($color: var(--sr5-action));
+
+            &:hover {
+                text-shadow: none;
+            }
+        }
+    }
+
+    .message-content {
+        @include config.padding($y: 1);
+
+        h2 {
+            color: var(--sr5-accent);
+            @include config.font-size(20);
+            border-bottom: 1px solid var(--sr5-border-variant);
+        }
+
+        .content-link {
+            background: var(--sr5-surface-high);
+            color: var(--sr5-text);
+            border: 1px solid var(--sr5-border-default);
+            @include config.padding($x: 2);
+            @include config.hover-transition($color: var(--sr5-action));
+
+            i {
+                color: var(--sr5-text-subtle);
+                @include config.padding($right: 1);
+            }
+
+            &:hover {
+                text-shadow: none;
+            }
+        }
+    }
+    h4 {
+        @include config.use-font($weight: 700);
+        @include config.font-size(13);
+        color: var(--sr5-text);
+    }
+}

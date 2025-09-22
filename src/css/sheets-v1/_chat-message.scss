@@ -1,0 +1,408 @@
+@use '../config';
+
+// we should not be using it here, but got to fix switching to oklch
+@use 'sass:color';
+
+.sr5 {
+    &.chat-card {
+        background: transparent;
+        font-style: normal;
+        @include config.font-size(16);
+
+        //
+        // Content with this class should be hidden from players eyes
+        // Check SuccessTest._showGmOnlyContent for when to show it to users.
+        //
+        .gm-only-content {
+            display: none !important;
+        }
+
+        .clickable {
+            @include config.hover-transition($background-color: var(--sr5-surface-high));
+        }
+
+        .card-header {
+            padding: 0.25em 0;
+            border-bottom: 1px solid var(--sr5-border-default);
+
+
+            img {
+                flex: 0 0;
+                margin-right: 0.5em;
+                padding: 1px 1px 1px 1px;
+                border: 0;
+                height: 28px;
+                width: 28px;
+            }
+
+            h3 {
+                font-weight: bold;
+                align-self: center;
+                flex: 1;
+                margin: 0;
+                @include config.font-size(12);
+            }
+        }
+        .card-header:first-of-type {
+            color: var(--sr5-accent);
+            border-color: var(--sr5-accent);
+        }
+        .button {
+            color: var(--sr5-text);
+            border-color: var(--sr5-border-default);
+            background: var(--sr5-control-background);
+            border-radius: 0.3em;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            padding-left: 1em;
+            padding-right: 1em;
+
+            &:hover {
+                cursor: pointer;
+                outline: none;
+                box-shadow: 0 0 5px var(--sr5-action);
+            }
+        }
+        .card-description {
+            span {
+                border-right: 1px solid var(--sr5-border-default);
+                padding: 0;
+                gap: 0.3em;
+                @include config.font-size(12);
+            }
+            .card-description-content {
+                border-bottom: 1px solid var(--sr5-border-default);
+            }
+        }
+
+        .damage-line {
+            margin-top: 0.25em;
+        }
+        .reducedResult {
+            color: var(--sr5-color-physical);
+            filter: sepia(0.5) hue-rotate(-60deg);
+        }
+    }
+    &.roll-card {
+        margin: 0.15em;
+        @include config.font-size(12);
+
+        .card-title {
+            font-weight: 600;
+            display: flex;
+            border-bottom: 1px solid var(--sr5-border-default);
+            justify-content: flex-start;
+            align-content: center;
+            align-items: flex-end;
+
+            > * {
+                margin-left: 0.15em;
+                margin-right: 0.15em;
+                width: 100%;
+            }
+
+            .document {
+                overflow: hidden;
+                white-space: nowrap;
+                display: flex;
+                align-content: center;
+
+                * {
+                    display: inline-block;
+                }
+            }
+
+            .header-name {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                // Override Foundry default header styling.
+                border-bottom: none;
+                color: var(--sr5-text);
+
+                &:hover {
+                    text-shadow: -1px -1px 0 var(--sr5-color-stun), 1px -1px 0 var(--sr5-color-stun), -1px 1px 0 var(--sr5-color-stun), 1px 1px 0 var(--sr5-color-stun);
+                }
+            }
+
+            .show-display-description,
+            .hide-display-description {
+                border: none;
+                cursor: pointer;
+                height: 32px;
+                width: 32px;
+            }
+            .hide-display-description {
+                display: none;
+            }
+        }
+        .test-line {
+            margin-top: 0.25em;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            .test-name {
+                font-style: italic;
+                &.test-roll {
+                    text-decoration: underline;
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+            }
+            .place-template {
+                padding: 2px 5px;
+                line-height: 1em;
+                color: var(--sr5-color-primary-inverse);
+                @include config.font-size(18);
+                margin-right: 1em;
+                flex: 0;
+            }
+            .test-icon {
+                width: 15px;
+                height: 15px;
+                margin-left: 5px;
+                margin-bottom: 0;
+                border: 0;
+            }
+        }
+        .card-description {
+            padding: 0.25em;
+            border-bottom: 1px solid var(--sr5-border-default);
+            display: none;
+        }
+        .card-content {
+            border-bottom: 1px solid var(--sr5-border-default);
+
+            padding: 0.25em 0.25em 0.25em;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            .left-side {
+                display: flex;
+                flex: 1;
+                flex-flow: column;
+            }
+            .right-side {
+                display: flex;
+                flex: 1;
+                flex-flow: column;
+                text-align: right;
+                align-content: flex-end;
+                .limit-line {
+                    justify-content: flex-end;
+                }
+            }
+            .key {
+                margin-right: 0.35em;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 10em;
+                &.bold {
+                    font-weight: bold;
+                }
+            }
+            .value {
+                font-weight: bold;
+                align-self: flex-end;
+            }
+            .value-result {
+                text-align: right;
+            }
+            .limit-line {
+                display: flex;
+                flex-flow: nowrap row;
+                justify-content: flex-start;
+            }
+            .category-line {
+                font-style: italic;
+            }
+            .damage-line {
+                display: flex;
+                flex-flow: nowrap row;
+                justify-content: flex-start;
+                align-items: flex-end;
+                text-align: left;
+                gap: 0.2em;
+
+                .icon {
+                    font-style: italic;
+                }
+            }
+            p {
+                @include config.font-size(12);
+            }
+            h3 {
+                @include config.font-size(14);
+                margin: 0;
+                font-weight: bold;
+            }
+            .test-value {
+                display: flex;
+                span.value {
+                    flex: auto;
+                    text-align: left;
+                }
+                span.value-result {
+                    flex: auto;
+                    text-align: right;
+                    padding-right: 8px;
+                    white-space: nowrap;
+                }
+                .test-icon {
+                    width: 15px;
+                    height: 15px;
+                    margin-left: 0;
+                    margin-bottom: 0;
+                    border: 0;
+                }
+            }
+            .test-code {
+                @include config.font-size(12);
+            }
+            &.can-wrap {
+                flex-flow: row wrap;
+                row-gap: 5px;
+                .left-side {
+                    flex: 1 0;
+                    white-space: nowrap;
+                }
+                .right-side {
+                    flex: 1 0;
+                    white-space: nowrap;
+                }
+            }
+        }
+        .dice-rolls {
+            display: none;
+            border-bottom: 1px solid var(--sr5-border-default);
+        }
+        .dice-roll-content {
+            gap: 0.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            line-height: 1.5;
+            @include config.padding($y: 1);
+
+            .dice-roll {
+                // asset no longer exists
+                // background-image: config.asset('d6-grey.svg', 'icons/svg/');
+                // use clip-path instead to make them look more geometrical
+                clip-path: polygon(0 0.25rem, 0.25rem 0, calc(100% - 0.25rem) 0, 100% 0.25rem, 100% calc(100% - 0.25rem), calc(100% - 0.25rem) 100%, 0.25rem 100%, 0 calc(100% - 0.25rem));
+                background: var(--sr5-surface-highest);
+                @include config.font-size(16);
+                font-weight: 700;
+                text-align: center;
+                flex-basis: 1.5rem;
+                aspect-ratio: 1;
+                margin: 0;
+
+                &.red {
+                    color: var(--sr5-color-physical-strong);
+                }
+                &.green {
+                    color: var(--sr5-color-matrix-strong);
+                }
+            }
+        }
+        .glitch-content {
+            display: flex;
+            flex-flow: column;
+            border-bottom: 1px solid var(--sr5-border-default);
+
+            .glitch {
+                position: relative;
+                text-decoration: none;
+                text-transform: uppercase;
+                margin: 0;
+                letter-spacing: 5px;
+                text-align: center;
+                padding-top: 4px;
+                font-weight: bold;
+                z-index: 1;
+            }
+            .glitch:before,
+            .glitch:after {
+                display: inline;
+                position: absolute;
+                top: 4px;
+                right: 0;
+                left: 0;
+                content: attr(data-glitch);
+                text-transform: uppercase;
+                font-weight: normal;
+            }
+
+            .glitch:after {
+                color: var(--sr5-color-magic);
+                opacity: 0;
+                z-index: -1;
+                animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both 5;
+            }
+
+            .glitch:before {
+                color: var(--sr5-color-stun);
+                opacity: 0;
+                z-index: -2;
+                animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both 5;
+            }
+            .message:hover .glitch:before {
+                animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+                opacity: 1;
+            }
+            .message:hover .glitch:after {
+                animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
+                opacity: 1;
+            }
+
+            @media only screen and (max-width: 400px) {
+                .glitch {
+                    @include config.font-size(48);
+                }
+            }
+
+            @keyframes glitch {
+                from {
+                    opacity: 1;
+                }
+                0% {
+                    transform: translate(0);
+                    opacity: 0;
+                }
+                1% {
+                    opacity: 1;
+                }
+                20% {
+                    transform: translate(-2px, 2px);
+                }
+                40% {
+                    transform: translate(-2px, -2px);
+                }
+                60% {
+                    transform: translate(2px, 2px);
+                }
+                80% {
+                    transform: translate(2px, -2px);
+                    opacity: 1;
+                }
+                to {
+                    transform: translate(0);
+                }
+            }
+        }
+    }
+    &.item-card {
+        .card-description {
+            display: block;
+        }
+    }
+    .chat-select-link img:hover {
+        padding: 0;
+        border: 1px solid var(--sr5-border-default);
+    }
+}

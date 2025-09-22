@@ -1,0 +1,47 @@
+// -----------------------------------------------------------------------------
+// SCSS Bootstrap File (NOT for direct compilation)
+//
+// Purpose:
+// - Collects all style modules using `@forward`
+// - Serves as the central import point for `bundle.scss`
+// - Helps control load order and export public mixins/variables
+//
+// Usage:
+// - `bundle.scss` uses this via `@use 'bootstrap';`
+// - Do not define styles here directly
+//
+// Note:
+// - To add new sheets/components/config files, forward them here.
+// -----------------------------------------------------------------------------
+
+// remove once we start using foundry to register fonts.
+@forward 'fonts';
+
+// layout section, atomic classes for use in .html/.hbs files
+@forward 'layout/display';
+@forward 'layout/flex';
+@forward 'layout/grid';
+@forward 'layout/object';
+@forward 'layout/positioning';
+@forward 'layout/sizing';
+@forward 'layout/spacing';
+
+// Legacy Section
+// TODO: Remove when migrated.
+@forward 'sheets-v1/active-effect';
+@forward 'sheets-v1/actor';
+@forward 'sheets-v1/chat-message';
+@forward 'sheets-v1/foundry';
+@forward 'sheets-v1/item';
+@forward 'sheets-v1/modifiers';
+@forward 'sheets-v1/modifiers-container';
+@forward 'sheets-v1/test';
+
+// Components section
+@forward 'components/surface';
+
+// Overrides Section
+@forward 'overrides/chat-message';
+@forward 'overrides/miscellaneous';
+@forward 'overrides/foundry';
+@forward 'overrides/tagify';

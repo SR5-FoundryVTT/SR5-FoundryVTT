@@ -1,0 +1,56 @@
+//
+// Rules around the value modifier pop up that's shown for Value style data structures like Attributes, Skills, etc.
+//
+@use '../config';
+
+.sr5 .value {
+    >.value-modifiers-container {
+        display: none;
+        visibility: hidden;
+
+        position: absolute;
+        z-index: 2147483647;
+
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    &:hover .value-modifiers-container {
+        display: block;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .value-modifiers {
+        display: grid;
+        grid-template-columns: 200px 50px;
+        background: var(--sr5-backdrop);
+        border: 1px solid var(--sr5-border-default);
+        padding: 0.5em 0.5em 0.5em 0.5em;
+        text-align: left;
+        font-weight: normal;
+
+        >.value-modifier-name {
+            font-weight: 600;
+        }
+
+        >.value-modifiers-base {
+            border-bottom: 1px solid var(--sr5-accent);
+            color: var(--sr5-text);
+        }
+
+        >.value-modifiers-modifier {
+            color: var(--sr5-text);
+        }
+
+        >.value-modifiers-total {
+            font-weight: 600;
+            border-top: 1px double var(--sr5-accent);
+            color: var(--sr5-text);
+        }
+
+        >.value-modifiers-invalid-total {
+            text-decoration: line-through;
+        }
+    }
+}

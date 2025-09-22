@@ -1,0 +1,26 @@
+// -----------------------------------------------------------------------------
+// Display Utilities SCSS File
+//
+// Purpose:
+// - Provides utility classes for display values NOT covered by flex/grid helpers
+//
+// Usage:
+// - Apply `.display-block`, `.display-inline-block`, `.display-contents`, etc.
+//
+// Includes:
+// - Common layout display values except `grid`, `inline-grid`, `flex`, `inline-flex`
+// -----------------------------------------------------------------------------
+
+$display-keymap: (
+    'block': block,
+    'inline-block': inline block,
+    'flow-root': flow-root,
+    'contents': contents,
+    'hidden': none,
+);
+
+@each $key, $value in $display-keymap {
+    .#{$key} {
+        display: $value;
+    }
+}

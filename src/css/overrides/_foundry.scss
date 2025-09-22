@@ -1,0 +1,18 @@
+// -----------------------------------------------------------------------------
+// SCSS Override File: Foundry VTT Global Defaults
+//
+// Purpose:
+// - Overrides Foundry VTT's unscoped global default styles.
+// - Removes or adjusts base styles (e.g., fonts, margins) that apply outside `.sr5`.
+// - Provides a clean slate for the SR5 system without relying on `.sr5` scoping.
+//
+// Scope:
+// - Targets Foundry’s built-in global styles where no `.sr5` scope can be applied.
+// - Does NOT contain scoped `.sr5` styles or theming definitions.
+// - Scoped styling and theming belong in separate files (e.g., components/_surface.scss).
+//
+// Examples:
+// - Resetting global font stacks and base line heights on `html` and `body`
+// - Removing default margins or paddings on top-level elements
+// - Neutralizing Foundry styles outside `.sr5` to avoid bleed-through
+// -----------------------------------------------------------------------------
