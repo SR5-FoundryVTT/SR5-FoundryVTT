@@ -18,6 +18,7 @@ import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/t
 
 import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -1773,5 +1774,101 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     get itemEffectApplyTos() {
         return ['actor', 'item', 'test_all', 'test_item', 'modifier'];
+    }
+
+    override async _onFirstRender(context, options) {
+        await super._onFirstRender(context, options);
+
+        this._createContextMenu(this._getDocumentListContextOptions.bind(this), ".new-list-item[data-item-id]", {
+            hookName: "getDocumentListContextOptions",
+            parentClassHooks: false,
+            fixed: true,
+            jQuery: false,
+        });
+    }
+
+    _getDocumentListContextOptions() {
+        return [
+            {
+                name: "SR5.ActorSheet.ContextOptions.View",
+                icon: "<i class='fas fa-eye'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    return !ActorOwnershipFlow.isOwnerOf(this.actor, id);
+                },
+                callback: async (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    const item = await fromUuid(id);
+                    if (!item) return;
+                    if (item instanceof SR5Item
+                        || item instanceof SR5ActiveEffect
+                        || item instanceof SR5Actor) {
+                        await item.sheet?.render(true)
+                    }
+                }
+            },
+            {
+                name: "SR5.ActorSheet.ContextOptions.Source",
+                icon: "<i class='fas fa-page'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    const item = fromUuidSync(id);
+                    if (!item) return false;
+                    if (item instanceof SR5Item
+                        || item instanceof SR5ActiveEffect
+                        || item instanceof SR5Actor) {
+                        return item.hasSource;
+                    }
+                    return false;
+                },
+                callback: async (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    const item = fromUuidSync(id);
+                    if (!item) return;
+                    if (item instanceof SR5Item
+                        || item instanceof SR5ActiveEffect
+                        || item instanceof SR5Actor) {
+                        await item.openSource();
+                    }
+                }
+            },
+            {
+                name: "SR5.ActorSheet.ContextOptions.Edit",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    return ActorOwnershipFlow.isOwnerOf(this.actor, id);
+                },
+                callback: async (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    const item = await fromUuid(id);
+                    if (!item) return;
+                    if (item instanceof SR5Item
+                        || item instanceof SR5ActiveEffect
+                        || item instanceof SR5Actor) {
+                        await item.sheet?.render(true)
+                    }
+                }
+            },
+            {
+                name: "SR5.ActorSheet.ContextOptions.Delete",
+                icon: "<i class='fas fa-trash'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    return ActorOwnershipFlow.isOwnerOf(this.actor, id);
+                },
+                callback: async (target) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+
+                    const id = SheetFlow.listItemId(target);
+                    const item = await fromUuid(id);
+                    if (!item) return;
+                    if (item instanceof SR5Item) {
+                        await this.actor.deleteItem(item);
+                    }
+                }
+            }
+        ]
     }
 }

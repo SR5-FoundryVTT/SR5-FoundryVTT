@@ -1,6 +1,6 @@
 {{!-- expects an MatrixDocument to be passed in as 'item' --}}
 <div class="new-list-item-container {{cssClass}}">
-    <div class="new-list-item">
+    <div class="new-list-item" data-item-id="{{item.document.uuid}}">
         <div class="new-list-item-label-container">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
             <label class="{{#if item.selected}}new-list-item-selected{{/if}}">
@@ -27,8 +27,6 @@
         </div>
     </div>
     <div class="new-list-item-description">
-        <a data-action="openMatrixDocument" data-item-id="{{item.document.uuid}}">
-            <i class="fas fa-page"></i>&nbsp;{{localize "SR5.Labels.ActorSheet.OpenSourceDocument"}}
-        </a>
+        TODO
     </div>
 </div>

@@ -389,7 +389,8 @@ export const SR5 = {
         detection: 'SR5.Spell.CatDetection',
         health: 'SR5.Spell.CatHealth',
         illusion: 'SR5.Spell.CatIllusion',
-        manipulation: 'SR5.Spell.CatManipulation'
+        manipulation: 'SR5.Spell.CatManipulation',
+        ritual: 'SR5.Spell.CatRitual'
     },
 
     spellTypes: {
@@ -422,6 +423,14 @@ export const SR5 = {
     illusionSpellSenses: {
         'single-sense': 'SR5.Spell.IllusionSingleSense',
         'multi-sense': 'SR5.Spell.IllusionMultiSense',
+    },
+
+    ritualSpellTypes: {
+        anchored: 'SR5.Spell.Ritual.Anchored',
+        material_link: 'SR5.Spell.Ritual.MaterialLink',
+        minion: 'SR5.Spell.Ritual.Minion',
+        spell: 'SR5.Spell.Ritual.Spell',
+        spotter: 'SR5.Spell.Ritual.Spotter',
     },
 
     attributeRolls: {

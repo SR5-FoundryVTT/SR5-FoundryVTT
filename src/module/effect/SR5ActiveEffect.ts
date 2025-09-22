@@ -4,6 +4,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { ModifiableValueType } from "../types/template/Base";
 import DataModel = foundry.abstract.DataModel;
 import { Migrator } from "../migrator/Migrator";
+import { LinksHelpers } from '@/module/utils/links';
 
 /**
  * Shadowrun Active Effects implement additional ways of altering document data.
@@ -46,6 +47,17 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (path[0] === 'Actor' && path.length === 4) return true;
 
         return false;
+    }
+
+    async openSource() {
+        const source = this.origin;
+        if (source) {
+            await LinksHelpers.openSource(source);
+        }
+    }
+
+    get hasSource(): boolean {
+        return !!this.origin;
     }
 
     public get source() {

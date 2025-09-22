@@ -372,6 +372,14 @@
                 }
             }
         },
+        "ActorSheet": {
+            "ContextOptions": {
+                "Source": "Open Source",
+                "View": "View",
+                "Edit": "Edit",
+                "Delete": "Delete"
+            }
+        },
         "ActorTypes": {
             "Character": "Character",
             "Critter": "Critter",
@@ -1975,6 +1983,82 @@
         "Specialization": "Specialization",
         "Specializations": "Specializations",
         "Spell": {
+            "FIELDS": {
+                "type": {
+                    "label": "Spell Type",
+                    "hint": "If the Spell is Physical or Mana based"
+                },
+                "category": {
+                    "label": "Category",
+                    "hint": "Category that the Spell belongs to"
+                },
+                "drain": {
+                    "label": "Drain Value",
+                    "hint": "Drain Value of the spell, this is is added to the Force of the spell to Resist Drain"
+                },
+                "range": {
+                    "label": "Range",
+                    "hint": "Range of the Spell"
+                },
+                "duration": {
+                    "label": "Duration",
+                    "hint": "Duration of the Spell"
+                },
+                "combat": {
+                    "type": {
+                        "label": "Combat Spell Type",
+                        "hint": "If the Spell is Direct or Indirect"
+                    }
+                },
+                "detection": {
+                    "type": {
+                        "label": "Detection Spell Type",
+                        "hint": "How the Spell affects targets"
+                    },
+                    "passive": {
+                        "label": "Passive",
+                        "hint": "If the Spell is Passive"
+                    },
+                    "extended": {
+                        "label": "Extended",
+                        "hint": "If the Spell is Extended"
+                    }
+                },
+                "illusion": {
+                    "type": {
+                        "label": "Illusion Spell Type",
+                        "hint": "Type of Illusion Spell"
+                    },
+                    "sense": {
+                        "label": "Sense",
+                        "hint": "The Sense that the Spell affects"
+                    }
+                },
+                "manipulation": {
+                    "damaging": {
+                        "label": "Damaging",
+                        "hint": "If the Spell deals Damage"
+                    },
+                    "mental": {
+                        "label": "Mental",
+                        "hint": "If the Spell affects targets Mentally"
+                    },
+                    "physical": {
+                        "label": "Physical",
+                        "hint": "These spells affect physical forms and are usually defended against"
+                    },
+                    "environmental": {
+                        "label": "Environmental",
+                        "hint": "These spells don’t really have a target, and they don’t really affect targets directly. They just affect an area."
+                    }
+                },
+                "ritual": {
+                    "type": {
+                        "label": "Ritual Type",
+                        "hint": "Type of Ritual to perform"
+                    }
+                }
+            },
             "Attack": "Spell Attack",
             "Cast": "Spell Cast",
             "CatCombat": "Combat",
@@ -1982,6 +2066,7 @@
             "CatHealth": "Health",
             "CatIllusion": "Illusion",
             "CatManipulation": "Manipulation",
+            "CatRitual": "Ritual",
             "Category": "Category",
             "CombatDirect": "Direct",
             "CombatIndirect": "Indirect",

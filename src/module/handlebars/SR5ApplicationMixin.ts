@@ -5,6 +5,7 @@ import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
     return class SR5ApplicationMixin extends foundry.applications.api.HandlebarsApplicationMixin(base) {
@@ -12,9 +13,14 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         declare element: HTMLElement;
         declare window: ApplicationV2.Window;
         declare editIcon: HTMLElement;
+        declare isEditable: boolean;
 
         static DEFAULT_OPTIONS = {
             classes: [SR5_APPV2_CSS_CLASS],
+            form: {
+                submitOnChange: true,
+                closeOnSubmit: false,
+            },
             window: {
                 resizable: true,
             },
@@ -27,8 +33,11 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         static async #toggleEditMode(this, event: MouseEvent) {
             event.preventDefault();
             event.stopPropagation();
-            if (this._isEditMode) await this.submit();
-            this._isEditMode = !this._isEditMode;
+            if (this.isEditable) {
+                this._isEditMode = !this._isEditMode;
+            } else {
+                this._isEditMode = false;
+            }
             await this.render();
         }
 
@@ -108,18 +117,28 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             // once we render, process the Tagify Elements to we rendered
             Hooks.call('sr5_processTagifyElements', this.element);
 
-            if (!this.editIcon) {
-                const button = document.createElement('a');
+            if (this.editIcon) {
+                this.editIcon.className = this._isEditMode ? 'fas fa-file-pen' : 'fas fa-pen-to-square';
+            }
+        }
+
+        async _renderFrame(options) {
+            // @ts-ignore
+            const frame = await super._renderFrame(options);
+            if (this.isEditable) {
+                const button = document.createElement('button');
                 button.setAttribute('font-size', '150%');
+                button.className = 'header-control icon'
                 button.dataset.tooltip = "SR5.Tooltips.ToggleEditMode"
                 this.editIcon = document.createElement('i');
                 button.appendChild(this.editIcon);
                 this.editIcon.className = this._isEditMode ? 'fas fa-file-pen' : 'fas fa-pen-to-square';
                 button.dataset.action = "toggleEditMode";
-                this.window.header?.prepend(button);
-            } else {
-                this.editIcon.className = this._isEditMode ? 'fas fa-file-pen' : 'fas fa-pen-to-square';
+
+                this.window?.controls?.after(button);
             }
+
+            return frame;
         }
 
     } // end of SR5ApplicationMixin

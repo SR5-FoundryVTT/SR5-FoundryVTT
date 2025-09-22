@@ -1761,6 +1761,15 @@ input[type='text'].display {
             flex: 1;
             border-top: $groove;
             border-bottom: 2px solid $yellow;
+
+            .description-buttons {
+                display: flex;
+                flex-flow: row;
+
+                button.line-item-button {
+
+                }
+            }
         }
 
         &:nth-of-type(even) {

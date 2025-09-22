@@ -50,6 +50,7 @@ import { PackActionFlow } from '../item/flows/PackActionFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
+import { LinksHelpers } from '@/module/utils/links';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -2067,7 +2068,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * - this will check for items and for actors in the case of Vehicles/Drones
      * @param uuid - uuid of the instance to check
      */
-    async isOwnerOf(uuid: string): Promise<boolean> {
+    isOwnerOf(uuid: string): boolean {
         return ActorOwnershipFlow.isOwnerOf(this, uuid);
     }
 
@@ -2292,5 +2293,30 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
+    }
+
+    async deleteItem(item: SR5Item | SR5ActiveEffect) {
+        if (item instanceof SR5Item) {
+            if (ActorOwnershipFlow._isOwnerOfItem(this, item)) {
+                if (item._id) {
+                    await this.deleteEmbeddedDocuments('Item', [item._id]);
+                } else {
+                    console.error("Could not find _id field item, cannot delete an unowned item by the actor");
+                }
+            }
+        }
+    }
+
+    getSource() {
+        return this.system.description.source ?? '';
+    }
+
+    get hasSource(): boolean {
+        return !!this.getSource()
+    }
+
+    async openSource() {
+        const source = this.getSource();
+        await LinksHelpers.openSource(source);
     }
 }

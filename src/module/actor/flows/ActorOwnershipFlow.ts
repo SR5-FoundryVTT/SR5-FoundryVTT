@@ -13,8 +13,8 @@ export const ActorOwnershipFlow = {
      * @param actor
      * @param uuid - uuid of the instance to check
      */
-    async isOwnerOf(actor: SR5Actor, uuid: string): Promise<boolean> {
-        const device = await fromUuid(uuid) as any;
+    isOwnerOf(actor: SR5Actor, uuid: string): boolean {
+        const device = fromUuidSync(uuid) as any;
         if (!device) return false;
         if (device instanceof SR5Item) {
             return this._isOwnerOfItem(actor, device);

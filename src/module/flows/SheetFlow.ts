@@ -130,5 +130,20 @@ export const SheetFlow = {
         if (!item.isType('device')) {
             delete parts['device'];
         }
+        if (!item.isType('spell')) {
+            delete parts['spell'];
+        }
+    },
+
+    listItemResolve(target) {
+        const id = this.listItemId(target);
+        if (!id) return undefined;
+        const item = fromUuidSync(id);
+        if (item && item instanceof SR5Item) return item;
+        return undefined;
+    },
+
+    listItemId(target) {
+       return target.closest('.new-list-item[data-item-id]')?.dataset?.itemId;
     }
 }

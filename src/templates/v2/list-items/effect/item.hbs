@@ -1,6 +1,6 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container">
-    <div class="new-list-item">
+    <div class="new-list-item" data-item-id="{{item.uuid}}">
         <div class="new-list-item-label-container">
             {{#if item.img}}
                 <img src="{{item.img}}" class="new-list-item-image" height="24px" width="24px" />
@@ -29,21 +29,6 @@
             <a data-tooltip="SR5.ToggleActive" data-action="toggleEffect" data-item-id="{{item.uuid}}">
                 <i class="{{#if item.disabled}}far fa-circle{{else}}fas fa-check-circle{{/if}}"></i>
             </a>
-            {{#if @root.isEditMode}}
-            <a data-tooltip="SR5.EditItem" data-action="editEffect" data-item-id="{{item.uuid}}">
-                <i class="fas fa-pen-to-square"></i>
-            </a>
-            {{/if}}
-            {{#if isItemEffect}}
-            <a data-tooltip="SR5.OpenSource" data-action="openEffectSource" data-item-id="{{item.uuid}}">
-                <i class="fas fa-file"></i>
-            </a>
-            {{else if @root.isEditMode}}
-            <a data-tooltip="SR5.DeleteItem" data-action="deleteEffect" data-item-id="{{item.uuid}}">
-                <i class="fas fa-trash"></i>
-            </a>
-            {{/if}}
-
         </div>
     </div>
     <div class="new-list-item-description">

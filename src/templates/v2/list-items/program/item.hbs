@@ -1,6 +1,6 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container">
-    <div class="new-list-item">
+    <div class="new-list-item" data-item-id="{{item.uuid}}">
         <div class="new-list-item-label-container">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
             {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
@@ -20,19 +20,10 @@
         </div>
 
         <div class="new-list-item-icons">
-            <button type="button">
-                {{#if (isEquipped item)}}{{localize "SR5.Loaded"}}{{else}}{{localize "SR5.Load"}} >>{{/if}}
-            </button>
-            {{#if (isOwner item owner=@root.actor)}}
-            {{!-- Add Icons for what the Owner of an item can do --}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
-            {{/if}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">
-        <a data-action="openItemSource" data-item-id="{{item.uuid}}">
-            <i class="fas fa-page"></i>&nbsp;{{localize "SR5.Labels.ActorSheet.OpenSourceDocument"}}
-        </a>
         {{{item.system.description.value}}}
     </div>
 </div>

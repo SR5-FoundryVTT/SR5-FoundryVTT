@@ -350,7 +350,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         let actions = await PackActionFlow.getActorMatrixActions(this.actor);
         // Reduce actions to those matching the marks on the selected target.
         if (this.selectedMatrixTarget) {
-            const ownedItem = await this.actor.isOwnerOf(this.selectedMatrixTarget);
+            const ownedItem = this.actor.isOwnerOf(this.selectedMatrixTarget);
             const marksPlaced = this.actor.getMarksPlaced(this.selectedMatrixTarget);
             actions = actions.filter(action => {
                 const {marks, owner} = action.system.action.category.matrix

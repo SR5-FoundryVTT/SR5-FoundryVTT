@@ -780,6 +780,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return LinksHelpers.isUuid(source);
     }
 
+    get hasSource(): boolean {
+        const source = this.getSource();
+        return !!source;
+    }
+
     _canDealDamage(): boolean {
         // NOTE: Double negation to force boolean comparison casting.
         const action = this.getAction();

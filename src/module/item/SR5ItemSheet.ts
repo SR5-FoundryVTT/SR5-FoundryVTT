@@ -151,6 +151,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/contact'),
             scrollable: ['scrollable']
         },
+        spell: {
+            template: SheetFlow.templateBase('item/tabs/spell'),
+            scrollable: ['scrollable']
+        },
         action: {
             template: SheetFlow.templateBase('item/tabs/action'),
             scrollable: ['scrollable']
@@ -200,6 +204,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'lifestyle', label: 'Lifestyle', cssClass: '' },
                 { id: 'program', label: 'Program', cssClass: '' },
                 { id: 'adeptPower', label: 'AdeptPower', cssClass: '' },
+                { id: 'spell', label: 'Spell', cssClass: '' },
                 { id: 'armor', label: 'Armor', cssClass: '' },
                 { id: 'contact', label: 'Contact', cssClass: '' },
                 { id: 'compilation', label: 'Compilation', cssClass: '' },

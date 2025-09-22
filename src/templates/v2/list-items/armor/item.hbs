@@ -1,6 +1,6 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container">
-    <div class="new-list-item">
+    <div class="new-list-item" data-item-id="{{item.uuid}}">
         <div class="new-list-item-label-container">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
             {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
@@ -27,13 +27,9 @@
 
         <div class="new-list-item-icons">
             {{#if (isOwner item owner=@root.actor)}}
-            {{!-- Add Icons for what the Owner of an item can do --}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
             {{/if}}
-
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">
