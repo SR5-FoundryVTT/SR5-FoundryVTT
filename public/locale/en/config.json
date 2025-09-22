@@ -337,9 +337,9 @@
                 "Composure": "Composure",
                 "ControlDevice": "Control Device",
                 "CrackFile": "Crack File",
-                "CrackProgramme": "Crack Programme",
+                "CrashProgram": "Crash Program",
                 "DataSpike": "Data Spike",
-                "DisarmDatabomb": "Disarm Databomb",
+                "DisarmDataBomb": "Disarm Databomb",
                 "Drain": "Drain",
                 "DroneInfiltration": "Drone Infiltration",
                 "DronePerception": "Drone Perception",
@@ -371,7 +371,7 @@
                 "PhysicalDefense": "Physical Defense",
                 "RebootDevice": "Reboot Device",
                 "SendMessage": "Send Message",
-                "SetDatabomb": "Set Databomb",
+                "SetDataBomb": "Set Databomb",
                 "Snoop": "Snoop",
                 "SpoofCommand": "Spoof Command",
                 "SwitchInterfaceMode": "Switch Interface Mode",
@@ -1512,6 +1512,7 @@
             "Actor": {
                 "ConnectNetwork": "Enter this host/grid",
                 "Critter": "Allow the use of critter powers",
+                "DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
                 "DisconnectNetwork": "Leave this host/grid",
                 "Grunt": "Apply grunt rules to this actor",
                 "MarkTarget": "Place additional marks on this target",
@@ -1527,7 +1528,6 @@
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
-            "Actor.DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
             "CallInAction": {
                 "ActorType": "Type of actor to call in"
             },

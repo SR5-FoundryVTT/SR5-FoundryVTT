@@ -95,6 +95,7 @@
             "ResistBiofeedback": "Biofeedback Widerstand",
             "ResistDisease": "Krankheit widerstehen",
             "ResistToxin": "Gift widerstehen",
+            "ResistMatrix": "Matrix widerstehen",
             "Resonance": "Resonanz-Handlungen",
             "Rigging": "Rigger-Handlungen",
             "Social": "Soziale Handlungen",
@@ -337,9 +338,9 @@
                 "Composure": "Selbstbeherrschung",
                 "ControlDevice": "Gerät Steuern",
                 "CrackFile": "Datei Cracken",
-                "CrackProgramme": "Programm Abstürzen Lassen",
+                "CrashProgram": "Programm Abstürzen Lassen",
                 "DataSpike": "Datenspike",
-                "DisarmDatabomb": "Datenbombe entschärfen",
+                "DisarmDataBomb": "Datenbombe entschärfen",
                 "Drain": "Entzug",
                 "DroneInfiltration": "Drohnen-Heimlichkeit",
                 "DronePerception": "Drohnen-Wahrnehmung",
@@ -371,7 +372,7 @@
                 "PhysicalDefense": "Physische Verteidigung",
                 "RebootDevice": "Gerät neu starten",
                 "SendMessage": "Nachricht übermitteln",
-                "SetDatabomb": "Datenbombe legen",
+                "SetDataBomb": "Datenbombe legen",
                 "Snoop": "Übertragung Abfangen",
                 "SpoofCommand": "Befehl vortäuschen",
                 "SwitchInterfaceMode": "Interfacemodus wechseln",
@@ -461,7 +462,7 @@
             "Consent": "Bist du sicher?",
             "Delete": "Ja",
             "Description": "Das Löschen eines Eintrags kann nicht rückgängig gemacht werden!",
-            "Titel": "Eintrag löschen"
+            "Title": "Eintrag löschen"
         },
         "DeleteItem": "Gegenstand löschen",
         "DeleteLicense": "Lizenz löschen",
@@ -486,6 +487,7 @@
         },
         "DicePool": "Würfelpool",
         "DicePoolModifier": "Würfelpool-Modifikator",
+        "DirectConnection": "Direkte Verbindung",
         "DmgTypeMatrix": "Matrix",
         "DmgTypePhysical": "Körperlich",
         "DmgTypeStun": "Geistig",
@@ -626,6 +628,7 @@
             "MissingIC": "Fehlende IC",
             "Rating": "Host-Stufe"
         },
+        "Hosts": "Hosts",
         "HotSim": "Heißes Sim",
         "IC": {
             "MissingHost": "Drag&Drop Host",
@@ -773,6 +776,8 @@
                 "MarkedIcons": "Markierte Icons",
                 "Matrix": "Matrix",
                 "MatrixActions": "Matrix Handlungen",
+                "Network": "Netzwerk",
+                "NoNetwork": "Kein Netzwerk",
                 "Offline": "Offline",
                 "OwnedIcons": "Icons im Besitz",
                 "Persona": "Persona",
@@ -1068,7 +1073,6 @@
         "PhysicalLimit": "Körperliches Limit",
         "PhysicalOverflowTrack": "Körperlicher Überschuss-Monitor",
         "PhysicalTrack": "Körperlicher Monitor",
-        "PlaceMarks": "Platziere Marken",
         "PlaceTemplate": "Platziere Vorlage",
         "PlusFifteenMinutes": "+15min",
         "PowerLevel": "Kraftstufe",
@@ -1495,10 +1499,10 @@
             "RangedAttackTest": "Fernkampfangriff",
             "RitualSpellcastingTest": "Ritualzauber",
             "SkillTest": "Fertigkeitenprobe",
-            "SpellcastingTest": "Spruchzauberei",
+            "SpellCastingTest": "Spruchzauberei",
             "SuccessTest": "Erfolgsprobe",
             "SummonSpiritTest": "Geist Herbeirufen",
-            "SupressionDefenseTest": "Sperrfeuer-Verteidigung",
+            "SuppressionDefenseTest": "Sperrfeuer-Verteidigung",
             "ThrownAttackTest": "Wurfwaffen-Angriff"
         },
         "Threshold": "Schwellenwert",
@@ -1509,6 +1513,7 @@
             "Actor": {
                 "ConnectNetwork": "Betrete Host / Gitter",
                 "Critter": "Ermöglicht die Nutzung von Critterkräften",
+                "DefaultCategoryVisibility": "Zeige Artikelkategorien an, auch wenn keine Artikel hinzugefügt wurden",
                 "DisconnectNetwork": "Verlasse Host/ Gitter",
                 "Grunt": "Nutze Schergen-Regeln für Akteur",
                 "MarkTarget": "Platziere Marken auf diesem Ziel",
@@ -1855,6 +1860,7 @@
             "device": "Gerät",
             "echo": "Echo",
             "equipment": "Ausrüstung",
+            "grid": "Grid",
             "host": "Host",
             "lifestyle": "Lebensstil",
             "metamagic": "Metamagie",
@@ -1865,6 +1871,7 @@
             "sin": "SIN",
             "spell": "Zauberspruch",
             "sprite_power": "Spritekraft",
+            "vehicle": "Vehicle",
             "weapon": "Waffe"
         }
     }
