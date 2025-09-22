@@ -1,68 +1,63 @@
-$systemFonts: 'Signika', 'Palatino Linotype', sans-serif;
+// -----------------------------------------------------------------------------
+// SCSS Variables File
+//
+// Purpose:
+// - Defines core global variables for internal SCSS usage only.
+// - Contains system constants such as layout dimensions, font stacks, asset paths, etc.
+// - Does NOT generate or assign CSS custom properties (those belong in theme files).
+//
+// Scope:
+// - Purely for SCSS preprocessing and calculations.
+// - Used throughout the system to maintain consistency in sizing, spacing, fonts, etc.
+//
+// Examples:
+// - $actor-sheet-min-height: 43.125rem
+// - $window-header-height: 1.25rem
+// - $sans-font-stack: 'Signika', sans-serif
+//
+// -----------------------------------------------------------------------------
 
-$black: black;
-$blue: blue;
-$cornflower: #6495ed;
-$green: green;
-$red: red;
-$grey: grey;
-$white: white;
-$darkblue: darkblue;
-$crimson: crimson;
-$darkred: #55101e;
-$light: darken($white, 10%);
-$light-1: darken($light, 10%);
-$light-2: darken($light-1, 10%);
-$dark: darken($grey, 20%);
-$dark2: #222;
-$dark-sunken: #41404073; //Removed as no longer needed in situational modifiers
-$matrix-green: rgb(7, 145, 35);
-$mce-background: #939393;
-$yellow: #ebb531;
-$freshImportColor: #ffdc80;
-$pdfColor: #ebb531a6;//#e67260;
-$fadedBlack: #000000b8;
-$fLightRed: #cc5e5e;
-$fDarkRed: #af0505;
-$bgrButton: rgba(70, 7, 7, 0.692);
+$base-url: '/systems/shadowrun5e/dist/';
+$base-class: 'sr5v2';
 
-$stun: $blue;
-$physical: $red;
-$matrix: $matrix-green;
+// Typography
+// Font Defs
+$sans-font: 'Rajdhani';
+$serif-font: null;
+$mono-font: null;
 
-$edge: #C7B002;
+// default weights
+$default-sans-weight: 500;
+$default-serif-weight: 400;
+$default-mono-weight: 400;
 
-$roll-limit-hit: $green;
-$roll-failure-background: #ffdddd;
-$roll-failure-border: #6e0000;
+// Stack creation
+$sans-fallback-stack:
+    ui-sans-serif, system-ui, sans-serif, var(--fa-style-family-classic), 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+$serif-fallback-stack: ui-serif, 'Times New Roman', Georgia, 'Noto Serif', 'Roboto Serif', serif;
+$mono-fallback-stack: ui-monospace, Consolas, Menlo, 'Liberation Mono', 'Roboto Mono', monospace;
 
-$rollcolor: $darkblue;
+$font-stacks: (
+    'sans': (
+        user-font: $sans-font,
+        fallback: $sans-fallback-stack,
+        default-weight: $default-sans-weight,
+    ),
+    'serif': (
+        user-font: $serif-font,
+        fallback: $serif-fallback-stack,
+        default-weight: $default-serif-weight,
+    ),
+    'mono': (
+        user-font: $mono-font,
+        fallback: $mono-fallback-stack,
+        default-weight: $default-mono-weight,
+    ),
+);
 
-$color: $white;
-$inner-color: $white;
-$outline-color: $black;
-
-$groove-width: 1px;
-$groove-color: $dark;
-$groove: $groove-width solid $groove-color;
-$light-border: $dark;
-
-$dark-sunken-box-shadow: inset 0 0 3px 0 $darkred, 0 -2px 2px -1px $darkred, -2px 0 2px -2px $fDarkRed, -2px 0 2px -2px $fDarkRed, 2px 0 2px -2px $darkred, 2px 0 2px -2px $darkred, 0 3px 3px -3px $fLightRed, 0 2px 2px -2px $fLightRed, 0 1px 1px -1px $fLightRed;
-
-$radius: 0.25em;
-$small-distance: 0.15em;
-$medium-distance: 0.25em;
-$large-distance: 0.5em;
-
-$border-under: 1px groove $groove-color;
-
-$sheetbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
-    url('assets/brushed_metal.jpg') repeat;
-
-$popupbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
-    url('assets/brushed_metal.jpg') repeat;
+$actor-sheet-min-width: 54.375rem;
+$actor-sheet-min-height: 43.125rem;
 
 $grid__cols: 12;
 $sheet-max-width: 690px;
-
-$nameplate-background: linear-gradient(to right, $darkred 30%, rgba(85, 16, 30, 0.0) 100%);
