@@ -2,10 +2,10 @@
     <div class="fill-container">
         <div class="standard-form scrollable">
             {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.neighborhood value=system.neighborhood rootId=@root.rootId disabled=@root.isPlayMode}}
             {{formGroup systemFields.cost value=system.cost rootId=@root.rootId disabled=@root.isPlayMode}}
             {{formGroup systemFields.comforts value=system.comforts rootId=@root.rootId disabled=@root.isPlayMode}}
             {{formGroup systemFields.security value=system.security rootId=@root.rootId disabled=@root.isPlayMode}}
-            {{formGroup systemFields.neighborhood value=system.neighborhood rootId=@root.rootId disabled=@root.isPlayMode}}
             {{formGroup systemFields.guests value=system.guests rootId=@root.rootId disabled=@root.isPlayMode}}
         </div>
     </div>

@@ -94,6 +94,9 @@ export const SheetFlow = {
             delete parts['damage'];
             delete parts['opposed'];
         }
+        if (!item.isType('armor', 'critter_power', 'cyberware', 'bioware', 'adept_power')) {
+            delete parts['armor'];
+        }
         if (!item.isType('ammo')) {
             delete parts['ammo'];
         }
@@ -103,14 +106,23 @@ export const SheetFlow = {
         if (!item.isType('adept_power')) {
             delete parts['adeptPower'];
         }
-        if (!item.isType('armor')) {
-            delete parts['armor'];
-        }
         if (!item.isCompilation) {
             delete parts['compilation'];
         }
         if (!item.isSummoning) {
             delete parts['summoning'];
+        }
+        if (!item.isType('critter_power')) {
+            delete parts['critterPower'];
+        }
+        if (!item.isType('ritual')) {
+            delete parts['ritual'];
+        }
+        if (!item.isType('modification')) {
+            delete parts['modification'];
+        }
+        if (!item.isType('lifestyle')) {
+            delete parts['lifestyle'];
         }
     }
 

@@ -757,6 +757,28 @@
         "Cover": "Cover",
         "Create": "Create {type}",
         "CritterPower": {
+            "FIELDS": {
+                "optional": {
+                    "label": "Optional",
+                    "hint": "If the Critter Power is Optional"
+                },
+                "powerType": {
+                    "label": "Power Type",
+                    "hint": "The Type of Critter Power"
+                },
+                "duration": {
+                    "label": "Duration",
+                    "hint": "Duration of the Critter Power"
+                },
+                "range": {
+                    "label": "Range",
+                    "hint": "Range of the Critter Power"
+                },
+                "karma": {
+                    "label": "Karma",
+                    "hint": "Karma cost of the Critter Power"
+                }
+            },
             "Categories": {
                 "Drake": "Drake",
                 "Echoes": "Echoes",
@@ -1224,6 +1246,18 @@
                         }
                     }
                 },
+                "grade": {
+                    "label": "Grade",
+                    "hint": "Grade of the Cyberware/Bioware"
+                },
+                "essence": {
+                    "label": "Essence",
+                    "hint": "Essence cost of the Cyberware/Bioware"
+                },
+                "capacity": {
+                    "label": "Capacity",
+                    "hint": "Capacity of the Cyberware/Bioware"
+                },
                 "technology": {
                     "rating": {
                         "label": "Rating",
@@ -1407,7 +1441,39 @@
         "Level": "Level",
         "License": "License",
         "Licenses": "Licenses",
-        "Lifestyle": "Lifestyle",
+        "Lifestyle": {
+            "label": "Lifestyle",
+            "FIELDS": {
+                "type": {
+                    "label": "Lifestyle Type",
+                    "hint": "Type of Lifestyle"
+                },
+                "cost": {
+                    "label": "Lifestyle Cost",
+                    "hint": "Cost of the Lifestyle per month"
+                },
+                "comforts": {
+                    "label": "Comforts",
+                    "hint": "Comforts level of the Lifestyle"
+                },
+                "security": {
+                    "label": "Security",
+                    "hint": "Security level of the Lifestyle"
+                },
+                "neighborhood": {
+                    "label": "Neighborhood",
+                    "hint": "Neighborhood level of the Lifestyle"
+                },
+                "guests": {
+                    "label": "Guests",
+                    "hint": "Guests staying in the same Lifestyle"
+                },
+                "permanent": {
+                    "label": "Permanent",
+                    "hint": "If this Lifestyle is a Permanent Lifestyle"
+                }
+            }
+        },
         "LifestyleComforts": "Comforts",
         "LifestyleGuests": "Guests",
         "LifestyleHigh": "High",
@@ -1503,7 +1569,42 @@
             "SomeAmmoMelee": "Not enough ammunition left to make a melee attack"
         },
         "ModPoints": "Mod Points",
-        "Modification": "Modification",
+        "Modification": {
+            "FIELDS": {
+                "type": {
+                    "label": "Mod Type",
+                    "hint": "Type of Modification"
+                },
+                "mount_point": {
+                    "label": "Mount Point",
+                    "hint": "Mount Point on the weapon this attaches to"
+                },
+                "modification_category": {
+                    "label": "Modification Category",
+                    "hint": "Category this Modification belongs to"
+                },
+                "dice_pool": {
+                    "label": "Dice Pool",
+                    "hint": "Dice Pool Modifier to apply"
+                },
+                "accuracy": {
+                    "label": "Accuracy",
+                    "hint": "Accuracy/Limit Modifier to apply"
+                },
+                "rc": {
+                    "label": "Recoil Compensation",
+                    "hint": "Recoil Compensation Modifier to apply"
+                },
+                "conceal": {
+                    "label": "Concealability",
+                    "hint": "Concealability Modifier to apply"
+                },
+                "slots": {
+                    "label": "Slots",
+                    "hint": "Number of Slots (Vehicles) or Points (Drones) this takes up"
+                }
+            }
+        },
         "ModificationCategories": "Modification Categories",
         "ModificationCategory": "Modification Category",
         "ModificationSlots": "Modification Slots",
@@ -1696,6 +1797,19 @@
         "Resist": "Resist",
         "RestoreDefaultSkills": "Restore Default Skills",
         "RightClickToClear": "Right Click to Clear",
+        "Ritual": {
+            "FIELDS": {
+                "type": {
+                    "label": "Ritual Type",
+                    "hint": "Type of Ritual to Perform"
+                },
+                "descriptors": {
+                    "label": "Descriptors",
+                    "hint": "Descriptors for the Ritual ???"
+
+                }
+            }
+        },
         "Roll": "Roll",
         "RollArmor": "Armor",
         "RollComposure": "Composure",

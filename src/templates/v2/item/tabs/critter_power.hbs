@@ -1,0 +1,11 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <section class="standard-form scrollable">
+            {{formGroup systemFields.optional value=system.optional localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.powerType value=system.powerType localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.duration value=system.duration localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.range value=system.range localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.karma value=system.karma rootId=@root.rootId disabled=@root.isPlayMode}}
+        </section>
+    </div>
+</section>

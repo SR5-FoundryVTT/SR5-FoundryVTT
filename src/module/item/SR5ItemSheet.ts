@@ -111,12 +111,20 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/description'),
             scrollable: ['scrollable']
         },
+        technology: {
+            template: SheetFlow.templateBase('item/tabs/technology'),
+            scrollable: ['scrollable']
+        },
         armor: {
             template: SheetFlow.templateBase('item/tabs/armor'),
             scrollable: ['scrollable']
         },
         adeptPower: {
             template: SheetFlow.templateBase('item/tabs/adept_power'),
+            scrollable: ['scrollable']
+        },
+        critterPower: {
+            template: SheetFlow.templateBase('item/tabs/critter_power'),
             scrollable: ['scrollable']
         },
         compilation: {
@@ -127,8 +135,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/summoning'),
             scrollable: ['scrollable']
         },
-        technology: {
-            template: SheetFlow.templateBase('item/tabs/technology'),
+        modification: {
+            template: SheetFlow.templateBase('item/tabs/modification'),
+            scrollable: ['scrollable']
+        },
+        lifestyle: {
+            template: SheetFlow.templateBase('item/tabs/lifestyle'),
             scrollable: ['scrollable']
         },
         contact: {
@@ -155,6 +167,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/quality'),
             scrollable: ['scrollable']
         },
+        ritual:{
+            template: SheetFlow.templateBase('item/tabs/ritual'),
+            scrollable: ['scrollable']
+        },
         effects: {
             template: SheetFlow.templateBase('item/tabs/effects'),
             templates: SheetFlow.listItem('effect'),
@@ -171,12 +187,16 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             initial: 'description',
             tabs: [
                 { id: 'description', label: 'Description', cssClass: '' },
+                { id: 'technology', label: 'Technology', cssClass: '' },
+                { id: 'lifestyle', label: 'Lifestyle', cssClass: '' },
                 { id: 'adeptPower', label: 'AdeptPower', cssClass: '' },
                 { id: 'armor', label: 'Armor', cssClass: '' },
                 { id: 'contact', label: 'Contact', cssClass: '' },
                 { id: 'compilation', label: 'Compilation', cssClass: '' },
+                { id: 'critterPower', label: 'CritterPower', cssClass: '' },
+                { id: 'ritual', label: 'Ritual', cssClass: '' },
+                { id: 'modification', label: 'Modification', cssClass: '' },
                 { id: 'summoning', label: 'Summoning', cssClass: '' },
-                { id: 'technology', label: 'Technology', cssClass: '' },
                 { id: 'quality', label: 'Quality', cssClass: '' },
                 { id: 'action', label: 'Action', cssClass: '' },
                 { id: 'damage', label: 'Damage', cssClass: '' },

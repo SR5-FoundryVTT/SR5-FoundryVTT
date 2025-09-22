@@ -687,7 +687,7 @@ export const SR5 = {
 
     mountPoints: {
         barrel: 'SR5.Barrel',
-        under_barrel: 'SR5.UnderBarrel',
+        under: 'SR5.UnderBarrel',
         stock: 'SR5.Stock',
         top: 'SR5.Top',
         side: 'SR5.Side',
