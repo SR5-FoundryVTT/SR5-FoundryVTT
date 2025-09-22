@@ -124,6 +124,8 @@ export const SheetFlow = {
         if (!item.isType('lifestyle')) {
             delete parts['lifestyle'];
         }
+        if (!item.isType('program')) {
+            delete parts['program'];
+        }
     }
-
 }
