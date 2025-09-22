@@ -1,38 +1,27 @@
-// Comments using /* are forbidden in SCSS files
-// as they are compiled into the css that we bundle
+@import 'node_modules/@yaireo/tagify/dist/tagify';
 
-@use 'config';
-@use 'bootstrap';
-
-// got to remove this, when theming is done fully via variables
-@use 'sass:color';
-
+@import 'config';
+@import 'item';
+@import 'actor';
+@import 'chat';
+@import 'test';
+@import 'tagify';
+@import 'modifiers';
+@import 'modifiers-container';
+@import 'foundry';
+@import 'module';
+@import 'effect';
 
 // .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
-// TODO: Refactor html to replace with .roll
 .Roll {
-    @include config.hover-transition($color: var(--sr5-action));
+    @include rollable;
 }
 
-//
-// These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
-// TODO: This is abusing default FoundryVTT CSS classing, which often can cause default FoundryVTT styling to break.
-//
+/**
+ * These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
+ * TODO: This is abusing default FoundryVTT CSS classing, which often can cause default FoundryVTT styling to break.
+ */
 .sr5 {
-    input[type="text"], input[type="number"], input[type="password"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="search"], input[type="file"], select {
-        box-shadow: none;
-        // fix blinking outline
-        outline: none;
-        &:hover, &:focus {
-            outline: none;
-        }
-    }
-
-    *:hover {
-        text-shadow: none;
-        outline: none;
-    }
-
     .flexcol {
         display: flex;
         flex-direction: column;
@@ -104,7 +93,7 @@
     }
 
     .show-situation-modifiers-application {
-        @include config.hover-transition($color: var(--sr5-action));
+        @include rollable;
     }
     .grid-2-col {
         display: grid;
@@ -120,14 +109,14 @@
         padding: 1px !important;
     }
 
-    // New or updated rules
+    /* New or updated rules */
     .license-section .item-text.rtg.rate,
     .license-section .rtg-rate.item-text {
-        // Updated
+        /* Updated */
         margin-left: 0;
         padding-left: 0;
         text-align: left;
-        width: 22px;
+        width: 22px; /* Updated */
     }
     //Header Rating
     .license-section .item-text.rtg.rate-header {
@@ -147,12 +136,12 @@
         max-width: 1em;
     }
     .item-name-field {
-        max-width: 11em;
+        max-width: 11em; /* Set to your desired max width */
     }
 
     .display.left.name-display {
-        width: 100%;
-        max-width: 100%;
+        width: 100%; /* Takes the maximum width of the parent */
+        max-width: 100%; /* Optional, ensures it doesn't go beyond parent */
     }
     // This class is only used for sin license descriptions and seems to be mostly a hack to get the description to better align with the license rating.
     .display.desc-sin {
@@ -165,14 +154,16 @@
     }
 
     .item-text.item-name-header {
-        max-width: 11em;
+        /* Set to your desired width */
+        max-width: 11em; /* Optional, ensures it doesn't go beyond the set width */
     }
 
     .license-section .list-item.item-section .item-text.rtg.rate,
     .license-section .list-item .rtg-rate.item-text {
+        /* Updated */
         flex-basis: calc(25% - 1em);
         text-align: left;
-        width: 22px;
+        width: 22px; /* Updated */
     }
 
     .license-section .list-item.item-section .item-text.desc.detail,
@@ -181,9 +172,10 @@
         text-align: left;
     }
 
-    // Specifics for the rtg-rate input field
+    /* Specifics for the rtg-rate input field */
     .license-section .list-item .rtg-rate.item-text input {
-        width: 22px;
+        /* Updated */
+        width: 22px; /* Updated */
     }
 
     // Specific em
@@ -220,19 +212,6 @@
         display: flex;
         margin: 0.2em;
     }
-
-    // more specifivity hacks
-    a.control, a.control > i, a.document-id-link > i {
-        @include config.hover-transition($color: var(--sr5-action));
-
-        &:hover {
-            text-shadow: none;
-        }
-    }
-
-    .window-resizable-handle {
-        background: var(--sr5-surface-high);
-    }
 }
 
 .align-items-center {
@@ -267,7 +246,7 @@
     position: relative;
 
     .unit {
-        font-weight: 700;
+        @include textOutline;
         position: absolute;
         display: block;
         left: 5px;
@@ -283,11 +262,17 @@ label.checkbox {
     left: 0;
     cursor: pointer;
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 
+    &:hover input ~ .checkmark {
+        text-shadow: 0 0 0.2em $rollcolor;
+    }
 
     &.init-edge-label {
         margin-right: 1.75em;
-        @include config.font-size(12);
+        font-size: 0.75em;
         top: 0.95em;
         left: -0.5em;
     }
@@ -305,12 +290,25 @@ label.checkbox {
 
     .checkmark {
         position: absolute;
-        @include config.font-size(13); // original 20px, but it always rendered to 13
+        font-size: 1.25em;
         top: -0.5em;
         left: 0.8em;
     }
 }
 
+button.plus1_button {
+    padding: 2px;
+    color: $black;
+    line-height: 0;
+    flex: 0;
+    background: rgba($light, 0.1);
+    border-radius: 0.3em;
+    text-align: center;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
 input[type='checkbox'].toggle {
     display: none;
 }
@@ -322,7 +320,7 @@ input[type='checkbox'].toggle {
     max-height: 0;
     overflow-y: auto;
     transition: max-height 0.25s ease-in-out;
-    color: var(--sr5-text);
+    color: $white;
 }
 
 .toggle:checked + .list-item-content + .collapsible-content {
@@ -331,41 +329,41 @@ input[type='checkbox'].toggle {
 //Collapsible End
 input[type='checkbox'].display {
     background: transparent;
-    color: var(--sr5-text);
+    color: $color;
     border: none;
     text-align: center;
-    @include config.font-size(16);
+    font-size: 1em;
 
     &:hover {
         background: transparent;
-        border:  1px solid var(--sr5-border-default);
+        border: $groove;
     }
 }
 
 input[type='text'].disabled-for-display {
-    color: var(--sr5-text-subtle);
-    background-color: transparent;
+    color: $black;
+    background-color: rgba(0, 0, 0, 0);
 }
 
 input[type='text'].display {
-    font-weight: 700;
-    background: var(--sr5-control-background);
-    color: var(--sr5-text);
+    @include textOutline;
+    background: rgba($light, 0.1);
+    color: $color;
     border-radius: 0.3em;
-    border-color: var(--sr5-border-default);
+    border-color: $black;
     text-align: center;
     min-height: 1em;
 
     &::placeholder {
-        color: var(--sr5-text-subtle);
+        color: $light-2;
     }
 
     &.short {
-        @include config.font-size(12);
+        font-size: 0.75em;
     }
 
     &.text {
-        background: var(--sr5-control-background-inverse);
+        background: rgba($dark, 0.1);
         border-radius: 0;
     }
 
@@ -378,7 +376,7 @@ input[type='text'].display {
     }
 
     &:disabled {
-        color: var(--sr5-text);
+        color: $color;
         background: transparent;
         border-color: transparent;
         padding-left: 0;
@@ -403,37 +401,37 @@ input[type='text'].display {
         }
     }
 }
-//
-// Special SR5 hr and select display
-//
+/**
+     * Special SR5 hr and select display
+     */
 .sr5 {
     hr {
-        border-color: var(--sr5-accent);
+        border-color: $yellow;
     }
 
     select.display,
     select {
-        color: var(--sr5-text);
-        background: var(--sr5-surface-high);
+        color: $color;
+        background: rgba($black, 0.05);
         border-radius: 0.3em;
-        border-color: var(--sr5-border-default);
+        border-color: $dark;
 
         > option {
-            background-color: var(--sr5-surface-high);
+            background-color: $dark;
         }
     }
 
-    //
-    // Overwrite FoundryVTT default styling within sheets.
-    //
+    /**
+     * Overwrite FoundryVTT default styling within sheets.
+     */
     .form-group {
         label {
-            color: var(--sr5-text);
+            color: $white;
             font-weight: bold;
         }
 
         input {
-            color: var(--sr5-text);
+            color: $white;
         }
 
         .form-group-element-numerical {
@@ -441,7 +439,7 @@ input[type='text'].display {
             flex-direction: row;
 
             button {
-                border-color: var(--sr5-neutral);
+                border-color: $grey;
             }
 
             button,
@@ -455,45 +453,44 @@ input[type='text'].display {
         }
     }
 
-    //
-    // Elements used for inline editing
-    //
+    /**
+     * Elements used for inline editing
+     */
     .inline-input-inventory {
         display: none;
     }
 
-    //
-    // Elements used for linkable documents / entities.
-    //
-    // This is also present in foundry.scss, but is overwritten by Monks Enhanced Journals module.
-    // Let's force it within the SR5 context, while leaving it everywhere else.
-    //
+    /**
+     * Elements used for linkable documents / entities.
+     *
+     * This is also present in foundry.scss, but is overwritten by Monks Enhanced Journals module.
+     * Let's force it within the SR5 context, while leaving it everywhere else.
+     */
     .entity-link,
     .content-link,
     .inline-roll {
         border: 0;
         background: none;
-        color: var(--sr5-text) !important;
+        color: $white !important;
     }
 
     .entity-link.content-link {
-        color: var(--sr5-text) !important;
+        color: $white !important;
     }
 
     // An origin link is a uuid based entity link, without drag support.
     .origin-link {
-        background: var(--sr5-surface-highest);
-        font-weight: 600;
-        border: 1px solid var(--sr5-border-default);
-        border-radius: 0.25rem;
+        background: #ddd;
+        padding: 1px 4px;
+        border: 1px solid #4b4a44;
+        border-radius: 2px;
         white-space: nowrap;
         word-break: break-all;
-        color: var(--sr5-accent-strong);
-        @include config.padding($x: 2, $y: 1);
+        color: $black;
     }
 
-    .roll:not(button) {
-        @include config.hover-transition($color: var(--sr5-action));
+    .roll {
+        @include rollable;
     }
 
     .editor {
@@ -502,40 +499,40 @@ input[type='text'].display {
     }
 
     .editor .tox-edit-area {
-        background: var(--sr5-neutral);
+        background: $mce-background;
     }
 
     // Styling for any prosemirror editors within shadowrun applications.
     .editor.prosemirror {
         // handles dropdown menus, not select based.
         .pm-dropdown {
-            color: var(--sr5-text);
-            background: var(--sr5-control-background-inverse);
+            color: $color;
+            background: rgba($black, 0.05);
             border-radius: 0.3em;
-            border-color: var(--sr5-control-background-inverse);
+            border-color: $dark;
 
             // Icons like chevron and ticks.
             i,
             i:hover {
-                color: var(--sr5-text);
+                color: $color;
             }
 
             // ul will contain menus and sub-menus and can be nested.
             ul {
-                background-color: var(--sr5-surface);
+                background-color: $dark;
             }
 
             // li represents each menu entry in both menus and sub-menus
             ul > li:hover {
-                color: var(--sr5-text);
-                border-color: var(--sr5-control-background);
-                background: var(--sr5-control-background-inverse);
+                color: $color;
+                border-color: rgba($white, 0.1);
+                background: rgba($black, 0.05);
             }
         }
 
         // HTML editing uses a class-less textarea
         textarea {
-            color: var(--sr5-text);
+            color: $color;
         }
     }
 
@@ -544,7 +541,7 @@ input[type='text'].display {
     }
 
     .parts-list {
-        @include config.font-size(12);
+        font-size: 12px;
         display: flex;
         flex-flow: row wrap;
         justify-content: center;
@@ -578,10 +575,9 @@ input[type='text'].display {
     }
 
     .window-content {
-        background: transparent;
-        color: var(--sr5-text);
+        @include sheet;
         overflow: hidden;
-        border: 1px solid var(--sr5-border-default);
+        border: 1px solid $dark2;
         border-top: 0px;
     }
 
@@ -589,7 +585,7 @@ input[type='text'].display {
         height: 95%;
         min-height: 15em;
         width: 100%;
-        color: var(--sr5-text);
+        color: $color;
     }
 
     .mods-scroll,
@@ -597,7 +593,7 @@ input[type='text'].display {
         margin-bottom: 0.5em;
         flex: 1;
         overflow-y: auto;
-        color: var(--sr5-text);
+        color: $white;
     }
     .flexcontainer-skills {
         display: flex;
@@ -627,7 +623,7 @@ input[type='text'].display {
 
     img {
         box-sizing: border-box;
-        border: 1px solid var(--sr5-border-default);
+        border: 1px solid var(--color-border-dark);
         border-radius: 2px;
         max-width: 100%;
         object-fit: contain;
@@ -637,60 +633,41 @@ input[type='text'].display {
         padding: 0.25em;
         min-width: 80px; // should also have a min width
         max-width: 100px;
+        //border-right: $groove;
+        //border-bottom: $groove;
     }
 
     .tabs {
         flex: 0;
         align-items: stretch; // Make tabs stretch instead of space horizontally.
-        border-bottom: 1px solid var(--sr5-border-variant);
+        border-bottom: 1px solid $yellow;
 
         > a {
             margin: 0.25em;
             padding: 0.25em;
             margin-bottom: 0;
             position: relative;
-            isolation: isolate;
-            text-shadow: none;
-            font-weight: 600;
-            @include config.font-size(16);
-            @include config.hover-transition($color: var(--sr5-accent-subtle));
-
-            &::before {
-                content: "";
-                position: absolute;
-                left: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 100%;
-                height: 0;
-                background-color: transparent;
-                transition:
-                    height 250ms linear,
-                    background-color 250ms linear;
-                z-index: -1;
-            }
-
-            &:hover::before,
-            &:focus::before,
-            &.active::before {
-                height: 100%;
-                background-color: var(--sr5-control-background);
-            }
+            font-size: 1.15em;
+            @include rollable;
 
             &.active {
-                color: var(--sr5-accent);
+                @include linkHovered;
+                color: $color;
+                // border-color: $black;
+                // border-bottom: 0px;
+                background: rgba($light, 0.1);
             }
         }
 
         > .item {
             // Make tabs stretch across horizontally.
-            color: var(--sr5-text);
+            color: $white;
             flex: 1;
             text-align: center;
         }
     }
     .sheet .editor-content {
-        color: var(--sr5-text);
+        color: $white;
         height: 100%;
         overflow-y: auto;
         word-break: break-word;
@@ -700,11 +677,11 @@ input[type='text'].display {
     }
 
     label.item-text.item-name[for='select-inventory'] {
-        color: var(--sr5-accent);
+        color: $yellow;
     }
 
     label.item-text.item-name {
-        color: var(--sr5-text);
+        color: $white;
     }
 
     .tab {
@@ -728,28 +705,28 @@ input[type='text'].display {
     .split-container {
         display: flex;
         flex-flow: row nowrap;
+        justify-content: center;
         align-items: stretch;
+        align-content: stretch;
         height: 100%;
-        gap: 0.4375rem;
 
         > * {
             flex: 1;
-            position: relative;
+            width: 100%;
+        }
 
-            &:not(:first-child)::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: -0.21875rem;
-                width: 1px;
-                background: var(--sr5-border-default);
-            }
+        > *:not(:first-child) {
+            margin-left: 0.25em;
+        }
+
+        > *:not(:last-child) {
+            border-right: $groove;
+            padding-right: 0.25em;
         }
     }
 
     .container {
-        max-width: config.$sheet-max-width;
+        max-width: $sheet-max-width;
         margin: 0 auto;
 
         &--fluid {
@@ -764,9 +741,9 @@ input[type='text'].display {
         }
 
         // Auto create grid style classes for a fixed max column grid
-        @for $i from 1 through config.$grid__cols {
+        @for $i from 1 through $grid__cols {
             &__col-#{$i} {
-                flex-basis: calc(100 / (config.$grid__cols / $i)) * 1%;
+                flex-basis: calc(100 / ($grid__cols / $i)) * 1%;
                 overflow: hidden;
             }
         }
@@ -812,11 +789,17 @@ input[type='text'].display {
             }
 
             &.border-bottom {
-                border-bottom:  1px solid var(--sr5-border-default);
+                border-bottom: $groove;
             }
 
             &.gap-4 {
-                gap: 0.5rem;
+                > :not(:first-child) {
+                    margin-left: 4px;
+                }
+
+                > :not(:last-child) {
+                    margin-right: 4px;
+                }
             }
         }
     }
@@ -827,11 +810,21 @@ input[type='text'].display {
         justify-content: start;
         padding: 4px;
 
-        @include config.condition-monitor-style('stun', 'sr5-color-stun', 'sr5-color-stun-strong');
-        @include config.condition-monitor-style('physical', 'sr5-color-physical', 'sr5-color-physical-strong');
-        @include config.condition-monitor-style('edge', 'sr5-color-edge', 'sr5-color-edge-strong');
-        @include config.condition-monitor-style('matrix', 'sr5-color-matrix', 'sr5-color-matrix-strong');
-        @include config.condition-monitor-style('overflow', 'sr5-color-overflow', 'sr5-color-overflow-strong');
+        &.stun .cell {
+            box-shadow: 0 0 5px 1px rgba($stun, 0.5);
+        }
+
+        &.physical .cell {
+            box-shadow: 0 0 5px 1px rgba($physical, 0.5);
+        }
+
+        &.edge .cell {
+            box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+        }
+
+        &.matrix .cell {
+            box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
+        }
 
         .roll {
             width: 60px;
@@ -842,33 +835,35 @@ input[type='text'].display {
             display: flex;
             flex-flow: row;
             justify-content: stretch;
-            gap: 0.25rem;
-        }
 
-        .cell {
-            cursor: pointer;
-            transition:
-                border-color 250ms ease-in-out,
-                box-shadow 250ms ease-in-out;
-            text-align: center;
-            @include config.font-size(11);
-            border:  1px solid var(--sr5-border-default);
-            color: var(--sr5-text-subtle);
-            background: var(--sr5-surface);
-            min-width: 26px;
-            height: 18px;
-            border-radius: 0.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            .cell {
+                cursor: pointer;
+                text-align: center;
+                font-size: 80%;
+                border: $groove;
+                color: $light-2;
+                border-radius: 4px;
+                background: $black;
+                min-width: 26px;
+                height: 18px;
 
-            &.filled {
-                background: var(--sr5-neutral-subtle);
-                color: var(--sr5-text);
-            }
+                &:not(:first-child) {
+                    margin-left: 2px;
+                }
 
-            &:hover {
-                border-color: var(--sr5-text);
+                &:not(:last-child) {
+                    margin-right: 2px;
+                }
+
+                &.filled {
+                    background: $light-2;
+                    border-color: $black;
+                    color: $black;
+                }
+
+                &:hover {
+                    border-color: $light;
+                }
             }
         }
     }
@@ -881,24 +876,19 @@ input[type='text'].display {
         flex-flow: column nowrap;
     }
 
-    .list-header .item-text, .item-section .item-text {
-        font-weight: 700;
-    }
-
     .list-header,
     .list-item {
-        --list-item-min-height: 26px;
-        @include config.font-size(12);
+        font-size: var(--font-size-12);
         padding: 0.1em 0.25em;
-        min-height: var(--list-item-min-height);
+        min-height: 26px;
         margin: 0.1em;
-        margin-inline: 1px;
-
+        margin-right: $groove-width;
+        margin-left: $groove-width;
         &.matrix {
-            color: var(--sr5-text);
+            color: $white;
         }
         .has-desc {
-            @include config.hover-transition($color: var(--sr5-action));
+            @include rollable;
         }
 
         &.no-border {
@@ -914,18 +904,25 @@ input[type='text'].display {
         }
 
         &.item-section {
-            background: var(--sr5-surface);
-            color: var(--sr5-accent);
+            background: black;
+            color: $yellow;
             margin-right: 0;
             margin-left: 0;
-            border-bottom: 1px solid var(--sr5-accent);
+            // background: rgba($grey, 0.2);
+            // padding: 0.25em;
+            // border-radius: 0.2em;
+            border-bottom: 1px solid $yellow;
+            border-radius: 0.2em;
             padding-top: 5px;
             &.sprite {
                 background: none;
             }
             &.faded {
-                color: var(--sr5-text-subtle);
+                color: $grey;
             }
+            // &:first-child {
+            //     border-top: 1px solid $yellow;
+            // }
 
             &.subcategory-header {
                 margin-left: 0.5em;
@@ -938,14 +935,17 @@ input[type='text'].display {
         }
 
         .list-item-content {
+            //color: white;
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
             align-items: center;
             align-content: center;
 
+            // vertically center the rows, using a table would have
+            // been better, but i pray for V2 or during the rework.
             &:not(.list-header > .list-item-content) {
-                min-height: calc(var(--list-item-min-height) - 0.2em);
+              margin-top: 0.3125rem;
             }
 
             .item-center {
@@ -961,6 +961,8 @@ input[type='text'].display {
                 justify-content: flex-start;
                 align-items: center;
                 flex-grow: 1;
+                // Do not let long text overspill
+                overflow: hidden;
             }
 
             .item-right {
@@ -976,11 +978,11 @@ input[type='text'].display {
                 max-width: 50px;
 
                 &.item-roll {
-                    @include config.hover-transition($color: var(--sr5-action));
+                    @include rollable;
 
                     &:hover {
                         > img {
-                            content: config.asset('dice-solid.svg');
+                            content: url('assets/dice-solid.svg');
                             filter: invert(1);
                         }
                     }
@@ -1005,8 +1007,8 @@ input[type='text'].display {
                 flex-flow: row nowrap;
                 justify-content: space-evenly;
                 align-items: center;
-                color: var(--sr5-neutral);
-                @include config.font-size(12);
+                color: $grey;
+                font-size: 12px;
                 height: 100%;
             }
 
@@ -1016,11 +1018,18 @@ input[type='text'].display {
                 flex: 1 0 auto;
                 text-align: center;
                 height: 100%;
-                border: var(--sr5-text);
+                border: $light;
                 padding-right: 10px;
 
+                &.is-broken {
+                    color: $crimson;
+                }
+                &.is-damaged {
+                    color: $yellow;
+                }
+
                 &.faded {
-                    color: var(--sr5-text-subtle);
+                    color: $grey;
                 }
 
                 &.center {
@@ -1037,10 +1046,10 @@ input[type='text'].display {
                     width: auto;
 
                     &.fresh-import {
-                        color: var(--sr5-accent);
+                        color: $freshImportColor;
                     }
                     &.mods-label {
-                        color: var(--sr5-text);
+                        color: $white;
                     }
                 }
 
@@ -1077,7 +1086,7 @@ input[type='text'].display {
                     width: 16em;
                 }
                 .content-inner {
-                    color: var(--sr5-text);
+                    color: $white;
                 }
             }
 
@@ -1090,41 +1099,46 @@ input[type='text'].display {
             }
 
             &.skill-header {
-                @include config.hover-transition($color: var(--sr5-action));
+                @include rollable;
             }
+        }
+        .selected-list-item {
+            color: $edge;
         }
     }
 
     .list-item:nth-of-type(even) {
-        background: var(--sr5-control-background);
+        background: rgba($white, 0.03);
     }
 
     .list-item-description {
         .item-desc {
             padding: 0.25em;
-            @include config.font-size(16);
+            font-size: 1em;
             width: 100%;
 
             .props {
                 display: flex;
                 flex-flow: wrap row;
-                @include config.padding($y: 1);
+                padding: 0.25em 0;
 
                 > * {
                     flex-shrink: 0;
-                    border: 1px solid var(--sr5-border-default);
-                    background-color: var(--sr5-surface);
-                    border-radius: 0.125rem;
-                    margin: 0.0875rem 0.125rem;
-                    @include config.shadow-elevation(6);
-                    @include config.font-size(14);
-                    @include config.padding($x: 2, $y: 1);
+                    border-right: $groove;
+                    border-bottom: $groove;
+                    padding: 0.25em 0.5em;
+                    margin: 0.1em 0.25em;
+                    box-shadow: 0.2em 0.2em 0.3em $black;
                 }
             }
 
             .description {
+                //border-right: $light 2px solid;
+                // border-top: $light 2px solid;
                 margin: 0.5em 0.25em;
                 padding: 0.5em;
+                // margin-right: 0.5em;
+                //padding-right: 0.5em;
             }
         }
         .item-desc:after {
@@ -1140,15 +1154,15 @@ input[type='text'].display {
         display: contents;
     }
     .modified-target-damage {
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
+        margin-top: $large-distance;
+        margin-bottom: $large-distance;
         display: grid;
         grid-template-columns: 40px auto auto;
 
         .modified-target-damage-cell {
             display: flex;
             align-items: center;
-            margin-bottom: 0.15em;
+            margin-bottom: $small-distance;
         }
     }
 
@@ -1158,16 +1172,15 @@ input[type='text'].display {
 
     button,
     button.display {
-        color: var(--sr5-text);
-        border: 1px solid var(--sr5-border-default);
-        background: var(--sr5-surface-high);
-        border-radius: 0.25rem;
+        color: $color;
+        border-color: $black;
+        background: rgba($light, 0.1);
+        border-radius: 0.3em;
         text-align: center;
-        @include config.use-font($weight: 600);
-        @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action-subtle), $border-color: var(--sr5-action-subtle));
 
         &:hover {
-            box-shadow: none;
+            cursor: pointer;
+            background: $bgrButton;
         }
 
         &.short {
@@ -1175,71 +1188,79 @@ input[type='text'].display {
         }
 
         &.light {
-            background: var(--sr5-action-subtle);
-            @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action), $border-color: var(--sr5-action));
+            color: $black;
+            background: $light;
         }
     }
 
     button.display.import-character {
-        color: var(--sr5-text);
-        border: 1px solid var(--sr5-border-default);
-        background-color: var(--sr5-surface-high);
+        color: $color;
+        border-color: $black;
+        background: $dark-sunken;
         border-radius: 0.3em;
         text-align: center;
-        @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-surface), $border-color: var(--sr5-border-default-strong));
+
+        &:hover {
+            cursor: pointer;
+        }
 
         &.short {
             line-height: 1.3em;
         }
 
         &.light {
-            background: var(--sr5-action-subtle);
-            @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action), $border-color: var(--sr5-action));
+            color: $black;
+            background: $light;
         }
     }
     button.display.show-hidden-skills {
-        color: var(--sr5-text);
-        border: 1px solid var(--sr5-border-default);
-        background: var(--sr5-action);
+        color: $color;
+        border-color: $black;
+        background: rgb(70, 7, 7);
         border-radius: 0.3em;
         text-align: center;
-        @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action-subtle), $border-color: var(--sr5-border-default-strong));
+
+        &:hover {
+            cursor: pointer;
+        }
 
         &.short {
             line-height: 1.3em;
         }
 
         &.light {
-            background: var(--sr5-action-subtle);
-            @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action), $border-color: var(--sr5-action));
+            color: $black;
+            background: $light;
         }
     }
 
     button.display.reset-actor-run-data {
-        color: var(--sr5-text);
-        border-color: var(--sr5-border-default);
-        border: 1px solid var(--sr5-border-default);
-        background: var(--sr5-action);
+        color: $color;
+        border-color: $black;
+        background: rgb(70, 7, 7);
         border-radius: 0.3em;
         text-align: center;
-        @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action-subtle), $border-color: var(--sr5-border-default-strong));
+
+        &:hover {
+            cursor: pointer;
+        }
 
         &.short {
             line-height: 1.3em;
         }
 
         &.light {
-            background: var(--sr5-action-subtle);
-            @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action), $border-color: var(--sr5-action));
+            color: $black;
+            background: $light;
         }
     }
 
-    // CSS for the Environmental Modifier Application Window
-    //
-    //
+    /** CSS for the Environmental Modifier Application Window
+     *
+     */
     button.env-modifier {
         text-align: left;
-        @include config.font-size(13);
+        font-size: var(--font-size-13) !important;
         line-height: normal;
         padding-top: 5px;
         padding-bottom: 5px;
@@ -1247,8 +1268,9 @@ input[type='text'].display {
 
     .env-modifier-active {
         border-radius: 8px;
-        background-color: var(--sr5-action);
-        color: var(--sr5-accent);
+        //box-shadow: $dark-sunken-box-shadow;
+        background-color: $darkred; //$dark-sunken;
+        color: $yellow;
     }
 
     .env-modifier-total {
@@ -1263,79 +1285,69 @@ input[type='text'].display {
         font-style: italic;
     }
 
-    // Input element for inventory name editing
+    /** Input element for inventory name editing */
     input#input-inventory {
         // Otherwise the other classes used will break styling.
         width: auto;
     }
 
     .document-name {
-        @include config.font-size(18);
-        font-weight: 700;
+        @include systemFonts;
+        font-size: var(--font-size-18);
+        font-weight: bold;
     }
 
     .cell-input-roll {
-        color: var(--sr5-accent);
+        color: $yellow;
     }
 
     // Intended to affect icons only within the url/pdf source controls.
     .source-button i.fas {
-        color:  var(--sr5-accent-subtle);
+        color: $pdfColor;
     }
 }
 //END SR5 Style
 
 .custom-item-element {
-    color: var(--sr5-text); // Text color
+    color: $white; /* Text color */
 }
 //lable back to white color
 .matrix-label {
-    color: var(--sr5-text);
+    color: $white;
 }
 
 .scroll-area-matrix {
     overflow-y: auto;
-    color: var(--sr5-text);
+    color: $white;
 }
 
 //table in any Item
 .SR5 th {
-    color: var(--sr5-accent);
-    padding: 10px;
-    text-align: left;
-    border-bottom: 2px solid var(--sr5-color-edge);
-    @include config.font-size(14);
+    color: $yellow;
+    padding: 10px; /* Padding */
+    text-align: left; /* Left text */
+    border-bottom: 2px solid $edge; /* Add a border at the bottom */
+    font-size: medium;
 }
 .SR5 th:hover {
-    color: var(--sr5-accent-subtle);
+    color: $pdfColor;
 }
 .SR5 caption {
     background: none;
-    color: var(--sr5-accent);
+    color: $yellow;
     padding: 6px;
     text-align: left;
-    @include config.font-size(14);
+    font-size: medium;
 }
 .SR5 caption:hover {
-    color: var(--sr5-action);
+    color: $fDarkRed;
 }
 .SR5 tr {
-    color: var(--sr5-text);
+    color: $white;
 }
 .SR5 tr:hover {
-    color: var(--sr5-accent-subtle);
+    color: $pdfColor;
 }
 .SR5 tr p:not(th p) {
-    padding-left: 10px;
-}
-
-/*! purgecss ignore */
-.theme-light .sr5 img[src*="dist/icons"][src$=".svg"] {
-    // convert our white icons to black in .theme-light
-    filter: invert(1);
-}
-
-// specifivity hack... someone needs to clean out the closet
-.theme-light .sr5 .list-item .list-item-content .item-img.item-roll:hover > img {
-    filter: invert(0);
+    padding-left: 10px; /* Padding on the left */
 }
