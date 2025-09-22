@@ -499,6 +499,7 @@ export const SR5 = {
         cyberdeck: 'SR5.DeviceCatCyberdeck',
         rcc: 'SR5.DeviceCatRCC',
         living_persona: 'SR5.LivingPersona',
+        host: 'SR5.ItemTypes.Host',
     },
 
     cyberwareGrades: {

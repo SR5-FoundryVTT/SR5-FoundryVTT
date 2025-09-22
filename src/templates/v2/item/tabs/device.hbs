@@ -1,0 +1,34 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="standard-form scrollable">
+            {{formGroup systemFields.category
+                        value=system.category
+                        localize = true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{#unless (eq system.category 'living_persona')}}
+                {{#each system.atts as |att att_id|}}
+                    <div class="form-group">
+                        {{#ifin @root.system.category (toArray "cyberdeck" "host")}}
+                        <select name="system.atts.{{att_id}}.att" {{#if @root.isPlayMode}}disabled{{/if}}>
+                            {{selectOptions @root.config.matrixAttributes
+                                            selected=att.att
+                                            localize=true
+                                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </select>
+                        {{else}}
+                         <label>{{localize (lookup @root.config.matrixAttributes att.att)}}</label>
+                        {{/ifin}}
+                        {{log @root.systemFields}}
+                        <div class="form-fields">
+                            {{formInput (objValue (objValue (objValue @root.systemFields.atts.fields att_id) 'fields') 'value')
+                                            value=att.value
+                                            rootId=@root.rootId
+                                            disabled=(or @root.isPlayMode (not att.editable)) }}
+                        </div>
+                    </div>
+                {{/each}}
+            {{/unless}}
+        </div>
+    </div>
+</section>

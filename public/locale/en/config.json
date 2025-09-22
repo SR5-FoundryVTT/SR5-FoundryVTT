@@ -866,7 +866,15 @@
         "Descriptors": "Descriptors",
         "Details": "Details",
         "DetectionSpellExtended": "Extended",
-        "Device": "Device",
+        "Device": {
+            "label": "Device",
+            "FIELDS": {
+                "category": {
+                    "label": "Device Type",
+                    "hint": "The type of Device"
+                }
+            }
+        },
         "DeviceCatCommlink": "Commlink",
         "DeviceCatCyberdeck": "Cyberdeck",
         "DeviceCatRCC": "Rigger Command Console",

@@ -127,5 +127,8 @@ export const SheetFlow = {
         if (!item.isType('program')) {
             delete parts['program'];
         }
+        if (!item.isType('device')) {
+            delete parts['device'];
+        }
     }
 }
