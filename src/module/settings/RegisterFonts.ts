@@ -1,17 +1,5 @@
-// TODO: Remove local definitions if League-of-Foundry-Developers/foundry-vtt-types
-// supplies the correct types [#3498](https://github.com/League-of-Foundry-Developers/foundry-vtt-types/issues/3498) and directly assign Rajdhani
-interface LocalFontDefinition {
-    editor: boolean;
-    fonts: {
-        urls: string[];
-        style?: string;
-        weight?: string | number;
-    }[];
-}
-
 export function registerFonts(): void {
-    // Use the local interface to satisfy TS
-    const rajdhani: LocalFontDefinition = {
+    CONFIG.fontDefinitions['Rajdhani'] = {
         editor: true,
         fonts: [
             {
@@ -41,9 +29,6 @@ export function registerFonts(): void {
             },
         ],
     };
-
-    // Assign with any-cast to bypass the broken CONFIG.fontDefinitions type
-    CONFIG.fontDefinitions['Rajdhani'] = rajdhani as any;
 
     // Remove non-supplied fallback fonts
     const fallbackFonts = ['Arial', 'Courier', 'Courier New', 'Times', 'Times New Roman'];
