@@ -291,6 +291,15 @@
             },
             "Title": "System compendiums"
         },
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "Clear Search",
+                "SearchPlaceholder": "Search results...",
+                "System": "System",
+                "World": "World"
+            },
+            "Title": "Compendium Browser"
+        },
         "Compendiums": {
             "Folders": {
                 "Root": "SR5e Imports"

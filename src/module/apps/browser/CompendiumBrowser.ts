@@ -98,7 +98,7 @@ export class CompendiumBrowser extends Base {
 
     /** Defines the application window's title. */
     override get title() {
-        return "Compendium Browser";
+        return game.i18n.localize("SR5.CompendiumBrowser.Title");
     }
 
     private static onToggleCollapse(event: MouseEvent, target: HTMLElement) {
@@ -145,8 +145,6 @@ export class CompendiumBrowser extends Base {
     private async _renderSettings() {
         // 1. Build the data tree
         const tree = this._buildPackTree();
-
-        console.log(tree);
 
         // 2. Prepare context for Handlebars
         const context = { tree };
@@ -566,12 +564,12 @@ export class CompendiumBrowser extends Base {
         const modules = Array.from(new Set(packs.filter(p => p.metadata.packageType === "module").map(p => p.metadata.packageName)));
 
         this.allFilters = [
-            { value: game.i18n.localize("System"), id: "system", selected: false }
+            { value: game.i18n.localize("SR5.CompendiumBrowser.Filters.System"), id: "system", selected: false }
         ];
 
         if (hasWorld)
             this.allFilters = this.allFilters.concat([
-                { value: game.i18n.localize("World"), id: "world", selected: false }
+                { value: game.i18n.localize("SR5.CompendiumBrowser.Filters.World"), id: "world", selected: false }
             ]);
 
         this.allFilters = this.allFilters.concat([
