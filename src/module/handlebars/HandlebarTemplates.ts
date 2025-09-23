@@ -105,7 +105,6 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscVehicle.hbs',
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscCritter.hbs',
 
-
         // item parts
         'systems/shadowrun5e/dist/templates/item/parts/description.hbs',
         'systems/shadowrun5e/dist/templates/item/parts/technology.hbs',
@@ -173,14 +172,14 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs',
 
-        // Modifier management parts
-        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
-
         // Application - Matrix Network Hacking
         'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs',
 
         // Application - Compendium Browser
         'systems/shadowrun5e/dist/templates/apps/compendium-browser/settings-folder.hbs',
+
+        // Application - Situational Modifiers
+        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
     ];
 
     return foundry.applications.handlebars.loadTemplates(templatePaths);

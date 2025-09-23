@@ -117,53 +117,53 @@
         "Active": "Active",
         "ActiveDefense": "Active Defense",
         "ActiveEffect": {
-            "FIELDS": {
-                "applyTo": {
-                    "label": "Apply-To",
-                    "hint": "Apply-To different Targets"
-                },
-                "applyByTest": {
-                    "label": "Apply-To Test via Item"
-                },
-                "onlyForEquipped": {
-                    "label": "Equipped Only",
-                    "hint": "Apply for equipped item only"
-                },
-                "onlyForItemTest": {
-                    "label": "Item Test Only",
-                    "hint": "Apply for parent item test only"
-                },
-                "onlyForWireless": {
-                    "label": "Wireless Only",
-                    "hint": "Apply for wireless active only"
-                },
-                "selection_attributes": {
-                    "label": "Attributes Filter",
-                    "hint": "Filter the test based on Attributes used"
-                },
-                "selection_categories": {
-                    "label": "Action Categories Filter",
-                    "hint": "Filter the test based on Action Category used"
-                },
-                "selection_limits": {
-                    "label": "Limits Filter",
-                    "hint": "Filter the test based on the Limit used"
-                },
-                "selection_skills": {
-                    "label": "Skills Filter",
-                    "hint": "Filter the test based on the Skills used"
-                },
-                "selection_tests": {
-                    "label": "Tests Filter",
-                    "hint": "Filter the test based on the Tests used"
-                }
-            },
             "ApplyTo": "Apply-To",
             "ApplyTos": {
                 "TargetedActor": "Targeted Actor",
                 "TestItem": "Test via Item"
             },
             "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
+            "FIELDS": {
+                "applyByTest": {
+                    "label": "Apply-To Test via Item"
+                },
+                "applyTo": {
+                    "hint": "Apply-To different Targets",
+                    "label": "Apply-To"
+                },
+                "onlyForEquipped": {
+                    "hint": "Apply for equipped item only",
+                    "label": "Equipped Only"
+                },
+                "onlyForItemTest": {
+                    "hint": "Apply for parent item test only",
+                    "label": "Item Test Only"
+                },
+                "onlyForWireless": {
+                    "hint": "Apply for wireless active only",
+                    "label": "Wireless Only"
+                },
+                "selection_attributes": {
+                    "hint": "Filter the test based on Attributes used",
+                    "label": "Attributes Filter"
+                },
+                "selection_categories": {
+                    "hint": "Filter the test based on Action Category used",
+                    "label": "Action Categories Filter"
+                },
+                "selection_limits": {
+                    "hint": "Filter the test based on the Limit used",
+                    "label": "Limits Filter"
+                },
+                "selection_skills": {
+                    "hint": "Filter the test based on the Skills used",
+                    "label": "Skills Filter"
+                },
+                "selection_tests": {
+                    "hint": "Filter the test based on the Tests used",
+                    "label": "Tests Filter"
+                }
+            },
             "Modes": {
                 "Modify": "Modify"
             },
@@ -276,33 +276,33 @@
         "CommonProgram": "Common Program",
         "CompendiaSettings": {
             "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
-            "Label": "Compendium Packs",
-            "Title": "System compendiums",
             "GeneralActionsPack": {
-                "label": "General Actions",
-                "hint": "This compendium will be used for all general, attribute only actions."
-            },
-            "MatrixActionsPack": {
-                "label": "Matrix Actions",
-                "hint": "This compendium will be used for all matrix actions."
+                "hint": "This compendium will be used for all general, attribute only actions.",
+                "label": "General Actions"
             },
             "ICActionsPack": {
-                "label": "IC Actions",
-                "hint": "This compendium will be used for IC actions, filtered for each IC type"
-            }
+                "hint": "This compendium will be used for IC actions, filtered for each IC type",
+                "label": "IC Actions"
+            },
+            "Label": "Compendium Packs",
+            "MatrixActionsPack": {
+                "hint": "This compendium will be used for all matrix actions.",
+                "label": "Matrix Actions"
+            },
+            "Title": "System compendiums"
         },
         "Compendiums": {
+            "Folders": {
+                "Root": "SR5e Imports"
+            },
             "sr5critter": "Critters & Spirits & Sprites",
             "sr5drone": "Drones & Vehicles",
             "sr5gear": "Armors & Gears",
-            "sr5trait": "Quality & Powers",
             "sr5magic": "Spell & Complex Forms",
             "sr5modification": "Modifications",
+            "sr5trait": "Quality & Powers",
             "sr5ware": "Bioware & Cyberware",
-            "sr5weapon": "Weapons",
-            "Folders": {
-                "Root": "SR5e Imports"
-            }
+            "sr5weapon": "Weapons"
         },
         "Compilation": {
             "DropSprite": "Drop Sprite",
@@ -326,7 +326,6 @@
         },
         "ContactType": "Type",
         "Contacts": "Contacts",
-        "Continue": "Continue",
         "Content": {
             "Actions": {
                 "Armor": "Armor",
@@ -338,9 +337,9 @@
                 "Composure": "Composure",
                 "ControlDevice": "Control Device",
                 "CrackFile": "Crack File",
-                "CrackProgramme": "Crack Programme",
+                "CrashProgram": "Crash Program",
                 "DataSpike": "Data Spike",
-                "DisarmDatabomb": "Disarm Databomb",
+                "DisarmDataBomb": "Disarm Databomb",
                 "Drain": "Drain",
                 "DroneInfiltration": "Drone Infiltration",
                 "DronePerception": "Drone Perception",
@@ -372,13 +371,14 @@
                 "PhysicalDefense": "Physical Defense",
                 "RebootDevice": "Reboot Device",
                 "SendMessage": "Send Message",
-                "SetDatabomb": "Set Databomb",
+                "SetDataBomb": "Set Databomb",
                 "Snoop": "Snoop",
                 "SpoofCommand": "Spoof Command",
                 "SwitchInterfaceMode": "Switch Interface Mode",
                 "TraceIcon": "Trace Icon"
             }
         },
+        "Continue": "Continue",
         "ControlRig": "Control Rig",
         "Cost": "Cost",
         "Cover": "Cover",
@@ -601,8 +601,8 @@
         "FireMode": "Fire Mode",
         "Force": "Force",
         "FullDefense": "Full Defense",
-        "FullMatrixDefense": "Full Matrix Defense",
         "FullDefenseAttribute": "Full Defense Attribute",
+        "FullMatrixDefense": "Full Matrix Defense",
         "GMRequest": {
             "General": "Your GM wants you to do a",
             "RollAttribute": "Attribute Check",
@@ -756,30 +756,30 @@
             },
             "ActorSheet": {
                 "AddNetwork": "Direct Connect Network",
+                "ColdSim": "Cold Sim",
                 "Compilations": "Compilations",
+                "ConnectToDriver": "Connect To Driver",
                 "CreateInventory": "Create inventory place",
                 "CritterPowers": "Critter Powers",
-                "ColdSim": "Cold Sim",
-                "ConnectToDriver": "Connect To Driver",
-                "DisplayingPersona": "Displaying Persona",
                 "DeviceRating": "Device Rating",
                 "DeviceSetup": "Device Setup",
                 "DisabledOptionCritterPowers": "Optional Critter Powers - Disabled",
                 "DisabledOptionSpritePowers": "Optional Sprite Powers - Disabled",
+                "DisplayingPersona": "Displaying Persona",
                 "EnabledOptionCritterPowers": "Optional Critter Powers - Enabled",
                 "EnabledOptionSpritePowers": "Optional Sprite Powers - Enabled",
                 "Hacking": "Hacking",
                 "ICConfiguration": "IC Configuration",
                 "Icons": "Icons",
-                "MarkedIcons": "Marked Icons",
                 "MarkNetwork": "Mark Network",
+                "MarkedIcons": "Marked Icons",
                 "Matrix": "Matrix",
                 "MatrixActions": "Matrix Actions",
                 "Network": "Network",
                 "NoNetwork": "No Network",
-                "Persona": "Persona",
                 "Offline": "Offline",
                 "OwnedIcons": "Owned Icons",
+                "Persona": "Persona",
                 "PersonalInventory": "On Person",
                 "ResetActorForNewRun": "New Run Reset",
                 "Rituals": "Rituals",
@@ -805,18 +805,18 @@
                 "PlaceOnMainIcon": "Place on persona/host"
             },
             "Matrix": {
-                "TargetMainIcon": "Target Main Icon",
-                "TargetDevice": "Target Device",
-                "Local": "Local",
                 "Global": "Global",
-                "Public": "Public"
+                "Local": "Local",
+                "Public": "Public",
+                "TargetDevice": "Target Device",
+                "TargetMainIcon": "Target Main Icon"
             },
             "Message": {
                 "ClickToSelect": "Click to select on scene",
+                "FailedAttackAction": "Failed a Matrix Attack Action",
                 "OverwatchConvergence": "Overwatch Convergence",
                 "TargetedIcon": "Targeted Icon",
-                "TestEffects": "Applied effects",
-                "FailedAttackAction": "Failed a Matrix Attack Action"
+                "TestEffects": "Applied effects"
             },
             "Sheet": {
                 "AddOne": "Add One",
@@ -975,8 +975,8 @@
             "Global": "Global",
             "JudgeIntentions": "J.Intentions",
             "LiftCarry": "Lift&Carry",
-            "Marks": "Marks",
             "MarkDamage": "Per Mark Damage",
+            "Marks": "Marks",
             "MatrixDice": "Matrix Init Dice",
             "MatrixInit": "Matrix Init",
             "MatrixTrack": "Matrix Track",
@@ -997,8 +997,8 @@
             "Soak": "Soak",
             "SocialLimit": "Social Limit",
             "StunTrack": "Stun Track",
-            "TwoMarks": "Two Marks",
             "ThreeMarks": "Three Marks",
+            "TwoMarks": "Two Marks",
             "Walk": "Walk",
             "WoundTolerance": "Wound Tolerance",
             "Wounds": "Wounds"
@@ -1029,15 +1029,15 @@
         "NormalSpellButton": "Normal",
         "NotExtended": "Not Extended",
         "Notifications": {
-            "DeletingStorageReferences": {
-                "Start": "Deleting Network and MARK references",
-                "Item": "Clearing references to item",
-                "Finished": "Finished clearing references"
-            },
             "AddDevicesToPAN": {
                 "Adding": "Adding",
-                "Starting": "Starting to add equipped devices to PAN",
-                "FinishedAddingItems": "Finished adding devices to PAN. Please close and reopen any item sheets that changed connections."
+                "FinishedAddingItems": "Finished adding devices to PAN. Please close and reopen any item sheets that changed connections.",
+                "Starting": "Starting to add equipped devices to PAN"
+            },
+            "DeletingStorageReferences": {
+                "Finished": "Finished clearing references",
+                "Item": "Clearing references to item",
+                "Start": "Deleting Network and MARK references"
             },
             "VehicleCannotBeOwnDriver": "A vehicle cannot be the Driver of itself (that's what Pilot is for)"
         },
@@ -1140,9 +1140,9 @@
         "SecondAttribute": "Second Attribute",
         "SecondChance": "Second Chance",
         "SelectMatrixNetworkDialog": {
-            "Title": "Select a Network",
+            "Cancel": "Cancel",
             "Connect": "Connect",
-            "Cancel": "Cancel"
+            "Title": "Select a Network"
         },
         "SelectTokenMessage": "You must select a token first",
         "SelectedTargets": "Selected Targets",
@@ -1448,8 +1448,8 @@
             "AttackResisted": "Attack Resisted",
             "BruteForceFailure": "Brute Force failed!",
             "BruteForceSuccess": "Brute Force successful!",
-            "CheckOverwatchScoreSuccess": "Check Overwatch Score successful!",
             "CheckOverwatchScoreFailure": "Check Overwatch Score failed!",
+            "CheckOverwatchScoreSuccess": "Check Overwatch Score successful!",
             "Failure": "Failure!",
             "HackOnTheFlyFailure": "Hack on the Fly failed!",
             "HackOnTheFlySuccess": "Hack on the Fly successful!",
@@ -1512,22 +1512,22 @@
             "Actor": {
                 "ConnectNetwork": "Enter this host/grid",
                 "Critter": "Allow the use of critter powers",
+                "DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
                 "DisconnectNetwork": "Leave this host/grid",
                 "Grunt": "Apply grunt rules to this actor",
                 "MarkTarget": "Place additional marks on this target",
+                "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
+                "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
                 "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
                 "MissingSummoner": "Drag&Drop Character or use summoning action",
                 "MissingTechnomancer": "Drag&Drop Character or use compilation action",
                 "NPC": "Mark actor as NPC to get additional features",
-                "PlaceMark": "Action to be used to place marks on already marked targets",
-                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
-                "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
-                "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
                 "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
+                "PlaceMark": "Action to be used to place marks on already marked targets",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
+                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
-            "Actor.DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
             "CallInAction": {
                 "ActorType": "Type of actor to call in"
             },
@@ -1542,13 +1542,13 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
                 "ApplyTo": "Changes of this effect will apply to this target only",
-                "PriorityFieldDisabled": "Custom priority is not supported at this time",
                 "DocumentEffects": "Effects directly on this document",
                 "ItemEffects": "Effects collected from items on this document",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
                 "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
                 "OnlyForItemTest": "Only affect test of parent item",
-                "OnlyForWireless": "This effect will apply only for items that have wireless enabled"
+                "OnlyForWireless": "This effect will apply only for items that have wireless enabled",
+                "PriorityFieldDisabled": "Custom priority is not supported at this time"
             },
             "Item": {
                 "ActionCategories": "Select action categories to use instead of the test's default categories. Using Active Effects you can use categories to modify test values",
@@ -1591,6 +1591,8 @@
                 "physical_limit": "Modifies physical limit",
                 "physical_overflow_track": "Modifies physical overflow damage track",
                 "physical_track": "Modifies physical damage track",
+                "place_three_marks": "Modifies the modifier to place three marks at the same time",
+                "place_two_marks": "Modifies the modifier to place two marks at the same time",
                 "public_grid": "Modifies the Public Grid modifier when connected to it",
                 "reach": "Modifies reach of melee attacks",
                 "recoil": "Modifies recoil tests pool",
@@ -1598,8 +1600,6 @@
                 "soak": "Modifies physical damage resist tests pool",
                 "social_limit": "Modifies social limit",
                 "stun_track": "Modifies stun damage track",
-                "place_two_marks": "Modifies the modifier to place two marks at the same time",
-                "place_three_marks": "Modifies the modifier to place three marks at the same time",
                 "walk": "Modifies walking distance by multiples of the agility attribute",
                 "wound_tolerance": "Modifies damage per wound modifier"
             },
@@ -1832,8 +1832,8 @@
             "Weapon": "Weapon"
         },
         "Wireless": "Wireless",
-        "WirelessOnline": "Online",
         "WirelessOffline": "Offline",
+        "WirelessOnline": "Online",
         "WirelessUnavailable": "Unavailable"
     },
     "TYPES": {
