@@ -230,6 +230,15 @@
         "Collapse": "Recolher",
         "CollapseAll": "Recolher Tudo",
         "CommonProgram": "Programa Comum",
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "Limpar Pesquisa",
+                "SearchPlaceholder": "Pesquisar por...",
+                "System": "Sistema",
+                "World": "Mundo"
+            },
+            "Title": "Navegador de Compêndio"
+        },
         "Compendiums": {
             "sr5critter": "Criaturas & Espíritos & Sprites",
             "sr5drone": "Drones & Veículos",
