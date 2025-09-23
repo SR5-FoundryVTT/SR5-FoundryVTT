@@ -7,6 +7,7 @@ type Context = foundry.applications.api.ApplicationV2.RenderContext & Record<str
 type FilterEntry = { value: string; id: string; selected: boolean };
 const Base = HandlebarsApplicationMixin(ApplicationV2<Context>);
 type BaseType = InstanceType<typeof Base>;
+type Pack = CompendiumCollection<'Actor' | 'Item'>;
 
 type PackNode = {
     id: string;
@@ -71,8 +72,7 @@ export class CompendiumBrowser extends Base {
     // --- Instance State ---
 
     private activeTab: "Actor" | "Item" | "Config" = "Item";
-    private allFilters: FilterEntry[] = [];
-    private _packs: CompendiumCollection<'Actor' | 'Item'>[];
+    private allFilters: FilterEntry[] = [];xx
     private packBlackList: string[] = [];
     private _searchQuery: string = "";
     private _searchCursorPosition: number | null = null;
@@ -93,9 +93,6 @@ export class CompendiumBrowser extends Base {
      */
     constructor(options?: ConstructorParameters<typeof Base>[0]) {
         super(options);
-        this._packs = game.packs.filter((p): p is CompendiumCollection<'Actor' | 'Item'> =>
-            p.visible && ["Actor", "Item"].includes(p.metadata.type)
-        );
         this.setFilters();
     }
 
@@ -174,8 +171,8 @@ export class CompendiumBrowser extends Base {
 
     /** Builds the hierarchical tree of folders and packs. */
     private _buildPackTree(): FolderNode {
-        let packs = this._packs
-            .filter((p) => p.visible && ["Actor", "Item"].includes(p.metadata.type))
+        let packs = game.packs
+            .filter((p): p is Pack => p.visible && ["Actor", "Item"].includes(p.metadata.type))
             .map(p => ({
                 pack: p,
                 path: p.folder ? [...p.folder.ancestors.reverse(), p.folder] : [],
@@ -185,6 +182,23 @@ export class CompendiumBrowser extends Base {
                 const bPath = [...b.path.map(folder => folder.name), b.pack.metadata.label];
                 return aPath.join("/").localeCompare(bPath.join("/"));
             });
+
+            if (this.allFilters.some(f => f.selected)) {
+                const selected = this.allFilters.filter(f => f.selected);
+                const selectedIds = selected.map(f => f.id);
+
+                const selectedModules = selectedIds.filter(id => id !== "system" && id !== "world");
+
+                packs = packs.filter(({ pack }) => {
+                    const { packageType, packageName } = pack.metadata;
+
+                    if (packageType === "system" && selectedIds.includes("system")) return true;
+                    if (packageType === "world"  && selectedIds.includes("world"))  return true;
+                    if (packageType === "module" && selectedModules.includes(packageName)) return true;
+
+                    return false;
+                });
+            }
 
         if (this._searchQuery)
             packs = packs.filter(({ pack }) => pack.metadata.label.toLowerCase().includes(this._searchQuery.toLowerCase()));
@@ -234,33 +248,34 @@ export class CompendiumBrowser extends Base {
     private settingsListeners(htmlElement: HTMLElement) {
         const checkboxes = htmlElement.querySelectorAll<HTMLInputElement>(".pack-row label input[type='checkbox']");
         for (const checkbox of checkboxes) {
-            checkbox.addEventListener("change", (event) => {
-                const target = event.target as HTMLInputElement;
-                const id = target.dataset.id;
-                const type = target.dataset.type as "folder" | "pack";
-                if (type === "pack") {
-                    if (target.checked)
-                        this.packBlackList = this.packBlackList.filter((p) => p !== id!);
-                    else
-                        this.packBlackList.push(id!);
-                } else {
-                    const toRemove = !target.checked && !target.classList.contains('indeterminate');
+            checkbox.addEventListener("change", (event) => this._onPackCheckboxChange(event));
+        }
+    }
 
-                    for (const pack of this._packs) {
-                        if (pack.folder == null) continue;
-                        if ([pack.folder, ...pack.folder.ancestors].some(f => f.id === id)) {
-                            if (toRemove) {
-                                this.packBlackList.push(pack.collection);
-                            } else {
-                                this.packBlackList = this.packBlackList.filter((p) => p !== pack.collection);
-                            }
-                        }
+    private _onPackCheckboxChange(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const id = target.dataset.id;
+        const type = target.dataset.type as "folder" | "pack";
+        if (type === "pack") {
+            if (target.checked)
+                this.packBlackList = this.packBlackList.filter((p) => p !== id!);
+            else
+                this.packBlackList.push(id!);
+        } else {
+            const toRemove = !target.checked && !target.classList.contains('indeterminate');
+
+            for (const pack of game.packs) {
+                if (pack.folder == null) continue;
+                if ([pack.folder, ...pack.folder.ancestors].some(f => f.id === id)) {
+                    if (toRemove) {
+                        this.packBlackList.push(pack.collection);
+                    } else {
+                        this.packBlackList = this.packBlackList.filter((p) => p !== pack.collection);
                     }
                 }
-                void this.render({ parts: ["settings"] });
-                console.log(this, id, type);
-            });
+            }
         }
+        void this.render({ parts: ["settings"] });
     }
 
     /** Recursively updates the selection state of a folder based on its children. */
@@ -456,8 +471,8 @@ export class CompendiumBrowser extends Base {
         if (this.results.throttle) return;
         this.results.throttle = true;
 
-        const activePacks = this._packs.filter(
-            (p) => p.visible && p.metadata.type === this.activeTab
+        const activePacks = game.packs.filter(
+            (p): p is Pack => p.visible && p.metadata.type === this.activeTab
         );
         const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
         let entries = indexes.flatMap((index) => [...index.values()]);
@@ -539,13 +554,32 @@ export class CompendiumBrowser extends Base {
 
     /** Populates and sorts the `allFilters` array based on the document types of the active tab. */
     private setFilters() {
-        if (this.activeTab === "Config") {
-            this.allFilters = [];
+        if (this.activeTab !== "Config") {
+            this.allFilters = Object.keys(CONFIG[this.activeTab].dataModels)
+                .map((id) => ({ value: game.i18n.localize(`TYPES.${this.activeTab}.${id}`), id, selected: false }))
+                .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang));
             return;
         }
 
-        this.allFilters = Object.keys(CONFIG[this.activeTab].dataModels)
-            .map((id) => ({ value: game.i18n.localize(`TYPES.${this.activeTab}.${id}`), id, selected: false }))
-            .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang));
+        const packs = game.packs.filter((p): p is Pack => p.visible && ["Actor", "Item"].includes(p.metadata.type));
+        const hasWorld = packs.some(p => p.metadata.packageType === "world");
+        const modules = Array.from(new Set(packs.filter(p => p.metadata.packageType === "module").map(p => p.metadata.packageName)));
+
+        this.allFilters = [
+            { value: game.i18n.localize("System"), id: "system", selected: false }
+        ];
+
+        if (hasWorld)
+            this.allFilters = this.allFilters.concat([
+                { value: game.i18n.localize("World"), id: "world", selected: false }
+            ]);
+
+        this.allFilters = this.allFilters.concat([
+            ...modules.map(m => ({
+                value: game.modules.get(m)?.title ?? m.capitalize(),
+                id: m,
+                selected: false,
+            })).sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang))
+        ]);
     }
 }
