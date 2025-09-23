@@ -161,15 +161,8 @@ export class CompendiumBrowser extends Base {
     /** Attaches input and change listeners to the search bar and filter checkboxes. */
     private filterListeners(htmlElement: HTMLElement) {
         const searchInput = htmlElement.querySelector<HTMLInputElement>("#compendium-browser-search");
-        if (searchInput) {
-            // Restore cursor position after re-render
-            if (this._searchCursorPosition) {
-                searchInput.focus();
-                searchInput.setSelectionRange(this._searchCursorPosition, this._searchCursorPosition);
-                this._searchCursorPosition = null;
-            }
+        if (searchInput)
             searchInput.addEventListener("input", (event) => this._onSearch(event, searchInput));
-        }
 
         const typeCheckboxes = htmlElement.querySelectorAll<HTMLInputElement>(".types .type input[type='checkbox']");
         for (const checkbox of typeCheckboxes) {
