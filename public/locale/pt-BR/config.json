@@ -237,6 +237,11 @@
                 "System": "Sistema",
                 "World": "Mundo"
             },
+            "Tabs": {
+                "Actors": "Atores",
+                "Items": "Itens",
+                "Settings": "Configurações"
+            },
             "Title": "Navegador de Compêndio"
         },
         "Compendiums": {

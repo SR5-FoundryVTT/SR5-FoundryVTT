@@ -298,6 +298,11 @@
                 "System": "System",
                 "World": "World"
             },
+            "Tabs": {
+                "Actors": "Actors",
+                "Items": "Items",
+                "Settings": "Settings"
+            },
             "Title": "Compendium Browser"
         },
         "Compendiums": {
