@@ -1,19 +1,19 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        <div class="flexrow list-header item-section space-between">
+        <div class="new-list-item new-list-item-header">
             {{#if matrixDevice}}
-            <div>
+            <div class="new-list-item-col">
                 <a class="open-matrix-device roll" data-uuid="{{matrixDevice.uuid}}">
                     {{matrixDevice.name}}
                 </a>
             </div>
             {{/if}}
-            <div class="RollId" data-roll-id="matrix.device-rating">
-                <a class="roll Roll">
+            <div class="new-list-item-col" >
+                <a data-roll-id="matrix.device-rating">
                     {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
                 </a>
             </div>
-            <div>
+            <div class="new-list-item-col">
                 <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
                     {{#if system.matrix.running_silent}}
                     {{localize "SR5.RunningSilent"}}
@@ -22,7 +22,7 @@
                     {{/if}}
                 </a>
             </div>
-            <div>
+            <div class="new-list-item-col">
                 <a class="reboot-persona-device" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
                     {{localize "SR5.Labels.Sheet.RebootDevice"}} <i class="item-icon fas fa-power-off"></i>
                 </a>
@@ -42,20 +42,20 @@
                         item=../system.matrix.item }}
                     {{/each}}
                 </div>
-                <div class="flexrow align-start list-header item-section space-between">
-                    <div>
+                <div class="new-list-item new-list-item-header">
+                    <div class="new-list-item-col">
                         {{#if network}}
-                        {{localize "SR5.Labels.ActorSheet.Network"}}: <a class="open-matrix-device" data-uuid="{{network.uuid}}">{{network.name}}</a>
-                        <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                            <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                        {{localize "SR5.Labels.ActorSheet.Network"}}: <a data-action="openMatrixDevice" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                        <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                            <i class="fas fa-right-from-bracket"></i>
                         </a>
                         {{else}}
                         {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
-                        <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                        <a data-action="connectToNetwork">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
                         {{/if}}
                     </div>
                     <div>
-                        <a class="show-matrix-network-hacking">
+                        <a data-action="showNetwork">
                             {{localize "SR5.Labels.ActorSheet.MarkNetwork"}} <i class="item-icon fas fa-network-wired"></i>
                         </a>
                     </div>

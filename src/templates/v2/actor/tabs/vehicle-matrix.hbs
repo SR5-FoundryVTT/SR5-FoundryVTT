@@ -1,13 +1,13 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        <div class="flexrow list-header item-section space-between">
-            <div class="RollId" data-roll-id="matrix.device-rating">
-                <a class="roll Roll">
+        <div class="new-list-item new-list-item-header">
+            <div class="new-list-item-col">
+                <a data-action="roll" data-roll-id="matrix.device-rating">
                     {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
                 </a>
             </div>
-            <div>
-                <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
+            <div class="new-list-item-col">
+                <a data-action="togglePersonaRunningSilent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
                     {{#if system.matrix.running_silent}}
                         {{localize "SR5.RunningSilent"}}
                     {{else}}
@@ -15,9 +15,9 @@
                     {{/if}}
                 </a>
             </div>
-            <div>
-                <a class="reboot-persona-device" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
-                    {{localize "SR5.Labels.Sheet.RebootDevice"}} <i class="item-icon fas fa-power-off"></i>
+            <div class="new-list-item-col">
+                <a data-action="rebootPersona" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
+                    {{localize "SR5.Labels.Sheet.RebootDevice"}} <i class="fas fa-power-off"></i>
                 </a>
             </div>
         </div>
@@ -35,8 +35,8 @@
                             item=../system.matrix.item }}
                     {{/each}}
                 </div>
-                <div class="flexrow align-start list-header item-section space-between">
-                    <div>
+                <div class="new-list-item new-list-item-header">
+                    <div class="new-list-item-col">
                         {{#if network}}
                             {{localize "SR5.Labels.ActorSheet.Network"}}: <a class="open-matrix-device" data-uuid="{{network.uuid}}">{{network.name}}</a>
                             <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
@@ -49,9 +49,9 @@
                     </div>
                     {{#unless network}}
                     {{#if vehicle.driver}}
-                    <div>
-                        <a class="connect-to-driver">
-                            {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}} <i class="item-icon fas fa-network-wired"></i>
+                    <div class="new-list-item-col">
+                        <a data-action="connectToDriver">
+                            {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}} <i class="fas fa-network-wired"></i>
                         </a>
                     </div>
                     {{/if}}

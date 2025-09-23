@@ -162,7 +162,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             height: 600,
         },
         actions: {
-            commonRoll: SR5BaseActorSheet.#rollById,
+            roll: SR5BaseActorSheet.#rollById,
 
             openSkillSource: SR5BaseActorSheet.#openSkillSource,
             rollAttribute: SR5BaseActorSheet.#rollAttribute,
