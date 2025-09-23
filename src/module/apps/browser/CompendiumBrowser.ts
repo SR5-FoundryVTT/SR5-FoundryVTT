@@ -266,6 +266,7 @@ export class CompendiumBrowser extends Base {
         const uuid = el?.dataset.uuid;
         if (!uuid) return;
 
+        // FVTT-Types not handling this correctly
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const doc = (await fromUuid(uuid)) as Actor | Item | null;
         await doc?.sheet?.render(true);
@@ -348,8 +349,6 @@ export class CompendiumBrowser extends Base {
             topOddPadDiv.style.height = `0px`;
             toRender.push(topOddPadDiv);
         }
-
-        console.log({ indexStart, indexEnd, total: this.results.entries.length });
 
         indexStart = Math.max(0, indexStart);
         indexEnd = Math.min(this.results.entries.length, indexEnd);
