@@ -21,7 +21,7 @@
         "timers": "^0.1.1",
         "typescript": "^5.4.5",
         "vite": "^7.1.7",
-        "vite-plugin-fvtt": "^0.2.4",
+        "vite-plugin-fvtt": "^0.2.5",
         "vite-plugin-static-copy": "^3.1.2",
         "vite-tsconfig-paths": "^5.1.4",
         "xml2js": "^0.6.2",
