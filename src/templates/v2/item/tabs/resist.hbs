@@ -1,0 +1,28 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="standard-form scrollable">
+            {{formGroup systemFields.action.fields.opposed.fields.resist.fields.test
+                        value=system.action.opposed.resist.test
+                        options=(tests2Array resistTests)
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{#if system.action.opposed.resist.test}}
+                {{formGroup systemFields.action.fields.opposed.fields.resist.fields.attribute
+                            value=system.action.opposed.resist.attribute
+                            options=(config2Array attributes)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.action.fields.opposed.fields.resist.fields.attribute2
+                            value=system.action.opposed.resist.attribute2
+                            options=(config2Array attributes)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.action.fields.opposed.fields.resist.fields.armor
+                            value=system.action.opposed.resist.armor
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+        </div>
+    </div>
+</section>

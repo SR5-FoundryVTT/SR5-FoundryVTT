@@ -93,6 +93,7 @@ export const SheetFlow = {
             delete parts['action'];
             delete parts['damage'];
             delete parts['opposed'];
+            delete parts['resist'];
         }
         if (!item.isType('armor', 'critter_power', 'cyberware', 'bioware', 'adept_power')) {
             delete parts['armor'];
@@ -132,6 +133,9 @@ export const SheetFlow = {
         }
         if (!item.isType('spell')) {
             delete parts['spell'];
+        }
+        if (!item.isType('weapon')) {
+            delete parts['weapon'];
         }
     },
 
