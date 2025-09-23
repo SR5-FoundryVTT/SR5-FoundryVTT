@@ -66,7 +66,7 @@ export class CompendiumBrowser extends Base {
             tabs: [
                 { id: "Actor", icon: "fa-solid fa-user", label: "Actors" },
                 { id: "Item", icon: "fa-solid fa-suitcase", label: "Items" },
-                { id: "Config", icon: "fa-solid fa-gear", label: "Settings" },
+                { id: "Settings", icon: "fa-solid fa-gear", label: "Settings" },
             ],
         },
     };
@@ -75,7 +75,7 @@ export class CompendiumBrowser extends Base {
     //                                  STATE
     // =========================================================================
 
-    private activeTab: "Actor" | "Item" | "Config" = "Item";
+    private activeTab: "Actor" | "Item" | "Settings" = "Item";
     private allFilters: FilterEntry[] = [];
     private packBlackList: string[] = [];
     private _searchQuery: string = "";
@@ -126,7 +126,7 @@ export class CompendiumBrowser extends Base {
     protected override async _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
         await super._onRender(context, options);
 
-        if (this.activeTab === "Config") {
+        if (this.activeTab === "Settings") {
             void this._renderSettings().then(() => this.settingsListeners(this.element));
         } else {
             // Fetch results and then render the initial visible set
@@ -150,7 +150,7 @@ export class CompendiumBrowser extends Base {
         super._attachPartListeners(partId, htmlElement, options);
         if (partId === "filters") this.filterListeners(htmlElement);
 
-        if (this.activeTab === "Config") {
+        if (this.activeTab === "Settings") {
             if (partId === "results") htmlElement.classList.add("hidden");
             else if (partId === "settings") htmlElement.classList.remove("hidden");
         } else if (partId === "settings") {
@@ -195,7 +195,7 @@ export class CompendiumBrowser extends Base {
     /** Handles switching between the main tabs (e.g., 'Actors', 'Items'), updating filters and re-rendering. */
     override changeTab(...[tab, group, options]: Parameters<BaseType["changeTab"]>) {
         super.changeTab(tab, group, options);
-        this.activeTab = tab as "Actor" | "Item" | "Config";
+        this.activeTab = tab as "Actor" | "Item" | "Settings";
         this.setFilters();
         void this.render({ parts: ["filters", "results", "settings"] });
     }
@@ -204,20 +204,20 @@ export class CompendiumBrowser extends Base {
     private _onSearch(event: Event, target: HTMLInputElement) {
         this._searchCursorPosition = target.selectionStart;
         this._searchQuery = target.value;
-        void this.render({ parts: [this.activeTab === "Config" ? "settings" : "results"] });
+        void this.render({ parts: [this.activeTab === "Settings" ? "settings" : "results"] });
     }
 
     /** Handles the click event for the 'clear search' button, resetting the query. */
     private _onClearSearch() {
         this._searchQuery = "";
-        void this.render({ parts: ["filters", this.activeTab === "Config" ? "settings" : "results"] });
+        void this.render({ parts: ["filters", this.activeTab === "Settings" ? "settings" : "results"] });
     }
 
     /** Handles the `change` event for a type filter checkbox. */
     private _onFilterChange(type: string, selected: boolean) {
         const typeEntry = this.allFilters.find((t) => t.id === type);
         if (typeEntry) typeEntry.selected = selected;
-        void this.render({ parts: [this.activeTab === "Config" ? "settings" : "results"] });
+        void this.render({ parts: [this.activeTab === "Settings" ? "settings" : "results"] });
     }
 
     /** Handles the `dragstart` event for a compendium entry row. */
@@ -514,7 +514,7 @@ export class CompendiumBrowser extends Base {
 
     /** Populates and sorts the `allFilters` array based on the document types or packages of the active tab. */
     private setFilters() {
-        if (this.activeTab !== "Config") {
+        if (this.activeTab !== "Settings") {
             this.allFilters = Object.keys(CONFIG[this.activeTab].dataModels)
                 .map((id) => ({ value: game.i18n.localize(`TYPES.${this.activeTab}.${id}`), id, selected: false }))
                 .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang));
