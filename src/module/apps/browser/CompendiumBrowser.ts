@@ -266,6 +266,7 @@ export class CompendiumBrowser extends Base {
         const uuid = el?.dataset.uuid;
         if (!uuid) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const doc = (await fromUuid(uuid)) as Actor | Item | null;
         await doc?.sheet?.render(true);
     }
@@ -289,7 +290,7 @@ export class CompendiumBrowser extends Base {
         this.results.throttle = true;
 
         const activePacks = game.packs.filter(
-            (p): p is Pack => p.visible && p.metadata.type === this.activeTab
+            (p): p is Pack => p.visible && p.metadata.type === this.activeTab && !this.packBlackList.includes(p.collection)
         );
         const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
         let entries = indexes.flatMap((index) => [...index.values()]);
