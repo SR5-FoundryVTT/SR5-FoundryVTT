@@ -293,7 +293,7 @@
 
         &.minimized .window-header .window-title {
             font-size: inherit;
-            @include config.use-font($weight: 700);
+            @include config.use-font($weight: 600);
 
             a {
                 margin-left: 0.5rem;

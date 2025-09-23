@@ -53,10 +53,10 @@
                 color: var(--sr5-text);
                 @include config.font-size(16);
                 height: 2em;
-                left: .5em;
+                left: 0.5em;
                 padding: 2px;
                 position: absolute;
-                top: .2em;
+                top: 0.2em;
                 width: 2em;
             }
 
@@ -99,42 +99,42 @@
         padding-left: 10px;
 
         > * {
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: space-between;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
         }
 
         label {
-          color: var(--sr5-accent);
-          font-weight: 600;
-          @include config.font-size($px: 15, $lh: auto);
+            color: var(--sr5-accent);
+            font-weight: 600;
+            @include config.font-size($px: 15, $lh: auto);
         }
 
         .tech-adjustable-label {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
         }
 
         .tech-adjustable-input {
-          flex: 1;
-          position: relative;
+            flex: 1;
+            position: relative;
 
-          input.display {
-            width: 100%;
-          }
+            input.display {
+                width: 100%;
+            }
 
-          .unit {
-            position: absolute;
-            right: 0.5em;
-            top: 50%;
-            transform: translateY(-50%);
-            @include config.font-size(11);
-            pointer-events: none;
-          }
+            .unit {
+                position: absolute;
+                right: 0.5em;
+                top: 50%;
+                transform: translateY(-50%);
+                @include config.font-size(11);
+                pointer-events: none;
+            }
         }
-      }
+    }
     .description {
         padding: 2px;
         padding-left: 10px;
@@ -145,7 +145,7 @@
     }
     .item-form {
         padding: 0.5em;
-        &.des{
+        &.des {
             max-width: 14em;
         }
         .header {
@@ -161,7 +161,7 @@
             justify-content: space-between;
             align-content: center;
             padding: 0.1em 0.25em;
-            &.advanced{
+            &.advanced {
                 color: var(--sr5-accent);
             }
             > * {
@@ -171,7 +171,7 @@
                 color: var(--sr5-text);
                 @include config.font-size(15);
                 font-weight: 600;
-                &.advanced{
+                &.advanced {
                     color: var(--sr5-accent);
                 }
             }
@@ -232,17 +232,17 @@
             background-repeat: repeat;
             background-size: 100% 20px auto;
             flex: 0 0 20px;
-            padding: 0 3px 0 0;
+            @include config.padding($x: 2);
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
 
             & a {
-            display: inline-flex;
-            padding: 6px 0 0 0;
-            font-size: 0;
-            color: var(--sr5-neutral-subtle);
+                display: inline-flex;
+                padding: 6px 0 0 0;
+                font-size: 0;
+                color: var(--sr5-neutral-subtle);
 
-            & .fa-solid,
+                & .fa-solid,
                 & .fas {
                     @include config.font-size(12);
                 }
@@ -250,6 +250,19 @@
 
             & .window-title {
                 font-size: 0;
+
+                a {
+                    margin-left: 0.25rem;
+                }
+            }
+        }
+
+        &.minimized .window-header .window-title {
+            font-size: inherit;
+            @include config.use-font($weight: 600);
+
+            a {
+                margin-left: 0.5rem;
             }
         }
     }

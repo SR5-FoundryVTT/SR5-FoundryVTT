@@ -25,15 +25,29 @@
 
     .window-title {
         font-size: 0;
+
+        a {
+            margin-left: 0.25rem;
+        }
     }
 
-    .control, .document-id-link {
+    &.minimized .window-header .window-title {
+        font-size: inherit;
+        @include config.use-font($weight: 600);
+
+        a {
+            margin-left: 0.5rem;
+        }
+    }
+
+    .control,
+    .document-id-link {
         color: var(--sr5-text-subtle);
         @include config.hover-transition($color: var(--sr5-action));
     }
 
     .document-id-link {
-         @include config.font-size(14);
+        @include config.font-size(14);
     }
 
     .window-content {
@@ -45,7 +59,7 @@
             border: 1px solid var(--sr5-border-default);
         }
 
-        .effect-title  {
+        .effect-title {
             color: var(--sr5-text);
             font-weight: 600;
         }
@@ -92,7 +106,15 @@
         }
     }
 
-    input[type="text"], input[type="number"], input[type="password"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="search"], input[type="file"], select {
+    input[type='text'],
+    input[type='number'],
+    input[type='password'],
+    input[type='date'],
+    input[type='time'],
+    input[type='datetime-local'],
+    input[type='search'],
+    input[type='file'],
+    select {
         box-shadow: none;
 
         font-weight: 700;
@@ -101,7 +123,8 @@
         border-color: var(--sr5-border-default);
 
         outline: none;
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             outline: none;
         }
 
@@ -111,7 +134,7 @@
     }
 
     // Effects Tab Container
-    section.tab[data-tab="effects"] {
+    section.tab[data-tab='effects'] {
         padding: 0.75em;
         padding-top: 0;
         @include config.font-size(14);
@@ -155,7 +178,7 @@
     }
 
     // Input Fields
-    .effect-change input[type="text"],
+    .effect-change input[type='text'],
     .effect-change select {
         width: 100%;
         box-sizing: border-box;
@@ -198,9 +221,14 @@
         background: var(--sr5-surface-high);
         color: var(--sr5-text);
         border: 1px solid var(--sr5-border-default);
-        @include config.hover-transition($color: var(--sr5-accent), $background-color: var(--sr5-surface-highest), $border-color: var(--sr5-border-default-strong));
+        @include config.hover-transition(
+            $color: var(--sr5-accent),
+            $background-color: var(--sr5-surface-highest),
+            $border-color: var(--sr5-border-default-strong)
+        );
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             box-shadow: none;
         }
     }
