@@ -263,10 +263,23 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                             word-break: break-word;
                             font-weight: normal;
                         }
-                        .item-type {
+
+                        .item-type,
+                        .item-pack {
+                            display: inline-block;
                             font-size: 0.8em;
                             color: $text-placeholder;
                             padding-top: 3px;
+                        }
+
+                        .item-type::after {
+                            content: "|";
+                            margin: 0 0.5em;
+                            opacity: 0.5;
+                        }
+
+                        .item-pack {
+                            font-style: italic;
                         }
                     }
                 }

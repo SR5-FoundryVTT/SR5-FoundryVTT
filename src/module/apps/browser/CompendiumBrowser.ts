@@ -293,7 +293,13 @@ export class CompendiumBrowser extends Base {
             (p): p is Pack => p.visible && p.metadata.type === this.activeTab && !this.packBlackList.includes(p.collection)
         );
         const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
-        let entries = indexes.flatMap((index) => [...index.values()]);
+        let entries = indexes.flatMap((index, idx) => {
+            const packTitle = activePacks[idx].title;
+            return [...index.values()].map((entry) => ({
+                ...entry,
+                pack: packTitle,
+            }));
+        });
 
         if (this._searchQuery) {
             const query = this._searchQuery.toLowerCase();
