@@ -23,7 +23,7 @@
         position: relative;
 
         &::after {
-            content: "";
+            content: '';
             position: absolute;
             left: 0;
             bottom: 0;
@@ -35,10 +35,10 @@
         }
 
         &:has(input:focus)::after {
-          width: 100%;
+            width: 100%;
         }
 
-        input[type=text].display {
+        input[type='text'].display {
             background: none;
         }
     }
@@ -227,39 +227,39 @@
         overflow: auto;
     }
 
-        // Intended to be used in the matrix tab and hacking subtab for all columns.
-        .scroll-area-matrix-hacking {
-            // I hate this. It's necessary to make the scrollbar work together with .scroll-area
-            // Otherweise the height will grow out of the application bounds hide the overflow...
-            height: 400px;
-        }
+    // Intended to be used in the matrix tab and hacking subtab for all columns.
+    .scroll-area-matrix-hacking {
+        // I hate this. It's necessary to make the scrollbar work together with .scroll-area
+        // Otherweise the height will grow out of the application bounds hide the overflow...
+        height: 400px;
+    }
 
-        // Intended to be used in the matrix tab > icons/programs/marks subtab.
-        .scroll-area-matrix-icons {
-            // I hate this. It's necessary to make the scrollbar work together with .scroll-area
-            // Otherweise the height will grow out of the application bounds hide the overflow...
-            height: 330px;
-        }
+    // Intended to be used in the matrix tab > icons/programs/marks subtab.
+    .scroll-area-matrix-icons {
+        // I hate this. It's necessary to make the scrollbar work together with .scroll-area
+        // Otherweise the height will grow out of the application bounds hide the overflow...
+        height: 330px;
+    }
 
-        // Use only to indicate interactibility within the HackingTab markslist.
-        .select-matrix-target {
-            cursor: pointer;
-        }
+    // Use only to indicate interactibility within the HackingTab markslist.
+    .select-matrix-target {
+        cursor: pointer;
+    }
 
-        // Use only to indicate interactibility within the HackingTab markslist.
-        .open-matrix-target {
-            cursor: pointer;
-        }
+    // Use only to indicate interactibility within the HackingTab markslist.
+    .open-matrix-target {
+        cursor: pointer;
+    }
 
-        // Used to switch between the different hacking targets.
-        .switch-matrix-hacking-target {
-            cursor: pointer;
-        }
+    // Used to switch between the different hacking targets.
+    .switch-matrix-hacking-target {
+        cursor: pointer;
+    }
 
-        &.sheet.window-app {
-            background: var(--sr5-backdrop);
-            border: 1px solid var(--sr5-border-default-subtle);
-            @include config.shadow-elevation(10);
+    &.sheet.window-app {
+        background: var(--sr5-backdrop);
+        border: 1px solid var(--sr5-border-default-subtle);
+        @include config.shadow-elevation(10);
 
         & .window-header {
             border-bottom: none;
@@ -267,24 +267,36 @@
             background-repeat: repeat;
             background-size: 100% 20px auto;
             flex: 0 0 20px;
-            padding: 0 3px 0 0;
+            @include config.padding($x: 2);
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
 
             & a {
-            display: inline-flex;
-            padding: 6px 0 0 0;
-            font-size: 0;
-            color: var(--sr5-neutral-subtle);
+                display: inline-flex;
+                font-size: 0;
+                color: var(--sr5-neutral-subtle);
 
-            & .fa-solid,
+                & .fa-solid,
                 & .fas {
                     @include config.font-size(12);
                 }
             }
 
             & .window-title {
-            font-size: 0;
+                font-size: 0;
+
+                a {
+                    margin-left: 0.25rem;
+                }
+            }
+        }
+
+        &.minimized .window-header .window-title {
+            font-size: inherit;
+            @include config.use-font($weight: 700);
+
+            a {
+                margin-left: 0.5rem;
             }
         }
     }
@@ -311,7 +323,8 @@
     border: 1px solid var(--sr5-border-default);
     padding-block: 0.25rem 0;
 
-    .window-header, .window-content {
+    .window-header,
+    .window-content {
         border: none;
     }
 
