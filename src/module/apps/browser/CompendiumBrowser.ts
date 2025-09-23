@@ -80,8 +80,6 @@ export class CompendiumBrowser extends Base {
     private packBlackList: string[] = [];
     private _searchQuery: string = "";
     private _searchCursorPosition: number | null = null;
-    #tooltipElement: HTMLElement | null = null;
-    #tooltipTimeout: number | null = null;
 
     /** State for virtual scrolling */
     private readonly results = {
@@ -134,17 +132,6 @@ export class CompendiumBrowser extends Base {
             // Fetch results and then render the initial visible set
             void this.fetch().then(async () => this.prepareResults(0, 50));
         }
-    }
-
-    /** Handles cleanup when the application is closed. */
-    override async close(...args: Parameters<BaseType["close"]>) {
-        if (this.#tooltipTimeout) clearTimeout(this.#tooltipTimeout);
-        this.#tooltipTimeout = null;
-        if (this.#tooltipElement) {
-            this.#tooltipElement.remove();
-            this.#tooltipElement = null;
-        }
-        return super.close(...args);
     }
 
     // =========================================================================
