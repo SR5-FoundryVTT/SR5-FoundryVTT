@@ -78,7 +78,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     // This is a dummy inventory
     allInventories: InventoryType = {
         name: 'All',
-        type: '',
+        type: 'all',
         label: 'SR5.Labels.Inventory.All',
         itemIds: [],
         showAll: true
