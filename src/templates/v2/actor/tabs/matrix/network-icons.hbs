@@ -5,7 +5,7 @@
             type='network_icon'
             cssClass="header-for-scrollable"
         }}
-        <div class="scrollable">
+        <div id="network-icons-scroll" class="scrollable">
         {{!-- Show main icons (personas) visible to this actor --}}
         {{#each @root.matrixTargets}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/network_icon/item.hbs' item=this}}

@@ -5,7 +5,7 @@
             type='marked_icon'
             cssClass="header-for-scrollable"
         }}
-        <div class="scrollable">
+        <div id="marked-icons-scroll" class="scrollable">
         {{#each @root.markedDocuments}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/marked_icon/item.hbs' item=this}}
             {{! -- Overview of icons connected to the main icon (devices of persona) -- }}

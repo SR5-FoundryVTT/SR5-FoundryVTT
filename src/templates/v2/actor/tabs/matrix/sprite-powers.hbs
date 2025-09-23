@@ -4,7 +4,7 @@
             label='SR5.Labels.ActorSheet.SpritePowers'
             type='sprite_power' }}
 
-            <div class="scrollable">
+            <div id="sprite-powers-scroll" class="scrollable">
                 {{#each itemType.sprite_power}}
                 {{#if (or (and @root.isPlayMode (eq this.system.optional "enabled_option"))
                         (or (not this.system.optional) (eq this.system.optional "standard")))}}

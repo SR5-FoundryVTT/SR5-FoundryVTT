@@ -115,7 +115,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                 ...SheetFlow.actorSystemParts('active-skills', 'language-and-knowledge-skills', 'attributes', 'special-attributes' ),
                 ...SheetFlow.listItem('skill')
             ],
-            scrollable: ['scrollable']
+            scrollable: ['#active-skills-scroll', '#knowledge-skills-scroll']
         },
         magic: {
             template: SheetFlow.templateBase('actor/tabs/magic'),
@@ -123,32 +123,32 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                 ...SheetFlow.actorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
                 ...SheetFlow.listItem('spell', 'ritual', 'call_in_action', 'adept_power')
                 ],
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         complexForms: {
             template: SheetFlow.templateBase('actor/tabs/matrix/complex-forms'),
             templates: SheetFlow.listItem('complex_form'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         compilations: {
             template: SheetFlow.templateBase('actor/tabs/matrix/compilations'),
             templates: SheetFlow.listItem('call_in_action'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         critter: {
             template: SheetFlow.templateBase('actor/tabs/critter'),
             templates: SheetFlow.listItem('critter_power'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         inventory: {
             template: SheetFlow.templateBase('actor/tabs/inventory'),
             templates: SheetFlow.listItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         social: {
             template: SheetFlow.templateBase('actor/tabs/social'),
             templates: SheetFlow.listItem('sin', 'lifestyle', 'contact'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         bio: {
             template: SheetFlow.templateBase('actor/tabs/bio'),
@@ -156,7 +156,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                     ...SheetFlow.actorSystemParts('metamagics', 'echoes'),
                     ...SheetFlow.listItem('metamagic', 'echo', 'quality'),
                 ],
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
     }
 

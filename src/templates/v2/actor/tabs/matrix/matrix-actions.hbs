@@ -4,7 +4,7 @@
             label='SR5.Labels.ActorSheet.MatrixActions'
             type='matrix_action'
             cssClass="header-for-scrollable" }}
-        <div class="scrollable">
+        <div id="matrix-actions-scroll" class="scrollable">
         {{#each @root.matrixActions}}
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/action/item.hbs"
                 item=this.action

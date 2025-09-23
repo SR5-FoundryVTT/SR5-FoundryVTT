@@ -54,7 +54,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
                     ...SheetFlow.actorSystemParts('spells', 'rituals'),
                     ...SheetFlow.listItem('spell', 'ritual')
                 ],
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         critter: {
             template: SheetFlow.templateBase('actor/tabs/critter'),

@@ -53,49 +53,43 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         header: {
             template: SheetFlow.templateBase('actor/header'),
             templates: SheetFlow.actorSystemParts('initiative', 'common-rolls'),
-            scrollable: ['scrollable']
         },
         tabs: {
             template: SheetFlow.templateBase('common/primary-tab-group'),
-            scrollable: ['scrollable']
         },
         actions: {
             template: SheetFlow.templateBase('actor/tabs/actions'),
             templates: SheetFlow.listItem('action'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         matrix: {
             template: SheetFlow.templateBase('actor/tabs/ic-matrix'),
             templates: SheetFlow.actorSystemParts('active-skills', 'ic-attributes', 'ic-options'),
-            scrollable: ['scrollable']
+            scrollable: ['#active-skills-scroll', '#matrix-actions-scroll', '#network-icons-scroll', '#marked-icons-scroll']
         },
         matrixActions: {
             template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
             templates: SheetFlow.listItem('action'),
-            scrollable: ['scrollable']
         },
         markedIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),
             templates: SheetFlow.listItem('marked_icon'),
-            scrollable: ['scrollable']
         },
         networkIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/network-icons'),
             templates: SheetFlow.listItem('network_icon'),
-            scrollable: ['scrollable']
         },
         effects: {
             template: SheetFlow.templateBase('actor/tabs/effects'),
             templates: SheetFlow.listItem('effect'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         misc: {
             template: SheetFlow.templateBase('actor/tabs/misc'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         footer: {
             template: SheetFlow.templateBase('actor/footer'),
-            scrollable: ['scrollable']
         },
     }
 

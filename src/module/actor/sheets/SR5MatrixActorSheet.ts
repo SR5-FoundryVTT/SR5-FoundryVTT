@@ -123,32 +123,36 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         ...super.PARTS,
         matrix: {
             template: SheetFlow.templateBase('actor/tabs/matrix'),
-            scrollable: ['scrollable']
+            scrollable: [
+                '#matrix-actions-scroll',
+                '#marked-icons-scroll' ,
+                '#owned-icons-scroll',
+                '#network-icons-scroll',
+                '#programs-scroll',
+                '#complex-forms-scroll',
+                '#compilations-scroll',
+                '#sprite-powers-scroll',
+            ]
         },
         matrixActions: {
             template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
             templates: SheetFlow.listItem('action'),
-            scrollable: ['scrollable']
         },
         markedIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),
             templates: SheetFlow.listItem('marked_icon'),
-            scrollable: ['scrollable']
         },
         ownedIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/owned-icons'),
             templates: SheetFlow.listItem('owned_icon'),
-            scrollable: ['scrollable']
         },
         networkIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/network-icons'),
             templates: SheetFlow.listItem('network_icon'),
-            scrollable: ['scrollable']
         },
         programs: {
             template: SheetFlow.templateBase('actor/tabs/matrix/programs'),
             templates: SheetFlow.listItem('program'),
-            scrollable: ['scrollable']
         }
     }
 

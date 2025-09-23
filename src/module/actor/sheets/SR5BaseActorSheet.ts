@@ -207,21 +207,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         header: {
             template: SheetFlow.templateBase('actor/header'),
             templates: SheetFlow.actorSystemParts('movement', 'initiative'),
-            scrollable: ['scrollable']
         },
         tabs: {
             template: SheetFlow.templateBase('common/primary-tab-group'),
-            scrollable: ['scrollable']
         },
         actions: {
             template: SheetFlow.templateBase('actor/tabs/actions'),
             templates: SheetFlow.listItem('action'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         effects: {
             template: SheetFlow.templateBase('actor/tabs/effects'),
             templates: SheetFlow.listItem('effect'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         misc: {
             template: SheetFlow.templateBase('actor/tabs/misc'),
@@ -229,7 +227,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         },
         footer: {
             template: SheetFlow.templateBase('actor/footer'),
-            scrollable: ['scrollable']
         },
     }
 

@@ -15,7 +15,7 @@
             placeholder="{{localize 'SR5.Filter'}}..."
         />
     </div>
-    <section class="scrollable">
+    <section id="active-skills-scroll" class="scrollable">
         {{#each system.skills.active as |skill sid|}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
                 skillPath=(concat "system.skills.active." sid)

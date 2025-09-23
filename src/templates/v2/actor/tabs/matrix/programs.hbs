@@ -3,7 +3,7 @@
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/program/header.hbs'
             label='SR5.Programs'
             type='program' }}
-        <div class="scrollable">
+        <div id="programs-scroll" class="scrollable">
         {{#each itemType.program}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/program/item.hbs' item=this }}
         {{/each}}
