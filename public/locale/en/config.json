@@ -13,6 +13,8 @@
         "AutomateMultiDefenseModifierDescription": "Will automatically apply defense mod for multiple attacks",
         "AutomateProgressiveRecoil": "Automate progressive recoil",
         "AutomateProgressiveRecoilDescription": "Characters accrue progressive recoil until reset",
+        "CompendiumBrowserBlacklist": "Compendium Browser Blacklist",
+        "CompendiumBrowserBlacklistDescription": "List of compendiums to hide from the compendium browser",
         "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
         "DefaultOpposedTestActorSelectionDescription": "Always overwrite selected tokens with targets used for testing",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",

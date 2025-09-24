@@ -1,3 +1,4 @@
+import { FLAGS, SYSTEM_NAME } from "@/module/constants";
 import { LinksHelpers } from "@/module/utils/links";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -79,7 +80,6 @@ export class CompendiumBrowser extends Base {
     private allFilters: FilterEntry[] = [];
     private packBlackList: string[] = [];
     private _searchQuery: string = "";
-    private _searchCursorPosition: number | null = null;
 
     /** State for virtual scrolling */
     private readonly results = {
@@ -96,6 +96,7 @@ export class CompendiumBrowser extends Base {
     constructor(options?: ConstructorParameters<typeof Base>[0]) {
         super(options);
         this.setFilters();
+        this.packBlackList = game.settings.get(SYSTEM_NAME, FLAGS.CompendiumBrowserBlacklist);
     }
 
     /** Defines the application window's title. */
@@ -195,7 +196,6 @@ export class CompendiumBrowser extends Base {
 
     /** Handles the `input` event on the search field to update the query and re-render results. */
     private _onSearch(event: Event, target: HTMLInputElement) {
-        this._searchCursorPosition = target.selectionStart;
         this._searchQuery = target.value;
         void this.render({ parts: [this.activeTab === "Settings" ? "settings" : "results"] });
     }
@@ -244,6 +244,7 @@ export class CompendiumBrowser extends Base {
                 }
             }
         }
+        void game.settings.set(SYSTEM_NAME, FLAGS.CompendiumBrowserBlacklist, this.packBlackList);
         void this.render({ parts: ["settings"] });
     }
 

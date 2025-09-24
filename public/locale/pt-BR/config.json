@@ -13,6 +13,8 @@
         "AutomateMultiDefenseModifierDescription": "Aplicará automaticamente o modificador de defesa para múltiplos ataques",
         "AutomateProgressiveRecoil": "Automatizar recuo progressivo",
         "AutomateProgressiveRecoilDescription": "Personagens acumulam recuo progressivo até serem reiniciados",
+        "CompendiumBrowserBlacklist": "Lista Negra do Navegador de Compêndio",
+        "CompendiumBrowserBlacklistDescription": "Lista de compêndios a serem ocultados no navegador de compêndios",
         "DefaultOpposedTestActorSelection": "Sobrescrever seleções de token de testes de oposição",
         "DefaultOpposedTestActorSelectionDescription": "Sempre sobrescrever tokens selecionados com alvos usados para testes",
         "FreshColor": "Destacar Apenas com Cor do Texto",

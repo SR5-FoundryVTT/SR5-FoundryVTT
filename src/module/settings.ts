@@ -276,6 +276,15 @@ export const registerSystemSettings = () => {
         type: new foundry.data.fields.AlphaField({ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 } as const),
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.CompendiumBrowserBlacklist, {
+        name: 'SETTINGS.CompendiumBrowserBlacklist.label',
+        hint: 'SETTINGS.CompendiumBrowserBlacklist.hint',
+        scope: 'client',
+        config: false,
+        type: Array,
+        default: []
+    });
+
     /**
      * Select compendia to use for system porpuses like different action packs
      */
