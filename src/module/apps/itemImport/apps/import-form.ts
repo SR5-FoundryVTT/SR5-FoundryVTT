@@ -28,7 +28,7 @@ export class Import extends Application {
 
     private currentParsedFile: string = "";
     private dataFiles: File[] = [];
-    private parsedFiles: string[] = [];
+    private parsedFiles: Set<string> = new Set<string>();
     private supportedDataFiles: string[] = [];
 
     private langDataFile: File | undefined;
@@ -183,9 +183,9 @@ export class Import extends Application {
 
     /**
      * Parse a single file with all applicable importers.
-     * 
+     *
      * A file can contain actors and item documents, as well as both in a single file.
-     * 
+     *
      * @param xmlSource The XML source as string.
      * @param fileName The XML file name. Only imported supporting this file will be considered.
      * @param setIcons Wether or not to apply system icons to the imported documents.
@@ -255,10 +255,10 @@ export class Import extends Application {
         getTextForFile: (param: any) => Promise<{ text: string; name: string; } | null>
     ) {
         if (deleteCompendiums)
-            for (const [_, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
+            for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG))
                 await game.packs?.get(compendium.pack)?.deleteCompendium();
 
-        this.parsedFiles = [];
+        this.parsedFiles = new Set<string>();
 
         DataImporter.setIcons = setIcons;
         DataImporter.supportedBooks = this.shadowrunBooks
@@ -282,15 +282,14 @@ export class Import extends Application {
                 const result = await getTextForFile(fileName);
                 if (!result) continue;
                 const { text, name } = result;
-                if (!text) continue;
+                if (!text || this.parsedFiles.has(name)) continue;
 
                 this.currentParsedFile = name;
                 await this.render();
 
                 await this.parseXML(text, name);
 
-                if (!this.parsedFiles.includes(name))
-                    this.parsedFiles.push(name);
+                this.parsedFiles.add(name);
 
                 await this.render();
             } catch (err) {
@@ -312,8 +311,8 @@ export class Import extends Application {
             const setIcons = $('.setIcons').is(':checked');
             const deleteCompendiums = $('.deleteCompendiums').is(':checked');
 
-            const languageText = this.selectedLanguage 
-                ? await this.fetchGitHubFile(`Chummer/lang/${this.selectedLanguage}`) 
+            const languageText = this.selectedLanguage
+                ? await this.fetchGitHubFile(`Chummer/lang/${this.selectedLanguage}`)
                 : undefined;
 
             const getTextForFile = async (fileName: string) => {
@@ -334,7 +333,7 @@ export class Import extends Application {
             const languageText = this.langDataFile
                 ? await this.langDataFile.text()
                 : undefined;
-            
+
             const getTextForFile = async (fileName: string) => {
                 const file = this.dataFiles.find(f => f.name === fileName);
                 if (!file) return null;
