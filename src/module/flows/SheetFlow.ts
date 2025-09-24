@@ -137,6 +137,7 @@ export const SheetFlow = {
         if (!item.isType('weapon')) {
             delete parts['weapon'];
             delete parts['weaponModifications'];
+            delete parts['weaponAmmo'];
         }
     },
 

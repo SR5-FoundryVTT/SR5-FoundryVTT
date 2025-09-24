@@ -1,0 +1,13 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/weapon-ammo/header.hbs'
+            label='SR5.Weapon.Ammo'
+            type='ammo'
+        }}
+        <div class="scrollable">
+            {{#each @root.ammunition}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/weapon-ammo/item.hbs' item=this }}
+            {{/each}}
+        </div>
+    </div>
+</section>

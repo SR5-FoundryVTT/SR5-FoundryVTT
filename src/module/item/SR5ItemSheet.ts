@@ -164,6 +164,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             templates: SheetFlow.templateListItem('weapon-modification'),
             scrollable: ['.scrollable']
         },
+        weaponAmmo: {
+            template: SheetFlow.templateBase('item/tabs/weapon-ammo'),
+            templates: SheetFlow.templateListItem('weapon-ammo'),
+            scrollable: ['.scrollable']
+        },
         action: {
             template: SheetFlow.templateBase('item/tabs/action'),
             scrollable: ['.scrollable']
@@ -218,6 +223,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'program', label: 'Program', cssClass: '' },
                 { id: 'weapon', label: 'Weapon', cssClass: '' },
                 { id: 'weaponModifications', label: 'WeaponMods', cssClass: '' },
+                { id: 'weaponAmmo', label: 'WeaponAmmo', cssClass: '' },
                 { id: 'adeptPower', label: 'AdeptPower', cssClass: '' },
                 { id: 'spell', label: 'Spell', cssClass: '' },
                 { id: 'armor', label: 'Armor', cssClass: '' },

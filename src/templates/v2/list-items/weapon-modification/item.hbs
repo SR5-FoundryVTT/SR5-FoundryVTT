@@ -1,14 +1,16 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container">
-    {{log item}}
-    <div class="new-list-item" data-item-id="{{item._id}}">
+    <div class="new-list-item" data-item-id="{{item.id}}">
         <div class="new-list-item-label-container">
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
-            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-            <label
-                class="{{#if system.importFlags.isFreshImport}}
-                        {{#if (itemMarking "COLOR")}}fresh-import{{/if}}
-                    {{/if}}">
+            <a data-action="rollItem"
+               data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}">
+
+                <img src="{{item.img}}"
+                     class="new-list-item-image {{#if (hasRoll item)}}new-list-item-image-roll{{else}}new-list-item-image-info{{/if}}"
+                     height="24px"
+                     width="24px" />
+            </a>
+            <label>
                 {{!-- allow overriding the name if provided --}}
                 <a data-action="showItemDescription">
                     {{#if name}}
@@ -37,10 +39,30 @@
         </div>
 
         <div class="new-list-item-icons">
-            <a data-action="equipItem" data-item-id="{{this.uuid}}">
-                <i   class="{{#if this.system.technology.equipped}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
+            <a data-action="equipItem">
+                <i   class="{{#if item.system.technology.equipped}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
             </a>
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
+            {{#if (canBeWireless item)}}
+                {{#if (isBroken item)}}
+                    <a data-tooltip="SR5.Broken" data-action="repairBrokenItem">
+                        <i
+                           class="fas fa-link-slash"></i>
+                    </a>
+                {{else}}
+                    <a data-action="toggleItemWireless">
+                        <i
+                           data-item-id="{{item.id}}"
+                            {{#if (isRunningSilent item)}}
+                           class="fa-duotone fa-wifi-fair"
+                            {{else if (isWireless item)}}
+                           class="fas fa-wifi"
+                            {{else}}
+                           class="fas fa-wifi-slash"
+                            {{/if}}
+                        ></i>
+                    </a>
+                {{/if}}
+            {{/if}}
         </div>
     </div>
     <div class="new-list-item-description">
