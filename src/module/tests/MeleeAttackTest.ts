@@ -33,7 +33,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.hbs';
+        return 'systems/shadowrun5e/templates/apps/dialogs/melee-attack-test-dialog.hbs';
     }
 
     override get showSuccessLabel(): boolean {

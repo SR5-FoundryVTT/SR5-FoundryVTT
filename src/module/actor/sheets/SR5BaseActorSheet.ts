@@ -201,7 +201,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * @override
      */
     override get template() {
-        const path = 'systems/shadowrun5e/dist/templates';
+        const path = 'systems/shadowrun5e/templates';
 
         // v10 actor.limited doesn't take GM into account, so we have to do it ourselves.
         if (!game.user?.isGM && this.actor.limited) {

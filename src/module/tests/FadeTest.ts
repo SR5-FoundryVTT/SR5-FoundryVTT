@@ -37,11 +37,11 @@ export class FadeTest extends SuccessTest<FadeTestData> {
     }
 
     override get _dialogTemplate() {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/fade-test-dialog.hbs';
+        return 'systems/shadowrun5e/templates/apps/dialogs/fade-test-dialog.hbs';
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/fade-test-message.hbs';
+        return 'systems/shadowrun5e/templates/rolls/fade-test-message.hbs';
     }
 
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {

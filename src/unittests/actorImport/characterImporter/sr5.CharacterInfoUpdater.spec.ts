@@ -1,6 +1,6 @@
-import { SR5TestFactory } from 'src/unittests/utils';
+import { SR5TestFactory } from '@/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { CharacterImporter } from '../../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
+import { CharacterImporter } from '@/module/apps/importer/actorImport/characterImporter/CharacterImporter';
 
 export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -10,7 +10,9 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
     let importOptions = {};
     let chummerFile;
 
-    after(async () => { factory.destroy(); });
+    after(async () => {
+        factory.destroy();
+    });
 
     beforeEach(async () => {
         chummerFile = {

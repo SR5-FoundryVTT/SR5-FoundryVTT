@@ -24,7 +24,7 @@ export const MatrixSheetFlow = {
             content: '',
             default: 'cancel',
             templateData: {},
-            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.hbs'
+            templatePath: 'systems/shadowrun5e/templates/apps/dialogs/reboot-confirmation-dialog.hbs'
         }
         const options = {
             classes: ['sr5', 'form-dialog'],

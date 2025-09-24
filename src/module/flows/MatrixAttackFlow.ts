@@ -54,7 +54,7 @@ export const MatrixAttackFlow = {
      */
     async sendFailedAttackActionMessage(templateData) {
         const content = await foundry.applications.handlebars.renderTemplate(
-            'systems/shadowrun5e/dist/templates/chat/matrix-failed-attack-action.hbs',
+            'systems/shadowrun5e/templates/chat/matrix-failed-attack-action.hbs',
             templateData,
         );
         const messageData = { content, speaker: templateData.speaker };

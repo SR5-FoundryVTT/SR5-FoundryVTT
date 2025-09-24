@@ -1,14 +1,16 @@
-import { SR5TestFactory } from 'src/unittests/utils';
+import { SR5TestFactory } from '@/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { ActorFile, ActorSchema } from 'src/module/apps/importer/actorImport/ActorSchema';
-import { CharacterImporter } from '../../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
+import { ActorFile, ActorSchema } from '@/module/apps/importer/actorImport/ActorSchema';
+import { CharacterImporter } from '@/module/apps/importer/actorImport/characterImporter/CharacterImporter';
 
 export const characterImporterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => {
+        factory.destroy();
+    });
 
     const importOptions = {};
     const chummerFile = {
@@ -62,7 +64,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             const item = await factory.createItem({ type: 'action' });
             const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
             await character.createEmbeddedDocuments('Item', [item]);
-            
+
             assert.lengthOf(character.items, 1);
 
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
@@ -74,15 +76,17 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
 
         it('Clears all items but effects', async () => {
             const item = await factory.createItem({ type: 'weapon' });
-            void item.createEmbeddedDocuments('ActiveEffect', [{
-                origin: item.uuid,
-                disabled: false,
-                name: 'Test Effect',
-                changes: [
-                    { key: 'system.attributes.body.mod', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
-                    { key: 'system.attributes.body', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
-                ]
-            }]);
+            void item.createEmbeddedDocuments('ActiveEffect', [
+                {
+                    origin: item.uuid,
+                    disabled: false,
+                    name: 'Test Effect',
+                    changes: [
+                        { key: 'system.attributes.body.mod', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                        { key: 'system.attributes.body', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    ],
+                },
+            ]);
             const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
             await character.createEmbeddedDocuments('Item', [item]);
             await new CharacterImporter().importChummerCharacter(character, chummerFile, importOptions);
@@ -90,7 +94,6 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.lengthOf(character.items, 1);
             assert.strictEqual(character.items.contents[0].name, item.name);
             assert.strictEqual(character.items.contents[0].type, item.type);
-
         });
     });
 };

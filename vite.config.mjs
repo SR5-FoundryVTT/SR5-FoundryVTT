@@ -1,0 +1,32 @@
+import { defineConfig } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
+import foundryVTT from 'vite-plugin-fvtt';
+
+export default defineConfig({
+    plugins: [
+        tsconfigPaths(),
+        foundryVTT(),
+        // note that we do not need to copy the system.json, as the
+        // fvtt plugin handles this
+        viteStaticCopy({
+            targets: [
+                { src: 'LICENSE', dest: '' },
+                { src: 'README.md', dest: '' },
+                { src: 'README-DEV.md', dest: '' },
+            ],
+        }),
+    ],
+    build: {
+        // target: 'esnext', // let vite autotarget for compat?
+        lib: { entry: './src/module/main.ts' },
+    },
+    css: { preprocessorOptions: { scss: { api: 'modern-compiler' } } },
+    // tsconfigPaths works for normal imports, but dynamic imports (for code-splitting)
+    // don’t resolve aliases correctly, for whatever reason, so we need an explicit alias here
+    resolve: {
+        alias: {
+            '@': '/src',
+        },
+    },
+});

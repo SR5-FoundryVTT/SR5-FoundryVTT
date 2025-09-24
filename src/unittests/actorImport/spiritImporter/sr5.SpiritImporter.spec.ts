@@ -1,16 +1,17 @@
 import { emptySpirit } from './spirits';
-import { SR5TestFactory } from 'src/unittests/utils';
+import { SR5TestFactory } from '@/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { SpiritImporter } from '../../../module/apps/importer/actorImport/spiritImporter/SpiritImporter';
-
+import { SpiritImporter } from '@/module/apps/importer/actorImport/spiritImporter/SpiritImporter';
 
 export const spiritImporterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
     const { describe, it, beforeEach, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
-    
+    after(async () => {
+        factory.destroy();
+    });
+
     beforeEach(async () => {
         chummerFile = structuredClone(emptySpirit);
     });

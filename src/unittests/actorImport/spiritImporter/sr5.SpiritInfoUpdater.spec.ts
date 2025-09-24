@@ -1,15 +1,17 @@
 import { emptySpirit } from './spirits';
-import { SR5TestFactory } from 'src/unittests/utils.js';
+import { SR5TestFactory } from '@/unittests/utils.js';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { SpiritImporter } from '../../../module/apps/importer/actorImport/spiritImporter/SpiritImporter.js';
+import { SpiritImporter } from '@/module/apps/importer/actorImport/spiritImporter/SpiritImporter.js';
 
 export const spiritInfoUpdaterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
     const { describe, it, beforeEach, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
-    
+    after(async () => {
+        factory.destroy();
+    });
+
     beforeEach(async () => {
         chummerFile = structuredClone(emptySpirit);
     });
@@ -47,7 +49,7 @@ export const spiritInfoUpdaterTesting = (context: QuenchBatchContext) => {
                         attribute: [
                             {
                                 name_english: 'MAG',
-                                total: '3'
+                                total: '3',
                             },
                         ],
                     },
