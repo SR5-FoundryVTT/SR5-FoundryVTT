@@ -1,0 +1,191 @@
+// -----------------------------------------------------------------------------
+// SCSS Component File: SR5 Surface Styles
+//
+// Purpose:
+// - Defines the base visual appearance and layout within the `.sr5` scope.
+// - Sets default typography, colors, spacing, and element styles for the SR5 system.
+// - Provides a consistent and clean “surface” layer for all SR5 UI components.
+//
+// Scope:
+// - All styles are strictly scoped under the `.sr5` class to avoid conflicts.
+// - Contains foundational theming and design tokens usage (colors, fonts, etc.).
+// - Does NOT override Foundry global defaults (handled separately).
+//
+// Examples:
+// - Setting default font-family, font-weight, and text color inside `.sr5`
+// - Resetting margins and paddings on headings, paragraphs, and links scoped to `.sr5`
+// -----------------------------------------------------------------------------
+
+@use '../config';
+
+.sr5 {
+    @include config.use-font($weight: 'default');
+    color: var(--sr5-text);
+    --color-scrollbar: var(--sr5-action);
+}
+
+// have a different, proper reset for AppV2
+// to not rely on foundries defaults
+// reset inspired by tailwindcss, needs to merge
+// to also reset foundry default styles
+.#{config.$base-class} {
+    @include config.use-font($weight: 'default');
+    @include config.font-size($px: 16, $lh: auto);
+    tab-size: 4;
+    color: var(--sr5-text);
+
+    // iOS orientation fixes
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+
+    // overwrite some foundry specific variables
+    --color-scrollbar: var(--sr5-action);
+
+    // remove all margins, paddings, and spacing from borders
+    // to prevent them affecting element width
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        border: 0 solid;
+    }
+
+    // reset headings
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-size: inherit;
+        font-weight: inherit;
+    }
+
+    // reset links
+    a {
+        color: inherit;
+        -webkit-text-decoration: inherit;
+        text-decoration: inherit;
+    }
+
+    // edge and safari fix for bold
+    b,
+    strong {
+        font-weight: bolder;
+    }
+
+    code,
+    kbd,
+    samp,
+    pre {
+        @include config.use-font($family: 'mono', $weight: default);
+        font-size: 1rem;
+    }
+
+    // fix small size
+    small {
+        font-size: 80%;
+    }
+
+    // chrome and safari fixes, mostly.
+    table {
+        text-indent: 0;
+        border-color: inherit;
+        border-collapse: collapse;
+    }
+
+    // firefox focusing
+    :-moz-focusring {
+        outline: auto;
+    }
+
+    // chrome and safari fixes
+    summary {
+        display: list-item;
+    }
+
+    // remove list styling by default
+    ol,
+    ul,
+    menu {
+        list-style: none;
+    }
+
+    img,
+    svg,
+    video,
+    canvas,
+    audio,
+    embed,
+    object {
+        display: block;
+        vertical-align: middle;
+    }
+
+    // Constrain images and videos to the parent width and preserve their intrinsic aspect ratio.
+    img,
+    video {
+        max-width: 100%; // foundry only calls this on img
+        height: auto;
+    }
+
+    // consistency in all browsers
+    button,
+    input,
+    select,
+    optgroup,
+    textarea,
+    ::file-selector-button {
+        font: inherit;
+        font-feature-settings: inherit;
+        font-variation-settings: inherit;
+        letter-spacing: inherit;
+        color: inherit;
+        border-radius: 0;
+        background-color: transparent;
+        opacity: 1;
+    }
+
+    // restore forms of things we removed
+    :where(select:is([multiple], [size])) optgroup {
+        font-weight: bolder;
+    }
+
+    :where(select:is([multiple], [size])) optgroup option {
+        padding-inline-start: 20px;
+    }
+
+    ::file-selector-button {
+        margin-inline-end: 4px;
+    }
+
+    // iOS fix
+    button,
+    input:where([type='button'], [type='reset'], [type='submit']),
+    ::file-selector-button {
+        appearance: button;
+    }
+
+    // prestyle placeholders
+    ::placeholder {
+        opacity: 1;
+        color: var(--sr5-text-subtle);
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    ::-webkit-search-decoration {
+        -webkit-appearance: none;
+    }
+
+    // hide elements with the hidden attribute
+    [hidden] {
+        display: none;
+    }
+}

@@ -1,0 +1,189 @@
+// -----------------------------------------------------------------------------
+// SCSS Theme File
+//
+// Purpose:
+// - Centralizes theme-related variables and visual tokens.
+// - Defines the color palettes, shadows, gradients, and other design foundations.
+// - Generates CSS custom properties for use throughout the system.
+//
+// Scope:
+// - Provides a flexible, extensible system for managing light/dark modes and theme variants.
+// - Supplies consistent visual language through reusable tokens and color maps.
+// - Does not contain layout or component-specific styles; those belong elsewhere.
+//
+// Usage:
+// - Maps abstract color concepts to usable CSS custom properties.
+// - Supports dynamic adjustments and mode switching through conditional variables.
+// - Integrates asset references used in backgrounds or visual effects.
+//
+// Notes:
+// - CSS custom properties defined here should be scoped globally or within high-level selectors.
+// - This file focuses on visual design data, not structural or behavioral CSS rules.
+// -----------------------------------------------------------------------------
+
+@use 'functions';
+@use 'sass:color';
+
+// shadow is always black
+$shadow: black;
+
+$color-scheme: (
+    // primary highlight color in dark mode
+    'primary': functions.createColorMap(oklch(80% 0.15 85)),
+    // secondary accent color in dark mode
+    'secondary': functions.createColorMap(oklch(30% 0.15 25)),
+    // neutral color palette, slight chroma, to give it life
+    // started with a warm orange, but that did not work,
+    // changed to be complementary of hue 55
+    'neutral': functions.createColorMap(oklch(10% 0.015 235)),
+    // use it for magic related things
+    'magic': functions.createColorMap(oklch(50% 0.15 325)),
+    // matrix green, use it for matrix colors but also
+    // for success states
+    'matrix': functions.createColorMap(oklch(50% 0.15 170)),
+    // use for stun damage, or indicating something
+    // is purely mental, otherwise use the color for
+    // info states
+    'mental': functions.createColorMap(oklch(50% 0.15 210)),
+    // use for error or meatspace related things
+    'physical': functions.createColorMap(oklch(50% 0.15 10)),
+    // complement of neutral but with chroma / more color,
+    // use for overflow damage or warnings
+    'overflow': functions.createColorMap(oklch(50% 0.15 55))
+);
+
+// new properties could be scoped to .sr5 classes, however since we do not
+// universally apply .sr5 to all content that should be styled, we instead
+// use :root --sr5-varname properties.
+body {
+    // shadowrun-related colors
+    --sr5-color-stun-strong: #{functions.getColor($color-scheme, 'mental', 450)};
+    --sr5-color-stun: #{functions.getColor($color-scheme, 'mental', 600)};
+    --sr5-color-stun-subtle: #{functions.getColor($color-scheme, 'mental', 750)};
+
+    --sr5-color-physical-strong: #{functions.getColor($color-scheme, 'physical', 450)};
+    --sr5-color-physical: #{functions.getColor($color-scheme, 'physical', 600)};
+    --sr5-color-physical-subtle: #{functions.getColor($color-scheme, 'physical', 750)};
+
+    --sr5-color-overflow-strong: #{functions.getColor($color-scheme, 'overflow', 450)};
+    --sr5-color-overflow: #{functions.getColor($color-scheme, 'overflow', 600)};
+    --sr5-color-overflow-subtle: #{functions.getColor($color-scheme, 'overflow', 750)};
+
+    --sr5-color-matrix-strong: #{functions.getColor($color-scheme, 'matrix', 450)};
+    --sr5-color-matrix: #{functions.getColor($color-scheme, 'matrix', 600)};
+    --sr5-color-matrix-subtle: #{functions.getColor($color-scheme, 'matrix', 750)};
+
+    --sr5-color-magic-strong: #{functions.getColor($color-scheme, 'magic', 450)};
+    --sr5-color-magic: #{functions.getColor($color-scheme, 'magic', 600)};
+    --sr5-color-magic-subtle: #{functions.getColor($color-scheme, 'magic', 750)};
+
+    --sr5-color-edge-strong: #{functions.getColor($color-scheme, 'primary', 450)};
+    --sr5-color-edge: #{functions.getColor($color-scheme, 'primary', 600)};
+    --sr5-color-edge-subtle: #{functions.getColor($color-scheme, 'primary', 750)};
+
+    // ui colors
+    --sr5-text-strong: #{functions.getColor($color-scheme, 'neutral', 100)};
+    --sr5-text: #{functions.getColor($color-scheme, 'neutral', 300)};
+    --sr5-text-subtle: #{functions.getColor($color-scheme, 'neutral', 500)};
+
+    --sr5-accent-strong: #{functions.getColor($color-scheme, 'secondary', 200)};
+    --sr5-accent: #{functions.getColor($color-scheme, 'secondary', 300)};
+    --sr5-accent-subtle: #{functions.getColor($color-scheme, 'secondary', 400)};
+
+    --sr5-action-strong: #{functions.getColor($color-scheme, 'primary', 500)};
+    --sr5-action: #{functions.getColor($color-scheme, 'primary', 600)};
+    --sr5-action-subtle: #{functions.getColor($color-scheme, 'primary', 700)};
+
+    --sr5-neutral-strong: #{functions.getColor($color-scheme, 'neutral', 300)};
+    --sr5-neutral: #{functions.getColor($color-scheme, 'neutral', 400)};
+    --sr5-neutral-subtle: #{functions.getColor($color-scheme, 'neutral', 500)};
+
+    --sr5-border-default-strong: #{functions.getColor($color-scheme, 'neutral', 800)};
+    --sr5-border-default: #{functions.getColor($color-scheme, 'neutral', 700)};
+    --sr5-border-default-subtle: #{functions.getColor($color-scheme, 'neutral', 600)};
+
+    --sr5-border-variant-strong: #{functions.getColor($color-scheme, 'secondary', 200)};
+    --sr5-border-variant: #{functions.getColor($color-scheme, 'secondary', 300)};
+    --sr5-border-variant-subtle: #{functions.getColor($color-scheme, 'secondary', 400)};
+
+    --sr5-surface: #{functions.getColor($color-scheme, 'neutral', 900)};
+    --sr5-surface-high: #{functions.getColor($color-scheme, 'neutral', 800)};
+    --sr5-surface-highest: #{functions.getColor($color-scheme, 'neutral', 700)};
+
+    --sr5-backdrop: #{functions.asset('light-page.webp')};
+
+    // legacy support, should be culled asap
+    // used in too many different places to cull without
+    // transistioning the scss to the component system
+    // so cull will happen post V2 migration
+    --sr5-control-background: #{color.adjust(functions.getColor($color-scheme, 'neutral', 100), $alpha: -0.9)};
+    --sr5-control-background-inverse: #{color.adjust(functions.getColor($color-scheme, 'neutral', 700), $alpha: -0.9)};
+
+    &.theme-dark {
+        // shadowrun-related colors
+        --sr5-color-stun-strong: #{functions.getColor($color-scheme, 'mental', 550)};
+        --sr5-color-stun: #{functions.getColor($color-scheme, 'mental', 400)};
+        --sr5-color-stun-subtle: #{functions.getColor($color-scheme, 'mental', 250)};
+
+        --sr5-color-physical-strong: #{functions.getColor($color-scheme, 'physical', 550)};
+        --sr5-color-physical: #{functions.getColor($color-scheme, 'physical', 400)};
+        --sr5-color-physical-subtle: #{functions.getColor($color-scheme, 'physical', 250)};
+
+        --sr5-color-overflow-strong: #{functions.getColor($color-scheme, 'overflow', 550)};
+        --sr5-color-overflow: #{functions.getColor($color-scheme, 'overflow', 400)};
+        --sr5-color-overflow-subtle: #{functions.getColor($color-scheme, 'overflow', 250)};
+
+        --sr5-color-matrix-strong: #{functions.getColor($color-scheme, 'matrix', 550)};
+        --sr5-color-matrix: #{functions.getColor($color-scheme, 'matrix', 400)};
+        --sr5-color-matrix-subtle: #{functions.getColor($color-scheme, 'matrix', 250)};
+
+        --sr5-color-magic-strong: #{functions.getColor($color-scheme, 'magic', 550)};
+        --sr5-color-magic: #{functions.getColor($color-scheme, 'magic', 400)};
+        --sr5-color-magic-subtle: #{functions.getColor($color-scheme, 'magic', 250)};
+
+        --sr5-color-edge-strong: #{functions.getColor($color-scheme, 'primary', 550)};
+        --sr5-color-edge: #{functions.getColor($color-scheme, 'primary', 400)};
+        --sr5-color-edge-subtle: #{functions.getColor($color-scheme, 'primary', 250)};
+
+        // ui colors
+        --sr5-text-strong: #{functions.getColor($color-scheme, 'neutral', 950)};
+        --sr5-text: #{functions.getColor($color-scheme, 'neutral', 850)};
+        --sr5-text-subtle: #{functions.getColor($color-scheme, 'neutral', 750)};
+
+        --sr5-accent-strong: #{functions.getColor($color-scheme, 'primary', 950)};
+        --sr5-accent: #{functions.getColor($color-scheme, 'primary', 800)};
+        --sr5-accent-subtle: #{functions.getColor($color-scheme, 'primary', 650)};
+
+        --sr5-action-strong: #{functions.getColor($color-scheme, 'secondary', 500)};
+        --sr5-action: #{functions.getColor($color-scheme, 'secondary', 400)};
+        --sr5-action-subtle: #{functions.getColor($color-scheme, 'secondary', 300)};
+
+        --sr5-neutral-strong: #{functions.getColor($color-scheme, 'neutral', 700)};
+        --sr5-neutral: #{functions.getColor($color-scheme, 'neutral', 600)};
+        --sr5-neutral-subtle: #{functions.getColor($color-scheme, 'neutral', 500)};
+
+        --sr5-border-default-strong: #{functions.getColor($color-scheme, 'neutral', 600)};
+        --sr5-border-default: #{functions.getColor($color-scheme, 'neutral', 500)};
+        --sr5-border-default-subtle: #{functions.getColor($color-scheme, 'neutral', 400)};
+
+        --sr5-border-variant-strong: #{functions.getColor($color-scheme, 'primary', 950)};
+        --sr5-border-variant: #{functions.getColor($color-scheme, 'primary', 800)};
+        --sr5-border-variant-subtle: #{functions.getColor($color-scheme, 'primary', 650)};
+
+        --sr5-surface: #{functions.getColor($color-scheme, 'neutral', 150)};
+        --sr5-surface-high: #{functions.getColor($color-scheme, 'neutral', 250)};
+        --sr5-surface-highest: #{functions.getColor($color-scheme, 'neutral', 350)};
+
+        --sr5-backdrop: linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.6)), #{functions.asset('page.webp')} repeat;
+
+        // legacy support, should be culled asap
+        // used in too many different places to cull without
+        // transistioning the scss to the component system
+        // so cull will happen post V2 migration
+        --sr5-control-background: #{color.adjust(functions.getColor($color-scheme, 'neutral', 900), $alpha: -0.9)};
+        --sr5-control-background-inverse: #{color.adjust(
+                functions.getColor($color-scheme, 'neutral', 300),
+                $alpha: -0.9
+            )};
+    }
+}

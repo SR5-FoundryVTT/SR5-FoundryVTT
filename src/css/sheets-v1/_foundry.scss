@@ -1,0 +1,216 @@
+//
+// Rules related to FoundryVTT styling meant to not be limited to the system id.
+// Everything here will overwrite default Foundry Styling.
+//
+
+//
+// GENERAL ELEMENT STYLING
+//
+
+@use '../config';
+
+blockquote {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: var(--sr5-surface-high);
+}
+
+input[type='text'].display {
+    border: 1;
+}
+
+.settings-sidebar h2 {
+    color: var(--sr5-text);
+}
+
+.display.text.left.document-name {
+    @include config.font-size(24);
+    border: none;
+}
+
+.ProseMirror-selectednode {
+    outline: 0;
+}
+
+.entity-link.content-link {
+    color: var(--sr5-text);
+}
+
+//
+// JOURNAL ENTRY STYLING
+//
+// Journal Entry
+.sheet.journal-entry .journal-entry-content,
+// Journal Entry Page Editor
+.journal-sheet.journal-entry-page .window-content {
+    background: var(--sr5-backdrop);
+}
+
+.sheet.journal-entry .journal-entry-content,
+// Journal Entry Page Editor
+.journal-sheet.journal-entry-page .window-content {
+    // As we only change headers in journal-entires, avoid cross styling outside of it.
+    // This clashed with Weather Control module and others.
+    h1 {
+        color: var(--sr5-action);
+        @include config.font-size(24);
+        border-color: var(--sr5-action);
+    }
+
+    h2 {
+        color: var(--sr5-action);
+        border-color: var(--sr5-action);
+    }
+
+    table {
+        background: var(--sr5-surface-high);
+        @include config.font-size(13);
+        caption{
+            background: inherit;
+            text-align: left;
+            color: var(--sr5-accent);
+            @include config.font-size(16);
+            padding: 9px;
+        }
+    }
+
+    th {
+        padding: 9px;
+        background: var(--sr5-surface);
+        color: var(--sr5-accent);
+        text-align: left;
+    }
+    td{
+        text-align: left;
+        padding: 9px;
+    }
+
+    tr {
+        color: var(--sr5-text);
+    }
+
+    tr:nth-child(even) {
+        background-color: var(--sr5-surface-high);
+    }
+
+    tr:first-child th {
+        border-top: 1px solid var(--sr5-accent);
+    }
+
+    tr:first-child th {
+        border-bottom: 1px solid var(--sr5-accent);
+    }
+
+    tr:last-child td {
+        border-bottom: 1px solid var(--sr5-accent);
+    }
+
+    table .content-link {
+        background: none;
+        padding: 0px;
+        border: 0px;
+    }
+}
+
+.sheet.journal-entry .journal-entry-pages {
+    margin: 14px 8px 16px 16px;
+}
+.journal-entry .journal-header {
+    height: 80px;
+    width: 100%;
+    margin: auto;
+}
+.journal-sheet .journal-header .title {
+    // removed the background asset, to better support light mode
+    background: linear-gradient(to right, var(--sr5-action-subtle) 30%, transparent 100%) no-repeat;
+    background-size: 100% var(--font-size-40, 2.5rem), auto;
+    background-position: center, top;
+    border-radius: 0;
+    text-align: left !important;
+    text-indent: 5px;
+    color: var(--sr5-text);
+    border-width: 0;
+    height: 80px;
+}
+
+
+
+.journal-sheet h3 {
+    color: var(--sr5-action);
+}
+
+.journal-sheet option {
+    color: var(--sr5-text);
+}
+
+//
+// Settings Sidebar
+//
+// Links for system information in the settings sidebar.
+#game-details > .system-links {
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+
+    > a[href] {
+        flex: 0;
+        @include config.font-size(12);
+        text-transform: uppercase;
+
+        &:hover {
+            text-shadow: 0 0 8px var(--sr5-action);
+        }
+    }
+}
+// Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
+// otherwise cause issues with custom button styling.
+//
+.form-dialog .window-content .dialog-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.form-dialog .window-content .dialog-buttons > * {
+    flex: 1;
+    &:focus {
+        box-shadow: none;
+        outline: 0.125rem solid var(--sr5-action);
+    }
+}
+
+.dialog-button.remove-token-modifiers-from-scene,
+.dialog-button.remove-modifiers-from-target{
+    background-color: var(--sr5-action-strong);
+}
+.far-right {
+    justify-content: center;
+    right: -150px;
+}
+
+.list-header.item-section[data-item-id="weapon"][data-item-type=""] {
+    color: var(--sr5-accent);
+    @include config.font-size(13);
+}
+
+.common-test{
+    margin-bottom: 4px;
+    margin-top: 4px;
+    color: var(--sr5-text);
+    display: flex;
+    .test-icon {
+        width: 17px;
+        height: 17px;
+        margin-left: 5px;
+        margin-bottom: 0;
+        border: 0;
+    }
+}
+.fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
+{
+    color: var(--sr5-accent-subtle);
+}
+.window-resizable-handle {
+    .fa-solid {
+        transform: rotate(45deg)
+    }
+}

@@ -1,27 +1,38 @@
-@import 'node_modules/@yaireo/tagify/dist/tagify';
+// Comments using /* are forbidden in SCSS files
+// as they are compiled into the css that we bundle
 
-@import 'config';
-@import 'item';
-@import 'actor';
-@import 'chat';
-@import 'test';
-@import 'tagify';
-@import 'modifiers';
-@import 'modifiers-container';
-@import 'foundry';
-@import 'module';
-@import 'effect';
+@use 'config';
+@use 'bootstrap';
+
+// got to remove this, when theming is done fully via variables
+@use 'sass:color';
+
 
 // .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
+// TODO: Refactor html to replace with .roll
 .Roll {
-    @include rollable;
+    @include config.hover-transition($color: var(--sr5-action));
 }
 
-/**
- * These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
- * TODO: This is abusing default FoundryVTT CSS classing, which often can cause default FoundryVTT styling to break.
- */
+//
+// These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
+// TODO: This is abusing default FoundryVTT CSS classing, which often can cause default FoundryVTT styling to break.
+//
 .sr5 {
+    input[type="text"], input[type="number"], input[type="password"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="search"], input[type="file"], select {
+        box-shadow: none;
+        // fix blinking outline
+        outline: none;
+        &:hover, &:focus {
+            outline: none;
+        }
+    }
+
+    *:hover {
+        text-shadow: none;
+        outline: none;
+    }
+
     .flexcol {
         display: flex;
         flex-direction: column;
@@ -93,7 +104,7 @@
     }
 
     .show-situation-modifiers-application {
-        @include rollable;
+        @include config.hover-transition($color: var(--sr5-action));
     }
     .grid-2-col {
         display: grid;
@@ -109,14 +120,14 @@
         padding: 1px !important;
     }
 
-    /* New or updated rules */
+    // New or updated rules
     .license-section .item-text.rtg.rate,
     .license-section .rtg-rate.item-text {
-        /* Updated */
+        // Updated
         margin-left: 0;
         padding-left: 0;
         text-align: left;
-        width: 22px; /* Updated */
+        width: 22px;
     }
     //Header Rating
     .license-section .item-text.rtg.rate-header {
@@ -136,12 +147,12 @@
         max-width: 1em;
     }
     .item-name-field {
-        max-width: 11em; /* Set to your desired max width */
+        max-width: 11em;
     }
 
     .display.left.name-display {
-        width: 100%; /* Takes the maximum width of the parent */
-        max-width: 100%; /* Optional, ensures it doesn't go beyond parent */
+        width: 100%;
+        max-width: 100%;
     }
     // This class is only used for sin license descriptions and seems to be mostly a hack to get the description to better align with the license rating.
     .display.desc-sin {
@@ -154,16 +165,14 @@
     }
 
     .item-text.item-name-header {
-        /* Set to your desired width */
-        max-width: 11em; /* Optional, ensures it doesn't go beyond the set width */
+        max-width: 11em;
     }
 
     .license-section .list-item.item-section .item-text.rtg.rate,
     .license-section .list-item .rtg-rate.item-text {
-        /* Updated */
         flex-basis: calc(25% - 1em);
         text-align: left;
-        width: 22px; /* Updated */
+        width: 22px;
     }
 
     .license-section .list-item.item-section .item-text.desc.detail,
@@ -172,10 +181,9 @@
         text-align: left;
     }
 
-    /* Specifics for the rtg-rate input field */
+    // Specifics for the rtg-rate input field
     .license-section .list-item .rtg-rate.item-text input {
-        /* Updated */
-        width: 22px; /* Updated */
+        width: 22px;
     }
 
     // Specific em
@@ -212,6 +220,19 @@
         display: flex;
         margin: 0.2em;
     }
+
+    // more specifivity hacks
+    a.control, a.control > i, a.document-id-link > i {
+        @include config.hover-transition($color: var(--sr5-action));
+
+        &:hover {
+            text-shadow: none;
+        }
+    }
+
+    .window-resizable-handle {
+        background: var(--sr5-surface-high);
+    }
 }
 
 .align-items-center {
@@ -246,7 +267,7 @@
     position: relative;
 
     .unit {
-        @include textOutline;
+        font-weight: 700;
         position: absolute;
         display: block;
         left: 5px;
@@ -262,17 +283,11 @@ label.checkbox {
     left: 0;
     cursor: pointer;
     user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
 
-    &:hover input ~ .checkmark {
-        text-shadow: 0 0 0.2em $rollcolor;
-    }
 
     &.init-edge-label {
         margin-right: 1.75em;
-        font-size: 0.75em;
+        @include config.font-size(12);
         top: 0.95em;
         left: -0.5em;
     }
@@ -290,25 +305,12 @@ label.checkbox {
 
     .checkmark {
         position: absolute;
-        font-size: 1.25em;
+        @include config.font-size(13); // original 20px, but it always rendered to 13
         top: -0.5em;
         left: 0.8em;
     }
 }
 
-button.plus1_button {
-    padding: 2px;
-    color: $black;
-    line-height: 0;
-    flex: 0;
-    background: rgba($light, 0.1);
-    border-radius: 0.3em;
-    text-align: center;
-
-    &:hover {
-        cursor: pointer;
-    }
-}
 input[type='checkbox'].toggle {
     display: none;
 }
@@ -320,7 +322,7 @@ input[type='checkbox'].toggle {
     max-height: 0;
     overflow-y: auto;
     transition: max-height 0.25s ease-in-out;
-    color: $white;
+    color: var(--sr5-text);
 }
 
 .toggle:checked + .list-item-content + .collapsible-content {
@@ -329,41 +331,41 @@ input[type='checkbox'].toggle {
 //Collapsible End
 input[type='checkbox'].display {
     background: transparent;
-    color: $color;
+    color: var(--sr5-text);
     border: none;
     text-align: center;
-    font-size: 1em;
+    @include config.font-size(16);
 
     &:hover {
         background: transparent;
-        border: $groove;
+        border:  1px solid var(--sr5-border-default);
     }
 }
 
 input[type='text'].disabled-for-display {
-    color: $black;
-    background-color: rgba(0, 0, 0, 0);
+    color: var(--sr5-text-subtle);
+    background-color: transparent;
 }
 
 input[type='text'].display {
-    @include textOutline;
-    background: rgba($light, 0.1);
-    color: $color;
+    font-weight: 700;
+    background: var(--sr5-control-background);
+    color: var(--sr5-text);
     border-radius: 0.3em;
-    border-color: $black;
+    border-color: var(--sr5-border-default);
     text-align: center;
     min-height: 1em;
 
     &::placeholder {
-        color: $light-2;
+        color: var(--sr5-text-subtle);
     }
 
     &.short {
-        font-size: 0.75em;
+        @include config.font-size(12);
     }
 
     &.text {
-        background: rgba($dark, 0.1);
+        background: var(--sr5-control-background-inverse);
         border-radius: 0;
     }
 
@@ -376,7 +378,7 @@ input[type='text'].display {
     }
 
     &:disabled {
-        color: $color;
+        color: var(--sr5-text);
         background: transparent;
         border-color: transparent;
         padding-left: 0;
@@ -401,37 +403,37 @@ input[type='text'].display {
         }
     }
 }
-/**
-     * Special SR5 hr and select display
-     */
+//
+// Special SR5 hr and select display
+//
 .sr5 {
     hr {
-        border-color: $yellow;
+        border-color: var(--sr5-accent);
     }
 
     select.display,
     select {
-        color: $color;
-        background: rgba($black, 0.05);
+        color: var(--sr5-text);
+        background: var(--sr5-surface-high);
         border-radius: 0.3em;
-        border-color: $dark;
+        border-color: var(--sr5-border-default);
 
         > option {
-            background-color: $dark;
+            background-color: var(--sr5-surface-high);
         }
     }
 
-    /**
-     * Overwrite FoundryVTT default styling within sheets.
-     */
+    //
+    // Overwrite FoundryVTT default styling within sheets.
+    //
     .form-group {
         label {
-            color: $white;
+            color: var(--sr5-text);
             font-weight: bold;
         }
 
         input {
-            color: $white;
+            color: var(--sr5-text);
         }
 
         .form-group-element-numerical {
@@ -439,7 +441,7 @@ input[type='text'].display {
             flex-direction: row;
 
             button {
-                border-color: $grey;
+                border-color: var(--sr5-neutral);
             }
 
             button,
@@ -453,44 +455,45 @@ input[type='text'].display {
         }
     }
 
-    /**
-     * Elements used for inline editing
-     */
+    //
+    // Elements used for inline editing
+    //
     .inline-input-inventory {
         display: none;
     }
 
-    /**
-     * Elements used for linkable documents / entities.
-     *
-     * This is also present in foundry.scss, but is overwritten by Monks Enhanced Journals module.
-     * Let's force it within the SR5 context, while leaving it everywhere else.
-     */
+    //
+    // Elements used for linkable documents / entities.
+    //
+    // This is also present in foundry.scss, but is overwritten by Monks Enhanced Journals module.
+    // Let's force it within the SR5 context, while leaving it everywhere else.
+    //
     .entity-link,
     .content-link,
     .inline-roll {
         border: 0;
         background: none;
-        color: $white !important;
+        color: var(--sr5-text) !important;
     }
 
     .entity-link.content-link {
-        color: $white !important;
+        color: var(--sr5-text) !important;
     }
 
     // An origin link is a uuid based entity link, without drag support.
     .origin-link {
-        background: #ddd;
-        padding: 1px 4px;
-        border: 1px solid #4b4a44;
-        border-radius: 2px;
+        background: var(--sr5-surface-highest);
+        font-weight: 600;
+        border: 1px solid var(--sr5-border-default);
+        border-radius: 0.25rem;
         white-space: nowrap;
         word-break: break-all;
-        color: $black;
+        color: var(--sr5-accent-strong);
+        @include config.padding($x: 2, $y: 1);
     }
 
-    .roll {
-        @include rollable;
+    .roll:not(button) {
+        @include config.hover-transition($color: var(--sr5-action));
     }
 
     .editor {
@@ -499,40 +502,40 @@ input[type='text'].display {
     }
 
     .editor .tox-edit-area {
-        background: $mce-background;
+        background: var(--sr5-neutral);
     }
 
     // Styling for any prosemirror editors within shadowrun applications.
     .editor.prosemirror {
         // handles dropdown menus, not select based.
         .pm-dropdown {
-            color: $color;
-            background: rgba($black, 0.05);
+            color: var(--sr5-text);
+            background: var(--sr5-control-background-inverse);
             border-radius: 0.3em;
-            border-color: $dark;
+            border-color: var(--sr5-control-background-inverse);
 
             // Icons like chevron and ticks.
             i,
             i:hover {
-                color: $color;
+                color: var(--sr5-text);
             }
 
             // ul will contain menus and sub-menus and can be nested.
             ul {
-                background-color: $dark;
+                background-color: var(--sr5-surface);
             }
 
             // li represents each menu entry in both menus and sub-menus
             ul > li:hover {
-                color: $color;
-                border-color: rgba($white, 0.1);
-                background: rgba($black, 0.05);
+                color: var(--sr5-text);
+                border-color: var(--sr5-control-background);
+                background: var(--sr5-control-background-inverse);
             }
         }
 
         // HTML editing uses a class-less textarea
         textarea {
-            color: $color;
+            color: var(--sr5-text);
         }
     }
 
@@ -541,7 +544,7 @@ input[type='text'].display {
     }
 
     .parts-list {
-        font-size: 12px;
+        @include config.font-size(12);
         display: flex;
         flex-flow: row wrap;
         justify-content: center;
@@ -575,9 +578,10 @@ input[type='text'].display {
     }
 
     .window-content {
-        @include sheet;
+        background: transparent;
+        color: var(--sr5-text);
         overflow: hidden;
-        border: 1px solid $dark2;
+        border: 1px solid var(--sr5-border-default);
         border-top: 0px;
     }
 
@@ -585,7 +589,7 @@ input[type='text'].display {
         height: 95%;
         min-height: 15em;
         width: 100%;
-        color: $color;
+        color: var(--sr5-text);
     }
 
     .mods-scroll,
@@ -593,7 +597,7 @@ input[type='text'].display {
         margin-bottom: 0.5em;
         flex: 1;
         overflow-y: auto;
-        color: $white;
+        color: var(--sr5-text);
     }
     .flexcontainer-skills {
         display: flex;
@@ -623,7 +627,7 @@ input[type='text'].display {
 
     img {
         box-sizing: border-box;
-        border: 1px solid var(--color-border-dark);
+        border: 1px solid var(--sr5-border-default);
         border-radius: 2px;
         max-width: 100%;
         object-fit: contain;
@@ -633,41 +637,60 @@ input[type='text'].display {
         padding: 0.25em;
         min-width: 80px; // should also have a min width
         max-width: 100px;
-        //border-right: $groove;
-        //border-bottom: $groove;
     }
 
     .tabs {
         flex: 0;
         align-items: stretch; // Make tabs stretch instead of space horizontally.
-        border-bottom: 1px solid $yellow;
+        border-bottom: 1px solid var(--sr5-border-variant);
 
         > a {
             margin: 0.25em;
             padding: 0.25em;
             margin-bottom: 0;
             position: relative;
-            font-size: 1.15em;
-            @include rollable;
+            isolation: isolate;
+            text-shadow: none;
+            font-weight: 600;
+            @include config.font-size(16);
+            @include config.hover-transition($color: var(--sr5-accent-subtle));
+
+            &::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 100%;
+                height: 0;
+                background-color: transparent;
+                transition:
+                    height 250ms linear,
+                    background-color 250ms linear;
+                z-index: -1;
+            }
+
+            &:hover::before,
+            &:focus::before,
+            &.active::before {
+                height: 100%;
+                background-color: var(--sr5-control-background);
+            }
 
             &.active {
-                @include linkHovered;
-                color: $color;
-                // border-color: $black;
-                // border-bottom: 0px;
-                background: rgba($light, 0.1);
+                color: var(--sr5-accent);
             }
         }
 
         > .item {
             // Make tabs stretch across horizontally.
-            color: $white;
+            color: var(--sr5-text);
             flex: 1;
             text-align: center;
         }
     }
     .sheet .editor-content {
-        color: $white;
+        color: var(--sr5-text);
         height: 100%;
         overflow-y: auto;
         word-break: break-word;
@@ -677,11 +700,11 @@ input[type='text'].display {
     }
 
     label.item-text.item-name[for='select-inventory'] {
-        color: $yellow;
+        color: var(--sr5-accent);
     }
 
     label.item-text.item-name {
-        color: $white;
+        color: var(--sr5-text);
     }
 
     .tab {
@@ -705,28 +728,28 @@ input[type='text'].display {
     .split-container {
         display: flex;
         flex-flow: row nowrap;
-        justify-content: center;
         align-items: stretch;
-        align-content: stretch;
         height: 100%;
+        gap: 0.4375rem;
 
         > * {
             flex: 1;
-            width: 100%;
-        }
+            position: relative;
 
-        > *:not(:first-child) {
-            margin-left: 0.25em;
-        }
-
-        > *:not(:last-child) {
-            border-right: $groove;
-            padding-right: 0.25em;
+            &:not(:first-child)::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: -0.21875rem;
+                width: 1px;
+                background: var(--sr5-border-default);
+            }
         }
     }
 
     .container {
-        max-width: $sheet-max-width;
+        max-width: config.$sheet-max-width;
         margin: 0 auto;
 
         &--fluid {
@@ -741,9 +764,9 @@ input[type='text'].display {
         }
 
         // Auto create grid style classes for a fixed max column grid
-        @for $i from 1 through $grid__cols {
+        @for $i from 1 through config.$grid__cols {
             &__col-#{$i} {
-                flex-basis: calc(100 / ($grid__cols / $i)) * 1%;
+                flex-basis: calc(100 / (config.$grid__cols / $i)) * 1%;
                 overflow: hidden;
             }
         }
@@ -789,17 +812,11 @@ input[type='text'].display {
             }
 
             &.border-bottom {
-                border-bottom: $groove;
+                border-bottom:  1px solid var(--sr5-border-default);
             }
 
             &.gap-4 {
-                > :not(:first-child) {
-                    margin-left: 4px;
-                }
-
-                > :not(:last-child) {
-                    margin-right: 4px;
-                }
+                gap: 0.5rem;
             }
         }
     }
@@ -810,21 +827,11 @@ input[type='text'].display {
         justify-content: start;
         padding: 4px;
 
-        &.stun .cell {
-            box-shadow: 0 0 5px 1px rgba($stun, 0.5);
-        }
-
-        &.physical .cell {
-            box-shadow: 0 0 5px 1px rgba($physical, 0.5);
-        }
-
-        &.edge .cell {
-            box-shadow: 0 0 5px 1px rgba($edge, 0.5);
-        }
-
-        &.matrix .cell {
-            box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
-        }
+        @include config.condition-monitor-style('stun', 'sr5-color-stun', 'sr5-color-stun-strong');
+        @include config.condition-monitor-style('physical', 'sr5-color-physical', 'sr5-color-physical-strong');
+        @include config.condition-monitor-style('edge', 'sr5-color-edge', 'sr5-color-edge-strong');
+        @include config.condition-monitor-style('matrix', 'sr5-color-matrix', 'sr5-color-matrix-strong');
+        @include config.condition-monitor-style('overflow', 'sr5-color-overflow', 'sr5-color-overflow-strong');
 
         .roll {
             width: 60px;
@@ -835,35 +842,33 @@ input[type='text'].display {
             display: flex;
             flex-flow: row;
             justify-content: stretch;
+            gap: 0.25rem;
+        }
 
-            .cell {
-                cursor: pointer;
-                text-align: center;
-                font-size: 80%;
-                border: $groove;
-                color: $light-2;
-                border-radius: 4px;
-                background: $black;
-                min-width: 26px;
-                height: 18px;
+        .cell {
+            cursor: pointer;
+            transition:
+                border-color 250ms ease-in-out,
+                box-shadow 250ms ease-in-out;
+            text-align: center;
+            @include config.font-size(11);
+            border:  1px solid var(--sr5-border-default);
+            color: var(--sr5-text-subtle);
+            background: var(--sr5-surface);
+            min-width: 26px;
+            height: 18px;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-                &:not(:first-child) {
-                    margin-left: 2px;
-                }
+            &.filled {
+                background: var(--sr5-neutral-subtle);
+                color: var(--sr5-text);
+            }
 
-                &:not(:last-child) {
-                    margin-right: 2px;
-                }
-
-                &.filled {
-                    background: $light-2;
-                    border-color: $black;
-                    color: $black;
-                }
-
-                &:hover {
-                    border-color: $light;
-                }
+            &:hover {
+                border-color: var(--sr5-text);
             }
         }
     }
@@ -876,19 +881,24 @@ input[type='text'].display {
         flex-flow: column nowrap;
     }
 
+    .list-header .item-text, .item-section .item-text {
+        font-weight: 700;
+    }
+
     .list-header,
     .list-item {
-        font-size: var(--font-size-12);
+        --list-item-min-height: 26px;
+        @include config.font-size(12);
         padding: 0.1em 0.25em;
-        min-height: 26px;
+        min-height: var(--list-item-min-height);
         margin: 0.1em;
-        margin-right: $groove-width;
-        margin-left: $groove-width;
+        margin-inline: 1px;
+
         &.matrix {
-            color: $white;
+            color: var(--sr5-text);
         }
         .has-desc {
-            @include rollable;
+            @include config.hover-transition($color: var(--sr5-action));
         }
 
         &.no-border {
@@ -904,25 +914,18 @@ input[type='text'].display {
         }
 
         &.item-section {
-            background: black;
-            color: $yellow;
+            background: var(--sr5-surface);
+            color: var(--sr5-accent);
             margin-right: 0;
             margin-left: 0;
-            // background: rgba($grey, 0.2);
-            // padding: 0.25em;
-            // border-radius: 0.2em;
-            border-bottom: 1px solid $yellow;
-            border-radius: 0.2em;
+            border-bottom: 1px solid var(--sr5-accent);
             padding-top: 5px;
             &.sprite {
                 background: none;
             }
             &.faded {
-                color: $grey;
+                color: var(--sr5-text-subtle);
             }
-            // &:first-child {
-            //     border-top: 1px solid $yellow;
-            // }
 
             &.subcategory-header {
                 margin-left: 0.5em;
@@ -935,18 +938,23 @@ input[type='text'].display {
         }
 
         .list-item-content {
-            //color: white;
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
             align-items: center;
             align-content: center;
 
+            &:not(.list-header > .list-item-content) {
+                min-height: calc(var(--list-item-min-height) - 0.2em);
+            }
+
             .item-center {
                 display: flex;
                 flex-flow: row nowrap;
                 align-items: center;
                 align-self: center;
+                // Do not let long text overspill
+                overflow: hidden;
             }
 
             .item-left {
@@ -955,8 +963,6 @@ input[type='text'].display {
                 justify-content: flex-start;
                 align-items: center;
                 flex-grow: 1;
-                // Do not let long text overspill
-                overflow: hidden;
             }
 
             .item-right {
@@ -972,11 +978,11 @@ input[type='text'].display {
                 max-width: 50px;
 
                 &.item-roll {
-                    @include rollable;
+                    @include config.hover-transition($color: var(--sr5-action));
 
                     &:hover {
                         > img {
-                            content: url('assets/dice-solid.svg');
+                            content: config.asset('dice-solid.svg');
                             filter: invert(1);
                         }
                     }
@@ -1001,8 +1007,8 @@ input[type='text'].display {
                 flex-flow: row nowrap;
                 justify-content: space-evenly;
                 align-items: center;
-                color: $grey;
-                font-size: 12px;
+                color: var(--sr5-neutral);
+                @include config.font-size(12);
                 height: 100%;
             }
 
@@ -1012,18 +1018,18 @@ input[type='text'].display {
                 flex: 1 0 auto;
                 text-align: center;
                 height: 100%;
-                border: $light;
+                border: var(--sr5-text);
                 padding-right: 10px;
 
                 &.is-broken {
-                    color: $crimson;
+                    color: var(--sr5-color-physical);
                 }
                 &.is-damaged {
-                    color: $yellow;
+                    color: var(--sr5-color-overflow);
                 }
 
                 &.faded {
-                    color: $grey;
+                    color: var(--sr5-text-subtle);
                 }
 
                 &.center {
@@ -1040,10 +1046,10 @@ input[type='text'].display {
                     width: auto;
 
                     &.fresh-import {
-                        color: $freshImportColor;
+                        color: var(--sr5-accent);
                     }
                     &.mods-label {
-                        color: $white;
+                        color: var(--sr5-text);
                     }
                 }
 
@@ -1080,7 +1086,7 @@ input[type='text'].display {
                     width: 16em;
                 }
                 .content-inner {
-                    color: $white;
+                    color: var(--sr5-text);
                 }
             }
 
@@ -1093,46 +1099,45 @@ input[type='text'].display {
             }
 
             &.skill-header {
-                @include rollable;
+                @include config.hover-transition($color: var(--sr5-action));
             }
         }
+
         .selected-list-item {
-            color: $edge;
+            color: var(--sr5-accent);
         }
     }
 
     .list-item:nth-of-type(even) {
-        background: rgba($white, 0.03);
+        background: var(--sr5-control-background);
     }
 
     .list-item-description {
         .item-desc {
             padding: 0.25em;
-            font-size: 1em;
+            @include config.font-size(16);
             width: 100%;
 
             .props {
                 display: flex;
                 flex-flow: wrap row;
-                padding: 0.25em 0;
+                @include config.padding($y: 1);
 
                 > * {
                     flex-shrink: 0;
-                    border-right: $groove;
-                    border-bottom: $groove;
-                    padding: 0.25em 0.5em;
-                    margin: 0.1em 0.25em;
-                    box-shadow: 0.2em 0.2em 0.3em $black;
+                    border: 1px solid var(--sr5-border-default);
+                    background-color: var(--sr5-surface);
+                    border-radius: 0.125rem;
+                    margin: 0.0875rem 0.125rem;
+                    @include config.shadow-elevation(6);
+                    @include config.font-size(14);
+                    @include config.padding($x: 2, $y: 1);
                 }
             }
 
             .description {
-                //border-right: $light 2px solid;
-                // border-top: $light 2px solid;
                 margin: 0.5em 0.25em;
                 padding: 0.5em;
-                // margin-right: 0.5em;
-                //padding-right: 0.5em;
             }
         }
         .item-desc:after {
@@ -1148,15 +1153,15 @@ input[type='text'].display {
         display: contents;
     }
     .modified-target-damage {
-        margin-top: $large-distance;
-        margin-bottom: $large-distance;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
         display: grid;
         grid-template-columns: 40px auto auto;
 
         .modified-target-damage-cell {
             display: flex;
             align-items: center;
-            margin-bottom: $small-distance;
+            margin-bottom: 0.15em;
         }
     }
 
@@ -1166,15 +1171,16 @@ input[type='text'].display {
 
     button,
     button.display {
-        color: $color;
-        border-color: $black;
-        background: rgba($light, 0.1);
-        border-radius: 0.3em;
+        color: var(--sr5-text);
+        border: 1px solid var(--sr5-border-default);
+        background: var(--sr5-surface-high);
+        border-radius: 0.25rem;
         text-align: center;
+        @include config.use-font($weight: 600);
+        @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action-subtle), $border-color: var(--sr5-action-subtle));
 
         &:hover {
-            cursor: pointer;
-            background: $bgrButton;
+            box-shadow: none;
         }
 
         &.short {
@@ -1182,79 +1188,71 @@ input[type='text'].display {
         }
 
         &.light {
-            color: $black;
-            background: $light;
+            background: var(--sr5-action-subtle);
+            @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action), $border-color: var(--sr5-action));
         }
     }
 
     button.display.import-character {
-        color: $color;
-        border-color: $black;
-        background: $dark-sunken;
+        color: var(--sr5-text);
+        border: 1px solid var(--sr5-border-default);
+        background-color: var(--sr5-surface-high);
         border-radius: 0.3em;
         text-align: center;
-
-        &:hover {
-            cursor: pointer;
-        }
+        @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-surface), $border-color: var(--sr5-border-default-strong));
 
         &.short {
             line-height: 1.3em;
         }
 
         &.light {
-            color: $black;
-            background: $light;
+            background: var(--sr5-action-subtle);
+            @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action), $border-color: var(--sr5-action));
         }
     }
     button.display.show-hidden-skills {
-        color: $color;
-        border-color: $black;
-        background: rgb(70, 7, 7);
+        color: var(--sr5-text);
+        border: 1px solid var(--sr5-border-default);
+        background: var(--sr5-action);
         border-radius: 0.3em;
         text-align: center;
-
-        &:hover {
-            cursor: pointer;
-        }
+        @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action-subtle), $border-color: var(--sr5-border-default-strong));
 
         &.short {
             line-height: 1.3em;
         }
 
         &.light {
-            color: $black;
-            background: $light;
+            background: var(--sr5-action-subtle);
+            @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action), $border-color: var(--sr5-action));
         }
     }
 
     button.display.reset-actor-run-data {
-        color: $color;
-        border-color: $black;
-        background: rgb(70, 7, 7);
+        color: var(--sr5-text);
+        border-color: var(--sr5-border-default);
+        border: 1px solid var(--sr5-border-default);
+        background: var(--sr5-action);
         border-radius: 0.3em;
         text-align: center;
-
-        &:hover {
-            cursor: pointer;
-        }
+        @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action-subtle), $border-color: var(--sr5-border-default-strong));
 
         &.short {
             line-height: 1.3em;
         }
 
         &.light {
-            color: $black;
-            background: $light;
+            background: var(--sr5-action-subtle);
+            @include config.hover-transition($color: var(--sr5-text-strong), $background-color: var(--sr5-action), $border-color: var(--sr5-action));
         }
     }
 
-    /** CSS for the Environmental Modifier Application Window
-     *
-     */
+    // CSS for the Environmental Modifier Application Window
+    //
+    //
     button.env-modifier {
         text-align: left;
-        font-size: var(--font-size-13) !important;
+        @include config.font-size(13);
         line-height: normal;
         padding-top: 5px;
         padding-bottom: 5px;
@@ -1262,9 +1260,8 @@ input[type='text'].display {
 
     .env-modifier-active {
         border-radius: 8px;
-        //box-shadow: $dark-sunken-box-shadow;
-        background-color: $darkred; //$dark-sunken;
-        color: $yellow;
+        background-color: var(--sr5-action);
+        color: var(--sr5-accent);
     }
 
     .env-modifier-total {
@@ -1279,69 +1276,79 @@ input[type='text'].display {
         font-style: italic;
     }
 
-    /** Input element for inventory name editing */
+    // Input element for inventory name editing
     input#input-inventory {
         // Otherwise the other classes used will break styling.
         width: auto;
     }
 
     .document-name {
-        @include systemFonts;
-        font-size: var(--font-size-18);
-        font-weight: bold;
+        @include config.font-size(18);
+        font-weight: 700;
     }
 
     .cell-input-roll {
-        color: $yellow;
+        color: var(--sr5-accent);
     }
 
     // Intended to affect icons only within the url/pdf source controls.
     .source-button i.fas {
-        color: $pdfColor;
+        color:  var(--sr5-accent-subtle);
     }
 }
 //END SR5 Style
 
 .custom-item-element {
-    color: $white; /* Text color */
+    color: var(--sr5-text); // Text color
 }
 //lable back to white color
 .matrix-label {
-    color: $white;
+    color: var(--sr5-text);
 }
 
 .scroll-area-matrix {
     overflow-y: auto;
-    color: $white;
+    color: var(--sr5-text);
 }
 
 //table in any Item
 .SR5 th {
-    color: $yellow;
-    padding: 10px; /* Padding */
-    text-align: left; /* Left text */
-    border-bottom: 2px solid $edge; /* Add a border at the bottom */
-    font-size: medium;
+    color: var(--sr5-accent);
+    padding: 10px;
+    text-align: left;
+    border-bottom: 2px solid var(--sr5-color-edge);
+    @include config.font-size(14);
 }
 .SR5 th:hover {
-    color: $pdfColor;
+    color: var(--sr5-accent-subtle);
 }
 .SR5 caption {
     background: none;
-    color: $yellow;
+    color: var(--sr5-accent);
     padding: 6px;
     text-align: left;
-    font-size: medium;
+    @include config.font-size(14);
 }
 .SR5 caption:hover {
-    color: $fDarkRed;
+    color: var(--sr5-action);
 }
 .SR5 tr {
-    color: $white;
+    color: var(--sr5-text);
 }
 .SR5 tr:hover {
-    color: $pdfColor;
+    color: var(--sr5-accent-subtle);
 }
 .SR5 tr p:not(th p) {
-    padding-left: 10px; /* Padding on the left */
+    padding-left: 10px;
+}
+
+/*! purgecss ignore */
+.theme-light .sr5 img[src*="dist/icons"][src$=".svg"] {
+    // convert our white icons to black in .theme-light
+    filter: invert(1);
+}
+
+// specifivity hack... someone needs to clean out the closet
+.theme-light .sr5 .list-item .list-item-content .item-img.item-roll:hover > img {
+    filter: invert(0);
 }

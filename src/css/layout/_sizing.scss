@@ -1,0 +1,88 @@
+// -----------------------------------------------------------------------------
+// Sizing Utilities SCSS File
+//
+// Purpose:
+// - Defines utility classes for setting width, height, and size constraints
+// - Provides a consistent spacing scale based on 0.25rem increments (0–256)
+// - Includes support for keyword-based values (e.g., auto, fit-content, 100%)
+//
+// Usage:
+// - Apply classes like `.w-32`, `.h-fit`, `.size-screen` to control element size
+// - Useful for layout control, containers, and responsive sizing constraints
+//
+// Includes:
+// - width (`.w-*`), height (`.h-*`), min/max constraints, and `.size-*` combos
+// - Keyword values: `auto`, `fit`, `min`, `max`, `full`, `screen`
+// - Numeric scale: 0 to 256 (steps of 0.25rem → max: 64rem)
+//
+// Notes:
+// - All classes follow a consistent naming convention: `prefix-value`
+// - Keep strictly scoped to general-purpose sizing only
+// - Responsive logic or breakpoints should be handled elsewhere
+// -----------------------------------------------------------------------------
+
+$properties: (
+    'w': width,
+    'min-w': min-width,
+    'max-w': max-width,
+    'h': height,
+    'min-h': min-height,
+    'max-h': max-height,
+);
+
+@for $i from 0 through 256 {
+    $value: $i * 0.25rem;
+
+    @each $prefix, $property in $properties {
+        .#{$prefix}-#{$i} {
+            #{$property}: $value;
+        }
+    }
+
+    .size-#{$i} {
+        width: $value;
+        height: $value;
+    }
+}
+
+$keyword-values: (
+    'full': 100%,
+    'fit': fit-content,
+    'max': max-content,
+    'min': min-content,
+    'auto': auto,
+);
+
+@each $keyword, $value in $keyword-values {
+    @each $prefix, $property in $properties {
+        .#{$prefix}-#{$keyword} {
+            #{$property}: $value;
+        }
+    }
+
+    .size-#{$keyword} {
+        width: $value;
+        height: $value;
+    }
+}
+
+.w-screen {
+    width: 100dvw;
+}
+
+.h-screen {
+    height: 100dvh;
+}
+
+.size-screen {
+    width: 100dvw;
+    height: 100dvh;
+}
+
+.max-w-screen {
+    max-width: 100dvw;
+}
+
+.max-h-screen {
+    max-height: 100dvh;
+}

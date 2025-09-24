@@ -1,4 +1,5 @@
-@import 'config';
+@use '../config';
+
 .sr5.item {
     min-height: 484px;
     min-width: 600px;
@@ -26,15 +27,14 @@
         display: flex;
         flex-flow: row nowrap;
         align-items: stretch;
-        // border: $groove;
+
         .item-name {
-            @include systemFonts;
             border: 0px;
             flex: 1;
             height: 60px;
-            font-size: var(--font-size-20);
+            @include config.font-size(20);
             .display {
-                background: $nameplate-background;
+                background: linear-gradient(to right, var(--sr5-action-subtle) 30%, transparent 100%) no-repeat;
                 border: none;
                 height: 35px;
                 margin-top: 11px;
@@ -50,30 +50,25 @@
             height: 2em;
 
             .source-button {
-                color: $light;
-                font-size: 16px;
+                color: var(--sr5-text);
+                @include config.font-size(16);
                 height: 2em;
-                left: .5em;
+                left: 0.5em;
                 padding: 2px;
                 position: absolute;
-                top: .2em;
+                top: 0.2em;
                 width: 2em;
             }
 
             .display {
-                // padding-top: 1em;
-                // padding-bottom: 1em;
-                // padding-top: 2px;
-                // padding-bottom: 0px;
                 height: auto;
                 border: none;
             }
         }
         .item-type {
-            @include systemFonts;
             flex: 0;
             padding: 0 0.5em;
-            color: $color;
+            color: var(--sr5-text);
             display: flex;
             flex-flow: column;
             align-content: center;
@@ -81,7 +76,7 @@
         }
         .item-image {
             max-width: 100px;
-            border-right: $groove;
+            border-right: 1px solid var(--sr5-border-default);
             margin-bottom: 0;
             padding-bottom: 0;
             border: none;
@@ -89,56 +84,57 @@
         .item-info {
             flex: 1;
             > :not(:last-child) {
-                border-bottom: $groove;
+                border-bottom: 1px solid var(--sr5-border-default);
             }
 
             .toggle-fresh-import-off {
                 flex-grow: 0;
-                background-color: $bgrButton;
+                background-color: var(--sr5-action);
             }
         }
     }
     .technology {
-        @include systemFonts;
         min-width: 12em;
         padding-top: 10px;
         padding-left: 10px;
 
         > * {
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: space-between;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
         }
 
         label {
-          color: $yellow;
+            color: var(--sr5-accent);
+            font-weight: 600;
+            @include config.font-size($px: 15, $lh: auto);
         }
 
         .tech-adjustable-label {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
         }
 
         .tech-adjustable-input {
-          flex: 1;
-          position: relative;
+            flex: 1;
+            position: relative;
 
-          input.display {
-            width: 100%;
-          }
+            input.display {
+                width: 100%;
+            }
 
-          .unit {
-            position: absolute;
-            right: 0.5em;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.8em;
-            pointer-events: none;
-          }
+            .unit {
+                position: absolute;
+                right: 0.5em;
+                top: 50%;
+                transform: translateY(-50%);
+                @include config.font-size(11);
+                pointer-events: none;
+            }
         }
-      }
+    }
     .description {
         padding: 2px;
         padding-left: 10px;
@@ -149,13 +145,15 @@
     }
     .item-form {
         padding: 0.5em;
-        &.des{
+        &.des {
             max-width: 14em;
         }
         .header {
-            @include title;
-            font-size: 1.25em;
-            color: $yellow;
+            font-weight: 700;
+            @include config.font-size(16);
+            color: var(--sr5-accent);
+            border-bottom: 1px solid var(--sr5-border-variant);
+            margin-bottom: 0.5rem;
         }
         .form-line {
             display: flex;
@@ -163,18 +161,18 @@
             justify-content: space-between;
             align-content: center;
             padding: 0.1em 0.25em;
-            &.advanced{
-                color: $yellow;
+            &.advanced {
+                color: var(--sr5-accent);
             }
             > * {
                 flex: 1;
             }
             .label {
-                color: $light;
-                font-size: 1.15em;
-                @include systemFonts;
-                &.advanced{
-                    color: $yellow;
+                color: var(--sr5-text);
+                @include config.font-size(15);
+                font-weight: 600;
+                &.advanced {
+                    color: var(--sr5-accent);
                 }
             }
             .inputs {
@@ -182,7 +180,7 @@
                 flex-flow: row;
                 justify-content: flex-end;
                 align-items: center;
-                font-size: 0.75em;
+                @include config.font-size(14);
                 &.between {
                     justify-content: space-between;
                 }
@@ -203,55 +201,68 @@
                 }
             }
             select {
-                color: $color;
-                background: rgba($black, 0.05);
+                color: var(--sr5-text);
+                background: var(--sr5-control-background-inverse);
                 border-radius: 0.3em;
-                border-color: $dark;
+                border-color: var(--sr5-border-default);
                 > option {
-                    background-color: $dark;
+                    background-color: var(--sr5-surface);
                 }
             }
             input {
-                color: $color;
-                background: rgba($black, 0.05);
+                color: var(--sr5-text);
+                background: var(--sr5-control-background-inverse);
                 border-radius: 0.3em;
-                border-color: $dark;
+                border-color: var(--sr5-border-default);
             }
             label {
-                color: $yellow;
+                color: var(--sr5-accent);
             }
         }
     }
 
-    /** Header Removal **/
-
     &.sheet.window-app {
-        box-shadow: 0 0 10px 0px rgba(235,181,49,0.3);
+        @include config.shadow-elevation(10);
+        background: var(--sr5-backdrop);
+        border: 1px solid var(--sr5-border-default-subtle);
+        box-sizing: border-box;
 
         & .window-header {
             border-bottom: none;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
             background-repeat: repeat;
             background-size: 100% 20px auto;
             flex: 0 0 20px;
-            padding: 0 3px 0 0;
+            @include config.padding($x: 2);
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
 
             & a {
-            display: inline-flex;
-            padding: 6px 0 0 0;
-            font-size: 0px;
-            color: rgb(100, 100, 100);
+                display: inline-flex;
+                padding: 6px 0 0 0;
+                font-size: 0;
+                color: var(--sr5-neutral-subtle);
 
-            & .fa-solid,
+                & .fa-solid,
                 & .fas {
-                    font-size: 12px;
+                    @include config.font-size(12);
                 }
             }
 
             & .window-title {
-            font-size: 0;
+                font-size: 0;
+
+                a {
+                    margin-left: 0.25rem;
+                }
+            }
+        }
+
+        &.minimized .window-header .window-title {
+            font-size: inherit;
+            @include config.use-font($weight: 600);
+
+            a {
+                margin-left: 0.5rem;
             }
         }
     }

@@ -1,0 +1,52 @@
+// -----------------------------------------------------------------------------
+// Spacing Utilities SCSS File
+//
+// Purpose:
+// - Contains all spacing-related utility classes
+// - Centralizes CSS helpers for consistent margins, paddings and gaps
+// - Provides a minimal and consistent utility set for managing space
+//
+// Usage:
+// - Use utility classes to apply margins in a direction-agnostic way
+// - 'mx-' for horizontal margins (margin-inline)
+// - 'my-' for vertical margins (margin-block)
+// - 'mt-', 'mb-', 'ml-', 'mr-' for physical margins (margin-top, etc.)
+// -----------------------------------------------------------------------------
+
+$keys: (
+    // Margins
+    'mx': margin-inline,
+    'my': margin-block,
+    'mt': margin-top,
+    'mb': margin-bottom,
+    'ml': margin-left,
+    'mr': margin-right,
+    'm': margin,
+
+    // Paddings
+    'px': padding-inline,
+    'py': padding-block,
+    'pt': padding-top,
+    'pb': padding-bottom,
+    'pl': padding-left,
+    'pr': padding-right,
+    'p': padding,
+
+    // Gaps
+    'gap': gap
+);
+
+@for $step from 0 through 9 {
+    $spacing: $step * 0.25rem;
+    $negative-spacing: $step * -0.25rem;
+
+    @each $key, $value in $keys {
+        .#{$key}-#{$step} {
+            #{$value}: $spacing;
+        }
+
+        .-#{$key}-#{$step} {
+            #{$value}: $negative-spacing;
+        }
+    }
+}

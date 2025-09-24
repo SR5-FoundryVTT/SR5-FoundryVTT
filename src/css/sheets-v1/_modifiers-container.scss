@@ -1,13 +1,14 @@
-/**
- * Rules around the value modifier pop up that's shown for Value style data structures like Attributes, Skills, etc.
- */
+//
+// Rules around the value modifier pop up that's shown for Value style data structures like Attributes, Skills, etc.
+//
+@use '../config';
+
 .sr5 .value {
     >.value-modifiers-container {
         display: none;
         visibility: hidden;
 
         position: absolute;
-        /* We WILL be on top! */
         z-index: 2147483647;
 
         opacity: 0;
@@ -23,29 +24,29 @@
     .value-modifiers {
         display: grid;
         grid-template-columns: 200px 50px;
-        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
-        border: 1px solid $dark;
+        background: var(--sr5-backdrop);
+        border: 1px solid var(--sr5-border-default);
         padding: 0.5em 0.5em 0.5em 0.5em;
         text-align: left;
         font-weight: normal;
 
         >.value-modifier-name {
-            font-weight: bold;
+            font-weight: 600;
         }
 
         >.value-modifiers-base {
-            border-bottom: 1px solid $yellow;
-            color: $white;
+            border-bottom: 1px solid var(--sr5-accent);
+            color: var(--sr5-text);
         }
 
         >.value-modifiers-modifier {
-            color: $white;
+            color: var(--sr5-text);
         }
 
         >.value-modifiers-total {
-            font-weight: bold;
-            border-top: 1px double $yellow;
-            color: $white;
+            font-weight: 600;
+            border-top: 1px double var(--sr5-accent);
+            color: var(--sr5-text);
         }
 
         >.value-modifiers-invalid-total {

@@ -1,0 +1,57 @@
+//
+// Progress Bar Component
+//
+// A div-based progress bar styled with CSS custom properties for
+// flexibility and consistency. Uses ARIA attributes for accessibility.
+// We use <div> over <progress> due to it not being uniformly defined
+// accross multiple browsers, so aria-labeling is the preferred method.
+// The property --value goes from 0 to 100, and sets the completion.
+//
+// Usage Example:
+//
+// <div
+//     class="progress"
+//     role="progressbar"
+//     aria-valuenow="75"
+//     aria-valuemin="0"
+//     aria-valuemax="100"
+//     style="--value: 75"
+// ></div>
+
+@use '../config';
+
+.#{config.$base-class} .progress {
+    --progress-border-height: 0.125rem;
+    --progress-bar-height-ratio: 3; // height of the progress bar in terms of border-height
+    --value: 0;
+
+    position: relative;
+    height: calc(var(--progress-border-height) * (4 + var(--progress-bar-height-ratio)));
+    border: var(--progress-border-height) solid var(--sr5-action);
+    padding: var(--progress-border-height);
+
+    &::before {
+        content: '';
+        display: block;
+        height: calc(var(--progress-border-height) * var(--progress-bar-height-ratio));
+        width: clamp(0%, calc(var(--value) * 1%), 100%);
+        transition: width 250ms ease-in-out;
+        background: var(--sr5-action);
+    }
+
+    &.subtle {
+        border-color: var(--sr5-action-subtle);
+
+        &::before {
+            background-color: var(--sr5-action-subtle);
+        }
+    }
+
+    &.strong {
+        border-color: var(--sr5-action-strong);
+
+        &::before {
+            background-color: var(--sr5-action-strong);
+        }
+    }
+}

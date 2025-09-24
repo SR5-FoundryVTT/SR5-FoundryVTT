@@ -1,6 +1,9 @@
-/**
-  * Is used on TokenHUDs to display a additional segment per situational modifer.
-  */
+//
+// Is used on TokenHUDs to display a additional segment per situational modifer.
+//
+
+@use '../config';
+
 .sr-modifier-container {
 
     // The column to hold all modifiers besides the FoundryVTT token HUD.
@@ -9,7 +12,7 @@
         // Stop flexing.
         display: block;
         font-weight: bold;
-        font-size: 18px;
+        @include config.font-size(18);
         // Render below the open/closable token hud actions.
         z-index: -1;
     }
@@ -21,10 +24,10 @@
         flex-wrap: wrap;
         align-items: stretch;
         width: 160px;
-        background: rgba(0, 0, 0, 0.6);
-        box-shadow: 0 0 15px #000;
-        border: 1px solid #333;
-        color: #DDD;
+        background: var(--sr5-surface-high);
+        box-shadow: 0 0 15px config.$shadow;
+        border: 1px solid var(--sr5-border-default-subtle);
+        color: var(--sr5-text);
         height: 40px;
         line-height: 40px;
         margin-bottom: 18px;
@@ -33,7 +36,7 @@
         grid-template-columns: 36px auto;
         overflow: hidden;
 
-        // The numerical modifier total 
+        // The numerical modifier total
         .modifier-value {}
 
         // The corresponding modifier description per .modifier-value
@@ -46,34 +49,33 @@
             cursor: pointer;
 
             &:hover {
-                box-shadow: 0 0 0.25em 0.15em $white;
+                box-shadow: 0 0 0.25em 0.15em var(--sr5-text);
                 border-radius: 8px;
             }
         }
     }
 }
 
-/**
- * All stylings necessary for situation modifiers
- */
+//
+// All stylings necessary for situation modifiers
+//
 .sr5#situational-modifiers-application {
 
     // Remove other sr5 window styles.
     * {
-        // font-size: var(--font-size-14);
         font-weight: normal;
     }
 
     h1 {
-        border-bottom: 1px solid $yellow;
-        color: $yellow;
+        border-bottom: 1px solid var(--sr5-accent);
+        color: var(--sr5-accent);
         font-weight: bold;
     }
 
     // Add back in stylings as necessary
     h2,
     h3 {
-        color: $yellow;
+        color: var(--sr5-accent);
         border-bottom: none;
         font-weight: normal;
     }

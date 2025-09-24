@@ -1,0 +1,23 @@
+// -----------------------------------------------------------------------------
+// SCSS Config Index File
+//
+// Purpose:
+// - Bundles and re-exports all core configuration partials in the proper order.
+// - Centralizes access to variables, functions, mixins, and theming settings.
+// - Enables clean and convenient `@use 'config';` imports elsewhere.
+//
+// Scope:
+// - Does NOT contain styles itself.
+// - Purely a forwarding module for configuration components.
+//
+// Contents:
+// - Variables: design tokens and constants.
+// - Theme: semantic tokens and CSS variable mappings.
+// - Functions: reusable SCSS functions.
+// - Mixins: reusable SCSS mixins and helpers.
+// -----------------------------------------------------------------------------
+
+@forward 'variables';
+@forward 'theme';
+@forward 'functions';
+@forward 'mixins';

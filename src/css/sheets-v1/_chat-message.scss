@@ -1,29 +1,30 @@
-@import 'config';
+@use '../config';
+
+// we should not be using it here, but got to fix switching to oklch
+@use 'sass:color';
 
 .sr5 {
     &.chat-card {
-        @include sheet;
+        background: transparent;
         font-style: normal;
-        font-size: 1rem;
+        @include config.font-size(16);
 
-        /**
-         * Content with this class should be hidden from players eyes
-         * Check SuccessTest._showGmOnlyContent for when to show it to users.
-         */
+        //
+        // Content with this class should be hidden from players eyes
+        // Check SuccessTest._showGmOnlyContent for when to show it to users.
+        //
         .gm-only-content {
             display: none !important;
         }
 
-        .clickable:hover {
-            cursor: pointer;
-            background: #4b4a44;
-            color: $white;
+        .clickable {
+            @include config.hover-transition($background-color: var(--sr5-surface-high));
         }
 
         .card-header {
             padding: 0.25em 0;
-            border-bottom: $groove;
-            
+            border-bottom: 1px solid var(--sr5-border-default);
+
 
             img {
                 flex: 0 0;
@@ -39,17 +40,17 @@
                 align-self: center;
                 flex: 1;
                 margin: 0;
-                font-size: var(--font-size-12);
+                @include config.font-size(12);
             }
         }
         .card-header:first-of-type {
-            color: $yellow;
-            border-color: $yellow;
+            color: var(--sr5-accent);
+            border-color: var(--sr5-accent);
         }
         .button {
-            color: $color;
-            border-color: $black;
-            background: rgba($light, 0.2);
+            color: var(--sr5-text);
+            border-color: var(--sr5-border-default);
+            background: var(--sr5-control-background);
             border-radius: 0.3em;
             text-align: center;
             margin-top: 0.5em;
@@ -62,43 +63,38 @@
 
             &:hover {
                 cursor: pointer;
-                // box-shadow: 0 0 0.25em 0.15em $black;
                 outline: none;
-                box-shadow: 0 0 5px var(--color-shadow-primary);
+                box-shadow: 0 0 5px var(--sr5-action);
             }
         }
         .card-description {
             span {
-                border-right: $groove;
+                border-right: 1px solid var(--sr5-border-default);
                 padding: 0;
-                padding-right: 0.3em;
-                font-size: 0.75em;
-
-                &:last-child {
-                    border-right: none;
-                    padding-right: 0;
-                }
+                gap: 0.3em;
+                @include config.font-size(12);
             }
             .card-description-content {
-                border-bottom: $groove;
+                border-bottom: 1px solid var(--sr5-border-default);
             }
-        }        
+        }
 
         .damage-line {
             margin-top: 0.25em;
         }
         .reducedResult {
-            color: #aa0200;
+            color: var(--sr5-color-physical);
             filter: sepia(0.5) hue-rotate(-60deg);
         }
     }
     &.roll-card {
         margin: 0.15em;
-        font-size: 12px;
+        @include config.font-size(12);
 
         .card-title {
+            font-weight: 600;
             display: flex;
-            border-bottom: $groove;
+            border-bottom: 1px solid var(--sr5-border-default);
             justify-content: flex-start;
             align-content: center;
             align-items: flex-end;
@@ -126,10 +122,10 @@
                 white-space: nowrap;
                 // Override Foundry default header styling.
                 border-bottom: none;
-                color: $white;
+                color: var(--sr5-text);
 
                 &:hover {
-                    text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower, 1px 1px 0 $cornflower;
+                    text-shadow: -1px -1px 0 var(--sr5-color-stun), 1px -1px 0 var(--sr5-color-stun), -1px 1px 0 var(--sr5-color-stun), 1px 1px 0 var(--sr5-color-stun);
                 }
             }
 
@@ -161,8 +157,8 @@
             .place-template {
                 padding: 2px 5px;
                 line-height: 1em;
-                color: $black;
-                font-size: 18px;
+                color: var(--sr5-color-primary-inverse);
+                @include config.font-size(18);
                 margin-right: 1em;
                 flex: 0;
             }
@@ -176,11 +172,11 @@
         }
         .card-description {
             padding: 0.25em;
-            border-bottom: $groove;
+            border-bottom: 1px solid var(--sr5-border-default);
             display: none;
         }
         .card-content {
-            border-bottom: $groove;
+            border-bottom: 1px solid var(--sr5-border-default);
 
             padding: 0.25em 0.25em 0.25em;
             display: flex;
@@ -231,21 +227,17 @@
                 justify-content: flex-start;
                 align-items: flex-end;
                 text-align: left;
-                > :not(:first-child) {
-                    margin-left: 0.1em;
-                }
-                > :not(:last-child) {
-                    margin-right: 0.1em;
-                }
+                gap: 0.2em;
+
                 .icon {
                     font-style: italic;
                 }
             }
             p {
-                font-size: 0.8em;
+                @include config.font-size(12);
             }
             h3 {
-                font-size: 1em;
+                @include config.font-size(14);
                 margin: 0;
                 font-weight: bold;
             }
@@ -270,8 +262,7 @@
                 }
             }
             .test-code {
-                @include systemFonts;
-                font-size: var(--font-size-12);
+                @include config.font-size(12);
             }
             &.can-wrap {
                 flex-flow: row wrap;
@@ -288,39 +279,41 @@
         }
         .dice-rolls {
             display: none;
-            border-bottom: $groove;
+            border-bottom: 1px solid var(--sr5-border-default);
         }
         .dice-roll-content {
-            padding: 0.5em 0.5em;
+            gap: 0.25rem;
             display: flex;
-            flex-flow: row wrap;
+            flex-wrap: wrap;
             justify-content: center;
+            line-height: 1.5;
+            @include config.padding($y: 1);
+
             .dice-roll {
-                background-image: url(/icons/svg/d6-grey.svg);
-                background-size: 24px 24px;
-                font-size: 16px;
-                font-weight: bold;
+                // asset no longer exists
+                // background-image: config.asset('d6-grey.svg', 'icons/svg/');
+                // use clip-path instead to make them look more geometrical
+                clip-path: polygon(0 0.25rem, 0.25rem 0, calc(100% - 0.25rem) 0, 100% 0.25rem, 100% calc(100% - 0.25rem), calc(100% - 0.25rem) 100%, 0.25rem 100%, 0 calc(100% - 0.25rem));
+                background: var(--sr5-surface-highest);
+                @include config.font-size(16);
+                font-weight: 700;
                 text-align: center;
-                width: 24px;
-                line-height: 24px;
-                
-                // Consistent margin on top, if missing result boxes will clip.
-                margin-top: 5px;
+                flex-basis: 1.5rem;
+                aspect-ratio: 1;
+                margin: 0;
 
                 &.red {
-                    color: #aa0200;
-                    filter: sepia(0.5) hue-rotate(-60deg);
+                    color: var(--sr5-color-physical-strong);
                 }
                 &.green {
-                    color: #18520b;
-                    filter: sepia(0.5) hue-rotate(60deg);
+                    color: var(--sr5-color-matrix-strong);
                 }
             }
         }
         .glitch-content {
             display: flex;
             flex-flow: column;
-            border-bottom: $groove;
+            border-bottom: 1px solid var(--sr5-border-default);
 
             .glitch {
                 position: relative;
@@ -346,14 +339,14 @@
             }
 
             .glitch:after {
-                color: #a0a;
+                color: var(--sr5-color-magic);
                 opacity: 0;
                 z-index: -1;
                 animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both 5;
             }
 
             .glitch:before {
-                color: #0aa;
+                color: var(--sr5-color-stun);
                 opacity: 0;
                 z-index: -2;
                 animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both 5;
@@ -369,7 +362,7 @@
 
             @media only screen and (max-width: 400px) {
                 .glitch {
-                    font-size: 3em;
+                    @include config.font-size(48);
                 }
             }
 
@@ -410,6 +403,6 @@
     }
     .chat-select-link img:hover {
         padding: 0;
-        border: $groove;
+        border: 1px solid var(--sr5-border-default);
     }
 }

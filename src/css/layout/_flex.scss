@@ -1,0 +1,54 @@
+// -----------------------------------------------------------------------------
+// Flexbox Utilities SCSS File
+//
+// Purpose:
+// - Contains all flexbox-related utility classes
+// - Centralizes flexbox helpers for layout management
+// - Provides easy-to-use flexbox utilities for consistent styling
+//
+// Usage:
+// - Use the utility classes to control flex container and item behavior
+//
+// Note:
+// - Do not add non-flexbox related styles here
+// - Keep utilities focused on flexbox properties only
+// -----------------------------------------------------------------------------
+
+$prefixes: ('flex', 'inline-flex');
+$directions: (
+    'row': row,
+    'row-reverse': row-reverse,
+    'column': column,
+    'column-reverse': column-reverse,
+);
+
+@each $prefix in $prefixes {
+    $display: if($prefix == 'inline-flex', inline flex, flex);
+
+    @each $suffix, $direction in $directions {
+        .#{$prefix}-#{$suffix} {
+            display: $display;
+            flex-direction: $direction;
+        }
+    }
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-wrap-reverse {
+    flex-wrap: wrap-reverse;
+}
+
+// -----------------------------------------------------------------------------
+// children only
+// -----------------------------------------------------------------------------
+
+.flex-auto {
+    flex: 1 1 auto;
+}
+
+.flex-none {
+    flex: none;
+}

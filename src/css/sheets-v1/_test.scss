@@ -1,0 +1,53 @@
+/**
+ * CSS for Success Test Dialog styling.
+ */
+@use '../config';
+
+.sr5 {
+    &.form-dialog {
+        border: 1px solid var(--sr5-border-default);
+        color: var(--sr5-text);
+        background: var(--sr5-backdrop);
+
+        .window-header {
+            border: none;
+
+            h4 {
+                @include config.use-font($weight: 600);
+            }
+        }
+        .window-content {
+            border: none;
+
+            h3 {
+                @include config.use-font($weight: 600);
+                color: var(--sr5-accent);
+                border-bottom: 1px solid var(--sr5-border-variant);
+            }
+        }
+
+        .form-group {
+          .form-group-element-2 {
+            flex: 2;
+            display: flex;
+            gap: 0.25em;
+          }
+
+          .form-group-element-1-right {
+              flex: 1;
+              display: flex;
+              justify-content: flex-end;
+          }
+        }
+
+        // this might be old
+        .dialog-content-common {
+          h2 {
+            border: none;
+            color: var(--sr5-color-magic);
+            margin: 0;
+            text-underline: none;
+          }
+        }
+    }
+}

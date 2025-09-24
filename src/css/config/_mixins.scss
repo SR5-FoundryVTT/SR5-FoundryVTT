@@ -1,55 +1,237 @@
-@mixin basic-rollable {
+// -----------------------------------------------------------------------------
+// SCSS Mixins File
+//
+// Purpose:
+// - Contains reusable SCSS mixins for styling patterns, UI behaviors, and layout.
+// - Encapsulates common style logic to promote consistency and reduce duplication.
+//
+// Scope:
+// - Mixins cover typography, shadows, interaction states, sizing, and theming helpers.
+// - Designed to be imported and used throughout the SR5 system stylesheets.
+// - Does NOT contain direct style rules—only reusable blocks for inclusion.
+//
+// Examples:
+// - Typography helpers: `font-size`
+// - Visual effects: `shadow-elevation`
+// -----------------------------------------------------------------------------
+
+@use 'sass:list';
+@use 'sass:meta';
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:string';
+@use 'variables';
+@use 'theme';
+@use 'functions';
+
+// Generic hover helper, transistions colors explicitly only those that are changed
+// on hover. Use it for easy uncomplicated hover-steps to alter colors.
+@mixin hover-transition(
+    $color: null,
+    $background-color: null,
+    $border-color: null,
+    $transition-duration: 250ms,
+    $transition-timing-function: ease-in-out
+) {
+    $transition-properties: ();
+
+    @if $color {
+        $transition-properties: list.append($transition-properties, color);
+    }
+    @if $background-color {
+        $transition-properties: list.append($transition-properties, background-color);
+    }
+    @if $border-color {
+        $transition-properties: list.append($transition-properties, border-color);
+    }
+
+    @if list.length($transition-properties) > 0 {
+        $transition-string: '';
+        @each $property in $transition-properties {
+            $transition-string: $transition-string +
+                $property +
+                ' ' +
+                $transition-duration +
+                ' ' +
+                $transition-timing-function +
+                ', ';
+        }
+        $transition-string: string.slice($transition-string, 1, string.length($transition-string) - 2);
+
+        transition: string.unquote($transition-string);
+    }
+
+    cursor: pointer;
+
     &:hover {
-        @include linkHovered;
-    }
-}
-@mixin rollable {
-    &:hover {
-        @include linkHovered;
-        cursor: pointer;
-    }
-}
-
-@mixin clickable {
-    &:hover {
-        cursor: pointer;
+        @if $color {
+            color: $color;
+        }
+        @if $background-color {
+            background-color: $background-color;
+        }
+        @if $border-color {
+            border-color: $border-color;
+        }
     }
 }
 
-@mixin systemFonts {
-    font-family: $systemFonts;
-}
+// font-family mixin allow additional weights of 'none' and 'default'
+@mixin use-font($family: 'sans', $weight: 'none') {
+    $font-data: map.get(variables.$font-stacks, $family);
 
-@mixin title {
-    font-family: $systemFonts;
-    color: $color;
-    @include textOutline;
-}
+    @if $font-data {
+        $user-font: map.get($font-data, user-font);
+        $fallback-stack: map.get($font-data, fallback);
 
-@mixin textOutline {
-    color: $color;
-    text-shadow: -1px -1px 0 $outline-color, 1px -1px 0 $outline-color, -1px 1px 0 $outline-color,
-        1px 1px 0 $outline-color;
-}
+        @if $user-font {
+            font-family:
+                #{$user-font,
+                $fallback-stack};
+        } @else {
+            font-family: $fallback-stack;
+        }
 
-@mixin shortUnder {
-    position: relative;
-    &:after {
-        content: '';
-        display: block;
-        position: absolute;
-        width: 50%;
-        transform: translateX(50%);
-        border-bottom: $border-under;
+        @if $weight != 'none' and ($weight == 'default' or meta.type-of($weight) == 'number') {
+            font-weight: if($weight == 'default', map.get($font-data, default-weight), $weight);
+        }
+    } @else {
+        @warn "Unknown font family `#{$family}` passed to use-font mixin.";
     }
 }
 
-@mixin sheet {
-    background: linear-gradient(rgba(0, 0, 0, 0.60), rgba(0, 0, 0, 0.60)), url("assets/page.webp") repeat;
-    color: $color;
+/// Apply a FoundryVTT font size using a CSS variable fallback.
+/// Example: @include font-size(16);
+/// Base size that foundry uses at the moment (v13) is 14.
+@mixin font-size($px, $lh: null) {
+    $rem: math.div($px, 16);
+    font-size: var(--font-size-#{$px}, #{$rem}rem);
+
+    @if $lh == auto {
+        $lh-val: 1;
+        @if $rem > 0 {
+            $denominator: (12 * math.pow($rem, 2) - 22 * $rem + 12);
+            $lh-val: math.div($rem, $denominator) + 1;
+        }
+        line-height: functions.round-decimals($lh-val, 3);
+    } @else if $lh != null {
+        line-height: $lh;
+    }
 }
 
-@mixin linkHovered {
-    text-shadow: 0 0 8px var(--color-shadow-primary);
-    color: $fLightRed;
+// Adds a layered shadow to component, similar to tailwind or material design
+// it is pretty useless in darkmode except for floating windows
+// i recommend using elevation 6 and 10 for smaller and larger shadows.
+@mixin shadow-elevation($elevation: 1, $color: theme.$shadow, $enhanced: true) {
+    @if $elevation <= 0 {
+        box-shadow: none;
+    } @else {
+        // Define base shadow properties
+        $base-y-offset: math.ceil($elevation * 1.5px);
+        $base-blur: $base-y-offset + math.ceil($elevation * 0.5px);
+        $base-spread: math.floor(-$elevation * 0.25px);
+
+        // Define enhanced (top) shadow properties if enabled
+        $enhanced-y-offset: math.ceil($elevation * 0.5px);
+        $enhanced-blur: $enhanced-y-offset + math.ceil($elevation * 0.25px);
+        $enhanced-spread: math.floor(-$elevation * 0.125px);
+
+        // Set the opacity for the shadows.
+        $base-opacity: 0.14;
+        $enhanced-opacity: 0.12;
+
+        // Construct the shadow declarations
+        $base-shadow: 0 $base-y-offset $base-blur $base-spread rgb(from $color r g b / $base-opacity);
+        $enhanced-shadow: 0
+            $enhanced-y-offset
+            $enhanced-blur
+            $enhanced-spread
+            rgb(from $color r g b / $enhanced-opacity);
+
+        // Assemble the final box-shadow value
+        @if $enhanced {
+            box-shadow: $base-shadow, $enhanced-shadow;
+        } @else {
+            box-shadow: $base-shadow;
+        }
+    }
+}
+
+// Utility Mixin for condition box styles
+@mixin condition-monitor-style($name, $color-var, $strong-color-var: null) {
+    &.#{$name} .cell {
+        box-shadow: inset 0 0 6px var(--#{$color-var});
+        border: 1px solid var(--#{$color-var});
+
+        @if $strong-color-var != null {
+            &:hover {
+                border-color: var(--#{$strong-color-var});
+                box-shadow: inset 0 0 12px var(--#{$strong-color-var});
+            }
+        }
+
+        &.filled {
+            background: oklch(from var(--#{$color-var}) l c h / 0.5);
+            color: var(--sr5-text);
+        }
+    }
+}
+
+// there should be no margin mixin, as margins are more of a layouting thing
+// and better used in html with the layout/_spacing.scss classes.
+// combines the different paddings into one consistent output.
+// default is 1 step = 0.25rem or 4px.
+@mixin padding(
+    $top: 0,
+    $right: 0,
+    $bottom: 0,
+    $left: 0,
+    $all: 0,
+    $x: 0,
+    $y: 0,
+    $scaling: 0.25,
+    $unit: rem,
+    $prefer-logical: true
+) {
+    $t: ($all + $y + $top) * $scaling;
+    $r: ($all + $x + $right) * $scaling;
+    $b: ($all + $y + $bottom) * $scaling;
+    $l: ($all + $x + $left) * $scaling;
+
+    $t: if($t != 0, $t + $unit, 0);
+    $r: if($r != 0, $r + $unit, 0);
+    $b: if($b != 0, $b + $unit, 0);
+    $l: if($l != 0, $l + $unit, 0);
+
+    $nonzero: ();
+    @each $v in $t, $r, $b, $l {
+        @if $v != 0 {
+            $nonzero: list.append($nonzero, $v);
+        }
+    }
+    $nonzero-count: list.length($nonzero);
+
+    @if $prefer-logical {
+        @if $t == $b and $r == $l {
+            padding-block: #{$t};
+            padding-inline: #{$r};
+        } @else {
+            padding-block-start: #{$t};
+            padding-inline-end: #{$r};
+            padding-block-end: #{$b};
+            padding-inline-start: #{$l};
+        }
+    } @else {
+        @if $nonzero-count == 0 {
+            padding: 0;
+        } @else if $t == $b and $r == $l and $t == $r {
+            padding: #{$t};
+        } @else if $t == $b and $r == $l {
+            padding: #{$t} #{$r};
+        } @else if $r == $l {
+            padding: #{$t} #{$r} #{$b};
+        } @else {
+            padding: #{$t} #{$r} #{$b} #{$l};
+        }
+    }
 }

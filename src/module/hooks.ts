@@ -124,6 +124,7 @@ import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
+import { registerFonts } from './settings/RegisterFonts';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -135,7 +136,7 @@ export class HooksManager {
 
         Hooks.once('init', () => {
             HooksManager.init();
-            
+
             // Custom Module Integrations
             // See src/module/integartions for more information.
             if (game.modules.get('routinglib')?.active) {
@@ -171,12 +172,12 @@ export class HooksManager {
     static init() {
         console.log(`Loading Shadowrun 5e System
 ___________________
- ___________ _____ 
+ ___________ _____
 /  ___| ___ \\  ___|
-\\ \`--.| |_/ /___ \\ 
+\\ \`--.| |_/ /___ \\
  \`--. \\    /    \\ \\
 /\\__/ / |\\ \\/\\__/ /
-\\____/\\_| \\_\\____/ 
+\\____/\\_| \\_\\____/
 ===================
 `);
         // Create a shadowrun5e namespace within the game global
@@ -404,7 +405,7 @@ ___________________
         CONFIG.Item.dataModels["spell"] = Spell;
         CONFIG.Item.dataModels["sprite_power"] = SpritePower;
         CONFIG.Item.dataModels["weapon"] = Weapon;
-    
+
         CONFIG.Actor.dataModels["character"] = Character;
         CONFIG.Actor.dataModels["critter"] = Critter;
         CONFIG.Actor.dataModels["ic"] = IC;
@@ -414,6 +415,7 @@ ___________________
 
         registerSystemSettings();
         registerSystemKeybindings();
+        registerFonts();
 
         // Register sheets for collection documents.
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
@@ -541,10 +543,10 @@ ___________________
     /**
      * Extend rendering of Sidebar tab 'CompendiumDirectory' by
      * - the Chummer Compendium Import button
-     * 
+     *
      * @param app Foundry CompendiumDirectory app instance
      * @param html HTML element of the app
-     * @returns 
+     * @returns
      */
     static renderCompendiumDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
         if (!game.user?.isGM) {
@@ -561,7 +563,7 @@ ___________________
 
     /**
      * Handle all updateItem calls for all item types.
-     * 
+     *
      * @param item The item updates.
      * @param data The update data given.
      * @param id The items id.
@@ -651,7 +653,7 @@ ___________________
         if (rendered) {
             rendered.innerHTML = inner;
         } else {
-            // create the button using custom attributes 
+            // create the button using custom attributes
             const button = document.createElement('button');
             button.setAttribute('type', 'button');
             button.setAttribute('id', id);

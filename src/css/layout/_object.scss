@@ -1,0 +1,44 @@
+// -----------------------------------------------------------------------------
+// Object Utilities SCSS File
+//
+// Purpose:
+// - Provides utility classes for `object-fit` and `object-position`
+// - Useful for images, video, and pseudo-elements using background media
+//
+// Usage:
+// - Apply `.object-cover`, `.object-top-left`, etc. for layout control
+//
+// Includes:
+// - `object-fit`: contain, cover, fill, none, scale-down
+// - `object-position`: vertical + optional horizontal combinations
+//
+// Notes:
+// - Only includes common positioning combinations (e.g., top-left, bottom-right)
+// - Skips inset-based positions for clarity and simplicity
+// -----------------------------------------------------------------------------
+
+$object-fit-keywords: (contain, cover, fill, none, scale-down);
+
+@each $keyword in $object-fit-keywords {
+    .object-#{$keyword} {
+        object-fit: $keyword;
+    }
+}
+
+$object-positions: (
+    'bottom': bottom,
+    'bottom-left': bottom left,
+    'bottom-right': bottom right,
+    'center': center,
+    'left': left,
+    'right': right,
+    'top': top,
+    'top-left': top left,
+    'top-right': top right,
+);
+
+@each $key, $value in $object-positions {
+    .object-#{$key} {
+        object-position: $value;
+    }
+}

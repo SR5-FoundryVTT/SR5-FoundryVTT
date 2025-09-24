@@ -1,0 +1,59 @@
+// -----------------------------------------------------------------------------
+// Positioning Alignment Utilities SCSS File
+//
+// Purpose:
+// - Generates utility classes for alignment-related CSS properties
+// - Covers align-*, justify-*, and place-* CSS properties
+// - Centralizes alignment logic for consistency across layouts
+//
+// Usage:
+// - Apply generated utility classes like `.items-center`, `.justify-content-between`, etc.
+// - Use to control positioning of flex/grid items and content
+//
+// Note:
+// - Only includes alignment-related properties (no spacing/margin/etc.)
+// - Additional `space-*` values are only applied to *-content properties
+// -----------------------------------------------------------------------------
+
+@use 'sass:string';
+
+$align-values: (
+    'start': flex-start,
+    'end': flex-end,
+    'center': center,
+    'stretch': stretch,
+);
+
+$content-spacing-values: (
+    'between': space-between,
+    'around': space-around,
+    'evenly': space-evenly,
+);
+
+$alignment-properties: (
+    'content': align-content,
+    'items': align-items,
+    'self': align-self,
+    'justify-content': justify-content,
+    'justify-items': justify-items,
+    'justify-self': justify-self,
+    'place-content': place-content,
+    'place-items': place-items,
+    'place-self': place-self,
+);
+
+@each $prefix, $property in $alignment-properties {
+    @each $key, $value in $align-values {
+        .#{$prefix}-#{$key} {
+            #{$property}: $value;
+        }
+    }
+
+    @if string.index($prefix, 'content') {
+        @each $key, $value in $content-spacing-values {
+            .#{$prefix}-#{$key} {
+                #{$property}: $value;
+            }
+        }
+    }
+}

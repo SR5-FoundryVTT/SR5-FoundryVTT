@@ -1,0 +1,110 @@
+// This is intended to replace foriens Quest Log to Match its CSS to Shadowrun Styles
+//
+@use '../config';
+
+.window-app .window-content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+
+    padding: 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.tox .tox-tbtn svg {
+    display: block;
+    fill: var(--sr5-text);
+}
+
+//Start Simple Calendar
+//
+// CHAT MESSAGE STYLING
+//
+//Icons
+span.fa.fa-calendar {
+    color: var(--sr5-accent);
+}
+//End Simple Calendar
+
+// Baby Monitor
+#overwatch-score-tracker.sr5,
+#situational-modifiers-application.sr5 {
+    background: var(--sr5-backdrop);
+    border: 1px solid var(--sr5-border-default-subtle);
+    @include config.shadow-elevation(10);
+
+    header {
+        border: none;
+    }
+
+    .window-content {
+        border: none;
+    }
+}
+
+// Fix situational modifiers
+#situational-modifiers-application.sr5 {
+    h1 {
+        @include config.use-font('sans', 600);
+    }
+    h2 {
+        @include config.use-font('sans', 500);
+        text-transform: uppercase;
+    }
+    table {
+        border: none;
+    }
+    tr:not(:last-child) {
+        background: none;
+
+        td[colspan='4'] {
+            text-align: right;
+            padding-right: 0.5rem;
+        }
+    }
+    tr:last-child td {
+        @include config.use-font('sans', 600);
+        text-align: center;
+    }
+    tr:first-child {
+        border-bottom: 1px solid var(--sr5-border-variant);
+        color: var(--sr5-accent);
+        background: var(--sr5-surface);
+
+        th {
+            @include config.use-font('sans', 600);
+        }
+    }
+
+    button.env-modifier {
+        text-align: center;
+
+        &-active {
+            color: var(--sr5-text-strong);
+            border-radius: 0.25rem;
+            border-color: var(--sr5-border-default-strong);
+        }
+    }
+
+    .dialog-button {
+        margin: 0.125rem;
+        background: var(--sr5-action);
+        @include config.use-font('sans', 600);
+
+        @include config.hover-transition(
+            $color: var(--sr5-text-strong),
+            $background-color: var(--sr5-action-subtle),
+            $border-color: var(--sr5-action-subtle)
+        );
+    }
+}
+
+.sr5 .scroll-area-mods .list-item.item-section {
+    background: none;
+
+    .list-item-content:nth-child(2) {
+        background: var(--sr5-surface);
+    }
+}

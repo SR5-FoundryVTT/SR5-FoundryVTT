@@ -1,0 +1,41 @@
+// -----------------------------------------------------------------------------
+// Grid Utilities SCSS File
+//
+// Purpose:
+// - Contains all grid-related utility classes
+// - Centralizes CSS Grid helpers for layout structure
+// - Provides a minimal and consistent utility set for grid layouts
+//
+// Usage:
+// - Use utility classes to define display mode and common grid behaviors
+//
+// Note:
+// - Keep scoped to general-purpose grid layout helpers only
+// - Avoid layout-specific or responsive logic here
+// -----------------------------------------------------------------------------
+
+$names: ('grid', 'inline-grid');
+
+@for $number from 1 through 16 {
+    @each $name in $names {
+        $display: if($name == 'inline-grid', inline grid, grid);
+
+        .#{$name}-columns-#{$number} {
+            display: $display;
+            grid-template-columns: repeat(#{$number}, minmax(0, 1fr));
+        }
+
+        .#{$name}-rows-#{$number} {
+            display: $display;
+            grid-template-rows: repeat(#{$number}, minmax(0, 1fr));
+        }
+    }
+
+    .grid-column-span-#{$number} {
+        grid-column: span #{$number} / span #{$number};
+    }
+
+    .grid-row-span-#{$number} {
+        grid-row: span #{$number} / span #{$number};
+    }
+}
