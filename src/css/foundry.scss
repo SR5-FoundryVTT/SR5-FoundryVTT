@@ -63,7 +63,7 @@ body:not(.theme-dark) {
     table {
         background: linear-gradient(to bottom, #3d3c3f, #000000);
         font-size: 90%;
-        caption{
+        caption {
             background: inherit;
             text-align: left;
             color: $yellow;
@@ -78,7 +78,7 @@ body:not(.theme-dark) {
         color: $yellow;
         text-align: left;
     }
-    td{
+    td {
         text-align: left;
         padding: 9px;
     }
@@ -117,14 +117,15 @@ body:not(.theme-dark) {
     height: 80px;
     width: 100%;
     margin: auto;
-    z-index: 2;
 }
 .journal-sheet .journal-header .title {
     background:
         $nameplate-background,
-        url("assets/page.webp") repeat;
+        url('assets/page.webp') repeat;
     background-repeat: no-repeat, repeat;
-    background-size: 100% 41px, auto; // first layer = 60px tall
+    background-size:
+        100% 41px,
+        auto; // first layer = 60px tall
     background-position: center, top;
     border-radius: 0;
     text-align: left !important;
@@ -133,8 +134,6 @@ body:not(.theme-dark) {
     border-width: 0;
     height: 80px;
 }
-
-
 
 .journal-sheet h3 {
     color: $darkred;
@@ -155,7 +154,9 @@ body:not(.theme-dark) {
 .chat-message,
 .chat-message.emote {
     color: $white;
-    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)), url('assets/page.webp') repeat;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)),
+        url('assets/page.webp') repeat;
     border: 1px solid $dark;
 }
 
@@ -163,12 +164,16 @@ body:not(.theme-dark) {
 // Private Roll
 // Self Roll
 .chat-message.whisper {
-    background: linear-gradient(rgba(64, 64, 85, 0.5), rgba(0, 0, 0, 0.5)), url('assets/page.webp') repeat;
+    background:
+        linear-gradient(rgba(64, 64, 85, 0.5), rgba(0, 0, 0, 0.5)),
+        url('assets/page.webp') repeat;
 }
 
 // Blind Roll
 .chat-message.blind {
-    background: linear-gradient(rgba(87, 51, 87, 0.25), rgba(0, 0, 0, 0.5)), url('assets/page.webp') repeat;
+    background:
+        linear-gradient(rgba(87, 51, 87, 0.25), rgba(0, 0, 0, 0.5)),
+        url('assets/page.webp') repeat;
 }
 
 .chat-message .message-header,
@@ -208,12 +213,12 @@ body:not(.theme-dark) {
     flex-wrap: wrap;
 }
 
-.form-dialog .window-content .dialog-buttons>* {
+.form-dialog .window-content .dialog-buttons > * {
     flex: 1;
 }
 
 .dialog-button.remove-token-modifiers-from-scene,
-.dialog-button.remove-modifiers-from-target{
+.dialog-button.remove-modifiers-from-target {
     background-color: $bgrButton;
 }
 .far-right {
@@ -221,12 +226,12 @@ body:not(.theme-dark) {
     right: -150px;
 }
 
-.list-header.item-section[data-item-id="weapon"][data-item-type=""] {
-    color: $yellow;  /* set the color to yellow */
+.list-header.item-section[data-item-id='weapon'][data-item-type=''] {
+    color: $yellow; /* set the color to yellow */
     font-size: small;
 }
 
-.common-test{
+.common-test {
     margin-bottom: 4px;
     margin-top: 4px;
     color: $white;
@@ -245,6 +250,6 @@ body:not(.theme-dark) {
 }
 .window-resizable-handle {
     .fa-solid {
-        transform: rotate(45deg)
+        transform: rotate(45deg);
     }
 }
