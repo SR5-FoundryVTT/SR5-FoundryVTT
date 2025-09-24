@@ -1,3 +1,4 @@
+import { Version0_30_3 } from './versions/Version0_30_3';
 import { FLAGS } from "../constants";
 import { Sanitizer } from "../sanitizer/Sanitizer";
 import { Version0_8_0 } from "./versions/Version0_8_0";
@@ -36,6 +37,7 @@ export class Migrator {
         new Version0_16_0(),
         new Version0_27_0(),
         new Version0_30_0(),
+        new Version0_30_3(),
     ] as const;
 
     private static documentsToBeMigrated: number = 0;

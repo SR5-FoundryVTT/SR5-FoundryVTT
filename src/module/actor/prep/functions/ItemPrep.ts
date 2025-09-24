@@ -19,7 +19,8 @@ export class ItemPrep {
         }
 
         const armorModParts = new PartsList<number>(armor.mod);
-        const equippedArmor = items.filter((item) => item.isType('armor') && item.isEquipped()) as SR5Item<'armor'>[];
+        // NOTE: We retrieve different types of items, all containing armor data.
+        const equippedArmor = items.filter((item) => item.hasArmor() && item.isEquipped()) as SR5Item<'armor'>[];
         equippedArmor?.forEach((item) => {
             const armorValue = item.system.armor.value;
             // Don't spam armor values with clothing or armor like items without any actual armor.
