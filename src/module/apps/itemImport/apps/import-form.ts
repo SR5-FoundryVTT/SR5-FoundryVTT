@@ -137,11 +137,11 @@ export class Import extends Application {
         data.showImportOptions = this.showImportOptions;
         data.disableImportButton = this.disableImportButton;
         data.langDataFile = this.langDataFile ? this.langDataFile.name : '';
-        data.finishedOverallParsing = this.supportedDataFiles.length === this.parsedFiles.length;
+        data.finishedOverallParsing = this.supportedDataFiles.length === this.parsedFiles.size;
 
         if (!data.finishedOverallParsing) {
             data.currentParsedFile = this.currentParsedFile?.replace(/\.xml$/i, '').capitalize() || '';
-            data.filesImported = " (" + (this.parsedFiles.length + 1) + "/" + this.supportedDataFiles.length + ")";
+            data.filesImported = " (" + (this.parsedFiles.size + 1) + "/" + this.supportedDataFiles.length + ")";
         }
 
         const {owner, repo, branch, version} = this.githubConfig;
