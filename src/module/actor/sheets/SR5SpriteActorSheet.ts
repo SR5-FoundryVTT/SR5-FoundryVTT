@@ -55,8 +55,8 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         skills: {
             template: SheetFlow.templateBase('actor/tabs/sprite-skills'),
             templates: [
-                ...SheetFlow.actorSystemParts('active-skills', 'sprite-options'),
-                ...SheetFlow.listItem('skill')
+                ...SheetFlow.templateActorSystemParts('active-skills', 'sprite-options'),
+                ...SheetFlow.templateListItem('skill')
             ],
             scrollable: ['#active-skills-scroll', '#sprite-options-scroll']
         },
@@ -76,7 +76,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         },
         spritePowers: {
             template: SheetFlow.templateBase('actor/tabs/matrix/sprite-powers'),
-            templates: SheetFlow.listItem('sprite_power'),
+            templates: SheetFlow.templateListItem('sprite_power'),
         },
     }
     /**

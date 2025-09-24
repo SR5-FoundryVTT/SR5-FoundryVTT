@@ -159,6 +159,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/weapon'),
             scrollable: ['.scrollable']
         },
+        weaponModifications: {
+            template: SheetFlow.templateBase('item/tabs/weapon-modifications'),
+            templates: SheetFlow.templateListItem('weapon-modification'),
+            scrollable: ['.scrollable']
+        },
         action: {
             template: SheetFlow.templateBase('item/tabs/action'),
             scrollable: ['.scrollable']
@@ -193,7 +198,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         },
         effects: {
             template: SheetFlow.templateBase('item/tabs/effects'),
-            templates: SheetFlow.listItem('effect'),
+            templates: SheetFlow.templateListItem('effect'),
             scrollable: ['.scrollable']
         },
         footer: {
@@ -212,6 +217,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'lifestyle', label: 'Lifestyle', cssClass: '' },
                 { id: 'program', label: 'Program', cssClass: '' },
                 { id: 'weapon', label: 'Weapon', cssClass: '' },
+                { id: 'weaponModifications', label: 'WeaponMods', cssClass: '' },
                 { id: 'adeptPower', label: 'AdeptPower', cssClass: '' },
                 { id: 'spell', label: 'Spell', cssClass: '' },
                 { id: 'armor', label: 'Armor', cssClass: '' },
@@ -315,7 +321,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 SR5Item<'modification'>[]
             ]>(
             (acc, item: SR5Item) => {
-                const data = item.toObject() as unknown as SR5Item;
+                const data = item as unknown as SR5Item;
                 if (item.type === 'ammo') acc[0].push(data as SR5Item<'ammo'>);
                 else if (item.type === 'modification') {
                     const type = item.system?.type;
@@ -1160,5 +1166,61 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
 
         return false;
+    }
+
+    override async _onFirstRender(context, options) {
+        await super._onFirstRender(context, options);
+
+        this._createContextMenu(this._getDocumentListContextOptions.bind(this), ".new-list-item[data-item-id]", {
+            hookName: "getDocumentListContextOptions",
+            parentClassHooks: false,
+            fixed: true,
+            jQuery: false,
+        });
+    }
+
+    _getDocumentListContextOptions() {
+        return [
+            {
+                name: "SR5.ActorSheet.ContextOptions.Source",
+                icon: "<i class='fas fa-page'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    const item = this.item.getOwnedItem(id);
+                    if (!item) return false;
+                    if (item instanceof SR5Item) {
+                        return item.hasSource;
+                    }
+                    return false;
+                },
+                callback: async (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    const item = this.item.getOwnedItem(id);
+                    if (!item) return;
+                    await item.openSource();
+                }
+            },
+            {
+                name: "SR5.ActorSheet.ContextOptions.Edit",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                callback: async (target) => {
+                    const id = SheetFlow.listItemId(target);
+                    const item = this.item.getOwnedItem(id);
+                    if (!item) return;
+                    await item.sheet?.render(true)
+                }
+            },
+            {
+                name: "SR5.ActorSheet.ContextOptions.Delete",
+                icon: "<i class='fas fa-trash'></i>",
+                callback: async (target) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+
+                    const id = SheetFlow.listItemId(target);
+                    await this.item.deleteOwnedItem(id);
+                }
+            }
+        ]
     }
 }

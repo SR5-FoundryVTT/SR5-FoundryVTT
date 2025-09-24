@@ -159,10 +159,10 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         },
         skills: {
             template: SheetFlow.templateBase('actor/tabs/vehicle-skills'),
-            templates: [...SheetFlow.actorSystemParts(
+            templates: [...SheetFlow.templateActorSystemParts(
                 'active-skills', 'vehicle-options',
                 'vehicle-rolls', 'vehicle-attributes'
-            ), ...SheetFlow.listItem('skill')],
+            ), ...SheetFlow.templateListItem('skill')],
             scrollable: ['#active-skills-scroll', '#vehicle-options-scroll']
         },
         description: {
@@ -171,7 +171,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         },
         inventory: {
             template: SheetFlow.templateBase('actor/tabs/inventory'),
-            templates: SheetFlow.listItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon'),
+            templates: SheetFlow.templateListItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon'),
             scrollable: ['.scrollable']
         },
     }

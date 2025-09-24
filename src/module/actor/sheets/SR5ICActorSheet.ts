@@ -52,36 +52,36 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
     static override PARTS: any = {
         header: {
             template: SheetFlow.templateBase('actor/header'),
-            templates: SheetFlow.actorSystemParts('initiative', 'common-rolls'),
+            templates: SheetFlow.templateActorSystemParts('initiative', 'common-rolls'),
         },
         tabs: {
             template: SheetFlow.templateBase('common/primary-tab-group'),
         },
         actions: {
             template: SheetFlow.templateBase('actor/tabs/actions'),
-            templates: SheetFlow.listItem('action'),
+            templates: SheetFlow.templateListItem('action'),
             scrollable: ['.scrollable']
         },
         matrix: {
             template: SheetFlow.templateBase('actor/tabs/ic-matrix'),
-            templates: SheetFlow.actorSystemParts('active-skills', 'ic-attributes', 'ic-options'),
+            templates: SheetFlow.templateActorSystemParts('active-skills', 'ic-attributes', 'ic-options'),
             scrollable: ['#active-skills-scroll', '#matrix-actions-scroll', '#network-icons-scroll', '#marked-icons-scroll']
         },
         matrixActions: {
             template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
-            templates: SheetFlow.listItem('action'),
+            templates: SheetFlow.templateListItem('action'),
         },
         markedIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),
-            templates: SheetFlow.listItem('marked_icon'),
+            templates: SheetFlow.templateListItem('marked_icon'),
         },
         networkIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/network-icons'),
-            templates: SheetFlow.listItem('network_icon'),
+            templates: SheetFlow.templateListItem('network_icon'),
         },
         effects: {
             template: SheetFlow.templateBase('actor/tabs/effects'),
-            templates: SheetFlow.listItem('effect'),
+            templates: SheetFlow.templateListItem('effect'),
             scrollable: ['.scrollable']
         },
         misc: {

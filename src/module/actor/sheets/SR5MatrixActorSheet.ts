@@ -136,23 +136,23 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         },
         matrixActions: {
             template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
-            templates: SheetFlow.listItem('action'),
+            templates: SheetFlow.templateListItem('action'),
         },
         markedIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),
-            templates: SheetFlow.listItem('marked_icon'),
+            templates: SheetFlow.templateListItem('marked_icon'),
         },
         ownedIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/owned-icons'),
-            templates: SheetFlow.listItem('owned_icon'),
+            templates: SheetFlow.templateListItem('owned_icon'),
         },
         networkIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/network-icons'),
-            templates: SheetFlow.listItem('network_icon'),
+            templates: SheetFlow.templateListItem('network_icon'),
         },
         programs: {
             template: SheetFlow.templateBase('actor/tabs/matrix/programs'),
-            templates: SheetFlow.listItem('program'),
+            templates: SheetFlow.templateListItem('program'),
         }
     }
 

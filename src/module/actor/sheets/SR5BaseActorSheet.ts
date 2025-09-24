@@ -206,19 +206,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static override PARTS = {
         header: {
             template: SheetFlow.templateBase('actor/header'),
-            templates: SheetFlow.actorSystemParts('movement', 'initiative'),
+            templates: SheetFlow.templateActorSystemParts('movement', 'initiative'),
         },
         tabs: {
             template: SheetFlow.templateBase('common/primary-tab-group'),
         },
         actions: {
             template: SheetFlow.templateBase('actor/tabs/actions'),
-            templates: SheetFlow.listItem('action'),
+            templates: SheetFlow.templateListItem('action'),
             scrollable: ['.scrollable']
         },
         effects: {
             template: SheetFlow.templateBase('actor/tabs/effects'),
-            templates: SheetFlow.listItem('effect'),
+            templates: SheetFlow.templateListItem('effect'),
             scrollable: ['.scrollable']
         },
         misc: {

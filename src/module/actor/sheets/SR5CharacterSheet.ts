@@ -112,49 +112,49 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         skills: {
             template: SheetFlow.templateBase('actor/tabs/character-skills'),
             templates: [
-                ...SheetFlow.actorSystemParts('active-skills', 'language-and-knowledge-skills', 'attributes', 'special-attributes' ),
-                ...SheetFlow.listItem('skill')
+                ...SheetFlow.templateActorSystemParts('active-skills', 'language-and-knowledge-skills', 'attributes', 'special-attributes' ),
+                ...SheetFlow.templateListItem('skill')
             ],
             scrollable: ['#active-skills-scroll', '#knowledge-skills-scroll']
         },
         magic: {
             template: SheetFlow.templateBase('actor/tabs/magic'),
             templates: [
-                ...SheetFlow.actorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
-                ...SheetFlow.listItem('spell', 'ritual', 'call_in_action', 'adept_power')
+                ...SheetFlow.templateActorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
+                ...SheetFlow.templateListItem('spell', 'ritual', 'call_in_action', 'adept_power')
                 ],
             scrollable: ['.scrollable']
         },
         complexForms: {
             template: SheetFlow.templateBase('actor/tabs/matrix/complex-forms'),
-            templates: SheetFlow.listItem('complex_form'),
+            templates: SheetFlow.templateListItem('complex_form'),
             scrollable: ['.scrollable']
         },
         compilations: {
             template: SheetFlow.templateBase('actor/tabs/matrix/compilations'),
-            templates: SheetFlow.listItem('call_in_action'),
+            templates: SheetFlow.templateListItem('call_in_action'),
             scrollable: ['.scrollable']
         },
         critter: {
             template: SheetFlow.templateBase('actor/tabs/critter'),
-            templates: SheetFlow.listItem('critter_power'),
+            templates: SheetFlow.templateListItem('critter_power'),
             scrollable: ['.scrollable']
         },
         inventory: {
             template: SheetFlow.templateBase('actor/tabs/inventory'),
-            templates: SheetFlow.listItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon'),
+            templates: SheetFlow.templateListItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon'),
             scrollable: ['.scrollable']
         },
         social: {
             template: SheetFlow.templateBase('actor/tabs/social'),
-            templates: SheetFlow.listItem('sin', 'lifestyle', 'contact'),
+            templates: SheetFlow.templateListItem('sin', 'lifestyle', 'contact'),
             scrollable: ['.scrollable']
         },
         bio: {
             template: SheetFlow.templateBase('actor/tabs/bio'),
             templates: [
-                    ...SheetFlow.actorSystemParts('metamagics', 'echoes'),
-                    ...SheetFlow.listItem('metamagic', 'echo', 'quality'),
+                    ...SheetFlow.templateActorSystemParts('metamagics', 'echoes'),
+                    ...SheetFlow.templateListItem('metamagic', 'echo', 'quality'),
                 ],
             scrollable: ['.scrollable']
         },

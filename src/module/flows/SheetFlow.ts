@@ -70,11 +70,11 @@ export const SheetFlow = {
         return `systems/shadowrun5e/dist/templates/v2/${path}.hbs`
     },
 
-    actorSystemParts(...parts: string[]) {
+    templateActorSystemParts(...parts: string[]) {
         return parts.map(p => this.templateBase(`actor/parts/${p}`))
     },
 
-    listItem(...parts: string[]) {
+    templateListItem(...parts: string[]) {
         return parts.reduce<string[]>(( items, p) => {
             items.push(this.templateBase(`list-items/${p}/header`));
             items.push(this.templateBase(`list-items/${p}/item`));
@@ -136,6 +136,7 @@ export const SheetFlow = {
         }
         if (!item.isType('weapon')) {
             delete parts['weapon'];
+            delete parts['weaponModifications'];
         }
     },
 
