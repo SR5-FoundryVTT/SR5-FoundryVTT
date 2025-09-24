@@ -2565,6 +2565,108 @@
             "TokenSelectionNeeded": "One or more tokens need to be selected"
         },
         "Weapon": {
+            "FIELDS": {
+                "category": {
+                    "label": "Weapon Type",
+                    "hint": "The type of Weapon this item represents. Different types require different configurations"
+                },
+                "range": {
+                    "modes": {
+                        "single_shot": {
+                            "label": "Single Shot",
+                            "hint": "If the Weapon supports Single Shot (SS)"
+                        },
+                        "semi_auto": {
+                            "label": "Semi-Auto",
+                            "hint": "If the Weapon supports Semi-Automatic (SA)"
+                        },
+                        "burst_fire": {
+                            "label": "Burst-Fire",
+                            "hint": "If the Weapon supports Burst-Fire (BF)"
+                        },
+                        "full_auto": {
+                            "label": "Full-Auto",
+                            "hint": "If the Weapon supports Full-Auto (FA)"
+                        }
+                    },
+                    "ranges": {
+                        "category": {
+                            "label": "Range Category",
+                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values"
+                        },
+                        "short": {
+                            "label": "Short Range",
+                            "hint": "Short Range distance for the Weapon, in meters"
+                        },
+                        "medium": {
+                            "label": "Medium Range",
+                            "hint": "Medium Range distance for the Weapon, in meters"
+                        },
+                        "long": {
+                            "label": "Long Range",
+                            "hint": "Long Range distance for the Weapon, in meters"
+                        },
+                        "extreme": {
+                            "label": "Extreme Range",
+                            "hint": "Extreme Range distance for the Weapon, in meters"
+                        },
+                        "attribute": {
+                            "label": "Range Attribute",
+                            "hint": "Actor's Attribute to multiply the above Range's by"
+                        }
+                    },
+                    "rc": {
+                        "base": {
+                            "label": "Recoil Compensation",
+                            "hint": "Recoil Compensation of the Weapon"
+                        }
+                    }
+                },
+                "thrown": {
+                    "ranges": {
+                        "category": {
+                            "label": "Range Category",
+                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values"
+                        },
+                        "short": {
+                            "label": "Short Range",
+                            "hint": "Short Range distance for the Weapon, in meters"
+                        },
+                        "medium": {
+                            "label": "Medium Range",
+                            "hint": "Medium Range distance for the Weapon, in meters"
+                        },
+                        "long": {
+                            "label": "Long Range",
+                            "hint": "Long Range distance for the Weapon, in meters"
+                        },
+                        "extreme": {
+                            "label": "Extreme Range",
+                            "hint": "Extreme Range distance for the Weapon, in meters"
+                        },
+                        "attribute": {
+                            "label": "Range Attribute",
+                            "hint": "Actor's Attribute to multiply the above Range's by"
+                        },
+                        "blast": {
+                            "radius": {
+                                "label": "Blast Radius",
+                                "hint": "Radius of the Weapon's attack, in meters"
+                            },
+                            "dropoff": {
+                                "label": "Blast Dropoff",
+                                "hint": "The Damage Reduction per meter from the blast"
+                            }
+                        }
+                    }
+                },
+                "melee": {
+                    "reach": {
+                        "label": "Reach",
+                        "hint": "Reach of the Weapon, this is used as a modifier in combat"
+                    }
+                }
+            },
             "AmmoCount": "Ammo Count",
             "Category": {
                 "Melee": "Melee",

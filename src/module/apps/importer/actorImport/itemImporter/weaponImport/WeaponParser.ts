@@ -233,7 +233,7 @@ export class WeaponParser {
                 medium: parseInt(ranges.medium.split('-')[1]),
                 long: parseInt(ranges.long.split('-')[1]),
                 extreme: parseInt(ranges.extreme.split('-')[1]),
-                category: 'manual',
+                category: 'manual' as const,
                 attribute: ''
             };
             if(system.category === "range") {

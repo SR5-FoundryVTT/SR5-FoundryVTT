@@ -101,100 +101,104 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static override PARTS = {
         header: {
             template: SheetFlow.templateBase('item/header'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         tabs: {
             template: SheetFlow.templateBase('common/primary-tab-group'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         description: {
             template: SheetFlow.templateBase('item/tabs/description'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         program: {
             template: SheetFlow.templateBase('item/tabs/program'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         technology: {
             template: SheetFlow.templateBase('item/tabs/technology'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         armor: {
             template: SheetFlow.templateBase('item/tabs/armor'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         adeptPower: {
             template: SheetFlow.templateBase('item/tabs/adept_power'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         critterPower: {
             template: SheetFlow.templateBase('item/tabs/critter_power'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         compilation: {
             template: SheetFlow.templateBase('item/tabs/compilation'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         summoning: {
             template: SheetFlow.templateBase('item/tabs/summoning'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         modification: {
             template: SheetFlow.templateBase('item/tabs/modification'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         lifestyle: {
             template: SheetFlow.templateBase('item/tabs/lifestyle'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         contact: {
             template: SheetFlow.templateBase('item/tabs/contact'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         spell: {
             template: SheetFlow.templateBase('item/tabs/spell'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
+        },
+        weapon: {
+            template: SheetFlow.templateBase('item/tabs/weapon'),
+            scrollable: ['.scrollable']
         },
         action: {
             template: SheetFlow.templateBase('item/tabs/action'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         damage: {
             template: SheetFlow.templateBase('item/tabs/damage'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         opposed: {
             template: SheetFlow.templateBase('item/tabs/opposed'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         resist: {
             template: SheetFlow.templateBase('item/tabs/resist'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         ammo: {
             template: SheetFlow.templateBase('item/tabs/ammo'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         device: {
             template: SheetFlow.templateBase('item/tabs/device'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         quality: {
             template: SheetFlow.templateBase('item/tabs/quality'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         ritual:{
             template: SheetFlow.templateBase('item/tabs/ritual'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         effects: {
             template: SheetFlow.templateBase('item/tabs/effects'),
             templates: SheetFlow.listItem('effect'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         footer: {
             template: SheetFlow.templateBase('item/footer'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
     }
 
@@ -207,6 +211,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'device', label: 'Device', cssClass: '' },
                 { id: 'lifestyle', label: 'Lifestyle', cssClass: '' },
                 { id: 'program', label: 'Program', cssClass: '' },
+                { id: 'weapon', label: 'Weapon', cssClass: '' },
                 { id: 'adeptPower', label: 'AdeptPower', cssClass: '' },
                 { id: 'spell', label: 'Spell', cssClass: '' },
                 { id: 'armor', label: 'Armor', cssClass: '' },

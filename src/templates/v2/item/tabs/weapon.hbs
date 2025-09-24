@@ -1,0 +1,99 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="scrollable standard-form">
+            {{formGroup systemFields.category
+                        value=source.system.category
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{#if (eq system.category 'range')}}
+                {{formGroup systemFields.range.fields.modes.fields.single_shot
+                            value=source.system.range.modes.single_shot
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.range.fields.modes.fields.semi_auto
+                            value=source.system.range.modes.semi_auto
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.range.fields.modes.fields.burst_fire
+                            value=source.system.range.modes.burst_fire
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.range.fields.modes.fields.full_auto
+                            value=source.system.range.modes.full_auto
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.range.fields.ranges.fields.category
+                            value=source.system.range.ranges.category
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.range.fields.ranges.fields.short
+                            value=source.system.range.ranges.short
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                {{formGroup systemFields.range.fields.ranges.fields.medium
+                            value=source.system.range.ranges.medium
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                {{formGroup systemFields.range.fields.ranges.fields.long
+                            value=source.system.range.ranges.long
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                {{formGroup systemFields.range.fields.ranges.fields.extreme
+                            value=source.system.range.ranges.extreme
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                {{formGroup systemFields.range.fields.ranges.fields.attribute
+                            value=source.system.range.ranges.attribute
+                            options=attributes
+                            localize=true
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+
+                {{formGroup systemFields.range.fields.rc.fields.base
+                            value=source.system.range.rc.base
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+
+            {{else if (eq system.category 'thrown')}}
+                {{formGroup systemFields.thrown.fields.ranges.fields.category
+                            value=source.system.thrown.ranges.category
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.thrown.fields.ranges.fields.short
+                            value=source.system.thrown.ranges.short
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                {{formGroup systemFields.thrown.fields.ranges.fields.medium
+                            value=source.system.thrown.ranges.medium
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                {{formGroup systemFields.thrown.fields.ranges.fields.long
+                            value=source.system.thrown.ranges.long
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                {{formGroup systemFields.thrown.fields.ranges.fields.extreme
+                            value=source.system.thrown.ranges.extreme
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                {{formGroup systemFields.thrown.fields.ranges.fields.attribute
+                            value=source.system.thrown.ranges.attribute
+                            options=attributes
+                            localize=true
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+
+                {{formGroup systemFields.thrown.fields.blast.fields.radius
+                            value=source.system.thrown.blast.radius
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                {{formGroup systemFields.thrown.fields.blast.fields.dropoff
+                            value=source.system.thrown.blast.dropoff
+                            rootId=@root.rootId
+                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+
+            {{else if (eq system.category 'melee')}}
+                {{formGroup systemFields.melee.fields.reach
+                            value=source.system.melee.reach
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+        </div>
+    </div>
+</section>
