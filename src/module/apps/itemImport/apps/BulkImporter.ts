@@ -218,12 +218,12 @@ export class BulkImporter extends HandlebarsApplicationMixin(ApplicationV2<Impor
         const start = performance.now();
 
         // Unlock all world compendiums for editing
-        for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
+        for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG))
             await game.packs.get("world." + compendium.pack)?.configure({ locked: false });
 
         // Optionally delete existing compendiums
         if (BulkImporter.deleteCompendiums)
-            for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
+            for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG))
                 await game.packs.get("world." + compendium.pack)?.deleteCompendium();
 
         // Load ZIP file if provided
@@ -271,7 +271,7 @@ export class BulkImporter extends HandlebarsApplicationMixin(ApplicationV2<Impor
         }
 
         // Re-lock all compendiums
-        for (const [, compendium] of Object.entries(Constants.MAP_COMPENDIUM_CONFIG))
+        for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG))
             await game.packs.get("world." + compendium.pack)?.configure({ locked: true });
 
         // Finalize and notify
