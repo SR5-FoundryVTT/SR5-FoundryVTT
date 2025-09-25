@@ -63,9 +63,9 @@ export const MarkPlacementFlow = {
     /**
      * Grid networks have special pool calculation based on rules.
      * 
-     * Note: This is called mulitple times during execution!
+     * Note: This is called multiple times during execution!
      */
-    prepareGridDefensePool(test: MarkPlacementDefenseTest) {
+    prepareGridBaseValues(test: MarkPlacementDefenseTest) {
         if (!test.device?.isType('grid')) return;
         const modifier = MatrixRules.gridMarkPlacementDefensePool(test.device);
         if (!modifier) return;
