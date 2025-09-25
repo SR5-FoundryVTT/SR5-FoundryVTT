@@ -27,7 +27,7 @@ export class OpposedHackOnTheFlyTest extends OpposedMatrixTest {
 
     override prepareBaseValues() {
         super.prepareBaseValues();
-        MarkPlacementFlow.prepareGridDefensePool(this);
+        MarkPlacementFlow.prepareGridBaseValues(this);
     }
 
     /**
