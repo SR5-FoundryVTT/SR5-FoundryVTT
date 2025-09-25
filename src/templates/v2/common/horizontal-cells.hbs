@@ -14,7 +14,7 @@
 --}}
 {{#if (not disabled)}}
 <div class="horizontal-cell-input {{id}}" data-id="{{id}}">
-    {{#if (isDefined name)}}<div class="roll cell-input-roll no-break" id="{{id}}">{{name}}</div>{{/if}}
+    {{#if (isDefined name)}}<div class="cell-input-roll" id="{{id}}">{{name}}</div>{{/if}}
     <div class="cell-container">
         {{#for 1 (sum max 1)}}
             <div class="cell {{#iflte this ../value}}filled{{/iflte}}" data-value="{{this}}" data-tooltip="SR5.RightClickToClear" >

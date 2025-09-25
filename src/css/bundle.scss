@@ -1734,6 +1734,7 @@ input[type='text'].display {
     .cell-input-roll {
         color: $yellow;
         white-space: nowrap;
+        width: 5rem;
     }
 
     // Intended to affect icons only within the url/pdf source controls.

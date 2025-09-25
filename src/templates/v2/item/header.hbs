@@ -1,77 +1,106 @@
-<div class="sheet-header">
-    <img src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" width="80" height="80" />
-    <div class="sheet-header-labels">
-        <div class="sheet-header-name">
-            {{#if @root.isPlayMode}}
-                {{#if system.description.source}}
-                    <div>
-                        <button type="button" data-action="openSource" data-tooltip="SR5.OpenSource">
-                            {{#if sourceIsURL}}
-                                <i class="fas fa-link"></i>
-                            {{else if sourceIsPDF}}
-                                <i class="fas fa-file-pdf"></i>
-                            {{else if sourceIsUuid}}
-                                <i class="fas fa-file"></i>
-                            {{/if}}
-                        </button>
-                    </div>
+<div>
+    <div class="sheet-header">
+        <img src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" width="80" height="80" />
+        <div class="sheet-header-labels">
+            <div class="sheet-header-name">
+                {{#if @root.isPlayMode}}
+                    {{#if system.description.source}}
+                        <div>
+                            <button type="button" data-action="openSource" data-tooltip="SR5.OpenSource">
+                                {{#if sourceIsURL}}
+                                    <i class="fas fa-link"></i>
+                                {{else if sourceIsPDF}}
+                                    <i class="fas fa-file-pdf"></i>
+                                {{else if sourceIsUuid}}
+                                    <i class="fas fa-file"></i>
+                                {{/if}}
+                            </button>
+                        </div>
+                    {{/if}}
                 {{/if}}
-            {{/if}}
-            <input type="text" class="name" name="name" value="{{item.name}}" placeholder='{{localize "SR5.ItemName"}}' {{#if @root.isPlayMode}}disabled{{/if}}/>
-        </div>
-        {{#if @root.isEditMode}}
-        <div class="sheet-header-source">
-            <input
-                class="display text"
-                type="text"
-                name="system.description.source"
-                value="{{system.description.source}}"
-                placeholder='{{localize "SR5.Source"}}'
-            />
-            {{#if system.importFlags.isFreshImport}}
-                {{#if (itemMarking "ANY")}}
-                    <button class="toggle-fresh-import-off" data-tooltip="SR5.MarkImportedItemTooltip">{{localize 'SR5.MarkImportedItemReviewed'}}</button>
-                {{/if}}
-            {{/if}}
-        </div>
-        {{/if}}
-        {{#if @root.isPlayMode}}
-            <div class="new-list-item">
-                <div class="new-list-item-label-container">
-                    {{#unless system.technology.show_quantity}}
-                        {{#if system.technology.condition_monitor.max}}
-                            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                                name=(localize "SR5.ConditionMonitor")
-                                value=system.technology.condition_monitor.value
-                                max=system.technology.condition_monitor.max
-                                id='matrix'
-                                disabled=system.technology.condition_monitor.disabled
-                            }}
-                        {{/if}}
-                    {{else}}
-                        <span>
-                            <label>{{localize "SR5.Qty"}} </label>
-                            <a data-action="removeOneQty"
-                               data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty"
-                               data-item-id="{{item.uuid}}">
-                                <i class="fas fa-minus-square"></i>
-                            </a>
-                            {{system.technology.quantity}}
-                            <a data-action="addOneQty"
-                               data-tooltip="SR5.ItemSheet.Labels.AddOneQty"
-                               data-item-id="{{item.uuid}}">
-                                <i class="fas fa-plus-square"></i>
-                            </a>
-                        </span>
-                    {{/unless}}
-                </div>
-                {{#if systemFields.technology}}
-                    <div class="new-list-item-icons">
-                        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
-                        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
-                    </div>
+                <input type="text" class="name" name="name" value="{{item.name}}" placeholder='{{localize "SR5.ItemName"}}' {{#if @root.isPlayMode}}disabled{{/if}}/>
+            </div>
+            {{#if @root.isEditMode}}
+            <div class="sheet-header-source">
+                <input
+                    class="display text"
+                    type="text"
+                    name="system.description.source"
+                    value="{{system.description.source}}"
+                    placeholder='{{localize "SR5.Source"}}'
+                />
+                {{#if system.importFlags.isFreshImport}}
+                    {{#if (itemMarking "ANY")}}
+                        <button class="toggle-fresh-import-off" data-tooltip="SR5.MarkImportedItemTooltip">{{localize 'SR5.MarkImportedItemReviewed'}}</button>
+                    {{/if}}
                 {{/if}}
             </div>
-        {{/if}}
+            {{/if}}
+            {{#if @root.isPlayMode}}
+                <div class="new-list-item">
+                    <div class="new-list-item-label-container">
+                        {{#unless system.technology.show_quantity}}
+                            {{#if system.technology.condition_monitor.max}}
+                                {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                                    name=(localize "SR5.ConditionMonitor")
+                                    value=system.technology.condition_monitor.value
+                                    max=system.technology.condition_monitor.max
+                                    id='matrix'
+                                    disabled=system.technology.condition_monitor.disabled
+                                }}
+                            {{/if}}
+                        {{else}}
+                            <span>
+                                <label>{{localize "SR5.Qty"}} </label>
+                                <a data-action="removeOneQty"
+                                   data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty"
+                                   data-item-id="{{item.uuid}}">
+                                    <i class="fas fa-minus-square"></i>
+                                </a>
+                                {{system.technology.quantity}}
+                                <a data-action="addOneQty"
+                                   data-tooltip="SR5.ItemSheet.Labels.AddOneQty"
+                                   data-item-id="{{item.uuid}}">
+                                    <i class="fas fa-plus-square"></i>
+                                </a>
+                            </span>
+                        {{/unless}}
+                    </div>
+                    {{#if systemFields.technology}}
+                        <div class="new-list-item-icons">
+                            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
+                            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
+                        </div>
+                    {{/if}}
+                </div>
+            {{/if}}
+        </div>
     </div>
+    {{#if (eq item.type 'weapon')}}
+        <div class="new-list-item new-list-item-header">
+            {{#if (eq system.category 'range')}}
+                <label>
+                    {{localize "SR5.Weapon.Mode.Modes"}}:
+                    {{#if system.range.modes.single_shot}}
+                        {{localize "SR5.Weapon.Mode.SingleShot"}}
+                    {{/if}}
+                    {{#if system.range.modes.semi_auto}}
+                        {{localize "SR5.Weapon.Mode.SemiAuto"}}
+                    {{/if}}
+                    {{#if system.range.modes.burst_fire}}
+                        {{localize "SR5.Weapon.Mode.BurstFire"}}
+                    {{/if}}
+                    {{#if system.range.modes.full_auto}}
+                        {{localize "SR5.Weapon.Mode.FullAuto"}}
+                    {{/if}}
+                </label>
+                <label>{{localize "SR5.Weapon.Range.Ranges"}}: {{system.range.ranges.short}}m/{{system.range.ranges.medium}}m/{{system.range.ranges.long}}m/{{system.range.ranges.extreme}}m</label>
+                <label>{{localize "SR5.RecoilCompensation"}} {{system.range.rc.value}}</label>
+            {{else if (eq system.category 'thrown')}}
+                <label>{{localize "SR5.Weapon.Range.Ranges"}}: {{system.thrown.ranges.short}}m/{{system.thrown.ranges.medium}}m/{{system.thrown.ranges.long}}m/{{system.thrown.ranges.extreme}}m</label>
+            {{else if (eq system.category 'melee')}}
+                <label>{{systemFields.melee.fields.reach.label}} {{system.melee.reach}}</label>
+            {{/if}}
+        </div>
+    {{/if}}
 </div>

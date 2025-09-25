@@ -1,35 +1,26 @@
 <footer class="sheet-footer">
-    {{#if @root.isEditMode}}
-        <div class="new-list-item">
-            <div class="new-list-item-col">
-                <button type="submit" data-action="toggleEditMode"><i class="fas fa-save"></i>{{localize "SR5.Save"}}</button>
-            </div>
-        </div>
-    {{else}}
-        <span class="fa-stack" style="vertical-align: center; font-size: 0.5em">
+    <div class="new-list-item">
+        <label>
+            <span class="fa-stack" style="vertical-align: center; font-size: 0.5em">
             <i class="fa-light fa-circle-dashed fa-stack-2x"></i>
             <i class="fas fa-user fa-stack-1x"></i>
-        </span>
-        <span>{{speakerName actor}}</span>
+            </span>
+            {{speakerName actor}}
+        </label>
         {{#if system.metatype}}
-            <span>|</span>
-            <span>{{system.metatype}}</span>
+            <label>{{system.metatype}}</label>
         {{/if}}
         {{#if system.is_npc}}
-            <span>|</span>
-            <span>{{localize "SR5.IsNPC"}}</span>
+            <label>{{localize "SR5.IsNPC"}}</label>
         {{/if}}
         {{#if system.is_critter}}
-            <span>|</span>
-            <span>{{localize "SR5.IsCritter"}}</span>
+            <label>{{localize "SR5.IsCritter"}}</label>
         {{/if}}
         {{#if system.is_grunt}}
-            <span>|</span>
-            <span>{{localize "SR5.IsGrunt"}}</span>
+            <label>{{localize "SR5.IsGrunt"}}</label>
         {{/if}}
         {{#if system.nuyen}}
-            <span>|</span>
-            <span><i class="fas fa-yen"></i> {{system.nuyen}}</span>
+            <label><i class="fas fa-yen"></i> {{system.nuyen}}</label>
         {{/if}}
-    {{/if}}
+    </div>
 </footer>
