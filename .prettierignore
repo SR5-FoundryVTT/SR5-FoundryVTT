@@ -1,7 +1,1 @@
-node_modules
-.github
 dist
-packs
-public
-gulp.tasks.js
-gulpfile.js
