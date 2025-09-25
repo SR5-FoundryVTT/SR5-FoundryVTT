@@ -51,27 +51,6 @@ export class BonusHelper {
         return name;
     }
 
-    private static addTagifyLabels(effect: BC.AECreateData) {
-        if (!effect.system) return;
-
-        type TagifyItem = {value?: string, id: string}[];
-        for (const attribute of IH.getArray(effect.system.selection_attributes) as TagifyItem)
-            attribute.value = SR5.attributes[attribute.id];
-
-        for (const category of IH.getArray(effect.system.selection_categories) as TagifyItem)
-            category.value = SR5.actionCategories[category.id];
-
-        for (const limit of IH.getArray(effect.system.selection_limits) as TagifyItem)
-            limit.value = SR5.limits[limit.id];
-
-        // it can include non-Active skills, but those are not an option in AE yet
-        for (const skill of IH.getArray(effect.system.selection_skills) as TagifyItem)
-            skill.value = SR5.activeSkills[skill.id];
-
-        for (const test of IH.getArray(effect.system.selection_tests) as TagifyItem)
-            test.value = game.shadowrun5e.tests[test.id]?.label;
-    }
-
     private static createEffect(
         sheet: BC.DocCreateData,
         effect: BC.AECreateData
@@ -80,8 +59,6 @@ export class BonusHelper {
 
         for (const change of changes)
             change.value = this.normalizeValue(sheet, change.value);
-
-        this.addTagifyLabels(effect);
 
         sheet.effects!.push({
             name: sheet.name,

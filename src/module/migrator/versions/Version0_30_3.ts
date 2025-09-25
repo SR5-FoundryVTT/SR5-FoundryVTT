@@ -24,38 +24,6 @@ export class Version0_30_3 extends VersionMigration {
         this._migrateNonAllInventories(_actor);
     }
 
-    override handlesActiveEffect(_effect: Readonly<any>) {
-        if (!_effect.system) return false;
-
-        return _effect.system.selection_attributes?.some(a => !a.value)
-            || _effect.system.selection_categories?.some(c => !c.value)
-            || _effect.system.selection_limits?.some(l => !l.value)
-            || _effect.system.selection_skills?.some(s => !s.value)
-            || _effect.system.selection_tests?.some(t => !t.value);
-    }
-
-    override migrateActiveEffect(_effect: any): void {
-        for (const attribute of _effect.system.selection_attributes)
-            if (!attribute.value)
-                attribute.value = SR5.attributes[attribute.id];
-
-        for (const category of _effect.system.selection_categories)
-            if (!category.value)
-                category.value = SR5.actionCategories[category.id];
-
-        for (const limit of _effect.system.selection_limits)
-            if (!limit.value)
-                limit.value = SR5.limits[limit.id];
-
-        for (const skill of _effect.system.selection_skills)
-            if (!skill.value)
-                skill.value = SR5.activeSkills[skill.id];
-
-        for (const test of _effect.system.selection_tests)
-            if (!test.value)
-                test.value = game.shadowrun5e.tests[test.id]?.label;
-    }
-
     /**
      * Due to an issue with default inventory data setting showAll to true, newly created inventories, 
      * as well as default 'carried', since 0.30.0 would break display of which inventory an item belongs to.
