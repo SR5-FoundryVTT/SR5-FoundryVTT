@@ -20,7 +20,7 @@
         font-size: 200%;
         margin-bottom: 0;
         padding-left: 5px;
-        input[type=text].display {
+        input[type='text'].display {
             background: none;
         }
     }
@@ -243,11 +243,13 @@
     }
 
     &.sheet.window-app {
-        box-shadow: 0 0 10px 0px rgba(235,181,49,0.3);
+        box-shadow: 0 0 10px 0px rgba(235, 181, 49, 0.3);
 
         & .window-header {
             border-bottom: none;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('assets/page.webp') repeat;
             background-repeat: repeat;
             background-size: 100% 20px auto;
             flex: 0 0 20px;
@@ -256,19 +258,19 @@
             border-top-right-radius: 8px;
 
             & a {
-            display: inline-flex;
-            padding: 6px 0 0 0;
-            font-size: 0px;
-            color: rgb(100, 100, 100);
+                display: inline-flex;
+                padding: 6px 0 0 0;
+                font-size: 0px;
+                color: rgb(100, 100, 100);
 
-            & .fa-solid,
+                & .fa-solid,
                 & .fas {
                     font-size: 12px;
                 }
             }
 
             & .window-title {
-            font-size: 0;
+                font-size: 0;
             }
         }
     }
