@@ -8,7 +8,7 @@
             {{speakerName actor}}
         </label>
         {{#if system.metatype}}
-            <label>{{system.metatype}}</label>
+            <label>{{localizeOb system.metatype config.character.types}}</label>
         {{/if}}
         {{#if system.is_npc}}
             <label>{{localize "SR5.IsNPC"}}</label>
@@ -22,5 +22,6 @@
         {{#if system.nuyen}}
             <label><i class="fas fa-yen"></i> {{system.nuyen}}</label>
         {{/if}}
+        <div></div>
     </div>
 </footer>

@@ -1395,7 +1395,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #onToggleEquippedItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = event.target.dataset.itemId;
+        const iid = SheetFlow.listItemId(event.target);
         const item = await fromUuid(iid);
         if (!item || !(item instanceof SR5Item) || item.actorOwner !== this.actor) return;
 
@@ -1429,7 +1429,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         event.stopPropagation();
 
-        const iid = event.target.dataset.itemId;
+        const iid = SheetFlow.listItemId(event.target);
         const item = await fromUuid(iid);
         if (!item || !(item instanceof SR5Item)) return;
 
