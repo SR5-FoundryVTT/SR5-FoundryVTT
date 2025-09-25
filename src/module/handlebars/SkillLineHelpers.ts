@@ -47,7 +47,7 @@ export const registerSkillLineHelpers = () => {
         // Display filters for active skills. See issue #871.
         // when not given, filters won't be undefined, but will contain a handlebar object.
         const activeSkillFilter = id === 'active' &&
-            filters && filters.hasOwnProperty('showUntrainedSkills') &&
+            filters && Object.hasOwn(filters, 'showUntrainedSkills') &&
             !filters.showUntrainedSkills;
 
         const rtg = {

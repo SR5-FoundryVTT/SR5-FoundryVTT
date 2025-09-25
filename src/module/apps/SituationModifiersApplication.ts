@@ -199,7 +199,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
         const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        if (!triggerElement || !Object.hasOwn(triggerElement.dataset, 'delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -337,7 +337,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
         const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        if (!triggerElement || !Object.hasOwn(triggerElement.dataset, 'delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);

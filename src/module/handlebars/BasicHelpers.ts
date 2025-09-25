@@ -66,7 +66,7 @@ export const registerBasicHelpers = () => {
         return v1 / v2;
     });
     Handlebars.registerHelper('hasprop', function (this: any, obj, prop, options) {
-        if (obj.hasOwnProperty(prop)) {
+        if (Object.hasOwn(obj, prop)) {
             return options.fn(this);
         } else return options.inverse(this);
     });

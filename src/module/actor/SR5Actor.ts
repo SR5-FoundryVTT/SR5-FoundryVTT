@@ -853,17 +853,17 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const skills = rollData?.skills ?? this.getSkills();
 
         // Find skill by direct id to key matching.
-        if (skills.active.hasOwnProperty(id)) {
+        if (Object.hasOwn(skills.active, id)) {
             return skills.active[id];
         }
-        if (skills.language.value.hasOwnProperty(id)) {
+        if (Object.hasOwn(skills.language.value, id)) {
             return skills.language.value[id];
         }
         // Knowledge skills are de-normalized into categories (street, hobby, ...)
         for (const categoryKey in skills.knowledge) {
-            if (skills.knowledge.hasOwnProperty(categoryKey)) {
+            if (Object.hasOwn(skills.knowledge, categoryKey)) {
                 const category = skills.knowledge[categoryKey];
-                if (category.value.hasOwnProperty(id)) {
+                if (Object.hasOwn(category.value, id)) {
                     return category.value[id];
                 }
             }
@@ -893,7 +893,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Iterate over all different knowledge skill categories
         for (const categoryKey in skills.knowledge) {
-            if (!skills.knowledge.hasOwnProperty(categoryKey)) continue;
+            if (!Object.hasOwn(skills.knowledge, categoryKey)) continue;
             // TODO: check this function Typescript can't follow the flow here...
             const categorySkills = skills.knowledge[categoryKey].value as SkillFieldType[];
             for (const [id, skill] of Object.entries(categorySkills)) {
@@ -940,7 +940,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         category: KnowledgeSkillCategory,
         skill: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }
     ): Promise<string|undefined> {
-        if (!this.system.skills.knowledge.hasOwnProperty(category)) {
+        if (!Object.hasOwn(this.system.skills.knowledge, category)) {
             console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
             return;
         }
@@ -1033,7 +1033,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async removeActiveSkill(skillId: string) {
         const activeSkills = this.getActiveSkills();
-        if (!activeSkills.hasOwnProperty(skillId)) return;
+        if (!Object.hasOwn(activeSkills, skillId)) return;
         const skill = this.getSkill(skillId);
         if (!skill) return;
 
@@ -1354,7 +1354,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param attribute
      */
     _isMatrixAttribute(attribute: string): boolean {
-        return SR5.matrixAttributes.hasOwnProperty(attribute);
+        return Object.hasOwn(SR5.matrixAttributes, attribute);
     }
 
     /**
