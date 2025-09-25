@@ -1,8 +1,11 @@
 import { CharacterImporter } from "../../importer/actorImport/characterImporter/CharacterImporter";
 import { SpiritImporter } from "../../importer/actorImport/spiritImporter/SpiritImporter";
+import { SpriteImporter } from "../../importer/actorImport/spriteImporter/SpriteImporter";
 
 import AppV2 = foundry.applications.api.ApplicationV2;
-import { ActorFile } from "../../importer/actorImport/ActorSchema";
+import { ActorFile, ActorSchema } from "../../importer/actorImport/ActorSchema";
+import { ImportHelper as IH } from "../helper/ImportHelper";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
 
 interface ImporterContext extends AppV2.RenderContext {
@@ -12,7 +15,7 @@ interface ImporterContext extends AppV2.RenderContext {
 export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<ImporterContext>) {
     private static readonly characterImporter = new CharacterImporter();
     private static readonly spiritImporter = new SpiritImporter();
-
+    private static readonly spriteImporter = new SpriteImporter();
     /**
      * Default options for the application window.
      */
@@ -74,14 +77,19 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
         const textarea = document.getElementById('chummer-input') as HTMLTextAreaElement;
         const jsonText = textarea?.value.trim();
 
+        if(!game.user?.can("ACTOR_CREATE")) {
+            ui.notifications?.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
+            return;
+        }
+
         if (!jsonText) {
             ui.notifications?.warn("Please paste Chummer JSON data to import.");
             return;
         }
 
-        let chummerData: ActorFile;
+        let actorData: ActorSchema;
         try {
-            chummerData = JSON.parse(jsonText);
+            actorData = IH.getArray((JSON.parse(jsonText) as ActorFile).characters.character)[0];
         } catch (e) {
             ui.notifications?.error("Invalid JSON. Please check your input.");
             console.error("JSON Parse Error:", e);
@@ -111,10 +119,17 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
         };
 
         // Log everything for now (replace with actual import logic)
-        console.log("Parsed Chummer Data:", chummerData);
+        console.log("Parsed Chummer Data:", actorData);
         console.log("Import Options:", importOptions);
 
-        await ActorImporter.characterImporter.import(chummerData, importOptions);
+        const spiritType = this.getSpiritType(actorData);
+        if (actorData.metatype_english?.toLowerCase().includes('sprite')) {
+            await ActorImporter.spriteImporter.import(actorData, importOptions);
+        } else if (spiritType) {
+            await ActorImporter.spiritImporter.import(actorData, spiritType, importOptions);
+        } else {
+            await ActorImporter.characterImporter.import(actorData, importOptions);
+        }
     }
 
     protected override async _onRender(
@@ -124,5 +139,46 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
 
         const importBtn = this.element.querySelector<HTMLButtonElement>("#chummer-import-button");
         importBtn?.addEventListener("click", (event) => { void this.handleActorImport(event);});
+    }
+
+    private getSpiritType(chummerChar: ActorSchema) {
+        const chummerType = chummerChar.metatype_english;
+
+        const spiritTypes = [
+            'air', 'aircraft', 'airwave', 'ally', 'automotive', 'beasts', 'ceramic', 'earth', 'energy',
+            'fire', 'guardian', 'guidance', 'homunculus', 'man', 'metal','plant', 'ship', 'task', 'train',
+            'water', 'watcher', 'toxic_air', 'toxic_beasts', 'toxic_earth', 'toxic_fire', 'toxic_man',
+            'toxic_water', 'blood', 'muse', 'nightmare', 'shade', 'succubus', 'wraith',
+
+            //shedim
+            'shedim', 'hopper', 'blade_summoned', 'horror_show', 'unbreakable', 'master_shedim',
+
+            // insect
+            'caretaker', 'nymph', 'scout', 'soldier', 'worker', 'queen',
+
+            "carcass", "corpse", "rot", "palefile", "detritus",
+
+            // Howling Shadow
+            "anarch", "arboreal", "blackjack", "boggle", "bugul", "chindi", "corpselight", "croki",
+            "duende", "ejerian", "elvar", "erinyes", "green_man", "imp", "jarl", "kappa", "kokopelli",
+            "morbi", "nocnitsa", "phantom", "preta", "stabber", "tungak", "vucub_caquix",
+            
+            // Aetherology
+            'gum_toad', 'crawler', 'ghasts', 'vryghots', 'gremlin', 'anansi', 'tsuchigumo_warrior',
+
+            // Horror Terrors
+            'corps_cadavre',
+        ]
+
+        const specialMapping = new Map([
+            ['Noxious Spirit', 'toxic_air'],
+            ['Abomination Spirit', 'toxic_beasts'],
+            ['Barren Spirit', 'toxic_earth'],
+            ['Nuclear Spirit', 'toxic_fire'],
+            ['Plague Spirit', 'toxic_man'],
+            ['Sludge Spirit', 'toxic_water']
+        ]);
+
+        return spiritTypes.find(v => chummerType?.toLowerCase().includes(v)) ?? specialMapping.get(chummerType);
     }
 }

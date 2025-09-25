@@ -180,7 +180,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
 
         } else {
             // Create a new sprite actor from scratch...
-            const spriteType = this.against.data.spriteTypeSelected;
+            const spriteType = this.against.data.spriteTypeSelected as keyof typeof SR5.spriteTypes;
             const spriteTypeLabel = game.i18n.localize(SR5.spriteTypes[spriteType]);
             const name = `${technomancer.name} ${spriteTypeLabel} ${game.i18n.localize('TYPES.Actor.sprite')}`;
             const level = this.against.data.level;

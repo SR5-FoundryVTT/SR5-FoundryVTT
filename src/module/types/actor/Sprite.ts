@@ -10,7 +10,11 @@ const SpriteData = () => ({
     // === Core Identity ===
     ...CommonData(),
     attributes: new SchemaField({...Attributes(), ...MatrixActorAttributes() }),
-    spriteType: new StringField({ required: true }),
+    spriteType: new StringField({
+        required: true,
+        initial: "courier",
+        choices: ['companion', 'courier', 'crack', 'data', 'fault', 'generalist', 'machine']
+    }),
     special: new StringField({ required: true, initial: "resonance", readonly: true }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
 

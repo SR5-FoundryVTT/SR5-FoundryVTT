@@ -1,7 +1,7 @@
 import { BlankCharacter, CharacterInfoUpdater } from "./CharacterInfoUpdater"
 import { ItemsParser } from "../itemImporter/ItemsParser";
 import { VehicleParser } from "../itemImporter/vehicleImport/VehicleParser";
-import { ActorFile } from "../ActorSchema";
+import { ActorSchema } from "../ActorSchema";
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ImportHelper as IH } from "src/module/apps/itemImport/helper/ImportHelper";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
@@ -35,25 +35,7 @@ export class CharacterImporter {
      * @param {*} chummerFile The complete chummer file as json object. The first character will be selected for import.
      * @param {*} importOptions Additional import option that specify what parts of the chummer file will be imported.
      */
-    async import(chummerFile: ActorFile, importOptions: importOptionsType) {
-        if(!game.user?.can("ACTOR_CREATE")) {
-            ui.notifications?.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
-            return;
-        }
-
-        console.log('Importing the following character file content:');
-        console.log(chummerFile);
-
-        console.log('Using the following import options:')
-        console.log(importOptions);
-
-        if (!chummerFile.characters?.character) {
-            ui.notifications.error("No valid character found in Chummer file");
-            return;
-        }
-
-        const chummerCharacter = IH.getArray(chummerFile.characters.character)[0];
-
+    async import(chummerCharacter: ActorSchema, importOptions: importOptionsType) {
         const character = {
             effects: [],
             type: 'character',
