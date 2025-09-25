@@ -549,9 +549,8 @@ ___________________
      * @returns 
      */
     static renderCompendiumDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
-        if (!game.user?.isGM) {
+        if (!game.user?.isGM)
             return;
-        }
 
         const button = $('<button class="sr5 import-button"><i class="fa-solid fa-file-import"></i><span>Import Chummer Data</span></button>');
         $(html).find('.header-actions').append(button);
@@ -560,6 +559,9 @@ ___________________
     }
 
     static renderActorDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
+        if(!game.user?.can("ACTOR_CREATE"))
+            return;
+
         const button = $('<button class="sr5 import-button"><i class="fa-solid fa-file-import"></i><span>Import Actor</span></button>');
         $(html).find('.header-actions').append(button);
 

@@ -1,18 +1,19 @@
 import { CharacterImporter } from "../../importer/actorImport/characterImporter/CharacterImporter";
 import { SpiritImporter } from "../../importer/actorImport/spiritImporter/SpiritImporter";
 import { SpriteImporter } from "../../importer/actorImport/spriteImporter/SpriteImporter";
-
-import AppV2 = foundry.applications.api.ApplicationV2;
 import { ActorFile, ActorSchema } from "../../importer/actorImport/ActorSchema";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
 
-interface ImporterContext extends AppV2.RenderContext {
+interface ImporterContext extends foundry.applications.api.ApplicationV2.RenderContext {
     folders: { id: string, name: string }[]
 };
 
-export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<ImporterContext>) {
+const Base = HandlebarsApplicationMixin(ApplicationV2<ImporterContext>);
+type BaseType = InstanceType<typeof Base>;
+
+export class ActorImporter extends Base {
     private static readonly characterImporter = new CharacterImporter();
     private static readonly spiritImporter = new SpiritImporter();
     private static readonly spriteImporter = new SpriteImporter();
@@ -30,6 +31,11 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
             classes: ["chummer-import"],
             title: "Chummer/Data Import",
         },
+        actions: {
+            import: function(this: ActorImporter) {
+                void this.handleActorImport();
+            }
+        }
     };
 
     /**
@@ -48,7 +54,7 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
         return "Chummer/Data Import";
     }
 
-    override async _prepareContext(options?: any) {
+    override async _prepareContext(options: Parameters<BaseType['_prepareContext']>[0]) {
         const baseContext = await super._prepareContext(options);
         const compareOptions = { numeric: true, sensitivity: 'base' } satisfies Intl.CollatorOptions;
 
@@ -72,15 +78,10 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
         return { ...baseContext, folders };
     }
 
-    private async handleActorImport(event) {
+    private async handleActorImport() {
         // Get the JSON input from the textarea
         const textarea = document.getElementById('chummer-input') as HTMLTextAreaElement;
         const jsonText = textarea?.value.trim();
-
-        if(!game.user?.can("ACTOR_CREATE")) {
-            ui.notifications?.error(game.i18n.format("SR5.VehicleImport.MissingPermission"))
-            return;
-        }
 
         if (!jsonText) {
             ui.notifications?.warn("Please paste Chummer JSON data to import.");
@@ -123,22 +124,14 @@ export class ActorImporter extends HandlebarsApplicationMixin(ApplicationV2<Impo
         console.log("Import Options:", importOptions);
 
         const spiritType = this.getSpiritType(actorData);
-        if (actorData.metatype_english?.toLowerCase().includes('sprite')) {
-            await ActorImporter.spriteImporter.import(actorData, importOptions);
-        } else if (spiritType) {
+        if (spiritType)
             await ActorImporter.spiritImporter.import(actorData, spiritType, importOptions);
-        } else {
+        else if (actorData.metatype_english?.toLowerCase().includes('sprite'))
+            await ActorImporter.spriteImporter.import(actorData, importOptions);
+        else
             await ActorImporter.characterImporter.import(actorData, importOptions);
-        }
-    }
 
-    protected override async _onRender(
-        ...[context, options]: Parameters<AppV2["_onRender"]>
-    ): Promise<void> {
-        await super._onRender(context, options);
-
-        const importBtn = this.element.querySelector<HTMLButtonElement>("#chummer-import-button");
-        importBtn?.addEventListener("click", (event) => { void this.handleActorImport(event);});
+        await this.close();
     }
 
     private getSpiritType(chummerChar: ActorSchema) {
