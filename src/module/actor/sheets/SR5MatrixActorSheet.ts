@@ -12,12 +12,18 @@ import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 
+// Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
+type sheetAction = {
+    name: string,
+    description: string,
+    action: SR5Item
+}
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
     markedDocuments: Shadowrun.MarkedDocument[]
     handledItemTypes: string[]
     network: SR5Item | null
-    matrixActions: {name: string, action: SR5Item}[]
+    matrixActions: sheetAction[]
     selectedMatrixTarget: string|undefined
     // Stores icons connected to the selected matrix target.
     selectedMatrixTargetIcons: Shadowrun.MatrixTargetDocument[];
@@ -307,7 +313,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         }
 
         // Prepare sorting and display of a possibly translated document name.
-        const sheetActions: {name: string, description: string, action: SR5Item}[] = [];
+        const sheetActions: sheetAction[] = [];
         for (const action of actions) {
             sheetActions.push({
                 name: PackActionFlow.localizePackAction(action.name),
