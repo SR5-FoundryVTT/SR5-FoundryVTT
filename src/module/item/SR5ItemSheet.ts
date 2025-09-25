@@ -96,6 +96,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         position: {
             width: 500,
             height: 300,
+        },
+        actions: {
+            openSource: SR5ItemSheet.#onOpenSource,
         }
     }
 
@@ -472,11 +475,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         /**
          * General item handling
          */
-        html.find('.edit-item').click(this._onEditItem.bind(this));
-        html.find('.open-source').on('click', this._onOpenSource.bind(this));
-        html.find('.has-desc').click(this._onListItemToggleDescriptionVisibility.bind(this));
         html.find('.hidden').hide();
-        html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
 
         /**
          * Contact item specific
@@ -687,7 +686,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
-    async _onOpenSource(event) {
+    static async #onOpenSource(this: SR5ItemSheet, event) {
         event.preventDefault();
         await this.item.openSource();
     }
@@ -903,89 +902,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         return $(this.element).find('.tab.active .scroll-area');
     }
 
-    /**
-     * Add a tagify element for an action-modifier dom element.
-     *
-     * Usage: Call method after render with a singular item's html sub-dom-tree.
-     * 
-     * Only action items will trigger the creation of a tagify element.
-     *
-     * @param html see DocumentSheet.activateListeners#html param for documentation.
-     */
-    _createActionModifierTagify(html) {
-        if (!('action' in this.item.system)) return;
-        const inputElement = html.find('input#action-modifier').get(0);
-
-        if (!inputElement)
-            return console.error('Shadowrun 5e | Action item sheet does not contain an action-modifier input element');
-
-        // Tagify expects this format for localized tags.
-        const whitelist = Object.keys(SR5.modifierTypes).map(modifier => ({
-            value: game.i18n.localize(SR5.modifierTypes[modifier]),
-            id: modifier
-        }));
-
-        // Tagify dropdown should show all whitelist tags.
-        const maxItems = Object.keys(SR5.modifierTypes).length;
-
-        // Use localized label as value, and modifier as the later to be extracted value
-        const modifiers = this.item.system.action?.modifiers ?? [];
-        const tags = modifiers.map(modifier => ({
-            value: game.i18n.localize(SR5.modifierTypes[modifier]),
-            id: modifier
-        }));
-
-        const tagify = createTagify(inputElement, { whitelist, maxItems, tags });
-
-        html.find('input#action-modifier').on('change', async (event) => {
-            const modifiers = tagify.value.map(tag => tag.id);
-            // render would loose tagify input focus. submit on close will save.
-            await this.item.update({ system: { action: { modifiers } } }, { render: false });
-        });
-    }
-
-    /**
-     * Add a tagify element for an action-categories dom element.
-     * 
-     * Usage: Call method after render with a singular item's html sub-dom-tree.
-     * 
-     * Only action items will trigger the creation of a tagify element.
-     * @param html 
-     */
-    _createActionCategoriesTagify(html) {
-        if (!('action' in this.item.system)) return;
-        const inputElement = html.find('input#action-categories').get(0) as HTMLInputElement;
-
-        if (!inputElement) {
-            console.error('Shadowrun 5e | Action item sheet does not contain an action-categories input element');
-            return;
-        }
-
-        // Tagify expects this format for localized tags.
-        const whitelist = Object.keys(SR5.actionCategories).map(category => ({
-            value: game.i18n.localize(SR5.actionCategories[category]),
-            id: category
-        }));
-
-        // Tagify dropdown should show all whitelist tags.
-        const maxItems = Object.keys(SR5.actionCategories).length;
-
-        // Use localized label as value, and category as the later to be extracted value
-        const categories = this.item.system.action?.categories ?? [];
-        const tags = categories.map(category => ({
-            value: game.i18n.localize(SR5.actionCategories[category]) ?? category,
-            id: category
-        }));
-
-        const tagify = createTagify(inputElement, { whitelist, maxItems, tags });
-
-        html.find('input#action-categories').on('change', async (event) => {
-            // Custom tags will not have an id, so use value as id.
-            const categories = tagify.value.map(tag => tag.id ?? tag.value);
-            // render would loose tagify input focus. submit on close will save.
-            await this.item.update({ system: { action: { categories } } }, { render: false });
-        });
-    }
 
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
@@ -1059,19 +975,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         await this.item.disconnectFromNetwork();
         this.render(false);
-    }
-
-    /**
-     * Activate listeners for tagify elements for item types that allow changing action
-     * modifiers.
-     *
-     * @param html The JQuery HTML as given by the activateListeners method.
-     */
-    _activateTagifyListeners(html) {
-        if (!['action', 'metamagic', 'bioware', 'cyberware', 'equipment', 'quality', 'ritual', 'call_in_action', 'sprite_power', 'critter_power', 'adept_power'].includes(this.document.type)) return;
-
-        this._createActionModifierTagify(html);
-        this._createActionCategoriesTagify(html);
     }
 
     /**

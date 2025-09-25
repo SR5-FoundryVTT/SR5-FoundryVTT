@@ -90,6 +90,10 @@ export const SheetFlow = {
         return undefined;
     },
 
+    closestAction(target) {
+        return target.closest('[data-action]');
+    },
+
     listItemId(target) {
        return target.closest('.new-list-item[data-item-id]')?.dataset?.itemId;
     }
