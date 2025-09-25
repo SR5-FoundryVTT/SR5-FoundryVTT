@@ -253,7 +253,8 @@
             background-repeat: repeat;
             background-size: 100% 20px auto;
             flex: 0 0 20px;
-            padding: 0 3px 0 0;
+            padding-inline: 0.5rem;
+            padding-block: 0rem;
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
 
@@ -271,6 +272,23 @@
 
             & .window-title {
                 font-size: 0;
+
+                // set the left margin of the icon to mirror the increased inline padding
+                // so maximized window icons are still symetrically spaced to the borders
+                // of the window header
+                a {
+                    margin-left: 0.25rem;
+                }
+            }
+        }
+
+        // Display the window-title when the window is minimized, and restore margin
+        &.minimized .window-header .window-title {
+            font-size: inherit;
+            font-weight: inherit;
+
+            a {
+                margin-left: 0.5rem;
             }
         }
     }
