@@ -441,7 +441,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      */
     _addInventoryTypes(inventory: InventorySheetData) {
         for (const type of this.getInventoryItemTypes()) {
-            if (inventory.types.hasOwnProperty(type)) continue;
+            if (Object.hasOwn(inventory.types, type)) continue;
 
             inventory.types[type] = {
                 type,
@@ -990,7 +990,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             const { name, label, itemIds } = inventory;
 
             // Avoid re-adding default inventories.
-            if (!inventoriesSheet.hasOwnProperty(name)) {
+            if (!Object.hasOwn(inventoriesSheet, name)) {
                 inventoriesSheet[name] = {
                     name,
                     label,

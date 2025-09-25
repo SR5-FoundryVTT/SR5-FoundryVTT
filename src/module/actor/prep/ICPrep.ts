@@ -104,7 +104,7 @@ export class ICPrep {
         const { attributes, host } = system;
 
         for (const id of Object.keys(SR5.attributes)) {
-            if (!attributes.hasOwnProperty(id)) continue;
+            if (!Object.hasOwn(attributes, id)) continue;
             // Exclude invalid attributes for IC
             if (['magic', 'edge', 'essence', 'resonance'].includes(id)) continue
 
@@ -129,7 +129,7 @@ export class ICPrep {
         const { matrix } = system;
 
         for (const id of Object.keys(SR5.matrixAttributes)) {
-            if (!matrix.hasOwnProperty(id)) continue;
+            if (!Object.hasOwn(matrix, id)) continue;
 
             const attribute = matrix[id];
             AttributesPrep.prepareAttribute(id, attribute);

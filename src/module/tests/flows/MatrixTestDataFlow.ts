@@ -50,7 +50,7 @@ export const MatrixTestDataFlow = {
      * @param attribute
      */
     isMatrixAttribute(attribute: string): boolean {
-        return SR5.matrixAttributes.hasOwnProperty(attribute);
+        return Object.hasOwn(SR5.matrixAttributes, attribute);
     },
 
     /**

@@ -32,7 +32,7 @@ export class AttributesPrep {
      */
     static prepareAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
-        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+        if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
@@ -50,7 +50,7 @@ export class AttributesPrep {
      */
     static calculateAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
-        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+        if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.

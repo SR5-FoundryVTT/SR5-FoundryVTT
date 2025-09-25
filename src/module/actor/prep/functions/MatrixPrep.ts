@@ -97,7 +97,7 @@ export class MatrixPrep {
 
         // add matrix attributes to both limits and attributes as hidden entries
         Object.keys(SR5.matrixAttributes).forEach((attributeName) => {
-            if (!matrix.hasOwnProperty(attributeName)) {
+            if (!Object.hasOwn(matrix, attributeName)) {
                 return console.error(`SR5Actor matrix preparation failed due to missing matrix attributes`);
             }
 
