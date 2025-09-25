@@ -1,6 +1,6 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        <div class="standard-form scrollable">
+        <div class="scrollable standard-form">
             {{formGroup systemFields.action.fields.test
                         value=system.action.test
                         options=(tests2Array activeTests)
@@ -28,17 +28,21 @@
                             options=(config2Array activeSkills)
                             localize=true
                             rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{formGroup systemFields.action.fields.spec value=system.action.spec rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.action.fields.spec
+                            value=system.action.spec
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
                 {{formGroup systemFields.action.fields.attribute
                             value=system.action.attribute
                             options=(config2Array attributes)
                             localize=true
                             rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{#unless system.action.skill}}
                 {{formGroup systemFields.action.fields.attribute2
                             value=system.action.attribute2
                             options=(config2Array attributes)
                             localize=true
                             rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/unless}}
                 {{formGroup systemFields.action.fields.armor value=system.action.armor rootId=@root.rootId disabled=@root.isPlayMode}}
                 {{formGroup systemFields.action.fields.mod value=system.action.mod rootId=@root.rootId disabled=@root.isPlayMode}}
                 {{#ifne item.type "spell"}}{{#ifne item.type "complex_form"}}
@@ -59,7 +63,127 @@
                                 rootId=@root.rootId disabled=@root.isPlayMode}}
                 {{/ifne}}{{/ifne}}
             {{/if}}
+            <div class="new-list-item new-list-item-header">
+                <div class="new-list-item-label-container">
+                    <label>{{localize "SR5.Damage"}}</label>
+                </div>
+            </div>
+            {{formGroup systemFields.action.fields.damage.fields.type.fields.base
+                        value=system.action.damage.type.base
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
 
+            {{#if system.action.damage.type.base}}
+                {{#unless (eq item.type 'spell')}}
+                    {{formGroup systemFields.action.fields.damage.fields.base
+                                value=system.action.damage.base
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.damage.fields.base_formula_operator
+                                value=system.action.damage.base_formula_operator
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.action.fields.damage.fields.attribute
+                                value=system.action.damage.attribute
+                                options=(config2Array attributes)
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/unless}}
+
+                {{#if (eq system.action.damage.type.base "matrix")}}
+                    {{formGroup systemFields.action.fields.damage.fields.biofeedback
+                                value=system.action.damage.biofeedback
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else}}
+                    {{formGroup systemFields.action.fields.damage.fields.element.fields.base
+                                value=system.action.damage.element.base
+                                localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{#unless (eq item.type 'spell')}}
+                        {{formGroup systemFields.action.fields.damage.fields.ap.fields.base
+                                    value=system.action.damage.ap.base
+                                    rootId=@root.rootId disabled=@root.isPlayMode}}
+                        {{formGroup systemFields.action.fields.damage.fields.ap.fields.base_formula_operator
+                                    value=system.action.damage.ap.base_formula_operator
+                                    rootId=@root.rootId disabled=@root.isPlayMode}}
+                        {{formGroup systemFields.action.fields.damage.fields.ap.fields.attribute
+                                    value=system.action.damage.ap.attribute
+                                    options=(config2Array attributes)
+                                    localize=true
+                                    rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{/unless}}
+                {{/if}}
+            {{/if}}
+            <div class="new-list-item new-list-item-header">
+                <div class="new-list-item-label-container">
+                    <label>{{systemFields.action.fields.opposed.fields.test.label}}</label>
+                </div>
+            </div>
+
+            {{formGroup systemFields.action.fields.opposed.fields.test
+                        value=system.action.opposed.test
+                        options=(tests2Array opposedTests)
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{#if system.action.opposed.test}}
+                {{formGroup systemFields.action.fields.opposed.fields.skill
+                            value=system.action.opposed.skill
+                            options=(config2Array activeSkills)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.action.fields.opposed.fields.attribute
+                            value=system.action.opposed.attribute
+                            options=(config2Array attributes)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{#unless system.action.opposed.skill}}
+                {{formGroup systemFields.action.fields.opposed.fields.attribute2
+                            value=system.action.opposed.attribute2
+                            options=(config2Array attributes)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/unless}}
+
+                {{formGroup systemFields.action.fields.opposed.fields.armor
+                            value=system.action.opposed.armor
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.action.fields.opposed.fields.mod
+                            value=system.action.opposed.mod
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+            <div class="new-list-item new-list-item-header">
+                <div class="new-list-item-label-container">
+                    <label>{{systemFields.action.fields.opposed.fields.resist.fields.test.label}}</label>
+                </div>
+            </div>
+
+            {{formGroup systemFields.action.fields.opposed.fields.resist.fields.test
+                        value=system.action.opposed.resist.test
+                        options=(tests2Array resistTests)
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{#if system.action.opposed.resist.test}}
+                {{formGroup systemFields.action.fields.opposed.fields.resist.fields.attribute
+                            value=system.action.opposed.resist.attribute
+                            options=(config2Array attributes)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.action.fields.opposed.fields.resist.fields.attribute2
+                            value=system.action.opposed.resist.attribute2
+                            options=(config2Array attributes)
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.action.fields.opposed.fields.resist.fields.armor
+                            value=system.action.opposed.resist.armor
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
         </div>
     </div>
 </section>

@@ -1,14 +1,6 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
         <div class="standard-form scrollable">
-            {{formGroup systemFields.spirit.fields.type
-                        value=system.spirit.type
-                        localize=true
-                        rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
-            {{formGroup systemFields.spirit.fields.force
-                        value=system.spirit.force
-                        rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
-
             <div class="form-group">
                 <label>{{localize "SR5.Summoning.FixedSpirit"}}</label>
                 <div class="form-fields">
@@ -25,6 +17,13 @@
                     {{localize "SR5.Tooltips.SummoningTest.PreparedSpirit"}}
                 </p>
             </div>
+            {{formGroup systemFields.spirit.fields.type
+                        value=system.spirit.type
+                        localize=true
+                        rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
+            {{formGroup systemFields.spirit.fields.force
+                        value=system.spirit.force
+                        rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
         </div>
     </div>
 </section>

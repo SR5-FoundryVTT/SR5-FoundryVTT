@@ -1,8 +1,9 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/weapon-ammo/header.hbs'
-            label='SR5.Weapon.Ammo'
+            label='SR5.ItemTypes.Ammo'
             type='ammo'
+            cssClass="header-for-scrollable"
         }}
         <div class="scrollable">
             {{#each @root.ammunition}}

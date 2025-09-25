@@ -24,6 +24,7 @@ export class Cyberware extends ItemBase<ReturnType<typeof CyberwareData>> {
     static override defineSchema() {
         return CyberwareData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Item", "SR5.Armor"];
 }
 
 console.log("CyberwareData", CyberwareData(), new Cyberware());

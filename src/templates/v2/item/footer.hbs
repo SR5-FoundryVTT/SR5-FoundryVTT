@@ -1,7 +1,79 @@
 <footer class="sheet-footer">
-    <span class="fa-stack" style="vertical-align: center; font-size: 0.5em">
-        <i class="fa-light fa-circle-dashed fa-stack-2x"></i>
-        <i class="fas fa-user fa-stack-1x"></i>
-    </span>
-    <span>{{speakerName item}}</span>
+    {{#if (eq item.type 'armor')}}
+        {{#if system.armor.value}}
+            <label data-tooltip="{{systemFields.armor.fields.base.label}}"><i class="fas fa-shield-halved"></i> {{#if system.armor.mod}}+{{/if}}{{system.armor.value}}</label>
+            <label>|</label>
+        {{/if}}
+    {{/if}}
+
+    {{#if (or (eq item.type 'bioware') (eq item.type 'cyberware'))}}
+        {{#if system.grade}}
+            <label>{{localizeOb system.grade config.cyberwareGrades}}</label>
+            <label>|</label>
+        {{/if}}
+        {{#if system.technology.calculated.essence.value}}
+            <label data-tooltip="SR5.EssenceCost"><i class="fas fa-dna"></i> {{system.technology.calculated.essence.value}}</label>
+            <label>|</label>
+        {{/if}}
+    {{/if}}
+
+    {{#if system.technology}}
+        {{#if system.technology.rating}}
+            <label>{{localize "SR5.Rtg"}} {{system.technology.rating}}</label>
+            <label>|</label>
+        {{/if}}
+        {{#if system.technology.calculated.availability.value}}
+            <label>{{localize "SR5.Availability"}} {{system.technology.calculated.availability.value}}</label>
+            <label>|</label>
+        {{/if}}
+        {{#if system.technology.calculated.cost.value}}
+            <label data-tooltip="{{systemFields.technology.fields.cost.label}}"><i class="fas fa-yen-sign"></i> {{system.technology.calculated.cost.value}}</label>
+            <label>|</label>
+        {{/if}}
+        {{#if system.technology.conceal.value}}
+            <label data-tooltip="{{systemFields.technology.fields.conceal.fields.value.label}}"><i class="fas fa-user-ninja"></i> {{system.technology.conceal.value}}</label>
+        {{/if}}
+    {{/if}}
+
+    {{#if (eq item.type 'contact')}}
+        <label>{{system.type}}</label>
+        <label>|</label>
+        <label>{{systemFields.loyalty.label}} {{system.loyalty}}</label>
+        <label>|</label>
+        <label>{{systemFields.connection.label}} {{system.connection}}</label>
+        <label>|</label>
+        {{#if system.family}}
+            <label>{{systemFields.family.label}}</label>
+            <label>|</label>
+        {{/if}}
+        {{#if system.blackmail}}
+            <label>{{systemFields.blackmail.label}}</label>
+            <label>|</label>
+        {{/if}}
+        {{#if system.blackmail}}
+            <label>{{systemFields.group.label}}</label>
+        {{/if}}
+    {{/if}}
+
+    {{#if (eq item.type 'lifestyle')}}
+        <label>{{system.type}}</label>
+        <label>|</label>
+        <label><i data-tooltip="{{systemFields.cost.label}}" class="fas fa-yen-sign"></i> {{system.cost}}</label>
+        <label>|</label>
+        <label><i data-tooltip="{{systemFields.neighborhood.label}}" class="fas fa-buildings"></i> {{system.neighborhood}}</label>
+        <label>|</label>
+        <label><i data-tooltip="{{systemFields.comforts.label}}" class="far fa-mattress-pillow"></i> {{system.comforts}}</label>
+        <label>|</label>
+        <label><i data-tooltip="{{systemFields.security.label}}" class="far fa-shield-halved"></i> {{system.security}}</label>
+        <label>|</label>
+        <label><i data-tooltip="{{systemFields.guests.label}}" class="far fa-people"></i> {{system.guests}}</label>
+    {{/if}}
+
+    {{#if (eq item.type 'quality')}}
+        <label>{{system.type}}</label>
+        <label>|</label>
+        <label>{{systemFields.rating.label}} {{system.rating}}</label>
+        <label>|</label>
+        <label>{{systemFields.karma.label}} {{system.karma}}</label>
+    {{/if}}
 </footer>

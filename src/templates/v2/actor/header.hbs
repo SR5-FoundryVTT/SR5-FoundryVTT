@@ -14,20 +14,16 @@
         </div>
         <div class="flexcol flex-end">
             <div style="display: flex;">
-                <div class="block" style="flex: 1">
-                    <div class="name">
-                        <input
-                            class="display text left document-name"
-                            name="name"
-                            type="text"
-                            value="{{actor.name}}"
-                            placeholder="Name"
-                            {{#if @root.isPlayMode}}
-                                disabled
-                            {{/if}}
-                        />
-                    </div>
-                </div>
+                <input
+                    class="name"
+                    name="name"
+                    type="text"
+                    value="{{actor.name}}"
+                    placeholder="Name"
+                    {{#if @root.isPlayMode}}
+                        disabled
+                    {{/if}}
+                />
             </div>
             <div class="attributes smooth" id="tracks">
                 <div class="block">

@@ -696,6 +696,36 @@
         "ConditionMonitor": "Con. Mon.",
         "Connection": "Connection",
         "Contact": {
+            "FIELDS": {
+                "type": {
+                    "label": "Type",
+                    "hint": "Contact Type determines what kind of access they have for gear, jobs, info, etc."
+                },
+                "connection": {
+                    "label": "Connection",
+                    "hint": "This measures the contact’s influence on a scale of 1 to 12. The higher the Connection Rating, the more juice the contact has."
+                },
+                "blackmail": {
+                    "label": "Blackmail",
+                    "hint": "You have something that can be held over the contact to get them to do business."
+                },
+                "loyalty": {
+                    "label": "Loyalty",
+                    "hint": "This shows you how much you can trust the contact, measured on a scale of 1 to 6. The higher the Loyalty Rating, the more the contact is willing to do for you"
+                },
+                "family": {
+                    "label": "Family",
+                    "hint": "Blood is always thicker than water, this is true for having family as contacts."
+                },
+                "group": {
+                    "label": "Group",
+                    "hint": "Contact is a Group; could be a gang, corp, or some nerds"
+                },
+                "linkedActor": {
+                    "label": "Actor",
+                    "hint": "Actor that this Contact represents"
+                }
+            },
             "Blackmail": "Blackmail",
             "Connection": "Connection",
             "DropActor": "Drag&Drop an actor to link it to this contact",
@@ -1108,6 +1138,33 @@
         "IsNPC": "NPC",
         "Item": {
             "FIELDS": {
+                "description": {
+                    "base": {
+                        "label": "Description",
+                        "hint": "Description of the Item"
+                    },
+                    "source": {
+                        "label": "Source",
+                        "hint": "Source of the Item, this can be a PDF Page, URL, or Journal"
+                    }
+                },
+                "ammo": {
+                    "spare_clips": {
+                        "value": {
+                            "label": "Current Spare Reloads",
+                            "hint": "The number of Spare Clips the actor has left"
+                        },
+                        "max": {
+                            "label": "Maximum Spare Reloads",
+                            "hint": "The Maximum number of Spare Clips the actor holds for this Weapon"
+                        }
+                    },
+                    "clip_type": {
+                        "label": "Weapon Reload Type",
+                        "hint": "The type of Reloading mechanism that the weapon uses"
+
+                    }
+                },
                 "action": {
                     "categories": {
                         "label": "Categories",
@@ -1134,7 +1191,7 @@
                         "hint": "Skill used by this action. Leave blank if no skill is used"
                     },
                     "spec": {
-                        "label": "Specialization",
+                        "label": "Skill Specialization",
                         "hint": "If the skill specialization modifier should be applied to this action"
                     },
                     "attribute": {
@@ -1275,6 +1332,32 @@
                     "hint": "Capacity of the Cyberware/Bioware"
                 },
                 "technology": {
+                    "master": {
+                        "label": "Master Device",
+                        "hint": "Master Device that this Item is Slaved to, forming a PAN or WAN"
+                    },
+                    "cost": {
+                        "label": "Cost",
+                        "hint": "Amount of money this item costs"
+                    },
+                    "availability": {
+                        "label": "Availability",
+                        "hint": "The Availability attribute of the Item, this determines how easy it is to get it"
+                    },
+                    "equipped": {
+                        "label": "Equipped",
+                        "hint": "If the Item is Equipped"
+                    },
+                    "wireless": {
+                        "label": "Wireless",
+                        "hint": "The Wireless state of the item"
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "label": "Condition Monitor Damage",
+                            "hint": "Current Damage done to the Item's Condition Monitor"
+                        }
+                    },
                     "rating": {
                         "label": "Rating",
                         "hint": "The Device Rating of the item, this factors into matrix actions."
@@ -1282,6 +1365,10 @@
                     "quantity": {
                         "label": "Quantity",
                         "hint": "The amount of items this Item represents"
+                    },
+                    "show_quantity": {
+                        "label": "Show Quantity",
+                        "hint": "If the Quantity of this Item should be shown on the Actor sheet and the header of the Item sheet"
                     },
                     "conceal": {
                         "base" : {
@@ -1294,6 +1381,12 @@
         },
         "ItemMod": "Item Mod",
         "ItemName": "Item Name",
+        "ItemSheet": {
+            "Labels": {
+                "Equipped": "Equipped",
+                "Unequipped": "Unequipped"
+            }
+        },
         "ItemTypes": {
             "Action": "Action",
             "AdeptPower": "Adept Power",

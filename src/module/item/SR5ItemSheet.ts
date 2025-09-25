@@ -89,6 +89,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
  * Extend the basic ItemSheet with some very simple modifications
  */
 export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
+    declare protected _isEditMode;
 
     static override DEFAULT_OPTIONS = {
         classes: [SR5_APPV2_CSS_CLASS, 'item'],
@@ -111,24 +112,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/description'),
             scrollable: ['.scrollable']
         },
-        program: {
-            template: SheetFlow.templateBase('item/tabs/program'),
-            scrollable: ['.scrollable']
-        },
-        technology: {
-            template: SheetFlow.templateBase('item/tabs/technology'),
-            scrollable: ['.scrollable']
-        },
         armor: {
             template: SheetFlow.templateBase('item/tabs/armor'),
-            scrollable: ['.scrollable']
-        },
-        adeptPower: {
-            template: SheetFlow.templateBase('item/tabs/adept_power'),
-            scrollable: ['.scrollable']
-        },
-        critterPower: {
-            template: SheetFlow.templateBase('item/tabs/critter_power'),
             scrollable: ['.scrollable']
         },
         compilation: {
@@ -143,12 +128,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/modification'),
             scrollable: ['.scrollable']
         },
-        lifestyle: {
-            template: SheetFlow.templateBase('item/tabs/lifestyle'),
-            scrollable: ['.scrollable']
-        },
-        contact: {
-            template: SheetFlow.templateBase('item/tabs/contact'),
+        licenses: {
+            template: SheetFlow.templateBase('item/tabs/licenses'),
+            templates: SheetFlow.templateListItem('license'),
             scrollable: ['.scrollable']
         },
         spell: {
@@ -159,30 +141,18 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/weapon'),
             scrollable: ['.scrollable']
         },
-        weaponModifications: {
-            template: SheetFlow.templateBase('item/tabs/weapon-modifications'),
-            templates: SheetFlow.templateListItem('weapon-modification'),
-            scrollable: ['.scrollable']
-        },
         weaponAmmo: {
             template: SheetFlow.templateBase('item/tabs/weapon-ammo'),
             templates: SheetFlow.templateListItem('weapon-ammo'),
             scrollable: ['.scrollable']
         },
+        weaponModifications: {
+            template: SheetFlow.templateBase('item/tabs/weapon-modifications'),
+            templates: SheetFlow.templateListItem('weapon-modification'),
+            scrollable: ['.scrollable']
+        },
         action: {
             template: SheetFlow.templateBase('item/tabs/action'),
-            scrollable: ['.scrollable']
-        },
-        damage: {
-            template: SheetFlow.templateBase('item/tabs/damage'),
-            scrollable: ['.scrollable']
-        },
-        opposed: {
-            template: SheetFlow.templateBase('item/tabs/opposed'),
-            scrollable: ['.scrollable']
-        },
-        resist: {
-            template: SheetFlow.templateBase('item/tabs/resist'),
             scrollable: ['.scrollable']
         },
         ammo: {
@@ -191,14 +161,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         },
         device: {
             template: SheetFlow.templateBase('item/tabs/device'),
-            scrollable: ['.scrollable']
-        },
-        quality: {
-            template: SheetFlow.templateBase('item/tabs/quality'),
-            scrollable: ['.scrollable']
-        },
-        ritual:{
-            template: SheetFlow.templateBase('item/tabs/ritual'),
             scrollable: ['.scrollable']
         },
         effects: {
@@ -217,45 +179,71 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             initial: 'description',
             tabs: [
                 { id: 'description', label: 'Description', cssClass: '' },
-                { id: 'technology', label: 'Technology', cssClass: '' },
-                { id: 'device', label: 'Device', cssClass: '' },
-                { id: 'lifestyle', label: 'Lifestyle', cssClass: '' },
-                { id: 'program', label: 'Program', cssClass: '' },
-                { id: 'weapon', label: 'Weapon', cssClass: '' },
-                { id: 'weaponModifications', label: 'WeaponMods', cssClass: '' },
-                { id: 'weaponAmmo', label: 'WeaponAmmo', cssClass: '' },
-                { id: 'adeptPower', label: 'AdeptPower', cssClass: '' },
-                { id: 'spell', label: 'Spell', cssClass: '' },
+                { id: 'device', label: 'Matrix', cssClass: '' },
+                { id: 'weapon', label: 'Details', cssClass: '' },
+                { id: 'weaponAmmo', label: 'Ammo', cssClass: '' },
+                { id: 'weaponModifications', label: 'Mods', cssClass: '' },
+                { id: 'licenses', label: 'Licenses', cssClass: '' },
+                { id: 'spell', label: 'Details', cssClass: '' },
                 { id: 'armor', label: 'Armor', cssClass: '' },
-                { id: 'contact', label: 'Contact', cssClass: '' },
-                { id: 'compilation', label: 'Compilation', cssClass: '' },
-                { id: 'critterPower', label: 'CritterPower', cssClass: '' },
-                { id: 'ritual', label: 'Ritual', cssClass: '' },
-                { id: 'modification', label: 'Modification', cssClass: '' },
-                { id: 'summoning', label: 'Summoning', cssClass: '' },
-                { id: 'quality', label: 'Quality', cssClass: '' },
+                { id: 'compilation', label: 'Details', cssClass: '' },
+                { id: 'modification', label: 'Details', cssClass: '' },
+                { id: 'summoning', label: 'Details', cssClass: '' },
+                { id: 'ammo', label: 'Details', cssClass: '' },
                 { id: 'action', label: 'Action', cssClass: '' },
-                { id: 'damage', label: 'Damage', cssClass: '' },
-                { id: 'opposed', label: 'Opposed', cssClass: '' },
-                { id: 'resist', label: 'Resist', cssClass: '' },
-                { id: 'ammo', label: 'Ammo', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' }
             ]
         }
     }
 
     protected override _prepareTabs(group: string) {
-        const retVal = super._prepareTabs(group);
+        const parts = super._prepareTabs(group);
         if (group === 'primary') {
-            SheetFlow._cleanItemParts(this.item, retVal);
+            this._cleanParts(this.item, parts);
         }
-        return retVal;
+        return parts;
     }
 
     protected override _configureRenderParts(options) {
         const retVal = super._configureRenderParts(options);
-        SheetFlow._cleanItemParts(this.item, retVal);
+        this._cleanParts(this.item, retVal);
         return retVal;
+    }
+
+    protected _cleanParts(item: SR5Item, parts: Record<string, any>) {
+        if (!item.getAction()) {
+            delete parts['action'];
+        }
+        if (!item.isType('armor', 'critter_power', 'cyberware', 'bioware', 'adept_power')) {
+            delete parts['armor'];
+        }
+        if (!item.isType('ammo')) {
+            delete parts['ammo'];
+        }
+        if (!item.isCompilation) {
+            delete parts['compilation'];
+        }
+        if (!item.isSummoning) {
+            delete parts['summoning'];
+        }
+        if (!item.isType('modification')) {
+            delete parts['modification'];
+        }
+        if (!item.isType('device')) {
+            delete parts['device'];
+        }
+        if (!item.isType('spell')) {
+            delete parts['spell'];
+        }
+        if (!item.isType('weapon')) {
+            delete parts['weapon'];
+            delete parts['weaponModifications'];
+            delete parts['weaponAmmo'];
+        }
+        if (!item.isType('sin')) {
+            delete parts['licenses'];
+        }
+        return parts;
     }
 
     /* -------------------------------------------- */

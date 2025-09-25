@@ -2,7 +2,7 @@
     <div class="fill-container">
         <div class="standard-form scrollable">
             {{formGroup systemFields.category
-                        value=system.category
+                        value=source.system.category
                         localize = true
                         rootId=@root.rootId disabled=@root.isPlayMode}}
 
@@ -17,7 +17,7 @@
                                             rootId=@root.rootId disabled=@root.isPlayMode}}
                         </select>
                         {{else}}
-                         <label>{{localize (lookup @root.config.matrixAttributes att.att)}}</label>
+                        <label>{{localize (lookup @root.config.matrixAttributes att.att)}}</label>
                         {{/ifin}}
                         {{log @root.systemFields}}
                         <div class="form-fields">

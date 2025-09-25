@@ -3,6 +3,7 @@ import { ConditionData } from "./Condition";
 import { MatrixMasterData } from "./MatrixNetwork";
 import { TechnologyAttributes } from "./Attributes";
 import { ModifiableField } from "../fields/ModifiableField";
+import { SR5 } from '@/module/config';
 const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField } = foundry.data.fields;
 
 export const TechnologyData = () => ({
@@ -10,6 +11,7 @@ export const TechnologyData = () => ({
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
     availability: new StringField({ required: true }),
     quantity: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
+    show_quantity: new BooleanField(),
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
     equipped: new BooleanField(),
 
@@ -21,7 +23,7 @@ export const TechnologyData = () => ({
     wireless: new StringField({
         required: true,
         initial: 'none',
-        choices: ['online', 'silent', 'offline', 'none'],
+        choices: SR5.wirelessModes,
     }),
     master: new DocumentUUIDField({ blank: true, required: true, nullable: false }),
 

@@ -82,65 +82,6 @@ export const SheetFlow = {
         }, [])
     },
 
-    _cleanItemParts(item: SR5Item, parts: Record<string, any>) {
-        if (!item.getTechnologyData()) {
-            delete parts['technology'];
-        }
-        if (!item.isType('contact')) {
-            delete parts['contact'];
-        }
-        if (!item.getAction()) {
-            delete parts['action'];
-            delete parts['damage'];
-            delete parts['opposed'];
-            delete parts['resist'];
-        }
-        if (!item.isType('armor', 'critter_power', 'cyberware', 'bioware', 'adept_power')) {
-            delete parts['armor'];
-        }
-        if (!item.isType('ammo')) {
-            delete parts['ammo'];
-        }
-        if (!item.isType('quality')) {
-            delete parts['quality'];
-        }
-        if (!item.isType('adept_power')) {
-            delete parts['adeptPower'];
-        }
-        if (!item.isCompilation) {
-            delete parts['compilation'];
-        }
-        if (!item.isSummoning) {
-            delete parts['summoning'];
-        }
-        if (!item.isType('critter_power')) {
-            delete parts['critterPower'];
-        }
-        if (!item.isType('ritual')) {
-            delete parts['ritual'];
-        }
-        if (!item.isType('modification')) {
-            delete parts['modification'];
-        }
-        if (!item.isType('lifestyle')) {
-            delete parts['lifestyle'];
-        }
-        if (!item.isType('program')) {
-            delete parts['program'];
-        }
-        if (!item.isType('device')) {
-            delete parts['device'];
-        }
-        if (!item.isType('spell')) {
-            delete parts['spell'];
-        }
-        if (!item.isType('weapon')) {
-            delete parts['weapon'];
-            delete parts['weaponModifications'];
-            delete parts['weaponAmmo'];
-        }
-    },
-
     listItemResolve(target) {
         const id = this.listItemId(target);
         if (!id) return undefined;

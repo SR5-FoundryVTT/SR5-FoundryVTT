@@ -1,17 +1,26 @@
 <div class="sheet-header">
-    <img src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" width="80" height="80"/>
+    <img src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" width="80" height="80" />
     <div class="sheet-header-labels">
-        <input type="text" class="name" name="name" value="{{item.name}}" placeholder='{{localize "SR5.ItemName"}}' />
-        <div class="sheet-header-source">
-            <div class="source-button roll open-source" data-tooltip="SR5.OpenSource">
-                {{#if sourceIsURL}}
-                    <i class="fas fa-link"></i>
-                {{else if sourceIsPDF}}
-                    <i class="fas fa-file-pdf"></i>
-                {{else if sourceIsUuid}}
-                    <i class="fas fa-file"></i>
+        <div class="sheet-header-name">
+            {{#if @root.isPlayMode}}
+                {{#if system.description.source}}
+                    <div>
+                        <button type="button" data-action="openSource" data-tooltip="SR5.OpenSource">
+                            {{#if sourceIsURL}}
+                                <i class="fas fa-link"></i>
+                            {{else if sourceIsPDF}}
+                                <i class="fas fa-file-pdf"></i>
+                            {{else if sourceIsUuid}}
+                                <i class="fas fa-file"></i>
+                            {{/if}}
+                        </button>
+                    </div>
                 {{/if}}
-            </div>
+            {{/if}}
+            <input type="text" class="name" name="name" value="{{item.name}}" placeholder='{{localize "SR5.ItemName"}}' {{#if @root.isPlayMode}}disabled{{/if}}/>
+        </div>
+        {{#if @root.isEditMode}}
+        <div class="sheet-header-source">
             <input
                 class="display text"
                 type="text"
@@ -25,14 +34,44 @@
                 {{/if}}
             {{/if}}
         </div>
-        {{#if system.technology.condition_monitor.max}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                name=(localize "SR5.ConditionMonitor")
-                value=system.technology.condition_monitor.value
-                max=system.technology.condition_monitor.max
-                id='matrix'
-                disabled=system.technology.condition_monitor.disabled
-            }}
+        {{/if}}
+        {{#if @root.isPlayMode}}
+            <div class="new-list-item">
+                <div class="new-list-item-label-container">
+                    {{#unless system.technology.show_quantity}}
+                        {{#if system.technology.condition_monitor.max}}
+                            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                                name=(localize "SR5.ConditionMonitor")
+                                value=system.technology.condition_monitor.value
+                                max=system.technology.condition_monitor.max
+                                id='matrix'
+                                disabled=system.technology.condition_monitor.disabled
+                            }}
+                        {{/if}}
+                    {{else}}
+                        <span>
+                            <label>{{localize "SR5.Qty"}} </label>
+                            <a data-action="removeOneQty"
+                               data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty"
+                               data-item-id="{{item.uuid}}">
+                                <i class="fas fa-minus-square"></i>
+                            </a>
+                            {{system.technology.quantity}}
+                            <a data-action="addOneQty"
+                               data-tooltip="SR5.ItemSheet.Labels.AddOneQty"
+                               data-item-id="{{item.uuid}}">
+                                <i class="fas fa-plus-square"></i>
+                            </a>
+                        </span>
+                    {{/unless}}
+                </div>
+                {{#if systemFields.technology}}
+                    <div class="new-list-item-icons">
+                        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
+                    </div>
+                {{/if}}
+            </div>
         {{/if}}
     </div>
 </div>

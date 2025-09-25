@@ -5,7 +5,7 @@ const { NumberField, BooleanField, StringField } = foundry.data.fields;
 const LifestyleData = () => ({
     ...BaseItemData(),
 
-    type: new StringField({ required: true, blank: true, choice: SR5.lifestyleTypes }),
+    type: new StringField({ required: true, blank: true, choices: SR5.lifestyleTypes }),
     comforts: new NumberField({ required: true, nullable: false, initial: 0 }),
     security: new NumberField({ required: true, nullable: false, initial: 0 }),
     neighborhood: new NumberField({ required: true, nullable: false, initial: 0 }),

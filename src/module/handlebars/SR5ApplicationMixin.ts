@@ -5,7 +5,6 @@ import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
-import { SheetFlow } from '@/module/flows/SheetFlow';
 
 export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
     return class SR5ApplicationMixin extends foundry.applications.api.HandlebarsApplicationMixin(base) {
