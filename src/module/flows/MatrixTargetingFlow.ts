@@ -209,11 +209,10 @@ export const MatrixTargetingFlow = {
     /**
      * Collect matrix icons connected to the document given by uuid.
      * 
-     * TODO: Look into MarkPlacementFlow_prepareActorDevices and merge functionality.
-     * @param document 
-     * @returns List of matrix icons connected to the document.
+     * @param document Retrieve icons connected to this document.
+     * @returns List of matrix icons that can be targeted wirelessly.
      */
-    getConnectedMatrixIconTargets(document: SR5Actor) {
+    getWirelessMatrixIconTargets(document: SR5Actor) {
         const connectedIcons: Shadowrun.MarkedDocument[] = [];
 
         // Only persona icons should show connected icons.
@@ -223,6 +222,7 @@ export const MatrixTargetingFlow = {
         for (const device of document.wirelessDevices) {
             // Persona devices don't have their own device icon.
             if (personaDevice && device.uuid === personaDevice.uuid) continue;
+            if (device.isRunningSilent()) continue;
 
             connectedIcons.push({
                 name: Helpers.getChatSpeakerName(device),
