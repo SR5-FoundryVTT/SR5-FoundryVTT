@@ -307,13 +307,16 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         }
 
         // Prepare sorting and display of a possibly translated document name.
-        return actions.map(action => {
-                return {
-                    name: PackActionFlow.localizePackAction(action.name),
-                    action
-                };
-            })
-            .sort(Helpers.sortByName.bind(Helpers));
+        const sheetActions: {name: string, description: string, action: SR5Item}[] = [];
+        for (const action of actions) {
+            sheetActions.push({
+                name: PackActionFlow.localizePackAction(action.name),
+                description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
+                action
+            });
+        }
+
+        return sheetActions.sort(Helpers.sortByName.bind(Helpers));
     }
 
     /**
