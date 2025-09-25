@@ -219,7 +219,7 @@ export const MatrixTargetingFlow = {
         if (!(document instanceof SR5Actor)) return connectedIcons;
 
         const personaDevice = document.getMatrixDevice();
-        for (const device of document.wirelessDevices) {
+        for (const device of document.wirelessDevices()) {
             // Persona devices don't have their own device icon.
             if (personaDevice && device.uuid === personaDevice.uuid) continue;
             if (device.isRunningSilent()) continue;
