@@ -1,57 +1,39 @@
-import { formatAsSlug, genImportFlags, getArray, parseDescription, parseTechnology } from "../importHelper/BaseParserFunctions"
-import { BaseGearParser } from "../importHelper/BaseGearParser"
-import { DataDefaults } from "src/module/data/DataDefaults";
-import { ActorSchema } from "../../ActorSchema";
-import { Unwrap } from "../ItemsParser";
+import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
+import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 
 /**
  * Parses SINs and the attached licenses.
  * Licenses that are not attached to a SIN are not handled.
  */
-export class SinParser extends BaseGearParser {
-    override parse(chummerGear: Unwrap<NonNullable<ActorSchema['gears']>['gear']>): Item.CreateData {
-        const parserType = 'sin';
-        const parsedGear = {
-            name: chummerGear.name || 'Unnamed',
-            type: parserType,
-            system: DataDefaults.baseSystemData(parserType)
-        } satisfies Item.CreateData;
+export class SinParser extends Parser<'sin'> {
+    protected readonly parseType = 'sin';
+    protected readonly compKey = null;
 
-        const system = parsedGear.system;
-
-        system.technology = parseTechnology(chummerGear);
-        system.description = parseDescription(chummerGear);
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(chummerGear.name), parserType);
+    protected parseItem(item: BlankItem<'sin'>, itemData: ExtractItemType<'gears', 'gear'>) {
+        const system = item.system;
 
         // Create licenses if there are any
-        if (chummerGear.children) {
-            parsedGear.system.licenses = this.parseLicenses(getArray(chummerGear.children));
-        }
+        if (itemData.children)
+            system.licenses = this.parseLicenses(itemData.children);
 
         // Assign import flags
-        parsedGear.system.importFlags = genImportFlags(formatAsSlug(chummerGear.name_english), parserType);
-
-        return parsedGear;
+        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
     }
 
-    private parseLicenses(chummerLicenses : any) : any[] {
-        const parsedLicenses : any[] = [];
+    private parseLicenses(licensesData: ExtractItemType<'gears', 'gear'>['children']) {
+        const licenses: BlankItem<'sin'>['system']['licenses'] = [];
 
-        chummerLicenses.forEach(chummerLicense => {
-            if (chummerLicense.category_english === 'ID/Credsticks')
-            {
-                parsedLicenses.push(
-                    {
-                        name: chummerLicense.extra, // 'extra' holds the type of license from chummer
-                        rtg: chummerLicense.rating,
-                        description: ''
-                    }
-                );
+        for (const licenseData of IH.getArray(licensesData?.gear)) {
+            if (licenseData.category_english === 'ID/Credsticks') {
+                licenses.push({
+                    name: licenseData.extra || "Unnamed",
+                    rtg: Number(licenseData.rating) || 0,
+                    description: ''
+                });
             }
-        });
+        }
 
-        return parsedLicenses;
+        return licenses;
     }
 }

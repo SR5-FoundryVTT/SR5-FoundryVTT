@@ -11,7 +11,11 @@ const RitualData = () => ({
         followedTest: 'DrainTest'
     }),
 
-    type: new StringField({ required: true }),
+    type: new StringField({
+        blank: true,
+        required: true,
+        choices: ['physical', 'mana']
+    }),
     descriptors: new StringField({ required: true }),
 });
 

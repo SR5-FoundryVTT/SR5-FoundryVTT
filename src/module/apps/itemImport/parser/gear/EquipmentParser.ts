@@ -2,7 +2,6 @@ import { Parser } from "../Parser";
 import { CompendiumKey } from "../../importer/Constants";
 import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
-import { TranslationHelper as TH } from "../../helper/TranslationHelper";
 
 export class EquipmentParser extends Parser<'equipment'> {
     protected readonly parseType = 'equipment';
@@ -14,7 +13,7 @@ export class EquipmentParser extends Parser<'equipment'> {
 
     protected override async getFolder(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
-        const folderName = TH.getTranslation(categoryData, {type: 'category'});
+        const folderName = IH.getTranslatedCategory("gear", categoryData);
         let rootFolder = "Other";
 
         for (const category of this.categories)

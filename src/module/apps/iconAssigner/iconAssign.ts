@@ -1,7 +1,5 @@
-import { SR5Item } from "src/module/item/SR5Item";
 import { SR5 } from "../../config";
 import { FLAGS, SYSTEM_NAME } from './../../constants';
-import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ImportFlagType } from "src/module/types/template/ImportFlags";
 
 export async function getIconFiles(): Promise<string[]> {
@@ -11,7 +9,7 @@ export async function getIconFiles(): Promise<string[]> {
     }
 
     // Icon locations
-    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) as string || "systems/shadowrun5e/dist/icons/importer/";
+    const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) || "systems/shadowrun5e/dist/icons/importer/";
     const folderList = await FilePicker.browse("data", imgFolder).then(picker => picker.dirs);
     let fileList = await FilePicker.browse("data", imgFolder).then(picker => picker.files);
 

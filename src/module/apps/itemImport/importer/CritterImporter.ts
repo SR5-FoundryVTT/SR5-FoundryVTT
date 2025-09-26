@@ -6,13 +6,8 @@ import { SpriteParser } from '../parser/metatype/SpriteParser';
 import { CritterParser } from '../parser/metatype/CritterParser';
 import { MetatypeSchema, Metatype } from "../schema/MetatypeSchema";
 
-
 export class CritterImporter extends DataImporter {
-    public files = ['critters.xml'];
-
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('metatypes') && jsonObject['metatypes'].hasOwnProperty('metatype');
-    }
+    public readonly files = ['critters.xml'] as const;
 
     protected static parserWrap = class {
         public static isSpirit(jsonData: Metatype): boolean {
@@ -29,19 +24,21 @@ export class CritterImporter extends DataImporter {
             return false;
         }
 
-        public static async Parse(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Actor.CreateData> {
-            const critterParser = new CritterParser();
-            const spiritParser = new SpiritParser();
-            const spriteParser = new SpriteParser();
-
-            const selectedParser = jsonData.category?._TEXT === 'Sprites' ? spriteParser
-                                 : this.isSpirit(jsonData) ? spiritParser : critterParser;
+        private readonly critterParser = new CritterParser();
+        private readonly spiritParser = new SpiritParser();
+        private readonly spriteParser = new SpriteParser();
+        public async Parse(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Actor.CreateData> {
+            const selectedParser = jsonData.category?._TEXT === 'Sprites'        ? this.spriteParser
+                                 : CritterImporter.parserWrap.isSpirit(jsonData) ? this.spiritParser 
+                                                                                 : this.critterParser;
 
             return selectedParser.Parse(jsonData, compendiumKey) as Promise<Actor.CreateData>;
         }
     };
 
-    async Parse(chummerData: MetatypeSchema): Promise<void> {
+    async _parse(chummerData: MetatypeSchema): Promise<void> {
+        IH.setTranslatedCategory('metatypes', IH.getArray(chummerData.categories.category));
+
         // get metavariants as well
         const baseMetatypes = chummerData.metatypes.metatype;
         const metavariants = baseMetatypes.flatMap(metatype => {
@@ -62,8 +59,8 @@ export class CritterImporter extends DataImporter {
                     if (CritterImporter.parserWrap.isSpirit(jsonData)) return 'Sprite';
                     return 'Critter';
                 },
-                parser: CritterImporter.parserWrap,
-                errorPrefix: "Failed Parsing Critter"
+                parser: new CritterImporter.parserWrap(),
+                documentType: "Critter"
             }
         );
     }

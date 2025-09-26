@@ -1,44 +1,39 @@
 import { Parser } from '../Parser';
-import { SR5Item } from '../../../../item/SR5Item';
 import { Vehicle } from '../../schema/VehiclesSchema';
 import { CompendiumKey } from '../../importer/Constants';
-import { TranslationHelper as TH } from '../../helper/TranslationHelper';
-import { ImportHelper as IH, NotEmpty } from '../../helper/ImportHelper';
+import { ImportHelper as IH, NotEmpty, RetrievedItem } from '../../helper/ImportHelper';
 
 export class VehicleParser extends Parser<'vehicle'> {
     protected readonly parseType = 'vehicle';
 
     private getVehicleItems(
         vehicleName: string,
-        items: SR5Item[],
+        items: RetrievedItem[],
         itemsData: NotEmpty<Vehicle['mods']>['mod' | 'name'] | NotEmpty<Vehicle['gears']>['gear'] | NotEmpty<Vehicle['weapons']>['weapon'],
-        translationMap: Record<string, string>
     ): Item.Source[] {
-        const itemMap = new Map(items.map(i => [i.name, i]));
+        const itemMap = new Map(items.map(({name_english, ...i}) => [name_english, i]));
 
         const result: Item.Source[] = [];
+        for (const itemData of IH.getArray(itemsData)) {
+            const name = ('name' in itemData ? itemData.name?._TEXT : itemData._TEXT) || '';
+            const item = itemMap.get(name);
 
-        for (const item of IH.getArray(itemsData)) {
-            const name = ('name' in item ? item.name?._TEXT : item._TEXT) || '';
-            const translatedName = translationMap[name] || name;
-            const foundItem = itemMap.get(translatedName);
-
-            if (!foundItem) {
+            if (!item) {
                 console.log(`[Vehicle Mod Missing]\nVehicle: ${vehicleName}\nMod: ${name}`);
                 continue;
             }
 
-            const itemBase = game.items.fromCompendium(foundItem, { keepId: true });
-            const system = itemBase.system as Item.SystemOfType<'modification' | 'equipment' | 'weapon'>;
+            item._id = foundry.utils.randomID();
+            const system = item.system as Item.SystemOfType<'modification' | 'equipment' | 'weapon'>;
 
             if ('technology' in system)
                 system.technology.equipped = true;
 
-            if ('$' in item && item.$?.select)
-                itemBase.name += `(${item.$.select})`;
+            if ('$' in itemData && itemData.$?.select)
+                item.name += ` (${itemData.$.select})`;
 
-            if ('$' in item && item.$?.rating) {
-                const rating = Number(item.$.rating) || 0;
+            if ('$' in itemData && itemData.$?.rating) {
+                const rating = Number(itemData.$.rating) || 0;
                 // probably, it does not exist `system.rating` for any item
                 if ('rating' in system)
                     system.rating = rating;
@@ -46,7 +41,7 @@ export class VehicleParser extends Parser<'vehicle'> {
                     system.technology.rating = rating;
             }
 
-            result.push(itemBase as Item.Source);
+            result.push(item);
         }
 
         return result;
@@ -93,31 +88,24 @@ export class VehicleParser extends Parser<'vehicle'> {
         const allGearName = IH.getArray(jsonData.gears?.gear).map(v => v?._TEXT || v?.name?._TEXT || '');
         const allWeaponName = IH.getArray(jsonData.weapons?.weapon).map(w => w.name._TEXT);
 
-        const translationMap: Record<string, string> = {};
-        for (const name of allModName) translationMap[name] = TH.getTranslation(name, { type: 'mod' });
-        for (const name of allGearName) translationMap[name] = TH.getTranslation(name, { type: 'gear' });
-        for (const name of allWeaponName) translationMap[name] = TH.getTranslation(name, { type: 'weapon' });
-
-        const [modItem, gearItem, weaponItem] = await Promise.all([
-            IH.findItem('Vehicle_Mod', allModName.map(name => translationMap[name])),
-            IH.findItem('Gear', allGearName.map(name => translationMap[name])),
-            IH.findItem('Weapon', allWeaponName.map(name => translationMap[name])),
-        ]);
+        const modItem = await IH.findItems('Vehicle_Mod', allModName);
+        const gearItem = await IH.findItems('Gear', allGearName);
+        const weaponItem = await IH.findItems('Weapon', allWeaponName);
 
         const name = jsonData.name._TEXT;
         return [
-            ...this.getVehicleItems(name, modItem, jsonData.mods?.mod, translationMap),
-            ...this.getVehicleItems(name, modItem, jsonData.mods?.name, translationMap),
-            ...this.getVehicleItems(name, gearItem, jsonData.gears?.gear, translationMap),
-            ...this.getVehicleItems(name, weaponItem, jsonData.weapons?.weapon, translationMap),
+            ...this.getVehicleItems(name, modItem, jsonData.mods?.mod),
+            ...this.getVehicleItems(name, modItem, jsonData.mods?.name),
+            ...this.getVehicleItems(name, gearItem, jsonData.gears?.gear),
+            ...this.getVehicleItems(name, weaponItem, jsonData.weapons?.weapon),
         ];
     }
 
     protected override async getFolder(jsonData: Vehicle, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category._TEXT;
         const isDrone = category.startsWith("Drones:");
-        const rootFolder = TH.getTranslation(isDrone ? "Drones" : "Vehicles");
-        const folderName = TH.getTranslation(category);
+        const rootFolder = isDrone ? "Drones" : "Vehicles";
+        const folderName = IH.getTranslatedCategory('vehicles', category);
 
         return IH.getFolder(compendiumKey, rootFolder, folderName);
     }

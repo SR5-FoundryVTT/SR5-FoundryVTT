@@ -1,11 +1,17 @@
-import {SpiritInfoUpdater} from "./SpiritInfoUpdater.js"
-import {ItemsParser} from "../itemImporter/ItemsParser.js";
-import { SR5Actor } from "src/module/actor/SR5Actor.js";
-import { ActorFile } from "../ActorSchema.js";
-import { importOptionsType } from "../characterImporter/CharacterImporter.js";
-import { getArray } from "../itemImporter/importHelper/BaseParserFunctions.js";
-import { Sanitizer } from "@/module/sanitizer/Sanitizer.js";
+import { ItemsParser } from "../itemImporter/ItemsParser";
+import { SR5Actor } from "src/module/actor/SR5Actor";
+import { ActorSchema } from "../ActorSchema";
+import { importOptionsType } from "../characterImporter/CharacterImporter";
+import { Sanitizer } from "@/module/sanitizer/Sanitizer";
+import { DataDefaults } from "@/module/data/DataDefaults";
 
+export interface BlankSpirit extends Actor.CreateData {
+    type: 'spirit',
+    name: string,
+    items: Item.CreateData[],
+    effects: ActiveEffect.CreateData[],
+    system: ReturnType<typeof DataDefaults.baseSystemData<'spirit'>>,
+};
 
 /**
  * Imports characters from other tools into an existing foundry actor.
@@ -14,59 +20,29 @@ export class SpiritImporter {
 
     /**
      * Imports a chummer character into an existing actor. The actor will be updated. This might lead to duplicate items.
-     * @param {*} actor The actor that will be updated with the chummer character.
      * @param {*} chummerFile The complete chummer file as json object. The first character will be selected for import.
      * @param {*} importOptions Additional import option that specify what parts of the chummer file will be imported.
      */
-    async importChummerCharacter(actor: SR5Actor<'spirit'>, chummerFile: ActorFile, importOptions: importOptionsType) {
-        console.log('Importing the following character file content:');
-        console.log(chummerFile);
+    async import(chummerData: ActorSchema, type: Actor.SystemOfType<'spirit'>['spiritType'], importOptions: importOptionsType) {
+        const spirit = {
+            effects: [],
+            type: 'spirit',
+            folder: importOptions.folderId ?? null,
+            system: DataDefaults.baseSystemData('spirit'),
+            items: await new ItemsParser().parse(chummerData, importOptions),
+            name: chummerData.alias ?? chummerData.name ?? '[Name not found]',
+        } satisfies BlankSpirit;
 
-        console.log('Using the following import options:')
-        console.log(importOptions);
+        spirit.system.spiritType = type;
+        const magic = Number(chummerData.attributes[1]?.attribute.filter(att => att.name_english.toLowerCase() === 'mag')[0].total);
+        spirit.system.force = magic;
 
-        if (!chummerFile.characters?.character) {
-            console.log('Did not find a valid character to import  - aborting import');
-            return;
-        }
-
-        if(actor.type !== "spirit") {
-            return;
-        }
-
-        await this.resetCharacter(actor)
-
-        const chummerCharacter = getArray(chummerFile.characters.character)[0];
-        const infoUpdater = new SpiritInfoUpdater();
-        const updatedActorData = await infoUpdater.update(actor, chummerCharacter);
-        const items = await new ItemsParser().parse(chummerCharacter, importOptions);
-
-        const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.spirit.schema, updatedActorData.system);
+        const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.spirit.schema, spirit.system);
         if (consoleLogs) {
-            console.warn(`Document Sanitized on Import; Name: ${chummerCharacter.name}\n`);
+            console.warn(`Document Sanitized on Import; Name: ${chummerData.name}\n`);
             console.table(consoleLogs);
         }
 
-        await actor.update(updatedActorData as any);
-        await actor.createEmbeddedDocuments('Item', items);
-    }
-
-    async resetCharacter(actor: SR5Actor<'spirit'>) {
-        const toDeleteItems = actor.items?.filter(item => item.type !== "action").map(item => item.id) as string[];
-        await actor.deleteEmbeddedDocuments("Item", toDeleteItems);
-
-        await actor.update({
-            system: {
-                skills: {
-                    language: { value: {} },
-                    knowledge: {
-                        academic: { value: {} },
-                        interests: { value: {} },
-                        professional: { value: {} },
-                        street: { value: {} }
-                    }
-                }
-            }
-        });
+        await SR5Actor.create(spirit);
     }
 }
