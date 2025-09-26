@@ -104,7 +104,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         for (const target of targets) {
             // Collect connected icons, if user wants to see them.
             if (this._connectedIconsOpenClose[target.document.uuid]) {
-                target.icons = MatrixTargetingFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
+                target.icons = MatrixTargetingFlow.getWirelessMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.
@@ -484,7 +484,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
                 // An already marked icon will again show up when all icons are collected.
                 // So we can simply overwrite all icons here without any filtering.
 
-                target.icons = MatrixTargetingFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
+                target.icons = MatrixTargetingFlow.getWirelessMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.
