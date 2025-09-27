@@ -42,6 +42,11 @@ const VehicleData = () => ({
         initial: "speed",
         choices: ["speed", "handling"],
     }),
+    category: new StringField({
+        required: true,
+        initial: "medium",
+        choices: ["micro", "mini", "small", "medium", "large", "huge", "anthro", "missile"],
+    }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),
 

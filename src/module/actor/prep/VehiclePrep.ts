@@ -156,21 +156,21 @@ export class VehiclePrep {
     }
 
     static prepareConditionMonitor(system: Actor.SystemOfType<'vehicle'>) {
-        const { track, attributes, matrix, isDrone, modifiers } = system;
+        const { track, attributes, matrix, isDrone, modifiers, category } = system;
 
         const halfBody = Math.ceil(Helpers.calcTotal(attributes.body) / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
         if (isDrone) {
-            track.physical.base = 6 + halfBody;
-            track.physical.max = track.physical.base + (Number(modifiers['physical_track']) || 0);
+            track.physical.base = 6 + halfBody + (category === 'anthro' ? 2 : 0);
+            track.physical.max = track.physical.base + modifiers['physical_track'];
         } else {
             track.physical.base = 12 + halfBody;
-            track.physical.max =  track.physical.base + (Number(modifiers['physical_track']) || 0);
+            track.physical.max =  track.physical.base + modifiers['physical_track'];
         }
         track.physical.label = SR5.damageTypes.physical;
 
         const rating = matrix.rating || 0;
-        matrix.condition_monitor.max = 8 + Math.ceil(rating / 2) + Number(modifiers.matrix_track);
+        matrix.condition_monitor.max = 8 + Math.ceil(rating / 2) + modifiers.matrix_track;
     }
 
     static prepareMovement(system: Actor.SystemOfType<'vehicle'>) {
@@ -181,10 +181,10 @@ export class VehiclePrep {
         // algorithm to determine speed, CRB pg 202 table.
         // Allow ActiveEffects to apply to movement directly.
         movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
-        movement.walk.value = Helpers.calcTotal(movement.walk as ModifiableValueType, {min: 0});
+        movement.walk.value = Helpers.calcTotal(movement.walk, {min: 0});
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = Helpers.calcTotal(movement.run as ModifiableValueType, {min: 0});
+        movement.run.value = Helpers.calcTotal(movement.run, {min: 0});
     }
 
     static prepareMeatspaceInit(system: Actor.SystemOfType<'vehicle'>) {
@@ -204,8 +204,8 @@ export class VehiclePrep {
     static prepareArmor(system: Actor.SystemOfType<'vehicle'>) {
         const { armor, modifiers } = system;
 
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp'] || 0));
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', Number(modifiers['armor'] || 0));
+        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', armor['temp']);
+        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', modifiers['armor']);
 
         Helpers.calcTotal(armor);
     }
