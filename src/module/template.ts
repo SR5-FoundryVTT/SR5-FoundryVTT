@@ -165,8 +165,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
         const now = Date.now(); // Apply a 20ms throttle
         if (now - this.#moveTime <= 20) return;
         const center = event.data.getLocalPosition(this.layer);
-        // @ts-expect-error TODO: fvtt-types v14 Getting type errors for snap mode behavior param, though it works using what Foundry does internally.
-        const snapped = canvas.grid!.getSnappedPoint({x: center.x, y: center.y}, CONST.GRID_SNAPPING_MODES.CENTER);
+        const snapped = canvas.grid!.getSnappedPoint({x: center.x, y: center.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         this.document.updateSource({ x: snapped.x, y: snapped.y });
         this.refresh();
         this.#moveTime = now;
@@ -196,8 +195,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      */
     async _onConfirmPlacement(event) {
         await this._finishPlacement(event);
-        // @ts-expect-error TODO: fvtt-types v14 Getting type errors for snap mode behavior param, though it works using what Foundry does internally.
-        const destination = canvas.grid!.getSnappedPoint({x: this.document.x, y: this.document.y}, CONST.GRID_SNAPPING_MODES.CENTER);
+        const destination = canvas.grid!.getSnappedPoint({x: this.document.x, y: this.document.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         this.document.updateSource(destination);
         this.#events.resolve(canvas.scene!.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]));
     }
