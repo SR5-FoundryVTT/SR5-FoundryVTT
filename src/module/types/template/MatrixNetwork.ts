@@ -6,7 +6,7 @@ const { NumberField, BooleanField } = foundry.data.fields;
 export const MatrixDeviceData = () => ({
     // Helper data point to indicate a network connection update.
     // This is not storing data that's used anywhere but rather is used
-    // to trigger sheet renders across all user sessions when this actors
+    // to trigger sheet renders across all user sessions when this items
     // network connection is updated. The connection itself is stored in DataStorage.
     updatedConnections: new NumberField({ required: true, nullable: false, integer: true, initial: 0 })
 });
