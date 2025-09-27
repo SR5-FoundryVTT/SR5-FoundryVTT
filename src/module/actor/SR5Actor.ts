@@ -1990,7 +1990,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     hasWirelessDevices() {
-        return this.wirelessDevices.length > 0;
+        return this.wirelessDevices().length > 0;
     }
 
     matrixData(this: SR5Actor) {
