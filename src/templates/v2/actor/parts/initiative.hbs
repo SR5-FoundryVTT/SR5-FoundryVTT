@@ -1,0 +1,43 @@
+<div class="initiative-container">
+    <div class="initiative-col">
+        <div class="initiative-center">
+            <label class="initiative-label">
+                {{localize "SR5.Initiative"}}
+            </label>
+        </div>
+        <select class="presence-select" name="initiative-select">
+            {{#select initiativePerception}}
+                {{#if system.initiative.meatspace}}
+                    <option value="meatspace">{{localize "SR5.InitCatMeatspace"}}</option>
+                {{/if}}
+
+                {{#ife system.special 'magic'}}
+                    <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
+                {{/ife}}
+
+                {{#if system.initiative.matrix}}
+                    <option value="hot_sim">{{localize "SR5.HotSim"}}</option>
+                    <option value="cold_sim">{{localize "SR5.Labels.ActorSheet.ColdSim"}}</option>
+                {{/if}}
+            {{/select}}
+        </select>
+    </div>
+    <div class="initiative-col">
+        <div class="initiative-end">
+            <label data-action="toggleInitiativeBlitz">
+                {{localize "SR5.Blitz"}}
+                {{#if system.initiative.edge}}
+                    <i class="fas fa-toggle-on"></i>
+                {{else}}
+                    <i class="fas fa-toggle-off"></i>
+                {{/if}}
+            </label>
+        </div>
+        <button type="button" class="button">
+            <span>{{system.initiative.current.base.value}}</span>
+            <i class="fas fa-plus" style="font-size: 0.75em"></i>
+            <span>{{system.initiative.current.dice.value}}</span>
+            <i class="far fa-dice"></i>
+        </button>
+    </div>
+</div>

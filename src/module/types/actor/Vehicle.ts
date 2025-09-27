@@ -1,13 +1,14 @@
-import { CommonData, PhysicalCombatValues, CreateModifiers, ActorBase } from "./Common";
-import { Attributes, AttributeField } from "../template/Attributes";
-import { VehicleLimits } from "../template/Limits";
-import { Movement } from "../template/Movement";
-import { Tracks } from "../template/ConditionMonitors";
-import { ActorArmorData } from "../template/Armor";
-import { Initiative } from "../template/Initiative";
-import { MatrixData } from "../template/Matrix";
-import { VisibilityChecks } from "../template/Visibility";
-import { ModifiableField } from "../fields/ModifiableField";
+import { ActorBase, CommonData, CreateModifiers, PhysicalCombatValues } from './Common';
+import { AttributeChoices, AttributeField, Attributes } from '../template/Attributes';
+import { VehicleLimits } from '../template/Limits';
+import { Movement } from '../template/Movement';
+import { Tracks } from '../template/ConditionMonitors';
+import { ActorArmorData } from '../template/Armor';
+import { Initiative } from '../template/Initiative';
+import { MatrixData } from '../template/Matrix';
+import { VisibilityChecks } from '../template/Visibility';
+import { ModifiableField } from '../fields/ModifiableField';
+
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const VehicleStats = () => ({
@@ -30,17 +31,32 @@ const VehicleData = () => ({
     vehicleType: new StringField({
         required: true,
         initial: "ground",
-        choices: ["air", "aerospace", "ground", "water", "walker", "exotic"],
+        choices: {
+            air: "SR5.Vehicle.Types.Air",
+            aerospace: "SR5.Vehicle.Types.Aerospace",
+            exotic: "SR5.Vehicle.Types.Exotic",
+            ground: "SR5.Vehicle.Types.Ground",
+            water: "SR5.Vehicle.Types.Water",
+            walker: "SR5.Vehicle.Types.Walker"
+        },
     }),
     controlMode: new StringField({
         required: true,
         initial: "manual",
-        choices: ["manual", "remote", "rigger", "autopilot"],
+        choices: {
+            manual: 'SR5.Vehicle.ControlModes.Manual',
+            remote: 'SR5.Vehicle.ControlModes.Remote',
+            rigger: 'SR5.Vehicle.ControlModes.Rigger',
+            autopilot: 'SR5.Vehicle.ControlModes.Autopilot'
+        },
     }),
     environment: new StringField({
         required: true,
         initial: "speed",
-        choices: ["speed", "handling"],
+        choices: {
+            speed: 'SR5.Vehicle.Environments.Speed',
+            handling: 'SR5.Vehicle.Environments.Handling'
+        },
     }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),
@@ -63,7 +79,7 @@ const VehicleData = () => ({
     // === Matrix & Initiative ===
     matrix: new SchemaField(MatrixData()),
     initiative: new SchemaField(Initiative('meatspace', 'matrix')),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    full_defense_attribute: new StringField({ required: true, initial: "willpower", choices: AttributeChoices() }),
     visibilityChecks: new SchemaField(VisibilityChecks("matrix", "meatspace")),
 
     // === Driver & Networking ===
@@ -105,6 +121,7 @@ export class Vehicle extends ActorBase<ReturnType<typeof VehicleData>> {
     static override defineSchema() {
         return VehicleData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Vehicle", "SR5.Actor"];
 }
 
 console.log("VehicleData", VehicleData(), new Vehicle());

@@ -17,13 +17,13 @@ export class CritterPowerParser extends Parser<'critter_power'> {
             ? (category as typeof CritterPowerCategories[number])
             : "";
 
-        system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : "";
+        system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() as any : "";
 
         const range = jsonData.range ? jsonData.range._TEXT : "";
-        system.range = CritterPowerParser.rangeMap[range] ?? 'special';
+        system.range = CritterPowerParser.rangeMap[range] as any ?? 'special';
 
         const type = jsonData.type ? jsonData.type._TEXT : "";
-        system.powerType = CritterPowerParser.typeMap[type] ?? "";
+        system.powerType = CritterPowerParser.typeMap[type] as any ?? "";
 
         system.rating = 1;
 

@@ -4,15 +4,19 @@ import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
 import { Limits, MatrixLimits } from "../template/Limits";
 import { ActorBase, CommonData, CreateModifiers } from "./Common";
+import { SR5 } from '@/module/config';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpriteData = () => ({
     // === Core Identity ===
     ...CommonData(),
     attributes: new SchemaField({...Attributes(), ...MatrixActorAttributes() }),
-    spriteType: new StringField({ required: true }),
+    spriteType: new StringField({
+        required: true,
+        initial: 'data',
+        choices: SR5.spriteTypes,
+    }),
     special: new StringField({ required: true, initial: "resonance", readonly: true }),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
 
     // === Matrix & Host ===
     matrix: new SchemaField(MatrixData()),
@@ -56,6 +60,7 @@ export class Sprite extends ActorBase<ReturnType<typeof SpriteData>> {
     static override defineSchema() {
         return SpriteData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Sprite", "SR5.Actor"];
 }
 
 console.log("SpriteData", SpriteData(), new Sprite());

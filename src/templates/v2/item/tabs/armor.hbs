@@ -1,0 +1,16 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <section class="standard-form scrollable">
+            {{formGroup systemFields.armor.fields.value value=system.armor.value rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.armor.fields.mod value=system.armor.mod rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.armor.fields.hardened value=system.armor.hardened rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{!-- Iterate over damage types provided from config to display the fields --}}
+            {{#each config.elementTypes as |_ignored element_id|}}
+                {{formGroup (objValue @root.systemFields.armor.fields element_id)
+                            value=(objValue @root.system.armor element_id)
+                            rootId=@root.rootId disabled=@root.isPlayMode }}
+            {{/each}}
+        </section>
+    </div>
+</section>

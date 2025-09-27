@@ -1,0 +1,18 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="scrollable">
+            {{#if contentVisibility.adept_power_list}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/adept-powers.hbs' }}
+            {{/if}}
+            {{#if contentVisibility.spell_list}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/spells.hbs' }}
+            {{/if}}
+            {{#if contentVisibility.ritual_list}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/rituals.hbs' }}
+            {{/if}}
+            {{#if contentVisibility.summoning_list}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/summonings.hbs' }}
+            {{/if}}
+        </div>
+    </div>
+</section>

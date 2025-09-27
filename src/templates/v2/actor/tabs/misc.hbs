@@ -1,0 +1,126 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="split-container">
+        <div>
+            <section class="scrollable standard-form">
+                {{#if isIC}}
+                    {{editor biographyHTML target="system.description.value" button=true editable=true engine="prosemirror" collaborate=false}}
+                {{else}}
+                    <div>
+                        <button type="button" class="display reset-actor-run-data" data-tooltip="SR5.Tooltips.Actor.ResetActorForNewRun">
+                            {{localize "SR5.Labels.ActorSheet.ResetActorForNewRun"}}
+                        </button>
+                    </div>
+                    {{#if hasSkills}}
+                        <div>
+                            <button type="button" class="display show-hidden-skills">
+                                {{localize "SR5.RestoreDefaultSkills"}}
+                            </button>
+                        </div>
+                    {{#if (or isCharacter isSpirit)}}
+                        <div>
+                            <button type="button" class="display import-character">
+                                {{localize "SR5.ImportCharacter"}}
+                            </button>
+                        </div>
+                    {{/if}}
+                    {{#if (hasAnyFreshImports this.actor)}}
+                        <div>
+                            <button class="display import-character toggle-fresh-import-all-off"
+                                    data-tooltip="SR5.MarkImportsTooltip">
+                                {{localize 'SR5.MarkImportsReviewed'}}
+                            </button>
+                        </div>
+                    {{/if}}
+                    {{#if system.matrix.device}}
+                        <div>
+                            <button type="button" class="display setup-pan" data-tooltip="{{localize 'SR5.Tooltips.Actor.SetupPAN'}}">
+                                {{localize "SR5.Labels.ActorSheet.SetupPAN"}}
+                            </button>
+                        </div>
+                    {{/if}}
+                    {{/if}}
+                    {{#if isCharacter}}
+                        {{formGroup systemFields.nuyen value=source.system.nuyen rootId=rootId disabled=@root.isPlayMode }}
+                        {{formGroup systemFields.karma.fields.value value=source.system.karma.value rootId=rootId disabled=@root.isPlayMode }}
+                        {{formGroup systemFields.karma.fields.max value=source.system.karma.max rootId=rootId disabled=@root.isPlayMode }}
+                        {{formGroup systemFields.notoriety value=source.system.notoriety rootId=rootId disabled=@root.isPlayMode }}
+                        {{formGroup systemFields.public_awareness value=source.system.public_awareness rootId=rootId disabled=@root.isPlayMode }}
+                        {{formGroup systemFields.street_cred value=source.system.street_cred rootId=rootId disabled=@root.isPlayMode }}
+                    <!--Magic/Resonaz Selector-->
+                    {{/if}}
+                    {{#if canAlterSpecial }}
+                        {{formGroup systemFields.special value=source.system.special rootId=rootId disabled=@root.isPlayMode localize=true }}
+                    {{/if}}
+                    {{#if awakened}}
+                        {{formGroup systemFields.magic.fields.attribute value=source.system.magic.attribute rootId=rootId disabled=@root.isPlayMode localize=true }}
+                    {{/if}}
+                    {{#if emerged}}
+                        {{formGroup systemFields.technomancer.fields.attribute value=source.system.technomancer.attribute rootId=rootId disabled=@root.isPlayMode localize=true }}
+                    {{/if}}
+                    <!--Defense Selector -->
+                    {{#if hasFullDefense }}
+                        {{formGroup systemFields.full_defense_attribute value=source.system.full_defense_attribute rootId=rootId disabled=@root.isPlayMode localize=true }}
+                    {{/if}}
+                    {{#if isCharacter }}
+                        {{formGroup systemFields.matrix_full_defense_attribute value=source.system.matrix_full_defense_attribute rootId=rootId disabled=@root.isPlayMode localize=true }}
+                    {{/if}}
+                    {{#if isCharacter}}
+                        {{formGroup systemFields.is_critter value=source.system.is_critter rootId=rootId disabled=@root.isPlayMode }}
+                        {{formGroup systemFields.is_npc value=source.system.is_npc rootId=rootId disabled=@root.isPlayMode }}
+                    {{/if}}
+                    {{#if system.is_npc }}
+                        {{formGroup systemFields.is_grunt value=source.system.is_grunt rootId=rootId disabled=@root.isPlayMode }}
+                    {{/if}}
+                    {{#if isCharacter}}
+                        {{formGroup systemFields.metatype value=source.system.metatype rootId=rootId disabled=@root.isPlayMode localize=true }}
+                    {{/if}}
+                    {{formGroup systemFields.category_visibility.fields.default value=source.system.category_visibility.default rootId=rootId disabled=@root.isPlayMode }}
+                {{/if}}
+            </section>
+        </div>
+        <div>
+            <!-- Situational Modifiers Section -->
+            {{#if situationModifiers}}
+            <div>
+                <div class="new-list-item new-list-item-header">
+                    <div class="new-list-item-label-container">
+                        <label>
+                            {{localize "SR5.SituationalModifiersApplication.Title"}}
+                        </label>
+                    </div>
+                    <div class="new-list-item-col">
+                        <span>{{localize "SR5.Value"}}</span>
+                    </div>
+                </div>
+                {{#each situationModifiers}}
+                {{#if (not this.hidden)}}
+                    <div class="new-list-item">
+                        <div class="new-list-item-label-container">
+                            <label>{{localize this.label}}</label>
+                        </div>
+                        <div class="new-list-item-col">
+                            <span>{{this.value}}</span>
+                        </div>
+                    </div>
+                {{/if}}
+                {{/each}}
+            </div>
+            {{/if}}
+
+            <!-- Modifier Section -->
+            <div class="new-list-item new-list-item-header header-for-scrollable">
+                <div class="new-list-item-label-container">
+                    <label>
+                        {{localize "SR5.Modifier"}}
+                    </label>
+                </div>
+            </div>
+            <section class="scrollable standard-form">
+                {{!-- use source.system here to ensure we don't  --}}
+                {{#each source.system.modifiers as |value id|}} {{#ifne id 'wound'}}
+                    {{formGroup (objValue @root.systemFields.modifiers.fields id) value=value rootId=@root.rootId disabled=@root.isPlayMode }}
+                {{/ifne}} {{/each}}
+            </section>
+        </div>
+    </div>
+</section>

@@ -275,7 +275,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     getActionTestName(): string {
         const testName = this.getRollName();
-        return testName || game.i18n.localize('SR5.Action');
+        return testName || game.i18n.localize('SR5.ItemType.Action');
     }
 
     /**
@@ -780,6 +780,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return LinksHelpers.isUuid(source);
     }
 
+    get hasSource(): boolean {
+        const source = this.getSource();
+        return !!source;
+    }
+
     _canDealDamage(): boolean {
         // NOTE: Double negation to force boolean comparison casting.
         const action = this.getAction();
@@ -984,7 +989,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return matrix;
     }
 
+    canBeEquipped(this: SR5Item): boolean {
+        // currently only technology items with technology can be equipped
+        return !!this.getTechnologyData();
+    }
+
     isEquipped(this: SR5Item): boolean {
+        if (this.isType('critter_power', 'sprite_power')) {
+            return this.system.optional !== 'disabled_option';
+        }
         return this.system.technology?.equipped ?? false;
     }
 
@@ -1157,11 +1170,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     isWireless(this: SR5Item): boolean {
-        return this.system.technology?.wireless === 'online' || this.isRunningSilent();
+        return this.isMatrixDevice &&
+            (this.system.technology?.wireless === 'online' || this.isRunningSilent());
     }
 
     isRunningSilent(): boolean {
-        return (this as SR5Item).system.technology?.wireless === 'silent';
+        return this.isMatrixDevice && (this as SR5Item).system.technology?.wireless === 'silent';
     }
 
     isLivingPersona(this: SR5Item) {
@@ -1169,7 +1183,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     canBeWireless(this: SR5Item): boolean {
-        return this.system.technology?.wireless !== 'none';
+        return this.isMatrixDevice && this.system.technology?.wireless !== 'none';
     }
 
     isPublicGrid(this: SR5Item) {

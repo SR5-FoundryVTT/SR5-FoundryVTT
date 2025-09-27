@@ -1,8 +1,84 @@
 import { SR5Actor } from '../SR5Actor';
-import { SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
+export type SpriteActorSheetData = MatrixActorSheetData & {
+    technmomancer: SR5Actor | null;
+    isSprite: boolean;
+}
 
-export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
+export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetData> {
+    static override DEFAULT_OPTIONS: any = {
+        classes: ['sprite'],
+        position: {
+            width: 930,
+            height: 690,
+        },
+        actions: {
+            removeTechnomancer: this.#onRemoveTechnomancer,
+        }
+    }
+
+    static override TABS = {
+        ...super.TABS,
+        primary: {
+            initial: 'skills',
+            tabs: [
+                { id: 'actions', label: 'Actions', cssClass: '' },
+                { id: 'skills', label: 'Skills', cssClass: '' },
+                { id: 'matrix', label: 'Matrix', cssClass: '' },
+                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'description', label: 'Description', cssClass: '' },
+                { id: 'misc', label: 'Misc', cssClass: '' },
+            ]
+        },
+        matrixRight: {
+            initial: 'matrixActions',
+            tabs: [
+                { id: 'matrixActions', label: 'Actions', cssClass: '', },
+                { id: 'spritePowers', label: 'Sprite Powers', cssClass: '', }
+            ]
+        }
+    }
+    protected override async _renderHTML(content, options) {
+        const parts = await super._renderHTML(content, options);
+        const matrixRightSideContent = parts.matrix.querySelector("section.content.matrix-right-tab-content");
+        if (matrixRightSideContent) {
+            this.moveTabs(SR5SpriteActorSheet.TABS.matrixRight.tabs, parts, matrixRightSideContent);
+        }
+
+        return parts;
+    }
+
+    static override PARTS = {
+        ...super.PARTS,
+        skills: {
+            template: SheetFlow.templateBase('actor/tabs/sprite-skills'),
+            templates: [
+                ...SheetFlow.templateActorSystemParts('active-skills', 'sprite-options'),
+                ...SheetFlow.templateListItem('skill')
+            ],
+            scrollable: ['#active-skills-scroll', '#sprite-options-scroll']
+        },
+        description: {
+            template: SheetFlow.templateBase('actor/tabs/description'),
+            scrollable: ['.scrollable']
+        },
+        matrix: {
+            template: SheetFlow.templateBase('actor/tabs/sprite-matrix'),
+            scrollable: [
+                '#matrix-actions-scroll',
+                '#marked-icons-scroll' ,
+                '#owned-icons-scroll',
+                '#network-icons-scroll',
+                '#sprite-powers-scroll',
+            ]
+        },
+        spritePowers: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/sprite-powers'),
+            templates: SheetFlow.templateListItem('sprite_power'),
+        },
+    }
     /**
      * Sprite actors will handle these item types specifically.
      *
@@ -19,18 +95,14 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
         ];
     }
 
-    override activateListeners(html) {
-        super.activateListeners(html);
-
-        html.find('.technomancer-remove').on('click', this._onRemoveTechnomancer.bind(this));
-    }
-
-    override async getData(options: any) {
-        const data = await super.getData(options);
+    override async _prepareContext(options) {
+        const data = await super._prepareContext(options);
 
         // Collect sprite technomancer for easy interaction.
         if (this.document.isType('sprite') && this.document.system.technomancerUuid !== '')
-            data['technomancer'] = await fromUuid(this.document.system.technomancerUuid as any);
+            data['technomancer'] = await fromUuid(this.document.system.technomancerUuid);
+
+        data.isSprite = true;
 
         return data;
     }
@@ -38,7 +110,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
     /**
      * Sprites have support for dropping actors onto them.
      */
-    override async _onDrop(event: DragEvent) {
+    override async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -49,7 +121,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
         // Handle technomancer drops, ignore other actor drops as sprites can't handle them.
         if (dropData.type === 'Actor') {
             await this._addTechnomancerOnDrop(dropData);
-            return [];
+            return;
         }
 
         return super._onDrop(event);
@@ -70,32 +142,10 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
     /**
      * Remove the technomancer from the sprite.
      */
-    async _onRemoveTechnomancer(event: MouseEvent): Promise<void> {
+    static async #onRemoveTechnomancer(this: SR5SpriteActorSheet, event: MouseEvent) {
         event.preventDefault();
         event.stopPropagation();
 
         await this.document.removeTechnomancer();
-    }
-
-    /**
-     * Custom behavior for ListHeader item creation for sprites.
-     */
-    override async _onItemCreate(event: any) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const type = event.currentTarget.closest('.list-header').dataset.itemId;
-        const optional = event.currentTarget.closest('.list-header').dataset.optional;
-
-        switch (type) {
-            // Sprite powers need special handling, as there are different sections for them.
-            case 'sprite_power':
-                if (!optional) return console.error('Shadowrun 5e | Sprite Actor Sheet: Missing optional value for sprite power item creation.');
-                await super._onItemCreate(event, {system: {optional}});
-                break;
-            default:
-                await super._onItemCreate(event);
-                break;
-        }
     }
 }

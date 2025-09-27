@@ -1,0 +1,43 @@
+{{!--expects a MarkedDocument to be passed in as 'item' --}}
+<div class="new-list-item-container {{cssClass}}">
+    <div class="new-list-item" data-item-id="{{item.document.uuid}}">
+        <div class="new-list-item-label-container">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
+            <label class="{{#if item.selected}}new-list-item-selected{{/if}}">
+                <a data-action="showItemDescription" data-item-id="{{item.documnet.uuid}}">
+                    {{item.name}}
+                </a>
+            </label>
+        </div>
+
+        <div class="new-list-item-col">
+            <span>
+                {{matrixIconType item.document.type}}
+            </span>
+        </div>
+
+        <div class="new-list-item-col mark-input-col">
+            <a data-action="removeOneMark"
+               data-tooltip="SR5.Labels.ActorSheet.RemoveOneMark"
+               data-item-id="{{item.document.uuid}}">
+                <i class="fas fa-minus-square"></i>
+            </a>
+            {{item.marks}}
+            <a data-action="addOneMark"
+               data-tooltip="SR5.Labels.ActorSheet.AddOneMark"
+               data-item-id="{{item.document.uuid}}">
+                <i class="fas fa-plus-square"></i>
+            </a>
+        </div>
+
+        <div class="new-list-item-icons">
+            <a data-action="removeMarks" data-item-id="{{item.document.uuid}}">
+                <i class="fas fa-trash"></i>
+            </a>
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connected-icons-toggle.hbs' item }}
+        </div>
+    </div>
+    <div class="new-list-item-description">
+        TODO
+    </div>
+</div>

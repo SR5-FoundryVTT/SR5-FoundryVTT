@@ -13,7 +13,8 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
         switch (jsonData.category?._TEXT) {
             case "Insect Spirits":
-                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase();
+                // TODO shawn fix typing
+                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as any;
                 break;
 
             case "Toxic Spirits": {
@@ -23,7 +24,8 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                     ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
                 ]);
 
-                system.spiritType = specialMapping.get(jsonData.name._TEXT) ?? "";
+                // TODO shawn fix typing
+                system.spiritType = specialMapping.get(jsonData.name._TEXT) ?? "" as any;
                 break;
             }
 
@@ -40,14 +42,16 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                 system.attributes.magic.base = Number(jsonData.magmin?._TEXT) || 0;
                 system.attributes.resonance.base = Number(jsonData.resmin?._TEXT) || 0;
 
+                // TODO shawn fix typing
                 system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
-                    ? jsonData.name._TEXT.replace(" ", "_").toLowerCase() : "homunculus";
+                    ? (jsonData.name._TEXT.replace(" ", "_").toLowerCase() as any) : "homunculus";
                 break;
             default:
+                // TODO shawn fix typing
                 system.spiritType = jsonData.name._TEXT
                     .replace(" Spirit", "").replace("Spirit of ", "")
                     .replace(" (Demon)", "").replace(/[\s\-]/g, "_")
-                    .split("/")[0].toLowerCase();
+                    .split("/")[0].toLowerCase() as any;
         }
 
         if (jsonData.run) {

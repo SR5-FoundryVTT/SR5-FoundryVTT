@@ -1,0 +1,65 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="standard-form scrollable">
+            {{formGroup systemFields.category
+                        value=system.category
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.type
+                        value=system.type
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.drain value=system.drain rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.range
+                        value=system.range
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formGroup systemFields.duration
+                        value=system.duration
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{#if (eq system.category 'combat')}}
+                {{formGroup systemFields.combat.fields.type
+                            value=system.combat.type
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{else if (eq system.category 'detection')}}
+                {{formGroup systemFields.detection.fields.type
+                            value=system.detection.type
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.detected.fields.extended
+                            value=system.detected.extended
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{else if (eq system.category 'illusion')}}
+                {{formGroup systemFields.illusion.fields.type
+                            value=system.illusion.type
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.illusion.fields.sense
+                            value=system.illusion.sense
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{else if (eq system.category 'manipulation')}}
+                {{formGroup systemFields.manipulation.fields.damaging
+                            value=system.manipulation.damaging
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.manipulation.fields.mental
+                            value=system.manipulation.mental
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.manipulation.fields.environmental
+                            value=system.manipulation.environmental
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.manipulation.fields.physical
+                            value=system.manipulation.physical
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{else if (eq system.category 'ritual')}}
+                {{formGroup systemFields.ritual.fields.type
+                            value=system.ritual.type
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+        </div>
+    </div>
+</section>
