@@ -13,12 +13,18 @@ import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { SheetFlow } from '@/module/flows/SheetFlow';
 
+// Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
+type sheetAction = {
+    name: string,
+    description: string,
+    action: SR5Item
+}
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
     markedDocuments: Shadowrun.MarkedDocument[]
     handledItemTypes: string[]
     network: SR5Item | null
-    matrixActions: {name: string, action: SR5Item}[]
+    matrixActions: sheetAction[]
     selectedMatrixTarget: string|undefined
     // Stores icons connected to the selected matrix target.
     selectedMatrixTargetIcons: Shadowrun.MatrixTargetDocument[];
@@ -215,7 +221,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         for (const target of targets) {
             // Collect connected icons, if user wants to see them.
             if (this._connectedIconsOpenClose[target.document.uuid]) {
-                target.icons = MatrixTargetingFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
+                target.icons = MatrixTargetingFlow.getWirelessMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.
@@ -365,13 +371,16 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         }
 
         // Prepare sorting and display of a possibly translated document name.
-        return actions.map(action => {
-                return {
-                    name: PackActionFlow.localizePackAction(action.name),
-                    action
-                };
-            })
-            .sort(Helpers.sortByName.bind(Helpers));
+        const sheetActions: sheetAction[] = [];
+        for (const action of actions) {
+            sheetActions.push({
+                name: PackActionFlow.localizePackAction(action.name),
+                description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
+                action
+            });
+        }
+
+        return sheetActions.sort(Helpers.sortByName.bind(Helpers));
     }
 
     /**
@@ -507,7 +516,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
                 // An already marked icon will again show up when all icons are collected.
                 // So we can simply overwrite all icons here without any filtering.
 
-                target.icons = MatrixTargetingFlow.getConnectedMatrixIconTargets(target.document as SR5Actor);
+                target.icons = MatrixTargetingFlow.getWirelessMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
                     // Mark icon as selected.

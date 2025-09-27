@@ -48,6 +48,15 @@
         "ShowTokenNameForChatOutputName": "굴림 카드에 토큰 이름 사용",
         "TokenHealthBars": "토큰 체력 표시줄",
         "TokenHealthBarsDescription": "미러링 대신 토큰의 전체 피해 추적기에 빈 체력 막대가 표시됨",
+        "TokenRulerColorRunning": "토큰 이동 달리기 색상",
+        "TokenRulerColorRunningDescription": "달리기 범위 내에서의 색상.",
+        "TokenRulerColorSprinting": "토큰 이동 전력질주 색상",
+        "TokenRulerColorSprintingDescription": "달리기 범위를 초과하고 전력 질주가 필요한 범위의 색상.",
+        "TokenRulerColorWalking": "토큰 이동 걷기 색상",
+        "TokenRulerColorWalkingDescription": "걷기 범위 내에서의 색상.",
+        "TokenRulerOpacity": "토큰 이동 투명도",
+        "TokenRulerOpacityDescription": "토큰 눈금 자 표시의 불투명도. (0 = 완전 투명, 1 = 완전 불투명)",
+        "TokenUseRoutingLib": "RoutingLib 사용",
         "UseDamageConditionDescription": "시스템이 상태 측정기에 따라 토큰을 표시",
         "UseDamageConditionName": "토큰 상태 효과에 시스템 처리 사용",
         "UseImportIconOverridesDescription": "물품 불러오기 시 서로 다른 물품 유형에 동일한 아이콘을 사용하는 것이 합리적일 경우 사용. 사용자 지정 아이콘을 사용하는 경우 체크 해제.",
@@ -63,6 +72,7 @@
             "AddictionMental": "정신적 중독",
             "AddictionPhysical": "신체적 중독",
             "Attack": "공격 행동",
+            "AttackMatrix": "매트릭스 공격",
             "AttackMelee": "근접 공격",
             "AttackRanged": "원거리 공격",
             "AttackThrown": "투척 공격",
@@ -71,6 +81,7 @@
             "Compiling": "컴파일링 행동",
             "ComplexForm": "컴플렉스 폼 행동",
             "Defense": "방어 행동",
+            "DefenseMatrix": "매트릭스 방어",
             "DefenseSuppression": "제압 사격 방어",
             "Drain": "드레인 행동",
             "Fade": "페이드 행동",
@@ -81,7 +92,9 @@
             "RecoveryPhysical": "육체 회복",
             "RecoveryStun": "정신 회복",
             "Resist": "저항 행동",
+            "ResistBiofeedback": "생체반응 저항",
             "ResistDisease": "질병 저항",
+            "ResistMatrix": "매트릭스 저항",
             "ResistToxin": "독소 저항",
             "Resonance": "공명 행동",
             "Rigging": "리깅 행동",
@@ -110,20 +123,51 @@
                 "TestItem": "물품을 통한 판정"
             },
             "CannotAddTestViaItemToActor": "액터에 '물품을 통한 판정' 종류의 액티브 이펙트 추가 불가",
+            "FIELDS": {
+                "applyByTest": {
+                    "label": "물품을 통한 판정에 적용"
+                },
+                "applyTo": {
+                    "hint": "다른 목표에 적용",
+                    "label": "적용 대상"
+                },
+                "onlyForEquipped": {
+                    "hint": "장착한 물품에만 적용",
+                    "label": "장착에만"
+                },
+                "onlyForItemTest": {
+                    "hint": "모체 물품 판정에만 적용",
+                    "label": "물품 판정에만"
+                },
+                "onlyForWireless": {
+                    "hint": "무선이 활성화된 물품에만 적용",
+                    "label": "무선이 활성화된 물품에만"
+                },
+                "selection_attributes": {
+                    "hint": "사용된 특성에 따라 판정을 필터링",
+                    "label": "특성치 필터링"
+                },
+                "selection_categories": {
+                    "hint": "사용된 행동 범주에 따라 판정을 필터링",
+                    "label": "행동 범주 필터링"
+                },
+                "selection_limits": {
+                    "hint": "사용된 한계에 따라 판정을 필터링",
+                    "label": "한계 필터링"
+                },
+                "selection_skills": {
+                    "hint": "사용된 기술에 따라 판정을 필터링",
+                    "label": "기술 필터"
+                },
+                "selection_tests": {
+                    "hint": "사용된 판정에 따라 판정을 필터링",
+                    "label": "판정 필터링"
+                }
+            },
             "Modes": {
                 "Modify": "수정"
             },
-            "New": "새로운 효과",
-            "OnlyForEquipped": "물품을 장착한 경우에만 적용",
-            "OnlyForItemTest": "상위 물품 판정에만 적용",
-            "OnlyForWireless": "무선이 활성화된 경우에만 적용",
-            "Test": {
-                "ActionCategories": "행동 범주 필터",
-                "Attributes": "특성치 필터",
-                "Limits": "한계치 필터",
-                "Skills": "기술 필터",
-                "Tests": "판정 필터"
-            }
+            "New": "새로운 효과"
         },
         "ActiveSkills": "활성형 기술",
         "ActorTypes": {
@@ -180,11 +224,13 @@
         "Barrel": "총열",
         "Base": "기본",
         "BaseValue": "기본 수치",
+        "BiofeedbackDamage": "생체반응 피해",
         "Biography": "인물 기록",
         "BlastRadius": "폭발 범위",
         "Block": "막기",
         "Bonus": "보너스",
         "Bonuses": "보너스",
+        "Broken": "망가짐",
         "Bullet": "발",
         "BulletCount": "잔탄 수",
         "Bullets": "발",
@@ -228,6 +274,36 @@
         "Collapse": "접기",
         "CollapseAll": "전체 접기",
         "CommonProgram": "일반 프로그램",
+        "CompendiaSettings": {
+            "Description": "이 팩들은 시스템에 사용됩니다. 사용자 정의 팩으로 오버라이드 할 수 있지만, 원본 팩을 삭제해서는 안 됩니다.",
+            "GeneralActionsPack": {
+                "hint": "이 컨펜디움은 모든 일반, 특성치 전용 행동에 사용됩니다.",
+                "label": "일반 행동"
+            },
+            "ICActionsPack": {
+                "hint": "이 컨펜디움은 IC 행동에 사용되며, 각 IC 유형별로 필터링 됩니다.",
+                "label": "IC 행동"
+            },
+            "Label": "컴펜디움 팩",
+            "MatrixActionsPack": {
+                "hint": "이 컨펜디움은 모든 매트릭스 행동에 사용됩니다.",
+                "label": "매트릭스 행동"
+            },
+            "Title": "시스템 컨펜디움"
+        },
+        "Compendiums": {
+            "Folders": {
+                "Root": "SR5e 불러온 항목"
+            },
+            "sr5critter": "생명체 & 영혼 & 요정",
+            "sr5drone": "드론 & 탑승물",
+            "sr5gear": "방어구 & 장비",
+            "sr5magic": "주문 & 컴플렉스 폼",
+            "sr5modification": "부착물 추가",
+            "sr5trait": "특징 & 능력",
+            "sr5ware": "바이오웨어 & 사이버웨어",
+            "sr5weapon": "무기"
+        },
         "Compilation": {
             "DropSprite": "요정 배치",
             "FixedSprite": "준비된 요정",
@@ -237,6 +313,7 @@
         "ComplexForms": "컴플렉스 폼",
         "Conceal": "은폐도",
         "ConditionMonitor": "상태 측정기",
+        "Connection": "연결",
         "Contact": {
             "Blackmail": "협박",
             "Connection": "영향력",
@@ -247,8 +324,63 @@
             "Loyalty": "친밀도",
             "Type": "유형"
         },
+        "ContactType": "유형",
         "Contacts": "연줄",
+        "Content": {
+            "Actions": {
+                "Armor": "아머",
+                "Biofeedback Resist": "생체반응 저항",
+                "BruteForce": "브루트 포스",
+                "ChangeConfiguration": "환경설정",
+                "ChangeIcon": "아이콘 변경",
+                "CheckOverwatchScore": "감시 점수 확인",
+                "Composure": "평정심",
+                "ControlDevice": "장치 조작",
+                "CrackFile": "파일 크랙",
+                "CrackProgramme": "프로그램 크랙",
+                "DataSpike": "스파이크",
+                "DisarmDataBomb": "데이터 폭탄 해체",
+                "Drain": "드레인",
+                "DroneInfiltration": "드론 침입",
+                "DronePerception": "드론 인식",
+                "DronePilotVehicle": "드론 탑승물 조종",
+                "EditFile": "파일 수정",
+                "EnterexitHost": "호스트 입장/퇴장",
+                "EraseMark": "마크 제거",
+                "EraseMatrixSignature": "매트릭스 흔적 제거",
+                "Fade": "페이드",
+                "FormatDevice": "장치 포맷",
+                "FullMatrixDefense": "매트릭스 전력 방어",
+                "GridHop": "그리드 홉",
+                "HackOnTheFly": "즉석 해킹",
+                "Hide": "숨기",
+                "InviteMark": "마크 초대",
+                "JackOut": "잭 아웃",
+                "JamSignals": "잼 신호",
+                "JudgeIntentions": "의도 판단",
+                "JumpIntoRiggedDevice": "리그된 장치로 점프",
+                "LiftCarry": "들기 운반",
+                "MatrixDamageResist": "매트릭스 피해 저항",
+                "MatrixDefenseTest": "매트릭스 방어 판정",
+                "MatrixPerception": "매트릭스 인식",
+                "MatrixSearch": "매트릭스 검색",
+                "Memory": "기억",
+                "NaturalRecoveryPhysical": "자연적 물리 회복",
+                "NaturalRecoveryStun": "자연적 기절 회복",
+                "PhysicalDamageResist": "물리적 피해 저항",
+                "PhysicalDefense": "물리적 방어",
+                "RebootDevice": "장치 재부팅",
+                "SendMessage": "메세지 보내기",
+                "SetDataBomb": "데이터 폭탄 설치",
+                "Snoop": "스눕",
+                "SpoofCommand": "스푸프 명령",
+                "SwitchInterfaceMode": "인터페이스 모드 변경",
+                "TraceIcon": "아이콘 추적",
+								"CrashProgram": "프로그램 충돌"
+            }
+        },
         "Continue": "계속",
+        "ControlRig": "컨트롤 리그",
         "Cost": "비용",
         "Cover": "엄폐",
         "Create": " {type} 생성",
@@ -299,6 +431,8 @@
         "CyberwareGradeAlpha": "알파웨어",
         "CyberwareGradeBeta": "베타웨어",
         "CyberwareGradeDelta": "델타웨어",
+        "CyberwareGradeGamma": "감마웨어",
+        "CyberwareGradeGrey": "그레이웨어",
         "CyberwareGradeStandard": "표준",
         "CyberwareGradeUsed": "중고",
         "DIALOG": {
@@ -353,6 +487,7 @@
         },
         "DicePool": "주사위 풀",
         "DicePoolModifier": "주사위 풀 수정치",
+        "DirectConnection": "직접 연결",
         "DmgTypeMatrix": "매트릭스",
         "DmgTypePhysical": "물리",
         "DmgTypeStun": "기절",
@@ -384,7 +519,7 @@
         "Emerged": "공명자",
         "EnvModifiersApplication": {
             "ClearModifiers": "개인 수정치 초기화",
-            "Extreme": " 두 가지 이상의 극단적 상태가 조합됨",
+            "Extreme": "두 가지 이상의 극단적 상태가 조합됨",
             "LightGlare": {
                 "Good": "완전 밝음/조명 없음",
                 "Heavy": "완전 어두움/너무 눈부신 조명",
@@ -429,7 +564,9 @@
         "Equipment": "도구",
         "Equipped": "장착 됨",
         "Errors": {
-            "CanOnlyAddTechnologyItemsToANetwork": "네트워크에는 기술적 물품만 추가할 수 있습니다.",
+            "CantConnectICToGrid": "IC 액터는 그리드 네트워크에 연결될 수 없음",
+            "CantConnectToPAN": "해당 문서는 PAN 네트워크에 추가할 수 없음",
+            "CantConnectToWAN": "해당 문서는 WAN 네트워크에 추가할 수 없음",
             "CantEditAppliedItemEffects": "물품에 의해 적용된 활성 효과는 편집할 수 없습니다.",
             "DefaultInventoryCantBeRemoved": "기본 소지품 위치는 삭제할 수 없습니다.",
             "InventoryAlreadyExists": "해당 이름의 소지품 위치가 이미 존재합니다.",
@@ -437,10 +574,13 @@
             "MarkCouldNotBePlaced": "내부 오류: 당신의 마커는 배치될 수 없습니다.",
             "MarksCantBePlacedBy": "활성화된 액터는 마커를 배치할 수 없습니다.",
             "MarksCantBePlacedOn": "선택된 유형의 액터는 마커를 받을 수 없습니다.",
+            "MarksCantBePlacedWithoutPersona": "선택한 액터는 활성된 페르소나를 가지고 있지 않습니다.",
+            "MasterDeviceIsMissing": "마스터 장치가 없습니다. 로컬 장치 값으로 대체됩니다.",
             "MissingSkill": "액터가 요구되는 기술을 가지고 있지 않습니다.",
             "NoAvailableActorFound": "해당 행동에 사용할 수 있는 액터를 찾을 수 없음",
             "SkillWithoutAttribute": "이 기술은 특성치 설정이 없습니다.",
-            "TestExpectsVehicleOnly": "해당 테스트는 탑승물 유형의 액터만 사용할 수 있음"
+            "TestExpectsVehicleOnly": "해당 테스트는 탑승물 유형의 액터만 사용할 수 있음",
+            "TooManyActionsWithCategory": "액터에 {category} 범주의 해동이 정확히 하나 있어야 함"
         },
         "EssenceCost": "에센스",
         "Expand": "펼치기",
@@ -463,6 +603,7 @@
         "Force": "강도",
         "FullDefense": "전력방어",
         "FullDefenseAttribute": "전력방어 특성치",
+        "FullMatrixDefense": "매트릭스 전력 방어",
         "GMRequest": {
             "General": "GM이 원하는 판정",
             "RollAttribute": "특성치 확인",
@@ -475,6 +616,7 @@
         "GlitchCritical": "심각한 글리치!",
         "Glitches": "글리치:",
         "GoodCover": "완벽한 엄폐물",
+        "Grids": "그리드",
         "HackingProgram": "해킹 프로그램",
         "Help": "도움",
         "Hits": "성공횟수",
@@ -486,6 +628,7 @@
             "MissingIC": "빠진 IC",
             "Rating": "호스트 등급"
         },
+        "Hosts": "호스트",
         "HotSim": "핫 심",
         "IC": {
             "MissingHost": "호스트 물품 끌어서 놓기",
@@ -555,6 +698,7 @@
             "Device": "장치",
             "Echo": "에코",
             "Equipment": "도구",
+            "Grid": "그리드",
             "Host": "호스트",
             "Lifestyle": "생활방식",
             "Metamagic": "메타마법",
@@ -584,6 +728,10 @@
             "ShowSituationModifiers": {
                 "Hint": "선택한 대상에 대한 상황 수정치 열기",
                 "Label": "상황 수정치"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "표준 성공 판정 수행 요청",
+                "Label": "성공 판정 요청"
             }
         },
         "KnockedDown": "넘어짐",
@@ -596,22 +744,43 @@
                 "ActiveTest": "판정",
                 "Category": "범주",
                 "DamageResistanceTest": "피해 저항 판정",
+                "ForceReboot": "강제 재부팅",
                 "Modifier": "수정치",
                 "Modifiers": "수정치",
                 "OpposedTest": "경쟁 판정",
                 "SpiritType": "영혼 유형",
                 "SpriteType": "요정 유형"
             },
+            "Actions": {
+                "BruteForce": "브루트 포스",
+                "HackontheFly": "즉석 해킹"
+            },
             "ActorSheet": {
+                "AddNetwork": "직접 연결 네트워크",
+                "ColdSim": "콜드 심",
+                "Compilations": "컴파일 모음",
+                "ConnectToDriver": "조종자에게 연결",
                 "CreateInventory": "물품 보관 장소 생성",
                 "CritterPowers": "생명체 능력",
                 "DeviceRating": "장치 등급",
+                "DeviceSetup": "장치 설정",
                 "DisabledOptionCritterPowers": "추가 생명체 능력 - 사용 불가능",
                 "DisabledOptionSpritePowers": "추가 요정 능력 - 사용 불가능",
+                "DisplayingPersona": "페르소나 표시",
                 "EnabledOptionCritterPowers": "추가 생명체 능력 - 사용 가능",
                 "EnabledOptionSpritePowers": "추가 요정 능력 - 사용 가능",
+                "Hacking": "해킹",
                 "ICConfiguration": "IC 배열",
+                "Icons": "아이콘",
+                "MarkNetwork": "네트워크 마크",
+                "MarkedIcons": "마크된 아이콘",
                 "Matrix": "매트릭스",
+                "MatrixActions": "매트릭스 행동",
+                "Network": "네트워크 마크",
+                "NoNetwork": "네트워크 없음",
+                "Offline": "오프라인",
+                "OwnedIcons": "소유한 아이콘",
+                "Persona": "페르소나",
                 "PersonalInventory": "개인 소지 중",
                 "ResetActorForNewRun": "신규 런을 위한 초기화",
                 "Rituals": "의식",
@@ -619,6 +788,7 @@
                 "RollDronePerception": "드론 인식",
                 "RollPilotVehicleTest": "탑승물 조종",
                 "SetMonitor": "상태 측정기는 수동으로 설정해야 합니다.",
+                "SetupPAN": "PAN에 장치 추가",
                 "Spells": "주문",
                 "SpiritConfiguration": "영혼 구성",
                 "SpriteConfiguration": "요정 구성",
@@ -631,8 +801,22 @@
                 "Carried": "소지",
                 "OpenInventory": "소지품 위치"
             },
+            "MarkPlacement": {
+                "PlaceOnDevice": "장치에 배치",
+                "PlaceOnMainIcon": "페르소나/호스트에 배치"
+            },
+            "Matrix": {
+                "Global": "글로벌",
+                "Local": "로컬",
+                "Public": "공공",
+                "TargetDevice": "목표 장치",
+                "TargetMainIcon": "목표 주 아이콘"
+            },
             "Message": {
                 "ClickToSelect": "장면에서 클릭하여 선택",
+                "FailedAttackAction": "매트릭스 공격 행동 실패",
+                "OverwatchConvergence": "감시 융합",
+                "TargetedIcon": "목표 아이콘",
                 "TestEffects": "적용된 효과"
             },
             "Sheet": {
@@ -642,7 +826,10 @@
                 "MissingNetworkDevices": "추가할 네트워크 장치를 끌어다 놓기",
                 "NetworkDevices": "네트워크화 된 장치",
                 "PAN": "PAN",
+                "RebootDevice": "재부팅",
                 "SubtractOne": "제외",
+                "Type": "종류",
+                "Visible": "보임",
                 "WAN": "WAN"
             },
             "Sidebar": {
@@ -678,6 +865,7 @@
         "LivingPersona": "리빙 페르소나",
         "Load": "불러오기",
         "Loaded": "불러옴",
+        "Loyalty": "친밀도",
         "MIGRATION": {
             "BeginMigration": "마이그레이션 시작",
             "BeginNotification": "버전에서 섀도우런 시스템 마이그레이션 시작",
@@ -707,9 +895,23 @@
         "MatrixAttrDataProc": "데이터 처리",
         "MatrixAttrFirewall": "방화벽",
         "MatrixAttrSleaze": "슬리즈",
+        "MatrixDefense": "매트릭스 방어",
+        "MatrixFullDefenseAttribute": "매트릭스 전력 방어 특성치",
+        "MatrixNetworkHackingApplication": {
+            "Icons": "아이콘",
+            "Invite": "초대 요청",
+            "Title": "네트워크로 연결"
+        },
         "MatrixTarget": "매트릭스 목표",
         "MeleeWeaponAttack": "근거리 무기 공격",
         "MentalLimit": "정신 한계치",
+        "Messages": {
+            "MarkInvitation": {
+                "AcceptInvite": "수락",
+                "AskForInvite": "다음에 대한 마크 초대 요청:",
+                "InviteAccepted": "{networkName}에 자유롭게 참여하세요, {userName}!"
+            }
+        },
         "Metamagic": "메타 마법",
         "Metamagics": "메타마법",
         "Metatype": "메타인종",
@@ -754,6 +956,7 @@
             "AstralLimit": "아스트랄 한계",
             "BackgroundCount": "배경 계산",
             "Composure": "평정심",
+            "ControlRigRating": "컨트롤 리그 등급",
             "Defense": "방어",
             "DefenseBlock": "방어 (막기)",
             "DefenseDodge": "방어 (회피)",
@@ -761,6 +964,7 @@
             "DefenseMulti": "방어 (다중)",
             "DefenseParry": "방어 (쳐내기)",
             "DefenseRanged": "방어 (원거리)",
+            "DifferentGrid": "다른 그리드",
             "Drain": "드레인",
             "Environmental": "환경",
             "EnvironmentalLight": "환경 (조명)",
@@ -772,12 +976,14 @@
             "Global": "전체",
             "JudgeIntentions": "의심",
             "LiftCarry": "들기&운반",
+            "MarkDamage": "마크 당 피해량",
+            "Marks": "마크",
             "MatrixDice": "매트릭스 우선권 주사위",
             "MatrixInit": "매트릭스 우선권",
             "MatrixTrack": "매트릭스 상태 추적기",
             "MeatSpaceDice": "현실 우선권 주사위",
             "MeatSpaceInit": "현실 우선권",
-            "Memory": "기억",
+            "Memory": "기억\n",
             "MentalLimit": "정신 한계치",
             "Noise": "노이즈",
             "PainTolerancePhysical": "통증 내성 물리",
@@ -785,12 +991,15 @@
             "PhysicalLimit": "물리 한계치",
             "PhysicalOverflowTrack": "물리 치명상 추적기",
             "PhysicalTrack": "물리 추적기",
+            "PublicGrid": "공공 그리드",
             "Reach": "길이",
             "Recoil": "반동",
             "Run": "달리기",
             "Soak": "피해 저항",
             "SocialLimit": "사교 한계치",
             "StunTrack": "기절 추적기",
+            "ThreeMarks": "3 마크",
+            "TwoMarks": "2 마크",
             "Walk": "걷기",
             "WoundTolerance": "부상 내성",
             "Wounds": "부상"
@@ -803,9 +1012,15 @@
         },
         "MoveItemInventory": "소지품 창으로 물품 옮기기",
         "Movement": "이동",
+        "MovementTypes": {
+            "Run": "달리기",
+            "Sprint": "전력질주"
+        },
         "Mundane": "일반인",
         "Name": "이름",
         "NetHits": "순 성공횟수",
+        "Network": "네트워크",
+        "Networks": "네트워크",
         "New": "신규",
         "NoCover": "엄폐물 없음",
         "NoSelectableToken": "캔버스 위에 액터가 선택할 수 있는 토큰이 없음",
@@ -814,6 +1029,19 @@
         "NormalSkillButton": "보통",
         "NormalSpellButton": "보통",
         "NotExtended": "연장 안됨",
+        "Notifications": {
+            "AddDevicesToPAN": {
+                "Adding": "추가",
+                "FinishedAddingItems": "PAN에 장치 추가를 완료했습니다. 연결이 변경된 물품 시트는 닫았다가 다시 열어주세요.",
+                "Starting": "PAN에 장착한 장치 추가 시작"
+            },
+            "DeletingStorageReferences": {
+                "Finished": "참조 정리 완료",
+                "Item": "물품에 있는 참조 정리",
+                "Start": "네트워크와 마크 참조 삭제"
+            },
+            "VehicleCannotBeOwnDriver": "탑승물은 스스로의 조종자가 될 수 없음(그건 조종 특성치의 역할)"
+        },
         "Notoriety": "악명",
         "Nuyen": "뉴엔",
         "OpenOrigin": "물품 열기",
@@ -830,19 +1058,21 @@
             "AddSelect": "선택된 토큰을 연결된 액터에 추가",
             "CantDeleteUserCharacter": "추적기에서 플레이어 캐릭터 제거할 수 없음",
             "DeleteScore": "추적기에서 점수 삭제",
+            "GMOnly": "GOD가 당신의 위치를 추적하고 있습니다...",
             "NotifyNoSelectedTokens": "최소 하나 이상의 연결된 토큰이 선택되어있어야 합니다.",
             "OnlyLinkedActorsSupported": "연결된 액터만 지원됩니다. 연결되지 않은 액터와 선택된 토큰은 무시됩니다.",
             "ResetScore": "감시 점수 초기화"
         },
-        "OverwatchScoreTrackerTitle": "존슨 씨의 육아용 감시기",
+        "OverwatchScoreTrackerTitle": "존슨 씨의 육아 모니터",
+        "Owner": "소유자",
         "PP": "PP",
         "Parry": "쳐내기",
         "PartialCover": "부분적 엄폐물",
         "Passive": "자동형",
+        "Personas": "페르소나",
         "PhysicalLimit": "물리 한계치",
         "PhysicalOverflowTrack": "물리 치명상 추적기",
         "PhysicalTrack": "물리 추적기",
-        "PlaceMarks": "마커 배치",
         "PlaceTemplate": "템플릿 배치",
         "PlusFifteenMinutes": "+15분",
         "PowerLevel": "단계",
@@ -853,6 +1083,7 @@
         "ProgramType": "유형",
         "Programs": "프로그램",
         "PublicAwareness": "대중 인식도",
+        "PublicGrid": "공공 그리드",
         "PushTheLimit": "한계 돌파",
         "Qty": "수량",
         "Quality": "특징",
@@ -870,9 +1101,16 @@
         "Rating": "등급",
         "Reach": "길이",
         "Reagent": "시약",
+        "RebootConfirmationDialog": {
+            "Cancel": "취소",
+            "Confirm": "재부팅",
+            "Description": "해당 장치를 정말 재부팅 하시겠습니까?",
+            "Title": "재부팅 확인"
+        },
         "RecklessSpellButton": "무모한 시전",
         "Recoil": "반동",
         "RecoilCompensation": "반동 제어",
+        "Refresh": "새로고침",
         "RemoveBonus": "보너스 제거",
         "RemoveSpecialization": "전문화 제거",
         "Resist": "저항",
@@ -887,7 +1125,7 @@
         "RollFade": "페이드",
         "RollJudgeIntentions": "의심",
         "RollLiftCarry": "들기&운반",
-        "RollMemory": "기억",
+        "RollMemory": "기억\n",
         "RollMode": "굴림 방식",
         "RollOneDie": "1개 미만의 주사위는 굴릴 수 없어, 처머",
         "RollSoak": "피해 저항",
@@ -896,10 +1134,17 @@
         "RtgAboveZero": "등급 > 0",
         "Run": "달리기",
         "RunningSilent": "정숙 실행",
+        "RunningSilentControlledByDevice": "다음의 활성된 매트릭스 장치에 의해 정숙 실행 조작 중:",
         "RunningSpeed": "달리기",
         "SIN": "SIN",
-        "SecondAttribute": "두 번쨰 특성치",
-        "SecondChance": "두 번쨰 기회",
+        "SameGrid": "동일한 그리드",
+        "SecondAttribute": "두 번? 특성치",
+        "SecondChance": "두 번? 기회",
+        "SelectMatrixNetworkDialog": {
+            "Cancel": "취소",
+            "Connect": "연결",
+            "Title": "네트워크 선택"
+        },
         "SelectTokenMessage": "먼저 토큰을 선택해야 함",
         "SelectedTargets": "선택된 목표",
         "SheetActor": "액터 시트",
@@ -1074,14 +1319,16 @@
                 "Blackjack": "블랙잭",
                 "BladeSummoned": "블레이드 소환",
                 "Blood": "혈액",
+                "BloodShade": "블러드 셰이드",
                 "Boggle": "혼란",
+                "Bone": "뼈",
                 "Bugul": "부굴",
                 "Carcass": "날고기",
                 "Caretaker": "곤충 경비병",
                 "Ceramic": "도자기",
                 "Chindi": "친디",
-                "Corpse": "시체",
                 "CorpsCadavre": "군단 카다브르",
+                "Corpse": "시체",
                 "Crawler": "크롤러(악마)",
                 "Croki": "크로키",
                 "Detritus": "폐기물",
@@ -1139,8 +1386,8 @@
                 "Unbreakable": "깨지지 않는",
                 "Vrygoths": "브라이고스족",
                 "VucubCaquix": "부쿱 카킥스",
-                "Water": "물",
                 "Watcher": "당직자",
+                "Water": "물",
                 "Worker": "곤충 일꾼",
                 "Wraith": "유령"
             }
@@ -1199,7 +1446,14 @@
             "AttackDodged": "공격 회피",
             "AttackDoesNoPhysicalDamageToVehicle": "공격이 명중했으나 탑승물에 물리적 피해를 가하지 못함",
             "AttackHits": "공격 성공횟수",
+            "AttackResisted": "공격 저항됨",
+            "BruteForceFailure": "브루트 포스 실패!",
+            "BruteForceSuccess": "브루트 포스 성공!",
+            "CheckOverwatchScoreFailure": "감시 점수 확인 실패!",
+            "CheckOverwatchScoreSuccess": "감시 점수 확인 성공!",
             "Failure": "실패!",
+            "HackOnTheFlyFailure": "즉석 해킹 실패!",
+            "HackOnTheFlySuccess": "즉성 해킹 성공!",
             "ResistedAllDamage": "피해받지 않음!",
             "ResistedSomeDamage": "피해 받음!",
             "Results": "결과",
@@ -1214,6 +1468,9 @@
         },
         "Tests": {
             "AttributeOnlyTest": "특성치 전용 판정",
+            "BiofeedbackResistTest": "생체반응 저항",
+            "BruteForceTest": "브루트 포스",
+            "CheckOverwatchScoreTest": "감시 점수 확인",
             "CombatSpellDefenseTest": "전투 주문 방어",
             "CompileSpriteTest": "요정 컴파일",
             "ComplexFormTest": "컴플렉스 폼 쓰레딩",
@@ -1222,12 +1479,19 @@
             "DronePerceptionTest": "드론 인식 판정",
             "ExtendedTest": "연장 판정",
             "FadeTest": "페이드 판정",
+            "HackOnTheFlyTest": "즉석 해킹",
+            "MatrixDefenseTest": "매트릭스 방어",
+            "MatrixResistTest": "매트릭스 피해 저항",
+            "MatrixTest": "매트릭스 판정",
             "MeleeAttackTest": "근거리 무기 공격",
             "NaturalRecoveryPhysicalTest": "물리 자연 회복",
             "NaturalRecoveryStunTest": "기절 자연 회복",
-            "OpposedCompileSpriteTest": "컴파일 경쟁",
+            "OpposedBruteForceTest": "브루트 포스 대항",
+            "OpposedCheckOverwatchScoreTest": "감시 점수 확인 대항",
+            "OpposedCompileSpriteTest": "컴파일 경쟁\n",
+            "OpposedHackOnTheFlyTest": "즉석 해킹 대항",
             "OpposedRitualTest": "의식 봉인",
-            "OpposedSummonSpiritTest": "소환 경쟁",
+            "OpposedSummonSpiritTest": "소환 경쟁\n",
             "OpposedTest": "경쟁 판정",
             "PhysicalDefenseTest": "물리 방어",
             "PhysicalResistTest": "물리 피해 저항",
@@ -1244,17 +1508,27 @@
         "Threshold": "요구 성공횟수",
         "ToggleActive": "활성 전환",
         "ToggleEquip": "장착 전환",
+        "ToggleWireless": "무선 전환",
         "Tooltips": {
             "Actor": {
+                "ConnectNetwork": "해당 호스트/그리드 입장",
                 "Critter": "생명체 능력 사용 허용",
+                "DisconnectNetwork": "해당 호스트/그리드 퇴장",
                 "Grunt": "액터에게 하수인 규칙 적용",
+                "MarkTarget": "해당 목표에 추가 마크 배치",
+                "MatrixConnectionToggle": "매트릭스 연결 상태 변경: 증강 현실, 콜드 심, 핫 심",
+                "MatrixRunningSilentToggle": "자신의 매트릭스 장치를 정숙 실행이나 페르소나 표시로 전환",
                 "Metatype": "NPC로서 메타인종은 특성치 빠른 수정치도 적용함",
                 "MissingSummoner": "캐릭터를 끌어서 놓거나 소환 행동 사용하기",
                 "MissingTechnomancer": "캐릭터를 끌어서 놓거나 컴파일 행동 사용하기",
                 "NPC": "액터를 NPC로 표시하여 추가 기능 사용",
-                "ResetActorForNewRun": "신규 런을 위해 피해, 엣지 등을 초기화"
+                "PickControlledTokenAsDriver": "현재 제어 중인 토큰 액터를 조종자로 선택",
+                "PlaceMark": "이미 마크된 목표에게 마크 배치 사용",
+                "RebootPersonaAndClearAllMarks": "페르소나를 재부팅하여 자신에게 배치된 모든 마커 제거",
+                "ResetActorForNewRun": "신규 런을 위해 피해, 엣지 등을 초기화",
+                "SetupPAN": "해당 캐릭터의 페르소나에 모든 장착된 무선 장치들을 추가",
+                "DefaultCategoryVisibility": "범주에 물품이 없더라도 물품 범주 표시"
             },
-            "Actor.DefaultCategoryVisibility": "범주에 물품이 없더라도 물품 범주 표시",
             "CallInAction": {
                 "ActorType": "호출할 액터 유형"
             },
@@ -1274,13 +1548,16 @@
                 "OnlyAllFilteredUsed": "전체 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyFilteredUsed": "최소 하나 이상의 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyForItemTest": "상위 항목의 판정에만 영향",
-                "OnlyForWireless": "무선 활성화 된 물품에만 효과가 적용됨"
+                "OnlyForWireless": "무선 활성화 된 물품에만 효과가 적용됨",
+                "PriorityFieldDisabled": "현재 사용자 지정 우선순위는 지원되지 않음"
             },
             "Item": {
                 "ActionCategories": "판정의 기본 범주 대신 사용할 행동 범주를 선택합니다. 액티브 이펙트를 사용하여 판정 수치를 수정하는데 범주를 사용 가능",
                 "ActionModifier": "판정의 기본 수정치 대신 선택한 풀 수정치가 사용됨",
                 "ActionRollMode": "이 행동을 시전 할 때 무리한 굴림 방식을 사용함. 전체 채팅 설정에 덮어 써짐.",
                 "AmmoReplaceDamage": "무기 피해를 수정하는 대신 대체하도록 설정",
+                "AvailabilityAdjustment": "물품 등급에 따라 현재 희귀도 조정",
+                "CostAdjustment": "물품 등급에 따라 현재 가격 조정",
                 "DisabledForPreparedActor": "준비된 액터를 사용하기에 비활성화됨"
             },
             "Modifiers": {
@@ -1301,6 +1578,7 @@
                 "global": "피해 감소 판정을 제외한 모든 판정 풀 수정",
                 "judge_intentions": "의도 판단 판정 풀 수정치",
                 "lift_carry": "들기&운반 판정 풀 수정",
+                "mark_damage": "자신에게 부여된 각 마크당 받는 피해량 수정",
                 "matrix_initiative": "기본 매트릭스 우선권 수정",
                 "matrix_initiative_dice": "매트릭스 우선권 주사위 수정",
                 "matrix_track": "매트릭스 피해 추적기 수정",
@@ -1314,7 +1592,11 @@
                 "physical_limit": "물리 한계 수정치",
                 "physical_overflow_track": "물리 치명적 피해 추적기 수정치",
                 "physical_track": "물리 피해 추적기 수정치",
+                "place_three_marks": "한번에 마크 3개를 부여할 경우의 수정치",
+                "place_two_marks": "한번에 마크 2개를 부여할 경우의 수정치",
+                "public_grid": "공공 그리드에 연결 되어 있을 경우의 수정치",
                 "reach": "근거리 공격 길이 수정",
+                "recoil": "반동 판정 풀 수정",
                 "run": "민첩 특성치 배수만큼 달리기 거리 수정",
                 "soak": "물리 피해 저항 판정 풀 수정",
                 "social_limit": "사교 한계 수정",
@@ -1443,6 +1725,7 @@
         "WalkingSpeed": "걷기",
         "Warnings": {
             "AlreadyExistingInventory": "해당 이름의 소지품 위치가 이미 존재",
+            "AlreadyJoinedNetwork": "{name} 은/는 이미 네트워크에 접속함",
             "BulkImportPerformanceWarning": "한 번에 다수의 물품을 불러올 경우 브라우저를 새로고침 하기 전까지 Foundry가 느려질 수 있습니다. 즉시 새로고침 하는 것을 추천합니다.",
             "CantEditDefaultInventory": "기본 소지품 위치의 이름은 변경할 수 없음",
             "CantExtendTest": "연장 할 수 없는 판정 유형",
@@ -1463,6 +1746,7 @@
             "InvalidSummoningForce": "선택한 강도의 수치가 규칙을 위반",
             "NegativeLimitValue": "한계치는 반드시 양수여야 함",
             "NoFireModeConfigured": "원거리 무기에 사격방식 설정이 없습니다. 단발로 사격합니다.",
+            "OnlyGMCanDoThis": "GM 유저만 가능",
             "RitualInvalidForce": "의식 강도가 유효하지 않거나 오두막 등급보다 높습니다.",
             "RitualNotConcluded": "의식이 완료되지 않았습니다. 드레인 결정을 위해 의식 경쟁 판정이 완료되길 기다려야 합니다.",
             "RitualNotEnoughReagents": "시약이 충분하지 않습니다.",
@@ -1548,7 +1832,10 @@
             "Type": "유형",
             "Weapon": "무기"
         },
-        "Wireless": "무선"
+        "Wireless": "무선",
+        "WirelessOffline": "오프라인",
+        "WirelessOnline": "온라인",
+        "WirelessUnavailable": "이용 불가능"
     },
     "TYPES": {
         "Actor": {
@@ -1573,6 +1860,7 @@
             "device": "장치",
             "echo": "에코",
             "equipment": "도구",
+            "grid": "그리드",
             "host": "호스트",
             "lifestyle": "생활방식",
             "metamagic": "메타마법",

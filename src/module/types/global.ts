@@ -273,4 +273,10 @@ declare global {
 
         format(stringId: Translation, data?: Record<string, unknown>): string;
     }
+
+    interface UI {
+        pdfpager?: {
+            openPDFByCode: (pdfcode: string, options?: { page?: number; uuid?: string }) => void;
+        }
+    }
 }

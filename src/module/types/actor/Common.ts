@@ -51,7 +51,7 @@ const InventoryData = () => ({
     name: new StringField({ required: true }),
     type: new StringField({ required: true }),
     itemIds: new ArrayField(new StringField({ required: true })),
-    showAll: new BooleanField({ initial: true }),
+    showAll: new BooleanField({ initial: false }),
     label: new StringField({ required: true }),
 });
 

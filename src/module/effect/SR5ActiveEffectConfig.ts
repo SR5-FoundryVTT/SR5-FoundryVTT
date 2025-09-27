@@ -66,8 +66,9 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         sheet: {
             ...super.TABS.sheet,
             tabs: [
-                ...super.TABS.sheet.tabs,
+                ...super.TABS.sheet.tabs.slice(0, 2),
                 { id: 'applyTo', group: 'sheet', cssClass: '', label: 'SR5.ActiveEffect.ApplyTo', icon: 'fas fa-filter' },
+                ...super.TABS.sheet.tabs.slice(2),
                 { id: 'help', group: 'sheet', cssClass: '', label: 'SR5.Help', icon: 'fas fa-book' },
             ],
             initial: 'details',

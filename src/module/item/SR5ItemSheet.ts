@@ -643,6 +643,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             // Provide readable error for failing item retrieval assumptions.
             if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
 
+            // if it's a master device, add ourself as a slave to it
+            if (item.canBeMaster) {
+                await item.addSlave(this.item);
+                return;
+            }
             return this.item.createNestedItem(item._source);
         }
 
