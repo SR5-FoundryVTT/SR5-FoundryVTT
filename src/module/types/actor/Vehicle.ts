@@ -71,7 +71,7 @@ const VehicleData = () => ({
     master: new StringField({ required: true }),
 
     // === Condition & Movement ===
-    track: new SchemaField(Tracks('physical')),
+    track: new SchemaField(Tracks('physical', 'matrix')),
     movement: new SchemaField(Movement()),
 
     // === Protection ===
