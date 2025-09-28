@@ -75,6 +75,9 @@ export class VehicleParser extends Parser<'vehicle'> {
         system.armor.base = Number(jsonData.armor._TEXT) || 0;
         system.isDrone = jsonData.category._TEXT.includes("Drone") || false;
 
+        if (system.isDrone)
+            system.category = jsonData.category._TEXT.replace("Drones: ", "").toLowerCase() as typeof system.category;
+
         const category = jsonData.category._TEXT.toLowerCase();
         system.vehicleType = /drone|hovercraft/.test(category) ? "exotic"    :
                              /boats|submarines/.test(category) ? "water"     :
