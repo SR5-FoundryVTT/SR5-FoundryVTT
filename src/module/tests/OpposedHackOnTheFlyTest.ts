@@ -43,4 +43,18 @@ export class OpposedHackOnTheFlyTest extends OpposedMatrixTest {
         const marks = this.against.data.marks;
         await this.against.actor.setMarks(this.icon, marks);
     }
+
+    /**
+     * When succeeeding against hack on the fly, the defender gets a mark on the attacker
+     */
+    override async processSuccess() {
+        if (!this.icon || !this.against.actor) {
+            console.error('Shadowrun 5e | Expected an active decker or icon', this.actor, this.icon);
+            return;
+        }
+
+        // Place a mark on the attacker
+        const marks = this.against.data.marks;
+        await this.icon.setMarks(this.against.actor, marks);
+    }
 }
