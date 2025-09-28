@@ -186,10 +186,10 @@ export class VehiclePrep {
         // algorithm to determine speed, CRB pg 202 table.
         // Allow ActiveEffects to apply to movement directly.
         movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
-        movement.walk.value = Helpers.calcTotal(movement.walk, {min: 0});
+        movement.walk.value = Helpers.calcTotal(movement.walk as ModifiableValueType, {min: 0});
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = Helpers.calcTotal(movement.run, {min: 0});
+        movement.run.value = Helpers.calcTotal(movement.run as ModifiableValueType, {min: 0});
     }
 
     static prepareMeatspaceInit(system: Actor.SystemOfType<'vehicle'>) {
@@ -209,8 +209,8 @@ export class VehiclePrep {
     static prepareArmor(system: Actor.SystemOfType<'vehicle'>) {
         const { armor, modifiers } = system;
 
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', armor['temp']);
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', modifiers['armor']);
+        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp'] || 0));
+        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', Number(modifiers['armor'] || 0));
 
         Helpers.calcTotal(armor);
     }
