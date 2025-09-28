@@ -1620,13 +1620,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Use this method for whenever you need to access this actors matrix damage track as it's source might differ.
      */
     getMatrixTrack(this: SR5Actor): ConditionType | undefined {
-        // Some actors will have a direct matrix track.
-        if (this.system.track && "matrix" in this.system.track)
-            return this.system.track.matrix;
-
         // Some actors will have a personal matrix condition monitor, like a device condition monitor.
         if (this.system.matrix)
             return this.system.matrix.condition_monitor;
+        
+        // Some actors will have a direct matrix track.
+        if (this.system.track && "matrix" in this.system.track)
+            return this.system.track.matrix as ConditionType;
 
         // Fallback to equipped matrix device.
         const device = this.getMatrixDevice();
