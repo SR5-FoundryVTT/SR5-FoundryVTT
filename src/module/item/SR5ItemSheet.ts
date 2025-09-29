@@ -17,6 +17,7 @@ import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import RenderContext = foundry.applications.sheets.ItemSheet.RenderContext;
 import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import {ItemMarksFlow} from "@/module/item/flows/ItemMarksFlow";
 
 const { ItemSheet } = foundry.applications.sheets;
 
@@ -96,6 +97,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             openOrigin: SR5ItemSheet.#openOriginLink,
             addItem: SR5ItemSheet.#addItem,
             equipItem: SR5ItemSheet.#equipItem,
+            addItemQty: SR5ItemSheet.#addItemQty,
+            removeItemQty: SR5ItemSheet.#removeItemQty,
             addLicense: SR5ItemSheet.#addLicense,
             removeLicense: SR5ItemSheet.#removeLicense,
             removeNetwork: SR5ItemSheet.#removeNetwork,
@@ -730,10 +733,32 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const uuid = SheetFlow.listItemId(event);
+        const uuid = SheetFlow.listItemId(event.target);
         if (!uuid) return;
 
         await SINFlow.removeNetwork(this.item, uuid);
+    }
+
+    static async #addItemQty(this: SR5ItemSheet, event) {
+        event.preventDefault();
+        const id = SheetFlow.listItemId(event.target);
+        const item = SheetFlow.fromUuidSync(id);
+        if (item && item instanceof SR5Item) {
+            const qty = item.getTechnologyData()?.quantity ?? 0;
+            const newQty = event.shiftKey ? qty + 20 : event.ctrlKey ? qty + 50 : qty + 1;
+            await item.update({system: {technology: {quantity: newQty}}})
+        }
+    }
+
+    static async #removeItemQty(this: SR5ItemSheet, event) {
+        event.preventDefault();
+        const id = SheetFlow.listItemId(event.target);
+        const item = SheetFlow.fromUuidSync(id);
+        if (item && item instanceof SR5Item) {
+            const qty = item.getTechnologyData()?.quantity ?? 0;
+            const newQty = event.shiftKey ? qty - 20 : event.ctrlKey ? qty - 50 : qty - 1;
+            await item.update({system: { technology: { quantity: newQty}}})
+        }
     }
 
     static async #equipItem(this: SR5ItemSheet, event) {
