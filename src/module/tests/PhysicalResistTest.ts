@@ -88,7 +88,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         if (this.data.action.armor) {
             if (this.actor) {
                 const armor = this.actor.getArmor(this.data.incomingDamage);
-                this.data.pool.mod = PartsList.AddUniquePart(this.data.pool.mod,'SR5.Armor', armor.value);
+                this.data.pool.mod = PartsList.AddUniquePart(this.data.pool.mod,'SR5.Armor.label', armor.value);
             }
         }
     }

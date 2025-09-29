@@ -493,7 +493,7 @@ export const TestCreator = {
         // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
-            data.pool.mod = PartsList.AddUniquePart(data.pool.mod,'SR5.Armor', armor.value);
+            data.pool.mod = PartsList.AddUniquePart(data.pool.mod,'SR5.Armor.label', armor.value);
         }
 
         // Prepare limit values...

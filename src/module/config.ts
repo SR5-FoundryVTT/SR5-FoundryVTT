@@ -107,8 +107,6 @@ export const SR5 = {
     },
 
     biofeedbackOptions: {
-        // create an empty string option, this should not be needed after appv2
-        '': '',
         physical: 'SR5.DmgTypePhysical',
         stun: 'SR5.DmgTypeStun',
     },
@@ -391,7 +389,8 @@ export const SR5 = {
         detection: 'SR5.Spell.CatDetection',
         health: 'SR5.Spell.CatHealth',
         illusion: 'SR5.Spell.CatIllusion',
-        manipulation: 'SR5.Spell.CatManipulation'
+        manipulation: 'SR5.Spell.CatManipulation',
+        ritual: 'SR5.Spell.CatRitual'
     },
 
     spellTypes: {
@@ -424,6 +423,14 @@ export const SR5 = {
     illusionSpellSenses: {
         'single-sense': 'SR5.Spell.IllusionSingleSense',
         'multi-sense': 'SR5.Spell.IllusionMultiSense',
+    },
+
+    ritualSpellTypes: {
+        anchored: 'SR5.Spell.Ritual.Anchored',
+        material_link: 'SR5.Spell.Ritual.MaterialLink',
+        minion: 'SR5.Spell.Ritual.Minion',
+        spell: 'SR5.Spell.Ritual.Spell',
+        spotter: 'SR5.Spell.Ritual.Spotter',
     },
 
     attributeRolls: {
@@ -501,6 +508,7 @@ export const SR5 = {
         cyberdeck: 'SR5.DeviceCatCyberdeck',
         rcc: 'SR5.DeviceCatRCC',
         living_persona: 'SR5.LivingPersona',
+        host: 'SR5.ItemTypes.Host',
     },
 
     cyberwareGrades: {
@@ -682,14 +690,14 @@ export const SR5 = {
     // Gear modification types. :) Not modifiers.
     modificationTypes: {
         weapon: 'SR5.Weapon.Weapon',
-        armor: 'SR5.Armor',
+        armor: 'SR5.Armor.label',
         vehicle: 'SR5.Vehicle.Vehicle',
         drone: 'SR5.Vehicle.Drone'
     },
 
     mountPoints: {
         barrel: 'SR5.Barrel',
-        under_barrel: 'SR5.UnderBarrel',
+        under: 'SR5.UnderBarrel',
         stock: 'SR5.Stock',
         top: 'SR5.Top',
         side: 'SR5.Side',

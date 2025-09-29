@@ -221,4 +221,24 @@ export const registerBasicHelpers = () => {
         }
         return undefined;
     });
+
+    /**
+     * Expects a config object and turns it into an array of objects for FormGroup options
+     */
+    Handlebars.registerHelper('config2Array', function(config: Record<string, string>) {
+        return Object.keys(config).map(category => ({
+            label: config[category] ?? category,
+            value: category
+        }));
+    })
+
+    /**
+     * Expects a config object and turns it into an array of objects for FormGroup options
+     */
+    Handlebars.registerHelper('tests2Array', function(config: Record<string, any>) {
+        return Object.keys(config).map(test => ({
+            label: test,
+            value: test
+        }));
+    })
 };

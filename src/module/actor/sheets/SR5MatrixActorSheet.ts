@@ -11,6 +11,7 @@ import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 // Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
 type sheetAction = {
@@ -35,41 +36,157 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     ownedIcons: MatrixTargetDocument[];
 }
 
-export class SR5MatrixActorSheet extends SR5BaseActorSheet {
+export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorSheetData> extends SR5BaseActorSheet<T> {
     // Stores which document has been selected in the matrix tab.
     // We accept this selection to not be persistant across Foundry sessions.
     selectedMatrixTarget: string|undefined;
+    _connectedIconsOpenClose: Record<string, boolean> = {};
 
-    static override get defaultOptions() {
-        const defaultOptions = super.defaultOptions;
-        return foundry.utils.mergeObject(defaultOptions, {
-            tabs: [...defaultOptions.tabs,
-                {
-                    navSelector: '.tabs[data-group="matrix"]',
-                    contentSelector: '.tabsbody[data-group="matrix"]',
-                    initial: 'targets',
-                },
-                {
-                    navSelector: '.tabs[data-group="matrix-right-side"]',
-                    contentSelector: '.tabsbody[data-group="matrix-right-side"]',
-                    initial: 'matrix-actions',
-                },
-            ] as {navSelector: string, contentSelector: string, initial: string}[],
-        });
-    }
-
-    override async getData(options): Promise<any> {
-        const data = await super.getData(options) as MatrixActorSheetData;
+    override async _prepareContext(options) {
+        const data = await super._prepareContext(options);
 
         data.network = this.actor.network;
-        data.matrixActions = await this._prepareMatrixActions();
-
-        this._prepareMatrixTargets(data);
-        this._prepareOwnedIcons(data);
-        await this._prepareMarkedDocuments(data);
+        data.matrixLeftTabs = this._prepareTabs('matrixLeft');
+        data.matrixRightTabs = this._prepareTabs('matrixRight');
         this._prepareMatrixDevice(data);
 
         return data;
+    }
+
+    static override DEFAULT_OPTIONS: any = {
+        actions: {
+            toggleConnectedMatrixIcons: SR5MatrixActorSheet.#toggleConnectedMatrixIcons,
+            openMatrixDocument: SR5MatrixActorSheet.#openMatrixDocument,
+            selectMatrixTarget: SR5MatrixActorSheet.#selectMatrixTarget,
+            connectToNetwork: SR5MatrixActorSheet.#connectToMatrixNetwork,
+            rebootPersona: SR5MatrixActorSheet.#rebootPersonaDevice,
+            showMatrixNetworkSelection: SR5MatrixActorSheet.#showMatrixNetworkSelection,
+            connectToMarkedNetwork: SR5MatrixActorSheet.#connectToMarkedNetwork,
+            disconnectNetwork: SR5MatrixActorSheet.#disconnectNetwork,
+            togglePersonaRunningSilent: SR5MatrixActorSheet.#togglePersonaRunningSilent,
+            addOneMark: SR5MatrixActorSheet.#addOneMark,
+            removeOneMark: SR5MatrixActorSheet.#removeOneMark,
+            setupPAN: SR5MatrixActorSheet.#addAllEquippedWirelessDevicesToPAN,
+            refreshTargets: SR5MatrixActorSheet.#refreshTargets,
+            removeMarks: SR5MatrixActorSheet.#deleteMarks,
+            clearAllMarks: SR5MatrixActorSheet.#clearAllMarks,
+        }
+
+    }
+
+    static override TABS = {
+        ...super.TABS,
+        matrixLeft: {
+            initial: 'networkIcons',
+            tabs: [
+                { id: 'programs', label: 'Programs', cssClass: ''},
+                { id: 'networkIcons', label: 'Icons', cssClass: ''},
+                { id: 'markedIcons', label: 'Marked', cssClass: ''},
+                { id: 'ownedIcons', label: 'Owned', cssClass: ''},
+
+            ]
+        },
+        matrixRight: {
+            initial: 'matrixActions',
+            tabs: [
+                { id: 'matrixActions', label: 'Actions', cssClass: '', }
+            ]
+        }
+    }
+
+    /**
+     * Move tabs into a target and delete
+     * @param tabs
+     * @param parts
+     * @param target
+     * @protected
+     */
+    protected moveTabs(tabs: any, parts: any, target: any) {
+        for (const tab of tabs) {
+            const key = tab.id;
+            if (key in parts) {
+                target.append(parts[key]);
+                delete parts[key];
+            }
+        }
+    }
+
+    protected override async _renderHTML(content, options) {
+        const parts = await super._renderHTML(content, options);
+        const matrixLeftSideContent = parts.matrix.querySelector("section.content.matrix-left-tab-content");
+        if (matrixLeftSideContent) {
+            this.moveTabs(SR5MatrixActorSheet.TABS.matrixLeft.tabs, parts, matrixLeftSideContent);
+        }
+        const matrixRightSideContent = parts.matrix.querySelector("section.content.matrix-right-tab-content");
+        if (matrixRightSideContent) {
+            this.moveTabs(SR5MatrixActorSheet.TABS.matrixRight.tabs, parts, matrixRightSideContent);
+        }
+
+        return parts;
+    }
+
+    static override PARTS = {
+        ...super.PARTS,
+        matrix: {
+            template: SheetFlow.templateBase('actor/tabs/matrix'),
+            scrollable: [
+                '#matrix-actions-scroll',
+                '#marked-icons-scroll' ,
+                '#owned-icons-scroll',
+                '#network-icons-scroll',
+                '#programs-scroll',
+                '#complex-forms-scroll',
+                '#compilations-scroll',
+                '#sprite-powers-scroll',
+            ]
+        },
+        matrixActions: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
+            templates: SheetFlow.templateListItem('action'),
+        },
+        markedIcons: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),
+            templates: SheetFlow.templateListItem('marked_icon'),
+        },
+        ownedIcons: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/owned-icons'),
+            templates: SheetFlow.templateListItem('owned_icon'),
+        },
+        networkIcons: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/network-icons'),
+            templates: SheetFlow.templateListItem('network_icon'),
+        },
+        programs: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/programs'),
+            templates: SheetFlow.templateListItem('program'),
+        }
+    }
+
+    override async _preparePartContext(partId, context, options) {
+        const partContext = await super._preparePartContext(partId, context, options) as any;
+
+        if (partId === 'matrixActions') {
+            partContext.matrixActions = await this._prepareMatrixActions();
+        } else if (partId === 'ownedIcons') {
+            this._prepareOwnedIcons(partContext);
+        } else if (partId === 'networkIcons') {
+            this._prepareMatrixTargets(partContext);
+        } else if (partId === 'markedIcons') {
+            await this._prepareMarkedDocuments(partContext);
+        }
+
+        if (partContext?.matrixLeftTabs) {
+            if (partId in partContext.matrixLeftTabs) {
+                partContext.tab = partContext.matrixLeftTabs[partId];
+            }
+        }
+        if (partContext?.matrixRightTabs) {
+            if (partId in partContext.matrixRightTabs) {
+                partContext.tab = partContext.matrixRightTabs[partId];
+            }
+        }
+
+        return partContext;
     }
 
     /**
@@ -123,72 +240,12 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         data.markedDocuments = this._prepareMarkedDocumentTargets(markedDocuments);
     }
 
-    override activateListeners(html) {
-        super.activateListeners(html);
-
-        html.find('.show-matrix-network-hacking').click(this._onShowMatrixNetworkHacking.bind(this));
-        html.find('.matrix-hacking-actions .item-roll').click(this._onRollMatrixAction.bind(this));
-
-        html.find('.select-matrix-target').on('click', this._onSelectMatrixTarget.bind(this));
-        html.find('.open-matrix-target').on('click', this._onOpenMarkedDocument.bind(this));
-        html.find('.open-matrix-device').on('click', this._onOpenMatrixDevice.bind(this));
-
-        html.find('.targets-refresh').on('click', this._onTargetsRefresh.bind(this));
-
-        html.find('.setup-pan').on('click', this._addAllEquippedWirelessDevicesToPAN.bind(this));
-        // Matrix Target - Connected Icons Visibility Switch
-        html.find('.toggle-connected-matrix-icons').on('click', this._onToggleConnectedMatrixIcons.bind(this));
-
-        // Matrix Network
-        html.find('.connect-to-network').on('click', this._onConnectToMatrixNetwork.bind(this));
-
-        html.find('.reboot-persona-device').on('click', this._onRebootPersonaDevice.bind(this));
-        html.find('.matrix-toggle-running-silent').on('click', this._onMatrixToggleRunningSilent.bind(this));
-        html.find('.toggle-owned-icon-silent').on('click', this._onOwnedIconRunningSilentToggle.bind(this));
-    }
-
-    async _onOwnedIconRunningSilentToggle(event: MouseEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const iid = Helpers.listItemUuid(event);
-        const document = await fromUuid(iid);
-        if (!document) return;
-
-        if (document instanceof SR5Actor) {
-            // if the actor has a matrix device, change the wireless state there
-            const device = document.getMatrixDevice();
-            if (device) {
-                // iterate through the states of online -> silent -> online
-                const newState =  device.isRunningSilent() ? 'online' : 'silent';
-                await this.actor.updateEmbeddedDocuments('Item', [
-                    {
-                        '_id': device._id,
-                        system: { technology: { wireless: newState } }
-                    }
-                ])
-            } else {
-                // update the embedded item with the new wireless state
-                await document.update({
-                    system: { matrix: { running_silent: !document.isRunningSilent() } },
-                });
-                this.render();
-            }
-        } else if (document instanceof SR5Item) {
-            // iterate through the states of online -> silent -> online
-            const newState =  document.isRunningSilent() ? 'online' : 'silent';
-            // update the embedded item with the new wireless state
-            await document.update({ system: { technology: { wireless: newState } } });
-            this.render();
-        }
-    }
-
     /**
      * Handle changing if an Actor is Running Silent
      * @param event
      * @private
      */
-    private async _onMatrixToggleRunningSilent(event) {
+    static  async #togglePersonaRunningSilent(this: SR5MatrixActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
         await MatrixSheetFlow.toggleRunningSilent(this.actor);
@@ -198,7 +255,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      * Handle the user request to reboot their main active matrix device or living persona.
      * @param event Any pointer event
      */
-    async _onRebootPersonaDevice(event: Event) {
+    static async #rebootPersonaDevice(this: SR5MatrixActorSheet, event: Event) {
         event.preventDefault();
         event.stopPropagation();
         await MatrixSheetFlow.promptRebootPersonaDevice(this.actor);
@@ -207,7 +264,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
     /**
      * Allow the user to select a matrix network to connect to.
      */
-    async _onConnectToMatrixNetwork(event) {
+    static async #connectToMatrixNetwork(this: SR5MatrixActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -224,10 +281,11 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      * - switching out sheet display
      * - provide a display of additional matrix icons underneath uuid
      */
-    async _onToggleConnectedMatrixIcons(event) {
+    static async #toggleConnectedMatrixIcons(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
+        console.log('Toggle connected matrix icons', event);
 
-        const uuid = Helpers.listItemUuid(event);
+        const uuid = event.target.dataset.itemId;
         if (!uuid) return;
 
         // Mark main icon as open or closed.
@@ -242,7 +300,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      * Add All equipped wireless items on the character to their PAN
      * @param event
      */
-    async _addAllEquippedWirelessDevicesToPAN(event) {
+    static async #addAllEquippedWirelessDevicesToPAN(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
         const matrixDevice = this.actor.getMatrixDevice();
         if (matrixDevice) {
@@ -275,7 +333,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      * Handle user requesting to show the matrix network hacking application.
      * @param event Any pointer event
      */
-    async _onShowMatrixNetworkHacking(event: Event) {
+    static async #showMatrixNetworkSelection(this: SR5MatrixActorSheet, event) {
         const app = new MatrixNetworkHackingApplication(this.document);
         app.render(true);
     }
@@ -302,7 +360,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
         let actions = await PackActionFlow.getActorMatrixActions(this.actor);
         // Reduce actions to those matching the marks on the selected target.
         if (this.selectedMatrixTarget) {
-            const ownedItem = await this.actor.isOwnerOf(this.selectedMatrixTarget);
+            const ownedItem = this.actor.isOwnerOf(this.selectedMatrixTarget);
             const marksPlaced = this.actor.getMarksPlaced(this.selectedMatrixTarget);
             actions = actions.filter(action => {
                 const {marks, owner} = action.system.action.category.matrix
@@ -326,28 +384,22 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
     }
 
     /**
-     * Cast a matrix action for this actor. Use the actions from the matrix pack for this.
+     * Override rolling items to include a check for matrix actions
+     * @param item
+     * @param event
      */
-    async _onRollMatrixAction(event) {
-        event.preventDefault();
-
-        const id = Helpers.listItemId(event);
-        const action = await fromUuid(id) as SR5Item;
-        if (!action) return;
-
-        // this.actor.rollItem(action, {event});
-
-        const test = await this.actor.testFromItem(action, {event});
-        if (!test) return;
-
-        if (this.selectedMatrixTarget) {
+    override async _handleRollItem(item: SR5Item, event): Promise<void> {
+        if (this.selectedMatrixTarget && item.hasActionCategory('matrix')) {
             const document = fromUuidSync(this.selectedMatrixTarget) as SR5Actor | SR5Item;
             if (!document) return;
-
-            await test.addTarget(document);
+            const test = await this.actor.testFromItem(item, {event});
+            if (test) {
+                await test.addTarget(document);
+                await test.execute();
+            }
+        } else {
+            await super._handleRollItem(item, event);
         }
-
-        await test.execute();
     }
 
     /**
@@ -357,30 +409,10 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      *
      * @param event Any interaction event
      */
-    async _onOpenMatrixDevice(event) {
+    static async #openMatrixDocument(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
-        const uuid = Helpers.eventUuid(event);
-        if (!uuid) return;
-
-        // Marked documents can´t live in packs.
-        const document = fromUuidSync(uuid) as SR5Item|SR5Actor;
-        if (!document) return;
-
-        await document.sheet?.render(true);
-    }
-
-    /**
-     * Open a document from a DOM node containing a dataset uuid.
-     *
-     * This is intended to let deckers open marked documents they're FoundryVTT user has permissions for.
-     *
-     * @param event Any interaction event
-     */
-    async _onOpenMarkedDocument(event) {
-        event.stopPropagation();
-
-        const uuid = Helpers.listItemUuid(event)
+        const uuid = $(event.target).closest('a').data().itemId;
         if (!uuid) return;
 
         // Marked documents can´t live in packs.
@@ -398,10 +430,10 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
      *
      * @param event Any interaction event
      */
-    async _onSelectMatrixTarget(event) {
+    static async #selectMatrixTarget(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
-        const uuid = Helpers.listItemUuid(event);
+        const uuid = $(event.target).closest('a').data().itemId;
         if (!uuid) return;
 
         if (this.selectedMatrixTarget === uuid) {
@@ -418,7 +450,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
     /**
      * Manual user interaction to refresh list of show matrix targets.
      */
-    async _onTargetsRefresh(event) {
+    static async #refreshTargets(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
         this.render();
@@ -516,4 +548,99 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
         ui.notifications.error('SR5.Errors.MarksCantBePlacedWithoutPersona', {localize: true});
     }
+
+    static async #addOneMark(this: SR5MatrixActorSheet, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
+        }
+
+        const uuid = $(event.target).closest('a').data().itemId;
+        if (!uuid) return;
+
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
+        if (!markedDocument) return;
+
+        await this.actor.setMarks(markedDocument, 1);
+    }
+
+    static async #removeOneMark(this: SR5MatrixActorSheet, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
+        }
+
+        const uuid = $(event.target).closest('a').data().itemId;
+        if (!uuid) return;
+
+        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
+        if (!markedDocument) return;
+
+        await this.actor.setMarks(markedDocument, -1);
+    }
+
+    static async #deleteMarks(this: SR5MatrixActorSheet, event) {
+        event.stopPropagation();
+
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
+        }
+
+        const uuid = $(event.target).closest('a').data().itemId;
+        if (!uuid) return;
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.actor.clearMark(uuid);
+    }
+
+    static async #clearAllMarks(this: SR5MatrixActorSheet, event) {
+        event.stopPropagation();
+
+        if (this.actor.hasHost()) {
+            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return;
+        }
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.actor.clearMarks();
+    }
+
+    /**
+     * When clicking on a specific mark, connect to the actor to this host/grid behind that.
+     *
+     * @param event Any interaction action
+     */
+    static async #connectToMarkedNetwork(this: SR5MatrixActorSheet, event) {
+        event.stopPropagation();
+
+        const uuid = $(event.target).closest('a').data().itemId;
+        if (!uuid) return;
+
+        const target = fromUuidSync(uuid) as SR5Item;
+        if (!target || !(target instanceof SR5Item)) return;
+
+        await this.actor.connectNetwork(target);
+        this.render();
+    }
+
+    /**
+     * When clicking on the disconnect button for the connected network, disconnect from it.
+     * @param event Any interaction event.
+     */
+    static async #disconnectNetwork(this: SR5MatrixActorSheet, event) {
+        event.stopPropagation();
+
+        await this.actor.disconnectNetwork();
+        this.render();
+    }
+
 }

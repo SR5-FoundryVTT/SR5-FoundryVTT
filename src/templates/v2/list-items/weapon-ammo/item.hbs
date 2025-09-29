@@ -1,0 +1,50 @@
+{{!-- list-item expects an SR5Item to be passed in as 'item' --}}
+<div class="new-list-item-container">
+    <div class="new-list-item" data-item-id="{{item.id}}">
+        <div class="new-list-item-label-container">
+            <a data-action="rollItem"
+                data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}">
+
+                <img src="{{item.img}}"
+                     class="new-list-item-image {{#if (hasRoll item)}}new-list-item-image-roll{{else}}new-list-item-image-info{{/if}}"
+                     height="24px"
+                     width="24px" />
+            </a>
+            <label>
+                {{!-- allow overriding the name if provided --}}
+                <a data-action="showItemDescription" data-item-id="{{item.id}}">
+                    {{#if name}}
+                        {{name}}
+                    {{else}}
+                        {{item.name}}
+                    {{/if}}
+                </a>
+            </label>
+        </div>
+
+        <div class="new-list-item-col">
+            <a data-action="removeOneQty"
+               data-tooltip="SR5.Labels.ActorSheet.RemoveOneQty">
+                <i class="fas fa-minus-square"></i>
+            </a>
+            {{#if @root.isEditMode}}
+                <input type="number" class="item-quantity-input" value="{{item.system.technology.quantity}}" min="0" max="999">
+            {{else}}
+                {{item.system.technology.quantity}}
+            {{/if}}
+            <a data-action="addOneQty"
+               data-tooltip="SR5.Labels.ActorSheet.AddOneQty">
+                <i class="fas fa-plus-square"></i>
+            </a>
+        </div>
+
+        <div class="new-list-item-icons">
+            <a data-action="equipItem">
+                <i   class="{{#if item.system.technology.equipped}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
+            </a>
+        </div>
+    </div>
+    <div class="new-list-item-description">
+        {{{item.system.description.value}}}
+    </div>
+</div>

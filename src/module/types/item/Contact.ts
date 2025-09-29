@@ -17,6 +17,7 @@ export class Contact extends ItemBase<ReturnType<typeof ContactData>> {
     static override defineSchema() {
         return ContactData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Contact", "SR5.Item"];
 }
 
 console.log("ContactData", ContactData(), new Contact());

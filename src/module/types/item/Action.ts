@@ -1,7 +1,9 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
-const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foundry.data.fields;
+import { TagifyAltField } from '@/module/types/fields/TagifyAltField';
+import { SR5 } from '@/module/config';
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const ResultActionData = () => ({
     action: new StringField({
@@ -44,24 +46,24 @@ export const DamageData = () => ({
         base: new StringField({
             blank: true,
             required: true,
-            choices: ["physical", "matrix", "stun", ""]
+            choices: SR5.damageTypes,
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: ["physical", "matrix", "stun", ""]
+            choices: SR5.damageTypes,
         }),
     }),
     element: new SchemaField({
         base: new StringField({
             blank: true,
             required: true,
-            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+            choices: SR5.elementTypes,
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+            choices: SR5.elementTypes
         }),
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
@@ -69,7 +71,7 @@ export const DamageData = () => ({
         required: true,
         blank: true,
         initial: '',
-        choices: ["physical", "stun"],
+        choices: SR5.biofeedbackOptions,
     }),
     attribute: new StringField({ required: true }),
     source: new SchemaField({
@@ -97,14 +99,14 @@ export const ActionRollData = (
 ) => ({
     ...MinimalActionData(),
     test: new StringField({ required: true, initial: test }),
-    type: new StringField({ required: true, initial: type }),
+    type: new StringField({ required: true, initial: type, blank: true, choices: SR5.actionTypes }),
     category: new SchemaField(ActionCategory()),
-    categories: new ArrayField(new StringField({ required: true })),
+    categories: new TagifyAltField(new StringField({ required: true })),
     spec: new BooleanField(),
     mod_description: new StringField({ required: true }),
     threshold: new SchemaField(BaseValuePair()),
     extended: new BooleanField({ initial: false }),
-    modifiers: new ArrayField(new StringField({ required: true })),
+    modifiers: new TagifyAltField(new StringField({ required: true })),
     damage: new ModifiableField(DamageData()),
     opposed: new SchemaField({
         test: new StringField({ required: true, initial: opposedTest }),

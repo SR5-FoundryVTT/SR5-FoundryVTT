@@ -1,0 +1,45 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <section class="standard-form scrollable">
+            {{formGroup systemFields.type
+                        value=system.type
+                        localize=true
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{#if (eq system.type 'weapon')}}
+                {{formGroup systemFields.mount_point
+                            value=system.mount_point
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.dice_pool
+                            value=system.dice_pool
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.accuracy
+                            value=system.accuracy
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.rc
+                            value=system.rc
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.conceal
+                            value=system.conceal
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{else if (eq system.type 'vehicle')}}
+                {{formGroup systemFields.modification_category
+                            value=system.modification_category
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.slots value=system.slots rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{else if (eq system.type 'drone')}}
+                {{formGroup systemFields.slots value=system.slots rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{/if}}
+        </section>
+    </div>
+</section>

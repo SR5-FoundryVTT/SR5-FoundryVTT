@@ -1,0 +1,27 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="split-container">
+        <div>
+            {{editor biographyHTML target="system.description.value" button=true
+                     editable=true engine="prosemirror" collaborate=false}}
+        </div>
+        <div>
+            <div class="scrollable">
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/quality/header.hbs'
+                        label='SR5.ItemTypes.Quality'
+                        type='quality' }}
+                {{#each itemType.quality}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/quality/item.hbs' item=this }}
+                {{/each}}
+
+                {{#ife actor.type 'character'}}
+                    {{#if awakened}}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/metamagics.hbs' }}
+                    {{/if}}
+                    {{#if emerged}}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/echoes.hbs' }}
+                    {{/if}}
+                {{/ife}}
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,72 @@
+<header class="actor-header">
+    <div class="left-side">
+        <div>
+            <div class="profile-img">
+                <img
+                    class="profile"
+                    src="{{actor.img}}"
+                    data-edit="img"
+                    data-tooltip="{{actor.name}}"
+                    height="90px"
+                    width="90px"
+                />
+            </div>
+        </div>
+        <div class="flexcol flex-end">
+            <div style="display: flex;">
+                <input
+                    class="name"
+                    name="name"
+                    type="text"
+                    value="{{actor.name}}"
+                    placeholder="Name"
+                    {{#if @root.isPlayMode}}
+                        disabled
+                    {{/if}}
+                />
+            </div>
+            <div class="attributes smooth" id="tracks">
+                <div class="block">
+                    {{#if (or isIC isSprite)}}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                            id='matrix'
+                            track = system.track.matrix
+                        }}
+                    {{/if}}
+                    {{#if (or isCharacter isSpirit)}}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                            id='stun'
+                            track = system.track.stun
+                        }}
+                    {{/if}}
+                    {{#unless (or isIC isSprite)}}
+                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                            id='physical'
+                            track = system.track.physical
+                        }}
+                    {{/unless}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="right-side">
+        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
+        {{#unless (or isIC isSprite)}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
+        {{/unless}}
+        {{#if (or isSpirit isSprite)}}
+        <div class="right-side-row">
+            {{#if isSpirit}}
+                <label>{{localize "SR5.Spirit.Services"}}:</label>
+            {{else}}
+                <label>{{localize "SR5.Sprite.Services"}}:</label>
+            {{/if}}
+            {{#if @root.isEditMode}}
+                {{formInput systemFields.services value=system.services classes="short" rootId=rootId}}
+            {{else}}
+                {{system.services}}
+            {{/if}}
+        </div>
+        {{/if}}
+    </div>
+</header>

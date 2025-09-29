@@ -1,5 +1,9 @@
+import RenderContext = foundry.applications.sheets.ActorSheetV2.RenderContext;
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
+
 declare namespace Shadowrun {
-    export interface SR5ActorSheetData {
+
+    export interface SR5ActorSheetData extends RenderContext {
         config: typeof SR5CONFIG
         system: Actor.Implementation['system']
         filters: SR5SheetFilters
@@ -15,6 +19,7 @@ declare namespace Shadowrun {
         canAlterSpecial: boolean
         hasFullDefense: boolean
         effects: any[]
+        tab: ApplicationV2.Tab
     }
 
     type AllEnabledEffectsSheetData = any[];

@@ -1,0 +1,27 @@
+<footer class="sheet-footer">
+    <div class="new-list-item">
+        <label>
+            <span class="fa-stack" style="vertical-align: center; font-size: 0.5em">
+            <i class="fa-light fa-circle-dashed fa-stack-2x"></i>
+            <i class="fas fa-user fa-stack-1x"></i>
+            </span>
+            {{speakerName actor}}
+        </label>
+        {{#if system.metatype}}
+            <label>{{localizeOb system.metatype config.character.types}}</label>
+        {{/if}}
+        {{#if system.is_npc}}
+            <label>{{localize "SR5.IsNPC"}}</label>
+        {{/if}}
+        {{#if system.is_critter}}
+            <label>{{localize "SR5.IsCritter"}}</label>
+        {{/if}}
+        {{#if system.is_grunt}}
+            <label>{{localize "SR5.IsGrunt"}}</label>
+        {{/if}}
+        {{#if system.nuyen}}
+            <label><i class="fas fa-yen"></i> {{system.nuyen}}</label>
+        {{/if}}
+        <div></div>
+    </div>
+</footer>

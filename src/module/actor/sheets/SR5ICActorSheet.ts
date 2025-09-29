@@ -1,12 +1,14 @@
 import {SR5Item} from "../../item/SR5Item";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 interface ICActorSheetData extends MatrixActorSheetData {
     disableMarksEdit: boolean;
+    isIC: boolean;
 }
 
-export class SR5ICActorSheet extends SR5MatrixActorSheet {
+export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
     /**
      * IC actors will handle these item types specifically.
      *
@@ -18,15 +20,81 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet {
         return super.getHandledItemTypes();
     }
 
-    override async getData(options) {
-        const data = await super.getData(options) as ICActorSheetData;
+    override async _prepareContext(options) {
+        const data = await super._prepareContext(options);
         data.disableMarksEdit = this.actor.hasHost();
+        data.isIC = true;
 
         return data;
     }
 
-    override activateListeners(html) {
-        super.activateListeners(html);
+    static override TABS = {
+        ...super.TABS,
+        primary: {
+            initial: 'matrix',
+            tabs: [
+                { id: 'actions', label: 'Actions', cssClass: '' },
+                { id: 'matrix', label: 'Matrix', cssClass: '' },
+                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'misc', label: 'Misc', cssClass: '' },
+            ]
+        },
+        matrixLeft: {
+            initial: 'networkIcons',
+            tabs: [
+                { id: 'networkIcons', label: 'Icons', cssClass: ''},
+                { id: 'markedIcons', label: 'Marked', cssClass: ''},
+
+            ]
+        },
+    }
+
+    static override PARTS: any = {
+        header: {
+            template: SheetFlow.templateBase('actor/header'),
+            templates: SheetFlow.templateActorSystemParts('initiative', 'common-rolls'),
+        },
+        tabs: {
+            template: SheetFlow.templateBase('common/primary-tab-group'),
+        },
+        actions: {
+            template: SheetFlow.templateBase('actor/tabs/actions'),
+            templates: SheetFlow.templateListItem('action'),
+            scrollable: ['.scrollable']
+        },
+        matrix: {
+            template: SheetFlow.templateBase('actor/tabs/ic-matrix'),
+            templates: SheetFlow.templateActorSystemParts('active-skills', 'ic-attributes', 'ic-options'),
+            scrollable: ['#active-skills-scroll', '#matrix-actions-scroll', '#network-icons-scroll', '#marked-icons-scroll']
+        },
+        matrixActions: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
+            templates: SheetFlow.templateListItem('action'),
+        },
+        markedIcons: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),
+            templates: SheetFlow.templateListItem('marked_icon'),
+        },
+        networkIcons: {
+            template: SheetFlow.templateBase('actor/tabs/matrix/network-icons'),
+            templates: SheetFlow.templateListItem('network_icon'),
+        },
+        effects: {
+            template: SheetFlow.templateBase('actor/tabs/effects'),
+            templates: SheetFlow.templateListItem('effect'),
+            scrollable: ['.scrollable']
+        },
+        misc: {
+            template: SheetFlow.templateBase('actor/tabs/misc'),
+            scrollable: ['.scrollable']
+        },
+        footer: {
+            template: SheetFlow.templateBase('actor/footer'),
+        },
+    }
+
+    override activateListeners_LEGACY(html) {
+        super.activateListeners_LEGACY(html);
 
         html.find('.entity-remove').on('click', this._removeHost.bind(this));
     }
@@ -50,7 +118,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet {
                     return action.name === "Binder";
                 case 'bloodhound':
                     return action.name === "Track" || action.name === 'Patrol';
-                case 'blue_gloo':
+                case 'blue_goo':
                     return action.name === 'Blue Goo';
                 case 'black_ic':
                     return action.name === "Black";
