@@ -58,7 +58,12 @@ export const MatrixData = () => ({
     running_silent: new BooleanField(),
     item: new AnyField({ required: false }),
     marks: MatrixMarksTarget(),
-    grid: new SchemaField(LastGridData())
+    grid: new SchemaField(LastGridData()),
+    // Helper data point to indicate a network connection update.
+    // This is not storing data that's used anywhere but rather is used
+    // to trigger sheet renders across all user sessions when this actors
+    // network connection is updated. The connection itself is stored in DataStorage.
+    updatedConnections: new NumberField({ required: true, nullable: false, integer: true, initial: 0 })
 })
 
 export type MatrixType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixData>>;

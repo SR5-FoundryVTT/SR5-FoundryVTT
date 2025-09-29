@@ -383,7 +383,7 @@ export const MatrixTestDataFlow = {
         if (!test.persona.isType('character', 'critter', 'vehicle')) return;
 
         // Collect network devices
-        test.devices = test.persona.wirelessDevices;
+        test.devices = test.persona.wirelessDevices();
     },
 
     /**
