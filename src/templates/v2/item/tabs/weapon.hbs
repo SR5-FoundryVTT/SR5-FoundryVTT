@@ -31,6 +31,11 @@
                             localize=true
                             rootId=@root.rootId disabled=@root.isPlayMode}}
 
+                {{formGroup systemFields.range.fields.rc.fields.base
+                            value=source.system.range.rc.base
+                            rootId=@root.rootId
+                            disabled=@root.isPlayMode}}
+
                 {{formGroup systemFields.range.fields.ranges.fields.category
                             value=source.system.range.ranges.category
                             localize=true
@@ -53,13 +58,8 @@
                             disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
                 {{formGroup systemFields.range.fields.ranges.fields.attribute
                             value=source.system.range.ranges.attribute
-                            options=attributes
+                            options=(config2Array attributes)
                             localize=true
-                            rootId=@root.rootId
-                            disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
-
-                {{formGroup systemFields.range.fields.rc.fields.base
-                            value=source.system.range.rc.base
                             rootId=@root.rootId
                             disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
 
@@ -86,7 +86,7 @@
                             disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
                 {{formGroup systemFields.thrown.fields.ranges.fields.attribute
                             value=source.system.thrown.ranges.attribute
-                            options=attributes
+                            options=(config2Array attributes)
                             localize=true
                             rootId=@root.rootId
                             disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}

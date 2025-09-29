@@ -1991,6 +1991,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     hasWirelessDevices() {
+        if (!this.wirelessDevices) return false;
         return this.wirelessDevices.length > 0;
     }
 

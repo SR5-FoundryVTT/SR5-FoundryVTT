@@ -99,17 +99,37 @@ export const SheetFlow = {
     },
 
     fromUuidSync(uuid: string) {
-       const regex = /(^\S\.Item\.\S)\.Item\.(\S$)/;
-       const matches = uuid.match(regex);
-       if (matches) {
-           // we have an embedded item, resolve the parent item
-           const newUuid = matches[0];
-           const itemId = matches[1];
-           const doc = fromUuidSync(newUuid);
-           if (doc && doc instanceof SR5Item) {
-               return doc.getOwnedItem(itemId);
-           }
-       }
-       return fromUuidSync(uuid);
+        const parts = uuid.split('.');
+        // if the parts includes multiple 'Item' parts, we are dealing with an embedded item within an item
+        if (parts.filter(part => part === 'Item').length > 1) {
+            // get the parent item
+            const indexOfParentItem = parts.findIndex(part => part === 'Item') + 2;
+            const parentItemParts = parts.slice(0, indexOfParentItem);
+            const parentItemUuid = parentItemParts.join(".");
+            const item = fromUuidSync(parentItemUuid);
+            if (item && item instanceof SR5Item) {
+                // now determine if this is an effect within an embedded item or just an embedded item
+                const finalParts = parts.slice(indexOfParentItem);
+                if (finalParts.includes('ActiveEffect')) {
+                    const finalItemId = finalParts[1];
+                    const finalItem = item.getOwnedItem(finalItemId);
+                    if (finalItem) {
+                        const effectId = finalParts[3];
+                        return finalItem.effects.get(effectId);
+                    } else {
+                        console.error('Shadowrun5e | Could not find item on parent item', item, finalItemId)
+                        return undefined;
+                    }
+                } else {
+                    const finalItemId = finalParts[1];
+                    return item.getOwnedItem(finalItemId);
+                }
+            } else {
+                console.error("Shadowrun5e | I was expecting an item but didn't get an item", item);
+                return undefined;
+            }
+        } else {
+            return fromUuidSync(uuid);
+        }
     }
 }

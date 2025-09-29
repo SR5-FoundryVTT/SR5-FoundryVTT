@@ -1,6 +1,6 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container">
-    <div class="new-list-item" data-item-id="{{item.id}}">
+    <div class="new-list-item" data-item-id="{{item.uuid}}">
         <div class="new-list-item-label-container">
             <a data-action="rollItem"
                data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}">
@@ -40,19 +40,16 @@
 
         <div class="new-list-item-icons">
             <a data-action="equipItem">
-                <i   class="{{#if item.system.technology.equipped}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
+                <i class="{{#if item.system.technology.equipped}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
             </a>
             {{#if (canBeWireless item)}}
                 {{#if (isBroken item)}}
                     <a data-tooltip="SR5.Broken" data-action="repairBrokenItem">
-                        <i
-                           class="fas fa-link-slash"></i>
+                        <i class="fas fa-link-slash"></i>
                     </a>
                 {{else}}
                     <a data-action="toggleItemWireless">
-                        <i
-                           data-item-id="{{item.id}}"
-                            {{#if (isRunningSilent item)}}
+                        <i {{#if (isRunningSilent item)}}
                            class="fa-duotone fa-wifi-fair"
                             {{else if (isWireless item)}}
                            class="fas fa-wifi"
