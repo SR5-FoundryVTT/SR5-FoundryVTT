@@ -1,5 +1,6 @@
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
+import {SheetFlow} from "@/module/flows/SheetFlow";
 
 /**
  * ActorOwnershipFlow should handle the Ownership of items by actors
@@ -14,7 +15,7 @@ export const ActorOwnershipFlow = {
      * @param uuid - uuid of the instance to check
      */
     isOwnerOf(actor: SR5Actor, uuid: string): boolean {
-        const device = fromUuidSync(uuid) as any;
+        const device = SheetFlow.fromUuidSync(uuid);
         if (!device) return false;
         if (device instanceof SR5Item) {
             return this._isOwnerOfItem(actor, device);

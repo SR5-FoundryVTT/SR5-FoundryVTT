@@ -390,7 +390,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     override async _handleRollItem(item: SR5Item, event): Promise<void> {
         if (this.selectedMatrixTarget && item.hasActionCategory('matrix')) {
-            const document = fromUuidSync(this.selectedMatrixTarget) as SR5Actor | SR5Item;
+            const document = SheetFlow.fromUuidSync(this.selectedMatrixTarget) as SR5Actor | SR5Item;
             if (!document) return;
             const test = await this.actor.testFromItem(item, {event});
             if (test) {
@@ -416,7 +416,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (!uuid) return;
 
         // Marked documents can´t live in packs.
-        const document = fromUuidSync(uuid) as SR5Item|SR5Actor;
+        const document = SheetFlow.fromUuidSync(uuid) as SR5Item|SR5Actor;
         if (!document) return;
 
         await document.sheet?.render(true);
@@ -433,7 +433,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     static async #selectMatrixTarget(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
-        const uuid = $(event.target).closest('a').data().itemId;
+        const uuid = SheetFlow.listItemId(event.target);
         if (!uuid) return;
 
         if (this.selectedMatrixTarget === uuid) {
@@ -543,7 +543,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     informAboutOfflineSelection() {
         if (!this.selectedMatrixTarget) return;
 
-        const target = foundry.utils.fromUuidSync(this.selectedMatrixTarget);
+        const target = SheetFlow.fromUuidSync(this.selectedMatrixTarget);
         if (!(target instanceof SR5Actor) || target?.hasPersona) return;
 
         ui.notifications.error('SR5.Errors.MarksCantBePlacedWithoutPersona', {localize: true});
@@ -625,7 +625,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const uuid = $(event.target).closest('a').data().itemId;
         if (!uuid) return;
 
-        const target = fromUuidSync(uuid) as SR5Item;
+        const target = SheetFlow.fromUuidSync(uuid) as SR5Item;
         if (!target || !(target instanceof SR5Item)) return;
 
         await this.actor.connectNetwork(target);

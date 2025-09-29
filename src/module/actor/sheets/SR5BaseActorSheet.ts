@@ -1809,7 +1809,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 icon: "<i class='fas fa-page'></i>",
                 condition: (target) => {
                     const id = SheetFlow.listItemId(target);
-                    const item = fromUuidSync(id);
+                    const item = SheetFlow.fromUuidSync(id);
                     if (!item) return false;
                     if (item instanceof SR5Item
                         || item instanceof SR5ActiveEffect
@@ -1820,7 +1820,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 },
                 callback: async (target) => {
                     const id = SheetFlow.listItemId(target);
-                    const item = fromUuidSync(id);
+                    const item = SheetFlow.fromUuidSync(id);
                     if (!item) return;
                     if (item instanceof SR5Item
                         || item instanceof SR5ActiveEffect

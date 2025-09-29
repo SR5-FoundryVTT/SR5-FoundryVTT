@@ -90,6 +90,11 @@ export const SheetFlow = {
         return undefined;
     },
 
+    localIdFromUuid(uuid: string) {
+        const parts = uuid.split('.');
+        return parts.length > 0 ? parts[parts.length - 1] : '';
+    },
+
     closestAction(target) {
         return target.closest('[data-action]');
     },
@@ -129,6 +134,17 @@ export const SheetFlow = {
                 return undefined;
             }
         } else {
+
+            // fromUuidSync doesn't allow  retrieving embedded compendium documents, so manually retrieving each child document from the base document.
+            const { collection, embedded, documentId } = foundry.utils.parseUuid(uuid);
+            if (collection && embedded && documentId) {
+                let document = collection.get(documentId) as any;
+                while (document && (embedded.length > 1)) {
+                    const [embeddedName, embeddedId] = embedded.splice(0, 2);
+                    document = document.getEmbeddedDocument(embeddedName, embeddedId);
+                }
+                return document;
+            }
             return fromUuidSync(uuid);
         }
     }

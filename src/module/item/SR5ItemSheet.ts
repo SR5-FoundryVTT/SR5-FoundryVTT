@@ -872,7 +872,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!uuid) return;
 
         // Marked documents can´t live in packs.
-        const document = fromUuidSync(uuid) as SR5Item|SR5Actor;
+        const document = SheetFlow.fromUuidSync(uuid) as SR5Item|SR5Actor;
         if (!document) return;
 
         await document.sheet?.render(true);
