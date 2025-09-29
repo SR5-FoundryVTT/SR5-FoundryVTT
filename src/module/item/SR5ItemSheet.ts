@@ -72,12 +72,6 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     isUsingRangeCategory: boolean
 
-    // Define if the miscellaneous tab is shown or not.
-    showMiscTab: boolean
-
-    // Misc. Tab has different sections that can be shown or hidden.
-    miscMatrixPart: boolean
-
     // Allow users to view what values is calculated and what isn´t
     calculatedEssence: boolean
     calculatedCost: boolean
@@ -99,6 +93,24 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         },
         actions: {
             openSource: SR5ItemSheet.#onOpenSource,
+            openOrigin: SR5ItemSheet.#openOriginLink,
+            editItem: SR5ItemSheet.#editItem,
+            addLicense: SR5ItemSheet.#addLicense,
+            removeLicense: SR5ItemSheet.#removeLicense,
+            removeNetwork: SR5ItemSheet.#removeNetwork,
+            equipMod: SR5ItemSheet.#equipWeaponMod,
+            reload: SR5ItemSheet.#reloadAmmo,
+            partialReload: SR5ItemSheet.#partialReloadAmmo,
+            equipAmmo: SR5ItemSheet.#equipAmmo,
+            addAmmo: SR5ItemSheet.#addAmmo,
+            openSlave: SR5ItemSheet.#openSlave,
+            addOneMark: SR5ItemSheet.#addOneMark,
+            removeOneMark: SR5ItemSheet.#removeOneMark,
+            clearMarks: SR5ItemSheet.#deleteMarks,
+            clearAllMark: SR5ItemSheet.#deleteAllMarks,
+            removeController: SR5ItemSheet.#removeController,
+            toggleFreshImport: SR5ItemSheet.#toggleFreshImportFlag,
+            toggleEquipped: SR5ItemSheet.#toggleEquipped,
         }
     }
 
@@ -404,12 +416,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         data.rollModes = CONFIG.Dice.rollModes;
 
-        // What tabs should be shown on this sheet?
-        data.showMiscTab = this._prepareShowMiscTab();
-
-        // What sections should be shown on the misc. tab?
-        data.miscMatrixPart = this.item.hasActionCategory('matrix');
-
         data.primaryTabs = this._prepareTabs('primary');
         data.item = this.item;
 
@@ -485,54 +491,16 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         /**
          * Weapon item specific
          */
-        html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
-        html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
-        html.find('select[name="change-ammo"]').on('change', async (event) => this._onAmmoEquip(event.target.value));
-        html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
-        html.find('.ammo-reload').on('click', async (event) => this._onAmmoReload(event, false));
-        html.find('select[name="change-clip-type"]').on('change', async (event) => this._onClipEquip(event.target.value));
-
-        html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
-        html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
-        html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
-
-        /**
-         * SIN item specific
-         */
-        html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
-        html.find('.sin-remove-network').on('click', this._onRemoveNetwork.bind(this));
-
-        html.find('.network-clear').on('click', this._onRemoveAllSlaves.bind(this));
-        html.find('.network-device-remove').on('click', this._onRemoveSlave.bind(this));
+        html.find('select[name="change-ammo"]').on('change', async (event) => this._onAmmoSelect(event.target.value));
+        html.find('select[name="change-clip-type"]').on('change', async (event) => this._onClipSelect(event.target.value));
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
-        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
-        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
-        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
-
-        // Origin Link handling
-        html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
-        html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
-        // Freshly imported item toggle
-        html.find('.toggle-fresh-import-off').on('click', async (event) => this._toggleFreshImportFlag(event, false));
-
         html.find('.select-ranged-range-category').on('change', this._onSelectRangedRangeCategory.bind(this));
         html.find('.select-thrown-range-category').on('change', this._onSelectThrownRangeCategory.bind(this));
-
-        html.find('input[name="system.technology.equipped"').on('change', this._onToggleEquippedDisableOtherDevices.bind(this))
-
-        html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
-        html.find('.open-matrix-slave').on('click', this._onOpenSlave.bind(this));
-
-        html.find('.power-optional-input').on('change', this._onPowerOptionalInputChanged.bind(this));
-
-        // this._activateTagifyListeners(html);
     }
 
     /**
@@ -688,7 +656,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     _eventId(event) {
         event.preventDefault();
-        return event.currentTarget.closest('.list-item').dataset.itemId;
+        return event.currentTarget.closest('.new-list-item').dataset.itemId;
     }
 
     static async #onOpenSource(this: SR5ItemSheet, event) {
@@ -741,9 +709,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
 
-    async _onEditItem(event) {
+    static async #editItem(this: SR5ItemSheet, event) {
         const item = this.item.getOwnedItem(this._eventId(event));
-        return item?.sheet?.render(true);
+        await item?.sheet?.render(true);
     }
 
     async _onEntityRemove(event) {
@@ -759,21 +727,21 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await this.item.removeIC(position);
     }
 
-    async _onAddLicense(event) {
+    static async #addLicense(this: SR5ItemSheet, event) {
         event.preventDefault();
         await this.item.addNewLicense();
     }
 
-    async _onRemoveLicense(event) {
+    static async #removeLicense(this: SR5ItemSheet, event) {
         event.preventDefault();
-        const index = event.currentTarget.dataset.index;
+        const index = SheetFlow.closestAction(event.target)?.dataset.index;
         if (index >= 0) await this.item.removeLicense(index);
     }
 
     /**
      * User wants to remove a network from a SIN item.
      */
-    async _onRemoveNetwork(event) {
+    static async #removeNetwork(this: SR5ItemSheet, event) {
         event.preventDefault();
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -784,15 +752,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await SINFlow.removeNetwork(this.item, uuid);
     }
 
-    async _onWeaponModRemove(event) {
-        await this._onOwnedItemRemove(event);
-    }
-
-    async _onWeaponModEquip(event) {
+    static async #equipWeaponMod(this: SR5ItemSheet, event) {
         await this.item.equipWeaponMod(this._eventId(event));
     }
 
-    async _onAddWeaponMod(event) {
+    static async #addWeaponMod(this: SR5ItemSheet, event) {
         event.preventDefault();
         const type = 'modification';
         const name = `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`;
@@ -803,16 +767,24 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.createNestedItem(item.toObject());
     }
 
-    async _onAmmoReload(event, partialReload: boolean) {
+    static async #reloadAmmo(this: SR5ItemSheet, event) {
         event.preventDefault();
-        await this.item.reloadAmmo(partialReload);
+        await this.item.reloadAmmo(false);
     }
 
-    async _onAmmoRemove(event) {
-        await this._onOwnedItemRemove(event);
+    static async #partialReloadAmmo(this: SR5ItemSheet, event) {
+        event.preventDefault();
+        await this.item.reloadAmmo(true);
     }
 
-    async _onAmmoEquip(input) {
+    static async #equipAmmo(this: SR5ItemSheet, event) {
+        event.preventDefault();
+        const id = SheetFlow.listItemId(event.target);
+
+        await this.item.equipAmmo(id);
+    }
+
+    async _onAmmoSelect(input) {
         let id;
 
         if (input.currentTarget) {
@@ -824,7 +796,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.equipAmmo(id);
     }
 
-    async _onAddNewAmmo(event) {
+    static async #addAmmo(this: SR5ItemSheet, event) {
         event.preventDefault();
         const type = 'ammo';
         const itemData = {
@@ -835,7 +807,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.createNestedItem(item._source);
     }
 
-    async _onClipEquip(clipType: AmmunitionType['clip_type']) {
+    async _onClipSelect(clipType: AmmunitionType['clip_type']) {
         if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
 
         const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
@@ -849,16 +821,18 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }, { render: true });
     }
 
-    async _onOwnedItemRemove(event) {
+    static async #removeOwnedItem(this: SR5ItemSheet, event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.item.deleteOwnedItem(this._eventId(event));
+        const id = SheetFlow.listItemId(event.target);
+
+        await this.item.deleteOwnedItem(id);
     }
 
-    async _onRemoveAllSlaves(event) {
+    static async #removeAllSlaves(this: SR5ItemSheet, event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
@@ -867,7 +841,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.removeAllSlaves();
     }
 
-    async _onRemoveSlave(event) {
+    static async #removeSlave(this: SR5ItemSheet, event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
@@ -887,10 +861,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *
      * @param event Any interaction event
      */
-    async _onOpenSlave(event) {
+    static async #openSlave(event) {
         event.stopPropagation();
 
-        const uuid = Helpers.listItemUuid(event);
+        const uuid = SheetFlow.listItemId(event);
         if (!uuid) return;
 
         // Marked documents can´t live in packs.
@@ -898,13 +872,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!document) return;
 
         await document.sheet?.render(true);
-    }
-
-    /**
-     * @private
-     */
-    _findActiveList() {
-        return $(this.element).find('.tab.active .scroll-area');
     }
 
 
@@ -923,6 +890,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.setMarks(markedDocument, marks, { overwrite: true });
     }
 
+    static async #addOneMark(this: SR5ItemSheet, event) {
+        await this._onMarksQuantityChangeBy(event, 1);
+    }
+
+    static async #removeOneMark(this: SR5ItemSheet, event) {
+        await this._onMarksQuantityChangeBy(event, -1);
+    }
+
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
@@ -937,12 +912,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.setMarks(markedDocument, by);
     }
 
-    async _onMarksDelete(event) {
+    static async #deleteMarks(this: SR5ItemSheet, event) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
 
-        const markId = event.currentTarget.dataset.markId;
+        const markId = SheetFlow.closestAction(event.target).dataset.markId;
         if (!markId) return;
 
         const userConsented = await Helpers.confirmDeletion();
@@ -951,7 +926,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.clearMark(markId);
     }
 
-    async _onMarksClearAll(event) {
+    static async #deleteAllMarks(this: SR5ItemSheet, event) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
@@ -962,12 +937,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.clearMarks();
     }
 
-    async _onOpenOriginLink(event) {
+    static async #openOriginLink(this: SR5ItemSheet, event) {
         event.preventDefault();
 
         console.log('Shadowrun 5e | Opening PAN/WAN network controller');
 
-        const originLink = event.currentTarget.dataset.originLink;
+        const originLink = SheetFlow.closestAction(event.target).dataset.originLink;
         const device = await fromUuid(originLink);
         if (!device) return;
 
@@ -975,7 +950,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await device?.sheet?.render(true);
     }
 
-    async _onControllerRemove(event) {
+    static async #removeController(this: SR5ItemSheet, event) {
         event.preventDefault();
 
         await this.item.disconnectFromNetwork();
@@ -983,21 +958,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     /**
-     * Show / hide the items description within a sheet item l ist.
-     */
-    async _onListItemToggleDescriptionVisibility(event) {
-        event.preventDefault();
-        const item = $(event.currentTarget).parents('.list-item');
-        const field = item.find('.list-item-description');
-        field.toggle();
-    }
-
-    /**
      * Toggle to isFreshImport property of importFlags for an item
      *
      * @param event
      */
-    async _toggleFreshImportFlag(event, onOff: boolean) {
+    static async #toggleFreshImportFlag(this: SR5ItemSheet, event) {
+        const onOff = !this.item.system.importFlags.isFreshImport;
         console.debug('Toggling isFreshImport on item to ->', onOff, event);
         const item = this.item;
         if (item.system.importFlags) {
@@ -1005,11 +971,28 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
+    static async #toggleEquipped(this: SR5ItemSheet, event) {
+        if (this.item.isType('device') && this.item.parent instanceof SR5Actor) {
+            await this.item.parent.equipOnlyOneItemOfType(this.item);
+        } else if (this.item.isType('ammo') && this.item.parent instanceof SR5Item) {
+            await (this.item.parent as SR5Item).equipAmmo(this.item.id);
+        } else if (this.item.isType('modification') && this.item.parent instanceof SR5Item) {
+            await (this.item.parent as SR5Item).equipWeaponMod(this.item.id);
+        } else {
+            const equipped = this.item.isEquipped();
+            if (this.item.isType('critter_power', 'sprite_power')) {
+                await this.item.update({system: { optional : equipped ? 'disabled_option' : 'enabled_option'}});
+            } else {
+                await this.item.update({system: { technology: { equipped: !equipped }}});
+            }
+        }
+    }
+
     /**
      * Clicking on equipped status should trigger unequipping all other devices of the same type.
      * @param event Click event on the equipped checkbox.
      */
-    async _onToggleEquippedDisableOtherDevices(event: PointerEvent) {
+    static async #toggleEquippedDisableOtherDevices(this: SR5ItemSheet, event) {
         event.preventDefault();
 
         // Assure owned item device.
@@ -1018,56 +1001,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!this.document.isEquipped()) return;
 
         await this.document.parent.equipOnlyOneItemOfType(this.document);
-    }
-
-    /**
-     * Change the enabled status of an item shown within a sheet item list.
-     */
-    async _onPowerOptionalInputChanged(event) {
-        event.preventDefault();
-        const power = this.item.asType('critter_power') || this.item.asType('sprite_power') || undefined;
-        if (!power) return;
-
-        let selectedRangeCategory;
-
-        if (this.item.isType('critter_power')) {
-            selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.critterPower.optional;
-        } else {
-            selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.spritePower.optional;
-        }
-
-        power.system.optional = selectedRangeCategory;
-
-        switch (power.system.optional) {
-            case 'standard':
-            case 'enabled_option':
-                power.system.enabled = true;
-                break;
-            case 'disabled_option':
-                power.system.enabled = false;
-                break;
-        }
-
-        this.item.render(false);
-    }
-
-    /**
-     * Go through an action item action categories and if at least one is found that needs additional
-     * configuration, let the sheet show the misc. tab.
-     *
-     * @returns true, when the tab is to be shown.
-     */
-    _prepareShowMiscTab() {
-        // Currently, only action items use this tab.
-        const action = this.item.asType('action');
-        if (!action) return false;
-
-        const relevantCategories: Shadowrun.ActionCategories[] = ['matrix'];
-        for (const category of relevantCategories) {
-            if (this.document.hasActionCategory(category)) return true;
-        }
-
-        return false;
     }
 
     override async _onFirstRender(context, options) {

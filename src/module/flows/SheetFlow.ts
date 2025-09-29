@@ -96,5 +96,20 @@ export const SheetFlow = {
 
     listItemId(target) {
        return target.closest('.new-list-item[data-item-id]')?.dataset?.itemId;
+    },
+
+    fromUuidSync(uuid: string) {
+       const regex = /(^\S\.Item\.\S)\.Item\.(\S$)/;
+       const matches = uuid.match(regex);
+       if (matches) {
+           // we have an embedded item, resolve the parent item
+           const newUuid = matches[0];
+           const itemId = matches[1];
+           const doc = fromUuidSync(newUuid);
+           if (doc && doc instanceof SR5Item) {
+               return doc.getOwnedItem(itemId);
+           }
+       }
+       return fromUuidSync(uuid);
     }
 }

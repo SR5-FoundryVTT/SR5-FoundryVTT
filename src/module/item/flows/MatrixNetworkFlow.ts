@@ -521,7 +521,7 @@ export class MatrixNetworkFlow {
         const isItem = document instanceof SR5Item;
         if (isItem && document.type === 'host') return 'SR5.ItemTypes.Host';
         if (isItem && document.type === 'grid') return 'SR5.ItemTypes.Grid';
-        if (isItem) return 'SR5.Device';
+        if (isItem) return 'SR5.ItemTypes.Device';
 
         if (isActor && document.type === 'ic') return 'SR5.ActorTypes.IC';
         if (isActor && document.type === 'vehicle') return 'SR5.ActorTypes.Vehicle';
