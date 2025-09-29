@@ -279,7 +279,6 @@ export const registerSystemSettings = () => {
     game.settings.register(SYSTEM_NAME, FLAGS.CompendiumBrowserBlacklist, {
         name: 'SETTINGS.CompendiumBrowserBlacklist.label',
         hint: 'SETTINGS.CompendiumBrowserBlacklist.hint',
-        //@ts-expect-error foundry type issue
         scope: 'user',
         config: false,
         type: Array,
