@@ -1,0 +1,200 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="scrollable standard-form">
+            {{#if systemFields.armor}}
+                {{formGroup systemFields.armor.fields.value value=system.armor.value rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.armor.fields.mod value=system.armor.mod rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.armor.fields.hardened value=system.armor.hardened rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{!-- Iterate over damage types provided from config to display the fields --}}
+                {{#each config.elementTypes as |_ignored element_id|}}
+                    {{formGroup (objValue @root.systemFields.armor.fields element_id)
+                                value=(objValue @root.system.armor element_id)
+                                rootId=@root.rootId disabled=@root.isPlayMode }}
+                {{/each}}
+            {{/if}}
+
+            {{#if (eq item.type 'ammo')}}
+                {{formGroup systemFields.damage value=system.damage rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.damageType
+                            value=system.damageType
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.element
+                            value=system.element
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.replaceDamage value=system.replaceDamage
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.ap value=system.ap
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.replaceAP value=system.replaceAP
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.accuracy value=system.accuracy
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.blast.fields.radius value=system.blast.radius
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.blast.fields.dropoff value=system.blast.dropoff
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{else if (and (eq item.type 'call_in_action') (eq system.actor_type 'sprite'))}}
+                {{formGroup systemFields.sprite.fields.uuid value=system.sprite.uuid
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.sprite.fields.type value=system.sprite.type
+                            localize=true rootId=@root.rootId disabled=(or @root.isPlayMode sprite)}}
+                {{formGroup systemFields.sprite.fields.level value=system.sprite.level
+                            rootId=@root.rootId disabled=(or @root.isPlayMode sprite)}}
+            {{else if (and (eq item.type 'call_in_action') (eq system.actor_type 'spirit'))}}
+                {{formGroup systemFields.spirit.fields.uuid value=system.spirit.uuid
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.spirit.fields.type value=system.spirit.type
+                            localize=true rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
+                {{formGroup systemFields.spirit.fields.force value=system.spirit.force
+                            rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
+            {{else if (eq item.type 'device')}}
+                {{formGroup systemFields.category value=source.system.category
+                            localize = true rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{#unless (eq system.category 'living_persona')}}
+                    {{#each system.atts as |att att_id|}}
+                        <div class="form-group">
+                            {{#ifin @root.system.category (toArray "cyberdeck" "host")}}
+                                <select name="system.atts.{{att_id}}.att" {{#if @root.isPlayMode}}disabled{{/if}}>
+                                    {{selectOptions @root.config.matrixAttributes selected=att.att
+                                                    localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                                </select>
+                            {{else}}
+                                <label>{{localize (lookup @root.config.matrixAttributes att.att)}}</label>
+                            {{/ifin}}
+                            {{log @root.systemFields}}
+                            <div class="form-fields">
+                                {{formInput (objValue (objValue (objValue @root.systemFields.atts.fields att_id) 'fields') 'value')
+                                            value=att.value rootId=@root.rootId disabled=(or @root.isPlayMode (not att.editable)) }}
+                            </div>
+                        </div>
+                    {{/each}}
+                {{/unless}}
+            {{else if (eq item.type 'weapon')}}
+                {{formGroup systemFields.category value=source.system.category
+                            localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{#if (eq system.category 'range')}}
+                    {{formGroup systemFields.range.fields.modes.fields.single_shot
+                                value=source.system.range.modes.single_shot
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.range.fields.modes.fields.semi_auto
+                                value=source.system.range.modes.semi_auto
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.range.fields.modes.fields.burst_fire
+                                value=source.system.range.modes.burst_fire
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.range.fields.modes.fields.full_auto
+                                value=source.system.range.modes.full_auto
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.ammo.fields.spare_clips.fields.value
+                                value=source.system.ammo.spare_clips.value
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.ammo.fields.spare_clips.fields.max
+                                value=source.system.ammo.spare_clips.max
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.ammo.fields.clip_type value=source.system.ammo.clip_type
+                                localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.range.fields.rc.fields.base value=source.system.range.rc.base
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                    {{formGroup systemFields.range.fields.ranges.fields.category value=source.system.range.ranges.category
+                                localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.range.fields.ranges.fields.short value=source.system.range.ranges.short
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                    {{formGroup systemFields.range.fields.ranges.fields.medium value=source.system.range.ranges.medium
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                    {{formGroup systemFields.range.fields.ranges.fields.long value=source.system.range.ranges.long
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                    {{formGroup systemFields.range.fields.ranges.fields.extreme value=source.system.range.ranges.extreme
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                    {{formGroup systemFields.range.fields.ranges.fields.attribute value=source.system.range.ranges.attribute
+                                options=(config2Array attributes) localize=true
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+
+                {{else if (eq system.category 'thrown')}}
+                    {{formGroup systemFields.thrown.fields.ranges.fields.category
+                                value=source.system.thrown.ranges.category
+                                localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.thrown.fields.ranges.fields.short
+                                value=source.system.thrown.ranges.short
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                    {{formGroup systemFields.thrown.fields.ranges.fields.medium
+                                value=source.system.thrown.ranges.medium
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                    {{formGroup systemFields.thrown.fields.ranges.fields.long
+                                value=source.system.thrown.ranges.long
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                    {{formGroup systemFields.thrown.fields.ranges.fields.extreme
+                                value=source.system.thrown.ranges.extreme
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                    {{formGroup systemFields.thrown.fields.ranges.fields.attribute
+                                value=source.system.thrown.ranges.attribute
+                                options=(config2Array attributes) localize=true
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+
+                    {{formGroup systemFields.thrown.fields.blast.fields.radius
+                                value=source.system.thrown.blast.radius
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                    {{formGroup systemFields.thrown.fields.blast.fields.dropoff
+                                value=source.system.thrown.blast.dropoff
+                                rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+
+                {{else if (eq system.category 'melee')}}
+                    {{formGroup systemFields.melee.fields.reach value=source.system.melee.reach
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/if}}
+
+            {{else if (eq item.type 'spell')}}
+                {{formGroup systemFields.category value=system.category
+                            localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.type value=system.type
+                            localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.drain value=system.drain rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.range value=system.range
+                            localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.duration value=system.duration
+                            localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{#if (eq system.category 'combat')}}
+                    {{formGroup systemFields.combat.fields.type value=system.combat.type
+                                localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else if (eq system.category 'detection')}}
+                    {{formGroup systemFields.detection.fields.type value=system.detection.type
+                                localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.detected.fields.extended
+                                value=system.detected.extended
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else if (eq system.category 'illusion')}}
+                    {{formGroup systemFields.illusion.fields.type value=system.illusion.type
+                                localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.illusion.fields.sense value=system.illusion.sense
+                                localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else if (eq system.category 'manipulation')}}
+                    {{formGroup systemFields.manipulation.fields.damaging
+                                value=system.manipulation.damaging
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.manipulation.fields.mental
+                                value=system.manipulation.mental
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.manipulation.fields.environmental
+                                value=system.manipulation.environmental
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formGroup systemFields.manipulation.fields.physical
+                                value=system.manipulation.physical
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else if (eq system.category 'ritual')}}
+                    {{formGroup systemFields.ritual.fields.type
+                                value=system.ritual.type localize=true
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/if}}
+
+            {{/if}}
+        </div>
+    </div>
+</section>

@@ -131,33 +131,13 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             template: SheetFlow.templateBase('item/tabs/description'),
             scrollable: ['.scrollable']
         },
-        armor: {
-            template: SheetFlow.templateBase('item/tabs/armor'),
-            scrollable: ['.scrollable']
-        },
-        compilation: {
-            template: SheetFlow.templateBase('item/tabs/compilation'),
-            scrollable: ['.scrollable']
-        },
-        summoning: {
-            template: SheetFlow.templateBase('item/tabs/summoning'),
-            scrollable: ['.scrollable']
-        },
-        modification: {
-            template: SheetFlow.templateBase('item/tabs/modification'),
+        details: {
+            template: SheetFlow.templateBase('item/tabs/details'),
             scrollable: ['.scrollable']
         },
         licenses: {
             template: SheetFlow.templateBase('item/tabs/licenses'),
             templates: SheetFlow.templateListItem('license'),
-            scrollable: ['.scrollable']
-        },
-        spell: {
-            template: SheetFlow.templateBase('item/tabs/spell'),
-            scrollable: ['.scrollable']
-        },
-        weapon: {
-            template: SheetFlow.templateBase('item/tabs/weapon'),
             scrollable: ['.scrollable']
         },
         weaponAmmo: {
@@ -172,14 +152,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         },
         action: {
             template: SheetFlow.templateBase('item/tabs/action'),
-            scrollable: ['.scrollable']
-        },
-        ammo: {
-            template: SheetFlow.templateBase('item/tabs/ammo'),
-            scrollable: ['.scrollable']
-        },
-        device: {
-            template: SheetFlow.templateBase('item/tabs/device'),
             scrollable: ['.scrollable']
         },
         effects: {
@@ -198,17 +170,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             initial: 'description',
             tabs: [
                 { id: 'description', label: 'Description', cssClass: '' },
-                { id: 'device', label: 'Matrix', cssClass: '' },
-                { id: 'weapon', label: 'Details', cssClass: '' },
+                { id: 'details', label: 'Details', cssClass: '' },
                 { id: 'weaponAmmo', label: 'Ammo', cssClass: '' },
                 { id: 'weaponModifications', label: 'Mods', cssClass: '' },
                 { id: 'licenses', label: 'Licenses', cssClass: '' },
-                { id: 'spell', label: 'Details', cssClass: '' },
-                { id: 'armor', label: 'Armor', cssClass: '' },
-                { id: 'compilation', label: 'Details', cssClass: '' },
-                { id: 'modification', label: 'Details', cssClass: '' },
-                { id: 'summoning', label: 'Details', cssClass: '' },
-                { id: 'ammo', label: 'Details', cssClass: '' },
                 { id: 'action', label: 'Action', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' }
             ]
@@ -233,29 +198,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!item.getAction()) {
             delete parts['action'];
         }
-        if (!item.isType('armor', 'critter_power', 'cyberware', 'bioware', 'adept_power')) {
-            delete parts['armor'];
-        }
-        if (!item.isType('ammo')) {
-            delete parts['ammo'];
-        }
-        if (!item.isCompilation) {
-            delete parts['compilation'];
-        }
-        if (!item.isSummoning) {
-            delete parts['summoning'];
-        }
-        if (!item.isType('modification')) {
-            delete parts['modification'];
-        }
-        if (!item.isType('device')) {
-            delete parts['device'];
-        }
-        if (!item.isType('spell')) {
-            delete parts['spell'];
-        }
         if (!item.isType('weapon')) {
-            delete parts['weapon'];
             delete parts['weaponModifications'];
             delete parts['weaponAmmo'];
         }

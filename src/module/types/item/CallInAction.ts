@@ -1,7 +1,7 @@
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { SR5 } from '@/module/config';
-const { SchemaField, NumberField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, StringField, DocumentUUIDField } = foundry.data.fields;
 
 const CallInActionData = () => ({
     ...BaseItemData(),
@@ -15,12 +15,12 @@ const CallInActionData = () => ({
     spirit: new SchemaField({
         type: new StringField({ required: true, blank: true, choices: SR5.spiritTypes }),
         force: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
-        uuid: new StringField({ required: true }),
+        uuid: new DocumentUUIDField({ blank: true, required: true }),
     }),
     sprite: new SchemaField({
         type: new StringField({ required: true, blank: true, choices: SR5.spriteTypes }),
         level: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
-        uuid: new StringField({ required: true }),
+        uuid: new DocumentUUIDField({ blank: true, required: true }),
     }),
 });
 
