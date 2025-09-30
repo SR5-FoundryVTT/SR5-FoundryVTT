@@ -30,7 +30,7 @@ export class CritterPower extends ItemBase<ReturnType<typeof CritterPowerData>> 
         return CritterPowerData();
     }
 
-    static override LOCALIZATION_PREFIXES = ["SR5.CritterPower", "SR5.Item"];
+    static override LOCALIZATION_PREFIXES = ["SR5.CritterPower", "SR5.Armor", "SR5.Item"];
 }
 
 console.log("CritterPowerData", CritterPowerData(), new CritterPower());

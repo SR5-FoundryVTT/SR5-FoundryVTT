@@ -1,22 +1,24 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{#if @root.isEditMode}}
         <div class="new-list-item new-list-item-header header-for-scrollable">
             <div class="new-list-item-label-container">
                 <span class="selection-inventory">
                     <label class="item-text item-name" for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
-                    <select id="select-inventory">
+                    <select id="select-inventory" class="short">
                         {{#each inventories as |inventory name|}}
                         <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>
                         {{/each}}
                     </select>
+                    {{#if @root.isEditMode}}
                     <a class="inventory-edit action-icon roll">
                         <i class="fas fa-edit"></i>
                     </a>
                     <a class="inventory-remove action-icon roll">
                         <i class="fas fa-trash"></i>
                     </a>
+                    {{/if}}
                 </span>
+                {{#if @root.isEditMode}}
                 <span class="inline-input-inventory">
                     <input type="text" id="input-inventory" class="display text left" value="{{inventory.name}}"/>
                     <a class="roll action-icon inventory-input-save">
@@ -26,12 +28,15 @@
                         <i class="fas fa-times"></i>
                     </a>
                 </span>
+                {{/if}}
             </div>
             <div class="new-list-item-icons">
+                {{#if @root.isEditMode}}
                 <a class="inventory-inline-create" data-tooltip="SR5.Labels.ActorSheet.CreateInventory">
                     <i class="item-icon fas fa-plus"></i>
                     {{localize "SR5.Add"}}
                 </a>
+                {{/if}}
                 <a class="inventory-collapse" data-tooltip="SR5.CollapseAll">
                     <i class="item-icon fas fa-chevrons-up"></i>
                 </a>
@@ -40,7 +45,6 @@
                 </a>
             </div>
         </div>
-        {{/if}}
         <div class="scrollable">
             {{#each inventory.types as |section type|}}
                 {{> (concatStrings "systems/shadowrun5e/dist/templates/v2/list-items/" type "/header.hbs")
