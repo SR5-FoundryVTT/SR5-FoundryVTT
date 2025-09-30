@@ -89,8 +89,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static override DEFAULT_OPTIONS = {
         classes: [SR5_APPV2_CSS_CLASS, 'item'],
         position: {
-            width: 500,
-            height: 300,
+            width: 600,
+            height: 500,
         },
         actions: {
             openSource: SR5ItemSheet.#onOpenSource,
@@ -171,10 +171,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             tabs: [
                 { id: 'description', label: 'Description', cssClass: '' },
                 { id: 'details', label: 'Details', cssClass: '' },
+                { id: 'action', label: 'Action', cssClass: '' },
                 { id: 'weaponAmmo', label: 'Ammo', cssClass: '' },
                 { id: 'weaponModifications', label: 'Mods', cssClass: '' },
                 { id: 'licenses', label: 'Licenses', cssClass: '' },
-                { id: 'action', label: 'Action', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' }
             ]
         }
