@@ -1739,6 +1739,10 @@ input[type='text'].display {
 
     ///////////////////////////////////////////////////////////////////////////////
 
+    .no-shrink {
+        flex-shrink: 0;
+    }
+
     // new-list-item classes should be renamed to list-item when complete
     .new-list-item-container {
         display: flex;
@@ -1825,7 +1829,6 @@ input[type='text'].display {
                     content: url('assets/dice-solid.svg');
                     filter: invert(1);
                 }
-
             }
             img.new-list-item-image-info {
                 &:hover {
