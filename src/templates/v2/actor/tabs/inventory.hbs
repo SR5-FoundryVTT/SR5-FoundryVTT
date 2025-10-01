@@ -2,46 +2,45 @@
     <div class="fill-container">
         <div class="new-list-item new-list-item-header header-for-scrollable">
             <div class="new-list-item-label-container">
-                <span class="selection-inventory">
-                    <label class="item-text item-name" for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
+                <label class="item-text item-name" for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
+                <div>
                     <select id="select-inventory" class="short">
                         {{#each inventories as |inventory name|}}
-                        <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>
+                            <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>
                         {{/each}}
                     </select>
-                    {{#if @root.isEditMode}}
-                    <a class="inventory-edit action-icon roll">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a class="inventory-remove action-icon roll">
+                </div>
+                {{#if @root.isEditMode}}
+                    <a>
                         <i class="fas fa-trash"></i>
                     </a>
-                    {{/if}}
-                </span>
-                {{#if @root.isEditMode}}
-                <span class="inline-input-inventory">
-                    <input type="text" id="input-inventory" class="display text left" value="{{inventory.name}}"/>
-                    <a class="roll action-icon inventory-input-save">
-                        <i class="fas fa-check"></i>
-                    </a>
-                    <a class="roll action-icon inventory-input-cancel">
-                        <i class="fas fa-times"></i>
-                    </a>
-                </span>
                 {{/if}}
             </div>
+            {{#if @root.isEditMode}}
+            <div class="new-list-item-col">
+                <div>
+                    <input class="short" type="text" id="input-inventory" value="{{inventory.name}}"/>
+                </div>
+                <a data-action="saveInventoryName">
+                    <i class="fas fa-check"></i>
+                </a>
+                <a class="inventory-input-cancel">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+            {{/if}}
             <div class="new-list-item-icons">
                 {{#if @root.isEditMode}}
                 <a class="inventory-inline-create" data-tooltip="SR5.Labels.ActorSheet.CreateInventory">
-                    <i class="item-icon fas fa-plus"></i>
+                    <i class="fas fa-plus"></i>
                     {{localize "SR5.Add"}}
                 </a>
                 {{/if}}
                 <a class="inventory-collapse" data-tooltip="SR5.CollapseAll">
-                    <i class="item-icon fas fa-chevrons-up"></i>
+                    <i class="fas fa-chevrons-up"></i>
                 </a>
                 <a class="inventory-expand" data-tooltip="SR5.ExpandAll">
-                    <i class="item-icon fas fa-chevrons-down"></i>
+                    <i class="fas fa-chevrons-down"></i>
                 </a>
             </div>
         </div>

@@ -34,16 +34,6 @@
         @include clickable;
     }
 
-    input[type="number"].short {
-        min-width: 2rem;
-        max-width: 2rem;
-        max-height: 1.25rem;
-    }
-
-    select.short {
-        max-height: 1.5rem;
-    }
-
     .attributes {
         display: flex;
         flex-flow: row nowrap;
@@ -53,26 +43,28 @@
         .attribute {
             display: flex;
             flex-flow: column nowrap;
-            gap: 0.25rem;
+            gap: 2px;
 
-            .attribute-label {
+            > label {
                 display: flex;
                 flex-flow: row nowrap;
                 justify-content: center;
-                font-size: 1.25rem;
-                color: $yellow;
+                font-size: 1.15rem;
+            }
+
+            .attribute-value {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: center;
+                align-items: center;
+                gap: 0.25rem;
+                max-width: 8rem;
             }
         }
+    }
 
-        .attribute-value {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: center;
-            align-items: center;
-            gap: 0.25rem;
-            max-width: 8rem;
-            font-size: 1.25rem;
-        }
+    .condition-monitor-container {
+        padding: 0.25rem;
     }
 
     .movement-container {
@@ -93,9 +85,6 @@
         align-content: stretch;
         gap: .25rem;
         padding: .25rem;
-        border-bottom: 1px solid $yellow;
-        border-left: 1px solid $yellow;
-        border-bottom-left-radius: .1rem;
         overflow: hidden;
 
         // this selects things like cold sim, hot sim, meatspace, astral
@@ -114,6 +103,7 @@
             flex-flow: column nowrap;
             flex: 1;
             justify-content: space-between;
+            align-items: center;
             align-content: end;
         }
 

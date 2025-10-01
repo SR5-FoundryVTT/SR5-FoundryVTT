@@ -24,20 +24,19 @@
     </div>
     <div class="initiative-col">
         <div class="initiative-end">
-            <label data-action="toggleInitiativeBlitz">
+            <a data-action="toggleInitiativeBlitz">
                 {{localize "SR5.Blitz"}}
                 {{#if system.initiative.edge}}
                     <i class="fas fa-toggle-on"></i>
                 {{else}}
                     <i class="fas fa-toggle-off"></i>
                 {{/if}}
-            </label>
+            </a>
         </div>
-        <button type="button" class="button">
+        <button type="button" class="short">
             <span>{{system.initiative.current.base.value}}</span>
             <i class="fas fa-plus" style="font-size: 0.75em"></i>
-            <span>{{system.initiative.current.dice.value}}</span>
-            <i class="far fa-dice"></i>
+            <span>{{system.initiative.current.dice.value}}d6</span>
         </button>
     </div>
 </div>

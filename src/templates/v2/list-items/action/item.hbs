@@ -22,16 +22,18 @@
 
         {{#if (isMatrixAction item)}}
         <div class="new-list-item-col">
-            {{marksRequired item}}
+            <label>{{marksRequired item}}</label>
         </div>
         {{else}}
         <div class="new-list-item-col">
-            {{localizeOb item.system.action.type @root.config.actionTypes}}
+            <label>{{localizeOb item.system.action.type @root.config.actionTypes}}</label>
         </div>
         {{/if}}
 
+        {{#if @root.isEditMode}}
         <div class="new-list-item-icons">
         </div>
+        {{/if}}
     </div>
     <div class="new-list-item-description">
         {{{item.system.description.value}}}

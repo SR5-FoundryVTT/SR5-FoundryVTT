@@ -1,42 +1,65 @@
-<div class="attributes no-border">
-    <div class="attribute row space-around">
-        <div class="Roll attribute-name" data-roll-id="composure">
-            {{localize "SR5.RollComposure"}}
-        </div>
-        <div class="Roll attribute-name" data-roll-id="judge-intentions">
-            {{localize "SR5.RollJudgeIntentions"}}
-        </div>
-        <div class="Roll attribute-name" data-roll-id="lift-carry">
-            {{localize "SR5.RollLiftCarry"}}
-        </div>
-        <div class="Roll attribute-name" data-roll-id="memory">
-            {{localize "SR5.RollMemory"}}
-        </div>
-        <div
-            data-tooltip="SR5.Roll"
-            class="attribute-name Roll fas fa-dice-six"
-            data-roll-id="prompt-roll"
-        ></div>
-        <div data-tooltip="SR5.Defense" class="attribute-name Roll" data-roll-id="defense">
-            {{localize "SR5.RollDefense"}}
-        </div>
-        <div data-tooltip="SR5.Soak" class="attribute-name Roll" data-roll-id="damage-resist">
-            {{localize "SR5.RollSoak"}}
-        </div>
-        <div class="attribute-name Roll" data-roll-id="armor">
-            {{localize "SR5.RollArmor"}} ({{system.armor.value}})
-        </div>
-
-        {{#if awakened}}
-            <div class="attribute-name Roll" data-roll-id="drain">
-                {{localize "SR5.RollDrain"}}
-            </div>
-        {{/if}}
-
-        {{#if emerged}}
-            <div class="attribute-name Roll" data-roll-id="fade">
-                {{localize "SR5.RollFade"}}
-            </div>
-        {{/if}}
+<div class="new-list-item new-list-item-header">
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.Roll"
+           data-roll-id="prompt-roll">
+            <i class="fas fa-dice-six"></i>
+        </a>
     </div>
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.RollComposure" data-roll-id="composure">
+            <i class="fas fa-face-angry"></i>
+        </a>
+    </div>
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.RollJudgeIntentions" data-roll-id="judge-intentions">
+            <i class="fas fa-gavel"></i>
+        </a>
+    </div>
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.RollLiftCarry" data-roll-id="lift-carry">
+            <i class="fas fa-person-carry-box"></i>
+        </a>
+    </div>
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.RollMemory" data-roll-id="memory">
+            <i class="fas fa-brain"></i>
+        </a>
+    </div>
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.RollDefense" data-roll-id="defense">
+            <i class="fas fa-user-shield"></i>
+        </a>
+    </div>
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.RollSoak" data-roll-id="damage-resist">
+            <i class="fas fa-shield"></i>
+        </a>
+    </div>
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.RollArmor" data-roll-id="armor">
+            <i class="fas fa-shield-halved"></i>
+        </a>
+    </div>
+
+    {{#if awakened}}
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.RollDrain" data-roll-id="drain">
+            <i class="fas fa-shield"></i>
+        </a>
+    </div>
+    {{/if}}
+
+    {{#if emerged}}
+    <div class="new-list-item-col">
+        <a data-tooltip="SR5.RollFade" data-roll-id="fade">
+            <i class="fas fa-shield"></i>
+        </a>
+    </div>
+    {{/if}}
+
+    {{#unless (or isIC isSprite)}}
+        <div class="new-list-item-label-container">
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
+        </div>
+    {{/unless}}
 </div>

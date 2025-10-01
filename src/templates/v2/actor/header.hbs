@@ -1,11 +1,9 @@
 <header class="sheet-header">
     <img
-        class="profile"
+        class="sheet-image"
         src="{{actor.img}}"
         data-edit="img"
         data-tooltip="{{actor.name}}"
-        height="90px"
-        width="90px"
     />
     <div class="sheet-header-labels">
         <div class="sheet-header-name">
@@ -30,59 +28,46 @@
                    {{#if @root.isPlayMode}}disabled{{/if}}/>
         </div>
         {{#if @root.isEditMode}}
-        <div class="sheet-header-source">
-            <input
-                type="text"
-                name="system.description.source"
-                value="{{system.description.source}}"
-                placeholder='{{localize "SR5.Source"}}'
-            />
-        </div>
+            <div class="sheet-header-source">
+                <input
+                    type="text"
+                    name="system.description.source"
+                    value="{{system.description.source}}"
+                    placeholder='{{localize "SR5.Source"}}'
+                />
+            </div>
         {{else}}
             <div>
-            {{#if (or isIC isSprite)}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
-                    id='matrix'
-                    track = system.track.matrix
-                }}
-            {{/if}}
-            {{#if (or isCharacter isSpirit)}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
-                    id='stun'
-                    track = system.track.stun
-                }}
-            {{/if}}
-            {{#unless (or isIC isSprite)}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
-                    id='physical'
-                    track = system.track.physical
-                }}
-            {{/unless}}
+                {{#if (or isIC isSprite)}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                        id='matrix'
+                        track = system.track.matrix
+                    }}
+                {{/if}}
+                {{#if (or isCharacter isSpirit)}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                        id='stun'
+                        track = system.track.stun
+                    }}
+                {{/if}}
+                {{#unless (or isIC isSprite)}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                        id='physical'
+                        track = system.track.physical
+                    }}
+                {{/unless}}
             </div>
         {{/if}}
     </div>
     <div>
         {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
-        {{#unless (or isIC isSprite)}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
-        {{/unless}}
-        {{#if system.attributes.edge.max}}
-        <div class="new-list-item">
-            <div class="new-list-item-label-container">
-                <label>{{localize "SR5.Edge"}}</label>
-            </div>
-            <div class="new-list-item-col">
-                <a data-action="removeOneEdge"
-                   data-tooltip="SR5.Labels.ActorSheet.RemoveOneEdge">
-                    <i class="fas fa-minus-square"></i>
-                </a>
-                {{system.attributes.edge.uses}}/{{system.attributes.edge.max}}
-                <a data-action="addOneService"
-                   data-tooltip="SR5.Labels.ActorSheet.AddOneService">
-                    <i class="fas fa-plus-square"></i>
-                </a>
-            </div>
-        </div>
+        {{#if system.attributes.edge.value}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                tooltip="SR5.AttrEdge"
+                value=system.attributes.edge.uses
+                max=system.attributes.edge.value
+                id="edge"
+            }}
         {{/if}}
         {{#if (or isSpirit isSprite)}}
         <div class="new-list-item">

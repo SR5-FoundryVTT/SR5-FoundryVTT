@@ -1,27 +1,27 @@
 <div class="attribute">
-    <a class="attribute-label">
+    <label>
         {{localize label}}
-    </a>
+    </label>
     {{#if @root.isEditMode}}
-    <div class="attribute-value">
-        {{#if isCyberdeck}}
-        <select class="matrix-att-selector short" name="matrix-{{key}}" data-att="{{key}}">
-            {{!selectOptions value=matrixAtt.device_att choices=item.atts }}
-        {{#select matrixAtt.device_att}}
-        {{#each item.atts as |att key|}}
-            <option value="{{key}}" data-tooltip="{{lookup ../matrixAttributes att.att}}">{{att.value}}</option>
-        {{/each}}
-        {{/select}}
-        </select>
-        {{else}}
-        <span>{{matrixAtt.base}}</span>
-        {{/if}}
-        <i style="font-size: 0.75rem" class="fas fa-plus"></i>
-        {{formInput attributeField.fields.temp value=matrixAtt.temp classes="short" rootId=rootId }}
-    </div>
+        <div class="attribute-value">
+            {{#if isCyberdeck}}
+                <select class="matrix-att-selector short" name="matrix-{{key}}" data-att="{{key}}">
+                    {{!selectOptions value=matrixAtt.device_att choices=item.atts }}
+                    {{#select matrixAtt.device_att}}
+                    {{#each item.atts as |att key|}}
+                        <option value="{{key}}" data-tooltip="{{lookup ../matrixAttributes att.att}}">{{att.value}}</option>
+                    {{/each}}
+                    {{/select}}
+                </select>
+            {{else}}
+                <span>{{matrixAtt.base}}</span>
+            {{/if}}
+            <i style="font-size: 0.75rem" class="fas fa-plus"></i>
+            {{formInput attributeField.fields.temp value=matrixAtt.temp classes="short" rootId=rootId }}
+        </div>
     {{else}}
-    <div class="attribute-value">
-        <span class="attribute-value-total">{{matrixAtt.value}}</span>
-    </div>
+        <div class="attribute-value">
+            <button class="icon" type="button" data-action="rollAttribute" data-attribute-id="{{attributeField.name}}">{{matrixAtt.value}}</button>
+        </div>
     {{/if}}
 </div>

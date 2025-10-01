@@ -1715,8 +1715,8 @@
             }
         },
         "ModificationCategories": "Modification Categories",
-        "ModificationCategory": "Modification Category",
-        "ModificationSlots": "Modification Slots",
+        "ModificationCategory": "Category",
+        "ModificationSlots": "Slots",
         "Modified": "Modified",
         "ModifiedArmor": "Mod. Armor",
         "ModifiedDamage": "Mod. Damage",

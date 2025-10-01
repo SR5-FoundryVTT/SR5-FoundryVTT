@@ -2,11 +2,6 @@
     <div class="new-list-item {{skillClass skill}}">
         <div class="new-list-item-label-container">
             <label>
-                {{#if @root.isEditMode}}
-                <a data-action="showItemDescription">
-                    <i class="far fa-file-pen"></i>
-                </a>
-                {{/if}}
                 {{#if skill.link}}
                 <a data-action="openSkillSource"
                    data-skill="{{id}}"
@@ -14,12 +9,7 @@
                     <i class="fas fa-file"></i>
                 </a>
                 {{/if}}
-                <a {{#if @root.isEditMode}}
-                   data-action="showItemDescription"
-                   {{else}}
-                   data-action="rollSkill"
-                   {{/if}}
-                   data-skill="{{id}}">{{localizeSkill skill}}</a>
+                <a data-action="showItemDescription" data-skill="{{id}}">{{localizeSkill skill}}</a>
             </label>
         </div>
         {{#if @root.isPlayMode}}
@@ -34,11 +24,19 @@
                 <i style="font-size: 0.75rem" class="fas fa-plus"></i>
                 <input type="number" name="{{concat skillPath '.temp'}}" class="short" value="{{skill.temp}}" data-skill="{{id}}" >
             {{else}}
-                {{skill.value}}
+                <button type="button" class="skill-roll-value">
+                    {{skill.value}}
+                </button>
             {{/if}}
         </div>
         {{#if @root.isEditMode}}
         <div class="new-list-item-icons">
+            <a data-action="{{editAction}}"
+               data-skill="{{id}}"
+               data-category="{{editCategory}}"
+               data-tooltip="SR5.Edit">
+                <i class="fas fa-pen-to-square"></i>
+            </a>
             <a data-action="{{removeAction}}"
                data-skill="{{id}}"
                data-category="{{removeCategory}}"
@@ -49,64 +47,10 @@
         {{/if}}
     </div>
     <div class="new-list-item-description">
-    {{#if @root.isEditMode}}
-        <div class="new-list-item new-list-item-header">
-            <div class="new-list-item-label">
-                <label>
-                    {{localize "SR5.Specializations"}}
-                </label>
-            </div>
-            <div class="new-list-item-icons">
-                <a>
-                    <i data-action="addSkillSpecialization"
-                       data-skill="{{id}}"
-                       class="fas fa-plus"></i>
-                </a>
-            </div>
-        </div>
-        <div class="skill-specialization-edit-container">
-            {{#each skill.specs as |spec id|}}
-                <div class="new-list-item">
-                    <div class="new-list-item-label">
-                        <input
-                            type="text"
-                            name="{{concat skillPath '.specs.' id}}"
-                            value="{{spec}}"
-                            placeholder='{{localize "SR5.Specialization"}}'
-                        />
-                    </div>
-                    <div class="new-list-item-icons">
-                        <a>
-                            <i data-action="removeSkillSpecialization"
-                               data-tooltip="SR5.RemoveSpecialization"
-                               data-spec="{{id}}"
-                               class="fas fa-trash"></i>
-                        </a>
-                    </div>
-                </div>
-            {{/each}}
-        </div>
-        <hr />
-        <div class="new-list-item">
-            <div class="new-list-item-label">
-                <label>{{localize "SR5.Source"}}</label>
-            </div>
-            <div class="new-list-item-col">
-                <div>
-                    <input
-                        type="text"
-                        value="{{skill.link}}"
-                        name="{{concat skillPath '.link'}}"
-                    />
-                </div>
-            </div>
-        </div>
-    {{else}}
         <div class="new-list-item">
             <div class="new-list-item-col">
                 <span>{{skill.group}}</span>
             </div>
         </div>
-    {{/if}}
     </div>
 </div>

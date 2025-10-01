@@ -21,9 +21,12 @@ export const preloadHandlebarsTemplates = async () => {
             'list-items/edit-delete-icons',
             'list-items/equip-icon',
             'list-items/header-add-icon',
+            'list-items/item-quantity-col',
+            'list-items/item-rating-col',
             'list-items/item-roll-image',
             'list-items/matrix-icon-image',
             'list-items/open-source-icon',
+            'list-items/toggle-expand-icon',
             'list-items/wireless-icon',
         ),
         ...v2AP(

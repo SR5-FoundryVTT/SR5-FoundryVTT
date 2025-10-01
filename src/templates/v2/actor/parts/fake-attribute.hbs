@@ -1,11 +1,11 @@
 <div class="attribute">
-    <div class="attribute-label">
+    <label>
         {{#if label}}
             {{localize label}}
         {{else}}
             {{localize attribute.label}}
         {{/if}}
-    </div>
+    </label>
     <div class="attribute-value">
     {{#if @root.isEditMode}}
         {{formInput attributeField.fields.base value=attribute.base classes="short" rootId=rootId }}

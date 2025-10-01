@@ -1,20 +1,18 @@
 <div class="attribute">
-    <a class="attribute-label" data-action="rollAttribute" data-attribute-id="{{attributeField.name}}">
+    <label>
         {{#if label}}
             {{localize label}}
         {{else}}
             {{localize attribute.label}}
         {{/if}}
-    </a>
+    </label>
+    <div class="attribute-value">
     {{#if @root.isEditMode}}
-        <div class="attribute-value">
-            {{formInput attributeField.fields.base value=attribute.base classes="short" rootId=rootId }}
-            <i style="font-size: 0.75rem" class="fas fa-plus"></i>
-            {{formInput attributeField.fields.temp value=attribute.temp classes="short" rootId=rootId }}
-        </div>
+        {{formInput attributeField.fields.base value=attribute.base classes="short" rootId=rootId }}
+        <i style="font-size: 0.75rem" class="fas fa-plus"></i>
+        {{formInput attributeField.fields.temp value=attribute.temp classes="short" rootId=rootId }}
     {{else}}
-        <div class="attribute-value">
-            <span class="attribute-value-total">{{attribute.value}}</span>
-        </div>
+        <button class="icon" type="button" data-action="rollAttribute" data-attribute-id="{{attributeField.name}}">{{attribute.value}}</button>
     {{/if}}
+    </div>
 </div>

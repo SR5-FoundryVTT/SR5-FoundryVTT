@@ -12,11 +12,6 @@
 @import 'module';
 @import 'effect';
 
-// .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
-.Roll {
-    @include rollable;
-}
-
 /**
  * These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
  * TODO: This is abusing default FoundryVTT CSS classing, which often can cause default FoundryVTT styling to break.
@@ -1303,50 +1298,6 @@ input[type='text'].display {
 }
 //END SR5 Style
 
-.custom-item-element {
-    color: $white; /* Text color */
-}
-//lable back to white color
-.matrix-label {
-    color: $white;
-}
-
-.scroll-area-matrix {
-    overflow-y: auto;
-    color: $white;
-}
-
-//table in any Item
-.SR5 th {
-    color: $yellow;
-    padding: 10px; /* Padding */
-    text-align: left; /* Left text */
-    border-bottom: 2px solid $edge; /* Add a border at the bottom */
-    font-size: medium;
-}
-.SR5 th:hover {
-    color: $pdfColor;
-}
-.SR5 caption {
-    background: none;
-    color: $yellow;
-    padding: 6px;
-    text-align: left;
-    font-size: medium;
-}
-.SR5 caption:hover {
-    color: $fDarkRed;
-}
-.SR5 tr {
-    color: $white;
-}
-.SR5 tr:hover {
-    color: $pdfColor;
-}
-.SR5 tr p:not(th p) {
-    padding-left: 10px; /* Padding on the left */
-}
-
 .sr5v2 {
     box-shadow: 0 0 10px 5px rgba($yellow, 0.4);
     background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
@@ -1360,19 +1311,32 @@ input[type='text'].display {
         background-repeat: repeat;
         background-size: 100% 20px auto;
 
+        .sheet-image {
+            margin: .25rem;
+            width: 5rem;
+            height: 5rem;
+        }
+
         .sheet-header {
             display: flex;
             flex-flow: row wrap;
             justify-content: start;
             align-items: end;
             width: 100%;
+            padding-bottom: .25rem;
+
             .sheet-header-labels {
                 flex: 1;
+                display: flex;
+                flex-flow: column nowrap;
+                gap: .25rem;
             }
+
             .sheet-header-source {
                 display: flex;
                 flex-flow: row nowrap;
             }
+
             .sheet-header-name {
                 display: flex;
                 flex-flow: row nowrap;
@@ -1396,8 +1360,17 @@ input[type='text'].display {
         &.standard-form, .standard-form {
             gap: 0;
             .form-group {
-                padding: .25rem;
+                padding: .5rem .25rem;
                 margin: 0;
+                label {
+                    color: $yellow;
+                }
+                p.hint {
+                    color: darken($yellow, 20%);
+                }
+                &:nth-of-type(odd) {
+                    background: rgba($black, 0.03);
+                }
                 &:nth-of-type(even) {
                     background: rgba($white, 0.03);
                 }
@@ -1405,9 +1378,9 @@ input[type='text'].display {
         }
 
         .tabs {
-            margin-top: .25rem;
+            margin-top: .5rem;
             border-top: none;
-            border-bottom: 2px solid $darkred;
+            border-bottom: 2px solid darken($darkred, 20%);
             a {
                 line-height: 1.5rem;
                 border-top-left-radius: .25rem;
@@ -1415,7 +1388,6 @@ input[type='text'].display {
                 border: 1px solid $darkred;
                 border-bottom: none;
                 background: rgba($darkred, 0.7);
-                color: $white;
                 width: 100%;
                 &.active {
                     color: $darkred;
@@ -1439,39 +1411,73 @@ input[type='text'].display {
             --background: unset;
             background: unset;
             border-bottom: none;
-            padding: 0 .25rem;
-            & a {
-                display: inline-flex;
-                font-size: 0px;
-                color: rgb(100, 100, 100);
 
-                & .fa-solid,
-                & .fas {
-                    font-size: 12px;
-                }
-            }
+            &:not(.minimized) {
+                padding: 0 .25rem;
+                flex: 0 0 auto;
+                .window-title {
+                    font-size: 0;
+                    height: 0;
 
-            & .window-title {
-                font-size: 0;
-
-                // set the left margin of the icon to mirror the increased inline padding
-                // so maximized window icons are still symetrically spaced to the borders
-                // of the window header
-                a {
-                    margin-left: 0.25rem;
+                    // set the left margin of the icon to mirror the increased inline padding
+                    // so maximized window icons are still symetrically spaced to the borders
+                    // of the window header
+                    a {
+                        margin-left: 0.25rem;
+                    }
                 }
             }
         }
+    }
 
-        // Display the window-title when the window is minimized, and restore margin
-        &.minimized .window-header .window-title {
-            font-size: inherit;
-            font-weight: inherit;
+    input[type="number"].short {
+        width: 2rem;
+    }
+    input.short {
+        height: 1.5rem;
+        min-height: 1.5rem;
+        max-height: 1.5rem;
+    }
+    button.short {
+        height: 1.5rem;
+        min-height: 1.5rem;
+        max-height: 1.5rem;
+    }
+    select.short {
+        height: 1.5rem;
+        padding-right: 2px;
+        padding-left: 2px;
+        min-height: 1.5rem;
+        max-height: 1.5rem;
+    }
+    a {
+        color: $light;
+        &:hover {
+            text-shadow: 0 0 8px 8px rgba($darkred, 0.9);
+        }
+    }
+    label {
+        color: $yellow;
+    }
+    button {
+        color: $light;
+        border-color: $light;
+        &:hover {
+            box-shadow: 8 0 8px 8px rgba($darkred, 0.9);
+            background: $darkred;
+        }
 
-            a {
-                margin-left: 0.5rem;
+        /*
+        &.icon {
+            &:hover {
+                background: url('assets/dice-solid.svg') 0 0 no-repeat;
+                filter: invert(1);
+                display:block;
+                text-indent:-99999em;
+                overflow:hidden;
             }
         }
+         */
     }
 
     /**
@@ -1568,7 +1574,6 @@ input[type='text'].display {
         word-break: break-word;
     }
 
-
     .container {
         max-width: $sheet-max-width;
         margin: 0 auto;
@@ -1599,21 +1604,6 @@ input[type='text'].display {
 
         .element {
             padding: 4px;
-        }
-    }
-
-    .document {
-        overflow: hidden;
-        white-space: nowrap;
-        display: flex;
-        align-content: center;
-
-        img {
-            height: 34px;
-        }
-
-        * {
-            display: inline-block;
         }
     }
 
@@ -1666,16 +1656,7 @@ input[type='text'].display {
                 background: $black;
                 min-width: 26px;
                 height: 18px;
-                margin-top: 4px;
-                margin-bottom: 4px;
-
-                &:not(:first-child) {
-                    margin-left: 2px;
-                }
-
-                &:not(:last-child) {
-                    margin-right: 2px;
-                }
+                margin: 2px;
 
                 &.filled {
                     background: $light-2;
@@ -1778,22 +1759,10 @@ input[type='text'].display {
         padding-right: 6px;
     }
 
-    /** Input element for inventory name editing */
-    input#input-inventory {
-        // Otherwise the other classes used will break styling.
-        width: auto;
-    }
-
     .document-name {
         @include systemFonts;
         font-size: var(--font-size-18);
         font-weight: bold;
-    }
-
-    .cell-input-roll {
-        color: $yellow;
-        white-space: nowrap;
-        width: 5rem;
     }
 
     // Intended to affect icons only within the url/pdf source controls.
@@ -1830,10 +1799,6 @@ input[type='text'].display {
             .description-buttons {
                 display: flex;
                 flex-flow: row;
-
-                button.line-item-button {
-
-                }
             }
         }
 
@@ -1852,22 +1817,27 @@ input[type='text'].display {
         width: 100%;
         padding: 0.25rem;
 
-        &.new-list-item-header {
-            border-bottom: 1px solid $yellow;
-            border-top: 1px solid $yellow;
-            background: rgba($black, 0.9);
-
-            &.collapsible-header:hover {
-                @include clickable;
-
-                .new-list-item-label-container {
-                    @include linkHovered;
+        .new-list-item-image-container {
+            min-width: 24px;
+            max-width: 24px;
+            min-height: 24px;
+            max-height: 24px;
+            padding: 2px;
+            border-color: $light;
+            &:hover {
+                .new-list-item-image-roll {
+                    content: url('assets/dice-solid.svg');
+                    filter: invert(1);
+                }
+                .new-list-item-image-info {
+                    content: url('icons/files.svg');
                 }
             }
+        }
 
-            .new-list-item-label-container:not(.label-collapsed) {
-                color: $yellow !important;
-            }
+        &.new-list-item-header {
+            border-bottom: 1px solid $yellow;
+            background: rgba($black, 0.7);
         }
 
         &:nth-of-type(even) {
@@ -1880,24 +1850,10 @@ input[type='text'].display {
             display: flex;
             flex-flow: row nowrap;
             flex: 3;
-            color: $white;
             gap: .25rem;
 
             .new-list-item-selected {
                 color: $yellow;
-            }
-
-            img.new-list-item-image-roll {
-                &:hover {
-                    content: url('assets/dice-solid.svg');
-                    filter: invert(1);
-                }
-            }
-            img.new-list-item-image-info {
-                &:hover {
-                    content: url('icons/files.svg');
-                }
-
             }
 
             .selection-inventory {
@@ -1921,6 +1877,41 @@ input[type='text'].display {
                 max-height: 1.25rem;
             }
 
+            &.rtg-col {
+                flex: none;
+                width: 4rem;
+            }
+
+            &.slots-col {
+                flex: none;
+                width: 5rem;
+            }
+
+            &.mod-category-col {
+                flex: none;
+                width: 4rem;
+            }
+
+            &.qty-input-col {
+                flex: none;
+                width: 5rem;
+                gap: 0.25rem;
+
+                .qty-button {
+                    font-size: 0;
+                }
+
+                &:hover {
+                    .qty-button {
+                        font-size: 0.8rem;
+                    }
+                }
+
+                .qty-label {
+                    font-size: 1.1rem;
+                }
+            }
+
             &.mark-input-col {
                 flex: 1;
                 gap: 0.25rem;
@@ -1930,12 +1921,22 @@ input[type='text'].display {
                 flex: 1;
             }
 
+            .skill-roll-value {
+                min-width: 20px;
+                max-width: 20px;
+                min-height: 20px;
+                max-height: 20px;
+                padding: 2px;
+                border-color: $light;
+                font-size: 1.1rem;
+            }
         }
 
         .new-list-item-icons {
             display: flex;
             flex-flow: row nowrap;
-            flex: 1;
+            width: 6rem;
+            flex: none;
             justify-content: end;
             align-items: center;
             gap: 0.25rem;

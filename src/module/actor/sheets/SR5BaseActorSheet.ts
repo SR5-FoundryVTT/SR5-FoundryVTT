@@ -210,6 +210,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             template: SheetFlow.templateBase('actor/header'),
             templates: SheetFlow.templateActorSystemParts('movement', 'initiative'),
         },
+        rollBar: {
+            template: SheetFlow.templateBase('actor/parts/common-rolls'),
+            templates: SheetFlow.templateActorSystemParts('movement'),
+        },
         tabs: {
             template: SheetFlow.templateBase('common/primary-tab-group'),
         },
@@ -1308,13 +1312,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = $(event.target).closest('a').data().skill;
+        const skillId = SheetFlow.closestAction(event.target).dataset.skill;
         await this.actor.removeActiveSkill(skillId);
     }
 
     static async #rollAttribute(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const attribute = $(event.target).closest('a').data().attributeId;
+        const attribute = SheetFlow.closestAction(event.target).dataset.attributeId;
         if (attribute) {
             await this.actor.rollAttribute(attribute, { event });
         }
