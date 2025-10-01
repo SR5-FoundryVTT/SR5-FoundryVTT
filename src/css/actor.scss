@@ -1,55 +1,12 @@
 @import 'config';
 
-.sr5 #filter-skills.display.text.left {
-    font-size: 15px;
-}
-
-/**
- * Skill Editing Application
- */
-.sr5.skill-edit-window {
-    min-height: 200px;
-    min-width: 370px;
-    display: inline-block;
-
-    .wholesheet {
-        height: auto;
-        display: flex;
-        flex-flow: column nowrap;
-        overflow: hidden;
-    }
-}
-
 .sr5v2.actor {
-    // default window padding was pretty big, tone it down
-    .window-content {
-        padding: .25rem;
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
-        background-repeat: repeat;
-        background-size: 100% 20px auto;
-    }
-
-    .name {
-        @include systemFonts;
-        background: $nameplate-background;
-        font-size: 200%;
-        margin-bottom: 0;
-        padding-left: 5px;
-        border: none;
-        input[type='text'].display {
-            background: none;
-        }
-    }
-    .limit-title {
-        font-size: 115%;
-    }
-
     .limit {
         @include systemFonts;
         padding: 0 0.1em;
         margin-top: -2px;
         text-align: center;
-        font-size: 115%;
+        font-size: 1.1rem;
         display: flex;
         flex-flow: column nowrap;
         justify-content: center;
@@ -81,14 +38,11 @@
         min-width: 2rem;
         max-width: 2rem;
         max-height: 1.25rem;
-        font-size: 1rem;
     }
 
     select.short {
         max-height: 1.5rem;
     }
-
-
 
     .attributes {
         display: flex;
@@ -107,63 +61,17 @@
                 justify-content: center;
                 font-size: 1.25rem;
                 color: $yellow;
-
-                // set the left margin of the icon to mirror the increased inline padding
-                // so maximized window icons are still symetrically spaced to the borders
-                // of the window header
-                a {
-                    margin-left: 0.25rem;
-                }
             }
         }
 
-        // Display the window-title when the window is minimized, and restore margin
-        &.minimized .window-header .window-title {
-            font-size: inherit;
-            font-weight: inherit;
-
-            a {
-                margin-left: 0.5rem;
-            }
-
-            .attribute-value {
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: center;
-                align-items: center;
-                gap: 0.25rem;
-                max-width: 8rem;
-                font-size: 1.25rem;
-            }
-        }
-    }
-
-    .actor-header {
-        display: flex;
-        flex-flow: row;
-        align-items: start;
-        justify-content: space-between;
-        padding: .25rem;
-        flex-shrink: 0;
-        font-size: 1rem;
-
-        .left-side {
+        .attribute-value {
             display: flex;
             flex-flow: row nowrap;
-        }
-
-        .right-side {
-            display: flex;
-            flex-flow: column nowrap;
-            align-items: end;
-
-            .right-side-row {
-                display: flex;
-                flex-flow: row nowrap;
-                align-items: end;
-                justify-content: center;
-                gap: 0.25rem;
-            }
+            justify-content: center;
+            align-items: center;
+            gap: 0.25rem;
+            max-width: 8rem;
+            font-size: 1.25rem;
         }
     }
 
@@ -220,22 +128,5 @@
             flex-flow: row nowrap;
             justify-content: end;
         }
-    }
-
-    // add a footer to the sheet
-    .sheet-footer {
-        display: flex;
-        flex-flow: row nowrap;
-        gap: 2px;
-        align-items: center;
-        justify-content: start;
-        margin-top: .25rem;
-        box-shadow: 0 -.25rem .5rem $black;
-        border-top: 1px solid $yellow;
-        padding-left: .1rem;
-        padding-top: .1rem;
-        flex-shrink: 0;
-        vertical-align: bottom;
-        font-size: 1rem
     }
 }

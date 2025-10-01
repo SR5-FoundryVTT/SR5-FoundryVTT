@@ -2,6 +2,7 @@
     <div class="fill-container">
         <div class="scrollable standard-form">
             {{#if @root.isEditMode}}
+                {{formGroup systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
                 {{#if systemFields.technology}}
                     {{formGroup systemFields.technology.fields.show_quantity
                                 value=source.system.technology.show_quantity
@@ -96,8 +97,6 @@
                     {{formGroup systemFields.karma value=system.karma rootId=@root.rootId disabled=@root.isPlayMode}}
 
                 {{/if}}
-
-                {{formGroup systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
             {{else}}
                 {{{descriptionHTML}}}
             {{/if}}

@@ -17,7 +17,7 @@
                     </div>
                 {{/if}}
             {{/if}}
-            <input type="text" class="name" name="name" value="{{item.name}}" placeholder='{{localize "SR5.ItemName"}}' {{#if @root.isPlayMode}}disabled{{/if}}/>
+            <input type="text" name="name" value="{{item.name}}" placeholder='{{localize "SR5.ItemName"}}' {{#if @root.isPlayMode}}disabled{{/if}}/>
         </div>
         {{#if @root.isEditMode}}
         <div class="sheet-header-source">

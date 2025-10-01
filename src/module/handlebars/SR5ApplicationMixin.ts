@@ -117,7 +117,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             Hooks.call('sr5_processTagifyElements', this.element);
 
             if (this.editIcon) {
-                this.editIcon.className = this._isEditMode ? 'fas fa-file-pen' : 'fas fa-pen-to-square';
+                this.editIcon.className = this._isEditMode ? 'fas fa-toggle-off' : 'fas fa-toggle-on';
             }
         }
 
@@ -126,15 +126,15 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             const frame = await super._renderFrame(options);
             if (this.isEditable) {
                 const button = document.createElement('button');
-                button.setAttribute('font-size', '150%');
+                button.style.fontSize = '150%';
                 button.className = 'header-control icon'
                 button.dataset.tooltip = "SR5.Tooltips.ToggleEditMode"
                 this.editIcon = document.createElement('i');
                 button.appendChild(this.editIcon);
-                this.editIcon.className = this._isEditMode ? 'fas fa-file-pen' : 'fas fa-pen-to-square';
+                this.editIcon.className = this._isEditMode ? 'fas fa-toggle-off' : 'fas fa-toggle-on';
                 button.dataset.action = "toggleEditMode";
 
-                this.window?.controls?.after(button);
+                this.window?.header?.prepend(button);
             }
 
             return frame;

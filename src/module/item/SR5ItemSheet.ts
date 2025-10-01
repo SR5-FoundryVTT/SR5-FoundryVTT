@@ -87,7 +87,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     declare protected _isEditMode;
 
     static override DEFAULT_OPTIONS = {
-        classes: [SR5_APPV2_CSS_CLASS, 'item'],
+        classes: ['item', 'named-sheet'],
         position: {
             width: 600,
             height: 500,
@@ -985,6 +985,17 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!this.document.isEquipped()) return;
 
         await this.document.parent.equipOnlyOneItemOfType(this.document);
+    }
+
+    static async #createEffect(this: SR5ItemSheet, event) {
+        // TODO handle nested items
+        event.preventDefault();
+        const effect = [{
+            name: game.i18n.localize("SR5.ActiveEffect.New"),
+            origin: this.item.uuid,
+        }];
+
+        return this.item.createEmbeddedDocuments('ActiveEffect', effect);
     }
 
     override async _onFirstRender(context, options) {

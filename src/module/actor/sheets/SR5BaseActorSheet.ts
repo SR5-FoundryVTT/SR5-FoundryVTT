@@ -156,7 +156,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @returns {Object}
      */
     static override DEFAULT_OPTIONS: any = {
-        classes: ['actor'],
+        classes: ['actor', 'named-sheet'],
         position: {
             width: 700,
             height: 600,
@@ -176,6 +176,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             removeKnowledgeSkill: SR5BaseActorSheet.#deleteKnowledgeSkill,
             removeLanguageSkill: SR5BaseActorSheet.#deleteLanguageSkill,
             removeActiveSkill: SR5BaseActorSheet.#deleteActiveSkill,
+
+            addEffect: SR5BaseActorSheet.#createEffect,
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
@@ -556,6 +558,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     _setInventoryTypeVisibility(this: SR5BaseActorSheet, type: string, isOpen: boolean) {
         this._inventoryOpenClose[type] = isOpen
+    }
+
+    static async #createEffect(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const effect = [{
+            name: game.i18n.localize("SR5.ActiveEffect.New"),
+            origin: this.actor.uuid,
+        }];
+
+        return this.actor.createEmbeddedDocuments('ActiveEffect', effect);
     }
 
     /**

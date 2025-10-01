@@ -1,5 +1,5 @@
 {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-        name=(localize track.label)
+        tooltip=(localize track.label)
         value=track.value
         max=track.max
         id=id
@@ -10,7 +10,7 @@
 {{#if track.overflow}}
     {{#ife track.value track.max}}
         {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                name=(localize "SR5.Overflow")
+                tooltip=(localize "SR5.Overflow")
                 value=track.overflow.value
                 max=track.overflow.max
                 id="overflow"

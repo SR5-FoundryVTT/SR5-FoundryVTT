@@ -1348,45 +1348,131 @@ input[type='text'].display {
 }
 
 .sr5v2 {
+    box-shadow: 0 0 10px 5px rgba($yellow, 0.4);
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+    background-repeat: repeat;
+    background-size: 100% 20px auto;
 
-    // new SIN Layout
-    .license-section .list-item-content,
-    .license-section .list-item.item-section .list-item-content {
-        display: flex !important;
-        flex-direction: row;
-        justify-content: flex-start !important;
-        margin: 0 !important;
-        padding: 1px !important;
+    .window-content {
+        padding: 0 .25rem .25rem .25rem;
+        // transparent doesn't seem to show the background from above so set it to the same thing with a slightly different gradient
+        background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+        background-repeat: repeat;
+        background-size: 100% 20px auto;
+
+        .sheet-header {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: start;
+            align-items: end;
+            width: 100%;
+            .sheet-header-labels {
+                flex: 1;
+            }
+            .sheet-header-source {
+                display: flex;
+                flex-flow: row nowrap;
+            }
+            .sheet-header-name {
+                display: flex;
+                flex-flow: row nowrap;
+            }
+        }
+
+        .sheet-footer {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            justify-content: start;
+            margin-top: .25rem;
+            box-shadow: 0 -.25rem .5rem $black;
+            border-top: 1px solid $yellow;
+            padding-left: .1rem;
+            padding-top: .1rem;
+            flex-shrink: 0;
+            vertical-align: bottom;
+        }
+
+        &.standard-form, .standard-form {
+            gap: 0;
+            .form-group {
+                padding: .25rem;
+                margin: 0;
+                &:nth-of-type(even) {
+                    background: rgba($white, 0.03);
+                }
+            }
+        }
+
+        .tabs {
+            margin-top: .25rem;
+            border-top: none;
+            border-bottom: 2px solid $darkred;
+            a {
+                line-height: 1.5rem;
+                border-top-left-radius: .25rem;
+                border-top-right-radius: .25rem;
+                border: 1px solid $darkred;
+                border-bottom: none;
+                background: rgba($darkred, 0.7);
+                color: $white;
+                width: 100%;
+                &.active {
+                    color: $darkred;
+                    background: $light-2;
+                    box-shadow: 0 0 5px 5px rgba($white, 0.2);
+                }
+            }
+        }
     }
 
-    /* New or updated rules */
-    .license-section .item-text.rtg.rate,
-    .license-section .rtg-rate.item-text {
-        /* Updated */
-        margin-left: 0;
-        padding-left: 0;
-        text-align: left;
-        width: 22px; /* Updated */
-    }
-    //Header Rating
-    .license-section .item-text.rtg.rate-header {
-        max-width: 2em;
-        margin-left: -1em;
-    }
-    //Header detail
-    .detail {
-        margin-left: 1em !important;
-    }
-    //Rating width
-    .license-section .list-item .rtg-rate.item-text {
-        max-width: 2em;
-    }
-    //Item Name field size
-    .license-section .list-item .rtg-rate.item-text {
-        max-width: 1em;
-    }
+    // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
+    &.named-sheet {
+        input[name="name"] {
+            @include systemFonts;
+            flex-shrink: 0;
+            background: $nameplate-background;
+            border: none;
+            margin-bottom: 0;
+        }
+        .window-header {
+            --background: unset;
+            background: unset;
+            border-bottom: none;
+            padding: 0 .25rem;
+            & a {
+                display: inline-flex;
+                font-size: 0px;
+                color: rgb(100, 100, 100);
 
-    /////////////////////////////////////////////////////////////
+                & .fa-solid,
+                & .fas {
+                    font-size: 12px;
+                }
+            }
+
+            & .window-title {
+                font-size: 0;
+
+                // set the left margin of the icon to mirror the increased inline padding
+                // so maximized window icons are still symetrically spaced to the borders
+                // of the window header
+                a {
+                    margin-left: 0.25rem;
+                }
+            }
+        }
+
+        // Display the window-title when the window is minimized, and restore margin
+        &.minimized .window-header .window-title {
+            font-size: inherit;
+            font-weight: inherit;
+
+            a {
+                margin-left: 0.5rem;
+            }
+        }
+    }
 
     /**
      * Elements used for linkable documents / entities.
@@ -1531,42 +1617,12 @@ input[type='text'].display {
         }
     }
 
-    .block {
-        display: flex;
-        flex-flow: column;
-        padding: 2px 4px;
-        justify-content: space-around;
-
-        .block-line {
-            display: flex;
-            flex-flow: row nowrap;
-            padding: 4px;
-
-            &.center {
-                justify-content: center;
-            }
-
-            &.border-bottom {
-                border-bottom: $groove;
-            }
-
-            &.gap-4 {
-                > :not(:first-child) {
-                    margin-left: 4px;
-                }
-
-                > :not(:last-child) {
-                    margin-right: 4px;
-                }
-            }
-        }
-    }
-
     .horizontal-cell-input {
         display: flex;
         flex-flow: row nowrap;
         justify-content: start;
-        padding: 4px;
+        align-content: center;
+        align-items: center;
 
         &.stun .cell {
             box-shadow: 0 0 5px 1px rgba($stun, 0.5);
@@ -1584,14 +1640,20 @@ input[type='text'].display {
             box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
         }
 
-        .roll {
-            width: 60px;
-            margin-right: 8px;
+        .icon-container {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+            margin-right: .5rem;
+            font-size: 1.1rem;
+            width: 1.1rem;
         }
 
         .cell-container {
             display: flex;
-            flex-flow: row;
+            flex-flow: row wrap;
             justify-content: stretch;
 
             .cell {
@@ -1604,6 +1666,8 @@ input[type='text'].display {
                 background: $black;
                 min-width: 26px;
                 height: 18px;
+                margin-top: 4px;
+                margin-bottom: 4px;
 
                 &:not(:first-child) {
                     margin-left: 2px;

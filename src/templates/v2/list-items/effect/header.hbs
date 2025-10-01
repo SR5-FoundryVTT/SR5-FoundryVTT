@@ -15,7 +15,13 @@
 
     <div class="new-list-item-icons">
         {{#unless isItemEffect}}
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+            {{#if @root.isEditMode}}
+                <a data-action="addEffect"
+                   data-tooltip="SR5.CreateEffect">
+                    {{localize "SR5.Add"}}
+                    <i class="fas fa-plus"></i>
+                </a>
+            {{/if}}
         {{/unless}}
     </div>
 </div>

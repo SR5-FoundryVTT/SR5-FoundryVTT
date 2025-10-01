@@ -1,71 +1,109 @@
-<header class="actor-header">
-    <div class="left-side">
-        <div>
-            <div class="profile-img">
-                <img
-                    class="profile"
-                    src="{{actor.img}}"
-                    data-edit="img"
-                    data-tooltip="{{actor.name}}"
-                    height="90px"
-                    width="90px"
-                />
-            </div>
-        </div>
-        <div class="flexcol flex-end">
-            <div style="display: flex;">
-                <input
-                    class="name"
-                    name="name"
-                    type="text"
-                    value="{{actor.name}}"
-                    placeholder="Name"
-                    {{#if @root.isPlayMode}}
-                        disabled
-                    {{/if}}
-                />
-            </div>
-            <div class="attributes smooth" id="tracks">
-                <div class="block">
-                    {{#if (or isIC isSprite)}}
-                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
-                            id='matrix'
-                            track = system.track.matrix
-                        }}
-                    {{/if}}
-                    {{#if (or isCharacter isSpirit)}}
-                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
-                            id='stun'
-                            track = system.track.stun
-                        }}
-                    {{/if}}
-                    {{#unless (or isIC isSprite)}}
-                        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
-                            id='physical'
-                            track = system.track.physical
-                        }}
-                    {{/unless}}
+<header class="sheet-header">
+    <img
+        class="profile"
+        src="{{actor.img}}"
+        data-edit="img"
+        data-tooltip="{{actor.name}}"
+        height="90px"
+        width="90px"
+    />
+    <div class="sheet-header-labels">
+        <div class="sheet-header-name">
+            {{#if (and @root.isPlayMode system.description.source)}}
+                <div>
+                    <button type="button" data-action="openSource" data-tooltip="SR5.OpenSource">
+                        {{#if sourceIsURL}}
+                            <i class="fas fa-link"></i>
+                        {{else if sourceIsPDF}}
+                            <i class="fas fa-file-pdf"></i>
+                        {{else if sourceIsUuid}}
+                            <i class="fas fa-file"></i>
+                        {{else}}
+                            <i class="fas fa-question"></i>
+                        {{/if}}
+                    </button>
                 </div>
-            </div>
+            {{/if}}
+            <input type="text" name="name"
+                   value="{{actor.name}}"
+                   placeholder='{{localize "SR5.Name"}}'
+                   {{#if @root.isPlayMode}}disabled{{/if}}/>
         </div>
+        {{#if @root.isEditMode}}
+        <div class="sheet-header-source">
+            <input
+                type="text"
+                name="system.description.source"
+                value="{{system.description.source}}"
+                placeholder='{{localize "SR5.Source"}}'
+            />
+        </div>
+        {{else}}
+            <div>
+            {{#if (or isIC isSprite)}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                    id='matrix'
+                    track = system.track.matrix
+                }}
+            {{/if}}
+            {{#if (or isCharacter isSpirit)}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                    id='stun'
+                    track = system.track.stun
+                }}
+            {{/if}}
+            {{#unless (or isIC isSprite)}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                    id='physical'
+                    track = system.track.physical
+                }}
+            {{/unless}}
+            </div>
+        {{/if}}
     </div>
-    <div class="right-side">
+    <div>
         {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
         {{#unless (or isIC isSprite)}}
             {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
         {{/unless}}
+        {{#if system.attributes.edge.max}}
+        <div class="new-list-item">
+            <div class="new-list-item-label-container">
+                <label>{{localize "SR5.Edge"}}</label>
+            </div>
+            <div class="new-list-item-col">
+                <a data-action="removeOneEdge"
+                   data-tooltip="SR5.Labels.ActorSheet.RemoveOneEdge">
+                    <i class="fas fa-minus-square"></i>
+                </a>
+                {{system.attributes.edge.uses}}/{{system.attributes.edge.max}}
+                <a data-action="addOneService"
+                   data-tooltip="SR5.Labels.ActorSheet.AddOneService">
+                    <i class="fas fa-plus-square"></i>
+                </a>
+            </div>
+        </div>
+        {{/if}}
         {{#if (or isSpirit isSprite)}}
-        <div class="right-side-row">
-            {{#if isSpirit}}
-                <label>{{localize "SR5.Spirit.Services"}}:</label>
-            {{else}}
-                <label>{{localize "SR5.Sprite.Services"}}:</label>
-            {{/if}}
-            {{#if @root.isEditMode}}
-                {{formInput systemFields.services value=system.services classes="short" rootId=rootId}}
-            {{else}}
+        <div class="new-list-item">
+            <div class="new-list-item-label-container">
+                {{#if isSpirit}}
+                    <label>{{localize "SR5.Spirit.Services"}}:</label>
+                {{else}}
+                    <label>{{localize "SR5.Sprite.Services"}}:</label>
+                {{/if}}
+            </div>
+            <div class="new-list-item-col">
+                <a data-action="removeOneService"
+                   data-tooltip="SR5.Labels.ActorSheet.RemoveOneService">
+                    <i class="fas fa-minus-square"></i>
+                </a>
                 {{system.services}}
-            {{/if}}
+                <a data-action="addOneService"
+                   data-tooltip="SR5.Labels.ActorSheet.AddOneService">
+                    <i class="fas fa-plus-square"></i>
+                </a>
+            </div>
         </div>
         {{/if}}
     </div>

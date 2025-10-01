@@ -14,7 +14,21 @@
 --}}
 {{#if (not disabled)}}
 <div class="horizontal-cell-input {{id}}" data-id="{{id}}">
-    {{#if (isDefined name)}}<div class="cell-input-roll" id="{{id}}">{{name}}</div>{{/if}}
+    <div class="icon-container">
+        <a data-tooltip="{{tooltip}}" data-action="rollConditionMonitor" id="{{id}}">
+            {{#if (eq id 'physical')}}
+                <i class="fas fa-heart-pulse"></i>
+            {{else if (eq id 'stun')}}
+                <i class="fas fa-kit-medical"></i>
+            {{else if (eq id 'overflow')}}
+                <i class="fas fa-droplet"></i>
+            {{else if (eq id 'matrix')}}
+                <i class="fas fa-heart-circle-bolt"></i>
+            {{else}}
+                <i class="fas fa-square-question"></i>
+            {{/if}}
+        </a>
+    </div>
     <div class="cell-container">
         {{#for 1 (sum max 1)}}
             <div class="cell {{#iflte this ../value}}filled{{/iflte}}" data-value="{{this}}" data-tooltip="SR5.RightClickToClear" >
