@@ -1466,18 +1466,6 @@ input[type='text'].display {
             box-shadow: 8 0 8px 8px rgba($darkred, 0.9);
             background: $darkred;
         }
-
-        /*
-        &.icon {
-            &:hover {
-                background: url('assets/dice-solid.svg') 0 0 no-repeat;
-                filter: invert(1);
-                display:block;
-                text-indent:-99999em;
-                overflow:hidden;
-            }
-        }
-         */
     }
 
     /**
@@ -1851,6 +1839,7 @@ input[type='text'].display {
             flex-flow: row nowrap;
             flex: 3;
             gap: .25rem;
+            margin-left: 0.25rem;
 
             .new-list-item-selected {
                 color: $yellow;
@@ -1892,6 +1881,26 @@ input[type='text'].display {
                 width: 4rem;
             }
 
+            &.mark-input-col {
+                flex: none;
+                width: 5rem;
+                gap: 0.25rem;
+
+                .mark-button {
+                    font-size: 0;
+                }
+
+                &:hover {
+                    .mark-button {
+                        font-size: 0.8rem;
+                    }
+                }
+
+                .mark-label {
+                    font-size: 1.1rem;
+                }
+            }
+
             &.qty-input-col {
                 flex: none;
                 width: 5rem;
@@ -1919,17 +1928,17 @@ input[type='text'].display {
 
             &.skill-rating-col {
                 flex: 1;
+                button {
+                    min-width: 20px;
+                    max-width: 20px;
+                    min-height: 20px;
+                    max-height: 20px;
+                    padding: 2px;
+                    border-color: $light;
+                    font-size: 1.1rem;
+                }
             }
 
-            .skill-roll-value {
-                min-width: 20px;
-                max-width: 20px;
-                min-height: 20px;
-                max-height: 20px;
-                padding: 2px;
-                border-color: $light;
-                font-size: 1.1rem;
-            }
         }
 
         .new-list-item-icons {

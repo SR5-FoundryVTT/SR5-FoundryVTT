@@ -1,33 +1,39 @@
 {{!--expects a MarkedDocument to be passed in as 'item' --}}
 <div class="new-list-item-container {{cssClass}}">
     <div class="new-list-item" data-item-id="{{item.document.uuid}}">
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
         <div class="new-list-item-label-container">
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
-            <label class="{{#if item.selected}}new-list-item-selected{{/if}}">
-                <a data-action="showItemDescription" data-item-id="{{item.documnet.uuid}}">
-                    {{item.name}}
-                </a>
-            </label>
+            <a class="{{#if item.selected}}new-list-item-selected{{/if}}"
+               data-action="showItemDescription"
+               data-item-id="{{item.documnet.uuid}}">
+                {{item.name}}
+            </a>
         </div>
 
         <div class="new-list-item-col">
-            <span>
+            <label>
                 {{matrixIconType item.document.type}}
-            </span>
+            </label>
         </div>
 
         <div class="new-list-item-col mark-input-col">
-            <a data-action="removeOneMark"
-               data-tooltip="SR5.Labels.ActorSheet.RemoveOneMark"
-               data-item-id="{{item.document.uuid}}">
-                <i class="fas fa-minus-square"></i>
-            </a>
-            {{item.marks}}
-            <a data-action="addOneMark"
-               data-tooltip="SR5.Labels.ActorSheet.AddOneMark"
-               data-item-id="{{item.document.uuid}}">
-                <i class="fas fa-plus-square"></i>
-            </a>
+            {{#if @root.isEditMode}}
+                <input type="number" class="mark-input" value="{{item.marks}}" min="0" max="3">
+            {{else}}
+                <a class="mark-button"
+                   data-action="removeOneMark"
+                   data-tooltip="SR5.Labels.ActorSheet.RemoveOneMark"
+                   data-item-id="{{item.document.uuid}}">
+                    <i class="fas fa-minus-square"></i>
+                </a>
+                <label class="marks-label">{{item.marks}}</label>
+                <a class="mark-button"
+                   data-action="addOneMark"
+                   data-tooltip="SR5.Labels.ActorSheet.AddOneMark"
+                   data-item-id="{{item.document.uuid}}">
+                    <i class="fas fa-plus-square"></i>
+                </a>
+            {{/if}}
         </div>
 
         <div class="new-list-item-icons">

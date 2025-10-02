@@ -1,25 +1,25 @@
 {{!-- expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container {{cssClass}}">
     <div class="new-list-item" data-item-id="{{item.document.uuid}}">
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
         <div class="new-list-item-label-container">
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
-            <label class="{{#if item.selected}}new-list-item-selected{{/if}}">
-                <a data-action="showItemDescription" data-item-id="{{item.document.uuid}}">
-                    {{item.name}}
-                </a>
+            <a class="{{#if item.selected}}new-list-item-selected{{/if}}"
+               data-action="showItemDescription"
+               data-item-id="{{item.document.uuid}}">
+                {{item.name}}
+            </a>
+        </div>
+
+        <div class="new-list-item-col">
+            <label>
+                {{matrixIconType item.document.type}}
             </label>
         </div>
 
         <div class="new-list-item-col">
-            <span>
-                {{matrixIconType item.document.type}}
-            </span>
-        </div>
-
-        <div class="new-list-item-col">
-            <span>
+            <label>
                 {{item.network}}
-            </span>
+            </label>
         </div>
 
         <div class="new-list-item-icons">

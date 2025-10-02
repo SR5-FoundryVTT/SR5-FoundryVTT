@@ -24,7 +24,7 @@
                 <i style="font-size: 0.75rem" class="fas fa-plus"></i>
                 <input type="number" name="{{concat skillPath '.temp'}}" class="short" value="{{skill.temp}}" data-skill="{{id}}" >
             {{else}}
-                <button type="button" class="skill-roll-value">
+                <button type="button" class="skill-roll-value" data-action="rollSkill" data-skill="{{id}}">
                     {{skill.value}}
                 </button>
             {{/if}}
