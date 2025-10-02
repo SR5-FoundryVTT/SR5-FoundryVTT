@@ -29,13 +29,20 @@ export class TagifyField<
      * - this is currently done in the _postRender function of SR5ActiveEffectConfig
      */
     override _toInput(config) {
-        // filter the config values to be only valid ids
-        config.value = config.value?.filter(({id}) => id) ?? [];
+        // Create a Map for O(1) lookups from id to label
+        const optionsMap = new Map(
+            (config.options as {id: string; label: string}[]).map(opt => [opt.id, opt.label])
+        );
+        // map the values from their id to their option
+        const value = (config.value as {id: string; value: string}[])?.map(({id}) => {
+            const label = optionsMap.get(id);
+            return label ? { id, value: game.i18n.localize(label) } : undefined;
+        }).filter(obj => !!obj) ?? [];
 
         const input = document.createElement('input');
         input.name = config.name;
         // stringify our values to set on the data so that we can parse it later
-        input.setAttribute('value', JSON.stringify(config.value))
+        input.setAttribute('value', JSON.stringify(value))
         input.setAttribute('options', JSON.stringify(config.options));
         input.className = "tagify-selection";
         return input;
