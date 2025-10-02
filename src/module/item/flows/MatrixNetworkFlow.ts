@@ -223,6 +223,9 @@ export class MatrixNetworkFlow {
         await NetworkStorage.removeFromNetworks(slave);
         await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
 
+        // Cause rerender of sheets across all user sessions.
+        await slave.update({system: {matrix: {updatedConnections: Date.now()}}});        
+
         // Reconnect to previously used grid, if any.
         if (slave instanceof SR5Item || !(master instanceof SR5Item)) return;
         await MatrixNetworkFlow.reconnectToLastGrid(slave, master);

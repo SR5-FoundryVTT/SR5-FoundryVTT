@@ -1128,7 +1128,7 @@ export const registerItemLineHelpers = () => {
             };
 
         const icons: any = [];
-        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices) icons.push(toggleConnectedItemsIcon);
+        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices()) icons.push(toggleConnectedItemsIcon);
 
         // if there are no icons, add an empty object to the list so that the columns match up correctly
         if (icons.length === 0) icons.push({});
@@ -1177,7 +1177,7 @@ export const registerItemLineHelpers = () => {
 
         // Handle document type specific icons.
         if (target.document instanceof SR5Item && target.document.isNetwork()) icons.unshift(connectNetworkIcon);
-        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices) icons.push(toggleConnectedItemsIcon)
+        if (target.document instanceof SR5Actor && target.document.hasWirelessDevices()) icons.push(toggleConnectedItemsIcon)
 
         return icons;
     });
@@ -1234,7 +1234,7 @@ export const registerItemLineHelpers = () => {
                     : 'SR5.WirelessOnline')
         }
         if (target.document instanceof SR5Actor) {
-            return target.document.hasWirelessDevices ? [wirelessIcon, toggleConnectedItemsIcon] : [wirelessIcon];
+            return target.document.hasWirelessDevices() ? [wirelessIcon, toggleConnectedItemsIcon] : [wirelessIcon];
         }
         return [wirelessIcon];
     });

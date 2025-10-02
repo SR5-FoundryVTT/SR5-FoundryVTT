@@ -23,6 +23,19 @@ export class MatrixRules {
     }
 
     /**
+     * Calculate the matrix condition monitor for vehicles and drones.
+     * 
+     * The result is round up as for physical and stun monitor (SR5#101), even though it's not specified for
+     * matrix monitors specifically.
+     *
+     * @param deviceRating The device rating of the vehicle or drone.
+     * @returns The condition max monitor value.
+     */
+    static getVehicleMonitor(deviceRating: number): number {
+        return Math.ceil(8 + (deviceRating / 2));
+    }
+
+    /**
      * Derive the IC device rating based of it's hosts rating based on SR5#247 'Intrusion Countermeasures'
      *
      */

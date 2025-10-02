@@ -80,7 +80,6 @@ export function createTagifyOnInput(element: HTMLInputElement, values: TagifyVal
     options = options ?? {};
 
     const whitelist = values.map(value => ({value: game.i18n.localize(value.label), id: value.id}));
-    // const tags = selected.map(value => ({value: game.i18n.localize(value), id: value}));
     const tagify = createTagify(element, {whitelist, maxItems, tags, ...options});
 
     if (onChangeCallback) $(element).on('change', onChangeCallback);

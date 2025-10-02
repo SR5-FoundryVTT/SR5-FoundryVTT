@@ -12,6 +12,7 @@ import { RangedWeaponRules } from '../../rules/RangedWeaponRules';
 import { SR } from '../../constants';
 import { ModifiableValueType } from 'src/module/types/template/Base';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { MatrixRules } from '@/module/rules/MatrixRules';
 
 
 export class VehiclePrep {
@@ -169,8 +170,16 @@ export class VehiclePrep {
         }
         track.physical.label = SR5.damageTypes.physical;
 
+        // Prepare internal matrix condition monitor values
+        // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
         const rating = matrix.rating || 0;
-        matrix.condition_monitor.max = 8 + Math.ceil(rating / 2) + Number(modifiers.matrix_track);
+        matrix.condition_monitor.max = MatrixRules.getVehicleMonitor(rating) + Number(modifiers.matrix_track);
+
+        // Prepare user visible matrix track values
+        track.matrix.base = MatrixRules.getVehicleMonitor(rating);
+        track.matrix.mod = PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
+        track.matrix.max = matrix.condition_monitor.max;
+        track.matrix.label = SR5.damageTypes.matrix;
     }
 
     static prepareMovement(system: Actor.SystemOfType<'vehicle'>) {

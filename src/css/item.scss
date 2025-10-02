@@ -53,10 +53,10 @@
                 color: $light;
                 font-size: 16px;
                 height: 2em;
-                left: .5em;
+                left: 0.5em;
                 padding: 2px;
                 position: absolute;
-                top: .2em;
+                top: 0.2em;
                 width: 2em;
             }
 
@@ -105,40 +105,40 @@
         padding-left: 10px;
 
         > * {
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: space-between;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
         }
 
         label {
-          color: $yellow;
+            color: $yellow;
         }
 
         .tech-adjustable-label {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
         }
 
         .tech-adjustable-input {
-          flex: 1;
-          position: relative;
+            flex: 1;
+            position: relative;
 
-          input.display {
-            width: 100%;
-          }
+            input.display {
+                width: 100%;
+            }
 
-          .unit {
-            position: absolute;
-            right: 0.5em;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.8em;
-            pointer-events: none;
-          }
+            .unit {
+                position: absolute;
+                right: 0.5em;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.8em;
+                pointer-events: none;
+            }
         }
-      }
+    }
     .description {
         padding: 2px;
         padding-left: 10px;
@@ -149,7 +149,7 @@
     }
     .item-form {
         padding: 0.5em;
-        &.des{
+        &.des {
             max-width: 14em;
         }
         .header {
@@ -163,7 +163,7 @@
             justify-content: space-between;
             align-content: center;
             padding: 0.1em 0.25em;
-            &.advanced{
+            &.advanced {
                 color: $yellow;
             }
             > * {
@@ -173,7 +173,7 @@
                 color: $light;
                 font-size: 1.15em;
                 @include systemFonts;
-                &.advanced{
+                &.advanced {
                     color: $yellow;
                 }
             }
@@ -226,32 +226,52 @@
     /** Header Removal **/
 
     &.sheet.window-app {
-        box-shadow: 0 0 10px 0px rgba(235,181,49,0.3);
+        box-shadow: 0 0 10px 0px rgba(235, 181, 49, 0.3);
 
         & .window-header {
             border-bottom: none;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('assets/page.webp') repeat;
             background-repeat: repeat;
             background-size: 100% 20px auto;
             flex: 0 0 20px;
-            padding: 0 3px 0 0;
+            padding-inline: 0.5rem;
+            padding-block: 0rem;
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
 
             & a {
-            display: inline-flex;
-            padding: 6px 0 0 0;
-            font-size: 0px;
-            color: rgb(100, 100, 100);
+                display: inline-flex;
+                padding: 6px 0 0 0;
+                font-size: 0px;
+                color: rgb(100, 100, 100);
 
-            & .fa-solid,
+                & .fa-solid,
                 & .fas {
                     font-size: 12px;
                 }
             }
 
             & .window-title {
-            font-size: 0;
+                font-size: 0;
+
+                // set the left margin of the icon to mirror the increased inline padding
+                // so maximized window icons are still symetrically spaced to the borders
+                // of the window header
+                a {
+                    margin-left: 0.25rem;
+                }
+            }
+        }
+
+        // Display the window-title when the window is minimized, and restore margin
+        &.minimized .window-header .window-title {
+            font-size: inherit;
+            font-weight: inherit;
+
+            a {
+                margin-left: 0.5rem;
             }
         }
     }

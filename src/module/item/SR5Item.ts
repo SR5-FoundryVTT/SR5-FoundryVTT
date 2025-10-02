@@ -1011,6 +1011,16 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
+     * Determine if this item can contain armor.
+     * This can happen both for actual armor and items containing armor data.
+     * @returns true, if this item can provide armor values.
+     */
+    hasArmor(this: SR5Item) {
+        const armor = this.system.armor;
+        return this.isType('armor') || !!armor;
+    }
+
+    /**
      * Amount of current recoil left after recoil compensation.
      */
     get unhandledRecoil(): number {

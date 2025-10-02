@@ -1,7 +1,7 @@
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
 import * as BC from "./BonusConstant";
-import { DeepPartial } from "fvtt-types/utils";
+import { SR5 } from "@/module/config";
 
 export class BonusHelper {
     private static isTrue(value: "" | { _TEXT: string }): boolean {

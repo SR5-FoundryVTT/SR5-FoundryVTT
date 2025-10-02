@@ -26,7 +26,7 @@ const VehicleData = () => ({
     ...CommonData(),
 
     // === Identity & Classification ===
-    special: new StringField({ required: true, initial: "mundane", readonly: true }),
+    special: new StringField({ required: true, initial: "mundane", choices: ["mundane"], readonly: true }),
     vehicleType: new StringField({
         required: true,
         initial: "ground",

@@ -18,7 +18,7 @@ const HostData = () => ({
     ...DevicePartData(),
 
     // override
-    category: new StringField({ required: true, initial: 'host', readonly: true }),
+    category: new StringField({ required: true, initial: 'host', choices: ['host'], readonly: true }),
 
     attributes: new SchemaField(TechnologyAttributes()),
     matrix: new SchemaField(MatrixMasterData()),
