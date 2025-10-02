@@ -12,7 +12,7 @@ const ICData = () => ({
     // === Core Identity ===
     ...CommonData(),
     icType: new StringField({ required: true }),
-    special: new StringField({ required: true, initial: 'mundane', choice: ['mundane'], readonly: true }),
+    special: new StringField({ required: true, initial: 'mundane', choices: ['mundane'], readonly: true }),
 
     // === Matrix & Host ===
     matrix: new SchemaField(MatrixData()),
