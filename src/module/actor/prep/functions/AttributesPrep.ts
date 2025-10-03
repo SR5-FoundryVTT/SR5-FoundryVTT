@@ -1,11 +1,9 @@
-import { Helpers } from '../../../helpers';
-import {SR} from "../../../constants";
-import {SR5} from "../../../config";
-import { PartsList } from '../../../parts/PartsList';
-import { ItemPrep } from './ItemPrep';
+import { SR5 } from '../../../config';
+import { SR } from '../../../constants';
 import { SR5Actor } from '../../SR5Actor';
-import { AttributeFieldType } from 'src/module/types/template/Attributes';
+import { Helpers } from '../../../helpers';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { AttributeFieldType } from 'src/module/types/template/Attributes';
 
 export class AttributesPrep {
     /**
@@ -32,7 +30,7 @@ export class AttributesPrep {
      */
     static prepareAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
-        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+        if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
@@ -50,7 +48,7 @@ export class AttributesPrep {
      */
     static calculateAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
-        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+        if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
@@ -68,18 +66,15 @@ export class AttributesPrep {
         // The essence base is fixed. Changes should be made through the attribute.temp field.
         system.attributes.essence.base = SR.attributes.defaults.essence;
 
-        // Modify essence by actor modifer
-        const parts = new PartsList<number>(system.attributes.essence.mod);
-
         const essenceMod = system.modifiers['essence'];
-        if (essenceMod && !Number.isNaN(essenceMod)) {
-            parts.addUniquePart('SR5.Bonus', Number(essenceMod));
+        if (essenceMod && !Number.isNaN(essenceMod))
+            Helpers.addChange(system.attributes.essence, { name: "SR5.Bonus", value: Number(essenceMod) });
+       
+        for (const item of items) {
+            if (item.isEquipped() && item.isType('bioware', 'cyberware'))
+                Helpers.addChange(system.attributes.essence, { name: item.name, value: -item.getEssenceLoss() });
         }
 
-        system.attributes.essence.mod = parts.list;
-
-        ItemPrep.prepareWareEssenceLoss(system, items);
-
-        system.attributes.essence.value = Helpers.calcTotal(system.attributes.essence);
+        Helpers.calcTotal(system.attributes.essence);
     }
 }

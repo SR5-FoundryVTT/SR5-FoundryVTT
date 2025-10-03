@@ -20,11 +20,27 @@ interface CalcTotalOptions {
     // Min/Max value range
     min?: number,
     max?: number,
-    // Round total to a given decimal, 0 rounds to the next integer.
-    roundDecimals?: number
 }
 
 export class Helpers {
+
+    static addChange(
+        mod: ModifiableValueType,
+        change: { name: string, mode?: CONST.ACTIVE_EFFECT_MODES, value: number, priority?: number }
+    ): void {
+        if (!change.value && (!change.mode || change.mode === CONST.ACTIVE_EFFECT_MODES.ADD)) return;
+
+        const mode = change.mode ?? CONST.ACTIVE_EFFECT_MODES.ADD;
+        const priority = change.priority ?? 10 * mode;
+        mod.changes.push({ mode, priority, unused: false, ...change });
+    }
+
+    private static _markPreviousChangesUnused(changes: ModifiableValueType['changes'], currentIndex: number): void {
+        for (let i = 0; i < currentIndex; i++) {
+            changes[i].unused = true;
+        }
+    }
+
     /**
      * Calculate the total value for a ModifiableValue shape.
      *
@@ -40,49 +56,69 @@ export class Helpers {
      * downgraded or upgraded but still be changed further by the options.min or options.max
      * params of the overall method. That way effect changes can't override system min/max borders.
      *
-     * @param value The ModifiableValue shape.
+     * @param mod The ModifiableValue shape.
      * @param options min will a apply a minimum value, max will apply a maximum value.
      */
-    static calcTotal(value: ModifiableValueType, options?: CalcTotalOptions): number {
-        // reset operation
-        value.mode = null;
+    static calcTotal(mod: ModifiableValueType, options?: CalcTotalOptions): number {
+        mod.value = mod.base;
 
-        // Some values will have their total overridden directly.
-        if (value.override) {
-            // Still apply a possible value range, even if override says otherwise.
-            value.value = Helpers.applyRange(value.override.value, options);
-            value.mode = 'override';
-            return value.value;
+        if (options?.min != null && mod.value < options.min) {
+            this.addChange(mod, {
+                name: 'System Enforced Minimum',
+                mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE,
+                value: options.min,
+                priority: Infinity,
+            });
         }
 
-        const parts = new PartsList(value.mod);
-        // if a temp field is found, add it as a unique part
-        if (!isNaN(value.temp) && Number(value.temp) !== 0) {
-            parts.addUniquePart('SR5.Temporary', value['temp']);
+        if (options?.max != null && mod.value > options.max) {
+            this.addChange(mod, {
+                name: 'System Enforced Maximum',
+                mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE,
+                value: options.max,
+                priority: Infinity,
+            });
         }
 
-        value.value = parts.total + value.base;
+        mod.changes.sort((a, b) => a.priority - b.priority);
+        for (let i = 0; i < mod.changes.length; i++) {
+            const change = mod.changes[i];
 
-        // Apply both down- and upgrade, should multiple effect changes have been applied.
-        if (value.downgrade) {
-            const previousValue = value.value;
-            value.value = Helpers.applyRange(value.value, { max: value.downgrade.value });
-            if (value.value !== previousValue)
-                value.mode = 'downgrade';
+            switch (change.mode) {
+                case CONST.ACTIVE_EFFECT_MODES.ADD:
+                case CONST.ACTIVE_EFFECT_MODES.CUSTOM:
+                    mod.value += change.value;
+                    break;
+                case CONST.ACTIVE_EFFECT_MODES.MULTIPLY:
+                    mod.value *= change.value;
+                    break;
+                case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
+                    mod.value = change.value;
+                    this._markPreviousChangesUnused(mod.changes, i);
+                    break;
+                case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
+                    if (mod.value < change.value) {
+                        mod.value = change.value;
+                        this._markPreviousChangesUnused(mod.changes, i);
+                    } else {
+                        change.unused = true;
+                    }
+                    break;
+                case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
+                    if (mod.value > change.value) {
+                        mod.value = change.value;
+                        this._markPreviousChangesUnused(mod.changes, i);
+                    } else {
+                        change.unused = true;
+                    }
+                    break;
+                default:
+                    console.warn(`Unknown Active Effect mode ${change.mode} encountered.`);
+                    break;
+            }
         }
-        if (value.upgrade) {
-            const previousValue = value.value;
-            value.value = Helpers.applyRange(value.value, { min: value.upgrade.value });
-            if (value.value !== previousValue)
-                value.mode = 'upgrade';
-        }
 
-        value.value = Helpers.roundTo(value.value, options?.roundDecimals);
-        value.value = Helpers.applyRange(value.value, options);
-
-        value.mod = parts.list;
-
-        return value.value;
+        return mod.value;
     }
 
     /** Round a number to a given degree.

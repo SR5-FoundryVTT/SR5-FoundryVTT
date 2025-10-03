@@ -2,29 +2,21 @@
     <div class="value-modifiers">
         <div class="value-modifier-name">{{localize 'SR5.BaseValue'}}</div>
         <div class="value-modifiers-base">{{value.base}}</div>
-        {{#each value.mod}}
-        <div class="value-modifier-name">{{localize this.name}}</div>
-        <div class="value-modifiers-modifier">{{signedValue this.value}}</div>
+        {{#each value.changes}}
+            <div class="value-modifier-name {{#if this.unused}}value-modifiers-invalid-total{{/if}}">{{localize this.name}}</div>
+            {{#if (eq this.mode 0)}}
+                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">{{signedValue this.value}}</div>
+            {{else if (eq this.mode 1)}}
+                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">* {{this.value}}</div>
+            {{else if (eq this.mode 2)}}
+                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">{{signedValue this.value}}</div>
+            {{else if (eq this.mode 3)}}
+                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">↓ {{this.value}}</div>
+            {{else if (eq this.mode 4)}}
+                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">↑ {{this.value}}</div>
+            {{else}}
+                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">➝ {{this.value}}</div>
+            {{/if}}
         {{/each}}
-
-        {{#if (eq (ModifierMode value) "override")}}
-        <div class="value-modifier-name value-modifiers-invalid-total">{{localize 'SR5.Total'}}</div>
-        <div class="value-modifiers-total value-modifiers-invalid-total">?</div>
-        <div class="value-modifier-name">{{localize value.override.name}}</div>
-        <div class="value-modifiers-total">{{value.override.value}}</div>
-        {{else if (eq (ModifierMode value) "upgrade")}}
-        <div class="value-modifier-name value-modifiers-invalid-total">{{localize 'SR5.Total'}}</div>
-        <div class="value-modifiers-total value-modifiers-invalid-total">?</div>
-        <div class="value-modifier-name">{{localize value.upgrade.name}}</div>
-        <div class="value-modifiers-total">{{value.value}}</div>
-        {{else if (eq (ModifierMode value) "downgrade")}}
-        <div class="value-modifier-name value-modifiers-invalid-total">{{localize 'SR5.Total'}}</div>
-        <div class="value-modifiers-total value-modifiers-invalid-total">?</div>
-        <div class="value-modifier-name">{{localize value.downgrade.name}}</div>
-        <div class="value-modifiers-total">{{value.value}}</div>
-        {{else}}
-        <div class="value-modifier-name">{{localize 'SR5.Total'}}</div>
-        <div class="value-modifiers-total">{{value.value}}</div> 
-        {{/if}}
     </div>
 </div>

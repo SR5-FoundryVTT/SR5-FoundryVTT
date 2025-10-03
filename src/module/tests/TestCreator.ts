@@ -467,16 +467,12 @@ export const TestCreator = {
             const attribute = actor.getAttribute(action.attribute, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
-            // Apply matrix modifiers, when applicable
-            // if (attribute && actor._isMatrixAttribute(action.attribute)) actor._addMatrixParts(pool, true);
         }
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
-            // Apply matrix modifiers, when applicable
-            // if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
         }
         
         // Include pool modifiers for opposed and resist tests.

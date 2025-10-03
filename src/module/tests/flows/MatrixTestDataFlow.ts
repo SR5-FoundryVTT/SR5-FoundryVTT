@@ -64,7 +64,6 @@ export const MatrixTestDataFlow = {
     },
 
     /**
-     * Wrapping legacy implementation of SR5Actor._addMatrixParts.
      *
      * Will add modifiers based on actor data to test pool
      * @param actor

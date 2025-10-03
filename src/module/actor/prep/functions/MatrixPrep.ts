@@ -1,5 +1,4 @@
 import { Helpers } from '../../../helpers';
-import { PartsList } from '../../../parts/PartsList';
 import { SR5 } from "../../../config";
 import { AttributesPrep } from "./AttributesPrep";
 import { SR5Item } from 'src/module/item/SR5Item';
@@ -14,17 +13,15 @@ export class MatrixPrep {
     static prepareMatrix(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5Item[]) {
         const { matrix, attributes, modifiers } = system;
 
-        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
+        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'] as const;
 
         // clear matrix data to defaults
-        MatrixList.forEach((key) => {
-            const parts = new PartsList(matrix[key].mod);
-            if (matrix[key].temp) parts.addUniquePart('SR5.Temporary', matrix[key].temp);
-            // LEGACY from when the sheet used 'mod.Temporary'
-            parts.removePart('Temporary');
-            matrix[key].mod = parts.list;
-            matrix[key].value = parts.total;
-        });
+        for (const key of MatrixList) {
+            matrix[key].base = 0;
+            Helpers.addChange(matrix[key], { name: "SR5.Temporary", value: matrix[key].temp });
+            Helpers.calcTotal(matrix[key]);
+        }
+
         matrix.condition_monitor.max = 0;
         matrix.rating = 0;
         matrix.name = '';
@@ -96,43 +93,30 @@ export class MatrixPrep {
         const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries
-        Object.keys(SR5.matrixAttributes).forEach((attributeName) => {
-            if (!matrix.hasOwnProperty(attributeName)) {
-                return console.error(`SR5Actor matrix preparation failed due to missing matrix attributes`);
-            }
-
+        for (const attributeName of Object.keys(SR5.matrixAttributes) as (keyof typeof SR5.matrixAttributes)[]) {
             const attribute = matrix[attributeName];
-            // Helpers.calcTotal(matrix[attributeName]);
-            // const label = SR5.matrixAttributes[attributeName];
-            // const { value, base, mod } = matrix[attributeName];
+
             AttributesPrep.prepareAttribute(attributeName, attribute);
             const { value, base, mod, label } = attribute;
-            const hidden = true;
 
             // Each matrix attribute also functions as a limit.
             limits[attributeName] = {
-                value,
-                base,
-                mod,
-                label,
-                hidden,
+                ...limits[attributeName],
+                ...{ value, base, mod, label, hidden: true }
             };
 
             // Copy matrix attribute data into attributes for ease of access during testing.
             attributes[attributeName] = {
-                value,
-                base,
-                mod,
-                label,
-                hidden,
+                ...attributes[attributeName],
+                ...{ value, base, mod, label, hidden: true }
             };
-        });
+        }
     }
 
     static prepareMatrixAttributesForDevice(system: Actor.SystemOfType<'vehicle'>, rating?: number) {
         const { matrix } = system;
         rating = rating ?? matrix.rating;
-        const matrixAttributes = ['firewall', 'data_processing'];
+        const matrixAttributes = ['firewall', 'data_processing'] as const;
         matrixAttributes.forEach((attribute) => {
             matrix[attribute].base = rating;
         });
@@ -140,5 +124,4 @@ export class MatrixPrep {
             Helpers.calcTotal(matrix[attId]);
         });
     }
-
 }

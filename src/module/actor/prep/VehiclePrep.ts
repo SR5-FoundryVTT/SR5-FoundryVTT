@@ -1,27 +1,21 @@
 import { CharacterPrep } from './CharacterPrep';
 import { SkillsPrep } from './functions/SkillsPrep';
-import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
 import { Helpers } from '../../helpers';
-import { PartsList } from '../../parts/PartsList';
 import { SR5 } from "../../config";
 import { RangedWeaponRules } from '../../rules/RangedWeaponRules';
 import { SR } from '../../constants';
 import { ModifiableValueType } from 'src/module/types/template/Base';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { MatrixRules } from '@/module/rules/MatrixRules';
-
+import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
-        SkillsPrep.prepareSkillData(system);
-
-        ModifiersPrep.clearAttributeMods(system);
-        ModifiersPrep.clearArmorMods(system);
-        ModifiersPrep.clearLimitMods(system);
+        ModifiableFieldPrep.resetAllModifiers(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[]) {
@@ -55,19 +49,9 @@ export class VehiclePrep {
 
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, isOffRoad, isDrone } = system;
-        // set the value for the stats
+
         for (const [key, stat] of Object.entries(vehicle_stats)) {
-            // this turns the Object model into the list mod
-            if (typeof stat.mod === 'object') {
-                stat.mod = new PartsList(stat.mod).list;
-            }
-            const parts = new PartsList(stat.mod);
-
-            if (stat.temp) parts.addUniquePart('SR5.Temporary', stat.temp);
-
-            stat.mod = parts.list;
             Helpers.calcTotal(stat);
-            // add labels
             stat.label = SR5.vehicle.stats[key];
         }
 
@@ -114,7 +98,7 @@ export class VehiclePrep {
 
             // Allow value to be understandable when displayed.
             attribute.base = 0;
-            PartsList.AddUniquePart(attribute.mod, vehicle_stats.pilot.label, vehicle_stats.pilot.value);
+            Helpers.addChange(attribute, { name: vehicle_stats.pilot.label, value: vehicle_stats.pilot.value });
             AttributesPrep.calculateAttribute(attId, attribute);
         });
     }
@@ -131,7 +115,7 @@ export class VehiclePrep {
 
             // Allow value to be understandable when displayed.
             attribute.base = 0;
-            PartsList.AddUniquePart(attribute.mod, attributes.body.label, attributes.body.value);
+            Helpers.addChange(attribute, { name: attributes.body.label, value: attributes.body.value });
             AttributesPrep.calculateAttribute(attId, attribute);
         });
     }
@@ -177,7 +161,7 @@ export class VehiclePrep {
 
         // Prepare user visible matrix track values
         track.matrix.base = MatrixRules.getVehicleMonitor(rating);
-        track.matrix.mod = PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
+        Helpers.addChange(track.matrix, { name: "SR5.Bonus", value: modifiers.matrix_track });
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
     }
@@ -202,9 +186,9 @@ export class VehiclePrep {
         const pilot = Helpers.calcTotal(vehicle_stats.pilot);
 
         initiative.meatspace.base.base = pilot * 2;
-        initiative.meatspace.base.mod = PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meat_initiative']));
+        Helpers.addChange(initiative.meatspace.base, { name: "SR5.Bonus", value: modifiers.meat_initiative });
         initiative.meatspace.dice.base = 4;
-        initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
+        Helpers.addChange(initiative.meatspace.dice, { name: "SR5.Bonus", value: modifiers.meat_initiative_dice });
 
         Helpers.calcTotal(initiative.meatspace.base);
         Helpers.calcTotal(initiative.meatspace.dice);
@@ -213,8 +197,7 @@ export class VehiclePrep {
     static prepareArmor(system: Actor.SystemOfType<'vehicle'>) {
         const { armor, modifiers } = system;
 
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp'] || 0));
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', Number(modifiers['armor'] || 0));
+        Helpers.addChange(armor, { name: 'SR5.Bonus', value: modifiers.armor });
 
         Helpers.calcTotal(armor);
     }
@@ -225,7 +208,7 @@ export class VehiclePrep {
         const {attributes} = system;
 
         const recoilCompensation = RangedWeaponRules.vehicleRecoilCompensationValue(attributes.body.value);
-        PartsList.AddUniquePart(system.values.recoil_compensation.mod, 'SR5.RecoilCompensation', recoilCompensation);
+        Helpers.addChange(system.values.recoil_compensation, { name: 'SR5.RecoilCompensation', value: recoilCompensation });
 
         Helpers.calcTotal(system.values.recoil_compensation, {min: 0});
     }

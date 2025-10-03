@@ -1354,25 +1354,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param attribute
      */
     _isMatrixAttribute(attribute: string): boolean {
-        return SR5.matrixAttributes.hasOwnProperty(attribute);
-    }
-
-    /**
-     * Add matrix modifier values to the given modifier parts from whatever Value as part of
-     * matrix success test.
-     *
-     * @param parts The Value.mod field as a PartsList
-     * @param atts The attributes used for the success test.
-     */
-    _addMatrixParts(this: SR5Actor, parts: PartsList<number>, atts) {
-        if (Helpers.isMatrix(atts)) {
-            if (!this.system.matrix) return;
-
-            // Apply general matrix modifiers based on commlink/cyberdeck status.
-            const matrix = this.system.matrix;
-            if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
-            if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
-        }
+        return Object.hasOwn(SR5.matrixAttributes, attribute);
     }
 
     /**

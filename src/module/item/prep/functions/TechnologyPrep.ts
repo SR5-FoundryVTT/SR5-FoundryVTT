@@ -129,5 +129,4 @@ export const TechnologyPrep = {
 
         technology.calculated.cost.value = value;
     },
-
 }

@@ -225,10 +225,8 @@ export class CombatRules {
     static modifyDamageAfterResist(actor: SR5Actor, damage: DamageType, hits: number): DamageType {
         if (hits < 0) hits = 0;
 
-        // modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
-        let {modified} = SoakRules.reduceDamage(actor, damage, hits);
-
-        Helpers.calcTotal(modified, {min: 0});
+        const { modified } = SoakRules.reduceDamage(actor, damage, hits);
+        Helpers.calcTotal(modified, { min: 0 });
 
         return modified;
     }

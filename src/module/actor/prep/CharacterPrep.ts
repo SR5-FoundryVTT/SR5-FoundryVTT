@@ -1,7 +1,5 @@
-import { PartsList } from './../../parts/PartsList';
 import { RangedWeaponRules } from './../../rules/RangedWeaponRules';
 import { InitiativePrep } from './functions/InitiativePrep';
-import { ModifiersPrep } from './functions/ModifiersPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
 import { ItemPrep } from './functions/ItemPrep';
 import { SkillsPrep } from './functions/SkillsPrep';
@@ -14,16 +12,12 @@ import { Helpers } from '../../helpers';
 import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 
 export class CharacterPrep {
     static prepareBaseData(system: Actor.SystemOfType<'character'>) {
+        ModifiableFieldPrep.resetAllModifiers(system);
         CharacterPrep.addSpecialAttributes(system);
-        SkillsPrep.prepareSkillData(system);
-
-        ModifiersPrep.clearAttributeMods(system);
-        ModifiersPrep.clearArmorMods(system);
-        ModifiersPrep.clearLimitMods(system);
-        ModifiersPrep.clearValueMods(system);
     }
 
     /**
@@ -85,7 +79,7 @@ export class CharacterPrep {
         const recoilCompensation = RangedWeaponRules.humanoidRecoilCompensationValue(system.attributes.strength.value);
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
         system.values.recoil_compensation.base = baseRc;
-        PartsList.AddUniquePart(system.values.recoil_compensation.mod, 'SR5.RecoilCompensation', recoilCompensation);
+        Helpers.addChange(system.values.recoil_compensation, { name: "SR5.RecoilCompensation", value: recoilCompensation });
 
         Helpers.calcTotal(system.values.recoil_compensation, { min: 0 });
     }

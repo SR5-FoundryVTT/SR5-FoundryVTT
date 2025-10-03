@@ -169,7 +169,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         for (let i = 0; i < this.document.changes.length; i++) {
             const input = this.element.querySelector<HTMLInputElement>(`input[name="changes.${i}.priority"]`);
             if (input) {
-                input.setAttribute('disabled', 'true');
+                input.removeAttribute('disabled');
                 input.setAttribute('data-tooltip', 'SR5.Tooltips.Effect.PriorityFieldDisabled');
             } else {
                 console.error(`Shadowrun5e | Could not find the 'priority' input field for ${i}.`);
