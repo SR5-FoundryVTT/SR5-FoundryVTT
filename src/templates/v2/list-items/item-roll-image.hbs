@@ -1,5 +1,18 @@
 <button type="button" class="new-list-item-image-container"
         data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}"
-        data-action="rollItem" data-item-id="{{this.uuid}}">
-        <img src="{{this.img}}" class="{{#if (hasRoll this)}}new-list-item-image-roll{{else}}new-list-item-image-info{{/if}}" />
+        {{#if @root.isPlayMode}}
+        data-action="rollItem"
+        {{else}}
+        data-action="editItem"
+        {{/if}}
+        data-item-id="{{this.uuid}}">
+        <img src="{{this.img}}"
+             {{#if @root.isEditMode}}
+                 class="new-list-item-image-edit"
+             {{else if (hasRoll this)}}
+                 class="new-list-item-image-roll"
+             {{else}}
+                 class="new-list-item-image-info"
+            {{/if}}
+            />
 </button>

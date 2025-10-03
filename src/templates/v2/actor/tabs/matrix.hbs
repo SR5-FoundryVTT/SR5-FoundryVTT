@@ -8,7 +8,7 @@
                 </a>
             </div>
             {{/if}}
-            <div class="new-list-item-col" >
+            <div class="new-list-item-col">
                 <a data-roll-id="matrix.device-rating">
                     {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
                 </a>
@@ -16,9 +16,9 @@
             <div class="new-list-item-col">
                 <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
                     {{#if system.matrix.running_silent}}
-                    {{localize "SR5.RunningSilent"}}
+                        {{localize "SR5.RunningSilent"}}
                     {{else}}
-                    {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
+                        {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
                     {{/if}}
                 </a>
             </div>
@@ -45,13 +45,14 @@
                 <div class="new-list-item new-list-item-header">
                     <div class="new-list-item-col">
                         {{#if network}}
-                        {{localize "SR5.Labels.ActorSheet.Network"}}: <a data-action="openMatrixDevice" data-uuid="{{network.uuid}}">{{network.name}}</a>
-                        <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                            <i class="fas fa-right-from-bracket"></i>
-                        </a>
+                            <label>{{localize "SR5.Labels.ActorSheet.Network"}}:</label>
+                            <a data-action="openMatrixDevice" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                            <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                                <i class="fas fa-right-from-bracket"></i>
+                            </a>
                         {{else}}
-                        {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
-                        <a data-action="connectToNetwork">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                            <label>{{localize "SR5.Labels.ActorSheet.NoNetwork"}}</label>
+                            <a data-action="connectToNetwork">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
                         {{/if}}
                     </div>
                     <div>

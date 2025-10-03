@@ -19,6 +19,7 @@ import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/t
 import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
+import {PackActionFlow} from "@/module/item/flows/PackActionFlow";
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -31,6 +32,13 @@ export interface InventorySheetDataByType {
     label: string;
     isOpen: boolean;
     items: SR5Item[];
+}
+
+// Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
+type sheetAction = {
+    name: string,
+    description: string,
+    action: SR5Item
 }
 
 export interface InventorySheetData {
@@ -262,7 +270,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
-        data.hasActions = this._prepareHasActions();
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
 
@@ -284,6 +291,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.primaryTabs = this._prepareTabs('primary');
 
         return data;
+    }
+
+    override async _preparePartContext(partId, context, options) {
+        const partContext = await super._preparePartContext(partId, context, options) as any;
+        if (partId === 'actions') {
+            partContext.actions = await this._prepareActions();
+        }
+
+        return partContext;
     }
 
     override async _onRender(context, options) {
@@ -547,9 +563,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const listHeader = $(event.target).closest('.new-list-item-header');
         const type = listHeader.data().itemType;
 
-        console.log('type', type);
-        console.log('inventoryOpenClose', this._inventoryOpenClose);
-
         const current = this._inventoryOpenClose[type] ?? true;
 
         this._setInventoryTypeVisibility(type, !current);
@@ -582,8 +595,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #createItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        console.log('onItemCreate', this, event);
-        const type = event.target.dataset.itemType ?? $(event.target).closest('a').data().itemType;
+        const type = SheetFlow.closestAction(event.target).dataset.itemType;
 
         // Unhide section it it was
         this._setInventoryTypeVisibility(type, true);
@@ -603,8 +615,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #editItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = event.target.dataset.itemId;
-        const item = await fromUuid(iid);
+        const iid = SheetFlow.listItemId(event.target);
+        const item = SheetFlow.fromUuidSync(iid);
         if (item && item instanceof SR5Item) await item.sheet?.render(true);
     }
 
@@ -626,8 +638,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #rollItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = event.target.dataset.itemId;
-        const item = await fromUuid(iid);
+        const iid = SheetFlow.listItemId(event.target);
+        const item = SheetFlow.fromUuidSync(iid);
 
         if (!item || !(item instanceof SR5Item)) return;
         await this._handleRollItem(item, event);
@@ -647,7 +659,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
 
         // look for roll id data in the current line
-        const rollId = event.target.dataset.rollId;
+        const rollId = SheetFlow.closestAction(event.target).dataset.rollId;
 
         const split = rollId.split('.');
         const options = { event };
@@ -1033,13 +1045,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         return false;
-    }
-
-    /**
-     * Prepare if this actor has an "Action" Items in their list of items
-     */
-    _prepareHasActions() {
-        return this.actor.items.filter(item => item.type === 'action').length > 0;
     }
 
     /**
@@ -1633,26 +1638,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (item && item instanceof SR5Item) return item.reloadAmmo(true);
     }
 
-    protected override _prepareTabs(group: string) {
-        const retVal = super._prepareTabs(group);
-        if (group === 'primary') {
-            // remove actions tab if the actor does not have any
-            if (!this._prepareHasActions()) {
-                delete retVal['actions'];
-            }
-        }
-        return retVal;
-    }
-
-    protected override _configureRenderParts(options) {
-        const retVal = super._configureRenderParts(options);
-        if (!this._prepareHasActions()) {
-            // remove actions tab if the actor does not have any
-            delete retVal['actions'];
-        }
-        return retVal;
-    }
-
     /**
      * Sync matrix attribute changes (order) made on the actor sheet into item data of the selected cyberdeck.
      *
@@ -1883,5 +1868,21 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 }
             }
         ]
+    }
+
+    async _prepareActions() {
+        const actions = await PackActionFlow.getActorActions(this.actor);
+
+        // Prepare sorting and display of a possibly translated document name.
+        const sheetActions: sheetAction[] = [];
+        for (const action of actions) {
+            sheetActions.push({
+                name: PackActionFlow.localizePackAction(action.name),
+                description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
+                action
+            });
+        }
+
+        return sheetActions.sort(Helpers.sortByName.bind(Helpers));
     }
 }

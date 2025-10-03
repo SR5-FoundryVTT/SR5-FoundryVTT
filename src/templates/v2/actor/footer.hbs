@@ -1,25 +1,31 @@
 <footer class="sheet-footer">
     <div class="new-list-item">
-        <label>
-            <span class="fa-stack" style="vertical-align: center; font-size: 0.5em">
-            <i class="fa-light fa-circle-dashed fa-stack-2x"></i>
-            <i class="fas fa-user fa-stack-1x"></i>
-            </span>
-            {{speakerName actor}}
-        </label>
-        {{#if system.metatype}}
-            <label>{{localizeOb system.metatype config.character.types}}</label>
+        {{#if (eq actor.type 'character')}}
+            {{#if system.metatype}}
+                <label>{{localizeOb system.metatype config.character.types}}</label>
+            {{/if}}
+            {{#if system.is_npc}}
+                <label>{{localize "SR5.IsNPC"}}</label>
+            {{/if}}
+            {{#if system.is_critter}}
+                <label>{{localize "SR5.IsCritter"}}</label>
+            {{/if}}
+            {{#if system.is_grunt}}
+                <label>{{localize "SR5.IsGrunt"}}</label>
+            {{/if}}
+            {{#unless (or system.is_npc system.is_critter)}}
+                <label><i class="fas fa-yen"></i>&nbsp;{{system.nuyen}}</label>
+                <label>
+                    <i class="fas fa-people-group"></i>
+                    <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.ActorSheet.Labels.StreetCredShort"}}&nbsp;{{system.street_cred}}</span>
+                    <i class="fas fa-pipe"></i>
+                    <span data-tooltip="{{systemFields.notoriety.label}} - {{systemFields.notoriety.hint}}">{{localize "SR5.ActorSheet.Labels.NotorietyShort"}}&nbsp;{{system.notoriety}}</span>
+                    <i class="fas fa-pipe"></i>
+                    <span data-tooltip="{{systemFields.public_awareness.label}} - {{systemFields.public_awareness.hint}}">{{localize "SR5.ActorSheet.Labels.PublicAwarenessShort"}}&nbsp;{{system.public_awareness}}</span>
+                </label>
+            {{/unless}}
+
         {{/if}}
-        {{#if system.is_npc}}
-            <label>{{localize "SR5.IsNPC"}}</label>
-        {{/if}}
-        {{#if system.is_critter}}
-            <label>{{localize "SR5.IsCritter"}}</label>
-        {{/if}}
-        {{#if system.is_grunt}}
-            <label>{{localize "SR5.IsGrunt"}}</label>
-        {{/if}}
-        <label><i class="fas fa-yen"></i> {{system.nuyen}}</label>
         <div></div>
     </div>
 </footer>

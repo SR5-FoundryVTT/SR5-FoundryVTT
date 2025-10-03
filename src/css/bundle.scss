@@ -1805,6 +1805,37 @@ input[type='text'].display {
         width: 100%;
         padding: 0.25rem;
 
+        // hide "hover buttons" by default, show by growing the font-size
+        .hover-show-button {
+            font-size: 0;
+        }
+
+        &.new-list-item-selected {
+            background: linear-gradient(to right, rgba($matrix-green, 0.4), rgba($matrix-green, 0.01));
+        }
+
+        // display certain things when the mouse is within the item's list
+        &:hover {
+            // background: rgba($darkred, 0.3);
+            .new-list-item-image-roll {
+                content: url('assets/dice-solid.svg');
+                filter: invert(1);
+            }
+            .new-list-item-image-info {
+                content: url('icons/files.svg');
+            }
+            .new-list-item-image-edit {
+                content: url('icons/redist/wrench.svg');
+            }
+            .new-list-item-image-target {
+                content: url('icons/redist/target.svg');
+            }
+
+            .hover-show-button {
+                font-size: 0.8rem;
+            }
+        }
+
         .new-list-item-image-container {
             min-width: 24px;
             max-width: 24px;
@@ -1812,15 +1843,6 @@ input[type='text'].display {
             max-height: 24px;
             padding: 2px;
             border-color: $light;
-            &:hover {
-                .new-list-item-image-roll {
-                    content: url('assets/dice-solid.svg');
-                    filter: invert(1);
-                }
-                .new-list-item-image-info {
-                    content: url('icons/files.svg');
-                }
-            }
         }
 
         &.new-list-item-header {
@@ -1886,16 +1908,6 @@ input[type='text'].display {
                 width: 5rem;
                 gap: 0.25rem;
 
-                .mark-button {
-                    font-size: 0;
-                }
-
-                &:hover {
-                    .mark-button {
-                        font-size: 0.8rem;
-                    }
-                }
-
                 .mark-label {
                     font-size: 1.1rem;
                 }
@@ -1905,20 +1917,6 @@ input[type='text'].display {
                 flex: none;
                 width: 5rem;
                 gap: 0.25rem;
-
-                .qty-button {
-                    font-size: 0;
-                }
-
-                &:hover {
-                    .qty-button {
-                        font-size: 0.8rem;
-                    }
-                }
-
-                .qty-label {
-                    font-size: 1.1rem;
-                }
             }
 
             &.mark-input-col {

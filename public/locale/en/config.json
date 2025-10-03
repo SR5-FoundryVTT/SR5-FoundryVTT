@@ -378,6 +378,11 @@
                 "View": "View",
                 "Edit": "Edit",
                 "Delete": "Delete"
+            },
+            "Labels": {
+                "NotorietyShort": "N",
+                "StreetCredShort": "SC",
+                "PublicAwarenessShort": "PA"
             }
         },
         "ActorTypes": {

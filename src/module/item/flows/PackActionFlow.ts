@@ -105,7 +105,49 @@ export const PackActionFlow = {
         console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;
     },
-    
+    /**
+     * Collect all actions of an actor.
+     *
+     * @param actor The actor to collect actions from.
+     * @return List of action items the actor has.
+     */
+    getActions(actor: SR5Actor): SR5Item<'action'>[] {
+        const actions = actor.itemsForType.get('action') as SR5Item<'action'>[];
+        // Normally all item types should exist, though during actor creation this might not be the case.
+        if (!actions) {
+            return [];
+        }
+        return actions;
+    },
+
+    /**
+     * Collect all actions of an actor.
+     *
+     * @param actor The actor to collect actions from.
+     * @returns Combined list of pack and actor actions.
+     */
+    async getActorActions(actor: SR5Actor) {
+        const packName = this.getGeneralActionsPackName();
+        // Collect all sources for matrix actions.
+        const packActions = await this.getPackActions(packName);
+        const filteredPackActions = packActions.filter(action => {
+            const testName = action.getAction()?.test ?? '';
+            console.log('actionName', testName);
+            if (['DronePerceptionTest', 'DroneInfiltrationTest', 'PilotVehicleTest'].includes(testName)) {
+                return actor.isType('vehicle');
+            }
+            if (testName === 'DrainTest') {
+                return actor.isAwakened();
+            }
+            if (testName === 'FadeTest') {
+                return actor.isEmerged();
+            }
+            return true;
+        })
+        const actorActions = this.getActions(actor);
+        return [...filteredPackActions, ...actorActions];
+    },
+
     /**
      * Collect all matrix actions of an actor.
      *

@@ -5,8 +5,8 @@
             type='action'
         }}
         <div class="scrollable">
-            {{#each itemType.action}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/action/item.hbs' item=this }}
+            {{#each actions}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/action/item.hbs' item=this.action name=this.name }}
             {{/each}}
         </div>
     </div>

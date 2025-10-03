@@ -2,14 +2,14 @@
     {{#if @root.isEditMode}}
         <input type="number" class="item-quantity-input" value="{{this.system.technology.quantity}}" min="0" max="999">
     {{else}}
-        <a class="qty-button"
+        <a class="hover-show-button"
            data-action="removeOneQty"
            data-tooltip="SR5.Labels.ActorSheet.RemoveOneQty"
            data-item-id="{{this.uuid}}">
             <i class="fas fa-minus-square"></i>
         </a>
         <label class="qty-label">{{this.system.technology.quantity}}</label>
-        <a class="qty-button"
+        <a class="hover-show-button"
            data-action="addOneQty"
            data-tooltip="SR5.Labels.ActorSheet.AddOneQty"
            data-item-id="{{this.uuid}}">
