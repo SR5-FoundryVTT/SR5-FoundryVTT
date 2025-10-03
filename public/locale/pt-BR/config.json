@@ -1407,6 +1407,17 @@
         "UseEdgeForInitiativeRoll": "Use a regra de vantagem blitz para iniciativa",
         "Value": "Valor",
         "Vehicle": {
+            "Category": "Categoria",
+            "Categories": {
+                "Micro": "Micro",
+                "Mini": "Mini",
+                "Small": "Pequeno",
+                "Medium": "Médio",
+                "Large": "Grande",
+                "Huge": "Enorme",
+                "Anthro": "Anthromórfico",
+                "Missile": "Míssil"
+            },
             "ChaseEnvironment": "Ambiente de Perseguição",
             "Clearsight": "Visão Clara",
             "ControlMode": "Modo de Controle",
