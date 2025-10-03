@@ -11,7 +11,7 @@ export const vehicleImporterTesting = (context: QuenchBatchContext) => {
     const assert: Chai.AssertStatic = context.assert;
     const vehicleParser = new VehicleParser();
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     describe('Vehicle Parser', () => {
         it('parses vehicles', async () => {

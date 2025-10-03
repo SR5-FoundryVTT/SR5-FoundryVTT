@@ -9,7 +9,7 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
     const { describe, it, beforeEach, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
     
     beforeEach(async () => {
         chummerFile = structuredClone(emptySpirit);
