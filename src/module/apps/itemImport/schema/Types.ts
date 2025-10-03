@@ -1,14 +1,19 @@
 /**
- * utility-types.ts
+ * Generated Automatically, DO NOT EDIT
+ *
+ * Check utils/generate_schemas.py for more info
  *
  * Shared TypeScript utility types for XML-to-TS schema generation.
  */
 
-/** Represents an explicit “empty” value (self-closed element marker). */
-export type Empty = "";
+/** Represents an explicit empty value from a self-closed element. */
+export type Empty = null;
 
-/** A homogeneous array of values. */
+/** Represents a homogeneous array of values. */
 export type Many<T> = T[];
 
-/** Either a single value or an array of values. */
+/** Represents either a single value or an array of values. */
 export type OneOrMany<T> = T | T[];
+
+/** Represents a string literal type for numeric values. */
+export type IntegerString = `${number}`;

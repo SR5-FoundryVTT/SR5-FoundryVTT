@@ -1,15 +1,14 @@
 import { DataImporter } from './DataImporter';
+import { ImportHelper as IH } from '../helper/ImportHelper';
 import { VehicleParser } from '../parser/vehicle/VehicleParser';
 import { VehiclesSchema, Vehicle } from '../schema/VehiclesSchema';
 
 export class VehicleImporter extends DataImporter {
-    public files = ["vehicles.xml"];
+    public readonly files = ["vehicles.xml"] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('vehicles') && jsonObject['vehicles'].hasOwnProperty('vehicle');
-    }
+    async _parse(jsonObject: VehiclesSchema): Promise<void> {
+        IH.setTranslatedCategory('vehicles', jsonObject.categories.category);
 
-    async Parse(jsonObject: VehiclesSchema): Promise<void> {
         return VehicleImporter.ParseItems<Vehicle>(
             jsonObject.vehicles.vehicle,
             {
@@ -17,7 +16,7 @@ export class VehicleImporter extends DataImporter {
                     return jsonData.category._TEXT.includes("Drone") ? "Drone" : "Vehicle";
                 },
                 parser: new VehicleParser(),
-                errorPrefix: "Failed Parsing Vehicle"
+                documentType: "Vehicle"
             }
         );
     }

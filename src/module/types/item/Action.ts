@@ -44,31 +44,30 @@ export const DamageData = () => ({
         base: new StringField({
             blank: true,
             required: true,
-            choices: ["physical", "matrix", "stun", ""]
+            choices: ["physical", "matrix", "stun"]
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: ["physical", "matrix", "stun", ""]
+            choices: ["physical", "matrix", "stun"]
         }),
     }),
     element: new SchemaField({
         base: new StringField({
             blank: true,
             required: true,
-            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+            choices: ["fire", "cold", "acid", "electricity", "radiation"]
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+            choices: ["fire", "cold", "acid", "electricity", "radiation"]
         }),
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
     biofeedback: new StringField({
         required: true,
         blank: true,
-        initial: '',
         choices: ["physical", "stun"],
     }),
     attribute: new StringField({ required: true }),

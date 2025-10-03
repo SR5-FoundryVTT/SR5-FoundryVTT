@@ -646,14 +646,14 @@ export const weaponParserTesting = (context: QuenchBatchContext) => {
         });
 
         it('weaponArray with empty array', async () => {
-            const weapons = await weaponParser.parseWeaponArray([]);
+            const weapons = await weaponParser.parseItems([]);
 
             assert.lengthOf(weapons, 0);
         });
 
         it('weaponArray with one weapon', async () => {
             const chummerWeapons = [chummerRangedWeapon];
-            const weapons = await weaponParser.parseWeaponArray(chummerWeapons as any);
+            const weapons = await weaponParser.parseItems(chummerWeapons as any);
 
             assert.lengthOf(weapons, 1);
         });

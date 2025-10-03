@@ -2,7 +2,6 @@ import { Parser } from '../Parser';
 import { Quality } from '../../schema/QualitiesSchema';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 
 export class QualityParser extends Parser<'quality'> {
     protected readonly parseType = 'quality';
@@ -18,11 +17,11 @@ export class QualityParser extends Parser<'quality'> {
 
     protected override async getFolder(jsonData: Quality, compendiumKey: CompendiumKey): Promise<Folder> {
         const isMetagenic = jsonData.metagenic?._TEXT === 'True';
-        const rootFolder = isMetagenic
-            ? TH.getTranslation('Quality (Metagenic)', { type: 'category' })
-            : TH.getTranslation('Quality', { type: 'category' });
-        const folderName = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
+        let rootFolder = game.i18n.localize('SR5.ItemTypes.Quality');
+        if (isMetagenic)
+            rootFolder += ' (Metagenic)';
 
+        const folderName = IH.getTranslatedCategory('qualities', jsonData.category._TEXT);
         return IH.getFolder(compendiumKey, rootFolder, folderName);
     }
 }

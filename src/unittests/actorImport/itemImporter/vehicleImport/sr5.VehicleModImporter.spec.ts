@@ -11,10 +11,10 @@ export const vehicleModParserTesting = (context: QuenchBatchContext) => {
     describe('Vehicle Mod Parser', () => {
 
         it('parses mods', async () => {
-            const mods = (await parser.parseMods(chummerDrone as any)) as (Item.CreateData & {system: Item.SystemOfType<'modification'>})[];
+            const mods = await parser.parseItems(chummerDrone as any);
 
             assert.lengthOf(mods, 2);
-            
+
             const ecm = mods.find(mod => mod.name === "ECM")
             assert.isNotNull(ecm)
             assert.strictEqual(ecm!.name, "ECM")
