@@ -10,7 +10,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     /**
      * Helper method to setup a decker actor with a cyberdeck.
