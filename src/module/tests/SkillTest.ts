@@ -80,7 +80,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
 
         if (!usedAttribute || !lastUsedAttribute) return; 
 
-        const pool = new PartsList<number>(this.pool.mod);
+        const pool = new PartsList(this.pool);
 
         // Replace previous attribute with new one, without changing other modifiers
         pool.removePart(lastUsedAttribute.label);
@@ -104,7 +104,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
 
         if (!usedLimit || !lastUsedLimit) return;
 
-        const limit = new PartsList<number>(this.limit.mod);
+        const limit = new PartsList(this.limit);
 
         // Replace previous limit with new one, without changing other modifiers.
         limit.removePart(lastUsedLimit.label);

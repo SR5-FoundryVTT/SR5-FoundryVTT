@@ -106,10 +106,9 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
 
     prepareLimitValue() {
         const force = Number(this.data.force);
-        this.data.limit.mod = PartsList.AddUniquePart(
-            this.data.limit.mod,
-            'SR5.Force',
-            SpellcastingRules.calculateLimit(force));
+        new PartsList(this.data.limit).addUniquePart(
+            'SR5.Force', SpellcastingRules.calculateLimit(force)
+        );
     }
 
     override calculateBaseValues() {

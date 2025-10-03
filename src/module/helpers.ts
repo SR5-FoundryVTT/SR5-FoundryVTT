@@ -747,8 +747,8 @@ export class Helpers {
      */
     static modifyDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageType {
         const modified = foundry.utils.duplicate(incoming) as DamageType;
-        modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
-        modified.value = Helpers.calcTotal(modified, {min: 0});
+        new PartsList(modified).addUniquePart(modificationLabel, hits);
+        modified.value = Helpers.calcTotal(modified, { min: 0 });
 
         return {incoming, modified};
     }

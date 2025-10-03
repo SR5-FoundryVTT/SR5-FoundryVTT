@@ -47,8 +47,9 @@ export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        PartsList.AddUniquePart(this.data.pool.mod, 'SR5.Force', this.against.data.force);
-        PartsList.AddPart(this.data.pool.mod, 'SR5.Force', this.against.data.force);
+        const pool = new PartsList(this.data.pool);
+        pool.addUniquePart('SR5.Force', this.against.data.force);
+        pool.addPart('SR5.Force', this.against.data.force);
     }
 
     /**

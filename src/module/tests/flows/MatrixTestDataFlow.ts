@@ -1,17 +1,14 @@
-import { SR5Actor } from "../../actor/SR5Actor";
-import { SR5 } from "../../config";
-import { Helpers } from "../../helpers";
-import { SR5Item } from "../../item/SR5Item";
-import { PartsList } from "../../parts/PartsList";
-import { SuccessTest, TestOptions } from "../SuccessTest";
-import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from "../MatrixTest";
-import { MatrixRules } from "../../rules/MatrixRules";
-import { MatrixDefenseTest } from "../MatrixDefenseTest";
-import { MatrixResistTest, MatrixResistTestData } from "../MatrixResistTest";
-import { OpposedBruteForceTest } from "../OpposedBruteForceTest";
-import { OpposedHackOnTheFlyTest } from "../OpposedHackOnTheFlyTest";
-import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
-import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
+import { SR5Actor } from '../../actor/SR5Actor';
+import { SR5Item } from '../../item/SR5Item';
+import { SR5 } from '../../config';
+import { Helpers } from '../../helpers';
+import { PartsList } from '../../parts/PartsList';
+import { MatrixRules } from '../../rules/MatrixRules';
+import { SuccessTest, TestOptions } from '../SuccessTest';
+import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from '../MatrixTest';
+import { MatrixDefenseTest } from '../MatrixDefenseTest';
+import { MatrixResistTest, MatrixResistTestData } from '../MatrixResistTest';
+import { BiofeedbackResistTest } from '../BiofeedbackResistTest';
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 
 /**
@@ -26,7 +23,7 @@ export const MatrixTestDataFlow = {
 
         MatrixTestDataFlow.removeMatrixModifiers(test);
 
-        const pool = new PartsList<number>(test.data.pool.mod);
+        const pool = new PartsList(test.data.pool);
         const action = test.data.action;
         const actor = test.source;
 
@@ -50,7 +47,7 @@ export const MatrixTestDataFlow = {
      * @param attribute
      */
     isMatrixAttribute(attribute: string): boolean {
-        return SR5.matrixAttributes.hasOwnProperty(attribute);
+        return Object.hasOwn(SR5.matrixAttributes, attribute);
     },
 
     /**
@@ -59,20 +56,15 @@ export const MatrixTestDataFlow = {
      * @param test A Value.mod field as a PartsList
      */
     removeMatrixModifiers(test: SuccessTest) {
-        const pool = new PartsList<number>(test.data.pool.mod);
+        const pool = new PartsList(test.data.pool);
         ['SR5.HotSim', 'SR5.RunningSilent', 'SR5.PublicGrid'].forEach(part => pool.removePart(part));
     },
 
     /**
      *
      * Will add modifiers based on actor data to test pool
-     * @param actor
-     * @param pool
-     * @param atts
-     * @param directConnection
-     * @returns
      */
-    addMatrixModifiersToPool(actor: SR5Actor, pool: PartsList<number>, atts: any, directConnection = false) {
+    addMatrixModifiersToPool(actor: SR5Actor, pool: PartsList, atts: any, directConnection = false) {
         if (Helpers.isMatrix(atts)) {
             if (!("matrix" in actor.system)) return;
 
@@ -89,7 +81,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Add Matrix damage to a Test that is a Matrix Attack and will do extra damage based on the number of marks
-     * @param test
      */
     addMatrixDamageForTargetMarks(test: SuccessTest) {
         if (!test.opposed || !test.hasDamage) return;
@@ -108,7 +99,7 @@ export const MatrixTestDataFlow = {
                 const marks = actor.getMarksPlaced(targetItem.uuid);
                 if (marks > 0) {
                     // add damage per mark on the target item
-                    test.data.damage.mod = PartsList.AddUniquePart(test.data.damage.mod,
+                    new PartsList(test.data.damage).addUniquePart(
                         "SR5.Marks", marks * (targetItem.actor?.getExtraMarkDamageModifier() ?? MatrixRules.getExtraMarkDamageModifier()));
                     test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
                 }
@@ -117,7 +108,7 @@ export const MatrixTestDataFlow = {
                 const marks = actor.getMarksPlaced(icon.uuid);
                 if (marks > 0) {
                     // add damage per mark on the target item
-                    test.data.damage.mod = PartsList.AddUniquePart(test.data.damage.mod,
+                    new PartsList(test.data.damage).addUniquePart(
                         "SR5.Marks", marks * icon.getExtraMarkDamageModifier());
                     test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
                 }
@@ -196,7 +187,7 @@ export const MatrixTestDataFlow = {
      */
     prepareTestModifiers(test: MatrixTest) {
 
-        const modifiers = new PartsList<number>(test.data.modifiers.mod);
+        const modifiers = new PartsList(test.data.modifiers);
 
         // Check for grid modifiers.
         if (!test.data.sameGrid) {

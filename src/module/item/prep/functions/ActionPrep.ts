@@ -66,17 +66,17 @@ export const ActionPrep = {
 
         // Collect weapon value modifications from used ammunition.
         const ammoData = equippedAmmo.system;
-        const limitParts = new PartsList(action.limit.mod);
+        const limitParts = new PartsList(action.limit);
 
         // Some ammunition want to replace the weapons damage, others modify it.
         if (ammoData.replaceDamage) {
             action.damage.override = { name: equippedAmmo.name, value: Number(ammoData.damage) };
         } else {
-            action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
+            new PartsList(action.damage).addUniquePart(equippedAmmo.name, ammoData.damage);
         }
 
         // add mods to ap from ammo
-        action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, ammoData.ap);
+        new PartsList(action.damage.ap).addUniquePart(equippedAmmo.name, ammoData.ap);
 
         if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name, ammoData.accuracy);
 
@@ -93,9 +93,6 @@ export const ActionPrep = {
         } else {
             action.damage.type.value = action.damage.type.base;
         }
-
-        // Apply collected modifications.
-        action.limit.mod = limitParts.list;
     },
 
     /**
@@ -108,7 +105,7 @@ export const ActionPrep = {
      */
     prepareWithMods(action: ActionRollType, equippedMods: SR5Item[]) {
         // Collect weapon value modifications from modifications.
-        const limitParts = new PartsList(action.limit.mod);
+        const limitParts = new PartsList(action.limit);
         const dpParts = new PartsList(action.dice_pool_mod);
         equippedMods.forEach((mod) => {
             const modification = mod.asType('modification');
@@ -117,10 +114,6 @@ export const ActionPrep = {
             if (modification.system.accuracy) limitParts.addUniquePart(mod.name, modification.system.accuracy);
             if (modification.system.dice_pool) dpParts.addUniquePart(mod.name, modification.system.dice_pool);
         });
-
-        // Apply collected modifications.
-        action.limit.mod = limitParts.list;
-        action.dice_pool_mod = dpParts.list;
     },
 
     /**

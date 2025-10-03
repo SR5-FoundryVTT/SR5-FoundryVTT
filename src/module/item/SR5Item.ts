@@ -31,6 +31,7 @@ import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
+import { ModifiableValueType } from '../types/template/Base';
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -283,8 +284,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * NOTE: This is a legacy method of applied modifiers to opposed tests but works fine for now.
      */
-    getOpposedTestMod(): PartsList<number> {
-        const parts = new PartsList<number>();
+    getOpposedTestMod(mod: ModifiableValueType): PartsList {
+        const parts = new PartsList(mod);
 
         if (this.hasOpposedTest()) {
             if (this.isAreaOfEffect()) {

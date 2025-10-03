@@ -111,9 +111,10 @@ export class CombatRules {
         if (defenderHits < 0) defenderHits = 0;
 
         // SR5#173  Step3: Defend B.
-        PartsList.AddUniquePart(modified.mod, 'SR5.Attacker', attackerHits);
-        PartsList.AddUniquePart(modified.mod, 'SR5.Defender', -defenderHits);
-        modified.value = Helpers.calcTotal(modified, {min: 0});
+        const mod = new PartsList(modified);
+        mod.addUniquePart('SR5.Attacker', attackerHits);
+        mod.addUniquePart('SR5.Defender', -defenderHits);
+        Helpers.calcTotal(modified, { min: 0 });
 
         // SR5#173 Step 3: Defend B.
         modified = CombatRules.modifyDamageTypeAfterHit(modified, defender);
@@ -245,7 +246,7 @@ export class CombatRules {
         if (damage.ap.value <= 0) return modifiedArmor;
 
         console.error('Check if ap is a negative value or positive value during weapon item configuration');
-        PartsList.AddUniquePart(modifiedArmor.mod, 'SR5.AP', damage.ap.value);
+        new PartsList(modifiedArmor).addUniquePart('SR5.AP', damage.ap.value);
         modifiedArmor.value = Helpers.calcTotal(modifiedArmor, {min: 0});
 
         return modifiedArmor;

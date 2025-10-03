@@ -451,13 +451,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Modify by penetration
         if (damage.ap.value !== 0)
-            PartsList.AddUniquePart(armor.mod, 'SR5.AP', damage.ap.value);
+            new PartsList(armor).addUniquePart('SR5.AP', damage.ap.value);
 
         // Modify by element
         if (damage.element.value !== '') {
             const armorForDamageElement = armor[damage.element.value] || 0;
             if (armorForDamageElement > 0)
-                PartsList.AddUniquePart(armor.mod, 'SR5.Element', armorForDamageElement);
+                new PartsList(armor).addUniquePart('SR5.Element', armorForDamageElement);
         }
 
         Helpers.calcTotal(armor, {min: 0});
@@ -1129,13 +1129,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
 
         // Build pool values.
-        const pool = new PartsList<number>(test.pool.mod);
+        const pool = new PartsList(test.pool);
         pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
         pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
 
 
         // Build modifiers values.
-        const mods = new PartsList<number>(test.data.modifiers.mod);
+        const mods = new PartsList(test.data.modifiers);
         mods.addUniquePart('SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
         return test.execute();
@@ -1362,7 +1362,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @param parts A Value.mod field as a PartsList
      */
-    _removeMatrixParts(parts: PartsList<number>) {
+    _removeMatrixParts(parts: PartsList) {
         ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.removePart(part));
     }
 
@@ -1684,8 +1684,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const modified = foundry.utils.duplicate(this.getArmor()) as ActorArmorType;
         if (modified) {
-            modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
-            modified.value = Helpers.calcTotal(modified, { min: 0 });
+            new PartsList(modified).addUniquePart('SR5.DV', damage.ap.value);
+            Helpers.calcTotal(modified, { min: 0 });
         }
 
         return modified;

@@ -42,7 +42,7 @@ export const RiggingTestDataFlow = {
         const driver = vehicle.getVehicleDriver();
         if (!driver) return;
         if (RiggingRules.isConsideredMatrixAction(test.data)) {
-            MatrixTestDataFlow.addMatrixModifiersToPool(driver, new PartsList(test.data.pool.mod), true);
+            MatrixTestDataFlow.addMatrixModifiersToPool(driver, new PartsList(test.data.pool), true);
         }
     },
 
