@@ -20,7 +20,7 @@ export class NaturalRecoveryStunTest extends SuccessTest {
         const track = this.actor.getStunTrack();
         const boxes = track?.value || 0;
 
-        const threshold = new PartsList(this.threshold.mod);
+        const threshold = new PartsList(this.threshold);
         threshold.addUniquePart('SR5.StunTrack', boxes)
     }
 

@@ -75,7 +75,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        PartsList.AddUniquePart(this.data.pool.mod, 'SR5.Force', this.against.data.force);
+        new PartsList(this.data.pool).addUniquePart('SR5.Force', this.against.data.force);
     }
 
     /**

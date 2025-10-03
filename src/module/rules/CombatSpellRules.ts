@@ -32,8 +32,8 @@ export class CombatSpellRules {
         damage = foundry.utils.duplicate(damage) as DamageType;
 
         const ap = -force;
-        damage.ap.mod = PartsList.AddUniquePart(damage.ap.mod, 'SR5.Force', ap);
-        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.Force', force);
+        new PartsList(damage.ap).addUniquePart('SR5.Force', ap);
+        new PartsList(damage).addUniquePart('SR5.Force', force);
 
         // Armor piercing can both be a negative and positive value.
         Helpers.calcTotal(damage.ap);

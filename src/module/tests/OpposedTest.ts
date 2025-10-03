@@ -205,11 +205,11 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         if (!this.item) return;
 
         // NOTE: This is a legacy method for applying item data based modifiers, but it will do.
-        const opposedMod = this.item.getOpposedTestMod();
+        const opposedMod = this.item.getOpposedTestMod(this.data.modifiers);
 
         // Do not simply concat list to avoid double applying an otherwise unique test modifier.
-        for (const modifier of opposedMod.list) {
-            PartsList.AddUniquePart(this.data.modifiers.mod, modifier.name, modifier.value, true);
+        for (const modifier of opposedMod.changes) {
+            new PartsList(this.data.modifiers).addUniquePart(modifier.name, modifier.value, true);
         }
     }
 

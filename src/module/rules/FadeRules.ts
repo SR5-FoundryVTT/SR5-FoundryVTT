@@ -44,7 +44,7 @@ export const FadeRules = {
 
         fadeDamage = foundry.utils.duplicate(fadeDamage) as DamageType;
 
-        PartsList.AddUniquePart(fadeDamage.mod, 'SR5.Hits', -hits);
+        new PartsList(fadeDamage).addUniquePart('SR5.Hits', -hits);
         Helpers.calcTotal(fadeDamage, {min: 0});
 
         return fadeDamage;

@@ -21,14 +21,13 @@ export const RangePrep = {
      * @param equippedMods Those item mods that are equipped.
      */
     prepareRecoilCompensation(range: RangeWeaponType, equippedMods: SR5Item<'modification'>[]) {
-        const rangeParts = new PartsList<number>();
+        const rangeParts = new PartsList(range.rc);
 
         // Apply ammo recoil compensation.
         for (const mod of equippedMods)
             if (mod.system.rc)
                 rangeParts.addPart(mod.name, mod.system.rc);
 
-        range.rc.mod = rangeParts.list;
-        range.rc.value = Helpers.calcTotal(range.rc);
+        Helpers.calcTotal(range.rc);
     }
 }

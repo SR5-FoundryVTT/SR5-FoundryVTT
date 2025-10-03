@@ -19,7 +19,8 @@ export class AttributeRules {
         names: readonly string[],
         source: SR5Actor | SR5Item,
         rollData: SR5Actor['system'] | SR5Item['system'],
-        options: { bigger: boolean }) {
+        options: { bigger: boolean }
+    ) {
         const targetAttributes = rollData.attributes;
         if (targetAttributes) {
             for (const name of names) {
@@ -62,10 +63,10 @@ export class AttributeRules {
      */
     static replacePhysicalAttributesWithMentalAttributes(action: MinimalActionType) {
         // check the attributes used by the action
-        if (this.PhysicalToMentalAttributeMap.hasOwnProperty(action.attribute)) {
+        if (Object.hasOwn(this.PhysicalToMentalAttributeMap, action.attribute)) {
             action.attribute = this.PhysicalToMentalAttributeMap[action.attribute];
         }
-        if (this.PhysicalToMentalAttributeMap.hasOwnProperty(action.attribute2)) {
+        if (Object.hasOwn(this.PhysicalToMentalAttributeMap, action.attribute2)) {
             action.attribute2 = this.PhysicalToMentalAttributeMap[action.attribute2];
         }
     }
@@ -75,5 +76,5 @@ export class AttributeRules {
         'body': 'willpower',
         'reaction': 'intuition',
         'strength': 'charisma',
-    }
+    } as const;
 }

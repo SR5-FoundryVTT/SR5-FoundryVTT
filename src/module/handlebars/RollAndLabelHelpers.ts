@@ -1,5 +1,3 @@
-import { PartsList } from '../parts/PartsList';
-import ModList = Shadowrun.ModList;
 import {Helpers} from "../helpers";
 import {SafeString} from "handlebars";
 import { DamageType } from '../types/item/Action';
@@ -54,11 +52,6 @@ export const registerRollAndLabelHelpers = () => {
             icon = 'fas fa-snowflake';
         }
         return icon;
-    });
-
-    Handlebars.registerHelper('partsTotal', function (partsList: ModList<number>) {
-        const parts = new PartsList(partsList);
-        return parts.total;
     });
 
     Handlebars.registerHelper('signedValue', function (value: number) {

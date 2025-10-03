@@ -259,4 +259,4 @@ export const SR = {
         grey: { essence: 0.75, avail: 0, cost: 1.3 },
         used: { essence: 1.25, avail: -4, cost: 0.75 },
     }
-}
+} as const;

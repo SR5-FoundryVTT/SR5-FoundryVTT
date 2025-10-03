@@ -304,8 +304,8 @@ export class MatrixRules {
         if (defenderHits < 0) defenderHits = 0;
 
         // add net hits as separate parts
-        PartsList.AddUniquePart(modified.mod, 'SR5.Attacker', attackerHits);
-        PartsList.AddUniquePart(modified.mod, 'SR5.Defender', -defenderHits);
+        new PartsList(modified).addUniquePart('SR5.Attacker',  attackerHits);
+        new PartsList(modified).addUniquePart('SR5.Defender', -defenderHits);
 
         modified.value = Helpers.calcTotal(modified, { min: 0 });
 

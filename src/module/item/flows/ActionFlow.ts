@@ -37,7 +37,7 @@ export class ActionFlow {
     }
 
     static _applyModifiableValue(value: ModifiableValueLinkedType, document: SR5Actor|SR5Item) {
-        const attribute = (document as SR5Actor).getAttribute(value.attribute!);
+        const attribute = (document as SR5Actor).getAttribute(value.attribute);
         if (!attribute) return;
 
         if (!value.base_formula_operator) {
@@ -48,20 +48,20 @@ export class ActionFlow {
         // Avoid altering base OR value fields and raising the resulting damage on multiple function calls.
         switch (value.base_formula_operator) {
             case "add":
-                PartsList.AddUniquePart(value.mod, attribute.label, attribute.value);
+                new PartsList(value).addUniquePart(attribute.label, attribute.value);
                 break;
             case "subtract":
-                PartsList.AddUniquePart(value.mod, attribute.label, -attribute.value);
+                new PartsList(value).addUniquePart(attribute.label, -attribute.value);
                 break;
             case "multiply":
-                PartsList.AddUniquePart(value.mod, 'SR5.Value', (value.base * attribute.value) - value.base);
+                new PartsList(value).addUniquePart('SR5.Value', (value.base * attribute.value) - value.base);
                 break;
             case "divide": {
                 // Remove base from value by modifying.
-                PartsList.AddUniquePart(value.mod, 'SR5.BaseValue', value.base * -1);
+                new PartsList(value).addUniquePart('SR5.BaseValue', value.base * -1);
                 // Add division result as modifier on zero.
                 const denominator = attribute.value === 0 ? 1 : attribute.value;
-                PartsList.AddUniquePart(value.mod, 'SR5.Value', Math.floor(value.base / denominator));
+                new PartsList(value).addUniquePart('SR5.Value', Math.floor(value.base / denominator));
                 break;
             }
         }

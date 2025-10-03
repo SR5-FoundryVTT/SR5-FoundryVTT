@@ -445,7 +445,7 @@ export const TestCreator = {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = actor.getRollData({againstData: againstData ?? data.following?.against});
 
-        const pool = new PartsList<number>(data.pool.mod);
+        const pool = new PartsList(data.pool);
 
         // Prepare pool values.
         if (action.skill) {
@@ -467,33 +467,29 @@ export const TestCreator = {
             const attribute = actor.getAttribute(action.attribute, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
-            // Apply matrix modifiers, when applicable
-            // if (attribute && actor._isMatrixAttribute(action.attribute)) actor._addMatrixParts(pool, true);
         }
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
-            // Apply matrix modifiers, when applicable
-            // if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
         }
         
         // Include pool modifiers for opposed and resist tests.
         if (action.mod) {
-            data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, 'SR5.DicePoolModifier', action.mod);
+            new PartsList(data.modifiers).addUniquePart('SR5.DicePoolModifier', action.mod);
         }
         
         // Include pool modifiers that have been collected on the action item.
         // These can come from nested items and more.
         if(action.dice_pool_mod) {
-            action.dice_pool_mod.forEach(mod => PartsList.AddUniquePart(data.modifiers.mod, mod.name, mod.value));
+            action.dice_pool_mod.forEach(mod => new PartsList(data.modifiers).addUniquePart(mod.name, mod.value));
         }
         
         // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
-            data.pool.mod = PartsList.AddUniquePart(data.pool.mod,'SR5.Armor', armor.value);
+            new PartsList(data.pool).addUniquePart('SR5.Armor', armor.value);
         }
 
         // Prepare limit values...
@@ -504,14 +500,14 @@ export const TestCreator = {
         }
         //...add limit modifiers
         if (action.limit.mod) {
-            action.limit.mod.forEach(mod => PartsList.AddUniquePart(data.limit.mod, mod.name, mod.value));
+            action.limit.mod.forEach(mod => new PartsList(data.limit).addUniquePart(mod.name, mod.value));
         }
         //...add limit attribute value based on actor.
         if (action.limit.attribute) {
             // Get the limit connected to the defined attribute.
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
-            if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
+            if (limit) new PartsList(data.limit).addUniquePart(limit.label, limit.value);
         }
 
         // Prepare threshold values...
@@ -557,7 +553,7 @@ export const TestCreator = {
             const label = SR5.modifierTypes[name];
             const options = {applicable};
             const value = actor.modifiers.totalFor(name, options);
-            data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
+            new PartsList(data.modifiers).addUniquePart(label, value);
         }
 
         // Mark test as extended.
@@ -579,7 +575,7 @@ export const TestCreator = {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = item.getRollData({action, testData: data, againstData: againstData ?? data.following?.against});
 
-        const pool = new PartsList<number>(data.pool.mod);
+        const pool = new PartsList(data.pool);
 
         if (action.attribute) {
             const attribute = item.getAttribute(action.attribute, {rollData});

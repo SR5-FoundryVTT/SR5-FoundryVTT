@@ -70,7 +70,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        PartsList.AddUniquePart(this.data.pool.mod, 'SR5.Level', this.against.data.level);
+        new PartsList(this.data.pool).addUniquePart('SR5.Level', this.against.data.level);
     }
 
     /**

@@ -88,7 +88,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         if (this.data.action.armor) {
             if (this.actor) {
                 const armor = this.actor.getArmor(this.data.incomingDamage);
-                this.data.pool.mod = PartsList.AddUniquePart(this.data.pool.mod,'SR5.Armor', armor.value);
+                new PartsList(this.data.pool).addUniquePart('SR5.Armor', armor.value);
             }
         }
     }
@@ -153,7 +153,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         // Automatic hits from hardened armor (SR5#397)
         const armor = this.actor?.getArmor(this.data.modifiedDamage);
         if(armor?.hardened) {
-            PartsList.AddUniquePart(this.hits.mod, 'SR5.AppendedHits', Math.ceil(armor.value/2));
+            new PartsList(this.hits).addUniquePart('SR5.AppendedHits', Math.ceil(armor.value/2));
             Helpers.calcTotal(this.hits);
         }
 

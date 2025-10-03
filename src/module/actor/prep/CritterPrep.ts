@@ -1,6 +1,5 @@
 import { CharacterPrep } from './CharacterPrep';
 import {InitiativePrep} from './functions/InitiativePrep';
-import {ModifiersPrep} from './functions/ModifiersPrep';
 import {MatrixPrep} from './functions/MatrixPrep';
 import {ItemPrep} from './functions/ItemPrep';
 import {SkillsPrep} from './functions/SkillsPrep';
@@ -10,14 +9,12 @@ import {WoundsPrep} from './functions/WoundsPrep';
 import {AttributesPrep} from './functions/AttributesPrep';
 import { GruntPrep } from './functions/GruntPrep';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 
 
 export class CritterPrep {
     static prepareBaseData(system: Actor.SystemOfType<'critter'>) {
-        ModifiersPrep.clearAttributeMods(system);
-        ModifiersPrep.clearArmorMods(system);
-        ModifiersPrep.clearLimitMods(system);
-        SkillsPrep.prepareSkillData(system);
+        ModifiableFieldPrep.resetAllModifiers(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'critter'>, items: SR5Item[]) {

@@ -605,7 +605,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *       a modifier. Rather set it to zero, causing it to not be shown.
      */
     applyPoolModifiers() {
-        const pool = new PartsList(this.pool.mod);
+        const pool = new PartsList(this.pool);
 
         // Remove override modifier from pool.
         pool.removePart('SR5.Labels.Action.Modifiers');
@@ -837,7 +837,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         for (const type of this.testModifiers) {
             const { name, value } = this.prepareActorModifier(this.actor, type);
-            PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
+            new PartsList(this.data.modifiers).addUniquePart(name, value, true);
         }
     }
 
@@ -1055,7 +1055,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.extended) return DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
 
         const extendedHits = this.extendedHits();
-        extendedHits.mod = PartsList.AddPart(extendedHits.mod, 'SR5.Hits', this.hits.value);
+        new PartsList(extendedHits).addPart('SR5.Hits', this.hits.value);
 
         Helpers.calcTotal(extendedHits, { min: 0 });
 
@@ -1282,7 +1282,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     applyPushTheLimit() {
         if (!this.actor) return;
 
-        const parts = new PartsList(this.pool.mod);
+        const parts = new PartsList(this.pool);
 
         // During the lifetime of a test (dialog/recasting) the user might want to remove push the limit again.
         if (!this.hasPushTheLimit) {
@@ -1313,7 +1313,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     applySecondChance() {
         if (!this.actor) return;
 
-        const parts = new PartsList(this.pool.mod);
+        const parts = new PartsList(this.pool);
 
         // During test lifetime (dialog/recasting) the user might want to remove second chance again.
         if (!this.hasSecondChance) {
@@ -1645,7 +1645,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!data.type) return;
 
         // Apply the extended modifier according the current iteration
-        const pool = new PartsList(data.pool.mod);
+        const pool = new PartsList(data.pool);
 
         const currentModifierValue = pool.getPartValue('SR5.ExtendedTest') || 0;
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
