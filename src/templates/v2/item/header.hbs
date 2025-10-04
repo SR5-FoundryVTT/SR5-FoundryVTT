@@ -38,7 +38,6 @@
         {{#if @root.isPlayMode}}
             <div class="new-list-item" data-item-id="{{item.uuid}}">
                 <div class="new-list-item-label-container">
-                    {{#unless system.technology.show_quantity}}
                         {{#if system.technology.condition_monitor.max}}
                             {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
                                 name=(localize "SR5.ConditionMonitor")
@@ -48,22 +47,24 @@
                                 disabled=system.technology.condition_monitor.disabled
                             }}
                         {{/if}}
-                    {{else}}
+                </div>
+                {{#if systemFields.technology}}
+                    <div class="new-list-item-col qty-input-col">
                         <span>
                             <label>{{localize "SR5.Qty"}} </label>
-                            <a data-action="removeOneQty"
+                            <a class="hover-show-button"
+                               data-action="removeOneQty"
                                data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty">
                                 <i class="fas fa-minus-square"></i>
                             </a>
-                            {{system.technology.quantity}}
-                            <a data-action="addOneQty"
+                            <label>{{system.technology.quantity}}</label>
+                            <a class="hover-show-button"
+                               data-action="addOneQty"
                                data-tooltip="SR5.ItemSheet.Labels.AddOneQty">
                                 <i class="fas fa-plus-square"></i>
                             </a>
                         </span>
-                    {{/unless}}
-                </div>
-                {{#if systemFields.technology}}
+                    </div>
                     <div class="new-list-item-icons">
                         <a data-action="toggleEquipped">
                             <i class="{{#if (isEquipped item)}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>

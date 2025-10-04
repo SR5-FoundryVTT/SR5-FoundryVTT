@@ -3,15 +3,7 @@
     <div class="new-list-item" data-item-id="{{item.uuid}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
         {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-        <div class="new-list-item-label-container">
-            <a data-action="showItemDescription">
-                {{#if name}}
-                    {{name}}
-                {{else}}
-                    {{item.name}}
-                {{/if}}
-            </a>
-        </div>
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
         <div class="new-list-item-col">
             <label>{{localizeOb item.system.mount_point @root.config.mountPoints}}</label>
@@ -30,27 +22,9 @@
         </div>
 
         <div class="new-list-item-icons">
-            <a data-action="equipItem">
-                <i class="{{#if item.system.technology.equipped}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
-            </a>
-            {{#if (canBeWireless item)}}
-                {{#if (isBroken item)}}
-                    <a data-tooltip="SR5.Broken" data-action="repairBrokenItem">
-                        <i class="fas fa-link-slash"></i>
-                    </a>
-                {{else}}
-                    <a data-action="toggleItemWireless">
-                        <i {{#if (isRunningSilent item)}}
-                           class="fa-duotone fa-wifi-fair"
-                            {{else if (isWireless item)}}
-                           class="fas fa-wifi"
-                            {{else}}
-                           class="fas fa-wifi-slash"
-                            {{/if}}
-                        ></i>
-                    </a>
-                {{/if}}
-            {{/if}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">

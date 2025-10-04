@@ -1,3 +1,4 @@
+{{#if (or awakened emerged)}}
 <div>
     <div class="new-list-item new-list-item-header">
         <div class="new-list-item-label-container">
@@ -7,14 +8,6 @@
         </div>
     </div>
     <div class="attributes center">
-        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-                attribute=system.attributes.edge
-                attributeField=@root.systemFields.attributes.fields.edge
-        }}
-        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
-                attribute=system.attributes.essence
-                attributeField=@root.systemFields.attributes.fields.essence
-        }}
         {{#if awakened}}
             {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
                 attribute=system.attributes.magic
@@ -39,3 +32,4 @@
         {{/if}}
     </div>
 </div>
+{{/if}}

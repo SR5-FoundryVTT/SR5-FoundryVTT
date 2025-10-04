@@ -1,0 +1,5 @@
+{{#if @root.isEditMode}}
+    <a data-action="toggleItemVisible" data-item-id="{{this.uuid}}">
+        <i class="{{#if (isVisible this)}}fas fa-eye{{else}}fas fa-eye-slash{{/if}}"></i>
+    </a>
+{{/if}}

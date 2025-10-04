@@ -1,25 +1,30 @@
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
-import { Helpers } from "../../helpers";
-import { SR5Item } from "../../item/SR5Item";
-import { onManageActiveEffect, onManageItemActiveEffect, prepareSortedItemEffects, prepareSortedEffects } from "../../effects";
-import { SR5 } from "../../config";
-import { SR5Actor } from "../SR5Actor";
-import { MoveInventoryDialog } from "../../apps/dialogs/MoveInventoryDialog";
+import { Helpers } from '../../helpers';
+import { SR5Item } from '../../item/SR5Item';
+import {
+    onManageActiveEffect,
+    onManageItemActiveEffect,
+    prepareSortedEffects,
+    prepareSortedItemEffects,
+} from '../../effects';
+import { SR5 } from '../../config';
+import { SR5Actor } from '../SR5Actor';
+import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { ChummerImportForm } from '../../apps/chummer-import-form';
-import SR5SheetFilters = Shadowrun.SR5SheetFilters;
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import MatrixAttribute = Shadowrun.MatrixAttribute;
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
-import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
+import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 
 import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
-import {PackActionFlow} from "@/module/item/flows/PackActionFlow";
+import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import SR5SheetFilters = Shadowrun.SR5SheetFilters;
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import MatrixAttribute = Shadowrun.MatrixAttribute;
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -102,6 +107,8 @@ export interface SR5BaseSheetDelays {
  *
  */
 export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> extends SR5ApplicationMixin(ActorSheetV2)<T> {
+    declare isEditMode: boolean;
+
     // If something needs filtering, store those filters here.
     _filters: SR5SheetFilters = {
         skills: '', // filter based on user input and skill name/label.
@@ -190,12 +197,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
             deleteItem: SR5BaseActorSheet.#deleteItem,
+            favoriteItem: SR5BaseActorSheet.#favoriteItem,
 
             openItemSource: SR5BaseActorSheet.#openSource,
 
             equipItem: SR5BaseActorSheet.#onToggleEquippedItem,
             toggleItemWireless: SR5BaseActorSheet.#toggleWirelessState,
             toggleExpanded: SR5BaseActorSheet.#toggleInventoryVisibility,
+            toggleItemVisible: SR5BaseActorSheet.#toggleItemVisible,
 
             weaponFullReload: SR5BaseActorSheet.#reloadAmmo,
             weaponPartialReload: SR5BaseActorSheet.#partialReloadAmmo,
@@ -298,8 +307,33 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (partId === 'actions') {
             partContext.actions = await this._prepareActions();
         }
+        if (partId === 'rollBar') {
+            partContext.favorites = await this._prepareFavorites();
+        }
 
         return partContext;
+    }
+
+    static async #favoriteItem(this: SR5BaseActorSheet, event) {
+        const uuid = SheetFlow.closestItemId(event.target);
+        const newFavorites = this.actor.system.favorites.slice();
+
+        if (newFavorites.includes(uuid)) {
+            newFavorites.splice(newFavorites.indexOf(uuid), 1);
+        } else {
+            newFavorites.push(uuid);
+        }
+        await this.actor.update({system: { favorites: newFavorites }});
+    }
+
+    async _prepareFavorites() {
+        const favorites: SR5Item[] = [];
+        for (const uuid of this.actor.system.favorites) {
+            let doc = SheetFlow.fromUuidSync(uuid as string);
+            if (!doc) doc = await fromUuid(uuid as string);
+            if (doc && doc instanceof SR5Item) favorites.push(doc);
+        }
+        return favorites;
     }
 
     override async _onRender(context, options) {
@@ -615,8 +649,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #editItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = SheetFlow.listItemId(event.target);
-        const item = SheetFlow.fromUuidSync(iid);
+        const uuid = SheetFlow.closestItemId(event.target);
+        const item = SheetFlow.fromUuidSync(uuid);
         if (item && item instanceof SR5Item) await item.sheet?.render(true);
     }
 
@@ -638,8 +672,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #rollItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = SheetFlow.listItemId(event.target);
+        const iid = SheetFlow.closestItemId(event.target);
         const item = SheetFlow.fromUuidSync(iid);
+
+        console.log('rollItem', iid, item);
 
         if (!item || !(item instanceof SR5Item)) return;
         await this._handleRollItem(item, event);
@@ -647,7 +683,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     async _handleRollItem(item: SR5Item, event) {
         if (!Hooks.call('SR5_PreActorItemRoll', this.actor, item)) return;
-        await item.castAction(event);
+        await item.castAction(event, this.actor);
     }
 
     /**
@@ -1358,9 +1394,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #openSource(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = event.target.dataset.itemId;
-        const item = await fromUuid(iid);
-        console.log('openSource', this, event, item);
+        const uuid = SheetFlow.closestItemId(event.target);
+        const item = SheetFlow.fromUuidSync(uuid);
         if (item) {
             if (item instanceof SR5Item) {
                 await item.openSource();
@@ -1411,13 +1446,30 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
+    static async #toggleItemVisible(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const uuid = SheetFlow.closestItemId(event.target);
+        if (uuid) {
+            const hidden_items = this.actor.system.hidden_items.slice();
+
+            const index = hidden_items.indexOf(uuid);
+
+            if (index >= 0) {
+                hidden_items.splice(index, 1);
+            } else {
+                hidden_items.push(uuid);
+            }
+            await this.actor.update({system: { hidden_items }});
+        }
+    }
+
     /**
      * Change the equipped status of an item shown within a sheet item list.
      */
     static async #onToggleEquippedItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = SheetFlow.listItemId(event.target);
-        const item = await fromUuid(iid);
+        const uuid = SheetFlow.closestItemId(event.target);
+        const item = SheetFlow.fromUuidSync(uuid);
         if (!item || !(item instanceof SR5Item) || item.actorOwner !== this.actor) return;
 
         if (item.isType('critter_power') || item.isType('sprite_power')) {
@@ -1450,8 +1502,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         event.stopPropagation();
 
-        const iid = SheetFlow.listItemId(event.target);
-        const item = await fromUuid(iid);
+        const uuid = SheetFlow.closestItemId(event.target);
+        const item = SheetFlow.fromUuidSync(uuid);
         if (!item || !(item instanceof SR5Item)) return;
 
         // iterate through the states of online -> silent -> offline
@@ -1594,8 +1646,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     async _onItemMoveToInventory(event) {
         event.preventDefault();
 
-        const itemId = Helpers.listItemId(event);
-        const item = this.actor.items.get(itemId);
+        const uuid = SheetFlow.closestItemId(event.target);
+        const item = SheetFlow.fromUuidSync(uuid);
         if (!item) return;
 
         // Ask user about what inventory to move the item to.
@@ -1626,15 +1678,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #reloadAmmo(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = event.target.dataset.itemId;
-        const item = await fromUuid(iid);
+        const uuid = SheetFlow.closestItemId(event.target);
+        const item = SheetFlow.fromUuidSync(uuid);
         if (item && item instanceof SR5Item) return item.reloadAmmo(false);
     }
 
     static async #partialReloadAmmo(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = event.target.dataset.itemId;
-        const item = await fromUuid(iid);
+        const uuid = SheetFlow.closestItemId(event.target);
+        const item = SheetFlow.fromUuidSync(uuid);
         if (item && item instanceof SR5Item) return item.reloadAmmo(true);
     }
 

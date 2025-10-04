@@ -1,4 +1,5 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
+{{#if (or @root.isEditMode (isVisible item))}}
 <div class="new-list-item-container">
     <div class="new-list-item" data-item-id="{{item.uuid}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
@@ -17,6 +18,12 @@
 
         {{#if @root.isEditMode}}
         <div class="new-list-item-icons">
+            {{#if (isOwner item owner=@root.actor)}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+            {{else}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/toggle-visible-icon.hbs' item }}
+            {{/if}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
         </div>
         {{/if}}
     </div>
@@ -24,3 +31,4 @@
         {{{item.system.description.value}}}
     </div>
 </div>
+{{/if}}

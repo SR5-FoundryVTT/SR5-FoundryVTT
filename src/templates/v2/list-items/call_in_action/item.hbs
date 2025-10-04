@@ -3,16 +3,7 @@
     <div class="new-list-item" data-item-id="{{item.uuid}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
         {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-        <div class="new-list-item-label-container">
-            <a class="{{#if system.importFlags.isFreshImport}}{{#if (itemMarking "COLOR")}}fresh-import{{/if}}{{/if}}"
-                data-action="showItemDescription" data-item-id="{{item.uuid}}">
-                {{#if name}}
-                    {{name}}
-                {{else}}
-                    {{item.name}}
-                {{/if}}
-            </a>
-        </div>
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
         {{#if (eq item.system.actor_type 'spirit')}}
             <div class="new-list-item-col">
@@ -39,6 +30,8 @@
         {{/if}}
 
         <div class="new-list-item-icons">
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">

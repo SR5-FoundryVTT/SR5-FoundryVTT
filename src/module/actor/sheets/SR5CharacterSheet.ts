@@ -48,7 +48,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             initial: 'skills',
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
-                { id: 'skills', label: 'Skills', cssClass: '' },
+                { id: 'skills', label: 'Character', cssClass: '' },
                 { id: 'inventory', label: 'Inventory', cssClass: '' },
                 { id: 'critter', label: 'Critter', cssClass: '' },
                 { id: 'magic', label: 'Magic', cssClass: '' },

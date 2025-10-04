@@ -20,6 +20,7 @@ export const preloadHandlebarsTemplates = async () => {
             'list-items/connected-icons-toggle',
             'list-items/edit-delete-icons',
             'list-items/equip-icon',
+            'list-items/favorite-icon',
             'list-items/header-add-icon',
             'list-items/item-quantity-col',
             'list-items/item-name',
@@ -28,6 +29,7 @@ export const preloadHandlebarsTemplates = async () => {
             'list-items/matrix-icon-image',
             'list-items/open-source-icon',
             'list-items/toggle-expand-icon',
+            'list-items/toggle-visible-icon',
             'list-items/wireless-icon',
         ),
         ...v2AP(

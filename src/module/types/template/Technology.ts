@@ -11,7 +11,6 @@ export const TechnologyData = () => ({
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
     availability: new StringField({ required: true }),
     quantity: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
-    show_quantity: new BooleanField(),
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
     equipped: new BooleanField(),
 

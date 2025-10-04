@@ -3,18 +3,7 @@
     <div class="new-list-item" data-item-id="{{item.uuid}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
         {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-        <div class="new-list-item-label-container">
-            <a class="{{#if (isBroken item)}}faded {{/if}}{{#if system.importFlags.isFreshImport}}{{#if (itemMarking "COLOR")}}fresh-import{{/if}}{{/if}}"
-               {{#if (isBroken item)}}disabled{{/if}}
-               data-action="showItemDescription"
-               data-item-id="{{item.uuid}}">
-                {{#if name}}
-                    {{name}}
-                {{else}}
-                    {{item.name}}
-                {{/if}}
-            </a>
-        </div>
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
         <div class="new-list-item-col">
             {{#if (usesAmmo item)}}
@@ -40,9 +29,11 @@
 
         <div class="new-list-item-icons">
             {{#if (isOwner item owner=@root.actor)}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
             {{/if}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">

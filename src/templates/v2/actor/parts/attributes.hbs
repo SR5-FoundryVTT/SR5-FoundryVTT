@@ -2,6 +2,7 @@
 <div class="attributes">
     {{#each system.attributes as |attribute attributeId|}} {{#unless attribute.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                label=(concat "SR5.Actor.Attribute." attributeId ".short")
                 attribute=attribute
                 attributeField=(objValue @root.systemFields.attributes.fields attributeId)
                 rootId=@root.rootId

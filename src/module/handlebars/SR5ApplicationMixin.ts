@@ -33,20 +33,28 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             event.preventDefault();
             event.stopPropagation();
             if (this.isEditable) {
-                this._isEditMode = !this._isEditMode;
+                this._mode = this.isEditMode ? 'play' : 'edit';
             } else {
-                this._isEditMode = false;
+                this._mode = 'play';
             }
             await this.render();
         }
 
-        protected _isEditMode = false;
+        protected _mode: 'play' | 'edit' = 'play'
+
+        get isEditMode() {
+            return this._mode === 'edit';
+        }
+
+        get isPlayMode() {
+            return this._mode === 'play';
+        }
 
         async _prepareContext(options) {
             // @ts-ignore
             const context = await super._prepareContext(options);
-            context.isEditMode = this._isEditMode;
-            context.isPlayMode = !this._isEditMode;
+            context.isEditMode = this.isEditMode;
+            context.isPlayMode = this.isPlayMode;
             if (this.document) {
                 if (!context.system) {
                     context.system = this.document.toObject(false).system;
@@ -117,7 +125,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             Hooks.call('sr5_processTagifyElements', this.element);
 
             if (this.editIcon) {
-                this.editIcon.className = this._isEditMode ? 'fas fa-toggle-off' : 'fas fa-toggle-on';
+                this.editIcon.className = this.isEditMode ? 'fas fa-toggle-off' : 'fas fa-toggle-on';
             }
         }
 
@@ -131,7 +139,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
                 button.dataset.tooltip = "SR5.Tooltips.ToggleEditMode"
                 this.editIcon = document.createElement('i');
                 button.appendChild(this.editIcon);
-                this.editIcon.className = this._isEditMode ? 'fas fa-toggle-off' : 'fas fa-toggle-on';
+                this.editIcon.className = this.isEditMode ? 'fas fa-toggle-off' : 'fas fa-toggle-on';
                 button.dataset.action = "toggleEditMode";
 
                 this.window?.header?.prepend(button);

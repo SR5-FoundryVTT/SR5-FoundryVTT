@@ -95,6 +95,10 @@ export const SheetFlow = {
         return parts.length > 0 ? parts[parts.length - 1] : '';
     },
 
+    closestItemId(target) {
+        return target.closest('[data-item-id]').dataset.itemId;
+    },
+
     closestAction(target) {
         return target.closest('[data-action]');
     },

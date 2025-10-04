@@ -14,16 +14,46 @@
                 <label>{{localize "SR5.IsGrunt"}}</label>
             {{/if}}
             {{#unless (or system.is_npc system.is_critter)}}
-                <label><i class="fas fa-yen"></i>&nbsp;{{system.nuyen}}</label>
+                <label>
+                    <i class="fas fa-yen"></i>
+                    <span>
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.nuyen value=system.nuyen rootId=rootId classes="nuyen"}}
+                        {{else}}
+                            {{system.nuyen}}
+                        {{/if}}
+                   </span>
+                </label>
                 <label>
                     <i class="fas fa-people-group"></i>
-                    <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.ActorSheet.Labels.StreetCredShort"}}&nbsp;{{system.street_cred}}</span>
+                    <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.ActorSheet.Labels.StreetCredShort"}}&nbsp;
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.street_cred value=system.street_cred rootId=rootId classes="short"}}
+                        {{else}}
+                            {{system.street_cred}}
+                        {{/if}}
+                    </span>
                     <i class="fas fa-pipe"></i>
-                    <span data-tooltip="{{systemFields.notoriety.label}} - {{systemFields.notoriety.hint}}">{{localize "SR5.ActorSheet.Labels.NotorietyShort"}}&nbsp;{{system.notoriety}}</span>
+                    <span data-tooltip="{{systemFields.notoriety.label}} - {{systemFields.notoriety.hint}}">{{localize "SR5.ActorSheet.Labels.NotorietyShort"}}&nbsp;
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.notoriety value=system.notoriety rootId=rootId classes="short"}}
+                        {{else}}
+                            {{system.notoriety}}
+                        {{/if}}
+                    </span>
                     <i class="fas fa-pipe"></i>
-                    <span data-tooltip="{{systemFields.public_awareness.label}} - {{systemFields.public_awareness.hint}}">{{localize "SR5.ActorSheet.Labels.PublicAwarenessShort"}}&nbsp;{{system.public_awareness}}</span>
+                    <span data-tooltip="{{systemFields.public_awareness.label}} - {{systemFields.public_awareness.hint}}">{{localize "SR5.ActorSheet.Labels.PublicAwarenessShort"}}&nbsp;
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.public_awareness value=system.public_awareness rootId=rootId classes="short"}}
+                        {{else}}
+                            {{system.public_awareness}}
+                        {{/if}}
+                    </span>
                 </label>
             {{/unless}}
+            <label data-tooltip="SR5.AttrEssence">
+                <i class="fas fa-head-side-gear"></i>&nbsp;{{system.attributes.essence.value}}
+            </label>
 
         {{/if}}
         <div></div>

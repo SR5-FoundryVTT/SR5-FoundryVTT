@@ -61,13 +61,26 @@
     </div>
     <div>
         {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
-        {{#if system.attributes.edge.value}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                tooltip="SR5.AttrEdge"
-                value=system.attributes.edge.uses
-                max=system.attributes.edge.value
-                id="edge"
-            }}
+        {{#if @root.isEditMode}}
+            <div class="new-list-item">
+                <div class="new-list-item-label-container">
+                    <label data-tooltip="{{systemFields.attributes.fields.edge.fields.base.hint}}">
+                        {{systemFields.attributes.fields.edge.fields.base.label}}
+                    </label>
+                </div>
+                <div class="new-list-item-col">
+                    {{formInput systemFields.attributes.fields.edge.fields.base value=system.attributes.edge.base
+                                rootId=rootId class="short"}}
+                </div>
+            </div>
+        {{else}}
+            {{#if system.attributes.edge.value}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                    tooltip="SR5.AttrEdge"
+                    value=system.attributes.edge.uses
+                    max=system.attributes.edge.value
+                    id="edge" }}
+            {{/if}}
         {{/if}}
         {{#if (or isSpirit isSprite)}}
         <div class="new-list-item">
@@ -79,12 +92,14 @@
                 {{/if}}
             </div>
             <div class="new-list-item-col">
-                <a data-action="removeOneService"
+                <a class="hover-show-button"
+                   data-action="removeOneService"
                    data-tooltip="SR5.Labels.ActorSheet.RemoveOneService">
                     <i class="fas fa-minus-square"></i>
                 </a>
-                {{system.services}}
-                <a data-action="addOneService"
+                <label>{{system.services}}</label>
+                <a class="hover-show-button"
+                   data-action="addOneService"
                    data-tooltip="SR5.Labels.ActorSheet.AddOneService">
                     <i class="fas fa-plus-square"></i>
                 </a>

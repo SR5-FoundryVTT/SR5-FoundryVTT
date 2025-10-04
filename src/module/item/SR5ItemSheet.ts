@@ -84,7 +84,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
  * Extend the basic ItemSheet with some very simple modifications
  */
 export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
-    declare protected _isEditMode;
+    declare isEditMode: boolean;
 
     static override DEFAULT_OPTIONS = {
         classes: ['item', 'named-sheet'],
@@ -1049,7 +1049,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 name: "SR5.ActorSheet.ContextOptions.Delete",
                 icon: "<i class='fas fa-trash'></i>",
                 condition: (target) => {
-                    return this._isEditMode;
+                    return this.isEditMode;
                 },
                 callback: async (target) => {
                     const userConsented = await Helpers.confirmDeletion();

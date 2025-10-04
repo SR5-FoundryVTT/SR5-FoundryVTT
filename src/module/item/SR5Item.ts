@@ -233,8 +233,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Cast the action of this item as a Test.
      *
      * @param event A PointerEvent by user interaction.
+     * @param actor
      */
-    async castAction(event?: RollEvent) {
+    async castAction(event?: RollEvent, actor?: SR5Actor) {
         
         // Only show the item's description by user intention or by lack of testability.
         let dontRollTest = TestCreator.shouldPostItemDescription(event);
@@ -247,10 +248,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         if (dontRollTest) return this.postItemCard();
 
-        if (!this.actor) return;
+        if (!actor) {
+            actor = this.actor ?? undefined;
+        }
+
+        if (!actor) return;
 
         const showDialog = !TestCreator.shouldHideDialog(event);
-        const test = await TestCreator.fromItem(this, this.actor, { showDialog });
+        const test = await TestCreator.fromItem(this, actor, { showDialog });
         await test?.execute();
         return undefined;
     }

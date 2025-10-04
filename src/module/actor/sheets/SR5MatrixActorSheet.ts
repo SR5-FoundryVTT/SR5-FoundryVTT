@@ -357,7 +357,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @returns Sorted list of objects containg a localized name and action item for sheet display.
      */
     async _prepareMatrixActions() {
-        let actions = await PackActionFlow.getActorMatrixActions(this.actor);
+        let actions = await this._getMatrixPackActions();
         // Reduce actions to those matching the marks on the selected target.
         if (this.selectedMatrixTarget) {
             const ownedItem = this.actor.isOwnerOf(this.selectedMatrixTarget);

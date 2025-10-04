@@ -3,36 +3,27 @@
     <div class="new-list-item" data-item-id="{{item.uuid}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
         {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-        <div class="new-list-item-label-container">
-            <a data-action="showItemDescription">
-                {{#if name}}
-                    {{name}}
-                {{else}}
-                    {{item.name}}
-                {{/if}}
-            </a>
-        </div>
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
         <div class="new-list-item-col">
-            <a data-action="removeItemQty"
-               data-tooltip="SR5.Labels.ActorSheet.RemoveOneQty">
-                <i class="fas fa-minus-square"></i>
-            </a>
             {{#if @root.isEditMode}}
                 <input type="number" class="item-quantity-input" value="{{item.system.technology.quantity}}" min="0" max="999">
             {{else}}
-                {{item.system.technology.quantity}}
+                <a data-action="removeItemQty"
+                   data-tooltip="SR5.ActorSheet.Labels.RemoveOneQty">
+                    <i class="fas fa-minus-square"></i>
+                </a>
+                <label>{{item.system.technology.quantity}}</label>
+                <a data-action="addItemQty"
+                   data-tooltip="SR5.ActorSheet.Labels.AddOneQty">
+                    <i class="fas fa-plus-square"></i>
+                </a>
             {{/if}}
-            <a data-action="addItemQty"
-               data-tooltip="SR5.Labels.ActorSheet.AddOneQty">
-                <i class="fas fa-plus-square"></i>
-            </a>
         </div>
 
         <div class="new-list-item-icons">
-            <a data-action="equipItem">
-                <i class="{{#if item.system.technology.equipped}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
-            </a>
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">

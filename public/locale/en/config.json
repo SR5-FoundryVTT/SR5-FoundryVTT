@@ -171,7 +171,49 @@
         },
         "ActiveSkills": "Active Skills",
         "Actor": {
+            "Attribute": {
+                "strength": {
+                    "short": "STR",
+                    "full": "Strength"
+                },
+                "agility": {
+                    "short": "AGI",
+                    "full": "Agility"
+                },
+                "body": {
+                    "short": "BOD",
+                    "full": "Body"
+                },
+                "reaction": {
+                    "short": "REA",
+                    "full": "Reaction"
+                },
+                "intuition": {
+                    "short": "INT",
+                    "full": "Intuition"
+                },
+                "willpower": {
+                    "short": "WIL",
+                    "full": "Willpower"
+                },
+                "logic": {
+                    "short": "LOG",
+                    "full": "Logic"
+                },
+                "charisma": {
+                    "short": "CHA",
+                    "full": "Charisma"
+                }
+            },
             "FIELDS": {
+                "attributes": {
+                    "edge": {
+                        "base": {
+                            "label": "Edge",
+                            "hint": "Edge is a character’s luck, the favor of the gods, that unexplainable factor that allows her to beat the odds."
+                        }
+                    }
+                },
                 "modifiers": {
                     "walk": {
                         "label": "Walk",

@@ -33,7 +33,6 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         primary: {
             initial: 'matrix',
             tabs: [
-                { id: 'actions', label: 'Actions', cssClass: '' },
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
                 { id: 'misc', label: 'Misc', cssClass: '' },
@@ -56,11 +55,6 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         },
         tabs: {
             template: SheetFlow.templateBase('common/primary-tab-group'),
-        },
-        actions: {
-            template: SheetFlow.templateBase('actor/tabs/actions'),
-            templates: SheetFlow.templateListItem('action'),
-            scrollable: ['.scrollable']
         },
         matrix: {
             template: SheetFlow.templateBase('actor/tabs/ic-matrix'),

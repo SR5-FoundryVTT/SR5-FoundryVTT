@@ -2320,4 +2320,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const source = this.getSource();
         await LinksHelpers.openSource(source);
     }
+
+    favorites() {
+        return new Set(this.system.favorites);
+    }
+
+    hiddenItems() {
+        return new Set(this.system.hidden_items);
+    }
 }

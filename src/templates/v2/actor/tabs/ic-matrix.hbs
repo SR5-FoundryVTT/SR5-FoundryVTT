@@ -6,7 +6,9 @@
             <section class="content matrix-left-tab-content"></section>
         </div>
         <div>
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/ic-options.hbs' }}
+            {{#if @root.isEditMode}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/ic-options.hbs' }}
+            {{/if}}
             {{tabGroup matrixRightTabs}}
             <section class="content matrix-right-tab-content"></section>
         </div>

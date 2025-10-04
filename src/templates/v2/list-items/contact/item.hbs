@@ -1,21 +1,13 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container">
     <div class="new-list-item" data-item-id="{{item.uuid}}">
-        <div class="new-list-item-label-container">
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
-            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-            {{!-- allow overriding the name if provided --}}
-            <a class="{{#if system.importFlags.isFreshImport}}{{#if (itemMarking "COLOR")}}fresh-import{{/if}}{{/if}}"
-                data-action="showItemDescription" data-item-id="{{item.uuid}}">
-                {{#if name}}
-                    {{name}}
-                {{else}}
-                    {{item.name}}
-                {{/if}}
-            </a>
-        </div>
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
+        {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
         <div class="new-list-item-icons">
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">

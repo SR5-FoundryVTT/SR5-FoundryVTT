@@ -48,7 +48,23 @@ export const registerItemLineHelpers = () => {
     });
 
     Handlebars.registerHelper('isEquipped', function (item: SR5Item, options) {
-        return item.isEquipped();
+        return item?.isEquipped();
+    });
+
+    Handlebars.registerHelper('isVisible', function (item: SR5Item, options) {
+        const actor = options?.data?.root?.actor;
+        if (actor && item && actor instanceof SR5Actor) {
+            return !actor.hiddenItems().has(item.uuid);
+        }
+        return true;
+    });
+
+    Handlebars.registerHelper('isFavorite', function (item: SR5Item, options) {
+        const actor = options?.data?.root?.actor;
+        if (actor && item && actor instanceof SR5Actor) {
+            return actor.favorites().has(item.uuid);
+        }
+        return false;
     });
 
     Handlebars.registerHelper('marksRequired', function (item: SR5Item, options) {

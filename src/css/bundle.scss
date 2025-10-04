@@ -1805,35 +1805,8 @@ input[type='text'].display {
         width: 100%;
         padding: 0.25rem;
 
-        // hide "hover buttons" by default, show by growing the font-size
-        .hover-show-button {
-            font-size: 0;
-        }
-
         &.new-list-item-selected {
             background: linear-gradient(to right, rgba($matrix-green, 0.4), rgba($matrix-green, 0.01));
-        }
-
-        // display certain things when the mouse is within the item's list
-        &:hover {
-            // background: rgba($darkred, 0.3);
-            .new-list-item-image-roll {
-                content: url('assets/dice-solid.svg');
-                filter: invert(1);
-            }
-            .new-list-item-image-info {
-                content: url('icons/files.svg');
-            }
-            .new-list-item-image-edit {
-                content: url('icons/redist/wrench.svg');
-            }
-            .new-list-item-image-target {
-                content: url('icons/redist/target.svg');
-            }
-
-            .hover-show-button {
-                font-size: 0.8rem;
-            }
         }
 
         .new-list-item-image-container {
@@ -1841,8 +1814,22 @@ input[type='text'].display {
             max-width: 24px;
             min-height: 24px;
             max-height: 24px;
-            padding: 2px;
-            border-color: $light;
+
+            &:hover {
+                .new-list-item-image-roll {
+                    content: url('assets/dice-solid.svg');
+                    filter: invert(1);
+                }
+                .new-list-item-image-info {
+                    content: url('icons/files.svg');
+                }
+                .new-list-item-image-edit {
+                    content: url('icons/redist/wrench.svg');
+                }
+                .new-list-item-image-target {
+                    content: url('icons/redist/target.svg');
+                }
+            }
         }
 
         &.new-list-item-header {
@@ -1886,6 +1873,17 @@ input[type='text'].display {
             input[type="number"] {
                 max-width: 4rem;
                 max-height: 1.25rem;
+            }
+
+            // hide "hover buttons" by default, show by growing the font-size
+            .hover-show-button {
+                font-size: 0;
+            }
+
+            &:hover {
+                .hover-show-button {
+                    font-size: 0.8rem;
+                }
             }
 
             &.rtg-col {
@@ -1942,8 +1940,9 @@ input[type='text'].display {
         .new-list-item-icons {
             display: flex;
             flex-flow: row nowrap;
-            width: 6rem;
             flex: none;
+            min-width: 4rem;
+            margin-left: 0.25rem;
             justify-content: end;
             align-items: center;
             gap: 0.25rem;

@@ -5,7 +5,7 @@ import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
 import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
 import { AttributeChoices } from '@/module/types/template/Attributes';
-const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField, DocumentUUIDField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
     active: Skills(),
@@ -60,6 +60,9 @@ export const CommonData = () => ({
     importFlags: new SchemaField(ImportFlagData()),
 
     skills: new SchemaField(CharacterSkills()),
+
+    favorites: new ArrayField(new DocumentUUIDField()),
+    hidden_items: new ArrayField(new DocumentUUIDField()),
 
     situation_modifiers: new SchemaField({
         environmental: new SchemaField({ active: new ObjectField({ initial: {} }) }),
