@@ -11,7 +11,7 @@ const SpriteData = () => ({
     ...CommonData(),
     attributes: new SchemaField({...Attributes(), ...MatrixActorAttributes() }),
     spriteType: new StringField({ required: true }),
-    special: new StringField({ required: true, initial: "resonance", readonly: true }),
+    special: new StringField({ required: true, initial: "resonance", choices: ["resonance"], readonly: true }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
 
     // === Matrix & Host ===

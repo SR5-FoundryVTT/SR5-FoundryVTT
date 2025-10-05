@@ -6,7 +6,7 @@ export const shadowrunMatrixFlow = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     describe('MatrixFlow testing', () => {
         it('should reboot device and trigger all resulting effects', async () => {

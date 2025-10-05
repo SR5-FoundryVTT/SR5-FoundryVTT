@@ -401,7 +401,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             // disable VR as well
             await this.actor.update({ system: {
                     initiative: { perception: newValue, },
-                    matrix: { vr: false }
+                    matrix: { vr: false, hot_sim: false }
                 }});
         } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
             // if we are hot sim or cold sim, we are in VR and using matrix init perception
@@ -410,7 +410,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                     initiative: {
                         perception: 'matrix',
                     },
-                    matrix: { hot_sim: newValue === 'hot_sim', vr: true }
+                    matrix: { vr: true, hot_sim: newValue === 'hot_sim' }
                 },
             });
         }

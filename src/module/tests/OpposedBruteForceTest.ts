@@ -37,7 +37,7 @@ export class OpposedBruteForceTest extends OpposedMatrixTest<OpposedBruteForceTe
 
     override prepareBaseValues() {
         super.prepareBaseValues();
-        MarkPlacementFlow.prepareGridDefensePool(this);
+        MarkPlacementFlow.prepareGridBaseValues(this);
     }
 
     /**

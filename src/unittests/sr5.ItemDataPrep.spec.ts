@@ -13,7 +13,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     describe('TechnologyData preparation', () => {
         it('Calculate the correct device item condition monitor', async () => {
