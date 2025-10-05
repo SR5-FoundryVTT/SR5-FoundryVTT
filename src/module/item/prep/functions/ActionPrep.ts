@@ -1,7 +1,6 @@
-import { ActionRollType } from 'src/module/types/item/Action';
-import { Helpers } from '../../../helpers';
-import { PartsList } from '../../../parts/PartsList';
 import { SR5Item } from './../../SR5Item';
+import { PartsList } from '../../../parts/PartsList';
+import { ActionRollType } from 'src/module/types/item/Action';
 /**
  * Item data preparation around the 'action' template.json item template.
  */
@@ -72,11 +71,11 @@ export const ActionPrep = {
         if (ammoData.replaceDamage) {
             action.damage.override = { name: equippedAmmo.name, value: Number(ammoData.damage) };
         } else {
-            new PartsList(action.damage).addUniquePart(equippedAmmo.name, ammoData.damage);
+            PartsList.addUniquePart(action.damage, equippedAmmo.name, ammoData.damage);
         }
 
         // add mods to ap from ammo
-        new PartsList(action.damage.ap).addUniquePart(equippedAmmo.name, ammoData.ap);
+        PartsList.addUniquePart(action.damage.ap, equippedAmmo.name, ammoData.ap);
 
         if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name, ammoData.accuracy);
 
@@ -107,13 +106,13 @@ export const ActionPrep = {
         // Collect weapon value modifications from modifications.
         const limitParts = new PartsList(action.limit);
         const dpParts = new PartsList(action.dice_pool_mod);
-        equippedMods.forEach((mod) => {
+        for (const mod of equippedMods) {
             const modification = mod.asType('modification');
-            if (!modification) return;
+            if (!modification) continue;
 
             if (modification.system.accuracy) limitParts.addUniquePart(mod.name, modification.system.accuracy);
             if (modification.system.dice_pool) dpParts.addUniquePart(mod.name, modification.system.dice_pool);
-        });
+        }
     },
 
     /**
@@ -122,8 +121,8 @@ export const ActionPrep = {
      * @param action To be altered action data.
      */
     calculateValues(action: ActionRollType) {
-        action.damage.value = Helpers.calcTotal(action.damage);
-        action.damage.ap.value = Helpers.calcTotal(action.damage.ap);
-        action.limit.value = Helpers.calcTotal(action.limit);
+        PartsList.calcTotal(action.damage);
+        PartsList.calcTotal(action.damage.ap);
+        PartsList.calcTotal(action.limit);
     }
 }

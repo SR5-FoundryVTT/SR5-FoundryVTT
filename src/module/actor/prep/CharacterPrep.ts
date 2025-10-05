@@ -13,6 +13,7 @@ import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
+import { PartsList } from '@/module/parts/PartsList';
 
 export class CharacterPrep {
     static prepareBaseData(system: Actor.SystemOfType<'character'>) {
@@ -79,9 +80,10 @@ export class CharacterPrep {
         const recoilCompensation = RangedWeaponRules.humanoidRecoilCompensationValue(system.attributes.strength.value);
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
         system.values.recoil_compensation.base = baseRc;
-        Helpers.addChange(system.values.recoil_compensation, { name: "SR5.RecoilCompensation", value: recoilCompensation });
 
-        Helpers.calcTotal(system.values.recoil_compensation, { min: 0 });
+        const mod = new PartsList(system.values.recoil_compensation);
+        mod.addUniquePart("SR5.RecoilCompensation", recoilCompensation);
+        mod.calcTotal({ min: 0 });
     }
 
     static addSpecialAttributes(system: Actor.SystemOfType<'character'>) {

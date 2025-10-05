@@ -451,13 +451,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Modify by penetration
         if (damage.ap.value !== 0)
-            new PartsList(armor).addUniquePart('SR5.AP', damage.ap.value);
+            PartsList.addUniquePart(armor, 'SR5.AP', damage.ap.value);
 
         // Modify by element
         if (damage.element.value !== '') {
             const armorForDamageElement = armor[damage.element.value] || 0;
             if (armorForDamageElement > 0)
-                new PartsList(armor).addUniquePart('SR5.Element', armorForDamageElement);
+                PartsList.addUniquePart(armor, 'SR5.Element', armorForDamageElement);
         }
 
         Helpers.calcTotal(armor, {min: 0});
@@ -1135,8 +1135,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
 
         // Build modifiers values.
-        const mods = new PartsList(test.data.modifiers);
-        mods.addUniquePart('SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
+        PartsList.addUniquePart(test.data.modifiers, 'SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
         return test.execute();
     }
@@ -1684,8 +1683,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const modified = foundry.utils.duplicate(this.getArmor()) as ActorArmorType;
         if (modified) {
-            new PartsList(modified).addUniquePart('SR5.DV', damage.ap.value);
-            Helpers.calcTotal(modified, { min: 0 });
+            const mod = new PartsList(modified);
+            mod.addUniquePart('SR5.DV', damage.ap.value);
+            mod.calcTotal({ min: 0 });
         }
 
         return modified;

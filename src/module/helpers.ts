@@ -60,65 +60,7 @@ export class Helpers {
      * @param options min will a apply a minimum value, max will apply a maximum value.
      */
     static calcTotal(mod: ModifiableValueType, options?: CalcTotalOptions): number {
-        mod.value = mod.base;
-
-        if (options?.min != null && mod.value < options.min) {
-            this.addChange(mod, {
-                name: 'System Enforced Minimum',
-                mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE,
-                value: options.min,
-                priority: Infinity,
-            });
-        }
-
-        if (options?.max != null && mod.value > options.max) {
-            this.addChange(mod, {
-                name: 'System Enforced Maximum',
-                mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE,
-                value: options.max,
-                priority: Infinity,
-            });
-        }
-
-        mod.changes.sort((a, b) => a.priority - b.priority);
-        for (let i = 0; i < mod.changes.length; i++) {
-            const change = mod.changes[i];
-
-            switch (change.mode) {
-                case CONST.ACTIVE_EFFECT_MODES.ADD:
-                case CONST.ACTIVE_EFFECT_MODES.CUSTOM:
-                    mod.value += change.value;
-                    break;
-                case CONST.ACTIVE_EFFECT_MODES.MULTIPLY:
-                    mod.value *= change.value;
-                    break;
-                case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
-                    mod.value = change.value;
-                    this._markPreviousChangesUnused(mod.changes, i);
-                    break;
-                case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
-                    if (mod.value < change.value) {
-                        mod.value = change.value;
-                        this._markPreviousChangesUnused(mod.changes, i);
-                    } else {
-                        change.unused = true;
-                    }
-                    break;
-                case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
-                    if (mod.value > change.value) {
-                        mod.value = change.value;
-                        this._markPreviousChangesUnused(mod.changes, i);
-                    } else {
-                        change.unused = true;
-                    }
-                    break;
-                default:
-                    console.warn(`Unknown Active Effect mode ${change.mode} encountered.`);
-                    break;
-            }
-        }
-
-        return mod.value;
+        return 0;
     }
 
     /** Round a number to a given degree.
@@ -747,10 +689,12 @@ export class Helpers {
      */
     static modifyDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageType {
         const modified = foundry.utils.duplicate(incoming) as DamageType;
-        new PartsList(modified).addUniquePart(modificationLabel, hits);
-        modified.value = Helpers.calcTotal(modified, { min: 0 });
 
-        return {incoming, modified};
+        const mod = new PartsList(modified);
+        mod.addUniquePart(modificationLabel, hits);
+        mod.calcTotal({ min: 0 });
+
+        return { incoming, modified };
     }
 
     /** Reduces given damage value and returns both original and modified damage.

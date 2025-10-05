@@ -477,19 +477,19 @@ export const TestCreator = {
         
         // Include pool modifiers for opposed and resist tests.
         if (action.mod) {
-            new PartsList(data.modifiers).addUniquePart('SR5.DicePoolModifier', action.mod);
+            PartsList.addUniquePart(data.modifiers, 'SR5.DicePoolModifier', action.mod);
         }
         
         // Include pool modifiers that have been collected on the action item.
         // These can come from nested items and more.
         if(action.dice_pool_mod) {
-            action.dice_pool_mod.forEach(mod => new PartsList(data.modifiers).addUniquePart(mod.name, mod.value));
+            action.dice_pool_mod.forEach(mod => PartsList.addUniquePart(data.modifiers, mod.name, mod.value));
         }
         
         // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
-            new PartsList(data.pool).addUniquePart('SR5.Armor', armor.value);
+            PartsList.addUniquePart(data.pool, 'SR5.Armor', armor.value);
         }
 
         // Prepare limit values...
@@ -500,14 +500,14 @@ export const TestCreator = {
         }
         //...add limit modifiers
         if (action.limit.mod) {
-            action.limit.mod.forEach(mod => new PartsList(data.limit).addUniquePart(mod.name, mod.value));
+            action.limit.mod.forEach(mod => PartsList.addUniquePart(data.limit, mod.name, mod.value));
         }
         //...add limit attribute value based on actor.
         if (action.limit.attribute) {
             // Get the limit connected to the defined attribute.
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
-            if (limit) new PartsList(data.limit).addUniquePart(limit.label, limit.value);
+            if (limit) PartsList.addUniquePart(data.limit, limit.label, limit.value);
         }
 
         // Prepare threshold values...
@@ -553,7 +553,7 @@ export const TestCreator = {
             const label = SR5.modifierTypes[name];
             const options = {applicable};
             const value = actor.modifiers.totalFor(name, options);
-            new PartsList(data.modifiers).addUniquePart(label, value);
+            PartsList.addUniquePart(data.modifiers, label, value);
         }
 
         // Mark test as extended.

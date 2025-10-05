@@ -3,6 +3,7 @@ import { SR } from '../../../constants';
 import { SR5Actor } from '../../SR5Actor';
 import { Helpers } from '../../../helpers';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { PartsList } from '@/module/parts/PartsList';
 import { AttributeFieldType } from 'src/module/types/template/Attributes';
 
 export class AttributesPrep {
@@ -66,13 +67,15 @@ export class AttributesPrep {
         // The essence base is fixed. Changes should be made through the attribute.temp field.
         system.attributes.essence.base = SR.attributes.defaults.essence;
 
-        const essenceMod = system.modifiers['essence'];
-        if (essenceMod && !Number.isNaN(essenceMod))
-            Helpers.addChange(system.attributes.essence, { name: "SR5.Bonus", value: Number(essenceMod) });
-       
+        // Modify essence by actor modifer
+        const parts = new PartsList(system.attributes.essence);
+
+        const essenceMod = system.modifiers.essence;
+        parts.addUniquePart('SR5.Bonus', essenceMod);
+
         for (const item of items) {
             if (item.isEquipped() && item.isType('bioware', 'cyberware'))
-                Helpers.addChange(system.attributes.essence, { name: item.name, value: -item.getEssenceLoss() });
+                parts.addPart(item.name, -item.getEssenceLoss());
         }
 
         Helpers.calcTotal(system.attributes.essence);

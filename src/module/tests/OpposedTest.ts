@@ -209,7 +209,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
         // Do not simply concat list to avoid double applying an otherwise unique test modifier.
         for (const modifier of opposedMod.changes) {
-            new PartsList(this.data.modifiers).addUniquePart(modifier.name, modifier.value, true);
+            PartsList.addUniquePart(this.data.modifiers, modifier.name, modifier.value);
         }
     }
 

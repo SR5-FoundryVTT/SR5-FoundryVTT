@@ -29,15 +29,76 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
     }
 
     /**
-     * Returns the sum of all numerical part values.
-     * It safely handles non-numerical values by ignoring them.
+     * Finds and returns the value of the first part with a matching name.
+     * @param name The name of the part to find.
+     * @returns The part's value, or undefined if not found.
      */
-    public get total(): number {
+    public getPartValue(name: string) {
+        return this._field.changes.find(part => part.name === name)?.value;
+    }
+
+    // --- Mutators ---
+
+    /**
+     * Adds a new part to the list.
+     */
+    public addPart(
+        name: string,
+        value: number,
+        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
+        priority = 0
+    ): void {
+        if (!value && (!mode || mode === CONST.ACTIVE_EFFECT_MODES.ADD)) return;
+
+        this._field.changes.push({ mode, priority, unused: false, name, value });
+    }
+
+    /**
+     * Adds a part with a unique name, optionally overwriting an existing one.
+     */
+    public addUniquePart(
+        name: string,
+        value: number | undefined,
+        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
+        priority = 0,
+    ): void {
+        const index = this._field.changes.findIndex(part => part.name === name);
+
+        // If part exists
+        if (index !== -1) {
+            if (value !== undefined) {
+                this._field.changes[index] = { mode, priority, unused: false, name, value };
+            } else {
+                this.removePart(name);
+            }
+        } else if (value !== undefined) {
+            // Part does not exist, add it.
+            this.addPart(name, value);
+        } else {
+            console.warn(`Shadowrun 5e | Cannot add a part with an undefined value. Part: ${name}`);
+        }
+    }
+
+    /**
+     * Removes all parts with a matching name.
+     */
+    public removePart(name: string): void {
+        this._field.changes = this._field.changes.filter(part => part.name !== name);
+    }
+
+    public calcTotal(options?: { min?: number; max?: number }): number {
         this._field.value = this._field.base;
+
+        if (options?.min != null && this._field.value < options.min)
+            this.addPart('System Enforced Minimum', options.min, CONST.ACTIVE_EFFECT_MODES.UPGRADE, Infinity);
+
+        if (options?.max != null && this._field.value > options.max)
+            this.addPart('System Enforced Maximum', options.max, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE, Infinity);
 
         this._field.changes.sort((a, b) => a.priority - b.priority);
         for (let i = 0; i < this._field.changes.length; i++) {
             const change = this._field.changes[i];
+            change.unused = false;
 
             switch (change.mode) {
                 case CONST.ACTIVE_EFFECT_MODES.ADD:
@@ -76,66 +137,27 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
         return this._field.value;
     }
 
-    /**
-     * Finds and returns the value of the first part with a matching name.
-     * @param name The name of the part to find.
-     * @returns The part's value, or undefined if not found.
-     */
-    public getPartValue(name: string) {
-        return this._field.changes.find(part => part.name === name)?.value;
-    }
-
-    // --- Mutators ---
-
-    /**
-     * Adds a new part to the list.
-     */
-    public addPart(
-        name: string,
-        value: number,
-        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
-        priority = 0
+    public static addPart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList<F>["addPart"]>
     ): void {
-        if (!value && (!mode || mode === CONST.ACTIVE_EFFECT_MODES.ADD)) return;
-
-        this._field.changes.push({ mode, priority, unused: false, name, value });
+        new PartsList(list).addPart(...args);
     }
 
-    /**
-     * Adds a part with a unique name, optionally overwriting an existing one.
-     */
-    public addUniquePart(
-        name: string,
-        value: number,
-        overwrite = true,
-        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
-        priority = 0,
+    public static addUniquePart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList["addUniquePart"]>
     ): void {
-        const index = this._field.changes.findIndex(part => part.name === name);
-
-        // If part exists
-        if (index !== -1) {
-            if (overwrite) {
-                // If value is defined, update the existing part.
-                // Otherwise, remove it.
-                if (value !== undefined) {
-                    this._field.changes[index] = { mode, priority, unused: false, name, value };
-                } else {
-                    this._field.changes.splice(index, 1);
-                }
-            }
-        } else if (value !== undefined) {
-            // Part does not exist, add it.
-            this.addPart(name, value);
-        } else {
-            console.warn(`Shadowrun 5e | Cannot add a part with an undefined value. Part: ${name}`);
-        }
+        new PartsList(list).addUniquePart(...args);
     }
 
-    /**
-     * Removes all parts with a matching name.
-     */
-    public removePart(name: string): void {
-        this._field.changes = this._field.changes.filter(part => part.name !== name);
+    public static removePart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList<F>["removePart"]>
+    ): void {
+        new PartsList(list).removePart(...args);
+    }
+
+    public static calcTotal<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList<F>["calcTotal"]>
+    ): number {
+        return new PartsList(list).calcTotal(...args);
     }
 }

@@ -114,20 +114,20 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
             this.data.cover;
 
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
-        new PartsList(this.data.modifiers).addUniquePart('SR5.Cover', this.data.cover);
+        PartsList.addUniquePart(this.data.modifiers, 'SR5.Cover', this.data.cover);
     }
 
     applyPoolActiveDefenseModifier() {
         const defense = this.data.activeDefenses[this.data.activeDefense] || {label: 'SR5.ActiveDefense', value: 0, init: 0};
 
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
-        new PartsList(this.data.modifiers).addUniquePart('SR5.ActiveDefense', defense.value || 0);
+        PartsList.addUniquePart(this.data.modifiers, 'SR5.ActiveDefense', defense.value);
     }
 
     applyPoolMeleeReachModifier() {
         if (!this.data.isMeleeAttack) return;
 
-        new PartsList(this.data.modifiers).addUniquePart('SR5.Weapon.Reach', this.data.defenseReach);
+        PartsList.addUniquePart(this.data.modifiers, 'SR5.Weapon.Reach', this.data.defenseReach);
     }
 
     /**
@@ -141,7 +141,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
 
         if (!fireMode.defense) return;
 
-        new PartsList(this.data.modifiers).addUniquePart(fireMode.label, Number(fireMode.defense));
+        PartsList.addUniquePart(this.data.modifiers, fireMode.label, Number(fireMode.defense));
     }
 
     override get success() {

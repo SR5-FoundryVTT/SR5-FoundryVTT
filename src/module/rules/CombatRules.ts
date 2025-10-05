@@ -246,7 +246,7 @@ export class CombatRules {
         if (damage.ap.value <= 0) return modifiedArmor;
 
         console.error('Check if ap is a negative value or positive value during weapon item configuration');
-        new PartsList(modifiedArmor).addUniquePart('SR5.AP', damage.ap.value);
+        PartsList.addUniquePart(modifiedArmor, 'SR5.AP', damage.ap.value);
         modifiedArmor.value = Helpers.calcTotal(modifiedArmor, {min: 0});
 
         return modifiedArmor;

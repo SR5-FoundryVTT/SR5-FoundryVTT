@@ -1,4 +1,3 @@
-import {Helpers} from "../helpers";
 import {CombatRules} from "./CombatRules";
 import { SR5Actor } from "../actor/SR5Actor";
 import {PartsList} from "../parts/PartsList";
@@ -32,12 +31,12 @@ export class CombatSpellRules {
         damage = foundry.utils.duplicate(damage) as DamageType;
 
         const ap = -force;
-        new PartsList(damage.ap).addUniquePart('SR5.Force', ap);
-        new PartsList(damage).addUniquePart('SR5.Force', force);
+        PartsList.addUniquePart(damage.ap, 'SR5.Force', ap);
+        PartsList.addUniquePart(damage, 'SR5.Force', force);
 
         // Armor piercing can both be a negative and positive value.
-        Helpers.calcTotal(damage.ap);
-        Helpers.calcTotal(damage, {min: 0});
+        PartsList.calcTotal(damage.ap);
+        PartsList.calcTotal(damage, { min: 0 });
 
         return damage;
     }

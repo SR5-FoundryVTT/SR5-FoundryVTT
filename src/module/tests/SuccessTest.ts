@@ -837,7 +837,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         for (const type of this.testModifiers) {
             const { name, value } = this.prepareActorModifier(this.actor, type);
-            new PartsList(this.data.modifiers).addUniquePart(name, value, true);
+            PartsList.addUniquePart(this.data.modifiers, name, value);
         }
     }
 
@@ -1293,7 +1293,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Edge will be applied differently for when the test has been already been cast or not.
         // Exploding dice will be handled during normal roll creation.
         const edge = this.actor.getEdge().value;
-        parts.addUniquePart('SR5.PushTheLimit', edge, true);
+        parts.addUniquePart('SR5.PushTheLimit', edge);
 
         // Before casting edge will be part of the whole dice pool and that pool will explode.
         if (!this.evaluated) return;
@@ -1333,7 +1333,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Apply second chance modifiers.
         // Overwrite existing, as only ONE edge per test is allowed, therefore stacking is not possible.
-        parts.addUniquePart('SR5.SecondChance', dice, true);
+        parts.addUniquePart('SR5.SecondChance', dice);
 
         // Add new dice as fully separate Roll.
         const formula = `${dice}d6`;
