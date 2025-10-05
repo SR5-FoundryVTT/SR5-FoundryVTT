@@ -1339,7 +1339,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             action.limit.mod.push({ name: "Teamwork", value: teamworkData.additionalLimit })
         }
 
-        action.dice_pool_mod.push({ name: "Teamwork", value: teamworkData.additionalDice })
+        action.dice_pool_mod.push({
+            name: "Teamwork",
+            value: teamworkData.additionalDice,
+            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+            unused: false, priority: 0,
+        });
 
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, {showDialog});

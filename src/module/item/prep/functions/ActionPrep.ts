@@ -1,6 +1,7 @@
 import { SR5Item } from './../../SR5Item';
 import { PartsList } from '../../../parts/PartsList';
 import { ActionRollType } from 'src/module/types/item/Action';
+import { DataDefaults } from '@/module/data/DataDefaults';
 /**
  * Item data preparation around the 'action' template.json item template.
  */
@@ -104,8 +105,10 @@ export const ActionPrep = {
      */
     prepareWithMods(action: ActionRollType, equippedMods: SR5Item[]) {
         // Collect weapon value modifications from modifications.
+        const valueField = DataDefaults.createData('value_field', { changes: action.dice_pool_mod });
         const limitParts = new PartsList(action.limit);
-        const dpParts = new PartsList(action.dice_pool_mod);
+        const dpParts = new PartsList(valueField);
+
         for (const mod of equippedMods) {
             const modification = mod.asType('modification');
             if (!modification) continue;
@@ -113,6 +116,8 @@ export const ActionPrep = {
             if (modification.system.accuracy) limitParts.addUniquePart(mod.name, modification.system.accuracy);
             if (modification.system.dice_pool) dpParts.addUniquePart(mod.name, modification.system.dice_pool);
         }
+
+        action.dice_pool_mod = valueField.changes;
     },
 
     /**

@@ -462,30 +462,32 @@ export const TestCreator = {
             // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
             if (action.spec) pool.addUniquePart('SR5.Specialization', SkillRules.SpecializationModifier);
         }
+
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
             const attribute = actor.getAttribute(action.attribute, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
         }
+
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) pool.addPart(attribute.label, attribute.value);
         }
-        
+
         // Include pool modifiers for opposed and resist tests.
         if (action.mod) {
             PartsList.addUniquePart(data.modifiers, 'SR5.DicePoolModifier', action.mod);
         }
-        
+
         // Include pool modifiers that have been collected on the action item.
         // These can come from nested items and more.
         if(action.dice_pool_mod) {
             action.dice_pool_mod.forEach(mod => PartsList.addUniquePart(data.modifiers, mod.name, mod.value));
         }
-        
+
         // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
@@ -498,10 +500,12 @@ export const TestCreator = {
             //       For WeaponItem this would result in 'Precision' to be shown instead of a numerical literal.
             data.limit.base = Number(action.limit.base);
         }
+
         //...add limit modifiers
         if (action.limit.mod) {
             action.limit.mod.forEach(mod => PartsList.addUniquePart(data.limit, mod.name, mod.value));
         }
+
         //...add limit attribute value based on actor.
         if (action.limit.attribute) {
             // Get the limit connected to the defined attribute.
@@ -526,7 +530,6 @@ export const TestCreator = {
             data.opposed = action.opposed;
         }
 
-        
         // Prepare test modifiers and possible applicable selections
         const modifiers: {[key in Shadowrun.ModifierTypes]?: string[]} = {};
         for (const modifier of data.action.modifiers) {

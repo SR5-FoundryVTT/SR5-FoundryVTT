@@ -35,7 +35,7 @@ export const OverrideModEntry = () => ({
     ...ModListEntry(),
 });
 
-export const NewModListEntryType = () => ({
+export const NewModListEntry = () => ({
     name: new StringField({ required: true }),
     unused: new BooleanField({ initial: false }),
     mode: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
@@ -43,7 +43,7 @@ export const NewModListEntryType = () => ({
     priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
-export const NewModList = () => new ArrayField(new SchemaField(ModListEntry()));
+export const NewModList = () => new ArrayField(new SchemaField(NewModListEntry()));
 export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
 
 export const ModifiableValue = () => ({
@@ -54,7 +54,7 @@ export const ModifiableValue = () => ({
         nullable: true,
         choices: ['override', 'upgrade', 'downgrade']
     }),
-    changes: new ArrayField(new SchemaField(NewModListEntryType())),
+    changes: new ArrayField(new SchemaField(NewModListEntry())),
     override: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
     downgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
     upgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
