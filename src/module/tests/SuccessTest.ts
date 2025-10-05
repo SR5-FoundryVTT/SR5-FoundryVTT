@@ -1682,7 +1682,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Mark test as extended to get iterative execution.
         if (!test.extended) {
             test.data.extended = true;
-            test.calculateExtendedHits();
+            test.data.values.extendedHits = test.calculateExtendedHits();
         }
 
         // Mark this roll as an extended roll.
