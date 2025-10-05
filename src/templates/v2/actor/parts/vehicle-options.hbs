@@ -1,71 +1,15 @@
 <div class="fill-container">
     <div class="new-list-item new-list-item-header">
         <div class="new-list-item-label-container">
-            {{localize "SR5.Labels.ActorSheet.VehicleConfiguration"}}
+            {{#if system.isDrone}}
+                <label>{{localize "SR5.ModPoints"}}</label>
+            {{else}}
+                <label>{{localize "SR5.ModificationCategories"}}</label>
+            {{/if}}
         </div>
     </div>
     <section id="vehicle-options-scroll" class="scrollable">
-        <div class="standard-form">
-            <div class="form-group">
-                <label>
-                    {{localize "SR5.Vehicle.Driver"}}
-                </label>
-                <div class="form-fields">
-                    {{#if vehicle.driver}}
-                    <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
-                        <i class="fas fa-user"></i>
-                        {{vehicle.driver.name}}
-                    </a>
-                    <a class="close driver-remove"><i class="fas fa-times"></i></a>
-                    {{else}}
-                    <a class="driver-pick" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsDriver">
-                        {{localize "SR5.Vehicle.MissingDriver"}}
-                        <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
-                            <i class="fa-light fa-square-dashed fa-stack-2x"></i>
-                            <i class="fas fa-user fa-stack-1x"></i>
-                        </span>
-                    </a>
-                    {{/if}}
-                </div>
-            </div>
-            <div class="form-group">
-                <label>
-                    {{localize "SR5.Labels.Sheet.PAN"}}
-                </label>
-                <div class="form-fields">
-                    {{#if vehicle.master}}
-                    <span>
-                        <a class="origin-link" draggable="false" data-origin-link="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
-                        <a class="close controller-remove"><i class="fas fa-times"></i></a>
-                    </span>
-                    {{else}}
-                    {{#if vehicle.driver}}
-                    <a class="connect-to-driver">
-                        <i class="fas fa-network-wired"></i>
-                        {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
-                    </a>
-                    {{/if}}
-                    {{/if}}
-                </div>
-            </div>
-            {{formGroup systemFields.vehicleType value=source.system.vehicleType disabled=@root.isPlayMode localize=true }}
-            {{formGroup systemFields.controlMode value=source.system.vehicle.controlMode disabled=@root.isPlayMode localize=true }}
-            {{formGroup systemFields.environment value=source.system.vehicle.environment disabled=@root.isPlayMode localize=true }}
-            {{formGroup systemFields.isDrone value=source.system.isDrone disabled=@root.isPlayMode }}
-            {{formGroup systemFields.isOffRoad value=source.system.isOffRoad disabled=@root.isPlayMode }}
-        </div>
-
-        <div class="new-list-item new-list-item-header">
-            <div class="new-list-item-label-container">
-                {{#if system.isDrone}}
-                    <label>{{localize "SR5.ModPoints"}}</label>
-                {{else}}
-                    <label>{{localize "SR5.ModificationCategories"}}</label>
-                {{/if}}
-            </div>
-        </div>
         {{#if system.isDrone}}
-
         <div class="new-list-item">
             <div class="new-list-item-label-container">
                 <label>{{localize "SR5.ModPoints"}}</label>

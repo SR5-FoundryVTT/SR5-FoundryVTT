@@ -8,12 +8,19 @@
         <div class="new-list-item-col">
             {{#if (usesAmmo item)}}
                 {{#iflt item.system.ammo.current.value item.system.ammo.current.max}}
-                    <a data-action="weaponFullReload" data-item-id="{{item.uuid}}">
-                        {{localize "SR5.Weapon.Reload"}} ({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})
+                    <a data-action="weaponFullReload"
+                       data-tooltip="{{localize 'SR5.Weapon.Reload'}} ({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})"
+                       data-item-id="{{item.uuid}}">
+                        <i class="fas fa-rotate"></i>
                     </a>
                     {{#ifgt item.system.ammo.partial_reload_value 0}}
-                        <a data-action="weaponPartialReload" data-item-id="{{item.uuid}}">
-                            {{localize "SR5.Weapon.PartialReload"}} (+{{item.system.ammo.partial_reload_value}})
+                        <a data-action="weaponPartialReload"
+                           data-tooltip="{{localize 'SR5.Weapon.PartialReload'}} (+{{item.system.ammo.partial_reload_value}})"
+                           data-item-id="{{item.uuid}}">
+                            <span class="fa-stack">
+                                <i class="fas fa-p"></i>
+                                <i class="fas fa-rotate"></i>
+                            </span>
                         </a>
                     {{/ifgt}}
                 {{else}}

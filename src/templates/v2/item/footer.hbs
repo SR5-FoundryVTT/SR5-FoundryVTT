@@ -1,34 +1,24 @@
 <footer class="sheet-footer">
     <div class="new-list-item">
-        {{#if (eq item.type 'weapon')}}
-            {{#if (eq system.category 'range')}}
-                <label>
-                    {{localize "SR5.Weapon.Mode.Modes"}}:
-                    {{#if system.range.modes.single_shot}}
-                        {{localize "SR5.Weapon.Mode.SingleShot"}}
-                    {{/if}}
-                    {{#if system.range.modes.semi_auto}}
-                        {{localize "SR5.Weapon.Mode.SemiAuto"}}
-                    {{/if}}
-                    {{#if system.range.modes.burst_fire}}
-                        {{localize "SR5.Weapon.Mode.BurstFire"}}
-                    {{/if}}
-                    {{#if system.range.modes.full_auto}}
-                        {{localize "SR5.Weapon.Mode.FullAuto"}}
-                    {{/if}}
-                </label>
-                <label>{{localize "SR5.Weapon.Range.Ranges"}}: {{system.range.ranges.short}}m/{{system.range.ranges.medium}}m/{{system.range.ranges.long}}m/{{system.range.ranges.extreme}}m</label>
-                <label>{{localize "SR5.RecoilCompensation"}} {{system.range.rc.value}}</label>
-            {{else if (eq system.category 'thrown')}}
-                <label>{{localize "SR5.Weapon.Range.Ranges"}}: {{system.thrown.ranges.short}}m/{{system.thrown.ranges.medium}}m/{{system.thrown.ranges.long}}m/{{system.thrown.ranges.extreme}}m</label>
-            {{else if (eq system.category 'melee')}}
-                <label>{{systemFields.melee.fields.reach.label}} {{system.melee.reach}}</label>
-            {{/if}}
-        {{/if}}
-        {{#if (eq item.type 'armor')}}
-            {{#if system.armor.value}}
-                <label data-tooltip="{{systemFields.armor.fields.base.label}}"><i class="fas fa-shield-halved"></i> {{#if system.armor.mod}}+{{/if}}{{system.armor.value}}</label>
-            {{/if}}
+        {{!-- Show Quantity First --}}
+        {{#if system.technology}}
+            <span>
+                <label>{{localize "SR5.Qty"}}&nbsp;</label>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.technology.fields.quantity value=system.technology.quantity
+                                classes="short midd" rootId=rootId}}
+                {{else}}
+                    <a data-action="removeOneQty"
+                       data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty">
+                    <i class="fas fa-minus-square"></i>
+                </a>
+                <label>{{system.technology.quantity}}</label>
+                <a data-action="addOneQty"
+                   data-tooltip="SR5.ItemSheet.Labels.AddOneQty">
+                    <i class="fas fa-plus-square"></i>
+                </a>
+                {{/if}}
+            </span>
         {{/if}}
 
         {{#if (or (eq item.type 'bioware') (eq item.type 'cyberware'))}}
@@ -42,23 +32,44 @@
 
         {{#if system.technology}}
             {{#if system.technology.rating}}
-                <label>{{localize "SR5.Rtg"}} {{system.technology.rating}}</label>
+                <label>{{localize "SR5.Rtg"}}&nbsp;
+                    {{#if @root.isEditMode}}
+                        {{formInput systemFields.technology.fields.rating value=system.technology.rating
+                                    classes="short skinny" rootId=rootId}}
+                    {{else}}
+                        {{system.technology.rating}}
+                    {{/if}}
+                </label>
             {{/if}}
             {{#if system.technology.calculated.availability.value}}
-                <label>{{localize "SR5.Availability"}} {{system.technology.calculated.availability.value}}</label>
+                <label>{{localize "SR5.Availability"}}&nbsp;
+                    {{#if @root.isEditMode}}
+                        {{formInput systemFields.technology.fields.availability value=system.technology.availability
+                                    classes="short thicc" rootId=rootId}}
+                    {{else}}
+                        {{system.technology.calculated.availability.value}}
+                    {{/if}}
+                </label>
             {{/if}}
             {{#if system.technology.calculated.cost.value}}
-                <label data-tooltip="{{systemFields.technology.fields.cost.label}}"><i class="fas fa-yen-sign"></i> {{system.technology.calculated.cost.value}}</label>
+                <label data-tooltip="{{systemFields.technology.fields.cost.label}}"><i class="fas fa-yen-sign"></i>&nbsp;
+                    {{#if @root.isEditMode}}
+                        {{formInput systemFields.technology.fields.cost value=system.technology.cost
+                                    classes="short midd" rootId=rootId}}
+                    {{else}}
+                        {{system.technology.calculated.cost.value}}
+                    {{/if}}
+                </label>
             {{/if}}
             {{#if system.technology.conceal.value}}
-                <label data-tooltip="{{systemFields.technology.fields.conceal.fields.value.label}}"><i class="fas fa-user-ninja"></i> {{system.technology.conceal.value}}</label>
+                <label data-tooltip="{{systemFields.technology.fields.conceal.fields.value.label}}"><i class="fas fa-user-ninja"></i>&nbsp;{{system.technology.conceal.value}}</label>
             {{/if}}
         {{/if}}
 
         {{#if (eq item.type 'contact')}}
             <label>{{system.type}}</label>
-            <label>{{systemFields.loyalty.label}} {{system.loyalty}}</label>
-            <label>{{systemFields.connection.label}} {{system.connection}}</label>
+            <label>{{systemFields.loyalty.label}}&nbsp;{{system.loyalty}}</label>
+            <label>{{systemFields.connection.label}}&nbsp;{{system.connection}}</label>
             {{#if system.family}}
                 <label>{{systemFields.family.label}}</label>
             {{/if}}

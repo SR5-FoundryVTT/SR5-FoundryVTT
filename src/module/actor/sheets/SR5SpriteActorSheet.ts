@@ -9,11 +9,6 @@ export type SpriteActorSheetData = MatrixActorSheetData & {
 
 export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetData> {
     static override DEFAULT_OPTIONS: any = {
-        classes: ['sprite'],
-        position: {
-            width: 930,
-            height: 690,
-        },
         actions: {
             removeTechnomancer: this.#onRemoveTechnomancer,
         }
@@ -25,7 +20,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
             initial: 'skills',
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
-                { id: 'skills', label: 'Skills', cssClass: '' },
+                { id: 'skills', label: 'Sprite', cssClass: '' },
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
                 { id: 'description', label: 'Description', cssClass: '' },
@@ -55,10 +50,10 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         skills: {
             template: SheetFlow.templateBase('actor/tabs/sprite-skills'),
             templates: [
-                ...SheetFlow.templateActorSystemParts('active-skills', 'sprite-options'),
+                ...SheetFlow.templateActorSystemParts('active-skills'),
                 ...SheetFlow.templateListItem('skill')
             ],
-            scrollable: ['#active-skills-scroll', '#sprite-options-scroll']
+            scrollable: ['#active-skills-scroll']
         },
         description: {
             template: SheetFlow.templateBase('actor/tabs/description'),

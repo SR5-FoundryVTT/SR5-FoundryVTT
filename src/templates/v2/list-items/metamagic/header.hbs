@@ -5,6 +5,17 @@
         </label>
     </div>
 
+    <div class="new-list-item-col">
+        <label>
+            {{localize "SR5.Initiation"}}&nbsp;
+            {{#if @root.isEditMode}}
+                {{formInput systemFields.attributes.fields.initiation.fields.base value=system.attributes.initiation.base rootId=rootId classes="short skinny"}}
+            {{else}}
+                {{system.attributes.initiation.value}}
+            {{/if}}
+        </label>
+    </div>
+
     <div class="new-list-item-icons">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
     </div>

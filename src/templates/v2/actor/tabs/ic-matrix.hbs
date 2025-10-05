@@ -1,16 +1,34 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-    <div class="split-container">
-        <div>
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/ic-attributes.hbs' }}
-            {{tabGroup matrixLeftTabs}}
-            <section class="content matrix-left-tab-content"></section>
+    <div class="fill-container">
+        <div class="new-list-item new-list-item-header">
+            <div class="new-list-item-col">
+                <label>{{localize "SR5.Labels.ActorSheet.DeviceRating"}}</label>
+                <a data-action="roll" data-roll-id="matrix.device-rating">
+                    {{system.matrix.rating}}
+                </a>
+            </div>
+            <div class="new-list-item-col">
+                {{#if network}}
+                    <label>{{localize "SR5.Labels.ActorSheet.Network"}}</label>
+                    <a data-action="openMatrixDevice" data-item-id="{{network.uuid}}">{{network.name}}</a>
+                    <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                        <i class="fas fa-right-from-bracket"></i>
+                    </a>
+                {{else}}
+                    <a data-action="connectToNetwork">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                {{/if}}
+            </div>
         </div>
-        <div>
-            {{#if @root.isEditMode}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/ic-options.hbs' }}
-            {{/if}}
-            {{tabGroup matrixRightTabs}}
-            <section class="content matrix-right-tab-content"></section>
+        <div class="split-container">
+            <div>
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/ic-attributes.hbs' }}
+                {{tabGroup matrixLeftTabs}}
+                <section class="content matrix-left-tab-content"></section>
+            </div>
+            <div>
+                {{tabGroup matrixRightTabs}}
+                <section class="content matrix-right-tab-content"></section>
+            </div>
         </div>
     </div>
 </section>

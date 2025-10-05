@@ -15,8 +15,8 @@ export class AttributesPrep {
         const {attributes} = system;
 
         // always have special attributes set to hidden
-        attributes.magic.hidden = true;
-        attributes.resonance.hidden = true;
+        attributes.magic.hidden = system.special !== 'magic';
+        attributes.resonance.hidden = system.special !== 'resonance';
         attributes.edge.hidden = true;
         attributes.essence.hidden = true;
 

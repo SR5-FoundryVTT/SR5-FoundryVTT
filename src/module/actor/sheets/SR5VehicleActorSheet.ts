@@ -32,6 +32,13 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         ];
     }
 
+    static override DEFAULT_OPTIONS: any = {
+        actions: {
+            pickDriver: SR5VehicleActorSheet.#pickDriver,
+            removeVehicleDriver: SR5VehicleActorSheet.#removeVehicleDriver,
+        }
+    }
+
     /**
      * Vehicle actors will always show these item types.
      *
@@ -80,10 +87,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
     override activateListeners_LEGACY(html) {
         super.activateListeners_LEGACY(html);
-
-        // Vehicle Sheet related handlers...
-        html.find('.driver-remove').on('click', this._handleRemoveVehicleDriver.bind(this));
-        html.find('.driver-pick').on('click', this._handlePickDriver.bind(this));
 
         // PAN/WAN
         html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
@@ -135,7 +138,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             initial: 'skills',
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
-                { id: 'skills', label: 'Skills', cssClass: '' },
+                { id: 'skills', label: 'Vehicle', cssClass: '' },
                 { id: 'inventory', label: 'Inventory', cssClass: '' },
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
@@ -197,7 +200,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         }
     }
 
-    async _handlePickDriver(event) {
+    static async #pickDriver(this: SR5VehicleActorSheet, event) {
         event.preventDefault();
         const actors = Helpers.getControlledTokenActors();
         if (actors.length > 0) {
@@ -209,7 +212,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
     }
 
-    async _handleRemoveVehicleDriver(event) {
+    static async #removeVehicleDriver(this: SR5VehicleActorSheet, event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
         this.render();

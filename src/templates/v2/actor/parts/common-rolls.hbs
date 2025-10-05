@@ -20,10 +20,45 @@
             />
         </a>
     </div>
-    {{/each}}
-    {{#unless (or isIC isSprite)}}
+    {{else}}
         <div class="new-list-item-label-container">
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
+            {{localize "SR5.Actor.NoFavoritesSelected"}}
         </div>
-    {{/unless}}
+    {{/each}}
+    <div class="new-list-item-icons">
+        {{#if (eq actor.type 'vehicle')}}
+            <a data-action="toggleChaseEnvironment" >
+                <i {{#if (eq system.environment 'handling')}}
+                data-tooltip="SR5.Vehicle.Environments.Handling"
+                class="far fa-steering-wheel"
+                {{else}}
+                data-tooltip="SR5.Vehicle.Environments.Speed"
+                class="far fa-gauge"
+                {{/if}}
+                ></i>
+            </a>
+            <a data-action="toggleOffRoad" >
+                <i {{#if system.isOffRoad}}
+                    data-tooltip="SR5.Vehicle.OffRoad"
+                    class="far fa-truck-monster"
+                    {{else}}
+                    data-tooltip="SR5.Vehicle.OnRoad"
+                    class="far fa-road"
+                    {{/if}}
+                ></i>
+            </a>
+        {{/if}}
+        {{#if system.matrix}}
+            <a data-action="togglePersonaRunningSilent" >
+                <i {{#if system.matrix.running_silent}}
+                    data-tooltip="SR5.RunningSilent"
+                    class="fa-duotone fa-wifi-fair"
+                    {{else}}
+                    data-tooltip="SR5.Labels.ActorSheet.DisplayingPersona"
+                    class="fas fa-wifi"
+                    {{/if}}
+                ></i>
+            </a>
+        {{/if}}
+    </div>
 </div>

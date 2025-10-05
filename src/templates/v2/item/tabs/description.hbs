@@ -1,105 +1,56 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-    <div class="fill-container">
-        <div class="scrollable standard-form">
-            {{#if @root.isEditMode}}
-                {{formGroup systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
-                {{#if systemFields.technology}}
-                    {{formGroup systemFields.technology.fields.show_quantity
-                                value=source.system.technology.show_quantity
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{#if system.technology.show_quantity}}
-                    {{formGroup systemFields.technology.fields.quantity
-                                value=source.system.technology.quantity
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{/if}}
-
-                    {{formGroup systemFields.technology.fields.cost
-                                value=source.system.technology.cost
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.technology.fields.rating
-                                value=source.system.technology.rating
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.technology.fields.availability
-                                value=source.system.technology.availability
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.technology.fields.equipped
-                                value=source.system.technology.equipped
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-
-                    {{formGroup systemFields.technology.fields.wireless
-                                value=source.system.technology.wireless
-                                localize=true
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{#unless (eq system.technology.wireless 'none')}}
-                        {{formGroup systemFields.technology.fields.master
-                                    value=source.system.technology.master
-                                    rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{/unless}}
-                    {{formGroup systemFields.technology.fields.conceal.fields.base
-                                value=source.system.technology.conceal.base
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.technology.fields.condition_monitor.fields.value
-                                value=source.system.technology.condition_monitor.value
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-
-                {{/if}}
-
-                {{#if systemFields.grade}}
-                    {{formGroup systemFields.grade value=system.grade rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{/if}}
-                {{#if systemFields.essence}}
-                    {{formGroup systemFields.essence value=system.essence rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{/if}}
-                {{#if systemFields.capacity}}
-                    {{formGroup systemFields.capacity value=system.capacity rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{/if}}
-
-                {{#if (eq item.type 'contact')}}
-                    {{formGroup systemFields.linkedActor value=system.linkedActor rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.connection value=system.connection rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.loyalty value=system.loyalty rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.family value=system.family rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.blackmail value=system.blackmail rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.group value=system.group rootId=@root.rootId disabled=@root.isPlayMode}}
-
-                {{else if (eq item.type 'lifestyle')}}
-                    {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.neighborhood value=system.neighborhood rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.cost value=system.cost rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.comforts value=system.comforts rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.security value=system.security rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.guests value=system.guests rootId=@root.rootId disabled=@root.isPlayMode}}
-
-                {{else if (eq item.type 'quality')}}
-                    {{formGroup systemFields.type value=system.type localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.rating value=system.rating rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.karma value=system.karma rootId=@root.rootId disabled=@root.isPlayMode}}
-
-                {{else if (eq item.type 'program')}}
-                    {{formGroup systemFields.type value=system.type localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
-
-                {{else if (eq item.type 'adept_power')}}
-                    {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.pp value=system.pp rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.level value=system.level rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.drain value=system.drain rootId=@root.rootId disabled=@root.isPlayMode}}
-
-                {{else if (eq item.type 'ritual')}}
-                    {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.descriptors value=system.descriptors rootId=@root.rootId disabled=@root.isPlayMode}}
-
-                {{else if (eq item.type 'critter_power')}}
-                    {{formGroup systemFields.optional value=system.optional localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.powerType value=system.powerType localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.duration value=system.duration localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.range value=system.range localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{formGroup systemFields.karma value=system.karma rootId=@root.rootId disabled=@root.isPlayMode}}
-
-                {{/if}}
-            {{else}}
-                {{{descriptionHTML}}}
+    <div class="fill-container standard-form">
+        {{#if @root.isEditMode}}
+            {{formGroup systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
+        {{else}}
+            {{#if (eq item.type 'weapon')}}
+                <div class="new-list-item new-list-item-header">
+                    {{#if (eq system.category 'range')}}
+                        <div class="new-list-item-label-container">
+                            <label>{{localize "SR5.Weapon.Range.Ranges"}}: {{system.range.ranges.short}}m/{{system.range.ranges.medium}}m/{{system.range.ranges.long}}m/{{system.range.ranges.extreme}}m</label>
+                        </div>
+                        <div class="new-list-item-col">
+                            <label>
+                                {{localize "SR5.Weapon.Mode.Modes"}}:
+                                {{#if system.range.modes.single_shot}}
+                                    {{localize "SR5.Weapon.Mode.SingleShot"}}
+                                {{/if}}
+                                {{#if system.range.modes.semi_auto}}
+                                    {{localize "SR5.Weapon.Mode.SemiAuto"}}
+                                {{/if}}
+                                {{#if system.range.modes.burst_fire}}
+                                    {{localize "SR5.Weapon.Mode.BurstFire"}}
+                                {{/if}}
+                                {{#if system.range.modes.full_auto}}
+                                    {{localize "SR5.Weapon.Mode.FullAuto"}}
+                                {{/if}}
+                            </label>
+                        </div>
+                        <div class="new-list-item-col">
+                            <label>{{localize "SR5.RecoilCompensation"}} {{system.range.rc.value}}</label>
+                        </div>
+                    {{else if (eq system.category 'thrown')}}
+                        <div class="new-list-item-label-container">
+                            <label>{{localize "SR5.Weapon.Range.Ranges"}}: {{system.thrown.ranges.short}}m/{{system.thrown.ranges.medium}}m/{{system.thrown.ranges.long}}m/{{system.thrown.ranges.extreme}}m</label>
+                        </div>
+                    {{else if (eq system.category 'melee')}}
+                        <div class="new-list-item-label-container">
+                            <label>{{systemFields.melee.fields.reach.label}} {{system.melee.reach}}</label>
+                        </div>
+                    {{/if}}
+                </div>
             {{/if}}
-        </div>
+            {{#if (eq item.type 'armor')}}
+                    {{#if system.armor.value}}
+                    <div class="new-list-item new-list-item-header">
+                        <div class="new-list-item-label-container">
+                            <label data-tooltip="{{systemFields.armor.fields.base.label}}"><i class="fas fa-shield-halved"></i> {{#if system.armor.mod}}+{{/if}}{{system.armor.value}}</label>
+                        </div>
+                    </div>
+                    {{/if}}
+            {{/if}}
+
+            {{{descriptionHTML}}}
+        {{/if}}
     </div>
 </section>

@@ -1,5 +1,5 @@
 <div class="attribute">
-    <label>
+    <label {{#if @root.isEditMode}}class="edit-mode"{{/if}}>
         {{#if label}}
             {{localize label}}
         {{else}}
@@ -7,12 +7,13 @@
         {{/if}}
     </label>
     <div class="attribute-value">
-    {{#if @root.isEditMode}}
-        {{formInput attributeField.fields.base value=attribute.base classes="short" rootId=rootId }}
-        <i style="font-size: 0.75rem" class="fas fa-plus"></i>
-        {{formInput attributeField.fields.temp value=attribute.temp classes="short" rootId=rootId }}
-    {{else}}
-        <button class="icon" type="button" data-action="rollAttribute" data-attribute-id="{{attributeField.name}}">{{attribute.value}}</button>
-    {{/if}}
+        {{#if @root.isEditMode}}
+            {{formInput attributeField.fields.base value=attribute.base
+                        classes="short skinny" rootId=rootId }}
+        {{else}}
+            <button class="icon" type="button"
+                    data-action="rollAttribute"
+                    data-attribute-id="{{attributeField.name}}">{{attribute.value}}</button>
+        {{/if}}
     </div>
 </div>

@@ -8,6 +8,7 @@ import { Initiative } from '../template/Initiative';
 import { MatrixData } from '../template/Matrix';
 import { VisibilityChecks } from '../template/Visibility';
 import { ModifiableField } from '../fields/ModifiableField';
+import { SR5 } from '@/module/config';
 
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
@@ -31,32 +32,17 @@ const VehicleData = () => ({
     vehicleType: new StringField({
         required: true,
         initial: "ground",
-        choices: {
-            air: "SR5.Vehicle.Types.Air",
-            aerospace: "SR5.Vehicle.Types.Aerospace",
-            exotic: "SR5.Vehicle.Types.Exotic",
-            ground: "SR5.Vehicle.Types.Ground",
-            water: "SR5.Vehicle.Types.Water",
-            walker: "SR5.Vehicle.Types.Walker"
-        },
+        choices: SR5.vehicle.types,
     }),
     controlMode: new StringField({
         required: true,
         initial: "manual",
-        choices: {
-            manual: 'SR5.Vehicle.ControlModes.Manual',
-            remote: 'SR5.Vehicle.ControlModes.Remote',
-            rigger: 'SR5.Vehicle.ControlModes.Rigger',
-            autopilot: 'SR5.Vehicle.ControlModes.Autopilot'
-        },
+        choices: SR5.vehicle.control_modes,
     }),
     environment: new StringField({
         required: true,
         initial: "speed",
-        choices: {
-            speed: 'SR5.Vehicle.Environments.Speed',
-            handling: 'SR5.Vehicle.Environments.Handling'
-        },
+        choices: SR5.vehicle.environments,
     }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),

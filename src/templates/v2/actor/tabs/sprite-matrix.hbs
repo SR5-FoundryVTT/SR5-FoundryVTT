@@ -1,34 +1,27 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        <div class="flexrow list-header item-section space-between">
-            <div class="RollId" data-roll-id="matrix.device-rating">
-                <a class="roll Roll">
-                    {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
+        <div class="new-list-item new-list-item-header">
+            <div class="new-list-item-col">
+                <label>{{localize "SR5.Level"}}</label>
+                <a data-action="roll" data-roll-id="level">
+                    {{system.level}}
                 </a>
             </div>
-            <div>
-                <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
-                    {{#if system.matrix.running_silent}}
-                        {{localize "SR5.RunningSilent"}}
-                    {{else}}
-                        {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
-                    {{/if}}
-                </a>
-            </div>
-            <div>
+            <div class="new-list-item-col">
                 {{#if network}}
-                    {{localize "SR5.Labels.ActorSheet.Network"}}: {{network.name}}
-                    <a data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                        <i class="item-icon fas fa-right-from-bracket disconnect-network"></i>
+                    <label>{{localize "SR5.Labels.ActorSheet.Network"}}</label>
+                    <a data-action="openMatrixDevice" data-item-id="{{network.uuid}}">{{network.name}}</a>
+                    <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                        <i class="fas fa-right-from-bracket"></i>
                     </a>
                 {{else}}
-                    {{localize "SR5.Labels.ActorSheet.NoNetwork"}}
-                    <a class="connect-to-network">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                    <a data-action="connectToNetwork">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
                 {{/if}}
             </div>
-            <div>
-                <a class="show-matrix-network-hacking">
-                    {{localize "SR5.Labels.ActorSheet.MarkNetwork"}} <i class="item-icon fas fa-network-wired"></i>
+            <div class="new-list-item-col">
+                <label>{{localize "SR5.Labels.ActorSheet.MarkNetwork"}}</label>
+                <a data-action="showNetwork">
+                    <i class="fas fa-network-wired"></i>
                 </a>
             </div>
         </div>

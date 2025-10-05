@@ -1,7 +1,11 @@
 <footer class="sheet-footer">
     <div class="new-list-item">
         {{#if (eq actor.type 'character')}}
-            {{#if system.metatype}}
+            {{#if @root.isEditMode}}
+                <div>
+                    {{formInput systemFields.metatype value=source.system.metatype rootId=rootId localize=true classes="short thicc" }}
+                </div>
+            {{else}}
                 <label>{{localizeOb system.metatype config.character.types}}</label>
             {{/if}}
             {{#if system.is_npc}}
@@ -18,7 +22,7 @@
                     <i class="fas fa-yen"></i>
                     <span>
                         {{#if @root.isEditMode}}
-                            {{formInput systemFields.nuyen value=system.nuyen rootId=rootId classes="nuyen"}}
+                            {{formInput systemFields.nuyen value=source.system.nuyen rootId=rootId classes="short thicc"}}
                         {{else}}
                             {{system.nuyen}}
                         {{/if}}
@@ -28,7 +32,7 @@
                     <i class="fas fa-people-group"></i>
                     <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.ActorSheet.Labels.StreetCredShort"}}&nbsp;
                         {{#if @root.isEditMode}}
-                            {{formInput systemFields.street_cred value=system.street_cred rootId=rootId classes="short"}}
+                            {{formInput systemFields.street_cred value=source.system.street_cred rootId=rootId classes="short skinny"}}
                         {{else}}
                             {{system.street_cred}}
                         {{/if}}
@@ -36,7 +40,7 @@
                     <i class="fas fa-pipe"></i>
                     <span data-tooltip="{{systemFields.notoriety.label}} - {{systemFields.notoriety.hint}}">{{localize "SR5.ActorSheet.Labels.NotorietyShort"}}&nbsp;
                         {{#if @root.isEditMode}}
-                            {{formInput systemFields.notoriety value=system.notoriety rootId=rootId classes="short"}}
+                            {{formInput systemFields.notoriety value=source.system.notoriety rootId=rootId classes="short skinny"}}
                         {{else}}
                             {{system.notoriety}}
                         {{/if}}
@@ -44,9 +48,25 @@
                     <i class="fas fa-pipe"></i>
                     <span data-tooltip="{{systemFields.public_awareness.label}} - {{systemFields.public_awareness.hint}}">{{localize "SR5.ActorSheet.Labels.PublicAwarenessShort"}}&nbsp;
                         {{#if @root.isEditMode}}
-                            {{formInput systemFields.public_awareness value=system.public_awareness rootId=rootId classes="short"}}
+                            {{formInput systemFields.public_awareness value=source.system.public_awareness rootId=rootId classes="short skinny"}}
                         {{else}}
                             {{system.public_awareness}}
+                        {{/if}}
+                    </span>
+                </label>
+                <label>
+                    {{localize "SR5.Karma"}}
+                    <span>
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.karma.fields.value value=source.system.karma.value
+                                        classes="short midd" rootId=rootId }}
+                            /
+                            {{formInput systemFields.karma.fields.max value=source.system.karma.max
+                                        classes="short midd" rootId=rootId }}
+                        {{else}}
+                            <span data-tooltip="{{sourceFields.karma.fields.value.hint}}">{{source.system.karma.value}}</span>
+                            /
+                            <span data-tooltip="{{sourceFields.karma.fields.max.hint}}">{{source.system.karma.max}}</span>
                         {{/if}}
                     </span>
                 </label>
@@ -54,8 +74,142 @@
             <label data-tooltip="SR5.AttrEssence">
                 <i class="fas fa-head-side-gear"></i>&nbsp;{{system.attributes.essence.value}}
             </label>
-
         {{/if}}
+        {{#if (eq actor.type 'spirit')}}
+            <span>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.spiritType value=source.system.spiritType
+                                localize=true classes="short" rootId=rootId }}
+                {{else}}
+                    <label>{{localizeOb  system.spiritType config.spiritTypes}}</label>
+                {{/if}}
+            </span>
+            <span>
+                <label>{{localize "SR5.Spirit.Force"}}</label>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.force value=system.force classes="short skinny" rootId=rootId}}
+                {{else}}
+                    <label>{{system.force}}</label>
+                {{/if}}
+            </span>
+            {{#if @root.isEditMode}}
+                <span>
+                    <label>
+                        {{localize "SR5.Spirit.Bound"}}
+                        {{formInput systemFields.bound value=system.bound rootId=rootId}}
+                    </label>
+                </span>
+            {{else if system.bound}}
+                <label>
+                    {{localize "SR5.Spirit.Bound"}}
+                </label>
+            {{/if}}
+        {{/if}}
+        {{#if (eq actor.type 'sprite')}}
+            <span>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.spriteType value=source.system.spriteType
+                                localize=true classes="short" rootId=rootId }}
+                {{else}}
+                    <label>{{localizeOb  system.spriteType config.spriteTypes}}</label>
+                {{/if}}
+            </span>
+            <span>
+                <label>{{localize "SR5.Sprite.Level"}}</label>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.level value=system.level classes="short skinny" rootId=rootId}}
+                {{else}}
+                    <label>{{system.level}}</label>
+                {{/if}}
+            </span>
+            {{#if @root.isEditMode}}
+                <span>
+                    <label>
+                        {{localize "SR5.Sprite.Registered"}}
+                        {{formInput systemFields.registered value=system.registered rootId=rootId}}
+                    </label>
+                </span>
+            {{else if system.registered}}
+                <label>
+                    {{localize "SR5.Sprite.Registered"}}
+                </label>
+            {{/if}}
+        {{else if (eq actor.type 'ic')}}
+            <span>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.icType value=system.icType rootId=rootId
+                                localize=true classes="short" disabled=network}}
+                {{else}}
+                    <label>{{localizeOb system.icType config.icTypes}}</label>
+                {{/if}}
+            </span>
+            <label>{{localize "SR5.Rtg"}}&nbsp;
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.host.fields.rating value=system.host.rating
+                                classes="short skinny" rootId=rootId disabled=network}}
+                {{else}}
+                    {{system.host.rating}}
+                {{/if}}
+            </label>
+        {{else if (eq actor.type 'vehicle')}}
+            <span>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.vehicleType value=source.system.vehicleType
+                                localize=true classes="short" rootId=rootId }}
+                {{else}}
+                    <label>{{localizeOb system.vehicleType config.vehicle.types}}</label>
+                {{/if}}
+            </span>
+
+            {{#if @root.isEditMode}}
+                <label>
+                    {{localize "SR5.Vehicle.Drone"}}
+                    {{formInput systemFields.isDrone value=source.system.isDrone rootId=rootId }}
+                </label>
+            {{else if system.isDrone}}
+                <label>{{localize "SR5.Vehicle.Drone"}}</label>
+            {{/if}}
+
+            {{#if @root.isPlayMode}}
+                {{#if system.isDrone}}
+                    <label>
+                        {{localize "SR5.ModPoints"}}&nbsp;
+                        {{calcModPointSlots items}}/{{calcModificationSlotsAvailable actor}}
+                    </label>
+                {{else}}
+                    <span>
+                    <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.body">
+                        <i class="fas fa-truck"></i>&nbsp;
+                        {{calcModificationCategorySlots items "body"}}/{{calcModificationSlotsAvailable actor}}
+                    </label>
+                    <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.cosmetic">
+                        <i class="fas fa-image"></i>&nbsp;
+                        {{calcModificationCategorySlots items "cosmetic"}}/{{calcModificationSlotsAvailable actor}}
+                    </label>
+                    <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.electromagnetic">
+                        <i class="far fa-bolt"></i>&nbsp;
+                        {{calcModificationCategorySlots items "electromagnetic"}}/{{calcModificationSlotsAvailable actor}}
+                    </label>
+                    <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.power_train">
+                        <i class="far fa-engine"></i>&nbsp;
+                        {{calcModificationCategorySlots items "power_train"}}/{{calcModificationSlotsAvailable actor}}
+                    </label>
+                    <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.protection">
+                        <i class="far fa-shield"></i>&nbsp;
+                        {{calcModificationCategorySlots items "protection"}}/{{calcModificationSlotsAvailable actor}}
+                    </label>
+                    <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.weapons">
+                        <i class="far fa-gun"></i>&nbsp;
+                        {{calcModificationCategorySlots items "weapons"}}/{{calcModificationSlotsAvailable actor}}
+                    </label>
+
+                </span>
+                {{/if}}
+            {{/if}}
+        {{/if}}
+        {{#unless (or isIC isSprite)}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
+        {{/unless}}
         <div></div>
     </div>
 </footer>

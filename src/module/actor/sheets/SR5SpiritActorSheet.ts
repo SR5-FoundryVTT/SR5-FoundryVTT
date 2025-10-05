@@ -27,7 +27,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
             initial: 'skills',
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
-                { id: 'skills', label: 'Skills', cssClass: '' },
+                { id: 'skills', label: 'Spirit', cssClass: '' },
                 { id: 'critter', label: 'Critter', cssClass: '' },
                 { id: 'magic', label: 'Magic', cssClass: '' },
                 { id: 'bio', label: 'Bio', cssClass: '' },
@@ -42,8 +42,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         skills: {
             template: SheetFlow.templateBase('actor/tabs/spirit-skills'),
             templates: [
-                ...SheetFlow.templateActorSystemParts('active-skills', 'spirit-options',
-                                'attributes', 'special-attributes'),
+                ...SheetFlow.templateActorSystemParts('active-skills', 'attributes'),
                 ...SheetFlow.templateListItem('skill')
             ],
             scrollable: ['scrollable']

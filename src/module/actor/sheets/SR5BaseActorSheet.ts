@@ -192,6 +192,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             removeLanguageSkill: SR5BaseActorSheet.#deleteLanguageSkill,
             removeActiveSkill: SR5BaseActorSheet.#deleteActiveSkill,
 
+            resetActorRunData: SR5BaseActorSheet.#resetActorRunData,
+            showImportCharacter: SR5BaseActorSheet.#showImportCharacter,
+
             addEffect: SR5BaseActorSheet.#createEffect,
 
             addItem: SR5BaseActorSheet.#createItem,
@@ -381,7 +384,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
-        html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
@@ -392,10 +394,25 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.toggle-fresh-import-all-off').on('click', async (event) => this._toggleAllFreshImportFlags(event, false));
         html.find('.toggle-fresh-import-all-on').on('click', async (event) => this._toggleAllFreshImportFlags(event, true));
 
-        // Reset Actor Run Data
-        html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
-
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
+    }
+
+    protected override _getHeaderControls() {
+        const controls = super._getHeaderControls();
+        controls.unshift({
+            action: 'showImportCharacter',
+            icon: 'fas fa-cloud-arrow-up',
+            label: 'SR5.ImportCharacter',
+            ownership: 3, // OWNER
+        })
+        controls.unshift({
+            action: 'resetActorRunData',
+            icon: 'fas fa-arrow-rotate-right',
+            label: 'SR5.Labels.ActorSheet.ResetActorForNewRun',
+            ownership: 3, // OWNER
+        })
+
+        return controls;
     }
 
     static async #showItemDescription(this: SR5BaseActorSheet, event: MouseEvent) {
@@ -674,8 +691,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         const iid = SheetFlow.closestItemId(event.target);
         const item = SheetFlow.fromUuidSync(iid);
-
-        console.log('rollItem', iid, item);
 
         if (!item || !(item instanceof SR5Item)) return;
         await this._handleRollItem(item, event);
@@ -1719,7 +1734,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Open the Chummer Character import handling.
      * @param event
      */
-    _onShowImportCharacter(event) {
+    static async #showImportCharacter(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const options = {
             name: 'chummer-import',
@@ -1801,8 +1816,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event
      */
-    _onResetActorRunData(event) {
-        this.actor.resetRunData()
+    static async #resetActorRunData(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+        await this.actor.resetRunData()
     }
 
     /**

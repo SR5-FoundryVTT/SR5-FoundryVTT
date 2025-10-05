@@ -5,6 +5,7 @@ import { MatrixAttributes, MatrixData } from "../template/Matrix";
 import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
 import { MatrixLimits } from "../template/Limits";
+import { SR5 } from '@/module/config';
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 // === Main Schema ===
@@ -13,29 +14,7 @@ const ICData = () => ({
     ...CommonData(),
     icType: new StringField({ required: true,
         initial:'patrol',
-        choices: {
-            acid: "SR5.IC.Types.Acid",
-            binder: "SR5.IC.Types.Binder",
-            black_ic: "SR5.IC.Types.BlackIC",
-            blaster: "SR5.IC.Types.Blaster",
-            bloodhound: "SR5.IC.Types.Bloodhound",
-            blue_goo: "SR5.IC.Types.BlueGoo",
-            catapult: "SR5.IC.Types.Catapult",
-            crash: "SR5.IC.Types.Crash",
-            flicker: "SR5.IC.Types.Flicker",
-            jammer: "SR5.IC.Types.Jammer",
-            killer: "SR5.IC.Types.Killer",
-            marker: "SR5.IC.Types.Marker",
-            patrol: "SR5.IC.Types.Patrol",
-            probe: "SR5.IC.Types.Probe",
-            scramble: "SR5.IC.Types.Scramble",
-            shocker: "SR5.IC.Types.Shocker",
-            sleuther: "SR5.IC.Types.Sleuther",
-            sparky: "SR5.IC.Types.Sparky",
-            tar_baby: "SR5.IC.Types.TarBaby",
-            track: "SR5.IC.Types.Track"
-
-        }
+        choices: SR5.icTypes,
     }),
     special: new StringField({ required: true, initial: 'mundane', readonly: true }),
 

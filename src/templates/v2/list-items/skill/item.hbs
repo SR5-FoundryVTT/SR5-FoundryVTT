@@ -20,9 +20,7 @@
         <div class="new-list-item-col skill-rating-col">
             {{#if @root.isEditMode}}
                 {{!-- use the original method of setting data because skills are weird in data model, they'll be items eventually --}}
-                <input type="number" name="{{concat skillPath '.base'}}" class="short" value="{{skill.base}}" data-skill="{{id}}" >
-                <i style="font-size: 0.75rem" class="fas fa-plus"></i>
-                <input type="number" name="{{concat skillPath '.temp'}}" class="short" value="{{skill.temp}}" data-skill="{{id}}" >
+                <input type="number" name="{{concat skillPath '.base'}}" class="short skinny" value="{{skill.base}}" data-skill="{{id}}" >
             {{else}}
                 <button type="button" class="skill-roll-value" data-action="rollSkill" data-skill="{{id}}">
                     {{skill.value}}

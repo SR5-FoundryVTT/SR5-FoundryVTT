@@ -5,8 +5,8 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute.hbs"
                         matrixAtt=(lookup ../system.matrix key)
                         attributeField=(objValue @root.systemFields.matrix.fields key)
-                        key=key
                         label=label
+                        key=key
                         matrixAttributes=../config/matrixAttributes
                 }}
             {{/each}}
@@ -16,13 +16,8 @@
             }}
         </div>
 
-        <div class="split-container">
-            <div>
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/active-skills.hbs' }}
-            </div>
-            <div>
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/sprite-options.hbs' }}
-            </div>
+        <div class="full-container">
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/active-skills.hbs' }}
         </div>
     </div>
 </section>

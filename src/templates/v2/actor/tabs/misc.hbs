@@ -16,37 +16,12 @@
                 </section>
             {{else}}
                 <section class="scrollable standard-form">
-                    <div class="form-group">
-                        <button type="button" class="display reset-actor-run-data" data-tooltip="SR5.Tooltips.Actor.ResetActorForNewRun">
-                            {{localize "SR5.Labels.ActorSheet.ResetActorForNewRun"}}
-                        </button>
-                    </div>
                     {{#if hasSkills}}
                         <div class="form-group">
                             <button type="button" class="display show-hidden-skills">
                                 {{localize "SR5.RestoreDefaultSkills"}}
                             </button>
                         </div>
-                    {{/if}}
-                    {{#if (or isCharacter isSpirit)}}
-                        <div class="form-group">
-                            <button type="button" class="display import-character">
-                                {{localize "SR5.ImportCharacter"}}
-                            </button>
-                        </div>
-                    {{/if}}
-                    {{#if (hasAnyFreshImports this.actor)}}
-                        <div class="form-group">
-                            <button class="display import-character toggle-fresh-import-all-off"
-                                    data-tooltip="SR5.MarkImportsTooltip">
-                                {{localize 'SR5.MarkImportsReviewed'}}
-                            </button>
-                        </div>
-                    {{/if}}
-                    {{#if isCharacter}}
-                        {{formGroup systemFields.karma.fields.value value=source.system.karma.value rootId=rootId disabled=@root.isPlayMode }}
-                        {{formGroup systemFields.karma.fields.max value=source.system.karma.max rootId=rootId disabled=@root.isPlayMode }}
-                    <!--Magic/Resonaz Selector-->
                     {{/if}}
                     {{#if canAlterSpecial }}
                         {{formGroup systemFields.special value=source.system.special rootId=rootId disabled=@root.isPlayMode localize=true }}
@@ -70,9 +45,6 @@
                     {{/if}}
                     {{#if system.is_npc }}
                         {{formGroup systemFields.is_grunt value=source.system.is_grunt rootId=rootId disabled=@root.isPlayMode }}
-                    {{/if}}
-                    {{#if isCharacter}}
-                        {{formGroup systemFields.metatype value=source.system.metatype rootId=rootId disabled=@root.isPlayMode localize=true }}
                     {{/if}}
                     {{formGroup systemFields.category_visibility.fields.default value=source.system.category_visibility.default rootId=rootId disabled=@root.isPlayMode }}
                 </section>

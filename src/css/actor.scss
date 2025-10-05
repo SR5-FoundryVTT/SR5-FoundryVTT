@@ -14,33 +14,6 @@
         align-content: center;
     }
 
-    // Interaction Element for Skill Lists
-    .skill-header {
-        @include rollable;
-    }
-
-    // Use only to indicate interactibility within the HackingTab markslist.
-    .select-matrix-target {
-        @include clickable;
-    }
-
-    // Use only to indicate interactibility within the HackingTab markslist.
-    .open-matrix-target {
-        @include clickable;
-    }
-
-    // Used to switch between the different hacking targets.
-    .switch-matrix-hacking-target {
-        @include clickable;
-    }
-
-    input.nuyen {
-        height: 1.5rem;
-        min-height: 1.5rem;
-        max-height: 1.5rem;
-        width: 5rem;
-    }
-
     .attributes {
         display: flex;
         flex-flow: row nowrap;
@@ -48,15 +21,19 @@
         gap: 0.25rem;
 
         .attribute {
+            flex: 1;
             display: flex;
             flex-flow: column nowrap;
             gap: 2px;
 
             > label {
+                white-space: nowrap;
                 display: flex;
                 flex-flow: row nowrap;
                 justify-content: center;
-                font-size: 1.15rem;
+                &.edit-mode {
+                    font-size: 0.8rem;
+                }
             }
 
             .attribute-value {
@@ -100,7 +77,6 @@
         }
 
         .initiative-label {
-            color: $yellow;
             text-align: center;
             align-self: center;
         }

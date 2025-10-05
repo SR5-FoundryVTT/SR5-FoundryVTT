@@ -1,6 +1,84 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
         <div class="scrollable standard-form">
+            {{#if systemFields.technology}}
+
+                {{formGroup systemFields.technology.fields.equipped
+                            value=source.system.technology.equipped
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.technology.fields.wireless
+                            value=source.system.technology.wireless
+                            localize=true
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{#unless (eq system.technology.wireless 'none')}}
+                    {{formGroup systemFields.technology.fields.master
+                                value=source.system.technology.master
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/unless}}
+                {{formGroup systemFields.technology.fields.conceal.fields.base
+                            value=source.system.technology.conceal.base
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.technology.fields.condition_monitor.fields.value
+                            value=source.system.technology.condition_monitor.value
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{/if}}
+
+            {{#if systemFields.grade}}
+                {{formGroup systemFields.grade value=system.grade rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+            {{#if systemFields.essence}}
+                {{formGroup systemFields.essence value=system.essence rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+            {{#if systemFields.capacity}}
+                {{formGroup systemFields.capacity value=system.capacity rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/if}}
+
+            {{#if (eq item.type 'contact')}}
+                {{formGroup systemFields.linkedActor value=system.linkedActor rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.connection value=system.connection rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.loyalty value=system.loyalty rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.family value=system.family rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.blackmail value=system.blackmail rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.group value=system.group rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{else if (eq item.type 'lifestyle')}}
+                {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.neighborhood value=system.neighborhood rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.cost value=system.cost rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.comforts value=system.comforts rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.security value=system.security rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.guests value=system.guests rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{else if (eq item.type 'quality')}}
+                {{formGroup systemFields.type value=system.type localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.rating value=system.rating rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.karma value=system.karma rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{else if (eq item.type 'program')}}
+                {{formGroup systemFields.type value=system.type localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{else if (eq item.type 'adept_power')}}
+                {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.pp value=system.pp rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.level value=system.level rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.drain value=system.drain rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{else if (eq item.type 'ritual')}}
+                {{formGroup systemFields.type value=system.type rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.descriptors value=system.descriptors rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{else if (eq item.type 'critter_power')}}
+                {{formGroup systemFields.optional value=system.optional localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.powerType value=system.powerType localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.duration value=system.duration localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.range value=system.range localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formGroup systemFields.karma value=system.karma rootId=@root.rootId disabled=@root.isPlayMode}}
+
+            {{/if}}
+
             {{#if systemFields.armor}}
                 {{formGroup systemFields.armor.fields.value value=system.armor.value rootId=@root.rootId disabled=@root.isPlayMode}}
                 {{formGroup systemFields.armor.fields.mod value=system.armor.mod rootId=@root.rootId disabled=@root.isPlayMode}}

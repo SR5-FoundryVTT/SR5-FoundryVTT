@@ -2,29 +2,42 @@
     <div class="fill-container">
         <div class="new-list-item new-list-item-header">
             {{#if matrixDevice}}
-            <div class="new-list-item-col">
-                <a class="open-matrix-device roll" data-uuid="{{matrixDevice.uuid}}">
+            <div>
+                <label>
+                    <i class="far fa-tablet"></i>
+                </label>
+                <a data-action="editItem" data-item-id="{{matrixDevice.uuid}}">
                     {{matrixDevice.name}}
                 </a>
             </div>
             {{/if}}
-            <div class="new-list-item-col">
-                <a data-roll-id="matrix.device-rating">
-                    {{localize "SR5.Labels.ActorSheet.DeviceRating"}}: {{system.matrix.rating}}
+            <div>
+                <label>{{localize "SR5.Labels.ActorSheet.DeviceRating"}}</label>
+                <a data-action="roll" data-roll-id="matrix.device-rating">
+                    {{system.matrix.rating}}
                 </a>
             </div>
-            <div class="new-list-item-col">
-                <a class="matrix-toggle-running-silent" data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle">
-                    {{#if system.matrix.running_silent}}
-                        {{localize "SR5.RunningSilent"}}
-                    {{else}}
-                        {{localize "SR5.Labels.ActorSheet.DisplayingPersona"}}
-                    {{/if}}
+            <div>
+                {{#if network}}
+                    <label>{{localize "SR5.Labels.ActorSheet.Network"}}</label>
+                    <a data-action="openMatrixDevice" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                    <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                        <i class="fas fa-right-from-bracket"></i>
+                    </a>
+                {{else}}
+                    <a data-action="connectToNetwork">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                {{/if}}
+            </div>
+            <div>
+                <label>{{localize "SR5.Labels.ActorSheet.MarkNetwork"}}</label>
+                <a data-action="showNetwork">
+                    <i class="item-icon fas fa-network-wired"></i>
                 </a>
             </div>
-            <div class="new-list-item-col">
+            <div>
+                <label>{{localize "SR5.Labels.Sheet.RebootDevice"}}</label>
                 <a class="reboot-persona-device" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
-                    {{localize "SR5.Labels.Sheet.RebootDevice"}} <i class="item-icon fas fa-power-off"></i>
+                    <i class="item-icon fas fa-power-off"></i>
                 </a>
             </div>
         </div>
@@ -41,25 +54,6 @@
                         matrixAttributes=../config/matrixAttributes
                         item=../system.matrix.item }}
                     {{/each}}
-                </div>
-                <div class="new-list-item new-list-item-header">
-                    <div class="new-list-item-col">
-                        {{#if network}}
-                            <label>{{localize "SR5.Labels.ActorSheet.Network"}}:</label>
-                            <a data-action="openMatrixDevice" data-uuid="{{network.uuid}}">{{network.name}}</a>
-                            <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                                <i class="fas fa-right-from-bracket"></i>
-                            </a>
-                        {{else}}
-                            <label>{{localize "SR5.Labels.ActorSheet.NoNetwork"}}</label>
-                            <a data-action="connectToNetwork">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
-                        {{/if}}
-                    </div>
-                    <div>
-                        <a data-action="showNetwork">
-                            {{localize "SR5.Labels.ActorSheet.MarkNetwork"}} <i class="item-icon fas fa-network-wired"></i>
-                        </a>
-                    </div>
                 </div>
                 {{tabGroup matrixLeftTabs}}
                 <section class="content matrix-left-tab-content"></section>

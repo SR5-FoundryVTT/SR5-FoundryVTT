@@ -5,20 +5,22 @@
         {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
-        <div class="new-list-item-col">
-            <span>{{localizeOb item.system.target @root.config.matrixTarget}}</span>
+        <div class="new-list-item-col midd-col">
+            <label>{{localizeOb item.system.target @root.config.matrixTargets}}</label>
         </div>
-        <div class="new-list-item-col">
-            <span>{{localizeOb item.system.duration @root.config.durations}}</span>
+        <div class="new-list-item-col thicc-col">
+            <label>{{localizeOb item.system.duration @root.config.durations}}</label>
         </div>
-        <div class="new-list-item-col">
-            <span>{{item.system.fade}}</span>
+        <div class="new-list-item-col skinny-col">
+            <label>{{item.system.fade}}</label>
         </div>
 
-        <div class="new-list-item-icons">
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
-        </div>
+        {{#if @root.isEditMode}}
+            <div class="new-list-item-icons">
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
+            </div>
+        {{/if}}
     </div>
     <div class="new-list-item-description">
         {{{item.system.description.value}}}
