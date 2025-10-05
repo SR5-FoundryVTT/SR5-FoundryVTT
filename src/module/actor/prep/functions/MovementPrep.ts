@@ -9,9 +9,6 @@ export class MovementPrep {
         movement.walk.base = attributes.agility.value * (2 + modifiers.walk);
         movement.run.base = attributes.agility.value * (4 + modifiers.run);
 
-        PartsList.addUniquePart(movement.walk, "SR5.Bonus", 2, CONST.ACTIVE_EFFECT_MODES.MULTIPLY);
-        PartsList.addUniquePart(movement.run, "SR5.Bonus", 2, CONST.ACTIVE_EFFECT_MODES.MULTIPLY);
-
         PartsList.calcTotal(movement.walk, { min: 0 });
         PartsList.calcTotal(movement.run, { min: 0 });
     }

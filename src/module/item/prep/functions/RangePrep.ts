@@ -1,7 +1,6 @@
 import { RangeWeaponType } from "src/module/types/item/Weapon";
 import { PartsList } from "../../../parts/PartsList";
 import { SR5Item } from "../../SR5Item";
-import { Helpers } from '../../../helpers';
 /**
  * Weapon item data preparation
  */
@@ -12,7 +11,7 @@ export const RangePrep = {
     },
 
     clearMods(range: RangeWeaponType) {
-        range.rc.mod = [];
+        range.rc.changes = [];
     },
     /**
      * Prepare a ranged weapons recoil compensation.

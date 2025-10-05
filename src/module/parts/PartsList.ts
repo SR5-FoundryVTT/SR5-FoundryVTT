@@ -73,7 +73,7 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
             }
         } else if (value !== undefined) {
             // Part does not exist, add it.
-            this.addPart(name, value);
+            this.addPart(name, value, mode, priority);
         } else {
             console.warn(`Shadowrun 5e | Cannot add a part with an undefined value. Part: ${name}`);
         }
@@ -88,12 +88,6 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
 
     public calcTotal(options?: { min?: number; max?: number }): number {
         this._field.value = this._field.base;
-
-        if (options?.min != null && this._field.value < options.min)
-            this.addPart('System Enforced Minimum', options.min, CONST.ACTIVE_EFFECT_MODES.UPGRADE, Infinity);
-
-        if (options?.max != null && this._field.value > options.max)
-            this.addPart('System Enforced Maximum', options.max, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE, Infinity);
 
         this._field.changes.sort((a, b) => a.priority - b.priority);
         for (let i = 0; i < this._field.changes.length; i++) {
@@ -132,6 +126,16 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
                     console.warn(`Unknown Active Effect mode ${change.mode} encountered.`);
                     break;
             }
+        }
+
+        if (options?.max != null && this._field.value > options.max) {
+            this.addUniquePart('System Enforced Maximum', options.max, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE, Infinity);
+            this._field.value = options.max;
+        }
+
+        if (options?.min != null && this._field.value < options.min) {
+            this.addUniquePart('System Enforced Minimum', options.min, CONST.ACTIVE_EFFECT_MODES.UPGRADE, Infinity);
+            this._field.value = options.min;
         }
 
         return this._field.value;

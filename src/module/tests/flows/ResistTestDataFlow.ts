@@ -37,11 +37,11 @@ export const ResistTestDataFlow = {
         // Remove user override and resulting incoming damage as base.
         data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
         data.modifiedDamage.base = data.incomingDamage.value;
-        data.modifiedDamage.mod = [];
+        data.modifiedDamage.changes = [];
         // @ts-expect-error taM check this 
         delete data.modifiedDamage.override;
         data.modifiedDamage.ap.base = data.incomingDamage.ap.value;
-        data.modifiedDamage.ap.mod = [];
+        data.modifiedDamage.ap.changes = [];
         // @ts-expect-error taM check this 
         delete data.modifiedDamage.ap.override;
 

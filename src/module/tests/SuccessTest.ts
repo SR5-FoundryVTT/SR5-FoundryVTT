@@ -406,13 +406,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Determine if this test has any kind of modifier types active
-     */
-    get hasModifiers(): boolean {
-        return this.data.modifiers.mod.length > 0;
-    }
-
-    /**
      * Create the default formula for this test based on it's pool
      *
      * FoundryVTT documentation:
@@ -484,7 +477,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * All parts of the test code can be dynamic, any will do.
      */
     get hasCode(): boolean {
-        return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
+        return this.pool.changes.length > 0 || this.threshold.changes.length > 0 || this.limit.changes.length > 0;
     }
 
     /**
@@ -613,7 +606,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // If applicable apply only override to pool. (User interaction)
         if (this.data.modifiers.override) {
             // Remove all modifiers and only apply override.
-            for (const modifier of this.data.modifiers.mod) {
+            for (const modifier of this.data.modifiers.changes) {
                 pool.removePart(modifier.name);
             }
 
@@ -622,7 +615,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Otherwise apply automated modifiers to pool.
-        for (const modifier of this.data.modifiers.mod) {
+        for (const modifier of this.data.modifiers.changes) {
             // A modifier might have been asked for, but not given by the actor.
             pool.addUniquePart(modifier.name, modifier.value);
         }
@@ -640,7 +633,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const roundAllMods = (value: ValueFieldType) => {
             value.base = Math.ceil(value.base);
             if (value.override) value.override.value = Math.ceil(value.override.value);
-            value.mod.forEach(mod => { mod.value = Math.ceil(mod.value) });
+            for (const mod of value.changes) mod.value = Math.ceil(mod.value);
         }
 
         roundAllMods(this.data.modifiers);
@@ -1003,7 +996,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     get appendedHits(): number | undefined {
-        return this.hits.mod.find((mod) => mod.name === "SR5.AppendedHits")?.value;
+        return new PartsList(this.hits).getPartValue('SR5.AppendedHits');
     }
 
     // In the case we've added appended hits, we want to separately display the hits value and the appended hits (ie. "7 + 5" instead of "12")

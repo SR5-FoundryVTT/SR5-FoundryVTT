@@ -39,7 +39,7 @@ export class AttributeOnlyTest extends SuccessTest {
         if (!this.actor) return;
 
         // Clear everything. This way we don't have to track previous / current attributes and remove accordingly.
-        this.data.pool.mod = [];
+        this.data.pool.changes = [];
         const pool = new PartsList(this.pool);
 
         const attribute1 = this.actor.getAttribute(this.data.attribute1);

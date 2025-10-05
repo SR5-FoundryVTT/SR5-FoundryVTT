@@ -8,7 +8,6 @@
 import {SR5Actor} from "./actor/SR5Actor";
 import {SR5Item} from "./item/SR5Item";
 import {Helpers} from "./helpers";
-import EffectsSheetData = Shadowrun.EffectsSheetData;
 import { SR5ActiveEffect } from "./effect/SR5ActiveEffect";
 
 /**

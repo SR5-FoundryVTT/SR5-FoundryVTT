@@ -1,3 +1,4 @@
+import { PartsList } from "@/module/parts/PartsList";
 import { SR5 } from "../../../config";
 import { SkillFieldType } from 'src/module/types/template/Skills';
 
@@ -13,8 +14,10 @@ export class SkillsPrep {
                 mode: CONST.ACTIVE_EFFECT_MODES.ADD,
             });
         }
+
+        PartsList.calcTotal(skill, { min: 0 });
     }
-    
+
     private static prepareActiveSkills(active: Actor['system']['skills']['active']) {
         for (const [skillKey, skillValue] of Object.entries(active)) {
             this.prepareSkill(skillValue);

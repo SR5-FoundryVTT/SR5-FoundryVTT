@@ -4,6 +4,7 @@ import { Translation } from '../../utils/strings';
 import { ModifiableValueType } from "src/module/types/template/Base";
 import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
 import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
+import { PartsList } from "@/module/parts/PartsList";
 
 export interface TestDialogData extends FormDialogData {
     test: SuccessTest
@@ -132,22 +133,20 @@ export class TestDialog extends FormDialog {
         if (this.selectedButton === 'cancel') return;
 
         // First, apply changes to ValueField style values in a way that makes sense.
-        Object.entries(data).forEach(([key, value]) => {
+        for (const [key, value] of Object.entries(data)) {
             // key is expected to be relative from TestDialog.data and begin with 'test'
             const valueField = foundry.utils.getProperty(this.data, key) as ModifiableValueType | undefined | null;
-            if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
+            if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) continue;
 
             // Remove from further automatic data merging.
             delete data[key];
 
             // Don't apply an unneeded override.
-            if (valueField.value === value) return;
+            if (valueField.value === value) continue;
 
-            if (value === null || value === '')
-                valueField.override = null;
-            else
-                valueField.override = { name: 'SR5.ManualOverride', value: Number(value) };
-        });
+            if (value)
+                PartsList.addUniquePart(valueField, 'SR5.ManualOverride', Number(value), CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+        }
 
         // Second, apply generic values.
         foundry.utils.mergeObject(this.data, data);

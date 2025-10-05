@@ -33,9 +33,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
             const modification = await factory.createItem({type: 'modification', system: {type: 'weapon', rc: 2, technology: {equipped: true}}});
             await weapon.createNestedItem(modification.toObject());
 
-            const weaponRc = weapon.system.range.rc.value;
-
-            assert.strictEqual(weaponRc, 2);
+            assert.strictEqual(weapon.system.range.rc.value, 2);
         });
 
         it('Reload weapon causes reduction in available clips', async () => {
