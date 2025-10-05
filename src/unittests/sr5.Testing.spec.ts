@@ -9,7 +9,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {

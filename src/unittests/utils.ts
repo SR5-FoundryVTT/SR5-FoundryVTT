@@ -33,10 +33,10 @@ export class SR5TestFactory {
         return scene;
     }
 
-    destroy() {
-        void Actor.deleteDocuments(this.actors.map(actor => actor.id!));
-        void Item.deleteDocuments(this.items.map(item => item.id!));
-        void Scene.deleteDocuments(this.scenes.map(scene => scene.id!));
+    async destroy() {
+        await Actor.deleteDocuments(this.actors.map(actor => actor.id!));
+        await Item.deleteDocuments(this.items.map(item => item.id!));
+        await Scene.deleteDocuments(this.scenes.map(scene => scene.id!));
 
         this.actors.length = 0;
         this.items.length = 0;
