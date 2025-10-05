@@ -16,7 +16,6 @@ import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
 type OneOrMany<T> = T | T[];
 
 export class Helpers {
-
     /**
      * Round a number to a given number of decimal places.
      *
@@ -43,28 +42,6 @@ export class Helpers {
 
     static eventUuid(event): string {
         return event.currentTarget?.dataset?.uuid ?? '';
-    }
-
-    // replace 'SR5.'s on keys with 'SR5_DOT_'
-    static onSetFlag(data) {
-        if (!data || typeof data !== 'object') return data;
-        const newData = {};
-        for (const [key, value] of Object.entries(data)) {
-            const newKey = key.replace('SR5.', 'SR5_DOT_');
-            newData[newKey] = this.onSetFlag(value);
-        }
-        return newData;
-    }
-
-    // replace 'SR5_DOT_' with 'SR5.' on keys
-    static onGetFlag(data) {
-        if (!data || typeof data !== 'object') return data;
-        const newData = {};
-        for (const [key, value] of Object.entries(data)) {
-            const newKey = key.replace('SR5_DOT_', 'SR5.');
-            newData[newKey] = this.onGetFlag(value);
-        }
-        return newData;
     }
 
     static isMatrix(atts: boolean | OneOrMany<string | AttributeFieldType | SkillFieldType>): boolean {
@@ -95,32 +72,6 @@ export class Helpers {
         return false;
     }
 
-    static parseInputToString(val: number | string | string[] | undefined): string {
-        if (val === undefined) return '';
-        if (typeof val === 'number') return val.toString();
-        if (typeof val === 'string') return val;
-        if (Array.isArray(val)) {
-            return val.join(',');
-        }
-        return '';
-    }
-
-    static parseInputToNumber(val: number | string | string[] | undefined): number {
-        if (typeof val === 'number') return val;
-        if (typeof val === 'string') {
-            const ret = +val;
-            if (!isNaN(ret)) return ret;
-            return 0;
-        }
-        if (Array.isArray(val)) {
-            const str = val.join('');
-            const ret = +str;
-            if (!isNaN(ret)) return ret;
-            return 0;
-        }
-        return 0;
-    }
-
     static setupCustomCheckbox(app, html) {
         const setContent = (el) => {
             const checkbox = $(el).children('input[type=checkbox]');
@@ -138,15 +89,6 @@ export class Helpers {
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
         html.find('.submit-checkbox').change((event) => app._onSubmit(event));
-    }
-
-    static mapRoundsToDefenseDesc(rounds) {
-        if (rounds === 1) return '';
-        if (rounds === 3) return '-2';
-        if (rounds === 6) return '-5';
-        if (rounds === 10) return '-9';
-        if (rounds === 20) return 'SR5.DuckOrCover';
-        return '';
     }
 
     static label(str: string) {
@@ -188,19 +130,9 @@ export class Helpers {
         return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
     }
 
-    static filter(obj, comp) {
-        const retObj = {};
-        if (typeof obj === 'object' && obj !== null) {
-            Object.entries(obj).forEach(([key, value]) => {
-                if (comp([key, value])) retObj[key] = value;
-            });
-        }
-        return retObj;
-    }
-
     static addLabels(obj, label) {
         if (typeof obj === 'object' && obj !== null) {
-            if (!obj.hasOwnProperty('label') && obj.hasOwnProperty('value') && label !== '') {
+            if (!Object.hasOwn(obj, 'label') && Object.hasOwn(obj, 'value') && label !== '') {
                 obj.label = label;
             }
             Object.entries(obj)
@@ -846,7 +778,7 @@ export class Helpers {
      */
     static objectHasKeys(obj: object, keys: string[]): boolean {
         for (const key of keys) {
-            if (!obj.hasOwnProperty(key)) return false;
+            if (!Object.hasOwn(obj, key)) return false;
         }
 
         return true;
@@ -891,7 +823,8 @@ export class Helpers {
      */
     static sanitizeDataKey(key: string, replace: string=''): string {
         const spicyCharacters = ['.', '-='];
-        spicyCharacters.forEach(character => key = key.replace(character, replace));
+        for (const character of spicyCharacters)
+            key = key.replace(character, replace);
         return key;
     }
 
