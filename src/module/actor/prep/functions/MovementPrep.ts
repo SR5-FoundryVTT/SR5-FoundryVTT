@@ -1,4 +1,4 @@
-import { Helpers } from "@/module/helpers";
+import { PartsList } from "@/module/parts/PartsList";
 
 export class MovementPrep {
     static prepareMovement(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
@@ -9,10 +9,10 @@ export class MovementPrep {
         movement.walk.base = attributes.agility.value * (2 + modifiers.walk);
         movement.run.base = attributes.agility.value * (4 + modifiers.run);
 
-        Helpers.addChange(movement.walk, { name: "SR5.Bonus", mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY, value: 2 });
-        Helpers.addChange(movement.run, { name: "SR5.Bonus", mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY, value: 2 });
+        PartsList.addUniquePart(movement.walk, "SR5.Bonus", 2, CONST.ACTIVE_EFFECT_MODES.MULTIPLY);
+        PartsList.addUniquePart(movement.run, "SR5.Bonus", 2, CONST.ACTIVE_EFFECT_MODES.MULTIPLY);
 
-        Helpers.calcTotal(movement.walk, { min: 0 });
-        Helpers.calcTotal(movement.run, { min: 0 });
+        PartsList.calcTotal(movement.walk, { min: 0 });
+        PartsList.calcTotal(movement.run, { min: 0 });
     }
 }

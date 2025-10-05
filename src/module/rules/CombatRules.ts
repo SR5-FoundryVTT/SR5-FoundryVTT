@@ -114,7 +114,7 @@ export class CombatRules {
         const mod = new PartsList(modified);
         mod.addUniquePart('SR5.Attacker', attackerHits);
         mod.addUniquePart('SR5.Defender', -defenderHits);
-        Helpers.calcTotal(modified, { min: 0 });
+        PartsList.calcTotal(modified, { min: 0 });
 
         // SR5#173 Step 3: Defend B.
         modified = CombatRules.modifyDamageTypeAfterHit(modified, defender);
@@ -202,9 +202,9 @@ export class CombatRules {
 
         // Keep base and modification intact, only overwriting the result.
         modifiedDamage.override = {name: 'SR5.TestResults.Success', value: 0};
-        Helpers.calcTotal(modifiedDamage, {min: 0});
+        PartsList.calcTotal(modifiedDamage, {min: 0});
         modifiedDamage.ap.override = {name: 'SR5.TestResults.Success', value: 0};
-        Helpers.calcTotal(modifiedDamage.ap);
+        PartsList.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';
 
         // If attack hits but deals no damage, keep the element of the attack for any side effects.
@@ -227,7 +227,7 @@ export class CombatRules {
         if (hits < 0) hits = 0;
 
         const { modified } = SoakRules.reduceDamage(actor, damage, hits);
-        Helpers.calcTotal(modified, { min: 0 });
+        PartsList.calcTotal(modified, { min: 0 });
 
         return modified;
     }
@@ -247,7 +247,7 @@ export class CombatRules {
 
         console.error('Check if ap is a negative value or positive value during weapon item configuration');
         PartsList.addUniquePart(modifiedArmor, 'SR5.AP', damage.ap.value);
-        modifiedArmor.value = Helpers.calcTotal(modifiedArmor, {min: 0});
+        modifiedArmor.value = PartsList.calcTotal(modifiedArmor, {min: 0});
 
         return modifiedArmor;
     }

@@ -15,6 +15,7 @@ import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { AttributesType } from 'src/module/types/template/Attributes';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
+import { PartsList } from '@/module/parts/PartsList';
 
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
@@ -79,14 +80,14 @@ export class SpiritPrep {
 
             // prepare initiative data
             initiative.meatspace.base.base = force * overrides.init_mult + overrides.init + modifiers.astral_initiative;
-            Helpers.addChange(initiative.meatspace.base, { name: "SR5.Bonus", value: modifiers.astral_initiative });
+            PartsList.addUniquePart(initiative.meatspace.base, "SR5.Bonus", modifiers.astral_initiative);
             initiative.meatspace.dice.base = overrides.init_dice;
-            Helpers.addChange(initiative.meatspace.dice, { name: "SR5.Bonus", value: modifiers.meat_initiative_dice });
+            PartsList.addUniquePart(initiative.meatspace.dice, "SR5.Bonus", modifiers.meat_initiative_dice);
 
             initiative.astral.base.base = force * overrides.astral_init_mult + overrides.astral_init + modifiers.astral_initiative_dice;
-            Helpers.addChange(initiative.astral.base, { name: "SR5.Bonus", value: modifiers.astral_initiative });
+            PartsList.addUniquePart(initiative.astral.base, "SR5.Bonus", modifiers.astral_initiative);
             initiative.astral.dice.base = overrides.astral_init_dice;
-            Helpers.addChange(initiative.astral.dice, { name: "SR5.Bonus", value: modifiers.astral_initiative_dice });
+            PartsList.addUniquePart(initiative.astral.dice, "SR5.Bonus", modifiers.astral_initiative_dice);
         }
     }
 
@@ -112,10 +113,10 @@ export class SpiritPrep {
         const { armor, attributes } = system;
 
         armor.base = attributes.essence.value * 2;
-        if (system.modifiers['armor'])
-            Helpers.addChange(armor, { name: "SR5.Bonus", value: system.modifiers['armor'] });
+        if (system.modifiers.armor)
+            PartsList.addUniquePart(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
 
-        armor.value = Helpers.calcTotal(armor);
+        PartsList.calcTotal(armor);
         armor.hardened = true;
     }
 
@@ -874,7 +875,7 @@ export class SpiritPrep {
 
         // Allow value to be understandable when displayed.
         attributes.force.base = 0;
-        Helpers.addChange(attributes.force, { name: 'SR5.Force', value: force });
+        PartsList.addUniquePart(attributes.force, 'SR5.Force', force);
         AttributesPrep.calculateAttribute('force', attributes.force);
     }
 }

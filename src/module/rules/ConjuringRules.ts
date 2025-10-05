@@ -1,5 +1,5 @@
 import { DataDefaults } from "../data/DataDefaults";
-import { Helpers } from "../helpers";
+import { PartsList } from "../parts/PartsList";
 import { DamageType } from "../types/item/Action";
 import { DrainRules } from "./DrainRules";
 
@@ -44,7 +44,7 @@ export const ConjuringRules = {
         const damage = DataDefaults.createData('damage');
         damage.base = ConjuringRules.summoningDrainValue(hitsSpirit);
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(force, magic);
-        Helpers.calcTotal(damage, {min: 0});
+        PartsList.calcTotal(damage, {min: 0});
         
         return damage;
     },

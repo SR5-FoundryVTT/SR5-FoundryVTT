@@ -103,7 +103,7 @@ export const MatrixTestDataFlow = {
                         test.data.damage, "SR5.Marks",
                         marks * (targetItem.actor?.getExtraMarkDamageModifier() ?? MatrixRules.getExtraMarkDamageModifier())
                     );
-                    test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
+                    test.data.damage.value = PartsList.calcTotal(test.data.damage, { min: 0 })
                 }
                 // if there wasn't a matrix device, see if we have marks placed on the actor itself
             } else if (icon instanceof SR5Actor) {
@@ -113,7 +113,7 @@ export const MatrixTestDataFlow = {
                     PartsList.addUniquePart(
                         test.data.damage, "SR5.Marks", marks * icon.getExtraMarkDamageModifier()
                     );
-                    test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
+                    test.data.damage.value = PartsList.calcTotal(test.data.damage, { min: 0 })
                 }
             }
         }

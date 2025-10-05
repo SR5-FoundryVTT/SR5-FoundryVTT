@@ -12,6 +12,7 @@ import { ModifiableValueType } from 'src/module/types/template/Base';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
+import { PartsList } from '@/module/parts/PartsList';
 
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
@@ -51,7 +52,7 @@ export class VehiclePrep {
         const { vehicle_stats, isOffRoad, isDrone } = system;
 
         for (const [key, stat] of Object.entries(vehicle_stats)) {
-            Helpers.calcTotal(stat);
+            PartsList.calcTotal(stat);
             stat.label = SR5.vehicle.stats[key];
         }
 
@@ -98,7 +99,7 @@ export class VehiclePrep {
 
             // Allow value to be understandable when displayed.
             attribute.base = 0;
-            Helpers.addChange(attribute, { name: vehicle_stats.pilot.label, value: vehicle_stats.pilot.value });
+            PartsList.addUniquePart(attribute, vehicle_stats.pilot.label, vehicle_stats.pilot.value);
             AttributesPrep.calculateAttribute(attId, attribute);
         });
     }
@@ -115,7 +116,7 @@ export class VehiclePrep {
 
             // Allow value to be understandable when displayed.
             attribute.base = 0;
-            Helpers.addChange(attribute, { name: attributes.body.label, value: attributes.body.value });
+            PartsList.addUniquePart(attribute, attributes.body.label, attributes.body.value);
             AttributesPrep.calculateAttribute(attId, attribute);
         });
     }
@@ -123,7 +124,7 @@ export class VehiclePrep {
     static prepareLimits(system: Actor.SystemOfType<'vehicle'>) {
         const { limits, vehicle_stats, isOffRoad } = system;
 
-        limits.mental.base = Helpers.calcTotal(vehicle_stats.sensor);
+        limits.mental.base = PartsList.calcTotal(vehicle_stats.sensor);
 
         // add sensor, handling, and speed as limits
         limits.sensor = { ...vehicle_stats.sensor, hidden: true, attribute: 'sensor' };
@@ -143,7 +144,7 @@ export class VehiclePrep {
     static prepareConditionMonitor(system: Actor.SystemOfType<'vehicle'>) {
         const { track, attributes, matrix, isDrone, modifiers } = system;
 
-        const halfBody = Math.ceil(Helpers.calcTotal(attributes.body) / 2);
+        const halfBody = Math.ceil(PartsList.calcTotal(attributes.body) / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
         if (isDrone) {
             track.physical.base = 6 + halfBody;
@@ -161,7 +162,7 @@ export class VehiclePrep {
 
         // Prepare user visible matrix track values
         track.matrix.base = MatrixRules.getVehicleMonitor(rating);
-        Helpers.addChange(track.matrix, { name: "SR5.Bonus", value: modifiers.matrix_track });
+        PartsList.addUniquePart(track.matrix, "SR5.Bonus", modifiers.matrix_track);
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
     }
@@ -169,37 +170,37 @@ export class VehiclePrep {
     static prepareMovement(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, movement, isOffRoad } = system;
 
-        const speedTotal = Helpers.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
+        const speedTotal = PartsList.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
 
         // algorithm to determine speed, CRB pg 202 table.
         // Allow ActiveEffects to apply to movement directly.
         movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
-        movement.walk.value = Helpers.calcTotal(movement.walk as ModifiableValueType, {min: 0});
+        movement.walk.value = PartsList.calcTotal(movement.walk as ModifiableValueType, {min: 0});
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = Helpers.calcTotal(movement.run as ModifiableValueType, {min: 0});
+        movement.run.value = PartsList.calcTotal(movement.run as ModifiableValueType, {min: 0});
     }
 
     static prepareMeatspaceInit(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, initiative, modifiers } = system;
 
-        const pilot = Helpers.calcTotal(vehicle_stats.pilot);
+        const pilot = PartsList.calcTotal(vehicle_stats.pilot);
 
         initiative.meatspace.base.base = pilot * 2;
-        Helpers.addChange(initiative.meatspace.base, { name: "SR5.Bonus", value: modifiers.meat_initiative });
+        PartsList.addUniquePart(initiative.meatspace.base, "SR5.Bonus", modifiers.meat_initiative);
         initiative.meatspace.dice.base = 4;
-        Helpers.addChange(initiative.meatspace.dice, { name: "SR5.Bonus", value: modifiers.meat_initiative_dice });
+        PartsList.addUniquePart(initiative.meatspace.dice, "SR5.Bonus", modifiers.meat_initiative_dice);
 
-        Helpers.calcTotal(initiative.meatspace.base);
-        Helpers.calcTotal(initiative.meatspace.dice);
+        PartsList.calcTotal(initiative.meatspace.base);
+        PartsList.calcTotal(initiative.meatspace.dice);
     }
 
     static prepareArmor(system: Actor.SystemOfType<'vehicle'>) {
         const { armor, modifiers } = system;
 
-        Helpers.addChange(armor, { name: 'SR5.Bonus', value: modifiers.armor });
+        PartsList.addUniquePart(armor, 'SR5.Bonus', modifiers.armor);
 
-        Helpers.calcTotal(armor);
+        PartsList.calcTotal(armor);
     }
     /**
      * Prepare the base actor recoil compensation without item influence.
@@ -208,9 +209,8 @@ export class VehiclePrep {
         const {attributes} = system;
 
         const recoilCompensation = RangedWeaponRules.vehicleRecoilCompensationValue(attributes.body.value);
-        Helpers.addChange(system.values.recoil_compensation, { name: 'SR5.RecoilCompensation', value: recoilCompensation });
-
-        Helpers.calcTotal(system.values.recoil_compensation, {min: 0});
+        PartsList.addUniquePart(system.values.recoil_compensation, 'SR5.RecoilCompensation', recoilCompensation);
+        PartsList.calcTotal(system.values.recoil_compensation, {min: 0});
     }
 
     /**
@@ -223,7 +223,7 @@ export class VehiclePrep {
      */
     static prepareAttributeRanges(system: Actor.SystemOfType<'vehicle'>) {
         const ranges = SR.actorTypeAttributes['vehicle'];
-        Helpers.calcTotal(system.attributes.strength, ranges.strength);
-        Helpers.calcTotal(system.attributes.agility, ranges.agility);
+        PartsList.calcTotal(system.attributes.strength, ranges.strength);
+        PartsList.calcTotal(system.attributes.agility, ranges.agility);
     }
 }

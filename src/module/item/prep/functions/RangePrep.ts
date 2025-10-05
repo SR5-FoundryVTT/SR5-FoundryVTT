@@ -28,6 +28,6 @@ export const RangePrep = {
             if (mod.system.rc)
                 rangeParts.addPart(mod.name, mod.system.rc);
 
-        Helpers.calcTotal(range.rc);
+        PartsList.calcTotal(range.rc);
     }
 }

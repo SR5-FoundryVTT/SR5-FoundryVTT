@@ -54,7 +54,7 @@ export class AttributesPrep {
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = ranges ? ranges[name] : SR.attributes.ranges[name];
-        Helpers.calcTotal(attribute, range);
+        PartsList.calcTotal(attribute, range);
     }
 
     /**
@@ -78,6 +78,6 @@ export class AttributesPrep {
                 parts.addPart(item.name, -item.getEssenceLoss());
         }
 
-        Helpers.calcTotal(system.attributes.essence);
+        PartsList.calcTotal(system.attributes.essence);
     }
 }

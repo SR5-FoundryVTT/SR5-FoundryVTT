@@ -25,10 +25,10 @@ export const RiggingTestDataFlow = {
         if (rating > 0 && test.data.limit.value > 0) {
             // add the control rig rating as a limit bonus to tests
             test.data.limit.mod.push({name: game.i18n.localize('SR5.ControlRig'), value: rating});
-            Helpers.calcTotal(test.data.limit);
+            PartsList.calcTotal(test.data.limit);
             // SR5 pg 452 says you add the control rig rating to vehicle tests
             test.data.pool.mod.push({name: game.i18n.localize('SR5.ControlRig'), value: rating});
-            Helpers.calcTotal(test.data.pool);
+            PartsList.calcTotal(test.data.pool);
         }
     },
 

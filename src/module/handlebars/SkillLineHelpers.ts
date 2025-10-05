@@ -1,9 +1,9 @@
-import { Helpers } from '../helpers';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SkillCategories = Shadowrun.SkillCategories;
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import { SkillFieldType } from '../types/template/Skills';
+import { PartsList } from '../parts/PartsList';
 
 export const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('SkillHeaderIcons', function (category: SkillCategories) {
@@ -78,7 +78,7 @@ export const registerSkillLineHelpers = () => {
             },
             {
                 text: {
-                    text: Helpers.calcTotal(skill),
+                    text: PartsList.calcTotal(skill),
                     cssClass: 'rtg',
                 },
             },

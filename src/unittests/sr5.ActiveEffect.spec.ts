@@ -1,6 +1,6 @@
 import { SR5TestFactory } from "./utils";
-import { Helpers } from "../module/helpers";
 import { SR5Item } from "../module/item/SR5Item";
+import { PartsList } from "@/module/parts/PartsList";
 import { SkillTest } from "../module/tests/SkillTest";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
@@ -753,7 +753,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareTestCategories();
             test.effects.applyAllEffects();
 
-            Helpers.calcTotal(test.pool);
+            PartsList.calcTotal(test.pool);
 
             assert.strictEqual(test.pool.value, 3);
 
@@ -765,7 +765,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareTestCategories();
             test.effects.applyAllEffects();
 
-            Helpers.calcTotal(test.pool);
+            PartsList.calcTotal(test.pool);
 
             assert.strictEqual(test.pool.value, 0);
 
@@ -777,7 +777,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareTestCategories();
             test.effects.applyAllEffects();
 
-            Helpers.calcTotal(test.pool);
+            PartsList.calcTotal(test.pool);
 
             assert.strictEqual(test.pool.value, 0);
         });

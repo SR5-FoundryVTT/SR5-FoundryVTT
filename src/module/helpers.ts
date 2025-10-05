@@ -7,7 +7,6 @@ import { SR5Item } from './item/SR5Item';
 import { PartsList } from './parts/PartsList';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
-import { ModifiableValueType } from "./types/template/Base";
 import { AttributeFieldType } from "./types/template/Attributes";
 import { SkillFieldType, SkillsType } from "./types/template/Skills";
 import { ModifiedDamageType } from "./types/rolls/ActorRolls";
@@ -16,76 +15,18 @@ import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
 
 type OneOrMany<T> = T | T[];
 
-interface CalcTotalOptions {
-    // Min/Max value range
-    min?: number,
-    max?: number,
-}
-
 export class Helpers {
 
-    static addChange(
-        mod: ModifiableValueType,
-        change: { name: string, mode?: CONST.ACTIVE_EFFECT_MODES, value: number, priority?: number }
-    ): void {
-        if (!change.value && (!change.mode || change.mode === CONST.ACTIVE_EFFECT_MODES.ADD)) return;
-
-        const mode = change.mode ?? CONST.ACTIVE_EFFECT_MODES.ADD;
-        const priority = change.priority ?? 10 * mode;
-        mod.changes.push({ mode, priority, unused: false, ...change });
-    }
-
-    private static _markPreviousChangesUnused(changes: ModifiableValueType['changes'], currentIndex: number): void {
-        for (let i = 0; i < currentIndex; i++) {
-            changes[i].unused = true;
-        }
-    }
-
     /**
-     * Calculate the total value for a ModifiableValue shape.
+     * Round a number to a given number of decimal places.
      *
-     * This can either be the sum of all modify values or the override total value as given.
-     *
-     * ActiveEffect modes are related to the expected data:
-     * - Modify / Add => Will insert into the .mod array
-     * - Override => Will create a .override value with no min and max
-     * - Upgrade => Will create a .override value with min
-     * - Downgrade => Will create a .override value with max
-     *
-     * Depending on the override value it's possible that a overriden value can be
-     * downgraded or upgraded but still be changed further by the options.min or options.max
-     * params of the overall method. That way effect changes can't override system min/max borders.
-     *
-     * @param mod The ModifiableValue shape.
-     * @param options min will a apply a minimum value, max will apply a maximum value.
+     * @param value The number to round.
+     * @param decimals The number of decimal places (default: 3).
+     * @returns The rounded number.
      */
-    static calcTotal(mod: ModifiableValueType, options?: CalcTotalOptions): number {
-        return 0;
-    }
-
-    /** Round a number to a given degree.
-     *
-     * @param value Number to round with.
-     * @param decimals Amount of decimals after the decimal point.
-     */
-    static roundTo(value: number, decimals: number=3): number {
+    static roundTo(value: number, decimals: number = 3): number {
         const multiplier = Math.pow(10, decimals);
         return Math.round(value * multiplier) / multiplier;
-    }
-
-    /** Make sure a given value is in between a range.
-     *
-     * @param value
-     * @param options Define the range the given value must be in (or none)
-     * @returns True if the value was modified, false otherwise
-     */
-    static applyRange(value: number, options?: CalcTotalOptions) {
-        if (options?.min != null)
-            value = Math.max(options.min, value);
-        if (options?.max != null)
-            value = Math.min(options.max, value);
-
-        return value;
     }
 
     static listItemId(event): string {

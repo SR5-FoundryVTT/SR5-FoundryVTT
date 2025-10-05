@@ -1,6 +1,7 @@
-import { Helpers } from '../../../helpers';
 import { SR5 } from "../../../config";
+import { Helpers } from '../../../helpers';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { PartsList } from '@/module/parts/PartsList';
 
 export class ItemPrep {
     /**
@@ -25,7 +26,7 @@ export class ItemPrep {
             if (armorValue > 0) {
                 // We allow only one base armor but multiple armor accessories
                 if (item.system.armor.mod) {
-                    Helpers.addChange(armor, { name: item.name, value: item.system.armor.value });
+                    PartsList.addUniquePart(armor, item.name, item.system.armor.value);
                 } else if (armorValue > armor.base) {
                     armor.base = armorValue;
                     armor.label = item.name;
@@ -39,8 +40,9 @@ export class ItemPrep {
             }
         }
 
-        if (system.modifiers['armor']) Helpers.addChange(armor, { name: game.i18n.localize('SR5.Bonus'), value: system.modifiers['armor'] });
-        // SET ARMOR
-        armor.value = Helpers.calcTotal(armor);
+        if (system.modifiers.armor)
+            PartsList.addUniquePart(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
+
+        PartsList.calcTotal(armor);
     }
 }

@@ -3,9 +3,9 @@ import { InitiativePrep } from './functions/InitiativePrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
-import { Helpers } from '../../helpers';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
+import { PartsList } from '@/module/parts/PartsList';
 
 /**
  * Prepare a Sprite Type of Actor
@@ -47,7 +47,7 @@ export class SpritePrep {
 
         // calculate resonance value
         attributes.resonance.base = level + overrides.resonance;
-        Helpers.calcTotal(attributes.resonance);
+        PartsList.calcTotal(attributes.resonance);
     }
 
     static prepareSpriteMatrixAttributes(system: Actor.SystemOfType<'sprite'>) {
@@ -61,7 +61,7 @@ export class SpritePrep {
         matrixAtts.forEach((att) => {
             if (matrix[att] !== undefined) {
                 matrix[att].base = level + overrides[att];
-                matrix[att].value = Helpers.calcTotal(matrix[att]);
+                PartsList.calcTotal(matrix[att]);
             }
         });
 
@@ -96,12 +96,12 @@ export class SpritePrep {
 
         // setup initiative from overrides
         initiative.matrix.base.base = level * 2 + overrides.init;
-        Helpers.addChange(initiative.matrix.base, { name: "SR5.Bonus", value: modifiers.matrix_initiative });
-        Helpers.calcTotal(initiative.matrix.base, {min: 0});
+        PartsList.addUniquePart(initiative.matrix.base, "SR5.Bonus", modifiers.matrix_initiative);
+        PartsList.calcTotal(initiative.matrix.base, {min: 0});
 
         initiative.matrix.dice.base = 4;
-        Helpers.addChange(initiative.matrix.dice, { name: "SR5.Bonus", value: modifiers.matrix_initiative_dice });
-        Helpers.calcTotal(initiative.matrix.dice, {min: 0});
+        PartsList.addUniquePart(initiative.matrix.dice, "SR5.Bonus", modifiers.matrix_initiative_dice);
+        PartsList.calcTotal(initiative.matrix.dice, {min: 0});
     }
 
     /**

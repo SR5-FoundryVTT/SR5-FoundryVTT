@@ -446,8 +446,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Prepare damage to apply to armor.
         damage = damage || DataDefaults.createData('damage');
 
-        Helpers.calcTotal(damage);
-        Helpers.calcTotal(damage.ap);
+        PartsList.calcTotal(damage);
+        PartsList.calcTotal(damage.ap);
 
         // Modify by penetration
         if (damage.ap.value !== 0)
@@ -460,7 +460,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
                 PartsList.addUniquePart(armor, 'SR5.Element', armorForDamageElement);
         }
 
-        Helpers.calcTotal(armor, {min: 0});
+        PartsList.calcTotal(armor, {min: 0});
 
         return armor;
     }
@@ -1823,7 +1823,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     getControlRigRating(): number {
         if (!this.isType('character')) return 0;
-        return Helpers.calcTotal(this.system.values.control_rig_rating);
+        return PartsList.calcTotal(this.system.values.control_rig_rating);
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Helpers } from '../../helpers';
+import { PartsList } from '@/module/parts/PartsList';
 import { SuccessTestData, TestOptions } from '../SuccessTest';
 import { DataDefaults } from '../../data/DataDefaults';
 import { DefenseTestData } from '../DefenseTest';
@@ -31,8 +31,8 @@ export const ResistTestDataFlow = {
      */
     calculateBaseValues(data: ResistTestData) {
         // Calculate damage values in case of user dialog interaction.
-        Helpers.calcTotal(data.incomingDamage, {min: 0});
-        Helpers.calcTotal(data.incomingDamage.ap);
+        PartsList.calcTotal(data.incomingDamage, {min: 0});
+        PartsList.calcTotal(data.incomingDamage.ap);
 
         // Remove user override and resulting incoming damage as base.
         data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
@@ -45,8 +45,8 @@ export const ResistTestDataFlow = {
         // @ts-expect-error taM check this 
         delete data.modifiedDamage.ap.override;
 
-        Helpers.calcTotal(data.modifiedDamage);
-        Helpers.calcTotal(data.modifiedDamage.ap);
+        PartsList.calcTotal(data.modifiedDamage);
+        PartsList.calcTotal(data.modifiedDamage.ap);
     },
 
     /**

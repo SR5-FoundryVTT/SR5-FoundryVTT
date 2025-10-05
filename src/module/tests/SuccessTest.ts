@@ -420,7 +420,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      */
     get formula(): string {
-        const pool = Helpers.calcTotal(this.data.pool, { min: 0 });
+        const pool = PartsList.calcTotal(this.data.pool, { min: 0 });
         return this.buildFormula(pool, this.hasPushTheLimit);
     }
 
@@ -657,17 +657,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     calculateBaseValues() {
         this.roundBaseValueParts();
 
-        this.data.modifiers.value = Helpers.calcTotal(this.data.modifiers);
+        this.data.modifiers.value = PartsList.calcTotal(this.data.modifiers);
 
-        this.data.pool.value = Helpers.calcTotal(this.data.pool, { min: 0 });
-        this.data.threshold.value = Helpers.calcTotal(this.data.threshold, { min: 0 });
-        this.data.limit.value = Helpers.calcTotal(this.data.limit, { min: 0 });
+        this.data.pool.value = PartsList.calcTotal(this.data.pool, { min: 0 });
+        this.data.threshold.value = PartsList.calcTotal(this.data.threshold, { min: 0 });
+        this.data.limit.value = PartsList.calcTotal(this.data.limit, { min: 0 });
 
-        this.data.manualHits.value = Helpers.calcTotal(this.data.manualHits, { min: 0 });
-        this.data.manualGlitches.value = Helpers.calcTotal(this.data.manualGlitches, { min: 0 });
+        this.data.manualHits.value = PartsList.calcTotal(this.data.manualHits, { min: 0 });
+        this.data.manualGlitches.value = PartsList.calcTotal(this.data.manualGlitches, { min: 0 });
 
         // Shows AP on incoming attacks
-        this.data.damage.ap.value = Helpers.calcTotal(this.data.damage.ap);
+        this.data.damage.ap.value = PartsList.calcTotal(this.data.damage.ap);
 
         console.debug(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
@@ -952,7 +952,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             label: "SR5.NetHits",
             base
         });
-        netHits.value = Helpers.calcTotal(netHits, { min: 0 });
+        netHits.value = PartsList.calcTotal(netHits, { min: 0 });
 
         return netHits;
     }
@@ -974,7 +974,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.hits.base = rollHits;
         
         // First, calculate hits based on roll and modifiers.
-        this.hits.value = Helpers.calcTotal(this.hits, { min: 0 });
+        this.hits.value = PartsList.calcTotal(this.hits, { min: 0 });
         // Second, reduce hits by limit.
         this.hits.value = this.hasLimit ? Math.min(this.limit.value, this.hits.value) : this.hits.value;
 
@@ -1043,7 +1043,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             label: "SR5.Glitches",
             base: rollGlitches
         })
-        glitches.value = Helpers.calcTotal(glitches, { min: 0 });
+        glitches.value = PartsList.calcTotal(glitches, { min: 0 });
 
         return glitches;
     }
@@ -1057,7 +1057,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const extendedHits = this.extendedHits();
         new PartsList(extendedHits).addPart('SR5.Hits', this.hits.value);
 
-        Helpers.calcTotal(extendedHits, { min: 0 });
+        PartsList.calcTotal(extendedHits, { min: 0 });
 
         return extendedHits;
     }
@@ -1657,7 +1657,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             pool.addUniquePart('SR5.ExtendedTest', nextModifierValue);
         }
 
-        Helpers.calcTotal(data.pool, { min: 0 });
+        PartsList.calcTotal(data.pool, { min: 0 });
 
         if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits().value)) {
             return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });

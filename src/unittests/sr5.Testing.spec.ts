@@ -2,7 +2,7 @@ import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { DataDefaults } from "@/module/data/DataDefaults";
-import { Helpers } from "@/module/helpers";
+import { PartsList } from "@/module/parts/PartsList";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -132,7 +132,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
             const data = TestCreator._prepareTestDataWithActionForItem(action, item, TestCreator._minimalTestData());
 
-            Helpers.calcTotal(data.pool);
+            PartsList.calcTotal(data.pool);
 
             assert.strictEqual(data.pool.value, 10);
         });

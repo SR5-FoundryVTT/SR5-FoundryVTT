@@ -68,7 +68,7 @@ export class CharacterPrep {
      * @param system Physical humanoid system data.
      */
     static prepareRecoil(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>) {
-        Helpers.calcTotal(system.values.recoil, { min: 0 });
+        PartsList.calcTotal(system.values.recoil, { min: 0 });
     }
 
     /**

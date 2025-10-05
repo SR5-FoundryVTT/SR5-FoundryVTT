@@ -1,4 +1,4 @@
-import { Helpers } from 'src/module/helpers';
+import { PartsList } from '@/module/parts/PartsList';
 import { MonitorRules } from './../../../rules/MonitorRules';
 
 export class WoundsPrep {
@@ -23,6 +23,6 @@ export class WoundsPrep {
 
         // The actor as a whole derives these wounds for wound modifier calculation
         system.wounds.base = stunWounds + physicalWounds;
-        system.wounds.value = Helpers.calcTotal(system.wounds);
+        PartsList.calcTotal(system.wounds);
     }
 }

@@ -37,7 +37,7 @@ export const TechnologyPrep = {
             if (mod.system.conceal > 0)
                 concealParts.addUniquePart(mod.name, mod.system.conceal);
 
-        Helpers.calcTotal(technology.conceal);
+        PartsList.calcTotal(technology.conceal);
     },
 
     /**

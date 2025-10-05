@@ -1,6 +1,6 @@
-import { Helpers } from "@/module/helpers";
-import {METATYPEMODIFIER, SR} from "../../../constants";
-import {AttributesPrep} from "./AttributesPrep";
+import { AttributesPrep } from "./AttributesPrep";
+import { PartsList } from "@/module/parts/PartsList";
+import { METATYPEMODIFIER, SR } from "../../../constants";
 
 export class NPCPrep {
     static prepareNPCData(system: Actor.SystemOfType<'character'>) {
@@ -24,7 +24,7 @@ export class NPCPrep {
             // Apply NPC modifiers
             const modifyBy = metatypeModifier.attributes?.[name] as number | undefined;
             if (modifyBy)
-                Helpers.addChange(attribute, { name: METATYPEMODIFIER, value: modifyBy });
+                PartsList.addUniquePart(attribute, METATYPEMODIFIER, modifyBy);
 
             AttributesPrep.calculateAttribute(name, attribute);
         }
