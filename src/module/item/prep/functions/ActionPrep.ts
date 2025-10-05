@@ -117,7 +117,7 @@ export const ActionPrep = {
             if (modification.system.dice_pool) dpParts.addUniquePart(mod.name, modification.system.dice_pool);
         }
 
-        action.dice_pool_mod = valueField.changes;
+        action.dice_pool_mod = dpParts.changes;
     },
 
     /**
