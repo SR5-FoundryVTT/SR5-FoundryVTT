@@ -1,10 +1,10 @@
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
+import { PartsList } from "../parts/PartsList";
 import { Migrator } from "../migrator/Migrator";
 import { ModifiableValueType } from "../types/template/Base";
 import DataModel = foundry.abstract.DataModel;
-import { PartsList } from "../parts/PartsList";
 
 /**
  * Shadowrun Active Effects implement additional ways of altering document data.

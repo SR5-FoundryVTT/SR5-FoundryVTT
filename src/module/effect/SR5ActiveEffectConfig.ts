@@ -82,7 +82,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             const index = options.parts.indexOf("footer");
             options.parts.push(options.parts.splice(index, 1)[0]);
         }
-        return await super._renderHTML(context, options);
+        return super._renderHTML(context, options);
     }
 
     /**
@@ -149,9 +149,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     override async _onRender(context, options) {
         const applyToSelect = this.element.querySelector<HTMLSelectElement>('select[name="system.applyTo"]')
         if (applyToSelect) {
-            applyToSelect.addEventListener('change', async (event) => {
-                await this.onApplyToChange(event, applyToSelect);
-            });
+            applyToSelect.addEventListener('change', (event) => { void this.onApplyToChange(event, applyToSelect); });
             // if we have changes, add a tooltip to the select to indicate it as disabled
             if (this.hasChanges) {
                 applyToSelect.setAttribute('data-tooltip', game.i18n.localize("SR5.Tooltips.Effect.AlterApplyToWithChanges"));

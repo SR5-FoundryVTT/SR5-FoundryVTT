@@ -192,7 +192,7 @@ export class CombatRules {
     }
 
     /**
-     * Modify damage according to combat sequence (SR5#173 part defend. Missing attack.
+     * Modify damage according to combat sequence SR5#173 part defend. Missing attack.
      * @param damage Incoming damage to be modified
      * @param isHitWithNoDamage Optional parameter used for physical defense tests when attack hits but will deal no damage
      * @return A new damage object for modified damage.
@@ -201,9 +201,9 @@ export class CombatRules {
         const modifiedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         // Keep base and modification intact, only overwriting the result.
-        modifiedDamage.override = {name: 'SR5.TestResults.Success', value: 0};
-        PartsList.calcTotal(modifiedDamage, {min: 0});
-        modifiedDamage.ap.override = {name: 'SR5.TestResults.Success', value: 0};
+        PartsList.addPart(modifiedDamage, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+        PartsList.calcTotal(modifiedDamage, { min: 0 });
+        PartsList.addPart(modifiedDamage.ap, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
         PartsList.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';
 

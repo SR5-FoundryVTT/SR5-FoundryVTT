@@ -49,11 +49,6 @@ export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
 export const ModifiableValue = () => ({
     ...BaseValuePair(),
     mod: ModList(),
-    mode: new StringField({
-        required: true,
-        nullable: true,
-        choices: ['override', 'upgrade', 'downgrade']
-    }),
     changes: new ArrayField(new SchemaField(NewModListEntry())),
     override: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
     temp: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

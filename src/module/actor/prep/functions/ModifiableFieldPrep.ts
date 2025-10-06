@@ -28,8 +28,11 @@ export class ModifiableFieldPrep {
         const resetFunc = (mod: ModifiableValueType) => {
             mod.changes = [];
 
-            if (mod.temp)
-                mod.changes.push({ name: "SR5.Temporary", value: mod.temp, mode: 2, unused: false, priority: 0 });
+            if (mod.temp) {
+                mod.changes.push(
+                    { name: "SR5.Temporary", value: mod.temp, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE, unused: false, priority: 0 }
+                );
+            }
         };
 
         return this.traverseFields(system, resolveField, resetFunc);
