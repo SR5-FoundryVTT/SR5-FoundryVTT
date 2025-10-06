@@ -58,7 +58,7 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
      */
     public addUniquePart(
         name: string,
-        value: number | undefined,
+        value: number | undefined | null,
         mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
         priority: number = 0,
     ): void {
@@ -66,12 +66,12 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
 
         // If part exists
         if (index !== -1) {
-            if (value !== undefined) {
+            if (value != null) {
                 this._field.changes[index] = { mode, priority, unused: false, name, value };
             } else {
                 this.removePart(name);
             }
-        } else if (value !== undefined) {
+        } else if (value != null) {
             // Part does not exist, add it.
             this.addPart(name, value, mode, priority);
         } else {
