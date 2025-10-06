@@ -1488,6 +1488,17 @@
             "Weapon": "Weapon"
         },
         "Karma": "Karma",
+        "KarmaManager": {
+            "Title": "Karma Manager",
+            "Submit": "Submit",
+            "Cancel": "Cancel",
+            "StartingKarma": "Starting Karma",
+            "CurrentKarma": "Amount of Karma the Character currently has",
+            "CareerKarma": "Amount of Career Karma the Character has accumulated",
+            "FinalKarma": "Final Karma",
+            "FinalCurrentKarma": "Karma this Character will have upon submitting",
+            "FinalCareerKarma": "Career Karma the Character will have upon submitting"
+        },
         "Keybinding": {
             "HideTestDialog": {
                 "Hint": "Skip dialog when rolling tests from any button",

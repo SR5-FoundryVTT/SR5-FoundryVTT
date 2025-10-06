@@ -1,12 +1,5 @@
 <div class="new-list-item-col">
-    <!-- Force the width on this so that the toggling doesn't move anything -->
-    <a data-action="toggleRunning" style="width: 1rem"><i
-          {{#if @root.system.movement.isRunning}}
-          class="fas fa-person-running"
-          {{else}}
-          class="fas fa-person-walking"
-          {{/if}}
-    ></i></a>
+    <i class="fas fa-person-walking"></i>
     <label data-tooltip="SR5.WalkingSpeed">{{system.movement.walk.value}}m</label>
     <label>/</label>
     <label data-tooltip="SR5.RunningSpeed">{{system.movement.run.value}}m</label>

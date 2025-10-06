@@ -219,10 +219,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             toggleInitiativeBlitz: SR5BaseActorSheet.#toggleInitiativeBlitz,
             rollInitiative: SR5BaseActorSheet.#rollInitiative,
-
-            toggleRunning: SR5BaseActorSheet.#toggleRunning,
-
-            openNuyenManager: SR5BaseActorSheet.#openNuyenManager,
         }
     }
 
@@ -2060,20 +2056,5 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.stopPropagation();
         await this.actor.rollInitiative();
         // TODO figure out how to roll initiative, probably want to prompt the GM to allow it?
-    }
-
-    static async #toggleRunning(this: SR5BaseActorSheet, event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (this.actor.system.movement) {
-            const running = this.actor.system.movement.isRunning;
-            await this.actor.update({system: { movement: { isRunning: !running }}});
-        }
-    }
-
-    static async #openNuyenManager(this: SR5BaseActorSheet, event) {
-        const app = new NuyenManager({document: this.actor});
-        await app.render(true);
     }
 }

@@ -1310,25 +1310,45 @@ input[type='text'].display {
         border-bottom: none;
     }
 
-    &.nuyen-manager {
+    &.karma-manager, &.nuyen-manager {
+        .sheet-footer {
+            border-color: transparent;
+        }
         .window-header {
             // hide buttons in the header since we are a simple interface
             button {
                 visibility: hidden;
             }
         }
-        .nuyen-label {
+        label.label {
             font-size: 1.25rem;
-            &.nuyen-positive {
+            &.positive {
                 color: $matrix-green;
                 text-shadow: 0 0 2px 1px $matrix-green;
             }
-            &.nuyen-negative {
+            &.negative {
                 color: $physical;
                 text-shadow: 0 0 2px 1px $physical;
             }
         }
-        .nuyen-mod-button-container {
+        .mod-input {
+            font-size: 1.25rem;
+        }
+        .input-row {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+        }
+        .input-col {
+            flex: none;
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            gap: .5rem;
+        }
+        .mod-button-container {
             display: flex;
             flex-flow: row nowrap;
             gap: .5rem;

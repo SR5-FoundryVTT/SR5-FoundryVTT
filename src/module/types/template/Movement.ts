@@ -8,7 +8,6 @@ export const MovementField = () => ({
 });
 
 export const Movement = () => ({
-    isRunning: new BooleanField({required: true, default: false}),
     walk: new ModifiableField(MovementField()),
     run: new ModifiableField(MovementField()),
     sprint: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),

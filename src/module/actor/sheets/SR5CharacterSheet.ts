@@ -1,6 +1,8 @@
 import { Helpers } from '../../helpers';
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { NuyenManager } from '@/module/apps/actor/NuyenManager';
+import { KarmaManager } from '@/module/apps/actor/KarmaManager';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
@@ -66,6 +68,13 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                 { id: 'complexForms', label: 'ComplexForms', cssClass: '', },
                 { id: 'compilations', label: 'Compilations', cssClass: '', }
             ]
+        }
+    }
+
+    static override DEFAULT_OPTIONS = {
+        actions: {
+            openNuyenManager: SR5CharacterSheet.#openNuyenManager,
+            openKarmaManager: SR5CharacterSheet.#openKarmaManager,
         }
     }
 
@@ -237,6 +246,16 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         }
 
         return parts;
+    }
+
+    static async #openKarmaManager(this: SR5CharacterSheet, event) {
+        const app = new KarmaManager({document: this.actor});
+        await app.render(true);
+    }
+
+    static async #openNuyenManager(this: SR5CharacterSheet, event) {
+        const app = new NuyenManager({document: this.actor});
+        await app.render(true);
     }
 
 }
