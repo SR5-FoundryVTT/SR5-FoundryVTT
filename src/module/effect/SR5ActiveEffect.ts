@@ -232,32 +232,7 @@ export class SR5ActiveEffect extends ActiveEffect {
             return;
         }
 
-        // Apply the change depending on the application mode
-        const modes = CONST.ACTIVE_EFFECT_MODES;
-        const changes = {};
-        switch (change.mode) {
-            case modes.ADD:
-                this._applyAdd(object, change, target, delta, changes);
-                break;
-            case modes.MULTIPLY:
-                this._applyMultiply(object, change, target, delta, changes);
-                break;
-            case modes.OVERRIDE:
-                this._applyOverride(object, change, target, delta, changes);
-                break;
-            case modes.UPGRADE:
-            case modes.DOWNGRADE:
-                this._applyUpgrade(object, change, target, delta, changes);
-                break;
-            default:
-                this._applyCustom(object, change, target, delta, changes);
-                break;
-        }
-
-        // Apply all changes to the Actor data
-        foundry.utils.mergeObject(object, changes);
-
-        return changes;
+        return super.apply(object, change);
     }
 
     /**

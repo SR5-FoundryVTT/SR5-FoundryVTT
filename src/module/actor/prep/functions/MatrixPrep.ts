@@ -100,16 +100,10 @@ export class MatrixPrep {
             const { value, base, mod, label } = attribute;
 
             // Each matrix attribute also functions as a limit.
-            limits[attributeName] = {
-                ...limits[attributeName],
-                ...{ value, base, mod, label, hidden: true }
-            };
+            limits[attributeName] = DataDefaults.createData('attribute_field', { value, base, mod, label, hidden: true });
 
             // Copy matrix attribute data into attributes for ease of access during testing.
-            attributes[attributeName] = {
-                ...attributes[attributeName],
-                ...{ value, base, mod, label, hidden: true }
-            };
+            attributes[attributeName] = DataDefaults.createData('attribute_field', { value, base, mod, label, hidden: true });
         }
     }
 
