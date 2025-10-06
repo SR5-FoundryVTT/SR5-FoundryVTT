@@ -3,6 +3,8 @@ import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
 import { Migrator } from "../migrator/Migrator";
 import { ModifiableValueType } from "../types/template/Base";
+import DataModel = foundry.abstract.DataModel;
+import { PartsList } from "../parts/PartsList";
 
 /**
  * Shadowrun Active Effects implement additional ways of altering document data.
@@ -84,13 +86,13 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Try redirecting given change key to a key matching a ModifiableValue instead of it's leafs.
      * Otherwise, redirect key as is. ChangeData will be altered in place.
      */
-    static redirectToNearModifiableValue(actor: SR5Actor, change: ActiveEffect.ChangeData) {
+    static redirectToNearModifiableValue(model: DataModel.Any, change: ActiveEffect.ChangeData) {
         // Move key up one hierarchy and check indirect match
         const nodes = change.key.split('.');
         const property = nodes.pop() ?? '';
         const indirectKey = nodes.join('.');
 
-        const value = SR5ActiveEffect.getModifiableValue(actor, indirectKey);
+        const value = SR5ActiveEffect.getModifiableValue(model, indirectKey);
         if (value) {
             // Allow users to change keys that don't affect value calculation
             // This could be skill.canDefault or similar.
@@ -110,16 +112,16 @@ export class SR5ActiveEffect extends ActiveEffect {
      * We do this to avoid effects breaking the sheet and easing the use of custom changes
      * for users not aware of system internal around ModifiableValue.
      */
-    static alterChange(actor: SR5Actor, change: ActiveEffect.ChangeData) {
-        if (!SR5ActiveEffect.getModifiableValue(actor, change.key))
-            SR5ActiveEffect.redirectToNearModifiableValue(actor, change);
+    static alterChange(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        if (!SR5ActiveEffect.getModifiableValue(model, change.key))
+            SR5ActiveEffect.redirectToNearModifiableValue(model, change);
     }
 
     /**
      * Return a ModifiableValue at the given key if it matches the ModifiableValue shape.
      */
-    static getModifiableValue(actor: SR5Actor, key: string): ModifiableValueType | null {
-        const possibleValue = foundry.utils.getProperty(actor, key);
+    static getModifiableValue(model: DataModel.Any, key: string): ModifiableValueType | null {
+        const possibleValue = foundry.utils.getProperty(model, key);
         const possibleValueType = foundry.utils.getType(possibleValue);
 
         if (possibleValue != null && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, this.modifiableValueProperties))
@@ -132,7 +134,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Return keys expected in the ModifiableField shape
      */
     static get modifiableValueProperties() {
-        return ['base', 'value', 'mod', 'override', 'temp'];
+        return ['base', 'value', 'mod', 'override', 'temp', 'changes'];
     }
 
     override get isSuppressed(): boolean {
@@ -182,20 +184,80 @@ export class SR5ActiveEffect extends ActiveEffect {
      * 
      * This can cause diffeing beahvior between these two for effect application.
      */
-    override apply(actor: SR5Actor, change: ActiveEffect.ChangeData) {
+    override apply(model: DataModel.Any, change: ActiveEffect.ChangeData) {
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
         const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
 
-        SR5ActiveEffect.alterChange(actor, change);
+        SR5ActiveEffect.alterChange(model, change);
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
 
-        // Add item error case, as FoundryVTT ActiveEffect.apply() is not meant to be used outside of Actor objects.
-        if (!(actor instanceof Actor)) throw new Error("SR5ActiveEffect.apply() cannot be used on non-Actor objects.");
+        // Add item error case, as FoundryVTT ActiveEffect.apply() is not meant to be used on items.
+        if (model instanceof SR5Item) throw new Error("SR5ActiveEffect.apply() cannot be used on SR5Item objects.");
+
+        // Other cases should be directly applied to the data, without actor / schema handling.
+        // This is used when applying effects to non-Actor objects, like tests.
+        if (!(model instanceof SR5Actor)) {
+            this._applyToObject(model, change);
+            return {};
+        }
 
         return Object.fromEntries(
-            Object.entries(super.apply(actor, change)).filter(([, v]) => v != null)
+            Object.entries(super.apply(model, change)).filter(([, v]) => v != null)
         );
+    }
+
+    /**
+     * Handle application for none-Document objects
+     */
+    _applyToObject(object: any, change: ActiveEffect.ChangeData) {
+        const target = foundry.utils.getProperty(object, change.key);
+        const targetType = foundry.utils.getType(target);
+
+        // Cast the effect change value to the correct type
+        let delta: any;
+        try {
+            if (Array.isArray(target)) {
+                const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
+                delta = this.__castArray(change.value, innerType);
+            }
+            else delta = this.__castDelta(change.value, targetType);
+        } catch (err) {
+            console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
+            return;
+        }
+
+        if (SR5ActiveEffect.getModifiableValue(object, change.key)) {
+            PartsList.addPart(target as any, change.effect.name, delta, change.mode, change.priority ?? undefined);
+            return;
+        }
+
+        // Apply the change depending on the application mode
+        const modes = CONST.ACTIVE_EFFECT_MODES;
+        const changes = {};
+        switch (change.mode) {
+            case modes.ADD:
+                this._applyAdd(object, change, target, delta, changes);
+                break;
+            case modes.MULTIPLY:
+                this._applyMultiply(object, change, target, delta, changes);
+                break;
+            case modes.OVERRIDE:
+                this._applyOverride(object, change, target, delta, changes);
+                break;
+            case modes.UPGRADE:
+            case modes.DOWNGRADE:
+                this._applyUpgrade(object, change, target, delta, changes);
+                break;
+            default:
+                this._applyCustom(object, change, target, delta, changes);
+                break;
+        }
+
+        // Apply all changes to the Actor data
+        foundry.utils.mergeObject(object, changes);
+
+        return changes;
     }
 
     /**
@@ -245,5 +307,63 @@ export class SR5ActiveEffect extends ActiveEffect {
         await Migrator.updateMigratedDocument(this);
 
         return super.update(data, operation);
+    }
+
+        /**
+     * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
+     * Cast a raw ActiveEffect.ChangeData change string to an Array of an inner type.
+     * @param {string} raw      The raw string value
+     * @param {string} type     The target data type of inner array elements
+     * @returns {Array<*>}      The parsed delta cast as a typed array
+     */
+    __castArray(raw: string, type: foundry.utils.DataType) {
+        let delta: any[];
+        try {
+            delta = this.__parseOrString(raw);
+            delta = delta instanceof Array ? delta : [delta];
+        } catch (e) {
+            delta = [raw];
+        }
+        return delta.map(d => this.__castDelta(d, type));
+    }
+
+    /**
+     * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
+     * Cast a raw ActiveEffect.ChangeData change string to the desired data type.
+     * @param {string} raw      The raw string value
+     * @param {string} type     The target data type that the raw value should be cast to match
+     * @returns {*}             The parsed delta cast to the target data type
+     */
+    __castDelta(raw: string, type: foundry.utils.DataType) {
+        let delta;
+        switch (type) {
+            case "boolean":
+                delta = Boolean(this.__parseOrString(raw));
+                break;
+            case "number":
+                delta = Number.fromString(raw);
+                if (Number.isNaN(delta)) delta = 0;
+                break;
+            case "string":
+                delta = String(raw);
+                break;
+            default:
+                delta = this.__parseOrString(raw);
+        }
+        return delta;
+    }
+
+    /**
+     * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
+     * Parse serialized JSON, or retain the raw string.
+     * @param {string} raw      A raw serialized string
+     * @returns {*}             The parsed value, or the original value if parsing failed
+     */
+    __parseOrString(raw: string) {
+        try {
+            return JSON.parse(raw);
+        } catch (err) {
+            return raw;
+        }
     }
 }

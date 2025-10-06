@@ -48,7 +48,7 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
         mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
         priority = 0
     ): void {
-        if (!value && (!mode || mode === CONST.ACTIVE_EFFECT_MODES.ADD)) return;
+        // if (!value && (!mode || mode === CONST.ACTIVE_EFFECT_MODES.ADD)) return;
 
         this._field.changes.push({ mode, priority, unused: false, name, value });
     }
@@ -60,7 +60,7 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
         name: string,
         value: number | undefined,
         mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
-        priority = 0,
+        priority: number = 0,
     ): void {
         const index = this._field.changes.findIndex(part => part.name === name);
 
