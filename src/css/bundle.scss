@@ -1304,6 +1304,65 @@ input[type='text'].display {
     background-repeat: repeat;
     background-size: 100% 20px auto;
 
+    .window-header {
+        --background: unset;
+        background: unset;
+        border-bottom: none;
+    }
+
+    &.nuyen-manager {
+        .window-header {
+            // hide buttons in the header since we are a simple interface
+            button {
+                visibility: hidden;
+            }
+        }
+        .nuyen-label {
+            font-size: 1.25rem;
+            &.nuyen-positive {
+                color: $matrix-green;
+                text-shadow: 0 0 2px 1px $matrix-green;
+            }
+            &.nuyen-negative {
+                color: $physical;
+                text-shadow: 0 0 2px 1px $physical;
+            }
+        }
+        .nuyen-mod-button-container {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: .5rem;
+        }
+    }
+
+    // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
+    &.named-sheet {
+        input.sheet-name, input[name='name'] {
+            @include systemFonts;
+            flex-shrink: 0;
+            background: $nameplate-background;
+            border: none;
+            margin-bottom: 0;
+        }
+        .window-header {
+            &:not(.minimized) {
+                padding: 0 .25rem;
+                flex: 0 0 auto;
+                .window-title {
+                    font-size: 0;
+                    height: 0;
+
+                    // set the left margin of the icon to mirror the increased inline padding
+                    // so maximized window icons are still symetrically spaced to the borders
+                    // of the window header
+                    a {
+                        margin-left: 0.25rem;
+                    }
+                }
+            }
+        }
+    }
+
     .window-content {
         padding: 0 .25rem .25rem .25rem;
         // transparent doesn't seem to show the background from above so set it to the same thing with a slightly different gradient
@@ -1406,38 +1465,6 @@ input[type='text'].display {
         }
     }
 
-    // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
-    &.named-sheet {
-        input.sheet-name, input[name='name'] {
-            @include systemFonts;
-            flex-shrink: 0;
-            background: $nameplate-background;
-            border: none;
-            margin-bottom: 0;
-        }
-        .window-header {
-            --background: unset;
-            background: unset;
-            border-bottom: none;
-
-            &:not(.minimized) {
-                padding: 0 .25rem;
-                flex: 0 0 auto;
-                .window-title {
-                    font-size: 0;
-                    height: 0;
-
-                    // set the left margin of the icon to mirror the increased inline padding
-                    // so maximized window icons are still symetrically spaced to the borders
-                    // of the window header
-                    a {
-                        margin-left: 0.25rem;
-                    }
-                }
-            }
-        }
-    }
-
     button.toggle-fresh-import {
         width: 1.5rem;
         flex-shrink: 0;
@@ -1462,7 +1489,8 @@ input[type='text'].display {
     input.thicc {
         width: 5rem;
     }
-    input.short {
+    input.short, input.center {
+        text-align: center;
         vertical-align: center;
         horiz-align: center;
     }
@@ -1477,6 +1505,25 @@ input[type='text'].display {
         height: 1.5rem;
         min-height: 1.5rem;
         max-height: 1.5rem;
+    }
+    button.sr5-button {
+        width: 100%;
+        &.sr5-submit {
+            background: #227836;
+            color: $light;
+            &:hover {
+                box-shadow: 0 0 4px 2px #227836;
+                color: $white;
+            }
+        }
+        &.sr5-cancel {
+            background: $darkred;
+            color: $light;
+            &:hover {
+                box-shadow: 0 0 4px 2px $darkred;
+                color: $white;
+            }
+        }
     }
     button.sr5-icon {
         border-color: transparent;
@@ -1499,7 +1546,7 @@ input[type='text'].display {
         color: $light;
         border-color: $light;
         &:hover {
-            box-shadow: 0 0 2px 1px rgba($light, 0.9);
+            box-shadow: 0 0 4px 2px rgba($light, 0.9);
             color: $white;
             background: $darkred;
         }

@@ -1890,6 +1890,13 @@
         },
         "Notoriety": "Notoriety",
         "Nuyen": "Nuyen",
+        "NuyenManager": {
+            "Title": "Nuyen Manager",
+            "Submit": "Submit",
+            "Cancel": "Cancel",
+            "CurrentNuyen": "Amount of Nuyen the Character currently has",
+            "FinalNuyen": "Final Amount of Nuyen upon Submitting"
+        },
         "OpenOrigin": "Open item",
         "OpenSource": "Open items source as pdfpager pdf or website",
         "OpposedType": "Type",

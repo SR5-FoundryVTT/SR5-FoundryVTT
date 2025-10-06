@@ -28,6 +28,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
 import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
 import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
+import { NuyenManager } from '@/module/apps/actor/NuyenManager';
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -220,6 +221,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollInitiative: SR5BaseActorSheet.#rollInitiative,
 
             toggleRunning: SR5BaseActorSheet.#toggleRunning,
+
+            openNuyenManager: SR5BaseActorSheet.#openNuyenManager,
         }
     }
 
@@ -2067,5 +2070,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             const running = this.actor.system.movement.isRunning;
             await this.actor.update({system: { movement: { isRunning: !running }}});
         }
+    }
+
+    static async #openNuyenManager(this: SR5BaseActorSheet, event) {
+        const app = new NuyenManager({document: this.actor});
+        await app.render(true);
     }
 }

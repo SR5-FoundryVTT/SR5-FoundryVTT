@@ -57,7 +57,7 @@
                         {{formInput systemFields.technology.fields.cost value=system.technology.cost
                                     classes="short midd" rootId=rootId}}
                     {{else}}
-                        {{system.technology.calculated.cost.value}}
+                        {{nuyenValue system.technology.calculated.cost.value}}
                     {{/if}}
                 </label>
             {{/if}}
@@ -83,17 +83,17 @@
 
         {{#if (eq item.type 'lifestyle')}}
             <label>{{system.type}}</label>
-            <label><i data-tooltip="{{systemFields.cost.label}}" class="fas fa-yen-sign"></i> {{system.cost}}</label>
-            <label><i data-tooltip="{{systemFields.neighborhood.label}}" class="fas fa-buildings"></i> {{system.neighborhood}}</label>
-            <label><i data-tooltip="{{systemFields.comforts.label}}" class="far fa-mattress-pillow"></i> {{system.comforts}}</label>
-            <label><i data-tooltip="{{systemFields.security.label}}" class="far fa-shield-halved"></i> {{system.security}}</label>
-            <label><i data-tooltip="{{systemFields.guests.label}}" class="far fa-people"></i> {{system.guests}}</label>
+            <label><i data-tooltip="{{systemFields.cost.label}}" class="fas fa-yen-sign"></i>&nbsp;{{nuyenValue system.cost}}</label>
+            <label><i data-tooltip="{{systemFields.neighborhood.label}}" class="fas fa-buildings"></i>&nbsp;{{system.neighborhood}}</label>
+            <label><i data-tooltip="{{systemFields.comforts.label}}" class="far fa-mattress-pillow"></i>&nbsp;{{system.comforts}}</label>
+            <label><i data-tooltip="{{systemFields.security.label}}" class="far fa-shield-halved"></i>&nbsp;{{system.security}}</label>
+            <label><i data-tooltip="{{systemFields.guests.label}}" class="far fa-people"></i>&nbsp;{{system.guests}}</label>
         {{/if}}
 
         {{#if (eq item.type 'quality')}}
             <label>{{system.type}}</label>
-            <label>{{systemFields.rating.label}} {{system.rating}}</label>
-            <label>{{systemFields.karma.label}} {{system.karma}}</label>
+            <label>{{systemFields.rating.label}}&nbsp;{{system.rating}}</label>
+            <label>{{systemFields.karma.label}}&nbsp;{{system.karma}}</label>
         {{/if}}
         <div></div>
     </div>

@@ -30,7 +30,7 @@
                     {{#if @root.isEditMode}}
                         {{formInput systemFields.nuyen value=source.system.nuyen rootId=rootId classes="short thicc"}}
                     {{else}}
-                        {{system.nuyen}}
+                        {{nuyenValue system.nuyen}}
                     {{/if}}
                 </label>
             </div>
@@ -67,10 +67,10 @@
                     <a data-action="openKarmaManager"><i class="fas fa-yin-yang"></i></a>&nbsp;
                     {{#if @root.isEditMode}}
                         {{formInput systemFields.karma.fields.value value=source.system.karma.value
-                                    classes="short skinny" rootId=rootId }}&nbsp;/&nbsp;{{formInput systemFields.karma.fields.max value=source.system.karma.max
-                                    classes="short skinny" rootId=rootId }}
+                                    classes="short skinny" rootId=rootId }}&nbsp;({{formInput systemFields.karma.fields.max value=source.system.karma.max
+                                    classes="short skinny" rootId=rootId }})
                     {{else}}
-                        <span data-tooltip="{{sourceFields.karma.fields.value.hint}}">{{source.system.karma.value}}</span>&nbsp;/&nbsp;<span data-tooltip="{{sourceFields.karma.fields.max.hint}}">{{source.system.karma.max}}</span>
+                        <span data-tooltip="{{sourceFields.karma.fields.value.hint}}">{{system.karma.value}}</span>&nbsp;<span data-tooltip="{{sourceFields.karma.fields.max.hint}}">({{system.karma.max}})</span>
                     {{/if}}
                 </label>
             </div>

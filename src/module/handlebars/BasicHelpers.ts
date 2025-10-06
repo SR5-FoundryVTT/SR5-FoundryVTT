@@ -254,4 +254,11 @@ export const registerBasicHelpers = () => {
             value: test
         }));
     })
+
+    /**
+     * Display the Nuyen value in a format using locale separators
+     */
+    Handlebars.registerHelper('nuyenValue', function(nuyen: number) {
+        return Number(nuyen).toLocaleString(game.i18n.lang);
+    })
 };

@@ -18,7 +18,7 @@
         addAction="addKnowledgeSkill" }}
     {{#each cat.value as |skill sid|}}
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
-            skillPath=(concat (concat (concat "system.skills.knowledge." cid) ".value") sid)
+            skillPath=(concat "system.skills.knowledge." cid ".value" sid)
             skill=skill
             category='knowledge'
             subcategory=cid
