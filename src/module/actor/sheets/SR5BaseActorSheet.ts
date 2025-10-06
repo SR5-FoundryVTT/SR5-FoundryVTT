@@ -25,6 +25,9 @@ import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
+import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
+import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
+import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -183,6 +186,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollAttribute: SR5BaseActorSheet.#rollAttribute,
             rollItem: SR5BaseActorSheet.#rollItem,
             rollSkill: SR5BaseActorSheet.#rollSkill,
+            editSkill: SR5BaseActorSheet.#editSkill,
             rollSkillSpec: SR5BaseActorSheet.#rollSkillSpec,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
             addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
@@ -211,6 +215,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             weaponFullReload: SR5BaseActorSheet.#reloadAmmo,
             weaponPartialReload: SR5BaseActorSheet.#partialReloadAmmo,
+
+            toggleInitiativeBlitz: SR5BaseActorSheet.#toggleInitiativeBlitz,
+            rollInitiative: SR5BaseActorSheet.#rollInitiative,
+
+            toggleRunning: SR5BaseActorSheet.#toggleRunning,
         }
     }
 
@@ -264,7 +273,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.actor = this.actor;
 
         // Sheet related general purpose fields. These aren't persistent.
-        data.config = SR5;
         data.filters = this._filters;
 
         this._prepareActorAttributes(data);
@@ -354,7 +362,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // General item header/list actions...
         html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
-        html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
 
         // Item list description display handling...
         html.find('.hidden').hide();
@@ -1294,10 +1301,43 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }, game.shadowrun5e.inputDelay);
     }
 
+    private _closestSkillTarget(target) {
+        return target.closest('[data-skill-id]');
+    }
+
+    async _editSkill(target) {
+        const closest = this._closestSkillTarget(target);
+        const skillId = closest?.dataset.skillId;
+        const category = closest?.dataset.category;
+
+        if (skillId) {
+            if (!category || category === 'active') {
+                const app = new SkillEditSheet({document: this.actor}, skillId)
+                await app.render(true);
+            } else if (category === 'knowledge') {
+                const subcategory = closest?.dataset.subcategory;
+                if (subcategory) {
+                    const app = new KnowledgeSkillEditSheet({document: this.actor}, skillId, subcategory)
+                    await app.render(true);
+                }
+            } else if (category === 'language') {
+                const app = new LanguageSkillEditSheet({document: this.actor}, skillId)
+                await app.render(true);
+            }
+        }
+    }
+
+    static async #editSkill(this: SR5BaseActorSheet, event) {
+        await this._editSkill(event.target);
+    }
+
     static async #rollSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const skillId = $(event.target).closest('a').data().skill;
-        return this.actor.rollSkill(skillId, { event });
+        const closest = this._closestSkillTarget(event.target);
+        const skillId = closest?.dataset.skillId;
+        if (skillId) {
+            await this.actor.rollSkill(skillId, { event });
+        }
     }
 
     static async #rollSkillSpec(this: SR5BaseActorSheet, event) {
@@ -1308,16 +1348,20 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return this.actor.rollSkill(skillId, { event, specialization: true });
     }
 
-    static async #openSkillSource(this: SR5BaseActorSheet, event) {
-        event.preventDefault();
-        const skillId = $(event.target).closest('a').data().skill;
+    async _openSkillSource(target) {
+        const skillId = this._closestSkillTarget(target).dataset.skillId;
 
         const skill = this.actor.getSkill(skillId);
         if (!skill) {
             console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`); return;
         }
 
-        LinksHelpers.openSource(skill.link);
+        await LinksHelpers.openSource(skill.link);
+    }
+
+    static async #openSkillSource(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        await this._openSkillSource(event.target);
     }
 
     static async #createLanguageSkill(this: SR5BaseActorSheet, event) {
@@ -1447,18 +1491,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         await item.update({ system: { technology: { quantity } } });
-    }
-
-    /**
-     * Change the rating on an item shown within a sheet item list.
-     */
-    async _onListItemChangeRating(event) {
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        const rtg = parseInt(event.currentTarget.value);
-        if (item && rtg) {
-            await item.update({ system: { technology: { rating: rtg } } });
-        }
     }
 
     static async #toggleItemVisible(this: SR5BaseActorSheet, event) {
@@ -1853,6 +1885,62 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             fixed: true,
             jQuery: false,
         });
+        this._createContextMenu(this._getSkillListContextOptions.bind(this), ".new-list-item[data-skill-id]", {
+            hookName: "getSkillListContextOptions",
+            parentClassHooks: false,
+            fixed: true,
+            jQuery: false,
+        });
+    }
+    _getSkillListContextOptions() {
+        return [
+            {
+                name: "SR5.ActorSheet.ContextOptions.Source",
+                icon: "<i class='fas fa-page'></i>",
+                condition: (target) => {
+                    const skillTarget = this._closestSkillTarget(target);
+                    const skillId = skillTarget.dataset.skillId;
+                    const skill = this.actor.getSkill(skillId);
+                    if (skill) {
+                        return skill.link !== '';
+                    }
+                    return false;
+                },
+                callback: async (target) => {
+                    await this._openSkillSource(target);
+                }
+            },
+            {
+                name: "SR5.ActorSheet.ContextOptions.Edit",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                callback: async (target) => {
+                    await this._editSkill(target);
+                }
+            },
+            {
+                name: "SR5.ActorSheet.ContextOptions.Delete",
+                icon: "<i class='fas fa-trash'></i>",
+                callback: async (target) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+
+                    const skillTarget = this._closestSkillTarget(target);
+                    const skillId = skillTarget.dataset.skillId;
+                    const subCategory = skillTarget.dataset.subcategory;
+                    switch (skillTarget.dataset.category) {
+                        case 'active':
+                            await this.actor.removeActiveSkill(skillId);
+                            break;
+                        case 'knowledge':
+                            await this.actor.removeKnowledgeSkill(skillId, subCategory);
+                            break;
+                        case 'language':
+                            await this.actor.removeLanguageSkill(skillId);
+                            break;
+                    }
+                }
+            }
+        ]
     }
 
     _getDocumentListContextOptions() {
@@ -1954,5 +2042,30 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         return sheetActions.sort(Helpers.sortByName.bind(Helpers));
+    }
+
+    static async #toggleInitiativeBlitz(this: SR5BaseActorSheet, event) { event.preventDefault();
+        event.preventDefault();
+        event.stopPropagation();
+
+        const blitz = this.actor.system.initiative.edge;
+        await this.actor.update({system: { initiative: { edge: !blitz }}});
+    }
+
+    static async #rollInitiative(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        await this.actor.rollInitiative();
+        // TODO figure out how to roll initiative, probably want to prompt the GM to allow it?
+    }
+
+    static async #toggleRunning(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (this.actor.system.movement) {
+            const running = this.actor.system.movement.isRunning;
+            await this.actor.update({system: { movement: { isRunning: !running }}});
+        }
     }
 }

@@ -9,6 +9,7 @@ export const preloadHandlebarsTemplates = async () => {
     const templatePaths = [
         // common templates
         ...v2Path(
+            'common/document-source-icon',
             'common/header-block',
             'common/horizontal-cells',
             'common/name-line-block',

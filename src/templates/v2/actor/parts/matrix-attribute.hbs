@@ -14,14 +14,12 @@
                     {{/select}}
                 </select>
             {{else}}
-                <span>{{matrixAtt.base}}</span>
+                <label>{{matrixAtt.base}}</label>
             {{/if}}
-            <i style="font-size: 0.75rem" class="fas fa-plus"></i>
-            {{formInput attributeField.fields.temp value=matrixAtt.temp classes="short" rootId=rootId }}
         </div>
     {{else}}
         <div class="attribute-value">
-            <button class="icon" type="button" data-action="rollAttribute" data-attribute-id="{{attributeField.name}}">{{matrixAtt.value}}</button>
+            <button class="icon sr5-icon" type="button" data-action="rollAttribute" data-attribute-id="{{attributeField.name}}">{{matrixAtt.value}}</button>
         </div>
     {{/if}}
 </div>

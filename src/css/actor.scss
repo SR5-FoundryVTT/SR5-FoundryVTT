@@ -36,6 +36,13 @@
                 }
             }
 
+            .attribute-button {
+                border-color: transparent;
+                &:hover {
+                    border-color: $light;
+                }
+            }
+
             .attribute-value {
                 display: flex;
                 flex-flow: row nowrap;
@@ -79,6 +86,10 @@
         .initiative-label {
             text-align: center;
             align-self: center;
+        }
+
+        .blitz-active {
+            color: lighten($matrix-green, 30%);
         }
 
         .initiative-col {

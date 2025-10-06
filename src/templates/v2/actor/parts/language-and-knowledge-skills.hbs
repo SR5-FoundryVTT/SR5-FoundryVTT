@@ -6,7 +6,7 @@
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
             skillPath=(concat "system.skills.language.value." sid)
             skill=skill
-            removeAction="removeLanguageSkill"
+            category='language'
             id=sid }}
     {{/each}}
     {{#each system.skills.knowledge as |cat cid|}}
@@ -20,8 +20,8 @@
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
             skillPath=(concat (concat (concat "system.skills.knowledge." cid) ".value") sid)
             skill=skill
-            removeAction="removeKnowledgeSkill"
-            removeCategory=cid
+            category='knowledge'
+            subcategory=cid
             id=sid }}
     {{/each}}
     {{/if}}

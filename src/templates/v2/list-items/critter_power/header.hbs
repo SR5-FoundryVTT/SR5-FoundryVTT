@@ -6,19 +6,21 @@
     </div>
 
     <div class="new-list-item-col">
-        <span>{{localize "SR5.CritterPower.Type"}}</span>
+        <label>{{localize "SR5.CritterPower.Type"}}</label>
     </div>
     <div class="new-list-item-col">
-        <span>{{localize "SR5.Range"}}</span>
+        <label>{{localize "SR5.Range"}}</label>
     </div>
     <div class="new-list-item-col">
-        <span>{{localize "SR5.Duration"}}</span>
+        <label>{{localize "SR5.Duration"}}</label>
     </div>
     <div class="new-list-item-col">
-        <span>{{localize "SR5.Rating"}}</span>
+        <label>{{localize "SR5.Rating"}}</label>
     </div>
 
-    <div class="new-list-item-icons">
-        {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
-    </div>
+    {{#if @root.isEditMode}}
+        <div class="new-list-item-icons">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+        </div>
+    {{/if}}
 </div>

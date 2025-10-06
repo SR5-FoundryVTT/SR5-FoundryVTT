@@ -1,13 +1,15 @@
 import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 import { FixedTypeObjectField } from "../fields/FixedTypeObjectField";
-const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedObjectField } = foundry.data.fields;
+const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
 export const SkillField = () => ({
     ...ModifiableValue(),
     name: new StringField({ required: true }),
+    img: new StringField({ required: true }),
+    description: new HTMLField({ required: true }),
     hidden: new BooleanField(),
     label: new StringField({ required: true }),
     attribute: new StringField({ required: true }),

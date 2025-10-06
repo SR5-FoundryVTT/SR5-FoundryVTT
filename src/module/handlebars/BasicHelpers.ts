@@ -4,6 +4,7 @@ import { SYSTEM_NAME } from "../constants";
 import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
 import { SkillFieldType } from '../types/template/Skills';
+import { LinksHelpers } from '@/module/utils/links';
 
 export const registerBasicHelpers = () => {
     /**
@@ -221,6 +222,18 @@ export const registerBasicHelpers = () => {
         }
         return undefined;
     });
+
+    Handlebars.registerHelper('isURL', function(value: string) {
+        return LinksHelpers.isURL(value);
+    })
+
+    Handlebars.registerHelper('isPDF', function(value: string) {
+        return LinksHelpers.isPDF(value);
+    })
+
+    Handlebars.registerHelper('isUuid', function(value: string) {
+        return LinksHelpers.isUuid(value);
+    })
 
     /**
      * Expects a config object and turns it into an array of objects for FormGroup options

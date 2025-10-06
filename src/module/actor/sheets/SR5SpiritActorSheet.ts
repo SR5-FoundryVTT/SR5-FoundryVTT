@@ -1,6 +1,7 @@
 import { SR5Actor } from "../SR5Actor";
 import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { Helpers } from '@/module/helpers';
 
 
 export class SR5SpiritActorSheet extends SR5BaseActorSheet {
@@ -20,6 +21,13 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
             'spell',
             'quality'
         ];
+    }
+
+    static override DEFAULT_OPTIONS = {
+        actions: {
+            pickSummoner: SR5SpiritActorSheet.#pickSummoner,
+            removeSummoner: SR5SpiritActorSheet.#removeSummoner,
+        }
     }
 
     static override TABS = {
@@ -88,16 +96,6 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     }
 
     /**
-     * Spirit actor sheets do provide some specific functionality.
-     * @param html 
-     */
-    override activateListeners_LEGACY(html) {
-        super.activateListeners_LEGACY(html);
-
-        html.find('.summoner-remove').on('click', this._onRemoveSummoner.bind(this));
-    }
-
-    /**
      * Spirit actors have additional drop cases to handle.
      */
     override async _onDrop(event) {
@@ -135,7 +133,24 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
      * Remove the summoner from this spirit actor.
      * @param event Any interaction event.
      */
-    async _onRemoveSummoner(event: MouseEvent) {
+    static async #pickSummoner(this: SR5SpiritActorSheet, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.preventDefault();
+        const actors = Helpers.getControlledTokenActors();
+        if (actors.length > 0) {
+            // pick the first controlled actor
+            const actor = actors[0];
+            await this.actor.addSummoner(actor);
+            await this.render();
+        }
+    }
+
+    /**
+     * Remove the summoner from this spirit actor.
+     * @param event Any interaction event.
+     */
+    static async #removeSummoner(this: SR5SpiritActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
 

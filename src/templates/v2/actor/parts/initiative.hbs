@@ -25,7 +25,7 @@
         </div>
         <div class="initiative-col">
             <div class="initiative-end">
-                <a data-action="toggleInitiativeBlitz">
+                <a data-action="toggleInitiativeBlitz" {{#if system.initiative.edge}}class="blitz-active"{{/if}}>
                     {{localize "SR5.Blitz"}}
                     {{#if system.initiative.edge}}
                         <i class="fas fa-toggle-on"></i>

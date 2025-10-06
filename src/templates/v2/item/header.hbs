@@ -2,6 +2,7 @@
     <img class="sheet-image" src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" />
     <div class="sheet-header-labels">
         <div class="sheet-header-name">
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
             {{#if (and system.importFlags.isFreshImport (itemMarking "ANY"))}}
                 {{#if @root.isEditMode}}
                     <button type="button" class="toggle-fresh-import" data-action="toggleFreshImport" data-tooltip="SR5.MarkImportedItemTooltip">
@@ -13,32 +14,14 @@
                     </label>
                 {{/if}}
             {{/if}}
-            {{#if (and @root.isPlayMode system.description.source)}}
-                <a data-action="openSource" data-tooltip="SR5.OpenSource" style="font-size: 1.5rem">
-                    {{#if sourceIsURL}}
-                        <i class="fas fa-link"></i>
-                    {{else if sourceIsPDF}}
-                        <i class="fas fa-file-pdf"></i>
-                    {{else if sourceIsUuid}}
-                        <i class="fas fa-file"></i>
-                    {{else}}
-                        <i class="fas fa-question"></i>
-                    {{/if}}
-                </a>
-            {{else if @root.isEditMode}}
-                <div>
-                    {{formInput systemFields.description.fields.source value=source.system.description.source
-                                placeholder=(localize "SR5.Source") classes="thicc" rootId=rootId}}
-                </div>
-            {{/if}}
-            <div style="flex: 1">
-                {{formInput fields.name value=item.name
-                            placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
-            </div>
+            {{formInput fields.name value=item.name classes="sheet-name"
+                        placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
         </div>
         {{#if @root.isEditMode}}
-        <div class="sheet-header-source">
-        </div>
+            <div class="sheet-header-source">
+                {{formInput systemFields.description.fields.source value=source.system.description.source
+                            placeholder=(localize "SR5.Source") rootId=rootId}}
+            </div>
         {{/if}}
         {{#if @root.isPlayMode}}
             <div>

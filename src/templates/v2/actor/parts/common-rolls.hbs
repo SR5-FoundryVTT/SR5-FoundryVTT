@@ -1,7 +1,7 @@
 <div class="new-list-item new-list-item-header">
     {{#each favorites}}
     <div class="new-list-item-col">
-        <a class="new-list-item-image-container"
+        <button class="new-list-item-image-container icon sr5-icon"
                 data-tooltip="{{this.name}} - {{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}"
             {{#if @root.isPlayMode}}
                 data-action="rollItem"
@@ -18,7 +18,7 @@
                  class="new-list-item-image-info"
                 {{/if}}
             />
-        </a>
+        </button>
     </div>
     {{else}}
         <div class="new-list-item-label-container">
@@ -59,6 +59,57 @@
                     {{/if}}
                 ></i>
             </a>
+        {{/if}}
+        {{#if isSpirit}}
+            {{#if summoner}}
+                <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{summoner.id}}" data-uuid="{{summoner.uuid}}">
+                    <i class="fas fa-ghost"></i>{{summoner.name}}
+                    <a data-action="removeSummoner" class="close"><i class="fas fa-times"></i></a>
+                </a>
+            {{else}}
+                <a data-action="pickSummoner" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsSummoner">
+                                <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
+                                    <i class="fa-light fa-square-dashed fa-stack-2x"></i>
+                                    <i class="fas fa-ghost fa-stack-1x"></i>
+                                </span>
+                    {{localize "SR5.Spirit.MissingSummoner"}}
+                </a>
+            {{/if}}
+        {{else if isSprite}}
+            {{#if technomancer}}
+                <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{technomancer.id}}" data-uuid="{{technomancer.uuid}}">
+                    <i class="fas fa-user"></i>{{technomancer.name}}
+                    <a data-action="removeTechnomancer" class="close"><i class="fas fa-times"></i></a>
+                </a>
+            {{else}}
+                <a data-action="pickTechnomancer" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsTechnomancer">
+                    <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
+                        <i class="fa-light fa-square-dashed fa-stack-2x"></i>
+                        <i class="fas fa-user fa-stack-1x"></i>
+                    </span>
+                    {{localize "SR5.Sprite.MissingTechnomancer"}}
+                </a>
+            {{/if}}
+        {{else if isVehicle}}
+            {{#if vehicle.driver}}
+                <div class="new-list-item">
+                    <div class="new-list-item-label-container">
+                        <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
+                            <i class="fas fa-steering-wheel"></i>{{vehicle.driver.name}}
+                            <a data-action="removeVehicleDriver" class="close"><i class="fas fa-times"></i></a>
+                        </a>
+                    </div>
+                </div>
+            {{else}}
+                <a data-action="pickDriver" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsDriver">
+                    <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
+                        <i class="fa-light fa-square-dashed fa-stack-2x"></i>
+                        <i class="fas fa-steering-wheel fa-stack-1x"></i>
+                    </span>
+                    {{localize "SR5.Vehicle.MissingDriver"}}
+                </a>
+            {{/if}}
+
         {{/if}}
     </div>
 </div>

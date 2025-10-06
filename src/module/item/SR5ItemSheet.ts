@@ -267,8 +267,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             }
         }
 
-        data['config'] = SR5;
-
         /**
          * Reduce nested items into typed lists.
          */

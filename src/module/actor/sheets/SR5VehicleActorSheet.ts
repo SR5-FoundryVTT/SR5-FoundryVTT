@@ -36,6 +36,8 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         actions: {
             pickDriver: SR5VehicleActorSheet.#pickDriver,
             removeVehicleDriver: SR5VehicleActorSheet.#removeVehicleDriver,
+            toggleChaseEnvironment: SR5VehicleActorSheet.#toggleChaseEnvironment,
+            toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad,
         }
     }
 
@@ -216,6 +218,18 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         event.preventDefault();
         await this.actor.removeVehicleDriver();
         this.render();
+    }
+
+    static async #toggleChaseEnvironment(this: SR5VehicleActorSheet, event) {
+        event.preventDefault();
+        const environment = this.actor.system.environment === 'handling' ? 'speed' : 'handling';
+        await this.actor.update({system: { environment }});
+    }
+
+    static async #toggleOffRoad(this: SR5VehicleActorSheet, event) {
+        event.preventDefault();
+        const isOffRoad = !this.actor.system.isOffRoad;
+        await this.actor.update({system: { isOffRoad }});
     }
 
     async _onOpenOriginLink(event) {

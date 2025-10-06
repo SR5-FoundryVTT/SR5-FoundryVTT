@@ -1,20 +1,33 @@
 <div class="new-list-item-container {{cssClass}}">
-    <div class="new-list-item {{skillClass skill}}">
-        <div class="new-list-item-label-container">
-            <label>
-                {{#if skill.link}}
-                <a data-action="openSkillSource"
-                   data-skill="{{id}}"
-                   data-tooltip="SR5.OpenSource">
-                    <i class="fas fa-file"></i>
-                </a>
+    <div class="new-list-item {{skillClass skill}}" data-skill-id="{{id}}" data-category-id="{{category}}" data-subcategory-id="{{subcategory}}">
+        <button class="new-list-item-image-container icon sr5-icon"
+           data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers'
+                                    skip=@root.bindings.skip descr=@root.bindings.card}}"
+            {{#if @root.isPlayMode}}
+           data-action="rollSkill"
+            {{else}}
+           data-action="editSkill"
+            {{/if}}
+           >
+            <img
+                {{#if skill.img}}
+                    src="{{skill.img}}"
+                {{else}}
+                    src="systems/shadowrun5e/dist/icons/redist/swirl.svg"
                 {{/if}}
-                <a data-action="showItemDescription" data-skill="{{id}}">{{localizeSkill skill}}</a>
-            </label>
+                {{#if @root.isEditMode}}
+                 class="new-list-item-image-edit"
+                {{else}}
+                 class="new-list-item-image-roll"
+                {{/if}}
+            />
+        </button>
+        <div class="new-list-item-label-container">
+            <a data-action="showItemDescription" data-skill="{{id}}">{{localizeSkill skill}}</a>
         </div>
         {{#if @root.isPlayMode}}
         <div class="new-list-item-col">
-            <a data-action="rollSkillSpecialization" data-skill="{{id}}">{{skillSpecializations skill}}</a>
+            <a data-action="rollSkillSpecialization">{{skillSpecializations skill}}</a>
         </div>
         {{/if}}
         <div class="new-list-item-col skill-rating-col">
@@ -22,22 +35,18 @@
                 {{!-- use the original method of setting data because skills are weird in data model, they'll be items eventually --}}
                 <input type="number" name="{{concat skillPath '.base'}}" class="short skinny" value="{{skill.base}}" data-skill="{{id}}" >
             {{else}}
-                <button type="button" class="skill-roll-value" data-action="rollSkill" data-skill="{{id}}">
+                <label>
                     {{skill.value}}
-                </button>
+                </label>
             {{/if}}
         </div>
         {{#if @root.isEditMode}}
         <div class="new-list-item-icons">
-            <a data-action="{{editAction}}"
-               data-skill="{{id}}"
-               data-category="{{editCategory}}"
+            <a data-action="editSkill"
                data-tooltip="SR5.Edit">
                 <i class="fas fa-pen-to-square"></i>
             </a>
-            <a data-action="{{removeAction}}"
-               data-skill="{{id}}"
-               data-category="{{removeCategory}}"
+            <a data-action="removeSkill"
                data-tooltip="SR5.DeleteSkill">
                 <i class="fas fa-trash"></i>
             </a>
@@ -47,8 +56,17 @@
     <div class="new-list-item-description">
         <div class="new-list-item">
             <div class="new-list-item-col">
-                <span>{{skill.group}}</span>
+                <label>{{localizeOb skill.attribute @root.config.attributes}}</label>
             </div>
+            <div class="new-list-item-col">
+                <label>{{skill.group}}</label>
+            </div>
+            {{#if skill.canDefault}}
+                <div class="new-list-item-col">
+                    <label>{{localize "SR5.CanDefault"}}</label>
+                </div>
+            {{/if}}
         </div>
+        {{{skill.description}}}
     </div>
 </div>

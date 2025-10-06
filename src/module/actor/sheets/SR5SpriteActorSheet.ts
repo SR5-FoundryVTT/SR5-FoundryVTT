@@ -1,6 +1,7 @@
 import { SR5Actor } from '../SR5Actor';
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { Helpers } from '@/module/helpers';
 
 export type SpriteActorSheetData = MatrixActorSheetData & {
     technmomancer: SR5Actor | null;
@@ -10,7 +11,8 @@ export type SpriteActorSheetData = MatrixActorSheetData & {
 export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetData> {
     static override DEFAULT_OPTIONS: any = {
         actions: {
-            removeTechnomancer: this.#onRemoveTechnomancer,
+            pickTechnomancer: SR5SpriteActorSheet.#pickTechnomancer,
+            removeTechnomancer: SR5SpriteActorSheet.#onRemoveTechnomancer,
         }
     }
 
@@ -132,6 +134,22 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         if (!actor.isType('character')) return;
 
         this.document.addTechnomancer(actor);
+    }
+
+    /**
+     * Remove the technomancer from the sprite.
+     */
+    static async #pickTechnomancer(this: SR5SpriteActorSheet, event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const actors = Helpers.getControlledTokenActors();
+        if (actors.length > 0) {
+            // pick the first controlled actor
+            const actor = actors[0];
+            await this.actor.addTechnomancer(actor);
+            await this.render();
+        }
     }
 
     /**

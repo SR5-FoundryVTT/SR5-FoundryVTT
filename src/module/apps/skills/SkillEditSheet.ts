@@ -1,147 +1,169 @@
 import { SR5 } from "../../config";
-import { SR5Actor } from "../../actor/SR5Actor";
-import { LinksHelpers } from "../../utils/links";
-import { Translation } from '../../utils/strings';
 import { parseDropData } from "../../utils/sheets";
+import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
+import { SheetFlow } from '@/module/flows/SheetFlow';
+import { SR5Actor } from '@/module/actor/SR5Actor';
+import { Helpers } from '@/module/helpers';
 
+const { DocumentSheetV2 } = foundry.applications.api;
+const { FilePicker } = foundry.applications.apps;
 
-export class SkillEditSheet extends DocumentSheet {
+export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Actor, any> {
     skillId: string;
 
-    override get document(): SR5Actor {
-        return super.document as SR5Actor;
+    constructor(options, skillId) {
+        super(options);
+        this.skillId = skillId;
     }
 
-    constructor(actor, options, skillId) {
-        super(actor, options);
-        this.skillId = skillId;
+    override async _prepareContext(options) {
+        const data = await super._prepareContext(options);
+        data.actor = this.document;
+
+        data.skillFields = this._getSkillFields(data.systemFields);
+
+        // skill property will hold a direct skill reference
+        data['skillId'] = this.skillId;
+        data['skill'] = this.document.getSkill(this.skillId);
+        data['skill_name'] = this._updateString();
+        data['editable_name'] = this._allowSkillNameEditing();
+        data['editable_canDefault'] = true;
+        data['editable_attribute'] = true;
+        data['attributes'] = this._getSkillAttributesForSelect();
+
+        data.primaryTabs = this._prepareTabs('primary');
+
+        console.log('skill', data.skill);
+
+        return data;
     }
 
     _updateString() {
         return `system.skills.active.${this.skillId}`;
     }
 
-    static override get defaultOptions() {
-        const options = super.defaultOptions;
-        return foundry.utils.mergeObject(options, {
-            id: 'skill-editor',
-            classes: ['sr5', 'sheet', 'skill-edit-window'],
-            template: 'systems/shadowrun5e/dist/templates/apps/skill-edit.hbs',
-            width: 300,
-            height: 'auto',
-            submitOnClose: true,
-            submitOnChange: true,
-            closeOnSubmit: false,
-            resizable: true,
-        });
-    }
-
-    override get title(): string {
-        const label = this.document.getSkillLabel(this.skillId);
-        return `${game.i18n.localize('SR5.EditSkill')} - ${game.i18n.localize(label as Translation)}`;
-    }
-
-    _onUpdateObject(event, formData, updateData) {
-        // get skill name.
-        // NOTE: This differs from the skill id, which is used to identify the skill internally.
-        const name = formData['skill.name'];
-
-        const link = formData['skill.link'];
-
-        // get attribute name
-        const attribute = formData['skill.attribute'];
-
-        // get base value
-        const base = formData['skill.base'];
-
-        // get can default
-        const canDefault = formData['skill.canDefault'];
-
-        // process specializations
-        const specsRegex = /skill\.specs\.(\d+)/;
-        const specs = Object.entries(formData).reduce<any[]>((running, [key, val]: [string, any]) => {
-            const found = key.match(specsRegex);
-            if (found?.[0]) {
-                running.push(val);
-            }
-            return running;
-        }, []);
-
-        // process bonuses
-        const bonusKeyRegex = /skill\.bonus\.(\d+).key/;
-        const bonusValueRegex = /skill\.bonus\.(\d+).value/;
-        const bonus = Object.entries(formData).reduce<any[]>((running, [key, value]: [string, any]) => {
-            const foundKey = key.match(bonusKeyRegex);
-            const foundVal = key.match(bonusValueRegex);
-            if (foundKey?.[0] && foundKey[1]) {
-                const index = foundKey[1];
-                if (running[index] === undefined) running[index] = {};
-                running[index].key = value;
-            } else if (foundVal?.[0] && foundVal[1]) {
-                const index = foundVal[1];
-                if (running[index] === undefined) running[index] = {};
-                running[index].value = value;
-            }
-
-            return running;
-        }, []);
-
-        updateData[this._updateString()] = {
-            specs,
-            bonus,
-            name,
-            attribute,
-            canDefault,
-            link
-        };
-
-        // Avoid re-applying active effects without actual base level changes.
-        // An actual base level change will come without an active effect, since it's user input.
-        if (event.currentTarget.name === 'skill.base') updateData[this._updateString()].base = base;
-    }
-
-    override async _updateObject(event, formData) {
-        // Without an actual input field used, avoid a unneeded update...
-        // ...the update would happen due to how _onUpdateObject works.
-        if (event.currentTarget) {
-            const updateData = {};
-            this._onUpdateObject(event, formData, updateData);
-            await this.document.update(updateData);
+    static override DEFAULT_OPTIONS: any = {
+        classes: ['actor', 'skill', 'named-sheet'],
+        position: {
+            width: 550,
+            height: 400,
+        },
+        actions: {
+            addSpecialization: SkillEditSheet.#addSpecialization,
+            removeSpecialization: SkillEditSheet.#removeSpecialization,
+            rollSkill: SkillEditSheet.#rollSkill,
+            editImage: SkillEditSheet.#editImage,
+            addBonus: SkillEditSheet.#addBonus,
+            removeBonus: SkillEditSheet.#removeBonus,
         }
     }
 
-    override activateListeners(html) {
-        super.activateListeners(html);
-
-        // Assure a application form is available.
-        //         // Assure a application form is available.
-        if (!this.form) return;
-
-        /**
-         * Drag and Drop Handling
-         */
-        this.form.ondragover = (event) => this._onDragOver(event);
-        this.form.ondrop = async (event) => this._onDrop(event);
-
-        $(html).find('.open-source').on('click', this._onOpenSource.bind(this));
-        $(html).find('.add-spec').on('click', this._addNewSpec.bind(this));
-        $(html).find('.remove-spec').on('click', this._removeSpec.bind(this));
-        $(html).find('.add-bonus').on('click', this._addNewBonus.bind(this));
-        $(html).find('.remove-bonus').on('click', this._removeBonus.bind(this));
+    static override PARTS: any = {
+        header: {
+            template: SheetFlow.templateBase('skill/header'),
+        },
+        tabs: {
+            template: SheetFlow.templateBase('common/primary-tab-group'),
+        },
+        description: {
+            template: SheetFlow.templateBase('skill/tabs/description'),
+        },
+        details: {
+            template: SheetFlow.templateBase('skill/tabs/details'),
+        },
+        footer: {
+            template: SheetFlow.templateBase('skill/footer'),
+        },
     }
 
-    async _addNewBonus(event) {
+    static override TABS: any = {
+        primary: {
+            initial: 'description',
+            tabs: [
+                { id: 'description', label: 'Description', cssClass: '' },
+                { id: 'details', label: 'Details', cssClass: '' },
+            ]
+        },
+
+    }
+
+    static async #editImage(this: SkillEditSheet, event) {
         event.preventDefault();
-        const updateData = {};
-        const skill = this.getData().skill;
-        if (!skill) return;
-        const { bonus = [] } = skill;
-        // add blank line for new bonus
-        updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: '' }];
-        await this.document.update(updateData);
+        console.log('editImage', event);
+
+        console.log(FilePicker);
+
+        await new FilePicker({
+            type: 'image',
+            callback: (path) => {
+                console.log(path);
+                if (path) {
+                    const key = `${this._updateString()}.img`
+                    this.document.update({ [key] : path });
+                }
+            }}).render(true);
     }
 
-    override async _onDrop(event) {
+    static async #addBonus(this: SkillEditSheet, event) {
+        event.preventDefault();
+        const skill = this.document.getSkill(this.skillId);
+        if (skill) {
+            const bonus = skill.bonus.slice();
+            bonus.push({key: 'NewBonus', value: 0});
+            const key = `${this._updateString()}.bonus`
+            await this.document.update({ [key] : bonus });
+        }
+    }
+
+    static async #removeBonus(this: SkillEditSheet, event) {
+        event.preventDefault();
+
+        const canDelete = await Helpers.confirmDeletion();
+        if (!canDelete) return;
+
+        const skill = this.document.getSkill(this.skillId);
+        const index = SheetFlow.closestAction(event.target).dataset.index;
+        if (skill && Number.isNumeric(index) && index >= 0) {
+            const bonus = skill.bonus.slice();
+            bonus.splice(index, 1);
+            const key = `${this._updateString()}.bonus`
+            await this.document.update({ [key] : bonus });
+        }
+    }
+
+    static async #addSpecialization(this: SkillEditSheet, event) {
+        event.preventDefault();
+        const skill = this.document.getSkill(this.skillId);
+        if (skill) {
+            const specs = skill.specs.slice();
+            specs.push(game.i18n.localize('SR5.NewSpecialization'));
+            const key = `${this._updateString()}.specs`
+            this.document.update({ [key] : specs });
+        }
+    }
+
+    static async #removeSpecialization(this: SkillEditSheet, event) {
+        event.preventDefault();
+
+        const canDelete = await Helpers.confirmDeletion();
+        if (!canDelete) return;
+
+        const skill = this.document.getSkill(this.skillId);
+        const index = SheetFlow.closestAction(event.target).dataset.index;
+        if (skill && Number.isNumeric(index) && index >= 0) {
+            const specs = skill.specs.slice();
+            specs.splice(index, 1);
+            const key = `${this._updateString()}.specs`
+            this.document.update({ [key] : specs });
+        }
+    }
+
+    static async #rollSkill(this: SkillEditSheet, event) {
+        event.preventDefault();
+        this.document.rollSkill(this.skillId);
+    }
+
+    async _onDrop(event) {
         if (!game.items || !game.actors || !game.scenes) return;
 
         event.preventDefault();
@@ -152,56 +174,6 @@ export class SkillEditSheet extends DocumentSheet {
         if (!data) return;
 
         this.document.update({[`${this._updateString()}.link`]: data.uuid});
-    }
-
-    async _removeBonus(event) {
-        event.preventDefault();
-        const updateData = {};
-        const data = this.getData().skill;
-        if (data?.bonus) {
-            const { bonus } = data;
-            const index = event.currentTarget.dataset.spec;
-            if (index >= 0) {
-                bonus.splice(index, 1);
-                updateData[`${this._updateString()}.bonus`] = bonus;
-                await this.document.update(updateData);
-            }
-        }
-    }
-
-    /**
-     * Open a source document connected to this skill.
-     */
-    async _onOpenSource(event) {
-        event.preventDefault();
-        LinksHelpers.openSource(this.getData().skill.link);
-    }
-
-    async _addNewSpec(event) {
-        event.preventDefault();
-        const updateData = {};
-        const data = this.getData().skill;
-        if (data?.specs) {
-            // add a blank line to specs
-            const { specs } = data;
-            updateData[`${this._updateString()}.specs`] = [...specs, ''];
-        }
-        await this.document.update(updateData);
-    }
-
-    async _removeSpec(event) {
-        event.preventDefault();
-        const updateData = {};
-        const data = this.getData().skill;
-        if (data?.specs) {
-            const { specs } = data;
-            const index = event.currentTarget.dataset.spec;
-            if (index >= 0) {
-                specs.splice(index, 1);
-                updateData[`${this._updateString()}.specs`] = specs;
-                await this.document.update(updateData);
-            }
-        }
     }
 
     /** Enhance attribute selection by an empty option to allow newly created skills to have no attribute selected.
@@ -216,15 +188,7 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
-    override getData() {
-        const data = super.getData() as any;
-
-        // skill property will hold a direct skill reference
-        data['skill'] = foundry.utils.getProperty(data.data, this._updateString());
-        data['editable_name'] = this._allowSkillNameEditing();
-        data['editable_canDefault'] = true;
-        data['editable_attribute'] = true;
-        data['attributes'] = this._getSkillAttributesForSelect();
-        return data;
+    _getSkillFields(systemFields) {
+        return systemFields.skills.fields.active.element.fields;
     }
 }

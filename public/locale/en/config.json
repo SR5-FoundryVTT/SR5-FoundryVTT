@@ -436,7 +436,8 @@
                     "label": "Awakened/Emerged",
                     "hint": "Select if the character is Awakened (mage/adept) or Emerged (technomancer)"
                 }
-            }
+            },
+            "NoFavoritesSelected": "No favorites have been selected"
         },
         "ActorSheet": {
             "ContextOptions": {
@@ -2119,6 +2120,7 @@
             "RitualSpellcasting": "Ritual Spellcasting",
             "Running": "Running",
             "Skill": "Skill",
+            "SkillGroup": "Skill Group",
             "Skills": "Skills",
             "Sneaking": "Sneaking",
             "Software": "Software",
@@ -2261,7 +2263,7 @@
         "Spirit": {
             "Bound": "Bound",
             "Force": "Force",
-            "MissingSummoner": "No active summoner",
+            "MissingSummoner": "Missing Summoner",
             "Services": "Services",
             "Summoner": "Summoner",
             "Type": "Type",
@@ -2375,7 +2377,7 @@
                 }
             },
             "Level": "Level",
-            "MissingTechnomancer": "No active technomancer",
+            "MissingTechnomancer": "Missing Technomancer",
             "Registered": "Registered",
             "Services": "Services",
             "Technomancer": "Technomancer",
@@ -2501,17 +2503,13 @@
                 "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
                 "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
                 "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
-                "MissingSummoner": "Drag&Drop Character or use summoning action",
-                "MissingTechnomancer": "Drag&Drop Character or use compilation action",
+                "MissingSummoner": "Missing Summoner",
+                "MissingTechnomancer": "Missing Technomancer",
                 "NPC": "Mark actor as NPC to get additional features",
                 "PlaceMark": "Action to be used to place marks on already marked targets",
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
-                "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
-                "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
                 "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
-                "PlaceMark": "Action to be used to place marks on already marked targets",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
-                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
             "CallInAction": {

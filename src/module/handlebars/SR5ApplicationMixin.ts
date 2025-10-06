@@ -5,6 +5,8 @@ import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
+import { SR5 } from '@/module/config';
+import { LinksHelpers } from '@/module/utils/links';
 
 export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
     return class SR5ApplicationMixin extends foundry.applications.api.HandlebarsApplicationMixin(base) {
@@ -26,6 +28,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             actions: {
                 toggleEditMode: SR5ApplicationMixin.#toggleEditMode,
                 showItemDescription: SR5ApplicationMixin.#toggleListItemDescription,
+                openSource: SR5ApplicationMixin.#openSource,
             }
         }
 
@@ -63,6 +66,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             }
 
             context.user = game.user;
+            context.config = SR5;
 
             return context;
         }
@@ -88,6 +92,13 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             const item = $(event.target).parents('.new-list-item-container');
             const field = $(item).find('.new-list-item-description');
             field.toggle();
+        }
+
+        static async #openSource(event) {
+            const sourceId = event.target.closest('[data-source-id]').dataset.sourceId;
+            if (sourceId) {
+                await LinksHelpers.openSource(sourceId);
+            }
         }
 
         /**

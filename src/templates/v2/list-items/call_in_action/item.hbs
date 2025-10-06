@@ -6,33 +6,35 @@
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
         {{#if (eq item.system.actor_type 'spirit')}}
-            <div class="new-list-item-col">
-                <span>
-                    {{localizeOb item.system.spirit.type config.spiritTypes}}
-                </span>
+            <div class="new-list-item-col thicc-col">
+                <label>
+                    {{localizeOb item.system.spirit.type @root.config.spiritTypes}}
+                </label>
             </div>
-            <div class="new-list-item-col">
-                <span>
+            <div class="new-list-item-col skinny-col">
+                <label>
                     {{item.system.spirit.force}}
-                </span>
+                </label>
             </div>
         {{else if (eq item.system.actor_type 'sprite')}}
-            <div class="new-list-item-col">
-                <span>
-                    {{localizeOb item.system.sprite.type config.spriteTypes}}
-                </span>
+            <div class="new-list-item-col thicc-col">
+                <label>
+                    {{localizeOb item.system.sprite.type @root.config.spriteTypes}}
+                </label>
             </div>
-            <div class="new-list-item-col">
-                <span>
+            <div class="new-list-item-col skinny-col">
+                <label>
                     {{item.system.sprite.level}}
-                </span>
+                </label>
             </div>
         {{/if}}
 
-        <div class="new-list-item-icons">
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
-        </div>
+        {{#if @root.isEditMode}}
+            <div class="new-list-item-icons">
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
+            </div>
+        {{/if}}
     </div>
     <div class="new-list-item-description">
         {{{item.system.description.value}}}

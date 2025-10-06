@@ -1,6 +1,6 @@
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValue } from "./Base";
-const { NumberField } = foundry.data.fields;
+const { NumberField, BooleanField } = foundry.data.fields;
 
 export const MovementField = () => ({
     ...ModifiableValue(),
@@ -8,6 +8,7 @@ export const MovementField = () => ({
 });
 
 export const Movement = () => ({
+    isRunning: new BooleanField({required: true, default: false}),
     walk: new ModifiableField(MovementField()),
     run: new ModifiableField(MovementField()),
     sprint: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),

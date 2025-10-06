@@ -1,17 +1,25 @@
-<label class="movement-container">
-    <i style="padding-right: .25rem;" class="fas fa-person-walking"></i>
-    <span data-tooltip="SR5.WalkingSpeed">{{system.movement.walk.value}}m</span>
-    <span>/</span>
-    <span data-tooltip="SR5.RunningSpeed">{{system.movement.run.value}}m</span>
+<div class="new-list-item-col">
+    <!-- Force the width on this so that the toggling doesn't move anything -->
+    <a data-action="toggleRunning" style="width: 1rem"><i
+          {{#if @root.system.movement.isRunning}}
+          class="fas fa-person-running"
+          {{else}}
+          class="fas fa-person-walking"
+          {{/if}}
+    ></i></a>
+    <label data-tooltip="SR5.WalkingSpeed">{{system.movement.walk.value}}m</label>
+    <label>/</label>
+    <label data-tooltip="SR5.RunningSpeed">{{system.movement.run.value}}m</label>
     {{#unless isVehicle}}
-    <span>/</span>
+    <label>/</label>
     {{#if @root.isEditMode}}
         {{formInput systemFields.movement.fields.sprint value=system.movement.sprint classes="short skinny" rootId=rootId}}
     {{else}}
-        <span style="white-space: nowrap" data-tooltip="SR5.SprintingBonus">
-        <i style="font-size: 0.75em;" class="fas fa-plus"></i>
-            {{system.movement.sprint}}
-    </span>
+        <a>
+            <span style="white-space: nowrap" data-tooltip="SR5.SprintingBonus">
+                <i style="font-size: 0.75em;" class="fas fa-plus"></i>{{system.movement.sprint}}
+            </span>
+        </a>
     {{/if}}
     {{/unless}}
-</label>
+</div>

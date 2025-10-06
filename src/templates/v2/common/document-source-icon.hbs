@@ -1,0 +1,13 @@
+{{#if (and @root.isPlayMode this)}}
+    <a class="open-source-icon" data-action="openSource" data-source-id="{{this}}" data-tooltip="SR5.OpenSource">
+        {{#if (isURL this)}}
+            <i class="fas fa-link"></i>
+        {{else if (isPDF this)}}
+            <i class="fas fa-file-pdf"></i>
+        {{else if (isUuid this)}}
+            <i class="fas fa-file"></i>
+        {{else}}
+            <i class="fas fa-question"></i>
+        {{/if}}
+    </a>
+{{/if}}

@@ -6,27 +6,29 @@
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
         <div class="new-list-item-col">
-            <span>{{localizeOb item.system.powerType @root.config.critterPower.types}}</span>
+            <label>{{localizeOb item.system.powerType @root.config.critterPower.types}}</label>
         </div>
         <div class="new-list-item-col">
-            <span>{{localizeOb item.system.range @root.config.critterPower.ranges}}</span>
+            <label>{{localizeOb item.system.range @root.config.critterPower.ranges}}</label>
         </div>
         <div class="new-list-item-col">
-            <span>{{localizeOb item.system.duration @root.config.critterPower.durations}}</span>
+            <label>{{localizeOb item.system.duration @root.config.critterPower.durations}}</label>
         </div>
         <div class="new-list-item-col">
-            <span>{{item.system.rating}}</span>
+            <label>{{item.system.rating}}</label>
         </div>
 
-        <div class="new-list-item-icons">
-            {{#if (isOwner item owner=@root.actor)}}
-                {{#unless (or (eq item.system.optional "standard") @root.isPlayMode)}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
-                {{/unless}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
-            {{/if}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
-        </div>
+        {{#if @root.isEditMode}}
+            <div class="new-list-item-icons">
+                {{#if (isOwner item owner=@root.actor)}}
+                    {{#unless (eq item.system.optional "standard")}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
+                    {{/unless}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+                {{/if}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
+            </div>
+        {{/if}}
     </div>
     <div class="new-list-item-description">
         {{{item.system.description.value}}}

@@ -18,30 +18,15 @@
                     </label>
                 {{/if}}
             {{/if}}
-            {{#if (and @root.isPlayMode system.description.source)}}
-                <a data-action="openSource" data-tooltip="SR5.OpenSource" style="font-size: 1.5rem">
-                    {{#if sourceIsURL}}
-                        <i class="fas fa-link"></i>
-                    {{else if sourceIsPDF}}
-                        <i class="fas fa-file-pdf"></i>
-                    {{else if sourceIsUuid}}
-                        <i class="fas fa-file"></i>
-                    {{else}}
-                        <i class="fas fa-question"></i>
-                    {{/if}}
-                </a>
-            {{else if @root.isEditMode}}
-                <div>
-                    {{formInput systemFields.description.fields.source value=source.system.description.source
-                                placeholder=(localize "SR5.Source") classes="thicc" rootId=rootId}}
-                </div>
-            {{/if}}
-            <div style="flex: 1">
-                {{formInput fields.name value=actor.name
-                            placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
-            </div>
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
+            {{formInput fields.name value=actor.name classes="sheet-name"
+                        placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
         </div>
         {{#if @root.isEditMode}}
+            <div class="sheet-header-source">
+                {{formInput systemFields.description.fields.source value=source.system.description.source
+                            placeholder=(localize "SR5.Source") rootId=rootId}}
+            </div>
         {{else}}
             <div>
                 {{#if (or isIC isSprite)}}
@@ -92,67 +77,22 @@
         {{/if}}
         {{#if (eq actor.type 'vehicle')}}
             <div>
-                {{#if vehicle.driver}}
-                    <div class="new-list-item">
-                        <div class="new-list-item-label-container">
-                            <div>
-                                <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
-                                    <i class="fas fa-steering-wheel"></i>{{vehicle.driver.name}}
-                                    <a data-action="removeVehicleDriver" class="close"><i class="fas fa-times"></i></a>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="new-list-item-col" data-tooltip="SR5.Vehicle.ControlMode">
-                            {{formInput systemFields.controlMode value=source.system.vehicle.controlMode
-                                            classes="short" localize=true }}
-                        </div>
+                <div class="new-list-item">
+                    <div class="new-list-item-label-container">
+                        <label>{{localize "SR5.Vehicle.ControlMode"}}</label>
                     </div>
-                {{else}}
-                    <a data-action="pickDriver" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsDriver">
-                        <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
-                            <i class="fa-light fa-square-dashed fa-stack-2x"></i>
-                            <i class="fas fa-steering-wheel fa-stack-1x"></i>
-                        </span>
-                        {{localize "SR5.Vehicle.MissingDriver"}}
-                    </a>
-                {{/if}}
+                    <div class="new-list-item-col thicc-col">
+                        {{formInput systemFields.controlMode value=source.system.vehicle.controlMode
+                                    classes="short" localize=true }}
+                    </div>
+                </div>
             </div>
         {{/if}}
         {{#if (or isSpirit isSprite)}}
             <div>
                 <div class="new-list-item">
                     <div class="new-list-item-label-container">
-                        {{#if isSpirit}}
-                            {{#if summoner}}
-                                <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{summoner.id}}" data-uuid="{{summoner.uuid}}">
-                                    <i class="fas fa-ghost"></i>{{summoner.name}}
-                                    <a class="close summoner-remove"><i class="fas fa-times"></i></a>
-                                </a>
-                            {{else}}
-                                <a data-action="pickSummoner" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsSummoner">
-                                    <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
-                                        <i class="fa-light fa-square-dashed fa-stack-2x"></i>
-                                        <i class="fas fa-ghost fa-stack-1x"></i>
-                                    </span>
-                                    {{localize "SR5.Spirit.MissingSummoner"}}
-                                </a>
-                            {{/if}}
-                        {{else}}
-                            {{#if technomancer}}
-                                <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{technomancer.id}}" data-uuid="{{technomancer.uuid}}">
-                                    <i class="fas fa-user"></i>{{technomancer.name}}
-                                    <a class="close technomancer-remove"><i class="fas fa-times"></i></a>
-                                </a>
-                            {{else}}
-                                <a data-action="pickTechnomancer" data-tooltip="SR5.Tooltips.Actor.PickControlledTokenAsTechnomancer">
-                                    <span class="fa-stack" style="vertical-align: top; font-size: 0.75em">
-                                        <i class="fa-light fa-square-dashed fa-stack-2x"></i>
-                                        <i class="fas fa-user fa-stack-1x"></i>
-                                    </span>
-                                    {{localize "SR5.Sprite.MissingTechnomancer"}}
-                                </a>
-                            {{/if}}
-                        {{/if}}
+                        <label>{{localize "SR5.Sprite.Services"}}</label>
                     </div>
                     <div class="new-list-item-col qty-input-col"
                          data-tooltip="{{#if isSpirit}}SR5.Spirit.Services{{else}}SR5.Sprite.Services{{/if}}">

@@ -13,7 +13,6 @@ export const CharacterSkills = () => ({
     knowledge: new SchemaField(KnowledgeSkills()),
 });
 
-
 export const MagicData = () => ({
     attribute: new StringField({ required: true, initial: "logic", choices: AttributeChoices() }), // Drain attribute
     projecting: new BooleanField(),

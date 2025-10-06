@@ -1321,10 +1321,10 @@ input[type='text'].display {
         .sheet-header {
             display: flex;
             flex-flow: row wrap;
-            justify-content: start;
-            align-items: end;
+            justify-content: center;
+            align-items: center;
             width: 100%;
-            padding-bottom: .25rem;
+            padding: .25rem;
 
             .sheet-header-col {
                 flex: none;
@@ -1361,8 +1361,6 @@ input[type='text'].display {
             margin-top: .25rem;
             box-shadow: 0 -.25rem .5rem $black;
             border-top: 1px solid $yellow;
-            padding-left: .1rem;
-            padding-top: .1rem;
             flex-shrink: 0;
             vertical-align: bottom;
         }
@@ -1410,7 +1408,7 @@ input[type='text'].display {
 
     // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
     &.named-sheet {
-        input[name="name"] {
+        input.sheet-name, input[name='name'] {
             @include systemFonts;
             flex-shrink: 0;
             background: $nameplate-background;
@@ -1465,6 +1463,12 @@ input[type='text'].display {
         width: 5rem;
     }
     input.short {
+        vertical-align: center;
+        horiz-align: center;
+    }
+    input.short, select.short {
+        padding: 1px;
+
         height: 1.5rem;
         min-height: 1.5rem;
         max-height: 1.5rem;
@@ -1474,17 +1478,18 @@ input[type='text'].display {
         min-height: 1.5rem;
         max-height: 1.5rem;
     }
-    select.short {
-        height: 1.5rem;
-        padding-right: 2px;
-        padding-left: 2px;
-        min-height: 1.5rem;
-        max-height: 1.5rem;
+    button.sr5-icon {
+        border-color: transparent;
+        padding: 2px !important;
+        margin: 0 !important;
+        &:hover {
+            border-color: $light;
+        }
     }
     a {
         color: $light;
         &:hover {
-            text-shadow: 0 0 8px 8px rgba($darkred, 0.9);
+            color: $white;
         }
     }
     label {
@@ -1494,7 +1499,8 @@ input[type='text'].display {
         color: $light;
         border-color: $light;
         &:hover {
-            box-shadow: 8 0 8px 8px rgba($darkred, 0.9);
+            box-shadow: 0 0 2px 1px rgba($light, 0.9);
+            color: $white;
             background: $darkred;
         }
     }
@@ -1515,6 +1521,11 @@ input[type='text'].display {
 
     .entity-link.content-link {
         color: $white !important;
+    }
+
+    .open-source-icon {
+        font-size: 1.25rem;
+        margin: .25rem;
     }
 
     // An origin link is a uuid based entity link, without drag support.
@@ -1539,6 +1550,17 @@ input[type='text'].display {
 
     // Styling for any prosemirror editors within shadowrun applications.
     .editor.prosemirror {
+
+        .editor-menu {
+            padding: 2px 4px;
+            background: $darkred;
+            li {
+                padding: 0;
+                > button {
+                    padding: 2px;
+                }
+            }
+        }
         // handles dropdown menus, not select based.
         .pm-dropdown {
             color: $color;
@@ -1892,11 +1914,6 @@ input[type='text'].display {
             align-items: center;
             gap: 0.1rem;
 
-            input[type="number"] {
-                max-width: 4rem;
-                max-height: 1.25rem;
-            }
-
             // hide "hover buttons" by default, show by growing the font-size
             .hover-show-button {
                 font-size: 0;
@@ -1916,6 +1933,31 @@ input[type='text'].display {
             }
             &.thicc-col {
                 flex: 0 0 6rem;
+            }
+
+            &.select-col {
+                justify-content: start;
+                flex: 2;
+            }
+
+            &.karma-mod-col {
+                flex: 3;
+                text-wrap: nowrap;
+            }
+
+            &.nuyen-col {
+                flex: 2;
+                text-wrap: nowrap;
+            }
+
+            &.social-mod-col {
+                flex: 5;
+                text-wrap: nowrap;
+            }
+
+            &.vehicle-mod-col {
+                flex: 6;
+                text-wrap: nowrap;
             }
 
             &.rtg-col {
