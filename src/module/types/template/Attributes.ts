@@ -40,10 +40,10 @@ export const Attributes = () => ({
 // MatrixActorAttributes are all the attributes an actor should have to work in the matrix
 // this was going to be named MatrixAttributes but that's taken...
 export const MatrixActorAttributes = () => ({
-    attack: new ModifiableField(AttributeField('attack')),
-    sleaze: new ModifiableField(AttributeField('sleaze')),
-    data_processing: new ModifiableField(AttributeField('data_processing')),
-    firewall: new ModifiableField(AttributeField('firewall')),
+    attack: new ModifiableField(AttributeField("attack")),
+    sleaze: new ModifiableField(AttributeField("sleaze")),
+    data_processing: new ModifiableField(AttributeField("data_processing")),
+    firewall: new ModifiableField(AttributeField("firewall")),
 
     rating: new ModifiableField(AttributeField()),
 })
