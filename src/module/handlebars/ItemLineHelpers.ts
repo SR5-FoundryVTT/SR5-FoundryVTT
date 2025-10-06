@@ -857,7 +857,7 @@ export const registerItemLineHelpers = () => {
      *
      * Add HTML data attributes using a key<string>:value<string> structure for each icon.
      */
-    Handlebars.registerHelper('EffectIcons', function (effect) {
+    Handlebars.registerHelper('EffectIcons', function (effect: ActiveEffect.Implementation) {
         const editIcon = {
             icon: 'fas fa-edit effect-control',
             title: game.i18n.localize('SR5.EditItem'),

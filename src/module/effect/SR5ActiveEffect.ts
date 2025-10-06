@@ -210,7 +210,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Handle application for none-Document objects
      */
-    _applyToObject(object: any, change: ActiveEffect.ChangeData) {
+    private _applyToObject(object: any, change: ActiveEffect.ChangeData) {
         const target = foundry.utils.getProperty(object, change.key);
         const targetType = foundry.utils.getType(target);
 
@@ -284,14 +284,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         return super.update(data, operation);
     }
 
-        /**
+    /**
      * This is 1to1 copy from the FoundryVTTv13 method with the private-# prefix...
      * Cast a raw ActiveEffect.ChangeData change string to an Array of an inner type.
      * @param {string} raw      The raw string value
      * @param {string} type     The target data type of inner array elements
      * @returns {Array<*>}      The parsed delta cast as a typed array
      */
-    __castArray(raw: string, type: foundry.utils.DataType) {
+    private __castArray(raw: string, type: foundry.utils.DataType) {
         let delta: any[];
         try {
             delta = this.__parseOrString(raw);
@@ -309,7 +309,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} type     The target data type that the raw value should be cast to match
      * @returns {*}             The parsed delta cast to the target data type
      */
-    __castDelta(raw: string, type: foundry.utils.DataType) {
+    private __castDelta(raw: string, type: foundry.utils.DataType) {
         let delta;
         switch (type) {
             case "boolean":
@@ -334,7 +334,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} raw      A raw serialized string
      * @returns {*}             The parsed value, or the original value if parsing failed
      */
-    __parseOrString(raw: string) {
+    private __parseOrString(raw: string) {
         try {
             return JSON.parse(raw);
         } catch (err) {

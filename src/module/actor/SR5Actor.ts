@@ -24,7 +24,6 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import AEChangeData = ActiveEffect.ChangeData;
 import { ActionRollType, DamageType } from '../types/item/Action';
 import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/Attributes';
 import { LimitFieldType } from '../types/template/Limits';
@@ -281,92 +280,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             items.push(item);
             this.itemsForType.set(item.type, items);
         }
-    }
-
-    /**
-     * NOTE: This method is unused at the moment, keep it for future inspiration.
-     */
-    applyOverrideActiveEffects() {
-        const changes = this.effects.reduce((changes: AEChangeData[], effect) => {
-            if (effect.disabled) return changes;
-
-            // include changes partially matching given keys.
-            const overrideChanges = effect.changes
-                .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
-                .map(origChange => {
-                    const change: AEChangeData = {
-                        key: String(origChange.key),
-                        value: String(origChange.value),
-                        mode: Number(origChange.mode) as CONST.ACTIVE_EFFECT_MODES,
-                        priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
-                        effect: effect,
-                    };
-                    return change;
-                });
-            return changes.concat(overrideChanges);
-        }, []);
-        // Sort changes according to priority, in case it's ever needed.
-        changes.sort((a, b) => a.priority! - b.priority!);
-
-        for (const change of changes) {
-            change.effect.apply(this, change);
-        }
-    }
-
-    /**
-     * A helper method to only apply a subset of keys instead of all.
-     * @param partialKeys Can either be complete keys or partial keys
-     */
-    _applySomeActiveEffects(partialKeys: string[]) {
-        const changes = this._reduceEffectChangesByKeys(partialKeys);
-        this._applyActiveEffectChanges(changes);
-    }
-
-
-    /**
-     * A helper method to apply a active effect changes collection (which might come from multiple active effects)
-     * @param changes
-     */
-    _applyActiveEffectChanges(changes: AEChangeData[]) {
-        const overrides = {};
-
-        for (const change of changes) {
-            const result = change.effect.apply(this, change);
-            if (result !== null) overrides[change.key] = result;
-        }
-
-        this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
-    }
-
-    /**
-     * Reduce all changes across multiple active effects that match the given set of partial keys
-     * @param partialKeys Can either be complete keys or partial keys
-     */
-    _reduceEffectChangesByKeys(partialKeys: string[]): AEChangeData[] {
-        // Collect only those changes matching the given partial keys.
-        const changes = this.effects.reduce((changes: AEChangeData[], effect) => {
-            if (effect.disabled) return changes;
-
-            // include changes partially matching given keys.
-            const overrideChanges = effect.changes
-                .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
-                .map(origChange => {
-                    const change: AEChangeData = {
-                        key: String(origChange.key),
-                        value: String(origChange.value),
-                        mode: Number(origChange.mode) as CONST.ACTIVE_EFFECT_MODES,
-                        priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
-                        effect: effect
-                    };
-                    return change;
-                });
-
-            return changes.concat(overrideChanges);
-        }, []);
-        // Sort changes according to priority, in case it's ever needed.
-        changes.sort((a, b) => a.priority! - b.priority!);
-
-        return changes;
     }
 
     /**
