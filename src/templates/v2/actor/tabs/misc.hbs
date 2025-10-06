@@ -1,5 +1,13 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-    <div class="split-container">
+
+    <div
+        {{#if @root.isEditMode}}
+        class="split-container"
+        {{else}}
+        class="fill-container"
+        {{/if}}
+    >
+        {{#if @root.isEditMode}}
         <div>
             {{#if isIC}}
                 <section class="standard-form">
@@ -50,7 +58,8 @@
                 </section>
             {{/if}}
         </div>
-        <div>
+        {{/if}}
+        <div {{#if @root.isPlayMode}}class="fill-container"{{/if}}>
             <!-- Situational Modifiers Section -->
             {{#if situationModifiers}}
             <div>
@@ -61,7 +70,7 @@
                         </label>
                     </div>
                     <div class="new-list-item-col">
-                        <span>{{localize "SR5.Value"}}</span>
+                        <label>{{localize "SR5.Value"}}</label>
                     </div>
                 </div>
                 {{#each situationModifiers}}
@@ -71,7 +80,7 @@
                             <label>{{localize this.label}}</label>
                         </div>
                         <div class="new-list-item-col">
-                            <span>{{this.value}}</span>
+                            <label>{{this.value}}</label>
                         </div>
                     </div>
                 {{/if}}
@@ -86,12 +95,39 @@
                         {{localize "SR5.Modifier"}}
                     </label>
                 </div>
+                <div class="new-list-item-col">
+                    <label>{{localize "SR5.Value"}}</label>
+                </div>
             </div>
             <section class="scrollable standard-form">
-                {{!-- use source.system here to ensure we don't  --}}
-                {{#each source.system.modifiers as |value id|}} {{#ifne id 'wound'}}
-                    {{formGroup (objValue @root.systemFields.modifiers.fields id) value=value rootId=@root.rootId disabled=@root.isPlayMode }}
-                {{/ifne}} {{/each}}
+                {{#if @root.isPlayMode}}
+                    {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}} {{#if value}}
+                        <div class="new-list-item">
+                            <div class="new-list-item-label-container">
+                                <label data-tooltip="{{objValue (objValue @root.systemFields.modifiers.fields id) 'hint'}}">
+                                    {{objValue (objValue @root.systemFields.modifiers.fields id) 'label'}}
+                                </label>
+                            </div>
+                            <div class="new-list-item-col">
+                                <label>{{value}}</labeL>
+                            </div>
+                        </div>
+                    {{/if}} {{/ifne}} {{/each}}
+                {{else}}
+                    {{#each source.system.modifiers as |value id|}} {{#ifne id 'wound'}}
+                        <div class="new-list-item">
+                            <div class="new-list-item-label-container">
+                                <label data-tooltip="{{objValue (objValue @root.systemFields.modifiers.fields id) 'hint'}}">
+                                    {{objValue (objValue @root.systemFields.modifiers.fields id) 'label'}}
+                                </label>
+                            </div>
+                            <div class="new-list-item-col">
+                                {{formInput (objValue @root.systemFields.modifiers.fields id) value=value
+                                            classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode }}
+                            </div>
+                        </div>
+                    {{/ifne}} {{/each}}
+                {{/if}}
             </section>
         </div>
     </div>

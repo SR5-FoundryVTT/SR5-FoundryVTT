@@ -2159,6 +2159,11 @@
         "Soak": "Soak",
         "SoakTest": "Damage Resist Test",
         "Social": "Social",
+        "SocialStatsManager": {
+            "Title": "Street Cred/Notoriety/Public Awareness Manager",
+            "Submit": "Submit",
+            "Cancel": "Cancel"
+        },
         "SocialLimit": "Social Limit",
         "Source": "Source",
         "SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",

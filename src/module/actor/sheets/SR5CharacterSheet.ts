@@ -3,6 +3,7 @@ import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { NuyenManager } from '@/module/apps/actor/NuyenManager';
 import { KarmaManager } from '@/module/apps/actor/KarmaManager';
+import { SocialStatsManager } from '@/module/apps/actor/SocialStatsManager';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
@@ -75,6 +76,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         actions: {
             openNuyenManager: SR5CharacterSheet.#openNuyenManager,
             openKarmaManager: SR5CharacterSheet.#openKarmaManager,
+            openSocialStatsManager: SR5CharacterSheet.#openSocialStatsManager,
         }
     }
 
@@ -255,6 +257,11 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
 
     static async #openNuyenManager(this: SR5CharacterSheet, event) {
         const app = new NuyenManager({document: this.actor});
+        await app.render(true);
+    }
+
+    static async #openSocialStatsManager(this: SR5CharacterSheet, event) {
+        const app = new SocialStatsManager({document: this.actor});
         await app.render(true);
     }
 
