@@ -12,6 +12,8 @@ import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { MatrixRules } from '@/module/rules/MatrixRules';
+import ActorAttribute = Shadowrun.ActorAttribute;
 
 // Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
 type sheetAction = {
@@ -358,6 +360,26 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     async _prepareMatrixActions() {
         let actions = await this._getMatrixPackActions();
+
+        actions = actions.filter(action => {
+            if (MatrixRules.isSleazeAction(
+                    action.system.action.attribute as ActorAttribute,
+                    action.system.action.attribute2 as ActorAttribute,
+                    action.system.action.limit.attribute as ActorAttribute)
+                && (this.actor.findAttribute('sleaze')?.value ?? 0) <= 0
+            ) {
+                return false;
+            }
+            if (MatrixRules.isAttackAction(
+                    action.system.action.attribute as ActorAttribute,
+                    action.system.action.attribute2 as ActorAttribute,
+                    action.system.action.limit.attribute as ActorAttribute)
+                && (this.actor.findAttribute('attack')?.value ?? 0) <= 0
+            ) {
+                return false;
+            }
+            return true;
+        });
         // Reduce actions to those matching the marks on the selected target.
         if (this.selectedMatrixTarget) {
             const ownedItem = this.actor.isOwnerOf(this.selectedMatrixTarget);
