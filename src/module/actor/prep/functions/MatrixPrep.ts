@@ -97,13 +97,13 @@ export class MatrixPrep {
             const attribute = matrix[attributeName];
 
             AttributesPrep.prepareAttribute(attributeName, attribute);
-            const { value, base, mod, label } = attribute;
+            const { value, base, changes, label } = attribute;
 
             // Each matrix attribute also functions as a limit.
-            limits[attributeName] = DataDefaults.createData('attribute_field', { value, base, mod, label, hidden: true });
+            limits[attributeName] = DataDefaults.createData('attribute_field', { value, base, changes, label, hidden: true });
 
             // Copy matrix attribute data into attributes for ease of access during testing.
-            attributes[attributeName] = DataDefaults.createData('attribute_field', { value, base, mod, label, hidden: true });
+            attributes[attributeName] = DataDefaults.createData('attribute_field', { value, base, changes, label, hidden: true });
         }
     }
 

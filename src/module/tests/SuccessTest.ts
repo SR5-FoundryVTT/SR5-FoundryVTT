@@ -123,7 +123,7 @@ export interface SuccessTestData extends TestData {
 export interface TestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     showMessage?: boolean // Show message when defined as true.
-    rollMode?: Roll.ConfiguredRollModes
+    rollMode?: foundry.dice.Roll.Mode
 }
 
 export interface SuccessTestMessageData {
@@ -281,10 +281,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data, options: TestOptions): Roll.ConfiguredRollModes {
+    _prepareRollMode(data, options: TestOptions): foundry.dice.Roll.Mode {
         if (options.rollMode != null) return options.rollMode;
         if (data?.action?.roll_mode) return data.action.roll_mode;
-        else return game.settings.get(CORE_NAME, 'rollMode') as Roll.ConfiguredRollModes;
+        else return game.settings.get(CORE_NAME, 'rollMode') as foundry.dice.Roll.Mode;
     }
 
     /**
@@ -442,19 +442,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get code(): string {
         // Add action dynamic value sources as labels.
-        const pool = this.pool.mod
-                        .filter(mod => mod.value)
+        const pool = this.pool.changes
+                        .filter(change => change.value)
                         // Dev code for pool display. This should be replaced by attribute style value calculation info popup
-                        .map(mod => `${game.i18n.localize(mod.name as Translation)} ${mod.value}`);
+                        .map(change => `${game.i18n.localize(change.name as Translation)} ${change.value}`);
 
         // Threshold and Limit are values that can be overwritten.
-        const threshold = this.threshold.override
-            ? [game.i18n.localize(this.threshold.override.name as Translation)]
-            : this.threshold.mod.map(mod => game.i18n.localize(mod.name as Translation));
-        const limit = this.limit.override
-            ? [game.i18n.localize(this.limit.override.name as Translation)]
-            : this.limit.mod.map(mod => game.i18n.localize(mod.name as Translation));
-
+        const threshold = this.threshold.changes.map(change => game.i18n.localize(change.name as Translation));
+        const limit = this.limit.changes.map(change => game.i18n.localize(change.name as Translation));
 
         // Add action static value modifiers as numbers.
         if (this.pool.base > 0 && !this.pool.override) pool.push(String(this.pool.base));
@@ -632,8 +627,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     roundBaseValueParts() {
         const roundAllMods = (value: ValueFieldType) => {
             value.base = Math.ceil(value.base);
-            if (value.override) value.override.value = Math.ceil(value.override.value);
-            for (const mod of value.changes) mod.value = Math.ceil(mod.value);
+            for (const change of value.changes) change.value = Math.ceil(change.value);
         }
 
         roundAllMods(this.data.modifiers);
@@ -650,17 +644,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     calculateBaseValues() {
         this.roundBaseValueParts();
 
-        this.data.modifiers.value = PartsList.calcTotal(this.data.modifiers);
+        PartsList.calcTotal(this.data.modifiers);
 
-        this.data.pool.value = PartsList.calcTotal(this.data.pool, { min: 0 });
-        this.data.threshold.value = PartsList.calcTotal(this.data.threshold, { min: 0 });
-        this.data.limit.value = PartsList.calcTotal(this.data.limit, { min: 0 });
+        PartsList.calcTotal(this.data.pool, { min: 0 });
+        PartsList.calcTotal(this.data.threshold, { min: 0 });
+        PartsList.calcTotal(this.data.limit, { min: 0 });
 
-        this.data.manualHits.value = PartsList.calcTotal(this.data.manualHits, { min: 0 });
-        this.data.manualGlitches.value = PartsList.calcTotal(this.data.manualGlitches, { min: 0 });
+        PartsList.calcTotal(this.data.manualHits, { min: 0 });
+        PartsList.calcTotal(this.data.manualGlitches, { min: 0 });
 
         // Shows AP on incoming attacks
-        this.data.damage.ap.value = PartsList.calcTotal(this.data.damage.ap);
+        PartsList.calcTotal(this.data.damage.ap);
 
         console.debug(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
@@ -941,11 +935,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             hits.value;
 
         // Calculate a ValueField for standardization.
-        const netHits = DataDefaults.createData('value_field', {
-            label: "SR5.NetHits",
-            base
-        });
-        netHits.value = PartsList.calcTotal(netHits, { min: 0 });
+        const netHits = DataDefaults.createData('value_field', { label: "SR5.NetHits", base });
+        PartsList.calcTotal(netHits, { min: 0 });
 
         return netHits;
     }
@@ -967,7 +958,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.hits.base = rollHits;
         
         // First, calculate hits based on roll and modifiers.
-        this.hits.value = PartsList.calcTotal(this.hits, { min: 0 });
+        PartsList.calcTotal(this.hits, { min: 0 });
         // Second, reduce hits by limit.
         this.hits.value = this.hasLimit ? Math.min(this.limit.value, this.hits.value) : this.hits.value;
 
@@ -1928,7 +1919,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        ChatMessage.applyRollMode(messageData, game.settings.get("core", "rollMode")!);
+        ChatMessage.applyRollMode(messageData, game.settings.get("core", "rollMode"));
 
         return messageData;
     }
