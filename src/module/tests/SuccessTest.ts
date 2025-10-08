@@ -940,7 +940,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     calculateNetHits(): ValueFieldType {
         // An extended test will use summed up extended hit, while a normal test will use its own hits.
-        const hits = this.extended ? this.extendedHits() : this.hits;
+        const hits = this.extended ? this.extendedHits : this.hits;
 
         // Maybe lower hits by threshold to get the actual net hits.
         const base = this.hasThreshold ?
@@ -985,7 +985,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.data.values.hits;
     }
 
-    extendedHits(): ValueFieldType {
+    get extendedHits(): ValueFieldType {
         // Return a default value field, for when no extended hits have been derived yet (or ever).
         return this.data.values.extendedHits || DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
     }
@@ -1054,7 +1054,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     calculateExtendedHits(): ValueFieldType {
         if (!this.extended) return DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
 
-        const extendedHits = this.extendedHits();
+        const extendedHits = this.extendedHits;
         extendedHits.mod = PartsList.AddPart(extendedHits.mod, 'SR5.Hits', this.hits.value);
 
         Helpers.calcTotal(extendedHits, { min: 0 });
@@ -1110,7 +1110,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get success(): boolean {
         // Extended tests use the sum of all extended hits.
-        const hits = this.extended ? this.extendedHits() : this.hits;
+        const hits = this.extended ? this.extendedHits : this.hits;
         return TestRules.success(hits.value, this.threshold.value);
     }
 
@@ -1123,7 +1123,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Allow extended tests without a threshold and avoid 'failure' confusion.
         if (this.extended && this.threshold.value === 0) return true;
         // When extendedHits have been collected, check against threshold.
-        if (this.extendedHits().value > 0 && this.threshold.value > 0) return this.extendedHits().value < this.threshold.value;
+        if (this.extendedHits.value > 0 && this.threshold.value > 0) return this.extendedHits.value < this.threshold.value;
         // Otherwise fall back to 'whatever is not a success.
         return !this.success;
     }
@@ -1659,7 +1659,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         Helpers.calcTotal(data.pool, { min: 0 });
 
-        if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits().value)) {
+        if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
             return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
         }
 
@@ -1682,7 +1682,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Mark test as extended to get iterative execution.
         if (!test.extended) {
             test.data.extended = true;
-            test.calculateExtendedHits();
+            test.data.values.extendedHits = test.calculateExtendedHits();
         }
 
         // Mark this roll as an extended roll.
