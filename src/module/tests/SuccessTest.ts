@@ -1011,7 +1011,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Determine if this success test must automated roll or can use a manual roll given by user.
      */
     get usingManualRoll(): boolean {
-        return this.allowManualHits && (Boolean(this.data.manualHits.override) || Boolean(this.data.manualGlitches.override))
+        return this.allowManualHits && (Boolean(this.data.manualHits.value) || Boolean(this.data.manualGlitches.value))
     }
 
     /**

@@ -69,7 +69,7 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
             if (value != null) {
                 this._field.changes[index] = { mode, priority, unused: false, name, value };
             } else {
-                this.removePart(name);
+                this._field.changes.splice(index, 1);
             }
         } else if (value != null) {
             // Part does not exist, add it.
@@ -137,6 +137,9 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
             this.addUniquePart('System Enforced Minimum', options.min, CONST.ACTIVE_EFFECT_MODES.UPGRADE, Infinity);
             this._field.value = options.min;
         }
+
+        // SR5#78 - All values are rounded up
+        this._field.value = Math.ceil(this._field.value);
 
         return this._field.value;
     }

@@ -1,5 +1,4 @@
 import { SR5 } from "../../config";
-import { Helpers } from "../../helpers";
 import { Translation } from '../../utils/strings';
 import { ModifiableValueType } from "src/module/types/template/Base";
 import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
@@ -77,7 +76,7 @@ export class TestDialog extends FormDialog {
     }
 
     //@ts-expect-error
-    getData() {
+    override getData() {
         const data = super.getData() as unknown as TestDialogData;
 
         //@ts-expect-error //TODO: default to general roll mode user setting
@@ -136,16 +135,14 @@ export class TestDialog extends FormDialog {
         for (const [key, value] of Object.entries(data)) {
             // key is expected to be relative from TestDialog.data and begin with 'test'
             const valueField = foundry.utils.getProperty(this.data, key) as ModifiableValueType | undefined | null;
-            if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) continue;
+            if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !Object.hasOwn(valueField, 'changes')) continue;
 
             // Remove from further automatic data merging.
             delete data[key];
 
             // Don't apply an unneeded override.
             if (valueField.value === value) continue;
-
-            if (value)
-                PartsList.addUniquePart(valueField, 'SR5.ManualOverride', Number(value), CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+            PartsList.addUniquePart(valueField, 'SR5.ManualOverride', value as number | null, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
         }
 
         // Second, apply generic values.

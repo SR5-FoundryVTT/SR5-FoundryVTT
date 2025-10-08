@@ -163,7 +163,7 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     /** Allow for the selected button to be addressed by its key, not it's localized label.
      */
     _amendButtonsWithName(buttons) {
-        Object.keys(buttons).forEach(name => buttons[name].name = name);
+        Object.keys(buttons).forEach(name => { buttons[name].name = name; });
     }
 
     /**
