@@ -5,6 +5,7 @@ import { VisibilityChecks } from "../template/Visibility";
 import { Limits, MatrixLimits } from "../template/Limits";
 import { ActorBase, CommonData, CreateModifiers } from "./Common";
 import { SR5 } from '@/module/config';
+import { Tracks } from '@/module/types/template/ConditionMonitors';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpriteData = () => ({
@@ -28,7 +29,7 @@ const SpriteData = () => ({
     technomancerUuid: new StringField({ required: true }),
 
     // === Condition & Monitoring ===
-    // track: new SchemaField(Tracks('matrix')),
+    track: new SchemaField(Tracks('matrix')),
     initiative: new SchemaField(Initiative('matrix')),
     limits: new SchemaField({ ...Limits(), ...MatrixLimits() }),
 

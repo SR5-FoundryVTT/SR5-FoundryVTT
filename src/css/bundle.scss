@@ -1366,18 +1366,10 @@ input[type='text'].display {
         }
         .window-header {
             &:not(.minimized) {
-                padding: 0 .25rem;
-                flex: 0 0 auto;
+                margin-bottom: 0;
                 .window-title {
                     font-size: 0;
                     height: 0;
-
-                    // set the left margin of the icon to mirror the increased inline padding
-                    // so maximized window icons are still symetrically spaced to the borders
-                    // of the window header
-                    a {
-                        margin-left: 0.25rem;
-                    }
                 }
             }
         }
