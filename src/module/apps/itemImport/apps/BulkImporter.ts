@@ -90,8 +90,8 @@ export class BulkImporter extends HandlebarsApplicationMixin(ApplicationV2<Impor
     private static readonly githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
-        version: "v5.225.977",
-        branch: "ceda7c93e54d8ede7623caa7953c88ae559465da",
+        version: "v5.225.1027",
+        branch: "fb979155da2e669907d03ce5863a1450fcee3efb",
     } as const;
 
     /**

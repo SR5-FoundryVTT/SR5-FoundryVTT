@@ -60,6 +60,14 @@ export interface Quality {
     altpage?: { _TEXT: string; };
 };
 
+export interface Query {
+    display: { _TEXT: string; };
+    id: { _TEXT: string; };
+    xpath: { _TEXT: string; };
+    translate?: { _TEXT: string; };
+    altpage?: { _TEXT: string; };
+};
+
 export interface QualitiesSchema {
     $: { xmlns: ""; "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"; "xsi:schemaLocation": "http://www.w3.org/2001/XMLSchema qualities.xsd"; };
     categories: {
@@ -67,5 +75,8 @@ export interface QualitiesSchema {
     };
     qualities: {
         quality: Many<Quality>;
+    };
+    xpathqueries: {
+        query: Many<Query>;
     };
 };

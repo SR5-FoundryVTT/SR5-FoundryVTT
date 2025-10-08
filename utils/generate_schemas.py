@@ -19,7 +19,7 @@ from io import BytesIO
 # Repository details for fetching XML files if no local path is provided
 OWNER = "chummer5a"
 REPO = "chummer5a"
-BRANCH = "99664f5ce3d5c1d9bdb4532537bcce8fc9c4c488"  # v5.255.989
+BRANCH = "fb979155da2e669907d03ce5863a1450fcee3efb"  # v5.255.1027
 
 # String length threshold for inline union literals
 STRING_LIMIT = 100
@@ -161,7 +161,7 @@ def infer_type(samples: List[str]) -> str:
         type_parts.append("IntegerString")
 
     if other_strings:
-        part = " | ".join([f'"{s}"' for s in other_strings])
+        part = " | ".join([f'"{s.replace('"', '\\"')}"' for s in other_strings])
         if len(part) < STRING_LIMIT:
             type_parts.append(part)
         else:

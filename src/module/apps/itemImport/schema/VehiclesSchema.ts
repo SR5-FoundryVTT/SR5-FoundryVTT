@@ -129,6 +129,7 @@ export interface Weaponmount {
     slots: { _TEXT: IntegerString; };
     source?: { _TEXT: "R5" | "SR5"; };
     weaponcategories?: { _TEXT: string; };
+    weaponfilter?: { _TEXT: "((type != \"Melee\") or (type = \"Melee\" and reach = \"0\"))"; };
     translate?: { _TEXT: string; };
     altpage?: { _TEXT: string; };
 };
