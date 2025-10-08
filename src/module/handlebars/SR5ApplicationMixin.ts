@@ -7,6 +7,9 @@ import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5 } from '@/module/config';
 import { LinksHelpers } from '@/module/utils/links';
+import { SheetFlow } from '@/module/flows/SheetFlow';
+import { SR5ItemSheet } from '@/module/item/SR5ItemSheet';
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
     return class SR5ApplicationMixin extends foundry.applications.api.HandlebarsApplicationMixin(base) {
@@ -15,6 +18,9 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         declare window: ApplicationV2.Window;
         declare editIcon: HTMLElement;
         declare isEditable: boolean;
+        declare options: typeof SR5ApplicationMixin.DEFAULT_OPTIONS;
+
+        #dragDrop: any;
 
         static DEFAULT_OPTIONS = {
             classes: [SR5_APPV2_CSS_CLASS],
@@ -29,8 +35,27 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
                 toggleEditMode: SR5ApplicationMixin.#toggleEditMode,
                 showItemDescription: SR5ApplicationMixin.#toggleListItemDescription,
                 openSource: SR5ApplicationMixin.#openSource,
+            },
+        };
+
+        /*
+        async _onDragStart(event) {
+            const target = event.currentTarget;
+            if ('link' in event.target.dataset) return;
+            let dragData;
+
+            const document = SheetFlow.fromUuidSync(target.dataset.itemId);
+            console.log('startingDrag', document);
+            if (document) {
+                dragData = document.toDragData();
             }
+
+            // Set data transfer
+            if (!dragData) return;
+            event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
         }
+
+         */
 
         static async #toggleEditMode(this, event: MouseEvent) {
             event.preventDefault();
@@ -43,7 +68,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             await this.render();
         }
 
-        protected _mode: 'play' | 'edit' = 'play'
+        protected _mode: 'play' | 'edit' = 'play';
 
         get isEditMode() {
             return this._mode === 'edit';
@@ -95,7 +120,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         }
 
         static async #openSource(event) {
-            const sourceId = event.target.closest('[data-source-id]').dataset.sourceId;
+            const sourceId = SheetFlow.closestSource(event.target);
             if (sourceId) {
                 await LinksHelpers.openSource(sourceId);
             }
@@ -108,14 +133,14 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
          */
         protected override async _renderHTML(context, options) {
             // push footer to the end of parts os it is rendered at the bottom
-            if (options.parts.includes("footer")) {
-                const index = options.parts.indexOf("footer");
+            if (options.parts.includes('footer')) {
+                const index = options.parts.indexOf('footer');
                 if (index !== options.parts.length - 1) {
                     options.parts.push(options.parts.splice(index, 1)[0]);
                 }
             }
-            if (options.parts.includes("header")) {
-                const index = options.parts.indexOf("header");
+            if (options.parts.includes('header')) {
+                const index = options.parts.indexOf('header');
                 if (index !== 0) {
                     options.parts.unshift(options.parts.splice(index, 1)[0]);
                 }
@@ -146,18 +171,17 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             if (this.isEditable) {
                 const button = document.createElement('button');
                 button.style.fontSize = '150%';
-                button.className = 'header-control icon'
-                button.dataset.tooltip = "SR5.Tooltips.ToggleEditMode"
+                button.className = 'header-control icon';
+                button.dataset.tooltip = 'SR5.Tooltips.ToggleEditMode';
                 this.editIcon = document.createElement('i');
                 button.appendChild(this.editIcon);
                 this.editIcon.className = this.isEditMode ? 'fas fa-toggle-off' : 'fas fa-toggle-on';
-                button.dataset.action = "toggleEditMode";
+                button.dataset.action = 'toggleEditMode';
 
                 this.window?.header?.prepend(button);
             }
 
             return frame;
         }
-
-    } // end of SR5ApplicationMixin
+    }; // end of SR5ApplicationMixin
 }

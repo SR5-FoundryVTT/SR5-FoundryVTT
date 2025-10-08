@@ -1,5 +1,6 @@
 import { formatStrict } from '@/module/utils/strings';
 import { SR5Item } from '@/module/item/SR5Item';
+import { LinksHelpers } from '@/module/utils/links';
 
 export const SheetFlow = {
     _getCreateItemText(type: string): string {
@@ -82,31 +83,6 @@ export const SheetFlow = {
         }, [])
     },
 
-    listItemResolve(target) {
-        const id = this.listItemId(target);
-        if (!id) return undefined;
-        const item = fromUuidSync(id);
-        if (item && item instanceof SR5Item) return item;
-        return undefined;
-    },
-
-    localIdFromUuid(uuid: string) {
-        const parts = uuid.split('.');
-        return parts.length > 0 ? parts[parts.length - 1] : '';
-    },
-
-    closestItemId(target) {
-        return target.closest('[data-item-id]').dataset.itemId;
-    },
-
-    closestAction(target) {
-        return target.closest('[data-action]');
-    },
-
-    listItemId(target) {
-       return target.closest('.new-list-item[data-item-id]')?.dataset?.itemId;
-    },
-
     fromUuidSync(uuid: string) {
         const parts = uuid.split('.');
         // if the parts includes multiple 'Item' parts, we are dealing with an embedded item within an item
@@ -150,6 +126,47 @@ export const SheetFlow = {
                 return document;
             }
             return fromUuidSync(uuid);
+        }
+    },
+
+    closestItemId(target) {
+        return target.closest('[data-item-id]').dataset.itemId;
+    },
+
+    closestUuid(target) {
+        return target.closest('[data-uuid]').dataset?.uuid;
+    },
+
+    closestEffectId(target) {
+        return target.closest('[data-effect-id]').dataset?.effectId;
+    },
+
+    closestAction(target) {
+        return target.closest('[data-action]');
+    },
+
+    listItemId(target) {
+        return target.closest('.new-list-item[data-item-id]')?.dataset?.itemId;
+    },
+
+    closestSource(target) {
+        return target.closest('[data-source]')?.dataset?.source;
+    },
+
+    _getSourceContextOption() {
+        return {
+            name: "SR5.ContextOptions.Source",
+            icon: "<i class='fas fa-page'></i>",
+            condition: (target) => {
+                const source = this.closestSource(target);
+                return !!source;
+            },
+            callback: async (target) => {
+                const source = this.closestSource(target);
+                if (source) {
+                    await LinksHelpers.openSource(source);
+                }
+            }
         }
     }
 }

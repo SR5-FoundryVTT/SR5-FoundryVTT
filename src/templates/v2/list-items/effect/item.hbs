@@ -1,11 +1,11 @@
-{{!-- list-item expects an SR5Item to be passed in as 'item' --}}
+{{!-- list-item expects an SR5ActiveEffect to be passed in as 'item' --}}
 <div class="new-list-item-container">
-    <div class="new-list-item" data-item-id="{{item.uuid}}">
+    <div class="new-list-item draggable" data-effect-id="{{item.id}}" data-uuid="{{item.uuid}}" {{#if isItemEffect}} data-source="{{item.parent.uuid}}" {{/if}}>
         {{#if item.img}}
             <img src="{{item.img}}" class="new-list-item-image" height="24px" width="24px" />
         {{/if}}
         <div class="new-list-item-label-container">
-            <a data-action="showItemDescription" data-item-id="{{item.uuid}}">
+            <a data-action="showItemDescription">
                 {{#if name}}
                     {{name}}
                 {{else}}
@@ -18,14 +18,23 @@
             <label>{{localizeOb item.system.applyTo @root.config.effectApplyTo}}</label>
         </div>
 
+        {{!-- Add in when we actual deal with durations
         <div class="new-list-item-col">
             <label>{{effectDurationLabel item}}</label>
         </div>
+        --}}
 
         <div class="new-list-item-icons">
-            <a data-tooltip="SR5.ToggleActive" data-action="toggleEffect" data-item-id="{{item.uuid}}">
+            <a data-tooltip="SR5.ToggleActive" data-action="toggleEffect">
                 <i class="{{#if item.disabled}}far fa-circle{{else}}fas fa-check-circle{{/if}}"></i>
             </a>
+            {{#unless isItemEffect}}
+                {{#if @root.isEditMode}}
+                    <a data-tooltip="SR5.Delete" data-action="deleteEffect">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                {{/if}}
+            {{/unless}}
         </div>
     </div>
     <div class="new-list-item-description">

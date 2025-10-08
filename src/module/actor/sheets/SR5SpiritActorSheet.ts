@@ -95,37 +95,8 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         return data;
     }
 
-    /**
-     * Spirit actors have additional drop cases to handle.
-     */
-    override async _onDrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!event.dataTransfer) return;
-
-        // First, spirit specific behavior.
-        const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-
-        // Handle summoner drops, ignore other actor drop options as spirits don't handle them.
-        if (dropData.type === 'Actor') {
-            await this._addSummonerOnDrop(dropData);
-            return;
-        }
-
-        // Then, handle the rest of the actor drop cases.
-        return super._onDrop(event);
-    }
-
-    /**
-     * Determine if a dropped actor should be used as a spirit summoner.
-     * @param dropData Actor drop data.
-     */
-    async _addSummonerOnDrop(dropData: { type: string; uuid: string; }) {
-        if (dropData.type !== 'Actor') return;
-        const actor = await fromUuid(dropData.uuid) as SR5Actor;
+    override async _onDropActor(event, actor) {
         if (!actor.isType('character')) return;
-
         await this.document.addSummoner(actor);
     }
 

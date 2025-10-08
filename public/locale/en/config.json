@@ -440,12 +440,6 @@
             "NoFavoritesSelected": "No favorites have been selected"
         },
         "ActorSheet": {
-            "ContextOptions": {
-                "Source": "Open Source",
-                "View": "View",
-                "Edit": "Edit",
-                "Delete": "Delete"
-            },
             "Labels": {
                 "NotorietyShort": "N",
                 "StreetCredShort": "SC",
@@ -860,6 +854,16 @@
                 "SwitchInterfaceMode": "Switch Interface Mode",
                 "TraceIcon": "Trace Icon"
             }
+        },
+        "ContextOptions": {
+            "Source": "Open Reference",
+            "View": "View",
+            "EditSkill": "Edit Skill",
+            "EditItem": "Edit Item",
+            "EditEffect": "Edit Effect",
+            "DeleteSkill": "Delete Skill",
+            "DeleteItem": "Delete Item",
+            "DeleteEffect": "Delete Effect"
         },
         "Continue": "Continue",
         "ControlRig": "Control Rig",

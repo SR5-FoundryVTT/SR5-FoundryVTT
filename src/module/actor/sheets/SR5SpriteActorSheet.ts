@@ -104,36 +104,8 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         return data;
     }
 
-    /**
-     * Sprites have support for dropping actors onto them.
-     */
-    override async _onDrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (event.dataTransfer === null) return;
-
-        const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-
-        // Handle technomancer drops, ignore other actor drops as sprites can't handle them.
-        if (dropData.type === 'Actor') {
-            await this._addTechnomancerOnDrop(dropData);
-            return;
-        }
-
-        return super._onDrop(event);
-    }
-
-    /**
-     * Determine if a dropped actor should be used as a technomancer.
-     * @param dropData Drop Data of any kind
-     */
-    async _addTechnomancerOnDrop(dropData: any): Promise<void> {
-        if (dropData.type !== 'Actor') return;
-        const actor = await fromUuid(dropData.uuid) as SR5Actor;
-        if (!actor.isType('character')) return;
-
-        this.document.addTechnomancer(actor);
+    override async _onDropActor(event, actor) {
+        await this.actor.addTechnomancer(actor);
     }
 
     /**

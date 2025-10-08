@@ -83,24 +83,31 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     getLastFireMode(): FireModeType {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || DataDefaults.createData('fire_mode');
     }
+
     async setLastFireMode(fireMode: FireModeType) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
     }
+
     getLastSpellForce(): SpellForceType {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastSpellForce) || { value: 0 };
     }
+
     async setLastSpellForce(force: SpellForceType) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
     }
+
     getLastComplexFormLevel(): ComplexFormLevelType {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel) || { value: 0 };
     }
+
     async setLastComplexFormLevel(level: ComplexFormLevelType) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
     }
+
     getLastFireRangeMod(): FireRangeType {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastFireRange) || { value: 0 };
     }
+
     async setLastFireRangeMod(environmentalMod: FireRangeType) {
         return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
     }
@@ -236,13 +243,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param actor
      */
     async castAction(event?: RollEvent, actor?: SR5Actor) {
-        
+
         // Only show the item's description by user intention or by lack of testability.
         let dontRollTest = TestCreator.shouldPostItemDescription(event);
         if (dontRollTest) return this.postItemCard();
-        
+
         // Should be right here so that TestCreator.shouldPostItemDescription(event); can prevent execution beforehand. 
-        if (!Hooks.call('SR5_CastItemAction', this)) return; 
+        if (!Hooks.call('SR5_CastItemAction', this)) return;
 
         dontRollTest = !this.hasRoll;
 
@@ -263,12 +270,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     /**
      * Create display only information for this item. Used on sheets, chat messages and more.
      * Both actor and item sheets.
-     * 
+     *
      * The original naming leans on the dnd5e systems use of it for chat messages.
      * NOTE: This is very legacy, difficult to read and should be improved upon.
-     * 
-     * @param htmlOptions 
-     * @returns 
+     *
+     * @param htmlOptions
+     * @returns
      */
     async getChatData(htmlOptions = {}) {
         const system = foundry.utils.duplicate(this.system) as SR5Item['system'];
@@ -395,7 +402,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Can this item (weapon, melee, ranged, whatever) use ammunition?
-     * 
+     *
      * @returns true, for weapons with ammunition.
      */
     usesAmmo(): boolean {
@@ -409,9 +416,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * - its current clips
      * - its available spare clips (when given)
      * - its equipped ammo
-     * 
+     *
      * This method will only reload the weapon to the max amount of ammo available.
-     * 
+     *
      * TODO: Currently only the minimal amount of bullets is reloaded. For weapons using ejectable clips, this should be full clip capacity.
      */
     async reloadAmmo(isPartial: boolean) {
@@ -497,7 +504,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Equip one ammo item exclusively.
-     * 
+     *
      * @param id Item id of the to be exclusively equipped ammo item.
      */
     async equipAmmo(id) {
@@ -522,7 +529,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * This method is used to add a new network to a SIN item.
-     * 
+     *
      * @param item The network item to add to this SIN.
      */
     async addNewNetwork(item: SR5Item) {
@@ -534,13 +541,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         await this.update({ system: { networks: sin.system.networks } });
     }
 
-    isWeaponModification(): this is SR5Item<'modification'> & { system : { type: 'weapon' } } {
+    isWeaponModification(): this is SR5Item<'modification'> & { system: { type: 'weapon' } } {
         return this.isType('modification') && this.system.type === 'weapon';
     }
 
     /**
      * SIN Item - remove a single license within this SIN
-     * 
+     *
      * @param index The license list index
      */
     async removeLicense(index) {
@@ -699,7 +706,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
 
-        for(const effectChanges of changes) {
+        for (const effectChanges of changes) {
             const effect = this.effects.get(effectChanges._id);
             if (!effect) continue;
             delete effectChanges._id;
@@ -879,10 +886,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * An attack with this weapon will create an area of effect / blast.
-     * 
-     * There is a multitude of possibilities as to HOW an item can create an AoE, 
+     *
+     * There is a multitude of possibilities as to HOW an item can create an AoE,
      * both directly connected to the item and / or some of it's nested items.
-     * 
+     *
      */
     isAreaOfEffect(): boolean {
         return false
@@ -920,10 +927,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.isType('call_in_action') && this.system.actor_type === 'sprite';
     }
 
-    /**    
-    * Retrieve the actor document linked to this item.
-    * e.g.: Contact items provide linked actors
-    */
+    /**
+     * Retrieve the actor document linked to this item.
+     * e.g.: Contact items provide linked actors
+     */
     async getLinkedActor(this: SR5Item): Promise<SR5Actor | undefined> {
         const uuid = this.system.linkedActor;
 
@@ -1025,7 +1032,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     getArmorElements(this: SR5Item<'armor'>): Record<string, number> {
         const { fire, electricity, cold, acid, radiation } = this.system.armor;
-        return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0, radiation: radiation ?? 0 };
+        return {
+            fire: fire ?? 0,
+            electricity: electricity ?? 0,
+            cold: cold ?? 0,
+            acid: acid ?? 0,
+            radiation: radiation ?? 0
+        };
     }
 
     /**
@@ -1048,7 +1061,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Amount of recoil compensation totally available when using weapon
-     * 
+     *
      * This includes both actor and item recoil compensation.
      */
     get totalRecoilCompensation(): number {
@@ -1058,9 +1071,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Current TOTAL recoil compensation with current recoil included.
-     * 
+     *
      * This includes both the items and it's parent actors recoil compensation and total progressive recoil.
-     * 
+     *
      * @returns A positive number or zero.
      */
     get currentRecoilCompensation(): number {
@@ -1168,7 +1181,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Item.item => Embedded item into another item!
         if (this._isNestedItem)
             return this.updateNestedItem(data);
-        
+
         await Migrator.updateMigratedDocument(this);
         // Actor.item => Directly owned item by an actor!
         return super.update(data, options);
@@ -1242,7 +1255,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param options Additional options that may be needed.
      *
      */
-    async setMarks(target: SR5Actor|SR5Item|undefined, marks: number, options?: SetMarksOptions) {
+    async setMarks(target: SR5Actor | SR5Item | undefined, marks: number, options?: SetMarksOptions) {
         await ItemMarksFlow.setMarks(this, target, marks, options);
     }
 
@@ -1289,9 +1302,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-    * In case this item is a network master, remove the slave from the network.
-    * @param slave The matrix item to be disconnected.
-    */
+     * In case this item is a network master, remove the slave from the network.
+     * @param slave The matrix item to be disconnected.
+     */
     async removeSlave(slave: SR5Actor | SR5Item) {
         await MatrixNetworkFlow.removeSlave(this, slave);
     }
@@ -1427,7 +1440,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * NOTE: Since getRollData is sync by default, we can't retrieve compendium documents here, resulting in fromUuidSync calls down
      *       the line.
      */
-    override getRollData(options: RollDataOptions={}): any {
+    override getRollData(options: RollDataOptions = {}): any {
         // Create a system data copy to avoid cross-contamination
         const rollData = this.system.toObject(false);
         return ItemRollDataFlow.getRollData(this, rollData, options);
@@ -1441,7 +1454,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Don't kill DocumentData by applying empty objects. Also performance.
         if (!foundry.utils.isEmpty(applyData)) await this.update(applyData);
     }
-    
+
     /**
      * Reset everything that needs to be reset between two runs.
      */
@@ -1473,5 +1486,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     override async _preDelete(...args: Parameters<Item["_preDelete"]>) {
         await StorageFlow.deleteStorageReferences(this);
         return await super._preDelete(...args);
+    }
+
+    override getEmbeddedDocument(embeddedName, id, options) {
+        if (embeddedName === 'Item') {
+            return this.getOwnedItem(id);
+        }
+        return super.getEmbeddedDocument(embeddedName, id, options);
     }
 }

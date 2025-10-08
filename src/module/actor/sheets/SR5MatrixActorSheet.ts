@@ -285,9 +285,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #toggleConnectedMatrixIcons(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
-        console.log('Toggle connected matrix icons', event);
 
-        const uuid = event.target.dataset.itemId;
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         // Mark main icon as open or closed.

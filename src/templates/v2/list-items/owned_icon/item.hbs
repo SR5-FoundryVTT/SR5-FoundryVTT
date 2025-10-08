@@ -1,6 +1,6 @@
 {{!-- expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container {{cssClass}}">
-    <div class="new-list-item {{#if item.selected}}new-list-item-selected{{/if}}" data-item-id="{{item.document.uuid}}">
+    <div class="new-list-item {{#if item.selected}}new-list-item-selected{{/if}}" data-uuid="{{item.document.uuid}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
         <div class="new-list-item-label-container">
             <a class="{{#if item.selected}}new-list-item-selected{{/if}}"

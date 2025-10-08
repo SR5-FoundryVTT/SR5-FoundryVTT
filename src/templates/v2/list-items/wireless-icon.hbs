@@ -2,13 +2,11 @@
     {{#if (canBeWireless this)}}
         {{#if (isBroken this)}}
             <a data-tooltip="SR5.Broken"
-               data-action="repairBrokenItem"
-               data-item-id="{{this.uuid}}" >
+               data-action="repairBrokenItem">
                 <i class="fas fa-link-slash"></i>
             </a>
         {{else}}
-            <a data-action="toggleItemWireless"
-               data-item-id="{{this.uuid}}">
+            <a data-action="toggleItemWireless">
                 <i
             {{#if (isRunningSilent this)}}
                    class="fa-duotone fa-wifi-fair"

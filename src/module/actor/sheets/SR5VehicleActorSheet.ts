@@ -97,30 +97,16 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         html.find('.connect-to-driver').on('click', this._onConnectToDriver.bind(this));
     }
 
-    /**
-     * Vehicle specific drop events
-     * @param event A DataTransferEvent containing some form of FoundryVTT Document / Data
-     */
-    override async _onDrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
+    override async _onDropActor(event, actor) {
+        await this.actor.addVehicleDriver(actor.uuid);
+    }
 
-        if (!event.dataTransfer) return;
-
-        const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-
-        if (dropData.type === 'Actor') {
-            return this.actor.addVehicleDriver(dropData.uuid)
-        } else if (dropData.type === 'Item') {
-            // if an item is dropped on us that can be a Master, connect to it
-            const item = await fromUuid(dropData.uuid) as SR5Item | undefined;
-            if (item && item.canBeMaster) {
-                return await this.actor.connectNetwork(item);
-            }
+    async _onDropItem(event, item) {
+        if (item.canBeMaster) {
+            return await this.actor.connectNetwork(item);
         }
-
-        // Handle none specific drop events.
-        return super._onDrop(event);
+        // @ts-expect-error I swear it exists
+        await super._onDropItem(event, item);
     }
 
     _prepareVehicleFields() {

@@ -11,13 +11,12 @@ import { AmmunitionType, RangeType } from '../types/item/Weapon';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { MatrixRules } from '../rules/MatrixRules';
 import { SINFlow } from './flows/SINFlow';
-import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 import RenderContext = foundry.applications.sheets.ItemSheet.RenderContext;
 import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
-import {ItemMarksFlow} from "@/module/item/flows/ItemMarksFlow";
+import { LinksHelpers } from '@/module/utils/links';
 
 const { ItemSheet } = foundry.applications.sheets;
 
@@ -85,6 +84,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
  */
 export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
     declare isEditMode: boolean;
+    #dragDrop: any;
 
     static override DEFAULT_OPTIONS = {
         classes: ['item', 'named-sheet'],
@@ -104,18 +104,27 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             removeNetwork: SR5ItemSheet.#removeNetwork,
             reload: SR5ItemSheet.#reloadAmmo,
             partialReload: SR5ItemSheet.#partialReloadAmmo,
-            openSlave: SR5ItemSheet.#openSlave,
+
             addOneMark: SR5ItemSheet.#addOneMark,
             removeOneMark: SR5ItemSheet.#removeOneMark,
-            addOneQty: SR5ItemSheet.#addOneQty,
-            removeOneQty: SR5ItemSheet.#removeOneQty,
             clearMarks: SR5ItemSheet.#deleteMarks,
             clearAllMark: SR5ItemSheet.#deleteAllMarks,
+
+            openSlave: SR5ItemSheet.#openSlave,
             removeController: SR5ItemSheet.#removeController,
+
             toggleFreshImport: SR5ItemSheet.#toggleFreshImportFlag,
             toggleEquipped: SR5ItemSheet.#toggleEquipped,
             toggleWireless: SR5ItemSheet.#toggleWirelessState,
-        }
+
+            addOneQty: SR5ItemSheet.#addOneQty,
+            removeOneQty: SR5ItemSheet.#removeOneQty,
+
+            addEffect: SR5ItemSheet.#addEffect,
+            toggleEffect: SR5ItemSheet.#toggleEffect,
+            deleteEffect: SR5ItemSheet.#deleteEffect,
+        },
+        dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     }
 
     static override PARTS = {
@@ -178,6 +187,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'effects', label: 'Effects', cssClass: '' }
             ]
         }
+    }
+
+    constructor(options) {
+        super(options);
+        this.#dragDrop = this.#createDragDropHandlers();
     }
 
     protected override _prepareTabs(group: string) {
@@ -367,6 +381,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data.primaryTabs = this._prepareTabs('primary');
         data.item = this.item;
 
+        data.isNestedItem = this.item._isNestedItem;
+
         return {
             ...data,
             linkedActor
@@ -413,6 +429,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     override async _onRender(context, options) {
         this.activateListeners_LEGACY($(this.element));
+        this.#dragDrop.forEach(d => d.bind(this.element));
         return super._onRender(context, options);
     }
 
@@ -455,145 +472,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.update({ system: { linkedActor: actor.uuid } });
     }
 
-    _addDragSupportToListItemTemplatePartial(i, item) {
-        if (item.dataset?.itemId) {
-            item.setAttribute('draggable', true);
-            item.addEventListener('dragstart', this._onDragStart.bind(this), false);
-        }
-    }
-
-    // TODO fix
-    async _onDragStart(event) {
-        const element = event.currentTarget;
-        if (element) {
-            // Create drag data object to use
-            const dragData = {
-                actor: this.item.actor,
-                actorId: this.item.actor?.id,
-                itemId: this.item.id,
-                type: '',
-                data: {}
-            };
-
-            switch (element.dataset.itemType) {
-                // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
-                case 'ActiveEffect':
-                    {
-                        const effectId = element.dataset.itemId;
-                        const effect = this.item.effects.get(effectId);
-                        if (effect) {
-                            // Prepare data transfer
-                            dragData.type = 'ActiveEffect';
-                            dragData.data = effect; // this may blow up
-
-                            // Set data transfer
-                            event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                            return;
-                        }
-                    }
-            }
-        }
-    }
-
-
-    // TODO fix
-    async _onDrop(event) {
-        if (!game.items || !game.actors || !game.scenes) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        // Parse drop data.
-        const data = parseDropData(event);
-        if (!data) return;
-
-        // CASE - Handle dropping of documents directly into the source field like urls and pdfs.
-        const targetElement = event.toElement || event.target;
-        if (targetElement?.name === 'system.description.source')
-            return this.item.setSource(data.uuid);
-
-        // CASE - Handle ActiveEffects
-        if (data.type === 'ActiveEffect') {
-            if (data.itemId === this.item.id) {
-                return; // don't add effects to ourselves
-            }
-            // the effect should be just the data itself
-            const effect = data.data;
-            // delete the id on it so a new one is generated
-            delete effect._id;
-            // add this to the embedded ActiveEffect documents
-            await this.item.createEmbeddedDocuments('ActiveEffect', [effect]);
-
-            return;
-        }
-
-        // CASE - Add items to a weapons modification / ammo
-        if (this.item.isType('weapon') && data.type === 'Item') {
-            let item;
-            // Case 1 - Data explicitly provided
-            if (data.data) {
-                if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
-                    return console.warn('Shadowrun 5e | Cant drop items onto themselves');
-                }
-                item = data;
-                // Case 2 - From a Compendium Pack
-            } else if (data.pack) {
-                item = await Helpers.getEntityFromCollection(data.pack, data.id);
-                // Case 3 - From a World Entity
-            } else {
-                item = await fromUuid(data.uuid);
-            }
-
-            // Provide readable error for failing item retrieval assumptions.
-            if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
-
-            // if it's a master device, add ourself as a slave to it
-            if (item.canBeMaster) {
-                await item.addSlave(this.item);
-                return;
-            }
-            return this.item.createNestedItem(item._source);
-        }
-
-        // Add actors to WAN, both GRID and HOST
-        if (this.item.isNetwork() && ['Item', 'Actor'].includes(data.type)) {
-            const document = await fromUuid(data.uuid) as SR5Actor;
-            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
-            await this.item.addSlave(document);
-            return;
-        }
-
-        // Add document to a PAN.
-        if (this.item.isType('device') && ['Item', 'Actor'].includes(data.type)) {
-            const document = await fromUuid(data.uuid) as SR5Item | SR5Actor;
-            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
-            await this.item.addSlave(document);
-            return;
-        }
-
-        // Link actors to existing contacts.
-        if (this.item.isType('contact') && data.type === 'Actor') {
-            const actor = await fromUuid(data.uuid) as SR5Actor;
-
-            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-
-            return this.updateLinkedActor(actor);
-        }
-
-        // Add networks to SINs.
-        if (this.item.isType('sin') && data.type === 'Item') {
-            const item = await fromUuid(data.uuid) as SR5Item;
-            if (!item) return;
-            if (!item.isNetwork()) return;
-
-            await this.item.addNewNetwork(item);
-        }
-    }
-
-    _eventId(event) {
-        event.preventDefault();
-        return event.currentTarget.closest('.new-list-item').dataset.itemId;
-    }
 
     static async #onOpenSource(this: SR5ItemSheet, event) {
         event.preventDefault();
@@ -677,7 +555,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const uuid = SheetFlow.listItemId(event.target);
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         await SINFlow.removeNetwork(this.item, uuid);
@@ -685,9 +563,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     static async #addItemQty(this: SR5ItemSheet, event) {
         event.preventDefault();
-        const id = SheetFlow.listItemId(event.target);
-        const item = SheetFlow.fromUuidSync(id);
-        if (item && item instanceof SR5Item) {
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (item) {
             const qty = item.getTechnologyData()?.quantity ?? 0;
             const newQty = event.shiftKey ? qty + 20 : event.ctrlKey ? qty + 50 : qty + 1;
             await item.update({system: {technology: {quantity: newQty}}})
@@ -696,9 +574,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     static async #removeItemQty(this: SR5ItemSheet, event) {
         event.preventDefault();
-        const id = SheetFlow.listItemId(event.target);
-        const item = SheetFlow.fromUuidSync(id);
-        if (item && item instanceof SR5Item) {
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (item) {
             const qty = item.getTechnologyData()?.quantity ?? 0;
             const newQty = event.shiftKey ? qty - 20 : event.ctrlKey ? qty - 50 : qty - 1;
             await item.update({system: { technology: { quantity: newQty}}})
@@ -707,13 +585,13 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     static async #equipItem(this: SR5ItemSheet, event) {
         event.preventDefault();
-        const id = SheetFlow.listItemId(event.target);
-        const item = SheetFlow.fromUuidSync(id);
-        if (item && item instanceof SR5Item) {
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (id && item) {
             if (item.type === 'modification') {
-                await this.item.equipWeaponMod(item.id);
+                await this.item.equipWeaponMod(id);
             } else if (item.type === 'ammo') {
-                await this.item.equipAmmo(item.id);
+                await this.item.equipAmmo(id);
             }
         }
     }
@@ -747,7 +625,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         let id;
 
         if (input.currentTarget) {
-            id = this._eventId(input);
+            id = SheetFlow.closestItemId(input);
         } else {
             id = input;
         }
@@ -775,7 +653,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const id = SheetFlow.listItemId(event.target);
+        const id = SheetFlow.closestItemId(event.target);
 
         await this.item.deleteOwnedItem(id);
     }
@@ -795,8 +673,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const uuid = Helpers.listItemUuid(event);
-        const document = await fromUuid(uuid) as SR5Actor | SR5Item;
+        const uuid = SheetFlow.closestUuid(event.target);
+        const document = fromUuidSync(uuid) as SR5Actor | SR5Item;
         if (!document) return;
 
         await this.item.removeSlave(document);
@@ -812,7 +690,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #openSlave(event) {
         event.stopPropagation();
 
-        const uuid = SheetFlow.listItemId(event);
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         // Marked documents can´t live in packs.
@@ -988,76 +866,103 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.document.parent.equipOnlyOneItemOfType(this.document);
     }
 
-    static async #createEffect(this: SR5ItemSheet, event) {
+    static async #addEffect(this: SR5ItemSheet, event) {
         // TODO handle nested items
         event.preventDefault();
         const effect = [{
             name: game.i18n.localize("SR5.ActiveEffect.New"),
-            origin: this.item.uuid,
         }];
 
-        return this.item.createEmbeddedDocuments('ActiveEffect', effect);
+        await this.item.createEmbeddedDocuments('ActiveEffect', effect);
+    }
+
+    static async #toggleEffect(this: SR5ItemSheet, event) {
+        const effectId = SheetFlow.closestEffectId(event.target);
+        const effect = this.item.effects.get(effectId);
+        if (effect && effect instanceof SR5ActiveEffect) {
+            await effect.update({ disabled: !effect.disabled })
+        }
+    }
+
+    static async #deleteEffect(this: SR5ItemSheet, event) {
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const effectId = SheetFlow.closestEffectId(event.target);
+        const effect = this.item.effects.get(effectId);
+        if (effect && effect.id) {
+            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effect.id]);
+        }
     }
 
     override async _onFirstRender(context, options) {
         await super._onFirstRender(context, options);
 
-        this._createContextMenu(this._getDocumentListContextOptions.bind(this), ".new-list-item[data-item-id]", {
-            hookName: "getDocumentListContextOptions",
-            parentClassHooks: false,
-            fixed: true,
+        this._createContextMenu(this._getNestedItemContextOptions.bind(this), "[data-item-id]", {
+            hookName: "getNestedItemContextOptions",
             jQuery: false,
+            fixed: true,
+        });
+        this._createContextMenu(this._getEffectContextOptions.bind(this), "[data-effect-id]", {
+            hookName: "getEffectContextOptions",
+            jQuery: false,
+            fixed: true,
         });
     }
 
-    _getDocumentListContextOptions() {
+    _getNestedItemContextOptions() {
         return [
+            SheetFlow._getSourceContextOption(),
             {
-                name: "SR5.ActorSheet.ContextOptions.Source",
-                icon: "<i class='fas fa-page'></i>",
-                condition: (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    const item = SheetFlow.fromUuidSync(id);
-                    if (!item) return false;
-                    if (item instanceof SR5Item) {
-                        return item.hasSource;
-                    }
-                    return false;
-                },
-                callback: async (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    const item = SheetFlow.fromUuidSync(id);
-                    if (item && item instanceof SR5Item) {
-                        await item.openSource();
-                    }
-                }
-            },
-            {
-                name: "SR5.ActorSheet.ContextOptions.Edit",
+                name: "SR5.ContextOptions.EditItem",
                 icon: "<i class='fas fa-pen-to-square'></i>",
                 callback: async (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    const item = SheetFlow.fromUuidSync(id);
-                    if (item && item instanceof SR5Item) {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.item.getOwnedItem(id);
+                    if (item) {
                         await item.sheet?.render(true)
                     }
                 }
             },
             {
-                name: "SR5.ActorSheet.ContextOptions.Delete",
+                name: "SR5.ContextOptions.DeleteItem",
                 icon: "<i class='fas fa-trash'></i>",
-                condition: (target) => {
-                    return this.isEditMode;
-                },
                 callback: async (target) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
-
-                    const id = SheetFlow.listItemId(target);
-                    const item = SheetFlow.fromUuidSync(id);
-                    if (item && item instanceof SR5Item) {
-                        // TODO add check here that we own the item?
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.item.getOwnedItem(id);
+                    if (item) {
                         await this.item.deleteOwnedItem(item.id);
+                    }
+                }
+            }
+        ]
+    }
+
+    _getEffectContextOptions() {
+        return [
+            SheetFlow._getSourceContextOption(),
+            {
+                name: "SR5.ContextOptions.EditEffect",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                callback: async (target) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.item.effects.get(id);
+                    if (item) {
+                        await item.sheet?.render(true)
+                    }
+                }
+            },
+            {
+                name: "SR5.ContextOptions.DeleteEffect",
+                icon: "<i class='fas fa-trash'></i>",
+                callback: async (target) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+                    const id = SheetFlow.closestEffectId(target);
+                    if (id) {
+                        await this.item.deleteEmbeddedDocuments('ActiveEffect', [id]);
                     }
                 }
             }
@@ -1066,9 +971,298 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     override async _processSubmitData(event, form, submitData, options) {
         if (this.item._isNestedItem) {
-            this.item.update(submitData, options);
+            await this.item.update(submitData, options);
         } else {
             await super._processSubmitData(event, form, submitData, options);
         }
     }
+
+    /**
+     * Create drag-and-drop workflow handlers for this Application
+     * @returns {DragDrop[]}     An array of DragDrop handlers
+     * @private
+     */
+    #createDragDropHandlers() {
+        return (this.options as any).dragDrop.map((d) => {
+            d.permissions = {
+                dragstart: this._canDragStart.bind(this),
+                drop: this._canDragDrop.bind(this),
+            };
+            d.callbacks = {
+                dragstart: this._onDragStart.bind(this),
+                dragover: this._onDragOver.bind(this),
+                drop: this._onDrop.bind(this),
+            };
+            return new DragDrop(d);
+        });
+    }
+
+    /**
+     * Define whether a user is able to begin a dragstart workflow for a given drag selector
+     * @param {string} selector       The candidate HTML selector for dragging
+     * @returns {boolean}             Can the current user drag this selector?
+     * @protected
+     */
+    _canDragStart(selector) {
+        return this.isEditable;
+    }
+
+
+    /**
+     * Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector
+     * @param {string} selector       The candidate HTML selector for the drop target
+     * @returns {boolean}             Can the current user drop on this selector?
+     * @protected
+     */
+    _canDragDrop(selector) {
+        return this.isEditable;
+    }
+
+
+    /**
+     * Callback actions which occur when a dragged element is over a drop target.
+     * @param {DragEvent} event       The originating DragEvent
+     * @protected
+     */
+    _onDragOver(event) {}
+
+    /* -------------------------------------------- */
+
+    /**
+     * An event that occurs when data is dropped into a drop target.
+     * @param {DragEvent} event
+     * @returns {Promise<void>}
+     * @protected
+     */
+    async _onDrop(event) {
+        const data = TextEditor.getDragEventData(event) as any;
+        if (!data) return;
+        const item = this.item;
+        const allowed = Hooks.call("dropItemSheetData", item, this, data);
+        if (allowed === false) return;
+
+        // Dropped Documents
+        const documentClass = foundry.utils.getDocumentClass(data.type);
+        if (documentClass) {
+            const document = await documentClass.fromDropData(data);
+            await this._onDropDocument(event, document);
+        }
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped document on the ActorSheet
+     * @template {Document} TDocument
+     * @param {DragEvent} event         The initiating drop event
+     * @param {TDocument} document       The resolved Document class
+     * @returns {Promise<TDocument|null>} A Document of the same type as the dropped one in case of a successful result,
+     *                                    or null in case of failure or no action being taken
+     * @protected
+     */
+    async _onDropDocument(event, document) {
+        switch (document.documentName) {
+            case "ActiveEffect":
+                return (await this._onDropActiveEffect(event, document)) ?? null;
+            case "Actor":
+                return (await this._onDropActor(event, document)) ?? null;
+            case "Item":
+                return (await this._onDropItem(event, document)) ?? null;
+            case "Folder":
+                return (await this._onDropFolder(event, document)) ?? null;
+            default:
+                return null;
+        }
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped Active Effect on the Actor Sheet.
+     * The default implementation creates an Active Effect embedded document on the Actor.
+     * @param {DragEvent} event       The initiating drop event
+     * @param {ActiveEffect} effect   The dropped ActiveEffect document
+     * @returns {Promise<ActiveEffect|null|undefined>} A Promise resolving to a newly created ActiveEffect, if one was
+     *                                                 created, or otherwise a nullish value
+     * @protected
+     */
+    async _onDropActiveEffect(event, effect) {
+        if ( !this.item.isOwner ) return null;
+        const keepId = !this.item.effects.has(effect.id);
+        const result = await SR5ActiveEffect.create(effect.toObject(), {parent: this.item, keepId});
+        return result ?? null;
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped Actor on the Actor Sheet.
+     * @param {DragEvent} event     The initiating drop event
+     * @param {Actor} actor         The dropped Actor document
+     * @returns {Promise<Actor|null|undefined>} A Promise resolving to an Actor identical or related to the dropped Actor
+     *                                          to indicate success, or a nullish value to indicate failure or no action
+     *                                          being taken
+     * @protected
+     */
+    async _onDropActor(event, actor) {
+        return null;
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped Item on the Actor Sheet.
+     * @param {DragEvent} event     The initiating drop event
+     * @param {Item} item           The dropped Item document
+     * @returns {Promise<Item|null|undefined>} A Promise resolving to the dropped Item (if sorting), a newly created Item,
+     *                                         or a nullish value in case of failure or no action being taken
+     * @protected
+     */
+    async _onDropItem(event, item) {
+        const result = await this.item.createNestedItem(item);
+        return result ?? null;
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped Folder on the Actor Sheet.
+     * @param {DragEvent} event     The initiating drop event
+     * @param {Folder} folder       The dropped Folder document
+     * @returns {Promise<Folder|null|undefined>} A Promise resolving to the dropped Folder indicate success, or a nullish
+     *                                           value to indicate failure or no action being taken
+     * @protected
+     */
+    async _onDropFolder(event, folder) {
+        return null;
+    }
+
+    /**
+     * An event that occurs when a drag workflow begins for a draggable item on the sheet.
+     * @param {DragEvent} event       The initiating drag start event
+     * @returns {Promise<void>}
+     * @protected
+     */
+    async _onDragStart(event) {
+        const target = event.currentTarget;
+        if ( "link" in event.target.dataset ) return;
+        let dragData;
+
+        // Owned Items
+        if (target.dataset.itemId) {
+            const item = this.item.getOwnedItem(target.dataset.itemId);
+            if (item) {
+                dragData = item.toDragData();
+            }
+        }
+
+        // Active Effect
+        if (target.dataset.effectId) {
+            const effect = this.item.effects.get(target.dataset.effectId);
+            if (effect) {
+                dragData = effect.toDragData();
+            }
+        }
+
+        // Set data transfer
+        if (!dragData) return;
+        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+    }
+
+    /*
+    // TODO fix
+    async _onDrop(event) {
+        if (!game.items || !game.actors || !game.scenes) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Parse drop data.
+        const data = parseDropData(event);
+        if (!data) return;
+
+        // CASE - Handle dropping of documents directly into the source field like urls and pdfs.
+        const targetElement = event.toElement || event.target;
+        if (targetElement?.name === 'system.description.source')
+            return this.item.setSource(data.uuid);
+
+        // CASE - Handle ActiveEffects
+        if (data.type === 'ActiveEffect') {
+            if (data.itemId === this.item.id) {
+                return; // don't add effects to ourselves
+            }
+            // the effect should be just the data itself
+            const effect = data.data;
+            // delete the id on it so a new one is generated
+            delete effect._id;
+            // add this to the embedded ActiveEffect documents
+            await this.item.createEmbeddedDocuments('ActiveEffect', [effect]);
+
+            return;
+        }
+
+        // CASE - Add items to a weapons modification / ammo
+        if (this.item.isType('weapon') && data.type === 'Item') {
+            let item;
+            // Case 1 - Data explicitly provided
+            if (data.data) {
+                if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
+                    return console.warn('Shadowrun 5e | Cant drop items onto themselves');
+                }
+                item = data;
+                // Case 2 - From a Compendium Pack
+            } else if (data.pack) {
+                item = await Helpers.getEntityFromCollection(data.pack, data.id);
+                // Case 3 - From a World Entity
+            } else {
+                item = await fromUuid(data.uuid);
+            }
+
+            // Provide readable error for failing item retrieval assumptions.
+            if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
+
+            // if it's a master device, add ourself as a slave to it
+            if (item.canBeMaster) {
+                await item.addSlave(this.item);
+                return;
+            }
+            return this.item.createNestedItem(item._source);
+        }
+
+        // Add actors to WAN, both GRID and HOST
+        if (this.item.isNetwork() && ['Item', 'Actor'].includes(data.type)) {
+            const document = await fromUuid(data.uuid) as SR5Actor;
+            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
+            await this.item.addSlave(document);
+            return;
+        }
+
+        // Add document to a PAN.
+        if (this.item.isType('device') && ['Item', 'Actor'].includes(data.type)) {
+            const document = await fromUuid(data.uuid) as SR5Item | SR5Actor;
+            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
+            await this.item.addSlave(document);
+            return;
+        }
+
+        // Link actors to existing contacts.
+        if (this.item.isType('contact') && data.type === 'Actor') {
+            const actor = await fromUuid(data.uuid) as SR5Actor;
+
+            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
+
+            return this.updateLinkedActor(actor);
+        }
+
+        // Add networks to SINs.
+        if (this.item.isType('sin') && data.type === 'Item') {
+            const item = await fromUuid(data.uuid) as SR5Item;
+            if (!item) return;
+            if (!item.isNetwork()) return;
+
+            await this.item.addNewNetwork(item);
+        }
+    }
+
+     */
 }

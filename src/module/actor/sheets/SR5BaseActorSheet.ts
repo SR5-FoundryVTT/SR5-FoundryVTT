@@ -183,7 +183,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         actions: {
             roll: SR5BaseActorSheet.#rollById,
 
-            openSkillSource: SR5BaseActorSheet.#openSkillSource,
             rollAttribute: SR5BaseActorSheet.#rollAttribute,
             rollItem: SR5BaseActorSheet.#rollItem,
             rollSkill: SR5BaseActorSheet.#rollSkill,
@@ -201,13 +200,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             showImportCharacter: SR5BaseActorSheet.#showImportCharacter,
 
             addEffect: SR5BaseActorSheet.#createEffect,
+            editEffect: SR5BaseActorSheet.#editEffect,
+            deleteEffect: SR5BaseActorSheet.#deleteEffect,
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
             deleteItem: SR5BaseActorSheet.#deleteItem,
             favoriteItem: SR5BaseActorSheet.#favoriteItem,
-
-            openItemSource: SR5BaseActorSheet.#openSource,
 
             equipItem: SR5BaseActorSheet.#onToggleEquippedItem,
             toggleItemWireless: SR5BaseActorSheet.#toggleWirelessState,
@@ -323,19 +322,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         return partContext;
     }
-
-    static async #favoriteItem(this: SR5BaseActorSheet, event) {
-        const uuid = SheetFlow.closestItemId(event.target);
-        const newFavorites = this.actor.system.favorites.slice();
-
-        if (newFavorites.includes(uuid)) {
-            newFavorites.splice(newFavorites.indexOf(uuid), 1);
-        } else {
-            newFavorites.push(uuid);
-        }
-        await this.actor.update({system: { favorites: newFavorites }});
-    }
-
     async _prepareFavorites() {
         const favorites: SR5Item[] = [];
         for (const uuid of this.actor.system.favorites) {
@@ -389,7 +375,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
-        html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
@@ -421,11 +406,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return controls;
     }
 
-    static async #showItemDescription(this: SR5BaseActorSheet, event: MouseEvent) {
-        event.preventDefault();
-        event.stopPropagation();
+    static async #favoriteItem(this: SR5BaseActorSheet, event) {
+        const uuid = SheetFlow.closestUuid(event.target);
+        const newFavorites = this.actor.system.favorites.slice();
 
-        await this.render();
+        if (newFavorites.includes(uuid)) {
+            newFavorites.splice(newFavorites.indexOf(uuid), 1);
+        } else {
+            newFavorites.push(uuid);
+        }
+        await this.actor.update({system: { favorites: newFavorites }});
     }
 
     /**
@@ -503,116 +493,27 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    /**
-     * @override Default drag start handler to add Skill support
-     * @param event
-     */
-    // TODO fix this
-    async _onDragStart(event) {
-        // Create drag data
-        const dragData = {
-            actorId: this.actor.id,
-            sceneId: this.actor.isToken ? canvas.scene?.id : null,
-            tokenId: this.actor.isToken ? this.actor.token?.id : null,
-            type: '',
-            data: {}
-        };
-
-        // Handle different item type data transfers.
-        // These handlers depend on behavior of the template partial ListItem.html.
-        const element = event.currentTarget;
-        switch (element.dataset.itemType) {
-            // Skill data transfer. (Active and language skills)
-            case 'skill':
-                // Prepare data transfer
-                dragData.type = 'Skill';
-                dragData.data = {
-                    skillId: element.dataset.itemId,
-                    skill: this.actor.getSkill(element.dataset.itemId)
-                };
-
-                // Set data transfer
-                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-
-                return;
-
-            // Knowlege skill data transfer
-            case 'knowledgeskill': {
-                // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
-                const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
-
-                dragData.type = 'Skill';
-                dragData.data = {
-                    skillId,
-                    skill: this.actor.getSkill(skillId)
-                };
-
-                // Set data transfer
-                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-
-                return;
-            }
-            // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
-            case 'ActiveEffect':
-                {
-                    const effectId = element.dataset.itemId;
-                    let effect = this.actor.effects.get(effectId);
-                    if (!effect) {
-                        // check to see if it belongs to an item we own
-                        effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
-                    }
-                    if (effect) {
-                        // Prepare data transfer
-                        dragData.type = 'ActiveEffect';
-                        dragData.data = effect;
-
-                        // Set data transfer
-                        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                    }
-                    return;
-                }
-
-            // All default Foundry data transfer.
-            default:
+    async _onDropActiveEffect(event: DragEvent, effect: SR5ActiveEffect) {
+        console.log('onDropActiveEffect', event, effect);
+        if (effect.actor?.uuid === this.actor.uuid) return;
+        // if the effect is just supposed to apply to the item's test, it won't work on an actor
+        if (effect.system.applyTo === 'test_item') {
+            ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
+            return;
         }
+        // @ts-expect-error hates inheritance I guess
+        super._onDropActiveEffect(event, effect);
     }
 
-    /** Handle all document drops onto all actor sheet types.
-     *
-     * @param event
-     */
-    // TODO fix this
-    async _onDrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!event.dataTransfer) return;
-
-        const data = parseDropData(event);
-        if (data !== undefined) {
-            if (data.type === 'ActiveEffect' && data.actorId !== this.actor.id) {
-                const effect = data.data;
-                // if the effect is just supposed to apply to the item's test, it won't work on an actor
-                if (effect.system.applyTo === 'test_item') {
-                    ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
-                    return;
-                }
-                // delete the id so a new one is generated
-                delete effect._id;
-                await this.actor.createEmbeddedDocuments('ActiveEffect', [effect]);
-                // don't process anything else since we handled the drop
-                return;
-            }
-            if (data.type === 'Actor' && data.uuid !== this.actor.uuid) {
-                const actor = await fromUuid(data.uuid) as SR5Actor;
-                const itemData = {
-                    name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
-                    type: 'contact' as Item.SubType,
-                    system: {linkedActor: actor.uuid }
-                };
-                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
-            }
-        }
+    async _onDropActor(event: DragEvent, actor: SR5Actor) {
+        //@ts-expect-error someday ill figure this out
+        super._onDropActor(event, actor);
+        const itemData = {
+            name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
+            type: 'contact' as Item.SubType,
+            system: {linkedActor: actor.uuid }
+        };
+        this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
 
     static async #toggleInventoryVisibility(this: SR5BaseActorSheet, event) {
@@ -644,6 +545,26 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return this.actor.createEmbeddedDocuments('ActiveEffect', effect);
     }
 
+    static async #editEffect(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const id = SheetFlow.closestEffectId(event.target);
+        const item = this.actor.effects.get(id);
+        if (item) await item.sheet?.render(true);
+    }
+
+    static async #deleteEffect(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const id = SheetFlow.closestEffectId(event.target);
+        const item = this.actor.effects.get(id);
+        if (!item) return;
+
+        return this.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
+    }
+
     /**
      * Create a new item based on the Item Header creation action and the item type of that header.
      * 
@@ -672,9 +593,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #editItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const uuid = SheetFlow.closestItemId(event.target);
-        const item = SheetFlow.fromUuidSync(uuid);
-        if (item && item instanceof SR5Item) await item.sheet?.render(true);
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
+        if (item) await item.sheet?.render(true);
+    }
+
+    _handleDeleteItem(item: SR5Item) {
+        // remove from the inventory tracking system
+        return this.actor.inventory.removeItem(item).then(() => {
+            return this.actor.deleteEmbeddedDocuments('Item', [item.id!]);
+        })
     }
 
     static async #deleteItem(this: SR5BaseActorSheet, event) {
@@ -683,19 +611,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        // deleting items use the item's _id property instead of uuid
-        // this may need to change at some point to allow deleting linked items
-        const iid = event.target.dataset.itemId;
-        const item = this.actor.items.get(iid);
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
         if (!item) return;
-        await this.actor.inventory.removeItem(item);
-
-        return this.actor.deleteEmbeddedDocuments('Item', [iid]);
+        this._handleDeleteItem(item);
     }
 
     static async #rollItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const iid = SheetFlow.closestItemId(event.target);
+        const iid = SheetFlow.closestUuid(event.target);
         const item = SheetFlow.fromUuidSync(iid);
 
         if (!item || !(item instanceof SR5Item)) return;
@@ -1358,11 +1282,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await LinksHelpers.openSource(skill.link);
     }
 
-    static async #openSkillSource(this: SR5BaseActorSheet, event) {
-        event.preventDefault();
-        await this._openSkillSource(event.target);
-    }
-
     static async #createLanguageSkill(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         await this.actor.addLanguageSkill({ name: '' });
@@ -1450,30 +1369,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.showHiddenSkills();
     }
 
-    static async #openSource(this: SR5BaseActorSheet, event) {
-        event.preventDefault();
-        const uuid = SheetFlow.closestItemId(event.target);
-        const item = SheetFlow.fromUuidSync(uuid);
-        if (item) {
-            if (item instanceof SR5Item) {
-                await item.openSource();
-            } else if (item instanceof SR5ActiveEffect) {
-                await item.renderSourceSheet();
-            }
-        }
-    }
-    /**
-     * Augment each item of the ListItem template partial with drag support.
-     * @param i
-     * @param item
-     */
-    _addDragSupportToListItemTemplatePartial(i, item) {
-        if (item.dataset?.itemId) {
-            item.setAttribute('draggable', true);
-            item.addEventListener('dragstart', this._onDragStart.bind(this), false);
-        }
-    }
-
     /**
      * Change the quantity on an item shown within a sheet item list.
      *
@@ -1494,7 +1389,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #toggleItemVisible(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const uuid = SheetFlow.closestItemId(event.target);
+        const uuid = SheetFlow.closestUuid(event.target);
         if (uuid) {
             const hidden_items = this.actor.system.hidden_items.slice();
 
@@ -1514,9 +1409,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #onToggleEquippedItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const uuid = SheetFlow.closestItemId(event.target);
-        const item = SheetFlow.fromUuidSync(uuid);
-        if (!item || !(item instanceof SR5Item) || item.actorOwner !== this.actor) return;
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
+        if (!item) return;
 
         if (item.isType('critter_power') || item.isType('sprite_power')) {
             switch (item.system.optional) {
@@ -1548,7 +1443,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         event.stopPropagation();
 
-        const uuid = SheetFlow.closestItemId(event.target);
+        const uuid = SheetFlow.closestUuid(event.target);
         const item = SheetFlow.fromUuidSync(uuid);
         if (!item || !(item instanceof SR5Item)) return;
 
@@ -1724,16 +1619,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #reloadAmmo(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const uuid = SheetFlow.closestItemId(event.target);
-        const item = SheetFlow.fromUuidSync(uuid);
-        if (item && item instanceof SR5Item) return item.reloadAmmo(false);
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
+        if (item) return item.reloadAmmo(false);
     }
 
     static async #partialReloadAmmo(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const uuid = SheetFlow.closestItemId(event.target);
-        const item = SheetFlow.fromUuidSync(uuid);
-        if (item && item instanceof SR5Item) return item.reloadAmmo(true);
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
+        if (item) return item.reloadAmmo(true);
     }
 
     /**
@@ -1878,46 +1773,34 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     override async _onFirstRender(context, options) {
         await super._onFirstRender(context, options);
 
-        this._createContextMenu(this._getDocumentListContextOptions.bind(this), ".new-list-item[data-item-id]", {
-            hookName: "getDocumentListContextOptions",
-            parentClassHooks: false,
-            fixed: true,
+        this._createContextMenu(this._getItemListContextOptions.bind(this), "[data-item-id]", {
+            hookName: "getItemListContextOptions",
             jQuery: false,
+            fixed: true,
         });
-        this._createContextMenu(this._getSkillListContextOptions.bind(this), ".new-list-item[data-skill-id]", {
-            hookName: "getSkillListContextOptions",
-            parentClassHooks: false,
-            fixed: true,
+        this._createContextMenu(this._getEffectListContextOptions.bind(this), "[data-effect-id]", {
+            hookName: "getEffectListContextOptions",
             jQuery: false,
+            fixed: true,
+        });
+        this._createContextMenu(this._getSkillListContextOptions.bind(this), "[data-skill-id]", {
+            hookName: "getSkillListContextOptions",
+            jQuery: false,
+            fixed: true,
         });
     }
     _getSkillListContextOptions() {
         return [
+            SheetFlow._getSourceContextOption(),
             {
-                name: "SR5.ActorSheet.ContextOptions.Source",
-                icon: "<i class='fas fa-page'></i>",
-                condition: (target) => {
-                    const skillTarget = this._closestSkillTarget(target);
-                    const skillId = skillTarget.dataset.skillId;
-                    const skill = this.actor.getSkill(skillId);
-                    if (skill) {
-                        return skill.link !== '';
-                    }
-                    return false;
-                },
-                callback: async (target) => {
-                    await this._openSkillSource(target);
-                }
-            },
-            {
-                name: "SR5.ActorSheet.ContextOptions.Edit",
+                name: "SR5.ContextOptions.EditSkill",
                 icon: "<i class='fas fa-pen-to-square'></i>",
                 callback: async (target) => {
                     await this._editSkill(target);
                 }
             },
             {
-                name: "SR5.ActorSheet.ContextOptions.Delete",
+                name: "SR5.ContextOptions.DeleteSkill",
                 icon: "<i class='fas fa-trash'></i>",
                 callback: async (target) => {
                     const userConsented = await Helpers.confirmDeletion();
@@ -1942,86 +1825,80 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         ]
     }
 
-    _getDocumentListContextOptions() {
+    _getItemListContextOptions() {
         return [
+            SheetFlow._getSourceContextOption(),
             {
-                name: "SR5.ActorSheet.ContextOptions.View",
-                icon: "<i class='fas fa-eye'></i>",
-                condition: (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    return !ActorOwnershipFlow.isOwnerOf(this.actor, id);
-                },
-                callback: async (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    const item = await fromUuid(id);
-                    if (!item) return;
-                    if (item instanceof SR5Item
-                        || item instanceof SR5ActiveEffect
-                        || item instanceof SR5Actor) {
-                        await item.sheet?.render(true)
-                    }
-                }
-            },
-            {
-                name: "SR5.ActorSheet.ContextOptions.Source",
-                icon: "<i class='fas fa-page'></i>",
-                condition: (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    const item = SheetFlow.fromUuidSync(id);
-                    if (!item) return false;
-                    if (item instanceof SR5Item
-                        || item instanceof SR5ActiveEffect
-                        || item instanceof SR5Actor) {
-                        return item.hasSource;
-                    }
-                    return false;
-                },
-                callback: async (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    const item = SheetFlow.fromUuidSync(id);
-                    if (!item) return;
-                    if (item instanceof SR5Item
-                        || item instanceof SR5ActiveEffect
-                        || item instanceof SR5Actor) {
-                        await item.openSource();
-                    }
-                }
-            },
-            {
-                name: "SR5.ActorSheet.ContextOptions.Edit",
+                name: "SR5.ContextOptions.EditItem",
                 icon: "<i class='fas fa-pen-to-square'></i>",
                 condition: (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    return ActorOwnershipFlow.isOwnerOf(this.actor, id);
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    return item !== undefined;
                 },
                 callback: async (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    const item = await fromUuid(id);
-                    if (!item) return;
-                    if (item instanceof SR5Item
-                        || item instanceof SR5ActiveEffect
-                        || item instanceof SR5Actor) {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    if (item) {
                         await item.sheet?.render(true)
                     }
                 }
             },
             {
-                name: "SR5.ActorSheet.ContextOptions.Delete",
+                name: "SR5.ContextOptions.DeleteItem",
                 icon: "<i class='fas fa-trash'></i>",
                 condition: (target) => {
-                    const id = SheetFlow.listItemId(target);
-                    return ActorOwnershipFlow.isOwnerOf(this.actor, id);
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    return item !== undefined;
                 },
                 callback: async (target) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
 
-                    const id = SheetFlow.listItemId(target);
-                    const item = await fromUuid(id);
-                    if (!item) return;
-                    if (item instanceof SR5Item) {
-                        await this.actor.deleteItem(item);
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    if (item) {
+                        this._handleDeleteItem(item);
                     }
+                }
+            }
+        ]
+    }
+
+    _getEffectListContextOptions() {
+        return [
+            SheetFlow._getSourceContextOption(),
+            {
+                name: "SR5.ContextOptions.EditEffect",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.actor.effects.get(id);
+                    return item !== undefined;
+                },
+                callback: async (target) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.actor.effects.get(id);
+                    if (item) {
+                        await item.sheet?.render(true)
+                    }
+                }
+            },
+            {
+                name: "SR5.ContextOptions.DeleteEffect",
+                icon: "<i class='fas fa-trash'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.actor.effects.get(id);
+                    return item !== undefined;
+                },
+                callback: async (target) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+
+                    const id = SheetFlow.closestEffectId(target);
+                    await this.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
                 }
             }
         ]

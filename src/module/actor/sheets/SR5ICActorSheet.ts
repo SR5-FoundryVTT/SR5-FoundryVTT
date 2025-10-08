@@ -162,33 +162,18 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         await this.actor.disconnectNetwork();
     }
 
-    override async _onDrop(event: DragEvent) {
-        event.preventDefault();
-        event.stopPropagation();
+    async _onDropItem(event: DragEvent, item: SR5Item) {
+        // Handle item types that aren't handled but are still useable.
+        switch (item.type) {
+            case 'host':
+                // We don't have to narrow down type here, the SR5Actor will handle this for us.
+                return this.actor.connectNetwork(item);
+        }
 
-        // Nothing to be dropped...
-        if (!event.dataTransfer) return;
-
-        const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-
-        // Some item types need special handling for IC Actors.
-        switch(dropData.type) {
-            case 'Item':
-                const item = await fromUuid(dropData.uuid) as SR5Item;
-                
-                // Handle item types that aren't handled but are still useable.
-                switch (item.type) {
-                    case 'host':
-                        // We don't have to narrow down type here, the SR5Actor will handle this for us.
-                        return this.actor.connectNetwork(item);
-                    }
-                
-                // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
-                const handledTypes = [...this.getHandledItemTypes(), ...this.getInventoryItemTypes()];
-                if (!handledTypes.includes(item.type)) return;
-        }        
-
-        // Default cases can be handled by the base class and Foundry.
-        return super._onDrop(event);
+        // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
+        const handledTypes = [...this.getHandledItemTypes(), ...this.getInventoryItemTypes()];
+        if (!handledTypes.includes(item.type)) return;
+        // @ts-expect-error whyyyyyyihateit
+        await super._onDropItem(event, item);
     }
 }

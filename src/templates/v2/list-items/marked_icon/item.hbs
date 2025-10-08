@@ -1,10 +1,9 @@
 {{!--expects a MarkedDocument to be passed in as 'item' --}}
 <div class="new-list-item-container {{cssClass}}">
-    <div class="new-list-item {{#if item.selected}}new-list-item-selected{{/if}}" data-item-id="{{item.document.uuid}}">
+    <div class="new-list-item {{#if item.selected}}new-list-item-selected{{/if}}" data-uuid="{{item.document.uuid}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
         <div class="new-list-item-label-container">
-            <a data-action="showItemDescription"
-               data-item-id="{{item.documnet.uuid}}">
+            <a data-action="showItemDescription">
                 {{item.name}}
             </a>
         </div>
@@ -21,15 +20,13 @@
             {{else}}
                 <a class="hover-show-button"
                    data-action="removeOneMark"
-                   data-tooltip="SR5.Labels.ActorSheet.RemoveOneMark"
-                   data-item-id="{{item.document.uuid}}">
+                   data-tooltip="SR5.Labels.ActorSheet.RemoveOneMark">
                     <i class="fas fa-minus-square"></i>
                 </a>
                 <label class="marks-label">{{item.marks}}</label>
                 <a class="hover-show-button"
                    data-action="addOneMark"
-                   data-tooltip="SR5.Labels.ActorSheet.AddOneMark"
-                   data-item-id="{{item.document.uuid}}">
+                   data-tooltip="SR5.Labels.ActorSheet.AddOneMark">
                     <i class="fas fa-plus-square"></i>
                 </a>
             {{/if}}
