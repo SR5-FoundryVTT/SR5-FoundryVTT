@@ -718,6 +718,7 @@ export const SR5 = {
         squatter: 'SR5.LifestyleSquatter',
         low: 'SR5.LifestyleLow',
         medium: 'SR5.LifestyleMiddle',
+        middle: 'SR5.LifestyleMiddle',
         high: 'SR5.LifestyleHigh',
         luxory: 'SR5.LifestyleLuxory',
         other: 'SR5.LifestyleOther',

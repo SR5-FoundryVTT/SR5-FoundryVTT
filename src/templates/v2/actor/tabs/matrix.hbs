@@ -2,11 +2,9 @@
     <div class="fill-container">
         <div class="new-list-item new-list-item-header">
             {{#if matrixDevice}}
-            <div>
-                <label>
-                    <i class="far fa-mobile"></i>
-                </label>
-                <a data-action="editItem" data-item-id="{{matrixDevice.uuid}}">
+            <div style="display: flex; flex-flow: row nowrap; gap: 4px; align-items: center" data-item-id="{{matrixDevice.id}}" data-uuid="{{matrixDevice.uuid}}">
+                {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" matrixDevice }}
+                <a data-action="editItem">
                     {{matrixDevice.name}}
                 </a>
             </div>
@@ -20,7 +18,7 @@
             <div>
                 {{#if network}}
                     <label>{{localize "SR5.Labels.ActorSheet.Network"}}</label>
-                    <a data-action="openMatrixDevice" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                    <a data-action="openMatrixDocument" data-uuid="{{network.uuid}}">{{network.name}}</a>
                     <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
                         <i class="fas fa-right-from-bracket"></i>
                     </a>
@@ -30,13 +28,13 @@
             </div>
             <div>
                 <label>{{localize "SR5.Labels.ActorSheet.MarkNetwork"}}</label>
-                <a data-action="showNetwork">
+                <a data-action="showMatrixNetworkSelection">
                     <i class="item-icon fas fa-network-wired"></i>
                 </a>
             </div>
             <div>
                 <label>{{localize "SR5.Labels.Sheet.RebootDevice"}}</label>
-                <a class="reboot-persona-device" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
+                <a data-action="rebootPersona" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
                     <i class="item-icon fas fa-power-off"></i>
                 </a>
             </div>
@@ -58,14 +56,16 @@
                 {{tabGroup matrixLeftTabs}}
                 <section class="content matrix-left-tab-content"></section>
             </div>
-            <div class="condition-monitor-container">
+            <div>
                 {{#if system.matrix.condition_monitor.max}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                        name=(localize "SR5.ConditionMonitor")
-                        value=system.matrix.condition_monitor.value
-                        max=system.matrix.condition_monitor.max
-                        id="matrix"
-                    }}
+                    <div class="condition-monitor-container">
+                        {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                            name=(localize "SR5.ConditionMonitor")
+                            value=system.matrix.condition_monitor.value
+                            max=system.matrix.condition_monitor.max
+                            id="matrix"
+                        }}
+                    </div>
                 {{/if}}
                 {{tabGroup matrixRightTabs}}
                 <section class="content matrix-right-tab-content"></section>

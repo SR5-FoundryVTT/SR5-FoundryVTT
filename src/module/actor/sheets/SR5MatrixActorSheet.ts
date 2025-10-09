@@ -433,7 +433,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     static async #openMatrixDocument(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
-        const uuid = $(event.target).closest('a').data().itemId;
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         // Marked documents can´t live in packs.
@@ -454,7 +454,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     static async #selectMatrixTarget(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
-        const uuid = SheetFlow.listItemId(event.target);
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         if (this.selectedMatrixTarget === uuid) {

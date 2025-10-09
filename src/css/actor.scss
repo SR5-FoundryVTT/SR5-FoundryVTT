@@ -18,26 +18,31 @@
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-around;
-        gap: 0.25rem;
+        margin-bottom: 3px;
+        margin-top: 2px;
+        // gap: 0.25rem;
 
         .attribute {
             flex: 1;
             display: flex;
             flex-flow: column nowrap;
             gap: 2px;
-            margin: 4px;
 
             .matrix-att-selector {
                 // reset the appearance
-                appearance: none;
+                // appearance: none;
 
                 line-height: 1rem;
+                height: 1rem;
+                max-height: 1rem;
+                padding: 0;
+                margin: 0;
                 background-color: transparent;
                 color: $light;
 
-                ::-ms-expand {
-                    display: none;
-                }
+                // ::-ms-expand {
+                //     display: none;
+                // }
 
                 &:hover {
                     color: $white;

@@ -10,7 +10,7 @@
             <div class="new-list-item-col">
                 {{#if network}}
                     <label>{{localize "SR5.Labels.ActorSheet.Network"}}</label>
-                    <a data-action="openMatrixDevice" data-item-id="{{network.uuid}}">{{network.name}}</a>
+                    <a data-action="openMatrixDocument" data-uuid="{{network.uuid}}">{{network.name}}</a>
                     <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
                         <i class="fas fa-right-from-bracket"></i>
                     </a>

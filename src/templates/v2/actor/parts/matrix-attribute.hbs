@@ -1,7 +1,7 @@
 <div class="attribute">
     {{#if isCyberdeck}}
         <label>
-            <select class="matrix-att-selector short" name="matrix-{{key}}" data-att="{{key}}">
+            <select class="matrix-att-selector" name="matrix-{{key}}" data-att="{{key}}">
                 {{selectOptions (matrixChoices item matrixAtt) selected=matrixAtt.device_att  }}
             </select>
         </label>
