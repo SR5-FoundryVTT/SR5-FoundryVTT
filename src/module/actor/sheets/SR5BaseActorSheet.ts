@@ -304,7 +304,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         data.bindings = this._prepareKeybindings();
 
-        data.initiativePerception = this._prepareInitiativePerception();
+        data.initiativePerception = this._prepareInitiativePresence();
 
         data.primaryTabs = this._prepareTabs('primary');
 
@@ -421,12 +421,40 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * Get the options for Initiative Perception
      */
-    _prepareInitiativePerception() {
-        const initiative = this.actor.system.initiative.perception;
-        if (initiative === 'matrix') {
-            return this.actor.isUsingHotSim ? 'hot_sim' : 'cold_sim';
+    _prepareInitiativePresence() {
+        const options: { label: string, value: string }[] = [];
+        let value = '';
+        if (this.actor.isType('spirit', 'character')) {
+            const initiative = this.actor.system.initiative;
+            value = initiative.perception === 'matrix'
+                ? this.actor.isUsingHotSim
+                    ? 'hot_sim' : 'cold_sim'
+                : initiative.perception;
+            if (initiative.meatspace) {
+                options.push({
+                    label: 'SR5.InitCatMeatspace',
+                    value: 'meatspace'
+                })
+            }
+            if (this.actor.system.special === 'magic') {
+                options.push({
+                    label: 'SR5.InitCatAstral',
+                    value: 'astral'
+                })
+            }
+            if (initiative['matrix']) {
+                options.push({
+                    label: 'SR5.Labels.ActorSheet.ColdSim',
+                    value: 'cold_sim',
+                });
+                options.push({
+                    label: 'SR5.HotSim',
+                    value: 'hot_sim'
+                });
+            }
         }
-        return initiative;
+
+        return { options, value }
     }
 
     /**

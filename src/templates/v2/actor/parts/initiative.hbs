@@ -7,22 +7,11 @@
                 </label>
             </div>
             {{#if (or isCharacter isSpirit)}}
-                <select class="presence-select short" name="initiative-select">
-                    {{#select initiativePerception}}
-                        {{#if system.initiative.meatspace}}
-                            <option value="meatspace">{{localize "SR5.InitCatMeatspace"}}</option>
-                        {{/if}}
-
-                        {{#ife system.special 'magic'}}
-                            <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
-                        {{/ife}}
-
-                        {{#if system.initiative.matrix}}
-                            <option value="hot_sim">{{localize "SR5.HotSim"}}</option>
-                            <option value="cold_sim">{{localize "SR5.Labels.ActorSheet.ColdSim"}}</option>
-                        {{/if}}
-                    {{/select}}
-                </select>
+                <div class="initiative-col">
+                    <select class="presence-select sr5-select" name="initiative-select">
+                        {{selectOptions initiativePerception.options value=initiativePerception.value localize=true}}
+                    </select>
+                </div>
             {{/if}}
         </div>
         <div class="initiative-col">

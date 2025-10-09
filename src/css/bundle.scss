@@ -1308,6 +1308,8 @@ input[type='text'].display {
         --background: unset;
         background: unset;
         border-bottom: none;
+        height: 2rem;
+        max-height: 2rem;
     }
 
     &.karma-manager, &.nuyen-manager, &.social-stats-manager {
@@ -1364,8 +1366,8 @@ input[type='text'].display {
             border: none;
             margin-bottom: 0;
         }
-        .window-header {
-            &:not(.minimized) {
+        &:not(.minimized) {
+            .window-header {
                 margin-bottom: 0;
                 .window-title {
                     font-size: 0;
@@ -1395,7 +1397,7 @@ input[type='text'].display {
             justify-content: center;
             align-items: center;
             width: 100%;
-            padding: .25rem;
+            padding: 0 .25rem .25rem;
 
             .sheet-header-col {
                 flex: none;
@@ -1535,6 +1537,24 @@ input[type='text'].display {
                 box-shadow: 0 0 4px 2px $darkred;
                 color: $white;
             }
+        }
+    }
+    select.sr5-select {
+        height: 1.5rem;
+        max-height: 1.5rem;
+        background-color: transparent;
+        color: $light;
+        margin: 0;
+        padding: 0;
+        vertical-align: center;
+
+        &:hover {
+            color: $white;
+        }
+
+        > option {
+            color: $yellow;
+            background-color: rgba($black, 0.9);
         }
     }
     button.sr5-icon {

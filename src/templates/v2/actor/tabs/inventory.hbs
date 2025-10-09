@@ -4,7 +4,7 @@
             <div class="new-list-item-label-container">
                 <label class="item-text item-name" for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
                 <div>
-                    <select id="select-inventory" class="short">
+                    <select id="select-inventory" class="sr5-select">
                         {{#each inventories as |inventory name|}}
                             <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>
                         {{/each}}
