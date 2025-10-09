@@ -27,6 +27,31 @@
             gap: 2px;
             margin: 4px;
 
+            .matrix-att-selector {
+                // reset the appearance
+                appearance: none;
+
+                line-height: 1rem;
+                background-color: transparent;
+                color: $light;
+
+                ::-ms-expand {
+                    display: none;
+                }
+
+                &:hover {
+                    color: $white;
+                }
+
+                > option {
+                    color: $yellow;
+                    background-color: rgba($black, 0.9);
+                    &[selected] {
+                        text-align: center;
+                    }
+                }
+            }
+
             > label {
                 white-space: nowrap;
                 display: flex;

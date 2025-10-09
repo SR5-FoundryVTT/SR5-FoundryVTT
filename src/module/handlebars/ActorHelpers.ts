@@ -1,6 +1,7 @@
 import { MonitorRules } from './../rules/MonitorRules';
 import { SR5Item } from './../item/SR5Item';
 import { SR5Actor } from './../actor/SR5Actor';
+import { SR5 } from '@/module/config';
 type ModificationCategoryType = Item.SystemOfType<'modification'>['modification_category'];
 
 export const registerActorHelpers = () => {
@@ -75,4 +76,30 @@ export const registerActorHelpers = () => {
 
         return slotSum;
     });
+
+    Handlebars.registerHelper('matrixChoices', (item, matrixAtt, options) => {
+        console.log('matrixChoices', item, matrixAtt, options);
+        const currentAtt = matrixAtt.device_att;
+        const choices: {label: string, value: string}[] = [];
+        let currentChoice;
+        for (const [key, att] of Object.entries(item.atts as Record<string, any>)) {
+            if (key === currentAtt) {
+                currentChoice = {
+                    label: game.i18n.localize(SR5.matrixAttributes[att.att]),
+                    value: key,
+                };
+            } else {
+                choices.push({
+                    label: `(${att.value}) ${game.i18n.localize(SR5.matrixAttributes[att.att])}`,
+                    value: key,
+                });
+            }
+        }
+        if (currentChoice) {
+            // keep the current option as the first to make it look better in the select
+            // if someone knows how to hide it in the dropdown options, that would be ideal
+            choices.unshift(currentChoice);
+        }
+        return choices;
+    })
 }

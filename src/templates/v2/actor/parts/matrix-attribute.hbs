@@ -1,21 +1,18 @@
 <div class="attribute">
-    <label>
-        {{localize label}}
-    </label>
+    {{#if isCyberdeck}}
+        <label>
+            <select class="matrix-att-selector short" name="matrix-{{key}}" data-att="{{key}}">
+                {{selectOptions (matrixChoices item matrixAtt) selected=matrixAtt.device_att  }}
+            </select>
+        </label>
+    {{else}}
+        <label>
+            {{localize label}}
+        </label>
+    {{/if}}
     {{#if @root.isEditMode}}
         <div class="attribute-value">
-            {{#if isCyberdeck}}
-                <select class="matrix-att-selector short" name="matrix-{{key}}" data-att="{{key}}">
-                    {{!selectOptions value=matrixAtt.device_att choices=item.atts }}
-                    {{#select matrixAtt.device_att}}
-                    {{#each item.atts as |att key|}}
-                        <option value="{{key}}" data-tooltip="{{lookup ../matrixAttributes att.att}}">{{att.value}}</option>
-                    {{/each}}
-                    {{/select}}
-                </select>
-            {{else}}
-                <label>{{matrixAtt.base}}</label>
-            {{/if}}
+            <label>{{matrixAtt.base}}</label>
         </div>
     {{else}}
         <div class="attribute-value">
