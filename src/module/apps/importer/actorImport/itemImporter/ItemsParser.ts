@@ -15,6 +15,7 @@ import { RitualParser } from "./magicImport/RitualParser";
 import { ActorSchema } from "../ActorSchema";
 import { OtherArmorParser } from "./armorImport/OtherArmorParser";
 import { GearsParser } from "./importHelper/GearsParser";
+import { ComplexFormParser } from "./magicImport/ComplexFormParser";
 
 export type Unwrap<T> = T extends Array<infer U> ? U : T;
 
@@ -64,6 +65,10 @@ export class ItemsParser {
             const spells = IH.getArray(chummerChar.spells.spell).filter(s => s.category_english !== "Rituals" && s.alchemy !== 'True');
             items.push(...await new SpellParser().parseItems(spells));
             items.push(...await new RitualParser().parseItems(rituals));
+        }
+
+        if (importOptions.spells && chummerChar.complexforms?.complexform) {
+            items.push(...await new ComplexFormParser().parseItems(IH.getArray(chummerChar.complexforms.complexform)));
         }
 
         if (importOptions.contacts)
