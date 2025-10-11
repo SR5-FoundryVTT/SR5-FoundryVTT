@@ -83,7 +83,15 @@ export class WeaponParser extends Parser<'weapon'> {
         }
 
         action.attribute = 'agility';
-        action.limit.base = Number(getValues(itemData.rawaccuracy)[0]) || 0;
+
+        if (itemData.rawaccuracy) {
+            let accuracy: string = itemData.rawaccuracy;
+            if (itemData.rawaccuracy.includes('Physical')) {
+                action.limit.attribute = 'physical';
+                accuracy = accuracy.replace('Physical', '').trim();
+            }
+            action.limit.base = Number(getValues(accuracy)[0]) || 0;
+        }
 
         if (itemData.type.toLowerCase() === 'melee') {
             this.handleMeleeWeapon(system, itemData)

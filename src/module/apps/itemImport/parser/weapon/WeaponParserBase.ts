@@ -87,13 +87,20 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
         system.category = WeaponParserBase.GetWeaponType(jsonData);
         system.subcategory = category.toLowerCase();
-        
+
         system.action.skill = this.GetSkill(jsonData);
         system.action.damage = this.GetDamage(jsonData as any);
-        
-        system.action.limit.value = Number(jsonData.accuracy?._TEXT) || 0;
-        system.action.limit.base = Number(jsonData.accuracy?._TEXT) || 0;
-        
+
+        if (jsonData.accuracy?._TEXT) {
+            let accuracy: string = jsonData.accuracy._TEXT;
+            if (accuracy.includes('Physical')) {
+                system.action.limit.attribute = 'physical';
+                accuracy = accuracy.replace('Physical', '').trim();
+            }
+
+            system.action.limit.base = Number(accuracy) || 0;
+        }
+
         system.technology.conceal.base = Number(jsonData.conceal?._TEXT);
 
         return system;
