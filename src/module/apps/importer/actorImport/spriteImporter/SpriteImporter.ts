@@ -20,10 +20,11 @@ export class SpriteImporter {
 
     /**
      * Imports a chummer character into an existing actor. The actor will be updated. This might lead to duplicate items.
-     * @param {*} chummerFile The complete chummer file as json object. The first character will be selected for import.
-     * @param {*} importOptions Additional import option that specify what parts of the chummer file will be imported.
      */
-    async import(chummerData: ActorSchema, importOptions: importOptionsType) {
+    static async import(
+        chummerData: ActorSchema,
+        importOptions: importOptionsType
+    ) {
         const sprite = {
             effects: [],
             type: 'sprite',
@@ -43,6 +44,6 @@ export class SpriteImporter {
             console.table(consoleLogs);
         }
 
-        await SR5Actor.create(sprite);
+        return SR5Actor.create(sprite) as Promise<SR5Actor<'sprite'> | null>;
     }
 }

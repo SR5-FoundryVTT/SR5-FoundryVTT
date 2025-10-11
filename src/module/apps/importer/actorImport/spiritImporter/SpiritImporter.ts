@@ -13,17 +13,12 @@ export interface BlankSpirit extends Actor.CreateData {
     system: ReturnType<typeof DataDefaults.baseSystemData<'spirit'>>,
 };
 
-/**
- * Imports characters from other tools into an existing foundry actor.
- */
 export class SpiritImporter {
-
-    /**
-     * Imports a chummer character into an existing actor. The actor will be updated. This might lead to duplicate items.
-     * @param {*} chummerFile The complete chummer file as json object. The first character will be selected for import.
-     * @param {*} importOptions Additional import option that specify what parts of the chummer file will be imported.
-     */
-    async import(chummerData: ActorSchema, type: Actor.SystemOfType<'spirit'>['spiritType'], importOptions: importOptionsType) {
+    static async import(
+        chummerData: ActorSchema,
+        type: Actor.SystemOfType<'spirit'>['spiritType'],
+        importOptions: importOptionsType
+    ): Promise<SR5Actor<'spirit'> | null> {
         const spirit = {
             effects: [],
             type: 'spirit',
@@ -34,6 +29,11 @@ export class SpiritImporter {
         } satisfies BlankSpirit;
 
         spirit.system.spiritType = type;
+
+        const edgeAttribute = chummerData.attributes[1]?.attribute.find(
+            att => att.name_english.toLowerCase() === 'edg'
+        );
+        spirit.system.attributes.edge.base = Number(edgeAttribute?.total) || 0;
         const magic = Number(chummerData.attributes[1]?.attribute.filter(att => att.name_english.toLowerCase() === 'mag')[0].total);
         spirit.system.force = magic;
 
@@ -43,6 +43,6 @@ export class SpiritImporter {
             console.table(consoleLogs);
         }
 
-        await SR5Actor.create(spirit);
+        return SR5Actor.create(spirit) as Promise<SR5Actor<'spirit'> | null>;
     }
 }

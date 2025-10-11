@@ -21,15 +21,19 @@ export class ImportHelper {
      * If the value is already an array, it is returned as-is.
      * If the value is a single item, it is wrapped in an array.
      * If the value is null or undefined, an empty array is returned.
-     *
-     * @template T The type of the elements.
-     * @param {T | T[] | undefined | null} value The input value to normalize.
-     * @returns {T[]} An array containing the input value(s), or an empty array.
     */
     public static getArray<T>(value: T | T[] | undefined | null): T[] {
         if (value)
             return Array.isArray(value) ? value : [value];
         return [];
+    }
+
+    /**
+     * Returns an array of the object's own enumerable string-keyed property [key, value] pairs.
+     * This is a strongly-typed wrapper around `Object.entries` for objects with known key and value types.
+     */
+    public static getEntries<K extends string | number | symbol, V>(obj: Record<K, V>): [K, V][] {
+        return Object.entries(obj) as [K, V][];
     }
 
     /**
@@ -78,10 +82,6 @@ export class ImportHelper {
     /**
      * Finds items in the given compendium by name, clones them with a new ID,
      * and adds their original English name for tracking purposes.
-     *
-     * @param compKey - The compendium category key to search in.
-     * @param names   - List of item names to retrieve.
-     * @returns Promise resolving to the cloned items.
      */
     public static async findItems(
         compKey: CompendiumKey,

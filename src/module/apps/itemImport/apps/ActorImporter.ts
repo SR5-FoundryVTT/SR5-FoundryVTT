@@ -14,9 +14,6 @@ const Base = HandlebarsApplicationMixin(ApplicationV2<ImporterContext>);
 type BaseType = InstanceType<typeof Base>;
 
 export class ActorImporter extends Base {
-    private static readonly characterImporter = new CharacterImporter();
-    private static readonly spiritImporter = new SpiritImporter();
-    private static readonly spriteImporter = new SpriteImporter();
     /**
      * Default options for the application window.
      */
@@ -125,11 +122,11 @@ export class ActorImporter extends Base {
 
         const spiritType = this.getSpiritType(actorData);
         if (spiritType)
-            await ActorImporter.spiritImporter.import(actorData, spiritType, importOptions);
+            await SpiritImporter.import(actorData, spiritType, importOptions);
         else if (actorData.metatype_english?.toLowerCase().includes('sprite'))
-            await ActorImporter.spriteImporter.import(actorData, importOptions);
+            await SpriteImporter.import(actorData, importOptions);
         else
-            await ActorImporter.characterImporter.import(actorData, importOptions);
+            await CharacterImporter.import(actorData, importOptions);
 
         await this.close();
     }
