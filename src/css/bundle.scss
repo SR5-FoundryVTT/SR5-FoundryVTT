@@ -1939,7 +1939,7 @@ input[type='text'].display {
         padding: 0.25rem;
 
         &.new-list-item-selected {
-            background: linear-gradient(to right, rgba($matrix-green, 0.4), rgba($matrix-green, 0.01));
+            background: radial-gradient(rgba($matrix-green, 0.4), rgba($matrix-green, 0.01));
         }
 
         .new-list-item-image-container {
@@ -1947,6 +1947,9 @@ input[type='text'].display {
             max-width: 24px;
             min-height: 24px;
             max-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
             &:hover {
                 .new-list-item-image-roll {
