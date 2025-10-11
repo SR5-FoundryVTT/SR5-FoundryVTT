@@ -53,31 +53,31 @@ export class BonusConstant {
         body: { changes: [{ key: "system.attributes.body" }] },
         composure: { changes: [{ key: "system.modifiers.composure" }] },
         damageresistance: {
-            changes: [{ key: "data.modifiers" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ value: "Physical Damage Resistance", id: "PhysicalResistTest" }] },
         },
         defensetest: {
-            changes: [{ key: "data.modifiers" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [
                 { value: "Physical Defense", id: "PhysicalDefenseTest" },
                 { value: "Suppression Defense", id: "SuppressionDefenseTest" }
             ]},
         },
         dodge: {
-            changes: [{ key: "data.modifiers" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [
                 { value: "Physical Defense", id: "PhysicalDefenseTest" },
                 { value: "Suppression Defense", id: "SuppressionDefenseTest" }
             ]},
         },
         drainresist: {
-            changes: [{ key: "data.modifiers" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ value: "Drain Resistance", id: "DrainTest" }] },
         },
         essencemax: { changes: [{ key: "system.attributes.essence.base" }] },
         essencepenalty: { changes: [{ key: "system.attributes.essence" }] },
         fadingresist: {
-            changes: [{ key: "data.modifiers" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ value: "Fading Resistance", id: "FadeTest" }] },
         },
         handling: { changes: [{ key: "system.vehicle_stats.handling" }] },
@@ -92,20 +92,21 @@ export class BonusConstant {
         offroadspeed: { changes: [{ key: "system.vehicle_stats.off_road_speed" }] },
         pilot: { changes: [{ key: "system.vehicle_stats.pilot" }] },
         physicalcmrecovery: {
-            changes: [{ key: "data.modifiers" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ value: "Physical Recovery", id: "NaturalRecoveryPhysicalTest" }] }
         },
         physicallimit: { changes: [{ key: "system.limits.physical" }] },
         reach: { changes: [{ key: "system.modifiers.reach" }] },
         seats: { changes: [{ key: "system.vehicle_stats.seats" }] },
         sensor: { changes: [{ key: "system.vehicle_stats.sensor" }] },
+        sociallimit: { changes: [{ key: "system.limits.social" }] },
         speed: { changes: [{ key: "system.vehicle_stats.speed" }] },
         spellresistance: {
-            changes: [{ key: "data.modifiers" } ],
+            changes: [{ key: "data.pool" } ],
             system: { applyTo: 'test_all', selection_tests: [{ value: "Combat Spell Defense", id: "CombatSpellDefenseTest" }] }
         },
         stuncmrecovery: {
-            changes: [{ key: "data.modifiers" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ value: "Stun Recovery", id: "NaturalRecoveryStunTest" }] }
         }
     } as const satisfies Partial< Record< keyof BonusSchema, AECreateData > >;
