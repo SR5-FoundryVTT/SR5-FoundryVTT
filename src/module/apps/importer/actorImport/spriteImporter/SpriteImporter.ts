@@ -35,7 +35,22 @@ export class SpriteImporter {
         } satisfies BlankSprite;
 
         sprite.system.spriteType = chummerData.metatype_english.split(" ")[0].toLowerCase() as any;
-        const level = Number(chummerData.attributes[1]?.attribute.filter(att => att.name_english.toLowerCase() === 'int')[0].total);
+
+        // Extract attributes safely and determine sprite level based on type
+        const attributes = chummerData.attributes?.[1]?.attribute ?? [];
+        const levelAttribute = attributes.find(att =>
+            att.name_english?.toLowerCase() === 'int'
+        );
+        let level = Number(levelAttribute?.total) || 0;
+
+        switch (sprite.system.spriteType) {
+            case 'companion': case 'generalist':
+                level = Math.max(0, level - 1);
+                break;
+            case 'courier': case 'crack':
+                level = Math.max(0, level - 3);
+                break;
+        }
         sprite.system.level = level;
 
         const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.sprite.schema, sprite.system);
