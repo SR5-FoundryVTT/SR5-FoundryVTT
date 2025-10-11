@@ -9,7 +9,7 @@ export const shadowrunDamage = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     const createDamage = (type: DamageTypeType, value: number) => {
         return DataDefaults.createData('damage', {type: {base: type, value: type}, base: value, value});

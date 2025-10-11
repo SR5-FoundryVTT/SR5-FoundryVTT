@@ -7,7 +7,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     describe('CharacterDataPrep', () => {
         it('default attribute values', async () => {

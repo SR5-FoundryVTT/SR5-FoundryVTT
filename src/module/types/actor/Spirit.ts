@@ -15,7 +15,7 @@ const SpiritData = () => ({
     ...CommonData(),
     spiritType: new StringField({ required: true }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
-    special: new StringField({ required: true, initial: "magic", readonly: true }),
+    special: new StringField({ required: true, initial: "magic", choices: ["magic"], readonly: true }),
     is_npc: new BooleanField({ initial: true }),
     npc: new SchemaField({ is_grunt: new BooleanField() }),
 
