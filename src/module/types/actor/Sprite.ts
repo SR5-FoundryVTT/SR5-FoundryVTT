@@ -1,9 +1,10 @@
+import { SR5 } from "@/module/config";
 import { MatrixData } from "../template/Matrix";
-import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
 import { Limits, MatrixLimits } from "../template/Limits";
 import { ActorBase, CommonData, CreateModifiers } from "./Common";
+import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpriteData = () => ({
@@ -13,9 +14,9 @@ const SpriteData = () => ({
     spriteType: new StringField({
         required: true,
         initial: "courier",
-        choices: ['companion', 'courier', 'crack', 'data', 'fault', 'generalist', 'machine']
+        choices: Object.keys(SR5.spriteTypes) as Array<keyof typeof SR5.spriteTypes>,
     }),
-    special: new StringField({ required: true, initial: "resonance", readonly: true }),
+    special: new StringField({ required: true, initial: "resonance", choices: ["resonance"], readonly: true }),
     full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
 
     // === Matrix & Host ===
