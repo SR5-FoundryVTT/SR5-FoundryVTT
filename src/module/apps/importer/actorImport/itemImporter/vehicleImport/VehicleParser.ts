@@ -4,7 +4,6 @@ import MountedWeaponParser from "./MountedWeaponParser";
 import { SR5Actor } from '../../../../../actor/SR5Actor';
 import VehicleModsParser from "./VehicleModsParser";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
-import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 import { ExtractItemType } from "../Parser";
 import { DataDefaults } from "@/module/data/DataDefaults";
 
@@ -27,7 +26,7 @@ export class VehicleParser {
         };
     }
 
-    async parseVehicles(actor: Actor.Stored, vehicles: ExtractItemType<'vehicles', 'vehicle'>[]) {
+    async parseVehicles(actor: SR5Actor<'character'>, vehicles: ExtractItemType<'vehicles', 'vehicle'>[]) {
         const vehicleActors: BlankVehicle[] = [];
 
         for (const vehicle of vehicles) {
@@ -56,6 +55,10 @@ export class VehicleParser {
             system.vehicle_stats.acceleration.base = Number(vehicle.accel) || 0;
             system.vehicle_stats.sensor.base = Number(vehicle.sensor) || 0;
             system.vehicle_stats.seats.base = Number(vehicle.seats) || 0;
+
+            if (vehicle.accel.includes('/')) {
+                system.vehicle_stats.acceleration.base = Number(vehicle.accel.split('/')[0]) || 0;
+            }
 
             system.attributes.body.base = Number(vehicle.body) || 0;
             system.armor.base = Number(vehicle.armor) || 0;
