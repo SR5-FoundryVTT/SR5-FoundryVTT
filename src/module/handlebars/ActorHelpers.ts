@@ -102,4 +102,16 @@ export const registerActorHelpers = () => {
         }
         return choices;
     })
+
+    Handlebars.registerHelper('inventoryCanRename', (inventory: string, options) => {
+        console.log(options);
+        const actor = options.data.root.actor as SR5Actor;
+        return !actor.inventory.disallowRename(inventory);
+    });
+
+    Handlebars.registerHelper('inventoryCanRemove', (inventory: string, options) => {
+        console.log(options);
+        const actor = options.data.root.actor as SR5Actor;
+        return !actor.inventory.disallowRemove(inventory);
+    });
 }

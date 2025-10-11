@@ -2,27 +2,31 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
-const { DocumentSheetV2, HandlebarsApplicationMixin } = foundry.applications.api;
+const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class SocialStatsManager extends HandlebarsApplicationMixin(DocumentSheetV2)<SR5Actor, any> {
+export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)<any> {
     streetCredModifier = 0;
     notorietyModifier = 0;
     publicAwarenessModifier = 0;
 
+    constructor(private actor: SR5Actor, options = {}) {
+        super(options);
+    }
+
     getStreetCred() {
-        return this.document.asType('character')?.system._source.street_cred ?? 0;
+        return this.actor.asType('character')?.system._source.street_cred ?? 0;
     }
 
     getNotoriety() {
-        return this.document.asType('character')?.system._source.notoriety ?? 0;
+        return this.actor.asType('character')?.system._source.notoriety ?? 0;
     }
 
     getPublicAwareness() {
-        return this.document.asType('character')?.system._source.public_awareness ?? 0;
+        return this.actor.asType('character')?.system._source.public_awareness ?? 0;
     }
 
     override get title() {
-        return game.i18n.localize("SR5.SocialStatsManager.Title");
+        return game.i18n.localize("SR5.ReputationManager.Title");
     }
 
     override async _prepareContext(options) {
@@ -55,7 +59,7 @@ export class SocialStatsManager extends HandlebarsApplicationMixin(DocumentSheet
         return super._onRender(context, options);
     }
 
-    static async #increase(this: SocialStatsManager, event) {
+    static async #increase(this: ReputationManager, event) {
         event.preventDefault();
         event.stopPropagation();
         const type = event.target.closest('[data-type]').dataset.type;
@@ -69,7 +73,7 @@ export class SocialStatsManager extends HandlebarsApplicationMixin(DocumentSheet
         await this.render();
     }
 
-    static async #reduce(this: SocialStatsManager, event) {
+    static async #reduce(this: ReputationManager, event) {
         event.preventDefault();
         event.stopPropagation();
         const type = event.target.closest('[data-type]').dataset.type;
@@ -83,7 +87,7 @@ export class SocialStatsManager extends HandlebarsApplicationMixin(DocumentSheet
         await this.render();
     }
 
-    static async #submitChanges(this: SocialStatsManager, event) {
+    static async #submitChanges(this: ReputationManager, event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -98,26 +102,26 @@ export class SocialStatsManager extends HandlebarsApplicationMixin(DocumentSheet
             updateData['system.notoriety'] = this.getNotoriety() + this.notorietyModifier;
         }
         if (!isEmpty(updateData)) {
-            this.document.update(updateData);
+            this.actor.update(updateData);
         }
         this.close();
     }
 
-    static async #cancel(this: SocialStatsManager, event) {
+    static async #cancel(this: ReputationManager, event) {
         this.close();
     }
 
     static override PARTS = {
         details: {
-            template: SheetFlow.templateBase('social-stats-manager/details')
+            template: SheetFlow.templateBase('actor/apps/reputation-manager/details')
         },
         footer: {
-            template: SheetFlow.templateBase('social-stats-manager/footer')
+            template: SheetFlow.templateBase('actor/apps/reputation-manager/footer')
         }
     }
 
     static override DEFAULT_OPTIONS = {
-        classes: [SR5_APPV2_CSS_CLASS, 'social-stats-manager'],
+        classes: [SR5_APPV2_CSS_CLASS, 'reputation-manager'],
         form: {
             submitOnChange: false,
             closeOnSubmit: false,
@@ -129,11 +133,11 @@ export class SocialStatsManager extends HandlebarsApplicationMixin(DocumentSheet
             resizable: true,
         },
         actions: {
-            increase: SocialStatsManager.#increase,
-            reduce: SocialStatsManager.#reduce,
+            increase: ReputationManager.#increase,
+            reduce: ReputationManager.#reduce,
 
-            submitChanges: SocialStatsManager.#submitChanges,
-            cancel: SocialStatsManager.#cancel,
+            submitChanges: ReputationManager.#submitChanges,
+            cancel: ReputationManager.#cancel,
         }
     }
 

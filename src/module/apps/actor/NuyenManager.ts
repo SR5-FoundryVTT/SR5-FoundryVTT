@@ -2,13 +2,17 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
-const { DocumentSheetV2, HandlebarsApplicationMixin } = foundry.applications.api;
+const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class NuyenManager extends HandlebarsApplicationMixin(DocumentSheetV2)<SR5Actor, any> {
+export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<any> {
     nuyenModifier = 0;
 
     getNuyen() {
-        return this.document.asType('character')?.system._source.nuyen ?? 0;
+        return this.actor.asType('character')?.system._source.nuyen ?? 0;
+    }
+
+    constructor(private actor: SR5Actor, options = {}) {
+        super(options);
     }
 
     override get title() {
@@ -44,7 +48,7 @@ export class NuyenManager extends HandlebarsApplicationMixin(DocumentSheetV2)<SR
         event.stopPropagation();
         const currentNuyen = this.getNuyen();
         const modifiedNuyen = currentNuyen + this.nuyenModifier;
-        this.document.update({system: { nuyen: modifiedNuyen }});
+        await this.actor.update({system: { nuyen: modifiedNuyen }});
         this.close();
     }
 
@@ -64,10 +68,10 @@ export class NuyenManager extends HandlebarsApplicationMixin(DocumentSheetV2)<SR
 
     static override PARTS = {
         details: {
-            template: SheetFlow.templateBase('nuyen-manager/details')
+            template: SheetFlow.templateBase('actor/apps/nuyen-manager/details')
         },
         footer: {
-            template: SheetFlow.templateBase('nuyen-manager/footer')
+            template: SheetFlow.templateBase('actor/apps/nuyen-manager/footer')
         }
     }
 

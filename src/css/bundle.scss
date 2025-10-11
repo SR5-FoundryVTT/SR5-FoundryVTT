@@ -1312,7 +1312,7 @@ input[type='text'].display {
         max-height: 2rem;
     }
 
-    &.karma-manager, &.nuyen-manager, &.social-stats-manager {
+    &.karma-manager, &.nuyen-manager, &.reputation-manager, &.inventory-rename {
         .sheet-footer {
             border-color: transparent;
         }
@@ -1365,6 +1365,10 @@ input[type='text'].display {
             background: $nameplate-background;
             border: none;
             margin-bottom: 0;
+            height: 1.5rem;
+            max-height: 1.5rem;
+            padding: .25rem;
+            vertical-align: center;
         }
         &:not(.minimized) {
             .window-header {
@@ -1380,7 +1384,7 @@ input[type='text'].display {
     .window-content {
         padding: 0 .25rem .25rem .25rem;
         // transparent doesn't seem to show the background from above so set it to the same thing with a slightly different gradient
-        background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
         background-repeat: repeat;
         background-size: 100% 20px auto;
 
@@ -1397,7 +1401,7 @@ input[type='text'].display {
             justify-content: center;
             align-items: center;
             width: 100%;
-            padding: 0 .25rem .25rem;
+            padding: 0;
 
             .sheet-header-col {
                 flex: none;
@@ -1744,6 +1748,9 @@ input[type='text'].display {
 
         &.edge .cell {
             box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+            &.filled {
+                background: rgba($edge, 0.9) !important;
+            }
         }
 
         &.matrix .cell {

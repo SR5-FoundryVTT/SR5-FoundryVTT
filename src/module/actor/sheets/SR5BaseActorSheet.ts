@@ -14,13 +14,11 @@ import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { ChummerImportForm } from '../../apps/chummer-import-form';
 import { LinksHelpers } from '../../utils/links';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
-import { parseDropData } from '../../utils/sheets';
 import { InventoryType } from 'src/module/types/actor/Common';
 import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 
 import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
-import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
@@ -28,7 +26,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
 import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
 import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
-import { NuyenManager } from '@/module/apps/actor/NuyenManager';
+import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 
@@ -208,6 +206,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             deleteItem: SR5BaseActorSheet.#deleteItem,
             favoriteItem: SR5BaseActorSheet.#favoriteItem,
 
+            renameInventory: SR5BaseActorSheet.#renameInventory,
+            removeInventory: SR5BaseActorSheet.#removeInventory,
+            createInventory: SR5BaseActorSheet.#createInventory,
+
             equipItem: SR5BaseActorSheet.#onToggleEquippedItem,
             toggleItemWireless: SR5BaseActorSheet.#toggleWirelessState,
             toggleExpanded: SR5BaseActorSheet.#toggleInventoryVisibility,
@@ -352,16 +354,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.hidden').hide();
 
         // Actor inventory handling....
-        html.find('.inventory-inline-create').on('click', this._onInventoryCreate.bind(this));
-        html.find('.inventory-remove').on('click', this._onInventoryRemove.bind(this));
-        html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
-        html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
-        html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
-        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditCancel.bind(this));
-        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditSave.bind(this));
-        html.find('input#input-inventory').on('change', this._onInventoryChangePreventSheetSubmit.bind(this));
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
-        html.find('.inventory-item-move').on('click', this._onItemMoveToInventory.bind(this));
 
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
@@ -380,10 +373,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Situation modifiers application
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
-
-        // Freshly imported item toggle
-        html.find('.toggle-fresh-import-all-off').on('click', async (event) => this._toggleAllFreshImportFlags(event, false));
-        html.find('.toggle-fresh-import-all-on').on('click', async (event) => this._toggleAllFreshImportFlags(event, true));
 
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
     }
@@ -1488,111 +1477,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
-     * Create an inventory place on the actor for gear organization.
-     */
-    async _onInventoryCreate(event) {
-        event.preventDefault();
-
-        // Overwrite currently selected inventory.
-        $('#input-inventory').val('');
-        await this._onInplaceInventoryEdit(event, 'create');
-    }
-
-    /**
-     * Remove the currently selected inventory.
-     * @param event
-     */
-    async _onInventoryRemove(event) {
-        event.preventDefault();
-
-        // TODO: Allow for options overwriting title/message and so forth.
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        await this.actor.inventory.remove(this.selectedInventory);
-
-        // Preselect default instead of none.
-        this.selectedInventory = this.actor.defaultInventory.name;
-        this.render();
-    }
-
-    /**
-     * Hide inventory selection and show inline editing instead.
-     *
-     * @param event
-     * @param action What action to take during later saving event.
-     */
-    async _onInplaceInventoryEdit(event, action: 'edit' | 'create' = 'edit') {
-        event.preventDefault();
-
-        // Disallow editing of default inventory.
-        if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory)) {
-            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
-            return;
-        }
-
-        $('.selection-inventory').hide();
-        $('.inline-input-inventory').show();
-
-        // Mark action and pre-select.
-        $('#input-inventory').data('action', action).select();
-    }
-
-    /**
-     * Hide inline inventory editing and show inventory selection instead.
-     *
-     * Cancel edit workflow and do nothing.
-     *
-     * @param event Can be an event of type click or keydown.
-     */
-    async _onInplaceInventoryEditCancel(event) {
-        if (event.type === 'keydown' && event.code !== 'Escape') return;
-
-        event.preventDefault();
-
-        $('.selection-inventory').show();
-        $('.inline-input-inventory').hide();
-
-        // Reset to selected inventory for next try.
-        $('#input-inventory')
-            .data('action', undefined)
-            .val(this.selectedInventory);
-    }
-
-    /**
-     * Complete inline editing and either save changes or create a missing inventory.
-     *
-     * @param event Either a click or keydown event.
-     */
-    async _onInplaceInventoryEditSave(event) {
-        if (event.type === 'keydown' && event.code !== 'Enter') return;
-
-        event.preventDefault();
-
-        const inputElement = $('#input-inventory');
-        const action = inputElement.data('action');
-        let inventory: string | void = String(inputElement.val());
-        if (!inventory) return;
-
-        switch (action) {
-            case 'edit':
-                inventory = await this.actor.inventory.rename(this.selectedInventory, inventory);
-                break;
-            case 'create':
-                inventory = await this.actor.inventory.create(inventory);
-                break;
-        }
-
-        await this._onInplaceInventoryEditCancel(event);
-
-        if (!inventory) return;
-
-        // Preselect the new or previous inventory.
-        this.selectedInventory = inventory;
-        this.render();
-    }
-
-    /**
      * Change selected inventory for this sheet.
      *
      * @param event
@@ -1606,43 +1490,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             this.selectedInventory = inventory;
 
         this.render();
-    }
-
-    /**
-     * Move an item between two inventories.
-     * @param event
-     */
-    async _onItemMoveToInventory(event) {
-        event.preventDefault();
-
-        const uuid = SheetFlow.closestItemId(event.target);
-        const item = SheetFlow.fromUuidSync(uuid);
-        if (!item) return;
-
-        // Ask user about what inventory to move the item to.
-        const dialog = new MoveInventoryDialog(this.actor, item, this.selectedInventory);
-        const inventory = await dialog.select();
-        if (dialog.canceled) return;
-
-        await this.actor.inventory.addItems(inventory, item);
-    }
-
-    /**
-     * When editing an existing or new inventory on a new actor for the frist time,
-     * the initial change event (by leaving the element focus, i.e. leaving or clicking on submit)
-     * will cause a general form submit (Foundry FormApplication onChangeSubmit), causing a render
-     * and removing the inventory input box.
-     *
-     * Note: This ONLY happens on new actors and NOT on inventory changes on old actors. The root cause
-     * is unclear.
-     *
-     * As the inventory inpunt box lives outside of Foundries default form handling, prevent
-     * this by stopping propagation into Foundries onChange listeners.
-     *
-     * @param event Any event
-     */
-    _onInventoryChangePreventSheetSubmit(event: Event) {
-        event.stopPropagation();
     }
 
     static async #reloadAmmo(this: SR5BaseActorSheet, event) {
@@ -1873,6 +1720,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 }
             },
             {
+                name: "SR5.ContextOptions.MoveItem",
+                icon: "<i class='fas fa-arrow-right-arrow-left'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    if (!item) return false;
+                    return item.isType('equipment', 'weapon', 'ammo', 'modification', 'armor', 'bioware', 'cyberware', 'device');
+                },
+                callback: async (target) => {
+                    await this._moveItemToInventory(target);
+                }
+            },
+            {
                 name: "SR5.ContextOptions.DeleteItem",
                 icon: "<i class='fas fa-trash'></i>",
                 condition: (target) => {
@@ -1962,4 +1822,71 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.rollInitiative();
         // TODO figure out how to roll initiative, probably want to prompt the GM to allow it?
     }
+
+    static async #renameInventory(this: SR5BaseActorSheet, event) {
+        const inventory = SheetFlow.closestAction(event.target).dataset.inventory;
+        if (this.actor.inventory.disallowRename(inventory)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+            return;
+        }
+        const app = new InventoryRenameApp(this.actor, inventory, 'edit');
+        await app.render(true);
+    }
+    /**
+     * Create an inventory place on the actor for gear organization.
+     */
+    static async #createInventory(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const app = new InventoryRenameApp(this.actor, '', 'create');
+        await app.render(true);
+        this.render();
+    }
+
+    /**
+     * Remove the currently selected inventory.
+     * @param event
+     */
+    static async #removeInventory(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+
+        // TODO: Allow for options overwriting title/message and so forth.
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+        const inventory = SheetFlow.closestAction(event.target).dataset.inventory;
+
+        if (this.actor.inventory.disallowRemove(inventory)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantRemoveDefaultInventory'));
+            return;
+        }
+
+        await this.actor.inventory.remove(this.selectedInventory);
+
+        // Preselect default instead of none.
+        this.selectedInventory = this.actor.defaultInventory.name;
+        this.render();
+    }
+
+    async _moveItemToInventory(target) {
+
+        const id = SheetFlow.closestItemId(target);
+        const item = this.actor.items.get(id);
+        if (!item) return;
+
+        // Ask user about what inventory to move the item to.
+        const dialog = new MoveInventoryDialog(this.actor, item, this.selectedInventory);
+        const inventory = await dialog.select();
+        if (dialog.canceled) return;
+
+        await this.actor.inventory.addItems(inventory, item);
+    }
+
+    /**
+     * Move an item between two inventories.
+     * @param event
+     */
+    static async #moveItemToInventory(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        await this._moveItemToInventory(event.target);
+    }
+
 }

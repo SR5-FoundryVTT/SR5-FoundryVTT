@@ -60,19 +60,19 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
 
     static override PARTS: any = {
         header: {
-            template: SheetFlow.templateBase('skill/header'),
+            template: SheetFlow.templateBase('actor/apps/skill/header'),
         },
         tabs: {
             template: SheetFlow.templateBase('common/primary-tab-group'),
         },
         description: {
-            template: SheetFlow.templateBase('skill/tabs/description'),
+            template: SheetFlow.templateBase('actor/apps/skill/tabs/description'),
         },
         details: {
-            template: SheetFlow.templateBase('skill/tabs/details'),
+            template: SheetFlow.templateBase('actor/apps/skill/tabs/details'),
         },
         footer: {
-            template: SheetFlow.templateBase('skill/footer'),
+            template: SheetFlow.templateBase('actor/apps/skill/footer'),
         },
     }
 

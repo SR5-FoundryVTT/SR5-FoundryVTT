@@ -10,13 +10,13 @@
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
         <div class="new-list-item-icons">
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
             {{#if (isOwner item owner=@root.actor)}}
                 {{#unless (or (eq item.system.optional "standard") @root.isPlayMode)}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
                 {{/unless}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
             {{/if}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
         </div>
     </div>
     <div class="new-list-item-description">

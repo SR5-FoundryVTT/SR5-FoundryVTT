@@ -3,7 +3,7 @@ import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { NuyenManager } from '@/module/apps/actor/NuyenManager';
 import { KarmaManager } from '@/module/apps/actor/KarmaManager';
-import { SocialStatsManager } from '@/module/apps/actor/SocialStatsManager';
+import { ReputationManager } from '@/module/apps/actor/ReputationManager';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
@@ -76,7 +76,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         actions: {
             openNuyenManager: SR5CharacterSheet.#openNuyenManager,
             openKarmaManager: SR5CharacterSheet.#openKarmaManager,
-            openSocialStatsManager: SR5CharacterSheet.#openSocialStatsManager,
+            openReputationManager: SR5CharacterSheet.#openReputationManager,
         }
     }
 
@@ -194,7 +194,6 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         ];
     }
 
-
     override async _prepareContext(options) {
         const data = await super._prepareContext(options);
 
@@ -251,17 +250,17 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
     }
 
     static async #openKarmaManager(this: SR5CharacterSheet, event) {
-        const app = new KarmaManager({document: this.actor});
+        const app = new KarmaManager(this.actor);
         await app.render(true);
     }
 
     static async #openNuyenManager(this: SR5CharacterSheet, event) {
-        const app = new NuyenManager({document: this.actor});
+        const app = new NuyenManager(this.actor);
         await app.render(true);
     }
 
-    static async #openSocialStatsManager(this: SR5CharacterSheet, event) {
-        const app = new SocialStatsManager({document: this.actor});
+    static async #openReputationManager(this: SR5CharacterSheet, event) {
+        const app = new ReputationManager(this.actor);
         await app.render(true);
     }
 

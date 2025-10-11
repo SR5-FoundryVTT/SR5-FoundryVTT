@@ -2,17 +2,21 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
-const { DocumentSheetV2, HandlebarsApplicationMixin } = foundry.applications.api;
+const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class KarmaManager extends HandlebarsApplicationMixin(DocumentSheetV2)<SR5Actor, any> {
+export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any> {
     karmaModifier = 0;
 
+    constructor(private actor: SR5Actor, options = {}) {
+        super(options);
+    }
+
     getKarma() {
-        return this.document.asType('character')?.system._source.karma.value ?? 0;
+        return this.actor.asType('character')?.system._source.karma.value ?? 0;
     }
 
     getCareerKarma() {
-        return this.document.asType('character')?.system._source.karma.max ?? 0;
+        return this.actor.asType('character')?.system._source.karma.max ?? 0;
     }
 
     getModifiedKarma() {
@@ -70,7 +74,7 @@ export class KarmaManager extends HandlebarsApplicationMixin(DocumentSheetV2)<SR
         }
         const finalKarma = this.getModifiedKarma();
         const finalCareerKarma = this.getModifiedCareerKarma();
-        await this.document.update({system: { karma: { value: finalKarma, max: finalCareerKarma } }});
+        await this.actor.update({system: { karma: { value: finalKarma, max: finalCareerKarma } }});
         await this.close();
     }
 
@@ -92,10 +96,10 @@ export class KarmaManager extends HandlebarsApplicationMixin(DocumentSheetV2)<SR
 
     static override PARTS = {
         details: {
-            template: SheetFlow.templateBase('karma-manager/details')
+            template: SheetFlow.templateBase('actor/apps/karma-manager/details')
         },
         footer: {
-            template: SheetFlow.templateBase('karma-manager/footer')
+            template: SheetFlow.templateBase('actor/apps/karma-manager/footer')
         }
     }
 

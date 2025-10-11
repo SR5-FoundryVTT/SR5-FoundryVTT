@@ -21,12 +21,12 @@
 
         {{#if @root.isEditMode}}
         <div class="new-list-item-icons">
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
             {{#if (isOwner item owner=@root.actor)}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
             {{else}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/toggle-visible-icon.hbs' item }}
             {{/if}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
         </div>
         {{/if}}
     </div>

@@ -856,14 +856,15 @@
             }
         },
         "ContextOptions": {
-            "Source": "Open Reference",
-            "View": "View",
-            "EditSkill": "Edit Skill",
-            "EditItem": "Edit Item",
-            "EditEffect": "Edit Effect",
-            "DeleteSkill": "Delete Skill",
+            "DeleteEffect": "Delete Effect",
             "DeleteItem": "Delete Item",
-            "DeleteEffect": "Delete Effect"
+            "DeleteSkill": "Delete Skill",
+            "EditEffect": "Edit Effect",
+            "EditItem": "Edit Item",
+            "EditSkill": "Edit Skill",
+            "MoveItem": "Move Item",
+            "Source": "Open Reference",
+            "View": "View"
         },
         "Continue": "Continue",
         "ControlRig": "Control Rig",
@@ -1208,6 +1209,12 @@
         "Initiation": "Initiation",
         "Initiative": "Initiative",
         "Internal": "Internal",
+        "InventoryRename": {
+            "Title": "Rename Inventory",
+            "Submit": "Submit",
+            "Cancel": "Cancel",
+            "NewName": "New Name"
+        },
         "IsCritter": "Critter",
         "IsFreshImport": "This item was imported from Chummer and needs manual review.",
         "IsGrunt": "Grunt",
@@ -2005,6 +2012,11 @@
         "Refresh": "Refresh",
         "RemoveBonus": "Remove Bonus",
         "RemoveSpecialization": "Remove Specialization",
+        "ReputationManager": {
+            "Title": "Reputation Manager",
+            "Submit": "Submit",
+            "Cancel": "Cancel"
+        },
         "Resist": "Resist",
         "RestoreDefaultSkills": "Restore Default Skills",
         "RightClickToClear": "Right Click to Clear",
@@ -2163,11 +2175,6 @@
         "Soak": "Soak",
         "SoakTest": "Damage Resist Test",
         "Social": "Social",
-        "SocialStatsManager": {
-            "Title": "Street Cred/Notoriety/Public Awareness Manager",
-            "Submit": "Submit",
-            "Cancel": "Cancel"
-        },
         "SocialLimit": "Social Limit",
         "Source": "Source",
         "SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",

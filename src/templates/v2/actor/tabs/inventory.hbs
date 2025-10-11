@@ -10,52 +10,49 @@
                         {{/each}}
                     </select>
                 </div>
+                {{log selectedInventory}}
                 {{#if @root.isEditMode}}
-                    <a>
+                    {{#if (inventoryCanRename selectedInventory)}}
+                    <a data-action="renameInventory" data-inventory="{{selectedInventory}}">
+                        <i class="fas fa-pen-to-square"></i>
+                    </a>
+                    {{/if}}
+                    {{#if (inventoryCanRemove selectedInventory)}}
+                    <a data-action="removeInventory" data-inventory="{{selectedInventory}}">
                         <i class="fas fa-trash"></i>
                     </a>
+                    {{/if}}
                 {{/if}}
             </div>
-            {{#if @root.isEditMode}}
-            <div class="new-list-item-col">
-                <div>
-                    <input class="short" type="text" id="input-inventory" value="{{inventory.name}}"/>
-                </div>
-                <a data-action="saveInventoryName">
-                    <i class="fas fa-check"></i>
-                </a>
-                <a class="inventory-input-cancel">
-                    <i class="fas fa-times"></i>
-                </a>
-            </div>
-            {{/if}}
             <div class="new-list-item-icons">
                 {{#if @root.isEditMode}}
-                <a class="inventory-inline-create" data-tooltip="SR5.Labels.ActorSheet.CreateInventory">
+                <a data-action="createInventory" data-tooltip="SR5.Labels.ActorSheet.CreateInventory">
                     {{localize "SR5.Add"}}&nbsp;<i class="fas fa-plus"></i>
                 </a>
                 {{/if}}
-                <a class="inventory-collapse" data-tooltip="SR5.CollapseAll">
+                <a data-action="collapseAllInventories" data-tooltip="SR5.CollapseAll">
                     <i class="fas fa-chevrons-up"></i>
                 </a>
-                <a class="inventory-expand" data-tooltip="SR5.ExpandAll">
+                <a data-action="expandAllInventories" data-tooltip="SR5.ExpandAll">
                     <i class="fas fa-chevrons-down"></i>
                 </a>
             </div>
         </div>
         <div class="scrollable">
             {{#each inventory.types as |section type|}}
-                {{> (concat "systems/shadowrun5e/dist/templates/v2/list-items/" type "/header.hbs")
-                    label=section.label
-                    isOpen=section.isOpen
-                    type=type
-                    rootId=@root.rootId }}
-                {{#if (or section.isOpen @root.isEditMode)}}
-                    {{#each section.items}}
-                        {{> (concat "systems/shadowrun5e/dist/templates/v2/list-items/" type "/item.hbs")
-                            item=this
-                            rootId=@root.rootId }}
-                    {{/each}}
+                {{#if (or @root.isEditMode section.items.length)}}
+                    {{> (concat "systems/shadowrun5e/dist/templates/v2/list-items/" type "/header.hbs")
+                        label=section.label
+                        isOpen=section.isOpen
+                        type=type
+                        rootId=@root.rootId }}
+                    {{#if (or section.isOpen @root.isEditMode)}}
+                        {{#each section.items}}
+                            {{> (concat "systems/shadowrun5e/dist/templates/v2/list-items/" type "/item.hbs")
+                                item=this
+                                rootId=@root.rootId }}
+                        {{/each}}
+                    {{/if}}
                 {{/if}}
             {{/each}}
         </div>
