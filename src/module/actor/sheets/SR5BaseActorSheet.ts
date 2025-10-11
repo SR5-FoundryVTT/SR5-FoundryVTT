@@ -336,6 +336,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     override async _onRender(context, options) {
         this.activateListeners_LEGACY($(this.element));
+        this.element.querySelectorAll('[data-attribute-modifier-tooltip]').forEach((el) => {
+            el.addEventListener('mouseenter', async (e: any) => {
+                const attributeId = e.target.closest('[data-attribute-modifier-tooltip]').dataset.attributeModifierTooltip;
+                const attribute = this.actor.getAttribute(attributeId);
+                if (attribute) {
+                    const html = await foundry.applications.handlebars.renderTemplate(
+                        SheetFlow.templateBase('actor/attribute-modifiers-tooltip'),
+                        {
+                            value: attribute,
+                            isEssence: attributeId === 'essence'
+                        });
+                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
+                }
+            })
+            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
+        })
         return super._onRender(context, options);
     }
 
@@ -1347,13 +1363,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = SheetFlow.closestAction(event.target).dataset.skill;
+        const skillId = event.target.closest('[data-skill]').dataset.skill;
         await this.actor.removeActiveSkill(skillId);
     }
 
     static async #rollAttribute(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const attribute = SheetFlow.closestAction(event.target).dataset.attributeId;
+        const attribute = event.target.closest('[data-attribute-id]').dataset.attributeId;
         if (attribute) {
             await this.actor.rollAttribute(attribute, { event });
         }
@@ -1663,10 +1679,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             jQuery: false,
             fixed: true,
         });
+        this._createContextMenu(this._getAttributeContextOptions.bind(this), "[data-attribute-id]", {
+            hookName: "getAttributeContextOptions",
+            jQuery: false,
+            fixed: true,
+        });
     }
     _getSkillListContextOptions() {
         return [
             SheetFlow._getSourceContextOption(),
+            {
+                name: "SR5.ContextOptions.AddSkillEffect",
+                icon: "<i class='fas fa-album-circle-plus'></i>",
+                callback: async (target) => {
+                    // TODO
+                }
+            },
             {
                 name: "SR5.ContextOptions.EditSkill",
                 icon: "<i class='fas fa-pen-to-square'></i>",
@@ -1697,6 +1725,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     }
                 }
             }
+        ]
+    }
+
+    _getAttributeContextOptions() {
+        return [
+            SheetFlow._getSourceContextOption(),
+            {
+                name: "SR5.ContextOptions.AddAttributeEffect",
+                icon: "<i class='fas fa-album-circle-plus'></i>",
+                callback: async (target) => {
+                    // TODO
+                }
+            },
         ]
     }
 

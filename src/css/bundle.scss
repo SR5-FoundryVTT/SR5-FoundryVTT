@@ -1530,7 +1530,6 @@ input[type='text'].display {
             background: #227836;
             color: $light;
             &:hover {
-                box-shadow: 0 0 4px 2px #227836;
                 color: $white;
             }
         }
@@ -1538,7 +1537,6 @@ input[type='text'].display {
             background: $darkred;
             color: $light;
             &:hover {
-                box-shadow: 0 0 4px 2px $darkred;
                 color: $white;
             }
         }
@@ -1582,7 +1580,6 @@ input[type='text'].display {
         color: $light;
         border-color: $light;
         &:hover {
-            box-shadow: 0 0 4px 2px rgba($light, 0.9);
             color: $white;
             background: $darkred;
         }
@@ -1943,10 +1940,10 @@ input[type='text'].display {
         }
 
         .new-list-item-image-container {
-            min-width: 24px;
-            max-width: 24px;
-            min-height: 24px;
-            max-height: 24px;
+            min-width: 1.25rem;
+            max-width: 1.25rem;
+            min-height: 1.25rem;
+            max-height: 1.25rem;
             display: flex;
             align-items: center;
             justify-content: center;

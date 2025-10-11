@@ -15,7 +15,6 @@ export const preloadHandlebarsTemplates = async () => {
             'common/name-line-block',
             'common/profile-image',
             'common/select',
-            'common/value-modifiers',
             'common/value-input',
             'common/import-flag',
             'list-items/connected-icons-toggle',

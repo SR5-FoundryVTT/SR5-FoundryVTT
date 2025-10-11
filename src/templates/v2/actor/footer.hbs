@@ -77,9 +77,7 @@
             {{/unless}}
             {{#if @root.isPlayMode}}
                 <div class="new-list-item-col">
-                    <label data-tooltip="SR5.AttrEssence">
-                        <i class="fas fa-head-side-gear"></i>&nbsp;{{system.attributes.essence.value}}
-                    </label>
+                    <label><i class="fas fa-head-side-gear" data-tooltip="SR5.AttrEssence"></i>&nbsp;<span data-attribute-modifier-tooltip="essence">{{system.attributes.essence.value}}</span></label>
                 </div>
             {{/if}}
         {{/if}}

@@ -1,4 +1,5 @@
-<div class="attribute">
+<div class="attribute" data-attribute-id="{{attributeFields.name}}">
+    {{log attributeFields}}
     <label {{#if @root.isEditMode}}class="edit-mode"{{/if}}>
         {{#if label}}
             {{localize label}}
@@ -13,7 +14,7 @@
         {{else}}
             <button class="icon sr5-icon" type="button"
                     data-action="rollAttribute"
-                    data-attribute-id="{{attributeField.name}}">{{attribute.value}}</button>
+                    data-attribute-modifier-tooltip="{{attributeField.name}}">{{attribute.value}}</button>
         {{/if}}
     </div>
 </div>

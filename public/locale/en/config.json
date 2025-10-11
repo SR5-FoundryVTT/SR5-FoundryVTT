@@ -856,6 +856,8 @@
             }
         },
         "ContextOptions": {
+            "AddAttributeEffect": "Add Effect for Attribute",
+            "AddSkillEffect": "Add Effect for Skill",
             "DeleteEffect": "Delete Effect",
             "DeleteItem": "Delete Item",
             "DeleteSkill": "Delete Skill",
