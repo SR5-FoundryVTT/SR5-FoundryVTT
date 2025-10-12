@@ -1359,7 +1359,7 @@ input[type='text'].display {
 
     // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
     &.named-sheet {
-        input.sheet-name, input[name='name'] {
+        input.sheet-name {
             @include systemFonts;
             flex-shrink: 0;
             background: $nameplate-background;

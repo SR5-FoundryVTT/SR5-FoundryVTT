@@ -10,12 +10,7 @@ export const preloadHandlebarsTemplates = async () => {
         // common templates
         ...v2Path(
             'common/document-source-icon',
-            'common/header-block',
             'common/horizontal-cells',
-            'common/name-line-block',
-            'common/profile-image',
-            'common/select',
-            'common/value-input',
             'common/import-flag',
             'list-items/connected-icons-toggle',
             'list-items/edit-delete-icons',

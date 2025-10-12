@@ -151,10 +151,9 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         skills: {
             template: SheetFlow.templateBase('actor/tabs/vehicle-skills'),
             templates: [...SheetFlow.templateActorSystemParts(
-                'active-skills', 'vehicle-options',
-                'vehicle-rolls', 'vehicle-attributes'
+                'active-skills', 'vehicle-attributes'
             ), ...SheetFlow.templateListItem('skill')],
-            scrollable: ['#active-skills-scroll', '#vehicle-options-scroll']
+            scrollable: ['#active-skills-scroll']
         },
         description: {
             template: SheetFlow.templateBase('actor/tabs/description'),
