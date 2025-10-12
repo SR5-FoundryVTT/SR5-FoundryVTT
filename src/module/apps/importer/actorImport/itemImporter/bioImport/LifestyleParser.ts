@@ -38,15 +38,8 @@ export class LifestyleParser {
         const chummerLifestyleType = chummerLifestyle.baselifestyle.toLowerCase();
         if ((chummerLifestyleType in SR5.lifestyleTypes)) {
             system.type = chummerLifestyleType as typeof system.type;
-        }
-        else {
-            // This is necessary because of a typo in SR5 config.
-            if (chummerLifestyleType === 'luxury') {
-                system.type = 'luxory';
-            }
-            else {
-                system.type = 'other';
-            }
+        } else {
+            system.type = 'other';
         }
 
         system.cost = Number(chummerLifestyle.totalmonthlycost) || 0;
