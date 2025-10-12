@@ -1,20 +1,30 @@
-import { ModifiableField } from "../fields/ModifiableField";
-import { ActorArmorData } from "../template/Armor";
-import { AttributeField, Attributes } from "../template/Attributes";
-import { ModifiableValue } from "../template/Base";
-import { Tracks } from "../template/ConditionMonitors";
-import { Initiative } from "../template/Initiative";
-import { AwakendLimits, Limits } from "../template/Limits";
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { Movement } from "../template/Movement";
+import { ActorArmorData } from "../template/Armor";
+import { ModifiableValue } from "../template/Base";
+import { Initiative } from "../template/Initiative";
+import { Tracks } from "../template/ConditionMonitors";
 import { VisibilityChecks } from "../template/Visibility";
+import { AwakendLimits, Limits } from "../template/Limits";
+import { ModifiableField } from "../fields/ModifiableField";
+import { AttributeField, Attributes } from "../template/Attributes";
 import { CommonData, PhysicalCombatValues, CreateModifiers, MagicData, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpiritData = () => ({
     // === Core Identity ===
     ...CommonData(),
-    spiritType: new StringField({ required: true }),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    spiritType: new StringField({
+        required: true,
+        initial: 'air',
+        choices: Typed.keys(SR5.spiritTypes)
+    }),
+    full_defense_attribute: new StringField({
+        required: true,
+        initial: "willpower",
+        choices: Typed.keys(SR5.attributes),
+    }),
     special: new StringField({ required: true, initial: "magic", choices: ["magic"], readonly: true }),
     is_npc: new BooleanField({ initial: true }),
     npc: new SchemaField({ is_grunt: new BooleanField() }),

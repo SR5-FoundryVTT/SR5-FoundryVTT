@@ -1,3 +1,4 @@
+import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
@@ -8,9 +9,9 @@ export const AttributeField = (limit?: keyof typeof SR5.limits) => ({
     hidden: new BooleanField(),
     label: new StringField({ required: true }),
     limit: new StringField({
+        blank: true,
         readonly: true,
-        required: false,
-        choices: Object.keys(SR5.limits) as Array<keyof typeof SR5.limits>,
+        choices: Typed.keys(SR5.limits),
         ...(limit ? { initial: limit } : {})
     }),
 });

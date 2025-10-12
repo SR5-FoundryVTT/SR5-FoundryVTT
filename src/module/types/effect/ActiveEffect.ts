@@ -1,3 +1,5 @@
+import { Typed } from '../typed';
+import { SR5 } from '@/module/config';
 import { TagifyField } from '@/module/types/fields/TagifyField';
 
 const { SchemaField, BooleanField, StringField } = foundry.data.fields;
@@ -6,7 +8,7 @@ const ActiveEffectData = {
     applyTo: new StringField({
         required: true,
         initial: 'actor',
-        choices: ['actor', 'targeted_actor', 'test_all', 'test_item', 'modifier', 'item'],
+        choices: Typed.keys(SR5.effectApplyTo),
     }),
 
     appliedByTest: new BooleanField(),

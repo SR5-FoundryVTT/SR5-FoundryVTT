@@ -1,3 +1,5 @@
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
@@ -23,8 +25,16 @@ const ActionResultData = () => ({
 });
 
 export const MinimalActionData = () => ({
-    attribute: new StringField({ required: true }),
-    attribute2: new StringField({ required: true }),
+    attribute: new StringField({
+        blank: true,
+        required: true,
+        choices: Typed.keys(SR5.attributes)
+    }),
+    attribute2: new StringField({
+        blank: true,
+        required: true,
+        choices: Typed.keys(SR5.attributes)
+    }),
     armor: new BooleanField(),
     limit: new ModifiableField(ModifiableValueLinked()),
     mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
@@ -44,34 +54,37 @@ export const DamageData = () => ({
         base: new StringField({
             blank: true,
             required: true,
-            choices: ["physical", "matrix", "stun", ""]
+            choices: Typed.keys(SR5.damageTypes)
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: ["physical", "matrix", "stun", ""]
+            choices: Typed.keys(SR5.damageTypes)
         }),
     }),
     element: new SchemaField({
         base: new StringField({
             blank: true,
             required: true,
-            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+            choices: Typed.keys(SR5.elementTypes)
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: ["fire", "cold", "acid", "electricity", "radiation", '']
+            choices: Typed.keys(SR5.elementTypes)
         }),
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
     biofeedback: new StringField({
         required: true,
         blank: true,
-        initial: '',
-        choices: ["physical", "stun"],
+        choices: Typed.keys(SR5.biofeedbackOptions),
     }),
-    attribute: new StringField({ required: true }),
+    attribute: new StringField({
+        blank: true,
+        required: true,
+        choices: Typed.keys(SR5.attributes)
+    }),
     source: new SchemaField({
         actorId: new StringField({ required: true }),
         itemId: new StringField({ required: true }),
@@ -112,15 +125,31 @@ export const ActionRollData = (
         description: new StringField({ required: true }),
         mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
         skill: new StringField({ required: true }),
-        attribute: new StringField({ required: true }),
-        attribute2: new StringField({ required: true }),
+        attribute: new StringField({
+            blank: true,
+            required: true,
+            choices: Typed.keys(SR5.attributes)
+        }),
+        attribute2: new StringField({
+            blank: true,
+            required: true,
+            choices: Typed.keys(SR5.attributes)
+        }),
         armor: new BooleanField(),
         resist: new SchemaField({
             test: new StringField({ required: true, initial: resistTest }),
             skill: new StringField({ required: true }),
             mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-            attribute: new StringField({ required: true }),
-            attribute2: new StringField({ required: true }),
+            attribute: new StringField({
+                blank: true,
+                required: true,
+                choices: Typed.keys(SR5.attributes)
+            }),
+            attribute2: new StringField({
+                blank: true,
+                required: true,
+                choices: Typed.keys(SR5.attributes)
+            }),
             armor: new BooleanField(),
         }),
     }),
@@ -128,8 +157,16 @@ export const ActionRollData = (
         test: new StringField({ required: true, initial: followedTest }),
         mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
         skill: new StringField({ required: true }),
-        attribute: new StringField({ required: true }),
-        attribute2: new StringField({ required: true }),
+        attribute: new StringField({
+            blank: true,
+            required: true,
+            choices: Typed.keys(SR5.attributes)
+        }),
+        attribute2: new StringField({
+            blank: true,
+            required: true,
+            choices: Typed.keys(SR5.attributes)
+        }),
         armor: new BooleanField(),
     }),
     alt_mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

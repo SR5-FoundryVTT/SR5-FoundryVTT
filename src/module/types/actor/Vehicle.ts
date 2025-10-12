@@ -1,13 +1,15 @@
-import { CommonData, PhysicalCombatValues, CreateModifiers, ActorBase } from "./Common";
-import { Attributes, AttributeField } from "../template/Attributes";
-import { VehicleLimits } from "../template/Limits";
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { Movement } from "../template/Movement";
-import { Tracks } from "../template/ConditionMonitors";
+import { MatrixData } from "../template/Matrix";
+import { VehicleLimits } from "../template/Limits";
 import { ActorArmorData } from "../template/Armor";
 import { Initiative } from "../template/Initiative";
-import { MatrixData } from "../template/Matrix";
+import { Tracks } from "../template/ConditionMonitors";
 import { VisibilityChecks } from "../template/Visibility";
 import { ModifiableField } from "../fields/ModifiableField";
+import { Attributes, AttributeField } from "../template/Attributes";
+import { CommonData, PhysicalCombatValues, CreateModifiers, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const VehicleStats = () => ({
@@ -30,17 +32,17 @@ const VehicleData = () => ({
     vehicleType: new StringField({
         required: true,
         initial: "ground",
-        choices: ["air", "aerospace", "ground", "water", "walker", "exotic"],
+        choices: Typed.keys(SR5.vehicle.types),
     }),
     controlMode: new StringField({
         required: true,
         initial: "manual",
-        choices: ["manual", "remote", "rigger", "autopilot"],
+        choices: Typed.keys(SR5.vehicle.control_modes),
     }),
     environment: new StringField({
         required: true,
         initial: "speed",
-        choices: ["speed", "handling"],
+        choices: Typed.keys(SR5.vehicle.environments),
     }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),
@@ -63,7 +65,11 @@ const VehicleData = () => ({
     // === Matrix & Initiative ===
     matrix: new SchemaField(MatrixData()),
     initiative: new SchemaField(Initiative('meatspace', 'matrix')),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    full_defense_attribute: new StringField({
+        required: true,
+        initial: "willpower",
+        choices: Typed.keys(SR5.attributes)
+    }),
     visibilityChecks: new SchemaField(VisibilityChecks("matrix", "meatspace")),
 
     // === Driver & Networking ===

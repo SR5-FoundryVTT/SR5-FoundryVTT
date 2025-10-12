@@ -1,3 +1,5 @@
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { DevicePartData } from "./Device";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { MatrixMasterData } from "../template/MatrixNetwork";
@@ -8,7 +10,11 @@ const GridData = {
     ...DevicePartData(),
 
     matrix: new SchemaField(MatrixMasterData()),
-    category: new StringField({ required: true, nullable: false, initial: 'local', choices: ['local', 'global', 'public'] })
+    category: new StringField({
+        required: true,
+        initial: 'local',
+        choices: Typed.keys(SR5.gridCategories),
+    })
 };
 
 export class Grid extends ItemBase<typeof GridData> {

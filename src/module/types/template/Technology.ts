@@ -1,3 +1,5 @@
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { ModifiableValue } from "./Base";
 import { ConditionData } from "./Condition";
 import { MatrixMasterData } from "./MatrixNetwork";
@@ -21,7 +23,7 @@ export const TechnologyData = () => ({
     wireless: new StringField({
         required: true,
         initial: 'none',
-        choices: ['online', 'silent', 'offline', 'none'],
+        choices: Typed.keys(SR5.wirelessModes),
     }),
     master: new DocumentUUIDField({ blank: true, required: true, nullable: false }),
 

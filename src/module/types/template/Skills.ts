@@ -1,3 +1,5 @@
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 import { FixedTypeObjectField } from "../fields/FixedTypeObjectField";
@@ -10,7 +12,11 @@ export const SkillField = () => ({
     name: new StringField({ required: true }),
     hidden: new BooleanField(),
     label: new StringField({ required: true }),
-    attribute: new StringField({ required: true }),
+    attribute: new StringField({
+        blank: true,
+        required: true,
+        choices: Typed.keys(SR5.attributes)
+    }),
     _delete: new BooleanField(), // Does it use it?
     specs: new ArrayField(new StringField({ required: true })),
     canDefault: new BooleanField({ initial: true }),

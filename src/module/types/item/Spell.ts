@@ -1,3 +1,5 @@
+import { SR5 } from "@/module/config";
+import { Typed } from "../typed";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
@@ -9,23 +11,23 @@ const SpellData = () => ({
     type: new StringField({
         blank: true,
         required: true,
-        choices: ['physical', 'mana']
+        choices: Typed.keys(SR5.spellTypes)
     }),
     category: new StringField({
         blank: true,
         required: true,
-        choices: ['combat', 'detection', 'enchantment', 'health', 'illusion', 'manipulation', 'ritual'] // what to do with enchantment (from chummer)?
+        choices: Typed.keys(SR5.spellCategories)
     }),
     drain: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     range: new StringField({
         blank: true,
         required: true,
-        choices: ['touch', 'los', 'los_a']
+        choices: Typed.keys(SR5.spellRanges)
     }),
     duration: new StringField({
         blank: true,
         required: true,
-        choices: ['instant', 'sustained', 'permanent']
+        choices: Typed.keys(SR5.durations)
     }),
 
     extended: new BooleanField({ initial: false }),
@@ -33,14 +35,14 @@ const SpellData = () => ({
         type: new StringField({
             blank: true,
             required: true,
-            choices: ['direct', 'indirect']
+            choices: Typed.keys(SR5.combatSpellTypes)
         }),
     }),
     detection: new SchemaField({
         type: new StringField({
             blank: true,
             required: true,
-            choices: ['directional', 'psychic', 'area']
+            choices: Typed.keys(SR5.detectionSpellTypes)
         }),
         passive: new BooleanField(),
         extended: new BooleanField(), // do we need this?
@@ -49,12 +51,12 @@ const SpellData = () => ({
         type: new StringField({
             blank: true,
             required: true,
-            choices: ['obvious', 'realistic']
+            choices: Typed.keys(SR5.illusionSpellTypes)
         }),
         sense: new StringField({
             blank: true,
             required: true,
-            choices: ['single-sense', 'multi-sense']
+            choices: Typed.keys(SR5.illusionSpellSenses)
         }),
     }),
     manipulation: new SchemaField({
@@ -62,13 +64,6 @@ const SpellData = () => ({
         mental: new BooleanField(),
         environmental: new BooleanField(),
         physical: new BooleanField(),
-    }),
-    ritual: new SchemaField({
-        type: new StringField({
-            blank: true,
-            required: true,
-            choices: ['anchored', 'material_link', 'minion', 'spell', 'spotter']
-        }),
     }),
 });
 

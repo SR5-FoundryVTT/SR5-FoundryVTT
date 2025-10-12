@@ -14,7 +14,7 @@ export class CritterPowerParser extends Parser<'critter_power'> {
         let category = jsonData.category._TEXT.toLowerCase();
         category = (category.includes("infected") ? "infected" : category);
         system.category = CritterPowerCategories.includes(category as any)
-            ? (category as typeof CritterPowerCategories[number])
+            ? (category as typeof system.category)
             : "";
 
         system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : "";

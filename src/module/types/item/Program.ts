@@ -1,3 +1,5 @@
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
 const { StringField } = foundry.data.fields;
@@ -9,7 +11,7 @@ const ProgramData = () => ({
     type: new StringField({
         required: true,
         initial: 'common_program',
-        choices: ['common_program', 'hacking_program', 'agent']
+        choices: Typed.keys(SR5.programTypes)
     }),
 });
 

@@ -1,12 +1,14 @@
-import { ModifiableField } from "../fields/ModifiableField";
-import { ActorArmorData } from "../template/Armor";
-import { Attributes, MatrixActorAttributes } from '../template/Attributes';
-import { ModifiableValue, ValueMaxPair } from "../template/Base";
-import { Tracks } from "../template/ConditionMonitors";
-import { Initiative } from "../template/Initiative";
-import { MatrixData } from "../template/Matrix";
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { Movement } from "../template/Movement";
+import { MatrixData } from "../template/Matrix";
+import { ActorArmorData } from "../template/Armor";
+import { Initiative } from "../template/Initiative";
+import { Tracks } from "../template/ConditionMonitors";
 import { VisibilityChecks } from "../template/Visibility";
+import { ModifiableField } from "../fields/ModifiableField";
+import { ModifiableValue, ValueMaxPair } from "../template/Base";
+import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 import { CommonData, PhysicalCombatValues, CharacterLimits, CreateModifiers, MagicData, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
@@ -18,8 +20,16 @@ export const CritterData = () => ({
     is_critter: new BooleanField(),
     is_npc: new BooleanField(),
     npc: new SchemaField({ is_grunt: new BooleanField() }),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
-    special: new StringField({ required: true, choices: ['magic', 'resonance', 'mundane'], initial: 'mundane' }),
+    full_defense_attribute: new StringField({
+        required: true,
+        initial: "willpower",
+        choices: Typed.keys(SR5.attributes),
+    }),
+    special: new StringField({
+        required: true,
+        initial: 'mundane',
+        choices: Typed.keys(SR5.specialTypes),
+    }),
 
     // === Attributes & Limits ===
     attributes: new SchemaField({
@@ -44,7 +54,11 @@ export const CritterData = () => ({
     magic: new SchemaField(MagicData()),
     matrix: new SchemaField(MatrixData()),
     technomancer: new SchemaField({
-        attribute: new StringField({ required: true, initial: "willpower" }), // fade attribute
+        attribute: new StringField({
+            required: true,
+            initial: "willpower",
+            choices: Typed.keys(SR5.attributes)
+        }), // fade attribute
         submersion: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     }),
 

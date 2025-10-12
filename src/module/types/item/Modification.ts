@@ -1,3 +1,5 @@
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
 const { NumberField, StringField } = foundry.data.fields;
@@ -9,17 +11,17 @@ const ModificationData = () => ({
     type: new StringField({
         blank: true,
         required: true,
-        choices: ['weapon', 'armor', 'vehicle', 'drone']
+        choices: Typed.keys(SR5.modificationTypes)
     }),
     mount_point: new StringField({
         blank: true,
         required: true,
-        choices: ['barrel', 'stock', 'top', 'side', 'internal', 'under']
+        choices: Typed.keys(SR5.mountPoints)
     }),
     modification_category: new StringField({
         blank: true,
         required: true,
-        choices: ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons']
+        choices: Typed.keys(SR5.modificationCategories)
     }),
     dice_pool: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

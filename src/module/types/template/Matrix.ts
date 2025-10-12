@@ -1,16 +1,18 @@
-import { ModifiableField } from "../fields/ModifiableField";
-import { AttributeField } from "./Attributes";
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { ConditionData } from "./Condition";
+import { AttributeField } from "./Attributes";
+import { ModifiableField } from "../fields/ModifiableField";
 
 const { SchemaField, NumberField, BooleanField, AnyField, StringField, ArrayField, DocumentUUIDField } = foundry.data.fields;
 
-const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing' | 'firewall', editable: boolean) => ({
+const DeviceAttribute = (initialAtt: '' | keyof typeof SR5.matrixAttributes, editable: boolean) => ({
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     att: new StringField({
         blank: true,
         required: true,
         initial: initialAtt,
-        choices: ['', 'attack', 'sleaze', 'data_processing', 'firewall'],
+        choices: Typed.keys(SR5.matrixAttributes),
     }),
     editable: new BooleanField({ initial: editable }),
 });

@@ -1,10 +1,16 @@
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 const { BooleanField, StringField } = foundry.data.fields;
 
 export const LimitField = () => ({
     ...ModifiableValue(),
-    attribute: new StringField({ required: false }), // Do we use it?
+    attribute: new StringField({
+        blank: true,
+        required: true,
+        choices: Typed.keys(SR5.limits)
+    }),
     label: new StringField({ required: true }),
     hidden: new BooleanField(),
 });
