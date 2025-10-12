@@ -1690,9 +1690,41 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             SheetFlow._getSourceContextOption(),
             {
                 name: "SR5.ContextOptions.AddSkillEffect",
-                icon: "<i class='fas fa-album-circle-plus'></i>",
+                icon: "<i class='fas fa-file-circle-plus'></i>",
                 callback: async (target) => {
-                    // TODO
+                    const skillTarget = this._closestSkillTarget(target);
+                    const skillId = skillTarget.dataset.skillId;
+                    const subCategory = skillTarget.dataset.subcategory;
+                    let path = '';
+                    switch (skillTarget.dataset.category) {
+                        case 'knowledge':
+                            path = `system.skills.knowledge.${subCategory}.${skillId}`;
+                            break;
+                        case 'language':
+                            path = `system.skills.language.${skillId}`;
+                            break;
+                        case 'active':
+                        default:
+                            path = `system.skills.active.${skillId}`;
+                            break;
+                    }
+                    if (!path) return;
+                    const skill = this.actor.getSkill(skillId)!;
+                    const effectData = {
+                            name: `${game.i18n.localize(skill.label) ?? skill.name} ${game.i18n.localize('SR5.Effect')}`,
+                            system: {
+                                applyTo: 'actor' as const,
+                            },
+                            changes: [
+                                {
+                                    key: path,
+                                    mode: 0 as any,
+                                    priority: 0,
+                                    value: '',
+                                }
+                            ]
+                        }
+                        await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
                 }
             },
             {
@@ -1733,9 +1765,35 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             SheetFlow._getSourceContextOption(),
             {
                 name: "SR5.ContextOptions.AddAttributeEffect",
-                icon: "<i class='fas fa-album-circle-plus'></i>",
+                icon: "<i class='fas fa-file-circle-plus'></i>",
                 callback: async (target) => {
-                    // TODO
+                    const attributeId = target.closest('[data-attribute-id]')?.dataset.attributeId;
+                    if (!attributeId) return;
+                    const attribute = this.actor.getAttribute(attributeId);
+                    if (!attribute) return;
+                    let path = '';
+                    if (this.actor.matrixData()?.[attributeId]) {
+                        path = `system.matrix.${attributeId}`;
+                    } else if (this.actor.getVehicleStats()?.[attributeId]) {
+                        path = `system.vehicle_stats.${attributeId}`;
+                    } else if (this.actor.getAttributes()[attributeId]) {
+                        path = `system.attributes.${attributeId}`;
+                    }
+                    const effectData = {
+                        name: `${game.i18n.localize(attribute.label)} ${game.i18n.localize('SR5.Effect')}`,
+                        changes: [
+                            {
+                                key: path,
+                                mode: 0 as any,
+                                priority: 0,
+                                value: '',
+                            }
+                        ],
+                        system: {
+                            applyTo: 'actor' as const,
+                        }
+                    }
+                    await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
                 }
             },
         ]

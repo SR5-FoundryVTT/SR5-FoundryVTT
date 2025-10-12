@@ -10,7 +10,6 @@
                         {{/each}}
                     </select>
                 </div>
-                {{log selectedInventory}}
                 {{#if @root.isEditMode}}
                     {{#if (inventoryCanRename selectedInventory)}}
                     <a data-action="renameInventory" data-inventory="{{selectedInventory}}">

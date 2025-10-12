@@ -6,7 +6,6 @@
             cssClass='header-for-scrollable'
         }}
         <div class="scrollable">
-            {{log @root.systemFields}}
             {{#each @root.system.licenses as |license id|}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/license/item.hbs' item=license id=id }}
             {{/each}}

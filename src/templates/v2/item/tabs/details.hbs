@@ -143,7 +143,6 @@
                             {{else}}
                                 <label>{{localize (lookup @root.config.matrixAttributes att.att)}}</label>
                             {{/ifin}}
-                            {{log @root.systemFields}}
                             <div class="form-fields">
                                 {{formInput (objValue (objValue (objValue @root.systemFields.atts.fields att_id) 'fields') 'value')
                                             value=att.value rootId=@root.rootId disabled=(or @root.isPlayMode (not att.editable)) }}
