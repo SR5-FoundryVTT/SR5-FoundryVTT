@@ -71,7 +71,6 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
             case 'health': return ['spell_healing'];
             case 'illusion': return ['spell_illusion'];
             case 'manipulation': return ['spell_manipulation'];
-            case 'ritual': return ['spell_ritual'];
         }
 
         return []

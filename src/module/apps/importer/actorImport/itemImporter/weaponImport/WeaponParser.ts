@@ -5,6 +5,7 @@ import { DataDefaults } from "src/module/data/DataDefaults";
 import { SR5Item } from "src/module/item/SR5Item";
 import { ActorSchema } from "../../ActorSchema";
 import { Unwrap } from "../ItemsParser";
+import { RangeType } from "@/module/types/item/Weapon";
 
 export class WeaponParser {
     private parseDamage(val: string) {
@@ -235,7 +236,7 @@ export class WeaponParser {
                 extreme: parseInt(ranges.extreme.split('-')[1]),
                 category: 'manual',
                 attribute: ''
-            };
+            } satisfies RangeType;
             if(system.category === "range") {
                 range.ranges = rangeData;
             }

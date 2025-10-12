@@ -93,7 +93,7 @@ export class CharacterInfoUpdater {
         try {
             if (chummerChar.metatype) {
                 // Avoid i18n metatype field issues. Chummer metatype aren't lowercase but foundry system metatypes are.
-                system.metatype = chummerChar.metatype_english.toLowerCase();
+                system.metatype = chummerChar.metatype_english.toLowerCase() as typeof system.metatype;
             }
             if (chummerChar.calculatedstreetcred) {
                 system.street_cred = Number(chummerChar.calculatedstreetcred) || 0;
