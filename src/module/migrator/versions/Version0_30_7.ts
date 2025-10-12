@@ -1,7 +1,7 @@
 import { VersionMigration } from "../VersionMigration";
 
 /**
- * Update attribute limits to their correct values.
+ * Update all dataSchema to their correct values choices.
  */
 export class Version0_30_7 extends VersionMigration {
     readonly TargetVersion = "0.30.7";
