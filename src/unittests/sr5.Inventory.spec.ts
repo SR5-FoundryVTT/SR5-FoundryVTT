@@ -8,7 +8,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
 
     describe('InventoryFlow testing', () => {
@@ -23,7 +23,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
                 type: '',
                 label: 'test',
                 itemIds: [],
-                showAll: true,
+                showAll: false,
             });
 
             assert.strictEqual(actor.inventory.exists('test'), true);
@@ -68,7 +68,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
                 label: after,
                 type: '',
                 itemIds: ['notAnItemId'],
-                showAll: true,
+                showAll: false,
             });
         });
 
@@ -84,7 +84,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
                 type: '',
                 label: 'Test',
                 itemIds: [],
-                showAll: true,
+                showAll: false,
             });
 
             await actor.inventory.rename('Test', 'Test.');
@@ -95,7 +95,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
                 type: '',
                 label: 'Test',
                 itemIds: [],
-                showAll: true,
+                showAll: false,
             });
 
             await actor.inventory.remove('Test');
@@ -107,7 +107,7 @@ export const shadowrunInventoryFlow = (context: QuenchBatchContext) => {
                 type: '',
                 label: 'Fisch',
                 itemIds: [],
-                showAll: true,
+                showAll: false,
             });
         });
     });

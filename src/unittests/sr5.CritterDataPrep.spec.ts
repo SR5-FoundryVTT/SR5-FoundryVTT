@@ -6,7 +6,7 @@ export const shadowrunSR5CritterDataPrep = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     describe('CritterDataPrep', () => {
         it('Critter character recoil compensation', async () => {
@@ -15,7 +15,7 @@ export const shadowrunSR5CritterDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(critter.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
 
-            await critter.update({ name: 'Testing', type: 'critter', system: { attributes: { strength: { base: 1 } } } });
+            await critter.update({ system: { attributes: { strength: { base: 1 } } } });
             if (!critter) return assert.fail();
 
             assert.strictEqual(critter.system.values.recoil_compensation.value, 2); // SR5#175: 1 / 3 = 0,3 (rounded up) = 1 => 1 + 1

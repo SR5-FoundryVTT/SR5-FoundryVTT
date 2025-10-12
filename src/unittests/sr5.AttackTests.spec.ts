@@ -13,7 +13,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     describe('Fire Mode Rules', () => {
         it('apply defense modifier per fire mode', () => {
