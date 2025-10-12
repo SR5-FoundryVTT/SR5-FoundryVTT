@@ -1678,6 +1678,17 @@
         "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
         "Value": "Value",
         "Vehicle": {
+            "Category": "Category",
+            "Categories": {
+                "Micro": "Micro",
+                "Mini": "Mini",
+                "Small": "Small",
+                "Medium": "Medium",
+                "Large": "Large",
+                "Huge": "Huge",
+                "Anthro": "Anthromorphic",
+                "Missile": "Missile"
+            },
             "ChaseEnvironment": "Chase Environment",
             "Clearsight": "Clearsight",
             "ControlMode": "Control Mode",

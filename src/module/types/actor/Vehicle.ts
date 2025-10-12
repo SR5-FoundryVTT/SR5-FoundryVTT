@@ -1,3 +1,4 @@
+import { SR5 } from "@/module/config";
 import { CommonData, PhysicalCombatValues, CreateModifiers, ActorBase } from "./Common";
 import { Attributes, AttributeField } from "../template/Attributes";
 import { VehicleLimits } from "../template/Limits";
@@ -41,6 +42,11 @@ const VehicleData = () => ({
         required: true,
         initial: "speed",
         choices: ["speed", "handling"],
+    }),
+    category: new StringField({
+        required: true,
+        initial: "medium",
+        choices: Object.keys(SR5.vehicle.categories) as Array<keyof typeof SR5.vehicle.categories>,
     }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),
