@@ -10,16 +10,14 @@
             {{localize label}}
         </label>
     {{/if}}
-    {{#if @root.isEditMode}}
-        <div class="attribute-value">
+    <div class="attribute-value">
+        {{#if @root.isEditMode}}
             <label>{{matrixAtt.base}}</label>
-        </div>
-    {{else}}
-        <div class="attribute-value">
+        {{else}}
             <button class="icon sr5-icon"
                     type="button"
                     data-action="rollAttribute"
                     data-attribute-modifier-tooltip="{{attributeField.name}}">{{matrixAtt.value}}</button>
-        </div>
-    {{/if}}
+        {{/if}}
+    </div>
 </div>
