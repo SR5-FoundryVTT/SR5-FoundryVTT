@@ -1,5 +1,5 @@
 {{!-- list-item expects an SR5ActiveEffect to be passed in as 'item' --}}
-<div class="new-list-item-container">
+<div class="new-list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
     <div class="new-list-item draggable" data-effect-id="{{item.id}}" data-uuid="{{item.uuid}}" {{#if isItemEffect}} data-source="{{item.parent.uuid}}" {{/if}}>
         {{#if item.img}}
             <img src="{{item.img}}" class="new-list-item-image" height="24px" width="24px" />
@@ -37,7 +37,12 @@
             {{/unless}}
         </div>
     </div>
-    <div class="new-list-item-description">
-        {{{effect.data.description}}}
-    </div>
+    {{#if (hasKey @root.expandedUuids item.uuid)}}
+        <div class="new-list-item-desc">
+            <div class="new-list-item-properties">
+                {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/effect.hbs' item=item }}
+            </div>
+            {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}
+        </div>
+    {{/if}}
 </div>

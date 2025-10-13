@@ -1,0 +1,9 @@
+<label><i class="far fa-user-tag"></i>&nbsp;{{item.system.type}}</label>
+<label>{{localize "SR5.Contact.Connection"}}&nbsp;{{item.system.connection}}</label>
+<label>{{localize "SR5.Contact.Loyalty"}}&nbsp;{{item.system.loyalty}}</label>
+{{#if item.system.blackmail}}
+    <label>{{localize "SR5.Contact.Blackmail"}}</label>
+{{/if}}
+{{#if item.system.family}}
+    <label>{{localize "SR5.Contact.Family"}}</label>
+{{/if}}

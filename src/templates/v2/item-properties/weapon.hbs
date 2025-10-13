@@ -1,0 +1,40 @@
+{{#if (eq item.system.category 'range')}}
+    <label data-tooltip="SR5.Weapon.Range.Range">
+        <i class="far fa-ruler"></i>
+        {{item.system.range.ranges.short}}/{{item.system.range.ranges.medium}}/{{item.system.range.ranges.long}}/{{item.system.range.ranges.extreme}}{{#if item.system.range.ranges.attribute}}/{{localizeObj item.system.range.ranges.attribute @root.config.attributes}}{{/if}}m
+    </label>
+    <label data-tooltip="SR5.Weapon.Range.Modes">
+        <i class="far fa-gun"></i>
+        {{#if item.system.range.modes.single_shot}}{{localize "SR5.Weapon.Mode.SingleShot"}}{{#if (or item.system.range.modes.semi_auto item.system.range.modes.burst_fire item.system.range.modes.full_auto)}}/{{/if}}{{/if}}{{#if item.system.range.modes.semi_auto}}{{localize "SR5.Weapon.Mode.SemiAuto"}}{{#if (or item.system.range.modes.burst_fire item.system.range.modes.full_auto)}}/{{/if}}{{/if}}{{#if item.system.range.modes.burst_fire}}{{localize "SR5.Weapon.Mode.BurstFire"}}{{#if item.system.range.modes.full_auto}}/{{/if}}{{/if}}{{#if item.system.range.modes.full_auto}}{{localize "SR5.Weapon.Mode.FullAuto"}}{{/if}}
+    </label>
+    <label>
+        {{localize "SR5.RecoilCompensation"}}&nbsp;{{item.system.range.rc.value}}
+        {{#if item.actor}}
+            <span data-tooltip="SR5.Total">({{item.totalRecoilCompensation}})</span>
+        {{/if}}
+    </label>
+{{else if (eq item.system.category 'thrown')}}
+    <label data-tooltip="SR5.Weapon.Thrown.Range">
+        <i class="far fa-ruler"></i>
+        {{item.system.thrown.ranges.short}}/{{item.system.thrown.ranges.medium}}/{{system.thrown.ranges.long}}/{{system.thrown.ranges.extreme}}m
+    </label>
+{{else if (eq item.system.category 'melee')}}
+    <label>{{localize "SR5.Reach"}}&nbsp;{{item.system.melee.reach}}</label>
+{{/if}}
+
+{{#if (and (usesAmmo item) (hasAmmo item))}}
+    <span style="display: flex; flex-flow: row nowrap; gap: 2px; align-items: center;">
+        <img src="{{objValue (equippedAmmo item) 'img'}}" width="12px" height="12px">
+        <a data-action="openUuid" data-uuid="{{objValue (equippedAmmo item) 'uuid'}}">{{objValue (equippedAmmo item) 'name'}}</a>
+        <label>({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})</label>
+    </span>
+    {{#if item.system.ammo.spare_clips.max}}
+            <label>{{localize "SR5.SpareClips"}}&nbsp;{{item.system.ammo.spare_clips.value}}/{{item.system.ammo.spare_clips.max}}</label>
+    {{/if}}
+{{/if}}
+
+{{#each (equippedMods item)}}
+    <span style="display: flex; flex-flow: row nowrap; gap: 2px; align-items: center;">
+        <img src="{{this.img}}" width="12px" height="12px">&nbsp;<a data-uuid="{{this.uuid}}" data-action="openUuid">{{this.name}}</a>
+    </span>
+{{/each}}

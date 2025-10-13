@@ -1,0 +1,34 @@
+<label>{{localizeOb item.system.category @root.config.spellCategories}}</label>
+<label>{{localizeOb item.system.type @root.config.spellTypes}}</label>
+{{#if (eq item.system.category 'combat')}}
+    <label>{{localizeOb item.system.combat.type @root.config.combatSpellTypes}}</label>
+{{else if (eq item.system.category 'illusion')}}
+    <label>{{localizeOb item.system.illusion.type @root.config.illusionSpellTypes}}</label>
+    <label>{{localizeOb item.system.illusion.sense @root.config.illusionSpellSense}}</label>
+{{else if (eq item.system.category 'manipulation')}}
+    {{#if item.system.manipulation.damaging}}
+        <label>{{localize "SR5.Spell.ManipulationDamaging"}}</label>
+    {{/if}}
+    {{#if item.system.manipulation.mental}}
+        <label>{{localize "SR5.Spell.ManipulationMental"}}</label>
+    {{/if}}
+    {{#if item.system.manipulation.environmental}}
+        <label>{{localize "SR5.Spell.ManipulationEnviornmental"}}</label>
+    {{/if}}
+    {{#if item.system.manipulation.physical}}
+        <label>{{localize "SR5.Spell.ManipulationPhysical"}}</label>
+    {{/if}}
+{{else if (eq item.system.category 'detection')}}
+    <label>{{localizeOb item.system.detection.type @root.config.detectionSpellTypes}}</label>
+    {{#if item.system.detection.passive}}
+        <label>{{localize "SR5.Passive"}}</label>
+    {{else}}
+        <label>{{localize "SR5.Active"}}</label>
+    {{/if}}
+    {{#if item.system.detection.extended}}
+        <label>{{localize "SR5.DetectionSpellExtended"}}</label>
+    {{/if}}
+{{/if}}
+<label>{{localizeOb item.system.range @root.config.spellRanges}}</label>
+<label>{{localizeOb item.system.duration @root.config.durations}}</label>
+<label>{{localize "SR5.Drain"}}&nbsp;{{localize "SR5.Force"}}{{#if item.system.drain}}{{numberFormat item.system.drain sign=true}}{{/if}}</label>

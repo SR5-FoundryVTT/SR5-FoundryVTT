@@ -1,5 +1,7 @@
-{{#if (hasSource this)}}
-    <a data-tooltip="SR5.OpenSource">
-        <i data-action="openItemSource" data-item-id="{{this.uuid}}" class="fas fa-file"></i>
-    </a>
+{{#if @root.isPlayMode}}
+    {{#if this.system.description.source}}
+        <a data-action="openSource" data-source="{{this.system.description.source}}" data-tooltip="SR5.OpenSource">
+            <i class="fas fa-file"></i>
+        </a>
+    {{/if}}
 {{/if}}

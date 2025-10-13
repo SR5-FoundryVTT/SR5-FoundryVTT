@@ -1,5 +1,5 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
-<div class="new-list-item-container">
+<div class="new-list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
     <div class="new-list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}"
          data-source="{{item.system.description.source}}"
          data-item-id="{{item.id}}"
@@ -10,6 +10,7 @@
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
 
         <div class="new-list-item-icons">
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
             {{#if (isOwner item owner=@root.actor)}}
                 {{#unless (or (eq item.system.optional "standard") @root.isPlayMode)}}
@@ -19,7 +20,13 @@
             {{/if}}
         </div>
     </div>
-    <div class="new-list-item-description">
-        {{{item.system.description.value}}}
-    </div>
+    {{#if (hasKey @root.expandedUuids item.uuid)}}
+        <div class="new-list-item-desc">
+            <div class="new-list-item-properties">
+                {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/sprite_power.hbs' item=item }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs' item=item }}
+            </div>
+            {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}
+        </div>
+    {{/if}}
 </div>

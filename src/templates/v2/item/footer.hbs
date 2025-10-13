@@ -91,7 +91,7 @@
         {{/if}}
 
         {{#if (eq item.type 'quality')}}
-            <label>{{system.type}}</label>
+            <label>{{localizeOb system.type @root.config.qualityTypes}}</label>
             <label>{{systemFields.rating.label}}&nbsp;{{system.rating}}</label>
             <label>{{systemFields.karma.label}}&nbsp;{{system.karma}}</label>
         {{/if}}

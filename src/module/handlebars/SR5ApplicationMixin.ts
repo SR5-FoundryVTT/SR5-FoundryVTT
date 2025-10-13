@@ -1,14 +1,12 @@
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
-
-import ApplicationV2 = foundry.applications.api.ApplicationV2;
-import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5 } from '@/module/config';
 import { LinksHelpers } from '@/module/utils/links';
 import { SheetFlow } from '@/module/flows/SheetFlow';
-import { SR5ItemSheet } from '@/module/item/SR5ItemSheet';
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
@@ -20,7 +18,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         declare isEditable: boolean;
         declare options: typeof SR5ApplicationMixin.DEFAULT_OPTIONS;
 
-        #dragDrop: any;
+        private expandedUuids = new Set<string>();
 
         static DEFAULT_OPTIONS = {
             classes: [SR5_APPV2_CSS_CLASS],
@@ -35,27 +33,9 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
                 toggleEditMode: SR5ApplicationMixin.#toggleEditMode,
                 showItemDescription: SR5ApplicationMixin.#toggleListItemDescription,
                 openSource: SR5ApplicationMixin.#openSource,
+                openUuid: SR5ApplicationMixin.#openUuid,
             },
         };
-
-        /*
-        async _onDragStart(event) {
-            const target = event.currentTarget;
-            if ('link' in event.target.dataset) return;
-            let dragData;
-
-            const document = SheetFlow.fromUuidSync(target.dataset.itemId);
-            console.log('startingDrag', document);
-            if (document) {
-                dragData = document.toDragData();
-            }
-
-            // Set data transfer
-            if (!dragData) return;
-            event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-        }
-
-         */
 
         static async #toggleEditMode(this, event: MouseEvent) {
             event.preventDefault();
@@ -93,6 +73,32 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             context.user = game.user;
             context.config = SR5;
 
+            context.expandedUuids = {};
+            for (const uuid of this.expandedUuids) {
+                const document = SheetFlow.fromUuidSync(uuid);
+                if (document) {
+                    if (document instanceof SR5Item || document instanceof SR5Actor) {
+                        console.log('document', document);
+                        const html = await TextEditor.enrichHTML((document as any).system.description.value, {
+                            secrets: document.isOwner,
+                            rollData: document.getRollData(),
+                        });
+
+                        context.expandedUuids[uuid] = {
+                            html,
+                        }
+                    } else if (document instanceof SR5ActiveEffect) {
+                        const html = await TextEditor.enrichHTML(document.description, {
+                            secrets: document.isOwner,
+                        });
+
+                        context.expandedUuids[uuid] = {
+                            html,
+                        }
+                    }
+                }
+            }
+
             return context;
         }
 
@@ -111,18 +117,33 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         /**
          * Show / hide the items description within a sheet item l ist.
          */
-        static async #toggleListItemDescription(event) {
+        static async #toggleListItemDescription(this: SR5ApplicationMixin, event) {
             event.preventDefault();
-            // find the list-item parent so we can find the child item
-            const item = $(event.target).parents('.new-list-item-container');
-            const field = $(item).find('.new-list-item-description');
-            field.toggle();
+            const uuid = SheetFlow.closestUuid(event.target);
+            if (!uuid) return;
+            if (this.expandedUuids.has(uuid)) {
+                this.expandedUuids.delete(uuid);
+            } else {
+                this.expandedUuids.add(uuid);
+            }
+            // @ts-expect-error i hate mixxins
+            await this.render();
         }
 
         static async #openSource(event) {
             const sourceId = SheetFlow.closestSource(event.target);
             if (sourceId) {
                 await LinksHelpers.openSource(sourceId);
+            }
+        }
+
+        static async #openUuid(event) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            if (uuid) {
+                const document = SheetFlow.fromUuidSync(uuid);
+                if (document && (document instanceof SR5Item || document instanceof SR5Actor || document instanceof SR5ActiveEffect)) {
+                    document.sheet?.render(true);
+                }
             }
         }
 

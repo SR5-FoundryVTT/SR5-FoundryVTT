@@ -1,7 +1,7 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
-    <div class="fill-container standard-form">
+    <div class="fill-container {{#if @root.isPlayMode}} scrollable {{/if}}">
         {{#if @root.isEditMode}}
-            {{formGroup systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
+            {{formInput systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
         {{else}}
             {{#if (eq item.type 'weapon')}}
                 <div class="new-list-item new-list-item-header">

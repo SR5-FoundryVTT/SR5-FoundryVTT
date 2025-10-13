@@ -1,7 +1,7 @@
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { SR5Item } from '../item/SR5Item';
-import { SR5Actor } from "../actor/SR5Actor";
-import { MatrixNetworkFlow } from "../item/flows/MatrixNetworkFlow";
+import { SR5Actor } from '../actor/SR5Actor';
+import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 
@@ -98,6 +98,22 @@ export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('usesAmmo', function (item, options) {
         if (!(item instanceof SR5Item)) return false;
         return item.usesAmmo();
+    })
+
+    Handlebars.registerHelper('equippedAmmo', function (item: SR5Item, options) {
+        return item.getEquippedAmmo();
+    })
+
+    Handlebars.registerHelper('equippedMods', function (item: SR5Item, options) {
+        return item.getEquippedMods();
+    })
+
+    Handlebars.registerHelper('ammoOptions', function (item: SR5Item, options) {
+        return item.items.filter(i => i.isType('ammo')).map(i => ({ label: i.name, value: i.id }));
+    })
+
+    Handlebars.registerHelper('hasAmmo', function (item: SR5Item, options) {
+        return item.items.filter(i => i.isType('ammo')).length > 0;
     })
 
     Handlebars.registerHelper('matrixIconType', function (icon: SR5Item | SR5Actor, options) {

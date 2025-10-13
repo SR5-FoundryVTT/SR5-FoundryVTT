@@ -24,27 +24,15 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
-    Handlebars.registerHelper('localizeSkill', function (skill: SkillFieldType): string {
+    Handlebars.registerHelper('localizeSkill', function (skill: SkillFieldType | string, options): string {
+        if (typeof skill === 'string') {
+            const actor = options.data.root.actor as SR5Actor;
+            if (!actor) return skill;
+            const newSkill = actor.getSkill(skill) as SkillFieldType;
+            if (!newSkill) return skill;
+            skill = newSkill;
+        }
         return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
-        // NOTE: Below is code to append a shortened attribute name to the skill name. It's been removed for readability.
-        //       But still might useful for someone.
-        // if (!game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) || !translatedSkill || !skill.attribute)
-        //     return translatedSkill;
-        //
-        // // Try showing the first three letters, or less.
-        // const translatedAttribute = game.i18n.localize(SR5.attributes[skill.attribute]);
-        // if (!translatedAttribute) return translatedSkill;
-        //
-        // const cutToIndex = translatedAttribute.length < SR.attributes.SHORT_NAME_LENGTH ?
-        //     translatedAttribute.length -1 :
-        //     SR.attributes.SHORT_NAME_LENGTH;
-        // const translatedAttributeShorthand = translatedAttribute.substring(0, cutToIndex).toUpperCase();
-        // return `${translatedSkill} (${translatedAttributeShorthand})`;
-    });
-
-    Handlebars.registerHelper('toHeaderCase', function (str) {
-        if (str) return Helpers.label(str);
-        return '';
     });
 
     Handlebars.registerHelper('concatStrings', function (...args) {
@@ -208,8 +196,11 @@ export const registerBasicHelpers = () => {
      * @param v The second value
      * @returns true or false
      */
-    Handlebars.registerHelper('or', function(a, b) {
-        return a || b;
+    Handlebars.registerHelper('or', function(...choices) {
+        choices.splice(choices.length - 1, 1); // delete the options object
+        return choices.reduce((acc, current) => {
+            return acc || current;
+        }, false);
     });
 
     /**
@@ -261,4 +252,9 @@ export const registerBasicHelpers = () => {
     Handlebars.registerHelper('nuyenValue', function(nuyen: number) {
         return Number(nuyen).toLocaleString(game.i18n.lang);
     })
+
+    Handlebars.registerHelper('hasKey', function(obj: Record<string, unknown>, key: string) {
+        if (!obj || typeof obj !== 'object') return false;
+        return obj[key] !== undefined;
+    });
 };
