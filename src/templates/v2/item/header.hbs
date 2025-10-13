@@ -25,17 +25,19 @@
                 </div>
             {{/if}}
             {{#if @root.isPlayMode}}
-                <div class="list-item">
-                    <div class="list-item-start">
-                        {{#if system.technology.condition_monitor.max}}
-                            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                                name=(localize "SR5.ConditionMonitor")
-                                value=system.technology.condition_monitor.value
-                                max=system.technology.condition_monitor.max
-                                id='matrix'
-                                disabled=system.technology.condition_monitor.disabled
-                            }}
-                        {{/if}}
+                <div>
+                    <div class="list-item">
+                        <div class="list-item-start">
+                            {{#if system.technology.condition_monitor.max}}
+                                {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                                    name=(localize "SR5.ConditionMonitor")
+                                    value=system.technology.condition_monitor.value
+                                    max=system.technology.condition_monitor.max
+                                    id='matrix'
+                                    disabled=system.technology.condition_monitor.disabled
+                                }}
+                            {{/if}}
+                        </div>
                     </div>
                 </div>
             {{/if}}
