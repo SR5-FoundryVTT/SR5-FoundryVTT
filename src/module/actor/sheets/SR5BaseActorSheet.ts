@@ -3,8 +3,6 @@ import { SituationModifiersApplication } from '../../apps/SituationModifiersAppl
 import { Helpers } from '../../helpers';
 import { SR5Item } from '../../item/SR5Item';
 import {
-    onManageActiveEffect,
-    onManageItemActiveEffect,
     prepareSortedEffects,
     prepareSortedItemEffects,
 } from '../../effects';
@@ -371,10 +369,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     activateListeners_LEGACY(html) {
         Helpers.setupCustomCheckbox(this, html)
 
-        // Active Effect management
-        html.find(".effect-control").on('click', async event => onManageActiveEffect(event, this.actor));
-        html.find(".item-effect-control").on('click', async event => onManageItemActiveEffect(event));
-
         // General item header/list actions...
         html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
 
@@ -482,7 +476,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     async _onInitiativePerceptionChange(event) {
         const newValue = event.currentTarget?.value;
-        if (newValue === 'meatspace' || newValue === 'magic') {
+        if (newValue === 'meatspace' || newValue === 'astral') {
             // meatspace and magic can be directly applied as the perception type
             // disable VR as well
             await this.actor.update({ system: {

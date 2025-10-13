@@ -9,7 +9,7 @@
             {{#if (or isCharacter isSpirit)}}
                 <div class="initiative-col">
                     <select class="presence-select sr5-select" name="initiative-select">
-                        {{selectOptions initiativePerception.options value=initiativePerception.value localize=true}}
+                        {{selectOptions initiativePerception.options selected=initiativePerception.value localize=true}}
                     </select>
                 </div>
             {{/if}}
