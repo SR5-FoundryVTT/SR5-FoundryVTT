@@ -126,6 +126,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     // Store the currently selected inventory.
     selectedInventory: string;
 
+    private readonly expandedSkills = new Set<string>();
+
     constructor(options) {
         super(options);
 
@@ -186,6 +188,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollSkill: SR5BaseActorSheet.#rollSkill,
             editSkill: SR5BaseActorSheet.#editSkill,
             rollSkillSpec: SR5BaseActorSheet.#rollSkillSpec,
+            openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
             addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
             addLanguageSkill: SR5BaseActorSheet.#createLanguageSkill,
@@ -309,6 +312,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.initiativePerception = this._prepareInitiativePresence();
 
         data.primaryTabs = this._prepareTabs('primary');
+
+        data.expandedSkills = {};
+        for (const id of this.expandedSkills) {
+            const skill = this.actor.getSkill(id);
+            if (skill) {
+                const html = await TextEditor.enrichHTML(skill.description, { secrets: this.actor.isOwner, });
+                data.expandedSkills[id] = { html, }
+            }
+        }
 
         return data;
     }
@@ -1988,4 +2000,18 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this._moveItemToInventory(event.target);
     }
 
+    /**
+     * Show / hide the items description within a sheet item l ist.
+     */
+    static async #toggleSkillDescription(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const id = this._closestSkillTarget(event.target).dataset.skillId;
+        if (!id) return;
+        if (this.expandedSkills.has(id)) {
+            this.expandedSkills.delete(id);
+        } else {
+            this.expandedSkills.add(id);
+        }
+        await this.render();
+    }
 }

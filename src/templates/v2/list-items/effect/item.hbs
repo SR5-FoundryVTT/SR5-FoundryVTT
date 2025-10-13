@@ -1,10 +1,10 @@
 {{!-- list-item expects an SR5ActiveEffect to be passed in as 'item' --}}
 <div class="new-list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
     <div class="new-list-item draggable" data-effect-id="{{item.id}}" data-uuid="{{item.uuid}}" {{#if isItemEffect}} data-source="{{item.parent.uuid}}" {{/if}}>
-        {{#if item.img}}
-            <img src="{{item.img}}" class="new-list-item-image" height="24px" width="24px" />
-        {{/if}}
         <div class="new-list-item-label-container">
+            {{#if item.img}}
+                <img src="{{item.img}}" class="new-list-item-image" height="24px" width="24px" />
+            {{/if}}
             <a data-action="showItemDescription">
                 {{#if name}}
                     {{name}}

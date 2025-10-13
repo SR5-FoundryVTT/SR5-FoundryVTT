@@ -18,7 +18,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         declare isEditable: boolean;
         declare options: typeof SR5ApplicationMixin.DEFAULT_OPTIONS;
 
-        private expandedUuids = new Set<string>();
+        private readonly expandedUuids = new Set<string>();
 
         static DEFAULT_OPTIONS = {
             classes: [SR5_APPV2_CSS_CLASS],

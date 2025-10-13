@@ -11,17 +11,17 @@
         <label>{{localize "SR5.Specializations"}}</label>
     </div>
     {{/if}}
-    <div class="new-list-item-col skill-rating-col">
+    <div class="new-list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
         <label>{{localize "SR5.Rtg"}}</label>
     </div>
-    {{#if @root.isEditMode}}
-    <div class="new-list-item-icons skill-icons">
-        {{#if addAction}}
-            <a data-action="{{addAction}}"
-               data-skill-type="{{addSkillType}}">
-                {{localize "SR5.Add"}}&nbsp;<i class="fas fa-plus"></i>
-            </a>
+    <div class="new-list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        {{#if @root.isEditMode}}
+            {{#if addAction}}
+                <a data-action="{{addAction}}"
+                   data-skill-type="{{addSkillType}}">
+                    {{localize "SR5.Add"}}&nbsp;<i class="fas fa-plus"></i>
+                </a>
+            {{/if}}
         {{/if}}
     </div>
-    {{/if}}
 </div>

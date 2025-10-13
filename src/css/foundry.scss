@@ -236,6 +236,12 @@ nav#context-menu {
     background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
     background-repeat: repeat;
     background-size: 100% 20px auto;
+
+    li {
+        &:nth-of-type(even) {
+            background: rgba(white, 0.03);
+        }
+    }
 }
 
 .common-test {

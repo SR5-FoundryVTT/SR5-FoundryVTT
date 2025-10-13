@@ -2,8 +2,9 @@
     <div class="fill-container">
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/critter_power/header.hbs'
             label="SR5.Labels.ActorSheet.CritterPowers"
+            cssClass="header-for-scrollable"
             type="critter_power" }}
-        <div class="scrollable">
+        <div class="scrollable fill-container">
             {{#each itemType.critter_power}}
                 {{#if (or (and @root.isPlayMode (eq this.system.optional "enabled_option"))
                           (or (not this.system.optional) (eq this.system.optional "standard")))}}

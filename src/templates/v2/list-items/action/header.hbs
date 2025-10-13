@@ -6,23 +6,18 @@
     </div>
 
     <div class="new-list-item-col">
+        {{#if (eq type 'matrix_action')}}
+            <label>{{localize "SR5.Marks"}}</label>
+        {{/if}}
+    </div>
+
+    <div class="new-list-item-col">
         <label>
             {{localize "SR5.ActionType"}}
         </label>
     </div>
 
-    {{#if (eq type 'matrix_action')}}
-        <div class="new-list-item-col">
-            <label>
-                {{localize "SR5.Marks"}}
-            </label>
-        </div>
-    {{else}}
-        <div class="new-list-item-col">
-        </div>
-    {{/if}}
-
-    <div class="new-list-item-icons">
+    <div class="new-list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
     </div>
 </div>

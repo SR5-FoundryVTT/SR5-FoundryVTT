@@ -1,8 +1,8 @@
 {{!-- expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container {{cssClass}}">
     <div class="new-list-item {{#if item.selected}}new-list-item-selected{{/if}}" data-uuid="{{item.document.uuid}}">
-        {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
         <div class="new-list-item-label-container">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
             <a class="{{#if item.selected}}new-list-item-selected{{/if}}"
                data-action="openUuid"
                data-item-id="{{item.document.uuid}}">
@@ -10,19 +10,19 @@
             </a>
         </div>
 
-        <div class="new-list-item-col">
+        <div class="new-list-item-col matrix-icon-col">
             <label>
                 {{matrixIconType item.document}}
             </label>
         </div>
 
-        <div class="new-list-item-col">
+        <div class="new-list-item-col matrix-network-col">
             <label>
                 {{item.network}}
             </label>
         </div>
 
-        <div class="new-list-item-icons">
+        <div class="new-list-item-icons skinny-icons">
             {{!-- Add Icons for what the Owner of an item can do --}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item.document }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connected-icons-toggle.hbs' item }}

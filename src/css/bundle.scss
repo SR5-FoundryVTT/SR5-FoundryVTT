@@ -1453,9 +1453,6 @@ input[type='text'].display {
                 p.hint {
                     color: darken($yellow, 20%);
                 }
-                &:nth-of-type(odd) {
-                    background: rgba($black, 0.03);
-                }
                 &:nth-of-type(even) {
                     background: rgba($white, 0.03);
                 }
@@ -1966,7 +1963,7 @@ input[type='text'].display {
         align-items: center;
         align-content: center;
         width: 100%;
-        padding: 0.25rem;
+        padding: 2px;
 
         &.new-list-item-selected {
             background: radial-gradient(rgba($matrix-green, 0.4), rgba($matrix-green, 0.01));
@@ -2013,9 +2010,10 @@ input[type='text'].display {
         .new-list-item-label-container {
             display: flex;
             flex-flow: row nowrap;
+            align-items: center;
+            justify-content: start;
             flex: 3;
             gap: .25rem;
-            margin-left: 0.25rem;
 
             .selection-inventory {
                 display: flex;
@@ -2045,15 +2043,6 @@ input[type='text'].display {
                 }
             }
 
-            &.skinny-col {
-                flex: 0 0 3rem;
-            }
-            &.midd-col {
-                flex: 0 0 4rem;
-            }
-            &.thicc-col {
-                flex: 0 0 6rem;
-            }
 
             &.select-col {
                 justify-content: start;
@@ -2070,7 +2059,7 @@ input[type='text'].display {
                 text-wrap: nowrap;
             }
 
-            &.social-mod-col {
+            &.reputation-col {
                 flex: 5;
                 text-wrap: nowrap;
             }
@@ -2080,24 +2069,25 @@ input[type='text'].display {
                 text-wrap: nowrap;
             }
 
-            &.rtg-col {
-                flex: none;
-                width: 4rem;
+            &.skinny-col {
+                flex: 0 0 3rem;
+            }
+            &.midd-col,
+            &.rtg-col,
+            &.armor-col,
+            &.ammo-col,
+            &.cost-col,
+            &.mod-category-col,
+            &.matrix-icon-col {
+                flex: 0 0 4rem;
             }
 
-            &.slots-col {
-                flex: none;
-                width: 5rem;
+            &.slots-col, &.matrix-network-col {
+                flex: 0 0 5rem;
             }
 
-            &.mod-category-col {
-                flex: none;
-                width: 4rem;
-            }
-
-            &.mark-input-col {
-                flex: none;
-                width: 5rem;
+            &.mark-input-col, &.qty-input-col {
+                flex: 0 0 5rem;
                 gap: 0.25rem;
 
                 .mark-label {
@@ -2105,30 +2095,9 @@ input[type='text'].display {
                 }
             }
 
-            &.qty-input-col {
-                flex: none;
-                width: 5rem;
-                gap: 0.25rem;
+            &.thicc-col {
+                flex: 0 0 6rem;
             }
-
-            &.mark-input-col {
-                flex: 1;
-                gap: 0.25rem;
-            }
-
-            &.skill-rating-col {
-                flex: 1;
-                button {
-                    min-width: 20px;
-                    max-width: 20px;
-                    min-height: 20px;
-                    max-height: 20px;
-                    padding: 2px;
-                    border-color: $light;
-                    font-size: 1.1rem;
-                }
-            }
-
         }
 
         .new-list-item-icons {
@@ -2136,11 +2105,16 @@ input[type='text'].display {
             flex-flow: row nowrap;
             flex: none;
             min-width: 4rem;
-            margin-left: 0.25rem;
             justify-content: end;
             align-items: center;
             gap: 0.25rem;
-            padding-right: .5rem;
+            margin-right: 2px;
+
+            &.skinny-icons {
+                width: 1.5rem;
+                min-width: 1.5rem;
+                max-width: 1.5rem;
+            }
         }
     }
 

@@ -5,24 +5,23 @@
          data-source="{{item.system.description.source}}"
          data-item-id="{{item.id}}"
          data-uuid="{{item.uuid}}">
-        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
-        {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+        <div class="new-list-item-label-container">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+        </div>
+
+        <div class="new-list-item-col">
+            {{#if (isMatrixAction item)}}
+                <label>{{marksRequired item}}</label>
+            {{/if}}
+        </div>
 
         <div class="new-list-item-col">
             <label>{{localizeOb item.system.action.type @root.config.actionTypes}}</label>
         </div>
 
-        {{#if (isMatrixAction item)}}
-            <div class="new-list-item-col">
-                <label>{{marksRequired item}}</label>
-            </div>
-        {{else}}
-            <div class="new-list-item-col">
-            </div>
-        {{/if}}
-
-        <div class="new-list-item-icons">
+        <div class="new-list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
             {{#if (isOwner item owner=@root.actor)}}

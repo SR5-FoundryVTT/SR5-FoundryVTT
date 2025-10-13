@@ -1,17 +1,25 @@
 {{!-- expects an SR5Item to be passed in as 'item' --}}
 <div class="new-list-item-container {{cssClass}}">
     <div class="new-list-item" data-uuid="{{item.uuid}}">
-        {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item }}
         <div class="new-list-item-label-container">
+            <div class="new-list-item-image-container">
+                <img src="{{speakerImg item}}" />
+            </div>
             <a data-action="openUuid">
                 {{item.name}}
             </a>
         </div>
 
-        <div class="new-list-item-col">
+        <div class="new-list-item-col matrix-icon-col">
             <label>
                 {{matrixIconType item}}
             </label>
+        </div>
+
+        <div class="new-list-item-icons">
+            <a data-action="removeSlave">
+                <i class="fas fa-trash"></i>
+            </a>
         </div>
     </div>
 </div>

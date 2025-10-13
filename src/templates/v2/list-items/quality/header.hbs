@@ -5,14 +5,14 @@
         </label>
     </div>
 
-    <div class="new-list-item-col">
+    <div class="new-list-item-col skinny-col">
         <label>{{localize "SR5.QualityType"}}</label>
     </div>
-    <div class="new-list-item-col">
-        <label>{{localize "SR5.Rating"}}</label>
+    <div class="new-list-item-col rtg-col">
+        <label>{{localize "SR5.Rtg"}}</label>
     </div>
 
-    <div class="new-list-item-icons">
+    <div class="new-list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
     </div>
 </div>

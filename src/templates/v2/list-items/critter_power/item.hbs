@@ -4,9 +4,11 @@
          data-source="{{item.system.description.source}}"
          data-item-id="{{item.id}}"
          data-uuid="{{item.uuid}}">
-        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
-        {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+        <div class="new-list-item-label-container">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+        </div>
 
         <div class="new-list-item-col">
             <label>{{localizeOb item.system.powerType @root.config.critterPower.types}}</label>
@@ -17,22 +19,20 @@
         <div class="new-list-item-col">
             <label>{{localizeOb item.system.duration @root.config.critterPower.durations}}</label>
         </div>
-        <div class="new-list-item-col">
+        <div class="new-list-item-col rtg-col">
             <label>{{item.system.rating}}</label>
         </div>
 
-        {{#if @root.isEditMode}}
-            <div class="new-list-item-icons">
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
-                {{#if (isOwner item owner=@root.actor)}}
-                    {{#unless (eq item.system.optional "standard")}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
-                    {{/unless}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
-                {{/if}}
-            </div>
-        {{/if}}
+        <div class="new-list-item-icons {{#if @root.isPlayMode}} skinny-col {{/if}}">
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
+            {{#if (isOwner item owner=@root.actor)}}
+                {{#unless (eq item.system.optional "standard")}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
+                {{/unless}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+            {{/if}}
+        </div>
     </div>
     {{#if (hasKey @root.expandedUuids item.uuid)}}
         <div class="new-list-item-desc">

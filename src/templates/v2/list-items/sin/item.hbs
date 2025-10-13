@@ -4,12 +4,14 @@
          data-source="{{item.system.description.source}}"
          data-item-id="{{item.id}}"
          data-uuid="{{item.uuid}}">
-        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
-        {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-        {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+        <div class="new-list-item-label-container">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+        </div>
 
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/item-rating-col.hbs' item }}
-        <div class="new-list-item-icons">
+        <div class="new-list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
             {{#if (isOwner item owner=@root.actor)}}

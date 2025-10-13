@@ -799,6 +799,8 @@
             "Group": "Group",
             "LinkedActor": "Actor",
             "Loyalty": "Loyalty",
+            "LoyaltyConnectionLabel": "L / C",
+            "LoyaltyConnectionHelp": "Loyalty / Connection",
             "Type": "Type"
         },
         "ContactType": "Type",

@@ -118,6 +118,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             addEffect: SR5ItemSheet.#addEffect,
             toggleEffect: SR5ItemSheet.#toggleEffect,
             deleteEffect: SR5ItemSheet.#deleteEffect,
+
+            removeSlave: SR5ItemSheet.#removeSlave,
+            removeAllSlaves: SR5ItemSheet.#removeAllSlaves
         },
         dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     }
