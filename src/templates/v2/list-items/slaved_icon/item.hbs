@@ -1,0 +1,17 @@
+{{!-- expects an SR5Item to be passed in as 'item' --}}
+<div class="new-list-item-container {{cssClass}}">
+    <div class="new-list-item" data-uuid="{{item.uuid}}">
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item }}
+        <div class="new-list-item-label-container">
+            <a data-action="openUuid">
+                {{item.name}}
+            </a>
+        </div>
+
+        <div class="new-list-item-col">
+            <label>
+                {{matrixIconType item}}
+            </label>
+        </div>
+    </div>
+</div>

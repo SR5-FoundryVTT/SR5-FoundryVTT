@@ -39,6 +39,7 @@ export const preloadHandlebarsTemplates = async () => {
             'item-properties/effect',
             'item-properties/lifestyle',
             'item-properties/quality',
+            'item-properties/program',
             'item-properties/ritual',
             'item-properties/sin',
             'item-properties/spell',

@@ -122,6 +122,6 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('hasConnectedIcons', function (target: Shadowrun.MatrixTargetDocument, options) {
 
-        return (target.document instanceof SR5Actor && target.document.hasWirelessDevices);
+        return (target.document instanceof SR5Actor && target.document.hasWirelessDevices());
     })
 };

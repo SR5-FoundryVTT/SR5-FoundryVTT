@@ -58,7 +58,6 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     static override DEFAULT_OPTIONS: any = {
         actions: {
             toggleConnectedMatrixIcons: SR5MatrixActorSheet.#toggleConnectedMatrixIcons,
-            openMatrixDocument: SR5MatrixActorSheet.#openMatrixDocument,
             selectMatrixTarget: SR5MatrixActorSheet.#selectMatrixTarget,
             connectToNetwork: SR5MatrixActorSheet.#connectToMatrixNetwork,
             rebootPersona: SR5MatrixActorSheet.#rebootPersonaDevice,
@@ -421,26 +420,6 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         } else {
             await super._handleRollItem(item, event);
         }
-    }
-
-    /**
-     * Open a document from a DOM node containing a dataset uuid.
-     *
-     * This is intended to let deckers open marked documents they're FoundryVTT user has permissions for.
-     *
-     * @param event Any interaction event
-     */
-    static async #openMatrixDocument(this: SR5MatrixActorSheet, event) {
-        event.stopPropagation();
-
-        const uuid = SheetFlow.closestUuid(event.target);
-        if (!uuid) return;
-
-        // Marked documents can´t live in packs.
-        const document = SheetFlow.fromUuidSync(uuid) as SR5Item|SR5Actor;
-        if (!document) return;
-
-        await document.sheet?.render(true);
     }
 
     /**

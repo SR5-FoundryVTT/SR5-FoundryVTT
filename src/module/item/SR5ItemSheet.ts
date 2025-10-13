@@ -3,7 +3,6 @@ import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
 import { SR5 } from "../config";
 import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from "../effects";
-import { createTagify, parseDropData } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
@@ -16,7 +15,6 @@ import { SINFlow } from './flows/SINFlow';
 import RenderContext = foundry.applications.sheets.ItemSheet.RenderContext;
 import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
-import { LinksHelpers } from '@/module/utils/links';
 
 const { ItemSheet } = foundry.applications.sheets;
 
@@ -93,8 +91,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             height: 500,
         },
         actions: {
-            openSource: SR5ItemSheet.#onOpenSource,
-            openOrigin: SR5ItemSheet.#openOriginLink,
             addItem: SR5ItemSheet.#addItem,
             equipItem: SR5ItemSheet.#equipItem,
             addItemQty: SR5ItemSheet.#addItemQty,
@@ -110,7 +106,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             clearMarks: SR5ItemSheet.#deleteMarks,
             clearAllMark: SR5ItemSheet.#deleteAllMarks,
 
-            openSlave: SR5ItemSheet.#openSlave,
             removeController: SR5ItemSheet.#removeController,
 
             toggleFreshImport: SR5ItemSheet.#toggleFreshImportFlag,
@@ -142,6 +137,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         },
         details: {
             template: SheetFlow.templateBase('item/tabs/details'),
+            scrollable: ['.scrollable']
+        },
+        network: {
+            template: SheetFlow.templateBase('item/tabs/network'),
+            templates: SheetFlow.templateListItem('slaved_icon'),
             scrollable: ['.scrollable']
         },
         licenses: {
@@ -181,6 +181,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'description', label: 'Description', cssClass: '' },
                 { id: 'details', label: 'Details', cssClass: '' },
                 { id: 'action', label: 'Action', cssClass: '' },
+                { id: 'network', label: 'Network', cssClass: '' },
                 { id: 'weaponAmmo', label: 'Ammo', cssClass: '' },
                 { id: 'weaponModifications', label: 'Mods', cssClass: '' },
                 { id: 'licenses', label: 'Licenses', cssClass: '' },
@@ -214,6 +215,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
         if (!item.getAction()) {
             delete parts['action'];
+        }
+        if (!item.canBeMaster) {
+            delete parts['network'];
         }
         if (!item.isType('weapon')) {
             delete parts['weaponModifications'];
@@ -472,12 +476,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.update({ system: { linkedActor: actor.uuid } });
     }
 
-
-    static async #onOpenSource(this: SR5ItemSheet, event) {
-        event.preventDefault();
-        await this.item.openSource();
-    }
-
     async _onSelectRangedRangeCategory(event) {
         await this._onSelectRangeCategory("system.range.ranges", event);
     }
@@ -680,27 +678,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.removeSlave(document);
     }
 
-    /**
-     * Open a document from a DOM node containing a dataset uuid.
-     *
-     * This is intended to let deckers open marked documents they're FoundryVTT user has permissions for.
-     *
-     * @param event Any interaction event
-     */
-    static async #openSlave(event) {
-        event.stopPropagation();
-
-        const uuid = SheetFlow.closestUuid(event.target);
-        if (!uuid) return;
-
-        // Marked documents can´t live in packs.
-        const document = SheetFlow.fromUuidSync(uuid) as SR5Item|SR5Actor;
-        if (!document) return;
-
-        await document.sheet?.render(true);
-    }
-
-
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
@@ -775,19 +752,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!userConsented) return;
 
         await this.item.clearMarks();
-    }
-
-    static async #openOriginLink(this: SR5ItemSheet, event) {
-        event.preventDefault();
-
-        console.log('Shadowrun 5e | Opening PAN/WAN network controller');
-
-        const originLink = SheetFlow.closestAction(event.target).dataset.originLink;
-        const device = await fromUuid(originLink);
-        if (!device) return;
-
-        if (device instanceof SR5Item || device instanceof SR5Actor)
-            await device?.sheet?.render(true);
     }
 
     static async #removeController(this: SR5ItemSheet, event) {
@@ -890,7 +854,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         const effectId = SheetFlow.closestEffectId(event.target);
         const effect = this.item.effects.get(effectId);
-        if (effect && effect.id) {
+        if (effect?.id) {
             await this.item.deleteEmbeddedDocuments('ActiveEffect', [effect.id]);
         }
     }
@@ -1105,13 +1069,18 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     async _onDropActor(event, actor) {
-        return null;
+        if (this.item.isNetwork()) {
+            return this.item.addSlave(actor);
+        }
+        if (this.item.isType('contact')) {
+            return this.updateLinkedActor(actor);
+        }
     }
 
     /* -------------------------------------------- */
 
     /**
-     * Handle a dropped Item on the Actor Sheet.
+     * Handle a dropped Item on the Item Sheet.
      * @param {DragEvent} event     The initiating drop event
      * @param {Item} item           The dropped Item document
      * @returns {Promise<Item|null|undefined>} A Promise resolving to the dropped Item (if sorting), a newly created Item,
@@ -1119,14 +1088,31 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     async _onDropItem(event, item) {
-        const result = await this.item.createNestedItem(item);
-        return result ?? null;
+        // dropped ammo and mods to weapons get added as a nested item
+        if (this.item.isType('weapon') && item.isType('ammo', 'modification')) {
+            return this.item.createNestedItem(item);
+        }
+        // dropped Grid and Hosts on SIN allows for adding the SIN as a network option
+        if (this.item.isType('sin') && item.isNetwork()) {
+            return this.item.addNewNetwork(item);
+        }
+        // dropped Network on any other type should result in connecting to that network
+        if (this.item.isNetwork() && item.canBeSlave) {
+            return this.item.addSlave(item);
+        }
+        if (this.item.canBeMaster && item.canBeSlave) {
+            return this.item.addSlave(item);
+        }
+        // if this item can be slaved and the dropped item can be a master, add ourselves as a slave to it
+        if (this.item.canBeSlave && item.canBeMaster) {
+            return item.addSlave(this.item);
+        }
     }
 
     /* -------------------------------------------- */
 
     /**
-     * Handle a dropped Folder on the Actor Sheet.
+     * Handle a dropped Folder on the Item Sheet.
      * @param {DragEvent} event     The initiating drop event
      * @param {Folder} folder       The dropped Folder document
      * @returns {Promise<Folder|null|undefined>} A Promise resolving to the dropped Folder indicate success, or a nullish
@@ -1168,101 +1154,4 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!dragData) return;
         event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
     }
-
-    /*
-    // TODO fix
-    async _onDrop(event) {
-        if (!game.items || !game.actors || !game.scenes) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        // Parse drop data.
-        const data = parseDropData(event);
-        if (!data) return;
-
-        // CASE - Handle dropping of documents directly into the source field like urls and pdfs.
-        const targetElement = event.toElement || event.target;
-        if (targetElement?.name === 'system.description.source')
-            return this.item.setSource(data.uuid);
-
-        // CASE - Handle ActiveEffects
-        if (data.type === 'ActiveEffect') {
-            if (data.itemId === this.item.id) {
-                return; // don't add effects to ourselves
-            }
-            // the effect should be just the data itself
-            const effect = data.data;
-            // delete the id on it so a new one is generated
-            delete effect._id;
-            // add this to the embedded ActiveEffect documents
-            await this.item.createEmbeddedDocuments('ActiveEffect', [effect]);
-
-            return;
-        }
-
-        // CASE - Add items to a weapons modification / ammo
-        if (this.item.isType('weapon') && data.type === 'Item') {
-            let item;
-            // Case 1 - Data explicitly provided
-            if (data.data) {
-                if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
-                    return console.warn('Shadowrun 5e | Cant drop items onto themselves');
-                }
-                item = data;
-                // Case 2 - From a Compendium Pack
-            } else if (data.pack) {
-                item = await Helpers.getEntityFromCollection(data.pack, data.id);
-                // Case 3 - From a World Entity
-            } else {
-                item = await fromUuid(data.uuid);
-            }
-
-            // Provide readable error for failing item retrieval assumptions.
-            if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
-
-            // if it's a master device, add ourself as a slave to it
-            if (item.canBeMaster) {
-                await item.addSlave(this.item);
-                return;
-            }
-            return this.item.createNestedItem(item._source);
-        }
-
-        // Add actors to WAN, both GRID and HOST
-        if (this.item.isNetwork() && ['Item', 'Actor'].includes(data.type)) {
-            const document = await fromUuid(data.uuid) as SR5Actor;
-            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
-            await this.item.addSlave(document);
-            return;
-        }
-
-        // Add document to a PAN.
-        if (this.item.isType('device') && ['Item', 'Actor'].includes(data.type)) {
-            const document = await fromUuid(data.uuid) as SR5Item | SR5Actor;
-            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
-            await this.item.addSlave(document);
-            return;
-        }
-
-        // Link actors to existing contacts.
-        if (this.item.isType('contact') && data.type === 'Actor') {
-            const actor = await fromUuid(data.uuid) as SR5Actor;
-
-            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-
-            return this.updateLinkedActor(actor);
-        }
-
-        // Add networks to SINs.
-        if (this.item.isType('sin') && data.type === 'Item') {
-            const item = await fromUuid(data.uuid) as SR5Item;
-            if (!item) return;
-            if (!item.isNetwork()) return;
-
-            await this.item.addNewNetwork(item);
-        }
-    }
-
-     */
 }

@@ -4,7 +4,7 @@
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
         <div class="new-list-item-label-container">
             <a class="{{#if item.selected}}new-list-item-selected{{/if}}"
-               data-action="showItemDescription"
+               data-action="openUuid"
                data-item-id="{{item.document.uuid}}">
                 {{item.name}}
             </a>
@@ -12,7 +12,7 @@
 
         <div class="new-list-item-col">
             <label>
-                {{matrixIconType item.document.type}}
+                {{matrixIconType item.document}}
             </label>
         </div>
 
@@ -27,8 +27,5 @@
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item.document }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connected-icons-toggle.hbs' item }}
         </div>
-    </div>
-    <div class="new-list-item-description">
-        TODO
     </div>
 </div>
