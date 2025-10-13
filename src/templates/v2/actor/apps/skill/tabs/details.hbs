@@ -2,12 +2,12 @@
     <div class="fill-container">
         <div class="fill-container standard-form">
             <div class=" fill-container scrollable">
-                <div class="new-list-item new-list-item-header">
-                    <div class="new-list-item-label-container">
+                <div class="list-item list-item-header">
+                    <div class="list-item-start">
                         <label>{{localize "SR5.Specializations"}}</label>
                     </div>
                     {{#if @root.isEditMode}}
-                        <div class="new-list-item-icons">
+                        <div class="list-item-icons">
                             <a data-action="addSpecialization">
                                 {{localize "SR5.Add"}}&nbsp;<i class="fas fa-plus"></i>
                             </a>
@@ -15,13 +15,13 @@
                     {{/if}}
                 </div>
                 {{#each skill.specs as |spec index|}}
-                <div class="new-list-item">
-                    <div class="new-list-item-label-container">
+                <div class="list-item">
+                    <div class="list-item-start">
                         {{formInput @root.skillFields.specs.element name=(concat @root.skill_name '.specs.' index) value=spec
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                     {{#if @root.isEditMode}}
-                        <div class="new-list-item-icons">
+                        <div class="list-item-icons">
                             <a data-action="removeSpecialization" data-index="{{index}}">
                                 <i class="fas fa-trash"></i>
                             </a>
@@ -31,13 +31,13 @@
                 {{/each}}
                 {{!-- Hide Skill Bonus fields if none are set, we will migrate them eventually --}}
                 {{#if skill.bonus.length}}
-                    <div class="new-list-item new-list-item-header">
-                        <div class="new-list-item-label-container">
+                    <div class="list-item list-item-header">
+                        <div class="list-item-start">
                             <label>{{localize "SR5.Bonuses"}}</label>
                         </div>
                         {{!-- Hide but keep the code around for debugging purposes
                         {{#if @root.isEditMode}}
-                            <div class="new-list-item-icons">
+                            <div class="list-item-icons">
                                 <a data-action="addBonus">
                                     {{localize "SR5.Add"}}&nbsp;<i class="fas fa-plus"></i>
                                 </a>
@@ -46,19 +46,19 @@
                         --}}
                     </div>
                     {{#each skill.bonus as |bonus bonusId|}}
-                        <div class="new-list-item">
-                            <div class="new-list-item-label-container">
+                        <div class="list-item">
+                            <div class="list-item-start">
                                 {{formInput @root.skillFields.bonus.element.fields.key
                                             name=(concat @root.skill_name '.bonus.' bonusId '.key') value=bonus.key
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </div>
-                            <div class="new-list-item-label-container">
+                            <div class="list-item-start">
                                 {{formInput @root.skillFields.bonus.element.fields.value
                                             name=(concat @root.skill_name '.bonus.' bonusId '.value') value=bonus.value
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </div>
                             {{#if @root.isEditMode}}
-                                <div class="new-list-item-icons">
+                                <div class="list-item-icons">
                                     <a data-action="removeBonus" data-index="{{bonusId}}">
                                         <i class="fas fa-trash"></i>
                                     </a>

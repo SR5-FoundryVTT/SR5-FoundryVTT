@@ -1,7 +1,7 @@
-<div class="new-list-item new-list-item-header">
+<div class="list-item list-item-header">
     {{#each favorites}}
-    <div class="new-list-item-col">
-        <button class="new-list-item-image-container icon sr5-icon"
+    <div class="list-item-col">
+        <button class="list-item-image-container icon sr5-icon"
                 data-tooltip="{{this.name}} - {{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}"
             {{#if @root.isPlayMode}}
                 data-action="rollItem"
@@ -11,21 +11,21 @@
                 data-item-id="{{this.uuid}}">
             <img src="{{this.img}}"
                 {{#if @root.isEditMode}}
-                 class="new-list-item-image-edit"
+                 class="list-item-image-edit"
                 {{else if (hasRoll this)}}
-                 class="new-list-item-image-roll"
+                 class="list-item-image-roll"
                 {{else}}
-                 class="new-list-item-image-info"
+                 class="list-item-image-info"
                 {{/if}}
             />
         </button>
     </div>
     {{else}}
-        <div class="new-list-item-label-container">
+        <div class="list-item-start">
             {{localize "SR5.Actor.NoFavoritesSelected"}}
         </div>
     {{/each}}
-    <div class="new-list-item-icons">
+    <div class="list-item-icons">
         {{#if (eq actor.type 'vehicle')}}
             <a data-action="toggleChaseEnvironment" >
                 <i {{#if (eq system.environment 'handling')}}
@@ -92,8 +92,8 @@
             {{/if}}
         {{else if isVehicle}}
             {{#if vehicle.driver}}
-                <div class="new-list-item">
-                    <div class="new-list-item-label-container">
+                <div class="list-item">
+                    <div class="list-item-start">
                         <a class="content-link" draggable="true" data-link data-type="Actor" data-id="{{vehicle.driver.id}}" data-uuid="{{vehicle.driver.uuid}}">
                             <i class="fas fa-steering-wheel"></i>{{vehicle.driver.name}}
                             <a data-action="removeVehicleDriver" class="close"><i class="fas fa-times"></i></a>

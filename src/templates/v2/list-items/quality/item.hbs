@@ -1,35 +1,35 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
-<div class="new-list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
-    <div class="new-list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}"
+<div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
+    <div class="list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}"
          data-source="{{item.system.description.source}}"
          data-item-id="{{item.id}}"
          data-uuid="{{item.uuid}}">
-        <div class="new-list-item-label-container">
+        <div class="list-item-start">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
             {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
         </div>
 
-        <div class="new-list-item-col skinny-col">
+        <div class="list-item-col skinny-col">
             <label>
                 {{localizeOb item.system.type @root.config.qualityTypes}}
             </label>
         </div>
-        <div class="new-list-item-col rtg-col">
+        <div class="list-item-col rtg-col">
             <label>
                 {{item.system.rating}}
             </label>
         </div>
 
-        <div class="new-list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
         </div>
     </div>
     {{#if (hasKey @root.expandedUuids item.uuid)}}
-        <div class="new-list-item-desc">
-            <div class="new-list-item-properties">
+        <div class="list-item-desc">
+            <div class="list-item-properties">
                 {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/quality.hbs' item=item }}
                 {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs' item=item }}
             </div>

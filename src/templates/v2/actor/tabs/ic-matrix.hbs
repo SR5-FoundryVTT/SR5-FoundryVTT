@@ -1,13 +1,13 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        <div class="new-list-item new-list-item-header">
-            <div class="new-list-item-col">
+        <div class="list-item list-item-header">
+            <div class="list-item-col">
                 <label>{{localize "SR5.Labels.ActorSheet.DeviceRating"}}</label>
                 <a data-action="roll" data-roll-id="matrix.device-rating">
                     {{system.matrix.rating}}
                 </a>
             </div>
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 {{#if network}}
                     <label>{{localize "SR5.Labels.ActorSheet.Network"}}</label>
                     <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>

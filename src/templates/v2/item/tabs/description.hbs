@@ -4,12 +4,12 @@
             {{formInput systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
         {{else}}
             {{#if (eq item.type 'weapon')}}
-                <div class="new-list-item new-list-item-header">
+                <div class="list-item list-item-header">
                     {{#if (eq system.category 'range')}}
-                        <div class="new-list-item-label-container">
+                        <div class="list-item-start">
                             <label>{{localize "SR5.Weapon.Range.Ranges"}}: {{system.range.ranges.short}}m/{{system.range.ranges.medium}}m/{{system.range.ranges.long}}m/{{system.range.ranges.extreme}}m</label>
                         </div>
-                        <div class="new-list-item-col">
+                        <div class="list-item-col">
                             <label>
                                 {{localize "SR5.Weapon.Mode.Modes"}}:
                                 {{#if system.range.modes.single_shot}}
@@ -26,15 +26,15 @@
                                 {{/if}}
                             </label>
                         </div>
-                        <div class="new-list-item-col">
+                        <div class="list-item-col">
                             <label>{{localize "SR5.RecoilCompensation"}} {{system.range.rc.value}}</label>
                         </div>
                     {{else if (eq system.category 'thrown')}}
-                        <div class="new-list-item-label-container">
+                        <div class="list-item-start">
                             <label>{{localize "SR5.Weapon.Range.Ranges"}}: {{system.thrown.ranges.short}}m/{{system.thrown.ranges.medium}}m/{{system.thrown.ranges.long}}m/{{system.thrown.ranges.extreme}}m</label>
                         </div>
                     {{else if (eq system.category 'melee')}}
-                        <div class="new-list-item-label-container">
+                        <div class="list-item-start">
                             <label>{{systemFields.melee.fields.reach.label}} {{system.melee.reach}}</label>
                         </div>
                     {{/if}}
@@ -42,8 +42,8 @@
             {{/if}}
             {{#if (eq item.type 'armor')}}
                     {{#if system.armor.value}}
-                    <div class="new-list-item new-list-item-header">
-                        <div class="new-list-item-label-container">
+                    <div class="list-item list-item-header">
+                        <div class="list-item-start">
                             <label data-tooltip="{{systemFields.armor.fields.base.label}}"><i class="fas fa-shield-halved"></i> {{#if system.armor.mod}}+{{/if}}{{system.armor.value}}</label>
                         </div>
                     </div>

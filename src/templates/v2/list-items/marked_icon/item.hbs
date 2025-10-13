@@ -1,20 +1,20 @@
 {{!--expects a MarkedDocument to be passed in as 'item' --}}
-<div class="new-list-item-container {{cssClass}}">
-    <div class="new-list-item {{#if item.selected}}new-list-item-selected{{/if}}" data-uuid="{{item.document.uuid}}">
-        <div class="new-list-item-label-container">
+<div class="list-item-container {{cssClass}}">
+    <div class="list-item {{#if item.selected}}list-item-selected{{/if}}" data-uuid="{{item.document.uuid}}">
+        <div class="list-item-start">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
             <a data-action="openUuid">
                 {{item.name}}
             </a>
         </div>
 
-        <div class="new-list-item-col matrix-icon-col">
+        <div class="list-item-col matrix-icon-col">
             <label>
                 {{matrixIconType item.document}}
             </label>
         </div>
 
-        <div class="new-list-item-col mark-input-col">
+        <div class="list-item-col mark-input-col">
             {{#if @root.isEditMode}}
                 <input type="number" class="mark-input" value="{{item.marks}}" min="0" max="3">
             {{else}}
@@ -32,7 +32,7 @@
             {{/if}}
         </div>
 
-        <div class="new-list-item-icons skinny-icons">
+        <div class="list-item-icons skinny-icons">
             <a data-action="removeMarks" data-item-id="{{item.document.uuid}}">
                 <i class="fas fa-trash"></i>
             </a>

@@ -1,13 +1,13 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        <div class="new-list-item new-list-item-header">
-            <div class="new-list-item-col">
+        <div class="list-item list-item-header">
+            <div class="list-item-col">
                 <label>{{localize "SR5.Level"}}</label>
                 <a data-action="roll" data-roll-id="level">
                     {{system.level}}
                 </a>
             </div>
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 {{#if network}}
                     <label>{{localize "SR5.Labels.ActorSheet.Network"}}</label>
                     <a data-action="openUud" data-uuid="{{network.uuid}}">{{network.name}}</a>
@@ -18,7 +18,7 @@
                     <a data-action="connectToNetwork">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
                 {{/if}}
             </div>
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 <label>{{localize "SR5.Labels.ActorSheet.MarkNetwork"}}</label>
                 <a data-action="showMatrixNetworkSelection">
                     <i class="fas fa-network-wired"></i>

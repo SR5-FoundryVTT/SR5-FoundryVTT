@@ -1,7 +1,7 @@
 <footer class="sheet-footer">
-    <div class="new-list-item">
+    <div class="list-item">
         {{#if (eq actor.type 'character')}}
-            <div class="new-list-item-col select-col">
+            <div class="list-item-col select-col">
             {{#if @root.isEditMode}}
                     {{formInput systemFields.metatype value=source.system.metatype rootId=rootId localize=true classes="short thicc" }}
             {{else}}
@@ -9,22 +9,22 @@
             {{/if}}
         </div>
             {{#if system.is_npc}}
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 <label>{{localize "SR5.IsNPC"}}</label>
             </div>
             {{/if}}
             {{#if system.is_critter}}
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 <label>{{localize "SR5.IsCritter"}}</label>
             </div>
             {{/if}}
             {{#if system.is_grunt}}
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 <label>{{localize "SR5.IsGrunt"}}</label>
             </div>
             {{/if}}
             {{#unless (or system.is_npc system.is_critter)}}
-            <div class="new-list-item-col nuyen-col">
+            <div class="list-item-col nuyen-col">
                 <label>
                     <a data-action="openNuyenManager"><i class="fas fa-yen"></i></a>&nbsp;
                     {{#if @root.isEditMode}}
@@ -34,7 +34,7 @@
                     {{/if}}
                 </label>
             </div>
-            <div class="new-list-item-col reputation-col">
+            <div class="list-item-col reputation-col">
                 <label>
                     <a data-action="openReputationManager"><i class="fas fa-people-group"></i></a>&nbsp;
                     <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.ActorSheet.Labels.StreetCredShort"}}&nbsp;
@@ -62,7 +62,7 @@
                     </span>
                 </label>
             </div>
-            <div class="new-list-item-col karma-mod-col">
+            <div class="list-item-col karma-mod-col">
                 <label data-tooltip="SR5.Karma">
                     <a data-action="openKarmaManager"><i class="fas fa-yin-yang"></i></a>&nbsp;
                     {{#if @root.isEditMode}}
@@ -76,13 +76,13 @@
             </div>
             {{/unless}}
             {{#if @root.isPlayMode}}
-                <div class="new-list-item-col">
+                <div class="list-item-col">
                     <label><i class="fas fa-head-side-gear" data-tooltip="SR5.AttrEssence"></i>&nbsp;<span data-attribute-modifier-tooltip="essence">{{system.attributes.essence.value}}</span></label>
                 </div>
             {{/if}}
         {{/if}}
         {{#if (eq actor.type 'spirit')}}
-            <div class="new-list-item-col select-col">
+            <div class="list-item-col select-col">
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.spiritType value=source.system.spiritType
                                 localize=true classes="short" rootId=rootId }}
@@ -90,7 +90,7 @@
                     <label>{{localizeOb  system.spiritType config.spiritTypes}}</label>
                 {{/if}}
             </div>
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 <label>{{localize "SR5.Spirit.Force"}}</label>
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.force value=system.force classes="short skinny" rootId=rootId}}
@@ -99,14 +99,14 @@
                 {{/if}}
             </div>
             {{#if @root.isEditMode}}
-                <div class="new-list-item-col">
+                <div class="list-item-col">
                     <label>
                         {{localize "SR5.Spirit.Bound"}}
                         {{formInput systemFields.bound value=system.bound rootId=rootId}}
                     </label>
                 </div>
             {{else if system.bound}}
-                <div class="new-list-item-col">
+                <div class="list-item-col">
                     <label>
                         {{localize "SR5.Spirit.Bound"}}
                     </label>
@@ -114,7 +114,7 @@
             {{/if}}
         {{/if}}
         {{#if (eq actor.type 'sprite')}}
-            <div class="new-list-item-col select-col">
+            <div class="list-item-col select-col">
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.spriteType value=source.system.spriteType
                                 localize=true classes="short" rootId=rootId }}
@@ -122,7 +122,7 @@
                     <label>{{localizeOb  system.spriteType config.spriteTypes}}</label>
                 {{/if}}
             </div>
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 <label>{{localize "SR5.Sprite.Level"}}</label>
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.level value=system.level classes="short skinny" rootId=rootId}}
@@ -131,21 +131,21 @@
                 {{/if}}
             </div>
             {{#if @root.isEditMode}}
-                <div class="new-list-item-col">
+                <div class="list-item-col">
                     <label>
                         {{localize "SR5.Sprite.Registered"}}
                         {{formInput systemFields.registered value=system.registered rootId=rootId}}
                     </label>
                 </div>
             {{else if system.registered}}
-                <div class="new-list-item-col">
+                <div class="list-item-col">
                     <label>
                         {{localize "SR5.Sprite.Registered"}}
                     </label>
                 </div>
             {{/if}}
         {{else if (eq actor.type 'ic')}}
-            <div class="new-list-item-label-container">
+            <div class="list-item-start">
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.icType value=system.icType rootId=rootId
                                 localize=true classes="short" disabled=network}}
@@ -153,7 +153,7 @@
                     <label>{{localizeOb system.icType config.icTypes}}</label>
                 {{/if}}
             </div>
-        <div class="new-list-item-col">
+        <div class="list-item-col">
             <label>{{localize "SR5.Rtg"}}&nbsp;
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.host.fields.rating value=system.host.rating
@@ -164,7 +164,7 @@
             </label>
         </div>
         {{else if (eq actor.type 'vehicle')}}
-            <div class="new-list-item-col select-col">
+            <div class="list-item-col select-col">
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.vehicleType value=source.system.vehicleType
                                 localize=true classes="short" rootId=rootId }}
@@ -174,28 +174,28 @@
             </div>
 
             {{#if @root.isEditMode}}
-                <div class="new-list-item-col">
+                <div class="list-item-col">
                     <label>
                         {{localize "SR5.Vehicle.Drone"}}
                         {{formInput systemFields.isDrone value=source.system.isDrone rootId=rootId }}
                     </label>
                 </div>
             {{else if system.isDrone}}
-                <div class="new-list-item-col">
+                <div class="list-item-col">
                     <label>{{localize "SR5.Vehicle.Drone"}}</label>
                 </div>
             {{/if}}
 
             {{#if @root.isPlayMode}}
                 {{#if system.isDrone}}
-                    <div class="new-list-item-col">
+                    <div class="list-item-col">
                         <label>
                             {{localize "SR5.ModPoints"}}&nbsp;
                             {{calcModPointSlots items}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                     </div>
                 {{else}}
-                    <div class="new-list-item-col vehicle-mod-col">
+                    <div class="list-item-col vehicle-mod-col">
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.body">
                             &nbsp;<i class="fas fa-truck"></i>
                             {{calcModificationCategorySlots items "body"}}/{{calcModificationSlotsAvailable actor}}

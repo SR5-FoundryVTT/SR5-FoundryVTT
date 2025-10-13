@@ -563,7 +563,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #toggleInventoryVisibility(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        const listHeader = $(event.target).closest('.new-list-item-header');
+        const listHeader = $(event.target).closest('.list-item-header');
         const type = listHeader.data().itemType;
 
         const current = this._inventoryOpenClose[type] ?? true;

@@ -1894,8 +1894,8 @@ input[type='text'].display {
         flex-shrink: 0;
     }
 
-    // new-list-item classes should be renamed to list-item when complete
-    .new-list-item-container {
+    // list-item classes should be renamed to list-item when complete
+    .list-item-container {
         display: flex;
         flex-flow: column nowrap;
 
@@ -1906,20 +1906,20 @@ input[type='text'].display {
             margin-bottom: -1px;
         }
 
-        &.new-list-item-subcategory {
+        &.list-item-subcategory {
             padding-left: .5rem;
         }
 
-        .new-list-item {
+        .list-item {
             flex: 1;
         }
 
-        .new-list-item-desc {
+        .list-item-desc {
             flex: 1;
             border-top: $groove;
             padding: .5rem;
 
-            .new-list-item-properties {
+            .list-item-properties {
                 display: flex;
                 flex-flow: row wrap;
                 justify-content: start;
@@ -1947,7 +1947,7 @@ input[type='text'].display {
             }
         }
 
-        .new-list-item-description {
+        .list-item-description {
             display: none;
             flex: 1;
         }
@@ -1957,8 +1957,8 @@ input[type='text'].display {
         }
     }
 
-    // allow new-list-item to exist outside of the container
-    .new-list-item {
+    // allow list-item to exist outside of the container
+    .list-item {
         display: flex;
         flex-flow: row;
         justify-content: space-between;
@@ -1967,11 +1967,11 @@ input[type='text'].display {
         width: 100%;
         padding: 2px;
 
-        &.new-list-item-selected {
+        &.list-item-selected {
             background: radial-gradient(rgba($matrix-green, 0.4), rgba($matrix-green, 0.01));
         }
 
-        .new-list-item-image-container {
+        .list-item-image-container {
             min-width: 1.25rem;
             max-width: 1.25rem;
             min-height: 1.25rem;
@@ -1981,35 +1981,35 @@ input[type='text'].display {
             justify-content: center;
 
             &:hover {
-                .new-list-item-image-roll {
+                .list-item-image-roll {
                     content: url('assets/dice-solid.svg');
                     filter: invert(1);
                 }
-                .new-list-item-image-info {
+                .list-item-image-info {
                     content: url('icons/files.svg');
                 }
-                .new-list-item-image-edit {
+                .list-item-image-edit {
                     content: url('icons/redist/wrench.svg');
                 }
-                .new-list-item-image-target {
+                .list-item-image-target {
                     content: url('icons/redist/target.svg');
                 }
             }
         }
 
-        &.new-list-item-header {
+        &.list-item-header {
             border-bottom: 1px solid $yellow;
             background: rgba($black, 0.7);
             margin-bottom: 1px;
         }
 
         &:nth-of-type(even) {
-            &:not(.new-list-item-header) {
+            &:not(.list-item-header) {
                 background: rgba($white, 0.03);
             }
         }
 
-        .new-list-item-label-container {
+        .list-item-start {
             display: flex;
             flex-flow: row nowrap;
             align-items: center;
@@ -2025,7 +2025,7 @@ input[type='text'].display {
             }
         }
 
-        .new-list-item-col {
+        .list-item-col {
             display: flex;
             flex-flow: row;
             flex: 2;
@@ -2102,7 +2102,7 @@ input[type='text'].display {
             }
         }
 
-        .new-list-item-icons {
+        .list-item-icons {
             display: flex;
             flex-flow: row nowrap;
             flex: none;

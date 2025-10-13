@@ -1,16 +1,16 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
-<div class="new-list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
-    <div class="new-list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}"
+<div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
+    <div class="list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}"
          data-source="{{item.system.description.source}}"
          data-item-id="{{item.id}}"
          data-uuid="{{item.uuid}}">
-        <div class="new-list-item-label-container">
+        <div class="list-item-start">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
             {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
         </div>
 
-        <div class="new-list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
@@ -18,8 +18,8 @@
         </div>
     </div>
     {{#if (hasKey @root.expandedUuids item.uuid)}}
-        <div class="new-list-item-desc">
-            <div class="new-list-item-properties">
+        <div class="list-item-desc">
+            <div class="list-item-properties">
                 {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/technology.hbs' item=item }}
                 {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/program.hbs' item=item }}
             </div>

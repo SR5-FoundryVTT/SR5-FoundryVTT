@@ -1,13 +1,13 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        <div class="new-list-item new-list-item-header">
-            <div class="new-list-item-col">
+        <div class="list-item list-item-header">
+            <div class="list-item-col">
                 <label>{{localize "SR5.Labels.ActorSheet.DeviceRating"}}</label>
                 <a data-action="roll" data-roll-id="matrix.device-rating">
                     {{system.matrix.rating}}
                 </a>
             </div>
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 {{#if network}}
                     <label>{{localize "SR5.Labels.ActorSheet.Network"}}</label>9
                     <a class="open-matrix-device" data-uuid="{{network.uuid}}">{{network.name}}</a>
@@ -20,7 +20,7 @@
             </div>
             {{#unless network}}
                 {{#if vehicle.driver}}
-                    <div class="new-list-item-col">
+                    <div class="list-item-col">
                         <label>{{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}</label>
                         <a data-action="connectToDriver">
                             <i class="fas fa-network-wired"></i>
@@ -28,7 +28,7 @@
                     </div>
                 {{/if}}
             {{/unless}}
-            <div class="new-list-item-col">
+            <div class="list-item-col">
                 <label>{{localize "SR5.Labels.Sheet.RebootDevice"}}</label>
                 <a data-action="rebootPersona" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
                     <i class="fas fa-power-off"></i>

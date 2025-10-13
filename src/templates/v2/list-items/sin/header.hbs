@@ -1,15 +1,15 @@
-<div class="new-list-item new-list-item-header">
-    <div class="new-list-item-label-container">
+<div class="list-item list-item-header">
+    <div class="list-item-start">
         <label>
             {{localize label}}
         </label>
     </div>
 
-    <div class="new-list-item-col rtg-col">
+    <div class="list-item-col rtg-col">
         <label>{{localize "SR5.Rating"}}</label>
     </div>
 
-    <div class="new-list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
+    <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
     </div>
 </div>

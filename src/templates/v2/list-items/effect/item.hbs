@@ -1,9 +1,9 @@
 {{!-- list-item expects an SR5ActiveEffect to be passed in as 'item' --}}
-<div class="new-list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
-    <div class="new-list-item draggable" data-effect-id="{{item.id}}" data-uuid="{{item.uuid}}" {{#if isItemEffect}} data-source="{{item.parent.uuid}}" {{/if}}>
-        <div class="new-list-item-label-container">
+<div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
+    <div class="list-item draggable" data-effect-id="{{item.id}}" data-uuid="{{item.uuid}}" {{#if isItemEffect}} data-source="{{item.parent.uuid}}" {{/if}}>
+        <div class="list-item-start">
             {{#if item.img}}
-                <img src="{{item.img}}" class="new-list-item-image" height="24px" width="24px" />
+                <img src="{{item.img}}" class="list-item-image" height="24px" width="24px" />
             {{/if}}
             <a data-action="showItemDescription">
                 {{#if name}}
@@ -14,17 +14,17 @@
             </a>
         </div>
 
-        <div class="new-list-item-col">
+        <div class="list-item-col">
             <label>{{localizeOb item.system.applyTo @root.config.effectApplyTo}}</label>
         </div>
 
         {{!-- Add in when we actual deal with durations
-        <div class="new-list-item-col">
+        <div class="list-item-col">
             <label>{{effectDurationLabel item}}</label>
         </div>
         --}}
 
-        <div class="new-list-item-icons">
+        <div class="list-item-icons">
             <a data-tooltip="SR5.ToggleActive" data-action="toggleEffect">
                 <i class="{{#if item.disabled}}far fa-circle{{else}}fas fa-check-circle{{/if}}"></i>
             </a>
@@ -38,8 +38,8 @@
         </div>
     </div>
     {{#if (hasKey @root.expandedUuids item.uuid)}}
-        <div class="new-list-item-desc">
-            <div class="new-list-item-properties">
+        <div class="list-item-desc">
+            <div class="list-item-properties">
                 {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/effect.hbs' item=item }}
             </div>
             {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}

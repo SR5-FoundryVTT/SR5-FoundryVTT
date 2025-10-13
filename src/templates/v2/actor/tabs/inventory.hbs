@@ -1,7 +1,7 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        <div class="new-list-item new-list-item-header header-for-scrollable">
-            <div class="new-list-item-label-container">
+        <div class="list-item list-item-header header-for-scrollable">
+            <div class="list-item-start">
                 <label class="item-text item-name" for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
                 <div>
                     <select id="select-inventory" class="sr5-select">
@@ -23,7 +23,7 @@
                     {{/if}}
                 {{/if}}
             </div>
-            <div class="new-list-item-icons">
+            <div class="list-item-icons">
                 {{#if @root.isEditMode}}
                 <a data-action="createInventory" data-tooltip="SR5.Labels.ActorSheet.CreateInventory">
                     {{localize "SR5.Add"}}&nbsp;<i class="fas fa-plus"></i>

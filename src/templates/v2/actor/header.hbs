@@ -54,13 +54,13 @@
         {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
         {{#if @root.isEditMode}}
             <div>
-                <div class="new-list-item">
-                    <div class="new-list-item-label-container">
+                <div class="list-item">
+                    <div class="list-item-start">
                         <label data-tooltip="{{systemFields.attributes.fields.edge.fields.base.hint}}">
                             {{systemFields.attributes.fields.edge.fields.base.label}}
                         </label>
                     </div>
-                    <div class="new-list-item-col">
+                    <div class="list-item-col">
                         {{formInput systemFields.attributes.fields.edge.fields.base value=system.attributes.edge.base
                                     rootId=rootId class="short"}}
                     </div>
@@ -77,11 +77,11 @@
         {{/if}}
         {{#if (eq actor.type 'vehicle')}}
             <div>
-                <div class="new-list-item">
-                    <div class="new-list-item-label-container">
+                <div class="list-item">
+                    <div class="list-item-start">
                         <label>{{localize "SR5.Vehicle.ControlMode"}}</label>
                     </div>
-                    <div class="new-list-item-col thicc-col">
+                    <div class="list-item-col thicc-col">
                         {{formInput systemFields.controlMode value=source.system.vehicle.controlMode
                                     classes="short" localize=true }}
                     </div>
@@ -90,11 +90,11 @@
         {{/if}}
         {{#if (or isSpirit isSprite)}}
             <div>
-                <div class="new-list-item">
-                    <div class="new-list-item-label-container">
+                <div class="list-item">
+                    <div class="list-item-start">
                         <label>{{localize "SR5.Sprite.Services"}}</label>
                     </div>
-                    <div class="new-list-item-col qty-input-col"
+                    <div class="list-item-col qty-input-col"
                          data-tooltip="{{#if isSpirit}}SR5.Spirit.Services{{else}}SR5.Sprite.Services{{/if}}">
                         {{#if @root.isEditMode}}
                             {{formInput systemFields.services value=system.services rootId=rootId class="short"}}

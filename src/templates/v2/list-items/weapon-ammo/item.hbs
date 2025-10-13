@@ -1,17 +1,17 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
-<div class="new-list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
-    <div class="new-list-item draggable"
+<div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
+    <div class="list-item draggable"
          data-source="{{item.system.description.source}}"
          data-item-id="{{item.id}}"
          data-uuid="{{item.uuid}}">
 
-        <div class="new-list-item-label-container">
+        <div class="list-item-start">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
             {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
         </div>
 
-        <div class="new-list-item-col qty-input-col">
+        <div class="list-item-col qty-input-col">
             {{#if @root.isEditMode}}
                 <input type="number" class="item-quantity-input" value="{{item.system.technology.quantity}}" min="0" max="999">
             {{else}}
@@ -27,7 +27,7 @@
             {{/if}}
         </div>
 
-        <div class="new-list-item-icons">
+        <div class="list-item-icons">
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
@@ -35,8 +35,8 @@
         </div>
     </div>
     {{#if (hasKey @root.expandedUuids item.uuid)}}
-        <div class="new-list-item-desc">
-            <div class="new-list-item-properties">
+        <div class="list-item-desc">
+            <div class="list-item-properties">
                 {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/ammo.hbs' item=item }}
             </div>
             {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}

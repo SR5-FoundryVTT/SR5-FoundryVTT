@@ -1,5 +1,5 @@
 <footer class="sheet-footer">
-    <div class="new-list-item">
+    <div class="list-item">
         {{!-- Show Quantity First --}}
         {{#if system.technology}}
             <span>
@@ -36,7 +36,7 @@
                 <label data-tooltip="{{systemFields.technology.fields.cost.label}}"><i class="fas fa-yen-sign"></i>&nbsp;{{nuyenValue system.technology.calculated.cost.value}}</label>
             {{/if}}
             {{#if system.technology.conceal.value}}
-                <label data-tooltip="{{systemFields.technology.fields.conceal.fields.value.label}}"><i class="fas fa-magnifying-glass-waveform"></i>&nbsp;{{system.technology.conceal.value}}</label>
+                <label data-tooltip="{{systemFields.technology.fields.conceal.fields.value.label}}"><i class="fas fa-magnifying-glass-waveform"></i>&nbsp;{{numberFormat system.technology.conceal.value sign=true}}</label>
             {{/if}}
         {{/if}}
 

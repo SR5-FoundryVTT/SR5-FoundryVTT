@@ -1,22 +1,22 @@
-<div class="new-list-item new-list-item-header {{cssClass}}">
-    <div class="new-list-item-label-container">
+<div class="list-item list-item-header {{cssClass}}">
+    <div class="list-item-start">
         <label>
             {{localize label}}
         </label>
     </div>
 
-    <div class="new-list-item-col midd-col">
+    <div class="list-item-col midd-col">
         <label>{{localize "SR5.Target"}}</label>
     </div>
-    <div class="new-list-item-col thicc-col">
+    <div class="list-item-col thicc-col">
         <label>{{localize "SR5.Duration"}}</label>
     </div>
-    <div class="new-list-item-col skinny-col">
+    <div class="list-item-col skinny-col">
         <label>{{localize "SR5.Fade"}}</label>
     </div>
 
     {{#if @root.isEditMode}}
-        <div class="new-list-item-icons">
+        <div class="list-item-icons">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
         </div>
     {{/if}}

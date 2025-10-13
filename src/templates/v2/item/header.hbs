@@ -26,8 +26,8 @@
             {{/if}}
             {{#if @root.isPlayMode}}
                 <div>
-                    <div class="new-list-item">
-                        <div class="new-list-item-label-container">
+                    <div class="list-item">
+                        <div class="list-item-start">
                             {{#if system.technology.condition_monitor.max}}
                                 {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
                                     name=(localize "SR5.ConditionMonitor")
@@ -43,8 +43,8 @@
             {{/if}}
         </div>
     </div>
-    <div class="new-list-item new-list-item-header">
-        <div class="new-list-item-label-container">
+    <div class="list-item list-item-header">
+        <div class="list-item-start">
             {{#if systemFields.technology}}
                 {{#unless (eq system.technology.wireless 'none')}}
                     {{#if master}}
@@ -70,16 +70,8 @@
                 {{/unless}}
             {{/if}}
         </div>
-        <div class="new-list-item-icons">
+        <div class="list-item-icons">
             {{#if systemFields.technology}}
-                <label>
-                    {{#if @root.isEditMode}}
-                        <i class="fas fa-magnifying-glass-waveform"></i>&nbsp;{{localize "SR5.Conceal"}}
-                    {{else}}
-                        <i data-tooltip="SR5.Conceal" class="fas fa-magnifying-glass-waveform"></i>
-                        {{numberFormat system.technology.conceal.value sign=true}}
-                    {{/if}}
-                </label>
                 <a data-action="toggleEquipped">
                     <i class="{{#if (isEquipped item)}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
                 </a>

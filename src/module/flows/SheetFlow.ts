@@ -146,7 +146,7 @@ export const SheetFlow = {
     },
 
     listItemId(target) {
-        return target.closest('.new-list-item[data-item-id]')?.dataset?.itemId;
+        return target.closest('.list-item[data-item-id]')?.dataset?.itemId;
     },
 
     closestSource(target) {

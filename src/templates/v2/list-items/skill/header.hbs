@@ -1,20 +1,20 @@
-<div class="new-list-item new-list-item-header {{cssClass}}"
+<div class="list-item list-item-header {{cssClass}}"
      {{#if headerAction}}
      data-action="{{headerAction}}"
      {{/if}}
 >
-    <div class="new-list-item-label-container">
+    <div class="list-item-start">
         <label>{{localize label}}</label>
     </div>
     {{#if @root.isPlayMode}}
-    <div class="new-list-item-col">
+    <div class="list-item-col">
         <label>{{localize "SR5.Specializations"}}</label>
     </div>
     {{/if}}
-    <div class="new-list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
+    <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
         <label>{{localize "SR5.Rtg"}}</label>
     </div>
-    <div class="new-list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}">
+    <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}">
         {{#if @root.isEditMode}}
             {{#if addAction}}
                 <a data-action="{{addAction}}"

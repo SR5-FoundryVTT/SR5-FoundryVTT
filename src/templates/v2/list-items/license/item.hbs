@@ -1,7 +1,7 @@
 {{!-- item and id are expected to be license objects and index, respectively --}}
-<div class="new-list-item-container">
-    <div class="new-list-item">
-        <div class="new-list-item-label-container">
+<div class="list-item-container">
+    <div class="list-item">
+        <div class="list-item-start">
             {{#if @root.isPlayMode}}
                 <label>{{item.name}}</label>
             {{else}}
@@ -14,7 +14,7 @@
                 />
             {{/if}}
         </div>
-        <div class="new-list-item-col">
+        <div class="list-item-col">
             {{#if @root.isPlayMode}}
                 <span>{{item.rtg}}</span>
             {{else}}
@@ -28,7 +28,7 @@
                 />
             {{/if}}
         </div>
-        <div class="new-list-item-col">
+        <div class="list-item-col">
             {{#if @root.isPlayMode}}
                     <span>{{item.description}}</span>
             {{else}}
@@ -42,14 +42,14 @@
             {{/if}}
         </div>
         {{#if @root.isEditMode}}
-        <div class="new-list-item-icons">
+        <div class="list-item-icons">
             <a data-action="deleteLicense" data-tooltip="SR5.DeleteLicense" data-index="{{id}}">
                 <i class="fas fa-trash"></i>
             </a>
         </div>
         {{/if}}
     </div>
-    <div class="new-list-item-description">
+    <div class="list-item-description">
         {{item.description}}
     </div>
 </div>

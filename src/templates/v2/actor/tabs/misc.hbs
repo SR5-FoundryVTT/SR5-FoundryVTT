@@ -11,8 +11,8 @@
         <div>
             {{#if isIC}}
                 <section class="standard-form">
-                    <div class="new-list-item new-list-item-header">
-                        <div class="new-list-item-label-container">
+                    <div class="list-item list-item-header">
+                        <div class="list-item-start">
                             <label>{{localize "SR5.Description"}}</label>
                         </div>
                     </div>
@@ -63,23 +63,23 @@
             <!-- Situational Modifiers Section -->
             {{#if situationModifiers}}
             <div>
-                <div class="new-list-item new-list-item-header">
-                    <div class="new-list-item-label-container">
+                <div class="list-item list-item-header">
+                    <div class="list-item-start">
                         <label>
                             {{localize "SR5.SituationalModifiersApplication.Title"}}
                         </label>
                     </div>
-                    <div class="new-list-item-col">
+                    <div class="list-item-col">
                         <label>{{localize "SR5.Value"}}</label>
                     </div>
                 </div>
                 {{#each situationModifiers}}
                 {{#if (not this.hidden)}}
-                    <div class="new-list-item">
-                        <div class="new-list-item-label-container">
+                    <div class="list-item">
+                        <div class="list-item-start">
                             <label>{{localize this.label}}</label>
                         </div>
-                        <div class="new-list-item-col">
+                        <div class="list-item-col">
                             <label>{{this.value}}</label>
                         </div>
                     </div>
@@ -89,39 +89,39 @@
             {{/if}}
 
             <!-- Modifier Section -->
-            <div class="new-list-item new-list-item-header header-for-scrollable">
-                <div class="new-list-item-label-container">
+            <div class="list-item list-item-header header-for-scrollable">
+                <div class="list-item-start">
                     <label>
                         {{localize "SR5.Modifier"}}
                     </label>
                 </div>
-                <div class="new-list-item-col">
+                <div class="list-item-col">
                     <label>{{localize "SR5.Value"}}</label>
                 </div>
             </div>
             <section class="scrollable standard-form">
                 {{#if @root.isPlayMode}}
                     {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}} {{#if value}}
-                        <div class="new-list-item">
-                            <div class="new-list-item-label-container">
+                        <div class="list-item">
+                            <div class="list-item-start">
                                 <label data-tooltip="{{objValue (objValue @root.systemFields.modifiers.fields id) 'hint'}}">
                                     {{objValue (objValue @root.systemFields.modifiers.fields id) 'label'}}
                                 </label>
                             </div>
-                            <div class="new-list-item-col">
+                            <div class="list-item-col">
                                 <label>{{value}}</labeL>
                             </div>
                         </div>
                     {{/if}} {{/ifne}} {{/each}}
                 {{else}}
                     {{#each source.system.modifiers as |value id|}} {{#ifne id 'wound'}}
-                        <div class="new-list-item">
-                            <div class="new-list-item-label-container">
+                        <div class="list-item">
+                            <div class="list-item-start">
                                 <label data-tooltip="{{objValue (objValue @root.systemFields.modifiers.fields id) 'hint'}}">
                                     {{objValue (objValue @root.systemFields.modifiers.fields id) 'label'}}
                                 </label>
                             </div>
-                            <div class="new-list-item-col">
+                            <div class="list-item-col">
                                 {{formInput (objValue @root.systemFields.modifiers.fields id) value=value
                                             classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode }}
                             </div>
