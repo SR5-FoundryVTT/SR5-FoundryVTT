@@ -106,7 +106,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             clearMarks: SR5ItemSheet.#deleteMarks,
             clearAllMark: SR5ItemSheet.#deleteAllMarks,
 
-            removeController: SR5ItemSheet.#removeController,
+            removeMaster: SR5ItemSheet.#removeMaster,
 
             toggleFreshImport: SR5ItemSheet.#toggleFreshImportFlag,
             toggleEquipped: SR5ItemSheet.#toggleEquipped,
@@ -757,7 +757,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.clearMarks();
     }
 
-    static async #removeController(this: SR5ItemSheet, event) {
+    static async #removeMaster(this: SR5ItemSheet, event) {
         event.preventDefault();
 
         await this.item.disconnectFromNetwork();

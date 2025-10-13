@@ -2,10 +2,25 @@
     <div class="fill-container">
         <div class="scrollable standard-form">
             {{#if systemFields.technology}}
+                {{formGroup systemFields.technology.fields.cost
+                            value=source.system.technology.cost
+                            rootId=rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.technology.fields.rating
+                            value=source.system.technology.rating
+                            rootId=rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.technology.fields.quantity
+                            value=source.system.technology.quantity
+                            rootId=rootId disabled=@root.isPlayMode}}
 
                 {{formGroup systemFields.technology.fields.equipped
                             value=source.system.technology.equipped
                             rootId=@root.rootId disabled=@root.isPlayMode}}
+
+                {{formGroup systemFields.technology.fields.availability
+                            value=source.system.technology.availability
+                            rootId=rootId disabled=@root.isPlayMode}}
 
                 {{formGroup systemFields.technology.fields.wireless
                             value=source.system.technology.wireless

@@ -34,7 +34,7 @@
 {{/if}}
 
 {{#each (equippedMods item)}}
-    <span style="display: flex; flex-flow: row nowrap; gap: 2px; align-items: center;">
+    <span class="document-img-name">
         <img src="{{this.img}}" width="12px" height="12px">&nbsp;<a data-uuid="{{this.uuid}}" data-action="openUuid">{{this.name}}</a>
     </span>
 {{/each}}

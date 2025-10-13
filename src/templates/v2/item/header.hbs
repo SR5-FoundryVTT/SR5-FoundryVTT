@@ -1,69 +1,107 @@
-<div class="sheet-header">
-    <img class="sheet-image" src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" />
-    <div class="sheet-header-labels">
-        <div class="sheet-header-name">
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
-            {{#if (and system.importFlags.isFreshImport (itemMarking "ANY"))}}
-                {{#if @root.isEditMode}}
-                    <button type="button" class="toggle-fresh-import" data-action="toggleFreshImport" data-tooltip="SR5.MarkImportedItemTooltip">
-                        <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" width="32px" height="32px" />
-                    </button>
-                {{else}}
-                    <label style="width: 1.5rem; flex-shrink: 0;" data-tooltip="SR5.MarkImportedItemTooltip">
-                        <img src="systems/shadowrun5e/dist/icons/checklist.svg" width="32px" height="32px" />
-                    </label>
+<div>
+    <div class="sheet-header">
+        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" />
+        <div class="sheet-header-labels">
+            <div class="sheet-header-name">
+                {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
+                {{#if (and system.importFlags.isFreshImport (itemMarking "ANY"))}}
+                    {{#if @root.isEditMode}}
+                        <button type="button" class="toggle-fresh-import" data-action="toggleFreshImport" data-tooltip="SR5.MarkImportedItemTooltip">
+                            <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" width="32px" height="32px" />
+                        </button>
+                    {{else}}
+                        <label style="width: 1.5rem; flex-shrink: 0;" data-tooltip="SR5.MarkImportedItemTooltip">
+                            <img src="systems/shadowrun5e/dist/icons/checklist.svg" width="32px" height="32px" />
+                        </label>
+                    {{/if}}
                 {{/if}}
-            {{/if}}
-            {{formInput fields.name value=item.name classes="sheet-name"
-                        placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
-        </div>
-        {{#if @root.isEditMode}}
-            <div class="sheet-header-source">
-                {{formInput systemFields.description.fields.source value=source.system.description.source
-                            placeholder=(localize "SR5.Source") rootId=rootId}}
+                {{formInput fields.name value=item.name classes="sheet-name"
+                            placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
             </div>
-        {{/if}}
-        {{#if @root.isPlayMode}}
-            <div>
-                <div class="new-list-item" data-item-id="{{item.uuid}}">
-                    <div class="new-list-item-label-container">
-                        {{#if system.technology.condition_monitor.max}}
-                            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                                name=(localize "SR5.ConditionMonitor")
-                                value=system.technology.condition_monitor.value
-                                max=system.technology.condition_monitor.max
-                                id='matrix'
-                                disabled=system.technology.condition_monitor.disabled
-                            }}
-                        {{/if}}
-                    </div>
-                    {{#if systemFields.technology}}
-                        <div class="new-list-item-icons">
-                            <a data-action="toggleEquipped">
-                                <i class="{{#if (isEquipped item)}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
-                            </a>
-                            {{#if (canBeWireless item)}}
-                                {{#if (isBroken item)}}
-                                    <a data-tooltip="SR5.Broken" data-action="repair">
-                                        <i class="fas fa-link-slash"></i>
-                                    </a>
-                                {{else}}
-                                    <a data-action="toggleWireless">
-                                        <i {{#if (isRunningSilent item)}}
-                                        class="fa-duotone fa-wifi-fair"
-                                        {{else if (isWireless item)}}
-                                        class="fas fa-wifi"
-                                        {{else}}
-                                        class="fas fa-wifi-slash"
-                                        {{/if}}
-                                        ></i>
-                                    </a>
-                                {{/if}}
+            {{#if @root.isEditMode}}
+                <div class="sheet-header-source">
+                    {{formInput systemFields.description.fields.source value=source.system.description.source
+                                placeholder=(localize "SR5.Source") rootId=rootId}}
+                </div>
+            {{/if}}
+            {{#if @root.isPlayMode}}
+                <div>
+                    <div class="new-list-item">
+                        <div class="new-list-item-label-container">
+                            {{#if system.technology.condition_monitor.max}}
+                                {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                                    name=(localize "SR5.ConditionMonitor")
+                                    value=system.technology.condition_monitor.value
+                                    max=system.technology.condition_monitor.max
+                                    id='matrix'
+                                    disabled=system.technology.condition_monitor.disabled
+                                }}
                             {{/if}}
                         </div>
-                    {{/if}}
+                    </div>
                 </div>
-            </div>
-        {{/if}}
+            {{/if}}
+        </div>
+    </div>
+    <div class="new-list-item new-list-item-header">
+        <div class="new-list-item-label-container">
+            {{#if systemFields.technology}}
+                {{#unless (eq system.technology.wireless 'none')}}
+                    {{#if master}}
+                        <span class="document-img-name">
+                            <img src="{{master.img}}" width="16px" height="16px" />
+                            <a class="content-link"
+                               draggable="true"
+                               data-link
+                               data-type="Actor"
+                               data-id="{{master.id}}"
+                               data-uuid="{{master.uuid}}">
+                                {{master.name}}
+                            </a>
+                            <a data-action="removeMaster" class="close"><i class="fas fa-times"></i></a>
+                        </span>
+                    {{else}}
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.technology.fields.master value=source.system.technology.master rootId=@root.rootId}}
+                        {{else}}
+                            <label>{{localize "SR5.NoMasterDevice"}}</label>
+                        {{/if}}
+                    {{/if}}
+                {{/unless}}
+            {{/if}}
+        </div>
+        <div class="new-list-item-icons">
+            {{#if systemFields.technology}}
+                <label>
+                    {{#if @root.isEditMode}}
+                        <i class="fas fa-magnifying-glass-waveform"></i>&nbsp;{{localize "SR5.Conceal"}}
+                    {{else}}
+                        <i data-tooltip="SR5.Conceal" class="fas fa-magnifying-glass-waveform"></i>
+                        {{numberFormat system.technology.conceal.value sign=true}}
+                    {{/if}}
+                </label>
+                <a data-action="toggleEquipped">
+                    <i class="{{#if (isEquipped item)}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
+                </a>
+                {{#if (canBeWireless item)}}
+                    {{#if (isBroken item)}}
+                        <a data-tooltip="SR5.Broken" data-action="repair">
+                            <i class="fas fa-link-slash"></i>
+                        </a>
+                    {{else}}
+                        <a data-action="toggleWireless">
+                            <i {{#if (isRunningSilent item)}}
+                            class="fa-duotone fa-wifi-fair"
+                            {{else if (isWireless item)}}
+                            class="fas fa-wifi"
+                            {{else}}
+                            class="fas fa-wifi-slash"
+                            {{/if}}
+                            ></i>
+                        </a>
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        </div>
     </div>
 </div>

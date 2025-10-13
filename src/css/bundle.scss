@@ -1564,6 +1564,7 @@ input[type='text'].display {
             border-color: $light;
         }
     }
+
     a {
         color: $light;
         &:hover {
@@ -1598,6 +1599,13 @@ input[type='text'].display {
 
     .entity-link.content-link {
         color: $white !important;
+    }
+
+    .document-img-name {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 2px;
+        align-items: center;
     }
 
     .open-source-icon {
@@ -1878,12 +1886,6 @@ input[type='text'].display {
 
     td.env-modifier-level {
         padding-right: 6px;
-    }
-
-    .document-name {
-        @include systemFonts;
-        font-size: var(--font-size-18);
-        font-weight: bold;
     }
 
     ///////////////////////////////////////////////////////////////////////////////

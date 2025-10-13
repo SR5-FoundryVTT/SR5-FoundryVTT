@@ -1,4 +1,4 @@
-<div class="new-list-item new-list-item-header{{#if @root.isPlayMode}} collapsible-header{{/if}}"
+<div class="new-list-item new-list-item-header {{cssClass}} {{#if @root.isPlayMode}} collapsible-header{{/if}}"
      {{#unless @root.isEditMode}}
      data-action="toggleExpanded"
      data-item-type="{{type}}"
