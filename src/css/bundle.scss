@@ -1498,6 +1498,9 @@ input[type='text'].display {
     input.skinny {
         width: 2rem;
     }
+    select.skinny {
+        width: 3rem;
+    }
     input.midd {
         width: 3rem;
     }
@@ -2016,6 +2019,10 @@ input[type='text'].display {
             justify-content: start;
             flex: 3;
             gap: .25rem;
+
+            &.skinny {
+                flex: 1;
+            }
 
             .selection-inventory {
                 display: flex;

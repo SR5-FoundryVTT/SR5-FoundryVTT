@@ -1,63 +1,148 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
 
-    <div
+    <div {{#if @root.isEditMode}} class="split-container" {{else}} class="fill-container" {{/if}}>
         {{#if @root.isEditMode}}
-        class="split-container"
-        {{else}}
-        class="fill-container"
-        {{/if}}
-    >
-        {{#if @root.isEditMode}}
-        <div>
-            {{#if isIC}}
-                <section class="standard-form">
-                    <div class="list-item list-item-header">
-                        <div class="list-item-start">
-                            <label>{{localize "SR5.Description"}}</label>
+            <div>
+                {{#if isIC}}
+                    <section class="fill-container scrollable">
+                        <div class="list-item list-item-header">
+                            <div class="list-item-start">
+                                <label>{{localize "SR5.Description"}}</label>
+                            </div>
                         </div>
-                    </div>
-                    {{#if @root.isEditMode}}
-                        {{formGroup systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
-                    {{else}}
-                        {{{biographyHTML}}}
-                    {{/if}}
-                </section>
-            {{else}}
-                <section class="scrollable standard-form">
-                    {{#if hasSkills}}
-                        <div class="form-group">
-                            <button type="button" class="display show-hidden-skills">
-                                {{localize "SR5.RestoreDefaultSkills"}}
-                            </button>
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
+                        {{else}}
+                            {{{biographyHTML}}}
+                        {{/if}}
+                    </section>
+                {{else}}
+                    <section class="scrollable standard-form">
+                        {{#if hasSkills}}
+                            <div class="form-group">
+                                <button type="button" class="display show-hidden-skills">
+                                    {{localize "SR5.RestoreDefaultSkills"}}
+                                </button>
+                            </div>
+                        {{/if}}
+                        {{#if canAlterSpecial }}
+                            <div class="list-item">
+                                <div class="list-item-start">
+                                    <label data-tooltip="{{systemFields.special.hint}}">
+                                        {{systemFields.special.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.special value=source.system.special classes="short"
+                                                rootId=rootId localize=true }}
+                                </div>
+                            </div>
+                        {{/if}}
+                        {{#if awakened}}
+                            <div class="list-item">
+                                <div class="list-item-start">
+                                    <label data-tooltip="{{systemFields.magic.fields.attribute.hint}}">
+                                        {{systemFields.magic.fields.attribute.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.magic.fields.attribute value=source.system.magic.attribute
+                                                    classes="short" rootId=rootId disabled=@root.isPlayMode localize=true }}
+                                </div>
+                            </div>
+                        {{/if}}
+                        {{#if emerged}}
+                            <div class="list-item">
+                                <div class="list-item-start">
+                                    <label data-tooltip="{{systemFields.technomancer.fields.attribute.hint}}">
+                                        {{systemFields.technomancer.fields.attribute.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.technomancer.fields.attribute
+                                                value=source.system.technomancer.attribute
+                                                rootId=rootId disabled=@root.isPlayMode localize=true }}
+                                </div>
+                            </div>
+                        {{/if}}
+                        <!--Defense Selector -->
+                        {{#if hasFullDefense }}
+                            <div class="list-item">
+                                <div class="list-item-start">
+                                    <label data-tooltip="{{systemFields.full_defense_attribute.hint}}">
+                                        {{systemFields.full_defense_attribute.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.full_defense_attribute value=source.system.full_defense_attribute
+                                                classes="short" rootId=rootId disabled=@root.isPlayMode localize=true }}
+                                </div>
+                            </div>
+                        {{/if}}
+                        {{#if isCharacter }}
+                            <div class="list-item">
+                                <div class="list-item-start">
+                                    <label data-tooltip="{{systemFields.matrix_full_defense_attribute.hint}}">
+                                        {{systemFields.matrix_full_defense_attribute.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.matrix_full_defense_attribute value=source.system.matrix_full_defense_attribute
+                                                classes="short" rootId=rootId disabled=@root.isPlayMode localize=true }}
+                                </div>
+                            </div>
+                        {{/if}}
+                        {{#if isCharacter}}
+                            <div class="list-item">
+                                <div class="list-item-start">
+                                    <label data-tooltip="{{systemFields.is_critter.hint}}">
+                                        {{systemFields.is_critter.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.is_critter value=source.system.is_critter
+                                                classes="short" rootId=rootId disabled=@root.isPlayMode }}
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <div class="list-item-start">
+                                    <label data-tooltip="{{systemFields.is_npc.hint}}">
+                                        {{systemFields.is_npc.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.is_npc value=source.system.is_npc
+                                                classes="short" rootId=rootId disabled=@root.isPlayMode }}
+                                </div>
+                            </div>
+                        {{/if}}
+                        {{#if system.is_npc }}
+                            <div class="list-item">
+                                <div class="list-item-start">
+                                    <label data-tooltip="{{systemFields.is_grunt.hint}}">
+                                        {{systemFields.is_grunt.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.is_grunt value=source.system.is_grunt
+                                                classes="short" rootId=rootId disabled=@root.isPlayMode }}
+                                </div>
+                            </div>
+                        {{/if}}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.category_visibility.fields.default.hint}}">
+                                    {{systemFields.category_visibility.fields.default.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.category_visibility.fields.default value=source.system.category_visibility.default
+                                            rootId=rootId disabled=@root.isPlayMode }}
+                            </div>
                         </div>
-                    {{/if}}
-                    {{#if canAlterSpecial }}
-                        {{formGroup systemFields.special value=source.system.special rootId=rootId disabled=@root.isPlayMode localize=true }}
-                    {{/if}}
-                    {{#if awakened}}
-                        {{formGroup systemFields.magic.fields.attribute value=source.system.magic.attribute rootId=rootId disabled=@root.isPlayMode localize=true }}
-                    {{/if}}
-                    {{#if emerged}}
-                        {{formGroup systemFields.technomancer.fields.attribute value=source.system.technomancer.attribute rootId=rootId disabled=@root.isPlayMode localize=true }}
-                    {{/if}}
-                    <!--Defense Selector -->
-                    {{#if hasFullDefense }}
-                        {{formGroup systemFields.full_defense_attribute value=source.system.full_defense_attribute rootId=rootId disabled=@root.isPlayMode localize=true }}
-                    {{/if}}
-                    {{#if isCharacter }}
-                        {{formGroup systemFields.matrix_full_defense_attribute value=source.system.matrix_full_defense_attribute rootId=rootId disabled=@root.isPlayMode localize=true }}
-                    {{/if}}
-                    {{#if isCharacter}}
-                        {{formGroup systemFields.is_critter value=source.system.is_critter rootId=rootId disabled=@root.isPlayMode }}
-                        {{formGroup systemFields.is_npc value=source.system.is_npc rootId=rootId disabled=@root.isPlayMode }}
-                    {{/if}}
-                    {{#if system.is_npc }}
-                        {{formGroup systemFields.is_grunt value=source.system.is_grunt rootId=rootId disabled=@root.isPlayMode }}
-                    {{/if}}
-                    {{formGroup systemFields.category_visibility.fields.default value=source.system.category_visibility.default rootId=rootId disabled=@root.isPlayMode }}
-                </section>
-            {{/if}}
-        </div>
+                    </section>
+                {{/if}}
+            </div>
         {{/if}}
         <div {{#if @root.isPlayMode}}class="fill-container"{{/if}}>
             <!-- Situational Modifiers Section -->
