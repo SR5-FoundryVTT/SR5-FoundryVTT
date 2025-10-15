@@ -1601,6 +1601,11 @@
                 "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
                 "VehicleConfiguration": "Vehicle Configuration"
             },
+            "Item": {
+                "AvailabilityAdjustment": "Scale Availability w/ Rating",
+                "CostAdjustment": "Scale Cost w/ Rating",
+                "EssenceAdjustment": "Scale Essence w/ Rating"
+            },
             "Inventory": {
                 "All": "All",
                 "Carried": "Carried",
@@ -2579,7 +2584,8 @@
                 "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
                 "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
                 "CostAdjustment": "Adjust actual cost based on the item rating",
-                "DisabledForPreparedActor": "Disabled due to use of prepared actor"
+                "DisabledForPreparedActor": "Disabled due to use of prepared actor",
+                "EssenceAdjustment": "Adjust actual essence cost based on the item rating"
             },
             "Modifiers": {
                 "armor": "Modifies total armor value",
@@ -2860,16 +2866,16 @@
                         "attribute": {
                             "label": "Range Attribute",
                             "hint": "Actor's Attribute to multiply the above Range's by"
+                        }
+                    },
+                    "blast": {
+                        "radius": {
+                            "label": "Blast Radius",
+                            "hint": "Radius of the Weapon's attack, in meters"
                         },
-                        "blast": {
-                            "radius": {
-                                "label": "Blast Radius",
-                                "hint": "Radius of the Weapon's attack, in meters"
-                            },
-                            "dropoff": {
-                                "label": "Blast Dropoff",
-                                "hint": "The Damage Reduction per meter from the blast"
-                            }
+                        "dropoff": {
+                            "label": "Blast Dropoff",
+                            "hint": "The Damage Reduction per meter from the blast"
                         }
                     }
                 },

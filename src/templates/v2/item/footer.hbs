@@ -1,16 +1,35 @@
 <footer class="sheet-footer">
     <div class="list-item">
         {{#if @root.isPlayMode}}
-            {{#unless (isType item 'spell' 'quality' 'lifestyle')}}
+            {{#unless (isType item 'spell' 'quality' 'lifestyle' 'bioware' 'cyberware')}}
                 <label>
+                    {{#if (isType item 'weapon')}}
+                        {{#if (eq system.category 'range')}}
+                            {{localize "SR5.Weapon.Category.Range"}}
+                        {{else if (eq system.category 'melee')}}
+                            {{localize "SR5.Weapon.Category.Melee"}}
+                        {{else if (eq system.category 'thrown')}}
+                            {{localize "SR5.Weapon.Category.Thrown"}}
+                        {{/if}}
+                    {{/if}}
                     {{localize (concat 'TYPES.Item.' item.type)}}
                 </label>
             {{/unless}}
         {{/if}}
         {{!-- Show Quantity First --}}
         {{#if system.technology}}
-            <span>
-                <label>{{localize "SR5.Qty"}}&nbsp;</label>
+            {{#if (isType item 'bioware' 'cyberware')}}
+                {{#if @root.isEditMode}}
+                        <span data-tooltip="{{systemFields.grade.label}}:&nbsp;{{systemFields.grade.hint}}">
+                            {{formInput systemFields.grade value=source.system.grade localize=true
+                                        classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </span>
+                {{else if system.grade}}
+                        <label>{{localizeOb system.grade @root.config.cyberwareGrades}}&nbsp;{{localize (concat 'TYPES.Item.' item.type)}}</label>
+                {{/if}}
+            {{/if}}
+            <div class="basic-row">
+                <label>{{localize "SR5.Qty"}}</label>
                 {{#if @root.isPlayMode}}
                     <a data-action="removeOneQty"
                        data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty">
@@ -27,29 +46,8 @@
                                     classes="short midd" rootId=rootId disabled=@root.isPlayMode}}
                     </span>
                 {{/if}}
-            </span>
-        {{/if}}
+            </div>
 
-        {{#if (isType item 'bioware' 'cyberware')}}
-            {{#if @root.isEditMode}}
-                <span data-tooltip="{{systemFields.grade.label}}:&nbsp;{{systemFields.grade.hint}}">
-                    {{formInput systemFields.grade value=source.system.grade localize=true
-                                classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
-                </span>
-            {{else if system.grade}}
-                <label>{{localizeOb system.grade @root.config.cyberwareGrades}}</label>
-            {{/if}}
-            {{#if @root.isEditMode}}
-                <span data-tooltip="{{systemFields.essence.label}}:&nbsp;{{systemFields.essence.hint}}">
-                    {{formInput systemFields.essence value=source.system.essence classes="short skinny"
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                </span>
-            {{else if system.technology.calculated.essence.value}}
-                <label data-tooltip="SR5.EssenceCost"><i class="fas fa-dna"></i> {{system.technology.calculated.essence.value}}</label>
-            {{/if}}
-        {{/if}}
-
-        {{#if system.technology}}
             {{#if @root.isEditMode}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Rtg"}}</label>
@@ -61,6 +59,23 @@
             {{else if system.technology.rating}}
                 <label>{{localize "SR5.Rtg"}}&nbsp;{{system.technology.rating}}</label>
             {{/if}}
+
+            {{#if (isType item 'bioware' 'cyberware')}}
+                {{#if @root.isEditMode}}
+                    <div class="basic-row">
+                        <label data-tooltip="SR5.EssenceCost"><i class="far fa-brain-circuit"></i></label>
+                        <span data-tooltip="{{systemFields.essence.label}}:&nbsp;{{systemFields.essence.hint}}">
+                            {{formInput systemFields.essence value=source.system.essence classes="short skinny"
+                                        rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </span>
+                    </div>
+                {{else if system.technology.calculated.essence.value}}
+                    <label data-tooltip="SR5.EssenceCost">
+                        <i class="far fa-brain-circuit"></i>&nbsp;{{system.technology.calculated.essence.value}}
+                    </label>
+                {{/if}}
+            {{/if}}
+
             {{#if @root.isEditMode}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Availability"}}</label>
@@ -72,7 +87,9 @@
             {{/if}}
             {{#if @root.isEditMode}}
                 <div class="basic-row">
-                    <label data-tooltip="{{systemFields.technology.fields.cost.label}}"><i class="fas fa-yen-sign"></i></label>
+                    <label data-tooltip="{{systemFields.technology.fields.cost.label}}">
+                        <i class="fas fa-yen-sign"></i>
+                    </label>
                     {{formInput systemFields.technology.fields.cost value=source.system.technology.cost
                                 classes="short nuyen" rootId=rootId disabled=@root.isPlayMode}}
                 </div>

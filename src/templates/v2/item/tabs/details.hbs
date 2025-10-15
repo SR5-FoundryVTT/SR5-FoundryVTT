@@ -1,6 +1,34 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
         <div class="scrollable">
+            {{#if systemFields.technology}}
+                <div class="list-item">
+                    <div class="list-item-col">
+                        <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.EssenceAdjustment">
+                            {{localize "SR5.Labels.Item.EssenceAdjustment"}}
+                            {{formInput systemFields.technology.fields.calculated.fields.essence.fields.adjusted
+                                        value=source.system.calculated.essence.adjusted classes="short"
+                                        rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </label>
+                    </div>
+                    <div class="list-item-col">
+                        <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.CostAdjustment">
+                            {{localize "SR5.Labels.Item.CostAdjustment"}}
+                            {{formInput systemFields.technology.fields.calculated.fields.cost.fields.adjusted
+                                        value=source.system.calculated.cost.adjusted classes="short"
+                                        rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </label>
+                    </div>
+                    <div class="list-item-col">
+                        <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.AvailabilityAdjustment">
+                            {{localize "SR5.Labels.Item.AvailabilityAdjustment"}}
+                            {{formInput systemFields.technology.fields.calculated.fields.availability.fields.adjusted
+                                        value=source.system.calculated.availability.adjusted classes="short"
+                                        rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </label>
+                    </div>
+                </div>
+            {{/if}}
 
             {{#if systemFields.armor}}
                 <div class="list-item list-item-header">
@@ -340,7 +368,7 @@
                         <div class="list-item-col">
                             {{formInput systemFields.thrown.fields.blast.fields.radius
                                         value=source.system.thrown.blast.radius classes="short"
-                                        rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                                        rootId=@root.rootId disabled=@root.isPlayMode}}&nbsp;m
                         </div>
                     </div>
                     <div class="list-item">
@@ -350,7 +378,7 @@
                         <div class="list-item-col">
                             {{formInput systemFields.thrown.fields.blast.fields.dropoff
                                         value=source.system.thrown.blast.dropoff classes="short"
-                                        rootId=@root.rootId disabled=(or @root.isPlayMode @root.isUsingRangeCategory)}}
+                                        rootId=@root.rootId disabled=@root.isPlayMode}}&nbsp;/&nbsp;m
                         </div>
                     </div>
 
