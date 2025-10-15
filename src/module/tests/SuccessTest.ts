@@ -1709,7 +1709,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const roll = this.rolls[this.rolls.length - 1];
 
         // Limit users to show dice to...
-        let whisper: User[] = [];
+        let whisper: User[] | null = null;
 
         // ...for gmOnlyContent check permissions
         if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
@@ -1718,14 +1718,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // ...for rollMode include GM when GM roll
         if (this.data.options?.rollMode === 'gmroll' || this.data.options?.rollMode === "blindroll") {
-            whisper = [...game.users.filter(user => user.isGM), ...whisper];
+            whisper = [...game.users.filter(user => user.isGM), ...(whisper || [])];
         }
 
         // Don't show dice to a user casting blind.
         const blind = this.data.options?.rollMode === 'blindroll';
         const synchronize = this.data.options?.rollMode === 'publicroll';
 
-        dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
+        void dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
     /**
