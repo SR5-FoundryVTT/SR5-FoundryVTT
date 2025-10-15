@@ -452,9 +452,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const limit = this.limit.changes.map(change => game.i18n.localize(change.name as Translation));
 
         // Add action static value modifiers as numbers.
-        if (this.pool.base > 0 && !this.pool.override) pool.push(String(this.pool.base));
-        if (this.threshold.base > 0 && !this.threshold.override) threshold.push(String(this.threshold.base));
-        if (this.limit.base > 0 && !this.limit.override) limit.push(String(this.limit.base));
+        pool.push(String(this.pool.base));
+        threshold.push(String(this.threshold.base));
+        limit.push(String(this.limit.base));
 
         // Pool portion can be dynamic or static.
         let code = pool.join(' + ').trim() || `${this.pool.value}`;
@@ -597,17 +597,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Remove override modifier from pool.
         pool.removePart('SR5.Labels.Action.Modifiers');
-
-        // If applicable apply only override to pool. (User interaction)
-        if (this.data.modifiers.override) {
-            // Remove all modifiers and only apply override.
-            for (const modifier of this.data.modifiers.changes) {
-                pool.removePart(modifier.name);
-            }
-
-            pool.addUniquePart('SR5.Labels.Action.Modifiers', this.data.modifiers.override.value)
-            return;
-        }
 
         // Otherwise apply automated modifiers to pool.
         for (const modifier of this.data.modifiers.changes) {
@@ -1635,11 +1624,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
 
         // A pool could be overwritten or not.
-        if (data.pool.override) {
-            data.pool.override.value = Math.max(data.pool.override.value - 1, 0);
-        } else {
-            pool.addUniquePart('SR5.ExtendedTest', nextModifierValue);
-        }
+        pool.addUniquePart('SR5.ExtendedTest', nextModifierValue);
 
         PartsList.calcTotal(data.pool, { min: 0 });
 

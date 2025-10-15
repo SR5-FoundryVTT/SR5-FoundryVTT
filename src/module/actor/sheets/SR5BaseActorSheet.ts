@@ -946,7 +946,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
                 const att = matrix[attribute];
                 if (att) {
-                    if (!att.mod) att.mod = [];
                     if (att.temp === 0)
                         // @ts-expect-error - so it doesn't show in sheet
                         att.temp = null;

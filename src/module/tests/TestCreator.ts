@@ -502,8 +502,8 @@ export const TestCreator = {
         }
 
         //...add limit modifiers
-        if (action.limit.mod) {
-            action.limit.mod.forEach(mod => PartsList.addUniquePart(data.limit, mod.name, mod.value));
+        if (action.limit.changes) {
+            action.limit.changes.forEach(change => PartsList.addUniquePart(data.limit, change.name, change.value, change.mode as any, change.priority));
         }
 
         //...add limit attribute value based on actor.

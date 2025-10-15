@@ -1,6 +1,6 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
-import { ModifiableValueLinked, BaseValuePair, NewModList } from "../template/Base";
+import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foundry.data.fields;
 
 const ResultActionData = () => ({
@@ -133,7 +133,7 @@ export const ActionRollData = (
         armor: new BooleanField(),
     }),
     alt_mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    dice_pool_mod: NewModList(),
+    dice_pool_mod: ModList(),
     roll_mode: new StringField({
         blank: true,
         required: true,

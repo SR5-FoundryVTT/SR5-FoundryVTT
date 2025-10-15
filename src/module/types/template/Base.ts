@@ -28,29 +28,17 @@ export const ValueMaxPair = () => ({
 
 export const ModListEntry = () => ({
     name: new StringField({ required: true }),
-    value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-});
-
-export const OverrideModEntry = () => ({
-    ...ModListEntry(),
-});
-
-export const NewModListEntry = () => ({
-    name: new StringField({ required: true }),
     unused: new BooleanField({ initial: false }),
     mode: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
-export const NewModList = () => new ArrayField(new SchemaField(NewModListEntry()));
 export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
 
 export const ModifiableValue = () => ({
     ...BaseValuePair(),
-    mod: ModList(),
-    changes: new ArrayField(new SchemaField(NewModListEntry())),
-    override: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
+    changes: new ArrayField(new SchemaField(ModListEntry())),
     temp: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 

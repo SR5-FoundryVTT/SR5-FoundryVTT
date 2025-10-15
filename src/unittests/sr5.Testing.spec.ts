@@ -31,7 +31,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                             value: 1,
                         },
                         damage: {
-                            ap: { value: 5, base: 5, mod: [] },
+                            ap: { value: 5, base: 5 },
                             base: 5,
                             type: { value: 'physical', base: 'physical' },
                             value: 5

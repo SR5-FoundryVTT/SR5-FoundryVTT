@@ -1249,7 +1249,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const action = this.skillActionData(skillId, options);
         if (!action) return;
         if (!teamworkData.criticalGlitch) {
-            action.limit.mod.push({ name: "Teamwork", value: teamworkData.additionalLimit })
+            action.limit.changes.push({
+                name: "Teamwork",
+                unused: false, priority: 0,
+                value: teamworkData.additionalLimit,
+                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+            });
         }
 
         action.dice_pool_mod.push({
@@ -1312,7 +1317,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             spec,
             attribute: skill.attribute,
             limit: {
-                base: 0, value: 0, mod: [],
+                base: 0, value: 0,
                 attribute: limit,
                 base_formula_operator: 'add',
             },

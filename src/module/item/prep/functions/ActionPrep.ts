@@ -27,9 +27,6 @@ export const ActionPrep = {
      */
     clearMods(action: ActionRollType) {
         action.alt_mod = 0;
-        action.limit.mod = [];
-        action.damage.mod = [];
-        action.damage.ap.mod = [];
         action.dice_pool_mod = [];
     },
 
