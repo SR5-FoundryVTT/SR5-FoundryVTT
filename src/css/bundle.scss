@@ -1398,8 +1398,8 @@ input[type='text'].display {
         .sheet-header {
             display: flex;
             flex-flow: row wrap;
-            justify-content: center;
-            align-items: center;
+            justify-content: end;
+            align-items: end;
             width: 100%;
             padding: 0;
 
@@ -1416,7 +1416,9 @@ input[type='text'].display {
                 flex: 1;
                 display: flex;
                 flex-flow: column nowrap;
-                gap: .25rem;
+                gap: 1px;
+                padding-top: .25rem;
+                padding-bottom: .25rem;
             }
 
             .sheet-header-source {
@@ -1427,6 +1429,7 @@ input[type='text'].display {
             .sheet-header-name {
                 display: flex;
                 flex-flow: row nowrap;
+                align-items: center;
             }
         }
 
@@ -1568,6 +1571,32 @@ input[type='text'].display {
         }
     }
 
+    .document-tags-container {
+        width: 15rem;
+        margin-left: 4px;
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+    }
+
+    document-tags.short {
+        input {
+            height: 1.5rem;
+            min-height: 1.5rem;
+            max-height: 1.5rem;
+        }
+        button {
+            height: 1.5rem;
+            width: 1.5rem;
+            text-align: center;
+            border-color: $light;
+            padding: 2px !important;
+            font-size: 12px;
+            &:hover {
+                border-color: $light;
+            }
+        }
+    }
+
     a {
         color: $light;
         &:hover {
@@ -1602,6 +1631,13 @@ input[type='text'].display {
 
     .entity-link.content-link {
         color: $white !important;
+    }
+
+    .basic-row {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 2px;
+        align-items: center;
     }
 
     .document-img-name {

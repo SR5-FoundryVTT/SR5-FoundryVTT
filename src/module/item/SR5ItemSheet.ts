@@ -107,6 +107,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             clearAllMark: SR5ItemSheet.#deleteAllMarks,
 
             removeMaster: SR5ItemSheet.#removeMaster,
+            removeLinkedActor: SR5ItemSheet.#removeLinkedActor,
 
             toggleFreshImport: SR5ItemSheet.#toggleFreshImportFlag,
             toggleEquipped: SR5ItemSheet.#toggleEquipped,
@@ -120,7 +121,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             deleteEffect: SR5ItemSheet.#deleteEffect,
 
             removeSlave: SR5ItemSheet.#removeSlave,
-            removeAllSlaves: SR5ItemSheet.#removeAllSlaves
+            removeAllSlaves: SR5ItemSheet.#removeAllSlaves,
+
+            toggleActionArmor: SR5ItemSheet.#toggleActionArmor,
+            toggleOpposedArmor: SR5ItemSheet.#toggleOpposedArmor,
+            toggleResistArmor: SR5ItemSheet.#toggleResistArmor,
         },
         dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     }
@@ -162,10 +167,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             templates: SheetFlow.templateListItem('weapon-modification'),
             scrollable: ['.scrollable']
         },
-        action: {
-            template: SheetFlow.templateBase('item/tabs/action'),
-            scrollable: ['.scrollable']
-        },
         effects: {
             template: SheetFlow.templateBase('item/tabs/effects'),
             templates: SheetFlow.templateListItem('effect'),
@@ -183,7 +184,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             tabs: [
                 { id: 'description', label: 'Description', cssClass: '' },
                 { id: 'details', label: 'Details', cssClass: '' },
-                { id: 'action', label: 'Action', cssClass: '' },
                 { id: 'network', label: 'Network', cssClass: '' },
                 { id: 'weaponAmmo', label: 'Ammo', cssClass: '' },
                 { id: 'weaponModifications', label: 'Mods', cssClass: '' },
@@ -213,11 +213,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     protected _cleanParts(item: SR5Item, parts: Record<string, any>) {
-        if (item.isType('action')) {
+        if (item.isType('contact', 'lifestyle', 'sin')) {
             delete parts['details'];
-        }
-        if (!item.getAction()) {
-            delete parts['action'];
         }
         if (!item.canBeMaster) {
             delete parts['network'];
@@ -764,6 +761,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         this.render(false);
     }
 
+    static async #removeLinkedActor(this: SR5ItemSheet, event) {
+        event.preventDefault();
+
+        await this.item.update({ system: { linkedActor: '' }});
+    }
+
     /**
      * Toggle to isFreshImport property of importFlags for an item
      *
@@ -941,6 +944,27 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await this.item.update(submitData, options);
         } else {
             await super._processSubmitData(event, form, submitData, options);
+        }
+    }
+
+    static async #toggleActionArmor(this: SR5ItemSheet, event) {
+        const action = this.item.getAction();
+        if (action) {
+            await this.item.update({system: { action: { armor: !action.armor }}});
+        }
+    }
+
+    static async #toggleOpposedArmor(this: SR5ItemSheet, event) {
+        const action = this.item.getAction();
+        if (action) {
+            await this.item.update({system: { action: { opposed: { armor: !action.opposed.armor }}}});
+        }
+    }
+
+    static async #toggleResistArmor(this: SR5ItemSheet, event) {
+        const action = this.item.getAction();
+        if (action) {
+            await this.item.update({system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor }}}}});
         }
     }
 

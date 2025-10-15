@@ -1278,8 +1278,8 @@
                         "hint": "Skill used by this action. Leave blank if no skill is used"
                     },
                     "spec": {
-                        "label": "Skill Specialization",
-                        "hint": "If the skill specialization modifier should be applied to this action"
+                        "label": "Specialized",
+                        "hint": "If the skill specialization modifier (+2) should be applied to this test"
                     },
                     "attribute": {
                         "label": "Attribute",

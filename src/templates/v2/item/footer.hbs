@@ -1,73 +1,513 @@
 <footer class="sheet-footer">
     <div class="list-item">
+        {{#if @root.isPlayMode}}
+            {{#unless (isType item 'spell' 'quality' 'lifestyle')}}
+                <label>
+                    {{localize (concat 'TYPES.Item.' item.type)}}
+                </label>
+            {{/unless}}
+        {{/if}}
         {{!-- Show Quantity First --}}
         {{#if system.technology}}
             <span>
                 <label>{{localize "SR5.Qty"}}&nbsp;</label>
+                {{#if @root.isPlayMode}}
                     <a data-action="removeOneQty"
                        data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty">
-                    <i class="fas fa-minus-square"></i>
-                </a>
-                <label>{{system.technology.quantity}}</label>
-                <a data-action="addOneQty"
-                   data-tooltip="SR5.ItemSheet.Labels.AddOneQty">
-                    <i class="fas fa-plus-square"></i>
-                </a>
+                        <i class="fas fa-minus-square"></i>
+                    </a>
+                    <label>{{system.technology.quantity}}</label>
+                    <a data-action="addOneQty"
+                       data-tooltip="SR5.ItemSheet.Labels.AddOneQty">
+                        <i class="fas fa-plus-square"></i>
+                    </a>
+                {{else}}
+                    <span>
+                        {{formInput systemFields.technology.fields.quantity value=source.system.technology.quantity
+                                    classes="short midd" rootId=rootId disabled=@root.isPlayMode}}
+                    </span>
+                {{/if}}
             </span>
         {{/if}}
 
-        {{#if (or (eq item.type 'bioware') (eq item.type 'cyberware'))}}
-            {{#if system.grade}}
+        {{#if (isType item 'bioware' 'cyberware')}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.grade.label}}:&nbsp;{{systemFields.grade.hint}}">
+                    {{formInput systemFields.grade value=source.system.grade localize=true
+                                classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else if system.grade}}
                 <label>{{localizeOb system.grade @root.config.cyberwareGrades}}</label>
             {{/if}}
-            {{#if system.technology.calculated.essence.value}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.essence.label}}:&nbsp;{{systemFields.essence.hint}}">
+                    {{formInput systemFields.essence value=source.system.essence classes="short skinny"
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else if system.technology.calculated.essence.value}}
                 <label data-tooltip="SR5.EssenceCost"><i class="fas fa-dna"></i> {{system.technology.calculated.essence.value}}</label>
             {{/if}}
         {{/if}}
 
         {{#if system.technology}}
-            {{#if system.technology.rating}}
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Rtg"}}</label>
+                    <span data-tooltip="{{systemFields.technology.fields.rating.label}}:&nbsp;{{systemFields.technology.fields.rating.hint}}">
+                        {{formInput systemFields.technology.fields.rating value=source.system.technology.rating
+                                    classes="short skinny" rootId=rootId disabled=@root.isPlayMode}}
+                    </span>
+                </div>
+            {{else if system.technology.rating}}
                 <label>{{localize "SR5.Rtg"}}&nbsp;{{system.technology.rating}}</label>
             {{/if}}
-            {{#if system.technology.calculated.availability.value}}
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Availability"}}</label>
+                    {{formInput systemFields.technology.fields.availability value=source.system.technology.availability
+                                classes="short skinny" rootId=rootId disabled=@root.isPlayMode}}
+                </div>
+            {{else if system.technology.calculated.availability.value}}
                 <label>{{localize "SR5.Availability"}}&nbsp;{{system.technology.calculated.availability.value}}</label>
             {{/if}}
-            {{#if system.technology.calculated.cost.value}}
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.technology.fields.cost.label}}"><i class="fas fa-yen-sign"></i></label>
+                    {{formInput systemFields.technology.fields.cost value=source.system.technology.cost
+                                classes="short nuyen" rootId=rootId disabled=@root.isPlayMode}}
+                </div>
+            {{else if system.technology.calculated.cost.value}}
                 <label data-tooltip="{{systemFields.technology.fields.cost.label}}"><i class="fas fa-yen-sign"></i>&nbsp;{{nuyenValue system.technology.calculated.cost.value}}</label>
             {{/if}}
-            {{#if system.technology.conceal.value}}
-                <label data-tooltip="{{systemFields.technology.fields.conceal.fields.value.label}}"><i class="fas fa-magnifying-glass-waveform"></i>&nbsp;{{numberFormat system.technology.conceal.value sign=true}}</label>
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.technology.fields.conceal.fields.base.label}}"><i class="fas fa-magnifying-glass-waveform"></i></label>
+                    {{formInput systemFields.technology.fields.conceal.fields.base value=source.system.technology.conceal.base
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            {{else}}
+                <label data-tooltip="{{systemFields.technology.fields.conceal.fields.base.label}}"><i class="fas fa-magnifying-glass"></i>&nbsp;{{numberFormat system.technology.conceal.value sign=true}}</label>
             {{/if}}
         {{/if}}
 
         {{#if (eq item.type 'contact')}}
-            <label>{{system.type}}</label>
-            <label>{{systemFields.loyalty.label}}&nbsp;{{system.loyalty}}</label>
-            <label>{{systemFields.connection.label}}&nbsp;{{system.connection}}</label>
-            {{#if system.family}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
+                    {{formInput systemFields.type value=source.system.type
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label>{{system.type}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{systemFields.loyalty.label}}</label>
+                    {{formInput systemFields.loyalty value=source.system.loyalty
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            {{else}}
+                <label>{{systemFields.loyalty.label}}&nbsp;{{system.loyalty}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{systemFields.connection.label}}</label>
+                    {{formInput systemFields.connection value=source.system.connection
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            {{else}}
+                <label>{{systemFields.connection.label}}&nbsp;{{system.connection}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <label>
+                    {{systemFields.family.label}}&nbsp;{{formInput systemFields.family value=source.system.family
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </label>
+            {{else if system.family}}
                 <label>{{systemFields.family.label}}</label>
             {{/if}}
-            {{#if system.blackmail}}
+
+            {{#if @root.isEditMode}}
+                <label>
+                    {{systemFields.blackmail.label}}&nbsp;{{formInput systemFields.blackmail value=source.system.blackmail
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </label>
+            {{else if system.blackmail}}
                 <label>{{systemFields.blackmail.label}}</label>
             {{/if}}
-            {{#if system.blackmail}}
+
+            {{#if @root.isEditMode}}
+                <label>
+                    {{systemFields.group.label}}&nbsp;{{formInput systemFields.group value=source.system.group
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </label>
+            {{else if system.group}}
                 <label>{{systemFields.group.label}}</label>
             {{/if}}
-        {{/if}}
+        {{else if (eq item.type 'lifestyle')}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
+                    {{formInput systemFields.type value=source.system.type localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label>{{localizeOb system.type @root.config.lifestyleTypes}}&nbsp;{{localize "SR5.ItemTypes.Lifestyle"}}</label>
+            {{/if}}
+            <label>
+                <i data-tooltip="{{systemFields.cost.label}}" class="fas fa-yen-sign"></i>
+                {{#if @root.isEditMode}}
+                    <span>
+                        {{formInput systemFields.cost value=source.system.cost
+                                    classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                {{else}}
+                    {{nuyenValue system.cost}}
+                {{/if}}
+            </label>
+            <label>
+                <i data-tooltip="{{systemFields.neighborhood.label}}" class="fas fa-buildings"></i>
+                {{#if @root.isEditMode}}
+                    <span>
+                        {{formInput systemFields.neighborhood value=source.system.neighborhood
+                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                {{else}}
+                    {{system.neighborhood}}
+                {{/if}}
+            </label>
+            <label>
+                <i data-tooltip="{{systemFields.comforts.label}}" class="far fa-mattress-pillow"></i>
+                {{#if @root.isEditMode}}
+                    <span>
+                        {{formInput systemFields.comforts value=source.system.comforts
+                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                {{else}}
+                    {{system.comforts}}
+                {{/if}}
+            </label>
+            <label>
+                <i data-tooltip="{{systemFields.security.label}}" class="far fa-shield-halved"></i>
+                {{#if @root.isEditMode}}
+                    <span>
+                        {{formInput systemFields.security value=source.system.security
+                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                {{else}}
+                    {{system.security}}
+                {{/if}}
+            </label>
+            <label>
+                <i data-tooltip="{{systemFields.guests.label}}" class="far fa-people"></i>
+                {{#if @root.isEditMode}}
+                    <span>
+                        {{formInput systemFields.guests value=source.system.guests
+                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                {{else}}
+                    {{system.guests}}
+                {{/if}}
+            </label>
+        {{else if (eq item.type 'quality')}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
+                    {{formInput systemFields.type value=source.system.type localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label>{{localizeOb system.type @root.config.qualityTypes}}&nbsp;{{localize "SR5.ItemTypes.Quality"}}</label>
+            {{/if}}
+            {{#if @root.isEditMode}}
+                <span>
+                    <label>{{systemFields.rating.label}}</label>
+                    <span>
+                        {{formInput systemFields.rating value=source.system.rating
+                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                </span>
+            {{else}}
+                <label>{{systemFields.rating.label}}&nbsp;{{system.rating}}</label>
+            {{/if}}
+            {{#if @root.isEditMode}}
+                <span>
+                    <label>{{systemFields.karma.label}}</label>
+                    <span>
+                        {{formInput systemFields.karma value=source.system.karma
+                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                </span>
 
-        {{#if (eq item.type 'lifestyle')}}
-            <label>{{system.type}}</label>
-            <label><i data-tooltip="{{systemFields.cost.label}}" class="fas fa-yen-sign"></i>&nbsp;{{nuyenValue system.cost}}</label>
-            <label><i data-tooltip="{{systemFields.neighborhood.label}}" class="fas fa-buildings"></i>&nbsp;{{system.neighborhood}}</label>
-            <label><i data-tooltip="{{systemFields.comforts.label}}" class="far fa-mattress-pillow"></i>&nbsp;{{system.comforts}}</label>
-            <label><i data-tooltip="{{systemFields.security.label}}" class="far fa-shield-halved"></i>&nbsp;{{system.security}}</label>
-            <label><i data-tooltip="{{systemFields.guests.label}}" class="far fa-people"></i>&nbsp;{{system.guests}}</label>
-        {{/if}}
+            {{else}}
+                <label>{{systemFields.karma.label}}&nbsp;{{system.karma}}</label>
+            {{/if}}
+        {{else if (eq item.type 'program')}}
+            {{#if @root.isEditMode}}
+                <span data-toolt="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
+                    {{formInput systemFields.type value=source.system.type localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label>{{item.system.type}}</label>
+            {{/if}}
+        {{else if (eq item.type 'adept_power')}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
+                    {{formInput systemFields.type value=source.system.type localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label>{{localizeOb system.type @root.config.adeptPower.types}}</label>
+            {{/if}}
 
-        {{#if (eq item.type 'quality')}}
-            <label>{{localizeOb system.type @root.config.qualityTypes}}</label>
-            <label>{{systemFields.rating.label}}&nbsp;{{system.rating}}</label>
-            <label>{{systemFields.karma.label}}&nbsp;{{system.karma}}</label>
+            {{#if @root.isEditMode}}
+                <span>
+                    <label data-tooltip="{{systemFields.pp.hint}}">{{systemFields.pp.label}}</label>
+                    {{formInput systemFields.pp value=source.system.pp classes="short skinny"
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label data-tooltip="{{systemFields.pp.hint}}">{{systemFields.pp.label}}&nbsp;{{system.pp}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <span>
+                    <label data-tooltip="{{systemFields.level.hint}}">{{systemFields.level.label}}</label>
+                    {{formInput systemFields.level value=source.system.level
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label data-tooltip="{{systemFields.level.hint}}">{{systemFields.level.label}}&nbsp;{{system.level}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <label data-tooltip="{{systemFields.drain.hint}}">
+                    {{systemFields.drain.label}}
+                    {{formInput systemFields.drain value=source.system.drain
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </label>
+            {{else if system.drain}}
+                <label data-tooltip="{{systemFields.drain.hint}}">{{systemFields.drain.label}}</label>
+            {{/if}}
+        {{else if (eq item.type 'ritual')}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
+                    {{formInput systemFields.type value=source.system.type localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
+                    {{localizeOb system.type @root.config.ritualSpellTypes}}
+                </label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <span>
+                    <label data-tooltip="{{systemFields.descriptors.hint}}">{{systemFields.descriptors.label}}</label>
+                    <span>
+                        {{formInput systemFields.descriptors value=source.system.descriptors
+                                      classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                </span>
+            {{else}}
+                <label data-tooltip="{{systemFields.descriptors.hint}}">{{systemFields.descriptors.label}}&nbsp;{{system.descriptors}}</label>
+            {{/if}}
+        {{else if (eq item.type 'critter_power')}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.powerType.label}}: &nbsp;{{systemFields.powerType.hint}}">
+                    {{formInput systemFields.powerType value=source.system.powerType localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label data-tooltip="{{systemFields.powerType.hint}}">{{localizeOb system.powerType @root.config.critterPower.types}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{systemFields.duration.label}}</label>
+                    <div data-tooltip="{{systemFields.duration.label}}:&nbsp;{{systemFields.duration.hint}}">
+                        {{formInput systemFields.duration value=source.system.duration localize=true
+                                    classes="short midd" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </div>
+                </div>
+            {{else}}
+                <label>{{systemFields.duration.label}}:&nbsp;{{localizeOb system.duration @root.config.critterPower.durations}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{systemFields.range.label}}</label>
+                    <div data-tooltip="{{systemFields.range.label}}:&nbsp;{{systemFields.range.hint}}">
+                        {{formInput systemFields.range value=source.system.range localize=true
+                                    classes="short midd" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </div>
+                </div>
+            {{else}}
+                <label>{{localizeOb system.range @root.config.critterPower.ranges}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{systemFields.karma.label}}</label>
+                    <div data-tooltip="{{systemFields.karma.label}}:&nbsp;{{systemFields.karma.hint}}">
+                        {{formInput systemFields.karma value=source.system.karma
+                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </div>
+                </div>
+            {{else if system.karma}}
+                <label>{{systemFields.karma.label}}&nbsp;{{system.karma}}</label>
+            {{/if}}
+
+        {{else if (eq item.type 'spell')}}
+            {{#if @root.isEditMode}}
+                <span>
+                    {{formInput systemFields.category value=source.system.category localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else}}
+                <label>{{localizeOb system.category @root.config.spellCategories}}&nbsp;{{localize "SR5.ItemTypes.Spell"}}</label>
+            {{/if}}
+
+            {{#if (eq system.category 'combat')}}
+
+                {{#if @root.isEditMode}}
+                    <span data-tooltip="{{systemFields.combat.fields.type.label}}:&nbsp;{{systemFields.combat.fields.type.hint}}">
+                        {{formInput systemFields.combat.fields.type value=source.system.combat.type localize=true
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                {{else}}
+                    <label data-tooltip="{{systemFields.combat.fields.type.label}}:&nbsp;{{systemFields.combat.fields.type.hint}}">
+                        {{localizeOb system.combat.type @root.config.combatSpellTypes}}
+                    </label>
+                {{/if}}
+
+            {{else if (eq system.category 'detection')}}
+
+                {{#if @root.isEditMode}}
+                    <span data-tooltip="{{systemFields.detection.fields.type.label}}:&nbsp;{{systemFields.detection.fields.type.hint}}">
+                        {{formInput systemFields.detection.fields.type value=source.system.detection.type localize=true
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                {{else}}
+                    <label data-tooltip="{{systemFields.detection.fields.type.label}}:&nbsp;{{systemFields.detection.fields.type.hint}}">
+                        {{localizeOb system.detection.type @root.config.detectionSpellTypes}}
+                    </label>
+                {{/if}}
+
+                {{#if @root.isEditMode}}
+                    <label data-tooltip="{{systemFields.detection.fields.extended.hint}}">
+                        {{systemFields.detection.fields.extended.label}}:&nbsp;{{formInput systemFields.detection.fields.extended value=source.system.detection.extended
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </label>
+                {{else if system.detection.fields.extended}}
+                    <label>{{localize "SR5.Extended"}}</label>
+                {{/if}}
+
+            {{else if (eq system.category 'illusion')}}
+
+                {{#if @root.isEditMode}}
+                    <label data-tooltip="{{systemFields.illusion.fields.type.label}}:&nbsp;{{systemFields.illusion.fields.type.hint}}">
+                        {{formInput systemFields.illusion.fields.type value=source.system.illusion.type localize=true
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </label>
+                {{else}}
+                    <label data-tooltip="{{systemFields.illusion.fields.type.label}}:&nbsp;{{systemFields.illusion.fields.type.hint}}">
+                        {{localizeOb system.illusion.type @root.config.illusionSpellTypes}}
+                    </label>
+                {{/if}}
+
+                {{#if @root.isEditMode}}
+                    <label data-tooltip="{{systemFields.illusion.fields.sense.label}}:&nbsp;{{systemFields.illusion.fields.sense.hint}}">
+                        {{formInput systemFields.illusion.fields.sense value=source.system.illusion.sense localize=true
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </label>
+                {{else}}
+                    <label data-tooltip="{{systemFields.illusion.fields.sense.label}}:&nbsp;{{systemFields.illusion.fields.sense.hint}}">
+                        {{localizeOb system.illusion.sense @root.config.illusionSpellSenses}}
+                    </label>
+                {{/if}}
+            {{else if (eq system.category 'manipulation')}}
+
+                {{#if @root.isEditMode}}
+                    <label data-tooltip="{{systemFields.manipulation.fields.damaging.hint}}">
+                        {{systemFields.manipulation.fields.damaging.label}}&nbsp;{{formInput systemFields.manipulation.fields.damaging value=system.manipulation.damaging
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </label>
+                {{else if system.manipulation.damaging}}
+                    <label data-tooltip="{{systemFields.manipulation.fields.damaging.hint}}">
+                        {{systemFields.manipulation.fields.damaging.label}}
+                    </label>
+                {{/if}}
+
+                {{#if @root.isEditMode}}
+                    <label data-tooltip="{{systemFields.manipulation.fields.mental.hint}}">
+                        {{systemFields.manipulation.fields.mental.label}}&nbsp;{{formInput systemFields.manipulation.fields.mental value=system.manipulation.mental
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </label>
+                {{else if system.manipulation.mental}}
+                    <label data-tooltip="{{systemFields.manipulation.fields.mental.hint}}">
+                        {{systemFields.manipulation.fields.mental.label}}
+                    </label>
+                {{/if}}
+
+                {{#if @root.isEditMode}}
+                    <label data-tooltip="{{systemFields.manipulation.fields.environmental.hint}}">
+                        {{systemFields.manipulation.fields.environmental.label}}&nbsp;{{formInput systemFields.manipulation.fields.environmental value=source.system.manipulation.environmental
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </label>
+                {{else if system.manipulation.environmental}}
+                    <label data-tooltip="{{systemFields.manipulation.fields.environmental.hint}}">
+                        {{systemFields.manipulation.fields.environmental.label}}
+                    </label>
+                {{/if}}
+
+                {{#if @root.isEditMode}}
+                    <label data-tooltip="{{systemFields.manipulation.fields.physical.hint}}">
+                        {{systemFields.manipulation.fields.physical.label}}&nbsp;{{formInput systemFields.manipulation.fields.physical value=system.manipulation.physical
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </label>
+                {{else if system.manipulation.physical}}
+                    <label data-tooltip="{{systemFields.manipulation.fields.physical.hint}}">
+                        {{systemFields.manipulation.fields.physical.label}}
+                    </label>
+                {{/if}}
+            {{else if (eq system.category 'ritual')}}
+
+                {{#if @root.isEditMode}}
+                    <label data-tooltip="{{systemFields.ritual.fields.type.label}}:&nbsp;{{systemFields.ritual.fields.type.hint}}">
+                        {{formInput systemFields.ritual.fields.type value=source.system.ritual.type localize=true
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </label>
+                {{else}}
+                    <label data-tooltip="{{systemFields.ritual.fields.type.label}}:&nbsp;{{systemFields.ritual.fields.type.hint}}">
+                        {{localizeOb system.ritual.type @root.config.ritualSpellTypes}}
+                    </label>
+                {{/if}}
+
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+            {{else}}
+            {{/if}}
+
+        {{/if}}
+        {{#if systemFields.capacity}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
+                    <label>
+                        <i class="fas fa-toolbox"></i>
+                    </label>
+                    <span>
+                        {{formInput systemFields.capacity value=source.system.capacity
+                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                </span>
+            {{else if system.capacity}}
+                <label data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
+                    <i class="fas fa-toolbox"></i>&nbsp;{{system.capacity}}
+                </label>
+            {{/if}}
         {{/if}}
         <div></div>
     </div>

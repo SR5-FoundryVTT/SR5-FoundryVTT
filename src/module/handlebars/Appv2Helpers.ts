@@ -1,4 +1,6 @@
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import { SR5Item } from '@/module/item/SR5Item';
+import { SR5Actor } from '@/module/actor/SR5Actor';
 
 export const registerAppv2Helpers = () => {
 
@@ -36,5 +38,14 @@ export const registerAppv2Helpers = () => {
         }
         return new Handlebars.SafeString(nav.outerHTML);
     });
+
+    Handlebars.registerHelper('isType', function(document: SR5Item | SR5Actor | any, ...types: any[]): boolean {
+        if (!(document instanceof SR5Item || document instanceof SR5Actor)) {
+            return false;
+        }
+        // remove options from the captured string
+        types.splice(types.length - 1, 1);
+        return (document as any).isType(...types);
+    })
 
 }

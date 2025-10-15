@@ -23,12 +23,14 @@
             <label>{{item.system.rating}}</label>
         </div>
 
-        <div class="list-item-icons {{#if @root.isPlayMode}} skinny-col {{/if}}">
+        <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
             {{#if (isOwner item owner=@root.actor)}}
-                {{#unless (eq item.system.optional "standard")}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
+                {{#unless (or (eq item.system.optional "standard") @root.isPlayMode)}}
+                    <a data-action="equipItem">
+                        <i class="{{#if (isEquipped item)}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
+                    </a>
                 {{/unless}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
             {{/if}}

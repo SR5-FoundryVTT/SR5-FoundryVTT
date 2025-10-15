@@ -21,58 +21,133 @@
             {{#if @root.isEditMode}}
                 <div class="sheet-header-source">
                     {{formInput systemFields.description.fields.source value=source.system.description.source
-                                placeholder=(localize "SR5.Source") rootId=rootId}}
+                                classes="short" placeholder=(localize "SR5.Source") rootId=rootId}}
                 </div>
             {{/if}}
-            {{#if @root.isPlayMode}}
+            {{#if (and @root.isPlayMode system.technology.condition_monitor.max)}}
                 <div>
                     <div class="list-item">
                         <div class="list-item-start">
-                            {{#if system.technology.condition_monitor.max}}
-                                {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                                    name=(localize "SR5.ConditionMonitor")
-                                    value=system.technology.condition_monitor.value
-                                    max=system.technology.condition_monitor.max
-                                    id='matrix'
-                                    disabled=system.technology.condition_monitor.disabled
-                                }}
-                            {{/if}}
+                            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                                name=(localize "SR5.ConditionMonitor")
+                                value=system.technology.condition_monitor.value
+                                max=system.technology.condition_monitor.max
+                                id='matrix'
+                                disabled=system.technology.condition_monitor.disabled }}
                         </div>
                     </div>
                 </div>
             {{/if}}
         </div>
+        {{#if (and @root.isEditMode (eq item.type 'contact'))}}
+            <div class="document-tags-container">
+                <span data-tooltip="{{systemFields.linkedActor.label}}:&nbsp;{{systemFields.linkedActor.hint}}">
+                    {{formInput systemFields.linkedActor value=source.system.linkedActor
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            </div>
+        {{/if}}
     </div>
-    {{#if @root.isPlayMode}}
-        <div class="list-item list-item-header">
+    <div class="list-item list-item-header">
+        {{#if (eq item.type 'spell')}}
+            <div class="list-item-col">
+                <label data-tooltip="{{systemFields.type.hint}}">{{localize "SR5.Spell.Type"}}:</label>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.type value=source.system.type localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else}}
+                    <label>{{localizeOb system.type @root.config.spellTypes}}</label>
+                {{/if}}
+            </div>
+
+            <div class="list-item-col">
+                <label data-tooltip="{{systemFields.duration.hint}}">{{localize "SR5.Duration"}}:</label>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.duration value=source.system.duration localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else}}
+                    <label>{{localizeOb system.duration @root.config.durations}}</label>
+                {{/if}}
+            </div>
+            <div class="list-item-col">
+                <label data-tooltip="{{systemFields.range.hint}}">{{localize "SR5.Range"}}:</label>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.range value=source.system.range localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else}}
+                    <label>{{localizeOb system.range @root.config.spellRanges}}</label>
+                {{/if}}
+            </div>
+
+            <div class="list-item-col">
+                <label>{{localize "SR5.Drain"}}:</label>
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.drain value=source.system.drain
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{else}}
+                    <label>{{localize "SR5.Force"}}{{#if system.drain}}{{numberFormat system.drain sign=true}}{{/if}}</label>
+                {{/if}}
+            </div>
+        {{else}}
             <div class="list-item-start">
+                {{#if (eq item.type 'contact')}}
+                    {{#if linkedActor}}
+                        <span class="document-img-name">
+                            <img src="{{linkedActor.img}}" width="16px" height="16px" />
+                            <a class="content-link"
+                               draggable="true"
+                               data-link
+                               data-type="Actor"
+                               data-id="{{linkedActor.id}}"
+                               data-uuid="{{linkedActor.uuid}}">
+                                {{linkedActor.name}}
+                            </a>
+                            <a data-action="removeLinkedActor" class="close"><i class="fas fa-times"></i></a>
+                        </span>
+                    {{else}}
+                        <label>{{localize "SR5.Tooltips.Contact.LinkActor"}}</label>
+                    {{/if}}
+                {{/if}}
                 {{#if systemFields.technology}}
                     {{#unless (eq system.technology.wireless 'none')}}
                         {{#if master}}
                             <span class="document-img-name">
-                                <img src="{{master.img}}" width="16px" height="16px" />
-                                <a class="content-link"
-                                   draggable="true"
-                                   data-link
-                                   data-type="Actor"
-                                   data-id="{{master.id}}"
-                                   data-uuid="{{master.uuid}}">
-                                    {{master.name}}
-                                </a>
-                                <a data-action="removeMaster" class="close"><i class="fas fa-times"></i></a>
-                            </span>
+                            <img src="{{master.img}}" width="16px" height="16px" />
+                            <a class="content-link"
+                               draggable="true"
+                               data-link
+                               data-type="Actor"
+                               data-id="{{master.id}}"
+                               data-uuid="{{master.uuid}}">
+                                {{master.name}}
+                            </a>
+                            <a data-action="removeMaster" class="close"><i class="fas fa-times"></i></a>
+                        </span>
                         {{else}}
-                            <label>{{localize "SR5.NoMasterDevice"}}</label>
+                            <label>{{localize "SR5.Labels.Sheet.MissingNetworkDevices"}}</label>
                         {{/if}}
                     {{/unless}}
                 {{/if}}
             </div>
             <div class="list-item-icons">
+                {{#if (eq item.type 'critter_power')}}
+                    <label data-tooltip="{{systemFields.optional.hint}}">{{systemFields.optional.label}}</label>
+                    <span>
+                        {{formInput systemFields.optional value=system.optional localize=true
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                {{/if}}
                 {{#if systemFields.technology}}
-                    <a data-action="toggleEquipped">
+                    <a data-tooltip="SR5.Equipped" data-action="toggleEquipped">
+                        {{localize "SR5.Equipped"}}
                         <i class="{{#if (isEquipped item)}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
                     </a>
-                    {{#if (canBeWireless item)}}
+                    {{#if @root.isEditMode}}
+                        <span data-tooltip="SR5.Wireless">
+                            {{formInput systemFields.technology.fields.wireless value=source.system.technology.wireless
+                                        classes="short" localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </span>
+                    {{else if (canBeWireless item)}}
                         {{#if (isBroken item)}}
                             <a data-tooltip="SR5.Broken" data-action="repair">
                                 <i class="fas fa-link-slash"></i>
@@ -92,6 +167,6 @@
                     {{/if}}
                 {{/if}}
             </div>
-        </div>
-    {{/if}}
+        {{/if}}
+    </div>
 </div>

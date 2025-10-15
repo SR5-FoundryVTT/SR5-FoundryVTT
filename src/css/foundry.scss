@@ -226,11 +226,6 @@ body:not(.theme-dark) {
     right: -150px;
 }
 
-.list-header.item-section[data-item-id='weapon'][data-item-type=''] {
-    color: $yellow; /* set the color to yellow */
-    font-size: small;
-}
-
 nav#context-menu {
     box-shadow: 0 0 5px 2px rgba($yellow, 0.4);
     background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
@@ -238,8 +233,11 @@ nav#context-menu {
     background-size: 100% 20px auto;
 
     li {
-        &:nth-of-type(even) {
+        &:not(:hover):nth-of-type(even) {
             background: rgba(white, 0.03);
+        }
+        &:hover {
+            background: rgba($darkred, 0.7);
         }
     }
 }
