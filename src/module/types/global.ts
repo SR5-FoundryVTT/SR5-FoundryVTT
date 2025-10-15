@@ -50,6 +50,7 @@ import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerc
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
+import { DiceSoNice } from "../rolls/DiceSoNice";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -263,8 +264,11 @@ declare module "fvtt-types/configuration" {
 }
 
 declare global {
-    // eslint-disable-next-line no-var
-    var routinglib: RoutingLib | null;
+    const routinglib: RoutingLib | null;
+
+    interface Game {
+        dice3d: DiceSoNice | undefined;
+    }
 
     // Use declaration merging to add strong typing to Foundry's game.i18n localize and format functions,
     // sourcing valid translation strings from this system's english translations file

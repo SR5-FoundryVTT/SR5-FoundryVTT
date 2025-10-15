@@ -23,7 +23,6 @@ import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlo
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
 import { DeepPartial } from "fvtt-types/utils";
-
 export interface TestDocuments {
     // Legacy field that used be the source document.
     actor?: SR5Actor
@@ -491,7 +490,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper method to create the main SR5Roll.
      */
     createRoll(): SR5Roll {
-        const roll = new SR5Roll(this.formula) as unknown as SR5Roll;
+        const roll = new SR5Roll(this.formula);
         this.rolls.push(roll);
         return roll;
     }
@@ -1701,27 +1700,24 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
     async rollDiceSoNice() {
-        if (!game.user || !game.users) return;
-
-        const dice3d = (game.modules.get("dice-so-nice") as any)?.api;
+        const dice3d = game.dice3d;
         if (!dice3d) return;
 
-        console.debug('Shadowrun5e | Initiating DiceSoNice throw');
-
         // Only roll the last dice rolled.
-        // This necessary when a test has been recast with second chance, and should only the re-rolled dice instead
-        // of all.
+        // This necessary when a test has been recast with second chance,
+        // and should only the re-rolled dice instead of all.
         const roll = this.rolls[this.rolls.length - 1];
 
         // Limit users to show dice to...
-        let whisper: User[] | null = null;
+        let whisper: User[] = [];
+
         // ...for gmOnlyContent check permissions
         if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
-            whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true);
+            whisper = game.users.filter(user => !!this.actor?.testUserPermission(user, 'OWNER'));
         }
+
         // ...for rollMode include GM when GM roll
         if (this.data.options?.rollMode === 'gmroll' || this.data.options?.rollMode === "blindroll") {
-            whisper = whisper || [];
             whisper = [...game.users.filter(user => user.isGM), ...whisper];
         }
 
