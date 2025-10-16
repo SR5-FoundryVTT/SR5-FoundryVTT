@@ -203,6 +203,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             addEffect: SR5BaseActorSheet.#createEffect,
             editEffect: SR5BaseActorSheet.#editEffect,
             deleteEffect: SR5BaseActorSheet.#deleteEffect,
+            toggleEffect: SR5BaseActorSheet.#toggleEffect,
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
@@ -586,7 +587,34 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         const id = SheetFlow.closestEffectId(event.target);
         const item = this.actor.effects.get(id);
-        if (item) await item.sheet?.render(true);
+        if (item) {
+            await item.sheet?.render(true);
+        } else {
+            // check for uuid
+            const uuid = SheetFlow.closestUuid(event.target);
+            const doc = SheetFlow.fromUuidSync(uuid);
+            if (doc && doc instanceof SR5ActiveEffect) {
+                await doc.sheet?.render(true);
+            }
+        }
+    }
+
+    static async #toggleEffect(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+
+        const id = SheetFlow.closestEffectId(event.target);
+        const item = this.actor.effects.get(id);
+        if (item) {
+            const disabled = !item.disabled;
+            await item.update({disabled});
+        } else {
+            const uuid = SheetFlow.closestUuid(event.target);
+            const doc = SheetFlow.fromUuidSync(uuid);
+            if (doc && doc instanceof SR5ActiveEffect) {
+                const disabled = !doc.disabled;
+                await doc.update({disabled});
+            }
+        }
     }
 
     static async #deleteEffect(this: SR5BaseActorSheet, event) {
@@ -1886,13 +1914,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 condition: (target) => {
                     const id = SheetFlow.closestEffectId(target);
                     const item = this.actor.effects.get(id);
-                    return item !== undefined;
+                    if (item) return true;
+                    const uuid = SheetFlow.closestUuid(target);
+                    const doc = SheetFlow.fromUuidSync(uuid);
+                    return !!(doc && doc instanceof SR5ActiveEffect);
                 },
                 callback: async (target) => {
                     const id = SheetFlow.closestEffectId(target);
                     const item = this.actor.effects.get(id);
                     if (item) {
                         await item.sheet?.render(true)
+                    } else {
+                        const uuid = SheetFlow.closestUuid(target);
+                        const doc = SheetFlow.fromUuidSync(uuid);
+                        if (doc && doc instanceof SR5ActiveEffect) {
+                            await doc.sheet?.render(true);
+                        }
                     }
                 }
             },
@@ -1903,6 +1940,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const id = SheetFlow.closestEffectId(target);
                     const item = this.actor.effects.get(id);
                     return item !== undefined;
+                    // don't check for effects by uuid for deletion
                 },
                 callback: async (target) => {
                     const userConsented = await Helpers.confirmDeletion();

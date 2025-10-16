@@ -1,20 +1,26 @@
 {{!-- list-item expects an SR5ActiveEffect to be passed in as 'item' --}}
 <div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
-    <div class="list-item draggable" data-effect-id="{{item.id}}" data-uuid="{{item.uuid}}" {{#if isItemEffect}} data-source="{{item.parent.uuid}}" {{/if}}>
+    <div class="list-item draggable"
+         data-effect-id="{{item.id}}"
+         data-uuid="{{item.uuid}}"
+        {{#if isItemEffect}}
+         data-source="{{item.parent.uuid}}"
+        {{/if}}
+        >
         <div class="list-item-start">
             {{#if item.img}}
                 <img src="{{item.img}}" class="list-item-image" height="24px" width="24px" />
             {{/if}}
             <a data-action="showItemDescription">
-                {{#if name}}
-                    {{name}}
+                {{#if isItemEffect}}
+                    {{item.sheetName}}
                 {{else}}
                     {{item.name}}
                 {{/if}}
             </a>
         </div>
 
-        <div class="list-item-col">
+        <div class="list-item-col thicc-col">
             <label>{{localizeOb item.system.applyTo @root.config.effectApplyTo}}</label>
         </div>
 
@@ -24,17 +30,27 @@
         </div>
         --}}
 
-        <div class="list-item-icons">
+        <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
+            {{#if @root.isPlayMode}}
+                {{#if isItemEffect}}
+                    <a data-action="openSource" data-tooltip="SR5.OpenSource">
+                        <i class="fas fa-file"></i>
+                    </a>
+                {{/if}}
+            {{/if}}
             <a data-tooltip="SR5.ToggleActive" data-action="toggleEffect">
                 <i class="{{#if item.disabled}}far fa-circle{{else}}fas fa-check-circle{{/if}}"></i>
             </a>
-            {{#unless isItemEffect}}
-                {{#if @root.isEditMode}}
+            {{#if @root.isEditMode}}
+                <a data-tooltip="SR5.EditEffect" data-action="editEffect">
+                    <i class="fas fa-pen-to-square"></i>
+                </a>
+                {{#unless isItemEffect}}
                     <a data-tooltip="SR5.Delete" data-action="deleteEffect">
                         <i class="fas fa-trash"></i>
                     </a>
-                {{/if}}
-            {{/unless}}
+                {{/unless}}
+            {{/if}}
         </div>
     </div>
     <div class="list-item-desc">

@@ -5,7 +5,7 @@
         </label>
     </div>
 
-    <div class="list-item-col">
+    <div class="list-item-col thicc-col">
         <label>{{localize "SR5.ActiveEffect.ApplyTo"}}</label>
     </div>
 
@@ -15,15 +15,15 @@
     </div>
     --}}
 
-    <div class="list-item-icons">
-        {{#unless (or isItemEffect isNestedItem)}}
-            {{#if @root.isEditMode}}
+    <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        {{#if @root.isEditMode}}
+            {{#unless (or isItemEffect isNestedItem)}}
                 <a data-action="addEffect"
                    data-tooltip="SR5.CreateEffect">
                     {{localize "SR5.Add"}}
                     <i class="fas fa-plus"></i>
                 </a>
-            {{/if}}
-        {{/unless}}
+            {{/unless}}
+        {{/if}}
     </div>
 </div>
