@@ -1704,7 +1704,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
-    async rollDiceSoNice() {
+    rollDiceSoNice() {
         const dice3d = game.dice3d;
         if (!dice3d) return;
 
@@ -1755,7 +1755,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.data.messageUuid = message.uuid;
         await this.saveToMessage();
 
-        await this.rollDiceSoNice();
+        this.rollDiceSoNice();
 
         return message;
     }
@@ -2132,7 +2132,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const card = $(event.currentTarget).closest('.chat-card');
         const element = card.find('.dice-rolls');
         if (element.is(':visible')) element.slideUp(200);
-        else element.slideDown(200);
+        else element.css('display', 'flex').hide().slideDown(200);
     }
 
     /**

@@ -5,7 +5,7 @@ export class SR5Die extends Terms.Die {
     static SR5Modifiers = ['cf=1', 'cs>=5'] as readonly string[];
 
     // Add SR5 specific modifiers to the expression
-    constructor(options: ConstructorParameters<typeof Terms.Die>[0]) {
+    constructor(options?: ConstructorParameters<typeof Terms.Die>[0]) {
         options ??= {};
         options.modifiers ??= [];
         options.modifiers = options.modifiers.filter(mod => !['cs', 'cf'].includes(mod));

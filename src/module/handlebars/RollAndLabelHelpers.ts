@@ -3,6 +3,9 @@ import ModList = Shadowrun.ModList;
 import {Helpers} from "../helpers";
 import {SafeString} from "handlebars";
 import { DamageType } from '../types/item/Action';
+import { SR5Die } from '../rolls/SR5Die';
+
+const sr5Die = new SR5Die();
 
 export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
@@ -18,26 +21,8 @@ export const registerRollAndLabelHelpers = () => {
         return new Handlebars.SafeString(code);
     });
 
-    Handlebars.registerHelper('diceIcon', function (side) {
-        if (side) {
-            switch (side) {
-                case 1:
-                    return 'red';
-                case 2:
-                    return 'grey';
-                case 3:
-                    return 'grey';
-                case 4:
-                    return 'grey';
-                case 5:
-                    return 'green';
-                case 6:
-                    return 'green';
-                default:
-                    return '';
-            }
-        }
-        return '';
+    Handlebars.registerHelper('dieResultCssClasses', function (result: foundry.dice.terms.Die.TermData['results'][number]) {
+        return sr5Die.getResultCSS(result).filter(cssClass => cssClass).join(' ');
     });
 
     Handlebars.registerHelper('elementIcon', function (element) {

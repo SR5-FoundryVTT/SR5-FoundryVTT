@@ -6,17 +6,8 @@ export class SR5Roll extends Roll {
         return this.dice[0].results;
     }
 
-    get hits(): number {
-        return this.results.filter(result => result.success).length;
-    }
-
-    get glitches(): number {
-        return this.results.filter(result => result.failure).length;
-    }
-
     /**
      * The amount of dice going into the throw (the pool used).
-     * 
      * NOTE: this can be different from the amount of dice actually thrown.
      */
     get pool(): number {
@@ -30,11 +21,15 @@ export class SR5Roll extends Roll {
         return this.results.length;
     }
 
-    get glitched(): boolean {
-        return this.glitches > Math.floor(this.pool / 2);
+    get hits(): number {
+        return this.total || 0;
     }
 
-    override get total(): number {
-        return this.hits;
+    get glitches(): number {
+        return this.results.filter(result => result.failure).length;
+    }
+
+    get glitched(): boolean {
+        return this.glitches > Math.floor(this.pool / 2);
     }
 }
