@@ -32,4 +32,8 @@ export class SR5Roll extends Roll {
     get glitched(): boolean {
         return this.glitches > Math.floor(this.pool / 2);
     }
+
+    evaluated() {
+        return this._evaluated;
+    }
 }

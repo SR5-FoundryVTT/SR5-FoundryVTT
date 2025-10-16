@@ -674,8 +674,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.usingManualRoll) {
             // Evaluate all rolls.
             for (const roll of this.rolls) {
-                // @ts-expect-error // foundry-vtt-types is missing evaluated.
-                if (!roll._evaluated)
+                if (!roll.evaluated())
                     await roll.evaluate();
             }
         }

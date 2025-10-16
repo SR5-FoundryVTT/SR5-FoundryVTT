@@ -69,7 +69,7 @@ export function initDiceSoNice() {
 
         dice3d.addDicePreset({
             type: `d${SR5Die.DENOMINATION}`,
-            labels: ['☠', ' ', ' ', ' ', '☆', '★'],
+            labels: ['☠', '', '', '', '☆', '★'],
             system: 'standard'
         }, "d6");
     });
