@@ -1132,6 +1132,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Use this method for subclasses which can't reasonably be successful.
      */
     get canSucceed(): boolean {
+        console.log(this.extended, this.hasThreshold);
         // Not extended tests can succeed normally.
         if (!this.extended) return true;
 
