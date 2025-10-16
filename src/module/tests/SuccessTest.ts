@@ -434,9 +434,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @returns The complete formula string.
      */
     buildFormula(dice: number, explode: boolean): string {
-        // Apply dice explosion, removing the limit is done outside the roll.
-        const explodeFormula = explode ? 'x6' : '';
-        return `(${dice})d6cs>=${SuccessTest.lowestSuccessSide}${explodeFormula}cf<=${SuccessTest.highestGlitchSide}`;
+        // Build the dice formula for a Shadowrun 5e test.
+        // - dice: number of d6 to roll
+        // - explode: whether to explode sixes (Edge rules)
+        // - cf<=: count failures (glitches) on highest glitch side
+        // - cs>=: count successes on lowest success side
+        // - x6: explode sixes if applicable
+
+        const explodeModifier = explode ? 'x6' : '';
+        const glitchSide = SuccessTest.highestGlitchSide;
+        const successSide = SuccessTest.lowestSuccessSide;
+
+        return `${dice}d6cf<=${glitchSide}cs>=${successSide}${explodeModifier}`;
     }
 
     /**
