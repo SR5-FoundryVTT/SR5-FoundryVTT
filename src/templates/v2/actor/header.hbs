@@ -33,6 +33,7 @@
                     {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
                         id='matrix'
                         track = system.track.matrix
+                        tooltip=(localize "SR5.Labels.ActorSheet.Matrix")
                     }}
                 {{/if}}
                 {{#if (or isCharacter isSpirit)}}

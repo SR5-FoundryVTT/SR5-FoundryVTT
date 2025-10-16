@@ -1,5 +1,5 @@
 {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-        tooltip=(localize track.label)
+        tooltip=(or tooltip (localize track.label))
         value=track.value
         max=track.max
         id=id

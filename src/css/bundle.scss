@@ -822,11 +822,6 @@ input[type='text'].display {
             box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
         }
 
-        .roll {
-            width: 60px;
-            margin-right: 8px;
-        }
-
         .cell-container {
             display: flex;
             flex-flow: row;
@@ -1800,6 +1795,15 @@ input[type='text'].display {
 
         &.matrix .cell {
             box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
+        }
+
+        .clear-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .5rem;
+            margin-left: 1px;
+            margin-right: 2px;
         }
 
         .icon-container {

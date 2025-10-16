@@ -60,7 +60,7 @@
                 {{#if system.matrix.condition_monitor.max}}
                     <div class="condition-monitor-container">
                         {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                            name=(localize "SR5.ConditionMonitor")
+                            tooltip=(localize "SR5.Labels.ActorSheet.Matrix")
                             value=system.matrix.condition_monitor.value
                             max=system.matrix.condition_monitor.max
                             id="matrix"

@@ -15,7 +15,7 @@
 {{#if (not disabled)}}
 <div class="horizontal-cell-input {{id}}" data-id="{{id}}">
     <div class="icon-container">
-        <a data-tooltip="{{tooltip}}" data-action="rollConditionMonitor" id="{{id}}">
+        <a data-tooltip="{{tooltip}}" data-action="rollConditionMonitor">
             {{#if (eq id 'physical')}}
                 <i class="fas fa-heart-pulse"></i>
             {{else if (eq id 'stun')}}
@@ -31,12 +31,27 @@
             {{/if}}
         </a>
     </div>
+    <div class="clear-container">
+        <a data-tooltip="{{localize tooltip}}:&nbsp;0/{{max}}"
+           data-action="clearConditionMonitor"
+           data-id="{{id}}">
+            <i class="fas fa-ban"></i>
+        </a>
+    </div>
     <div class="cell-container">
         {{#for 1 (sum max 1)}}
-            <div class="cell {{#iflte this ../value}}filled{{/iflte}}" data-value="{{this}}" data-tooltip="SR5.RightClickToClear" >
-            {{#if (isDefined ../tolerance)}}
-                {{#if (showWoundModifier this ../toleranceBase ../tolerance)}}<div id="woundModifierCell{{woundModifier this ../toleranceBase ../tolerance}}">{{woundModifier this ../toleranceBase ../tolerance}}</div>{{/if}}
-            {{/if}}
+            <div class="cell {{#iflte this ../value}}filled{{/iflte}}"
+                 data-action="modifyConditionMonitor"
+                 data-id="{{../id}}"
+                 data-tooltip="{{localize ../tooltip}}:&nbsp;{{this}}/{{../max}}"
+                 data-value="{{this}}">
+                {{#if (isDefined ../tolerance)}}
+                    {{#if (showWoundModifier this ../toleranceBase ../tolerance)}}
+                        <div id="woundModifierCell{{woundModifier this ../toleranceBase ../tolerance}}">
+                            {{woundModifier this ../toleranceBase ../tolerance}}
+                        </div>
+                    {{/if}}
+                {{/if}}
             </div>
         {{/for}}
     </div>

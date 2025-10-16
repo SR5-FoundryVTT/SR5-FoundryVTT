@@ -126,6 +126,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             toggleActionArmor: SR5ItemSheet.#toggleActionArmor,
             toggleOpposedArmor: SR5ItemSheet.#toggleOpposedArmor,
             toggleResistArmor: SR5ItemSheet.#toggleResistArmor,
+
+            modifyConditionMonitor: SR5ItemSheet.#modifyConditionMonitor,
+            clearConditionMonitor: SR5ItemSheet.#clearConditionMonitor,
+            rollConditionMonitor: SR5ItemSheet.#rollConditionMonitor,
         },
         dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     }
@@ -1180,5 +1184,53 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         // Set data transfer
         if (!dragData) return;
         event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+    }
+
+    /**
+     * Set any kind of condition monitor to a specific cell value.
+     *
+     * @event Most return a currentTarget with a value dataset
+     */
+    static async #modifyConditionMonitor(this: SR5ItemSheet, event) {
+        event.preventDefault();
+
+        const target = event.target.closest('[data-action="modifyConditionMonitor"]');
+
+        const track = target.dataset.id;
+        let value = Number(target.dataset.value);
+
+        // if the clicked on cell is the current value for it's track, set the value to 0 to clear it
+        if (track === 'matrix' && this.item.getConditionMonitor()?.value === value) {
+            value = 0;
+        }
+
+        if (track === 'matrix') {
+            await this.item.setMatrixDamage(value);
+        }
+    }
+
+    /**
+     * Reset all condition tracks to zero values.
+     * @param event
+     */
+    static async #clearConditionMonitor(this: SR5ItemSheet, event) {
+        event.preventDefault();
+
+        const track = event.target.closest('[data-id]').dataset.id;
+        if (track === 'matrix') {
+            await this.item.setMatrixDamage(0);
+        }
+    }
+
+    /**
+     * Handle interaction with a damage track title.
+     * @param event
+     */
+    static async #rollConditionMonitor(this: SR5ItemSheet, event) {
+        event.preventDefault();
+        const track = event.target.closest('[data-id]').dataset.id;
+
+        switch (track) {
+        }
     }
 }

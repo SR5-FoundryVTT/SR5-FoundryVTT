@@ -181,8 +181,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             height: 600,
         },
         actions: {
-            roll: SR5BaseActorSheet.#rollById,
-
             rollAttribute: SR5BaseActorSheet.#rollAttribute,
             rollItem: SR5BaseActorSheet.#rollItem,
             rollSkill: SR5BaseActorSheet.#rollSkill,
@@ -224,6 +222,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             toggleInitiativeBlitz: SR5BaseActorSheet.#toggleInitiativeBlitz,
             rollInitiative: SR5BaseActorSheet.#rollInitiative,
+
+            modifyConditionMonitor: SR5BaseActorSheet.#modifyConditionMonitor,
+            clearConditionMonitor: SR5BaseActorSheet.#clearConditionMonitor,
+            rollConditionMonitor: SR5BaseActorSheet.#rollConditionMonitor,
         },
         filters: [{ inputSelector: '#filter-active-skills', callback: SR5BaseActorSheet.#handleFilterActiveSkills }],
     }
@@ -379,13 +381,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Actor inventory handling....
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
-
-        // Condition monitor track handling...
-        html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
-        html.find('.horizontal-cell-input .cell').on('contextmenu', this._onClearConditionTrack.bind(this));
-
-        // Conditon monitor test rolling...
-        html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
@@ -697,116 +692,29 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
-     * Setup all general system rolls after clicking on their roll on the sheet.
-     *
-     * @param event Must contain a currentTarget with a rollId dataset
-     */
-    static async #rollById(this: SR5BaseActorSheet, event) {
-        event.preventDefault();
-
-        // look for roll id data in the current line
-        const rollId = SheetFlow.closestAction(event.target).dataset.rollId;
-
-        const split = rollId.split('.');
-        const options = { event };
-        switch (split[0]) {
-            case 'prompt-roll':
-                await this.actor.promptRoll();
-                break;
-            case 'armor':
-                await this.actor.rollGeneralAction('armor', options);
-                break;
-            case 'fade':
-                await this.actor.rollGeneralAction('fade', options);
-                break;
-            case 'drain':
-                await this.actor.rollGeneralAction('drain', options);
-                break;
-            case 'defense':
-                // await this.actor.rollAttackDefense(options);
-                await this.actor.rollGeneralAction('physical_defense', options);
-                break;
-            case 'damage-resist':
-                await this.actor.rollGeneralAction('physical_damage_resist', options);
-                break;
-
-            // attribute only rolls
-            case 'composure':
-                await this.actor.rollGeneralAction('composure', options);
-                break;
-            case 'judge-intentions':
-                await this.actor.rollGeneralAction('judge_intentions', options);
-                break;
-            case 'lift-carry':
-                await this.actor.rollGeneralAction('lift_carry', options);
-                break;
-            case 'memory':
-                await this.actor.rollGeneralAction('memory', options);
-                break;
-
-            case 'vehicle-stat':
-                console.log('roll vehicle stat', rollId);
-                break;
-
-            case 'drone': {
-                const droneRoll = split[1];
-                switch (droneRoll) {
-                    case 'perception':
-                        await this.actor.rollGeneralAction('drone_perception', options);
-                        break;
-                    case 'infiltration':
-                        await this.actor.rollGeneralAction('drone_infiltration', options);
-                        break;
-                    case 'pilot-vehicle':
-                        await this.actor.rollGeneralAction('drone_pilot_vehicle', options);
-                        break;
-                }
-                break;
-            }
-
-            case 'attribute': {
-                const attribute = split[1];
-                if (attribute) {
-                    await this.actor.rollAttribute(attribute, options);
-                }
-                break;
-            }
-
-            case 'skill': {
-                const skillId = split[2];
-                await this.actor.rollSkill(skillId, options);
-                break;
-            }
-
-            case 'matrix': {
-                const matrixRoll = split[1];
-                switch (matrixRoll) {
-                    case 'attribute': {
-                        const attr = split[2];
-                        await this.actor.rollAttribute(attr, options);
-                        break;
-                    }
-                    case 'device-rating':
-                        await this.actor.rollDeviceRating(options);
-                        break;
-                }
-
-                break;
-            }
-        }
-    }
-
-    /**
      * Set any kind of condition monitor to a specific cell value.
      *
      * @event Most return a currentTarget with a value dataset
      */
-    async _onSetConditionTrackCell(event) {
+    static async #modifyConditionMonitor(this: SR5BaseActorSheet, event) {
         event.preventDefault();
 
-        const value = Number(event.currentTarget.dataset.value);
-        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const target = event.target.closest('[data-action="modifyConditionMonitor"]');
+
+        const track = target.dataset.id;
         const data: Actor.UpdateData = {};
+        let value = Number(target.dataset.value);
+
+        // if the clicked on cell is the current value for it's track, set the value to 0 to clear it
+        if (track === 'stun' && this.actor.getStunTrack()?.value === value) {
+            value = 0;
+        } else if (track === 'physical' && this.actor.getPhysicalTrack()?.value === value) {
+            value = 0;
+        } else if (track === 'edge' && this.actor.getEdge().uses === value) {
+            value = 0;
+        } else if (track === 'matrix' && this.actor.getMatrixTrack()?.value === value) {
+            value = 0;
+        }
 
         if (track === 'stun' || track === 'physical') {
             const property = `system.track.${track}.value`;
@@ -830,10 +738,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Reset all condition tracks to zero values.
      * @param event
      */
-    async _onClearConditionTrack(event) {
+    static async #clearConditionMonitor(this: SR5BaseActorSheet, event) {
         event.preventDefault();
 
-        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const track = event.target.closest('[data-id]').dataset.id;
         const data = {};
         if (track === 'stun') {
             data[`system.track.stun.value`] = 0;
@@ -855,6 +763,27 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         if (data) await this.actor.update(data);
         await this.actor.applyDefeatedStatus();
+    }
+
+    /**
+     * Handle interaction with a damage track title.
+     * @param event
+     */
+    static async #rollConditionMonitor(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const track = event.target.closest('[data-id]').dataset.id;
+
+        switch (track) {
+            case 'stun':
+                await this.actor.rollGeneralAction('natural_recovery_stun', { event });
+                break;
+            case 'physical':
+                await this.actor.rollGeneralAction('natural_recovery_physical', { event });
+                break;
+            case 'edge':
+                await this.actor.rollAttribute('edge', { event });
+                break;
+        }
     }
 
     /**
@@ -1424,27 +1353,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const attribute = event.target.closest('[data-attribute-id]').dataset.attributeId;
         if (attribute) {
             await this.actor.rollAttribute(attribute, { event });
-        }
-    }
-
-    /**
-     * Handle interaction with a damage track title.
-     * @param event
-     */
-    async _onRollCellInput(event) {
-        event.preventDefault();
-        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
-
-        switch (track) {
-            case 'stun':
-                await this.actor.rollGeneralAction('natural_recovery_stun', { event });
-                break;
-            case 'physical':
-                await this.actor.rollGeneralAction('natural_recovery_physical', { event });
-                break;
-            case 'edge':
-                await this.actor.rollAttribute('edge', { event });
-                break;
         }
     }
 

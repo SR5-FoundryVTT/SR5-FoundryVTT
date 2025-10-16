@@ -829,6 +829,19 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         await this.update({ system: { technology: { condition_monitor: { value: toApply } } } });
     }
+    /**
+     * Set the matrix damage on a technology item
+     *
+     * @param value the matrix damage to set the condition monitor to
+     */
+    async setMatrixDamage(value: number) {
+        const track = this.getConditionMonitor();
+        if (!track) return;
+
+        const toApply = Math.min(value, track.max);
+
+        await this.update({ system: { technology: { condition_monitor: { value: toApply } } } });
+    }
 
     getAction(this: SR5Item): ActionRollType | undefined {
         return this.system.action;
