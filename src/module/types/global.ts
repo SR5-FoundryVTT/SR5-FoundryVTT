@@ -222,6 +222,7 @@ declare module "fvtt-types/configuration" {
             getChatMessageContextOptions: (args0: any, args1: any) => void;
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
+            diceSoNiceReady: (dice3d: DiceSoNice) => void;
         }
     }
 

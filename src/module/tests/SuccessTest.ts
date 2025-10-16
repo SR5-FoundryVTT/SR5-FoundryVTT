@@ -1,6 +1,7 @@
 import { SR5 } from "../config";
 import Template from "../template";
 import { Helpers } from "../helpers";
+import { SR5Die } from "../rolls/SR5Die";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { TestCreator } from "./TestCreator";
@@ -437,15 +438,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Build the dice formula for a Shadowrun 5e test.
         // - dice: number of d6 to roll
         // - explode: whether to explode sixes (Edge rules)
-        // - cf<=: count failures (glitches) on highest glitch side
-        // - cs>=: count successes on lowest success side
         // - x6: explode sixes if applicable
 
-        const explodeModifier = explode ? 'x6' : '';
-        const glitchSide = SuccessTest.highestGlitchSide;
-        const successSide = SuccessTest.lowestSuccessSide;
-
-        return `${dice}d6cf<=${glitchSide}cs>=${successSide}${explodeModifier}`;
+        const explodeModifier = explode ? 'x' : '';
+        return `${dice}d${SR5Die.DENOMINATION}${explodeModifier}`;
     }
 
     /**

@@ -25,6 +25,7 @@ import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
 import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
 
+import { SR5Die } from './rolls/SR5Die';
 import {SR5Roll} from "./rolls/SR5Roll";
 import {SuccessTest} from "./tests/SuccessTest";
 import {TeamworkTest} from "./actor/flows/TeamworkFlow";
@@ -80,6 +81,7 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 import { RoutingLibIntegration } from './integrations/routingLibIntegration';
+import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
 
@@ -140,6 +142,10 @@ export class HooksManager {
             // See src/module/integartions for more information.
             if (game.modules.get('routinglib')?.active) {
                 RoutingLibIntegration.init();
+            }
+
+            if (game.modules.get('dice-so-nice')?.active) {
+                initDiceSoNice();
             }
         });
         Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
@@ -369,6 +375,7 @@ ___________________
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
         // Register general SR5Roll for JSON serialization support.
+        CONFIG.Dice.terms[SR5Die.DENOMINATION] = SR5Die;
         CONFIG.Dice.rolls.push(SR5Roll);
         // @ts-expect-error // Register the SR5Roll dnd5e style.
         CONFIG.Roll = SR5Roll;
