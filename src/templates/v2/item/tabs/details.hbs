@@ -165,15 +165,6 @@
                     </div>
                 </div>
             {{else if (eq item.type 'device')}}
-                <div class="list-item list-item-header">
-                    <div class="list-item-start skinny">
-                        <label data-tooltip="{{systemFields.category.hint}}">{{systemFields.category.label}}</label>
-                    </div>
-                    <div class="list-item-col">
-                        {{formInput systemFields.category value=source.system.category localize=true
-                                    classes="short" rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
-                    </div>
-                </div>
 
                 {{#unless (eq system.category 'living_persona')}}
                     {{#each system.atts as |att att_id|}}
@@ -196,7 +187,7 @@
                     {{/each}}
                 {{/unless}}
             {{else if (eq item.type 'weapon')}}
-                <div class="list-item list-item-header">
+                <div class="list-item">
                     <div class="list-item-start skinny">
                         <label data-tooltip="{{systemFields.category.hint}}">{{systemFields.category.label}}</label>
                     </div>

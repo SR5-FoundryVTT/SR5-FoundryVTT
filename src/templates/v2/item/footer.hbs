@@ -23,7 +23,7 @@
     {{/if}}
     <div class="list-item">
         {{#if @root.isPlayMode}}
-            {{#unless (isType item 'spell' 'quality' 'lifestyle' 'bioware' 'cyberware')}}
+            {{#unless (isType item 'spell' 'quality' 'lifestyle' 'bioware' 'cyberware' 'device')}}
                 <label>
                     {{#if (isType item 'weapon')}}
                         {{#if (eq system.category 'range')}}
@@ -37,6 +37,16 @@
                     {{localize (concat 'TYPES.Item.' item.type)}}
                 </label>
             {{/unless}}
+        {{/if}}
+        {{#if (isType item 'device')}}
+            {{#if @root.isEditMode}}
+                <span>
+                    {{formInput systemFields.category value=source.system.category localize=true
+                                classes="short" rootId=@root.rootId}}
+                </span>
+            {{else}}
+                <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.deviceCategories}}</label>
+            {{/if}}
         {{/if}}
         {{!-- Show Quantity First --}}
         {{#if system.technology}}
