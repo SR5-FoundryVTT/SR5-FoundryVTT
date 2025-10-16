@@ -18,7 +18,7 @@
                        data-tooltip="{{localize 'SR5.Weapon.Reload'}} ({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})"
                        data-item-id="{{item.uuid}}">
                         {{item.system.ammo.current.value}}/{{item.system.ammo.current.max}}
-                    </a>&nbsp;
+                    </a>
                     {{#ifgt item.system.ammo.partial_reload_value 0}}
                         <a data-action="weaponPartialReload"
                            data-tooltip="{{localize 'SR5.Weapon.PartialReload'}} (+{{item.system.ammo.partial_reload_value}})"
@@ -49,13 +49,13 @@
             {{/if}}
         </div>
     </div>
-    {{#if (hasKey @root.expandedUuids item.uuid)}}
-        <div class="list-item-desc">
-            <div class="list-item-properties">
-                {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs' item=item }}
-                {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/weapon.hbs' item=item }}
-            </div>
+    <div class="list-item-desc">
+        <div class="list-item-properties">
+            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs' item=item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/weapon.hbs' item=item }}
+        </div>
+        <div class="description-body">
             {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}
         </div>
-    {{/if}}
+    </div>
 </div>

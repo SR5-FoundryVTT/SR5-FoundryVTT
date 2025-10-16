@@ -5,9 +5,12 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5 } from '@/module/config';
 import { LinksHelpers } from '@/module/utils/links';
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
+
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
-import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
+
+const { TextEditor } = foundry.applications.ux;
 
 export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
     return class SR5ApplicationMixin extends foundry.applications.api.HandlebarsApplicationMixin(base) {
@@ -17,6 +20,8 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         declare editIcon: HTMLElement;
         declare isEditable: boolean;
         declare options: typeof SR5ApplicationMixin.DEFAULT_OPTIONS;
+
+        #filters: any;
 
         private readonly expandedUuids = new Set<string>();
 
@@ -36,6 +41,19 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
                 openUuid: SR5ApplicationMixin.#openUuid,
             },
         };
+
+        constructor(options) {
+            // @ts-expect-error call super constructor
+            super(options);
+            this.#filters = this.#createFilters();
+        }
+
+        #createFilters() {
+            return (this.options as any)?.filters?.map((s) => {
+                s.callback = s.callback.bind(this);
+                return new SearchFilter(s);
+            }) ?? [];
+        }
 
         static async #toggleEditMode(this, event: MouseEvent) {
             event.preventDefault();
@@ -123,11 +141,28 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             if (!uuid) return;
             if (this.expandedUuids.has(uuid)) {
                 this.expandedUuids.delete(uuid);
+                event.target.closest('.list-item-container').classList.remove('expanded');
             } else {
                 this.expandedUuids.add(uuid);
+                event.target.closest('.list-item-container').classList.add('expanded');
+                const document = SheetFlow.fromUuidSync(uuid);
+                let html;
+                if (document instanceof SR5Item || document instanceof SR5Actor) {
+                    html = await TextEditor.enrichHTML((document as any).system.description.value, {
+                        secrets: document.isOwner,
+                        rollData: document.getRollData(),
+                    });
+                } else if (document instanceof SR5ActiveEffect) {
+                    html = await TextEditor.enrichHTML(document.description, {
+                        secrets: document.isOwner,
+                    });
+                }
+                if (html) {
+                    event.target.closest('.list-item-container')
+                        .querySelector('.description-body')
+                        .innerHTML = html;
+                }
             }
-            // @ts-expect-error i hate mixxins
-            await this.render();
         }
 
         static async #openSource(event) {
@@ -167,6 +202,12 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
                 }
             }
             return await super._renderHTML(context, options);
+        }
+
+        async _onRender(context, options) {
+            this.#filters.forEach(d => d.bind(this.element));
+            // @ts-ignore
+            return super._onRender(context, options);
         }
 
         /**

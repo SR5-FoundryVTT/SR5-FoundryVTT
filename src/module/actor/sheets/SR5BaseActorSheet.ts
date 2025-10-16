@@ -27,6 +27,7 @@ import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSh
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 
 const { ActorSheetV2 } = foundry.applications.sheets;
+const { TextEditor } = foundry.applications.ux;
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
@@ -125,6 +126,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     selectedInventory: string;
 
     private readonly expandedSkills = new Set<string>();
+    private readonly hiddenSkills = new Set<string>();
 
     constructor(options) {
         super(options);
@@ -221,7 +223,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             toggleInitiativeBlitz: SR5BaseActorSheet.#toggleInitiativeBlitz,
             rollInitiative: SR5BaseActorSheet.#rollInitiative,
-        }
+        },
+        filters: [{ inputSelector: '#filter-active-skills', callback: SR5BaseActorSheet.#handleFilterActiveSkills }],
     }
 
     static override TABS = {
@@ -362,6 +365,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             })
             el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
         })
+        this.#filterActiveSkillsElements();
         return super._onRender(context, options);
     }
 
@@ -372,18 +376,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // General item header/list actions...
         html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
 
-        // Item list description display handling...
-        html.find('.hidden').hide();
-
         // Actor inventory handling....
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
 
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
         html.find('.horizontal-cell-input .cell').on('contextmenu', this._onClearConditionTrack.bind(this));
-
-        // Skill Filter handling...
-        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
 
         // Conditon monitor test rolling...
         html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
@@ -1186,15 +1184,59 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     _showGeneralSkill(skillId, skill: SkillFieldType) {
-        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
+        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill);
     }
 
     _showMagicSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
-        return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic' && this._isSkillFiltered(skillId, skill);
+        return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic';
     }
 
     _showResonanceSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
-        return this._isSkillResonance(skill) && sheetData.system.special === 'resonance' && this._isSkillFiltered(skillId, skill);
+        return this._isSkillResonance(skill) && sheetData.system.special === 'resonance';
+    }
+
+    /** Setup untrained skill filter within getData */
+    static async #filterUntrainedSkills(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
+        event.target.closest('.active-skills-header')
+            .querySelector('.skill-rtg-label').innerText = new Handlebars.SafeString(game.i18n.localize(this._filters.showUntrainedSkills ? 'SR5.Rtg' : 'SR5.RtgAboveZero'));
+        this.#filterActiveSkillsElements();
+    }
+
+    static async #handleFilterActiveSkills(this: SR5BaseActorSheet, event, query, rgx, html) {
+        this._filters.skills = query;
+        this.#filterActiveSkillsElements();
+    }
+
+    #filterActiveSkillsElements() {
+        let count = 0;
+        this.element.querySelector('#active-skills-scroll')
+            ?.querySelectorAll<HTMLDivElement>('[data-skill-id]')
+            .forEach((listItemElem) => {
+
+                const container = listItemElem.parentElement;
+                if (!container) return;
+                const id = listItemElem.dataset.skillId;
+                if (!id) return;
+                const skill = this.actor.getSkill(id);
+                if (!skill) return;
+                if (this._isSkillFiltered(id, skill)) {
+                    container.classList.remove('hidden')
+                    count++;
+                    if (count % 2) {
+                        container.classList.add('nobg')
+                        container.classList.remove('forcebg')
+                    } else {
+                        container.classList.add('forcebg')
+                        container.classList.remove('nobg')
+                    }
+                } else {
+                    container.classList.add('hidden');
+                    container.classList.remove('nobg')
+                    container.classList.remove('forcebg')
+                }
+            });
     }
 
     _isSkillFiltered(skillId, skill) {
@@ -1237,30 +1279,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     _isSkillResonance(skill) {
         return skill.attribute === 'resonance';
-    }
-
-    /** Setup untrained skill filter within getData */
-    static async #filterUntrainedSkills(this: SR5BaseActorSheet, event) {
-        event.preventDefault();
-        this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
-        await this.render();
-    }
-
-    /**
-     * Parameterize skill filtering within getData and implement a general delay around it.
-     *
-     * NOTE: Be aware of UTF-8/16 multi character input languages, using mulitple separate input symbol to form a single alphabet character.
-     * NOTE: This is ONLY necessary as shadowrun5e filters through the render -> getData -> template chain instead of
-     *       hiding HTML elements based on their text.
-     */
-    async _onFilterSkills(event) {
-        if (this._delays.skills)
-            clearTimeout(this._delays.skills);
-
-        this._delays.skills = setTimeout(() => {
-            this._filters.skills = event.currentTarget.value;
-            this.render();
-        }, game.shadowrun5e.inputDelay);
     }
 
     private _closestSkillTarget(target) {
@@ -2003,9 +2021,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (!id) return;
         if (this.expandedSkills.has(id)) {
             this.expandedSkills.delete(id);
+            event.target.closest('.list-item-container').classList.remove('expanded');
         } else {
             this.expandedSkills.add(id);
+            event.target.closest('.list-item-container').classList.add('expanded');
+            const skill = this.actor.getSkill(id);
+            if (skill) {
+                const html = await TextEditor.enrichHTML(skill.description, { secrets: this.actor.isOwner, });
+                if (html) {
+                    event.target.closest('.list-item-container')
+                        .querySelector('.description-body')
+                        .innerHTML = html;
+                }
+            }
         }
-        await this.render();
     }
 }

@@ -28,13 +28,13 @@
             {{/if}}
         </div>
     </div>
-    {{#if (hasKey @root.expandedUuids item.uuid)}}
-        <div class="list-item-desc">
-            <div class="list-item-properties">
-                {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/technology.hbs' item=item }}
-                {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/armor.hbs' item=item }}
-            </div>
+    <div class="list-item-desc">
+        <div class="list-item-properties">
+            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/technology.hbs' item=item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/armor.hbs' item=item }}
+        </div>
+        <div class="description-body">
             {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}
         </div>
-    {{/if}}
+    </div>
 </div>

@@ -60,18 +60,18 @@
             {{/if}}
         </div>
     </div>
-    {{#if (hasKey @root.expandedSkills id)}}
-        <div class="list-item-desc">
-            <div class="list-item-properties">
-                <label>{{localizeOb skill.attribute @root.config.attributes}}</label>
-                {{#if skill.group}}
-                    <label>{{skill.group}}</label>
-                {{/if}}
-                {{#if skill.canDefault}}
-                    <label>{{localize "SR5.CanDefault"}}</label>
-                {{/if}}
-            </div>
+    <div class="list-item-desc">
+        <div class="list-item-properties">
+            <label>{{localizeOb skill.attribute @root.config.attributes}}</label>
+            {{#if skill.group}}
+                <label>{{skill.group}}</label>
+            {{/if}}
+            {{#if skill.canDefault}}
+                <label>{{localize "SR5.CanDefault"}}</label>
+            {{/if}}
+        </div>
+        <div class="description-body">
             {{{objValue (objValue @root.expandedSkills id) 'html'}}}
         </div>
-    {{/if}}
+    </div>
 </div>

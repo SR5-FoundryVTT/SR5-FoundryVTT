@@ -2,6 +2,7 @@ import { MonitorRules } from './../rules/MonitorRules';
 import { SR5Item } from './../item/SR5Item';
 import { SR5Actor } from './../actor/SR5Actor';
 import { SR5 } from '@/module/config';
+import { SkillFieldType } from '@/module/types/template/Skills';
 type ModificationCategoryType = Item.SystemOfType<'modification'>['modification_category'];
 
 export const registerActorHelpers = () => {
@@ -104,13 +105,11 @@ export const registerActorHelpers = () => {
     })
 
     Handlebars.registerHelper('inventoryCanRename', (inventory: string, options) => {
-        console.log(options);
         const actor = options.data.root.actor as SR5Actor;
         return !actor.inventory.disallowRename(inventory);
     });
 
     Handlebars.registerHelper('inventoryCanRemove', (inventory: string, options) => {
-        console.log(options);
         const actor = options.data.root.actor as SR5Actor;
         return !actor.inventory.disallowRemove(inventory);
     });

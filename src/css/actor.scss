@@ -68,6 +68,29 @@
         }
     }
 
+    .active-skills-header {
+        cursor: pointer;
+        color: $light !important;
+        label {
+            cursor: pointer;
+            color: $light !important;
+        }
+        &:hover {
+            background: radial-gradient(rgba($darkred, 0.7), rgba($darkred, 0.1));
+            color: $white !important;
+            label {
+                color: $white !important;
+            }
+        }
+    }
+
+    #filter-active-skills {
+        background: none;
+        padding-left: 4px;
+        color: $yellow;
+        border-bottom: $groove;
+    }
+
     select#select-inventory {
         height: 1rem;
         max-height: 1rem;

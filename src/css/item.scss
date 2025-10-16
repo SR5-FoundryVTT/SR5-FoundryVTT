@@ -2,5 +2,10 @@
 
 .sr5v2.item {
     // add a footer to the sheet
+    .item-footer {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0;
+    }
 
 }

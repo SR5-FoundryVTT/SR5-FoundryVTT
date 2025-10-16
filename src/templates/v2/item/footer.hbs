@@ -1,4 +1,26 @@
-<footer class="sheet-footer">
+<footer class="sheet-footer item-footer">
+    {{#if (and systemFields.technology @root.isEditMode)}}
+        <div class="list-item">
+            <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.EssenceAdjustment">
+                {{localize "SR5.Labels.Item.EssenceAdjustment"}}
+                {{formInput systemFields.technology.fields.calculated.fields.essence.fields.adjusted
+                            value=source.system.calculated.essence.adjusted classes="short"
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            </label>
+            <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.CostAdjustment">
+                {{localize "SR5.Labels.Item.CostAdjustment"}}
+                {{formInput systemFields.technology.fields.calculated.fields.cost.fields.adjusted
+                            value=source.system.calculated.cost.adjusted classes="short"
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            </label>
+            <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.AvailabilityAdjustment">
+                {{localize "SR5.Labels.Item.AvailabilityAdjustment"}}
+                {{formInput systemFields.technology.fields.calculated.fields.availability.fields.adjusted
+                            value=source.system.calculated.availability.adjusted classes="short"
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            </label>
+        </div>
+    {{/if}}
     <div class="list-item">
         {{#if @root.isPlayMode}}
             {{#unless (isType item 'spell' 'quality' 'lifestyle' 'bioware' 'cyberware')}}
@@ -20,12 +42,12 @@
         {{#if system.technology}}
             {{#if (isType item 'bioware' 'cyberware')}}
                 {{#if @root.isEditMode}}
-                        <span data-tooltip="{{systemFields.grade.label}}:&nbsp;{{systemFields.grade.hint}}">
-                            {{formInput systemFields.grade value=source.system.grade localize=true
-                                        classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
-                        </span>
+                    <span data-tooltip="{{systemFields.grade.label}}:&nbsp;{{systemFields.grade.hint}}">
+                        {{formInput systemFields.grade value=source.system.grade localize=true
+                                    classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
                 {{else if system.grade}}
-                        <label>{{localizeOb system.grade @root.config.cyberwareGrades}}&nbsp;{{localize (concat 'TYPES.Item.' item.type)}}</label>
+                    <label>{{localizeOb system.grade @root.config.cyberwareGrades}}&nbsp;{{localize (concat 'TYPES.Item.' item.type)}}</label>
                 {{/if}}
             {{/if}}
             <div class="basic-row">
@@ -140,7 +162,7 @@
             {{#if @root.isEditMode}}
                 <label>
                     {{systemFields.family.label}}&nbsp;{{formInput systemFields.family value=source.system.family
-                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                                                   classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                 </label>
             {{else if system.family}}
                 <label>{{systemFields.family.label}}</label>
@@ -149,7 +171,7 @@
             {{#if @root.isEditMode}}
                 <label>
                     {{systemFields.blackmail.label}}&nbsp;{{formInput systemFields.blackmail value=source.system.blackmail
-                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                                                      classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                 </label>
             {{else if system.blackmail}}
                 <label>{{systemFields.blackmail.label}}</label>
@@ -158,7 +180,7 @@
             {{#if @root.isEditMode}}
                 <label>
                     {{systemFields.group.label}}&nbsp;{{formInput systemFields.group value=source.system.group
-                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                                                  classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                 </label>
             {{else if system.group}}
                 <label>{{systemFields.group.label}}</label>
@@ -238,23 +260,23 @@
             {{/if}}
             {{#if @root.isEditMode}}
                 <span>
-                    <label>{{systemFields.rating.label}}</label>
-                    <span>
-                        {{formInput systemFields.rating value=source.system.rating
-                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
+                <label>{{systemFields.rating.label}}</label>
+                <span>
+                    {{formInput systemFields.rating value=source.system.rating
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                 </span>
+            </span>
             {{else}}
                 <label>{{systemFields.rating.label}}&nbsp;{{system.rating}}</label>
             {{/if}}
             {{#if @root.isEditMode}}
                 <span>
-                    <label>{{systemFields.karma.label}}</label>
-                    <span>
-                        {{formInput systemFields.karma value=source.system.karma
-                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
+                <label>{{systemFields.karma.label}}</label>
+                <span>
+                    {{formInput systemFields.karma value=source.system.karma
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                 </span>
+            </span>
 
             {{else}}
                 <label>{{systemFields.karma.label}}&nbsp;{{system.karma}}</label>
@@ -280,20 +302,20 @@
 
             {{#if @root.isEditMode}}
                 <span>
-                    <label data-tooltip="{{systemFields.pp.hint}}">{{systemFields.pp.label}}</label>
+                <label data-tooltip="{{systemFields.pp.hint}}">{{systemFields.pp.label}}</label>
                     {{formInput systemFields.pp value=source.system.pp classes="short skinny"
                                 rootId=@root.rootId disabled=@root.isPlayMode}}
-                </span>
+            </span>
             {{else}}
                 <label data-tooltip="{{systemFields.pp.hint}}">{{systemFields.pp.label}}&nbsp;{{system.pp}}</label>
             {{/if}}
 
             {{#if @root.isEditMode}}
                 <span>
-                    <label data-tooltip="{{systemFields.level.hint}}">{{systemFields.level.label}}</label>
+                <label data-tooltip="{{systemFields.level.hint}}">{{systemFields.level.label}}</label>
                     {{formInput systemFields.level value=source.system.level
                                 classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                </span>
+            </span>
             {{else}}
                 <label data-tooltip="{{systemFields.level.hint}}">{{systemFields.level.label}}&nbsp;{{system.level}}</label>
             {{/if}}
@@ -321,12 +343,12 @@
 
             {{#if @root.isEditMode}}
                 <span>
-                    <label data-tooltip="{{systemFields.descriptors.hint}}">{{systemFields.descriptors.label}}</label>
-                    <span>
-                        {{formInput systemFields.descriptors value=source.system.descriptors
-                                      classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
+                <label data-tooltip="{{systemFields.descriptors.hint}}">{{systemFields.descriptors.label}}</label>
+                <span>
+                    {{formInput systemFields.descriptors value=source.system.descriptors
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                 </span>
+            </span>
             {{else}}
                 <label data-tooltip="{{systemFields.descriptors.hint}}">{{systemFields.descriptors.label}}&nbsp;{{system.descriptors}}</label>
             {{/if}}
@@ -415,7 +437,7 @@
                 {{#if @root.isEditMode}}
                     <label data-tooltip="{{systemFields.detection.fields.extended.hint}}">
                         {{systemFields.detection.fields.extended.label}}:&nbsp;{{formInput systemFields.detection.fields.extended value=source.system.detection.extended
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                                                                           classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </label>
                 {{else if system.detection.fields.extended}}
                     <label>{{localize "SR5.Extended"}}</label>
@@ -449,7 +471,7 @@
                 {{#if @root.isEditMode}}
                     <label data-tooltip="{{systemFields.manipulation.fields.damaging.hint}}">
                         {{systemFields.manipulation.fields.damaging.label}}&nbsp;{{formInput systemFields.manipulation.fields.damaging value=system.manipulation.damaging
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                                                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </label>
                 {{else if system.manipulation.damaging}}
                     <label data-tooltip="{{systemFields.manipulation.fields.damaging.hint}}">
@@ -460,7 +482,7 @@
                 {{#if @root.isEditMode}}
                     <label data-tooltip="{{systemFields.manipulation.fields.mental.hint}}">
                         {{systemFields.manipulation.fields.mental.label}}&nbsp;{{formInput systemFields.manipulation.fields.mental value=system.manipulation.mental
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                                                                           classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </label>
                 {{else if system.manipulation.mental}}
                     <label data-tooltip="{{systemFields.manipulation.fields.mental.hint}}">
@@ -471,7 +493,7 @@
                 {{#if @root.isEditMode}}
                     <label data-tooltip="{{systemFields.manipulation.fields.environmental.hint}}">
                         {{systemFields.manipulation.fields.environmental.label}}&nbsp;{{formInput systemFields.manipulation.fields.environmental value=source.system.manipulation.environmental
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                                                                                  classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </label>
                 {{else if system.manipulation.environmental}}
                     <label data-tooltip="{{systemFields.manipulation.fields.environmental.hint}}">
@@ -482,7 +504,7 @@
                 {{#if @root.isEditMode}}
                     <label data-tooltip="{{systemFields.manipulation.fields.physical.hint}}">
                         {{systemFields.manipulation.fields.physical.label}}&nbsp;{{formInput systemFields.manipulation.fields.physical value=system.manipulation.physical
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                                                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </label>
                 {{else if system.manipulation.physical}}
                     <label data-tooltip="{{systemFields.manipulation.fields.physical.hint}}">
@@ -512,14 +534,14 @@
         {{#if systemFields.capacity}}
             {{#if @root.isEditMode}}
                 <span data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
-                    <label>
-                        <i class="fas fa-toolbox"></i>
-                    </label>
-                    <span>
-                        {{formInput systemFields.capacity value=source.system.capacity
-                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
+                <label>
+                    <i class="fas fa-toolbox"></i>
+                </label>
+                <span>
+                    {{formInput systemFields.capacity value=source.system.capacity
+                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                 </span>
+            </span>
             {{else if system.capacity}}
                 <label data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
                     <i class="fas fa-toolbox"></i>&nbsp;{{system.capacity}}
