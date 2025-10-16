@@ -111,7 +111,7 @@ export const Skills = () => new FixedTypeObjectField(
             computer: skill({ attribute: 'logic', group: 'Electronics', id: 'computer' }),
             cybercombat: skill({ attribute: 'logic', group: 'Cracking', id: 'cybercombat' }),
             cybertechnology: skill({ attribute: 'logic', group: 'Biotech', canDefault: false, id: 'cybertechnology' }),
-            demolitions: skill({ attribute: 'logic', id: 'deomilitions' }),
+            demolitions: skill({ attribute: 'logic', id: 'demolitions' }),
             electronic_warfare: skill({ attribute: 'logic', group: 'Cracking', canDefault: false, id: 'electronic_warfare' }),
             first_aid: skill({ attribute: 'logic', group: 'Biotech', id: 'first_aid' }),
             forgery: skill({ attribute: 'logic', id: 'forgery' }),
