@@ -346,15 +346,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Get the lowest side for a Shadowrun 5 die to count as a success
      */
-    static get lowestSuccessSide(): number {
+    static get lowestSuccessSide() {
         return Math.min(...SR.die.success);
     }
 
     /**
      * Get the lowest side for a Shadowrun 5 die to count as a glitch.
      */
-    static get lowestGlitchSide(): number {
-        return Math.min(...SR.die.glitch);
+    static get highestGlitchSide() {
+        return Math.max(...SR.die.glitch);
     }
 
     /**
@@ -436,7 +436,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     buildFormula(dice: number, explode: boolean): string {
         // Apply dice explosion, removing the limit is done outside the roll.
         const explodeFormula = explode ? 'x6' : '';
-        return `(${dice})d6cs>=${SuccessTest.lowestSuccessSide}${explodeFormula}`;
+        return `(${dice})d6cs>=${SuccessTest.lowestSuccessSide}${explodeFormula}cf<=${SuccessTest.highestGlitchSide}`;
     }
 
     /**
