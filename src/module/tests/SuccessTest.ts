@@ -345,20 +345,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Get the lowest side for a Shadowrun 5 die to count as a success
-     */
-    static get lowestSuccessSide() {
-        return Math.min(...SR.die.success);
-    }
-
-    /**
-     * Get the lowest side for a Shadowrun 5 die to count as a glitch.
-     */
-    static get highestGlitchSide() {
-        return Math.max(...SR.die.glitch);
-    }
-
-    /**
      * Get a possible globally defined default action set for this test class.
      */
     static _getDefaultTestAction(): DeepPartial<MinimalActionType> {
