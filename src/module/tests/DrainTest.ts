@@ -111,9 +111,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         if(this.data.modifiedDrain.value <= 0){
             return 'SR5.TestResults.ResistedAllDamage';
         }
-        else{
-            return 'SR5.TestResults.ResistedSomeDamage';
-        }
+        return 'SR5.TestResults.ResistedSomeDamage';
     }
 
     override async processResults() {
