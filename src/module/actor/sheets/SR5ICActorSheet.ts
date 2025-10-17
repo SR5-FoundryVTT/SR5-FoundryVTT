@@ -57,7 +57,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
             template: SheetFlow.templateBase('common/primary-tab-group'),
         },
         matrix: {
-            template: SheetFlow.templateBase('actor/tabs/ic-matrix'),
+            template: SheetFlow.templateBase('actor/tabs/matrix'),
             templates: SheetFlow.templateActorSystemParts('active-skills', 'ic-attributes'),
             scrollable: ['#active-skills-scroll', '#matrix-actions-scroll', '#network-icons-scroll', '#marked-icons-scroll']
         },

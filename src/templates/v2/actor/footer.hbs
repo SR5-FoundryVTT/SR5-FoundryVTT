@@ -69,7 +69,8 @@
             {{/unless}}
             {{#if @root.isPlayMode}}
                 <label style="text-wrap: nowrap;">
-                    <i class="far fa-brain-circuit" data-tooltip="SR5.AttrEssence"></i>
+                    <i class="far fa-brain-circuit"
+                       data-tooltip="SR5.AttrEssence"></i>
                     <span data-attribute-modifier-tooltip="essence">{{system.attributes.essence.value}}</span>
                 </label>
             {{/if}}
@@ -80,7 +81,7 @@
                     {{formInput systemFields.spiritType value=source.system.spiritType localize=true classes="short" rootId=rootId }}
                 </span>
             {{else}}
-                <label>{{localizeOb  system.spiritType config.spiritTypes}}</label>
+                <label>{{localizeOb  system.spiritType config.spiritTypes}}&nbsp;{{localize (concat 'TYPES.Actor.' actor.type)}}</label>
             {{/if}}
             <div class="basic-row">
                 <label>{{localize "SR5.Spirit.Force"}}</label>
@@ -108,7 +109,7 @@
                                 localize=true classes="short" rootId=rootId }}
                 </span>
             {{else}}
-                <label>{{localizeOb  system.spriteType config.spriteTypes}}</label>
+                <label>{{localizeOb  system.spriteType config.spriteTypes}}&nbsp;{{localize (concat 'TYPES.Actor.' actor.type)}}</label>
             {{/if}}
             <div class="basic-row">
                 <label>{{localize "SR5.Sprite.Level"}}</label>
@@ -135,7 +136,7 @@
                                 localize=true classes="short" disabled=network}}
                 </span>
             {{else}}
-                <label>{{localizeOb system.icType config.icTypes}}</label>
+                <label>{{localizeOb system.icType config.icTypes}}{{#unless (eq system.icType 'black_ic')}}&nbsp;{{localize (concat 'TYPES.Actor.' actor.type)}}{{/unless}}</label>
             {{/if}}
             <label style="text-wrap: nowrap">{{localize "SR5.Rtg"}}
                 {{#if @root.isEditMode}}
@@ -166,34 +167,34 @@
 
             {{#if @root.isPlayMode}}
                 {{#if system.isDrone}}
-                        <label>
-                            {{localize "SR5.ModPoints"}}&nbsp;
-                            {{calcModPointSlots items}}/{{calcModificationSlotsAvailable actor}}
-                        </label>
+                    <label>
+                        {{localize "SR5.ModPoints"}}&nbsp;
+                        {{calcModPointSlots items}}/{{calcModificationSlotsAvailable actor}}
+                    </label>
                 {{else}}
                     <div class="basic-row">
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.body">
-                            &nbsp;<i class="fas fa-truck"></i>
+                            <i class="fas fa-truck"></i>
                             {{calcModificationCategorySlots items "body"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.cosmetic">
-                            &nbsp;<i class="fas fa-image"></i>
+                            <i class="fas fa-image"></i>
                             {{calcModificationCategorySlots items "cosmetic"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.electromagnetic">
-                            &nbsp;<i class="far fa-bolt"></i>
+                            <i class="far fa-bolt"></i>
                             {{calcModificationCategorySlots items "electromagnetic"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.power_train">
-                            &nbsp;<i class="far fa-engine"></i>
+                            <i class="far fa-engine"></i>
                             {{calcModificationCategorySlots items "power_train"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.protection">
-                            &nbsp;<i class="far fa-shield"></i>
+                            <i class="far fa-shield"></i>
                             {{calcModificationCategorySlots items "protection"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.weapons">
-                            &nbsp;<i class="far fa-gun"></i>
+                            <i class="far fa-gun"></i>
                             {{calcModificationCategorySlots items "weapons"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                     </div>
@@ -203,9 +204,6 @@
         {{#unless (or isIC isSprite)}}
             {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
         {{/unless}}
-            <label>
-                {{localize (concat 'TYPES.Actor.' actor.type)}}
-            </label>
         <div></div>
     </div>
 </footer>

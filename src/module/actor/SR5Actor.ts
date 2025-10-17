@@ -370,6 +370,18 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return changes;
     }
 
+    async repairMatrixDamage() {
+        if (this.isType('vehicle')) {
+            // TODO
+        } else if (this.isType('sprite')) {
+            // TODO
+        } else {
+            const device = this.getMatrixDevice();
+            if (!device) return;
+            await device.repairItem();
+        }
+    }
+
     /**
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */

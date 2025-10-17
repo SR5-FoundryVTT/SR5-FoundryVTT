@@ -32,6 +32,7 @@ export const preloadHandlebarsTemplates = async () => {
             'item-properties/ammo',
             'item-properties/armor',
             'item-properties/call_in_action',
+            'item-properties/complex_form',
             'item-properties/contact',
             'item-properties/critter_power',
             'item-properties/device',

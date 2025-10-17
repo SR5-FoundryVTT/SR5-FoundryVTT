@@ -185,6 +185,15 @@
                             </div>
                         </div>
                     {{/each}}
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
+                            <label>{{localize "SR5.Programs"}}</label>
+                        </div>
+                        <div class="inputs">
+                            {{formInput systemFields.program value=system.programs classes="short skinny"
+                                        rootId=rootId disabled=@root.isPlayMode }}
+                        </div>
+                    </div>
                 {{/unless}}
             {{else if (eq item.type 'weapon')}}
                 <div class="list-item">

@@ -51,7 +51,7 @@ export const registerItemLineHelpers = () => {
         return item?.isEquipped();
     });
 
-    Handlebars.registerHelper('isVisible', function (item: SR5Item, options) {
+    Handlebars.registerHelper('isVisible', function (item: SR5Item | SR5ActiveEffect, options) {
         const actor = options?.data?.root?.actor;
         if (actor && item && actor instanceof SR5Actor) {
             return !actor.hiddenItems().has(item.uuid);

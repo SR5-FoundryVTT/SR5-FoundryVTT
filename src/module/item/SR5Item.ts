@@ -1234,6 +1234,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return monitor.max > 0 && monitor.value > 0;
     }
 
+    async repairItem() {
+
+    }
+
     /**
      * Determine if an item's Matrix Condition Monitor is filled
      */

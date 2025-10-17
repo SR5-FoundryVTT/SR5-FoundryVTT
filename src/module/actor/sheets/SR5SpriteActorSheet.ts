@@ -62,7 +62,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
             scrollable: ['.scrollable']
         },
         matrix: {
-            template: SheetFlow.templateBase('actor/tabs/sprite-matrix'),
+            template: SheetFlow.templateBase('actor/tabs/matrix'),
             scrollable: [
                 '#matrix-actions-scroll',
                 '#marked-icons-scroll' ,

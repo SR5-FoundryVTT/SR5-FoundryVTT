@@ -2,70 +2,107 @@
     <div class="fill-container">
         <div class="list-item list-item-header">
             {{#if matrixDevice}}
-            <div style="display: flex; flex-flow: row nowrap; gap: 4px; align-items: center" data-item-id="{{matrixDevice.id}}" data-uuid="{{matrixDevice.uuid}}">
-                {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" matrixDevice }}
-                <a data-action="editItem">
-                    {{matrixDevice.name}}
-                </a>
-            </div>
-            {{/if}}
-            <div>
-                <label>{{localize "SR5.Labels.ActorSheet.DeviceRating"}}</label>
-                <a data-action="roll" data-roll-id="matrix.device-rating">
-                    {{system.matrix.rating}}
-                </a>
-            </div>
-            <div>
-                {{#if network}}
-                    <label>{{localize "SR5.Labels.ActorSheet.Network"}}</label>
-                    <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>
-                    <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                        <i class="fas fa-right-from-bracket"></i>
+                <div class="basic-row" data-item-id="{{matrixDevice.id}}" data-uuid="{{matrixDevice.uuid}}">
+                    {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" matrixDevice }}
+                    <a data-action="editItem">
+                        {{matrixDevice.name}}
                     </a>
+                </div>
+            {{/if}}
+            {{#if (isType 'sprite')}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Level"}}</label>
+                    <a data-attribute-modifier-tooltip="level"
+                       data-action="rollAttribute"
+                       data-attribute-id="level">
+                        {{system.level}}
+                    </a>
+                </div>
+            {{else}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Labels.ActorSheet.DeviceRating"}}</label>
+                    <a data-attribute-modifier-tooltip="rating"
+                       data-action="rollAttribute"
+                       data-attribute-id="rating">
+                        {{system.matrix.rating}}
+                    </a>
+                </div>
+            {{/if}}
+            <div class="basic-row">
+                {{#if isCharacter}}
+                    <a data-action="showMatrixNetworkSelection" data-tooltip="SR5.Labels.ActorSheet.MarkNetwork">
+                        <i class="fas fa-network-wired"></i>
+                    </a>
+                {{/if}}
+                {{#if (isType actor 'vehicle')}}
+                    {{#if vehicle.master}}
+                        <label data-tooltip="SR5.Labels.ActorSheet.Network">
+                            <i class="fas fa-network-wired"></i>
+                        </label>
+                        <a data-action="openUuid" data-uuid="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
+                        <a data-action="removeMaster" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                            <i class="fas fa-right-from-bracket"></i>
+                        </a>
+                    {{else}}
+                        <label>{{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}</label>
+                        <a data-action="connectToDriver">
+                            <i class="fas fa-network-wired"></i>
+                        </a>
+                    {{/if}}
                 {{else}}
-                    <a data-action="connectToNetwork">{{localize "SR5.Labels.ActorSheet.AddNetwork"}}</a>
+                    {{#if network}}
+                        <label>{{localize "SR5.Network"}}</label>
+                        <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                        <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                            <i class="fas fa-right-from-bracket"></i>
+                        </a>
+                    {{else}}
+                        <label>{{localize "SR5.NoNetwork"}}</label>
+                    {{/if}}
                 {{/if}}
             </div>
-            <div>
-                <label>{{localize "SR5.Labels.ActorSheet.MarkNetwork"}}</label>
-                <a data-action="showMatrixNetworkSelection">
-                    <i class="item-icon fas fa-network-wired"></i>
-                </a>
-            </div>
-            <div>
-                <label>{{localize "SR5.Labels.Sheet.RebootDevice"}}</label>
-                <a data-action="rebootPersona" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
-                    <i class="item-icon fas fa-power-off"></i>
-                </a>
-            </div>
+            {{#if (isType actor 'character' 'vehicle')}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Labels.Sheet.RebootDevice"}}</label>
+                    <a data-action="rebootPersona" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
+                        <i class="fas fa-power-off"></i>
+                    </a>
+                </div>
+            {{/if}}
         </div>
         <div class="split-container">
             <div>
-                <div class="attributes">
-                    {{#each config.matrixAttributes as |label key|}}
-                    {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute.hbs"
-                        matrixAtt=(lookup ../system.matrix key)
-                        attributeField=(objValue @root.systemFields.matrix.fields key)
-                        isCyberdeck=../system.matrix.is_cyberdeck
-                        key=key
-                        label=label
-                        matrixAttributes=../config/matrixAttributes
-                        item=../system.matrix.item }}
-                    {{/each}}
-                </div>
+                {{#if (isType 'ic')}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/ic-attributes.hbs' }}
+                {{else}}
+                    <div class="attributes">
+                        {{#each config.matrixAttributes as |label key|}}
+                            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute.hbs"
+                                matrixAtt=(lookup ../system.matrix key)
+                                attributeField=(objValue @root.systemFields.matrix.fields key)
+                                isCyberdeck=../system.matrix.is_cyberdeck
+                                key=key
+                                label=label
+                                matrixAttributes=../config/matrixAttributes
+                                item=../system.matrix.item }}
+                        {{/each}}
+                    </div>
+                {{/if}}
                 {{tabGroup matrixLeftTabs}}
                 <section class="content matrix-left-tab-content"></section>
             </div>
             <div>
-                {{#if system.matrix.condition_monitor.max}}
-                    <div class="condition-monitor-container">
-                        {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                            tooltip=(localize "SR5.Labels.ActorSheet.Matrix")
-                            value=system.matrix.condition_monitor.value
-                            max=system.matrix.condition_monitor.max
-                            id="matrix"
-                        }}
-                    </div>
+                {{#if (isType actor 'character' 'vehicle')}}
+                    {{#if system.matrix.condition_monitor.max}}
+                        <div class="condition-monitor-container">
+                            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                                tooltip=(localize "SR5.Labels.ActorSheet.Matrix")
+                                value=system.matrix.condition_monitor.value
+                                max=system.matrix.condition_monitor.max
+                                id="matrix"
+                            }}
+                        </div>
+                    {{/if}}
                 {{/if}}
                 {{tabGroup matrixRightTabs}}
                 <section class="content matrix-right-tab-content"></section>

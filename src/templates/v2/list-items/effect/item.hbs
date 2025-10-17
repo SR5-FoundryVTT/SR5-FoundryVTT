@@ -1,4 +1,5 @@
 {{!-- list-item expects an SR5ActiveEffect to be passed in as 'item' --}}
+{{#if (or @root.isEditMode (isVisible item))}}
 <div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
     <div class="list-item draggable"
          data-effect-id="{{item.id}}"
@@ -42,6 +43,9 @@
                 <i class="{{#if item.disabled}}far fa-circle{{else}}fas fa-check-circle{{/if}}"></i>
             </a>
             {{#if @root.isEditMode}}
+                {{#if @root.actor}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/toggle-visible-icon.hbs' item }}
+                {{/if}}
                 <a data-tooltip="SR5.EditEffect" data-action="editEffect">
                     <i class="fas fa-pen-to-square"></i>
                 </a>
@@ -62,3 +66,4 @@
         </div>
     </div>
 </div>
+{{/if}}

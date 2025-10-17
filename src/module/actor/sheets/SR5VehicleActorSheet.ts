@@ -35,6 +35,8 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     static override DEFAULT_OPTIONS: any = {
         actions: {
             pickDriver: SR5VehicleActorSheet.#pickDriver,
+            connectToDriver: SR5VehicleActorSheet.#connectToDriver,
+            removeMaster: SR5VehicleActorSheet.#removeMaster,
             removeVehicleDriver: SR5VehicleActorSheet.#removeVehicleDriver,
             toggleChaseEnvironment: SR5VehicleActorSheet.#toggleChaseEnvironment,
             toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad,
@@ -87,16 +89,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         });
     }
 
-    override activateListeners_LEGACY(html) {
-        super.activateListeners_LEGACY(html);
-
-        // PAN/WAN
-        html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
-        html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
-
-        html.find('.connect-to-driver').on('click', this._onConnectToDriver.bind(this));
-    }
-
     override async _onDropActor(event, actor) {
         await this.actor.addVehicleDriver(actor.uuid);
     }
@@ -139,7 +131,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     static override PARTS = {
         ...super.PARTS,
         matrix: {
-            template: SheetFlow.templateBase('actor/tabs/vehicle-matrix'),
+            template: SheetFlow.templateBase('actor/tabs/matrix'),
             scrollable: [
                 '#matrix-actions-scroll',
                 '#marked-icons-scroll' ,
@@ -171,7 +163,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
      * Connect to the PAN of the Driver
      * @param event
      */
-    async _onConnectToDriver(event) {
+    static async #connectToDriver(this: SR5VehicleActorSheet, event) {
         event.preventDefault();
         const driver = this.actor.getVehicleDriver();
         if (driver) {
@@ -217,23 +209,10 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         await this.actor.update({system: { isOffRoad }});
     }
 
-    async _onOpenOriginLink(event) {
-        event.preventDefault();
-
-        console.log('Shadowrun 5e | Opening PAN/WAN network controller');
-
-        const originLink = event.currentTarget.dataset.originLink;
-        const device = await fromUuid(originLink);
-        if (!device) return;
-
-        if (device instanceof SR5Item || device instanceof SR5Actor)
-            device?.sheet?.render(true);
-    }
-
-    async _onControllerRemove(event) {
+    static async #removeMaster(this: SR5VehicleActorSheet, event) {
         event.preventDefault();
 
         await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
-        this.render();
+        await this.render();
     }
 }

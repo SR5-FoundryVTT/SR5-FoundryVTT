@@ -783,6 +783,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             case 'edge':
                 await this.actor.rollAttribute('edge', { event });
                 break;
+            case 'matrix':
+                if (this.actor.isType('character')) {
+                    await this.actor.getMatrixDevice()?.repairItem();
+                } else if (this.actor.isType('vehicle')) {
+
+                }
         }
     }
 
@@ -1351,7 +1357,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static async #rollAttribute(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const attribute = event.target.closest('[data-attribute-id]').dataset.attributeId;
-        if (attribute) {
+        if (attribute === 'rating') {
+            await this.actor.rollDeviceRating();
+        } else if (attribute) {
             await this.actor.rollAttribute(attribute, { event });
         }
     }

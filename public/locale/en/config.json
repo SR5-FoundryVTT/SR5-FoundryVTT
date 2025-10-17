@@ -2586,7 +2586,9 @@
                 "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
                 "CostAdjustment": "Adjust actual cost based on the item rating",
                 "DisabledForPreparedActor": "Disabled due to use of prepared actor",
-                "EssenceAdjustment": "Adjust actual essence cost based on the item rating"
+                "EssenceAdjustment": "Adjust actual essence cost based on the item rating",
+                "ToggleVisibility": "Toggle the Visibility of this during Play Mode",
+                "ToggleFavorite": "Favorite this and display it in the Favorites Bar"
             },
             "Modifiers": {
                 "armor": "Modifies total armor value",
