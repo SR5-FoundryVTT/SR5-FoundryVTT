@@ -1731,7 +1731,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
         }
 
-        await combat.adjustInitiative(combatant, modifier);
+        await combatant.adjustInitiative(modifier);
     }
 
     /**

@@ -12,11 +12,11 @@ import SocketMessageBody = Shadowrun.SocketMessageData;
  * To listen to these socket messages see Hooks#registerSocketListeners
  */
 export class SocketMessage {
-    static _createMessage(type, data, userId?): SocketMessageBody {
-        return {type, data, userId}
+    static _createMessage(type: string, data: any, userId?: string): SocketMessageBody {
+        return { type, data, userId };
     }
 
-    static emit(type, data) {
+    static emit(type: string, data: any) {
         if (!game.socket) return;
 
         const message = SocketMessage._createMessage(type, data);
@@ -28,12 +28,8 @@ export class SocketMessage {
      * Execute this message in the context of an active GM user.
      * This will be assured before the registered handleres are executed in a pre-call check.
      * Only the GM user matching the id given in the message will receive the message.
-     * 
-     * @param type 
-     * @param data 
-     * @returns 
      */
-    static emitForGM(type, data) {
+    static emitForGM(type: string, data: any) {
         if (!game.socket || !game.user || !game.users) return;
         if (game.user.isGM) return console.error('Active user is GM! Aborting socket message...');
 

@@ -201,6 +201,6 @@ export class WeaponRangeTestBehavior {
         const combatant = test.actor.combatant;
         if (!combatant) return;
 
-        await combatant.setFlag(SYSTEM_NAME, 'turnsSinceLastAttack', 0);
+        await combatant.update({ system: { attackedLastTurn: true } });
     }
 }

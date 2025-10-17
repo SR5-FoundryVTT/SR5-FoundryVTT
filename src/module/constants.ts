@@ -11,7 +11,7 @@
  *
  */
 export const SYSTEM_NAME = 'shadowrun5e' as const;
-export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}`;
+export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}` as const;
 export const FLAGS = {
     KEY_DATA_VERSION: 'systemMigrationVersion',
     ShowGlitchAnimation: 'showGlitchAnimation',
@@ -114,7 +114,9 @@ export const SR = {
 
         INI_RESULT_MOD_AFTER_INI_PASS: -10,
         INITIAL_INI_PASS: 1,
-        INITIAL_INI_ROUND: 1
+        INITIAL_INI_ROUND: 1,
+        ROUND_TIME_SECONDS: 3,
+        TURN_TIME_SECONDS: 0,
     },
     die: {
         glitch: [1],
@@ -259,4 +261,4 @@ export const SR = {
         grey: { essence: 0.75, avail: 0, cost: 1.3 },
         used: { essence: 1.25, avail: -4, cost: 0.75 },
     }
-}
+} as const;

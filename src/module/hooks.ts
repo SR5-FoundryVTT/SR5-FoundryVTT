@@ -5,13 +5,14 @@ import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
 import { registerSystemSettings } from './settings';
-import { FLAGS, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
+import { FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
 import { SR5Token } from './token/SR5Token';
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
-import { _combatantGetInitiativeFormula, SR5Combat } from './combat/SR5Combat';
+import { SR5Combat } from './combat/SR5Combat';
+import { SR5Combatant } from './combat/SR5Combatant';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
@@ -82,6 +83,9 @@ import { DataStorage } from './data/DataStorage';
 import { RoutingLibIntegration } from './integrations/routingLibIntegration';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
+
+import { CombatDM } from './types/combat/Combat';
+import { CombatantDM } from './types/combat/Combatant';
 
 import { Character } from './types/actor/Character';
 import { Critter } from './types/actor/Critter';
@@ -157,7 +161,6 @@ export class HooksManager {
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
-        Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant.bind(SR5Combat));
 
         Hooks.on('quenchReady', quenchRegister);
 
@@ -341,6 +344,7 @@ ___________________
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
         CONFIG.Combat.documentClass = SR5Combat;
+        CONFIG.Combatant.documentClass = SR5Combatant;
         CONFIG.ChatMessage.documentClass = SR5ChatMessage;
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
         // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
@@ -365,8 +369,6 @@ ___________________
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
-        // @ts-expect-error
-        Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
         // Register general SR5Roll for JSON serialization support.
         CONFIG.Dice.rolls.push(SR5Roll);
@@ -411,6 +413,12 @@ ___________________
         CONFIG.Actor.dataModels["spirit"] = Spirit;
         CONFIG.Actor.dataModels["sprite"] = Sprite;
         CONFIG.Actor.dataModels["vehicle"] = Vehicle;
+
+        CONFIG.Combat.dataModels["base"] = CombatDM;
+        CONFIG.Combatant.dataModels["base"] = CombatantDM;
+
+        CONFIG.time.turnTime = SR.combat.TURN_TIME_SECONDS;
+        CONFIG.time.roundTime = SR.combat.ROUND_TIME_SECONDS;
 
         registerSystemSettings();
         registerSystemKeybindings();
@@ -583,21 +591,19 @@ ___________________
     static registerSocketListeners() {
         if (!game.socket || !game.user) return;
         console.log('Registering Shadowrun5e system socket messages...');
-        const hooks: Shadowrun.SocketMessageHooks = {
-            [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage.bind(SR5Combat)],
+        const hooks = {
             [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage.bind(SR5Combat)],
-            [FLAGS.DoNewActionPhase]: [SR5Combat._handleDoNewActionPhaseSocketMessage.bind(SR5Combat)],
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(SuccessTestEffectsFlow)],
             [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(TeamworkTest)],
             [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
-        }
+        } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {
             console.log('Shadowrun 5e | Received system socket message.', message);
 
-            const handlers = hooks[message.type];
-            if (!handlers || handlers.length === 0) return console.warn('Shadowrun 5e | System socket message has no registered handler!', message);
+            const handlers = hooks[message.type] as typeof hooks[keyof typeof hooks] | undefined;
+            if (!handlers?.length) return console.warn('Shadowrun 5e | System socket message has no registered handler!', message);
             // In case of targeted socket message only execute with target user (intended for GM usage)
             if (message.userId && game.user?.id !== message.userId) return;
             if (message.userId && game.user?.id) console.log('Shadowrun 5e | GM is handling system socket message');
