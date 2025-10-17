@@ -67,6 +67,7 @@ export const FLAGS = {
     UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
     MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
+    DieFaceLabels: "DieFaceLabels"
 } as const;
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

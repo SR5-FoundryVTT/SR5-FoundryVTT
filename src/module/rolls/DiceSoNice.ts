@@ -1,4 +1,5 @@
 import { SR5Die } from "./SR5Die";
+import { FLAGS, SYSTEM_NAME } from "../constants";
 
 /*
  * Interface to interact with Dice So Nice module.
@@ -66,11 +67,16 @@ export interface DiceSoNice {
 export function initDiceSoNice() {
     Hooks.once('diceSoNiceReady', (dice3d) => {
         if (!dice3d) return;
+        const rawFaces = game.settings.get(SYSTEM_NAME, FLAGS.DieFaceLabels);
+        const parts = rawFaces.split(',').map(s => s.trim());
+        const faces = Array.from({ length: 6 }, (_, i) =>
+            parts[i] !== undefined ? parts[i] : String(i + 1)
+        );
 
         dice3d.addDicePreset({
             type: `d${SR5Die.DENOMINATION}`,
-            labels: ['☠', '', '', '', '☆', '★'],
+            labels: faces,
             system: 'standard'
-        }, "d6");
+        }, 'd6');
     });
 }

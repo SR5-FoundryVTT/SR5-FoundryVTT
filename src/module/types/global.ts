@@ -261,11 +261,13 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.GeneralActionsPack": string;
         "shadowrun5e.MatrixActionsPack": string;
         "shadowrun5e.ICActionsPack": string;
+        "shadowrun5e.DieFaceLabels": string;
     }
 }
 
 declare global {
-    const routinglib: RoutingLib | null;
+    // eslint-disable-next-line no-var
+    var routinglib: RoutingLib | null;
 
     interface Game {
         dice3d: DiceSoNice | undefined;

@@ -1703,7 +1703,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // ...for gmOnlyContent check permissions
         if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
-            whisper = game.users.filter(user => !!this.actor?.testUserPermission(user, 'OWNER'));
+            whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true);
         }
 
         // ...for rollMode include GM when GM roll
