@@ -422,11 +422,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     buildFormula(dice: number, explode: boolean): string {
         // Build the dice formula for a Shadowrun 5e test.
-        // - dice: number of d6 to roll
+        // - dice: number of ds (custom die) to roll
         // - explode: whether to explode sixes (Edge rules)
-        // - x6: explode sixes if applicable
 
-        const explodeModifier = explode ? 'x' : '';
+        const explodeModifier = explode ? 'x6' : '';
         return `${dice}d${SR5Die.DENOMINATION}${explodeModifier}`;
     }
 

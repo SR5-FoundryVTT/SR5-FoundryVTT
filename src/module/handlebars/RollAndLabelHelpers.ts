@@ -4,9 +4,7 @@ import {Helpers} from "../helpers";
 import {SafeString} from "handlebars";
 import { DamageType } from '../types/item/Action';
 import { SR5Die } from '../rolls/SR5Die';
-import Die = foundry.dice.terms.Die;
-
-const sr5Die = new SR5Die();
+type Result = Parameters<foundry.dice.terms.Die['getResultCSS']>[0];
 
 export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
@@ -22,8 +20,8 @@ export const registerRollAndLabelHelpers = () => {
         return new Handlebars.SafeString(code);
     });
 
-    Handlebars.registerHelper('dieResultCssClasses', function (result: Die.TermData['results'][number]) {
-        return sr5Die.getResultCSS(result).filter(cssClass => cssClass).join(' ');
+    Handlebars.registerHelper('dieResultCssClasses', function (result: Result) {
+        return SR5Die.getResultCSS(result).filter(cssClass => cssClass).join(' ');
     });
 
     Handlebars.registerHelper('elementIcon', function (element) {

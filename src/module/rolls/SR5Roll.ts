@@ -3,7 +3,7 @@
  */
 export class SR5Roll extends Roll {
     get results() {
-        return this.dice[0].results;
+        return this.dice[0]?.results ?? [];
     }
 
     /**
@@ -11,7 +11,7 @@ export class SR5Roll extends Roll {
      * NOTE: this can be different from the amount of dice actually thrown.
      */
     get pool(): number {
-        return this.dice[0].number || 0;
+        return this.dice[0]?.number || 0;
     }
 
     /**
