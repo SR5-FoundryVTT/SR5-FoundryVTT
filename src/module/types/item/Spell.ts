@@ -1,5 +1,4 @@
 import { SR5 } from "@/module/config";
-import { Typed } from "../typed";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
@@ -11,23 +10,23 @@ const SpellData = () => ({
     type: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.spellTypes)
+        choices: SR5.spellTypes
     }),
     category: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.spellCategories)
+        choices: SR5.spellCategories
     }),
     drain: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     range: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.spellRanges)
+        choices: SR5.spellRanges
     }),
     duration: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.durations)
+        choices: SR5.durations
     }),
 
     extended: new BooleanField({ initial: false }),
@@ -35,14 +34,14 @@ const SpellData = () => ({
         type: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.combatSpellTypes)
+            choices: SR5.combatSpellTypes
         }),
     }),
     detection: new SchemaField({
         type: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.detectionSpellTypes)
+            choices: SR5.detectionSpellTypes
         }),
         passive: new BooleanField(),
         extended: new BooleanField(), // do we need this?
@@ -51,12 +50,12 @@ const SpellData = () => ({
         type: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.illusionSpellTypes)
+            choices: SR5.illusionSpellTypes
         }),
         sense: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.illusionSpellSenses)
+            choices: SR5.illusionSpellSenses
         }),
     }),
     manipulation: new SchemaField({

@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { DevicePartData } from "./Device";
 import { BaseItemData, ItemBase } from "./ItemBase";
@@ -13,7 +12,7 @@ const GridData = {
     category: new StringField({
         required: true,
         initial: 'local',
-        choices: Typed.keys(SR5.gridCategories),
+        choices: SR5.gridCategories,
     })
 };
 

@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ModifiableValue } from "../template/Base";
 import { ImportFlagData } from "../template/ImportFlags";
@@ -19,7 +18,7 @@ export const MagicData = () => ({
     attribute: new StringField({
         required: true,
         initial: "logic",
-        choices: Typed.keys(SR5.attributes)
+        choices: SR5.attributes
     }), // Drain attribute
     projecting: new BooleanField(),
     initiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),

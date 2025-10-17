@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ArmorPartData } from "./Armor";
 import { ActionPartData } from "./Action";
@@ -14,7 +13,7 @@ const AdeptPowerData = () => ({
     type: new StringField({
         required: true,
         initial: 'passive',
-        choices: Typed.keys(SR5.adeptPower.types)
+        choices: SR5.adeptPower.types
     }),
     drain: new BooleanField(),
     level: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),

@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ModifiableValue } from "./Base";
 import { ConditionData } from "./Condition";
@@ -23,7 +22,7 @@ export const TechnologyData = () => ({
     wireless: new StringField({
         required: true,
         initial: 'none',
-        choices: Typed.keys(SR5.wirelessModes),
+        choices: SR5.wirelessModes,
     }),
     master: new DocumentUUIDField({ blank: true, required: true, nullable: false }),
 

@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { Movement } from "../template/Movement";
 import { MatrixData } from "../template/Matrix";
@@ -32,17 +31,17 @@ const VehicleData = () => ({
     vehicleType: new StringField({
         required: true,
         initial: "ground",
-        choices: Typed.keys(SR5.vehicle.types),
+        choices: SR5.vehicle.types,
     }),
     controlMode: new StringField({
         required: true,
         initial: "manual",
-        choices: Typed.keys(SR5.vehicle.control_modes),
+        choices: SR5.vehicle.control_modes,
     }),
     environment: new StringField({
         required: true,
         initial: "speed",
-        choices: Typed.keys(SR5.vehicle.environments),
+        choices: SR5.vehicle.environments,
     }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),
@@ -68,7 +67,7 @@ const VehicleData = () => ({
     full_defense_attribute: new StringField({
         required: true,
         initial: "willpower",
-        choices: Typed.keys(SR5.attributes)
+        choices: SR5.attributes
     }),
     visibilityChecks: new SchemaField(VisibilityChecks("matrix", "meatspace")),
 

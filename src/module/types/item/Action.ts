@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
@@ -28,12 +27,12 @@ export const MinimalActionData = () => ({
     attribute: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.attributes)
+        choices: SR5.attributes
     }),
     attribute2: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.attributes)
+        choices: SR5.attributes
     }),
     armor: new BooleanField(),
     limit: new ModifiableField(ModifiableValueLinked()),
@@ -54,36 +53,36 @@ export const DamageData = () => ({
         base: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.damageTypes)
+            choices: SR5.damageTypes
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.damageTypes)
+            choices: SR5.damageTypes
         }),
     }),
     element: new SchemaField({
         base: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.elementTypes)
+            choices: SR5.elementTypes
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.elementTypes)
+            choices: SR5.elementTypes
         }),
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
     biofeedback: new StringField({
         required: true,
         blank: true,
-        choices: Typed.keys(SR5.biofeedbackOptions),
+        choices: SR5.biofeedbackOptions,
     }),
     attribute: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.attributes)
+        choices: SR5.attributes
     }),
     source: new SchemaField({
         actorId: new StringField({ required: true }),
@@ -128,12 +127,12 @@ export const ActionRollData = (
         attribute: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.attributes)
+            choices: SR5.attributes
         }),
         attribute2: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.attributes)
+            choices: SR5.attributes
         }),
         armor: new BooleanField(),
         resist: new SchemaField({
@@ -143,12 +142,12 @@ export const ActionRollData = (
             attribute: new StringField({
                 blank: true,
                 required: true,
-                choices: Typed.keys(SR5.attributes)
+                choices: SR5.attributes
             }),
             attribute2: new StringField({
                 blank: true,
                 required: true,
-                choices: Typed.keys(SR5.attributes)
+                choices: SR5.attributes
             }),
             armor: new BooleanField(),
         }),
@@ -160,12 +159,12 @@ export const ActionRollData = (
         attribute: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.attributes)
+            choices: SR5.attributes
         }),
         attribute2: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.attributes)
+            choices: SR5.attributes
         }),
         armor: new BooleanField(),
     }),

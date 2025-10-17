@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
@@ -9,7 +8,7 @@ export const LimitField = () => ({
     attribute: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.limits)
+        choices: SR5.limits
     }),
     label: new StringField({ required: true }),
     hidden: new BooleanField(),

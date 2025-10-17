@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { MatrixAttributes } from "../template/Matrix";
@@ -9,7 +8,7 @@ export const DevicePartData = () => ({
     category: new StringField({
         required: true,
         initial: 'commlink',
-        choices: Typed.keys(SR5.deviceCategories),
+        choices: SR5.deviceCategories,
     }),
     atts: new SchemaField(MatrixAttributes(true)),
     slaves: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),

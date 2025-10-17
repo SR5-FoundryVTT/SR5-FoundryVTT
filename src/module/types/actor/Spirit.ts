@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { Movement } from "../template/Movement";
 import { ActorArmorData } from "../template/Armor";
@@ -18,12 +17,12 @@ const SpiritData = () => ({
     spiritType: new StringField({
         required: true,
         initial: 'air',
-        choices: Typed.keys(SR5.spiritTypes)
+        choices: SR5.spiritTypes
     }),
     full_defense_attribute: new StringField({
         required: true,
         initial: "willpower",
-        choices: Typed.keys(SR5.attributes),
+        choices: SR5.attributes,
     }),
     special: new StringField({ required: true, initial: "magic", choices: ["magic"], readonly: true }),
     is_npc: new BooleanField({ initial: true }),

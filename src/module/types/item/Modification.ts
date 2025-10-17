@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
@@ -11,17 +10,17 @@ const ModificationData = () => ({
     type: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.modificationTypes)
+        choices: SR5.modificationTypes
     }),
     mount_point: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.mountPoints)
+        choices: SR5.mountPoints
     }),
     modification_category: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.modificationCategories)
+        choices: SR5.modificationCategories
     }),
     dice_pool: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

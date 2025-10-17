@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
@@ -11,13 +10,13 @@ const CallInActionData = () => ({
     actor_type: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.callInActorTypes),
+        choices: SR5.callInActorTypes,
     }),
     spirit: new SchemaField({
         type: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.spiritTypes),
+            choices: SR5.spiritTypes,
         }),
         force: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
         uuid: new StringField({ required: true }),
@@ -26,7 +25,7 @@ const CallInActionData = () => ({
         type: new StringField({
             blank: true,
             required: true,
-            choices: Typed.keys(SR5.spriteTypes),
+            choices: SR5.spriteTypes,
         }),
         level: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
         uuid: new StringField({ required: true }),

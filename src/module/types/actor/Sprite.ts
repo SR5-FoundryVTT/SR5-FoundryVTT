@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { MatrixData } from "../template/Matrix";
 import { Initiative } from "../template/Initiative";
@@ -15,13 +14,13 @@ const SpriteData = () => ({
     spriteType: new StringField({
         required: true,
         initial: 'courier',
-        choices: Typed.keys(SR5.spriteTypes),
+        choices: SR5.spriteTypes,
     }),
     special: new StringField({ required: true, initial: "resonance", choices: ["resonance"], readonly: true }),
     full_defense_attribute: new StringField({
         required: true,
         initial: "willpower",
-        choices: Typed.keys(SR5.attributes)
+        choices: SR5.attributes
     }),
 
     // === Matrix & Host ===

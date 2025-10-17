@@ -8,7 +8,7 @@ const ActiveEffectData = {
     applyTo: new StringField({
         required: true,
         initial: 'actor',
-        choices: Typed.keys(SR5.effectApplyTo),
+        choices: SR5.effectApplyTo,
     }),
 
     appliedByTest: new BooleanField(),

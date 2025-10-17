@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { Movement } from "../template/Movement";
 import { MatrixData } from "../template/Matrix";
@@ -23,12 +22,12 @@ export const CritterData = () => ({
     full_defense_attribute: new StringField({
         required: true,
         initial: "willpower",
-        choices: Typed.keys(SR5.attributes),
+        choices: SR5.attributes,
     }),
     special: new StringField({
         required: true,
         initial: 'mundane',
-        choices: Typed.keys(SR5.specialTypes),
+        choices: SR5.specialTypes,
     }),
 
     // === Attributes & Limits ===
@@ -57,7 +56,7 @@ export const CritterData = () => ({
         attribute: new StringField({
             required: true,
             initial: "willpower",
-            choices: Typed.keys(SR5.attributes)
+            choices: SR5.attributes
         }), // fade attribute
         submersion: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     }),

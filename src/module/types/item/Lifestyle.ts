@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
@@ -9,7 +8,7 @@ const LifestyleData = () => ({
     type: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.lifestyleTypes)
+        choices: SR5.lifestyleTypes
     }),
     comforts: new NumberField({ required: true, nullable: false, initial: 0 }),
     security: new NumberField({ required: true, nullable: false, initial: 0 }),

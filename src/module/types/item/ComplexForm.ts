@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ActionRollData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
@@ -14,7 +13,7 @@ const ComplexFormData = () => ({
     target: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.matrixTargets), // what to do with 'host' (from chummer)?
+        choices: SR5.matrixTargets, // what to do with 'host' (from chummer)?
     }),
     duration: new StringField({ required: true }),
     fade: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

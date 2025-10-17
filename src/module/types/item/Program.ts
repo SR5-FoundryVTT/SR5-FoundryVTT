@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
@@ -11,7 +10,7 @@ const ProgramData = () => ({
     type: new StringField({
         required: true,
         initial: 'common_program',
-        choices: Typed.keys(SR5.programTypes)
+        choices: SR5.programTypes
     }),
 });
 

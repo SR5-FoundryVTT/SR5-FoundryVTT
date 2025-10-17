@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { MatrixLimits } from "../template/Limits";
 import { Initiative } from "../template/Initiative";
@@ -16,7 +15,7 @@ const ICData = () => ({
     icType: new StringField({
         required: true,
         initial: "acid",
-        choices: Typed.keys(SR5.ic.types)
+        choices: SR5.ic.types
     }),
     special: new StringField({ required: true, initial: 'mundane', choices: ['mundane'], readonly: true }),
 

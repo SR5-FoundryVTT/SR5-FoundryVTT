@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 
 const { SchemaField, NumberField, ArrayField, StringField } = foundry.data.fields;
@@ -16,7 +15,7 @@ export const SpecialAttribute = new StringField({
 });
 
 export const MatrixAttribute = new StringField({
-    choices: Typed.keys(SR5.matrixAttributes),
+    choices: SR5.matrixAttributes,
 });
 
 export const BaseValuePair = () => ({
@@ -60,7 +59,7 @@ export const ModifiableValueLinked = () => ({
     base_formula_operator: new StringField({
         required: false,
         initial: 'add',
-        choices: Typed.keys(SR5.actionDamageFormulaOperators)
+        choices: SR5.actionDamageFormulaOperators
     }),
 });
 

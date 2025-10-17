@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
@@ -18,7 +17,7 @@ const AmmunitionData = () => ({
     clip_type: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.weaponCliptypes),
+        choices: SR5.weaponCliptypes,
     }),
     partial_reload_value: new NumberField({ required: true, nullable: false, integer: true, initial: -1 }),
 });
@@ -31,7 +30,7 @@ export const RangeData = () => ({
     category: new StringField({
         required: true,
         initial: 'manual',
-        choices: Typed.keys(SR5.weaponRangeCategories)
+        choices: SR5.weaponRangeCategories
     }),
     attribute: new StringField({ required: true }),
 });
@@ -47,7 +46,7 @@ export const RangeWeaponData = () => ({
     category: new StringField({
         required: true,
         initial: 'manual',
-        choices: Typed.keys(SR5.weaponRangeCategories)
+        choices: SR5.weaponRangeCategories
     }),
     ranges: new SchemaField(RangeData()),
     rc: new ModifiableField(ModifiableValue()),
@@ -71,7 +70,7 @@ const WeaponData = () => ({
     category: new StringField({
         blank: true,
         required: true,
-        choices: Typed.keys(SR5.weaponCategories),
+        choices: SR5.weaponCategories,
     }),
     subcategory: new StringField({ required: true }),
     ammo: new SchemaField(AmmunitionData()),

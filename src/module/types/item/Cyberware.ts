@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ArmorPartData } from "./Armor";
 import { ActionPartData } from "./Action";
@@ -17,7 +16,7 @@ const CyberwareData = () => ({
     grade: new StringField({
         required: true,
         initial: 'standard',
-        choices: Typed.keys(SR5.cyberwareGrades),
+        choices: SR5.cyberwareGrades,
     }),
 });
 

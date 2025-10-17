@@ -1,4 +1,3 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ConditionData } from "./Condition";
 import { AttributeField } from "./Attributes";
@@ -12,7 +11,7 @@ const DeviceAttribute = (initialAtt: '' | keyof typeof SR5.matrixAttributes, edi
         blank: true,
         required: true,
         initial: initialAtt,
-        choices: Typed.keys(SR5.matrixAttributes),
+        choices: SR5.matrixAttributes,
     }),
     editable: new BooleanField({ initial: editable }),
 });
