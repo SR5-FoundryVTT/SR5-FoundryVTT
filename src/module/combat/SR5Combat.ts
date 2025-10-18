@@ -1,5 +1,6 @@
 import { SocketMessage } from "../sockets";
 import { SR5Actor } from "../actor/SR5Actor";
+import { SR5Combatant } from "./SR5Combatant";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import SocketMessageData = Shadowrun.SocketMessageData;
@@ -59,10 +60,8 @@ export class SR5Combat extends Combat<"base"> {
      * Use the given actor's token to get the combatant.
      * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
      */
-    getActorCombatant(actor: SR5Actor) {
-        const token = actor.getToken();
-        if (!token) return null;
-        return this.getCombatantByToken(token.id!);
+    getActorCombatant(actor: SR5Actor): SR5Combatant | null {
+        return this.getCombatantsByActor(actor)[0] ?? null;
     }
 
     /**
@@ -71,7 +70,8 @@ export class SR5Combat extends Combat<"base"> {
      * @param adjustment The delta to adjust the initiative score with.
      */
     async adjustActorInitiative(actor: SR5Actor, adjustment: number) {
-        await this.getActorCombatant(actor)?.adjustInitiative(adjustment);
+        for (const combatant of this.getCombatantsByActor(actor))
+            await combatant.adjustInitiative(adjustment);
     }
 
     /**
@@ -79,13 +79,8 @@ export class SR5Combat extends Combat<"base"> {
      */
     async handleIniPass() {
         // Collect all combatants' initiative changes for a singular update.
-        const combatants = this.combatants
-            .map((c) => ({ _id: c.id, initiative: CombatRules.initAfterPass(c.initiative ?? 0) }))
-            .filter((c): c is { _id: string; initiative: number } => c._id != null);
-
         const initiativePass = this.initiativePass + 1;
-        for (const combatant of this.combatants)
-            await combatant.initiativePassUpdate(initiativePass);
+        const combatants = this.combatants.map((c) => c.initPassUpdateData(initiativePass));
 
         await this.update({ turn: 0, combatants, system: { initiativePass } });
     }
@@ -159,9 +154,9 @@ export class SR5Combat extends Combat<"base"> {
      */
     protected override async _onStartRound(context: Combat.RoundEventContext) {
         await this.resetAll();
-        await this.update({ turn: 0, system: { initiativePass: SR.combat.INITIAL_INI_PASS } });
 
-        await Promise.all(this.combatants.map(async (c) => { await c.roundUpdate(); }));
+        const combatants = this.combatants.map((c) => c.roundUpdateData());
+        await this.update({ turn: 0, combatants, system: { initiativePass: SR.combat.INITIAL_INI_PASS } });
 
         await this.rollForActors({updateTurn: false});
         return super._onStartRound(context);

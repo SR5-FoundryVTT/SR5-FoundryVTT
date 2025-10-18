@@ -1,4 +1,5 @@
 import { SR } from "../constants";
+import { CombatRules } from "../rules/CombatRules";
 
 export class SR5Combatant extends Combatant<"base"> {
     protected override _getInitiativeFormula() {
@@ -23,6 +24,10 @@ export class SR5Combatant extends Combatant<"base"> {
         return super._preUpdate(changed, options, user);
     }
 
+    canAct() {
+        return this.initiative && this.initiative > 0 && !this.system.acted;
+    }
+
     async turnUpdate(initiativePass: number) {
         // Clear movement history on the first initiative pass.
         if (initiativePass === SR.combat.INITIAL_INI_PASS)
@@ -38,16 +43,17 @@ export class SR5Combatant extends Combatant<"base"> {
         }
     }
 
-    canAct() {
-        return this.initiative && this.initiative > 0 && !this.system.acted;
+    initPassUpdateData(initiativePass: number) {
+        return {
+            _id: this._id!,
+            system: { acted: false },
+            initiative: CombatRules.initAfterPass(this.initiative ?? 0),
+        } as const;
     }
 
-    async initiativePassUpdate(initiativePass: number) {
-        return this.update({ system: { acted: false } });
-    }
-
-    async roundUpdate() {
-        await this.initiativePassUpdate(0);
-        return this.update({ system: { coinFlip: Math.random() } });
+    roundUpdateData() {
+        const passData = this.initPassUpdateData(0);
+        const roundData = { _id: this._id!, system: { coinFlip: Math.random() } } as const;
+        return foundry.utils.mergeObject(passData, roundData);
     }
 }
