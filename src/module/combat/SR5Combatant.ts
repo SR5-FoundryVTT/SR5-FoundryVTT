@@ -6,7 +6,8 @@ export class SR5Combatant extends Combatant<"base"> {
     protected override _getInitiativeFormula(): string {
         const combat = this.parent;
         const baseFormula = super._getInitiativeFormula();
-        const ongoingIniPassModified = (combat.initiativePass - SR.combat.INITIAL_INI_PASS) * -SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
+        const initPassed = combat.initiativePass - SR.combat.INITIAL_INI_PASS;
+        const ongoingIniPassModified = initPassed * -SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
 
         return `max(${baseFormula} - ${ongoingIniPassModified}[Pass], 0)`;
     }
