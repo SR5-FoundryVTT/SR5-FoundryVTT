@@ -114,7 +114,6 @@ export class SR5TokenDocument extends TokenDocument {
         // Perform checks to ensure this logic should run.
         if (game.user.id !== user.id) return;
         if (!token.actor?.system.movement) return;
-        if (movement.constrainOptions.ignoreCost) return;
         if (!game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) return;
 
         const { walk, run } = token.actor.system.movement;
