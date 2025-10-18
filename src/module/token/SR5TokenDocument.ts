@@ -96,8 +96,8 @@ export class SR5TokenDocument extends TokenDocument {
         if (this.actor && game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) {
             // Concurrently remove running/sprinting status effects.
             await Promise.all([
-                this.actor.toggleStatusEffect("sr5running", { active: false }),
-                this.actor.toggleStatusEffect("sr5sprinting", { active: false }),
+                this.actor.toggleStatusEffect("sr5run", { active: false }),
+                this.actor.toggleStatusEffect("sr5sprint", { active: false }),
             ]);
         }
     }
@@ -126,8 +126,8 @@ export class SR5TokenDocument extends TokenDocument {
 
         // Concurrently apply the correct status effects.
         await Promise.all([
-            token.actor.toggleStatusEffect("sr5running", { active: shouldRun }),
-            token.actor.toggleStatusEffect("sr5sprinting", { active: shouldSprint }),
+            token.actor.toggleStatusEffect("sr5run", { active: shouldRun }),
+            token.actor.toggleStatusEffect("sr5sprint", { active: shouldSprint }),
         ]);
     }
 }

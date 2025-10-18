@@ -379,7 +379,7 @@ ___________________
         // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
-        CONFIG.statusEffects.push(...SRStatus);
+        CONFIG.statusEffects.splice(5, 0, ...SRStatus);
 
         CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
 
