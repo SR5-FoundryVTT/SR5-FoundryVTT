@@ -39,6 +39,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
                 showItemDescription: SR5ApplicationMixin.#toggleListItemDescription,
                 openSource: SR5ApplicationMixin.#openSource,
                 openUuid: SR5ApplicationMixin.#openUuid,
+                refresh: SR5ApplicationMixin.#refresh,
             },
         };
 
@@ -165,6 +166,11 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             }
         }
 
+        static async #refresh(this: SR5ApplicationMixin, event) {
+            // @ts-expect-error render will exist
+            await this.render();
+        }
+
         static async #openSource(event) {
             const sourceId = SheetFlow.closestSource(event.target);
             if (sourceId) {
@@ -177,7 +183,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             if (uuid) {
                 const document = SheetFlow.fromUuidSync(uuid);
                 if (document && (document instanceof SR5Item || document instanceof SR5Actor || document instanceof SR5ActiveEffect)) {
-                    document.sheet?.render(true);
+                    await document.sheet?.render(true);
                 }
             }
         }

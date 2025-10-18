@@ -2022,7 +2022,7 @@ input[type='text'].display {
         padding: 2px;
 
         &.list-item-selected {
-            background: radial-gradient(rgba($matrix-green, 0.4), rgba($matrix-green, 0.01));
+            background: radial-gradient(rgba($matrix-green, 0.4), rgba($matrix-green, 0.01)) !important;
         }
 
         .list-item-image-container {
@@ -2194,43 +2194,43 @@ input[type='text'].display {
             flex: 1;
             overflow: hidden;
         }
-        // fill the available space so that children can scroll correctly
-        .fill-container {
+    }
+    // fill the available space so that children can scroll correctly
+    .fill-container {
+        display: flex;
+        flex-flow: column nowrap;
+        flex: 1;
+        overflow: hidden;
+        height: 100%;
+    }
+    // split the available space into two side-by-side containers
+    .split-container {
+        display: flex;
+        flex-flow: row nowrap;
+        flex: 1;
+        overflow: hidden;
+        height: 100%;
+
+        // matrix tabs need to flex and hide overflow in order to have contents scroll
+        .matrix-left-tab-content,
+        .matrix-right-tab-content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+        }
+        // children of the split container need to flex as a column, hide overflow to all scrolling within
+        > * {
             display: flex;
             flex-flow: column nowrap;
             flex: 1;
             overflow: hidden;
-            height: 100%;
         }
-        // split the available space into two side-by-side containers
-        .split-container {
-            display: flex;
-            flex-flow: row nowrap;
-            flex: 1;
-            overflow: hidden;
-            height: 100%;
-
-            // matrix tabs need to flex and hide overflow in order to have contents scroll
-            .matrix-left-tab-content,
-            .matrix-right-tab-content {
-                flex: 1;
-                overflow: hidden;
-                display: flex;
-            }
-            // children of the split container need to flex as a column, hide overflow to all scrolling within
-            > * {
-                display: flex;
-                flex-flow: column nowrap;
-                flex: 1;
-                overflow: hidden;
-            }
-            > *:not(:first-child) {
-                padding-left: 0.25rem;
-                border-left: $groove;
-            }
-            > *:not(:last-child) {
-                padding-right: 0.25rem;
-            }
+        > *:not(:first-child) {
+            padding-left: 0.25rem;
+            border-left: $groove;
+        }
+        > *:not(:last-child) {
+            padding-right: 0.25rem;
         }
     }
 

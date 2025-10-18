@@ -762,6 +762,7 @@
         "Conceal": "Conceal",
         "ConditionMonitor": "Con. Mon.",
         "Connection": "Connection",
+        "ConnectToNetwork": "Connect to Network",
         "Contact": {
             "FIELDS": {
                 "type": {
@@ -1564,6 +1565,7 @@
                 "ColdSim": "Cold Sim",
                 "Compilations": "Compilations",
                 "ConnectToDriver": "Connect To Driver",
+                "ConnectedTo": "Connected To",
                 "CreateInventory": "Create inventory place",
                 "CritterPowers": "Critter Powers",
                 "DeviceRating": "Device Rating",
@@ -1576,6 +1578,7 @@
                 "Hacking": "Hacking",
                 "ICConfiguration": "IC Configuration",
                 "Icons": "Icons",
+                "ManageNetwork": "Manage Network",
                 "MarkNetwork": "Mark Network",
                 "MarkedIcons": "Marked Icons",
                 "Matrix": "Matrix",
@@ -1898,6 +1901,15 @@
         "Name": "Name",
         "NetHits": "Net Hits",
         "Network": "Network",
+        "NetworkManager": {
+            "AvailableNetworks": "Available Networks",
+            "BruteForce": "Brute Force",
+            "ConnectedTo": "Connected To",
+            "HackOnTheFly": "Hack on the Fly",
+            "InviteMark": "Ask to Invite a Mark",
+            "NoNetwork": "Not Connected",
+            "Title": "Network Manager"
+        },
         "Networks": "Networks",
         "New": "New",
         "NoCover": "No Cover",

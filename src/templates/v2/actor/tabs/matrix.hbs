@@ -28,39 +28,6 @@
                     </a>
                 </div>
             {{/if}}
-            <div class="basic-row">
-                {{#if isCharacter}}
-                    <a data-action="showMatrixNetworkSelection" data-tooltip="SR5.Labels.ActorSheet.MarkNetwork">
-                        <i class="fas fa-network-wired"></i>
-                    </a>
-                {{/if}}
-                {{#if (isType actor 'vehicle')}}
-                    {{#if vehicle.master}}
-                        <label data-tooltip="SR5.Labels.ActorSheet.Network">
-                            <i class="fas fa-network-wired"></i>
-                        </label>
-                        <a data-action="openUuid" data-uuid="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
-                        <a data-action="removeMaster" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                            <i class="fas fa-right-from-bracket"></i>
-                        </a>
-                    {{else}}
-                        <label>{{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}</label>
-                        <a data-action="connectToDriver">
-                            <i class="fas fa-network-wired"></i>
-                        </a>
-                    {{/if}}
-                {{else}}
-                    {{#if network}}
-                        <label>{{localize "SR5.Network"}}</label>
-                        <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>
-                        <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                            <i class="fas fa-right-from-bracket"></i>
-                        </a>
-                    {{else}}
-                        <label>{{localize "SR5.NoNetwork"}}</label>
-                    {{/if}}
-                {{/if}}
-            </div>
             {{#if (isType actor 'character' 'vehicle')}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Labels.Sheet.RebootDevice"}}</label>
@@ -88,6 +55,36 @@
                         {{/each}}
                     </div>
                 {{/if}}
+                <div class="list-item list-item-header">
+                    <div class="basic-row">
+                        <a data-action="connectToNetwork" data-tooltip="SR5.Labels.ActorSheet.ManageNetwork">
+                            <i class="fas fa-network-wired"></i>
+                        </a>
+                        {{#if vehicle.master}}
+                            <label>{{localize "SR5.Labels.ActorSheet.ConnectedTo"}}:&nbsp;</label>
+                            <a data-action="openUuid" data-uuid="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
+                            <a data-action="removeMaster" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                                <i class="fas fa-right-from-bracket"></i>
+                            </a>
+                        {{else}}
+                            {{#if network}}
+                                <label>{{localize "SR5.Labels.ActorSheet.ConnectedTo"}}:&nbsp;</label>
+                                <a data-action="openUuid" data-uuid="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
+                                <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                                <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                                    <i class="fas fa-right-from-bracket"></i>
+                                </a>
+                            {{else}}
+                                <label>{{localize "SR5.Labels.ActorSheet.NoNetwork"}}</label>
+                                {{#if (isType actor 'vehicle')}}
+                                    <a data-action="connectToDriver">
+                                        {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
+                                    </a>
+                                {{/if}}
+                            {{/if}}
+                        {{/if}}
+                    </div>
+                </div>
                 {{tabGroup matrixLeftTabs}}
                 <section class="content matrix-left-tab-content"></section>
             </div>

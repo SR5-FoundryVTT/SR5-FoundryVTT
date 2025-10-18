@@ -14,6 +14,7 @@ import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import ActorAttribute = Shadowrun.ActorAttribute;
+import { NetworkManager } from '@/module/apps/NetworkManager';
 
 // Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
 type sheetAction = {
@@ -61,7 +62,6 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             selectMatrixTarget: SR5MatrixActorSheet.#selectMatrixTarget,
             connectToNetwork: SR5MatrixActorSheet.#connectToMatrixNetwork,
             rebootPersona: SR5MatrixActorSheet.#rebootPersonaDevice,
-            showMatrixNetworkSelection: SR5MatrixActorSheet.#showMatrixNetworkSelection,
             connectToMarkedNetwork: SR5MatrixActorSheet.#connectToMarkedNetwork,
             disconnectNetwork: SR5MatrixActorSheet.#disconnectNetwork,
             togglePersonaRunningSilent: SR5MatrixActorSheet.#togglePersonaRunningSilent,
@@ -269,9 +269,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         event.preventDefault();
         event.stopPropagation();
 
-        if (await MatrixSheetFlow.promptConnectToMatrixNetwork(this.actor)) {
-            this.render();
-        }
+        const app = new NetworkManager(this.actor);
+        await app.render(true);
     }
 
     /**

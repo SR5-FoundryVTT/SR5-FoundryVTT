@@ -217,7 +217,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     protected _cleanParts(item: SR5Item, parts: Record<string, any>) {
-        if (item.isType('contact', 'lifestyle', 'sin')) {
+        if (item.isType('contact', 'lifestyle', 'sin', 'grid')) {
             delete parts['details'];
         }
         if (!item.canBeMaster) {

@@ -23,7 +23,7 @@
     {{/if}}
     <div class="list-item">
         {{#if @root.isPlayMode}}
-            {{#unless (isType item 'spell' 'quality' 'lifestyle' 'bioware' 'cyberware' 'device')}}
+            {{#unless (isType item 'spell' 'quality' 'lifestyle' 'bioware' 'cyberware' 'device' 'grid')}}
                 <label>
                     {{#if (isType item 'weapon')}}
                         {{#if (eq system.category 'range')}}
@@ -38,7 +38,16 @@
                 </label>
             {{/unless}}
         {{/if}}
-        {{#if (isType item 'device')}}
+        {{#if (isType item 'grid')}}
+            {{#if @root.isEditMode}}
+                <span>
+                    {{formInput systemFields.category value=source.system.category localize=true
+                                classes="short" rootId=@root.rootId}}
+                </span>
+            {{else}}
+                <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.gridCategories}}&nbsp;{{localize (concat 'TYPES.Item.' item.type)}}</label>
+            {{/if}}
+        {{else if (isType item 'device')}}
             {{#if @root.isEditMode}}
                 <span>
                     {{formInput systemFields.category value=source.system.category localize=true
@@ -47,19 +56,18 @@
             {{else}}
                 <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.deviceCategories}}</label>
             {{/if}}
-        {{/if}}
-        {{!-- Show Quantity First --}}
-        {{#if system.technology}}
-            {{#if (isType item 'bioware' 'cyberware')}}
-                {{#if @root.isEditMode}}
-                    <span data-tooltip="{{systemFields.grade.label}}:&nbsp;{{systemFields.grade.hint}}">
-                        {{formInput systemFields.grade value=source.system.grade localize=true
-                                    classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
-                {{else if system.grade}}
-                    <label>{{localizeOb system.grade @root.config.cyberwareGrades}}&nbsp;{{localize (concat 'TYPES.Item.' item.type)}}</label>
-                {{/if}}
+        {{else if (isType item 'bioware' 'cyberware')}}
+            {{#if @root.isEditMode}}
+                <span data-tooltip="{{systemFields.grade.label}}:&nbsp;{{systemFields.grade.hint}}">
+                    {{formInput systemFields.grade value=source.system.grade localize=true
+                                classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </span>
+            {{else if system.grade}}
+                <label>{{localizeOb system.grade @root.config.cyberwareGrades}}&nbsp;{{localize (concat 'TYPES.Item.' item.type)}}</label>
             {{/if}}
+        {{/if}}
+
+        {{#if system.technology}}
             <div class="basic-row">
                 <label>{{localize "SR5.Qty"}}</label>
                 {{#if @root.isPlayMode}}
@@ -279,6 +287,54 @@
                 </div>
             {{else if system.karma}}
                 <label>{{systemFields.karma.label}}&nbsp;{{system.karma}}</label>
+            {{/if}}
+        {{else if (isType item 'grid')}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Visible"}}
+                        {{formInput systemFields.matrix.fields.visible value=source.system.matrix.visible
+                                    rootId=rootId disabled=@root.isPlayMode}}
+                    </label>
+                </div>
+            {{else}}
+                <label>
+                    {{#if system.matrix.visible}}
+                        {{localize "SR5.Visible"}}
+                    {{else}}
+                        {{localize "SR5.NotVisible"}}
+                    {{/if}}
+                </label>
+            {{/if}}
+        {{else if (isType item 'host')}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Rtg"}}</label>
+                    <span data-tooltip="{{systemFields.rating.label}}:&nbsp;{{systemFields.rating.hint}}">
+                        {{formInput systemFields.rating value=source.system.rating
+                                    classes="short skinny" rootId=rootId disabled=@root.isPlayMode}}
+                    </span>
+                </div>
+            {{else if system.rating}}
+                <label>{{localize "SR5.Rtg"}}&nbsp;{{system.rating}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Visible"}}
+                        {{formInput systemFields.matrix.fields.visible value=source.system.matrix.visible
+                                    rootId=rootId disabled=@root.isPlayMode}}
+                    </label>
+                </div>
+            {{else}}
+                <label>
+                    {{#if system.matrix.visible}}
+                        {{localize "SR5.Visible"}}
+                    {{else}}
+                        {{localize "SR5.NotVisible"}}
+                    {{/if}}
+                </label>
             {{/if}}
 
         {{else if (eq item.type 'lifestyle')}}
