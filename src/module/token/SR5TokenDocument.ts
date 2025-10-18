@@ -1,38 +1,44 @@
-import { DeepReadonly } from 'fvtt-types/utils';
-import { SYSTEM_NAME, FLAGS } from '../constants';
-import { StorageFlow } from '@/module/flows/StorageFlow';
+import { DeepReadonly } from "fvtt-types/utils";
+import { SYSTEM_NAME, FLAGS } from "../constants";
+import { StorageFlow } from "@/module/flows/StorageFlow";
 
+/**
+ * A custom TokenDocument class for the SR5 system.
+ * It extends the base functionality to handle system-specific movement rules and data cleanup.
+ */
 export class SR5TokenDocument extends TokenDocument {
     /**
-     * Used by measureMovementPath to track if a movement is being planned or executed.
+     * Tracks if a movement operation is in progress to prevent visual flicker in `measureMovementPath`.
      * @private
      */
     #movementInProgress = false;
 
-    override async _preUpdate(
+    protected override async _preUpdate(
         changed: TokenDocument.UpdateData,
         options: TokenDocument.Database.PreUpdateOptions,
-        user: User.Implementation
+        user: User.Implementation,
     ) {
         this.#movementInProgress = true;
-        let result: boolean | void;
+        let result: Awaited<ReturnType<TokenDocument["_preUpdate"]>>;
+
         try {
             result = await super._preUpdate(changed, options, user);
         } finally {
             this.#movementInProgress = false;
         }
+
         return result;
     }
 
     /**
-     * Handle system specific things when this token document is being deleted
-     * @param args
+     * Handles system-specific cleanup before the token document is deleted.
      */
-    override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
-        // ensure we disconnect from any networks before being a token actor is deleted
+    protected override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
+        // Disconnect from any networks before a token actor is deleted.
         if (this.actor?.isToken) {
             await StorageFlow.deleteStorageReferences(this.actor);
         }
+
         return super._preDelete(...args);
     }
 
@@ -51,17 +57,17 @@ export class SR5TokenDocument extends TokenDocument {
      */
     override measureMovementPath(
         waypoints: TokenDocument.MeasuredMovementWaypoint[],
-        options?: TokenDocument.MeasureMovementPathOptions
-    ) {
+        options?: TokenDocument.MeasureMovementPathOptions,
+    ): foundry.grid.BaseGrid.MeasurePathResult {
         const measurement = super.measureMovementPath(waypoints, options);
+        const movementData = this.actor?.system.movement;
 
-        const characterMovementData = this.actor?.system.movement;
-        if (!characterMovementData || this.movementAction !== 'walk' || this.#movementInProgress) {
+        // Abort if actor has no movement data, it's not a standard walk, or movement is in progress.
+        if (!movementData || this.movementAction !== "walk" || this.#movementInProgress) {
             return measurement;
         }
 
-        const walkRate = characterMovementData.walk.value;
-        const runRate = characterMovementData.run.value;
+        const { walk, run } = movementData;
 
         for (let i = 0; i < waypoints.length; i++) {
             const waypoint = waypoints[i];
@@ -69,50 +75,59 @@ export class SR5TokenDocument extends TokenDocument {
 
             if (!Number.isFinite(cost)) continue;
 
-            if (cost > runRate) {
-                waypoint.action = 'sprint';
-            } else if (cost > walkRate) {
-                waypoint.action = 'run';
+            if (cost > run.value) {
+                waypoint.action = "sprint";
+            } else if (cost > walk.value) {
+                waypoint.action = "run";
             } else {
-                waypoint.action = 'walk';
+                waypoint.action = "walk";
             }
         }
 
         return measurement;
     }
 
+    /**
+     * Clears running and sprinting status effects when movement history is reset.
+     */
+    override async clearMovementHistory() {
+        await super.clearMovementHistory();
+
+        if (this.actor && game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) {
+            // Concurrently remove running/sprinting status effects.
+            await Promise.all([
+                this.actor.toggleStatusEffect("sr5running", { active: false }),
+                this.actor.toggleStatusEffect("sr5sprinting", { active: false }),
+            ]);
+        }
+    }
+
+    /**
+     * A hook handler that automatically applies 'running' or 'sprinting' status effects based on movement distance.
+     */
     static async moveToken(
         token: TokenDocument.Implementation,
         movement: DeepReadonly<TokenDocument.MovementOperation>,
         operation: Partial<foundry.abstract.types.DatabaseUpdateOperation>,
-        user: User.Implementation
-    ) {
+        user: User.Implementation,
+    ): Promise<void> {
+        // Perform checks to ensure this logic should run.
         if (game.user.id !== user.id) return;
         if (!token.actor?.system.movement) return;
         if (movement.constrainOptions.ignoreCost) return;
         if (!game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) return;
 
-        const path = token.measureMovementPath(token.movementHistory);
+        const { walk, run } = token.actor.system.movement;
+        const cost = token.measureMovementPath(token.movementHistory).cost;
 
-        if (path.cost > token.actor.system.movement.run.value) {
-            await token.actor.toggleStatusEffect("sr5running", { active: false });
-            await token.actor.toggleStatusEffect("sr5sprinting", { active: true });
-        } else if (path.cost > token.actor.system.movement.walk.value) {
-            await token.actor.toggleStatusEffect("sr5sprinting", { active: false });
-            await token.actor.toggleStatusEffect("sr5running", { active: true });
-        } else {
-            await token.actor.toggleStatusEffect("sr5running", { active: false });
-            await token.actor.toggleStatusEffect("sr5sprinting", { active: false });
-        }
-    }
+        // Determine the required movement state.
+        const shouldSprint = cost > run.value;
+        const shouldRun = !shouldSprint && cost > walk.value;
 
-    override async clearMovementHistory() {
-        await super.clearMovementHistory();
-
-        if (!game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) return;
-
-        // Clear running/sprinting status effects when movement history is cleared.
-        await this.actor?.toggleStatusEffect("sr5running", { active: false });
-        await this.actor?.toggleStatusEffect("sr5sprinting", { active: false });
+        // Concurrently apply the correct status effects.
+        await Promise.all([
+            token.actor.toggleStatusEffect("sr5running", { active: shouldRun }),
+            token.actor.toggleStatusEffect("sr5sprinting", { active: shouldSprint }),
+        ]);
     }
 }
