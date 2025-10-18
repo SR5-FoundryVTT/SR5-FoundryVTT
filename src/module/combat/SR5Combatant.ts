@@ -1,4 +1,5 @@
 import { SR } from "../constants";
+import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 
 export class SR5Combatant extends Combatant<"base"> {
@@ -13,6 +14,11 @@ export class SR5Combatant extends Combatant<"base"> {
     async adjustInitiative(adjustment: number) {
         const newIni = Math.max((this.initiative ?? 0) + adjustment, 0);
         return this.update({ initiative: newIni });
+    }
+
+    static override migrateData(source: any) {
+        Migrator.migrate("Combatant", source);
+        return super.migrateData(source);
     }
 
     override async _preUpdate(

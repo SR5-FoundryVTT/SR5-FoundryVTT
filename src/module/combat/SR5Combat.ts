@@ -4,6 +4,7 @@ import { SR5Combatant } from "./SR5Combatant";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import SocketMessageData = Shadowrun.SocketMessageData;
+import { Migrator } from "../migrator/Migrator";
 
 /**
  * Foundry combat implementation for Shadowrun 5th Edition rules.
@@ -16,6 +17,11 @@ import SocketMessageData = Shadowrun.SocketMessageData;
 export class SR5Combat extends Combat<"base"> {
     get initiativePass(): number {
         return this.system.initiativePass;
+    }
+
+    static override migrateData(source: any) {
+        Migrator.migrate("Combat", source);
+        return super.migrateData(source);
     }
 
     /**
