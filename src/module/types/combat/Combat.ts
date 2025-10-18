@@ -1,7 +1,14 @@
+import { SR } from "@/module/constants";
+
 const { NumberField } = foundry.data.fields;
 
 export const CombatData = () => ({
-    initiativePass: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    initiativePass: new NumberField({
+        integer: true,
+        required: true,
+        nullable: false,
+        initial: SR.combat.INITIAL_INI_PASS
+    }),
 });
 
 export class CombatDM extends foundry.abstract.TypeDataModel<ReturnType<typeof CombatData>, Combat.Implementation> {
