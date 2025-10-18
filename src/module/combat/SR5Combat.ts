@@ -57,8 +57,7 @@ export class SR5Combat extends Combat<"base"> {
     }
 
     /**
-     * Use the given actor's token to get the combatant.
-     * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
+     * Helper method to get a combatant for a specific actor.
      */
     getActorCombatant(actor: SR5Actor): SR5Combatant | null {
         return this.getCombatantsByActor(actor)[0] ?? null;
