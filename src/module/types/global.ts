@@ -7,6 +7,7 @@ import { SR5Combatant } from "../combat/SR5Combatant";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { SR5Token } from "../token/SR5Token";
+import { SR5TokenDocument } from "../token/SR5TokenDocument";
 
 import { Translation } from '../utils/strings';
 
@@ -67,6 +68,7 @@ declare module "fvtt-types/configuration" {
         Sheet: typeof foundry.appv1.api.FormApplication;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredCombat<SubType extends Combat.SubType> {
         document: SR5Combat;
     }
@@ -228,6 +230,7 @@ declare module "fvtt-types/configuration" {
             getChatMessageContextOptions: (args0: any, args1: any) => void;
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
+            moveToken: (...args: Parameters<typeof SR5TokenDocument.moveToken>) => void;
         }
     }
 
@@ -266,6 +269,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.GeneralActionsPack": string;
         "shadowrun5e.MatrixActionsPack": string;
         "shadowrun5e.ICActionsPack": string;
+        "shadowrun5e.TokenAutoRunning": boolean;
     }
 }
 

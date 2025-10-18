@@ -65,9 +65,12 @@ export class SR5Combatant extends Combatant<"base"> {
 
     /** Prepares the data object for updating at the end of a combat round. */
     roundUpdateData() {
-        const passData = this.initPassUpdateData(0);
-        const roundData = { _id: this._id!, system: { coinFlip: Math.random() } } as const;
-
-        return foundry.utils.mergeObject(passData, roundData);
+        return {
+            _id: this._id!,
+            system: {
+                acted: false,
+                coinFlip: Math.random()
+            }
+        } as const;
     }
 }

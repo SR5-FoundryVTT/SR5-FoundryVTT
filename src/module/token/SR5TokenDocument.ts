@@ -1,4 +1,5 @@
-import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
+import { DeepReadonly } from 'fvtt-types/utils';
+import { SYSTEM_NAME, FLAGS } from '../constants';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 
 export class SR5TokenDocument extends TokenDocument {
@@ -36,22 +37,17 @@ export class SR5TokenDocument extends TokenDocument {
     }
 
     /**
-     * This method measures the distance a Token moves through the provided waypoints.
-     * If the token actor implements MovementActorData and the selected movement action is 'walk', it will change the movement
-     * action for each waypoint according to the rules for walking/running/sprinting.
+     * Measure movement path and assign a movement action ('walk' | 'run' | 'sprint') to each provided waypoint.
      *
-     * This method gets called many times, both when the user is measuring and while the token is actually moving.
-     * The bulk of the token movement logic happens in TokenDocument#_preUpdate and specifically in
-     * TokenDocument##preUpdateMovement.
-     * The private property SR5TokenDocument##movementInProgress is used to track if a user is currently measuring and planning
-     * a move or if the move is actually in progress.
-     * While a move is in progress we skip assigning movement actions, because this method gets called with multiple
-     * different sections of the route depending on the progress of the movement.
-     * This makes it impossible to accurately assign the correct movement action, causing the measured route on
-     * screen to rapidly change colors as sections get closer to the token.
-     *
-     * @param waypoints
-     * @param options
+     * Behavior:
+     * - Delegates mathematical measurement to TokenDocument.measureMovementPath and then annotates the original
+     *   waypoints with an action based on the actor's movement thresholds.
+     * - Only adjusts waypoint.action when:
+     *     - The token's actor exposes movement data,
+     *     - The current movementAction is 'walk' (the user is measuring a walking move),
+     *     - No movement is currently in progress (to avoid flicker while the token is actually moving).
+     * - Uses measured waypoint cost from the computed measurement. If a measured cost is unavailable the waypoint
+     *   is left unchanged.
      */
     override measureMovementPath(
         waypoints: TokenDocument.MeasuredMovementWaypoint[],
@@ -60,37 +56,63 @@ export class SR5TokenDocument extends TokenDocument {
         const measurement = super.measureMovementPath(waypoints, options);
 
         const characterMovementData = this.actor?.system.movement;
-        if (characterMovementData && this.movementAction === 'walk' && !this.#movementInProgress) {
-            const movementHistory = this.movementHistory;
-            let usedMovementCost = 0;
-            if (movementHistory?.length) {
-                const lastDestination = movementHistory.at(-1);
-                const currentOrigin = waypoints.at(0);
+        if (!characterMovementData || this.movementAction !== 'walk' || this.#movementInProgress) {
+            return measurement;
+        }
 
-                if (lastDestination!.x === currentOrigin!.x && lastDestination!.y === currentOrigin!.y) {
-                    usedMovementCost = movementHistory.reduce((prev, curr) => prev + (curr.cost ?? 0), 0);
-                }
-            }
+        const walkRate = characterMovementData.walk.value;
+        const runRate = characterMovementData.run.value;
 
-            const walkingRate = characterMovementData.walk.value;
-            const runningRate = characterMovementData.run.value;
+        for (let i = 0; i < waypoints.length; i++) {
+            const waypoint = waypoints[i];
+            const cost = measurement.waypoints[i].cost;
 
-            for (let i = 0; i < waypoints.length; i++) {
-                const waypoint = waypoints[i];
-                const measuredWaypoint = measurement.waypoints[i];
-                const movementCost = measuredWaypoint.cost + usedMovementCost;
+            if (!Number.isFinite(cost)) continue;
 
-                if (movementCost <= walkingRate) {
-                    waypoint.action = 'walk';
-                }
-                if (movementCost > walkingRate) {
-                    waypoint.action = 'run';
-                }
-                if (movementCost > runningRate) {
-                    waypoint.action = 'sprint';
-                }
+            if (cost > runRate) {
+                waypoint.action = 'sprint';
+            } else if (cost > walkRate) {
+                waypoint.action = 'run';
+            } else {
+                waypoint.action = 'walk';
             }
         }
+
         return measurement;
+    }
+
+    static async moveToken(
+        token: TokenDocument.Implementation,
+        movement: DeepReadonly<TokenDocument.MovementOperation>,
+        operation: Partial<foundry.abstract.types.DatabaseUpdateOperation>,
+        user: User.Implementation
+    ) {
+        if (game.user.id !== user.id) return;
+        if (!token.actor?.system.movement) return;
+        if (movement.constrainOptions.ignoreCost) return;
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) return;
+
+        const path = token.measureMovementPath(token.movementHistory);
+
+        if (path.cost > token.actor.system.movement.run.value) {
+            await token.actor.toggleStatusEffect("sr5running", { active: false });
+            await token.actor.toggleStatusEffect("sr5sprinting", { active: true });
+        } else if (path.cost > token.actor.system.movement.walk.value) {
+            await token.actor.toggleStatusEffect("sr5sprinting", { active: false });
+            await token.actor.toggleStatusEffect("sr5running", { active: true });
+        } else {
+            await token.actor.toggleStatusEffect("sr5running", { active: false });
+            await token.actor.toggleStatusEffect("sr5sprinting", { active: false });
+        }
+    }
+
+    override async clearMovementHistory() {
+        await super.clearMovementHistory();
+
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) return;
+
+        // Clear running/sprinting status effects when movement history is cleared.
+        await this.actor?.toggleStatusEffect("sr5running", { active: false });
+        await this.actor?.toggleStatusEffect("sr5sprinting", { active: false });
     }
 }

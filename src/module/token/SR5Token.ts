@@ -1,6 +1,6 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
-import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
 import { TrackType } from "../types/template/ConditionMonitors";
+import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
 
 export class SR5Token extends foundry.canvas.placeables.Token {
     override _drawBar(number: number, bar: PIXI.Graphics, data: NonNullable<TokenDocument.GetBarAttributeReturn>) {
@@ -30,7 +30,8 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         return super.findMovementPath(waypoints, options);
     }
 
-    static tokenConfig(app, html, data, options) {
+    static tokenConfig(app: any, html: HTMLElement, data: any, options: any) {
+        console.log(app, html, data, options);
         if (!RoutingLibIntegration.routingLibReady || !app.actor?.system?.movement) return;
 
         // Default it to true, so that it is enabled by default.

@@ -5,7 +5,7 @@ import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
 import { registerSystemSettings } from './settings';
-import { FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
+import { FLAGS, SR, SRStatus, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
@@ -153,8 +153,8 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(SR5Combat));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
-        // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
+        Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
@@ -379,7 +379,19 @@ ___________________
         // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
+        CONFIG.statusEffects.push(...SRStatus);
+
         CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
+
+        CONFIG.Actor.dataModels["character"] = Character;
+        CONFIG.Actor.dataModels["critter"] = Critter;
+        CONFIG.Actor.dataModels["ic"] = IC;
+        CONFIG.Actor.dataModels["spirit"] = Spirit;
+        CONFIG.Actor.dataModels["sprite"] = Sprite;
+        CONFIG.Actor.dataModels["vehicle"] = Vehicle;
+
+        CONFIG.Combat.dataModels["base"] = CombatDM;
+        CONFIG.Combatant.dataModels["base"] = CombatantDM;
 
         CONFIG.Item.dataModels["action"] = Action;
         CONFIG.Item.dataModels["ammo"] = Ammo;
@@ -406,16 +418,6 @@ ___________________
         CONFIG.Item.dataModels["spell"] = Spell;
         CONFIG.Item.dataModels["sprite_power"] = SpritePower;
         CONFIG.Item.dataModels["weapon"] = Weapon;
-    
-        CONFIG.Actor.dataModels["character"] = Character;
-        CONFIG.Actor.dataModels["critter"] = Critter;
-        CONFIG.Actor.dataModels["ic"] = IC;
-        CONFIG.Actor.dataModels["spirit"] = Spirit;
-        CONFIG.Actor.dataModels["sprite"] = Sprite;
-        CONFIG.Actor.dataModels["vehicle"] = Vehicle;
-
-        CONFIG.Combat.dataModels["base"] = CombatDM;
-        CONFIG.Combatant.dataModels["base"] = CombatantDM;
 
         CONFIG.time.turnTime = SR.combat.TURN_TIME_SECONDS;
         CONFIG.time.roundTime = SR.combat.ROUND_TIME_SECONDS;

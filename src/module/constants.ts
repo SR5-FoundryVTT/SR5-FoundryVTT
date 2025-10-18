@@ -67,6 +67,7 @@ export const FLAGS = {
     UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
     MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
+    TokenAutoRunning: 'TokenAutoRunning'
 } as const;
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -262,3 +263,25 @@ export const SR = {
         used: { essence: 1.25, avail: -4, cost: 0.75 },
     }
 } as const;
+
+export const SRStatus = [
+    {
+        id: 'sr5sprinting',
+        name: 'SR5.StatusEffects.Sprinting',
+        img: 'systems/shadowrun5e/dist/icons/status-effects/sprinting.svg',
+        system: { applyTo: 'test_all' },
+        changes: [
+            {key: "data.poll", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-2"},
+        ],
+    },
+    {
+        id: 'sr5running',
+        name: 'SR5.StatusEffects.Running',
+        img: 'systems/shadowrun5e/dist/icons/status-effects/running.svg',
+        system: { applyTo: 'test_all' },
+        changes: [
+            {key: "data.pool", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-2"},
+        ],
+    }
+] as const satisfies CONFIG.StatusEffect[];
+

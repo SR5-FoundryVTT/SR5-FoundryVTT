@@ -46,6 +46,8 @@
         "ShowSkillsWithDetailsDescription": "When set skill list display will mirror core rulebook style (italics, short attributes)",
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
+        "TokenAutoRunning": "Auto-Detect Running Movement",
+        "TokenAutoRunningDescription": "Automatically switch token movement mode to running when measured distance exceeds walking speed",
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
         "TokenRulerColorRunning": "Token Movement Running Color",
@@ -1416,6 +1418,10 @@
                 "Standard": "By default"
             },
             "Type": "Type"
+        },
+        "StatusEffects": {
+            "Running": "Running",
+            "Sprinting": "Sprinting"
         },
         "Stock": "Stock",
         "StreetCred": "Street Cred",
