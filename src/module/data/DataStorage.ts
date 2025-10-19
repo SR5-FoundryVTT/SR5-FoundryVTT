@@ -82,7 +82,7 @@ export const DataStorage = {
      */
     _setAsPlayer: async function (key: string, value: any) {
         console.debug('Shadowrun 5e | Requesting GM to set a value in global data storage.', key, value);
-        await SocketMessage.emitForGM(FLAGS.SetDataStorage, {key, value});
+        SocketMessage.emitForGM(FLAGS.SetDataStorage, { key, value });
     },
 
     /**

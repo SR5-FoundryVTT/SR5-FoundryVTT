@@ -594,7 +594,7 @@ ___________________
         if (!game.socket || !game.user) return;
         console.log('Registering Shadowrun5e system socket messages...');
         const hooks = {
-            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage.bind(SR5Combat)],
+            [FLAGS.DoCombatFunction]: [SR5Combat._handleSocketMessage.bind(SR5Combat)],
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(SuccessTestEffectsFlow)],
             [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(TeamworkTest)],
             [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)],
@@ -612,7 +612,11 @@ ___________________
 
             for (const handler of handlers) {
                 console.debug(`Shadowrun 5e | Handover system socket message to handler: ${handler.name}`);
-                await handler(message);
+                try {
+                    await handler(message);
+                } catch (error) {
+                    console.error(`Shadowrun 5e | Error occurred in socket message handler ${handler.name}`, error);
+                }
             }
         });
     }

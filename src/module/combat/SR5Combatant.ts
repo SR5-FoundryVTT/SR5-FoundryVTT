@@ -48,10 +48,11 @@ export class SR5Combatant extends Combatant<"base"> {
         await this.actor?.removeDefenseMultiModifier();
 
         // Manage progressive recoil based on whether they attacked last turn.
-        if (this.system.attackedLastTurn)
+        if (this.system.attackedLastTurn) {
             await this.actor?.clearProgressiveRecoil();
-        else
+        } else {
             await this.update({ system: { attackedLastTurn: false } });
+        }
     }
 
     /** Prepares the data object for updating at the end of an initiative pass. */

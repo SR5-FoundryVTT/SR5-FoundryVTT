@@ -1,10 +1,10 @@
 import { SocketMessage } from "../sockets";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Combatant } from "./SR5Combatant";
+import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import SocketMessageData = Shadowrun.SocketMessageData;
-import { Migrator } from "../migrator/Migrator";
 
 /**
  * Foundry combat implementation for Shadowrun 5th Edition rules.
@@ -50,16 +50,18 @@ export class SR5Combat extends Combat<"base"> {
     }
 
     /**
-     * Handles the socket message to trigger an initiative pass change.
+     * Handles socket messages to trigger combat functions remotely.
      */
-    static async _handleDoInitPassSocketMessage(message: SocketMessageData) {
-        if (!Object.hasOwn(message.data, "id") || typeof message.data.id !== "string") {
-            console.error(
-                `SR5Combat Socket Message ${FLAGS.DoInitPass} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`
-            );
-            return;
-        }
-        return game.combats.get(message.data.id)?.handleIniPass();
+    static async _handleSocketMessage(message: SocketMessageData) {
+        const { id, func: fnName } = message.data ?? {};
+        if (typeof id !== 'string' || typeof fnName !== 'string') return;
+        if (fnName !== 'nextTurn' && fnName !== 'previousTurn') return;
+
+        const combat = game.combats.get(id);
+        const method = combat?.[fnName];
+        if (typeof method !== 'function') return;
+
+        return await method.call(combat);
     }
 
     /**
@@ -80,14 +82,16 @@ export class SR5Combat extends Combat<"base"> {
     }
 
     /**
-     * Handle the change of an initiative pass. This needs owner permissions on the combat document.
+     * Move to the previous turn in the combat.
      */
-    async handleIniPass() {
-        // Collect all combatants' initiative changes for a singular update.
-        const initiativePass = this.initiativePass + 1;
-        const combatants = this.combatants.map((c) => c.initPassUpdateData(initiativePass));
+    override async previousTurn(): Promise<this> {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'previousTurn' });
+            return this;
+        }
 
-        await this.update({ turn: 0, combatants, system: { initiativePass } });
+        await this.combatant?.update({ system: { acted: false } });
+        return super.previousTurn();
     }
 
     /**
@@ -95,24 +99,33 @@ export class SR5Combat extends Combat<"base"> {
      * initiative passes and combat turns.
      */
     override async nextTurn(): Promise<this> {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextTurn' });
+            return this;
+        }
+
         const nextTurn = this.nextTurnPosition();
+        const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
 
-        // Case 1: Just step from one combatant to the next in the current pass.
+        // Step to next combatant in current pass
         if (nextTurn < this.turns.length) {
-            await this.update({ turn: nextTurn });
+            const combatants = this.combatant ? [{ _id: this.combatant.id!, system: { acted: true } }] : [];
+            await this.update({ turn: nextTurn, combatants }, { direction: 1, worldTime: { delta: advanceTime } });
             return this;
         }
 
-        // Case 2: End of the pass, but another pass is needed.
-        if (this.canDoIniPass(nextTurn)) {
-            if (!game.user?.isGM)
-                this._requestInitiativePassFromGM();
-            else
-                await this.handleIniPass();
+        // End of pass, check whether another pass is needed
+        if (this.combatants.some((c) => CombatRules.initAfterPass(c.initiative ?? 0) > 0)) {
+            const initiativePass = this.initiativePass + 1;
+            const combatants = this.combatants.map((c) => c.initPassUpdateData(initiativePass));
+            await this.update(
+                { turn: 0, combatants, system: { initiativePass } },
+                { diff: false, direction: 1, worldTime: { delta: advanceTime } }
+            );
             return this;
         }
 
-        // Case 3: End of the round, no more passes needed.
+        // End of round
         return this.nextRound();
     }
 
@@ -121,26 +134,16 @@ export class SR5Combat extends Combat<"base"> {
      */
     nextTurnPosition(): number {
         for (const [turnInPass, combatant] of this.turns.entries()) {
-            // Skip combatants who have already acted in this pass.
-            if (this.turn !== null && turnInPass <= this.turn) continue;
+            // Skip the current combatant.
+            if (combatant.id === this.combatant?.id) continue;
             // Skip defeated combatants if the setting is active.
-            if (this.settings.skipDefeated && combatant.defeated) continue;
+            if (this.settings.skipDefeated && combatant.isDefeated) continue;
 
             if (combatant.canAct()) return turnInPass;
         }
 
         // The current turn is the last undefeated combatant, so go to the end.
         return this.turns.length;
-    }
-
-    /**
-     * Determine whether the current combat situation needs and can have another initiative pass.
-     */
-    canDoIniPass(nextTurn: number): boolean {
-        // Only consider a new pass if we are at the end of the current turn order.
-        if (nextTurn < this.turns.length) return false;
-        // A new pass is needed if at least one combatant will have a positive initiative score.
-        return this.combatants.some((c) => CombatRules.initAfterPass(c.initiative ?? 0) > 0);
     }
 
     /**
@@ -158,12 +161,12 @@ export class SR5Combat extends Combat<"base"> {
      * At the start of a new round, reset initiatives and roll for combatants.
      */
     protected override async _onStartRound(context: Combat.RoundEventContext) {
+        await this.update({ system: { initiativePass: SR.combat.INITIAL_INI_PASS } });
         await this.resetAll();
+        await this.rollForActors({ updateTurn: false });
 
-        const combatants = this.combatants.map((c) => c.roundUpdateData());
-        await this.update({ turn: 0, combatants, system: { initiativePass: SR.combat.INITIAL_INI_PASS } });
+        await this.update({ turn: 0, combatants: this.combatants.map((c) => c.roundUpdateData()) });
 
-        await this.rollForActors({updateTurn: false});
         return super._onStartRound(context);
     }
 
@@ -174,11 +177,6 @@ export class SR5Combat extends Combat<"base"> {
         await combatant.turnUpdate(this.initiativePass);
 
         return super._onStartTurn(combatant, context);
-    }
-
-    protected override async _onEndTurn(combatant: Combatant.Implementation, context: Combat.TurnEventContext) {
-        await combatant.update({system: { acted: true }});
-        return super._onEndTurn(combatant, context);
     }
 
     /**
@@ -222,12 +220,5 @@ export class SR5Combat extends Combat<"base"> {
     private async rollForActors(options?: Combat.InitiativeOptions) {
         const rollForAll = !game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat);
         return rollForAll ? this.rollAll(options) : this.rollNPC(options);
-    }
-
-    /**
-     * Emits a socket message to the GM to handle the initiative pass change.
-     */
-    private _requestInitiativePassFromGM(): void {
-        SocketMessage.emitForGM(FLAGS.DoInitPass, { id: this.id });
     }
 }

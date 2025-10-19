@@ -217,7 +217,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param effectsData The effects data to be applied;
      */
     async _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: SR5ActiveEffect[]) {
-        await SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, { actorUuid: actor.uuid, effectsData });
+        SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, { actorUuid: actor.uuid, effectsData });
     }
 
     /**
@@ -227,10 +227,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @returns 
      */
     static async _handleCreateTargetedEffectsSocketMessage(message: Shadowrun.SocketMessageData) {
-        if (!message.data.hasOwnProperty('actorUuid') && !message.data.hasOwnProperty('effectsData')) {
-            console.error(`Shadowrun 5e | ${this.name} Socket Message is missing necessary properties`, message);
-            return;
-        }
+        if (!Object.hasOwn(message.data, 'actorUuid') && !Object.hasOwn(message.data, 'effectsData'))
+            return console.error(`Shadowrun 5e | ${this.name} Socket Message is missing necessary properties`, message);
 
         if (!message.data.effectsData.length) return;
 

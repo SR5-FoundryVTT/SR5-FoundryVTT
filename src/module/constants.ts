@@ -35,9 +35,7 @@ export const FLAGS = {
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',
-    DoInitPass: 'doInitPass',
-    DoNextRound: 'doNextRound',
-    DoNewActionPhase: 'doNewActionPhase',
+    DoCombatFunction: 'doCombatFunction',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
     TokenHealthBars: 'tokenHealthBars',
@@ -82,14 +80,14 @@ export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {
     'km': 1000,
     'kilometers': 1000,
     'kilometer': 1000,
-};
+} as const;
 
 export const DEFAULT_ROLL_NAME = 'Roll';
 export const LENGTH_UNIT = 'm';
 export const SKILL_DEFAULT_NAME = '';
 export const DEFAULT_ID_LENGTH = 16;
 
-export const SR5_APPV2_CSS_CLASS = "sr5v2" as const;
+export const SR5_APPV2_CSS_CLASS = "sr5v2";
 
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 export const SR = {
