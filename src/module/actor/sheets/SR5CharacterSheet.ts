@@ -239,7 +239,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
 
     protected override async _renderHTML(content, options) {
         const parts = await super._renderHTML(content, options);
-        const matrixRightSideContent = parts.matrix.querySelector("section.content.matrix-right-tab-content");
+        const matrixRightSideContent = parts.matrix?.querySelector("section.content.matrix-right-tab-content");
         if (matrixRightSideContent) {
             this.moveTabs(SR5CharacterSheet.TABS.matrixRight.tabs, parts, matrixRightSideContent);
         }
