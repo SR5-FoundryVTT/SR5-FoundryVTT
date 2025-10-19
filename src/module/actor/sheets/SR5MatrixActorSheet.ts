@@ -1,4 +1,3 @@
-import { MatrixNetworkHackingApplication } from '../../apps/matrix/MatrixNetworkHackingApplication';
 import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { Helpers } from "../../helpers";
 import { SR5Item } from '../../item/SR5Item';
@@ -324,15 +323,6 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             progressBar.remove();
             ui.notifications.info(game.i18n.localize(`SR5.Notifications.AddDevicesToPAN.FinishedAddingItems`));
         }
-    }
-
-    /**
-     * Handle user requesting to show the matrix network hacking application.
-     * @param event Any pointer event
-     */
-    static async #showMatrixNetworkSelection(this: SR5MatrixActorSheet, event) {
-        const app = new MatrixNetworkHackingApplication(this.document);
-        app.render(true);
     }
 
     /**
