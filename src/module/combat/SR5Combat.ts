@@ -108,20 +108,30 @@ export class SR5Combat extends Combat<"base"> {
         const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
 
         // Step to next combatant in current pass
-        if (nextTurn < this.turns.length) {
+        if (nextTurn !== null) {
             const combatants = this.combatant ? [{ _id: this.combatant.id!, system: { acted: true } }] : [];
             await this.update({ turn: nextTurn, combatants }, { direction: 1, worldTime: { delta: advanceTime } });
             return this;
         }
 
         // End of pass, check whether another pass is needed
-        if (this.combatants.some((c) => CombatRules.initAfterPass(c.initiative ?? 0) > 0)) {
+        // Check if any combatant (excluding defeated if setting enabled) has initiative left for another pass
+        const hasNextPass = this.combatants.some((combatant) => {
+            if (this.settings.skipDefeated && combatant.isDefeated) return false;
+            return combatant.initiative != null && CombatRules.initAfterPass(combatant.initiative) > 0;
+        });
+
+        if (hasNextPass) {
             const initiativePass = this.initiativePass + 1;
-            const combatants = this.combatants.map((c) => c.initPassUpdateData(initiativePass));
+            const combatants = this.combatants.map((c) => c.initPassUpdateData());
+            const firstTurn = this.settings.skipDefeated ? this.turns.findIndex((c) => !c.isDefeated) : 0;
             await this.update(
-                { turn: 0, combatants, system: { initiativePass } },
+                { turn: firstTurn >= 0 ? firstTurn : null, combatants, system: { initiativePass } },
                 { diff: false, direction: 1, worldTime: { delta: advanceTime } }
             );
+
+            if (this.combatant)
+                await this._onStartTurn(this.combatant, { turn: 0, round: this.round, skipped: false });
             return this;
         }
 
@@ -132,7 +142,7 @@ export class SR5Combat extends Combat<"base"> {
     /**
      * Return the position in the current initiative pass of the next undefeated combatant.
      */
-    nextTurnPosition(): number {
+    nextTurnPosition(): number | null {
         for (const [turnInPass, combatant] of this.turns.entries()) {
             // Skip the current combatant.
             if (combatant.id === this.combatant?.id) continue;
@@ -143,7 +153,7 @@ export class SR5Combat extends Combat<"base"> {
         }
 
         // The current turn is the last undefeated combatant, so go to the end.
-        return this.turns.length;
+        return null;
     }
 
     /**
@@ -165,7 +175,8 @@ export class SR5Combat extends Combat<"base"> {
         await this.resetAll();
         await this.rollForActors({ updateTurn: false });
 
-        await this.update({ turn: 0, combatants: this.combatants.map((c) => c.roundUpdateData()) });
+        const firstTurn = this.settings.skipDefeated ? this.turns.findIndex(c => !c.isDefeated) : 0;
+        await this.update({ turn: firstTurn >= 0 ? firstTurn : null, combatants: this.combatants.map((c) => c.roundUpdateData()) });
 
         return super._onStartRound(context);
     }
@@ -174,7 +185,7 @@ export class SR5Combat extends Combat<"base"> {
      * When a combatant's turn starts, apply necessary changes.
      */
     protected override async _onStartTurn(combatant: Combatant.Implementation, context: Combat.TurnEventContext) {
-        await combatant.turnUpdate(this.initiativePass);
+        if (!context.skipped) await combatant.turnUpdate(this.initiativePass);
 
         return super._onStartTurn(combatant, context);
     }
