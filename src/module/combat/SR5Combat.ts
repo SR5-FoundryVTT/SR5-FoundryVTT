@@ -53,7 +53,7 @@ export class SR5Combat extends Combat<"base"> {
      * Handles socket messages to trigger combat functions remotely.
      */
     static async _handleSocketMessage(message: SocketMessageData) {
-        const { id, func: fnName } = message.data ?? {};
+        const { id, fnName } = message.data ?? {};
         if (typeof id !== 'string' || typeof fnName !== 'string') return;
         if (fnName !== 'nextTurn' && fnName !== 'previousTurn') return;
 
