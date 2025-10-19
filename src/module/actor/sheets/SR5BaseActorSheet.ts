@@ -236,7 +236,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'misc', label: 'Misc', cssClass: '' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]
         },
     }

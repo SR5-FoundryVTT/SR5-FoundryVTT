@@ -123,7 +123,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
                 { id: 'description', label: 'Description', cssClass: '' },
-                { id: 'misc', label: 'Misc', cssClass: '' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.ActorSheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
     }

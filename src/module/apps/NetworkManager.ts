@@ -17,6 +17,9 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         details: {
             template: SheetFlow.templateBase('matrix/network-manager/details')
         },
+        footer: {
+            template: SheetFlow.templateBase('matrix/network-manager/footer')
+        },
     }
 
     static override DEFAULT_OPTIONS = {
@@ -34,7 +37,6 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         },
         actions: {
             connectToNetwork: NetworkManager.#connectToNetwork,
-            disconnectNetwork: NetworkManager.#disconnectNetwork,
             inviteMark: NetworkManager.#handleMarkInvite,
             hackOnTheFly: NetworkManager.#handleHackOnTheFly,
             bruteForce: NetworkManager.#handleBruteForce,
@@ -99,6 +101,9 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         const test = await TestCreator.fromItem(action, this.actor);
         if (!test) return;
 
+        await this.actor.sheet?.render();
+        await this.close();
+
         await test.addTarget(target);
         await test.execute();
     }
@@ -115,8 +120,6 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         const targetUuid = SheetFlow.closestUuid(event.target);
         if (!targetUuid) return;
         await this.executeMarkPlacementActionTest(targetUuid, 'brute_force');
-        await this.actor.sheet?.render();
-        await this.render();
     }
 
     /**
@@ -131,8 +134,6 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         const targetUuid = SheetFlow.closestUuid(event.target);
         if (!targetUuid) return;
         await this.executeMarkPlacementActionTest(targetUuid, 'hack_on_the_fly');
-        await this.actor.sheet?.render();
-        await this.render();
     }
 
     /**
@@ -151,7 +152,8 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         if (!network) return;
 
         await MatrixNetworkFlow.AskForNetworkMarkInvite(this.actor, network);
-        await this.render();
+
+        await this.close();
     }
 
     static async #connectToNetwork(this: NetworkManager, event) {
@@ -166,14 +168,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
 
         await this.actor.connectNetwork(network);
         await this.actor.sheet?.render();
-        await this.render();
-    }
 
-    static async #disconnectNetwork(this: NetworkManager, event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        await this.actor.disconnectNetwork();
-        this.render();
+        await this.close();
     }
 }

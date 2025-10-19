@@ -59,7 +59,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                 { id: 'social', label: 'Social', cssClass: '' },
                 { id: 'bio', label: 'Bio', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'misc', label: 'Misc', cssClass: '' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.ActorSheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
         matrixRight: {

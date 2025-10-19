@@ -16,13 +16,19 @@
 
         <div class="list-item-col mark-input-col">
             {{#if @root.isEditMode}}
-                <input type="number" class="mark-input" value="{{item.marks}}" min="0" max="3">
+                <input type="number" class="mark-input short skinny" value="{{item.marks}}" min="0" max="3">
             {{else}}
-                <a class="hover-show-button"
-                   data-action="removeOneMark"
-                   data-tooltip="SR5.Labels.ActorSheet.RemoveOneMark">
-                    <i class="fas fa-minus-square"></i>
-                </a>
+                {{#if item.marks}}
+                    <a class="hover-show-button"
+                       data-action="removeOneMark"
+                       data-tooltip="SR5.Labels.ActorSheet.RemoveOneMark">
+                        <i class="fas fa-minus-square"></i>
+                    </a>
+                {{else}}
+                    <a class="hover-show-button" data-action="removeMarks">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                {{/if}}
                 <label class="marks-label">{{item.marks}}</label>
                 <a class="hover-show-button"
                    data-action="addOneMark"
@@ -32,11 +38,8 @@
             {{/if}}
         </div>
 
-        <div class="list-item-icons skinny-icons">
-            <a data-action="removeMarks" data-item-id="{{item.document.uuid}}">
-                <i class="fas fa-trash"></i>
-            </a>
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connect-network-icon.hbs' item }}
+        <div class="list-item-icons">
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connect-network-icon.hbs' item.document }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connected-icons-toggle.hbs' item }}
         </div>
     </div>

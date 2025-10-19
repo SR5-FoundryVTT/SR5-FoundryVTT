@@ -1999,12 +1999,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Retrieve all matrix devices of this actor that are equipped and set to wireless.
      */
     wirelessDevices() {
-        return this.items.filter(item => item.isMatrixDevice && item.isEquipped() && item.isWireless());
+        return this.items.filter(item => item.isMatrixDevice && item.isEquipped() && item.isWireless()) ?? [];
     }
 
     hasWirelessDevices() {
-        if (!this.wirelessDevices) return false;
-        return this.wirelessDevices.length > 0;
+        return this.wirelessDevices().length > 0;
     }
 
     matrixData(this: SR5Actor) {

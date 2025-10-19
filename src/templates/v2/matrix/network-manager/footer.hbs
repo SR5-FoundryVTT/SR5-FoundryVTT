@@ -1,0 +1,9 @@
+<footer class="sheet-footer">
+    <div class="basic-row">
+        <label>{{localize "SR5.NetworkManager.ConnectedTo"}}</label>
+        <a data-action="openUuid" data-uuid="{{connected_network.uuid}}">{{connected_network.name}}</a>
+        {{#if (isType connected_network 'host')}}{{#if grid}}
+            <label>(<a data-uuid="{{grid.uuid}}" data-action="openUuid">{{grid.name}}</a>)</label>
+        {{/if}}{{/if}}
+    </div>
+</footer>

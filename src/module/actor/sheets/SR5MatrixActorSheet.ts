@@ -60,15 +60,14 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         actions: {
             toggleConnectedMatrixIcons: SR5MatrixActorSheet.#toggleConnectedMatrixIcons,
             selectMatrixTarget: SR5MatrixActorSheet.#selectMatrixTarget,
-            connectToNetwork: SR5MatrixActorSheet.#connectToMatrixNetwork,
+            openNetworkManager: SR5MatrixActorSheet.#manageNetwork,
             rebootPersona: SR5MatrixActorSheet.#rebootPersonaDevice,
-            connectToMarkedNetwork: SR5MatrixActorSheet.#connectToMarkedNetwork,
+            connectToNetwork: SR5MatrixActorSheet.#connectToNetwork,
             disconnectNetwork: SR5MatrixActorSheet.#disconnectNetwork,
             togglePersonaRunningSilent: SR5MatrixActorSheet.#togglePersonaRunningSilent,
             addOneMark: SR5MatrixActorSheet.#addOneMark,
             removeOneMark: SR5MatrixActorSheet.#removeOneMark,
             setupPAN: SR5MatrixActorSheet.#addAllEquippedWirelessDevicesToPAN,
-            refreshTargets: SR5MatrixActorSheet.#refreshTargets,
             removeMarks: SR5MatrixActorSheet.#deleteMarks,
             clearAllMarks: SR5MatrixActorSheet.#clearAllMarks,
         }
@@ -80,11 +79,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         matrixLeft: {
             initial: 'networkIcons',
             tabs: [
-                { id: 'programs', label: 'Programs', cssClass: ''},
                 { id: 'networkIcons', label: 'Icons', cssClass: ''},
                 { id: 'markedIcons', label: 'Marked', cssClass: ''},
                 { id: 'ownedIcons', label: 'Owned', cssClass: ''},
-
+                { id: 'programs', label: '', icon: 'fas fa-server', cssClass: 'skinny', tooltip: 'SR5.Programs'},
             ]
         },
         matrixRight: {
@@ -265,7 +263,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     /**
      * Allow the user to select a matrix network to connect to.
      */
-    static async #connectToMatrixNetwork(this: SR5MatrixActorSheet, event) {
+    static async #manageNetwork(this: SR5MatrixActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -447,15 +445,6 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     }
 
     /**
-     * Manual user interaction to refresh list of show matrix targets.
-     */
-    static async #refreshTargets(this: SR5MatrixActorSheet, event) {
-        event.stopPropagation();
-
-        this.render();
-    }
-
-    /**
      * Restructure flat list of marked documents into a hierarchical list showing personas on top level and marked
      * icons below their personas, even if those are unmarked.
      */
@@ -556,7 +545,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             return;
         }
 
-        const uuid = $(event.target).closest('a').data().itemId;
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
@@ -573,7 +562,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             return;
         }
 
-        const uuid = $(event.target).closest('a').data().itemId;
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
@@ -590,7 +579,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             return;
         }
 
-        const uuid = $(event.target).closest('a').data().itemId;
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         const userConsented = await Helpers.confirmDeletion();
@@ -618,10 +607,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      *
      * @param event Any interaction action
      */
-    static async #connectToMarkedNetwork(this: SR5MatrixActorSheet, event) {
+    static async #connectToNetwork(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
 
-        const uuid = $(event.target).closest('a').data().itemId;
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         const target = SheetFlow.fromUuidSync(uuid) as SR5Item;

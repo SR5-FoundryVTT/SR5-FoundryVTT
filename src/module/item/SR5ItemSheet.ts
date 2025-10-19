@@ -156,6 +156,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             templates: SheetFlow.templateListItem('slaved_icon'),
             scrollable: ['.scrollable']
         },
+        sinNetworks: {
+            template: SheetFlow.templateBase('item/tabs/sin-networks'),
+            scrollable: ['.scrollable']
+        },
         licenses: {
             template: SheetFlow.templateBase('item/tabs/licenses'),
             templates: SheetFlow.templateListItem('license'),
@@ -189,6 +193,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'description', label: 'Description', cssClass: '' },
                 { id: 'details', label: 'Details', cssClass: '' },
                 { id: 'network', label: 'Network', cssClass: '' },
+                { id: 'sinNetworks', label: 'Networks', cssClass: '' },
                 { id: 'weaponAmmo', label: 'Ammo', cssClass: '' },
                 { id: 'weaponModifications', label: 'Mods', cssClass: '' },
                 { id: 'licenses', label: 'Licenses', cssClass: '' },
@@ -229,6 +234,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
         if (!item.isType('sin')) {
             delete parts['licenses'];
+            delete parts['sinNetworks'];
         }
         return parts;
     }
@@ -561,6 +567,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!uuid) return;
 
         await SINFlow.removeNetwork(this.item, uuid);
+    }
+
+    static async #removeAllNetworks(this: SR5ItemSheet, event) {
+        event.preventDefault();
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await SINFlow.removeAllNetworks(this.item);
     }
 
     static async #addItemQty(this: SR5ItemSheet, event) {

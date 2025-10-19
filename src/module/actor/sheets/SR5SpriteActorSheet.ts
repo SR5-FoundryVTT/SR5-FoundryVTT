@@ -26,7 +26,7 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
                 { id: 'description', label: 'Description', cssClass: '' },
-                { id: 'misc', label: 'Misc', cssClass: '' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.ActorSheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
         matrixRight: {

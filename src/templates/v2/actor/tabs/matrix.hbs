@@ -56,24 +56,20 @@
                     </div>
                 {{/if}}
                 <div class="list-item list-item-header">
-                    <div class="basic-row">
-                        <a data-action="connectToNetwork" data-tooltip="SR5.Labels.ActorSheet.ManageNetwork">
-                            <i class="fas fa-network-wired"></i>
-                        </a>
+                    <div class="list-item-start">
                         {{#if vehicle.master}}
                             <label>{{localize "SR5.Labels.ActorSheet.ConnectedTo"}}:&nbsp;</label>
-                            <a data-action="openUuid" data-uuid="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
-                            <a data-action="removeMaster" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                                <i class="fas fa-right-from-bracket"></i>
-                            </a>
+                            <div class="document-img-name">
+                                {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" network }}
+                                <a data-action="openUuid" data-uuid="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
+                            </div>
                         {{else}}
                             {{#if network}}
                                 <label>{{localize "SR5.Labels.ActorSheet.ConnectedTo"}}:&nbsp;</label>
-                                <a data-action="openUuid" data-uuid="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
-                                <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>
-                                <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
-                                    <i class="fas fa-right-from-bracket"></i>
-                                </a>
+                                <div class="document-img-name">
+                                    {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" network }}
+                                    <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                                </div>
                             {{else}}
                                 <label>{{localize "SR5.Labels.ActorSheet.NoNetwork"}}</label>
                                 {{#if (isType actor 'vehicle')}}
@@ -83,6 +79,20 @@
                                 {{/if}}
                             {{/if}}
                         {{/if}}
+                    </div>
+                    <div class="list-item-icons">
+                        {{#if vehicle.master}}
+                            <a data-action="removeMaster" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                                <i class="fas fa-right-from-bracket"></i>
+                            </a>
+                        {{else if network}}
+                            <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                                <i class="fas fa-right-from-bracket"></i>
+                            </a>
+                        {{/if}}
+                        {{#unless (or (isType network 'host') (isType vehicle.master 'host'))}}
+                            <a data-action="openNetworkManager" data-tooltip="SR5.OpenNetworkManager"><i class="fas fa-network-wired"></i></a>
+                        {{/unless}}
                     </div>
                 </div>
                 {{tabGroup matrixLeftTabs}}

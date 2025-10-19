@@ -292,7 +292,7 @@
 
             {{#if @root.isEditMode}}
                 <div class="basic-row">
-                    <label>{{localize "SR5.Visible"}}
+                    <label>{{localize "SR5.Labels.Sheet.Visible"}}
                         {{formInput systemFields.matrix.fields.visible value=source.system.matrix.visible
                                     rootId=rootId disabled=@root.isPlayMode}}
                     </label>
@@ -300,9 +300,9 @@
             {{else}}
                 <label>
                     {{#if system.matrix.visible}}
-                        {{localize "SR5.Visible"}}
+                        {{localize "SR5.Labels.Sheet.Visible"}}
                     {{else}}
-                        {{localize "SR5.NotVisible"}}
+                        {{localize "SR5.Labels.Sheet.NotVisible"}}
                     {{/if}}
                 </label>
             {{/if}}
@@ -322,7 +322,7 @@
 
             {{#if @root.isEditMode}}
                 <div class="basic-row">
-                    <label>{{localize "SR5.Visible"}}
+                    <label>{{localize "SR5.Labels.Sheet.SheetVisible"}}
                         {{formInput systemFields.matrix.fields.visible value=source.system.matrix.visible
                                     rootId=rootId disabled=@root.isPlayMode}}
                     </label>
@@ -330,9 +330,9 @@
             {{else}}
                 <label>
                     {{#if system.matrix.visible}}
-                        {{localize "SR5.Visible"}}
+                        {{localize "SR5.Labels.Sheet.Visible"}}
                     {{else}}
-                        {{localize "SR5.NotVisible"}}
+                        {{localize "SR5.Labels.Sheet.NotVisible"}}
                     {{/if}}
                 </label>
             {{/if}}

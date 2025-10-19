@@ -40,7 +40,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
                 { id: 'magic', label: 'Magic', cssClass: '' },
                 { id: 'bio', label: 'Bio', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'misc', label: 'Misc', cssClass: '' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.ActorSheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
     }

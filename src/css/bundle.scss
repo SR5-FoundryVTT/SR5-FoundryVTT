@@ -1474,6 +1474,10 @@ input[type='text'].display {
                     background: $light-2;
                     box-shadow: 0 0 5px 5px rgba($white, 0.2);
                 }
+                &.skinny {
+                    flex: 0;
+                    padding: 0 0.5rem;
+                }
             }
         }
     }
@@ -2047,6 +2051,9 @@ input[type='text'].display {
                 }
                 .list-item-image-target {
                     content: url('icons/redist/target.svg');
+                }
+                .list-item-image-connect {
+                    content: url('icons/redist/network.svg');
                 }
             }
         }
