@@ -2555,6 +2555,7 @@
         "Tooltips": {
             "ToggleEditMode": "Toggle Edit Mode",
             "Actor": {
+                "Blitz": "Use a point of Edge to roll the Maximum (5) number of dice for initiative",
                 "ConnectNetwork": "Enter this host/grid",
                 "Critter": "Allow the use of critter powers",
                 "DefaultCategoryVisibility": "Show item categories even if no item has been added to them",

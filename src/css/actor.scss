@@ -130,8 +130,15 @@
             align-self: center;
         }
 
+        // animate a color change for when blitz is active to make sure people uncheck it if needed
         .blitz-active {
-            color: lighten($matrix-green, 30%);
+            animation: blitzShine 3s linear infinite;
+        }
+
+        @keyframes blitzShine {
+            0% { color: $white; }
+            50% { color: $edge; }
+            100% { color: $white; }
         }
 
         .initiative-col {

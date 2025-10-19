@@ -85,11 +85,11 @@
                 <div>
                     <div class="list-item">
                         <div class="list-item-start">
-                            <label>{{localize "SR5.Vehicle.ControlMode"}}</label>
+                            <label style="text-wrap: nowrap;">{{localize "SR5.Vehicle.ControlMode"}}</label>
                         </div>
-                        <div class="list-item-col thicc-col">
-                            {{formInput systemFields.controlMode value=source.system.controlMode
-                                        classes="short" localize=true disabled=(not vehicle.driver) }}
+                        <div class="list-item-start">
+                            {{formInput systemFields.controlMode value=system.controlMode
+                                        classes="short sr5-select" localize=true }}
                         </div>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                                    data-tooltip="SR5.Labels.ActorSheet.RemoveOneService">
                                     <i class="fas fa-minus-square"></i>
                                 </a>
-                                <label>{{system.services}}</label>
+                                <label style="font-size: 1.1rem">{{system.services}}</label>
                                 <a class="hover-show-button"
                                    data-action="addOneService"
                                    data-tooltip="SR5.Labels.ActorSheet.AddOneService">
