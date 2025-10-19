@@ -104,7 +104,7 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
-        const nextTurn = this.nextTurnPosition();
+        let nextTurn = this.nextTurnPosition();
         const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
 
         // Step to next combatant in current pass
@@ -114,24 +114,26 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
-        // End of pass, check whether another pass is needed
-        // Check if any combatant (excluding defeated if setting enabled) has initiative left for another pass
-        const hasNextPass = this.combatants.some((combatant) => {
-            if (this.settings.skipDefeated && combatant.isDefeated) return false;
-            return combatant.initiative != null && CombatRules.initAfterPass(combatant.initiative) > 0;
+        // End of initiative pass: check if another pass is needed
+        // Determine if any combatant has enough initiative for another pass
+        nextTurn = this.turns.findIndex((c) => {
+            if (this.settings.skipDefeated && c.isDefeated) return false;
+            return c.initiative != null && CombatRules.initAfterPass(c.initiative) > 0;
         });
 
-        if (hasNextPass) {
+        // Start a new initiative pass
+        if (nextTurn !== -1) {
             const initiativePass = this.initiativePass + 1;
             const combatants = this.combatants.map((c) => c.initPassUpdateData());
-            const firstTurn = this.settings.skipDefeated ? this.turns.findIndex((c) => !c.isDefeated) : 0;
             await this.update(
-                { turn: firstTurn >= 0 ? firstTurn : null, combatants, system: { initiativePass } },
+                { turn: nextTurn, combatants, system: { initiativePass } },
                 { diff: false, direction: 1, worldTime: { delta: advanceTime } }
             );
 
-            if (this.combatant)
-                await this._onStartTurn(this.combatant, { turn: 0, round: this.round, skipped: false });
+            // Trigger start-of-turn logic for the new combatant
+            if (this.combatant) {
+                await this._onStartTurn(this.combatant, { turn: nextTurn, round: this.round, skipped: false });
+            }
             return this;
         }
 
