@@ -56,11 +56,11 @@ export class SR5Combatant extends Combatant<"base"> {
     }
 
     /** Prepares the data object for updating at the end of an initiative pass. */
-    initPassUpdateData(initiativePass: number) {
+    initPassUpdateData() {
         return {
             _id: this._id!,
             system: { acted: false },
-            initiative: CombatRules.initAfterPass(this.initiative ?? 0),
+            initiative: this.initiative ? CombatRules.initAfterPass(this.initiative) : null,
         } as const;
     }
 
