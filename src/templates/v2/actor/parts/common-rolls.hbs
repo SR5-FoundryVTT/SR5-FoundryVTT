@@ -30,7 +30,7 @@
             <a data-action="toggleChaseEnvironment" >
                 <i {{#if (eq system.environment 'handling')}}
                 data-tooltip="SR5.Vehicle.Environments.Handling"
-                class="far fa-steering-wheel"
+                class="far fa-hands-holding-circle"
                 {{else}}
                 data-tooltip="SR5.Vehicle.Environments.Speed"
                 class="far fa-gauge"
@@ -49,16 +49,22 @@
             </a>
         {{/if}}
         {{#if system.matrix}}
-            <a data-action="togglePersonaRunningSilent" >
-                <i {{#if system.matrix.running_silent}}
+            {{#if (or network vehicle.master)}}
+                <a data-action="togglePersonaRunningSilent" >
+                    <i {{#if system.matrix.running_silent}}
                     data-tooltip="SR5.RunningSilent"
                     class="fa-duotone fa-wifi-fair"
                     {{else}}
                     data-tooltip="SR5.Labels.ActorSheet.DisplayingPersona"
                     class="fas fa-wifi"
                     {{/if}}
-                ></i>
-            </a>
+                    ></i>
+                </a>
+            {{else}}
+                <a data-action="openNetworkManager" data-tooltip="SR5.OpenNetworkManager">
+                    <i class="fa-duotone fa-wifi-exclamation"></i>
+                </a>
+            {{/if}}
         {{/if}}
         {{#if isSpirit}}
             {{#if summoner}}

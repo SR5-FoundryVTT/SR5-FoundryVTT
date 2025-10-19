@@ -5,12 +5,38 @@
                 <label>{{localize "SR5.NetworkManager.AvailableNetworks"}}</label>
             </div>
             <div class="list-item-col midd-col">
-                {{localize "SR5.NetworkManager.NetworkType"}}
+                <label>
+                    {{localize "SR5.NetworkManager.NetworkType"}}
+                </label>
             </div>
             <div class="list-item-icons">
                 <a data-action="refresh"><i class="fas fa-rotate"></i></a>
             </div>
         </div>
+        {{#if (isType actor 'vehicle')}}
+            {{#if driver}}{{#unless (eq driver.uuid @root.connected_network.uuid)}}
+                <div class="list-item" data-uuid="{{this.uuid}}">
+                    <div class="list-item-start">
+                        <button class="list-item-image-container icon sr5-icon" data-action="connectToDriver" data-tooltip="SR5.ConnectToDriver">
+                            <img class="list-item-image-connect" src="{{speakerImg driver}}" />
+                        </button>
+                        <a data-action="connectToDriver">
+                            {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
+                        </a>
+                    </div>
+                    <div class="list-item-col midd-col">
+                        <label>
+                            {{matrixIconType driver}}
+                        </label>
+                    </div>
+                    <div class="list-item-icons">
+                        <a data-action="connectToDriver" data-tooltip="SR5.ConnectToDriver">
+                            <i class="fas fa-right-to-bracket"></i>
+                        </a>
+                    </div>
+                </div>
+            {{/unless}}{{/if}}
+        {{/if}}
         {{#each selectable_networks}}{{#unless (eq this.uuid @root.connected_network.uuid)}}
             <div class="list-item" data-uuid="{{this.uuid}}">
 
@@ -21,7 +47,9 @@
                     <a data-action="openUuid" data-uuid="{{this.uuid}}">{{this.name}}</a>
                 </div>
                 <div class="list-item-col midd-col">
-                    {{localize (concat 'TYPES.Item.' this.type)}}
+                    <label>
+                        {{localize (concat 'TYPES.Item.' this.type)}}
+                    </label>
                 </div>
                 <div class="list-item-icons">
                     {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connect-network-icon.hbs' this }}

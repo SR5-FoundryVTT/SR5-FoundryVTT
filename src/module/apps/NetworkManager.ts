@@ -40,6 +40,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
             inviteMark: NetworkManager.#handleMarkInvite,
             hackOnTheFly: NetworkManager.#handleHackOnTheFly,
             bruteForce: NetworkManager.#handleBruteForce,
+            connectToDriver: NetworkManager.#connectToDriver,
         }
     }
 
@@ -60,6 +61,9 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         context.hosts = MatrixNetworkFlow.visibleHosts();
 
         context.connected_network = this.actor.network;
+
+        context.actor = this.actor;
+        context.driver = this.actor.getVehicleDriver();
 
         return context;
     }
@@ -170,5 +174,25 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         await this.actor.sheet?.render();
 
         await this.close();
+    }
+
+    /**
+     * Connect to the PAN of the Driver
+     * @param event
+     */
+    static async #connectToDriver(this: NetworkManager, event) {
+        event.preventDefault();
+        const driver = this.actor.getVehicleDriver();
+        if (driver) {
+            const device = driver.getMatrixDevice();
+            if (device) {
+                await device.addSlave(this.actor);
+                await this.close();
+            } else {
+                ui.notifications.error("No Device found on Driver")
+            }
+        } else {
+            ui.notifications.error("No Driver found")
+        }
     }
 }

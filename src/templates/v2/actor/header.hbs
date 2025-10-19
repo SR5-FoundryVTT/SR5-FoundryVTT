@@ -83,8 +83,8 @@
                         <label>{{localize "SR5.Vehicle.ControlMode"}}</label>
                     </div>
                     <div class="list-item-col thicc-col">
-                        {{formInput systemFields.controlMode value=source.system.vehicle.controlMode
-                                    classes="short" localize=true }}
+                        {{formInput systemFields.controlMode value=source.system.controlMode
+                                    classes="short" localize=true disabled=(not vehicle.driver) }}
                     </div>
                 </div>
             </div>
