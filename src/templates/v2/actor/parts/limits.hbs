@@ -2,7 +2,7 @@
 <div class="list-item list-item-header">
     {{#each system.limits as |limit id|}} {{#unless limit.hidden}}
         <div class="list-item-col">
-            <label>
+            <label data-limit-modifier-tooltip="{{id}}">
                 {{localize limit.label}}&nbsp;{{limit.value}}
             </label>
         </div>

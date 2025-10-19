@@ -60,6 +60,9 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             event.preventDefault();
             event.stopPropagation();
             if (this.isEditable) {
+                if (this.isEditMode) {
+                    this.submit();
+                }
                 this._mode = this.isEditMode ? 'play' : 'edit';
             } else {
                 this._mode = 'play';
@@ -84,7 +87,11 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             context.isPlayMode = this.isPlayMode;
             if (this.document) {
                 if (!context.system) {
-                    context.system = this.document.toObject(false).system;
+                    if (this.isEditMode) {
+                        context.system = this.document.toObject(false).system;
+                    } else {
+                        context.system = this.document.getRollData();
+                    }
                 }
                 context.systemFields = this.document.system.schema.fields;
             }

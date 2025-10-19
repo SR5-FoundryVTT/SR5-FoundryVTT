@@ -381,22 +381,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     override async _onRender(context, options) {
         this.activateListeners_LEGACY($(this.element));
-        this.element.querySelectorAll('[data-attribute-modifier-tooltip]').forEach((el) => {
-            el.addEventListener('mouseenter', async (e: any) => {
-                const attributeId = e.target.closest('[data-attribute-modifier-tooltip]').dataset.attributeModifierTooltip;
-                const attribute = this.actor.getAttribute(attributeId);
-                if (attribute) {
-                    const html = await foundry.applications.handlebars.renderTemplate(
-                        SheetFlow.templateBase('actor/attribute-modifiers-tooltip'),
-                        {
-                            value: attribute,
-                            isEssence: attributeId === 'essence'
-                        });
-                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
-                }
-            })
-            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
-        })
+        this.prepareModifierTooltips();
         this.#filterActiveSkillsElements();
         return super._onRender(context, options);
     }
@@ -420,6 +405,59 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
+    }
+
+    /**
+     * Prepare Tooltips For Skills, Attributes, and Limits
+     * - these tooltips display all the modifiers for the ModifiedValue
+     */
+    prepareModifierTooltips() {
+        this.element?.querySelectorAll('[data-attribute-modifier-tooltip]').forEach((el) => {
+            el.addEventListener('mouseenter', async (e: any) => {
+                const attributeId = e.target.closest('[data-attribute-modifier-tooltip]').dataset.attributeModifierTooltip;
+                const attribute = this.actor.getAttribute(attributeId);
+                if (attribute) {
+                    const html = await foundry.applications.handlebars.renderTemplate(
+                        SheetFlow.templateBase('common/modifiers-tooltip'),
+                        {
+                            value: attribute,
+                            isEssence: attributeId === 'essence'
+                        });
+                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
+                }
+            })
+            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
+        })
+        this.element?.querySelectorAll('[data-limit-modifier-tooltip]').forEach((el) => {
+            el.addEventListener('mouseenter', async (e: any) => {
+                const limitId = e.target.closest('[data-limit-modifier-tooltip]').dataset.limitModifierTooltip;
+                const limit = this.actor.getLimit(limitId);
+                if (limit) {
+                    const html = await foundry.applications.handlebars.renderTemplate(
+                        SheetFlow.templateBase('common/modifiers-tooltip'),
+                        {
+                            value: limit,
+                        });
+                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
+                }
+            })
+            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
+        })
+        this.element?.querySelectorAll('[data-skill-modifier-tooltip]').forEach((el) => {
+            el.addEventListener('mouseenter', async (e: any) => {
+                const skillId = e.target.closest('[data-skill-modifier-tooltip]').dataset.skillModifierTooltip;
+                const skill = this.actor.getSkill(skillId);
+                if (skill) {
+                    const html = await foundry.applications.handlebars.renderTemplate(
+                        SheetFlow.templateBase('common/modifiers-tooltip'),
+                        {
+                            value: skill,
+                        });
+                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
+                }
+            })
+            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
+        })
     }
 
     protected override _getHeaderControls() {

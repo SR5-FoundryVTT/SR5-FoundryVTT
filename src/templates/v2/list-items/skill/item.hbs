@@ -38,7 +38,7 @@
                 {{!-- use the original method of setting data because skills are weird in data model, they'll be items eventually --}}
                 <input type="number" name="{{concat skillPath '.base'}}" class="short skinny" value="{{skill.base}}" data-skill="{{id}}" >
             {{else}}
-                <label>
+                <label data-skill-modifier-tooltip="{{id}}">
                     {{skill.value}}
                 </label>
             {{/if}}
