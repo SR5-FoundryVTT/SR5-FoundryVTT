@@ -1937,7 +1937,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     async _prepareActions() {
-        const actions = await PackActionFlow.getActorActions(this.actor);
+        const actions = await PackActionFlow.getActorSheetActions(this.actor);
 
         // Prepare sorting and display of a possibly translated document name.
         const sheetActions: sheetAction[] = [];

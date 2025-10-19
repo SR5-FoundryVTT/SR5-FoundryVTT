@@ -121,18 +121,17 @@ export const PackActionFlow = {
     },
 
     /**
-     * Collect all actions of an actor.
+     * Collect all actions of an actor for their sheet
      *
      * @param actor The actor to collect actions from.
      * @returns Combined list of pack and actor actions.
      */
-    async getActorActions(actor: SR5Actor) {
+    async getActorSheetActions(actor: SR5Actor) {
         const packName = this.getGeneralActionsPackName();
         // Collect all sources for matrix actions.
         const packActions = await this.getPackActions(packName);
         const filteredPackActions = packActions.filter(action => {
             const testName = action.getAction()?.test ?? '';
-            console.log('actionName', testName);
             if (['DronePerceptionTest', 'DroneInfiltrationTest', 'PilotVehicleTest'].includes(testName)) {
                 return actor.isType('vehicle');
             }
@@ -141,6 +140,13 @@ export const PackActionFlow = {
             }
             if (testName === 'FadeTest') {
                 return actor.isEmerged();
+            }
+            if (['NaturalRecoveryPhysicalTest', 'NaturalRecoveryStunTest'].includes(testName)) {
+                return false;
+            }
+            // hide these rolls on some sheets
+            if (['Composure', 'Lift Carry', 'Memory', 'Judge Intentions'].includes(action.name)) {
+                return !actor.isType('vehicle', 'ic', 'sprite');
             }
             return true;
         })
