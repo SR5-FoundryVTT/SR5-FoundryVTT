@@ -122,8 +122,8 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
                 { id: 'inventory', label: 'Inventory', cssClass: '' },
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'description', label: 'Description', cssClass: '' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.ActorSheet.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
     }
@@ -146,10 +146,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
                 'active-skills', 'vehicle-attributes'
             ), ...SheetFlow.templateListItem('skill')],
             scrollable: ['#active-skills-scroll']
-        },
-        description: {
-            template: SheetFlow.templateBase('actor/tabs/description'),
-            scrollable: ['.scrollable']
         },
         inventory: {
             template: SheetFlow.templateBase('actor/tabs/inventory'),

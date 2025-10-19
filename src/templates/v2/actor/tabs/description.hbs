@@ -5,10 +5,12 @@
                 <label>{{localize "SR5.Description"}}</label>
             </div>
         </div>
-        {{#if @root.isEditMode}}
-            {{formInput systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
-        {{else}}
-            {{{biographyHTML}}}
-        {{/if}}
+        <div class="fill-container {{#if @root.isPlayMode}} scrollable {{/if}}">
+            {{#if @root.isEditMode}}
+                {{formInput systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
+            {{else}}
+                {{{biographyHTML}}}
+            {{/if}}
+        </div>
     </div>
 </section>

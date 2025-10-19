@@ -52,17 +52,24 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         return game.i18n.localize("SR5.NetworkManager.Title");
     }
 
+    get document() {
+        return this.actor;
+    }
+
     override async _prepareContext(options) {
         const context = await super._prepareContext(options);
+
         context.selectable_networks = NetworkManager.selectableNetworks(this.actor);
 
-        // Prepare available networks for selection.
+        // prepare all the grids and hosts that are visible, except for public grids
         context.grids = MatrixNetworkFlow.visibleGrids().filter(item => !item.isPublicGrid());
         context.hosts = MatrixNetworkFlow.visibleHosts();
 
         context.connected_network = this.actor.network;
 
         context.actor = this.actor;
+
+        // driver data is used as a shortcut for connecting to the driver's PAN
         context.driver = this.actor.getVehicleDriver();
 
         return context;

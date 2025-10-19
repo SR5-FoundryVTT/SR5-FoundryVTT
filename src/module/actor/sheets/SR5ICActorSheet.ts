@@ -33,9 +33,10 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         primary: {
             initial: 'matrix',
             tabs: [
-                { id: 'matrix', label: 'Matrix', cssClass: '' },
+                { id: 'matrix', label: 'IC', cssClass: '' }, // name the Matrix tab as IC since that's all it needs
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.ActorSheet.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
         matrixLeft: {
@@ -78,6 +79,10 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
             templates: SheetFlow.templateListItem('effect'),
             scrollable: ['.scrollable']
         },
+        description: {
+            template: SheetFlow.templateBase('actor/tabs/description'),
+            scrollable: ['.scrollable']
+        },
         misc: {
             template: SheetFlow.templateBase('actor/tabs/misc'),
             scrollable: ['.scrollable']
@@ -85,12 +90,6 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         footer: {
             template: SheetFlow.templateBase('actor/footer'),
         },
-    }
-
-    override activateListeners_LEGACY(html) {
-        super.activateListeners_LEGACY(html);
-
-        html.find('.entity-remove').on('click', this._removeHost.bind(this));
     }
 
     /**
@@ -151,15 +150,6 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
                     return false
             }
         });
-    }
-
-    /**
-     * Remove a connected host from the shown IC actor type.
-     * @param event
-     */
-    async _removeHost(event) {
-        event.stopPropagation();
-        await this.actor.disconnectNetwork();
     }
 
     async _onDropItem(event: DragEvent, item: SR5Item) {

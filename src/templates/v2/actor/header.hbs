@@ -2,23 +2,27 @@
     <img
         class="sheet-image"
         src="{{actor.img}}"
+        {{#if @root.isEditMode}}
         data-edit="img"
+        {{/if}}
         data-tooltip="{{actor.name}}"
     />
     <div class="sheet-header-labels">
         <div class="sheet-header-name">
-            {{#if (hasAnyFreshImports actor)}}
-                {{#if @root.isEditMode}}
-                    <button type="button" class="toggle-fresh-import" data-tooltip="SR5.MarkImportsTooltip" data-action="toggleFreshImports">
-                        <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" width="32px" height="32px" />
-                    </button>
-                {{else}}
-                    <label data-tooltip="SR5.MarkImportsTooltip" style="width: 1.5rem; flex-shrink: 0;">
-                        <img src="systems/shadowrun5e/dist/icons/checklist.svg" width="32px" height="32px" />
-                    </label>
+            {{#unless isLimited}}
+                {{#if (hasAnyFreshImports actor)}}
+                    {{#if @root.isEditMode}}
+                        <button type="button" class="toggle-fresh-import" data-tooltip="SR5.MarkImportsTooltip" data-action="toggleFreshImports">
+                            <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" width="32px" height="32px" />
+                        </button>
+                    {{else}}
+                        <label data-tooltip="SR5.MarkImportsTooltip" style="width: 1.5rem; flex-shrink: 0;">
+                            <img src="systems/shadowrun5e/dist/icons/checklist.svg" width="32px" height="32px" />
+                        </label>
+                    {{/if}}
                 {{/if}}
-            {{/if}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
+                {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
+            {{/unless}}
             {{formInput fields.name value=actor.name classes="sheet-name"
                         placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
         </div>
@@ -27,7 +31,7 @@
                 {{formInput systemFields.description.fields.source value=source.system.description.source
                             placeholder=(localize "SR5.Source") rootId=rootId}}
             </div>
-        {{else}}
+        {{else if (not isLimited)}}
             <div>
                 {{#if (or isIC isSprite)}}
                     {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
@@ -51,70 +55,72 @@
             </div>
         {{/if}}
     </div>
-    <div class="sheet-header-col">
-        {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
-        {{#if @root.isEditMode}}
-            <div>
-                <div class="list-item">
-                    <div class="list-item-start">
-                        <label data-tooltip="{{systemFields.attributes.fields.edge.fields.base.hint}}">
-                            {{systemFields.attributes.fields.edge.fields.base.label}}
-                        </label>
-                    </div>
-                    <div class="list-item-col">
-                        {{formInput systemFields.attributes.fields.edge.fields.base value=system.attributes.edge.base
-                                    rootId=rootId class="short"}}
+    {{#unless isLimited}}
+        <div class="sheet-header-col">
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
+            {{#if @root.isEditMode}}
+                <div>
+                    <div class="list-item">
+                        <div class="list-item-start">
+                            <label data-tooltip="{{systemFields.attributes.fields.edge.fields.base.hint}}">
+                                {{systemFields.attributes.fields.edge.fields.base.label}}
+                            </label>
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.attributes.fields.edge.fields.base value=system.attributes.edge.base
+                                        rootId=rootId class="short"}}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {{else}}
-            {{#if system.attributes.edge.value}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
-                    tooltip="SR5.AttrEdge"
-                    value=system.attributes.edge.uses
-                    max=system.attributes.edge.value
-                    id="edge" }}
+            {{else}}
+                {{#if system.attributes.edge.value}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+                        tooltip="SR5.AttrEdge"
+                        value=system.attributes.edge.uses
+                        max=system.attributes.edge.value
+                        id="edge" }}
+                {{/if}}
             {{/if}}
-        {{/if}}
-        {{#if (eq actor.type 'vehicle')}}
-            <div>
-                <div class="list-item">
-                    <div class="list-item-start">
-                        <label>{{localize "SR5.Vehicle.ControlMode"}}</label>
-                    </div>
-                    <div class="list-item-col thicc-col">
-                        {{formInput systemFields.controlMode value=source.system.controlMode
-                                    classes="short" localize=true disabled=(not vehicle.driver) }}
-                    </div>
-                </div>
-            </div>
-        {{/if}}
-        {{#if (or isSpirit isSprite)}}
-            <div>
-                <div class="list-item">
-                    <div class="list-item-start">
-                        <label>{{localize "SR5.Sprite.Services"}}</label>
-                    </div>
-                    <div class="list-item-col qty-input-col"
-                         data-tooltip="{{#if isSpirit}}SR5.Spirit.Services{{else}}SR5.Sprite.Services{{/if}}">
-                        {{#if @root.isEditMode}}
-                            {{formInput systemFields.services value=system.services rootId=rootId class="short"}}
-                        {{else}}
-                            <a class="hover-show-button"
-                               data-action="removeOneService"
-                               data-tooltip="SR5.Labels.ActorSheet.RemoveOneService">
-                                <i class="fas fa-minus-square"></i>
-                            </a>
-                            <label>{{system.services}}</label>
-                            <a class="hover-show-button"
-                               data-action="addOneService"
-                               data-tooltip="SR5.Labels.ActorSheet.AddOneService">
-                                <i class="fas fa-plus-square"></i>
-                            </a>
-                        {{/if}}
+            {{#if (eq actor.type 'vehicle')}}
+                <div>
+                    <div class="list-item">
+                        <div class="list-item-start">
+                            <label>{{localize "SR5.Vehicle.ControlMode"}}</label>
+                        </div>
+                        <div class="list-item-col thicc-col">
+                            {{formInput systemFields.controlMode value=source.system.controlMode
+                                        classes="short" localize=true disabled=(not vehicle.driver) }}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {{/if}}
-    </div>
+            {{/if}}
+            {{#if (or isSpirit isSprite)}}
+                <div>
+                    <div class="list-item">
+                        <div class="list-item-start">
+                            <label>{{localize "SR5.Sprite.Services"}}</label>
+                        </div>
+                        <div class="list-item-col qty-input-col"
+                             data-tooltip="{{#if isSpirit}}SR5.Spirit.Services{{else}}SR5.Sprite.Services{{/if}}">
+                            {{#if @root.isEditMode}}
+                                {{formInput systemFields.services value=system.services rootId=rootId class="short"}}
+                            {{else}}
+                                <a class="hover-show-button"
+                                   data-action="removeOneService"
+                                   data-tooltip="SR5.Labels.ActorSheet.RemoveOneService">
+                                    <i class="fas fa-minus-square"></i>
+                                </a>
+                                <label>{{system.services}}</label>
+                                <a class="hover-show-button"
+                                   data-action="addOneService"
+                                   data-tooltip="SR5.Labels.ActorSheet.AddOneService">
+                                    <i class="fas fa-plus-square"></i>
+                                </a>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+    {{/unless}}
 </header>

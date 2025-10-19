@@ -53,13 +53,14 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                 { id: 'actions', label: 'Actions', cssClass: '' },
                 { id: 'skills', label: 'Character', cssClass: '' },
                 { id: 'inventory', label: 'Inventory', cssClass: '' },
-                { id: 'critter', label: 'Critter', cssClass: '' },
+                { id: 'critter', label: 'Powers', cssClass: '' },
                 { id: 'magic', label: 'Magic', cssClass: '' },
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'social', label: 'Social', cssClass: '' },
                 { id: 'bio', label: 'Bio', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.ActorSheet.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
         matrixRight: {
@@ -163,11 +164,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         },
         bio: {
             template: SheetFlow.templateBase('actor/tabs/bio'),
-            templates: [
-                    ...SheetFlow.templateActorSystemParts('metamagics', 'echoes'),
-                    ...SheetFlow.templateListItem('metamagic', 'echo', 'quality'),
-                ],
-            scrollable: ['.scrollable']
+            templates: SheetFlow.templateListItem('metamagic', 'echo', 'quality'),
+            scrollable: ['#metamagics-scroll-list', '#quality-scroll-list', '#echoes-scroll-list'],
         },
     }
 

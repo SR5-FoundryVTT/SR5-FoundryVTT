@@ -91,6 +91,8 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
 
             context.user = game.user;
             context.config = SR5;
+            context.isLimited = !game.user?.isGM && this.document.limited;
+            context.isEditable = this.isEditable;
 
             context.expandedUuids = {};
             for (const uuid of this.expandedUuids) {

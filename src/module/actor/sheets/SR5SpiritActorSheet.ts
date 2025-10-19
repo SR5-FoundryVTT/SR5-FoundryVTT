@@ -1,4 +1,3 @@
-import { SR5Actor } from "../SR5Actor";
 import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { Helpers } from '@/module/helpers';
@@ -36,11 +35,11 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
                 { id: 'skills', label: 'Spirit', cssClass: '' },
-                { id: 'critter', label: 'Critter', cssClass: '' },
+                { id: 'critter', label: 'Powers', cssClass: '' },
                 { id: 'magic', label: 'Magic', cssClass: '' },
-                { id: 'bio', label: 'Bio', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.ActorSheet.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
     }
@@ -66,14 +65,6 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         critter: {
             template: SheetFlow.templateBase('actor/tabs/critter'),
             templates: SheetFlow.templateListItem('critter_power'),
-            scrollable: ['scrollable']
-        },
-        bio: {
-            template: SheetFlow.templateBase('actor/tabs/bio'),
-            templates: [
-                ...SheetFlow.templateActorSystemParts('metamagics'),
-                ...SheetFlow.templateListItem('metamagic', 'quality'),
-            ],
             scrollable: ['scrollable']
         },
     }

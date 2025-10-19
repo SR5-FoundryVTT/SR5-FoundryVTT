@@ -82,7 +82,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
                 { id: 'networkIcons', label: 'Icons', cssClass: ''},
                 { id: 'markedIcons', label: 'Marked', cssClass: ''},
                 { id: 'ownedIcons', label: 'Owned', cssClass: ''},
-                { id: 'programs', label: '', icon: 'fas fa-server', cssClass: 'skinny', tooltip: 'SR5.Programs'},
+                { id: 'programs', label: '', icon: 'fas fa-disc-drive', cssClass: 'skinny', tooltip: 'SR5.Programs'},
             ]
         },
         matrixRight: {
@@ -112,11 +112,11 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
     protected override async _renderHTML(content, options) {
         const parts = await super._renderHTML(content, options);
-        const matrixLeftSideContent = parts.matrix.querySelector("section.content.matrix-left-tab-content");
+        const matrixLeftSideContent = parts.matrix?.querySelector("section.content.matrix-left-tab-content");
         if (matrixLeftSideContent) {
             this.moveTabs(SR5MatrixActorSheet.TABS.matrixLeft.tabs, parts, matrixLeftSideContent);
         }
-        const matrixRightSideContent = parts.matrix.querySelector("section.content.matrix-right-tab-content");
+        const matrixRightSideContent = parts.matrix?.querySelector("section.content.matrix-right-tab-content");
         if (matrixRightSideContent) {
             this.moveTabs(SR5MatrixActorSheet.TABS.matrixRight.tabs, parts, matrixRightSideContent);
         }

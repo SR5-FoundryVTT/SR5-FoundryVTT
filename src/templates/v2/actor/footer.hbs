@@ -21,59 +21,61 @@
                 <label>{{localize "SR5.IsGrunt"}}</label>
             {{/if}}
 
-            {{#unless (or system.is_npc system.is_critter)}}
-                <label>
-                    <a data-action="openNuyenManager"><i class="fas fa-yen"></i></a>&nbsp;
-                    {{#if @root.isEditMode}}
-                        {{formInput systemFields.nuyen value=source.system.nuyen rootId=rootId classes="short thicc"}}
-                    {{else}}
-                        {{nuyenValue system.nuyen}}
-                    {{/if}}
-                </label>
-                <label>
-                    <a data-action="openReputationManager"><i class="fas fa-people-group"></i></a>&nbsp;
-                    <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.ActorSheet.Labels.StreetCredShort"}}&nbsp;
+            {{#unless isLimited}}
+                {{#unless (or system.is_npc system.is_critter)}}
+                    <label>
+                        <a data-action="openNuyenManager"><i class="fas fa-yen"></i></a>&nbsp;
                         {{#if @root.isEditMode}}
-                            {{formInput systemFields.street_cred value=source.system.street_cred rootId=rootId classes="short skinny"}}
+                            {{formInput systemFields.nuyen value=source.system.nuyen rootId=rootId classes="short thicc"}}
                         {{else}}
-                            {{system.street_cred}}
+                            {{nuyenValue system.nuyen}}
                         {{/if}}
-                    </span>
-                    <i class="fas fa-pipe"></i>
-                    <span data-tooltip="{{systemFields.notoriety.label}} - {{systemFields.notoriety.hint}}">{{localize "SR5.ActorSheet.Labels.NotorietyShort"}}&nbsp;
+                    </label>
+                    <label>
+                        <a data-action="openReputationManager"><i class="fas fa-people-group"></i></a>&nbsp;
+                        <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.ActorSheet.Labels.StreetCredShort"}}&nbsp;
+                            {{#if @root.isEditMode}}
+                                {{formInput systemFields.street_cred value=source.system.street_cred rootId=rootId classes="short skinny"}}
+                            {{else}}
+                                {{system.street_cred}}
+                            {{/if}}
+                        </span>
+                        <i class="fas fa-pipe"></i>
+                        <span data-tooltip="{{systemFields.notoriety.label}} - {{systemFields.notoriety.hint}}">{{localize "SR5.ActorSheet.Labels.NotorietyShort"}}&nbsp;
+                            {{#if @root.isEditMode}}
+                                {{formInput systemFields.notoriety value=source.system.notoriety rootId=rootId classes="short skinny"}}
+                            {{else}}
+                                {{system.notoriety}}
+                            {{/if}}
+                        </span>
+                        <i class="fas fa-pipe"></i>
+                        <span data-tooltip="{{systemFields.public_awareness.label}} - {{systemFields.public_awareness.hint}}">{{localize "SR5.ActorSheet.Labels.PublicAwarenessShort"}}&nbsp;
+                            {{#if @root.isEditMode}}
+                                {{formInput systemFields.public_awareness value=source.system.public_awareness rootId=rootId classes="short skinny"}}
+                            {{else}}
+                                {{system.public_awareness}}
+                            {{/if}}
+                        </span>
+                    </label>
+                    <label data-tooltip="SR5.Karma">
+                        <a data-action="openKarmaManager"><i class="fas fa-yin-yang"></i></a>&nbsp;
                         {{#if @root.isEditMode}}
-                            {{formInput systemFields.notoriety value=source.system.notoriety rootId=rootId classes="short skinny"}}
+                            {{formInput systemFields.karma.fields.value value=source.system.karma.value
+                                        classes="short skinny" rootId=rootId }}&nbsp;({{formInput systemFields.karma.fields.max value=source.system.karma.max
+                                        classes="short skinny" rootId=rootId }})
                         {{else}}
-                            {{system.notoriety}}
+                            <span data-tooltip="{{sourceFields.karma.fields.value.hint}}">{{system.karma.value}}</span>&nbsp;<span data-tooltip="{{sourceFields.karma.fields.max.hint}}">({{system.karma.max}})</span>
                         {{/if}}
-                    </span>
-                    <i class="fas fa-pipe"></i>
-                    <span data-tooltip="{{systemFields.public_awareness.label}} - {{systemFields.public_awareness.hint}}">{{localize "SR5.ActorSheet.Labels.PublicAwarenessShort"}}&nbsp;
-                        {{#if @root.isEditMode}}
-                            {{formInput systemFields.public_awareness value=source.system.public_awareness rootId=rootId classes="short skinny"}}
-                        {{else}}
-                            {{system.public_awareness}}
-                        {{/if}}
-                    </span>
-                </label>
-                <label data-tooltip="SR5.Karma">
-                    <a data-action="openKarmaManager"><i class="fas fa-yin-yang"></i></a>&nbsp;
-                    {{#if @root.isEditMode}}
-                        {{formInput systemFields.karma.fields.value value=source.system.karma.value
-                                    classes="short skinny" rootId=rootId }}&nbsp;({{formInput systemFields.karma.fields.max value=source.system.karma.max
-                                    classes="short skinny" rootId=rootId }})
-                    {{else}}
-                        <span data-tooltip="{{sourceFields.karma.fields.value.hint}}">{{system.karma.value}}</span>&nbsp;<span data-tooltip="{{sourceFields.karma.fields.max.hint}}">({{system.karma.max}})</span>
-                    {{/if}}
-                </label>
+                    </label>
+                {{/unless}}
+                {{#if @root.isPlayMode}}
+                    <label style="text-wrap: nowrap;">
+                        <i class="far fa-brain-circuit"
+                           data-tooltip="SR5.AttrEssence"></i>
+                        <span data-attribute-modifier-tooltip="essence">{{system.attributes.essence.value}}</span>
+                    </label>
+                {{/if}}
             {{/unless}}
-            {{#if @root.isPlayMode}}
-                <label style="text-wrap: nowrap;">
-                    <i class="far fa-brain-circuit"
-                       data-tooltip="SR5.AttrEssence"></i>
-                    <span data-attribute-modifier-tooltip="essence">{{system.attributes.essence.value}}</span>
-                </label>
-            {{/if}}
         {{/if}}
         {{#if (eq actor.type 'spirit')}}
             {{#if @root.isEditMode}}
@@ -88,7 +90,7 @@
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.force value=system.force classes="short skinny" rootId=rootId}}
                 {{else}}
-                    <label>{{system.force}}</label>
+                    <label>{{#if isLimited}}?{{else}}{{system.force}}{{/if}}</label>
                 {{/if}}
             </div>
             {{#if @root.isEditMode}}
@@ -116,7 +118,7 @@
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.level value=system.level classes="short skinny" rootId=rootId}}
                 {{else}}
-                    <label>{{system.level}}</label>
+                    <label>{{#if isLimited}}?{{else}}{{system.level}}{{/if}}</label>
                 {{/if}}
             </div>
             {{#if @root.isEditMode}}
@@ -142,6 +144,8 @@
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.host.fields.rating value=system.host.rating
                                 classes="short skinny" rootId=rootId disabled=network}}
+                {{else if isLimited}}
+                    ?
                 {{else}}
                     {{system.host.rating}}
                 {{/if}}
@@ -165,7 +169,7 @@
                 <label>{{localize "SR5.Vehicle.Drone"}}</label>
             {{/if}}
 
-            {{#if @root.isPlayMode}}
+            {{#if (and @root.isPlayMode (not isLimited))}}
                 {{#if system.isDrone}}
                     <label>
                         {{localize "SR5.ModPoints"}}&nbsp;
@@ -201,8 +205,10 @@
                 {{/if}}
             {{/if}}
         {{/if}}
-        {{#unless (or isIC isSprite)}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
+        {{#unless isLimited}}
+            {{#unless (or isIC isSprite)}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
+            {{/unless}}
         {{/unless}}
         <div></div>
     </div>

@@ -190,14 +190,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         primary: {
             initial: 'description',
             tabs: [
-                { id: 'description', label: 'Description', cssClass: '' },
                 { id: 'details', label: 'Details', cssClass: '' },
                 { id: 'network', label: 'Network', cssClass: '' },
                 { id: 'sinNetworks', label: 'Networks', cssClass: '' },
                 { id: 'weaponAmmo', label: 'Ammo', cssClass: '' },
                 { id: 'weaponModifications', label: 'Mods', cssClass: '' },
                 { id: 'licenses', label: 'Licenses', cssClass: '' },
-                { id: 'effects', label: 'Effects', cssClass: '' }
+                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.ActorSheet.Description', cssClass: 'skinny' },
             ]
         }
     }
@@ -209,6 +209,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     protected override _prepareTabs(group: string) {
         const parts = super._prepareTabs(group);
+        if (group === 'primary' && !game.user?.isGM && this.item.limited) {
+            const description = parts.description;
+            description.active = true;
+            return { description };
+        }
         if (group === 'primary') {
             this._cleanParts(this.item, parts);
         }
@@ -217,6 +222,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     protected override _configureRenderParts(options) {
         const retVal = super._configureRenderParts(options);
+        if (!game.user?.isGM && this.item.limited) {
+            return {
+                header: retVal.header,
+                tabs: retVal.tabs,
+                description: retVal.description,
+                footer: retVal.footer,
+            }
+        }
         this._cleanParts(this.item, retVal);
         return retVal;
     }

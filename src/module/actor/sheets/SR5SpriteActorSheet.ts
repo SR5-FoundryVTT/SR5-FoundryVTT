@@ -25,8 +25,8 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
                 { id: 'skills', label: 'Sprite', cssClass: '' },
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'description', label: 'Description', cssClass: '' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.ActorSheet.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
         matrixRight: {
@@ -56,10 +56,6 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
                 ...SheetFlow.templateListItem('skill')
             ],
             scrollable: ['#active-skills-scroll']
-        },
-        description: {
-            template: SheetFlow.templateBase('actor/tabs/description'),
-            scrollable: ['.scrollable']
         },
         matrix: {
             template: SheetFlow.templateBase('actor/tabs/matrix'),

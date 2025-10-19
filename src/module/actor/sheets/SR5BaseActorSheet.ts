@@ -236,7 +236,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
             ]
         },
     }
@@ -266,6 +267,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         misc: {
             template: SheetFlow.templateBase('actor/tabs/misc'),
             scrollable: ['scrollable']
+        },
+        description: {
+            template: SheetFlow.templateBase('actor/tabs/description'),
+            scrollable: ['.scrollable']
         },
         footer: {
             template: SheetFlow.templateBase('actor/footer'),
@@ -304,13 +309,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         data.contentVisibility = this._prepareContentVisibility(data);
 
-        if ('description' in data.system)
-            data.biographyHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(data.system.description.value, {
-                // secrets: this.actor.isOwner,
-                // rollData: this.actor.getRollData.bind(this.actor),
-                relativeTo: this.actor
-            });
-
         data.bindings = this._prepareKeybindings();
 
         data.initiativePerception = this._prepareInitiativePresence();
@@ -337,6 +335,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (partId === 'rollBar') {
             partContext.favorites = await this._prepareFavorites();
         }
+        if (partId === 'description') {
+            if ('description' in this.actor.system) {
+                partContext.biographyHTML = await TextEditor.enrichHTML(this.actor.system.description.value, {
+                    relativeTo: this.actor,
+                    secrets: this.actor.isOwner,
+                });
+            }
+        }
 
         return partContext;
     }
@@ -348,6 +354,29 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             if (doc && doc instanceof SR5Item) favorites.push(doc);
         }
         return favorites;
+    }
+
+    protected override _prepareTabs(group: string) {
+        const parts = super._prepareTabs(group);
+        if (group === 'primary' && !game.user?.isGM && this.actor.limited) {
+            const description = parts.description;
+            description.active = true;
+            return { description };
+        }
+        return parts;
+    }
+
+    protected override _configureRenderParts(options) {
+        const retVal = super._configureRenderParts(options);
+        if (!game.user?.isGM && this.actor.limited) {
+            return {
+                header: retVal.header,
+                tabs: retVal.tabs,
+                description: retVal.description,
+                footer: retVal.footer,
+            }
+        }
+        return retVal;
     }
 
     override async _onRender(context, options) {
