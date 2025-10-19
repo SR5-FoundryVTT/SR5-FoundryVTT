@@ -24,15 +24,15 @@
     <label>/</label>
     <label data-tooltip="SR5.RunningSpeed">{{system.movement.run.value}}m</label>
     {{#unless isVehicle}}
-    <label>/</label>
-    {{#if @root.isEditMode}}
-        {{formInput systemFields.movement.fields.sprint value=system.movement.sprint classes="short skinny" rootId=rootId}}
-    {{else}}
-        <a>
-            <span style="white-space: nowrap" data-tooltip="SR5.SprintingBonus">
-                <i style="font-size: 0.75em;" class="fas fa-plus"></i>{{system.movement.sprint}}
-            </span>
-        </a>
-    {{/if}}
+        <label>/</label>
+        {{#if @root.isEditMode}}
+            {{formInput systemFields.movement.fields.sprint value=system.movement.sprint classes="short skinny" rootId=rootId}}
+        {{else}}
+            <label>
+                <span style="white-space: nowrap" data-tooltip="SR5.SprintingBonus">
+                    <i style="font-size: 0.75em;" class="fas fa-plus"></i>{{system.movement.sprint}}
+                </span>
+            </label>
+        {{/if}}
     {{/unless}}
 </div>
