@@ -1360,9 +1360,9 @@ input[type='text'].display {
             background: $nameplate-background;
             border: none;
             margin-bottom: 0;
-            height: 1.5rem;
-            max-height: 1.5rem;
-            padding: .25rem;
+            font-size: 1.5rem;
+            height: 100%;
+            padding: .5rem;
             vertical-align: center;
         }
         &:not(.minimized) {
@@ -1393,8 +1393,8 @@ input[type='text'].display {
         .sheet-header {
             display: flex;
             flex-flow: row wrap;
-            justify-content: end;
-            align-items: end;
+            justify-content: start;
+            align-items: start;
             width: 100%;
             padding: 0;
 
@@ -1475,7 +1475,7 @@ input[type='text'].display {
                     box-shadow: 0 0 5px 5px rgba($white, 0.2);
                 }
                 &.skinny {
-                    flex: 0;
+                    flex: 0 0 2rem;
                     padding: 0 0.5rem;
                 }
             }
@@ -1509,7 +1509,7 @@ input[type='text'].display {
     input.thicc {
         width: 5rem;
     }
-    input.short, input.center {
+    input.center {
         text-align: center;
         vertical-align: center;
         horiz-align: center;

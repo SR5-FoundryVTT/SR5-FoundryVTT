@@ -190,6 +190,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         primary: {
             initial: 'description',
             tabs: [
+                { id: 'description', label: 'Description', cssClass: '' },
                 { id: 'details', label: 'Details', cssClass: '' },
                 { id: 'network', label: 'Network', cssClass: '' },
                 { id: 'sinNetworks', label: 'Networks', cssClass: '' },
@@ -197,7 +198,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'weaponModifications', label: 'Mods', cssClass: '' },
                 { id: 'licenses', label: 'Licenses', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.ActorSheet.Description', cssClass: 'skinny' },
             ]
         }
     }

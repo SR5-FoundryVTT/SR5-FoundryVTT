@@ -1,12 +1,14 @@
 <footer class="sheet-footer item-footer">
     {{#if (and systemFields.technology @root.isEditMode)}}
         <div class="list-item">
-            <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.EssenceAdjustment">
-                {{localize "SR5.Labels.Item.EssenceAdjustment"}}
-                {{formInput systemFields.technology.fields.calculated.fields.essence.fields.adjusted
-                            value=source.system.calculated.essence.adjusted classes="short"
-                            rootId=@root.rootId disabled=@root.isPlayMode}}
-            </label>
+            {{#if systemFields.essence}}
+                <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.EssenceAdjustment">
+                    {{localize "SR5.Labels.Item.EssenceAdjustment"}}
+                    {{formInput systemFields.technology.fields.calculated.fields.essence.fields.adjusted
+                                value=source.system.calculated.essence.adjusted classes="short"
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                </label>
+            {{/if}}
             <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.CostAdjustment">
                 {{localize "SR5.Labels.Item.CostAdjustment"}}
                 {{formInput systemFields.technology.fields.calculated.fields.cost.fields.adjusted
@@ -22,22 +24,6 @@
         </div>
     {{/if}}
     <div class="list-item">
-        {{#if @root.isPlayMode}}
-            {{#unless (isType item 'spell' 'quality' 'lifestyle' 'bioware' 'cyberware' 'device' 'grid')}}
-                <label>
-                    {{#if (isType item 'weapon')}}
-                        {{#if (eq system.category 'range')}}
-                            {{localize "SR5.Weapon.Category.Range"}}
-                        {{else if (eq system.category 'melee')}}
-                            {{localize "SR5.Weapon.Category.Melee"}}
-                        {{else if (eq system.category 'thrown')}}
-                            {{localize "SR5.Weapon.Category.Thrown"}}
-                        {{/if}}
-                    {{/if}}
-                    {{localize (concat 'TYPES.Item.' item.type)}}
-                </label>
-            {{/unless}}
-        {{/if}}
         {{#if (isType item 'grid')}}
             {{#if @root.isEditMode}}
                 <span>
@@ -45,7 +31,7 @@
                                 classes="short" rootId=@root.rootId}}
                 </span>
             {{else}}
-                <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.gridCategories}}&nbsp;{{localize (concat 'TYPES.Item.' item.type)}}</label>
+                <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.gridCategories}}</label>
             {{/if}}
         {{else if (isType item 'device')}}
             {{#if @root.isEditMode}}
@@ -63,7 +49,7 @@
                                 classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
                 </span>
             {{else if system.grade}}
-                <label>{{localizeOb system.grade @root.config.cyberwareGrades}}&nbsp;{{localize (concat 'TYPES.Item.' item.type)}}</label>
+                <label>{{localizeOb system.grade @root.config.cyberwareGrades}}</label>
             {{/if}}
         {{/if}}
 
@@ -327,7 +313,7 @@
 
                 {{#if @root.isEditMode}}
                     <div class="basic-row">
-                        <label>{{localize "SR5.Labels.Sheet.SheetVisible"}}
+                        <label>{{localize "SR5.Labels.Sheet.Visible"}}
                             {{formInput systemFields.matrix.fields.visible value=source.system.matrix.visible
                                         rootId=rootId disabled=@root.isPlayMode}}
                         </label>
@@ -464,7 +450,7 @@
                         <label data-tooltip="{{systemFields.descriptors.hint}}">{{systemFields.descriptors.label}}</label>
                         <span>
                             {{formInput systemFields.descriptors value=source.system.descriptors
-                                        classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </span>
                     </div>
                 {{else}}

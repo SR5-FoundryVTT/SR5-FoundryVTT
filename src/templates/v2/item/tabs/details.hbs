@@ -60,12 +60,12 @@
                         <label>{{localize "SR5.Damage"}}</label>
                     </div>
                     <div class="list-item-col">
-                        <label style="text-wrap: nowrap" data-tooltip="{{systemFields.replaceDamage.hint}}">
-                            {{systemFields.replaceDamage.label}}&nbsp;{{formInput systemFields.replaceDamage value=system.replaceDamage
-                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                        </label>
                         {{formInput systemFields.damage value=system.damage
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        <label style="text-wrap: nowrap" data-tooltip="{{systemFields.replaceDamage.hint}}">
+                            {{systemFields.replaceDamage.label}}&nbsp;{{formInput systemFields.replaceDamage value=system.replaceDamage
+                                                                                  classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </label>
                     </div>
                 </div>
                 <div class="list-item">
@@ -91,12 +91,12 @@
                         <label data-tooltip="{{systemFields.ap.hint}}">{{systemFields.ap.label}}</label>
                     </div>
                     <div class="list-item-col">
-                        <label style="text-wrap: nowrap" data-tooltip="{{systemFields.replaceAP.hint}}">
-                            {{systemFields.replaceAP.label}}&nbsp;{{formInput systemFields.replaceAP value=system.replaceAP
-                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                        </label>
                         {{formInput systemFields.ap value=system.ap
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        <label style="text-wrap: nowrap" data-tooltip="{{systemFields.replaceAP.hint}}">
+                            {{systemFields.replaceAP.label}}&nbsp;{{formInput systemFields.replaceAP value=system.replaceAP
+                                                                              classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </label>
                     </div>
                 </div>
                 <div class="list-item">
@@ -114,7 +114,7 @@
                     </div>
                     <div class="list-item-col">
                         {{formInput systemFields.blast.fields.radius value=system.blast.radius
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}&nbsp;m
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
                 <div class="list-item">
@@ -123,7 +123,7 @@
                     </div>
                     <div class="list-item-col">
                         {{formInput systemFields.blast.fields.dropoff value=system.blast.dropoff
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}&nbsp;/&nbsp;m
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
             {{else if (and (eq item.type 'call_in_action') (eq system.actor_type 'sprite'))}}

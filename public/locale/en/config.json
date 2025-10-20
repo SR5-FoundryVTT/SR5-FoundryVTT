@@ -502,7 +502,7 @@
                     "hint": "Element the damage of this Element does."
                 },
                 "replaceDamage": {
-                    "label": "Replace Damage",
+                    "label": "Replace",
                     "hint": "If this Ammo should replace the Damage of the weapon"
                 },
                 "ap": {
@@ -510,7 +510,7 @@
                     "hint": "Armor Penetration of this Ammo. This may be added to the Weapon's AP or replace it"
                 },
                 "replaceAP": {
-                    "label": "Replace AP",
+                    "label": "Replace",
                     "hint": "If this Ammo should replace the AP of the Weapon"
                 },
                 "accuracy": {
@@ -2584,7 +2584,7 @@
                 "SpriteType": "Type of the compiled sprite"
             },
             "Contact": {
-                "LinkActor": "Drag&Drop an actor to link him to this contact"
+                "LinkActor": "Drag&Drop an Actor to link this Contact"
             },
             "Effect": {
                 "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
@@ -2892,11 +2892,11 @@
                     },
                     "blast": {
                         "radius": {
-                            "label": "Blast Radius",
+                            "label": "Blast Radius (m)",
                             "hint": "Radius of the Weapon's attack, in meters"
                         },
                         "dropoff": {
-                            "label": "Blast Dropoff",
+                            "label": "Blast Dropoff (per m)",
                             "hint": "The Damage Reduction per meter from the blast"
                         }
                     }

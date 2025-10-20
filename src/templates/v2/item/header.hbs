@@ -17,8 +17,13 @@
                         {{/if}}
                     {{/if}}
                 {{/unless}}
-                {{formInput fields.name value=item.name classes="sheet-name"
-                            placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
+                <span style="width: 100%">
+                    {{formInput fields.name value=item.name classes="sheet-name"
+                                placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
+                </span>
+                <div class="item-type-container">
+                    <label>{{localize (concat 'TYPES.Item.' item.type)}}</label>
+                </div>
             </div>
             {{#if @root.isEditMode}}
                 <div class="sheet-header-source">
@@ -43,14 +48,7 @@
                 {{/if}}
             {{/unless}}
         </div>
-        {{#if (and @root.isEditMode (eq item.type 'contact'))}}
-            <div class="document-tags-container">
-                <span data-tooltip="{{systemFields.linkedActor.label}}:&nbsp;{{systemFields.linkedActor.hint}}">
-                    {{formInput systemFields.linkedActor value=source.system.linkedActor
-                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                </span>
-            </div>
-        {{/if}}
+
     </div>
     {{!-- TODO go through this and allow fields that could be shown on a limited item --}}
     {{#unless isLimited}}
