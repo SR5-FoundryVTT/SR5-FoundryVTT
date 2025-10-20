@@ -81,7 +81,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         }
 
         async _prepareContext(options) {
-            // @ts-ignore
+            // @ts-expect-error mixin stuff
             const context = await super._prepareContext(options);
             context.isEditMode = this.isEditMode;
             context.isPlayMode = this.isPlayMode;
@@ -221,7 +221,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
 
         async _onRender(context, options) {
             this.#filters.forEach(d => d.bind(this.element));
-            // @ts-ignore
+            // @ts-expect-error mixin issues
             return super._onRender(context, options);
         }
 
@@ -232,7 +232,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
          * @param options
          */
         async _postRender(context, options) {
-            // @ts-ignore
+            // @ts-expect-error mixin issues
             await super._postRender(context, options);
             // once we render, process the Tagify Elements to we rendered
             Hooks.call('sr5_processTagifyElements', this.element);
@@ -243,7 +243,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         }
 
         async _renderFrame(options) {
-            // @ts-ignore
+            // @ts-expect-error mixin issues
             const frame = await super._renderFrame(options);
             if (this.isEditable) {
                 const button = document.createElement('button');
