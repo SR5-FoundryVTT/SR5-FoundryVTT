@@ -16,7 +16,7 @@ const ICData = () => ({
         initial:'patrol',
         choices: SR5.icTypes,
     }),
-    special: new StringField({ required: true, initial: 'mundane', readonly: true }),
+    special: new StringField({ required: true, initial: 'mundane', choices: ['mundane'], readonly: true }),
 
     // === Matrix & Host ===
     matrix: new SchemaField(MatrixData()),

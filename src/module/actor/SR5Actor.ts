@@ -1417,7 +1417,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Derive limit from skill attribute.
         const attribute = this.getAttribute(skill.attribute);
         // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
-        const limit = attribute.limit as Shadowrun.ActorAttribute || '';
+        const limit = attribute.limit || '';
         // Should a specialization be used?
         const spec = options.specialization || false;
 
@@ -1426,7 +1426,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             spec,
             attribute: skill.attribute,
             limit: {
-                base: 0, value: 0, mod: [],
                 attribute: limit,
                 base_formula_operator: 'add',
             },
@@ -2250,21 +2249,23 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * It's not necessary for the given item to be equipped.
      *
-     * @param unequipItem Input item that will be equipped while unequipping all others of the same type.
+     * @param toggledItem Input item that will be equipped while unequipping all others of the same type.
      */
-    async equipOnlyOneItemOfType(unequipItem: SR5Item) {
-        const sameTypeItems = this.items.filter(item => item.type === unequipItem.type);
-
-        // If the given item is the only of it's type, allow unequipping.
-        if (sameTypeItems.length === 1 && sameTypeItems[0].id === unequipItem.id) {
-            await unequipItem.update({ system: { technology: { equipped: !unequipItem.isEquipped() } } });
+    async equipOnlyOneItemOfType(toggledItem: SR5Item) {
+        // Allow unequipping of the only equipped item.
+        // This will leave all items as unequipped.
+        if (toggledItem.isEquipped()) {
+            await toggledItem.update({ system: { technology: { equipped: false } } });
             return
         }
+
+        // Unequipp all other items, while equipping the given item.
+        const sameTypeItems = this.items.filter(item => item.type === toggledItem.type);
 
         // For a set of items, assure only the selected is equipped.
         await this.updateEmbeddedDocuments('Item', sameTypeItems.map(item => ({
             _id: item.id,
-            system: { technology: { equipped: item.id === unequipItem.id } }
+            system: { technology: { equipped: item.id === toggledItem.id } }
         })));
     }
 

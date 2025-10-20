@@ -38,7 +38,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
     /**
      * The initially active CanvasLayer to re-activate after the workflow is complete.
      */
-    #initialLayer: CanvasLayer | undefined;
+    #initialLayer: TemplateLayer | undefined;
 
     /* -------------------------------------------- */
 
@@ -71,7 +71,9 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
             direction: 0,
             x: 0,
             y: 0,
-            fillColor: game.user?.color?.toRGBA(1),
+            // DataModel says it wants a string but breaks if given toRGBA(1)
+            // while happily accepting a Color instance...
+            fillColor: game.user?.color,
             distance: blast?.radius || 1, // Adhere to DataModel validation.
             dropoff: blast?.dropoff || 0
         };
@@ -105,7 +107,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
         return this.activatePreviewListeners(layer);
     }
 
-    async activatePreviewListeners(initialLayer: CanvasLayer): Promise<void> {
+    async activatePreviewListeners(initialLayer: TemplateLayer): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!canvas.ready) return;
 
@@ -117,22 +119,20 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
                 confirm: this._onConfirmPlacement.bind(this),
                 cancel: this._onCancelPlacement.bind(this),
                 rotate: this._onRotatePlacement.bind(this),
-                resolve: resolve,
-                reject: reject
+                resolve,
+                reject
             };
 
-            const canvasElement = canvas.app!.renderer!.view! as HTMLCanvasElement;
-
-            // Use canvas.view to attach DOM events
-            canvasElement.addEventListener("mousemove", this.#events.move);
-            canvasElement.addEventListener("mousedown", this.#events.confirm);
-            canvasElement.addEventListener("contextmenu", this.#events.cancel);
-            canvasElement.addEventListener("wheel", this.#events.rotate, { passive: false });
+            // Use canvas.view to attach PiXi events.
+            canvas.stage?.on("mousemove", this.#events.move);
+            canvas.stage?.on("mousedown", this.#events.confirm);
+            canvas.app!.view.oncontextmenu = this.#events.cancel;
+            canvas.app!.view.onwheel = this.#events.rotate;
         });
     }
     /**
      * Shared code for when template placement ends by being confirmed or canceled.
-    * @param {Event} event  Triggering event that ended the placement.
+    * @param event  Triggering event that ended the placement.
     */
     async _finishPlacement(event: PointerEvent) {
         if (!canvas.ready) return;
@@ -141,15 +141,13 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
         this.destroy();
 
         // Detach event listeners from the canvas DOM element
-        const canvasElement = canvas.app!.renderer!.view! as HTMLCanvasElement;
-        canvasElement.removeEventListener("mousemove", this.#events.move);
-        canvasElement.removeEventListener("mousedown", this.#events.confirm);
-        canvasElement.removeEventListener("contextmenu", this.#events.cancel);
-        canvasElement.removeEventListener("wheel", this.#events.rotate);
+        canvas.stage!.off("mousemove", this.#events.move);
+        canvas.stage!.off("mousedown", this.#events.confirm);
+        canvas.app!.view.oncontextmenu = null;
+        canvas.app!.view.onwheel = null;
 
-        // Reactivate previous layer, if necessary
         if (this.#initialLayer) {
-            (canvas as any)._setActiveLayer(this.#initialLayer);
+            this.#initialLayer.activate();
         }
 
         // Run the completion callback
@@ -167,8 +165,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
         const now = Date.now(); // Apply a 20ms throttle
         if (now - this.#moveTime <= 20) return;
         const center = event.data.getLocalPosition(this.layer);
-        const interval = canvas.grid!.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
-        const snapped = canvas.grid!.getSnappedPosition(center.x, center.y, interval);
+        const snapped = canvas.grid!.getSnappedPoint({x: center.x, y: center.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         this.document.updateSource({ x: snapped.x, y: snapped.y });
         this.refresh();
         this.#moveTime = now;
@@ -198,8 +195,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      */
     async _onConfirmPlacement(event) {
         await this._finishPlacement(event);
-        const interval = canvas.grid!.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
-        const destination = canvas.grid!.getSnappedPosition(this.document.x, this.document.y, interval);
+        const destination = canvas.grid!.getSnappedPoint({x: this.document.x, y: this.document.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         this.document.updateSource(destination);
         this.#events.resolve(canvas.scene!.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]));
     }

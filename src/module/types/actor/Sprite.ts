@@ -17,7 +17,7 @@ const SpriteData = () => ({
         initial: 'data',
         choices: SR5.spriteTypes,
     }),
-    special: new StringField({ required: true, initial: "resonance", readonly: true }),
+    special: new StringField({ required: true, initial: "resonance", choices: ["resonance"], readonly: true }),
 
     // === Matrix & Host ===
     matrix: new SchemaField(MatrixData()),

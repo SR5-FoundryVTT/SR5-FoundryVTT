@@ -10,7 +10,7 @@ export const characterInfoUpdaterTesting = (context: QuenchBatchContext) => {
     let importOptions = {};
     let chummerFile;
 
-    after(async () => { factory.destroy(); });
+    after(async () => { await factory.destroy(); });
 
     beforeEach(async () => {
         chummerFile = {

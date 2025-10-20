@@ -1,3 +1,4 @@
+import { SR5Item } from "../item/SR5Item";
 import { Translation } from "../utils/strings";
 import { MarkPlacementFlow } from "./flows/MarkPlacementFlow";
 import { HackOnTheFlyTest } from "./HackOnTheFlyTest";
@@ -42,5 +43,23 @@ export class OpposedHackOnTheFlyTest extends OpposedMatrixTest {
         // Place a mark on the target
         const marks = this.against.data.marks;
         await this.against.actor.setMarks(this.icon, marks);
+    }
+
+    /**
+     * When succeeeding against hack on the fly, the defender gets a mark on the attacker
+     */
+    override async processSuccess() {
+        if (!this.icon || !this.against.actor) {
+            console.error('Shadowrun 5e | Expected an active decker or icon', this.actor, this.icon);
+            return;
+        }
+
+        // While we support NPC backmarks, we don't support placing device owner marks yet. 
+        // As we also don't have device marks lists, do not place marks for matrix devices yet.
+        if (this.icon instanceof SR5Item && this.icon.type !== 'host') return;
+
+        // Place a mark on the attacker
+        const marks = this.against.data.marks;
+        await this.icon.setMarks(this.against.actor, marks);
     }
 }
