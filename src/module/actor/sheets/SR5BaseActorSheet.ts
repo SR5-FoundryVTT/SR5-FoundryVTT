@@ -115,10 +115,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         skills: '', // filter based on user input and skill name/label.
         showUntrainedSkills: true, // filter based on pool size.
     };
-    // Used together with _filters to delay textinput
-    _delays: SR5BaseSheetDelays = {
-        skills: null
-    }
     // Indicate if specific sections on sheet should be opened or closed.
     _inventoryOpenClose: Record<string, boolean> = {};
 
@@ -126,7 +122,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     selectedInventory: string;
 
     private readonly expandedSkills = new Set<string>();
-    private readonly hiddenSkills = new Set<string>();
+
+    // flag set while preparing inventory items to know if we actually have items
+    private hasInventoryItems = false;
+    // flag set while preparing effects to know if we have any effects
+    private hasEffects = false;
 
     constructor(options) {
         super(options);
@@ -298,6 +298,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.itemType = await this._prepareItemTypes(data);
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
+
+        this.hasEffects = (data.effects.length > 0 || data.itemEffects.length > 0);
+
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
@@ -363,6 +366,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             description.active = true;
             return { description };
         }
+        if (group === 'primary') {
+            this._cleanParts(this.actor, parts);
+        }
         return parts;
     }
 
@@ -376,7 +382,35 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 footer: retVal.footer,
             }
         }
+        this._cleanParts(this.actor, retVal);
         return retVal;
+    }
+
+    protected _cleanParts(actor: SR5Actor, parts: Record<string, any>) {
+        // if we should hide empty tabs
+        if (!this.isEditMode && !actor.system.category_visibility.default) {
+            if (!this.hasInventoryItems) {
+                delete parts['inventory'];
+            }
+            if (actor.isType('character') && actor.getMatrixDevice() === undefined) {
+                delete parts['matrix'];
+                delete parts['matrixActions'];
+                delete parts['networkIcons'];
+                delete parts['markedIcons'];
+                delete parts['ownedIcons'];
+                delete parts['programs'];
+            }
+            if (actor.items.filter(i => i.isType('sin', 'contact', 'lifestyle')).length === 0) {
+                delete parts['social']
+            }
+            if (actor.items.filter(i => i.isType('quality', 'metamagic', 'echo')).length === 0) {
+                delete parts['bio'];
+            }
+            if (!this.hasEffects) {
+                delete parts['effects'];
+            }
+        }
+        return parts;
     }
 
     override async _onRender(context, options) {
@@ -930,6 +964,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Each item can  be in one custom inventory or the default inventory.
      */
     async _prepareItemsInventory() {
+        this.hasInventoryItems = false;
         // All custom and default actor inventories.
         const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
@@ -1002,6 +1037,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     };
                 }
 
+                this.hasInventoryItems = true;
                 inventorySheet.types[item.type].items.push(item);
             })
         }
