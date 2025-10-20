@@ -1,17 +1,19 @@
-<div class="list-item list-item-header">
+<div class="list-item list-item-header list-item-favorites">
+    <div class="list-item-start">
     {{#each favorites}}
-    <div class="list-item-col">
-        <button class="list-item-image-container icon sr5-icon"
-                data-tooltip="{{this.name}} - {{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}"
+        <button class="list-item-image-container icon sr5-icon favorite"
             {{#if @root.isPlayMode}}
+                data-tooltip="{{this.name}} - {{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}"
                 data-action="rollItem"
             {{else}}
-                data-action="editItem"
+                data-tooltip="SR5.Tooltips.Actor.RemoveFavorite"
+                data-action="favoriteItem"
             {{/if}}
-                data-item-id="{{this.uuid}}">
+                data-item-id="{{this.id}}"
+                data-uuid="{{this.uuid}}">
             <img src="{{this.img}}"
                 {{#if @root.isEditMode}}
-                 class="list-item-image-edit"
+                 class="list-item-image-remove"
                 {{else if (hasRoll this)}}
                  class="list-item-image-roll"
                 {{else}}
@@ -19,12 +21,10 @@
                 {{/if}}
             />
         </button>
-    </div>
     {{else}}
-        <div class="list-item-start">
-            {{localize "SR5.Actor.NoFavoritesSelected"}}
-        </div>
+        <label>{{localize "SR5.Actor.NoFavoritesSelected"}}</label>
     {{/each}}
+    </div>
     <div class="list-item-icons">
         {{#if (eq actor.type 'vehicle')}}
             <a data-action="toggleChaseEnvironment" >

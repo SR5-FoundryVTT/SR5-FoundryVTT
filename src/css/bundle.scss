@@ -1567,10 +1567,11 @@ input[type='text'].display {
     }
     button.sr5-icon {
         border-color: transparent;
-        padding: 2px !important;
+        overflow: hidden;
+        padding: 0 !important;
         margin: 0 !important;
         &:hover {
-            border-color: $light;
+            border-color: $white;
         }
     }
 
@@ -2030,13 +2031,28 @@ input[type='text'].display {
         }
 
         .list-item-image-container {
-            min-width: 1.25rem;
-            max-width: 1.25rem;
-            min-height: 1.25rem;
-            max-height: 1.25rem;
+            min-width: 1.5rem;
+            width: 1.5rem;
+            max-width: 1.5rem;
+            min-height: 1.5rem;
+            height: 1.5rem;
+            max-height: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
+
+            &.favorite {
+                min-width: 1.75rem;
+                width: 1.75rem;
+                max-width: 1.75rem;
+                min-height: 1.75rem;
+                height: 1.75rem;
+                max-height: 1.75rem;
+            }
+
+            &:not(:hover).favorite {
+                border-color: rgba($light, 0.3);
+            }
 
             &:hover {
                 .list-item-image-roll {
@@ -2048,6 +2064,9 @@ input[type='text'].display {
                 }
                 .list-item-image-edit {
                     content: url('icons/redist/wrench.svg');
+                }
+                .list-item-image-remove {
+                    content: url('icons/cancel.svg');
                 }
                 .list-item-image-target {
                     content: url('icons/redist/target.svg');
@@ -2061,6 +2080,11 @@ input[type='text'].display {
         &.list-item-header {
             border-bottom: 1px solid $yellow;
             background: rgba($black, 0.7);
+        }
+
+        &.list-item-favorites {
+            background: linear-gradient(to top, rgba($black, 0.7), rgba($black, 0.1));
+            margin-top: 2px;
         }
 
         &:not(.nobg):nth-of-type(even), &.forcebg {
