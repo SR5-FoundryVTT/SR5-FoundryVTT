@@ -1,5 +1,4 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
-import { TrackType } from "../types/template/ConditionMonitors";
 import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
 
 export class SR5Token extends foundry.canvas.placeables.Token {
@@ -10,9 +9,8 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         // Shadowrun condition trackers count up from 0 to the maximum.
         // We flip the values from Shadowrun format to FoundryVTT format here
         // for drawing.
-        if (tokenHealthBars && data?.attribute.startsWith('track')) {
-            const track = data as unknown as TrackType;
-            track.value = track.max - track.value;
+        if (tokenHealthBars && 'max' in data && data.attribute.startsWith('track')) {
+            data.value = data.max - data.value;
         }
         return super._drawBar(number, bar, data);
     }
