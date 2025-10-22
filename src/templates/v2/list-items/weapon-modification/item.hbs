@@ -15,16 +15,32 @@
             <label>{{localizeOb item.system.mount_point @root.config.mountPoints}}</label>
         </div>
         <div class="list-item-col skinny-col">
-            <label>{{item.system.dice_pool}}</label>
-        </div>
-        <div class="list-item-col thicc-col">
-            <label>{{item.system.accuracy}}</label>
+            <label>
+                {{#if item.system.dice_pool}}
+                    {{numberFormat item.system.dice_pool sign=true}}
+                {{/if}}
+            </label>
         </div>
         <div class="list-item-col skinny-col">
-            <label>{{item.system.rc}}</label>
+            <label>
+                {{#if item.system.accuracy}}
+                    {{numberFormat item.system.accuracy sign=true}}
+                {{/if}}
+            </label>
         </div>
-        <div class="list-item-col thicc-col">
-            <label>{{item.system.conceal}}</label>
+        <div class="list-item-col skinny-col">
+            <label>
+                {{#if item.system.rc}}
+                    {{numberFormat item.system.rc sign=true}}
+                {{/if}}
+            </label>
+        </div>
+        <div class="list-item-col skinny-col">
+            <label>
+                {{#if item.system.technology.conceal.value}}
+                    {{numberFormat item.system.technology.conceal.value sign=true}}
+                {{/if}}
+            </label>
         </div>
 
         <div class="list-item-icons">

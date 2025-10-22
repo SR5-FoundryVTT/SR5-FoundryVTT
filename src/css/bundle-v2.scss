@@ -132,9 +132,6 @@
                 p.hint {
                     color: darken($yellow, 20%);
                 }
-                &:nth-of-type(even) {
-                    background: rgba($white, 0.03);
-                }
             }
         }
 

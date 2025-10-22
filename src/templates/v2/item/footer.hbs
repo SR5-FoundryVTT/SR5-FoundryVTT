@@ -82,11 +82,14 @@
                     </span>
                 </div>
             {{else if system.grade}}
-                <label>{{localizeOb system.grade @root.config.cyberwareGrades}}</label>
+                <label data-tooltip="{{systemFields.grade.label}}">
+                    <i class="far fa-memory"></i>
+                    {{localizeOb system.grade @root.config.cyberwareGrades}}
+                </label>
             {{/if}}
         {{else if (isType item 'modification')}}
             {{#if system.type}}
-                <label data-tooltip="{{systemFields.type.hint}}">{{localizeOb system.type @root.config.modificationTypes}}</label>
+                <label data-tooltip="{{systemFields.type.hint}}">{{localizeOb system.type @root.config.modificationTypes}}&nbsp;{{localize "SR5.Weapon.Mod"}}</label>
             {{/if}}
         {{else if (isType item 'program')}}
             {{#if @root.isEditMode}}
@@ -112,31 +115,34 @@
 
         {{#unless isLimited}}
             {{#if system.technology}}
-                <div class="basic-row hover-show-button-container">
-                    <label>{{localize "SR5.Qty"}}</label>
-                    {{#if @root.isPlayMode}}
-                        {{#if isEditable}}
-                            <a class="hover-show-button"
-                               data-action="removeOneQty"
-                               data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty">
-                                <i class="fas fa-minus-square"></i>
-                            </a>
+                {{!-- Hide Quantity for SINs as this should always be a unique item --}}
+                {{#unless (isType item 'sin')}}
+                    <div class="basic-row hover-show-button-container">
+                        <label>{{localize "SR5.Qty"}}</label>
+                        {{#if @root.isPlayMode}}
+                            {{#if isEditable}}
+                                <a class="hover-show-button"
+                                   data-action="removeOneQty"
+                                   data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty">
+                                    <i class="fas fa-minus-square"></i>
+                                </a>
+                            {{/if}}
+                            <label>{{system.technology.quantity}}</label>
+                            {{#if isEditable}}
+                                <a class="hover-show-button"
+                                   data-action="addOneQty"
+                                   data-tooltip="SR5.ItemSheet.Labels.AddOneQty">
+                                    <i class="fas fa-plus-square"></i>
+                                </a>
+                            {{/if}}
+                        {{else}}
+                            <span>
+                                {{formInput systemFields.technology.fields.quantity value=source.system.technology.quantity
+                                            classes="short midd" rootId=rootId disabled=@root.isPlayMode}}
+                            </span>
                         {{/if}}
-                        <label>{{system.technology.quantity}}</label>
-                        {{#if isEditable}}
-                            <a class="hover-show-button"
-                               data-action="addOneQty"
-                               data-tooltip="SR5.ItemSheet.Labels.AddOneQty">
-                                <i class="fas fa-plus-square"></i>
-                            </a>
-                        {{/if}}
-                    {{else}}
-                        <span>
-                            {{formInput systemFields.technology.fields.quantity value=source.system.technology.quantity
-                                        classes="short midd" rootId=rootId disabled=@root.isPlayMode}}
-                        </span>
-                    {{/if}}
-                </div>
+                    </div>
+                {{/unless}}
 
                 {{#if @root.isEditMode}}
                     <div class="basic-row">
@@ -212,20 +218,20 @@
 
                 {{#if @root.isEditMode}}
                     <span>
-                    <label data-tooltip="{{systemFields.pp.hint}}">{{systemFields.pp.label}}</label>
-                        {{formInput systemFields.pp value=source.system.pp classes="short skinny"
-                                    rootId=@root.rootId disabled=@root.isPlayMode}}
-                </span>
+                        <label data-tooltip="{{systemFields.pp.hint}}">{{systemFields.pp.label}}</label>
+                            {{formInput systemFields.pp value=source.system.pp classes="short skinny"
+                                        rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
                 {{else}}
                     <label data-tooltip="{{systemFields.pp.hint}}">{{systemFields.pp.label}}&nbsp;{{system.pp}}</label>
                 {{/if}}
 
                 {{#if @root.isEditMode}}
                     <span>
-                    <label data-tooltip="{{systemFields.level.hint}}">{{systemFields.level.label}}</label>
-                        {{formInput systemFields.level value=source.system.level
-                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                </span>
+                        <label data-tooltip="{{systemFields.level.hint}}">{{systemFields.level.label}}</label>
+                            {{formInput systemFields.level value=source.system.level
+                                        classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
                 {{else}}
                     <label data-tooltip="{{systemFields.level.hint}}">{{systemFields.level.label}}&nbsp;{{system.level}}</label>
                 {{/if}}
@@ -290,10 +296,13 @@
                 {{/if}}
             {{else if (eq item.type 'contact')}}
                 {{#if @root.isEditMode}}
-                    <span data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
-                        {{formInput systemFields.type value=source.system.type
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
+                    <div class="basic-row">
+                        <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
+                        <span>
+                            {{formInput systemFields.type value=source.system.type
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </span>
+                    </div>
                 {{else}}
                     <label>{{system.type}}</label>
                 {{/if}}
@@ -345,8 +354,11 @@
                     <label>{{systemFields.group.label}}</label>
                 {{/if}}
             {{else if (eq item.type 'critter_power')}}
+
                 {{#if @root.isEditMode}}
-                    <span data-tooltip="{{systemFields.powerType.label}}: &nbsp;{{systemFields.powerType.hint}}">
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.powerType.hint}}">{{systemFields.powerType.label}}</label>
+                    <span>
                         {{formInput systemFields.powerType value=source.system.powerType localize=true
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </span>
@@ -440,10 +452,13 @@
 
             {{else if (eq item.type 'lifestyle')}}
                 {{#if @root.isEditMode}}
-                    <span data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
-                        {{formInput systemFields.type value=source.system.type localize=true
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
+                    <div class="basic-row">
+                        <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
+                        <span>
+                            {{formInput systemFields.type value=source.system.type localize=true
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </span>
+                    </div>
                 {{else}}
                     <label>{{localizeOb system.type @root.config.lifestyleTypes}}&nbsp;{{localize "SR5.ItemTypes.Lifestyle"}}</label>
                 {{/if}}
@@ -505,7 +520,7 @@
             {{else if (eq item.type 'quality')}}
                 {{#if @root.isEditMode}}
                     <div class="basic-row">
-                        <label data-tooltip=":&nbsp;{{systemFields.type.hint}}">
+                        <label data-tooltip="{{systemFields.type.hint}}">
                             {{systemFields.type.label}}
                         </label>
                         <span>
@@ -541,10 +556,13 @@
                 {{/if}}
             {{else if (eq item.type 'ritual')}}
                 {{#if @root.isEditMode}}
-                    <span data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
-                        {{formInput systemFields.type value=source.system.type localize=true
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
+                    <div class="basic-row">
+                        <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
+                        <span>
+                            {{formInput systemFields.type value=source.system.type localize=true
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </span>
+                    </div>
                 {{else}}
                     <label data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
                         {{localizeOb system.type @root.config.ritualSpellTypes}}
@@ -711,15 +729,15 @@
 
             {{#if systemFields.capacity}}
                 {{#if @root.isEditMode}}
-                    <span data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
-                    <label>
-                        <i class="fas fa-toolbox"></i>
-                    </label>
-                    <span>
-                        {{formInput systemFields.capacity value=source.system.capacity
-                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    <span class="basic-row" data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
+                        <label>
+                            <i class="fas fa-toolbox"></i>
+                        </label>
+                        <span>
+                            {{formInput systemFields.capacity value=source.system.capacity
+                                        classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </span>
                     </span>
-                </span>
                 {{else if system.capacity}}
                     <label data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
                         <i class="fas fa-toolbox"></i>&nbsp;{{system.capacity}}
