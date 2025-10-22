@@ -52,7 +52,8 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         #createFilters() {
             return (this.options as any)?.filters?.map((s) => {
                 s.callback = s.callback.bind(this);
-                return new SearchFilter(s);
+                // Add the 'foundry.applications.ux' namespace here
+                return new foundry.applications.ux.SearchFilter(s);
             }) ?? [];
         }
 
