@@ -24,7 +24,10 @@
         </div>
     {{/if}}
     <div class="list-item">
-        {{#if (isType item 'call_in_action')}}
+        {{#if (isType item 'action')}}
+            {{> "systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs" item=item }}
+
+        {{else if (isType item 'call_in_action')}}
             {{#if @root.isEditMode}}
                 <div class="basic-row">
                     <label data-tooltip="{{systemFields.actor_type.hint}}">{{systemFields.actor_type.label}}</label>
@@ -56,7 +59,7 @@
                     </span>
                 </div>
             {{else}}
-                <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.gridCategories}}</label>
+                <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.gridCategories}}&nbsp;{{localize "TYPES.Item.grid"}}</label>
             {{/if}}
         {{else if (isType item 'device')}}
             {{#if @root.isEditMode}}

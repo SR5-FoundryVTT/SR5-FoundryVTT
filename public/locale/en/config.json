@@ -876,7 +876,8 @@
             "EditSkill": "Edit Skill",
             "MoveItem": "Move Item",
             "Source": "Open Reference",
-            "View": "View"
+            "View": "View",
+            "ViewItem": "View Item"
         },
         "Continue": "Continue",
         "ControlRig": "Control Rig",
@@ -1145,6 +1146,14 @@
         "GlitchCritical": "Critical Glitch!",
         "Glitches": "Glitches:",
         "GoodCover": "Good Cover",
+        "Grid": {
+            "FIELDS": {
+                "category": {
+                    "label": "Grid Type",
+                    "hint": "Public Grids apply a negative modifier while connected, Local and Global Grids have no modifiers"
+                }
+            }
+        },
         "Grids": "Grids",
         "HackingProgram": "Hacking Program",
         "Help": "Help",

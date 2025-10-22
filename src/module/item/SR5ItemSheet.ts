@@ -278,9 +278,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     override async _prepareContext(options) {
         const data = await super._prepareContext(options) as any;
         const itemData = this.item.toObject(false).system as SR5Item['system'];
+        data.actor = this.item.actorOwner;
 
-        const linkedActor = await this.item.getLinkedActor();
-        
         // Calculated values for derived data.
         data.calculatedEssence = itemData.technology?.calculated.essence.adjusted ?? false;
         data.calculatedCost = data.calculatedEssence ? true : itemData.technology?.calculated.cost.adjusted ?? false;
@@ -427,10 +426,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         data.isNestedItem = this.item._isNestedItem;
 
-        return {
-            ...data,
-            linkedActor
-        }
+        return data;
     }
 
     /**

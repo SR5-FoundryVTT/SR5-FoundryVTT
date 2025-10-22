@@ -8,7 +8,11 @@
     {{/if}}
     <label>
         {{#if item.system.action.skill}}
-                {{localizeSkill (objValue @root.actor.system.skills.active item.system.action.skill)}}&nbsp;+&nbsp;{{localizeOb item.system.action.attribute @root.config.attributes}}
+                {{#if @root.actor.system.skills.active}}
+                    {{localizeSkill (objValue @root.actor.system.skills.active item.system.action.skill)}}
+                {{else}}
+                    {{localizeOb item.system.action.skill @root.config.activeSkills}}
+                {{/if}}&nbsp;+&nbsp;{{localizeOb item.system.action.attribute @root.config.attributes}}
         {{else if item.system.action.attribute2}}
             {{localizeOb item.system.action.attribute @root.config.attributes}}&nbsp;+&nbsp;{{localizeOb item.system.action.attribute2 @root.config.attributes}}
         {{else if item.system.action.attribute}}
