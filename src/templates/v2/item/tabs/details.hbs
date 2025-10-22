@@ -449,7 +449,7 @@
                     </div>
                     <div class="list-item-col">
                         {{formInput systemFields.action.fields.test value=system.action.test options=(tests2Array activeTests)
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                    classes="short" rootId=@root.rootId disabled=true}}
                     </div>
                 </div>
                 {{#if system.action.test}}
@@ -640,7 +640,8 @@
                     </div>
                     <div class="list-item-col">
                         {{formInput systemFields.action.fields.opposed.fields.test value=system.action.opposed.test
-                                    options=(tests2Array opposedTests) classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                    options=(tests2Array opposedTests) classes="short" rootId=@root.rootId
+                                    disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapons')) }}
                     </div>
                 </div>
 
@@ -687,7 +688,8 @@
                     <div class="list-item-col">
                         {{formInput systemFields.action.fields.opposed.fields.resist.fields.test
                                     value=system.action.opposed.resist.test options=(tests2Array resistTests)
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                    classes="short" rootId=@root.rootId
+                                    disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapons')) }}
                     </div>
                 </div>
 
