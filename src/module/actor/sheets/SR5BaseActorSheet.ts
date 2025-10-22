@@ -123,8 +123,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     private readonly expandedSkills = new Set<string>();
 
-    // flag set while preparing inventory items to know if we actually have items
-    private hasInventoryItems = false;
     // flag set while preparing effects to know if we have any effects
     private hasEffects = false;
 
@@ -389,7 +387,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     protected _cleanParts(actor: SR5Actor, parts: Record<string, any>) {
         // if we should hide empty tabs
         if (!this.isEditMode && !actor.system.category_visibility.default) {
-            if (!this.hasInventoryItems) {
+            // look for actor items that go in the inventory tab and delete the tab/part if none exist
+            if (actor.items.filter(i => i.isType('modification', 'weapon', 'equipment', 'armor', 'bioware', 'cyberware', 'device')).length === 0) {
                 delete parts['inventory'];
             }
             if (actor.isType('character') && actor.getMatrixDevice() === undefined) {
@@ -964,7 +963,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Each item can  be in one custom inventory or the default inventory.
      */
     async _prepareItemsInventory() {
-        this.hasInventoryItems = false;
         // All custom and default actor inventories.
         const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
@@ -1037,7 +1035,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     };
                 }
 
-                this.hasInventoryItems = true;
                 inventorySheet.types[item.type].items.push(item);
             })
         }
