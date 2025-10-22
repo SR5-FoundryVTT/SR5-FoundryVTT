@@ -62,6 +62,8 @@
             {{else if system.grade}}
                 <label>{{localizeOb system.grade @root.config.cyberwareGrades}}</label>
             {{/if}}
+        {{else if (isType item 'modification')}}
+            <label data-tooltip="{{systemFields.type.hint}}">{{localizeOb system.type @root.config.modificationTypes}}</label>
         {{else if (isType item 'program')}}
             {{#if @root.isEditMode}}
                 <div class="basic-row">
