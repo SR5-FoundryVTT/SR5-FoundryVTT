@@ -26,30 +26,53 @@
     <div class="list-item">
         {{#if (isType item 'grid')}}
             {{#if @root.isEditMode}}
-                <span>
-                    {{formInput systemFields.category value=source.system.category localize=true
-                                classes="short" rootId=@root.rootId}}
-                </span>
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.category.hint}}">{{systemFields.category.label}}</label>
+                    <span>
+                        {{formInput systemFields.category value=source.system.category localize=true
+                                    classes="short" rootId=@root.rootId}}
+                    </span>
+                </div>
             {{else}}
                 <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.gridCategories}}</label>
             {{/if}}
         {{else if (isType item 'device')}}
             {{#if @root.isEditMode}}
-                <span>
-                    {{formInput systemFields.category value=source.system.category localize=true
-                                classes="short" rootId=@root.rootId}}
-                </span>
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.category.hint}}">{{systemFields.category.label}}</label>
+                    <span>
+                        {{formInput systemFields.category value=source.system.category localize=true
+                                    classes="short" rootId=@root.rootId}}
+                    </span>
+                </div>
             {{else}}
                 <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.deviceCategories}}</label>
             {{/if}}
         {{else if (isType item 'bioware' 'cyberware')}}
             {{#if @root.isEditMode}}
-                <span data-tooltip="{{systemFields.grade.label}}:&nbsp;{{systemFields.grade.hint}}">
-                    {{formInput systemFields.grade value=source.system.grade localize=true
-                                classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
-                </span>
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.grade.hint}}">
+                        {{systemFields.grade.label}}
+                    </label>
+                    <span>
+                        {{formInput systemFields.grade value=source.system.grade localize=true
+                                    classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                </div>
             {{else if system.grade}}
                 <label>{{localizeOb system.grade @root.config.cyberwareGrades}}</label>
+            {{/if}}
+        {{else if (isType item 'program')}}
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
+                    <span>
+                        {{formInput systemFields.type value=source.system.type localize=true
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </span>
+                </div>
+            {{else}}
+                <label>{{localizeOb item.system.type @root.config.programTypes}}</label>
             {{/if}}
         {{/if}}
 
@@ -423,15 +446,6 @@
 
                 {{else}}
                     <label>{{systemFields.karma.label}}&nbsp;{{system.karma}}</label>
-                {{/if}}
-            {{else if (eq item.type 'program')}}
-                {{#if @root.isEditMode}}
-                    <span data-toolt="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">
-                        {{formInput systemFields.type value=source.system.type localize=true
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
-                {{else}}
-                    <label>{{item.system.type}}</label>
                 {{/if}}
             {{else if (eq item.type 'ritual')}}
                 {{#if @root.isEditMode}}
