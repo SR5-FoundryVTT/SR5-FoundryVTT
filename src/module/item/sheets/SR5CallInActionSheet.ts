@@ -91,7 +91,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
      * User requested removal of the prepared sprite.
      */
     static async #removeSprite(this: SR5CallInActionSheet, event) {
-        await this.item.update({ system: { spirit: { uuid: '' } } });
+        await this.item.update({ system: { sprite: { uuid: '' } } });
     }
 
     /**
