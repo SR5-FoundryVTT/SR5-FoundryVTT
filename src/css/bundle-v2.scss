@@ -163,6 +163,11 @@
         }
     }
 
+    // remove padding from tooltips that are customized
+    &#tooltip {
+        padding: 0;
+    }
+
     button.toggle-fresh-import {
         width: 1.5rem;
         flex-shrink: 0;
