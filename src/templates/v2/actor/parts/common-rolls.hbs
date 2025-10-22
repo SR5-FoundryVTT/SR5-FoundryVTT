@@ -3,7 +3,7 @@
     {{#each favorites}}
         <button class="list-item-image-container icon sr5-icon favorite"
             {{#if @root.isPlayMode}}
-                data-tooltip="{{this.name}} - {{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}"
+                data-tooltip="{{this.name}}"
                 data-action="rollItem"
             {{else}}
                 data-tooltip="SR5.Tooltips.Actor.RemoveFavorite"

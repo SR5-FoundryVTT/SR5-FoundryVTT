@@ -2,29 +2,38 @@
     <div class="list-item">
         {{#if (eq actor.type 'character')}}
             {{#if @root.isEditMode}}
-                <span>
-                    {{formInput systemFields.metatype value=source.system.metatype rootId=rootId localize=true classes="short thicc" }}
-                </span>
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.metatype.hint}}">{{systemFields.metatype.label}}</label>
+                    <span>
+                        {{formInput systemFields.metatype value=source.system.metatype rootId=rootId localize=true classes="short thicc" }}
+                    </span>
+                </div>
             {{else}}
                 <label>{{localizeOb system.metatype config.character.types}}</label>
             {{/if}}
 
-            {{#if system.is_npc}}
-                <label>{{localize "SR5.IsNPC"}}</label>
-            {{/if}}
+            {{#if @root.isPlayMode}}
+                {{#if system.is_npc}}
+                    <label>{{localize "SR5.IsNPC"}}</label>
+                {{/if}}
 
-            {{#if system.is_critter}}
-                <label>{{localize "SR5.IsCritter"}}</label>
-            {{/if}}
+                {{#if system.is_critter}}
+                    <label>{{localize "SR5.IsCritter"}}</label>
+                {{/if}}
 
-            {{#if system.is_grunt}}
-                <label>{{localize "SR5.IsGrunt"}}</label>
+                {{#if system.is_grunt}}
+                    <label>{{localize "SR5.IsGrunt"}}</label>
+                {{/if}}
             {{/if}}
 
             {{#unless isLimited}}
                 {{#unless (or system.is_npc system.is_critter)}}
                     <label>
-                        <a data-action="openNuyenManager"><i class="fas fa-yen"></i></a>&nbsp;
+                        {{#if (and @root.isEditable @root.isPlayMode)}}
+                            <a data-action="openNuyenManager"><i class="fas fa-yen"></i></a>
+                        {{else}}
+                            <label><i class="fas fa-yen"></i></label>
+                        {{/if}}
                         {{#if @root.isEditMode}}
                             {{formInput systemFields.nuyen value=source.system.nuyen rootId=rootId classes="short thicc"}}
                         {{else}}
@@ -32,7 +41,11 @@
                         {{/if}}
                     </label>
                     <label>
-                        <a data-action="openReputationManager"><i class="fas fa-people-group"></i></a>&nbsp;
+                        {{#if (and @root.isEditable @root.isPlayMode)}}
+                            <a data-action="openReputationManager"><i class="fas fa-people-group"></i></a>&nbsp;
+                        {{else}}
+                            <label><i class="fas fa-people-group"></i></label>
+                        {{/if}}
                         <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.ActorSheet.Labels.StreetCredShort"}}&nbsp;
                             {{#if @root.isEditMode}}
                                 {{formInput systemFields.street_cred value=source.system.street_cred rootId=rootId classes="short skinny"}}
@@ -58,7 +71,11 @@
                         </span>
                     </label>
                     <label data-tooltip="SR5.Karma">
-                        <a data-action="openKarmaManager"><i class="fas fa-yin-yang"></i></a>&nbsp;
+                        {{#if (and @root.isEditable @root.isPlayMode)}}
+                            <a data-action="openKarmaManager"><i class="fas fa-yin-yang"></i></a>
+                        {{else}}
+                            <label><i class="fas fa-yin-yang"></i></label>
+                        {{/if}}
                         {{#if @root.isEditMode}}
                             {{formInput systemFields.karma.fields.value value=source.system.karma.value
                                         classes="short skinny" rootId=rootId }}&nbsp;({{formInput systemFields.karma.fields.max value=source.system.karma.max
