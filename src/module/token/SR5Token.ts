@@ -1,5 +1,6 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
+import PrototypeTokenConfig = foundry.applications.sheets.PrototypeTokenConfig;
 
 export class SR5Token extends foundry.canvas.placeables.Token {
     override _drawBar(number: number, bar: PIXI.Graphics, data: NonNullable<TokenDocument.GetBarAttributeReturn>) {
@@ -28,9 +29,14 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         return super.findMovementPath(waypoints, options);
     }
 
-    static tokenConfig(app: any, html: HTMLElement, data: any, options: any) {
-        console.log(app, html, data, options);
-        if (!RoutingLibIntegration.routingLibReady || !app.actor?.system?.movement) return;
+    static tokenConfig(
+        app: any, // TokenConfig | PrototypeTokenConfig, Stubs on FVTT-Types
+        html: HTMLElement,
+        data: TokenConfig.RenderContext | PrototypeTokenConfig.RenderContext,
+        options: TokenConfig.RenderOptions | PrototypeTokenConfig.RenderOptions
+    ) {
+        const actor = app.actor as Actor.Implementation | null | undefined;
+        if (!RoutingLibIntegration.routingLibReady || !actor?.system.movement) return;
 
         // Default it to true, so that it is enabled by default.
         const flagValue = app.token.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;
