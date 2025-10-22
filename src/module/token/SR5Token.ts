@@ -10,7 +10,7 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         // Shadowrun condition trackers count up from 0 to the maximum.
         // We flip the values from Shadowrun format to FoundryVTT format here
         // for drawing.
-        if (tokenHealthBars && 'max' in data && data.attribute.startsWith('track')) {
+        if (tokenHealthBars && data.type === 'bar' && data.attribute.startsWith('track')) {
             data.value = data.max - data.value;
         }
         return super._drawBar(number, bar, data);
