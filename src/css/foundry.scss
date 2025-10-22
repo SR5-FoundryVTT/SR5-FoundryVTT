@@ -233,10 +233,12 @@ nav#context-menu {
     background-size: 100% 20px auto;
 
     li {
+        color: $light;
         &:not(:hover):nth-of-type(even) {
             background: rgba(white, 0.03);
         }
         &:hover {
+            color: $white;
             background: rgba($darkred, 0.7);
         }
     }
