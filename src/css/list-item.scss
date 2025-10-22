@@ -226,8 +226,18 @@
                 flex: 0 0 4rem;
             }
 
-            &.slots-col, &.matrix-network-col {
+            &.slots-col {
                 flex: 0 0 5rem;
+            }
+
+            &.matrix-network-col {
+                flex: 0 0 4rem;
+                > label {
+                    width: 4rem;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
             }
 
             &.mark-input-col, &.qty-input-col {

@@ -15,7 +15,8 @@
         </div>
 
         <div class="list-item-col matrix-network-col">
-            <label>
+            {{!-- Add tooltip of the network incase it is cut off by being too long --}}
+            <label data-tooltip="{{item.network}}">
                 {{item.network}}
             </label>
         </div>

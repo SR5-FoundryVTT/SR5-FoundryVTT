@@ -138,6 +138,8 @@
             }
         }
 
+        // modify tabs to have a darkred background and light text
+        // when selected, the tab inverts its colors to be a light background with darkred text
         .tabs {
             margin-top: .5rem;
             border-top: none;
