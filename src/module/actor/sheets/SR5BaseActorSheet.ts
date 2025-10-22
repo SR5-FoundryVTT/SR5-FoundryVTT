@@ -1873,6 +1873,26 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return [
             SheetFlow._getSourceContextOption(),
             {
+                // context menu to view items that aren't an embedded item of this actor
+                name: "SR5.ContextOptions.ViewItem",
+                icon: "<i class='fas fa-eye'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    if (item) return false;
+                    const uuid = SheetFlow.closestUuid(target);
+                    const document = SheetFlow.fromUuidSync(uuid);
+                    return document && document instanceof SR5Item;
+                },
+                callback: async (target) => {
+                    const uuid = SheetFlow.closestUuid(target);
+                    const document = SheetFlow.fromUuidSync(uuid);
+                    if (document && document instanceof SR5Item) {
+                        await document.sheet?.render(true)
+                    }
+                }
+            },
+            {
                 name: "SR5.ContextOptions.EditItem",
                 icon: "<i class='fas fa-pen-to-square'></i>",
                 condition: (target) => {

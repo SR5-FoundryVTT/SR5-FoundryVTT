@@ -725,6 +725,18 @@
 
                 {{/if}}
 
+            {{else if (isType item 'sprite_power')}}
+                {{#if @root.isEditMode}}
+                    <div class="basic-row">
+                        <label>{{systemFields.duration.label}}</label>
+                        <div data-tooltip="{{systemFields.duration.label}}:&nbsp;{{systemFields.duration.hint}}">
+                            {{formInput systemFields.duration value=source.system.duration localize=true
+                                        classes="short midd" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </div>
+                    </div>
+                {{else}}
+                    <label>{{systemFields.duration.label}}:&nbsp;{{localizeOb system.duration @root.config.spritePower.durations}}</label>
+                {{/if}}
             {{/if}}
 
             {{#if systemFields.capacity}}

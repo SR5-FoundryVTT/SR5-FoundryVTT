@@ -2459,6 +2459,23 @@
             }
         },
         "SpritePower": {
+            "Durations": {
+                "Always": "Always",
+                "Instant": "Instant",
+                "Permanent": "Permanent",
+                "Special": "Special",
+                "Sustained": "Sustained"
+            },
+            "FIELDS": {
+                "optional": {
+                    "label": "Optional",
+                    "hint": "If the Sprite Power is Optional"
+                },
+                "duration": {
+                    "label": "Duration",
+                    "hint": "Duration of the Sprite Power"
+                }
+            },
             "IsOptional": "Optionality",
             "Optional": {
                 "DisabledOption": "Optional, disabled",
