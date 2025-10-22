@@ -267,6 +267,22 @@
         }
     }
 
+    .hover-show-button-container {
+        // hide "hover buttons" by default, show by growing the font-size
+        .hover-show-button {
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity .25s ease-in-out;
+        }
+
+        &:hover {
+            .hover-show-button {
+                opacity: 1;
+            }
+        }
+
+    }
+
     /**
      * Elements used for linkable documents / entities.
      *

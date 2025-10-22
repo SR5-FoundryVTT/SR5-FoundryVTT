@@ -175,19 +175,6 @@
             align-items: center;
             gap: 0.1rem;
 
-            // hide "hover buttons" by default, show by growing the font-size
-            .hover-show-button {
-                font-size: 0.8rem;
-                visibility: hidden;
-            }
-
-            &:hover {
-                .hover-show-button {
-                    visibility: visible;
-                }
-            }
-
-
             &.select-col {
                 justify-content: start;
                 flex: 2;

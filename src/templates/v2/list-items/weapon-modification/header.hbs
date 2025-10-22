@@ -1,4 +1,4 @@
-<div class="list-item list-item-header{{#if @root.isPlayMode}} collapsible-header{{/if}}"
+<div class="list-item list-item-header {{cssClass}} {{#if @root.isPlayMode}} collapsible-header{{/if}}"
     {{#unless @root.isEditMode}}
      data-action="toggleExpanded"
      data-item-type="{{type}}"
@@ -10,19 +10,19 @@
     </div>
 
     <div class="list-item-col thicc-col">
-        {{localize "SR5.MountPoint"}}
+        <label>{{localize "SR5.MountPoint"}}</label>
     </div>
     <div class="list-item-col skinny-col">
-        {{localize "SR5.DP"}}
+        <label>{{localize "SR5.DP"}}</label>
     </div>
     <div class="list-item-col thicc-col">
-        {{localize "SR5.Accuracy"}}
+        <label>{{localize "SR5.Accuracy"}}</label>
     </div>
     <div class="list-item-col skinny-col">
-        {{localize "SR5.RecoilCompensation"}}
+        <label>{{localize "SR5.RecoilCompensation"}}</label>
     </div>
     <div class="list-item-col thicc-col">
-        {{localize "SR5.Conceal"}}
+        <label>{{localize "SR5.Conceal"}}</label>
     </div>
 
     <div class="list-item-icons">

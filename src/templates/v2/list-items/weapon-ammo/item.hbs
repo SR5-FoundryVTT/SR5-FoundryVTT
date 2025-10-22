@@ -11,16 +11,18 @@
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
         </div>
 
-        <div class="list-item-col qty-input-col">
+        <div class="list-item-col qty-input-col hover-show-button-container">
             {{#if @root.isEditMode}}
                 <input type="number" class="item-quantity-input" value="{{item.system.technology.quantity}}" min="0" max="999">
             {{else}}
-                <a data-action="removeItemQty"
+                <a class="hover-show-button"
+                   data-action="removeItemQty"
                    data-tooltip="SR5.ActorSheet.Labels.RemoveOneQty">
                     <i class="fas fa-minus-square"></i>
                 </a>
                 <label>{{item.system.technology.quantity}}</label>
-                <a data-action="addItemQty"
+                <a class="hover-show-button"
+                   data-action="addItemQty"
                    data-tooltip="SR5.ActorSheet.Labels.AddOneQty">
                     <i class="fas fa-plus-square"></i>
                 </a>
