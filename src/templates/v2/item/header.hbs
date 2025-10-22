@@ -96,7 +96,7 @@
             <div class="list-item-start">
                 {{#if (eq item.type 'contact')}}
                     {{#if linkedActor}}
-                        <span class="document-img-name">
+                        <span class="basic-row">
                             <img src="{{linkedActor.img}}" width="16px" height="16px" />
                             <a class="content-link"
                                draggable="true"
@@ -115,18 +115,18 @@
                 {{#if systemFields.technology}}
                     {{#unless (eq system.technology.wireless 'none')}}
                         {{#if master}}
-                            <span class="document-img-name">
-                            <img src="{{master.img}}" width="16px" height="16px" />
-                            <a class="content-link"
-                               draggable="true"
-                               data-link
-                               data-type="Actor"
-                               data-id="{{master.id}}"
-                               data-uuid="{{master.uuid}}">
-                                {{master.name}}
-                            </a>
-                            <a data-action="removeMaster" class="close"><i class="fas fa-times"></i></a>
-                        </span>
+                            <span class="basic-row">
+                                <img src="{{master.img}}" width="16px" height="16px" />
+                                <a class="content-link"
+                                   draggable="true"
+                                   data-link
+                                   data-type="Actor"
+                                   data-id="{{master.id}}"
+                                   data-uuid="{{master.uuid}}">
+                                    {{master.name}}
+                                </a>
+                                <a data-action="removeMaster" class="close"><i class="fas fa-times"></i></a>
+                            </span>
                         {{else}}
                             <label>{{localize "SR5.Labels.Sheet.MissingNetworkDevices"}}</label>
                         {{/if}}

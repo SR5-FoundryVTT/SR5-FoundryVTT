@@ -1,0 +1,27 @@
+.sr5v2 {
+    /** CSS for the Environmental Modifier Application Window
+     *
+     */
+    button.env-modifier {
+        text-align: left;
+        font-size: var(--font-size-13) !important;
+        line-height: normal;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .env-modifier-active {
+        border-radius: 8px;
+        //box-shadow: $dark-sunken-box-shadow;
+        background-color: $darkred; //$dark-sunken;
+        color: $yellow;
+    }
+
+    .env-modifier-total {
+        font-weight: bold;
+    }
+
+    td.env-modifier-level {
+        padding-right: 6px;
+    }
+}

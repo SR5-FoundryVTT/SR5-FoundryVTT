@@ -59,14 +59,14 @@
                     <div class="list-item-start">
                         {{#if vehicle.master}}
                             <label>{{localize "SR5.Labels.ActorSheet.ConnectedTo"}}:&nbsp;</label>
-                            <div class="document-img-name">
+                            <div class="basic-row">
                                 {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" network }}
                                 <a data-action="openUuid" data-uuid="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
                             </div>
                         {{else}}
                             {{#if network}}
                                 <label>{{localize "SR5.Labels.ActorSheet.ConnectedTo"}}:&nbsp;</label>
-                                <div class="document-img-name">
+                                <div class="basic-row">
                                     {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" network }}
                                     <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>
                                 </div>

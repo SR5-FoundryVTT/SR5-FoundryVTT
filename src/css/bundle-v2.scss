@@ -1,0 +1,474 @@
+.sr5v2 {
+    box-shadow: 0 0 10px 5px rgba($yellow, 0.4);
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+    background-repeat: repeat;
+    background-size: 100% 20px auto;
+
+    // color links as light and be white on hover
+    a {
+        color: $light;
+        &:hover {
+            color: $white;
+        }
+    }
+    // labels are all yellow to differentiate between links
+    label {
+        color: $yellow;
+    }
+    // buttons use the link color for border and text color, on hover it fills in with a darkred background
+    button {
+        color: $light;
+        border-color: $light;
+        &:hover {
+            color: $white;
+            background: $darkred;
+        }
+    }
+
+    .window-header {
+        --background: unset;
+        background: unset;
+        border-bottom: none;
+        height: 2rem;
+        max-height: 2rem;
+    }
+
+    // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
+    &.named-sheet {
+        input.sheet-name {
+            @include systemFonts;
+            flex-shrink: 0;
+            background: $nameplate-background;
+            border: none;
+            margin-bottom: 0;
+            font-size: 1.5rem;
+            height: 100%;
+            padding: .5rem;
+            vertical-align: center;
+        }
+        &:not(.minimized) {
+            .window-header {
+                margin-bottom: 0;
+                .window-title {
+                    font-size: 0;
+                    height: 0;
+                }
+            }
+        }
+    }
+
+    .window-content {
+        padding: 0 .25rem .25rem .25rem;
+        // transparent doesn't seem to show the background from above so set it to the same thing with a slightly different gradient
+        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+        background-repeat: repeat;
+        background-size: 100% 20px auto;
+
+        .sheet-image {
+            flex: none;
+            margin: .25rem;
+            width: 5rem;
+            height: 5rem;
+        }
+
+        .sheet-header {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: start;
+            align-items: start;
+            width: 100%;
+            padding: 0;
+
+            .sheet-header-col {
+                flex: none;
+                display: flex;
+                justify-content: start;
+                align-items: center;
+                flex-flow: column nowrap;
+                gap: .25rem;
+            }
+
+            .sheet-header-labels {
+                flex: 1;
+                display: flex;
+                flex-flow: column nowrap;
+                gap: 1px;
+                padding-top: .25rem;
+                padding-bottom: .25rem;
+            }
+
+            .sheet-header-source {
+                display: flex;
+                flex-flow: row nowrap;
+            }
+
+            .sheet-header-name {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+            }
+        }
+
+        .sheet-footer {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            justify-content: start;
+            margin-top: .25rem;
+            box-shadow: 0 -.25rem .5rem $black;
+            border-top: 1px solid $yellow;
+            flex-shrink: 0;
+            vertical-align: bottom;
+        }
+
+        &.standard-form, .standard-form {
+            gap: 0;
+            .form-group {
+                padding: .5rem .25rem;
+                margin: 0;
+                label {
+                    color: $yellow;
+                }
+                p.hint {
+                    color: darken($yellow, 20%);
+                }
+                &:nth-of-type(even) {
+                    background: rgba($white, 0.03);
+                }
+            }
+        }
+
+        .tabs {
+            margin-top: .5rem;
+            border-top: none;
+            border-bottom: 2px solid darken($darkred, 20%);
+            a {
+                line-height: 1.5rem;
+                border-top-left-radius: .25rem;
+                border-top-right-radius: .25rem;
+                border: 1px solid $darkred;
+                border-bottom: none;
+                background: rgba($darkred, 0.7);
+                width: 100%;
+                &.active {
+                    color: $darkred;
+                    background: $light-2;
+                    box-shadow: 0 0 5px 5px rgba($white, 0.2);
+                }
+                &.skinny {
+                    flex: 0 0 2rem;
+                    padding: 0 0.5rem;
+                }
+            }
+        }
+    }
+
+    button.toggle-fresh-import {
+        width: 1.5rem;
+        flex-shrink: 0;
+        padding: 0;
+    }
+
+    input.nuyen {
+        width: 5rem;
+    }
+    input.availability {
+        width: 3rem;
+    }
+    input.qty {
+        width: 3rem;
+        padding: 1px;
+        text-align: center;
+    }
+    input.skinny {
+        width: 2rem;
+        padding: 1px;
+        text-align: center;
+    }
+    select.skinny {
+        width: 3rem;
+    }
+    input.midd {
+        width: 3rem;
+        padding: 1px;
+        text-align: center;
+    }
+    input.thicc {
+        width: 5rem;
+    }
+    input.center {
+        text-align: center;
+        vertical-align: center;
+        horiz-align: center;
+    }
+    input.left {
+        text-align: left;
+        horiz-align: left;
+    }
+    input.short, select.short {
+        height: 1.5rem;
+        min-height: 1.5rem;
+        max-height: 1.5rem;
+    }
+    button.short {
+        height: 1.5rem;
+        min-height: 1.5rem;
+        max-height: 1.5rem;
+    }
+    button.sr5-button {
+        width: 100%;
+        &.sr5-submit {
+            background: #227836;
+            color: $light;
+            &:hover {
+                color: $white;
+            }
+        }
+        &.sr5-cancel {
+            background: $darkred;
+            color: $light;
+            &:hover {
+                color: $white;
+            }
+        }
+    }
+    select.sr5-select {
+        height: 1.5rem;
+        max-height: 1.5rem;
+        background-color: transparent;
+        color: $light;
+        margin: 0;
+        padding: 0;
+        vertical-align: center;
+
+        &:hover {
+            color: $white;
+        }
+
+        > option {
+            color: $yellow;
+            background-color: rgba($black, 0.9);
+        }
+    }
+    button.sr5-icon {
+        border-color: transparent;
+        overflow: hidden;
+        padding: 0 !important;
+        margin: 0 !important;
+        &:hover {
+            border-color: $white;
+        }
+    }
+
+    /**
+     * Elements used for linkable documents / entities.
+     *
+     * This is also present in foundry.scss, but is overwritten by Monks Enhanced Journals module.
+     * Let's force it within the SR5 context, while leaving it everywhere else.
+     */
+    .entity-link,
+    .content-link,
+    .inline-roll {
+        border: 0;
+        background: none;
+        color: $white !important;
+    }
+
+    .entity-link.content-link {
+        color: $white !important;
+    }
+
+    .basic-row {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 2px;
+        align-items: center;
+    }
+
+    .open-source-icon {
+        font-size: 1.25rem;
+        margin: .25rem;
+    }
+
+    // An origin link is a uuid based entity link, without drag support.
+    .origin-link {
+        background: #ddd;
+        padding: 1px 4px;
+        border: 1px solid #4b4a44;
+        border-radius: 2px;
+        white-space: nowrap;
+        word-break: break-all;
+        color: $black;
+    }
+
+    .editor {
+        height: 95%;
+        width: 100%;
+    }
+
+    .editor .tox-edit-area {
+        background: $mce-background;
+    }
+
+    // Styling for any prosemirror editors within shadowrun applications.
+    .editor.prosemirror {
+
+        .editor-menu {
+            padding: 2px 4px;
+            background: $darkred;
+            li {
+                padding: 0;
+                > button {
+                    padding: 2px;
+                }
+            }
+        }
+        // handles dropdown menus, not select based.
+        .pm-dropdown {
+            color: $color;
+            background: rgba($black, 0.05);
+            border-radius: 0.3em;
+            border-color: $dark;
+
+            // Icons like chevron and ticks.
+            i,
+            i:hover {
+                color: $color;
+            }
+
+            // ul will contain menus and sub-menus and can be nested.
+            ul {
+                background-color: $dark;
+            }
+
+            // li represents each menu entry in both menus and sub-menus
+            ul > li:hover {
+                color: $color;
+                border-color: rgba($white, 0.1);
+                background: rgba($black, 0.05);
+            }
+        }
+
+        // HTML editing uses a class-less textarea
+        textarea {
+            color: $color;
+        }
+    }
+
+    .description > .editor {
+        height: 95%;
+        min-height: 15em;
+        width: 100%;
+        color: $color;
+    }
+
+    img {
+        box-sizing: border-box;
+        border: none;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .sheet .editor-content {
+        color: $white;
+        height: 100%;
+        overflow-y: auto;
+        word-break: break-word;
+    }
+
+    .container {
+        max-width: $sheet-max-width;
+        margin: 0 auto;
+
+        &--fluid {
+            margin: 0;
+            max-width: 100%;
+        }
+
+        &__row {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        // Auto create grid style classes for a fixed max column grid
+        @for $i from 1 through $grid__cols {
+            &__col-#{$i} {
+                flex-basis: calc(100 / ($grid__cols / $i)) * 1%;
+                overflow: hidden;
+            }
+        }
+
+        &__col-half {
+            flex-basis: 50%;
+            overflow: hidden;
+        }
+
+        .element {
+            padding: 4px;
+        }
+    }
+    ///////////////////////////////////////////////////////////////////////////////
+
+    .no-shrink {
+        flex-shrink: 0;
+    }
+    // start css for getting scroll working
+    // override the default scrollable class so it doesn't hide the scrollbar
+    // the default foundry css seemed to add weird padding that would actually hide the scrollbar
+    .scrollable {
+        margin-right: 0;
+        padding-right: 0;
+    }
+    .header-for-scrollable {
+        // TODO figure out how to make this use --scroll-margin
+        padding-right: 0.75rem !important;
+    }
+    .tab {
+        // hide overflow of the tab, this should be provided to any tab that doesn't scroll
+        &.hide-overflow {
+            flex: 1;
+            overflow: hidden;
+        }
+    }
+    // fill the available space so that children can scroll correctly
+    .fill-container {
+        display: flex;
+        flex-flow: column nowrap;
+        flex: 1;
+        overflow: hidden;
+        height: 100%;
+    }
+    // split the available space into two side-by-side containers
+    .split-container {
+        display: flex;
+        flex-flow: row nowrap;
+        flex: 1;
+        overflow: hidden;
+        height: 100%;
+
+        // matrix tabs need to flex and hide overflow in order to have contents scroll
+        .matrix-left-tab-content,
+        .matrix-right-tab-content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+        }
+        // children of the split container need to flex as a column, hide overflow to all scrolling within
+        > * {
+            display: flex;
+            flex-flow: column nowrap;
+            flex: 1;
+            overflow: hidden;
+        }
+        > *:not(:first-child) {
+            padding-left: 0.25rem;
+            border-left: $groove;
+        }
+        > *:not(:last-child) {
+            padding-right: 0.25rem;
+        }
+    }
+
+    // end of new css for getting scroll working
+}
