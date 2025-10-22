@@ -74,6 +74,14 @@
             {{else}}
                 <label>{{localizeOb item.system.type @root.config.programTypes}}</label>
             {{/if}}
+        {{else if (isType item 'weapon')}}
+            {{#if (and (eq item.system.category 'range') (not (eq item.system.range.ranges.category 'manual')))}}
+                <label>{{localize (objValue (objValue @root.config.weaponRangeCategories item.system.range.ranges.category) 'label')}}</label>
+            {{else if (and (eq item.system.category 'thrown') (not (eq item.system.thrown.ranges.category 'manual')))}}
+                <label>{{localize (objValue (objValue @root.config.weaponRangeCategories item.system.thrown.ranges.category) 'label')}}</label>
+            {{else}}
+                <label>{{localizeOb item.system.category @root.config.weaponCategories}}&nbsp;{{localize "SR5.ItemTypes.Weapon"}}</label>
+            {{/if}}
         {{/if}}
 
         {{#unless isLimited}}
