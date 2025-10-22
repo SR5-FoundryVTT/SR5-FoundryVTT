@@ -1299,3 +1299,979 @@ input[type='text'].display {
     }
 }
 //END SR5 Style
+
+.sr5v2 {
+    box-shadow: 0 0 10px 5px rgba($yellow, 0.4);
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.86)), url("assets/page.webp") repeat;
+    background-repeat: repeat;
+    background-size: 100% 20px auto;
+
+    .window-header {
+        --background: unset;
+        background: unset;
+        border-bottom: none;
+        height: 2rem;
+        max-height: 2rem;
+    }
+
+    &.karma-manager, &.nuyen-manager, &.reputation-manager, &.inventory-rename {
+        .sheet-footer {
+            border-color: transparent;
+        }
+        .window-header {
+            // hide buttons in the header since we are a simple interface
+            button {
+                visibility: hidden;
+            }
+        }
+        label.label {
+            font-size: 1.25rem;
+            &.positive {
+                color: $matrix-green;
+                text-shadow: 0 0 2px 1px $matrix-green;
+            }
+            &.negative {
+                color: $physical;
+                text-shadow: 0 0 2px 1px $physical;
+            }
+        }
+        .mod-input {
+            font-size: 1.25rem;
+        }
+        .input-row {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+        }
+        .input-col {
+            flex: none;
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            gap: .5rem;
+        }
+        .mod-button-container {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: .5rem;
+        }
+    }
+
+    // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
+    &.named-sheet {
+        input.sheet-name {
+            @include systemFonts;
+            flex-shrink: 0;
+            background: $nameplate-background;
+            border: none;
+            margin-bottom: 0;
+            font-size: 1.5rem;
+            height: 100%;
+            padding: .5rem;
+            vertical-align: center;
+        }
+        &:not(.minimized) {
+            .window-header {
+                margin-bottom: 0;
+                .window-title {
+                    font-size: 0;
+                    height: 0;
+                }
+            }
+        }
+    }
+
+    .window-content {
+        padding: 0 .25rem .25rem .25rem;
+        // transparent doesn't seem to show the background from above so set it to the same thing with a slightly different gradient
+        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.86)), url("assets/page.webp") repeat;
+        background-repeat: repeat;
+        background-size: 100% 20px auto;
+
+        .sheet-image {
+            flex: none;
+            margin: .25rem;
+            width: 5rem;
+            height: 5rem;
+        }
+
+        .sheet-header {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: start;
+            align-items: start;
+            width: 100%;
+            padding: 0;
+
+            .sheet-header-col {
+                flex: none;
+                display: flex;
+                justify-content: start;
+                align-items: center;
+                flex-flow: column nowrap;
+                gap: .25rem;
+            }
+
+            .sheet-header-labels {
+                flex: 1;
+                display: flex;
+                flex-flow: column nowrap;
+                gap: 1px;
+                padding-top: .25rem;
+                padding-bottom: .25rem;
+            }
+
+            .sheet-header-source {
+                display: flex;
+                flex-flow: row nowrap;
+            }
+
+            .sheet-header-name {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+            }
+        }
+
+        .sheet-footer {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            justify-content: start;
+            margin-top: .25rem;
+            box-shadow: 0 -.25rem .5rem $black;
+            border-top: 1px solid $yellow;
+            flex-shrink: 0;
+            vertical-align: bottom;
+        }
+
+        &.standard-form, .standard-form {
+            gap: 0;
+            .form-group {
+                padding: .5rem .25rem;
+                margin: 0;
+                label {
+                    color: $yellow;
+                }
+                p.hint {
+                    color: darken($yellow, 20%);
+                }
+                &:nth-of-type(even) {
+                    background: rgba($white, 0.03);
+                }
+            }
+        }
+
+        .tabs {
+            margin-top: .5rem;
+            border-top: none;
+            border-bottom: 2px solid darken($darkred, 20%);
+            a {
+                line-height: 1.5rem;
+                border-top-left-radius: .25rem;
+                border-top-right-radius: .25rem;
+                border: 1px solid $darkred;
+                border-bottom: none;
+                background: rgba($darkred, 0.7);
+                width: 100%;
+                &.active {
+                    color: $darkred;
+                    background: $light-2;
+                    box-shadow: 0 0 5px 5px rgba($white, 0.2);
+                }
+                &.skinny {
+                    flex: 0 0 2rem;
+                    padding: 0 0.5rem;
+                }
+            }
+        }
+    }
+
+    button.toggle-fresh-import {
+        width: 1.5rem;
+        flex-shrink: 0;
+        padding: 0;
+    }
+
+    input.nuyen {
+        width: 5rem;
+    }
+    input.availability {
+        width: 3rem;
+    }
+    input.qty {
+        width: 3rem;
+    }
+    input.skinny {
+        width: 2rem;
+    }
+    select.skinny {
+        width: 3rem;
+    }
+    input.midd {
+        width: 3rem;
+    }
+    input.thicc {
+        width: 5rem;
+    }
+    input.center {
+        text-align: center;
+        vertical-align: center;
+        horiz-align: center;
+    }
+    input.left {
+        text-align: left;
+        horiz-align: left;
+    }
+    input.short, select.short {
+        padding: 1px;
+
+        height: 1.5rem;
+        min-height: 1.5rem;
+        max-height: 1.5rem;
+    }
+    button.short {
+        height: 1.5rem;
+        min-height: 1.5rem;
+        max-height: 1.5rem;
+    }
+    button.sr5-button {
+        width: 100%;
+        &.sr5-submit {
+            background: #227836;
+            color: $light;
+            &:hover {
+                color: $white;
+            }
+        }
+        &.sr5-cancel {
+            background: $darkred;
+            color: $light;
+            &:hover {
+                color: $white;
+            }
+        }
+    }
+    select.sr5-select {
+        height: 1.5rem;
+        max-height: 1.5rem;
+        background-color: transparent;
+        color: $light;
+        margin: 0;
+        padding: 0;
+        vertical-align: center;
+
+        &:hover {
+            color: $white;
+        }
+
+        > option {
+            color: $yellow;
+            background-color: rgba($black, 0.9);
+        }
+    }
+    button.sr5-icon {
+        border-color: transparent;
+        overflow: hidden;
+        padding: 0 !important;
+        margin: 0 !important;
+        &:hover {
+            border-color: $white;
+        }
+    }
+
+    .document-tags-container {
+        width: 15rem;
+        margin-left: 4px;
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+    }
+
+    document-tags.short {
+        input {
+            height: 1.5rem;
+            min-height: 1.5rem;
+            max-height: 1.5rem;
+        }
+        button {
+            height: 1.5rem;
+            width: 1.5rem;
+            text-align: center;
+            border-color: $light;
+            padding: 2px !important;
+            font-size: 12px;
+            &:hover {
+                border-color: $light;
+            }
+        }
+    }
+
+    a {
+        color: $light;
+        &:hover {
+            color: $white;
+        }
+    }
+    label {
+        color: $yellow;
+    }
+    button {
+        color: $light;
+        border-color: $light;
+        &:hover {
+            color: $white;
+            background: $darkred;
+        }
+    }
+
+    /**
+     * Elements used for linkable documents / entities.
+     *
+     * This is also present in foundry.scss, but is overwritten by Monks Enhanced Journals module.
+     * Let's force it within the SR5 context, while leaving it everywhere else.
+     */
+    .entity-link,
+    .content-link,
+    .inline-roll {
+        border: 0;
+        background: none;
+        color: $white !important;
+    }
+
+    .entity-link.content-link {
+        color: $white !important;
+    }
+
+    .basic-row {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 2px;
+        align-items: center;
+    }
+
+    .document-img-name {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 2px;
+        align-items: center;
+    }
+
+    .open-source-icon {
+        font-size: 1.25rem;
+        margin: .25rem;
+    }
+
+    // An origin link is a uuid based entity link, without drag support.
+    .origin-link {
+        background: #ddd;
+        padding: 1px 4px;
+        border: 1px solid #4b4a44;
+        border-radius: 2px;
+        white-space: nowrap;
+        word-break: break-all;
+        color: $black;
+    }
+
+    .editor {
+        height: 95%;
+        width: 100%;
+    }
+
+    .editor .tox-edit-area {
+        background: $mce-background;
+    }
+
+    // Styling for any prosemirror editors within shadowrun applications.
+    .editor.prosemirror {
+
+        .editor-menu {
+            padding: 2px 4px;
+            background: $darkred;
+            li {
+                padding: 0;
+                > button {
+                    padding: 2px;
+                }
+            }
+        }
+        // handles dropdown menus, not select based.
+        .pm-dropdown {
+            color: $color;
+            background: rgba($black, 0.05);
+            border-radius: 0.3em;
+            border-color: $dark;
+
+            // Icons like chevron and ticks.
+            i,
+            i:hover {
+                color: $color;
+            }
+
+            // ul will contain menus and sub-menus and can be nested.
+            ul {
+                background-color: $dark;
+            }
+
+            // li represents each menu entry in both menus and sub-menus
+            ul > li:hover {
+                color: $color;
+                border-color: rgba($white, 0.1);
+                background: rgba($black, 0.05);
+            }
+        }
+
+        // HTML editing uses a class-less textarea
+        textarea {
+            color: $color;
+        }
+    }
+
+    .description > .editor {
+        height: 95%;
+        min-height: 15em;
+        width: 100%;
+        color: $color;
+    }
+
+    img {
+        box-sizing: border-box;
+        border: 1px solid var(--color-border-dark);
+        border-radius: 2px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .sheet .editor-content {
+        color: $white;
+        height: 100%;
+        overflow-y: auto;
+        word-break: break-word;
+    }
+
+    .container {
+        max-width: $sheet-max-width;
+        margin: 0 auto;
+
+        &--fluid {
+            margin: 0;
+            max-width: 100%;
+        }
+
+        &__row {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        // Auto create grid style classes for a fixed max column grid
+        @for $i from 1 through $grid__cols {
+            &__col-#{$i} {
+                flex-basis: calc(100 / ($grid__cols / $i)) * 1%;
+                overflow: hidden;
+            }
+        }
+
+        &__col-half {
+            flex-basis: 50%;
+            overflow: hidden;
+        }
+
+        .element {
+            padding: 4px;
+        }
+    }
+
+    .horizontal-cell-input {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: start;
+        align-content: center;
+        align-items: center;
+
+        &.stun .cell {
+            box-shadow: 0 0 5px 1px rgba($stun, 0.5);
+        }
+
+        &.physical .cell {
+            box-shadow: 0 0 5px 1px rgba($physical, 0.5);
+        }
+
+        &.edge .cell {
+            box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+            &.filled {
+                background: rgba($edge, 0.9) !important;
+            }
+        }
+
+        &.matrix .cell {
+            box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
+        }
+
+        .clear-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .5rem;
+            margin-left: 1px;
+            margin-right: 2px;
+        }
+
+        .icon-container {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+            margin: 0 .25rem;
+            font-size: 1.1rem;
+            width: 1.1rem;
+        }
+
+        .cell-container {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: stretch;
+
+            .cell {
+                cursor: pointer;
+                text-align: center;
+                font-size: 80%;
+                border: $groove;
+                color: $light-2;
+                border-radius: 4px;
+                background: $black;
+                min-width: 26px;
+                height: 18px;
+                margin: 2px;
+
+                &.filled {
+                    background: $light-2;
+                    border-color: $black;
+                    color: $black;
+                }
+
+                &:hover {
+                    border-color: $light;
+                }
+            }
+        }
+    }
+
+    button.import-character {
+        color: $color;
+        border-color: $black;
+        background: $dark-sunken;
+        border-radius: 0.3em;
+        text-align: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+
+        &.light {
+            color: $black;
+            background: $light;
+        }
+    }
+    button.show-hidden-skills {
+        color: $color;
+        border-color: $black;
+        background: rgb(70, 7, 7);
+        border-radius: 0.3em;
+        text-align: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+
+        &.light {
+            color: $black;
+            background: $light;
+        }
+    }
+
+    button.reset-actor-run-data {
+        color: $color;
+        border-color: $black;
+        background: rgb(70, 7, 7);
+        border-radius: 0.3em;
+        text-align: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+
+        &.light {
+            color: $black;
+            background: $light;
+        }
+    }
+
+    /** CSS for the Environmental Modifier Application Window
+     *
+     */
+    button.env-modifier {
+        text-align: left;
+        font-size: var(--font-size-13) !important;
+        line-height: normal;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .env-modifier-active {
+        border-radius: 8px;
+        //box-shadow: $dark-sunken-box-shadow;
+        background-color: $darkred; //$dark-sunken;
+        color: $yellow;
+    }
+
+    .env-modifier-total {
+        font-weight: bold;
+    }
+
+    td.env-modifier-level {
+        padding-right: 6px;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+
+    .no-shrink {
+        flex-shrink: 0;
+    }
+
+    // list-item classes should be renamed to list-item when complete
+    .list-item-container {
+        display: flex;
+        flex-flow: column nowrap;
+
+        &.expanded {
+            // show 1px box shadow at the top and bottom to emulate a border
+            box-shadow: inset 0 1px 0 0 $silver,
+                        inset 0 -1px 0 0 $silver;
+
+            .list-item-desc {
+                visibility: visible;
+                display: unset;
+            }
+        }
+
+        &.list-item-subcategory {
+            padding-left: .5rem;
+        }
+
+        .list-item {
+            flex: 1;
+        }
+
+        .list-item-desc {
+            visibility: hidden;
+            display: none;
+            flex: 1;
+            border-top: $groove;
+            background: rgba($black, 0.3);
+            padding: .5rem;
+
+            .list-item-properties {
+                display: flex;
+                flex-flow: row wrap;
+                justify-content: start;
+                align-items: center;
+                align-content: center;
+                width: 100%;
+
+                .sr5-select {
+                    padding: 0;
+                    height: 1rem;
+                }
+
+                > * {
+                    font-size: 0.8rem;
+                    padding: 0 .25rem;
+                    &:not(:last-child) {
+                        border-right: $groove;
+                    }
+                }
+            }
+
+            .description-buttons {
+                display: flex;
+                flex-flow: row;
+            }
+        }
+
+        .list-item-description {
+            display: none;
+            flex: 1;
+        }
+
+        &:not(.nobg):nth-of-type(even), &.forcebg {
+            background: rgba($white, 0.03);
+        }
+    }
+
+    // allow list-item to exist outside of the container
+    .list-item {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-between;
+        align-items: center;
+        align-content: center;
+        width: 100%;
+        padding: 2px;
+
+        &.list-item-selected {
+            background: radial-gradient(rgba($matrix-green, 0.4), rgba($matrix-green, 0.01)) !important;
+        }
+
+        .list-item-image-container {
+            min-width: 1.5rem;
+            width: 1.5rem;
+            max-width: 1.5rem;
+            min-height: 1.5rem;
+            height: 1.5rem;
+            max-height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &.favorite {
+                min-width: 1.75rem;
+                width: 1.75rem;
+                max-width: 1.75rem;
+                min-height: 1.75rem;
+                height: 1.75rem;
+                max-height: 1.75rem;
+            }
+
+            &:not(:hover).favorite {
+                border-color: rgba($light, 0.3);
+            }
+
+            &:hover {
+                .list-item-image-roll {
+                    content: url('assets/dice-solid.svg');
+                    filter: invert(1);
+                }
+                .list-item-image-info {
+                    content: url('icons/files.svg');
+                }
+                .list-item-image-edit {
+                    content: url('icons/redist/wrench.svg');
+                }
+                .list-item-image-remove {
+                    content: url('icons/cancel.svg');
+                }
+                .list-item-image-target {
+                    content: url('icons/redist/target.svg');
+                }
+                .list-item-image-connect {
+                    content: url('icons/redist/network.svg');
+                }
+            }
+        }
+
+        &.list-item-header {
+            border-bottom: 1px solid $yellow;
+            background: rgba($black, 0.7);
+        }
+
+        &.list-item-favorites {
+            background: linear-gradient(to top, rgba($black, 0.7), rgba($black, 0.1));
+            margin-top: 2px;
+        }
+
+        &:not(.nobg):nth-of-type(even), &.forcebg {
+            &:not(.list-item-header) {
+                background: rgba($white, 0.03);
+            }
+        }
+
+        .list-item-start {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: start;
+            flex: 3;
+            gap: .25rem;
+
+            &.skinny {
+                flex: 1;
+            }
+
+            .selection-inventory {
+                display: flex;
+                flex-flow: row;
+                justify-content: start;
+                align-items: center;
+            }
+        }
+
+        .list-item-col {
+            display: flex;
+            flex-flow: row;
+            flex: 2;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+            gap: 0.1rem;
+
+            // hide "hover buttons" by default, show by growing the font-size
+            .hover-show-button {
+                font-size: 0.8rem;
+                visibility: hidden;
+            }
+
+            &:hover {
+                .hover-show-button {
+                    visibility: visible;
+                }
+            }
+
+
+            &.select-col {
+                justify-content: start;
+                flex: 2;
+            }
+
+            &.karma-mod-col {
+                flex: 3;
+                text-wrap: nowrap;
+            }
+
+            &.nuyen-col {
+                flex: 2;
+                text-wrap: nowrap;
+            }
+
+            &.reputation-col {
+                flex: 5;
+                text-wrap: nowrap;
+            }
+
+            &.vehicle-mod-col {
+                flex: 6;
+                text-wrap: nowrap;
+            }
+
+            &.skinny-col {
+                flex: 0 0 3rem;
+            }
+            &.midd-col,
+            &.rtg-col,
+            &.armor-col,
+            &.ammo-col,
+            &.cost-col,
+            &.mod-category-col,
+            &.matrix-icon-col {
+                flex: 0 0 4rem;
+            }
+
+            &.slots-col, &.matrix-network-col {
+                flex: 0 0 5rem;
+            }
+
+            &.mark-input-col, &.qty-input-col {
+                flex: 0 0 5rem;
+                gap: 0.25rem;
+
+                .mark-label {
+                    font-size: 1.1rem;
+                }
+            }
+
+            &.thicc-col {
+                flex: 0 0 6rem;
+            }
+        }
+
+        .list-item-icons {
+            display: flex;
+            flex-flow: row nowrap;
+            flex: none;
+            min-width: 4rem;
+            justify-content: end;
+            align-items: center;
+            gap: 0.25rem;
+            margin-right: 2px;
+
+            &.skinny-icons {
+                width: 1.5rem;
+                min-width: 1.5rem;
+                max-width: 1.5rem;
+            }
+        }
+    }
+
+    // start css for getting scroll working
+    // override the default scrollable class so it doesn't hide the scrollbar
+    // the default foundry css seemed to add weird padding that would actually hide the scrollbar
+    .scrollable {
+        margin-right: 0;
+        padding-right: 0;
+    }
+    .header-for-scrollable {
+        // TODO figure out how to make this use --scroll-margin
+        padding-right: 0.75rem !important;
+    }
+    .tab {
+        // hide overflow of the tab, this should be provided to any tab that doesn't scroll
+        &.hide-overflow {
+            flex: 1;
+            overflow: hidden;
+        }
+    }
+    // fill the available space so that children can scroll correctly
+    .fill-container {
+        display: flex;
+        flex-flow: column nowrap;
+        flex: 1;
+        overflow: hidden;
+        height: 100%;
+    }
+    // split the available space into two side-by-side containers
+    .split-container {
+        display: flex;
+        flex-flow: row nowrap;
+        flex: 1;
+        overflow: hidden;
+        height: 100%;
+
+        // matrix tabs need to flex and hide overflow in order to have contents scroll
+        .matrix-left-tab-content,
+        .matrix-right-tab-content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+        }
+        // children of the split container need to flex as a column, hide overflow to all scrolling within
+        > * {
+            display: flex;
+            flex-flow: column nowrap;
+            flex: 1;
+            overflow: hidden;
+        }
+        > *:not(:first-child) {
+            padding-left: 0.25rem;
+            border-left: $groove;
+        }
+        > *:not(:last-child) {
+            padding-right: 0.25rem;
+        }
+    }
+
+    // end of new css for getting scroll working
+}
