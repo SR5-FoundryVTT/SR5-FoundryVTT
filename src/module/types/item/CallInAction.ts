@@ -10,7 +10,7 @@ const CallInActionData = () => ({
     actor_type: new StringField({
         blank: true,
         required: true,
-        choices: ['spirit', 'sprite'],
+        choices: SR5.callInActorTypes,
     }),
     spirit: new SchemaField({
         type: new StringField({ required: true, blank: true, choices: SR5.spiritTypes }),

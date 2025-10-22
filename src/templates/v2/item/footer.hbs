@@ -24,7 +24,29 @@
         </div>
     {{/if}}
     <div class="list-item">
-        {{#if (isType item 'grid')}}
+        {{#if (isType item 'call_in_action')}}
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.actor_type.hint}}">{{systemFields.actor_type.label}}</label>
+                    <span>
+                        {{formInput systemFields.actor_type value=source.system.actor_type localize=true
+                                    classes="short" rootId=@root.rootId disabled=(isDefined (or sprite spirit))}}
+                    </span>
+                </div>
+            {{else}}
+                <label>
+                    {{#if (eq system.actor_type 'sprite')}}
+                        {{localize "SR5.CallInAction.Compile"}}
+                        {{localizeOb system.sprite.type @root.config.spriteTypes}}
+                        {{localizeOb system.actor_type @root.config.callInActorTypes}}
+                    {{else if (eq system.actor_type 'spirit')}}
+                        {{localize "SR5.CallInAction.Summon"}}
+                        {{localizeOb system.spirit.type @root.config.spiritTypes}}
+                        {{localizeOb system.actor_type @root.config.callInActorTypes}}
+                    {{/if}}
+                </label>
+            {{/if}}
+        {{else if (isType item 'grid')}}
             {{#if @root.isEditMode}}
                 <div class="basic-row">
                     <label data-tooltip="{{systemFields.category.hint}}">{{systemFields.category.label}}</label>
@@ -63,7 +85,9 @@
                 <label>{{localizeOb system.grade @root.config.cyberwareGrades}}</label>
             {{/if}}
         {{else if (isType item 'modification')}}
-            <label data-tooltip="{{systemFields.type.hint}}">{{localizeOb system.type @root.config.modificationTypes}}</label>
+            {{#if system.type}}
+                <label data-tooltip="{{systemFields.type.hint}}">{{localizeOb system.type @root.config.modificationTypes}}</label>
+            {{/if}}
         {{else if (isType item 'program')}}
             {{#if @root.isEditMode}}
                 <div class="basic-row">
@@ -211,6 +235,54 @@
                     <label data-tooltip="{{systemFields.drain.hint}}">{{systemFields.drain.label}}</label>
                 {{/if}}
 
+            {{else if (isType item 'call_in_action')}}
+                {{#if (eq system.actor_type 'sprite')}}
+                    {{#if @root.isEditMode}}
+                        <div class="basic-row">
+                            <label data-tooltip="{{systemFields.sprite.fields.type.hint}}">{{systemFields.sprite.fields.type.label}}</label>
+                            <span>
+                                {{formInput systemFields.sprite.fields.type value=source.system.sprite.type localize=true
+                                            classes="short" rootId=@root.rootId disabled=(isDefined sprite)}}
+                            </span>
+                        </div>
+                    {{else}}
+                        {{!-- Sprite Type is diplayed at the beginning during play mode --}}
+                    {{/if}}
+                    {{#if @root.isEditMode}}
+                        <div class="basic-row">
+                            <label data-tooltip="{{systemFields.sprite.fields.level.hint}}">{{systemFields.sprite.fields.level.label}}</label>
+                            <span>
+                                {{formInput systemFields.sprite.fields.level value=source.system.sprite.level
+                                            classes="short skinny" rootId=@root.rootId disabled=(isDefined sprite)}}
+                            </span>
+                        </div>
+                    {{else}}
+                        <label data-tooltip="{{systemFields.sprite.fields.level.hint}}">{{systemFields.sprite.fields.level.label}}&nbsp;{{system.sprite.level}}</label>
+                    {{/if}}
+                {{else if (eq system.actor_type 'spirit')}}
+                    {{#if @root.isEditMode}}
+                        <div class="basic-row">
+                            <label data-tooltip="{{systemFields.spirit.fields.type.hint}}">{{systemFields.spirit.fields.type.label}}</label>
+                            <span>
+                                {{formInput systemFields.spirit.fields.type value=source.system.spirit.type localize=true
+                                            classes="short" rootId=@root.rootId disabled=(isDefined spirit)}}
+                            </span>
+                        </div>
+                    {{else}}
+                        {{!-- Spirit Type is diplayed at the beginning during play mode --}}
+                    {{/if}}
+                    {{#if @root.isEditMode}}
+                        <div class="basic-row">
+                            <label data-tooltip="{{systemFields.spirit.fields.force.hint}}">{{systemFields.spirit.fields.force.label}}</label>
+                            <span>
+                                {{formInput systemFields.spirit.fields.force value=source.system.spirit.force
+                                            classes="short skinny" rootId=@root.rootId disabled=(isDefined spirit)}}
+                            </span>
+                        </div>
+                    {{else}}
+                        <label data-tooltip="{{systemFields.spirit.fields.force.hint}}">{{systemFields.spirit.fields.force.label}}&nbsp;{{system.spirit.force}}</label>
+                    {{/if}}
+                {{/if}}
             {{else if (eq item.type 'contact')}}
                 {{#if @root.isEditMode}}
                     <span data-tooltip="{{systemFields.type.label}}:&nbsp;{{systemFields.type.hint}}">

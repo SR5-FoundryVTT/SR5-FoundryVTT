@@ -618,9 +618,9 @@
         "CallInAction": {
             "ActorType": "Actor Type",
             "Compilation": "Compilation",
+            "Compile": "Compile",
             "CreateCompilation": "Create compilation action",
             "CreateSummoning": "Create summoning action",
-            "Summoning": "Summoning",
             "FIELDS": {
                 "spirit": {
                     "type": {
@@ -628,7 +628,7 @@
                         "hint": "Type of Spirit to Summon. Disabled if a Spirit Actor is set"
                     },
                     "force": {
-                        "label": "Spirit Force",
+                        "label": "Force",
                         "hint": "Force of Spirit to Summon. Disabled if a Spirit Actor is set"
                     }
                 },
@@ -638,11 +638,17 @@
                         "hint": "Type of Sprite to Compile. Disabled if a Sprite Actor is set"
                     },
                     "level": {
-                        "label": "Sprite Force",
+                        "label": "Level",
                         "hint": "Level of Sprite to Summon. Disabled if a Sprite Actor is set"
                     }
+                },
+                "actor_type": {
+                    "label": "Type",
+                    "hint": "Type of Actor this action summons"
                 }
-            }
+            },
+            "Summon": "Summon",
+            "Summoning": "Summoning"
         },
         "CanDefault": "Can Default",
         "Capacity": "Capacity",
@@ -2576,7 +2582,8 @@
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
             "CallInAction": {
-                "ActorType": "Type of actor to call in"
+                "ActorType": "Type of actor to call in",
+                "LinkActor": "Drag&Drop an Actor to Call In"
             },
             "CompilationTest": {
                 "Level": "Level of the compiled sprite",

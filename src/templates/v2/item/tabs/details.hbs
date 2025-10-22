@@ -126,44 +126,6 @@
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
-            {{else if (and (eq item.type 'call_in_action') (eq system.actor_type 'sprite'))}}
-                <div class="list-item">
-                    <div class="list-item-start skinny">
-                        <label data-tooltip="{{systemFields.sprite.fields.type.hint}}">{{systemFields.sprite.fields.type.label}}</label>
-                    </div>
-                    <div class="list-item-col">
-                        {{formInput systemFields.sprite.fields.type value=system.sprite.type localize=true
-                                    classes="short" rootId=@root.rootId disabled=(or @root.isPlayMode sprite)}}
-                    </div>
-                </div>
-                <div class="list-item">
-                    <div class="list-item-start skinny">
-                        <label data-tooltip="{{systemFields.sprite.fields.level.hint}}">{{systemFields.sprite.fields.level.label}}</label>
-                    </div>
-                    <div class="list-item-col">
-                        {{formInput systemFields.sprite.fields.level value=system.sprite.level
-                                    classes="short" rootId=@root.rootId disabled=(or @root.isPlayMode sprite)}}
-                    </div>
-                </div>
-            {{else if (and (eq item.type 'call_in_action') (eq system.actor_type 'spirit'))}}
-                <div class="list-item">
-                    <div class="list-item-start skinny">
-                        <label data-tooltip="{{systemFields.spirit.fields.type.hint}}">{{systemFields.spirit.fields.type.label}}</label>
-                    </div>
-                    <div class="list-item-col">
-                        {{formInput systemFields.spirit.fields.type value=system.spirit.type localize=true
-                                    classes="short" rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
-                    </div>
-                </div>
-                <div class="list-item">
-                    <div class="list-item-start skinny">
-                        <label data-tooltip="{{systemFields.spirit.fields.force.hint}}">{{systemFields.spirit.fields.force.label}}</label>
-                    </div>
-                    <div class="list-item-col">
-                        {{formInput systemFields.spirit.fields.force value=system.spirit.force
-                                    classes="short" rootId=@root.rootId disabled=(or @root.isPlayMode spirit)}}
-                    </div>
-                </div>
             {{else if (isType item 'device' 'host')}}
 
                 {{#if (isType item 'host')}}

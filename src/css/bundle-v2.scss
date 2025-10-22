@@ -290,6 +290,10 @@
         flex-flow: row nowrap;
         gap: 2px;
         align-items: center;
+        // disable labels from wrapping within basic rows
+        > label {
+            text-wrap: nowrap;
+        }
     }
 
     .open-source-icon {

@@ -94,7 +94,7 @@
             </div>
         {{else}}
             <div class="list-item-start">
-                {{#if (eq item.type 'contact')}}
+                {{#if (isType item 'contact')}}
                     {{#if linkedActor}}
                         <span class="basic-row">
                             <img src="{{linkedActor.img}}" width="16px" height="16px" />
@@ -110,6 +110,36 @@
                         </span>
                     {{else}}
                         <label>{{localize "SR5.Tooltips.Contact.LinkActor"}}</label>
+                    {{/if}}
+                {{else if (isType item 'call_in_action')}}
+                    {{#if sprite}}
+                        <span class="basic-row">
+                            <img src="{{sprite.img}}" width="16px" height="16px" />
+                            <a class="content-link"
+                               draggable="true"
+                               data-link
+                               data-type="Actor"
+                               data-id="{{sprite.id}}"
+                               data-uuid="{{sprite.uuid}}">
+                                {{sprite.name}}
+                            </a>
+                            <a data-action="removeSprite" class="close"><i class="fas fa-times"></i></a>
+                        </span>
+                    {{else if spirit}}
+                        <span class="basic-row">
+                            <img src="{{spirit.img}}" width="16px" height="16px" />
+                            <a class="content-link"
+                               draggable="true"
+                               data-link
+                               data-type="Actor"
+                               data-id="{{spirit.id}}"
+                               data-uuid="{{spirit.uuid}}">
+                                {{spirit.name}}
+                            </a>
+                            <a data-action="removeSpirit" class="close"><i class="fas fa-times"></i></a>
+                        </span>
+                    {{else}}
+                        <label>{{localize "SR5.Tooltips.CallInAction.LinkActor"}}</label>
                     {{/if}}
                 {{/if}}
                 {{#if systemFields.technology}}

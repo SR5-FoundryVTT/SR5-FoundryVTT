@@ -1,6 +1,7 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { parseDropData } from "../../utils/sheets";
 import { SR5BaseItemSheetData, SR5ItemSheet } from "../SR5ItemSheet";
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 
 interface SR5CallInActionSheetData extends SR5BaseItemSheetData {
@@ -18,6 +19,14 @@ interface SR5CallInActionSheetData extends SR5BaseItemSheetData {
  * 'creator' or 'caller'. Summoner/Conjurer, Technomancer, etc.
  */
 export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData> {
+
+    static override DEFAULT_OPTIONS: any = {
+        actions: {
+            removeSpirit: SR5CallInActionSheet.#removeSpirit,
+            removeSprite: SR5CallInActionSheet.#removeSprite,
+        },
+    }
+
     override async _prepareContext(options): Promise<SR5CallInActionSheetData> {
         const data = await super._prepareContext(options);
 
@@ -40,29 +49,9 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
         }
     }
 
-    /**
-     * Summoning Sheets allow dropping of spirits onto them.
-     * These spirits will be used as pre-configured actors to summon.
-     */
-    override async _onDrop(event: any) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const data = parseDropData(event);
-        if (!data) return;
-
-        if (data.type !== 'Actor') return;
-        const actor = await fromUuid(data.uuid) as SR5Actor;
-
+    override async _onDropActor(event, actor) {
         if (actor.isType('spirit')) await this.updatePreparedSpirit(actor);
         if (actor.isType('sprite')) await this.updatePreparedSprite(actor);
-    }
-
-    override activateListeners_LEGACY(html: any): void {
-        super.activateListeners_LEGACY(html);
-
-        html.find('.spirit-remove').click(this.handleSpiritRemove.bind(this));
-        html.find('.sprite-remove').click(this.handleSpriteRemove.bind(this));
     }
 
     /**
@@ -75,7 +64,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
         if (!system.spirit.uuid)
             return null;
 
-        return fromUuid(system.spirit.uuid) as Promise<SR5Actor>;
+        return SheetFlow.fromUuidSync(system.spirit.uuid) as SR5Actor;
     }
 
     /**
@@ -88,31 +77,32 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
         if (!system.sprite.uuid)
             return null;
 
-        return fromUuid(system.sprite.uuid) as Promise<SR5Actor>;
+        return SheetFlow.fromUuidSync(system.sprite.uuid) as SR5Actor;
     }
     
     /**
      * Handling the removal of a spirit by any sheet action.
      */
-    async handleSpiritRemove(event: any) {
+    static async #removeSpirit(this: SR5CallInActionSheet, event) {
         await this.item.update({ system: { spirit: { uuid: '' } } });
     }
     
     /**
      * User requested removal of the prepared sprite.
      */
-    async handleSpriteRemove(event: any) {
+    static async #removeSprite(this: SR5CallInActionSheet, event) {
         await this.item.update({ system: { spirit: { uuid: '' } } });
     }
 
     /**
      * Updating the summoning items prepared spirit.
      * 
-     * @param actor The prepared actor
+     * @param spirit The prepared actor
      */
     async updatePreparedSpirit(spirit: SR5Actor<'spirit'>) {
         await this.item.update({
             system: {
+                actor_type: 'spirit',
                 spirit: {
                     uuid: spirit.uuid,
                     type: spirit.system.spiritType,
@@ -125,11 +115,12 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
     /**
      * Update the compilation items prepared sprite.
      * 
-     * @param actor The prepared actor
+     * @param sprite The prepared actor
      */
     async updatePreparedSprite(sprite: SR5Actor<'sprite'>) {
         await this.item.update({
             system: {
+                actor_type: 'sprite',
                 sprite: {
                     uuid: sprite.uuid,
                     type: sprite.system.spriteType,
