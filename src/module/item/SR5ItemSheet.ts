@@ -207,6 +207,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         this.#dragDrop = this.#createDragDropHandlers();
     }
 
+    /**
+     * Configure the Tabs that are actually used
+     * @param group
+     * @protected
+     */
     protected override _prepareTabs(group: string) {
         const parts = super._prepareTabs(group);
         if (group === 'primary' && !game.user?.isGM && this.item.limited) {
@@ -220,6 +225,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         return parts;
     }
 
+    /**
+     * Configure the parts that are actually used
+     * @param options
+     * @protected
+     */
     protected override _configureRenderParts(options) {
         const retVal = super._configureRenderParts(options);
         if (!game.user?.isGM && this.item.limited) {
@@ -234,6 +244,13 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         return retVal;
     }
 
+    /**
+     * Clean Parts will remove PARTS from the static property and Primary TABS
+     * - this removes parts that aren't used by types
+     * @param item
+     * @param parts
+     * @protected
+     */
     protected _cleanParts(item: SR5Item, parts: Record<string, any>) {
         if (item.isType('contact', 'lifestyle', 'sin', 'grid', 'program')) {
             delete parts['details'];
