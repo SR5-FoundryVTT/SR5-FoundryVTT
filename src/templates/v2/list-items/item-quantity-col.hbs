@@ -3,13 +3,13 @@
         <input type="number" class="item-quantity-input short midd" value="{{this.system.technology.quantity}}" min="0" max="999">
     {{else}}
         <a class="hover-show-button"
-           data-action="removeOneQty"
+           data-action="removeItemQty"
            data-tooltip="SR5.Labels.ActorSheet.RemoveOneQty">
             <i class="fas fa-minus-square"></i>
         </a>
         <label class="qty-label">{{this.system.technology.quantity}}</label>
         <a class="hover-show-button"
-           data-action="addOneQty"
+           data-action="addItemQty"
            data-tooltip="SR5.Labels.ActorSheet.AddOneQty">
             <i class="fas fa-plus-square"></i>
         </a>

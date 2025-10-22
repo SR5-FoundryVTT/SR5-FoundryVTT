@@ -210,6 +210,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             removeInventory: SR5BaseActorSheet.#removeInventory,
             createInventory: SR5BaseActorSheet.#createInventory,
 
+            addItemQty: SR5BaseActorSheet.#addItemQty,
+            removeItemQty: SR5BaseActorSheet.#removeItemQty,
             equipItem: SR5BaseActorSheet.#onToggleEquippedItem,
             toggleItemWireless: SR5BaseActorSheet.#toggleWirelessState,
             toggleExpanded: SR5BaseActorSheet.#toggleInventoryVisibility,
@@ -2090,4 +2092,35 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             }
         }
     }
+
+    static async #addItemQty(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const id = SheetFlow.closestItemId(event.target);
+        let item = this.actor.items.get(id);
+        if (!item) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            item = SheetFlow.fromUuidSync(uuid);
+        }
+        if (item && item instanceof SR5Item) {
+            const qty = item.getTechnologyData()?.quantity ?? 0;
+            const newQty = event.shiftKey ? qty + 5 : event.ctrlKey ? qty + 20 : qty + 1;
+            await item.update({system: {technology: {quantity: newQty}}})
+        }
+    }
+
+    static async #removeItemQty(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        const id = SheetFlow.closestItemId(event.target);
+        let item = this.actor.items.get(id);
+        if (!item) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            item = SheetFlow.fromUuidSync(uuid);
+        }
+        if (item && item instanceof SR5Item) {
+            const qty = item.getTechnologyData()?.quantity ?? 0;
+            const newQty = event.shiftKey ? qty - 5 : event.ctrlKey ? qty - 20 : qty - 1;
+            await item.update({system: { technology: { quantity: newQty}}})
+        }
+    }
+
 }
