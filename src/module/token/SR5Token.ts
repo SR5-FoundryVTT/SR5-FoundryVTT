@@ -22,7 +22,7 @@ export class SR5Token extends foundry.canvas.placeables.Token {
     ) {
         const movement = this.actor?.system.movement;
         const useRoutLib = this.document.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;
-        if (RoutingLibIntegration.routingLibReady && movement && useRoutLib && !options?.skipRoutingLib && !options?.ignoreWalls) {
+        if (RoutingLibIntegration.ready && movement && useRoutLib && !options?.skipRoutingLib && !options?.ignoreWalls) {
             return RoutingLibIntegration.routinglibPathfinding(waypoints, this, movement);
         }
 
@@ -36,7 +36,7 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         options: TokenConfig.RenderOptions | PrototypeTokenConfig.RenderOptions
     ) {
         const actor = app.actor as Actor.Implementation | null | undefined;
-        if (!RoutingLibIntegration.routingLibReady || !actor?.system.movement) return;
+        if (!RoutingLibIntegration.ready || !actor?.system.movement) return;
 
         // Default it to true, so that it is enabled by default.
         const flagValue = app.token.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;
