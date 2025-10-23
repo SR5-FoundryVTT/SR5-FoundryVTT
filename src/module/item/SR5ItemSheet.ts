@@ -17,6 +17,8 @@ import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 
 const { ItemSheet } = foundry.applications.sheets;
+const { FilePicker } = foundry.applications.apps;
+const { DragDrop } = foundry.applications.ux
 
 /**
  * Shadowrun 5e ItemSheetData typing shared across all item types
@@ -108,6 +110,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
             removeMaster: SR5ItemSheet.#removeMaster,
             removeLinkedActor: SR5ItemSheet.#removeLinkedActor,
+
+            editImage: SR5ItemSheet.#editImage,
 
             toggleFreshImport: SR5ItemSheet.#toggleFreshImportFlag,
             toggleEquipped: SR5ItemSheet.#toggleEquipped,
@@ -1010,6 +1014,18 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (action) {
             await this.item.update({system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor }}}}});
         }
+    }
+
+    static async #editImage(this: SR5ItemSheet, event) {
+        event.preventDefault();
+
+        await new FilePicker({
+            type: 'image',
+            callback: (path) => {
+                if (path) {
+                    this.item.update({ img : path });
+                }
+            }}).render(true);
     }
 
     /**

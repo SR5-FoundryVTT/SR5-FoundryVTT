@@ -33,8 +33,6 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
 
         data.primaryTabs = this._prepareTabs('primary');
 
-        console.log('skill', data.skill);
-
         return data;
     }
 
@@ -89,9 +87,6 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
 
     static async #editImage(this: SkillEditSheet, event) {
         event.preventDefault();
-        console.log('editImage', event);
-
-        console.log(FilePicker);
 
         await new FilePicker({
             type: 'image',

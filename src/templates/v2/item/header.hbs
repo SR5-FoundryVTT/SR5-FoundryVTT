@@ -1,6 +1,11 @@
 <div>
     <div class="sheet-header">
-        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{item.name}}" data-edit="img" />
+        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{item.name}}"
+             {{#if @root.isEditMode}}
+                 data-edit="img"
+                 data-action="editImage"
+             {{/if}}
+        />
         <div class="sheet-header-labels">
             <div class="sheet-header-name">
                 {{#unless isLimited}}

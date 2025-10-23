@@ -79,10 +79,9 @@ export const registerActorHelpers = () => {
     });
 
     Handlebars.registerHelper('matrixChoices', (item, matrixAtt, options) => {
-        console.log('matrixChoices', item, matrixAtt, options);
         const currentAtt = matrixAtt.device_att;
         const choices: {label: string, value: string}[] = [];
-        let currentChoice;
+        let currentChoice: { label: string; value: string; } | undefined;
         for (const [key, att] of Object.entries(item.atts as Record<string, any>)) {
             if (key === currentAtt) {
                 currentChoice = {
