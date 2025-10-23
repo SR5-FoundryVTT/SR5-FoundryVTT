@@ -50,7 +50,6 @@ export const ModifiableValue = () => ({
     override: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
     downgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
     upgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
-    temp: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
 export const ModifiableValueLinked = () => ({

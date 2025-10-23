@@ -56,10 +56,6 @@ export class Helpers {
         }
 
         const parts = new PartsList(value.mod);
-        // if a temp field is found, add it as a unique part
-        if (!isNaN(value.temp) && Number(value.temp) !== 0) {
-            parts.addUniquePart('SR5.Temporary', value['temp']);
-        }
 
         value.value = parts.total + value.base;
 

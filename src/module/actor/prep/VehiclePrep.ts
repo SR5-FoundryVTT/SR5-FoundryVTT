@@ -63,8 +63,6 @@ export class VehiclePrep {
             }
             const parts = new PartsList(stat.mod);
 
-            if (stat.temp) parts.addUniquePart('SR5.Temporary', stat.temp);
-
             stat.mod = parts.list;
             Helpers.calcTotal(stat);
             // add labels
@@ -213,7 +211,6 @@ export class VehiclePrep {
     static prepareArmor(system: Actor.SystemOfType<'vehicle'>) {
         const { armor, modifiers } = system;
 
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp'] || 0));
         armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', Number(modifiers['armor'] || 0));
 
         Helpers.calcTotal(armor);

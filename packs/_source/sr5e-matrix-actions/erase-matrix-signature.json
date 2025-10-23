@@ -34,7 +34,6 @@
         "override": null,
         "downgrade": null,
         "upgrade": null,
-        "temp": 0,
         "base_formula_operator": "add"
       },
       "threshold": {
@@ -61,7 +60,6 @@
           "override": null,
           "downgrade": null,
           "upgrade": null,
-          "temp": 0,
           "attribute": "",
           "base_formula_operator": "add"
         },
@@ -78,7 +76,6 @@
         "override": null,
         "downgrade": null,
         "upgrade": null,
-        "temp": 0,
         "biofeedback": ""
       },
       "opposed": {

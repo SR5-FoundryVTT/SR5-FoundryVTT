@@ -27,7 +27,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "data_processing",
         "base_formula_operator": "add"
       },
@@ -57,7 +56,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "",
         "base_formula_operator": "add",
         "type": {
@@ -73,7 +71,6 @@
           "base": 0,
           "mod": [],
           "override": null,
-          "temp": 0,
           "attribute": "",
           "base_formula_operator": "add"
         },

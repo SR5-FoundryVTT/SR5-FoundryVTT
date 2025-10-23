@@ -366,7 +366,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Return keys expected in the ModifiableField shape
      */
     static get modifiableValueProperties() {
-        return ['base', 'value', 'mod', 'override', 'temp'];
+        return ['base', 'value', 'mod', 'override'];
     }
 
     override get isSuppressed(): boolean {

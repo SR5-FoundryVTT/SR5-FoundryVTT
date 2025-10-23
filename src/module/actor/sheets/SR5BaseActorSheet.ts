@@ -287,7 +287,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Sheet related general purpose fields. These aren't persistent.
         data.filters = this._filters;
 
-        this._prepareActorAttributes(data);
         this._prepareActorModifiers(data);
 
         // Valid data fields for all actor types.
@@ -930,18 +929,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         sheetData.woundTolerance = 3 + ('wound_tolerance' in modifiers ? modifiers.wound_tolerance : 0);
     }
 
-    _prepareActorAttributes(sheetData: SR5ActorSheetData) {
-        // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attributes = sheetData.system.attributes;
-        for (const [, attribute] of Object.entries(attributes)) {
-            if (!attribute.hidden) {
-                if (attribute.temp === 0)
-                    // @ts-expect-error - temp is not defined in the SR5Attribute type
-                    attribute.temp = null;
-            }
-        }
-    }
-
     _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
         const { matrix } = sheetData.system;
         if (matrix) {
@@ -949,9 +936,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 const att = matrix[attribute];
                 if (att) {
                     if (!att.mod) att.mod = [];
-                    if (att.temp === 0)
-                        // @ts-expect-error - so it doesn't show in sheet
-                        att.temp = null;
                 }
             };
 
