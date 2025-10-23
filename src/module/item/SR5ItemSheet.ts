@@ -113,6 +113,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
             editImage: SR5ItemSheet.#editImage,
 
+            toggleActionSpecialization: SR5ItemSheet.#toggleActionSpecialization,
             toggleFreshImport: SR5ItemSheet.#toggleFreshImportFlag,
             toggleEquipped: SR5ItemSheet.#toggleEquipped,
             toggleWireless: SR5ItemSheet.#toggleWirelessState,
@@ -992,6 +993,13 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await this.item.update(submitData, options);
         } else {
             await super._processSubmitData(event, form, submitData, options);
+        }
+    }
+
+    static async #toggleActionSpecialization(this: SR5ItemSheet, event) {
+        const action = this.item.getAction();
+        if (action) {
+            await this.item.update({system: { action: { spec: !action.spec }}});
         }
     }
 

@@ -4,13 +4,13 @@
             <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.CostAdjustment">
                 {{localize "SR5.Labels.Item.CostAdjustment"}}
                 {{formInput systemFields.technology.fields.calculated.fields.cost.fields.adjusted
-                            value=source.system.calculated.cost.adjusted classes="short"
+                            value=source.system.technology.calculated.cost.adjusted classes="short"
                             rootId=@root.rootId disabled=@root.isPlayMode}}
             </label>
             <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.AvailabilityAdjustment">
                 {{localize "SR5.Labels.Item.AvailabilityAdjustment"}}
                 {{formInput systemFields.technology.fields.calculated.fields.availability.fields.adjusted
-                            value=source.system.calculated.availability.adjusted classes="short"
+                            value=source.system.technology.calculated.availability.adjusted classes="short"
                             rootId=@root.rootId disabled=@root.isPlayMode}}
             </label>
         </div>
@@ -664,7 +664,7 @@
 
                     {{#if @root.isEditMode}}
                         <label data-tooltip="{{systemFields.manipulation.fields.damaging.hint}}">
-                            {{systemFields.manipulation.fields.damaging.label}}&nbsp;{{formInput systemFields.manipulation.fields.damaging value=system.manipulation.damaging
+                            {{systemFields.manipulation.fields.damaging.label}}&nbsp;{{formInput systemFields.manipulation.fields.damaging value=source.system.manipulation.damaging
                                                                                                  classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </label>
                     {{else if system.manipulation.damaging}}
@@ -675,7 +675,7 @@
 
                     {{#if @root.isEditMode}}
                         <label data-tooltip="{{systemFields.manipulation.fields.mental.hint}}">
-                            {{systemFields.manipulation.fields.mental.label}}&nbsp;{{formInput systemFields.manipulation.fields.mental value=system.manipulation.mental
+                            {{systemFields.manipulation.fields.mental.label}}&nbsp;{{formInput systemFields.manipulation.fields.mental value=source.system.manipulation.mental
                                                                                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </label>
                     {{else if system.manipulation.mental}}
@@ -697,7 +697,7 @@
 
                     {{#if @root.isEditMode}}
                         <label data-tooltip="{{systemFields.manipulation.fields.physical.hint}}">
-                            {{systemFields.manipulation.fields.physical.label}}&nbsp;{{formInput systemFields.manipulation.fields.physical value=system.manipulation.physical
+                            {{systemFields.manipulation.fields.physical.label}}&nbsp;{{formInput systemFields.manipulation.fields.physical value=source.system.manipulation.physical
                                                                                                  classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </label>
                     {{else if system.manipulation.physical}}

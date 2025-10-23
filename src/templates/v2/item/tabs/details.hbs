@@ -15,18 +15,18 @@
                     <div class="list-item-col">
                         <span>
                             <label data-tooltip="{{systemFields.armor.fields.hardened.hint}}">
-                                {{systemFields.armor.fields.hardened.label}}&nbsp;{{formInput systemFields.armor.fields.hardened value=system.armor.hardened
+                                {{systemFields.armor.fields.hardened.label}}&nbsp;{{formInput systemFields.armor.fields.hardened value=source.system.armor.hardened
                                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </label>
                         </span>
                         <span>
                             <label data-tooltip="{{systemFields.armor.fields.mod.hint}}">
-                                {{systemFields.armor.fields.mod.label}}&nbsp;{{formInput systemFields.armor.fields.mod value=system.armor.mod
+                                {{systemFields.armor.fields.mod.label}}&nbsp;{{formInput systemFields.armor.fields.mod value=source.system.armor.mod
                                                                                          classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </label>
                         </span>
                         <span>
-                            {{formInput systemFields.armor.fields.value value=system.armor.value
+                            {{formInput systemFields.armor.fields.value value=source.system.armor.value
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </span>
                     </div>
@@ -60,10 +60,10 @@
                         <label>{{localize "SR5.Damage"}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.damage value=system.damage
+                        {{formInput systemFields.damage value=source.system.damage
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         <label style="text-wrap: nowrap" data-tooltip="{{systemFields.replaceDamage.hint}}">
-                            {{systemFields.replaceDamage.label}}&nbsp;{{formInput systemFields.replaceDamage value=system.replaceDamage
+                            {{systemFields.replaceDamage.label}}&nbsp;{{formInput systemFields.replaceDamage value=source.system.replaceDamage
                                                                                   classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </label>
                     </div>
@@ -73,7 +73,7 @@
                         <label data-tooltip="{{systemFields.damageType.hint}}">{{systemFields.damageType.label}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.damageType value=system.damageType localize=true
+                        {{formInput systemFields.damageType value=source.system.damageType localize=true
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                         <label data-tooltip="{{systemFields.element.hint}}">{{systemFields.element.label}}</label>
                     </div>
                     <div class="list-item-col">
-                            {{formInput systemFields.element value=system.element localize=true
+                            {{formInput systemFields.element value=source.system.element localize=true
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
@@ -91,10 +91,10 @@
                         <label data-tooltip="{{systemFields.ap.hint}}">{{systemFields.ap.label}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.ap value=system.ap
+                        {{formInput systemFields.ap value=source.system.ap
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         <label style="text-wrap: nowrap" data-tooltip="{{systemFields.replaceAP.hint}}">
-                            {{systemFields.replaceAP.label}}&nbsp;{{formInput systemFields.replaceAP value=system.replaceAP
+                            {{systemFields.replaceAP.label}}&nbsp;{{formInput systemFields.replaceAP value=source.system.replaceAP
                                                                               classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </label>
                     </div>
@@ -104,7 +104,7 @@
                         <label data-tooltip="{{systemFields.accuracy.hint}}">{{systemFields.accuracy.label}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.accuracy value=system.accuracy
+                        {{formInput systemFields.accuracy value=source.system.accuracy
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                         <label data-tooltip="{{systemFields.blast.fields.radius.hint}}">{{systemFields.blast.fields.radius.label}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.blast.fields.radius value=system.blast.radius
+                        {{formInput systemFields.blast.fields.radius value=source.system.blast.radius
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                         <label data-tooltip="{{systemFields.blast.fields.dropoff.hint}}">{{systemFields.blast.fields.dropoff.label}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.blast.fields.dropoff value=system.blast.dropoff
+                        {{formInput systemFields.blast.fields.dropoff value=source.system.blast.dropoff
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
@@ -165,7 +165,7 @@
                                 <label>{{localize "SR5.Programs"}}</label>
                             </div>
                             <div class="list-item-col">
-                                {{formInput systemFields.programs value=system.programs classes="short"
+                                {{formInput systemFields.programs value=source.system.programs classes="short"
                                             rootId=rootId disabled=@root.isPlayMode }}
                             </div>
                         </div>
@@ -345,7 +345,7 @@
                         <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.type value=system.type localize=true
+                        {{formInput systemFields.type value=source.system.type localize=true
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
@@ -356,7 +356,7 @@
                             <label data-tooltip="{{systemFields.mount_point.hint}}">{{systemFields.mount_point.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.mount_point value=system.mount_point localize=true
+                            {{formInput systemFields.mount_point value=source.system.mount_point localize=true
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
@@ -365,7 +365,7 @@
                             <label data-tooltip="{{systemFields.dice_pool.hint}}">{{systemFields.dice_pool.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.dice_pool value=system.dice_pool
+                            {{formInput systemFields.dice_pool value=source.system.dice_pool
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
@@ -374,7 +374,7 @@
                             <label data-tooltip="{{systemFields.accuracy.hint}}">{{systemFields.accuracy.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.accuracy value=system.accuracy
+                            {{formInput systemFields.accuracy value=source.system.accuracy
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
@@ -383,7 +383,7 @@
                             <label data-tooltip="{{systemFields.rc.hint}}">{{systemFields.rc.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.rc value=system.rc
+                            {{formInput systemFields.rc value=source.system.rc
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
@@ -392,7 +392,7 @@
                             <label data-tooltip="{{systemFields.conceal.hint}}">{{systemFields.conceal.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.conceal value=system.conceal
+                            {{formInput systemFields.conceal value=source.system.conceal
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
@@ -404,7 +404,7 @@
                             <label data-tooltip="{{systemFields.modification_category.hint}}">{{systemFields.modification_category.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.modification_category value=system.modification_category localize=true
+                            {{formInput systemFields.modification_category value=source.system.modification_category localize=true
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
@@ -413,7 +413,7 @@
                             <label data-tooltip="{{systemFields.slots.hint}}">{{systemFields.slots.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.slots value=system.slots
+                            {{formInput systemFields.slots value=source.system.slots
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
@@ -425,7 +425,7 @@
                             <label data-tooltip="{{systemFields.slots.hint}}">{{systemFields.slots.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.slots value=system.slots
+                            {{formInput systemFields.slots value=source.system.slots
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
@@ -448,7 +448,7 @@
                         <label data-tooltip="{{systemFields.action.fields.test.hint}}">{{systemFields.action.fields.test.label}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.action.fields.test value=system.action.test options=(tests2Array activeTests)
+                        {{formInput systemFields.action.fields.test value=source.system.action.test options=(tests2Array activeTests)
                                     classes="short" rootId=@root.rootId disabled=true}}
                     </div>
                 </div>
@@ -458,12 +458,12 @@
                             <label data-tooltip="{{systemFields.action.fields.type.hint}}">{{systemFields.action.fields.type.label}}</label>
                         </div>
                         <div class="list-item-col">
+                            {{formInput systemFields.action.fields.type value=source.system.action.type localize=true
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             <label style="text-wrap: nowrap;">
-                                {{localize "SR5.ExtendedTest"}}&nbsp;{{formInput systemFields.action.fields.extended value=system.action.extended
+                                {{localize "SR5.ExtendedTest"}}&nbsp;{{formInput systemFields.action.fields.extended value=source.system.action.extended
                                                                                  rootId=@root.rootId disabled=@root.isPlayMode}}
                             </label>
-                            {{formInput systemFields.action.fields.type value=system.action.type localize=true
-                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
                     {{#if (eq item.type 'action')}}
@@ -472,7 +472,7 @@
                                 <label data-tooltip="{{systemFields.action.fields.categories.hint}}">{{systemFields.action.fields.categories.label}}</label>
                             </div>
                             <div class="list-item-col">
-                                {{formInput systemFields.action.fields.categories value=system.action.categories options=config.actionCategories
+                                {{formInput systemFields.action.fields.categories value=source.system.action.categories options=config.actionCategories
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </div>
                         </div>
@@ -484,24 +484,35 @@
                         <div class="list-item-col">
                             {{!-- Hide this field the attribtue2 is set and the skill isn't set --}}
                             {{#unless (and system.action.attribute2 (not system.action.skill))}}
-                                <label style="text-wrap: nowrap;" data-tooltip="{{systemFields.action.fields.spec.hint}}">
-                                    {{systemFields.action.fields.spec.label}}&nbsp;{{formInput systemFields.action.fields.spec value=system.action.spec
-                                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                                </label>
-                                {{formInput systemFields.action.fields.skill value=system.action.skill options=(config2Array activeSkills) localize=true
+                                {{#if system.action.skill}}
+                                    <a {{#if @root.isEditMode}} data-action="toggleActionSpecialization" {{else}} disabled {{/if}} data-tooltip="{{systemFields.action.fields.spec.label}}:&nbsp;{{systemFields.action.fields.spec.hint}}">
+                                        <i style="font-size: 1.1rem" {{#if system.action.spec}} class="fas fa-circle-s" {{else}} class="fa-light fa-circle-s" {{/if}}></i>
+                                    </a>
+                                    <label>+</label>
+                                {{/if}}
+                                {{formInput systemFields.action.fields.skill value=source.system.action.skill options=(config2Array activeSkills) localize=true
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                                 <label>+</label>
                             {{/unless}}
-                            {{formInput systemFields.action.fields.attribute value=system.action.attribute options=(config2Array attributes)
+                            {{formInput systemFields.action.fields.attribute value=source.system.action.attribute options=(config2Array attributes)
                                         localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             {{#unless system.action.skill}}
                                 <label>+</label>
-                                {{formInput systemFields.action.fields.attribute2 value=system.action.attribute2 options=(config2Array attributes)
+                                {{formInput systemFields.action.fields.attribute2 value=source.system.action.attribute2 options=(config2Array attributes)
                                             localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             {{/unless}}
                             <label>+</label>
-                            {{formInput systemFields.action.fields.mod value=system.action.mod
+                            {{formInput systemFields.action.fields.mod value=source.system.action.mod
                                         classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                            <label>+</label>
+                            <a style="font-size: 1.1rem" data-tooltip="{{systemFields.action.fields.armor.label}}:&nbsp;{{systemFields.action.fields.armor.hint}}"
+                                {{#if @root.isEditMode}} data-action="toggleActionArmor" {{else}} disabled {{/if}} >
+                                {{#if system.action.armor}}
+                                    <i class="fas fa-shield"></i>
+                                {{else}}
+                                    <i class="far fa-shield"></i>
+                                {{/if}}
+                            </a>
                         </div>
                     </div>
                     <div class="list-item">
@@ -509,7 +520,7 @@
                             <label data-tooltip="{{systemFields.action.fields.modifiers.hint}}">{{systemFields.action.fields.modifiers.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.action.fields.modifiers value=system.action.modifiers options=config.modifierTypes
+                            {{formInput systemFields.action.fields.modifiers value=source.system.action.modifiers options=config.modifierTypes
                                         localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
@@ -519,10 +530,10 @@
                                 <label data-tooltip="{{systemFields.action.fields.limit.fields.base.hint}}">{{systemFields.action.fields.limit.fields.base.label}}</label>
                             </div>
                             <div class="list-item-col">
-                                {{formInput systemFields.action.fields.limit.fields.attribute value=system.action.limit.attribute options=(config2Array limits)
+                                {{formInput systemFields.action.fields.limit.fields.attribute value=source.system.action.limit.attribute options=(config2Array limits)
                                             localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                                 <label>+</label>
-                                {{formInput systemFields.action.fields.limit.fields.base value=system.action.limit.base
+                                {{formInput systemFields.action.fields.limit.fields.base value=source.system.action.limit.base
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </div>
                         </div>
@@ -532,7 +543,7 @@
                             </div>
                             <div class="list-item-col">
                                 {{formInput systemFields.action.fields.threshold.fields.base
-                                            value=system.action.threshold.base
+                                            value=source.system.action.threshold.base
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </div>
                         </div>
@@ -541,7 +552,7 @@
                                 <label data-tooltip="{{systemFields.action.fields.roll_mode.hint}}">{{systemFields.action.fields.roll_mode.label}}</label>
                             </div>
                             <div class="list-item-col">
-                                {{formInput systemFields.action.fields.roll_mode value=system.action.roll_mode localize=true
+                                {{formInput systemFields.action.fields.roll_mode value=source.system.action.roll_mode localize=true
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </div>
                         </div>
@@ -558,7 +569,7 @@
                     </div>
                     <div class="list-item-col">
                         {{formInput systemFields.action.fields.damage.fields.type.fields.base
-                                    value=system.action.damage.type.base localize=true
+                                    value=source.system.action.damage.type.base localize=true
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
@@ -573,7 +584,7 @@
                             </div>
                             <div class="list-item-col">
                                 {{formInput systemFields.action.fields.damage.fields.biofeedback
-                                            value=system.action.damage.biofeedback localize=true classes="short"
+                                            value=source.system.action.damage.biofeedback localize=true classes="short"
                                             rootId=@root.rootId disabled=@root.isPlayMode}}
                             </div>
                         </div>
@@ -586,7 +597,7 @@
                             </div>
                             <div class="list-item-col">
                                 {{formInput systemFields.action.fields.damage.fields.element.fields.base
-                                            value=system.action.damage.element.base localize=true
+                                            value=source.system.action.damage.element.base localize=true
                                             classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </div>
                         </div>
@@ -597,13 +608,13 @@
                                 <label data-tooltip="{{systemFields.action.fields.damage.fields.base.hint}}">{{systemFields.action.fields.damage.fields.base.label}}</label>
                             </div>
                             <div class="list-item-col">
-                                {{formInput systemFields.action.fields.damage.fields.base value=system.action.damage.base
+                                {{formInput systemFields.action.fields.damage.fields.base value=source.system.action.damage.base
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                                 {{formInput systemFields.action.fields.damage.fields.base_formula_operator
-                                            value=system.action.damage.base_formula_operator
+                                            value=source.system.action.damage.base_formula_operator
                                             classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                                 {{formInput systemFields.action.fields.damage.fields.attribute
-                                            value=system.action.damage.attribute options=(config2Array attributes) localize=true
+                                            value=source.system.action.damage.attribute options=(config2Array attributes) localize=true
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </div>
                         </div>
@@ -615,13 +626,13 @@
                                 </div>
                                 <div class="list-item-col">
                                     {{formInput systemFields.action.fields.damage.fields.ap.fields.base
-                                                value=system.action.damage.ap.base
+                                                value=source.system.action.damage.ap.base
                                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                                     {{formInput systemFields.action.fields.damage.fields.ap.fields.base_formula_operator
-                                                value=system.action.damage.ap.base_formula_operator
+                                                value=source.system.action.damage.ap.base_formula_operator
                                                 classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                                     {{formInput systemFields.action.fields.damage.fields.ap.fields.attribute
-                                                value=system.action.damage.ap.attribute
+                                                value=source.system.action.damage.ap.attribute
                                                 options=(config2Array attributes) localize=true
                                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                                 </div>
@@ -639,7 +650,7 @@
                         <label data-tooltip="{{systemFields.action.fields.opposed.fields.test.hint}}">{{systemFields.action.fields.opposed.fields.test.label}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.action.fields.opposed.fields.test value=system.action.opposed.test
+                        {{formInput systemFields.action.fields.opposed.fields.test value=source.system.action.opposed.test
                                     options=(tests2Array opposedTests) classes="short" rootId=@root.rootId
                                     disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapons')) }}
                     </div>
@@ -653,25 +664,34 @@
                         <div class="list-item-col">
                             {{!-- Hide this field the attribtue2 is set and the skill isn't set --}}
                             {{#unless (and system.action.opposed.attribute2 (not system.action.opposed.skill))}}
-                                {{formInput systemFields.action.fields.opposed.fields.skill value=system.action.opposed.skill
+                                {{formInput systemFields.action.fields.opposed.fields.skill value=source.system.action.opposed.skill
                                             options=(config2Array activeSkills) localize=true
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                                 <label>+</label>
                             {{/unless}}
                             {{formInput systemFields.action.fields.opposed.fields.attribute
-                                        value=system.action.opposed.attribute
+                                        value=source.system.action.opposed.attribute
                                         options=(config2Array attributes) localize=true
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             {{#unless system.action.opposed.skill}}
                                 <label>+</label>
                                 {{formInput systemFields.action.fields.opposed.fields.attribute2
-                                            value=system.action.opposed.attribute2
+                                            value=source.system.action.opposed.attribute2
                                             options=(config2Array attributes) localize=true
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             {{/unless}}
                             <label>+</label>
-                            {{formInput systemFields.action.fields.opposed.fields.mod value=system.action.opposed.mod
+                            {{formInput systemFields.action.fields.opposed.fields.mod value=source.system.action.opposed.mod
                                         classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                            <label>+</label>
+                            <a style="font-size: 1.1rem" data-tooltip="{{systemFields.action.fields.opposed.fields.armor.label}}:&nbsp;{{systemFields.action.fields.opposed.fields.armor.hint}}"
+                                {{#if @root.isEditMode}} data-action="toggleOpposedArmor" {{else}} disabled {{/if}} >
+                                {{#if system.action.opposed.armor}}
+                                    <i class="fas fa-shield"></i>
+                                {{else}}
+                                    <i class="far fa-shield"></i>
+                                {{/if}}
+                            </a>
                         </div>
                     </div>
                 {{/if}}
@@ -687,7 +707,7 @@
                     </div>
                     <div class="list-item-col">
                         {{formInput systemFields.action.fields.opposed.fields.resist.fields.test
-                                    value=system.action.opposed.resist.test options=(tests2Array resistTests)
+                                    value=source.system.action.opposed.resist.test options=(tests2Array resistTests)
                                     classes="short" rootId=@root.rootId
                                     disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapons')) }}
                     </div>
@@ -700,22 +720,17 @@
                         </div>
                         <div class="list-item-col">
                             {{formInput systemFields.action.fields.opposed.fields.resist.fields.attribute
-                                        value=system.action.opposed.resist.attribute
+                                        value=source.system.action.opposed.resist.attribute
                                         options=(config2Array attributes) localize=true
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             <label>+</label>
                             {{formInput systemFields.action.fields.opposed.fields.resist.fields.attribute2
-                                        value=system.action.opposed.resist.attribute2
+                                        value=source.system.action.opposed.resist.attribute2
                                         options=(config2Array attributes) localize=true
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             <label>+</label>
-                            <a data-tooltip="{{systemFields.action.fields.opposed.fields.resist.fields.armor.label}}:&nbsp;{{systemFields.action.fields.opposed.fields.resist.fields.armor.hint}}"
-                                {{#if @root.isEditMode}}
-                               data-action="toggleResistArmor"
-                                {{else}}
-                               disabled
-                                {{/if}}
-                            >
+                            <a style="font-size: 1.1rem" data-tooltip="{{systemFields.action.fields.opposed.fields.resist.fields.armor.label}}:&nbsp;{{systemFields.action.fields.opposed.fields.resist.fields.armor.hint}}"
+                                {{#if @root.isEditMode}} data-action="toggleResistArmor" {{else}} disabled {{/if}} >
                                 {{#if system.action.opposed.resist.armor}}
                                     <i class="fas fa-shield"></i>
                                 {{else}}
