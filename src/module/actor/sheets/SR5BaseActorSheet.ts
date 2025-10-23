@@ -26,17 +26,6 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 const { ActorSheetV2 } = foundry.applications.sheets;
 const { TextEditor } = foundry.applications.ux;
 
-/**
- * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
- */
-export interface SheetItemData<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> {
-    type: string,
-    name: string,
-    system: SR5Item<SubType>['system'],
-    properties: string[],
-    description: DescriptionType
-}
-
 export interface InventorySheetDataByType {
     type: string;
     label: string;
@@ -77,7 +66,7 @@ const sortByName = (a: { name: string }, b: { name: string }) => {
  * @param b Any type of item data
  * @returns
  */
-const sortByEquipped = (a: SheetItemData, b: SheetItemData) => {
+const sortByEquipped = (a: SR5Item, b: SR5Item) => {
     const leftEquipped = a.system?.technology?.equipped;
     const rightEquipped = b.system?.technology?.equipped;
 
@@ -93,7 +82,7 @@ const sortByEquipped = (a: SheetItemData, b: SheetItemData) => {
  * @param b A quality item data
  * @returns
  */
-const sortByQuality = (a: SheetItemData<'quality'>, b: SheetItemData<'quality'>) => {
+const sortByQuality = (a: SR5Item<'quality'>, b: SR5Item<'quality'>) => {
     if (a.system.type === 'positive' && b.system.type === 'negative') return -1;
     if (a.system.type === 'negative' && b.system.type === 'positive') return 1;
     return sortByName(a, b);
@@ -1151,7 +1140,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         Object.entries(itemsByType).forEach(([type, items]) => {
             switch (type) {
                 case 'quality':
-                    (items as SheetItemData<'quality'>[]).sort(sortByQuality);
+                    (items as SR5Item<'quality'>[]).sort(sortByQuality);
                     break;
                 case 'program':
                     items.sort(sortByEquipped);
