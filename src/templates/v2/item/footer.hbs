@@ -1,14 +1,6 @@
 <footer class="sheet-footer item-footer">
     {{#if (and systemFields.technology @root.isEditMode)}}
         <div class="list-item">
-            {{#if systemFields.essence}}
-                <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.EssenceAdjustment">
-                    {{localize "SR5.Labels.Item.EssenceAdjustment"}}
-                    {{formInput systemFields.technology.fields.calculated.fields.essence.fields.adjusted
-                                value=source.system.calculated.essence.adjusted classes="short"
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                </label>
-            {{/if}}
             <label style="text-wrap: nowrap" data-tooltip="SR5.Tooltips.Item.CostAdjustment">
                 {{localize "SR5.Labels.Item.CostAdjustment"}}
                 {{formInput systemFields.technology.fields.calculated.fields.cost.fields.adjusted

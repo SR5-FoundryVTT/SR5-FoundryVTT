@@ -57,17 +57,19 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             }) ?? [];
         }
 
-        static async #toggleEditMode(this, event: MouseEvent) {
+        static async #toggleEditMode(this: SR5ApplicationMixin, event: MouseEvent) {
             event.preventDefault();
             event.stopPropagation();
             if (this.isEditable) {
                 if (this.isEditMode) {
-                    this.submit();
+                    // @ts-expect-error submit exists
+                    await this.submit();
                 }
                 this._mode = this.isEditMode ? 'play' : 'edit';
             } else {
                 this._mode = 'play';
             }
+            // @ts-expect-error render exists
             await this.render();
         }
 
