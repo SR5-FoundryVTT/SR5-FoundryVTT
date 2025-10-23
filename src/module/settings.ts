@@ -284,6 +284,7 @@ export const registerSystemSettings = () => {
             config: true,
             type: String,
             default: '1,2,3,4,5,6',
+            requiresReload: true,
         });
     }
 
