@@ -17,7 +17,29 @@
     {{/if}}
     <div class="list-item">
         {{#if (isType item 'action')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs" item=item }}
+            {{#if (isMatrixAction item)}}
+                {{#if @root.isEditMode}}
+                    <div class="basic-row">
+                        <label>{{localize "SR5.Marks"}}</label>
+                        <span>
+                            {{formInput systemFields.action.fields.category.fields.matrix.fields.marks
+                                        value=source.system.action.category.matrix.marks
+                                        classes="short skinny" rootId=@root.rootId }}
+                        </span>
+                    </div>
+                {{else}}
+                    <label>{{localize "SR5.Marks"}}&nbsp;{{system.action.category.matrix.marks}}</label>
+                {{/if}}
+
+                {{#if @root.isEditMode}}
+                    <label>{{localize "SR5.Owner"}}&nbsp;{{formInput systemFields.action.fields.category.fields.matrix.fields.owner
+                                                               value=source.system.action.category.matrix.owner }}</label>
+                {{else if system.action.category.matrix.owner}}
+                    <label>{{localize "SR5.Owner"}}</label>
+                {{/if}}
+            {{else}}
+                {{> "systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs" item=item }}
+            {{/if}}
 
         {{else if (isType item 'call_in_action')}}
             {{#if @root.isEditMode}}
