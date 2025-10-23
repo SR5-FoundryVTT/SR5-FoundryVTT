@@ -2,10 +2,7 @@ import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { Helpers } from '../../helpers';
 import { SR5Item } from '../../item/SR5Item';
-import {
-    prepareSortedEffects,
-    prepareSortedItemEffects,
-} from '../../effects';
+import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
 import { SR5 } from '../../config';
 import { SR5Actor } from '../SR5Actor';
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
@@ -18,13 +15,13 @@ import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
-import SR5SheetFilters = Shadowrun.SR5SheetFilters;
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import MatrixAttribute = Shadowrun.MatrixAttribute;
 import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
 import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
 import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
+import SR5SheetFilters = Shadowrun.SR5SheetFilters;
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import MatrixAttribute = Shadowrun.MatrixAttribute;
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 const { TextEditor } = foundry.applications.ux;
@@ -32,6 +29,13 @@ const { TextEditor } = foundry.applications.ux;
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
  */
+export interface SheetItemData<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> {
+    type: string,
+    name: string,
+    system: SR5Item<SubType>['system'],
+    properties: string[],
+    description: DescriptionType
+}
 
 export interface InventorySheetDataByType {
     type: string;
@@ -62,10 +66,8 @@ export type InventoriesSheetData = Record<string, InventorySheetData>;
  * @param b Any type of item data
  * @returns
  */
-const sortByName = (a, b) => {
-    if (a.name > b.name) return 1;
-    if (a.name < b.name) return -1;
-    return 0;
+const sortByName = (a: { name: string }, b: { name: string }) => {
+    return a.name.localeCompare(b.name, game.i18n.lang);
 };
 
 /**
@@ -75,15 +77,13 @@ const sortByName = (a, b) => {
  * @param b Any type of item data
  * @returns
  */
-const sortByEquipped = (a, b) => {
+const sortByEquipped = (a: SheetItemData, b: SheetItemData) => {
     const leftEquipped = a.system?.technology?.equipped;
     const rightEquipped = b.system?.technology?.equipped;
 
     if (leftEquipped && !rightEquipped) return -1;
     if (rightEquipped && !leftEquipped) return 1;
-    if (a.name > b.name) return 1;
-    if (a.name < b.name) return -1;
-    return 0;
+    return sortByName(a, b);
 };
 
 /**
@@ -93,10 +93,10 @@ const sortByEquipped = (a, b) => {
  * @param b A quality item data
  * @returns
  */
-const sortyByQuality = (a: any, b: any) => {
+const sortByQuality = (a: SheetItemData<'quality'>, b: SheetItemData<'quality'>) => {
     if (a.system.type === 'positive' && b.system.type === 'negative') return -1;
     if (a.system.type === 'negative' && b.system.type === 'positive') return 1;
-    return a.name < b.name ? -1 : 1;
+    return sortByName(a, b);
 }
 
 export interface SR5BaseSheetDelays {
@@ -1007,7 +1007,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             // Build inventory list this item should be shown an.
             const addTo: string[] = inventory.showAll ? Object.keys(inventoriesSheet) : [inventory.name];
 
-            addTo.forEach(name => {
+            for (const name of addTo) {
                 const inventorySheet = inventoriesSheet[name];
 
                 // Should an item have been added to any inventory that wouldn't cary it's type normaly
@@ -1022,7 +1022,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 }
 
                 inventorySheet.types[item.type].items.push(item);
-            })
+            }
         }
 
         Object.values(inventoriesSheet).forEach(inventory => {
@@ -1151,7 +1151,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         Object.entries(itemsByType).forEach(([type, items]) => {
             switch (type) {
                 case 'quality':
-                    items.sort(sortyByQuality);
+                    (items as SheetItemData<'quality'>[]).sort(sortByQuality);
                     break;
                 case 'program':
                     items.sort(sortByEquipped);
