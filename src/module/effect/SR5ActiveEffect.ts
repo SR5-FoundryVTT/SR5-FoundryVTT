@@ -429,12 +429,12 @@ export class SR5ActiveEffect extends ActiveEffect {
         // TypedObjectField will otherwise create the missing property as a string,
         // which breaks data integrity and can result in errors like "undefined[object Object]".
         // For example, a change targeting "firstaid" instead of "first_aid" would trigger this case.
-        if (foundry.utils.getProperty(model, change.key) === undefined)
+        if (!foundry.utils.hasProperty(model, change.key))
             return {};
 
         // Foundry default effect application will use DataModel.applyChange.
         return Object.fromEntries(
-            Object.entries(super.apply(model, change)).filter(([, v]) => v != null)
+            Object.entries(super.apply(model, change)).filter(([, v]) => v !== undefined)
         );
     }
 
