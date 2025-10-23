@@ -187,7 +187,10 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         data['config'] = SR5;
 
         /**
-         * Reduce nested items into typed lists.
+         * Groups nested items by their type for rendering on the item sheet.
+         * - Ammo items are grouped under 'ammo'.
+         * - Modification items are grouped by their specific system type (e.g., 'weapon', 'armor', etc.).
+         * - All other items are grouped under 'other'.
          */
         const grouped = Object.groupBy(this.item.items, item => {
             if (item.isType('ammo')) return 'ammo';
