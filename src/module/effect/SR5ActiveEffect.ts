@@ -432,7 +432,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (!foundry.utils.hasProperty(model, change.key))
             return {};
 
-        // Foundry default effect application will use DataModel.applyChange.
+        // ModifiableField applies some changes outside of Foundry behavior, not causing a override value.
+        // Those override values are then undefined and should be hidden from Foundries 'override' behavior.
         return Object.fromEntries(
             Object.entries(super.apply(model, change)).filter(([, v]) => v !== undefined)
         );
