@@ -18,6 +18,7 @@
     <div class="list-item">
         {{#if (isType item 'action')}}
             {{#if (isMatrixAction item)}}
+                <label>{{localize "SR5.Labels.Action.MatrixAction"}}</label>
                 {{#if @root.isEditMode}}
                     <div class="basic-row">
                         <label>{{localize "SR5.Marks"}}</label>
@@ -140,7 +141,7 @@
                             {{#if isEditable}}
                                 <a class="hover-show-button"
                                    data-action="removeOneQty"
-                                   data-tooltip="SR5.ItemSheet.Labels.RemoveOneQty">
+                                   data-tooltip="SR5.Tooltips.Item.RemoveOneQty">
                                     <i class="fas fa-minus-square"></i>
                                 </a>
                             {{/if}}
@@ -148,7 +149,7 @@
                             {{#if isEditable}}
                                 <a class="hover-show-button"
                                    data-action="addOneQty"
-                                   data-tooltip="SR5.ItemSheet.Labels.AddOneQty">
+                                   data-tooltip="SR5.Tooltips.Item.AddOneQty">
                                     <i class="fas fa-plus-square"></i>
                                 </a>
                             {{/if}}

@@ -46,7 +46,7 @@
                         {{else}}
                             <label><i class="fas fa-people-group"></i></label>
                         {{/if}}
-                        <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.ActorSheet.Labels.StreetCredShort"}}&nbsp;
+                        <span data-tooltip="{{systemFields.street_cred.label}} - {{systemFields.street_cred.hint}}">{{localize "SR5.Labels.ActorSheet.StreetCredShort"}}&nbsp;
                             {{#if @root.isEditMode}}
                                 {{formInput systemFields.street_cred value=source.system.street_cred rootId=rootId classes="short skinny"}}
                             {{else}}
@@ -54,7 +54,7 @@
                             {{/if}}
                         </span>
                         <i class="fas fa-pipe"></i>
-                        <span data-tooltip="{{systemFields.notoriety.label}} - {{systemFields.notoriety.hint}}">{{localize "SR5.ActorSheet.Labels.NotorietyShort"}}&nbsp;
+                        <span data-tooltip="{{systemFields.notoriety.label}} - {{systemFields.notoriety.hint}}">{{localize "SR5.Labels.ActorSheet.NotorietyShort"}}&nbsp;
                             {{#if @root.isEditMode}}
                                 {{formInput systemFields.notoriety value=source.system.notoriety rootId=rootId classes="short skinny"}}
                             {{else}}
@@ -62,7 +62,7 @@
                             {{/if}}
                         </span>
                         <i class="fas fa-pipe"></i>
-                        <span data-tooltip="{{systemFields.public_awareness.label}} - {{systemFields.public_awareness.hint}}">{{localize "SR5.ActorSheet.Labels.PublicAwarenessShort"}}&nbsp;
+                        <span data-tooltip="{{systemFields.public_awareness.label}} - {{systemFields.public_awareness.hint}}">{{localize "SR5.Labels.ActorSheet.PublicAwarenessShort"}}&nbsp;
                             {{#if @root.isEditMode}}
                                 {{formInput systemFields.public_awareness value=source.system.public_awareness rootId=rootId classes="short skinny"}}
                             {{else}}

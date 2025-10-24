@@ -439,13 +439,6 @@
             },
             "NoFavoritesSelected": "No favorites have been selected"
         },
-        "ActorSheet": {
-            "Labels": {
-                "NotorietyShort": "N",
-                "StreetCredShort": "SC",
-                "PublicAwarenessShort": "PA"
-            }
-        },
         "ActorTypes": {
             "Character": "Character",
             "Critter": "Critter",
@@ -1485,12 +1478,6 @@
         },
         "ItemMod": "Item Mod",
         "ItemName": "Item Name",
-        "ItemSheet": {
-            "Labels": {
-                "Equipped": "Equipped",
-                "Unequipped": "Unequipped"
-            }
-        },
         "ItemTypes": {
             "Action": "Action",
             "AdeptPower": "Adept Power",
@@ -1568,7 +1555,8 @@
                 "Modifiers": "Modifiers",
                 "OpposedTest": "Opposed Test",
                 "SpiritType": "Spirit Type",
-                "SpriteType": "Sprite Type"
+                "SpriteType": "Sprite Type",
+                "MatrixAction": "Matrix Action"
             },
             "Actions": {
                 "BruteForce": "Brute Force",
@@ -1601,11 +1589,13 @@
                 "Network": "Network",
                 "Networks": "Networks",
                 "NoNetwork": "No Network",
+                "NotorietyShort": "N",
                 "Offline": "Offline",
                 "OpenSourceDocument": "Open Source",
                 "OwnedIcons": "Owned Icons",
                 "Persona": "Persona",
                 "PersonalInventory": "On Person",
+                "PublicAwarenessShort": "PA",
                 "RemoveOneMark": "Remove One Mark",
                 "ResetActorForNewRun": "New Run Reset",
                 "Rituals": "Rituals",
@@ -1618,6 +1608,7 @@
                 "SpiritConfiguration": "Spirit Configuration",
                 "SpriteConfiguration": "Sprite Configuration",
                 "SpritePowers": "Sprite Powers",
+                "StreetCredShort": "SC",
                 "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
                 "VehicleConfiguration": "Vehicle Configuration"
             },
@@ -2585,8 +2576,8 @@
         "ToggleEquip": "Toggle Equipped",
         "ToggleWireless": "Toggle Wireless",
         "Tooltips": {
-            "ToggleEditMode": "Toggle Edit Mode",
             "Actor": {
+                "AddOneQty": "Add One to this item's Quantity",
                 "Blitz": "Use a point of Edge to roll the Maximum (5) number of dice for initiative",
                 "ConnectNetwork": "Enter this host/grid",
                 "Critter": "Allow the use of critter powers",
@@ -2605,6 +2596,7 @@
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
+                "RemoveOneQty": "Remove One from this item's Quantity",
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
             "CallInAction": {
@@ -2634,57 +2626,15 @@
                 "ActionCategories": "Select action categories to use instead of the test's default categories. Using Active Effects you can use categories to modify test values",
                 "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",
                 "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
+                "AddOneQty": "Add One to this item's Quantity",
                 "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
                 "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
                 "CostAdjustment": "Adjust actual cost based on the item rating",
                 "DisabledForPreparedActor": "Disabled due to use of prepared actor",
                 "EssenceAdjustment": "Adjust actual essence cost based on the item rating",
+                "RemoveOneQty": "Remove One from this item's Quantity",
                 "ToggleVisibility": "Toggle the Visibility of this during Play Mode",
                 "ToggleFavorite": "Favorite this and display it in the Favorites Bar"
-            },
-            "Modifiers": {
-                "armor": "Modifies total armor value",
-                "astral_initiative": "Modifies astral initiative base",
-                "astral_initiative_dice": "Modifies astral initiative dice",
-                "astral_limit": "Modifies astral limit",
-                "composure": "Modifies composure tests pool",
-                "defense": "Modifies defense tests pool",
-                "defense_block": "Adds to the defense modifier for active blocking",
-                "defense_dodge": "Adds to the defense modifier for active dodging",
-                "defense_melee": "Adds to the defense modifier for melee defense",
-                "defense_parry": "Adds to the defense modifier for active parrying",
-                "defense_ranged": "Adds to the defense modifier for ranged attack",
-                "drain": "Modifies drain tests pool",
-                "essence": "Modifies essence attribute",
-                "fade": "Modifies fade tests pool",
-                "global": "Modifies all tests pool, excluding damage reducing tests",
-                "judge_intentions": "Modifies judge intentions tests pool",
-                "lift_carry": "Modifies lift&carry tests pool",
-                "mark_damage": "Modifies the amount of damage taken per MARK done to you",
-                "matrix_initiative": "Modifies matrix initiative base",
-                "matrix_initiative_dice": "Modifies matrix initiative dice",
-                "matrix_track": "Modifies matrix damage track",
-                "meat_initiative": "Modifies physical initiative base",
-                "meat_initiative_dice": "Modifies physical initiative dice",
-                "memory": "Modifies memory tests pool",
-                "mental_limit": "Modifies mental limit",
-                "multi_defense": "Modifies defense tests pool for multiple defenses per combat turn",
-                "pain_tolerance_physical": "Modifies damage to be ignored before first wound modifier",
-                "pain_tolerance_stun": "Modifies damage to be ignored before first wound modifier",
-                "physical_limit": "Modifies physical limit",
-                "physical_overflow_track": "Modifies physical overflow damage track",
-                "physical_track": "Modifies physical damage track",
-                "place_three_marks": "Modifies the modifier to place three marks at the same time",
-                "place_two_marks": "Modifies the modifier to place two marks at the same time",
-                "public_grid": "Modifies the Public Grid modifier when connected to it",
-                "reach": "Modifies reach of melee attacks",
-                "recoil": "Modifies recoil tests pool",
-                "run": "Modifies running distance by multiples of the agility attribute",
-                "soak": "Modifies physical damage resist tests pool",
-                "social_limit": "Modifies social limit",
-                "stun_track": "Modifies stun damage track",
-                "walk": "Modifies walking distance by multiples of the agility attribute",
-                "wound_tolerance": "Modifies damage per wound modifier"
             },
             "RangedAttack": {
                 "Recoil": "Progressive Recoil",
@@ -2717,7 +2667,8 @@
                 "PushTheLimit": "Apply push the limit edge rules",
                 "RollMode": "FoundryVTT chat message roll visibility",
                 "Threshold": "Calculated threshold value"
-            }
+            },
+            "ToggleEditMode": "Toggle Edit Mode"
         },
         "Top": "Top",
         "Total": "Total",
