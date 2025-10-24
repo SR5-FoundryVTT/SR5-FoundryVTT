@@ -20,17 +20,19 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         ...super.TABS,
         primary: {
             initial: 'skills',
+            labelPrefix: 'SR5.Tabs',
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
                 { id: 'skills', label: 'Sprite', cssClass: '' },
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]
         },
         matrixRight: {
             initial: 'matrixActions',
+            labelPrefix: 'SR5.Tabs',
             tabs: [
                 { id: 'matrixActions', label: 'Actions', cssClass: '', },
                 { id: 'spritePowers', label: 'Sprite Powers', cssClass: '', }

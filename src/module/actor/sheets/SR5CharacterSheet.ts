@@ -49,22 +49,24 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         ...super.TABS,
         primary: {
             initial: 'skills',
+            labelPrefix: 'SR5.Tabs',
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
                 { id: 'skills', label: 'Character', cssClass: '' },
                 { id: 'inventory', label: 'Inventory', cssClass: '' },
-                { id: 'critter', label: 'Powers', cssClass: '' },
+                { id: 'critter', label: 'CritterPowers', cssClass: '' },
                 { id: 'magic', label: 'Magic', cssClass: '' },
                 { id: 'matrix', label: 'Matrix', cssClass: '' },
                 { id: 'social', label: 'Social', cssClass: '' },
                 { id: 'bio', label: 'Bio', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]
         },
         matrixRight: {
             initial: 'matrixActions',
+            labelPrefix: 'SR5.Tabs',
             tabs: [
                 { id: 'matrixActions', label: 'Actions', cssClass: '', },
                 { id: 'complexForms', label: 'ComplexForms', cssClass: '', },

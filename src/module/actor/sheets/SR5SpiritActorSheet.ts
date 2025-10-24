@@ -32,14 +32,15 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     static override TABS = {
         primary: {
             initial: 'skills',
+            labelPrefix: 'SR5.Tabs',
             tabs: [
                 { id: 'actions', label: 'Actions', cssClass: '' },
                 { id: 'skills', label: 'Spirit', cssClass: '' },
                 { id: 'critter', label: 'Powers', cssClass: '' },
                 { id: 'magic', label: 'Magic', cssClass: '' },
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]
         },
     }

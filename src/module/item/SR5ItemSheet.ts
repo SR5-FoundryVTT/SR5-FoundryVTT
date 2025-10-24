@@ -97,9 +97,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             equipItem: SR5ItemSheet.#equipItem,
             addItemQty: SR5ItemSheet.#addItemQty,
             removeItemQty: SR5ItemSheet.#removeItemQty,
+
             addLicense: SR5ItemSheet.#addLicense,
             removeLicense: SR5ItemSheet.#removeLicense,
             removeNetwork: SR5ItemSheet.#removeNetwork,
+
             reload: SR5ItemSheet.#reloadAmmo,
             partialReload: SR5ItemSheet.#partialReloadAmmo,
 
@@ -194,6 +196,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static override TABS = {
         primary: {
             initial: 'description',
+            labelPrefix: 'SR5.Tabs',
             tabs: [
                 { id: 'description', label: 'Description', cssClass: '' },
                 { id: 'details', label: 'Details', cssClass: '' },
@@ -950,12 +953,24 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                     const item = this.item.effects.get(id);
                     if (item) {
                         await item.sheet?.render(true)
+                    } else {
+                        const uuid = SheetFlow.closestUuid(target);
+                        const effect = SheetFlow.fromUuidSync(uuid);
+                        if (effect && effect instanceof SR5ActiveEffect) {
+                            await effect.sheet?.render(true);
+                        }
                     }
                 }
             },
             {
                 name: "SR5.ContextOptions.DeleteEffect",
                 icon: "<i class='fas fa-trash'></i>",
+                condition: (target) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.item.effects.get(id);
+                    return item !== undefined;
+                    // don't check for effects by uuid for deletion
+                },
                 callback: async (target) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;

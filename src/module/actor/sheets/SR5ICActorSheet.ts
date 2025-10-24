@@ -32,15 +32,17 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         ...super.TABS,
         primary: {
             initial: 'matrix',
+            labelPrefix: 'SR5.Tabs',
             tabs: [
                 { id: 'matrix', label: 'IC', cssClass: '' }, // name the Matrix tab as IC since that's all it needs
                 { id: 'effects', label: 'Effects', cssClass: '' },
-                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Sheet.Description', cssClass: 'skinny' },
-                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Sheet.MiscConfig', cssClass: 'skinny' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]
         },
         matrixLeft: {
             initial: 'networkIcons',
+            labelPrefix: 'SR5.Tabs',
             tabs: [
                 { id: 'networkIcons', label: 'Icons', cssClass: ''},
                 { id: 'markedIcons', label: 'Marked', cssClass: ''},
