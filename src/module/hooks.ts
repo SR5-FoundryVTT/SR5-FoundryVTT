@@ -13,6 +13,7 @@ import { SR5Token } from './token/SR5Token';
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
 import { SR5Combat } from './combat/SR5Combat';
 import { SR5Combatant } from './combat/SR5Combatant';
+import { SR5CombatTracker } from './token/SR5CombatTracker';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
@@ -343,6 +344,7 @@ ___________________
         // Register document classes
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
+        CONFIG.ui.combat = SR5CombatTracker;
         CONFIG.Combat.documentClass = SR5Combat;
         CONFIG.Combatant.documentClass = SR5Combatant;
         CONFIG.ChatMessage.documentClass = SR5ChatMessage;
@@ -493,6 +495,7 @@ ___________________
                 new ChangelogApplication().render(true);
         }
 
+        Hooks.on('renderCombatTracker', SR5CombatTracker.renderCombatTracker.bind(SR5CombatTracker));
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
         HooksManager.registerSocketListeners();
