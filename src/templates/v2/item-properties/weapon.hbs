@@ -34,7 +34,31 @@
 {{/if}}
 
 {{#each (equippedMods item)}}
-    <span class="basic-row">
-        <img src="{{this.img}}" width="12px" height="12px"><a data-uuid="{{this.uuid}}" data-action="openUuid">{{this.name}}</a>
+    <span class="basic-row" data-uuid="{{this.uuid}}">
+        {{#if (canBeWireless this)}}
+            {{#if (isBroken this)}}
+                <a style="font-size: 12px;"
+                   data-tooltip="SR5.Broken"
+                   data-action="repairBrokenItem">
+                    <i class="fas fa-link-slash"></i>
+                </a>
+            {{else}}
+                <a style="font-size: 12px;"
+                    data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle"
+                   data-action="toggleItemWireless">
+                    <i {{#if (isRunningSilent this)}}
+                            class="fa-duotone fa-wifi-fair"
+                        {{else if (isWireless this)}}
+                            class="fas fa-wifi"
+                        {{else}}
+                            class="fas fa-wifi-slash"
+                        {{/if}}
+                    ></i>
+                </a>
+            {{/if}}
+        {{else}}
+            <img src="{{this.img}}" width="12px" height="12px">
+        {{/if}}
+        <a data-uuid="{{this.uuid}}" data-action="openUuid">{{this.name}}</a>
     </span>
 {{/each}}
