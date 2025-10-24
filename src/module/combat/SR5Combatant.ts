@@ -60,7 +60,7 @@ export class SR5Combatant extends Combatant<"base"> {
         return {
             _id: this._id!,
             system: { acted: false },
-            initiative: this.initiative ? CombatRules.initAfterPass(this.initiative) : null,
+            initiative: CombatRules.initAfterPass(this.initiative),
         } as const;
     }
 

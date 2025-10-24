@@ -11,7 +11,11 @@ export class CombatRules {
      * Reduce the given initiative score according to @PDF SR5#159
      * @param score This given score can't be reduced under zero.
      */
-    static initAfterPass(score: number): number {
+    static initAfterPass(score: null): null;
+    static initAfterPass(score: number): number;
+    static initAfterPass(score: number | null): number | null;
+    static initAfterPass(score: number | null): number | null {
+        if (score === null) return null;
         return Math.max(score + SR.combat.INI_RESULT_MOD_AFTER_INI_PASS, 0);
     }
 
