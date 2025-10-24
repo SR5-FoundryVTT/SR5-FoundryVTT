@@ -1,10 +1,10 @@
-import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValue } from "./Base";
+import { ModifiableField } from "../fields/ModifiableField";
 const { BooleanField, StringField } = foundry.data.fields;
 
 export const LimitField = () => ({
     ...ModifiableValue(),
-    attribute: new StringField({ required: false }), // Does it use it?
+    attribute: new StringField({ required: false }), // Do we use it?
     label: new StringField({ required: true }),
     hidden: new BooleanField(),
 });

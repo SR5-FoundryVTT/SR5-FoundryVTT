@@ -1308,7 +1308,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Derive limit from skill attribute.
         const attribute = this.getAttribute(skill.attribute);
         // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
-        const limit = attribute.limit as Shadowrun.ActorAttribute || '';
+        const limit = attribute.limit || '';
         // Should a specialization be used?
         const spec = options.specialization || false;
 
@@ -1317,7 +1317,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             spec,
             attribute: skill.attribute,
             limit: {
-                base: 0, value: 0,
                 attribute: limit,
                 base_formula_operator: 'add',
             },
