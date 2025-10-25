@@ -3,34 +3,57 @@ import { LinksHelpers } from "@/module/utils/links";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-// --- Type Definitions ---
-type Context = foundry.applications.api.ApplicationV2.RenderContext & Record<string, any>;
-type FilterEntry = { value: string; id: string; selected: boolean };
-const Base = HandlebarsApplicationMixin(ApplicationV2<Context>);
-type BaseType = InstanceType<typeof Base>;
-type Pack = CompendiumCollection<"Actor" | "Item">;
+/**
+ * Encapsulates all types and interfaces used by the CompendiumBrowser application.
+ */
+export namespace CompendiumBrowserTypes {
+    export type Tabs = "Actor" | "Item" | "Settings";
+    export type Pack = CompendiumCollection<"Actor" | "Item">;
+    export type FilterEntry = { value: string; id: string; selected: boolean };
 
-type PackNode = {
-    id: string;
-    name: string;
-    selected: boolean;
-    type: "Actor" | "Item";
-};
+    export type PackNode = {
+        id: string;
+        name: string;
+        selected: boolean;
+        type: "Actor" | "Item";
+    };
 
-type FolderNode = {
-    id: string;
-    name: string;
-    type: "Folder";
-    collapsed: boolean;
-    selectionState: "none" | "some" | "all";
-    children: (FolderNode | PackNode)[];
-};
+    export type FolderNode = {
+        id: string;
+        name: string;
+        type: "Folder";
+        collapsed: boolean;
+        selectionState: "none" | "some" | "all";
+        children: (FolderNode | PackNode)[];
+    };
+
+    export interface Context extends foundry.applications.api.ApplicationV2.RenderContext {
+        activeTab: Tabs;
+        types: FilterEntry[];
+    }
+
+    export interface Configuration extends foundry.applications.api.ApplicationV2.Configuration {}
+
+    export interface RenderOptions extends foundry.applications.api.ApplicationV2.RenderOptions {
+        tab: Tabs;
+        parts: ("tabs" | "filters" | "results" | "settings")[];
+    }
+}
+
+const BaseClass = HandlebarsApplicationMixin(
+    ApplicationV2<
+        CompendiumBrowserTypes.Context,
+        CompendiumBrowserTypes.Configuration,
+        CompendiumBrowserTypes.RenderOptions
+    >,
+);
+type BaseClassType = InstanceType<typeof BaseClass>;
 
 /**
  * A generic compendium browser application that allows users to view and search
  * across multiple compendium packs simultaneously.
  */
-export class CompendiumBrowser extends Base {
+export class CompendiumBrowser extends BaseClass {
     // =========================================================================
     //                            STATIC CONFIGURATION
     // =========================================================================
@@ -48,9 +71,9 @@ export class CompendiumBrowser extends Base {
         },
         actions: {
             clearSearch: function (this: CompendiumBrowser) { this._onClearSearch(); },
-            openDoc: CompendiumBrowser._openDoc.bind(this),
-            openSource: CompendiumBrowser._openSource.bind(this),
-            toggleCollapse: CompendiumBrowser.onToggleCollapse.bind(this),
+            openDoc: (event: MouseEvent, target: HTMLElement) => CompendiumBrowser._openDoc(event, target),
+            openSource: (event: MouseEvent, target: HTMLElement) => CompendiumBrowser._openSource(event, target),
+            toggleCollapse: (event: MouseEvent, target: HTMLElement) => CompendiumBrowser.onToggleCollapse(event, target),
         },
     };
 
@@ -73,29 +96,29 @@ export class CompendiumBrowser extends Base {
     };
 
     // =========================================================================
-    //                                  STATE
+    //                                     STATE
     // =========================================================================
 
-    private activeTab: "Actor" | "Item" | "Settings" = "Item";
-    private allFilters: FilterEntry[] = [];
+    private activeTab: CompendiumBrowserTypes.Tabs = "Item";
+    private allFilters: CompendiumBrowserTypes.FilterEntry[] = [];
     private packBlackList: string[] = [];
     private _searchQuery: string = "";
 
     /** State for virtual scrolling */
-    private readonly results = {
+    private readonly scrollState = {
         throttle: false,
         height: 50, // Estimated height of a single result row
         entries: [] as CompendiumCollection.IndexEntry<"Item" | "Actor">[],
     };
 
     // =========================================================================
-    //                             LIFECYCLE HOOKS
+    //                               LIFECYCLE HOOKS
     // =========================================================================
 
     /** Initializes the Compendium Browser, populating available packs and setting initial filters. */
-    constructor(options?: ConstructorParameters<typeof Base>[0]) {
+    constructor(options?: ConstructorParameters<typeof BaseClass>[0]) {
         super(options);
-        this.setFilters();
+        this._buildFilterList();
         this.packBlackList = game.settings.get(SYSTEM_NAME, FLAGS.CompendiumBrowserBlacklist);
     }
 
@@ -105,7 +128,7 @@ export class CompendiumBrowser extends Base {
     }
 
     /** Prepares the base context object for rendering the application. */
-    override async _prepareContext(...args: Parameters<BaseType["_prepareContext"]>) {
+    override async _prepareContext(...args: Parameters<BaseClassType["_prepareContext"]>) {
         return {
             ...(await super._prepareContext(...args)),
             searchQuery: this._searchQuery,
@@ -114,7 +137,7 @@ export class CompendiumBrowser extends Base {
 
     /** Prepares context for specific template parts, like fetching results or providing filter data. */
     protected override async _preparePartContext(
-        ...[partId, context, options]: Parameters<BaseType["_preparePartContext"]>
+        ...[partId, context, options]: Parameters<BaseClassType["_preparePartContext"]>
     ) {
         await super._preparePartContext(partId, context, options);
         if (partId === "filters") {
@@ -124,30 +147,32 @@ export class CompendiumBrowser extends Base {
         return context;
     }
 
-    protected override async _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
+    protected override async _onRender(...[context, options]: Parameters<BaseClassType["_onRender"]>) {
         await super._onRender(context, options);
 
         if (this.activeTab === "Settings") {
             void this._renderSettings().then(() => this.settingsListeners(this.element));
         } else {
             // Fetch results and then render the initial visible set
-            void this.fetch().then(async () => this.prepareResults(0, 50));
+            void this._refreshEntries().then(async () => this._renderResultSlice(0, 50));
         }
     }
 
     // =========================================================================
-    //                           EVENT LISTENER SETUP
+    //                          EVENT LISTENER SETUP
     // =========================================================================
 
     /** Attaches listeners to the main application frame, such as for drag-and-drop and scrolling. */
     protected override _attachFrameListeners() {
         super._attachFrameListeners();
         this.element.addEventListener("dragstart", this._onDrag.bind(this));
-        this.element.addEventListener("scroll", (event) => { void this._scrollResults(event); }, { capture: true, passive: true });
+        this.element.addEventListener("scroll", (event) => {
+            void this._scrollResults(event);
+        }, { capture: true, passive: true });
     }
 
     /** Delegates listener attachment to specific methods based on which part of the template is rendered. */
-    override _attachPartListeners(...[partId, htmlElement, options]: Parameters<BaseType["_attachPartListeners"]>) {
+    override _attachPartListeners(...[partId, htmlElement, options]: Parameters<BaseClassType["_attachPartListeners"]>) {
         super._attachPartListeners(partId, htmlElement, options);
         if (partId === "filters") this.filterListeners(htmlElement);
 
@@ -162,8 +187,9 @@ export class CompendiumBrowser extends Base {
     /** Attaches input and change listeners to the search bar and filter checkboxes. */
     private filterListeners(htmlElement: HTMLElement) {
         const searchInput = htmlElement.querySelector<HTMLInputElement>("#compendium-browser-search");
-        if (searchInput)
+        if (searchInput) {
             searchInput.addEventListener("input", (event) => this._onSearch(event, searchInput));
+        }
 
         const typeCheckboxes = htmlElement.querySelectorAll<HTMLInputElement>(".types .type input[type='checkbox']");
         for (const checkbox of typeCheckboxes) {
@@ -175,6 +201,7 @@ export class CompendiumBrowser extends Base {
         }
     }
 
+    /** Attaches change listeners to the pack checkboxes in the settings tab. */
     private settingsListeners(htmlElement: HTMLElement) {
         const checkboxes = htmlElement.querySelectorAll<HTMLInputElement>(".pack-row label input[type='checkbox']");
         for (const checkbox of checkboxes) {
@@ -187,10 +214,10 @@ export class CompendiumBrowser extends Base {
     // =========================================================================
 
     /** Handles switching between the main tabs (e.g., 'Actors', 'Items'), updating filters and re-rendering. */
-    override changeTab(...[tab, group, options]: Parameters<BaseType["changeTab"]>) {
+    override changeTab(...[tab, group, options]: Parameters<BaseClassType["changeTab"]>) {
         super.changeTab(tab, group, options);
-        this.activeTab = tab as "Actor" | "Item" | "Settings";
-        this.setFilters();
+        this.activeTab = tab as CompendiumBrowserTypes.Tabs;
+        this._buildFilterList();
         void this.render({ parts: ["filters", "results", "settings"] });
     }
 
@@ -223,10 +250,12 @@ export class CompendiumBrowser extends Base {
         event.dataTransfer?.setData("text/plain", JSON.stringify({ type, uuid }));
     }
 
+    /** Handles a change event on a pack or folder checkbox in the settings. */
     private _onPackCheckboxChange(event: Event) {
         const target = event.target as HTMLInputElement;
         const id = target.dataset.id;
         const type = target.dataset.type as "folder" | "pack";
+
         if (type === "pack") {
             if (target.checked) this.packBlackList = this.packBlackList.filter((p) => p !== id!);
             else this.packBlackList.push(id!);
@@ -248,6 +277,7 @@ export class CompendiumBrowser extends Base {
         void this.render({ parts: ["settings"] });
     }
 
+    /** Handles toggling folder collapse in the settings tree. */
     private static onToggleCollapse(event: MouseEvent, target: HTMLElement) {
         event.preventDefault();
         event.stopPropagation();
@@ -260,32 +290,32 @@ export class CompendiumBrowser extends Base {
         const uuid = el?.dataset.uuid;
         if (!uuid) return;
 
-        // FVTT-Types not handling this correctly
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const doc = (await fromUuid(uuid)) as Actor | Item | null;
         await doc?.sheet?.render(true);
     }
 
     /** Handles a click on the source element within a result row to open the sourcebook reference. */
-    private static async _openSource(event: MouseEvent, target: HTMLElement) {
+    private static _openSource(event: MouseEvent, target: HTMLElement) {
         const el = target.closest<HTMLElement>("[data-action='openSource']");
         const source = el?.textContent?.trim();
         if (!source) return;
 
-        await LinksHelpers.openSource(source);
+        void LinksHelpers.openSource(source);
     }
 
     // =========================================================================
-    //                        CORE DATA & RENDERING LOGIC
+    //                         CORE DATA & RENDERING LOGIC
     // =========================================================================
 
     /** Asynchronously fetches, filters, and sorts compendium entries based on current state. */
-    private async fetch() {
-        if (this.results.throttle) return;
-        this.results.throttle = true;
+    private async _refreshEntries() {
+        if (this.scrollState.throttle) return;
+        this.scrollState.throttle = true;
 
         const activePacks = game.packs.filter(
-            (p): p is Pack => p.visible && p.metadata.type === this.activeTab && !this.packBlackList.includes(p.collection)
+            (p): p is CompendiumBrowserTypes.Pack =>
+                p.visible && p.metadata.type === this.activeTab && !this.packBlackList.includes(p.collection),
         );
         const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
         let entries = indexes.flatMap((index, idx) => {
@@ -309,8 +339,8 @@ export class CompendiumBrowser extends Base {
         entries = entries.map((entry) => ({ ...entry, type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`) }));
 
         entries.sort((a, b) => a.name!.localeCompare(b.name!, game.i18n.lang));
-        this.results.entries = entries;
-        this.results.throttle = false;
+        this.scrollState.entries = entries;
+        this.scrollState.throttle = false;
 
         if (entries.length === 0) {
             const loading = this.element.querySelector<HTMLElement>(".compendium-list .loading");
@@ -321,9 +351,9 @@ export class CompendiumBrowser extends Base {
     }
 
     /** Renders a slice of the results for virtual scrolling. */
-    private async prepareResults(indexStart: number, indexEnd: number) {
-        if (this.results.throttle) return;
-        this.results.throttle = true;
+    private async _renderResultSlice(indexStart: number, indexEnd: number) {
+        if (this.scrollState.throttle) return;
+        this.scrollState.throttle = true;
 
         const container = this.element.querySelector<HTMLElement>(".compendium-list");
         if (!container) return;
@@ -333,7 +363,7 @@ export class CompendiumBrowser extends Base {
         // Create a top padding div to simulate the height of all items before the rendered slice
         const topPadDiv = document.createElement("div");
         topPadDiv.className = "top-pad";
-        topPadDiv.style.height = `${indexStart * this.results.height}px`;
+        topPadDiv.style.height = `${indexStart * this.scrollState.height}px`;
         toRender.push(topPadDiv);
 
         // Ensure that we always start rendering from an odd index to maintain consistent row styling
@@ -345,12 +375,12 @@ export class CompendiumBrowser extends Base {
         }
 
         indexStart = Math.max(0, indexStart);
-        indexEnd = Math.min(this.results.entries.length, indexEnd);
+        indexEnd = Math.min(this.scrollState.entries.length, indexEnd);
         for (let idx = indexStart; idx < indexEnd; idx++) {
-            const entry = this.results.entries[idx];
+            const entry = this.scrollState.entries[idx];
             const html = await foundry.applications.handlebars.renderTemplate(
                 "systems/shadowrun5e/dist/templates/apps/compendium-browser/entries.hbs",
-                { entry }
+                { entry },
             );
             const template = document.createElement("template");
             template.innerHTML = html;
@@ -360,26 +390,30 @@ export class CompendiumBrowser extends Base {
         // Create a bottom padding div to simulate the height of all items after the rendered slice
         const bottomPadDiv = document.createElement("div");
         bottomPadDiv.className = "bottom-pad";
-        bottomPadDiv.style.height = `${(this.results.entries.length - indexEnd) * this.results.height}px`;
+        bottomPadDiv.style.height = `${(this.scrollState.entries.length - indexEnd) * this.scrollState.height}px`;
         toRender.push(bottomPadDiv);
 
         container.replaceChildren(...toRender);
-        this.results.throttle = false;
+        this.scrollState.throttle = false;
     }
 
     /** Handles scroll events to implement virtual scrolling for the results list. */
     private async _scrollResults(event: Event) {
         const target = event.target as HTMLElement | null;
-        if (this.results.throttle || !target?.matches(".compendium-list")) return;
+        if (this.scrollState.throttle || !target?.matches(".compendium-list")) return;
         const { scrollTop, clientHeight } = target;
-        const entriesPerScreen = Math.ceil(clientHeight / this.results.height);
+        const entriesPerScreen = Math.ceil(clientHeight / this.scrollState.height);
 
         // Calculate the range of entries to render, including a buffer above and below the visible area
-        const startIndex = Math.max(0, Math.floor(scrollTop / this.results.height) - 2 * entriesPerScreen);
-        const endIndex = Math.min(this.results.entries.length, startIndex + 5 * entriesPerScreen);
+        const startIndex = Math.max(0, Math.floor(scrollTop / this.scrollState.height) - 2 * entriesPerScreen);
+        const endIndex = Math.min(this.scrollState.entries.length, startIndex + 5 * entriesPerScreen);
 
-        await this.prepareResults(startIndex, endIndex);
+        await this._renderResultSlice(startIndex, endIndex);
     }
+
+    // =========================================================================
+    //                            SETTINGS PANE LOGIC
+    // =========================================================================
 
     /** Renders the settings pane. */
     private async _renderSettings() {
@@ -387,7 +421,7 @@ export class CompendiumBrowser extends Base {
         const context = { tree };
         const html = await foundry.applications.handlebars.renderTemplate(
             "systems/shadowrun5e/dist/templates/apps/compendium-browser/settings.hbs",
-            context
+            context,
         );
 
         const container = this.element.querySelector<HTMLElement>(".compendium-settings");
@@ -400,10 +434,10 @@ export class CompendiumBrowser extends Base {
         this._updateIndeterminateStates(container, tree);
     }
 
-    /** Builds the hierarchical tree of folders and packs for the settings pane. */
-    private _buildPackTree(): FolderNode {
+    /** Retrieves and filters the packs to be displayed in the settings tree. */
+    private _getFilteredSettingsPacks(): { pack: CompendiumBrowserTypes.Pack; path: Folder[] }[] {
         let packs = game.packs
-            .filter((p): p is Pack => p.visible && ["Actor", "Item"].includes(p.metadata.type))
+            .filter((p): p is CompendiumBrowserTypes.Pack => p.visible && ["Actor", "Item"].includes(p.metadata.type))
             .map((p) => ({
                 pack: p,
                 path: p.folder ? [...p.folder.ancestors.reverse(), p.folder] : [],
@@ -414,6 +448,7 @@ export class CompendiumBrowser extends Base {
                 return aPath.join("/").localeCompare(bPath.join("/"));
             });
 
+        // Filter by selected package types (system, world, module)
         if (this.allFilters.some((f) => f.selected)) {
             const selectedIds = this.allFilters.filter((f) => f.selected).map((f) => f.id);
             const selectedModules = selectedIds.filter((id) => id !== "system" && id !== "world");
@@ -427,15 +462,28 @@ export class CompendiumBrowser extends Base {
             });
         }
 
+        // Filter by search query
         if (this._searchQuery) {
-            packs = packs.filter(({ pack }) => pack.metadata.label.toLowerCase().includes(this._searchQuery.toLowerCase()));
+            packs = packs.filter(({ pack }) =>
+                pack.metadata.label.toLowerCase().includes(this._searchQuery.toLowerCase()),
+            );
         }
+        return packs;
+    }
 
-        const root: FolderNode = {
-            name: "__root__", id: "__root__", type: "Folder", collapsed: false, selectionState: "none", children: [],
+    /** Builds the hierarchical tree of folders and packs for the settings pane. */
+    private _buildPackTree(): CompendiumBrowserTypes.FolderNode {
+        const packs = this._getFilteredSettingsPacks();
+        const root: CompendiumBrowserTypes.FolderNode = {
+            name: "__root__",
+            id: "__root__",
+            type: "Folder",
+            collapsed: false,
+            selectionState: "none",
+            children: [],
         };
 
-        const folderMap = new Map<string, FolderNode>([["", root]]);
+        const folderMap = new Map<string, CompendiumBrowserTypes.FolderNode>([["", root]]);
 
         for (const { pack, path } of packs) {
             // Ensure all parent folders exist in the tree
@@ -444,7 +492,7 @@ export class CompendiumBrowser extends Base {
                 if (!folderMap.has(folderId)) {
                     const parentId = i > 0 ? path[i - 1].id! : "";
                     const parentNode = folderMap.get(parentId)!;
-                    const folderNode: FolderNode = {
+                    const folderNode: CompendiumBrowserTypes.FolderNode = {
                         id: folderId,
                         name: path[i].name,
                         children: [],
@@ -474,7 +522,7 @@ export class CompendiumBrowser extends Base {
     }
 
     /** Recursively updates the selection state of a folder based on its children. */
-    private _updateFolderSelectionState(folder: FolderNode): "none" | "some" | "all" {
+    private _updateFolderSelectionState(folder: CompendiumBrowserTypes.FolderNode): "none" | "some" | "all" {
         let checkedCount = 0;
         let childCount = 0;
 
@@ -497,17 +545,21 @@ export class CompendiumBrowser extends Base {
     }
 
     /** Updates the visual indeterminate state of checkboxes in the DOM. */
-    private _updateIndeterminateStates(container: HTMLElement, node: FolderNode) {
+    private _updateIndeterminateStates(container: HTMLElement, node: CompendiumBrowserTypes.FolderNode) {
         const checkbox = container.querySelector<HTMLInputElement>(`input[data-id="${node.id}"]`);
         if (checkbox && node.selectionState === "some") checkbox.classList.add("indeterminate");
 
-        for (const child of node.children.filter((n): n is FolderNode => n.type === "Folder")) {
+        for (const child of node.children.filter((n): n is CompendiumBrowserTypes.FolderNode => n.type === "Folder")) {
             this._updateIndeterminateStates(container, child);
         }
     }
 
+    // =========================================================================
+    //                               FILTER LOGIC
+    // =========================================================================
+
     /** Populates and sorts the `allFilters` array based on the document types or packages of the active tab. */
-    private setFilters() {
+    private _buildFilterList() {
         if (this.activeTab !== "Settings") {
             this.allFilters = Object.keys(CONFIG[this.activeTab].dataModels)
                 .map((id) => ({ value: game.i18n.localize(`TYPES.${this.activeTab}.${id}`), id, selected: false }))
@@ -515,10 +567,12 @@ export class CompendiumBrowser extends Base {
             return;
         }
 
-        const packs = game.packs.filter((p): p is Pack => p.visible && ["Actor", "Item"].includes(p.metadata.type));
+        const packs = game.packs.filter(
+            (p): p is CompendiumBrowserTypes.Pack => p.visible && ["Actor", "Item"].includes(p.metadata.type),
+        );
         const hasWorld = packs.some((p) => p.metadata.packageType === "world");
         const modules = Array.from(
-            new Set(packs.filter((p) => p.metadata.packageType === "module").map((p) => p.metadata.packageName))
+            new Set(packs.filter((p) => p.metadata.packageType === "module").map((p) => p.metadata.packageName)),
         );
 
         this.allFilters = [{ value: game.i18n.localize("SR5.CompendiumBrowser.Filters.System"), id: "system", selected: false }];
@@ -534,7 +588,7 @@ export class CompendiumBrowser extends Base {
                     id: m,
                     selected: false,
                 }))
-                .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang))
+                .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang)),
         );
     }
 }
