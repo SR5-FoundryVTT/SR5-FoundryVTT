@@ -23,6 +23,15 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
         }
     }
 
+    private _createPartChange(
+        name: string,
+        value: number,
+        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
+        priority = 0
+    ) {
+        return { name, value, mode, priority, masked: false, applied: true };
+    }
+
     /**
      * Finds and returns the value of the first part with a matching name.
      * @param name The name of the part to find.
@@ -35,13 +44,8 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
     /**
      * Adds a new part to the list.
      */
-    addPart(
-        name: string,
-        value: number,
-        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
-        priority = 0
-    ): void {
-        this._field.changes.push({ name, value, mode, priority, masked: false, applied: true });
+    addPart(...args: Parameters<PartsList["_createPartChange"]>): void {
+        this._field.changes.push(this._createPartChange(...args));
     }
 
     addBasePart(name: string, value: number): void {
@@ -59,18 +63,24 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
     ): void {
         const index = this._field.changes.findIndex(part => part.name === name);
 
-        if (index !== -1) this._field.changes.splice(index, 1);
-        if (value != null) this.addPart(name, value, mode, priority);
-        else if (index === -1) console.warn(`Shadowrun 5e | Cannot add a part with an undefined value. Part: ${name}`);
+        if (value != null) {
+            const newPart = this._createPartChange(name, value, mode, priority);
+            if (index !== -1) {
+                this._field.changes[index] = newPart;
+            } else {
+                this._field.changes.push(newPart);
+            }
+        } else if (index === -1) {
+            console.warn(`Shadowrun 5e | Cannot add a part with an undefined value. Part: ${name}`);
+        } else {
+            this._field.changes.splice(index, 1);
+        }
     }
 
     addUniqueBasePart(name: string, value: number | undefined | null): void {
         return this.addUniquePart(name, value, CONST.ACTIVE_EFFECT_MODES.ADD, -Infinity);
     }
 
-    /**
-     * Removes all parts with a matching name.
-     */
     removePart(name: string): void {
         this._field.changes = this._field.changes.filter(part => part.name !== name);
     }
@@ -119,13 +129,17 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
             }
         }
 
+        this.removePart('SR5.EnforcedMaximum');
         if (options?.max != null && this._field.value > options.max) {
-            this.addUniquePart('System Enforced Maximum', options.max, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE, Infinity);
+            this._markPreviousChangesMasked(this._field.changes.length);
+            this.addUniquePart('SR5.EnforcedMaximum', options.max, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE, Infinity);
             this._field.value = options.max;
         }
 
+        this.removePart('SR5.EnforcedMinimum');
         if (options?.min != null && this._field.value < options.min) {
-            this.addUniquePart('System Enforced Minimum', options.min, CONST.ACTIVE_EFFECT_MODES.UPGRADE, Infinity);
+            this._markPreviousChangesMasked(this._field.changes.length);
+            this.addUniquePart('SR5.EnforcedMinimum', options.min, CONST.ACTIVE_EFFECT_MODES.UPGRADE, Infinity);
             this._field.value = options.min;
         }
 
