@@ -5,7 +5,7 @@
                 <label>{{localize "SR5.Description"}}</label>
             </div>
         </div>
-        <div class="fill-container {{#if @root.isPlayMode}} scrollable {{/if}}">
+        <div class="scrollable">
             {{#if @root.isEditMode}}
                 {{formInput systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
             {{else}}
