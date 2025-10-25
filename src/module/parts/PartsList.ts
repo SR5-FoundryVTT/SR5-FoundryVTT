@@ -66,6 +66,9 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
         if (value != null) {
             const newPart = this._createPartChange(name, value, mode, priority);
             if (index !== -1) {
+                newPart.masked = this._field.changes[index].masked;
+                newPart.applied = this._field.changes[index].applied;
+
                 this._field.changes[index] = newPart;
             } else {
                 this._field.changes.push(newPart);

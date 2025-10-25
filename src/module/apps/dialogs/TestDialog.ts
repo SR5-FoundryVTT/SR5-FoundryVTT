@@ -55,6 +55,10 @@ export class TestDialog extends FormDialog {
     override activateListeners(html: JQuery) {
         super.activateListeners(html);
 
+        html.find('.modifiable-value .form-fields input[type="number"]').on('keydown', ev => {
+            if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
+        });
+
         html.find('.toggle-breakdown').on('click', event => {
             event.preventDefault();
         

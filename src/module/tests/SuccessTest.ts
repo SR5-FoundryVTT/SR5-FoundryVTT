@@ -261,7 +261,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.manualGlitches = data.manualGlitches || DataDefaults.createData('value_field', { label: "SR5.ManualGlitches" });
 
         data.opposed = data.opposed || undefined;
-        data.modifiers = this._prepareModifiersData(data.modifiers);
 
         data.damage = data.damage || DataDefaults.createData('damage');
 
@@ -280,15 +279,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (options.rollMode != null) return options.rollMode;
         if (data?.action?.roll_mode) return data.action.roll_mode;
         else return game.settings.get(CORE_NAME, 'rollMode') as foundry.dice.Roll.Mode;
-    }
-
-    /**
-     * Prepare a default modifier object.
-     *
-     * This should be used for whenever a Test doesn't modifiers specified externally.
-     */
-    _prepareModifiersData(modifiers?: ValueFieldType): ValueFieldType {
-        return modifiers || DataDefaults.createData('value_field', { label: 'SR5.Labels.Action.Modifiers' });
     }
 
     /**
@@ -447,13 +437,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         };
 
         const pool = formatValueField(this.pool);
-        const threshold = formatValueField(this.threshold);
         const limit = formatValueField(this.limit);
+        const threshold = formatValueField(this.threshold);
 
         // Pool portion can be dynamic or static.
         let code = pool.join(' + ').trim() || `${this.pool.value}`;
-        if (threshold.length > 0 && this.threshold.value > 0) code = `${code} (${threshold.join(' + ').trim()})`;
-        if (limit.length > 0 && this.limit.value > 0) code = `${code} [${limit.join(' + ').trim()}]`;
+        if (limit.length > 0) code = `${code} [${limit.join(' + ').trim()}]`;
+        if (threshold.length > 0) code = `${code} (${threshold.join(' + ').trim()})`;
 
         return code;
     }
@@ -928,7 +918,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Sum of all rolls!
         this.hits.base = rollHits;
-        
+
         // First, calculate hits based on roll and modifiers.
         PartsList.calcTotal(this.hits, { min: 0 });
         // Second, reduce hits by limit.
@@ -1908,10 +1898,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Register listeners for ChatMessage html created by a SuccessTest.
      *
      * This listener needs to be registered to the 'renderChatMessage' FoundryVTT hook.
-     *
-     * @param message
-     * @param html
-     * @param data
      */
     static async chatMessageListeners(message: ChatMessage, html, data) {
         $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
@@ -1936,7 +1922,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         event.preventDefault();
         event.stopPropagation();
 
-        if (!game || !game.ready || !canvas || !canvas.ready) return;
+        if (!game?.ready || !canvas || !canvas.ready) return;
 
         const selectLink = $(event.currentTarget);
         const tokenId = selectLink.data('tokenId');
