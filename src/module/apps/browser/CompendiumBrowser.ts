@@ -38,7 +38,27 @@ export namespace CompendiumBrowserTypes {
         tab: Tabs;
         parts: ("tabs" | "filters" | "results" | "settings")[];
     }
+
+    export interface SearchOptions {
+        /** The document type to search for, "Actor" or "Item". */
+        docType: "Actor" | "Item";
+        /** An optional string to filter by name. */
+        searchQuery?: string;
+        /** An optional array of document subtypes (e.g., ["weapon", "spell"]). */
+        typeFilters?: string[];
+        /** An optional array of pack collections (e.g., ["shadowrun5e.core-items"]) to explicitly include. */
+        packFilters?: string[];
+    }
+
+    /**
+     * The enriched index entry returned by the search.
+     */
+    export type SearchResult = CompendiumCollection.IndexEntry<"Item" | "Actor"> & { sourcePack: string };
 }
+
+// =========================================================================
+//                                  BASE CLASS SETUP
+// =========================================================================
 
 const BaseClass = HandlebarsApplicationMixin(
     ApplicationV2<
@@ -70,7 +90,9 @@ export class CompendiumBrowser extends BaseClass {
             resizable: true,
         },
         actions: {
-            clearSearch: function (this: CompendiumBrowser) { this._onClearSearch(); },
+            clearSearch: function (this: CompendiumBrowser) {
+                this._onClearSearch();
+            },
             openDoc: (event: MouseEvent, target: HTMLElement) => CompendiumBrowser._openDoc(event, target),
             openSource: (event: MouseEvent, target: HTMLElement) => CompendiumBrowser._openSource(event, target),
             toggleCollapse: (event: MouseEvent, target: HTMLElement) => CompendiumBrowser.onToggleCollapse(event, target),
@@ -96,6 +118,44 @@ export class CompendiumBrowser extends BaseClass {
     };
 
     // =========================================================================
+    //                               STATIC API
+    // =========================================================================
+
+    /**
+     * Searches and filters compendium packs based on the provided criteria.
+     *
+     * @param options The search parameters.
+     * @returns A promise that resolves to an array of enriched compendium index entries.
+     */
+    public static async search(
+        options: CompendiumBrowserTypes.SearchOptions,
+    ): Promise<CompendiumBrowserTypes.SearchResult[]> {
+        const { docType, searchQuery, typeFilters, packFilters } = options;
+
+        const activePacks = game.packs.filter(
+            (p): p is CompendiumBrowserTypes.Pack =>
+                p.visible && p.metadata.type === docType &&
+                (!packFilters?.length || packFilters.includes(p.collection)),
+        );
+
+        const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
+        let entries = indexes.flatMap((index, idx) => {
+            const packTitle = activePacks[idx].title;
+            return [...index.values()].map((entry) => ({ ...entry, sourcePack: packTitle }));
+        });
+
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            entries = entries.filter((i) => i.name?.toLowerCase().includes(query));
+        }
+
+        if (typeFilters && typeFilters.length > 0)
+            entries = entries.filter((e) => typeFilters.includes(e.type as string));
+
+        return entries;
+    }
+
+    // =========================================================================
     //                                     STATE
     // =========================================================================
 
@@ -108,7 +168,7 @@ export class CompendiumBrowser extends BaseClass {
     private readonly scrollState = {
         throttle: false,
         height: 50, // Estimated height of a single result row
-        entries: [] as CompendiumCollection.IndexEntry<"Item" | "Actor">[],
+        entries: [] as CompendiumBrowserTypes.SearchResult[],
     };
 
     // =========================================================================
@@ -308,37 +368,28 @@ export class CompendiumBrowser extends BaseClass {
     //                         CORE DATA & RENDERING LOGIC
     // =========================================================================
 
-    /** Asynchronously fetches, filters, and sorts compendium entries based on current state. */
+    /**
+     * Asynchronously refreshes the compendium entries for the browser instance
+     * by calling the static search API with the current state.
+     */
     private async _refreshEntries() {
         if (this.scrollState.throttle) return;
         this.scrollState.throttle = true;
 
-        const activePacks = game.packs.filter(
-            (p): p is CompendiumBrowserTypes.Pack =>
-                p.visible && p.metadata.type === this.activeTab && !this.packBlackList.includes(p.collection),
-        );
-        const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
-        let entries = indexes.flatMap((index, idx) => {
-            const packTitle = activePacks[idx].title;
-            return [...index.values()].map((entry) => ({
-                ...entry,
-                pack: packTitle,
-            }));
+        const selectedTypes = this.allFilters.filter((f) => f.selected).map((f) => f.id);
+        const selectedPacks = game.packs.filter(p => !this.packBlackList.includes(p.collection)).map(p => p.collection);
+
+        let entries = await CompendiumBrowser.search({
+            docType: this.activeTab as 'Actor' | 'Item',
+            searchQuery: this._searchQuery,
+            typeFilters: selectedTypes.length ? selectedTypes : undefined,
+            packFilters: selectedPacks.length ? selectedPacks : undefined,
         });
 
-        if (this._searchQuery) {
-            const query = this._searchQuery.toLowerCase();
-            entries = entries.filter((i) => i.name?.toLowerCase().includes(query));
-        }
+        entries = entries.map(entry => ({
+            ...entry, type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`),
+        })).sort((a, b) => a.name!.localeCompare(b.name!, game.i18n.lang));
 
-        if (this.allFilters.some((f) => f.selected)) {
-            const selectedTypes = this.allFilters.filter((f) => f.selected).map((f) => f.id);
-            entries = entries.filter((e) => selectedTypes.includes(e.type as string));
-        }
-
-        entries = entries.map((entry) => ({ ...entry, type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`) }));
-
-        entries.sort((a, b) => a.name!.localeCompare(b.name!, game.i18n.lang));
         this.scrollState.entries = entries;
         this.scrollState.throttle = false;
 
