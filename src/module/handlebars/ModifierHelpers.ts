@@ -28,4 +28,10 @@ export const registerModifierHelpers = () => {
             return 'mod-change-masked';
         return '';
     });
+
+    Handlebars.registerHelper('getChangeDescription', (change: ChangeType) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        const effect = fromUuidSync(change.effectUuid ?? '') as ActiveEffect | null;
+        return effect?.description || '';
+    });
 }

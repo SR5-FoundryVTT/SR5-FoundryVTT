@@ -227,9 +227,17 @@ export class SR5ActiveEffect extends ActiveEffect {
             return;
         }
 
-        if (SR5ActiveEffect.getModifiableValue(object, change.key)) {
-            PartsList.addPart(target as any, change.effect.name, delta, change.mode, change.priority ?? undefined);
-            return;
+        if (PartsList.isModifiableValue(target)) {
+            target.changes.push({
+                applied: true,
+                masked: false,
+                name: change.effect.name,
+                value: delta,
+                mode: change.mode,
+                priority: change.priority ?? 10 * change.mode,
+                effectUuid: change.effect.uuid,
+            });
+            return undefined;
         }
 
         return super.apply(object, change);

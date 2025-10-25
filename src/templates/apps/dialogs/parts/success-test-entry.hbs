@@ -15,8 +15,7 @@
     <ol class="breakdown-list">
         {{#each data.changes as |change index|}}
         <li class="breakdown-entry {{getChangeCSS change}}" data-index="{{index}}">
-
-            <span class="mod-name" title="{{change.name}}">{{localize change.name}}</span>
+            <span class="mod-name" data-tooltip="{{getChangeDescription change}}">{{localize change.name}}</span>
             <span class="mod-value">{{getChangeValue change}}</span>
 
             <input type="checkbox" name="{{../path}}.changes.{{index}}.applied" data-dtype="Boolean" {{checked change.applied}} />

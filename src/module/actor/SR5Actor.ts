@@ -1252,10 +1252,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         }
 
         action.dice_pool_mod.push({
-            name: "Teamwork",
+            name: "Teamwork", effectUuid: null,
             value: teamworkData.additionalDice,
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            priority: 0, masked: false, applied: true
+            priority: 0, masked: false, applied: true,
         });
 
         const showDialog = this.tests.shouldShowDialog(options.event);

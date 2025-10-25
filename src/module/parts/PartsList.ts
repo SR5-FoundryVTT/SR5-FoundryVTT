@@ -27,9 +27,9 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
         name: string,
         value: number,
         mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
-        priority = 0
-    ) {
-        return { name, value, mode, priority, masked: false, applied: true };
+        priority = 0,
+    ): ModifiableValueType['changes'][number] {
+        return { name, value, mode, priority, masked: false, applied: true, effectUuid: null };
     }
 
     /**

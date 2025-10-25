@@ -7,6 +7,7 @@ import { TestCreator } from "../module/tests/TestCreator";
 import { SuccessTest } from "../module/tests/SuccessTest";
 import { DataDefaults } from "../module/data/DataDefaults";
 import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
+import { ModifiableValueType } from "@/module/types/template/Base";
 
 export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -27,7 +28,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         value: number,
         mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
         priority: number = mode * 10
-    ) => ({ name, value, mode, priority, masked: false, applied: true });
+    ): ModifiableValueType['changes'][number] => (
+        { name, value, mode, priority, masked: false, applied: true, effectUuid: null }
+    );
 
     describe('SR5ActiveEffect', () => {
         it('MODIFY mode: apply system custom mode to main and sub value-keys', async () => {

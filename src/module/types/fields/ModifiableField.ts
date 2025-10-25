@@ -44,7 +44,8 @@ export class ModifiableField<
             name: effectName,
             mode: effectMode,
             value: changeValue,
-            priority: effectPriority
+            priority: effectPriority,
+            effectUuid: change.effect.uuid,
         });
 
         return undefined;

@@ -1,4 +1,4 @@
-const { ArrayField, BooleanField, NumberField, SchemaField, StringField } = foundry.data.fields;
+const { ArrayField, BooleanField, DocumentUUIDField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 export const PhysicalAttribute = new StringField({
     choices: ['body', 'agility', 'reaction', 'strength'],
@@ -33,6 +33,7 @@ export const ModListEntry = () => ({
     mode: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    effectUuid: new DocumentUUIDField({ required: true, nullable: true }),
 });
 
 export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
