@@ -201,6 +201,11 @@ ___________________
             SR5Roll,
 
             /**
+             * You want to open the compendium browser?
+             */
+            CompendiumBrowser,
+
+            /**
              * You want to create a test from whatever source?
              * Use this.
              */
