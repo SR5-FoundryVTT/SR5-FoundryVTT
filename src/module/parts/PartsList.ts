@@ -12,19 +12,14 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
         return this._field.changes;
     }
 
-    /**
-     * Creates a new PartsList instance.
-     * @param field An optional initial list of parts.
-     */
     constructor(field: Field) {
         this._field = field;
     }
 
-    // --- Core Functionality ---
-
-    private _markPreviousChangesUnused(currentIndex: number): void {
+    private _markPreviousChangesMasked(currentIndex: number): void {
         for (let i = 0; i < currentIndex; i++) {
-            this._field.changes[i].unused = true;
+            if (!this._field.changes[i].applied) continue;
+            this._field.changes[i].masked = true;
         }
     }
 
@@ -33,30 +28,30 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
      * @param name The name of the part to find.
      * @returns The part's value, or undefined if not found.
      */
-    public getPartValue(name: string) {
+    getPartValue(name: string) {
         return this._field.changes.find(part => part.name === name)?.value;
     }
-
-    // --- Mutators ---
 
     /**
      * Adds a new part to the list.
      */
-    public addPart(
+    addPart(
         name: string,
         value: number,
         mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
         priority = 0
     ): void {
-        // if (!value && (!mode || mode === CONST.ACTIVE_EFFECT_MODES.ADD)) return;
+        this._field.changes.push({ name, value, mode, priority, masked: false, applied: true });
+    }
 
-        this._field.changes.push({ mode, priority, unused: false, name, value });
+    addBasePart(name: string, value: number): void {
+        return this.addPart(name, value, CONST.ACTIVE_EFFECT_MODES.ADD, -Infinity);
     }
 
     /**
      * Adds a part with a unique name, optionally overwriting an existing one.
      */
-    public addUniquePart(
+    addUniquePart(
         name: string,
         value: number | undefined | null,
         mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
@@ -64,35 +59,31 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
     ): void {
         const index = this._field.changes.findIndex(part => part.name === name);
 
-        // If part exists
-        if (index !== -1) {
-            if (value != null) {
-                this._field.changes[index] = { mode, priority, unused: false, name, value };
-            } else {
-                this._field.changes.splice(index, 1);
-            }
-        } else if (value != null) {
-            // Part does not exist, add it.
-            this.addPart(name, value, mode, priority);
-        } else {
-            console.warn(`Shadowrun 5e | Cannot add a part with an undefined value. Part: ${name}`);
-        }
+        if (index !== -1) this._field.changes.splice(index, 1);
+        if (value != null) this.addPart(name, value, mode, priority);
+        else if (index === -1) console.warn(`Shadowrun 5e | Cannot add a part with an undefined value. Part: ${name}`);
+    }
+
+    addUniqueBasePart(name: string, value: number | undefined | null): void {
+        return this.addUniquePart(name, value, CONST.ACTIVE_EFFECT_MODES.ADD, -Infinity);
     }
 
     /**
      * Removes all parts with a matching name.
      */
-    public removePart(name: string): void {
+    removePart(name: string): void {
         this._field.changes = this._field.changes.filter(part => part.name !== name);
     }
 
-    public calcTotal(options?: { min?: number; max?: number }): number {
+    calcTotal(options?: { min?: number; max?: number }): number {
         this._field.value = this._field.base;
 
         this._field.changes.sort((a, b) => a.priority - b.priority);
         for (let i = 0; i < this._field.changes.length; i++) {
             const change = this._field.changes[i];
-            change.unused = false;
+            change.masked = false;
+
+            if (!change.applied) continue;
 
             switch (change.mode) {
                 case CONST.ACTIVE_EFFECT_MODES.ADD:
@@ -104,22 +95,22 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
                     break;
                 case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
                     this._field.value = change.value;
-                    this._markPreviousChangesUnused(i);
+                    this._markPreviousChangesMasked(i);
                     break;
                 case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
                     if (this._field.value < change.value) {
                         this._field.value = change.value;
-                        this._markPreviousChangesUnused(i);
+                        this._markPreviousChangesMasked(i);
                     } else {
-                        change.unused = true;
+                        change.masked = true;
                     }
                     break;
                 case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
                     if (this._field.value > change.value) {
                         this._field.value = change.value;
-                        this._markPreviousChangesUnused(i);
+                        this._markPreviousChangesMasked(i);
                     } else {
-                        change.unused = true;
+                        change.masked = true;
                     }
                     break;
                 default:
@@ -144,25 +135,42 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
         return this._field.value;
     }
 
-    public static addPart<F extends ModifiableValueType>(
+    static isModifiableValue(list: any): list is ModifiableValueType {
+        const keys = ['base', 'changes', 'value'] satisfies ReadonlyArray<keyof ModifiableValueType>;
+        return typeof list === 'object' && keys.every(key => Object.hasOwn(list, key));
+    }
+
+    static addPart<F extends ModifiableValueType>(
         list: F, ...args: Parameters<PartsList<F>["addPart"]>
     ): void {
         new PartsList(list).addPart(...args);
     }
 
-    public static addUniquePart<F extends ModifiableValueType>(
+    static addBasePart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList<F>["addBasePart"]>
+    ): void {
+        new PartsList(list).addBasePart(...args);
+    }
+
+    static addUniquePart<F extends ModifiableValueType>(
         list: F, ...args: Parameters<PartsList["addUniquePart"]>
     ): void {
         new PartsList(list).addUniquePart(...args);
     }
 
-    public static removePart<F extends ModifiableValueType>(
+    static addUniqueBasePart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList["addUniqueBasePart"]>
+    ): void {
+        new PartsList(list).addUniqueBasePart(...args);
+    }
+
+    static removePart<F extends ModifiableValueType>(
         list: F, ...args: Parameters<PartsList<F>["removePart"]>
     ): void {
         new PartsList(list).removePart(...args);
     }
 
-    public static calcTotal<F extends ModifiableValueType>(
+    static calcTotal<F extends ModifiableValueType>(
         list: F, ...args: Parameters<PartsList<F>["calcTotal"]>
     ): number {
         return new PartsList(list).calcTotal(...args);

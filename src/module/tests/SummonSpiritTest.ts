@@ -141,7 +141,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         limitParts.removePart('SR5.Force');
         limitParts.removePart('SR5.Reagent');
 
-        limitParts.addUniquePart(label, limit);
+        limitParts.addUniqueBasePart(label, limit);
     }
 
     /**

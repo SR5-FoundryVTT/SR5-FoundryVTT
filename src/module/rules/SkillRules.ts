@@ -49,27 +49,19 @@ export class SkillRules {
 
     /**
      * Get the level a specific skill without its attribute.
-     * @param skill
-     * @param options
-     * @param options.specialization If true will add the default specialization bonus onto the level.
      */
-    static level(skill: SkillFieldType, options = {specialization: false}): number {
-        if (this.mustDefaultToRoll(skill)) {
+    static level(skill: SkillFieldType) {
+        if (this.mustDefaultToRoll(skill))
             return SkillRules.defaultingModifier;
-        }
 
-        // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
-        const skillValue = typeof skill.value === 'number' ? skill.value : 0;
-        const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
-
-        return skillValue + specializationBonus;
+        return skill.value;
     }
 
-    static get defaultingModifier(): number {
+    static get defaultingModifier() {
         return SR.skill.DEFAULTING_MODIFIER;
     }
 
-    static get SpecializationModifier(): number {
+    static get SpecializationModifier() {
         return SR.skill.SPECIALIZATION_MODIFIER;
     }
 

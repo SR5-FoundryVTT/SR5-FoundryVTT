@@ -48,32 +48,32 @@ export class BonusConstant {
     } as const;
 
     public static readonly simpleEffects = {
-        accel: { changes: [{ key: "system.vehicle_stats.acceleration.mod" }] },
+        accel: { changes: [{ key: "system.vehicle_stats.acceleration" }] },
         armor: {
             name: "Add Armor",
-            changes: [{ key: "system.armor.mod" }]
+            changes: [{ key: "system.armor" }]
         },
-        body: { changes: [{ key: "system.attributes.body.mod" }] },
+        body: { changes: [{ key: "system.attributes.body" }] },
         composure: { changes: [{ key: "system.modifiers.composure" }] },
         damageresistance: {
             name: "Add Damage Resistance",
-            changes: [{ key: "data.modifiers.mod" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "PhysicalResistTest" }] },
         },
         defensetest: { changes: [{ key: "system.modifiers.defense" }] },
         dodge: { changes: [{ key: "system.modifiers.defense" }] },
         drainresist: {
             name: "Add Drain Resistance",
-            changes: [{ key: "data.modifiers.mod" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "DrainTest" }] },
         },
-        essencemax: { changes: [{ key: "system.attributes.essence.mod" }] },
+        essencemax: { changes: [{ key: "system.attributes.essence" }] },
         fadingresist: {
             name: "Add Fading Resistance",
-            changes: [{ key: "data.modifiers.mod" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "FadeTest" }] },
         },
-        handling: { changes: [{ key: "system.vehicle_stats.handling.mod" }] },
+        handling: { changes: [{ key: "system.vehicle_stats.handling" }] },
         initiativedice: {
             name: "Increase Initiative Dice",
             changes: [{ key: "system.modifiers.meat_initiative_dice" }]
@@ -83,29 +83,29 @@ export class BonusConstant {
             name: "Increase Matrix Initiative Dice",
             changes: [{ key: "system.modifiers.matrix_initiative_dice" }]
         },
-        mentallimit: { changes: [{ key: "system.limits.mental.mod" }] },
+        mentallimit: { changes: [{ key: "system.limits.mental" }] },
         memory: { changes: [{ key: "system.modifiers.memory" }] },
-        offroadhandling: { changes: [{ key: "system.vehicle_stats.off_road_handling.mod" }] },
-        offroadspeed: { changes: [{ key: "system.vehicle_stats.off_road_speed.mod" }] },
-        pilot: { changes: [{ key: "system.vehicle_stats.pilot.mod" }] },
+        offroadhandling: { changes: [{ key: "system.vehicle_stats.off_road_handling" }] },
+        offroadspeed: { changes: [{ key: "system.vehicle_stats.off_road_speed" }] },
+        pilot: { changes: [{ key: "system.vehicle_stats.pilot" }] },
         physicalcmrecovery: {
             name: "Natural Recovery Physical",
-            changes: [{ key: "data.modifiers.mod" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "NaturalRecoveryPhysicalTest" }] }
         },
-        physicallimit: { changes: [{ key: "system.limits.physical.mod" }] },
+        physicallimit: { changes: [{ key: "system.limits.physical" }] },
         reach: { changes: [{ key: "system.modifiers.reach" }] },
-        seats: { changes: [{ key: "system.vehicle_stats.seats.mod" }] },
-        sensor: { changes: [{ key: "system.vehicle_stats.sensor.mod" }] },
-        speed: { changes: [{ key: "system.vehicle_stats.speed.mod" }] },
+        seats: { changes: [{ key: "system.vehicle_stats.seats" }] },
+        sensor: { changes: [{ key: "system.vehicle_stats.sensor" }] },
+        speed: { changes: [{ key: "system.vehicle_stats.speed" }] },
         spellresistance: {
             name: "Add Spell Resistance",
-            changes: [{ key: "data.modifiers.mod" } ],
+            changes: [{ key: "data.pool" } ],
             system: { applyTo: 'test_all', selection_tests: [{ id: "CombatSpellDefenseTest" }] }
         },
         stuncmrecovery: {
             name: "Natural Recovery Stun",
-            changes: [{ key: "data.modifiers.mod" }],
+            changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "NaturalRecoveryStunTest" }] }
         }
     } as const satisfies Partial< Record< keyof BonusSchema, AECreateData > >;

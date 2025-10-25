@@ -83,3 +83,143 @@
         flex-direction: column;
     }
 }
+
+.modifiable-value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    position: relative;
+
+    > label {
+        flex: 1 1 auto;
+        font-weight: bold;
+        padding-right: 10px;
+        font-size: 1.1em;
+        color: #191813;
+    }
+
+    .form-fields {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        input[type="number"] {
+            width: 45px;
+            max-width: 45px;
+            text-align: center;
+            padding: 3px;
+            font-size: 1.1em;
+            font-weight: bold;
+            background: rgba(0,0,0,0.05);
+            border: 1px solid var(--color-border-light-tertiary, #ccc);
+            cursor: default;
+        }
+    }
+
+    .toggle-breakdown {
+        flex: 0 0 20px;
+        height: 24px;
+        font-size: 1em;
+        text-align: center;
+        line-height: 24px;
+        cursor: pointer;
+        
+        color: #ccc;
+
+        &:hover {
+            color: #fff;
+        }
+
+        .fa-chevron-left {
+            transition: transform 0.2s ease-in-out;
+            transform: rotate(0deg);
+        }
+
+        &.disabled {
+            color: #555;
+            cursor: not-allowed;
+
+            &:hover {
+                color: #555;
+            }
+        }
+    }
+
+    .breakdown-list {
+        display: none;
+        flex-basis: 100%;
+        list-style: none;
+        margin: 5px 0 0 0;
+        padding: 8px;
+        border: 1px solid var(--color-border-light-tertiary, #ccc);
+        border-radius: 3px;
+        background: rgba(0,0,0,0.03);
+        gap: 4px;
+        flex-direction: column;
+
+        .mod-change-masked {
+            color: #777;
+        }
+
+        .mod-change-unapplied {
+            color: #777;
+            text-decoration: line-through;
+        }
+
+        .breakdown-entry {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 0;
+            border-bottom: 1px dashed var(--color-border-light-tertiary, #ddd);
+
+            &:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            input[type="checkbox"] {
+                flex: 0 0 16px;
+                margin: 0;
+            }
+
+            .mod-name {
+                flex: 1 1 auto;
+                font-size: 0.9em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .mod-value {
+                flex: 0 0 40px;
+                text-align: right;
+                font-weight: bold;
+                padding-right: 5px;
+                font-family: var(--font-primary);
+            }
+
+            .show-details {
+                flex: 0 0 16px;
+                text-align: center;
+                cursor: help;
+                color: #666;
+            }
+        }
+    }
+
+    &.expanded {
+        .breakdown-list {
+            display: flex;
+        }
+
+        .toggle-breakdown {
+            .fa-chevron-left { 
+                transform: rotate(-90deg); 
+            }
+        }
+    }
+}

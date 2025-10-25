@@ -1,6 +1,5 @@
 import { SR5 } from "../../config";
 import { Translation } from '../../utils/strings';
-import { ModifiableValueType } from "src/module/types/template/Base";
 import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
 import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
 import { PartsList } from "@/module/parts/PartsList";
@@ -9,7 +8,8 @@ export interface TestDialogData extends FormDialogData {
     test: SuccessTest
     rollMode: string
     rollModes: CONFIG.Dice.RollModes
-    config: typeof SR5
+    config: typeof SR5,
+    expandedPaths: string[]
 }
 
 /**
@@ -28,6 +28,7 @@ export class TestDialog extends FormDialog {
     declare data: TestDialogData
     // Listeners as given by the dialogs creator.
     listeners: TestDialogListener[]
+    _expandedList: Set<string>;
 
     // @ts-expect-error // TODO: default option value with all the values...
     constructor(data, options: FormDialogOptions = {}, listeners: TestDialogListener[]=[]) {
@@ -36,6 +37,7 @@ export class TestDialog extends FormDialog {
         super(data, options);
 
         this.listeners = listeners;
+        this._expandedList = new Set<string>();
     }
 
     static override get defaultOptions() {
@@ -52,6 +54,30 @@ export class TestDialog extends FormDialog {
 
     override activateListeners(html: JQuery) {
         super.activateListeners(html);
+
+        html.find('.toggle-breakdown').on('click', event => {
+            event.preventDefault();
+        
+            const modValueDiv = event.currentTarget.closest<HTMLDivElement>('.modifiable-value');
+            const path = modValueDiv?.dataset.path;
+            if (!path) return;
+
+            const isExpanded = modValueDiv.classList.toggle('expanded');
+            if (isExpanded) this._expandedList.add(path);
+            else this._expandedList.delete(path);
+            void this.render();
+        });
+
+        html.find('.toggle-manual-override').on('click', event => {
+            event.preventDefault();
+            const sectionDiv = event.currentTarget.closest('.manual-override-section');
+            if (!sectionDiv) return;
+
+            const isExpanded = sectionDiv.classList.toggle('expanded');
+            if (isExpanded) this._expandedList.add('manual');
+            else this._expandedList.delete('manual');
+            void this.render();
+        });
 
         this._injectExternalActiveListeners(html);
     }
@@ -86,6 +112,9 @@ export class TestDialog extends FormDialog {
 
         // Add in general SR5 config to allow access to general values.
         data.config = SR5;
+
+        // Pass the Set of expanded paths to Handlebars as an Array.
+        data.expandedPaths = Array.from(this._expandedList);
 
         return data;
     }
@@ -131,22 +160,23 @@ export class TestDialog extends FormDialog {
         // The user canceled their interaction by canceling, don't apply form changes.
         if (this.selectedButton === 'cancel') return;
 
+        // Apply keys ending with '.applied' first to ensure overrides are processed before dependent values
+        const entries = Object.entries(data);
+        const appliedEntries = entries.filter(([key]) => key.endsWith('.applied'));
+        const otherEntries = entries.filter(([key]) => !key.endsWith('.applied'));
+        
         // First, apply changes to ValueField style values in a way that makes sense.
-        for (const [key, value] of Object.entries(data)) {
-            // key is expected to be relative from TestDialog.data and begin with 'test'
-            const valueField = foundry.utils.getProperty(this.data, key) as ModifiableValueType | undefined | null;
-            if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !Object.hasOwn(valueField, 'changes')) continue;
-
-            // Remove from further automatic data merging.
-            delete data[key];
+        for (const [key, value] of [...appliedEntries, ...otherEntries]) {
+            const valueField = foundry.utils.getProperty(this.data, key);
+            if (!PartsList.isModifiableValue(valueField)) {
+                foundry.utils.setProperty(this.data, key, value);
+                continue;
+            }
 
             // Don't apply an unneeded override.
-            if (valueField.value === value) continue;
-            PartsList.addUniquePart(valueField, 'SR5.ManualOverride', value as number | null, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+            if (valueField.value !== value)
+                PartsList.addUniquePart(valueField, 'SR5.ManualOverride', value as number | null, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
         }
-
-        // Second, apply generic values.
-        foundry.utils.mergeObject(this.data, data);
 
         // Give tests opportunity to change resulting values on the fly.
         this.data.test.prepareBaseValues();

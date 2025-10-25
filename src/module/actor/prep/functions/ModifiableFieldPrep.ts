@@ -1,3 +1,4 @@
+import { PartsList } from "@/module/parts/PartsList";
 import { ModifiableValueType } from "@/module/types/template/Base";
 import { ModifiableField } from "@/module/types/fields/ModifiableField";
 const { ArrayField, TypedObjectField, SchemaField } = foundry.data.fields;
@@ -29,9 +30,7 @@ export class ModifiableFieldPrep {
             mod.changes = [];
 
             if (mod.temp) {
-                mod.changes.push(
-                    { name: "SR5.Temporary", value: mod.temp, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE, unused: false, priority: 0 }
-                );
+                PartsList.addPart(mod, "SR5.Temporary", mod.temp);
             }
         };
 

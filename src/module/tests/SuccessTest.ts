@@ -73,11 +73,6 @@ export interface TestData {
 
     damage: DamageType
 
-    // A list of modifier descriptions to be used for this test.
-    // These are designed to work with SR5Actor.getModifier()
-    // modifiers: Record<ModifierTypes, TestModifier>
-    modifiers: ValueFieldType
-
     // A list of test categories to be used for this test.
     // Check typing documentation for more information.
     categories: Shadowrun.ActionCategories[]
@@ -441,25 +436,22 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Automatics + Agility + 3 (3) [2 + Physical]
      */
     get code(): string {
-        // Add action dynamic value sources as labels.
-        const pool = this.pool.changes
-                        .filter(change => change.value)
-                        // Dev code for pool display. This should be replaced by attribute style value calculation info popup
-                        .map(change => `${game.i18n.localize(change.name as Translation)} ${change.value}`);
+        // Helper to format a ValueFieldType for code display
+        const formatValueField = (field: ValueFieldType) => {
+            const parts = field.changes
+                .filter(change => change.priority === -Infinity && change.mode === CONST.ACTIVE_EFFECT_MODES.ADD)
+                .map(change => `${game.i18n.localize(change.name as Translation)}`)
 
-        // Threshold and Limit are values that can be overwritten.
-        const threshold = this.threshold.changes.map(change => game.i18n.localize(change.name as Translation));
-        const limit = this.limit.changes.map(change => game.i18n.localize(change.name as Translation));
+            if (field.base) parts.push(String(field.base));
+            return parts;
+        };
 
-        // Add action static value modifiers as numbers.
-        pool.push(String(this.pool.base));
-        threshold.push(String(this.threshold.base));
-        limit.push(String(this.limit.base));
+        const pool = formatValueField(this.pool);
+        const threshold = formatValueField(this.threshold);
+        const limit = formatValueField(this.limit);
 
         // Pool portion can be dynamic or static.
         let code = pool.join(' + ').trim() || `${this.pool.value}`;
-
-        // Only add threshold / limit portions when appropriate.
         if (threshold.length > 0 && this.threshold.value > 0) code = `${code} (${threshold.join(' + ').trim()})`;
         if (limit.length > 0 && this.limit.value > 0) code = `${code} [${limit.join(' + ').trim()}]`;
 
@@ -597,12 +589,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Remove override modifier from pool.
         pool.removePart('SR5.Labels.Action.Modifiers');
-
-        // Otherwise apply automated modifiers to pool.
-        for (const modifier of this.data.modifiers.changes) {
-            // A modifier might have been asked for, but not given by the actor.
-            pool.addUniquePart(modifier.name, modifier.value);
-        }
     }
 
     /**
@@ -619,7 +605,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             for (const change of value.changes) change.value = Math.ceil(change.value);
         }
 
-        roundAllMods(this.data.modifiers);
         roundAllMods(this.data.pool);
         roundAllMods(this.data.threshold);
         roundAllMods(this.data.limit);
@@ -632,8 +617,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     calculateBaseValues() {
         this.roundBaseValueParts();
-
-        PartsList.calcTotal(this.data.modifiers);
 
         PartsList.calcTotal(this.data.pool, { min: 0 });
         PartsList.calcTotal(this.data.threshold, { min: 0 });
@@ -813,7 +796,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         for (const type of this.testModifiers) {
             const { name, value } = this.prepareActorModifier(this.actor, type);
-            PartsList.addUniquePart(this.data.modifiers, name, value);
+            if (value) PartsList.addUniquePart(this.data.pool, name, value);
         }
     }
 
@@ -1028,7 +1011,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.extended) return DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
 
         const extendedHits = this.extendedHits;
-        PartsList.addPart(extendedHits, 'SR5.Hits', this.hits.value);
+        PartsList.addBasePart(extendedHits, 'SR5.Hits', this.hits.value);
 
         PartsList.calcTotal(extendedHits, { min: 0 });
 
@@ -1266,7 +1249,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Edge will be applied differently for when the test has been already been cast or not.
         // Exploding dice will be handled during normal roll creation.
         const edge = this.actor.getEdge().value;
-        parts.addUniquePart('SR5.PushTheLimit', edge);
+        parts.addUniqueBasePart('SR5.PushTheLimit', edge);
 
         // Before casting edge will be part of the whole dice pool and that pool will explode.
         if (!this.evaluated) return;
@@ -1306,7 +1289,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Apply second chance modifiers.
         // Overwrite existing, as only ONE edge per test is allowed, therefore stacking is not possible.
-        parts.addUniquePart('SR5.SecondChance', dice);
+        parts.addUniqueBasePart('SR5.SecondChance', dice);
 
         // Add new dice as fully separate Roll.
         const formula = `${dice}d6`;
@@ -1624,7 +1607,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
 
         // A pool could be overwritten or not.
-        pool.addUniquePart('SR5.ExtendedTest', nextModifierValue);
+        pool.addUniqueBasePart('SR5.ExtendedTest', nextModifierValue);
 
         PartsList.calcTotal(data.pool, { min: 0 });
 

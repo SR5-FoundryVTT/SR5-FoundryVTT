@@ -139,7 +139,7 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
      * 
      */
     prepareLimitValue() {
-        PartsList.addUniquePart(this.data.limit, 'SR5.Force', this.data.force);
+        PartsList.addUniqueBasePart(this.data.limit, 'SR5.Force', this.data.force);
     }
 
     /**

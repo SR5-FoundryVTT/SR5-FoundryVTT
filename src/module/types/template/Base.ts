@@ -28,7 +28,8 @@ export const ValueMaxPair = () => ({
 
 export const ModListEntry = () => ({
     name: new StringField({ required: true }),
-    unused: new BooleanField({ initial: false }),
+    applied: new BooleanField({ initial: true }),
+    masked: new BooleanField({ initial: false }),
     mode: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

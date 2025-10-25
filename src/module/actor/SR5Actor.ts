@@ -1046,9 +1046,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
         pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
 
-
         // Build modifiers values.
-        PartsList.addUniquePart(test.data.modifiers, 'SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
+        PartsList.addUniquePart(test.data.pool, 'SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
         return test.execute();
     }
@@ -1249,19 +1248,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const action = this.skillActionData(skillId, options);
         if (!action) return;
         if (!teamworkData.criticalGlitch) {
-            action.limit.changes.push({
-                name: "Teamwork",
-                unused: false, priority: 0,
-                value: teamworkData.additionalLimit,
-                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            });
+            PartsList.addBasePart(action.limit, 'TeamWork', teamworkData.additionalLimit);
         }
 
         action.dice_pool_mod.push({
             name: "Teamwork",
             value: teamworkData.additionalDice,
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            unused: false, priority: 0,
+            priority: 0, masked: false, applied: true
         });
 
         const showDialog = this.tests.shouldShowDialog(options.event);

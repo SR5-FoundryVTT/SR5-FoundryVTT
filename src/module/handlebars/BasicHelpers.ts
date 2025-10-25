@@ -221,4 +221,16 @@ export const registerBasicHelpers = () => {
         }
         return undefined;
     });
+
+    Handlebars.registerHelper("includes", function (collection, value) {
+        if (collection == null) return false;
+
+        if (Array.isArray(collection) || typeof collection === "string")
+            return collection.includes(value);
+
+        if (typeof collection === "object")
+            return Object.values(collection).includes(value);
+
+        return false;
+    });
 };

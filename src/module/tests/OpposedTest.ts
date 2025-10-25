@@ -121,8 +121,6 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
             //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
             values: {},
 
-            modifiers: DataDefaults.createData('value_field', {label: 'SR5.Labels.Action.Modifiers'}),
-
             sourceItemUuid: againstData.sourceItemUuid,
             against: againstData
         }
@@ -205,11 +203,11 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         if (!this.item) return;
 
         // NOTE: This is a legacy method for applying item data based modifiers, but it will do.
-        const opposedMod = this.item.getOpposedTestMod(this.data.modifiers);
+        const opposedMod = this.item.getOpposedTestMod(this.data.pool);
 
         // Do not simply concat list to avoid double applying an otherwise unique test modifier.
         for (const modifier of opposedMod.changes) {
-            PartsList.addUniquePart(this.data.modifiers, modifier.name, modifier.value);
+            PartsList.addUniquePart(this.data.pool, modifier.name, modifier.value);
         }
     }
 

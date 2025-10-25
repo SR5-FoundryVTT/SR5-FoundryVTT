@@ -2,21 +2,9 @@
     <div class="value-modifiers">
         <div class="value-modifier-name">{{localize 'SR5.BaseValue'}}</div>
         <div class="value-modifiers-base">{{value.base}}</div>
-        {{#each value.changes}}
-            <div class="value-modifier-name {{#if this.unused}}value-modifiers-invalid-total{{/if}}">{{localize this.name}}</div>
-            {{#if (eq this.mode 0)}}
-                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">{{signedValue this.value}}</div>
-            {{else if (eq this.mode 1)}}
-                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">* {{this.value}}</div>
-            {{else if (eq this.mode 2)}}
-                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">{{signedValue this.value}}</div>
-            {{else if (eq this.mode 3)}}
-                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">↓ {{this.value}}</div>
-            {{else if (eq this.mode 4)}}
-                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">↑ {{this.value}}</div>
-            {{else}}
-                <div class="value-modifiers-modifier {{#if this.unused}}value-modifiers-invalid-total{{/if}}">➝ {{this.value}}</div>
-            {{/if}}
+        {{#each value.changes as |change|}}
+            <div class="value-modifier-name {{#if change.masked}}value-modifiers-invalid-total{{/if}}">{{localize change.name}}</div>
+            <div class="value-modifiers-modifier {{#if change.masked}}value-modifiers-invalid-total{{/if}}">{{getChangeValue change}}</div>
         {{/each}}
     </div>
 </div>

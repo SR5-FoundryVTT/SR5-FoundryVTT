@@ -15,6 +15,20 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
     after(async () => { await factory.destroy(); });
 
+    /**
+     * Helper to create a standardized change object for testing.
+     * @param value The value to apply in the change.
+     * @param mode The effect mode (default: ADD).
+     * @param priority The priority for the change (default: mode * 10).
+     * @returns The change object.
+     */
+    const createTestChange = (
+        name: string,
+        value: number,
+        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
+        priority: number = mode * 10
+    ) => ({ name, value, mode, priority, masked: false, applied: true });
+
     describe('SR5ActiveEffect', () => {
         it('MODIFY mode: apply system custom mode to main and sub value-keys', async () => {
             const actor = await factory.createActor({ type: 'character' });
@@ -28,8 +42,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             assert.deepEqual(actor.system.attributes.body.changes, [
-                { name: 'Test Effect', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false },
-                { name: 'Test Effect', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false }
+                createTestChange('Test Effect', 2),
+                createTestChange('Test Effect', 2),
             ]);
             assert.strictEqual(actor.system.attributes.body.value, 4);
         });
@@ -55,13 +69,13 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             // ModifiableValue should have a custom override value
             // Case - Direct change key
             assert.deepEqual(actor.system.attributes.body.changes,
-                [{ name: 'Test Effect', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE, priority: 50, unused: false }]
+                [createTestChange('Test Effect', 3, CONST.ACTIVE_EFFECT_MODES.OVERRIDE)]
             );
             assert.strictEqual(actor.system.attributes.body.base, 0);
             assert.strictEqual(actor.system.attributes.body.value, 3);
             // Case - Indirect change key
             assert.deepEqual(actor.system.attributes.agility.changes,
-                [{ name: 'Test Effect', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE, priority: 50, unused: false }]
+                [createTestChange('Test Effect', 3, CONST.ACTIVE_EFFECT_MODES.OVERRIDE)]
             );
             assert.strictEqual(actor.system.attributes.agility.base, 0);
             assert.strictEqual(actor.system.attributes.agility.value, 3);
@@ -93,8 +107,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 assert.strictEqual(actor.system.attributes.body.changes.length, 2);
                 assert.deepEqual(actor.system.attributes.body.changes,
                     [
-                        { name: 'Test Effect', value: 5, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false },
-                        { name: 'Test Effect', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE, priority: 50, unused: false }
+                        createTestChange('Test Effect', 5, CONST.ACTIVE_EFFECT_MODES.ADD),
+                        createTestChange('Test Effect', 3, CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
                     ]
                 );
                 assert.strictEqual(actor.system.attributes.body.value, 3);
@@ -211,18 +225,16 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             await test.execute();
 
             assert.deepEqual(test.limit.changes,
-                [{ name: 'Test Effect', value: limitValue, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false }]
+                [createTestChange('Test Effect', limitValue)]
             );
             assert.equal(test.limit.value, limitValue);
             // SuccessTest will always include global and wounds modifier by default.
             assert.deepEqual(test.pool.changes, [
-                { name: 'SR5.ModifierTypes.Global', value: 0, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 0, unused: false },
-                { name: 'SR5.ModifierTypes.Wounds', value: 0, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 0, unused: false },
-                { name: 'Test Effect', value: poolValue, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false },
+                createTestChange('Test Effect', poolValue)
             ]);
             assert.equal(test.pool.value, poolValue);
             assert.deepEqual(test.hits.changes,
-                [{ name: 'Test Effect', value: hitsValue, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false }]
+                [createTestChange('Test Effect', hitsValue)]
             );
             assert.isAtLeast(test.hits.value, hitsValue);
         });
@@ -253,18 +265,16 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             await test.execute();
 
             assert.deepEqual(test.limit.changes,
-                [{ name: 'Test Effect', value: limitValue, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false }]
+                [createTestChange('Test Effect', limitValue)]
             );
             assert.equal(test.limit.value, limitValue);
             // SuccessTest will always include global and wounds modifier by default.
             assert.deepEqual(test.pool.changes, [
-                { name: 'SR5.ModifierTypes.Global', value: 0, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 0, unused: false },
-                { name: 'SR5.ModifierTypes.Wounds', value: 0, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 0, unused: false },
-                { name: 'Test Effect', value: poolValue, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false },
+                createTestChange('Test Effect', poolValue)
             ]);
             assert.equal(test.pool.value, poolValue);
             assert.deepEqual(test.hits.changes,
-                [{ name: 'Test Effect', value: hitsValue, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false }]
+                [createTestChange('Test Effect', hitsValue)]
             );
             assert.isAtLeast(test.hits.value, hitsValue);
         });
@@ -326,18 +336,16 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             await test.execute();
 
             assert.deepEqual(test.limit.changes,
-                [{ name: 'Test Effect Correct Item', value: limitValue, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false }]
+                [createTestChange('Test Effect Correct Item', limitValue)]
             );
             assert.equal(test.limit.value, limitValue);
             // SuccessTest will always include global and wounds modifier by default.
             assert.deepEqual(test.pool.changes, [
-                { name: 'SR5.ModifierTypes.Global', value: 0, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 0, unused: false },
-                { name: 'SR5.ModifierTypes.Wounds', value: 0, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 0, unused: false },
-                { name: 'Test Effect Correct Item', value: poolValue, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false },
+                createTestChange('Test Effect Correct Item', poolValue)
             ]);
             assert.equal(test.pool.value, poolValue);
             assert.deepEqual(test.hits.changes,
-                [{ name: 'Test Effect Correct Item', value: hitsValue, mode: CONST.ACTIVE_EFFECT_MODES.ADD, priority: 20, unused: false }]
+                [createTestChange('Test Effect Correct Item', hitsValue)]
             );
             assert.isAtLeast(test.hits.value, hitsValue);
         });

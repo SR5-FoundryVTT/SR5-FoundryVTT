@@ -5,15 +5,8 @@ import { SkillFieldType } from 'src/module/types/template/Skills';
 export class SkillsPrep {
 
     private static prepareSkill(skill: SkillFieldType) {
-        for (const bonus of skill.bonus) {
-            skill.changes.push({
-                priority: 0,
-                unused: false,
-                name: bonus.key,
-                value: Number(bonus.value),
-                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            });
-        }
+        for (const bonus of skill.bonus)
+            PartsList.addPart(skill, bonus.key, bonus.value);
 
         PartsList.calcTotal(skill, { min: 0 });
     }

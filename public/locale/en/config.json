@@ -882,8 +882,9 @@
             "WarningTitle": "Alert"
         },
         "Magic": "Magic",
-        "ManualGlitches": "Man. Glitches",
-        "ManualHits": "Man. Hits",
+        "Manual": "Manual",
+        "ManualGlitches": "Glitches",
+        "ManualHits": "Hits",
         "ManualOverride": "Manual Override",
         "MarkImportedItemReviewed": "Mark Imported Item Reviewed",
         "MarkImportedItemTooltip": "Marks this imported item as having been reviewed.",

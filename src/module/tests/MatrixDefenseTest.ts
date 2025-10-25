@@ -107,7 +107,7 @@ export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTe
         const defense = this.data.activeDefenses[this.data.activeDefense] || {label: 'SR5.MatrixDefense', value: 0, init: 0};
 
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
-        PartsList.addUniquePart(this.data.modifiers, 'SR5.MatrixDefense', defense.value || 0);
+        PartsList.addUniquePart(this.data.pool, 'SR5.MatrixDefense', defense.value || 0);
     }
 
     override get success() {

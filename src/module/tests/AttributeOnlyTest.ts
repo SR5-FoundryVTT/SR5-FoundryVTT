@@ -46,8 +46,8 @@ export class AttributeOnlyTest extends SuccessTest {
         const attribute2 = this.actor.getAttribute(this.data.attribute2);
 
         // Re-build base pool values first. Other modifiers will be added within prepareBaseValues
-        if (attribute1) pool.addPart(attribute1.label, attribute1.value);
-        if (attribute2) pool.addPart(attribute2.label, attribute2.value);
+        if (attribute1) pool.addBasePart(attribute1.label, attribute1.value);
+        if (attribute2) pool.addBasePart(attribute2.label, attribute2.value);
 
         // Rebuild attribute specific modifiers previously added in TestCreate#_prepareTestDataWithAction
         this.data.action.attribute = this.data.attribute1;

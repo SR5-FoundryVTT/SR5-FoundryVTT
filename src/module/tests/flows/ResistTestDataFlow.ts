@@ -81,7 +81,6 @@ export const ResistTestDataFlow = {
             //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
             values: {},
 
-            modifiers: DataDefaults.createData('value_field', {label: 'SR5.Labels.Action.Modifiers'}),
             incomingDamage: opposedData.incomingDamage,
             modifiedDamage: opposedData.modifiedDamage,
 

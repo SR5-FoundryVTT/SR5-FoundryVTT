@@ -190,22 +190,22 @@ export const MatrixTestDataFlow = {
      */
     prepareTestModifiers(test: MatrixTest) {
 
-        const modifiers = new PartsList(test.data.modifiers);
+        const pool = new PartsList(test.data.pool);
 
         // Check for grid modifiers.
         if (!test.data.sameGrid) {
-            modifiers.addUniquePart('SR5.ModifierTypes.DifferentGrid', MatrixRules.differentGridModifier());
+            pool.addUniquePart('SR5.ModifierTypes.DifferentGrid', MatrixRules.differentGridModifier());
         } else {
-            modifiers.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
+            pool.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
         }
 
         // Check for direct connection modifiers.
         if (test.data.directConnection) {
             // Grid modifiers don't apply when directly connected.
-            modifiers.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
-            modifiers.addUniquePart('SR5.ModifierTypes.Noise', 0);
+            pool.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
+            pool.addUniquePart('SR5.ModifierTypes.Noise', 0);
         } else {
-            modifiers.addUniquePart('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
+            pool.addUniquePart('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
         }
     },
 

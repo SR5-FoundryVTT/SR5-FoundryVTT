@@ -772,16 +772,9 @@ export class Helpers {
     /**
      * Return true if all given keys are present in the given object.
      * Values don't matter for this comparison.
-     *
-     * @param obj
-     * @param keys
      */
     static objectHasKeys(obj: object, keys: string[]): boolean {
-        for (const key of keys) {
-            if (!Object.hasOwn(obj, key)) return false;
-        }
-
-        return true;
+        return keys.every(key => Object.hasOwn(obj, key));
     }
 
     /**

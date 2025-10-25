@@ -43,10 +43,10 @@ export const MarkPlacementFlow = {
      */
     prepareTestModifiers(test: MarkPlacementTests) {
 
-        const modifiers = new PartsList(test.data.modifiers);
+        const pool = new PartsList(test.data.pool);
 
         // Apply mark modifier
-        modifiers.addUniquePart('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkPlacementModifier(test));
+        pool.addUniquePart('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkPlacementModifier(test));
 
         MatrixTestDataFlow.prepareTestModifiers(test);
     },
