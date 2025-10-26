@@ -385,6 +385,18 @@
                 {{/if}}
 
                 {{#if @root.isEditMode}}
+                    <span class="basic-row">
+                        <label>{{localize "SR5.Rtg"}}</label>
+                        <span>
+                            {{formInput systemFields.rating value=source.system.rating
+                                        classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </span>
+                    </span>
+                {{else if system.rating}}
+                    <label>{{localize "SR5.Rtg"}}&nbsp;{{system.rating}}</label>
+                {{/if}}
+
+                {{#if @root.isEditMode}}
                     <div class="basic-row">
                         <label>{{systemFields.duration.label}}</label>
                         <div data-tooltip="{{systemFields.duration.label}}:&nbsp;{{systemFields.duration.hint}}">
