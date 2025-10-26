@@ -133,7 +133,7 @@
             color: #fff;
         }
 
-        .fa-chevron-left {
+        .fa-chevron-up {
             transition: transform 0.2s ease-in-out;
             transform: rotate(0deg);
         }
@@ -217,8 +217,8 @@
         }
 
         .toggle-breakdown {
-            .fa-chevron-left { 
-                transform: rotate(-90deg); 
+            .fa-chevron-up { 
+                transform: rotate(-180deg); 
             }
         }
     }
