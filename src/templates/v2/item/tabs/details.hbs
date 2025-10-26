@@ -466,7 +466,7 @@
                             </label>
                         </div>
                     </div>
-                    {{#if (eq item.type 'action')}}
+                    {{#if (isType item 'action' 'critter_power')}}
                         <div class="list-item">
                             <div class="list-item-start skinny">
                                 <label data-tooltip="{{systemFields.action.fields.categories.hint}}">{{systemFields.action.fields.categories.label}}</label>
