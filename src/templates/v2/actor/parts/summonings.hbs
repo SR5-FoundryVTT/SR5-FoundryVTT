@@ -1,7 +1,9 @@
-{{> 'systems/shadowrun5e/dist/templates/v2/list-items/call_in_action/header.hbs'
+{{#if (or @root.isEditMode itemType.summoning.length)}}
+    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/call_in_action/header.hbs'
         label='SR5.CallInAction.Summoning'
         actor_type='spirit'
         type='call_in_action' }}
-{{#each itemType.summoning}}
-    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/call_in_action/item.hbs' item=this }}
-{{/each}}
+    {{#each itemType.summoning}}
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/call_in_action/item.hbs' item=this }}
+    {{/each}}
+{{/if}}

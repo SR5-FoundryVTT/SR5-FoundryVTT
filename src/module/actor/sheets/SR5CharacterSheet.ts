@@ -23,7 +23,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    override getHandledItemTypes(): string[] {
+    override getHandledItemTypes(): Item.ConfiguredSubType[] {
         const itemTypes = super.getHandledItemTypes();
 
         return [
@@ -33,7 +33,6 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'lifestyle',
             'contact',
             'spell',
-            'ritual_spells',
             'adept_power',
             'complex_form',
             'quality',
@@ -41,6 +40,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'metamagic',
             'critter_power',
             'call_in_action',
+            'sprite_power',
             'ritual'
         ];
     }
@@ -49,30 +49,20 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         ...super.TABS,
         primary: {
             initial: 'skills',
-            labelPrefix: 'SR5.Tabs',
             tabs: [
-                { id: 'actions', label: 'Actions', cssClass: '' },
-                { id: 'skills', label: 'Character', cssClass: '' },
-                { id: 'inventory', label: 'Inventory', cssClass: '' },
-                { id: 'critter', label: 'CritterPowers', cssClass: '' },
-                { id: 'magic', label: 'Magic', cssClass: '' },
-                { id: 'matrix', label: 'Matrix', cssClass: '' },
-                { id: 'social', label: 'Social', cssClass: '' },
-                { id: 'bio', label: 'Bio', cssClass: '' },
-                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'actions', label: 'SR5.Tabs.Actor.Actions', cssClass: '' },
+                { id: 'skills', label: 'SR5.Tabs.Actor.Character', cssClass: '' },
+                { id: 'inventory', label: 'SR5.Tabs.Actor.Inventory', cssClass: '' },
+                { id: 'critterPowers', label: 'SR5.Tabs.Actor.CritterPowers', cssClass: '' },
+                { id: 'magic', label: 'SR5.Tabs.Actor.Magic', cssClass: '' },
+                { id: 'matrix', label: 'SR5.Tabs.Actor.Matrix', cssClass: '' },
+                { id: 'social', label: 'SR5.Tabs.Actor.Social', cssClass: '' },
+                { id: 'bio', label: 'SR5.Tabs.Actor.Bio', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
                 { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
                 { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]
         },
-        matrixRight: {
-            initial: 'matrixActions',
-            labelPrefix: 'SR5.Tabs',
-            tabs: [
-                { id: 'matrixActions', label: 'Actions', cssClass: '', },
-                { id: 'complexForms', label: 'ComplexForms', cssClass: '', },
-                { id: 'compilations', label: 'Compilations', cssClass: '', }
-            ]
-        }
     }
 
     static override DEFAULT_OPTIONS = {
@@ -81,44 +71,6 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             openKarmaManager: SR5CharacterSheet.#openKarmaManager,
             openReputationManager: SR5CharacterSheet.#openReputationManager,
         }
-    }
-
-    _hasCritterPowers() {
-        return this.actor.items.filter(item => item.type === 'critter_power').length > 0;
-    }
-
-    protected override _prepareTabs(group: string) {
-        const retVal = super._prepareTabs(group);
-        if (group === 'primary') {
-            if (!this._hasCritterPowers()) {
-                delete retVal['critter'];
-            }
-            if (!this.actor.isAwakened()) {
-                delete retVal['magic'];
-            }
-        }
-        if (group === 'matrixRight') {
-            if (!this.actor.isEmerged()) {
-                delete retVal['complexForms'];
-                delete retVal['compilations'];
-            }
-        }
-        return retVal;
-    }
-
-    protected override _configureRenderParts(options) {
-        const retVal = super._configureRenderParts(options);
-        if (!this._hasCritterPowers()) {
-            delete retVal['critter'];
-        }
-        if (!this.actor.isAwakened()) {
-            delete retVal['magic'];
-        }
-        if (!this.actor.isEmerged()) {
-            delete retVal['complexForms'];
-            delete retVal['compilations'];
-        }
-        return retVal;
     }
 
     static override PARTS = {
@@ -139,18 +91,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                 ],
             scrollable: ['.scrollable']
         },
-        complexForms: {
-            template: SheetFlow.templateBase('actor/tabs/matrix/complex-forms'),
-            templates: SheetFlow.templateListItem('complex_form'),
-            scrollable: ['.scrollable']
-        },
-        compilations: {
-            template: SheetFlow.templateBase('actor/tabs/matrix/compilations'),
-            templates: SheetFlow.templateListItem('call_in_action'),
-            scrollable: ['.scrollable']
-        },
-        critter: {
-            template: SheetFlow.templateBase('actor/tabs/critter'),
+        critterPowers: {
+            template: SheetFlow.templateBase('actor/tabs/critter-powers'),
             templates: SheetFlow.templateListItem('critter_power'),
             scrollable: ['.scrollable']
         },
@@ -178,7 +120,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    override getInventoryItemTypes(): string[] {
+    override getInventoryItemTypes(): Item.ConfiguredSubType[] {
         const itemTypes = super.getInventoryItemTypes();
 
         return [
@@ -202,6 +144,33 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
 
         data.isCharacter = true;
         return data;
+    }
+
+    protected override _prepareTabs(group: string) {
+        const parts = super._prepareTabs(group);
+        if (group === 'primary') {
+            // if we should hide empty tabs
+            if (this.isPlayMode && this.hideEmptyCategories()) {
+                if (parts.social && !this.actor.hasItemOfType('sin', 'contact', 'lifestyle')) {
+                    parts.social.hidden = true;
+                }
+                if (parts.bio && !this.actor.hasItemOfType('quality', 'metamagic', 'echo')) {
+                    parts.bio.hidden = true;
+                }
+            }
+            if (parts.critterPowers
+                && ((this.isPlayMode && !this._hasCritterPowers())
+                    || (this.isEditMode && !(this.actor.isType('critter') || this.actor.system.is_critter)))) {
+                parts.critterPowers.hidden = true;
+            }
+            if (parts.matrix && !(this.actor.isEmerged() || this.actor.hasPersona)) {
+                parts.matrix.hidden = true;
+            }
+            if (parts.magic && (!this.actor.isAwakened() || (this.isPlayMode && this.hideEmptyCategories() && !this._hasMagicItems()))) {
+                parts.magic.hidden = true;
+            }
+        }
+        return parts;
     }
 
     /**
@@ -237,16 +206,6 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         };
 
         await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
-    }
-
-    protected override async _renderHTML(content, options) {
-        const parts = await super._renderHTML(content, options);
-        const matrixRightSideContent = parts.matrix?.querySelector("section.content.matrix-right-tab-content");
-        if (matrixRightSideContent) {
-            this.moveTabs(SR5CharacterSheet.TABS.matrixRight.tabs, parts, matrixRightSideContent);
-        }
-
-        return parts;
     }
 
     static async #openKarmaManager(this: SR5CharacterSheet, event) {

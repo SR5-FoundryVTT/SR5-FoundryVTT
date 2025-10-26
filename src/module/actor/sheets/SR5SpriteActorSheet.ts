@@ -4,7 +4,7 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { Helpers } from '@/module/helpers';
 
 export type SpriteActorSheetData = MatrixActorSheetData & {
-    technmomancer: SR5Actor | null;
+    technomancer: SR5Actor | null;
     isSprite: boolean;
 }
 
@@ -20,33 +20,15 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         ...super.TABS,
         primary: {
             initial: 'skills',
-            labelPrefix: 'SR5.Tabs',
             tabs: [
-                { id: 'actions', label: 'Actions', cssClass: '' },
-                { id: 'skills', label: 'Sprite', cssClass: '' },
-                { id: 'matrix', label: 'Matrix', cssClass: '' },
-                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'actions', label: 'SR5.Tabs.Actor.Actions', cssClass: '' },
+                { id: 'skills', label: 'SR5.Tabs.Actor.Sprite', cssClass: '' },
+                { id: 'matrix', label: 'SR5.Tabs.Actor.Matrix', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
                 { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
                 { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]
         },
-        matrixRight: {
-            initial: 'matrixActions',
-            labelPrefix: 'SR5.Tabs',
-            tabs: [
-                { id: 'matrixActions', label: 'Actions', cssClass: '', },
-                { id: 'spritePowers', label: 'Sprite Powers', cssClass: '', }
-            ]
-        }
-    }
-    protected override async _renderHTML(content, options) {
-        const parts = await super._renderHTML(content, options);
-        const matrixRightSideContent = parts.matrix?.querySelector("section.content.matrix-right-tab-content");
-        if (matrixRightSideContent) {
-            this.moveTabs(SR5SpriteActorSheet.TABS.matrixRight.tabs, parts, matrixRightSideContent);
-        }
-
-        return parts;
     }
 
     static override PARTS = {
@@ -59,20 +41,6 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
             ],
             scrollable: ['#active-skills-scroll']
         },
-        matrix: {
-            template: SheetFlow.templateBase('actor/tabs/matrix'),
-            scrollable: [
-                '#matrix-actions-scroll',
-                '#marked-icons-scroll' ,
-                '#owned-icons-scroll',
-                '#network-icons-scroll',
-                '#sprite-powers-scroll',
-            ]
-        },
-        spritePowers: {
-            template: SheetFlow.templateBase('actor/tabs/matrix/sprite-powers'),
-            templates: SheetFlow.templateListItem('sprite_power'),
-        },
     }
     /**
      * Sprite actors will handle these item types specifically.
@@ -81,8 +49,8 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
      *
      * @returns An array of item types from the template.json Item section.
      */
-    override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+    override getHandledItemTypes(): Item.ConfiguredSubType[] {
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,

@@ -196,16 +196,15 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static override TABS = {
         primary: {
             initial: 'description',
-            labelPrefix: 'SR5.Tabs',
             tabs: [
-                { id: 'description', label: 'Description', cssClass: '' },
-                { id: 'details', label: 'Details', cssClass: '' },
-                { id: 'network', label: 'Network', cssClass: '' },
-                { id: 'sinNetworks', label: 'Networks', cssClass: '' },
-                { id: 'weaponAmmo', label: 'Ammo', cssClass: '' },
-                { id: 'weaponModifications', label: 'Mods', cssClass: '' },
-                { id: 'licenses', label: 'Licenses', cssClass: '' },
-                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'description', label: 'SR5.Tabs.Item.Description', cssClass: '' },
+                { id: 'details', label: 'SR5.Tabs.Item.Details', cssClass: '' },
+                { id: 'network', label: 'SR5.Tabs.Item.Network', cssClass: '' },
+                { id: 'sinNetworks', label: 'SR5.Tabs.Item.SinNetworks', cssClass: '' },
+                { id: 'weaponAmmo', label: 'SR5.Tabs.Item.WeaponAmmo', cssClass: '' },
+                { id: 'weaponModifications', label: 'SR5.Tabs.Item.WeaponMods', cssClass: '' },
+                { id: 'licenses', label: 'SR5.Tabs.Item.SinLicenses', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Item.Effects', cssClass: '' },
             ]
         }
     }

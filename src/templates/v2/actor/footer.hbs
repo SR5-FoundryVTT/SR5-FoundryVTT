@@ -8,17 +8,17 @@
                         {{formInput systemFields.metatype value=source.system.metatype rootId=rootId localize=true classes="short thicc" }}
                     </span>
                 </div>
-            {{else}}
+            {{else if (not system.is_critter)}}
                 <label>{{localizeOb system.metatype config.character.types}}</label>
             {{/if}}
 
             {{#if @root.isPlayMode}}
-                {{#if system.is_npc}}
-                    <label>{{localize "SR5.IsNPC"}}</label>
-                {{/if}}
-
                 {{#if system.is_critter}}
                     <label>{{localize "SR5.IsCritter"}}</label>
+                {{/if}}
+
+                {{#if system.is_npc}}
+                    <label>{{localize "SR5.IsNPC"}}</label>
                 {{/if}}
 
                 {{#if system.is_grunt}}

@@ -2,7 +2,6 @@ import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { Helpers } from '@/module/helpers';
 
-
 export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     /**
      * Spirit actors will handle these item types specifically.
@@ -11,8 +10,8 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+    override getHandledItemTypes(): Item.ConfiguredSubType[] {
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -32,13 +31,12 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     static override TABS = {
         primary: {
             initial: 'skills',
-            labelPrefix: 'SR5.Tabs',
             tabs: [
-                { id: 'actions', label: 'Actions', cssClass: '' },
-                { id: 'skills', label: 'Spirit', cssClass: '' },
-                { id: 'critter', label: 'Powers', cssClass: '' },
-                { id: 'magic', label: 'Magic', cssClass: '' },
-                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'actions', label: 'SR5.Tabs.Actor.Actions', cssClass: '' },
+                { id: 'skills', label: 'SR5.Tabs.Actor.Spirit', cssClass: '' },
+                { id: 'critterPowers', label: 'SR5.Tabs.Actor.CritterPowers', cssClass: '' },
+                { id: 'magic', label: 'SR5.Tabs.Actor.Magic', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
                 { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
                 { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]
@@ -56,15 +54,15 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
             scrollable: ['scrollable']
         },
         magic: {
-            template: SheetFlow.templateBase('actor/tabs/spirit-magic'),
+            template: SheetFlow.templateBase('actor/tabs/magic'),
             templates: [
                     ...SheetFlow.templateActorSystemParts('spells', 'rituals'),
                     ...SheetFlow.templateListItem('spell', 'ritual')
                 ],
             scrollable: ['.scrollable']
         },
-        critter: {
-            template: SheetFlow.templateBase('actor/tabs/critter'),
+        critterPowers: {
+            template: SheetFlow.templateBase('actor/tabs/critter-powers'),
             templates: SheetFlow.templateListItem('critter_power'),
             scrollable: ['scrollable']
         },
@@ -79,12 +77,28 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     override async _prepareContext(options) {
         const data = await super._prepareContext(options) as any;
 
-        if (this.document.isType('spirit') && this.document.system.summonerUuid)
+        if (this.document.isType('spirit') && this.document.system.summonerUuid) {
             data['summoner'] = await fromUuid(this.document.system.summonerUuid as any);
+        }
 
         data.isSpirit = true;
 
         return data;
+    }
+
+    protected override _prepareTabs(group: string) {
+        const parts = super._prepareTabs(group);
+
+        if (group === 'primary') {
+            if (this.isPlayMode && this.hideEmptyCategories() && !this._hasCritterPowers() && parts.critterPowers) {
+                parts.critterPowers.cssClass += " hidden";
+            }
+            if (this.isPlayMode && this.hideEmptyCategories() && !this._hasMagicItems() && parts.magic) {
+                parts.magic.cssClass += " hidden";
+            }
+        }
+
+        return parts;
     }
 
     override async _onDropActor(event, actor) {

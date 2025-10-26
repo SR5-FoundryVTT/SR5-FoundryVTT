@@ -83,6 +83,7 @@ export class Critter extends ActorBase<ReturnType<typeof CritterData>> {
     static override defineSchema() {
         return CritterData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Character", "SR5.Actor"];
 }
 
 console.log("CritterData", CritterData(), new Critter());

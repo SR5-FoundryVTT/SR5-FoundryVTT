@@ -22,6 +22,7 @@ import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
+import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 const { TextEditor } = foundry.applications.ux;
@@ -97,7 +98,8 @@ export interface SR5BaseSheetDelays {
  *
  */
 export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> extends SR5ApplicationMixin(ActorSheetV2)<T> {
-    declare isEditMode: boolean;
+    declare readonly isEditMode: boolean;
+    declare readonly isPlayMode: boolean;
 
     // If something needs filtering, store those filters here.
     _filters: SR5SheetFilters = {
@@ -130,7 +132,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @return A string of item types from the template.json Item section.
      */
-    getHandledItemTypes(): string[] {
+    getHandledItemTypes(): Item.ConfiguredSubType[] {
         return ['action'];
     }
 
@@ -144,7 +146,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @return An array of item types from the template.json Item section.
      */
-    getInventoryItemTypes(): string[] {
+    getInventoryItemTypes():Item.ConfiguredSubType[] {
         return [];
     }
 
@@ -153,7 +155,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * This includes dropping them onto this actor.
      */
-    getForbiddenItemTypes(): string[] {
+    getForbiddenItemTypes(): Item.ConfiguredSubType[] {
         return [];
     }
 
@@ -222,10 +224,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static override TABS = {
         primary: {
             initial: 'actions',
-            labelPrefix: 'SR5.Tabs',
             tabs: [
-                { id: 'actions', label: 'Actions', cssClass: '' },
-                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'actions', label: 'SR5.Tabs.Actor.Actions', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
                 { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
                 { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]
@@ -288,7 +289,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
 
-        this.hasEffects = (data.effects.length > 0 || data.itemEffects.length > 0);
+        this.hasEffects = data.effects.length > 0 || data.itemEffects.length > 0;
 
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
@@ -349,14 +350,23 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     protected override _prepareTabs(group: string) {
-        const parts = super._prepareTabs(group);
+        const parts = super._prepareTabs(group) as Record<string, SR5Tab>;
         if (group === 'primary' && !game.user?.isGM && this.actor.limited) {
             const description = parts.description;
             description.active = true;
             return { description };
         }
         if (group === 'primary') {
-            this._cleanParts(this.actor, parts);
+            // if we should hide empty tabs
+            if (this.isPlayMode && this.hideEmptyCategories()) {
+                // look for actor items that go in the inventory tab and delete the tab/part if none exist
+                if (this.actor.hasItemOfType(...this.getInventoryItemTypes()) && parts.inventory) {
+                    parts.inventory.hidden = true;
+                }
+                if (parts.effects && !this.hasEffects) {
+                    parts.effects.hidden = true;
+                }
+            }
         }
         return parts;
     }
@@ -371,36 +381,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 footer: retVal.footer,
             }
         }
-        this._cleanParts(this.actor, retVal);
         return retVal;
     }
 
-    protected _cleanParts(actor: SR5Actor, parts: Record<string, any>) {
-        // if we should hide empty tabs
-        if (!this.isEditMode && !actor.system.category_visibility.default) {
-            // look for actor items that go in the inventory tab and delete the tab/part if none exist
-            if (actor.items.filter(i => i.isType('modification', 'weapon', 'equipment', 'armor', 'bioware', 'cyberware', 'device')).length === 0) {
-                delete parts['inventory'];
-            }
-            if (actor.isType('character') && actor.getMatrixDevice() === undefined) {
-                delete parts['matrix'];
-                delete parts['matrixActions'];
-                delete parts['networkIcons'];
-                delete parts['markedIcons'];
-                delete parts['ownedIcons'];
-                delete parts['programs'];
-            }
-            if (actor.items.filter(i => i.isType('sin', 'contact', 'lifestyle')).length === 0) {
-                delete parts['social']
-            }
-            if (actor.items.filter(i => i.isType('quality', 'metamagic', 'echo')).length === 0) {
-                delete parts['bio'];
-            }
-            if (!this.hasEffects) {
-                delete parts['effects'];
-            }
-        }
-        return parts;
+    protected _hasCritterPowers() {
+        return this.actor.hasItemOfType('critter_power');
+    }
+
+    protected _hasMagicItems() {
+        return this.actor.hasItemOfType('spell', 'adept_power', 'ritual', 'call_in_action');
     }
 
     override async _onRender(context, options) {
@@ -592,7 +581,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Show all item types but remove empty unexpected item types.
         const inventoryTypes = this.getInventoryItemTypes();
         for (const type of Object.keys(inventory.types)) {
-            if (inventoryTypes.includes(type)) continue;
+            if (inventoryTypes.includes(type as Item.ConfiguredSubType)) continue;
             if (inventory.types[type].items.length === 0) delete inventory.types[type];
         }
 
@@ -614,6 +603,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 isOpen: this._inventoryOpenClose[type],
                 items: []
             };
+        }
+    }
+
+    async _onDropItem(event: DragEvent, item: SR5Item) {
+        // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
+        if (this.getHandledItemTypes().includes(item.type) || this.getInventoryItemTypes().includes(item.type)) {
+            // @ts-expect-error hates inheritance I guess
+            return super._onDropItem(event, item);
         }
     }
 
@@ -1070,7 +1067,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     _prepareContentVisibility(data) {
         const contentVisibility : Record<string, boolean> = {}
-        const defaultVisibility = data.system.category_visibility.default;
+        const defaultVisibility = !this.hideEmptyCategories();
 
         // If prefix is empty uses the category as a prefix
         const setVisibility = (category: string, prefix?: string) => {
@@ -1232,6 +1229,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     _showResonanceSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
         return this._isSkillResonance(skill) && sheetData.system.special === 'resonance';
+    }
+
+    hideEmptyCategories() {
+        return !this.actor.system.category_visibility.default;
     }
 
     /** Setup untrained skill filter within getData */

@@ -23,7 +23,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
      *
      * @returns An array of item types from the template.json Item section.
      */
-    override getHandledItemTypes(): string[] {
+    override getHandledItemTypes(): Item.ConfiguredSubType[] {
         let itemTypes = super.getHandledItemTypes();
 
         return [
@@ -50,7 +50,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
      *
      * @returns An array of item types from the template.json Item section.
      */
-    override getInventoryItemTypes(): string[] {
+    override getInventoryItemTypes(): Item.ConfiguredSubType[] {
         const itemTypes = super.getInventoryItemTypes();
 
         return [
@@ -93,11 +93,10 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         await this.actor.addVehicleDriver(actor.uuid);
     }
 
-    async _onDropItem(event, item) {
+    override async _onDropItem(event, item) {
         if (item.canBeMaster) {
             return await this.actor.connectNetwork(item);
         }
-        // @ts-expect-error I swear it exists
         await super._onDropItem(event, item);
     }
 
@@ -116,13 +115,13 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         ...super.TABS,
         primary: {
             initial: 'skills',
-            labelPrefix: 'SR5.Tabs',
+            labelPrefix: 'SR5.Tabs.Actor',
             tabs: [
-                { id: 'actions', label: 'Actions', cssClass: '' },
-                { id: 'skills', label: 'Vehicle', cssClass: '' },
-                { id: 'inventory', label: 'Inventory', cssClass: '' },
-                { id: 'matrix', label: 'Matrix', cssClass: '' },
-                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'actions', label: 'SR5.Tabs.Actor.Actions', cssClass: '' },
+                { id: 'skills', label: 'SR5.Tabs.Actor.Vehicle', cssClass: '' },
+                { id: 'inventory', label: 'SR5.Tabs.Actor.Inventory', cssClass: '' },
+                { id: 'matrix', label: 'SR5.Tabs.Actor.Matrix', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
                 { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
                 { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
             ]

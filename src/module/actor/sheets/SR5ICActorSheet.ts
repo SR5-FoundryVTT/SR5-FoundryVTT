@@ -9,16 +9,6 @@ interface ICActorSheetData extends MatrixActorSheetData {
 }
 
 export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
-    /**
-     * IC actors will handle these item types specifically.
-     *
-     * All others will be collected within the gear tab.
-     *
-     * @returns An array of item types from the template.json Item section.
-     */
-    override getHandledItemTypes(): string[] {
-        return super.getHandledItemTypes();
-    }
 
     override async _prepareContext(options) {
         const data = await super._prepareContext(options);
@@ -32,21 +22,11 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         ...super.TABS,
         primary: {
             initial: 'matrix',
-            labelPrefix: 'SR5.Tabs',
             tabs: [
-                { id: 'matrix', label: 'IC', cssClass: '' }, // name the Matrix tab as IC since that's all it needs
-                { id: 'effects', label: 'Effects', cssClass: '' },
+                { id: 'matrix', label: 'SR5.Tabs.Actor.IC', cssClass: '' }, // name the Matrix tab as IC since that's all it needs
+                { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
                 { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
                 { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
-            ]
-        },
-        matrixLeft: {
-            initial: 'networkIcons',
-            labelPrefix: 'SR5.Tabs',
-            tabs: [
-                { id: 'networkIcons', label: 'Icons', cssClass: ''},
-                { id: 'markedIcons', label: 'Marked', cssClass: ''},
-
             ]
         },
     }
@@ -154,18 +134,13 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         });
     }
 
-    async _onDropItem(event: DragEvent, item: SR5Item) {
+    override async _onDropItem(event: DragEvent, item: SR5Item) {
         // Handle item types that aren't handled but are still useable.
         switch (item.type) {
             case 'host':
                 // We don't have to narrow down type here, the SR5Actor will handle this for us.
                 return this.actor.connectNetwork(item);
         }
-
-        // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
-        const handledTypes = [...this.getHandledItemTypes(), ...this.getInventoryItemTypes()];
-        if (!handledTypes.includes(item.type)) return;
-        // @ts-expect-error whyyyyyyihateit
         await super._onDropItem(event, item);
     }
 }

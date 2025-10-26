@@ -9,7 +9,7 @@
                     </a>
                 </div>
             {{/if}}
-            {{#if (isType 'sprite')}}
+            {{#if (isType actor 'sprite')}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Level"}}</label>
                     <a data-attribute-modifier-tooltip="level"
@@ -39,7 +39,7 @@
         </div>
         <div class="split-container">
             <div>
-                {{#if (isType 'ic')}}
+                {{#if (isType actor 'ic')}}
                     {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/ic-attributes.hbs' }}
                 {{else}}
                     <div class="attributes">

@@ -51,6 +51,7 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
+import ItemTypes = Actor.ItemTypes;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -812,7 +813,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     isEmerged(this: SR5Actor): boolean {
         if (this.isType('sprite')) return true;
-        if (this.isType('character') && this.system.special === 'resonance') return true;
+        if (this.isType('character', 'critter') && this.system.special === 'resonance') return true;
 
         return false;
     }
@@ -2339,5 +2340,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     hiddenItems() {
         return new Set(this.system.hidden_items);
+    }
+
+    hasItemOfType<ST extends readonly Item.ConfiguredSubType[]>(...types: ST): this is SR5Item<ST[number]> {
+        return this.items.filter(i => i.isType(...types)).length > 0;
     }
 }

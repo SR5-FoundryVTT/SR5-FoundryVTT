@@ -2,7 +2,7 @@ import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 
-export type SR5Tab = ApplicationV2.Tab & { tooltip?: string };
+export type SR5Tab = ApplicationV2.Tab & { tooltip?: string, hidden?: boolean };
 
 export const registerAppv2Helpers = () => {
 
@@ -15,6 +15,8 @@ export const registerAppv2Helpers = () => {
         nav.classList.add('sheet-tabs');
         nav.classList.add('tabs');
         nav.setAttribute('aria-roledescription', game.i18n.localize('SHEETS.FormNavLabel'));
+        // keep track of tabs that aren't hidden so we know if the tabgroup should be hidden
+        let nonHiddenTabs = 0;
         for (const tab of Object.values(tabs)) {
             const link = document.createElement('a');
             link.dataset.action = 'tab';
@@ -31,6 +33,11 @@ export const registerAppv2Helpers = () => {
                 icon.className = `${tab.icon} inert`;
                 link.appendChild(icon);
             }
+            if (tab.hidden) {
+                link.className += ' hidden';
+            } else {
+                nonHiddenTabs += 1;
+            }
             if (tab.label) {
                 const text = document.createElement('span');
                 text.innerText = game.i18n.localize(tab.label);
@@ -38,7 +45,7 @@ export const registerAppv2Helpers = () => {
             }
             nav.appendChild(link);
         }
-        if (Object.values(tabs).length <= 1) {
+        if (nonHiddenTabs <= 1) {
             nav.classList.add('hidden');
         }
         return new Handlebars.SafeString(nav.outerHTML);

@@ -133,6 +133,17 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             return context;
         }
 
+        protected _prepareTabs(group: string) {
+            // @ts-expect-error i will figure this out one day
+            const parts = super._prepareTabs(group) as Record<string, any>;
+            for (const part of Object.values(parts)) {
+                if (part.label) {
+                    part.label = game.i18n.localize(part.label);
+                }
+            }
+            return parts;
+        }
+
         override async _preparePartContext(partId, context, options) {
             const partContext = await super._preparePartContext(partId, context, options);
 
