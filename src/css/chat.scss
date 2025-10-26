@@ -23,7 +23,6 @@
         .card-header {
             padding: 0.25em 0;
             border-bottom: $groove;
-            
 
             img {
                 flex: 0 0;
@@ -82,7 +81,7 @@
             .card-description-content {
                 border-bottom: $groove;
             }
-        }        
+        }
 
         .damage-line {
             margin-top: 0.25em;
@@ -303,7 +302,7 @@
                 text-align: center;
                 width: 24px;
                 line-height: 24px;
-                
+
                 // Consistent margin on top, if missing result boxes will clip.
                 margin-top: 5px;
 
