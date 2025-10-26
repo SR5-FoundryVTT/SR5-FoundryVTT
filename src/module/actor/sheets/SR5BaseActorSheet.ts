@@ -360,7 +360,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             // if we should hide empty tabs
             if (this.isPlayMode && this.hideEmptyCategories()) {
                 // look for actor items that go in the inventory tab and delete the tab/part if none exist
-                if (this.actor.hasItemOfType(...this.getInventoryItemTypes()) && parts.inventory) {
+                if (!this.actor.hasItemOfType(...this.getInventoryItemTypes()) && parts.inventory) {
                     parts.inventory.hidden = true;
                 }
                 if (parts.effects && !this.hasEffects) {
