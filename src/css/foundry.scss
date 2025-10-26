@@ -300,8 +300,8 @@ body:not(.theme-dark) {
             display: block;
         }
 
-        .toggle-manual-override .fa-chevron-left {
-            transform: rotate(-90deg);
+        .toggle-manual-override .fa-chevron-up {
+            transform: rotate(-180deg);
         }
     }
 

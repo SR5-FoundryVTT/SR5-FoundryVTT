@@ -133,11 +133,6 @@
             color: #fff;
         }
 
-        .fa-chevron-up {
-            transition: transform 0.2s ease-in-out;
-            transform: rotate(0deg);
-        }
-
         &.disabled {
             color: #555;
             cursor: not-allowed;
