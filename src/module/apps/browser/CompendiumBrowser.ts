@@ -1,5 +1,5 @@
-import { FLAGS, SYSTEM_NAME } from "@/module/constants";
 import { LinksHelpers } from "@/module/utils/links";
+import { FLAGS, SYSTEM_NAME } from "@/module/constants";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -7,15 +7,16 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
  * Encapsulates all types and interfaces used by the CompendiumBrowser application.
  */
 export namespace CompendiumBrowserTypes {
+    export type DocType = "Actor" | "Item";
     export type Tabs = "Actor" | "Item" | "Settings";
-    export type Pack = CompendiumCollection<"Actor" | "Item">;
+    export type Pack = CompendiumCollection<DocType>;
     export type FilterEntry = { value: string; id: string; selected: boolean };
 
     export type PackNode = {
         id: string;
         name: string;
         selected: boolean;
-        type: "Actor" | "Item";
+        type: DocType;
     };
 
     export type FolderNode = {
@@ -39,21 +40,22 @@ export namespace CompendiumBrowserTypes {
         parts: ("tabs" | "filters" | "results" | "settings")[];
     }
 
-    export interface SearchOptions {
-        /** The document type to search for, "Actor" or "Item". */
-        docType: "Actor" | "Item";
+    export interface SearchFilters<DocType extends CompendiumCollection.DocumentName> {
         /** An optional string to filter by name. */
-        searchQuery?: string;
+        queryName?: string;
         /** An optional array of document subtypes (e.g., ["weapon", "spell"]). */
-        typeFilters?: string[];
+        types?: (typeof foundry.documents)[DocType]["TYPES"][];
         /** An optional array of pack collections (e.g., ["shadowrun5e.core-items"]) to explicitly include. */
-        packFilters?: string[];
+        packs?: string[];
     }
 
     /**
-     * The enriched index entry returned by the search.
+     * Represents a single search result entry, enriched with the source pack name.
      */
-    export type SearchResult = CompendiumCollection.IndexEntry<"Item" | "Actor"> & { sourcePack: string };
+    export type SearchResult<DocType extends CompendiumCollection.DocumentName> = 
+        CompendiumCollection.IndexEntry<DocType> & {
+            sourcePack: string;
+        };
 }
 
 // =========================================================================
@@ -124,35 +126,61 @@ export class CompendiumBrowser extends BaseClass {
     /**
      * Searches and filters compendium packs based on the provided criteria.
      *
-     * @param options The search parameters.
+     * @param docType The type of document to search for.
+     * @param filter The search parameters.
      * @returns A promise that resolves to an array of enriched compendium index entries.
      */
-    public static async search(
-        options: CompendiumBrowserTypes.SearchOptions,
-    ): Promise<CompendiumBrowserTypes.SearchResult[]> {
-        const { docType, searchQuery, typeFilters, packFilters } = options;
+    public static async search<DocType extends CompendiumCollection.DocumentName>(
+        docType: DocType,
+        filter: CompendiumBrowserTypes.SearchFilters<DocType>,
+    ): Promise<CompendiumBrowserTypes.SearchResult<DocType>[]> {
+        const { queryName, types, packs } = filter;
 
         const activePacks = game.packs.filter(
-            (p): p is CompendiumBrowserTypes.Pack =>
+            (p): p is CompendiumCollection<DocType> =>
                 p.visible && p.metadata.type === docType &&
-                (!packFilters?.length || packFilters.includes(p.collection)),
+                (!packs?.length || packs.includes(p.collection)),
         );
 
         const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
         let entries = indexes.flatMap((index, idx) => {
-            const packTitle = activePacks[idx].title;
-            return [...index.values()].map((entry) => ({ ...entry, sourcePack: packTitle }));
+            const packCollection = activePacks[idx].collection;
+            return [...index.values()].map((entry) => ({ ...entry, sourcePack: packCollection }));
         });
 
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            entries = entries.filter((i) => i.name?.toLowerCase().includes(query));
+        if (queryName) {
+            const query = queryName.toLowerCase();
+            entries = entries.filter((i) => !("name" in i) || i.name?.toLowerCase().includes(query));
         }
 
-        if (typeFilters && typeFilters.length > 0)
-            entries = entries.filter((e) => typeFilters.includes(e.type as string));
+        if (types && types.length > 0)
+            entries = entries.filter((e) => !("type" in e && typeof e.type === "string") || types.includes(e.type as any));
 
         return entries;
+    }
+
+    /**
+	 * Returns an object containing all available, filterable search options.
+	 * This includes document types, sub-types, and available packs.
+	 *
+	 * @returns An object with structured search options.
+	 */
+    public static getSearchFilters(): {
+        [K in CompendiumCollection.DocumentName]?: {
+            types: (typeof foundry.documents)[K]["TYPES"][]; packs: string[]
+        };
+    } {
+        const groupedPacks = Object.groupBy(game.packs, pack => pack.metadata.type);
+        const searchOptions: Record<string, { packs: string[]; types: string[] }> = {};
+
+        for (const [type, packs] of Object.entries(groupedPacks)) {
+            searchOptions[type] = {
+                packs: packs.map(pack => pack.collection),
+                types: foundry.documents[type].TYPES as string[],
+            };
+        }
+
+        return searchOptions;
     }
 
     // =========================================================================
@@ -168,7 +196,7 @@ export class CompendiumBrowser extends BaseClass {
     private readonly scrollState = {
         throttle: false,
         height: 50, // Estimated height of a single result row
-        entries: [] as CompendiumBrowserTypes.SearchResult[],
+        entries: [] as CompendiumBrowserTypes.SearchResult<CompendiumBrowserTypes.DocType>[],
     };
 
     // =========================================================================
@@ -345,14 +373,13 @@ export class CompendiumBrowser extends BaseClass {
     }
 
     /** Handles a click on a result row to open the corresponding document sheet. */
-    private static async _openDoc(event: MouseEvent, target: HTMLElement) {
+    private static _openDoc(event: MouseEvent, target: HTMLElement) {
         const el = target.closest<HTMLElement>("[data-uuid]");
         const uuid = el?.dataset.uuid;
         if (!uuid) return;
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        const doc = (await fromUuid(uuid)) as Actor | Item | null;
-        await doc?.sheet?.render(true);
+        void fromUuid(uuid).then(doc => { void (doc as Actor | Item | null)?.sheet?.render(true); });
     }
 
     /** Handles a click on the source element within a result row to open the sourcebook reference. */
@@ -379,15 +406,18 @@ export class CompendiumBrowser extends BaseClass {
         const selectedTypes = this.allFilters.filter((f) => f.selected).map((f) => f.id);
         const selectedPacks = game.packs.filter(p => !this.packBlackList.includes(p.collection)).map(p => p.collection);
 
-        let entries = await CompendiumBrowser.search({
-            docType: this.activeTab as 'Actor' | 'Item',
-            searchQuery: this._searchQuery,
-            typeFilters: selectedTypes.length ? selectedTypes : undefined,
-            packFilters: selectedPacks.length ? selectedPacks : undefined,
-        });
+        let entries = await CompendiumBrowser.search(
+            this.activeTab as 'Actor' | 'Item',
+            {
+                queryName: this._searchQuery,
+                types: selectedTypes.length ? selectedTypes as any[] : undefined,
+                packs: selectedPacks.length ? selectedPacks : undefined,
+            }
+        );
 
         entries = entries.map(entry => ({
-            ...entry, type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`),
+            ...entry, sourcePack: game.packs.get(entry.sourcePack)!.title,
+            type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`),
         })).sort((a, b) => a.name!.localeCompare(b.name!, game.i18n.lang));
 
         this.scrollState.entries = entries;
