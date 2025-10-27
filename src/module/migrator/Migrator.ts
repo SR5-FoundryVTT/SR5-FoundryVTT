@@ -265,7 +265,7 @@ export class Migrator {
         for (const scene of game.scenes) {
             this.updateProgressbar();
             await TokenDocument.implementation.updateDocuments(
-                scene.tokens.filter(t => !t.actorLink).map(t => t.toObject()),
+                scene.tokens.map(t => t.toObject()),
                 { diff: false, recursive: false, parent: scene }
             );
         }
