@@ -3,8 +3,8 @@ import { VersionMigration } from "../VersionMigration";
 /**
  * Update attribute limits to their correct values.
  */
-export class Version0_31_0 extends VersionMigration {
-    readonly TargetVersion = "0.31.0";
+export class Version0_32_0 extends VersionMigration {
+    readonly TargetVersion = "0.32.0";
 
     override migrateActor(actor: any): void {
         actor.system.initiative.blitz = actor.system.initiative.edge;

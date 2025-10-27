@@ -8,7 +8,7 @@ export class InitiativePrep {
      *
      */
     static prepareCurrentInitiative(system: SR5Actor['system']) {
-        const { initiative } = system;
+        const { initiative, attributes } = system;
 
         if (initiative.perception === 'matrix') initiative.current = initiative.matrix;
         else if (initiative.perception === 'astral') initiative.current = initiative.astral;
@@ -20,9 +20,14 @@ export class InitiativePrep {
         // Recalculate selected initiative to be sure.
         initiative.current.base.value = Helpers.calcTotal(initiative.current.base);
 
-        // Apply edge ini rules.
+        // Disable blitz if edge is depleted.
+        if (attributes.edge.uses >= attributes.edge.value)
+            initiative.blitz = false;
+
+        // Apply blitz ini rules.
         initiative.current.dice.value = Helpers.calcTotal(initiative.current.dice, {min: 0, max: 5});
         if (initiative.blitz) initiative.current.dice.value = 5;
+
         initiative.current.dice.value = Math.min(5, initiative.current.dice.value); // maximum of 5d6 for initiative
         initiative.current.dice.text = `${initiative.current.dice.value}d6`;        
     }

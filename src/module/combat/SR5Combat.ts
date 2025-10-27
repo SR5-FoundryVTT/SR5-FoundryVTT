@@ -223,11 +223,11 @@ export class SR5Combat extends Combat<"base"> {
         for (const id of Array.isArray(ids) ? ids : [ids]) {
             const actor = this.combatants.get(id)?.actor;
             if (actor?.system.initiative.blitz) {
-                const edgeValue = actor.system.attributes.edge.value;
+                const edgeValue = actor.system.attributes.edge.uses;
                 await actor.update({
                     system: {
                         initiative: { blitz: false },
-                        attributes: { edge: { value: edgeValue + 1 } } 
+                        attributes: { edge: { uses: edgeValue + 1 } }
                     }
                 });
             }
