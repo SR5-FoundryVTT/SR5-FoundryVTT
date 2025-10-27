@@ -66,9 +66,36 @@ export class SR5Combat extends Combat<"base"> {
 
     /**
      * Helper method to get a combatant for a specific actor.
+     * If multiple combatants exist, tries to resolve by controlled tokens.
      */
     getActorCombatant(actor: SR5Actor): SR5Combatant | null {
-        return this.getCombatantsByActor(actor)[0] ?? null;
+        const combatants = this.getCombatantsByActor(actor);
+
+        // If only one combatant, return it directly
+        if (combatants.length === 1) {
+            return combatants[0];
+        }
+
+        // If multiple combatants, try to resolve by controlled tokens
+        if (combatants.length > 1) {
+            const activeTokens = actor.getActiveTokens();
+            const matchingCombatants = (canvas.tokens?.controlled ?? [])
+                .filter(token => activeTokens.includes(token))
+                .map(token => token.combatant)
+                .filter(c => c?.id != null && c.id === this.id);
+
+            if (matchingCombatants.length === 1) {
+                return matchingCombatants[0] as SR5Combatant;
+            }
+
+            ui.notifications.warn(
+                `SR5 | Actor '${actor.name}' has multiple combatants in Combat '${this.id}'. Please select one token.`
+            );
+            throw new Error('Multiple combatants found for actor.');
+        }
+
+        // No combatant found
+        return null;
     }
 
     /**

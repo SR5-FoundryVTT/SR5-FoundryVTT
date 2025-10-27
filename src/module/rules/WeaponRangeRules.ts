@@ -198,9 +198,12 @@ export class WeaponRangeTestBehavior {
     private static async markActionPhaseAsAttackUsed(test: WeaponRangeTest) {
         if (!test.actor! || !test.actor.combatActive) return;
 
-        const combatant = test.actor.combatant;
-        if (!combatant) return;
+        if (!test.actor.combatActive) return;
 
-        await combatant.update({ system: { attackedLastTurn: true } });
+        // Mark all combatants of the actor as having attacked this turn
+        const combatants = test.actor.combatants;
+        for (const combatant of combatants) {
+            await combatant.update({ system: { attackedLastTurn: true } });
+        }
     }
 }
