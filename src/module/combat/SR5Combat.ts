@@ -217,6 +217,25 @@ export class SR5Combat extends Combat<"base"> {
         return a.system.coinFlip - b.system.coinFlip;
     }
 
+    override async rollInitiative(ids: string | string[], options?: Combat.InitiativeOptions) {
+        await super.rollInitiative(ids, options);
+
+        for (const id of Array.isArray(ids) ? ids : [ids]) {
+            const actor = this.combatants.get(id)?.actor;
+            if (actor?.system.initiative.blitz) {
+                const edgeValue = actor.system.attributes.edge.value;
+                await actor.update({
+                    system: {
+                        initiative: { blitz: false },
+                        attributes: { edge: { value: edgeValue + 1 } } 
+                    }
+                });
+            }
+        }
+
+        return this;
+    }
+
     /**
      * Shadowrun does not clear movement history on turn start.
      */

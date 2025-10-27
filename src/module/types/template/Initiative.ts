@@ -17,9 +17,9 @@ export const Initiative = <
 
     const fields = {
         current: initiativeField(),
-        edge: new BooleanField(),
+        blitz: new BooleanField(),
         perception: new StringField({ required: true, initial: types[0], choices: types }),
-    }
+    } as const;
 
     return {
         ...fields,
