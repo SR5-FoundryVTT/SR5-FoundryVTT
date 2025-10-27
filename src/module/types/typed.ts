@@ -7,17 +7,18 @@
  * method signatures (e.g., for `Object.keys`) are conservatively typed and
  * don't fully capture the relationship between an object's keys and values.
  */
-export const Typed = {
+export class Typed {
     /**
      * A strongly typed version of `Object.keys`.
      * @param obj The object to get the keys from.
      * @returns An array of the object's own enumerable property names, correctly typed as strings.
      * For arrays, this will be an array of string-formatted indices (e.g., `['0', '1']`).
      */
-    keys: <T extends object>(obj: T) =>
-        Object.keys(obj) as T extends readonly any[]
+    static keys<T extends object>(obj: T) {
+        return Object.keys(obj) as T extends readonly any[]
             ? `${number}`[]
-            : (`${Exclude<keyof T, symbol>}`)[],
+            : (`${Exclude<keyof T, symbol>}`)[];
+    }
 
     /**
      * A strongly typed version of `Object.entries`.
@@ -27,17 +28,20 @@ export const Typed = {
      * @returns An array of the object's own enumerable [key, value] pairs.
      * For arrays, keys are string-formatted indices.
      */
-    entries: <T extends object>(obj: T) =>
-        Object.entries(obj) as T extends readonly (infer E)[]
+    static entries<T extends object>(obj: T) {
+        return Object.entries(obj) as T extends readonly (infer E)[]
             ? [`${number}`, E][]
-            : { [K in Exclude<keyof T, symbol>]: [`${K}`, T[K]] }[Exclude<keyof T, symbol>][],
+            : { [K in Exclude<keyof T, symbol>]: [`${K}`, Required<T>[K]] }[Exclude<keyof T, symbol>][];
+    }
 
     /**
      * A strongly typed version of `Object.values`.
      * @param obj The object to get the values from.
      * @returns An array of the object's own enumerable property values.
      */
-    values: <T extends object>(obj: T) => Object.values(obj) as T[keyof T][],
+    static values<T extends object>(obj: T) {
+        return Object.values(obj) as T[keyof T][];
+    }
 
     /**
      * A strongly typed version of `Object.fromEntries`.
@@ -45,10 +49,11 @@ export const Typed = {
      * @param entries An iterable of key-value pairs.
      * @returns A new object whose properties are given by the entries.
      */
-    fromEntries: <const E extends readonly (readonly [PropertyKey, unknown])[]>(
+    static fromEntries<const E extends readonly (readonly [PropertyKey, unknown])[]>(
         entries: E
-    ) =>
-        Object.fromEntries(entries) as {
+    ) {
+        return Object.fromEntries(entries) as {
             [K in E[number][0]]: Extract<E[number], readonly [K, unknown]>[1];
-        },
-} as const;
+        };
+    }
+}

@@ -1,4 +1,3 @@
-import { Typed } from '../typed';
 import { SR5 } from '@/module/config';
 import { TagifyField } from '@/module/types/fields/TagifyField';
 
