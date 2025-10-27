@@ -124,7 +124,7 @@ import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
-import { CompendiumBrowser } from './apps/browser/CompendiumBrowser';
+import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
