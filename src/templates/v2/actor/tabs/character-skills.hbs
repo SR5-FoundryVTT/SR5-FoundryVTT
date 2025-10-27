@@ -5,9 +5,11 @@
             <div>
                 {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/active-skills.hbs' rootId=rootId }}
             </div>
-            <div>
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/language-and-knowledge-skills.hbs' rootId=rootId }}
-            </div>
+            {{#if (or @root.isEditMode hasLanguageKnowledgeSkills)}}
+                <div>
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/language-and-knowledge-skills.hbs' rootId=rootId }}
+                </div>
+            {{/if}}
         </div>
     </div>
 </section>

@@ -114,9 +114,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     private readonly expandedSkills = new Set<string>();
 
-    // flag set while preparing effects to know if we have any effects
-    private hasEffects = false;
-
     constructor(options) {
         super(options);
 
@@ -289,8 +286,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
 
-        this.hasEffects = data.effects.length > 0 || data.itemEffects.length > 0;
-
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
@@ -362,9 +357,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 // look for actor items that go in the inventory tab and delete the tab/part if none exist
                 if (!this.actor.hasItemOfType(...this.getInventoryItemTypes()) && parts.inventory) {
                     parts.inventory.hidden = true;
-                }
-                if (parts.effects && !this.hasEffects) {
-                    parts.effects.hidden = true;
                 }
             }
         }
