@@ -95,6 +95,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         actions: {
             addItem: SR5ItemSheet.#addItem,
             equipItem: SR5ItemSheet.#equipItem,
+            editItem: SR5ItemSheet.#editItem,
+            deleteItem: SR5ItemSheet.#deleteItem,
             addItemQty: SR5ItemSheet.#addItemQty,
             removeItemQty: SR5ItemSheet.#removeItemQty,
 
@@ -124,6 +126,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             removeOneQty: SR5ItemSheet.#removeOneQty,
 
             addEffect: SR5ItemSheet.#addEffect,
+            editEffect: SR5ItemSheet.#editEffect,
             toggleEffect: SR5ItemSheet.#toggleEffect,
             deleteEffect: SR5ItemSheet.#deleteEffect,
 
@@ -625,6 +628,28 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
+    static async #editItem(this: SR5ItemSheet, event) {
+        event.preventDefault();
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (item) {
+            await item.sheet?.render(true);
+        }
+    }
+
+    static async #deleteItem(this: SR5ItemSheet, event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (id && item) {
+            await this.item.deleteOwnedItem(id);
+        }
+    }
+
     static async #addItem(this: SR5ItemSheet, event) {
         event.preventDefault();
         const type = SheetFlow.closestAction(event.target)?.dataset.itemType;
@@ -877,11 +902,32 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.createEmbeddedDocuments('ActiveEffect', effect);
     }
 
+    static async #editEffect(this: SR5ItemSheet, event) {
+        const effectId = SheetFlow.closestEffectId(event.target);
+        const effect = this.item.effects.get(effectId);
+        if (effect && effect instanceof SR5ActiveEffect) {
+            await effect.sheet?.render(true);
+        } else {
+            const uuid = SheetFlow.closestUuid(event.target);
+            const doc = SheetFlow.fromUuidSync(uuid);
+            if (doc && doc instanceof SR5ActiveEffect) {
+                await doc.sheet?.render(true);
+            }
+        }
+
+    }
+
     static async #toggleEffect(this: SR5ItemSheet, event) {
         const effectId = SheetFlow.closestEffectId(event.target);
         const effect = this.item.effects.get(effectId);
         if (effect && effect instanceof SR5ActiveEffect) {
             await effect.update({ disabled: !effect.disabled })
+        } else {
+            const uuid = SheetFlow.closestUuid(event.target);
+            const doc = SheetFlow.fromUuidSync(uuid);
+            if (doc && doc instanceof SR5ActiveEffect) {
+                await doc.update({ disabled: !doc.disabled })
+            }
         }
     }
 
