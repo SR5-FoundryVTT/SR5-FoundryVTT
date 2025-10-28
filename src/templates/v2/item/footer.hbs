@@ -371,6 +371,42 @@
                 {{else if system.group}}
                     <label>{{systemFields.group.label}}</label>
                 {{/if}}
+
+            {{else if (isType item 'complex_form')}}
+
+                {{#if @root.isEditMode}}
+                    <div class="basic-row">
+                        <label data-tooltip="{{systemFields.target.hint}}">{{systemFields.target.label}}</label>
+                        <span>
+                            {{formInput systemFields.target value=source.system.target localize=true
+                                        classes="short" rootId=@root.rootId}}
+                        </span>
+                    </div>
+                {{else}}
+                    <label data-tooltip="{{systemFields.target.hint}}">{{systemFields.target.label}}&nbsp;{{localizeOb system.target @root.config.matrixTargets}}</label>
+                {{/if}}
+                {{#if @root.isEditMode}}
+                    <div class="basic-row">
+                        <label data-tooltip="{{systemFields.duration.hint}}">{{systemFields.duration.label}}</label>
+                        <span>
+                            {{formInput systemFields.duration value=source.system.duration localize=true
+                                        classes="short" rootId=@root.rootId}}
+                        </span>
+                    </div>
+                {{else}}
+                    <label data-tooltip="{{systemFields.duration.hint}}">{{systemFields.duration.label}}&nbsp;{{localizeOb system.duration @root.config.matrixTargets}}</label>
+                {{/if}}
+                {{#if @root.isEditMode}}
+                    <div class="basic-row">
+                        <label data-tooltip="{{systemFields.fade.hint}}">{{systemFields.fade.label}}</label>
+                        <span>
+                            {{formInput systemFields.fade value=source.system.fade classes="short skinny" rootId=@root.rootId}}
+                        </span>
+                    </div>
+                {{else}}
+                    <label data-tooltip="{{systemFields.fade.hint}}">{{systemFields.fade.label}}{{numberFormat system.fade sign=true}}</label>
+                {{/if}}
+
             {{else if (eq item.type 'critter_power')}}
 
                 {{#if @root.isEditMode}}

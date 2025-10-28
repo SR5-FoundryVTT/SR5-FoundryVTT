@@ -756,7 +756,27 @@
             "FixedSprite": "Prep. Sprite",
             "SpriteType": "Sprite Type"
         },
-        "ComplexForm": "Complex Form",
+        "ComplexForm": {
+            "Durations": {
+                "Immediate": "Immediate",
+                "Permanent": "Permanent",
+                "Sustained": "Sustained"
+            },
+            "FIELDS": {
+                "target": {
+                    "label": "Target",
+                    "hint": "Valid Target types for the Complex Form"
+                },
+                "duration": {
+                    "label": "Duration",
+                    "hint": "Immediate (it happens instantly with no lasting effects), Sustained (you can sustain it), or Permanent (if you sustain it for its Level in Combat Turns, its effects remain after you stop sustaining it)."
+                },
+                "fade": {
+                    "label": "Fade",
+                    "hint": "The Fading Value is added to the Level chosen when threading to determine the amount of damage to be resisted"
+                }
+            }
+        },
         "ComplexForms": "Complex Forms",
         "Conceal": "Conceal",
         "ConditionMonitor": "Con. Mon.",

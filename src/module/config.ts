@@ -1001,6 +1001,14 @@ export const SR5 = {
         },
     },
 
+    complexForm: {
+        durations: {
+            immediate: 'SR5.ComplexForm.Durations.Immediate',
+            sustained: 'SR5.ComplexForm.Durations.Sustained',
+            permanent: 'SR5.ComplexForm.Durations.Permanent',
+        }
+    },
+
     spriteTypes: {
         courier: 'SR5.Sprite.Types.Courier',
         crack: 'SR5.Sprite.Types.Crack',
