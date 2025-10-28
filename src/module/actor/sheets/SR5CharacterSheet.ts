@@ -158,6 +158,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
                     parts.bio.hidden = true;
                 }
             }
+            // hide critter powers if the character is not set as a critter and doesn't have critter powers
             if (parts.critterPowers
                 && ((this.isPlayMode && !this._hasCritterPowers())
                     || (this.isEditMode && !(this.actor.isType('critter') || this.actor.system.is_critter)))) {

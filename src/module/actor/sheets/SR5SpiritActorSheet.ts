@@ -36,6 +36,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
                 { id: 'skills', label: 'SR5.Tabs.Actor.Spirit', cssClass: '' },
                 { id: 'critterPowers', label: 'SR5.Tabs.Actor.CritterPowers', cssClass: '' },
                 { id: 'magic', label: 'SR5.Tabs.Actor.Magic', cssClass: '' },
+                { id: 'bio', label: 'SR5.Tabs.Actor.Bio', cssClass: '' },
                 { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
                 { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
                 { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
@@ -51,7 +52,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
                 ...SheetFlow.templateActorSystemParts('active-skills', 'attributes'),
                 ...SheetFlow.templateListItem('skill')
             ],
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
         },
         magic: {
             template: SheetFlow.templateBase('actor/tabs/magic'),
@@ -64,7 +65,12 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         critterPowers: {
             template: SheetFlow.templateBase('actor/tabs/critter-powers'),
             templates: SheetFlow.templateListItem('critter_power'),
-            scrollable: ['scrollable']
+            scrollable: ['.scrollable']
+        },
+        bio: {
+            template: SheetFlow.templateBase('actor/tabs/bio'),
+            templates: SheetFlow.templateListItem('metamagic', 'echo', 'quality'),
+            scrollable: ['#metamagics-scroll-list', '#quality-scroll-list', '#echoes-scroll-list'],
         },
     }
 
@@ -90,11 +96,20 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         const parts = super._prepareTabs(group);
 
         if (group === 'primary') {
-            if (this.isPlayMode && this.hideEmptyCategories() && !this._hasCritterPowers() && parts.critterPowers) {
-                parts.critterPowers.cssClass += " hidden";
-            }
-            if (this.isPlayMode && this.hideEmptyCategories() && !this._hasMagicItems() && parts.magic) {
-                parts.magic.cssClass += " hidden";
+
+            if (this.isPlayMode && this.hideEmptyCategories()) {
+                if (parts.social && !this.actor.hasItemOfType('sin', 'contact', 'lifestyle')) {
+                    parts.social.hidden = true;
+                }
+                if (parts.bio && !this.actor.hasItemOfType('quality', 'metamagic', 'echo')) {
+                    parts.bio.hidden = true;
+                }
+                if (parts.critterPowers && !this._hasCritterPowers()) {
+                    parts.critterPowers.cssClass += " hidden";
+                }
+                if (parts.magic && !this._hasMagicItems()) {
+                    parts.magic.cssClass += " hidden";
+                }
             }
         }
 
