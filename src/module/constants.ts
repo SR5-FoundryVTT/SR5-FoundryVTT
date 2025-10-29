@@ -263,10 +263,10 @@ export const SR = {
 } as const;
 
 export const SRStatus = [
-    {
+        {
         id: 'sr5run',
         name: 'SR5.StatusEffects.Running',
-        icon: 'fa-solid fa-person-running',
+        img: 'systems/shadowrun5e/dist/icons/status-effects/running.svg',
         system: { applyTo: 'test_all' },
         changes: [
             {key: "data.pool", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-2"},
@@ -275,10 +275,10 @@ export const SRStatus = [
     {
         id: 'sr5sprint',
         name: 'SR5.StatusEffects.Sprinting',
-        icon: 'fa-solid fa-person-running-fast',
+        img: 'systems/shadowrun5e/dist/icons/status-effects/sprinting.svg',
         system: { applyTo: 'test_all' },
         changes: [
-            {key: "data.pool", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-4"},
+            {key: "data.poll", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-2"},
         ],
     },
 ] as const satisfies CONFIG.StatusEffect[];
