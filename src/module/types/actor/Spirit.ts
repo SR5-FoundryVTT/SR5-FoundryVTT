@@ -15,7 +15,7 @@ const SpiritData = () => ({
     // === Core Identity ===
     ...CommonData(),
     spiritType: new StringField({ required: true, initial: 'air', choices: SR5.spiritTypes }),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    full_defense_attribute: new StringField({ required: true, initial: "willpower", choices: SR5.attributes }),
     special: new StringField({ required: true, initial: "magic", choices: ["magic"], readonly: true }),
     is_npc: new BooleanField({ initial: true }),
     npc: new SchemaField({ is_grunt: new BooleanField() }),
@@ -27,7 +27,7 @@ const SpiritData = () => ({
     }),
     limits: new SchemaField({ ...Limits(), ...AwakendLimits() }),
     values: new SchemaField(PhysicalCombatValues()),
-    force: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0, step: 1 }),
+    force: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 
     // === Magic ===
     magic: new SchemaField(MagicData()),
