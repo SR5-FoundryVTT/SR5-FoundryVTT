@@ -105,7 +105,7 @@
             <div class="basic-row">
                 <label>{{localize "SR5.Spirit.Force"}}</label>
                 {{#if @root.isEditMode}}
-                    {{formInput systemFields.force value=system.force classes="short skinny" rootId=rootId}}
+                    {{formInput systemFields.force value=source.system.force classes="short skinny" rootId=rootId}}
                 {{else}}
                     <label>{{#if isLimited}}?{{else}}{{system.force}}{{/if}}</label>
                 {{/if}}
@@ -113,7 +113,7 @@
             {{#if @root.isEditMode}}
                 <label>
                     {{localize "SR5.Spirit.Bound"}}
-                    <span>{{formInput systemFields.bound value=system.bound rootId=rootId}}</span>
+                    <span>{{formInput systemFields.bound value=source.system.bound rootId=rootId}}</span>
                 </label>
             {{else if system.bound}}
                 <label>
@@ -133,7 +133,7 @@
             <div class="basic-row">
                 <label>{{localize "SR5.Sprite.Level"}}</label>
                 {{#if @root.isEditMode}}
-                    {{formInput systemFields.level value=system.level classes="short skinny" rootId=rootId}}
+                    {{formInput systemFields.level value=source.system.level classes="short skinny" rootId=rootId}}
                 {{else}}
                     <label>{{#if isLimited}}?{{else}}{{system.level}}{{/if}}</label>
                 {{/if}}
@@ -142,7 +142,7 @@
                 <label>
                     {{localize "SR5.Sprite.Registered"}}
                     <span>
-                        {{formInput systemFields.registered value=system.registered rootId=rootId}}
+                        {{formInput systemFields.registered value=source.system.registered rootId=rootId}}
                     </span>
                 </label>
             {{else if system.registered}}
@@ -151,7 +151,7 @@
         {{else if (eq actor.type 'ic')}}
             {{#if @root.isEditMode}}
                 <span>
-                    {{formInput systemFields.icType value=system.icType rootId=rootId
+                    {{formInput systemFields.icType value=source.system.icType rootId=rootId
                                 localize=true classes="short" disabled=network}}
                 </span>
             {{else}}
@@ -159,7 +159,7 @@
             {{/if}}
             <label style="text-wrap: nowrap">{{localize "SR5.Rtg"}}
                 {{#if @root.isEditMode}}
-                    {{formInput systemFields.host.fields.rating value=system.host.rating
+                    {{formInput systemFields.host.fields.rating value=source.system.host.rating
                                 classes="short skinny" rootId=rootId disabled=network}}
                 {{else if isLimited}}
                     ?

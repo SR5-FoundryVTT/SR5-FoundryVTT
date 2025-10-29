@@ -172,7 +172,7 @@
                 {{#if (isType item 'critter_power' 'sprite_power')}}
                     <label data-tooltip="{{systemFields.optional.hint}}">{{systemFields.optional.label}}</label>
                     <span>
-                        {{formInput systemFields.optional value=system.optional localize=true
+                        {{formInput systemFields.optional value=source.system.optional localize=true
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </span>
                 {{/if}}

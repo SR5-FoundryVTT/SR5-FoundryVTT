@@ -67,7 +67,7 @@
                             </label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.attributes.fields.edge.fields.base value=system.attributes.edge.base
+                            {{formInput systemFields.attributes.fields.edge.fields.base value=source.system.attributes.edge.base
                                         rootId=rootId class="short"}}
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                             <label style="text-wrap: nowrap;">{{localize "SR5.Vehicle.ControlMode"}}</label>
                         </div>
                         <div class="list-item-start">
-                            {{formInput systemFields.controlMode value=system.controlMode
+                            {{formInput systemFields.controlMode value=source.system.controlMode
                                         classes="short sr5-select" localize=true }}
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                         <div class="list-item-col qty-input-col hover-show-button-container"
                              data-tooltip="{{#if isSpirit}}SR5.Spirit.Services{{else}}SR5.Sprite.Services{{/if}}">
                             {{#if @root.isEditMode}}
-                                {{formInput systemFields.services value=system.services rootId=rootId class="short"}}
+                                {{formInput systemFields.services value=source.system.services rootId=rootId class="short"}}
                             {{else}}
                                 <a class="hover-show-button"
                                    data-action="removeOneService"

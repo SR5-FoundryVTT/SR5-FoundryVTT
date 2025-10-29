@@ -26,7 +26,7 @@
     {{#unless isVehicle}}
         <label>/</label>
         {{#if @root.isEditMode}}
-            {{formInput systemFields.movement.fields.sprint value=system.movement.sprint classes="short skinny" rootId=rootId}}
+            {{formInput systemFields.movement.fields.sprint value=source.system.movement.sprint classes="short skinny" rootId=rootId}}
         {{else}}
             <label>
                 <span style="white-space: nowrap" data-tooltip="SR5.SprintingBonus">
