@@ -52,21 +52,6 @@ export class SR5CombatTracker extends foundry.applications.sidebar.tabs.CombatTr
             this.addInitiativeIcon(combatantLi, combatant);
             this.addSeizeInitiativeIcon(combatantLi, combatant);
         });
-
-        $(html).on('click', '[data-action="toggleSeize"]', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const toggle = $(event.currentTarget);
-            const combatantLi = toggle.closest(".combatant");
-            const combatantId = combatantLi.data("combatant-id");
-
-            const combatant = app.viewed?.combatants.get(combatantId);
-            if (!combatant) return;
-
-            const currentSeize = combatant.system.seize;
-            void combatant.update({ system: { seize: !currentSeize } });
-        });
     }
 
     private static addInitiativeIcon(
@@ -97,7 +82,6 @@ export class SR5CombatTracker extends foundry.applications.sidebar.tabs.CombatTr
         
         initDiv.prepend(`
             <div class="combatant-seize" 
-                 data-action="toggleSeize" 
                  title="Toggle Seized Initiative">
                 <i class="fa-solid fa-angles-up"></i>
             </div>
