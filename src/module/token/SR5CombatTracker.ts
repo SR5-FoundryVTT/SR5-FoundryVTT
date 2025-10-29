@@ -2,14 +2,10 @@ import CombatTracker = foundry.applications.sidebar.tabs.CombatTracker;
 
 export class SR5CombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
 
-    override _configureRenderOptions(options: CombatTracker.RenderOptions): void {
-        super._configureRenderOptions(options);
-    }
-
     protected override _getEntryContextOptions() {
         const entryOptions = super._getEntryContextOptions();
 
-        entryOptions.splice(2, 0, {
+        entryOptions.splice(3, 0, {
             name: 'Seize Initiative',
             icon: '<i class="fa-solid fa-angles-up"></i>',
             condition: li => {
@@ -43,7 +39,6 @@ export class SR5CombatTracker extends foundry.applications.sidebar.tabs.CombatTr
     ) {
         console.log(app, html, context, options);
 
-        // Iterate over each combatant <li> in the tracker
         $(html).find(".combatant").each((_, li) => {
             const combatantLi = $(li);
             const combatantId = combatantLi.data("combatant-id");
