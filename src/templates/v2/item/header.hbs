@@ -1,6 +1,6 @@
 <div>
     <div class="sheet-header">
-        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{item.name}}"
+        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{#if @root.isEditMode}}{{item.img}}{{else}}{{item.name}}{{/if}}"
              {{#if @root.isEditMode}}
                  data-edit="img"
                  data-action="editImage"

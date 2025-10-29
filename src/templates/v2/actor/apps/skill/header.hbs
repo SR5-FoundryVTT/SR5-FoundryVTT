@@ -1,11 +1,11 @@
 <div class="sheet-header">
-    {{#if @root.isEditMode}}
-        <a>
-            <img class="sheet-image" src="{{skill.img}}" data-action="editImage" />
-        </a>
-    {{else}}
-        <img class="sheet-image" src="{{skill.img}}" />
-    {{/if}}
+    <img class="sheet-image"
+         src="{{skill.img}}"
+         data-tooltip="{{#if @root.isEditMode}}{{skill.img}}{{else}}{{skill.name}}{{/if}}"
+        {{#if @root.isEditMode}}
+         data-action="editImage"
+        {{/if}}
+    />
     <div class="sheet-header-labels">
         <div class="sheet-header-name">
             {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' skill.link }}
