@@ -1,6 +1,40 @@
 import CombatTracker = foundry.applications.sidebar.tabs.CombatTracker;
 
 export class SR5CombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
+
+    override _configureRenderOptions(options: CombatTracker.RenderOptions): void {
+        super._configureRenderOptions(options);
+    }
+
+    protected override _getEntryContextOptions() {
+        const entryOptions = super._getEntryContextOptions();
+
+        entryOptions.splice(2, 0, {
+            name: 'Seize Initiative',
+            icon: '<i class="fa-solid fa-angles-up"></i>',
+            condition: li => {
+                const combatantId = $(li).data('combatant-id');
+                const combatant = this.viewed!.combatants.get(combatantId)!;
+                const edge = combatant.actor?.system.attributes.edge;
+                return Boolean(
+                    combatant.isOwner &&
+                    combatant.initiative != null &&
+                    edge?.value && edge.uses < edge.max
+                );
+            },
+            callback: li => {
+                const combatantId = $(li).data('combatant-id');
+                const combatant = this.viewed!.combatants.get(combatantId)!;
+                const seize = !combatant.system.seize;
+                void combatant.update({ system: { seize } });
+                const edge = combatant.actor!.system.attributes.edge;
+                void combatant.actor!.update({ system: { attributes: { edge: { uses: edge.uses + (seize ? 1 : -1) } } } });
+            }
+        });
+
+        return entryOptions;
+    }
+
     static renderCombatTracker(
         app: CombatTracker,
         html: HTMLElement,
@@ -13,24 +47,33 @@ export class SR5CombatTracker extends foundry.applications.sidebar.tabs.CombatTr
         $(html).find(".combatant").each((_, li) => {
             const combatantLi = $(li);
             const combatantId = combatantLi.data("combatant-id");
-
-            // Get the combatant and their associated actor
-            const combatant = app.viewed?.combatants.get(combatantId);
+            const combatant = app.viewed!.combatants.get(combatantId)!;
 
             this.addInitiativeIcon(combatantLi, combatant);
+            this.addSeizeInitiativeIcon(combatantLi, combatant);
+        });
+
+        $(html).on('click', '[data-action="toggleSeize"]', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const toggle = $(event.currentTarget);
+            const combatantLi = toggle.closest(".combatant");
+            const combatantId = combatantLi.data("combatant-id");
+
+            const combatant = app.viewed?.combatants.get(combatantId);
+            if (!combatant) return;
+
+            const currentSeize = combatant.system.seize;
+            void combatant.update({ system: { seize: !currentSeize } });
         });
     }
 
     private static addInitiativeIcon(
         combatantLi: JQuery<HTMLElement>,
-        combatant: Combatant.Implementation | undefined
+        combatant: Combatant.Implementation
     ): void {
-        // --- Prevent duplicate renders ---
-        const existingIcon = combatantLi.find(".combatant-init-mode-icon");
-        if (existingIcon.length)
-            existingIcon.remove();
-
-        const init = combatant?.actor?.system.initiative.perception;
+        const init = combatant.actor?.system.initiative.perception;
         const iconData = {
             'meatspace': { cssClass: "mode-physical", iconClass: "fa-solid fa-person-running" },
             'astral': { cssClass: "mode-astral", iconClass: "fa-solid fa-star" },
@@ -41,6 +84,22 @@ export class SR5CombatTracker extends foundry.applications.sidebar.tabs.CombatTr
         combatantLi.find(".token-image").after(`
             <div class="combatant-init-mode-icon ${iconData[init ?? 'undefined'].cssClass}">
                 <i class="${iconData[init ?? 'undefined'].iconClass}"></i>
+            </div>
+        `);
+    }
+
+    private static addSeizeInitiativeIcon(
+        combatantLi: JQuery<HTMLElement>,
+        combatant: Combatant.Implementation
+    ): void {
+        if (!combatant.system.seize) return;
+        const initDiv = combatantLi.find(".token-initiative");
+        
+        initDiv.prepend(`
+            <div class="combatant-seize" 
+                 data-action="toggleSeize" 
+                 title="Toggle Seized Initiative">
+                <i class="fa-solid fa-angles-up"></i>
             </div>
         `);
     }

@@ -22,7 +22,7 @@
 }
 
 .combat-tracker .combatant-init-mode-icon i {
-    font-size: 12px;
+    font-size: 13px;
     color: white;
     text-shadow: 0 0 4px #000;
 }
@@ -49,4 +49,34 @@
 
 .combat-tracker .combatant-init-mode-icon.mode-unknown i {
     color: #aaa;
+}
+
+.combat-tracker .combatant .token-initiative {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 6px;
+
+    .initiative-input {
+        width: 32px;
+    }
+}
+
+.combat-tracker .combatant-seize {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid #ffc400;
+
+    font-size: 1.2em;
+    color: #ffc400;
+    line-height: 1;
+    text-shadow: 0 0 5px #000;
 }

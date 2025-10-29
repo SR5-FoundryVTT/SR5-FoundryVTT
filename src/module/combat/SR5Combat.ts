@@ -223,7 +223,12 @@ export class SR5Combat extends Combat<"base"> {
      * Compares two combatants to determine their sort order in the initiative tracker.
      */
     protected override _sortCombatants(a: Combatant.Implementation, b: Combatant.Implementation): number {
-        // Primary comparison: Initiative Score
+
+        // First check for seize the initiative status
+        if (a.system.seize !== b.system.seize)
+            return (b.system.seize ? 1 : 0) - (a.system.seize ? 1 : 0);
+
+        // Primary comparison: Initiative score (higher acts first)
         const initA = Number.isNumeric(a.initiative) ? a.initiative ?? 0 : -Infinity;
         const initB = Number.isNumeric(b.initiative) ? b.initiative ?? 0 : -Infinity;
         if (initA !== initB || !a.actor || !b.actor) return initB - initA;

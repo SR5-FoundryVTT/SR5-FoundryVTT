@@ -70,7 +70,8 @@ export class SR5Combatant extends Combatant<"base"> {
             _id: this._id!,
             system: {
                 acted: false,
-                coinFlip: Math.random()
+                seize: false,
+                coinFlip: Math.random(),
             }
         } as const;
     }
