@@ -10,8 +10,8 @@ export const AttributeField = (limit?: keyof typeof SR5.limits) => ({
     limit: new StringField({
         blank: true,
         readonly: true,
-        choices: SR5.limits,
-        ...(limit ? { initial: limit } : {})
+        ...(limit ? { initial: limit } : {}),
+        choices: limit ? { limit: SR5.limits[limit] } : SR5.limits,
     }),
 });
 
@@ -49,10 +49,10 @@ export const MatrixActorAttributes = () => ({
 })
 
 export const TechnologyAttributes = () => ({
-    willpower: new ModifiableField(AttributeField('mental')),
-    logic: new ModifiableField(AttributeField('mental')),
-    intuition: new ModifiableField(AttributeField('mental')),
-    charisma: new ModifiableField(AttributeField('social')),
+    willpower: new ModifiableField(AttributeField("mental")),
+    logic: new ModifiableField(AttributeField("mental")),
+    intuition: new ModifiableField(AttributeField("mental")),
+    charisma: new ModifiableField(AttributeField("social")),
     ...MatrixActorAttributes(),
 });
 
