@@ -9,6 +9,12 @@ import CombatTracker = foundry.applications.sidebar.tabs.CombatTracker;
  *  - GM-only "acted" toggle
  */
 export class SR5CombatTracker extends CombatTracker {
+
+    static override PARTS = {
+        ...super.PARTS,
+        footer: { template: "systems/shadowrun5e/dist/templates/apps/tabs/combat-tracker/footer.hbs" }
+    } as const;
+
     protected override _getEntryContextOptions(): ContextMenu.Entry<HTMLElement>[] {
         const options = super._getEntryContextOptions();
 
@@ -47,6 +53,65 @@ export class SR5CombatTracker extends CombatTracker {
             this._addSeizeIcon($li, combatant);
             this._addActedIndicator($li, combatant);
         });
+
+        $html.find('.combat-control[data-action="nextTurn"], .combat-control[data-action="previousTurn"]').on('contextmenu', (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            game.tooltip.deactivate();
+
+            const currentAction = $(ev.currentTarget).data('action') as string;
+            const isNext = currentAction.includes('next');
+
+            // Use attribute selectors to directly target the correct menus
+            const $menu = $html.find(`.combat-extra-menu[data-time="${isNext ? 'next' : 'previous'}"]`);
+            const $otherMenu = $html.find(`.combat-extra-menu[data-time="${isNext ? 'previous' : 'next'}"]`);
+
+            // Close the other menu
+            $otherMenu.addClass('hidden');
+
+            // Toggle the current menu
+            const wasHidden = $menu.hasClass('hidden');
+            $menu.toggleClass('hidden', !wasHidden);
+
+            // If the menu was just OPENED, add a one-time listener to close it
+            if (wasHidden) {
+                $(document).one('mousedown.combatExtraMenu', (event) => {
+                    // Check if the click was *inside* the menu
+                    // Do nothing if clicking inside
+                    if ($(event.target).closest('.combat-extra-menu').length)
+                        return;
+                    $menu.addClass('hidden');
+                    $otherMenu.addClass('hidden');
+                });
+            } else {
+                // If the menu was just CLOSED, remove any lingering listeners
+                $(document).off('mousedown.combatExtraMenu');
+            }
+        });
+
+        // Delegate click inside menus
+        $html.on('click', '.combat-extra-menu [data-action]', (ev) => {
+            ev.stopPropagation();
+            
+            // Clean up the global listener immediately
+            $(document).off('mousedown.combatExtraMenu');
+
+            const action = $(ev.currentTarget).data('action') as string;
+            $html.find('.combat-extra-menu').addClass('hidden');
+
+            try {
+                if (action === 'nextTurn') void game.combat?.nextTurn();
+                else if (action === 'previousTurn') void game.combat?.previousTurn();
+                else if (action === 'nextRound') void game.combat?.nextRound();
+                else if (action === 'previousRound') void game.combat?.previousRound();
+            } catch (err) {
+                console.error('Combat extra action failed', action, err);
+            }
+        });
+
+        // Prevent clicks inside the menu from closing it
+        $html.on('click', '.combat-extra-menu', ev => ev.stopPropagation());
 
         // Prevent duplicate bindings by tagging the container
         if ($html.hasClass("sr5-bound")) return;

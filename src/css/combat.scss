@@ -60,3 +60,46 @@
     color: #5cb85c;
 }
 
+.combat-controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.combat-controls .combat-extra-menu {
+    position: absolute;
+    bottom: 100%;
+    transform: translateY(-4px);
+    background: rgba(25, 25, 25, 0.95);
+    border-radius: 6px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    z-index: 10;
+}
+
+.combat-controls .combat-extra-menu[data-time="previous"] {
+    left: 0;
+}
+
+.combat-controls .combat-extra-menu[data-time="next"] {
+    right: 0;
+}
+
+.combat-controls .combat-extra-menu-previous button,
+.combat-controls .combat-extra-menu-next button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.combat-controls .combat-extra-menu-previous.hidden,
+.combat-controls .combat-extra-menu-next.hidden {
+    display: none;
+}
