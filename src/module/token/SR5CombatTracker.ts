@@ -1,84 +1,141 @@
 import CombatTracker = foundry.applications.sidebar.tabs.CombatTracker;
 
-export class SR5CombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
+/**
+ * Shadowrun 5e – Custom Combat Tracker Enhancements
+ * Adds:
+ *  - Context option to "Seize Initiative"
+ *  - Initiative mode icon (meatspace/astral/matrix)
+ *  - Seize indicator icon
+ *  - GM-only "acted" toggle
+ */
+export class SR5CombatTracker extends CombatTracker {
+    protected override _getEntryContextOptions(): ContextMenu.Entry<HTMLElement>[] {
+        const options = super._getEntryContextOptions();
 
-    protected override _getEntryContextOptions() {
-        const entryOptions = super._getEntryContextOptions();
-
-        entryOptions.splice(3, 0, {
+        options.splice(1, 0, {
             name: 'Seize Initiative',
             icon: '<i class="fa-solid fa-angles-up"></i>',
             condition: li => {
-                const combatantId = $(li).data('combatant-id');
-                const combatant = this.viewed!.combatants.get(combatantId)!;
+                const combatant = this._getCombatantFromLi(li);
+
                 const edge = combatant.actor?.system.attributes.edge;
-                return Boolean(
-                    combatant.isOwner &&
-                    combatant.initiative != null &&
-                    edge?.value && edge.uses < edge.max
-                );
+                return combatant.isOwner && edge != null && combatant.initiative != null;
             },
-            callback: li => {
-                const combatantId = $(li).data('combatant-id');
-                const combatant = this.viewed!.combatants.get(combatantId)!;
-                const seize = !combatant.system.seize;
-                void combatant.update({ system: { seize } });
-                const edge = combatant.actor!.system.attributes.edge;
-                void combatant.actor!.update({ system: { attributes: { edge: { uses: edge.uses + (seize ? 1 : -1) } } } });
-            }
+            callback: li => this._onSeizeInitiative(li)
         });
 
-        return entryOptions;
+        return options;
     }
 
+    /**
+     * Renders SR5-specific visual indicators for each combatant.
+     */
     static renderCombatTracker(
         app: CombatTracker,
         html: HTMLElement,
-        context: CombatTracker.RenderContext,
-        options: CombatTracker.RenderOptions
-    ) {
-        console.log(app, html, context, options);
+        _context: CombatTracker.RenderContext,
+        _options: CombatTracker.RenderOptions
+    ): void {
+        const $html = $(html);
 
-        $(html).find(".combatant").each((_, li) => {
-            const combatantLi = $(li);
-            const combatantId = combatantLi.data("combatant-id");
-            const combatant = app.viewed!.combatants.get(combatantId)!;
+        $html.find(".combatant").each((_, li) => {
+            const $li = $(li);
+            const combatant = app.viewed?.combatants.get($li.data("combatant-id"));
+            if (!combatant) return;
 
-            this.addInitiativeIcon(combatantLi, combatant);
-            this.addSeizeInitiativeIcon(combatantLi, combatant);
+            this._addInitiativeIcon($li, combatant);
+            this._addSeizeIcon($li, combatant);
+            this._addActedIndicator($li, combatant);
+        });
+
+        // Prevent duplicate bindings by tagging the container
+        if ($html.hasClass("sr5-bound")) return;
+        $html.addClass("sr5-bound");
+
+        // GM-only click handler for toggling "acted" status
+        $html.on("click", "[data-action='toggleActed']", (event: JQuery.ClickEvent) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!game.user.isGM) return;
+
+            const $li = $(event.currentTarget).closest(".combatant");
+            const combatant = app.viewed?.combatants.get($li.data("combatant-id"));
+            if (!combatant) return;
+
+            const hasActed = combatant.system.acted;
+            void combatant.update({ system: { acted: !hasActed } });
         });
     }
 
-    private static addInitiativeIcon(
-        combatantLi: JQuery<HTMLElement>,
-        combatant: Combatant.Implementation
-    ): void {
-        const init = combatant.actor?.system.initiative.perception;
-        const iconData = {
-            'meatspace': { cssClass: "mode-physical", iconClass: "fa-solid fa-person-running" },
-            'astral': { cssClass: "mode-astral", iconClass: "fa-solid fa-star" },
-            'matrix': { cssClass: "mode-matrix", iconClass: "fa-solid fa-laptop-code" },
-            'undefined': { cssClass: "mode-unknown", iconClass: "fa-solid fa-x" }
+    // ---- Private Helpers ----
+
+    private _onSeizeInitiative(li: HTMLElement): void {
+        const combatant = this._getCombatantFromLi(li);
+        if (!combatant?.actor) return;
+
+        const edge = combatant.actor.system.attributes.edge;
+        const seized = combatant.system.seize ?? false;
+
+        if (seized && !game.user.isGM) {
+            ui.notifications.warn("You cannot seize initiative again until the start of your next turn.");
+            return;
+        }
+
+        void combatant.update({ system: { seize: !seized } });
+        void combatant.actor.update({
+            system: { attributes: { edge: { uses: edge.uses + (seized ? -1 : 1) } } }
+        });
+    }
+
+    private _getCombatantFromLi(li: HTMLElement): Combatant.Implementation {
+        const combatantId = $(li).data("combatant-id");
+        return this.viewed!.combatants.get(combatantId)!;
+    }
+
+    // ---- UI Builders ----
+
+    private static _addInitiativeIcon($li: JQuery<HTMLElement>, combatant: Combatant.Implementation): void {
+        $li.find(".combatant-init-mode-icon").remove();
+
+        const mode = combatant.actor?.system.initiative.perception ?? "undefined";
+        const modes = {
+            meatspace: { cls: "mode-physical", icon: "fa-solid fa-person-running" },
+            astral: { cls: "mode-astral", icon: "fa-solid fa-star" },
+            matrix: { cls: "mode-matrix", icon: "fa-solid fa-laptop-code" },
+            undefined: { cls: "mode-unknown", icon: "fa-solid fa-question" }
         } as const;
 
-        combatantLi.find(".token-image").after(`
-            <div class="combatant-init-mode-icon ${iconData[init ?? 'undefined'].cssClass}">
-                <i class="${iconData[init ?? 'undefined'].iconClass}"></i>
+        const { cls, icon } = modes[mode];
+
+        $li.find(".token-image").after(`
+            <div class="combatant-init-mode-icon ${cls}" title="Mode: ${mode}">
+                <i class="${icon}"></i>
             </div>
         `);
     }
 
-    private static addSeizeInitiativeIcon(
-        combatantLi: JQuery<HTMLElement>,
-        combatant: Combatant.Implementation
-    ): void {
-        if (!combatant.system.seize) return;
-        const initDiv = combatantLi.find(".token-initiative");
-        
-        initDiv.prepend(`
-            <div class="combatant-seize" 
-                 title="Toggle Seized Initiative">
-                <i class="fa-solid fa-angles-up"></i>
+    private static _addSeizeIcon($li: JQuery<HTMLElement>, combatant: Combatant.Implementation): void {
+        $li.find(".combatant-seize-icon").remove();
+
+        if (combatant.system.seize) {
+            $li.find(".token-initiative").prepend(`
+                <div class="combatant-seize-icon" title="Seized Initiative">
+                    <i class="fa-solid fa-angles-up"></i>
+                </div>
+            `);
+        }
+    }
+
+    private static _addActedIndicator($li: JQuery<HTMLElement>, combatant: Combatant.Implementation): void {
+        const hasActed = combatant.system.acted && combatant.combat?.combatant?.id !== combatant.id;
+        $li.toggleClass("acted", hasActed);
+
+        $li.find(".token-initiative").prepend(`
+            <div class="combatant-acted-icon ${hasActed ? "active" : ""}"
+                 data-action="toggleActed"
+                 title="Toggle Acted Status (GM Only)">
+                <i class="fa-solid fa-circle-check"></i>
             </div>
         `);
     }
