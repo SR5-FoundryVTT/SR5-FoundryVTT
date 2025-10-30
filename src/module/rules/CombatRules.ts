@@ -242,20 +242,6 @@ export class CombatRules {
     }
 
     /**
-     * Determine the amount of initiative score modifier change.
-     * 
-     * According to SR5#170 'Wound Modifiers'.
-     * 
-     * @param woundModBefore A negative wound modifier, before taking latest damage.
-     * @param woundModAfter A negative wound modifier, after taking latest damage.
-     * @return An to be applied initiative score modifier
-     */
-    static combatInitiativeScoreModifierAfterDamage(woundModBefore: number, woundModAfter: number): number {
-        // Make sure no positive values are passed into.
-        return Math.min(woundModBefore, 0) - Math.min(woundModAfter, 0);
-    }
-
-    /**
      * Can a defense mode be used with a specific initiative score
      * 
      * @param iniScore The combatants ini score
@@ -288,5 +274,9 @@ export class CombatRules {
      */
     static initiativeScoreWoundAdjustment(woundsBefore: number, woundsAfter: number) {
         return woundsAfter - woundsBefore;
+    }
+
+    static getProneModifier(actor: SR5Actor, target?: SR5Actor) {
+
     }
 }

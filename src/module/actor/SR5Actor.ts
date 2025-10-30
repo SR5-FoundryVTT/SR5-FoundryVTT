@@ -1528,7 +1528,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
 
         // Only actors that can have a wound modifier, will have a delta.
-        if (iniAdjustment < 0 && game.combat) await game.combat.adjustActorInitiative(this, iniAdjustment);
+        if (iniAdjustment < 0 && game.combat)
+            await game.combat.adjustActorInitiative(this, iniAdjustment);
     }
 
     /**
@@ -1632,6 +1633,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (!device) return undefined;
 
         return device.getCondition();
+    }
+
+    /**
+     * Get a set of all status effect IDs currently applied to this actor.
+     * This collects all unique status IDs from the actor's active effects.
+     */
+    getStatusEffectsId() {
+        return new Set([...(this.effects ?? [])].flatMap(e => [...e.statuses]));
     }
 
     /**
