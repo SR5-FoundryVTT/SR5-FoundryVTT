@@ -18,10 +18,36 @@ export class ActionParser extends Parser<'action'> {
     private readonly limits = Object.keys(SR5.limits) as (keyof typeof SR5.limits)[];
     private readonly skills = Object.keys(SR5.activeSkills) as (keyof typeof SR5.activeSkills)[];
     private storedActions: Record<string, ActionRollType> = {};
+    private readonly systemActions: Item.Stored[];
+
+    constructor(matrixActions: Item.Stored[]) {
+        super(); this.systemActions = matrixActions;
+    }
+
+    private searchSystemActionByName(name: string): Item.Stored | undefined {
+        // Remove values inside parenthesis and trailing "IC" when searching for the default matrix action
+        const queryName = name.replace(/\s*\(.*?\)\s*/g, '').replace(/\s*IC\s*$/i, '').trim();
+        return this.systemActions.find(ma => ma.name === queryName);
+    }
+
+    // Parse the action and set the image if a system action is found
+    public override async Parse(jsonData: Action, compendiumKey: CompendiumKey) {
+        const item = await super.Parse(jsonData, compendiumKey);
+        const systemAction = this.searchSystemActionByName(jsonData.name._TEXT);
+        if (systemAction) item.img = systemAction.img;
+        return item;
+    }
 
     protected override getSystem(jsonData: Action) {
         const system = this.getBaseSystem();
         const { action, description } = system;
+
+        const systemAction = this.searchSystemActionByName(jsonData.name._TEXT);
+        if (systemAction) {
+            foundry.utils.mergeObject(system, systemAction.system, { insertKeys: false, insertValues: false });
+            description.value = jsonData.test?.bonusstring?._TEXT ?? "";
+            return system;
+        }
 
         // 1. Set basic action properties
         action.type = jsonData.type._TEXT.toLowerCase();
@@ -204,6 +230,7 @@ export class ActionParser extends Parser<'action'> {
         } else if (name.includes("Brute Force")) {
             action.test = "BruteForceTest";
             action.opposed.test = "OpposedBruteForceTest";
+            action.opposed.resist.test = "MatrixResistTest";
         } else if (name.includes("Hack on the Fly")) {
             action.test = "HackOnTheFlyTest";
             action.opposed.test = "OpposedHackOnTheFlyTest";
