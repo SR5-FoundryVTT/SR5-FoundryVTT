@@ -5,6 +5,7 @@ import { TestCreator } from "@/module/tests/TestCreator";
 import { ActionRollType } from "@/module/types/item/Action";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { CompendiumKey, Constants } from "../../importer/Constants";
+import { json } from "stream/consumers";
 
 // Define constants to avoid "magic strings"
 const DICE_POOL_SEPARATOR = 'v.';
@@ -267,9 +268,11 @@ export class ActionParser extends Parser<'action'> {
     }
 
     protected override async getFolder(jsonData: Action, compendiumKey: CompendiumKey): Promise<Folder> {
-        const matrix = this.storedActions[jsonData.name._TEXT]?.test?.includes("Matrix");
+        const isMatrixAction =
+            this.searchSystemActionByName(jsonData.name._TEXT) !== undefined ||
+            (this.storedActions[jsonData.name._TEXT]?.test?.includes('Matrix') ?? false);
         const matrixLabel = game.i18n.localize("SR5.Labels.ActorSheet.Matrix");
-        const rootFolder = game.i18n.localize("TYPES.Item.action") + (matrix ? ` (${matrixLabel})` : "");
+        const rootFolder = game.i18n.localize("TYPES.Item.action") + (isMatrixAction ? ` (${matrixLabel})` : "");
         const subFolder = jsonData.type?._TEXT || "Unknown";
         return IH.getFolder(compendiumKey, rootFolder, subFolder);
     }
