@@ -44,6 +44,15 @@ export class SR5CombatTracker extends CombatTracker {
     ): void {
         const $html = $(html);
 
+        if (app.viewed?.round) {
+            const $title = $html.find(".encounter-title");
+
+            if ($title.length) {
+                const currentPass = app.viewed.system.initiativePass;
+                $title.text(`Turn ${app.viewed.round} (Pass ${currentPass})`);
+            }
+        }
+
         $html.find(".combatant").each((_, li) => {
             const $li = $(li);
             const combatant = app.viewed?.combatants.get($li.data("combatant-id"));
