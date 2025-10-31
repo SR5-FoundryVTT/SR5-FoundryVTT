@@ -5,7 +5,6 @@ import { TestCreator } from "@/module/tests/TestCreator";
 import { ActionRollType } from "@/module/types/item/Action";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
 import { CompendiumKey, Constants } from "../../importer/Constants";
-import { json } from "stream/consumers";
 
 // Define constants to avoid "magic strings"
 const DICE_POOL_SEPARATOR = 'v.';
