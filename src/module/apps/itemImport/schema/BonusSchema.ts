@@ -486,7 +486,7 @@ export interface BonusSchema {
     };
     weaponcategorydv?: {
         bonus: { _TEXT: IntegerString; };
-        selectcategories?: {
+        selectcategory?: {
             category: Many<{ _TEXT: "Astral Combat" | "Blades" | "Clubs" | "Exotic Melee Weapon" | "Unarmed Combat"; }>;
         };
         selectskill?: { $: { limittoskill: "Astral Combat,Blades,Clubs,Exotic Melee Weapon,Unarmed Combat"; }; };

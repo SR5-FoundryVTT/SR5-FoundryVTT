@@ -1,3 +1,8 @@
+import JSZip from "jszip";
+import * as IconAssign from "../../iconAssigner/iconAssign";
+import { Constants } from "../importer/Constants";
+import { ImportHelper } from "../helper/ImportHelper";
+
 import { ActionImporter } from "../importer/ActionImporter";
 import { AdeptPowerImporter } from "../importer/AdeptPowerImporter";
 import { ArmorImporter } from "../importer/ArmorImporter";
@@ -14,10 +19,6 @@ import { VehicleModImporter } from "../importer/VehicleModImporter";
 import { WareImporter } from "../importer/WareImporter";
 import { WeaponImporter } from "../importer/WeaponImporter";
 import { WeaponModImporter } from "../importer/WeaponModImporter";
-import { Constants } from "../importer/Constants";
-import { ImportHelper } from "../helper/ImportHelper";
-import * as IconAssign from "../../iconAssigner/iconAssign";
-import JSZip from "jszip";
 
 import AppV2 = foundry.applications.api.ApplicationV2;
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -44,13 +45,16 @@ interface ImporterContext extends AppV2.RenderContext {
     };
 };
 
+const BaseClass = HandlebarsApplicationMixin(ApplicationV2<ImporterContext>);
+type BaseClassType = InstanceType<typeof BaseClass>;
+
 /**
  * This application allows bulk importing of Shadowrun 5e game data from either
  * a local ZIP file (Chummer output) or directly from the chummer5a GitHub repository.
  *
  * Import various types of game data (weapons, spells, gear, etc.)
  */
-export class BulkImporter extends HandlebarsApplicationMixin(ApplicationV2<ImporterContext>) {
+export class BulkImporter extends BaseClass {
     /**
      * Default options for the application window.
      */
@@ -90,8 +94,8 @@ export class BulkImporter extends HandlebarsApplicationMixin(ApplicationV2<Impor
     private static readonly githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
-        version: "v5.225.1027",
-        branch: "fb979155da2e669907d03ce5863a1450fcee3efb",
+        version: "v5.225.1049",
+        branch: "3e0520c06b8e393b500cfac8c951e8be28a24046",
     } as const;
 
     /**
@@ -136,13 +140,10 @@ export class BulkImporter extends HandlebarsApplicationMixin(ApplicationV2<Impor
 
     /**
      * Prepares the context data for rendering the template.
-     *
-     * @param options - Optional rendering options.
-     * @returns The context object with current state and metadata.
      */
-    override async _prepareContext(options?: any) {
+    override async _prepareContext(...args: Parameters<BaseClassType["_prepareContext"]>) {
         // Start with the base context from the parent class
-        const baseContext = await super._prepareContext(options);
+        const baseContext = await super._prepareContext(...args);
 
         // Destructure GitHub config for cleaner access
         const { owner, repo, branch, version } = BulkImporter.githubConfig;

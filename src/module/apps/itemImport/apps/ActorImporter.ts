@@ -10,10 +10,10 @@ interface ImporterContext extends foundry.applications.api.ApplicationV2.RenderC
     folders: { id: string, name: string }[]
 };
 
-const Base = HandlebarsApplicationMixin(ApplicationV2<ImporterContext>);
-type BaseType = InstanceType<typeof Base>;
+const BaseClass = HandlebarsApplicationMixin(ApplicationV2<ImporterContext>);
+type BaseClassType = InstanceType<typeof BaseClass>;
 
-export class ActorImporter extends Base {
+export class ActorImporter extends BaseClass {
     /**
      * Default options for the application window.
      */
@@ -51,8 +51,8 @@ export class ActorImporter extends Base {
         return "Chummer/Data Import";
     }
 
-    override async _prepareContext(options: Parameters<BaseType['_prepareContext']>[0]) {
-        const baseContext = await super._prepareContext(options);
+    override async _prepareContext(...args: Parameters<BaseClassType['_prepareContext']>) {
+        const baseContext = await super._prepareContext(...args);
         const compareOptions = { numeric: true, sensitivity: 'base' } satisfies Intl.CollatorOptions;
 
         const folders = game.folders
