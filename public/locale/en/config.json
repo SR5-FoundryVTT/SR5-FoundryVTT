@@ -657,6 +657,12 @@
             }
         },
         "Import": {
+            "ActorImporter": {
+                "Title": "Actor Importer"
+            },
+            "BulkImporter": {
+                "Title": "Bulk Importer"
+            },
             "Spirit": {
                 "SpiritTypeNotFound": "The spirit type was not found. Please open a github issue with your chummer export json."
             }

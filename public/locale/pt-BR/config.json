@@ -531,6 +531,12 @@
             }
         },
         "Import": {
+            "ActorImporter": {
+                "Title": "Importador de Ator"
+            },
+            "BulkImporter": {
+                "Title": "Importador em Massa"
+            },
             "Spirit": {
                 "SpiritTypeNotFound": "O tipo de espírito não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."
             }

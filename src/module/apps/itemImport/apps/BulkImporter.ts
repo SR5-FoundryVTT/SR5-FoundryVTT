@@ -68,6 +68,7 @@ export class BulkImporter extends BaseClass {
         window: {
             classes: ["chummer-import"],
             title: "Chummer/Data Import",
+            icon: "fas fa-file-import",
         },
     };
 
@@ -84,7 +85,7 @@ export class BulkImporter extends BaseClass {
      * Dynamic title for the application window.
      */
     override get title() {
-        return "Chummer/Data Import";
+        return game.i18n.localize("SR5.Import.BulkImporter.Title");
     }
 
     /**

@@ -27,6 +27,7 @@ export class ActorImporter extends BaseClass {
         window: {
             classes: ["chummer-import"],
             title: "Chummer/Data Import",
+            icon: "fas fa-file-import",
         },
         actions: {
             import: function(this: ActorImporter) {
@@ -48,7 +49,7 @@ export class ActorImporter extends BaseClass {
      * Dynamic title for the application window.
      */
     override get title() {
-        return "Chummer/Data Import";
+        return game.i18n.localize("SR5.Import.ActorImporter.Title");
     }
 
     override async _prepareContext(...args: Parameters<BaseClassType['_prepareContext']>) {
