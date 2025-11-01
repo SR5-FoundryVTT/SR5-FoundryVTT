@@ -665,6 +665,9 @@
             },
             "Spirit": {
                 "SpiritTypeNotFound": "The spirit type was not found. Please open a github issue with your chummer export json."
+            },
+            "ImporterSourcesConfig": {
+                "Title": "Importer Sources Configuration"
             }
         },
         "ImportCharacter": "Import Character",

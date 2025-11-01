@@ -2,6 +2,7 @@ import { CharacterImporter } from "../../importer/actorImport/characterImporter/
 import { SpiritImporter } from "../../importer/actorImport/spiritImporter/SpiritImporter";
 import { SpriteImporter } from "../../importer/actorImport/spriteImporter/SpriteImporter";
 import { ActorFile, ActorSchema } from "../../importer/actorImport/ActorSchema";
+import { ImporterSourcesConfig } from "./ImporterSourcesConfig";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
@@ -32,6 +33,9 @@ export class ActorImporter extends BaseClass {
         actions: {
             import: function(this: ActorImporter) {
                 void this.handleActorImport();
+            },
+            openConfig: function(this: ActorImporter) {
+                void new ImporterSourcesConfig().render(true);
             }
         }
     };

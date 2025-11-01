@@ -35,7 +35,7 @@ interface ImporterContext extends AppV2.RenderContext {
     // Progress
     progress: {
         message: string;
-        pct: string; // string from toFixed()
+        pct: string;
     };
 
     // Info

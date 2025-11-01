@@ -1,8 +1,4 @@
 @import 'config';
-// ===================================
-// 🔐 CHUMMER IMPORT MODAL - SCOPED
-// Prevents CSS leakage into Foundry UI
-// ===================================
 
 // _chummer-import.scss
 .chummer-import {
@@ -49,6 +45,16 @@
       font-size: 0.9em;
       transform: translateY(-5px);
     }
+  }
+
+  .import-settings {
+    display: flex;
+    gap: 9em;
+  }
+
+  .configure-button {
+    background-color: transparent;
+    font-weight: 500;
   }
 
   legend {
@@ -150,6 +156,7 @@
     border-radius: var(--ci-border-radius);
   }
 }
+
 .chummer-import-modal {
   // 🔽 Local variables
   $primary: #5d7f9c;
@@ -461,4 +468,101 @@
     flex-direction: column;
     gap: 12px;
   }
+}
+
+#importer-config-app {
+  min-width: 700px;
+  min-height: 300px;
+}
+
+#importer-source-config-form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  footer {
+    flex-shrink: 0;
+    padding: 0 10px;
+    text-align: right;
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.importer-config-container {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.importer-config-container .pane {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  border-top: 1px solid #ccc;
+}
+
+.importer-config-container .available-packs {
+  border-right: 1px solid #ccc;
+}
+
+.importer-config-container .pane-title {
+  font-weight: bold;
+  border-bottom: 1px solid #aaa;
+  padding-bottom: 5px;
+  margin: 0 0 5px 0;
+}
+
+.importer-config-container .pack-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.importer-config-container .pack-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 2px;
+  border-bottom: 1px solid #eee;
+}
+
+.importer-config-container .pack-item .label-container {
+  flex-grow: 1;
+  margin-right: 10px;
+  word-break: break-word;
+  display: flex;
+  flex-direction: column; 
+}
+
+.importer-config-container .pack-item .label {
+  line-height: 1.2;
+  font-weight: bold;
+}
+
+.importer-config-container .pack-item .pack-id {
+  font-size: 0.8em;
+  color: #777;
+  font-style: italic;
+  line-height: 1;
+}
+
+.importer-config-container .pack-item .controls {
+  flex-shrink: 0;
+  display: flex;
+}
+
+.importer-config-container .pack-item .controls button {
+  margin-left: 4px;
+  line-height: 1.2;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.importer-config-container .pack-item-empty {
+  padding: 10px;
+  text-align: center;
+  color: #777;
+  font-style: italic;
 }

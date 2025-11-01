@@ -1,0 +1,57 @@
+<form id="importer-source-config-form">
+    <div class="importer-config-container">
+        <div class="pane available-packs">
+        <h3 class="pane-title">Available Compendiums</h3>
+            <ul class="pack-list">
+                {{#each availablePacks}}
+                    <li class="pack-item">
+                        <div class="label-container">
+                            <span class="label">{{this.label}}</span>
+                            <span class="pack-id">{{this.id}}</span>
+                        </div>
+                        <button type="button" data-action="add" data-pack-id="{{this.id}}">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </li>
+                {{/each}}
+                {{#if (eq availablePacks.length 0)}}
+                    <li class="pack-item-empty">All compendiums added.</li>
+                {{/if}}
+            </ul>
+        </div>
+
+        <div class="pane selected-packs">
+            <h3 class="pane-title">Search Order</h3>
+            <ul class="pack-list">
+                {{#each selectedPacks}}
+                    <li class="pack-item">
+                        <div class="label-container">
+                            <span class="label">{{this.label}}</span>
+                            <span class="pack-id">{{this.id}}</span>
+                        </div>
+                        <div class="controls">
+                            <button type="button" data-tooltip="Move Up" data-action="move-up" data-pack-id="{{this.id}}" {{#if this.isFirst}}disabled{{/if}}>
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button type="button" data-tooltip="Move Down" data-action="move-down" data-pack-id="{{this.id}}" {{#if this.isLast}}disabled{{/if}}>
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                            <button type="button" data-tooltip="Remove" data-action="remove" data-pack-id="{{this.id}}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </li>
+                {{/each}}
+                {{#if (eq selectedPacks.length 0)}}
+                    <li class="pack-item-empty">Add compendiums from the left.</li>
+                {{/if}}
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <button type="submit">
+            <i class="fas fa-save"></i> Save and Close
+        </button>
+    </footer>
+</form>

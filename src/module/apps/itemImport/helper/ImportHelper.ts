@@ -29,14 +29,6 @@ export class ImportHelper {
     }
 
     /**
-     * Returns an array of the object's own enumerable string-keyed property [key, value] pairs.
-     * This is a strongly-typed wrapper around `Object.entries` for objects with known key and value types.
-     */
-    public static getEntries<K extends string | number | symbol, V>(obj: Record<K, V>): [K, V][] {
-        return Object.entries(obj) as [K, V][];
-    }
-
-    /**
      * Reformat the name or subtype name so it matches the categories in config.ts
      * @param name The item's name or subtype name to reformat
      */
@@ -61,7 +53,10 @@ export class ImportHelper {
         return result.padStart(16, '0').slice(-16);
     }
 
-    public static setTranslatedCategory(key: ChummerFile, categories: { _TEXT: string; $?: { translate?: string; }; }[]) {
+    public static setTranslatedCategory(
+        key: ChummerFile,
+        categories: { _TEXT: string; $?: { translate?: string; }; }[]
+    ) {
         const map = (this.categoryMap[key] ??= {});
         for (const { _TEXT: name, $ } of categories)
             map[name] = $?.translate ?? name;
@@ -160,7 +155,6 @@ export class ImportHelper {
      * @remarks
      * This function first attempts to locate an existing folder in the specified compendium
      * that matches the given name and parent. If no such folder exists, it creates a new one.
-     * Note: The `folders` property is not officially typed but is available in Foundry VTT v12.
      */
     private static async FindOrCreateFolder(ctype: CompendiumKey, name: string, parent: Folder | null = null): Promise<Folder> {
         const compendium = await this.GetCompendium(ctype);
