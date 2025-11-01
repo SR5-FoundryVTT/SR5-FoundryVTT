@@ -179,10 +179,12 @@ export class ImportHelper {
 
             // Create the compendium pack
             compendium = await foundry.documents.collections.CompendiumCollection.createCompendium({
-                type,
-                name: pack,
-                label: game.i18n.localize(`SR5.Compendiums.${pack}`)
-            }, { folder: currentFolder.id });
+                type, name: pack, label: game.i18n.localize(`SR5.Compendiums.${pack}`)
+            });
+
+            const config = game.settings.get("core", "compendiumConfiguration") ?? {};
+            Object.assign(config, { ["world." + pack]: { folder: currentFolder?.id ?? null } });
+            await game.settings.set("core", "compendiumConfiguration", config);
         }
 
         return compendium;
