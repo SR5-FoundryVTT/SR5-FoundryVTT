@@ -336,10 +336,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
     async _prepareFavorites() {
         const favorites: SR5Item[] = [];
-        for (const uuid of this.actor.system.favorites) {
-            let doc = SheetFlow.fromUuidSync(uuid as string);
-            if (!doc) doc = await fromUuid(uuid as string);
-            if (doc && doc instanceof SR5Item) favorites.push(doc);
+        for (const idOrUuid of this.actor.system.favorites) {
+            if (idOrUuid.includes('.')) {
+                const doc = SheetFlow.fromUuidSync(idOrUuid);
+                if (doc && doc instanceof SR5Item) favorites.push(doc);
+            } else {
+                const item = this.actor.items.get(idOrUuid);
+                if (item) favorites.push(item);
+            }
         }
         return favorites;
     }
@@ -485,12 +489,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #favoriteItem(this: SR5BaseActorSheet, event) {
         const uuid = SheetFlow.closestUuid(event.target);
+        const itemId = SheetFlow.closestItemId(event.target);
+
+        const favoriteId = this.actor.items.get(itemId) ? itemId : uuid;
+
         const newFavorites = this.actor.system.favorites.slice();
 
-        if (newFavorites.includes(uuid)) {
-            newFavorites.splice(newFavorites.indexOf(uuid), 1);
+        if (newFavorites.includes(favoriteId)) {
+            newFavorites.splice(newFavorites.indexOf(favoriteId), 1);
         } else {
-            newFavorites.push(uuid);
+            newFavorites.push(favoriteId);
         }
         await this.actor.update({system: { favorites: newFavorites }});
     }
@@ -1457,18 +1465,28 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await item.update({ system: { technology: { quantity } } });
     }
 
+    /**
+     * Toggle an Item or Effect to be hidden/visible on an actor sheet
+     * - this is used in part with the `isVisible` handlebar helper
+     * @param event
+     * @private
+     */
     static async #toggleItemVisible(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const uuid = SheetFlow.closestUuid(event.target);
-        if (uuid) {
+        const itemId = SheetFlow.closestItemId(event.target);
+        const effectId = SheetFlow.closestEffectId(event.target);
+        // if we got an effectId, use its Effect ID to make actor's hidden effects keep when getting imported or made as token actors
+        const hiddenId = effectId || (this.actor.items.get(itemId) ? itemId : uuid);
+        if (hiddenId) {
             const hidden_items = this.actor.system.hidden_items.slice();
 
-            const index = hidden_items.indexOf(uuid);
+            const index = hidden_items.indexOf(hiddenId);
 
             if (index >= 0) {
                 hidden_items.splice(index, 1);
             } else {
-                hidden_items.push(uuid);
+                hidden_items.push(hiddenId);
             }
             await this.actor.update({system: { hidden_items }});
         }

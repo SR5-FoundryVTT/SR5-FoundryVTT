@@ -60,8 +60,10 @@ export const CommonData = () => ({
 
     skills: new SchemaField(CharacterSkills()),
 
-    favorites: new ArrayField(new DocumentUUIDField()),
-    hidden_items: new ArrayField(new DocumentUUIDField()),
+    // favorites and hidden_items can be Local ID or UUID depending on if the item comes from a compendium or not
+    favorites: new ArrayField(new StringField({ required: true })),
+    // note that hidden_items includes ActiveEffects as well as Items
+    hidden_items: new ArrayField(new StringField({ required: true })),
 
     situation_modifiers: new SchemaField({
         environmental: new SchemaField({ active: new ObjectField({ initial: {} }) }),

@@ -91,7 +91,7 @@ export const SheetFlow = {
             const indexOfParentItem = parts.findIndex(part => part === 'Item') + 2;
             const parentItemParts = parts.slice(0, indexOfParentItem);
             const parentItemUuid = parentItemParts.join(".");
-            const item = fromUuidSync(parentItemUuid);
+            const item = SheetFlow.fromUuidSync(parentItemUuid);
             if (item && item instanceof SR5Item) {
                 // now determine if this is an effect within an embedded item or just an embedded item
                 const finalParts = parts.slice(indexOfParentItem);
@@ -130,15 +130,15 @@ export const SheetFlow = {
     },
 
     closestItemId(target) {
-        return target.closest('[data-item-id]').dataset.itemId;
+        return target.closest('[data-item-id]')?.dataset?.itemId ?? '';
     },
 
     closestUuid(target) {
-        return target.closest('[data-uuid]').dataset?.uuid;
+        return target.closest('[data-uuid]')?.dataset?.uuid ?? '';
     },
 
     closestEffectId(target) {
-        return target.closest('[data-effect-id]').dataset?.effectId;
+        return target.closest('[data-effect-id]')?.dataset?.effectId ?? '';
     },
 
     closestAction(target) {
@@ -150,9 +150,12 @@ export const SheetFlow = {
     },
 
     closestSource(target) {
-        return target.closest('[data-source]')?.dataset?.source;
+        return target.closest('[data-source]')?.dataset?.source ?? '';
     },
 
+    /**
+     * Context Menu Option to open the source for an item
+     */
     _getSourceContextOption() {
         return {
             name: "SR5.ContextOptions.Source",
