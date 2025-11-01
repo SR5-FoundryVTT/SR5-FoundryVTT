@@ -1,7 +1,7 @@
 {{#if (eq item.system.category 'range')}}
     <label data-tooltip="SR5.Weapon.Range.Range">
         <i class="far fa-ruler"></i>
-        {{item.system.range.ranges.short}}/{{item.system.range.ranges.medium}}/{{item.system.range.ranges.long}}/{{item.system.range.ranges.extreme}}{{#if item.system.range.ranges.attribute}}/{{localizeObj item.system.range.ranges.attribute @root.config.attributes}}{{/if}}m
+        {{item.system.range.ranges.short}}/{{item.system.range.ranges.medium}}/{{item.system.range.ranges.long}}/{{item.system.range.ranges.extreme}}{{#if item.system.range.ranges.attribute}}/{{localizeOb item.system.range.ranges.attribute @root.config.attributes}}{{/if}}m
     </label>
     <label data-tooltip="SR5.Weapon.Range.Modes">
         <i class="far fa-gun"></i>
