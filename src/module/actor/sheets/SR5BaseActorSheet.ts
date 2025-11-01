@@ -389,10 +389,81 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     override async _onRender(context, options) {
+        await super._onRender(context, options);
         this.activateListeners_LEGACY($(this.element));
         this.prepareModifierTooltips();
         this.#filterActiveSkillsElements();
-        return super._onRender(context, options);
+
+        const dragDropFavorites = new foundry.applications.ux.DragDrop({
+            dragSelector: '.favorite',
+            dropSelector: '.favorite',
+            permissions: {
+                dragstart: this._canDragStartFavorite.bind(this),
+                drop: this._canDragDropFavorite.bind(this),
+            },
+            callbacks: {
+                dragstart: this._onDragStartFavorite.bind(this),
+                dragover: this._onDragOverFavorite.bind(this),
+                drop: this._onDragDropFavorite.bind(this),
+            }
+        });
+        dragDropFavorites.bind(this.element);
+    }
+
+    _canDragStartFavorite(selector) {
+        return this.isEditable;
+    }
+
+    _canDragDropFavorite(selector) {
+        return this.isEditable;
+    }
+
+    _onDragStartFavorite(event) {
+        const target = event.currentTarget;
+        let dragData;
+
+        const uuid = SheetFlow.closestUuid(target);
+        const itemId = SheetFlow.closestItemId(target);
+
+        dragData = {
+            uuid,
+            itemId,
+        }
+
+        // Set data transfer
+        if (!dragData) return;
+        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+    }
+
+    _onDragDropFavorite(event) {
+        const target = event.target;
+        const favorites = this.actor.system.favorites.slice();
+        const data = TextEditor.getDragEventData(event) as any;
+        const srcUuid = data.uuid;
+        let sourceIndex = favorites.indexOf(srcUuid);
+        if (sourceIndex < 0) {
+            const srcItemId = data.id;
+            sourceIndex = favorites.indexOf(srcItemId);
+        }
+
+        const targetUuid = SheetFlow.closestUuid(target);
+        let targetIndex = favorites.indexOf(targetUuid);
+        if (targetIndex < 0) {
+            const targetItemId = SheetFlow.closestItemId(target);
+            targetIndex = favorites.indexOf(targetItemId);
+        }
+
+        if (sourceIndex >= 0 && targetIndex >= 0) {
+            const fs = favorites[sourceIndex];
+            const ft = favorites[targetIndex];
+            favorites[targetIndex] = fs;
+            favorites[sourceIndex] = ft;
+            await this.actor.update({system: { favorites }})
+        }
+    }
+
+    _onDragOverFavorite(event) {
+
     }
 
     /** Listeners used by _all_ actor types! */
