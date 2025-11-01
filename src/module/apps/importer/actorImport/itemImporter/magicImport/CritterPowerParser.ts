@@ -3,7 +3,6 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class CritterPowerParser extends Parser<'critter_power'> {
     protected readonly parseType = 'critter_power';
-    protected readonly compKey = 'Critter_Power';
 
     protected parseItem(item: BlankItem<'critter_power'>, itemData: ExtractItemType<'critterpowers', 'critterpower'>) {
         const system = item.system;

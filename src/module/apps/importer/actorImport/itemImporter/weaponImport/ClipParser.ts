@@ -5,7 +5,6 @@ type ClipType = Unwrap<NonNullable<ExtractItemType<'weapons', 'weapon'>['clips']
 
 export class ClipParser extends Parser<'ammo'> {
     protected readonly parseType = 'ammo';
-    protected readonly compKey = 'Ammo';
 
     private readonly currentWeapon: ExtractItemType<'weapons', 'weapon'>;
  

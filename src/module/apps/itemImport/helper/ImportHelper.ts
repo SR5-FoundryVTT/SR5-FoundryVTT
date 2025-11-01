@@ -102,32 +102,6 @@ export class ImportHelper {
         }));
     }
 
-    public static async getItem(
-        compKey: CompendiumKey | null,
-        itemData: { chummerId: string | null; name: string | null; name_english?: string }
-    ) {
-        if (!compKey) return null;
-        const pack = game.packs?.get(
-            `world.${Constants.MAP_COMPENDIUM_KEY[compKey].pack}`
-        ) as CompendiumCollection<'Item'>;
-        if (!pack) return null;
-
-        let item: Item.Stored | undefined | null;
-
-        if (itemData.chummerId) {
-            const id = this.guidToId(itemData.chummerId);
-            item = await pack.getDocument(id);
-        }
-
-        if (!item && itemData.name)
-            item = pack.getName(itemData.name);
-
-        if (!item && itemData.name_english)
-            item = pack.getName(itemData.name_english);
-
-        return item ? game.items.fromCompendium(item) as Item.CreateData : null;
-    }
-
     /**
      * Helper method to create a new folder.
      * @param ctype The compendium key identifying the target compendium.

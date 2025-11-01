@@ -10,7 +10,6 @@ import { ClipParser } from "./ClipParser";
 
 export class WeaponParser extends Parser<'weapon'> {
     protected readonly parseType = 'weapon';
-    protected readonly compKey = 'Weapon';
 
     private parseDamage(val: string) {
         const damage = {

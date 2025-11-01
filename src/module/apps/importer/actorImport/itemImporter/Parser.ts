@@ -2,8 +2,8 @@ import { ActorSchema } from '../ActorSchema';
 import * as IconAssign from '../../../iconAssigner/iconAssign';
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
-import { CompendiumKey } from '@/module/apps/itemImport/importer/Constants';
 import { Sanitizer } from '@/module/sanitizer/Sanitizer';
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 
 export type ItemSystems = SystemEntityType & Item.ConfiguredSubType;
 
@@ -38,7 +38,6 @@ export type BlankItem<T extends ItemSystems> = ReturnType<Parser<T>["createItem"
 
 export abstract class Parser<T extends ItemSystems> {
     protected abstract readonly parseType: T;
-    protected abstract readonly compKey: CompendiumKey | null;
     static iconList: string[] | undefined;
     static readonly DEFAULT_NAME = "Unnamed";
 
@@ -54,13 +53,42 @@ export abstract class Parser<T extends ItemSystems> {
         } satisfies Item.CreateData;
     }
 
-    protected async getItem(itemData: BaseType) {
-        const info = {
-            name: itemData.name,
-            name_english: itemData.name_english,
-            chummerId: itemData.suid ?? itemData.sourceid ?? null,
+    /**
+     * Attempts to retrieve an item from the compendium packs based on the provided item data.
+     * Tries to match by suid/sourceid (guid) first, then by name or name_english.
+     * Returns a blank item if not found.
+     */
+    protected async getItemFromCompendium(itemData: BaseType): Promise<BlankItem<T> | null> {
+        const guid = itemData.suid ?? itemData.sourceid ?? null;
+        const itemIdFromGuid = guid ? IH.guidToId(guid) : null;
+        const compendiumList = game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder);
+
+        // Iterate through each compendium pack in the preferred order
+        for (const packId of compendiumList) {
+            const pack = game.packs.get(packId) as CompendiumCollection<"Item"> | undefined;
+            if (!pack || pack.metadata.type !== "Item") continue;
+            
+            let item: Item.Stored | undefined | null;
+
+            if (itemIdFromGuid) {
+                item = await pack.getDocument(itemIdFromGuid);
+
+                if (item && item.type !== this.parseType) item = undefined;
+            }
+
+            if (!item) {
+                const index = await pack.getIndex({fields: ["name", "type"]});
+                const indexEntry = index.find(e => e.name === itemData.name && e.type === this.parseType)
+                                ?? index.find(e => e.name === itemData.name_english && e.type === this.parseType);
+                if (indexEntry)
+                    item = await pack.getDocument(indexEntry._id);
+            }
+
+            if (item)
+                return game.items.fromCompendium(item) as Item.CreateData as BlankItem<T>;
         }
-        return IH.getItem(this.compKey, info) as Promise<BlankItem<T> | null>;
+
+        return null;
     }
 
     protected parseDescription(item: BlankItem<T>, itemData: BaseType) {
@@ -104,7 +132,7 @@ export abstract class Parser<T extends ItemSystems> {
 
         for (const itemData of IH.getArray(itemsData)) {
             try {
-                const fetchedItem = await this.getItem(itemData);
+                const fetchedItem = await this.getItemFromCompendium(itemData);
                 const item = fetchedItem ?? this.createItem(itemData);
                 item._id = foundry.utils.randomID();
 

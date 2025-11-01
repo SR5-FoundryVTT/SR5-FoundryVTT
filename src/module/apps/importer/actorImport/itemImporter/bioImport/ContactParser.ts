@@ -3,7 +3,6 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class ContactParser extends Parser<'contact'> {
     protected readonly parseType = 'contact';
-    protected readonly compKey = null;
 
     protected parseItem(item: BlankItem<'contact'>, itemData: ExtractItemType<'contacts', 'contact'>) {
         const system = item.system;

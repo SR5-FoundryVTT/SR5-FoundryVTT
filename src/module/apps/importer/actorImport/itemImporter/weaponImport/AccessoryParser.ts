@@ -8,7 +8,6 @@ type AccessoryType = Unwrap<NonNullable<ExtractItemType<'weapons', 'weapon'>['ac
  */
 export class AccessoryParser extends Parser<'modification'> {
     protected readonly parseType = 'modification';
-    protected readonly compKey = 'Weapon_Mod';
 
     protected parseItem(item: BlankItem<'modification'>, itemData: AccessoryType) {
         const system = item.system;

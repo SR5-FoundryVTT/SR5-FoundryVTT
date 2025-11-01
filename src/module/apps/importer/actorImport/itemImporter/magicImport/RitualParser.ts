@@ -3,7 +3,6 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class RitualParser extends Parser<'ritual'> {
     protected readonly parseType = 'ritual';
-    protected readonly compKey = 'Spell';
 
     protected parseItem(item: BlankItem<'ritual'>, itemData: ExtractItemType<'spells', 'spell'>) {
         const system = item.system;

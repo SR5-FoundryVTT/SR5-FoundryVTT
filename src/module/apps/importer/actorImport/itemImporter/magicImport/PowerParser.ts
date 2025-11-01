@@ -3,7 +3,6 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class PowerParser extends Parser<'adept_power'> {
     protected readonly parseType = 'adept_power';
-    protected readonly compKey = 'Adept_Power';
 
     protected parseItem(item: BlankItem<'adept_power'>, itemData: ExtractItemType<'powers', 'power'>) {
         const system = item.system;

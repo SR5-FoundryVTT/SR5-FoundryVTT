@@ -81,7 +81,7 @@ export class ItemsParser {
             const metamagics = IH.getArray(chummerChar.metamagics?.metamagic).filter(meta => meta.improvementsource === "Metamagic");
             const echoes = IH.getArray(chummerChar.metamagics?.metamagic).filter(meta => meta.improvementsource === "Echo");
             items.push(...await new SimpleParser("metamagic").parseItems(metamagics));
-            items.push(...await new SimpleParser("echo", "Spell").parseItems(echoes));
+            items.push(...await new SimpleParser("echo").parseItems(echoes));
         }
 
         if (importOptions.powers)

@@ -10,7 +10,6 @@ type MappedType = ExtractItemType<'otherarmors', 'otherarmor'> & {
 
 export class OtherArmorParser extends Parser<'armor'> {
     protected readonly parseType = 'armor';
-    protected readonly compKey = 'Armor';
 
     protected parseItem(item: BlankItem<'armor'>, itemData: MappedType) {
         const system = item.system;

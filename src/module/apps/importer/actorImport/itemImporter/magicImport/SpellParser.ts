@@ -3,7 +3,6 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class SpellParser extends Parser<'spell'> {
     protected readonly parseType = 'spell';
-    protected readonly compKey = 'Spell';
 
     protected parseItem(item: BlankItem<'spell'>, itemData: ExtractItemType<'spells', 'spell'>) {
         const system = item.system;

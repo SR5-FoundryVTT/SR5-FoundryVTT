@@ -3,7 +3,6 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class QualityParser extends Parser<'quality'> {
     protected readonly parseType = 'quality';
-    protected readonly compKey = 'Quality';
 
     protected parseItem(item: BlankItem<'quality'>, itemData: ExtractItemType<'qualities', 'quality'>) {
         const system = item.system;

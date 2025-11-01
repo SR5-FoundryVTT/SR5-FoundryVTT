@@ -1,6 +1,6 @@
 import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
-import { BlankItem, ExtractItemType, Parser } from "../Parser";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 /**
  * Parses SINs and the attached licenses.
@@ -8,7 +8,6 @@ import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper
  */
 export class SinParser extends Parser<'sin'> {
     protected readonly parseType = 'sin';
-    protected readonly compKey = null;
 
     protected parseItem(item: BlankItem<'sin'>, itemData: ExtractItemType<'gears', 'gear'>) {
         const system = item.system;

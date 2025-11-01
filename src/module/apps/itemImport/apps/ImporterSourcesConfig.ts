@@ -51,7 +51,7 @@ export class ImporterSourcesConfig extends BaseClass {
      */
     static override PARTS = {
         content: {
-            template: "systems/shadowrun5e/dist/templates/apps/actor-importer-config.hbs",
+            template: "systems/shadowrun5e/dist/templates/apps/importer-sources-config.hbs",
         },
     };
 

@@ -4,7 +4,6 @@ import { SR5 } from "../../../../../config";
 
 export class LifestyleParser extends Parser<'lifestyle'> {
     protected readonly parseType = 'lifestyle';
-    protected readonly compKey = null;
 
     protected parseItem(item: BlankItem<'lifestyle'>, itemData: ExtractItemType<'lifestyles', 'lifestyle'>) {
         const system = item.system;

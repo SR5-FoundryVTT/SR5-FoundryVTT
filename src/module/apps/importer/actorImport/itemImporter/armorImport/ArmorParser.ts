@@ -4,7 +4,6 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class ArmorParser extends Parser<'armor'> {
     protected readonly parseType = 'armor';
-    protected readonly compKey = 'Armor';
 
     protected parseItem(item: BlankItem<'armor'>, itemData: ExtractItemType<'armors', 'armor'>) {
         const system = item.system;

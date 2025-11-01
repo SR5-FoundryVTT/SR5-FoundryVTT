@@ -3,7 +3,6 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class ComplexFormParser extends Parser<'complex_form'> {
     protected readonly parseType = 'complex_form';
-    protected readonly compKey = 'Complex_Form';
 
     protected parseItem(item: BlankItem<'complex_form'>, itemData: ExtractItemType<'complexforms', 'complexform'>) {
         const system = item.system;
