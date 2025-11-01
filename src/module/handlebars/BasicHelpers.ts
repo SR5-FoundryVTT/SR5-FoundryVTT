@@ -255,6 +255,6 @@ export const registerBasicHelpers = () => {
 
     Handlebars.registerHelper('hasKey', function(obj: Record<string, unknown>, key: string) {
         if (!obj || typeof obj !== 'object') return false;
-        return obj[key] !== undefined;
+        return Object.hasOwn(obj, key);
     });
 };

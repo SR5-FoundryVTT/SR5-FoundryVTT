@@ -14,9 +14,6 @@ export class AttributesPrep {
     static prepareAttributes(system: SR5Actor['system'], ranges?: Record<string, {min: number, max?: number}>) {
         const {attributes} = system;
 
-        // always have special attributes set to hidden
-        attributes.magic.hidden = system.special !== 'magic';
-        attributes.resonance.hidden = system.special !== 'resonance';
         attributes.edge.hidden = true;
         attributes.essence.hidden = true;
 
