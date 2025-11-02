@@ -171,7 +171,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollItem: SR5BaseActorSheet.#rollItem,
             rollSkill: SR5BaseActorSheet.#rollSkill,
             editSkill: SR5BaseActorSheet.#editSkill,
-            rollSkillSpec: SR5BaseActorSheet.#rollSkillSpec,
+            rollSkillSpecialization: SR5BaseActorSheet.#rollSkillSpec,
             openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
             addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
@@ -835,7 +835,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static async #rollItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const iid = SheetFlow.closestUuid(event.target);
-        const item = SheetFlow.fromUuidSync(iid);
+        const item = SheetFlow.fromUuidSync(iid) ?? await fromUuid(iid);
 
         if (!item || !(item instanceof SR5Item)) return;
         await this._handleRollItem(item, event);

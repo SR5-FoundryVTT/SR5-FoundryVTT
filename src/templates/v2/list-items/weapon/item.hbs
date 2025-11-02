@@ -15,14 +15,12 @@
             {{#if (usesAmmo item)}}
                 {{#iflt item.system.ammo.current.value item.system.ammo.current.max}}
                     <a data-action="weaponFullReload"
-                       data-tooltip="{{localize 'SR5.Weapon.Reload'}} ({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})"
-                       data-item-id="{{item.uuid}}">
+                       data-tooltip="{{localize 'SR5.Weapon.Reload'}} ({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})">
                         {{item.system.ammo.current.value}}/{{item.system.ammo.current.max}}
                     </a>
                     {{#ifgt item.system.ammo.partial_reload_value 0}}
                         <a data-action="weaponPartialReload"
-                           data-tooltip="{{localize 'SR5.Weapon.PartialReload'}} (+{{item.system.ammo.partial_reload_value}})"
-                           data-item-id="{{item.uuid}}">
+                           data-tooltip="{{localize 'SR5.Weapon.PartialReload'}} (+{{item.system.ammo.partial_reload_value}})">
                             <span class="fa-stack">
                                 <i class="fas fa-p"></i>
                                 <i class="fas fa-rotate"></i>
