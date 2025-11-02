@@ -43,6 +43,11 @@ const VehicleData = () => ({
         initial: "speed",
         choices: SR5.vehicle.environments,
     }),
+    category: new StringField({
+        required: true,
+        initial: "medium",
+        choices: SR5.vehicle.categories,
+    }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),
 

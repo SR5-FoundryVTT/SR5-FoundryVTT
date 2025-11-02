@@ -13,6 +13,8 @@
         "AutomateMultiDefenseModifierDescription": "Will automatically apply defense mod for multiple attacks",
         "AutomateProgressiveRecoil": "Automate progressive recoil",
         "AutomateProgressiveRecoilDescription": "Characters accrue progressive recoil until reset",
+        "CompendiumBrowserBlacklist": "Compendium Browser Blacklist",
+        "CompendiumBrowserBlacklistDescription": "List of compendiums to hide from the compendium browser",
         "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
         "DefaultOpposedTestActorSelectionDescription": "Always overwrite selected tokens with targets used for testing",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
@@ -290,6 +292,20 @@
                 "label": "Matrix Actions"
             },
             "Title": "System compendiums"
+        },
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "Clear Search",
+                "SearchPlaceholder": "Search results...",
+                "System": "System",
+                "World": "World"
+            },
+            "Tabs": {
+                "Actors": "Actors",
+                "Items": "Items",
+                "Settings": "Settings"
+            },
+            "Title": "Compendium Browser"
         },
         "Compendiums": {
             "Folders": {
@@ -1662,6 +1678,17 @@
         "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
         "Value": "Value",
         "Vehicle": {
+            "Category": "Category",
+            "Categories": {
+                "Micro": "Micro",
+                "Mini": "Mini",
+                "Small": "Small",
+                "Medium": "Medium",
+                "Large": "Large",
+                "Huge": "Huge",
+                "Anthro": "Anthromorphic",
+                "Missile": "Missile"
+            },
             "ChaseEnvironment": "Chase Environment",
             "Clearsight": "Clearsight",
             "ControlMode": "Control Mode",
