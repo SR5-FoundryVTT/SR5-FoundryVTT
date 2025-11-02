@@ -29,7 +29,7 @@ export type BaseType = {
     category_english?: string | null;
 };
 
-type Unwrap<T> = T extends Array<infer U> ? U : T;
+export type Unwrap<T> = T extends Array<infer U> ? U : T;
 export type ExtractItemType<
     FieldKey extends keyof ActorSchema,
     InnerKey extends keyof NonNullable<ActorSchema[FieldKey]>
