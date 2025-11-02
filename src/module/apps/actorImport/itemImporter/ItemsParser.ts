@@ -1,23 +1,24 @@
 import { Parser } from "./Parser";
+import { SYSTEM_NAME, FLAGS } from "@/module/constants";
 import * as IconAssign from "@/module/apps/iconAssigner/iconAssign";
 import { importOptionsType } from "../characterImporter/CharacterImporter";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 
-import { ArmorParser } from "./armorImport/ArmorParser";
-import { WareParser } from "./wareImport/WareParser";
-import { QualityParser } from "./bioImport/QualityParser";
-import { PowerParser } from "./magicImport/PowerParser";
-import { SpellParser } from "./magicImport/SpellParser";
-import { WeaponParser } from "./weaponImport/WeaponParser";
-import { LifestyleParser } from "./bioImport/LifestyleParser";
-import { ContactParser } from "./bioImport/ContactParser";
-import { SimpleParser } from "./importHelper/SimpleParser";
-import { CritterPowerParser } from "./magicImport/CritterPowerParser";
-import { RitualParser } from "./magicImport/RitualParser";
 import { ActorSchema } from "../ActorSchema";
-import { OtherArmorParser } from "./armorImport/OtherArmorParser";
-import { GearsParser } from "./importHelper/GearsParser";
+import { ArmorParser } from "./armorImport/ArmorParser";
 import { ComplexFormParser } from "./magicImport/ComplexFormParser";
+import { ContactParser } from "./bioImport/ContactParser";
+import { CritterPowerParser } from "./magicImport/CritterPowerParser";
+import { GearsParser } from "./importHelper/GearsParser";
+import { LifestyleParser } from "./bioImport/LifestyleParser";
+import { OtherArmorParser } from "./armorImport/OtherArmorParser";
+import { PowerParser } from "./magicImport/PowerParser";
+import { QualityParser } from "./bioImport/QualityParser";
+import { RitualParser } from "./magicImport/RitualParser";
+import { SimpleParser } from "./importHelper/SimpleParser";
+import { SpellParser } from "./magicImport/SpellParser";
+import { WareParser } from "./wareImport/WareParser";
+import { WeaponParser } from "./weaponImport/WeaponParser";
 
 export type Unwrap<T> = T extends Array<infer U> ? U : T;
 
@@ -25,6 +26,22 @@ export type Unwrap<T> = T extends Array<infer U> ? U : T;
  * Parses all items (qualities, weapons, gear, ...) from a chummer character.
  */
 export class ItemsParser {
+    /**
+     * Prepares the parser by setting up icon files and caching compendium indexes for item lookup.
+     */
+    private async prepareParser(importOptions: importOptionsType) {
+        Parser.iconSet = importOptions.assignIcons ? await IconAssign.getIconFiles() : null;
+        const compendiumList = game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder);
+
+        Parser.compendiumCache.clear();
+        for (const packId of compendiumList) {
+            const pack = game.packs.get(packId) as CompendiumCollection<"Item"> | undefined;
+            if (!pack || pack.metadata.type !== "Item") continue;
+
+            const index = await pack.getIndex({ fields: ["_id", "name", "type"] });
+            Parser.compendiumCache.set(packId, index);
+        }
+    }
 
     /**
      * Parses all items from a chummer char and returns an array of the corresponding foundry items.
@@ -35,7 +52,7 @@ export class ItemsParser {
         const items: Item.CreateData[] = [];
         Object.freeze(chummerChar);
 
-        Parser.iconSet = importOptions.assignIcons ? await IconAssign.getIconFiles() : null;
+        await this.prepareParser(importOptions);
 
         if (importOptions.qualities)
             items.push(...await new QualityParser().parseItems(chummerChar.qualities?.quality));
