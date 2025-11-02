@@ -1,7 +1,7 @@
 import { WeaponParser } from "../weaponImport/WeaponParser";
 import { GearsParser } from "../importHelper/GearsParser";
 import MountedWeaponParser from "./MountedWeaponParser";
-import { SR5Actor } from '../../../../../actor/SR5Actor';
+import { SR5Actor } from "../../../../actor/SR5Actor";
 import VehicleModsParser from "./VehicleModsParser";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { ExtractItemType } from "../Parser";

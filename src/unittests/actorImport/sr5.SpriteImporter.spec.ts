@@ -2,8 +2,8 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CompanionSprite } from './Examples/CompanionSprite';
-import { SpriteImporter } from '../../module/apps/importer/actorImport/spriteImporter/SpriteImporter';
-import { importOptionsType } from '@/module/apps/importer/actorImport/characterImporter/CharacterImporter';
+import { SpriteImporter } from '../../module/apps/actorImport/spriteImporter/SpriteImporter';
+import { importOptionsType } from '@/module/apps/actorImport/characterImporter/CharacterImporter';
 
 export const spriteImporterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();

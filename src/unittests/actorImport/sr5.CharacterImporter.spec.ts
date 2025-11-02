@@ -4,7 +4,7 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { ImportHelper as IH } from '@/module/apps/itemImport/helper/ImportHelper';
-import { CharacterImporter as CI, importOptionsType } from '../../module/apps/importer/actorImport/characterImporter/CharacterImporter';
+import { CharacterImporter as CI, importOptionsType } from '../../module/apps/actorImport/characterImporter/CharacterImporter';
 
 export const characterImporterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();

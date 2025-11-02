@@ -1,9 +1,9 @@
-import { ActorSchema } from '../ActorSchema';
-import * as IconAssign from '../../../iconAssigner/iconAssign';
+import { ActorSchema } from "../ActorSchema";
+import * as IconAssign from "../../iconAssigner/iconAssign";
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
-import { Sanitizer } from '@/module/sanitizer/Sanitizer';
-import { FLAGS, SYSTEM_NAME } from '@/module/constants';
+import { Sanitizer } from "@/module/sanitizer/Sanitizer";
+import { FLAGS, SYSTEM_NAME } from "@/module/constants";
 
 export type ItemSystems = SystemEntityType & Item.ConfiguredSubType;
 

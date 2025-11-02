@@ -1,7 +1,7 @@
-import { CharacterImporter } from "../../importer/actorImport/characterImporter/CharacterImporter";
-import { SpiritImporter } from "../../importer/actorImport/spiritImporter/SpiritImporter";
-import { SpriteImporter } from "../../importer/actorImport/spriteImporter/SpriteImporter";
-import { ActorFile, ActorSchema } from "../../importer/actorImport/ActorSchema";
+import { CharacterImporter } from "../../actorImport/characterImporter/CharacterImporter";
+import { SpiritImporter } from "../../actorImport/spiritImporter/SpiritImporter";
+import { SpriteImporter } from "../../actorImport/spriteImporter/SpriteImporter";
+import { ActorFile, ActorSchema } from "../../actorImport/ActorSchema";
 import { ImporterSourcesConfig } from "./ImporterSourcesConfig";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 

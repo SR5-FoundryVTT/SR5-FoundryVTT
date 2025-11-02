@@ -1,4 +1,4 @@
-import { SR5 } from "../../../../../config";
+import { SR5 } from "../../../../config";
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class LifestyleParser extends Parser<'lifestyle'> {

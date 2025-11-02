@@ -1,4 +1,4 @@
-import { ActorFile } from "@/module/apps/importer/actorImport/ActorSchema";
+import { ActorFile } from "@/module/apps/actorImport/ActorSchema";
 
 export const FireSpirit = {
   "?xml": {
