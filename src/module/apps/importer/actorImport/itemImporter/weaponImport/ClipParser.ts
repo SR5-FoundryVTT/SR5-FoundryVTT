@@ -26,11 +26,12 @@ export class ClipParser extends Parser<'ammo'> {
 
         if (ammobonus.weaponbonusdamage != null) {
             system.damage = Number(ammobonus.weaponbonusdamage_english.match(/(\d+)/)?.pop()) || 0;
-
             system.damageType = ammobonus.weaponbonusdamage_english.match(/S/)?.pop() === 'S' ? 'stun' : 'physical';
-
             system.element = (ammobonus.weaponbonusdamage_english || '').match(/\(e\)/)?.pop() === '(e)' ? 'electricity' : '';
         }
+    }
 
+    protected override parseCategoryFlags(item: BlankItem<'ammo'>, itemData: ClipType) {
+        return itemData.english_name.split(':')[0];
     }
 }

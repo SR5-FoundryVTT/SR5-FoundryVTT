@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class CritterPowerParser extends Parser<'critter_power'> {
@@ -16,13 +15,5 @@ export class CritterPowerParser extends Parser<'critter_power'> {
 
         if (itemData.duration_english)
             system.duration = itemData.duration_english;
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.fullname), this.parseType);
-        if (itemData.name_english !== itemData.fullname) {
-            setSubType(system, this.parseType, formatAsSlug(itemData.name_english));
-            if (system.importFlags.subType && itemData.extra_english)
-                system.importFlags.name = formatAsSlug(itemData.extra_english);
-        }
     }
 }

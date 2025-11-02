@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class ComplexFormParser extends Parser<'complex_form'> {
@@ -22,11 +21,5 @@ export class ComplexFormParser extends Parser<'complex_form'> {
             system.duration = 'sustained';
         else if (duration === 'P')
             system.duration = 'permanent';
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.fullname), this.parseType);
-        if (itemData.name_english !== itemData.fullname) {
-            setSubType(system, this.parseType, formatAsSlug(itemData.name_english));
-        }
     }
 }

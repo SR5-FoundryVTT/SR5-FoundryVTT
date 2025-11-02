@@ -1,5 +1,4 @@
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class ArmorParser extends Parser<'armor'> {
@@ -33,9 +32,5 @@ export class ArmorParser extends Parser<'armor'> {
                     armor.radiation += parseInt(mod.rating);
             }
         }
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
-        setSubType(system, this.parseType, formatAsSlug(itemData.category_english));
     }
 }

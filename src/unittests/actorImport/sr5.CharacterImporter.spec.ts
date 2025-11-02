@@ -139,7 +139,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.category, 'range');
 
             //import flags
-            assert.strictEqual(weapon.system.importFlags.isFreshImport, true);
+            assert.strictEqual(weapon.system.importFlags?.isFreshImport, true);
 
             //range
             assert.strictEqual(weapon.system.range.ranges.extreme, 60);

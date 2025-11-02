@@ -10,14 +10,9 @@ import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
  */
 export abstract class DataImporter {
     /**
-     * Whether to set icons for imported items.
+     * Set of icon paths to use for imported items.
      */
-    public static setIcons = true;
-
-    /**
-     * List of icon paths to use for imported items.
-     */
-    public static iconList: string[] = [];
+    public static iconSet: Set<string> | null = null;
 
     /**
      * Whether to override existing documents in the compendium.

@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class RitualParser extends Parser<'ritual'> {
@@ -13,9 +12,5 @@ export class RitualParser extends Parser<'ritual'> {
         system.action.type = 'varies';
         system.action.skill = 'ritual_spellcasting';
         system.action.attribute = 'magic';
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
-        setSubType(system, this.parseType, formatAsSlug(itemData.category_english));
     }
 }

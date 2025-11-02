@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 /**
@@ -28,9 +27,9 @@ export class AmmoParser extends Parser<'ammo'> {
         system.accuracy = Number(itemData.weaponbonusacc) || 0;
         system.blast = { radius: 0, dropoff: 0 };
         system.replaceDamage = false;
+    }
 
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
-        setSubType(system, this.parseType, formatAsSlug(itemData.name_english.split(':')[0]));
+    protected override parseCategoryFlags(item: BlankItem<'ammo'>, itemData: ExtractItemType<'gears', 'gear'>) {
+        return itemData.name_english.split(':')[0];
     }
 }

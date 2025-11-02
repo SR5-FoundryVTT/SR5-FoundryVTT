@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
@@ -15,9 +14,6 @@ export class SinParser extends Parser<'sin'> {
         // Create licenses if there are any
         if (itemData.children)
             system.licenses = this.parseLicenses(itemData.children);
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
     }
 
     private parseLicenses(licensesData: ExtractItemType<'gears', 'gear'>['children']) {

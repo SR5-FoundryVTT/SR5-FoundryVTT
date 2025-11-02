@@ -4,7 +4,7 @@ const { SchemaField } = foundry.data.fields;
 
 export const BaseItemData = () => ({
     description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    importFlags: new SchemaField(ImportFlagData(), { nullable: true, default: null }),
 });
 
 /**

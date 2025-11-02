@@ -1295,7 +1295,7 @@ export const SR5 = {
         'modifier': 'SR5.Modifier'
     },
 
-    itemSubTypeIconOverrides: {
+    itemCategoryIconOverrides: {
         action: {},
         adept_power: {
             'adept-spell': 'spell/spell'

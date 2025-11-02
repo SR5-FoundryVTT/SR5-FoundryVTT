@@ -1,4 +1,3 @@
-import { getValues, formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
 import { DamageTypeType } from "src/module/types/item/Action";
 import { DataDefaults } from "src/module/data/DataDefaults";
 import { ActorSchema } from "../../ActorSchema";
@@ -10,6 +9,12 @@ import { ClipParser } from "./ClipParser";
 
 export class WeaponParser extends Parser<'weapon'> {
     protected readonly parseType = 'weapon';
+
+    private getValues(val: string) {
+        const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
+        const l = val.match(regex);
+        return l || ['0'];
+    }
 
     private parseDamage(val: string) {
         const damage = {
@@ -59,7 +64,7 @@ export class WeaponParser extends Parser<'weapon'> {
         const action = system.action;
         const damage = system.action.damage;
 
-        damage.ap.base = Number(getValues(itemData.rawap)[0]) || 0;
+        damage.ap.base = Number(this.getValues(itemData.rawap)[0]) || 0;
 
         action.type = 'varies';
 
@@ -89,7 +94,7 @@ export class WeaponParser extends Parser<'weapon'> {
                 action.limit.attribute = 'physical';
                 accuracy = accuracy.replace('Physical', '').trim();
             }
-            action.limit.base = Number(getValues(accuracy)[0]) || 0;
+            action.limit.base = Number(this.getValues(accuracy)[0]) || 0;
         }
 
         if (itemData.type.toLowerCase() === 'melee') {
@@ -131,27 +136,21 @@ export class WeaponParser extends Parser<'weapon'> {
                 };
             }
         }
+    }
 
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
-
-        // Assign item subtype
+    protected override parseCategoryFlags(item: BlankItem<'weapon'>, itemData: ExtractItemType<'weapons', 'weapon'>) {
         let subType = '';
-        // range/melee/thrown
-        if (system.category) {
-            subType = formatAsSlug(system.category);
-        }
-        // exception for thrown weapons and explosives
-        const weaponCategory = formatAsSlug(itemData.category_english);
-        if (!(subType && ( weaponCategory === 'gear'))) {
-            subType = weaponCategory;
-        }
-        // deal with explosives
-        if (weaponCategory === 'gear' && itemData.name_english.includes(':')) {
-            subType = formatAsSlug(itemData.name_english.split(':')[0]);
-        }
+        if (item.system.category)
+            subType = IH.formatAsSlug(item.system.category);
 
-        setSubType(system, this.parseType, subType);
+        const weaponCategory = IH.formatAsSlug(itemData.category_english);
+        if (!(subType && ( weaponCategory === 'gear')))
+            subType = weaponCategory;
+
+        if (weaponCategory === 'gear' && itemData.name_english.includes(':'))
+            subType = IH.formatAsSlug(itemData.name_english.split(':')[0]);
+
+        return subType;
     }
 
     override async getEmbeddedItems(itemData: ExtractItemType<'weapons', 'weapon'>): Promise<Item.Source[]> {
@@ -194,7 +193,7 @@ export class WeaponParser extends Parser<'weapon'> {
 
         const range = DataDefaults.createData('range_weapon');
         system.range = range;
-        range.rc.base = Number(getValues(itemData.rawrc)[0]) || 0;
+        range.rc.base = Number(this.getValues(itemData.rawrc)[0]) || 0;
 
         if (itemData.mode) {
             const modes = itemData.mode_english_noammo!.toLowerCase();

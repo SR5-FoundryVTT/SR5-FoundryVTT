@@ -1,3 +1,5 @@
+import { Parser } from "./Parser";
+import * as IconAssign from "@/module/apps/iconAssigner/iconAssign";
 import { importOptionsType } from "../characterImporter/CharacterImporter";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 
@@ -32,6 +34,8 @@ export class ItemsParser {
     async parse(chummerChar: ActorSchema, importOptions: importOptionsType) {
         const items: Item.CreateData[] = [];
         Object.freeze(chummerChar);
+
+        Parser.iconSet = importOptions.assignIcons ? await IconAssign.getIconFiles() : null;
 
         if (importOptions.qualities)
             items.push(...await new QualityParser().parseItems(chummerChar.qualities?.quality));

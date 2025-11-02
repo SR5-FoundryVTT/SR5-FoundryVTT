@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class SpellParser extends Parser<'spell'> {
@@ -12,10 +11,6 @@ export class SpellParser extends Parser<'spell'> {
         this.parseDuration(system, itemData);
         this.prepareAction(system);
         this.handleSpellTypeSpecifics(system, itemData);
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
-        setSubType(system, this.parseType, formatAsSlug(itemData.category_english));
     }
 
     private prepareSystem(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {

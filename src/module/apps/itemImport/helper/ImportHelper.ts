@@ -33,7 +33,12 @@ export class ImportHelper {
      * @param name The item's name or subtype name to reformat
      */
     public static formatAsSlug(name: string): string {
-        return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        return name
+            .normalize('NFD')                // split accents from letters
+            .replace(/[\u0300-\u036f]/g, '') // remove diacritics
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')     // replace all non-alphanumerics with -
+            .replace(/^-+|-+$/g, '');        // trim hyphens
     }
 
     public static guidToId(guid: string): string {

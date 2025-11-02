@@ -56,9 +56,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         if ('technology' in system && system.technology)
             this.setTechnology(system.technology, jsonData);
 
-        // Add Icon
-        if (DataImporter.setIcons)
-            this.setIcons(entity, system, jsonData);
+        this.setImporterFlags(entity, jsonData);
 
         if ('bonus' in jsonData && jsonData.bonus)
             bonusPromise = BH.addBonus(entity as any, jsonData.bonus);
@@ -87,20 +85,20 @@ export abstract class Parser<SubType extends SystemEntityType> {
         technology.conceal.base = 'conceal' in jsonData && jsonData.conceal ? Number(jsonData.conceal._TEXT) || 0 : 0;
     }
 
-    protected setIcons(entity: Actor.CreateData | Item.CreateData, system: SystemType<SubType>, jsonData: ParseData) {
-        // Why don't we have importFlags as base in actors?
-        if ('importFlags' in system && system.importFlags) {
-            system.importFlags.name = IH.formatAsSlug(jsonData.name._TEXT);
-            system.importFlags.type = this.parseType;
-            system.importFlags.subType = '';
-            system.importFlags.isFreshImport = true;
+    protected setImporterFlags(entity: Actor.CreateData | Item.CreateData, jsonData: ParseData) {
+        let category = 'category' in jsonData ? IH.formatAsSlug(jsonData.category?._TEXT || '') : '';
+        if (category && !Object.keys(SR5.itemCategoryIconOverrides[this.parseType as string]).includes(category))
+            category = '';
 
-            const subType = 'category' in jsonData ? IH.formatAsSlug(jsonData.category?._TEXT || '') : '';
-            if (subType && Object.keys(SR5.itemSubTypeIconOverrides[this.parseType as string]).includes(subType))
-                system.importFlags.subType = subType;
+        entity.system!.importFlags = {
+            category,
+            isFreshImport: true,
+            name: jsonData.name._TEXT,
+            sourceid: jsonData.id._TEXT,
+        };
 
-            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entity.system);
-        }
+        if (DataImporter.iconSet)
+            entity.img = IconAssign.iconAssign(DataImporter.iconSet, entity);
     }
 
     protected getBaseSystem(createData: SystemConstructorArgs<SubType> = {}) {

@@ -26,6 +26,7 @@ export type BaseType = {
     conditionmonitor?: string | null;
     conceal?: string | null;
     rawconceal?: string | null;
+    category_english?: string | null;
 };
 
 type Unwrap<T> = T extends Array<infer U> ? U : T;
@@ -38,8 +39,8 @@ export type BlankItem<T extends ItemSystems> = ReturnType<Parser<T>["createItem"
 
 export abstract class Parser<T extends ItemSystems> {
     protected abstract readonly parseType: T;
-    static iconList: string[] | undefined;
     static readonly DEFAULT_NAME = "Unnamed";
+    static iconSet: Set<string> | null = null;
 
     protected createItem(itemData: BaseType) {
         type FlagType = NonNullable<NonNullable<Item.CreateData['flags']>['shadowrun5e']>;
@@ -125,6 +126,19 @@ export abstract class Parser<T extends ItemSystems> {
             technology.conceal.base = Number(itemData.rawconceal ?? itemData.conceal) || 0;
     }
 
+    protected parseCategoryFlags(item: BlankItem<T>, itemData: BaseType) {
+        return itemData.category_english ?? '';
+    }
+
+    protected parseImportFlags(item: BlankItem<T>, itemData: BaseType) {
+        item.system.importFlags = {
+            isFreshImport: true,
+            sourceid: itemData.sourceid ?? '',
+            category: this.parseCategoryFlags(item, itemData),
+            name: itemData.name_english ?? itemData.name ?? '',
+        };
+    }
+
     public async parseItems(itemsData: BaseType[] | BaseType | undefined) {
         if (!itemsData) return [];
 
@@ -140,11 +154,12 @@ export abstract class Parser<T extends ItemSystems> {
                 this.parseDescription(item, itemData);
                 this.parseTechnology(item, itemData);
                 this.parseItem(item, itemData);
+                this.parseImportFlags(item, itemData);
 
                 item.flags.shadowrun5e.embeddedItems = await this.getEmbeddedItems(itemData);
 
-                if (Parser.iconList && !item.img)
-                    item.img = IconAssign.iconAssign(item.system.importFlags, Parser.iconList, item.system);
+                if (Parser.iconSet && !item.img)
+                    item.img = IconAssign.iconAssign(Parser.iconSet, item);
 
                 const schema = CONFIG["Item"].dataModels[item.type].schema;
                 const correctionLogs = Sanitizer.sanitize(schema, item.system);

@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class ContactParser extends Parser<'contact'> {
@@ -23,9 +22,5 @@ export class ContactParser extends Parser<'contact'> {
         system.loyalty = Number(itemData.loyalty) || 0;
         system.family = itemData.family === 'True';
         system.blackmail = itemData.blackmail === 'True';
-
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(item.name), this.parseType);
     }
 }

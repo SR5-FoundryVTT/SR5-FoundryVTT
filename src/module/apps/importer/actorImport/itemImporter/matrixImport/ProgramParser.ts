@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 /**
@@ -16,9 +15,9 @@ export class ProgramParser extends Parser<'program'> {
             system.type = 'hacking_program'
         else if (itemData.category_english === 'Software')
             system.type = 'agent'
+    }
 
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
-        setSubType(system, this.parseType, system.type);
+    protected override parseCategoryFlags(item: BlankItem<'program'>, itemData: ExtractItemType<'gears', 'gear'>) {
+        return item.system.type;
     }
 }

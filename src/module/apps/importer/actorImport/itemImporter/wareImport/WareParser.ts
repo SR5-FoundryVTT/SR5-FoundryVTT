@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class WareParser extends Parser<'bioware' | 'cyberware'> {
@@ -21,9 +20,5 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
         if (this.parseType === 'bioware') {
             system.technology.wireless = 'none';
         }
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
-        setSubType(system, this.parseType, formatAsSlug(itemData.category_english));
     }
 }

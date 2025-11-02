@@ -1,4 +1,3 @@
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions";
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 /**
@@ -29,9 +28,9 @@ export class DeviceParser extends Parser<'device'> {
             Entertainment: 'commlink', // prepaid commlinks
         } as const;
         system.category = categoryMap[itemData.category_english as keyof typeof categoryMap] ?? 'commlink';
+    }
 
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.name_english), this.parseType);
-        setSubType(system, this.parseType, system.category);
+    protected override parseCategoryFlags(item: BlankItem<'device'>, itemData: ExtractItemType<'gears', 'gear'>) {
+        return item.system.category;
     }
 }

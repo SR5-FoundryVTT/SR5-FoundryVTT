@@ -1,5 +1,4 @@
 
-import { formatAsSlug, genImportFlags, setSubType } from "../importHelper/BaseParserFunctions"
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 type MappedType = ExtractItemType<'otherarmors', 'otherarmor'> & {
@@ -18,11 +17,9 @@ export class OtherArmorParser extends Parser<'armor'> {
         armor.mod = itemData.armor.includes('+');
         armor.value = Number(itemData.armor) || 0;
         system.technology.equipped = true;
+    }
 
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(itemData.objectname_english), this.parseType);
-        if (itemData.improvesource) {
-            setSubType(system, this.parseType, formatAsSlug(itemData.improvesource));
-        }
+    protected override parseCategoryFlags(item: BlankItem<'armor'>, itemData: MappedType) {
+        return itemData.improvesource ?? '';
     }
 }

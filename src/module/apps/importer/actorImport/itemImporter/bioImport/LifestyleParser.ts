@@ -1,6 +1,5 @@
-import { formatAsSlug, genImportFlags } from "../importHelper/BaseParserFunctions"
-import { BlankItem, ExtractItemType, Parser } from "../Parser";
 import { SR5 } from "../../../../../config";
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class LifestyleParser extends Parser<'lifestyle'> {
     protected readonly parseType = 'lifestyle';
@@ -25,8 +24,5 @@ export class LifestyleParser extends Parser<'lifestyle'> {
         // The name of the lifestyle is optional, so we use a fallback here.
         if (item.name === Parser.DEFAULT_NAME)
             item.name ||= itemData.baselifestyle;
-
-        // Assign import flags
-        system.importFlags = genImportFlags(formatAsSlug(item.name), this.parseType);
     }
 }
