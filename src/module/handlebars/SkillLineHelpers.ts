@@ -11,7 +11,7 @@ export const registerSkillLineHelpers = () => {
             const specSpan = document.createElement('a');
             specSpan.textContent = spec;
             specSpan.className = 'skill-specialization';
-            specSpan.dataset.action = 'skillSpecRoll';
+            specSpan.dataset.action = 'rollSkillSpecialization';
             specSpan.dataset.skill = skill.id
             span.appendChild(specSpan);
         }

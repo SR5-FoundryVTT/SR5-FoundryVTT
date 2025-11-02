@@ -48,7 +48,7 @@
         </div>
         {{#if @root.isPlayMode}}
         <div class="list-item-col">
-            <a data-action="rollSkillSpecialization">{{skillSpecializations skill}}</a>
+            {{skillSpecializations skill}}
         </div>
         {{/if}}
         <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">

@@ -1429,10 +1429,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #rollSkillSpec(this: SR5BaseActorSheet, event) {
         event.preventDefault();
-        // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
-        // const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
-        const skillId = $(event.target).closest('a').data().skill;
-        return this.actor.rollSkill(skillId, { event, specialization: true });
+        const closest = this._closestSkillTarget(event.target);
+        const skillId = closest?.dataset.skillId;
+        if (skillId) {
+            await this.actor.rollSkill(skillId, { event, specialization: true });
+        }
     }
 
     async _openSkillSource(target) {
