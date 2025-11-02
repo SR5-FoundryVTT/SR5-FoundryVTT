@@ -175,6 +175,9 @@ export const MatrixTargetingFlow = {
                 // Filter out persona based on matrix rules.
                 if (!actor.matrixPersonaIsVisible(target)) continue;
 
+                // filter out targets that don't have a persona or any wireless devices
+                if (!target.hasPersona && !target.hasWirelessDevices()) continue;
+
                 const type = MatrixNetworkFlow.getDocumentType(target);
                 targets.push({
                     name: token.name,
