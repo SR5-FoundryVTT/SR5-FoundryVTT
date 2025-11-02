@@ -9,6 +9,7 @@ import { Version0_30_3 } from './versions/Version0_30_3';
 import { Version0_30_6 } from './versions/Version0_30_6';
 import { Version0_30_7 } from './versions/Version0_30_7';
 import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
+import { Version0_30_8 } from '@/module/migrator/versions/Version0_30_8';
 const { deepClone } = foundry.utils;
 
 /**
@@ -42,6 +43,7 @@ export class Migrator {
         new Version0_30_3(),
         new Version0_30_6(),
         new Version0_30_7(),
+        new Version0_30_8(),
     ] as const;
 
     private static documentsToBeMigrated: number = 0;
