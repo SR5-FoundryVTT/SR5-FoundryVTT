@@ -11,7 +11,7 @@ export const AttributeField = (limit?: keyof typeof SR5.limits) => ({
         blank: true,
         readonly: true,
         ...(limit ? { initial: limit } : {}),
-        choices: limit ? { limit: SR5.limits[limit] } : SR5.limits,
+        choices: limit ? { [limit]: SR5.limits[limit] } : SR5.limits,
     }),
 });
 
