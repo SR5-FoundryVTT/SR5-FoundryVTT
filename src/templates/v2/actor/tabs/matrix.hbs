@@ -12,28 +12,32 @@
             {{#if (isType actor 'sprite')}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Level"}}</label>
-                    <a data-attribute-modifier-tooltip="level"
+                    <button class="icon sr5-icon"
+                       data-attribute-modifier-tooltip="level"
                        data-action="rollAttribute"
                        data-attribute-id="level">
                         {{system.level}}
-                    </a>
+                    </button>
                 </div>
             {{else}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Labels.ActorSheet.DeviceRating"}}</label>
-                    <a data-attribute-modifier-tooltip="rating"
+                    <button class="icon sr5-icon"
+                       data-attribute-modifier-tooltip="rating"
                        data-action="rollAttribute"
                        data-attribute-id="rating">
                         {{system.matrix.rating}}
-                    </a>
+                    </button>
                 </div>
             {{/if}}
             {{#if (isType actor 'character' 'vehicle')}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Labels.Sheet.RebootDevice"}}</label>
-                    <a data-action="rebootPersona" data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
+                    <button class="icon sr5-icon"
+                            data-action="rebootPersona"
+                            data-tooltip="SR5.Tooltips.Actor.RebootPersonaAndClearAllMarks">
                         <i class="fas fa-power-off"></i>
-                    </a>
+                    </button>
                 </div>
             {{/if}}
         </div>
@@ -72,7 +76,7 @@
                                 </div>
                             {{else}}
                                 <label>{{localize "SR5.Labels.ActorSheet.NoNetwork"}}</label>
-                                {{#if (isType actor 'vehicle')}}
+                                {{#if (and (isType actor 'vehicle') vehicle.driver)}}
                                     <a data-action="connectToDriver">
                                         {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
                                     </a>
@@ -82,16 +86,18 @@
                     </div>
                     <div class="list-item-icons">
                         {{#if vehicle.master}}
-                            <a data-action="removeMaster" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                            <button class="icon sr5-icon" data-action="removeMaster" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
                                 <i class="fas fa-right-from-bracket"></i>
-                            </a>
+                            </button>
                         {{else if network}}
-                            <a data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
+                            <button class="icon sr5-icon" data-action="disconnectNetwork" data-tooltip="SR5.Tooltips.Actor.DisconnectNetwork">
                                 <i class="fas fa-right-from-bracket"></i>
-                            </a>
+                            </button>
                         {{/if}}
                         {{#unless (or (isType network 'host') (isType vehicle.master 'host'))}}
-                            <a data-action="openNetworkManager" data-tooltip="SR5.OpenNetworkManager"><i class="fas fa-network-wired"></i></a>
+                            <button class="icon sr5-icon" data-action="openNetworkManager" data-tooltip="SR5.OpenNetworkManager">
+                                <i class="fas fa-network-wired"></i>
+                            </button>
                         {{/unless}}
                     </div>
                 </div>
