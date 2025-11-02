@@ -1,7 +1,8 @@
 import JSZip from "jszip";
-import * as IconAssign from "../../iconAssigner/iconAssign";
 import { Constants } from "../importer/Constants";
 import { ImportHelper } from "../helper/ImportHelper";
+import { SYSTEM_NAME, FLAGS } from "@/module/constants";
+import * as IconAssign from "../../iconAssigner/iconAssign";
 
 import { ActionImporter } from "../importer/ActionImporter";
 import { AdeptPowerImporter } from "../importer/AdeptPowerImporter";
@@ -271,9 +272,18 @@ export class BulkImporter extends BaseClass {
             }
         }
 
-        // Re-lock all compendiums
-        for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG))
-            await game.packs.get("world." + compendium.pack)?.configure({ locked: true });
+        // Lock all compendiums and update compendium order
+        const compendiumList = game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder);
+        for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG)) {
+            // Lock compendium
+            await game.packs.get('world.' + compendium.pack)?.configure({ locked: true });
+
+            // Add to compendium order if not present
+            if (!compendiumList.includes(compendium.pack))
+                compendiumList.push('world.' + compendium.pack);
+        }
+
+        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, compendiumList);
 
         // Finalize and notify
         ui.notifications?.warn("SR5.Warnings.BulkImportPerformanceWarning", { localize: true });
