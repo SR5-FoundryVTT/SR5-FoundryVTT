@@ -334,11 +334,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         return partContext;
     }
+
     async _prepareFavorites() {
         const favorites: SR5Item[] = [];
         for (const idOrUuid of this.actor.system.favorites) {
             if (idOrUuid.includes('.')) {
-                const doc = SheetFlow.fromUuidSync(idOrUuid);
+                let doc = SheetFlow.fromUuidSync(idOrUuid);
+                if (!doc) doc = await foundry.utils.fromUuid(idOrUuid);
                 if (doc && doc instanceof SR5Item) favorites.push(doc);
             } else {
                 const item = this.actor.items.get(idOrUuid);
@@ -394,6 +396,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this.prepareModifierTooltips();
         this.#filterActiveSkillsElements();
 
+        // drag and drop handling to change the positions of favorited items
         const dragDropFavorites = new foundry.applications.ux.DragDrop({
             dragSelector: '.favorite',
             dropSelector: '.favorite',
@@ -403,7 +406,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             },
             callbacks: {
                 dragstart: this._onDragStartFavorite.bind(this),
-                dragover: this._onDragOverFavorite.bind(this),
                 drop: this._onDragDropFavorite.bind(this),
             }
         });
@@ -418,24 +420,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return this.isEditable;
     }
 
-    _onDragStartFavorite(event) {
+    async _onDragStartFavorite(event) {
         const target = event.currentTarget;
-        let dragData;
 
         const uuid = SheetFlow.closestUuid(target);
         const itemId = SheetFlow.closestItemId(target);
 
-        dragData = {
+        const dragData = {
             uuid,
             itemId,
         }
 
-        // Set data transfer
-        if (!dragData) return;
+        // Set data transfer data
         event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
     }
 
-    _onDragDropFavorite(event) {
+    async _onDragDropFavorite(event) {
         const target = event.target;
         const favorites = this.actor.system.favorites.slice();
         const data = TextEditor.getDragEventData(event) as any;
@@ -460,10 +460,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             favorites[sourceIndex] = ft;
             await this.actor.update({system: { favorites }})
         }
-    }
-
-    _onDragOverFavorite(event) {
-
     }
 
     /** Listeners used by _all_ actor types! */
