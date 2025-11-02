@@ -13,6 +13,8 @@
         "AutomateMultiDefenseModifierDescription": "Aplicará automaticamente o modificador de defesa para múltiplos ataques",
         "AutomateProgressiveRecoil": "Automatizar recuo progressivo",
         "AutomateProgressiveRecoilDescription": "Personagens acumulam recuo progressivo até serem reiniciados",
+        "CompendiumBrowserBlacklist": "Lista Negra do Navegador de Compêndio",
+        "CompendiumBrowserBlacklistDescription": "Lista de compêndios a serem ocultados no navegador de compêndios",
         "DefaultOpposedTestActorSelection": "Sobrescrever seleções de token de testes de oposição",
         "DefaultOpposedTestActorSelectionDescription": "Sempre sobrescrever tokens selecionados com alvos usados para testes",
         "DieFaceLabels": "Rótulos das Faces dos Dados",
@@ -232,6 +234,20 @@
         "Collapse": "Recolher",
         "CollapseAll": "Recolher Tudo",
         "CommonProgram": "Programa Comum",
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "Limpar Pesquisa",
+                "SearchPlaceholder": "Pesquisar por...",
+                "System": "Sistema",
+                "World": "Mundo"
+            },
+            "Tabs": {
+                "Actors": "Atores",
+                "Items": "Itens",
+                "Settings": "Configurações"
+            },
+            "Title": "Navegador de Compêndio"
+        },
         "Compendiums": {
             "sr5critter": "Criaturas & Espíritos & Sprites",
             "sr5drone": "Drones & Veículos",

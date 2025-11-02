@@ -21,15 +21,14 @@ import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/t
 import { DescriptionType } from 'src/module/types/template/Description';
 import { ChatData } from 'src/module/item/ChatData';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
-import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
 
 /**
  * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
  */
-export interface SheetItemData {
+export interface SheetItemData<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> {
     type: string,
     name: string,
-    system: SR5Item['system'],
+    system: SR5Item<SubType>['system'],
     properties: string[],
     description: DescriptionType
 }
@@ -62,10 +61,8 @@ let globalSkillAppId: number = -1;
  * @param b Any type of item data
  * @returns
  */
-const sortByName = (a, b) => {
-    if (a.name > b.name) return 1;
-    if (a.name < b.name) return -1;
-    return 0;
+const sortByName = (a: { name: string }, b: { name: string }) => {
+    return a.name.localeCompare(b.name, game.i18n.lang);
 };
 
 /**
@@ -75,15 +72,13 @@ const sortByName = (a, b) => {
  * @param b Any type of item data
  * @returns
  */
-const sortByEquipped = (a, b) => {
+const sortByEquipped = (a: SheetItemData, b: SheetItemData) => {
     const leftEquipped = a.system?.technology?.equipped;
     const rightEquipped = b.system?.technology?.equipped;
 
     if (leftEquipped && !rightEquipped) return -1;
     if (rightEquipped && !leftEquipped) return 1;
-    if (a.name > b.name) return 1;
-    if (a.name < b.name) return -1;
-    return 0;
+    return sortByName(a, b);
 };
 
 /**
@@ -93,10 +88,10 @@ const sortByEquipped = (a, b) => {
  * @param b A quality item data
  * @returns
  */
-const sortyByQuality = (a: any, b: any) => {
+const sortByQuality = (a: SheetItemData<'quality'>, b: SheetItemData<'quality'>) => {
     if (a.system.type === 'positive' && b.system.type === 'negative') return -1;
     if (a.system.type === 'negative' && b.system.type === 'positive') return 1;
-    return a.name < b.name ? -1 : 1;
+    return sortByName(a, b);
 }
 
 export interface SR5BaseSheetDelays {
@@ -1023,7 +1018,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             // Build inventory list this item should be shown an.
             const addTo: string[] = inventory.showAll ? Object.keys(inventoriesSheet) : [inventory.name];
 
-            addTo.forEach(name => {
+            for (const name of addTo) {
                 const inventorySheet = inventoriesSheet[name];
 
                 // Should an item have been added to any inventory that wouldn't cary it's type normaly
@@ -1038,7 +1033,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 }
 
                 inventorySheet.types[item.type].items.push(sheetItem);
-            })
+            }
         }
 
         Object.values(inventoriesSheet).forEach(inventory => {
@@ -1196,7 +1191,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         Object.entries(itemsByType).forEach(([type, items]) => {
             switch (type) {
                 case 'quality':
-                    items.sort(sortyByQuality);
+                    (items as SheetItemData<'quality'>[]).sort(sortByQuality);
                     break;
                 case 'program':
                     items.sort(sortByEquipped);

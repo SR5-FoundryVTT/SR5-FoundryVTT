@@ -67,6 +67,7 @@ export const FLAGS = {
     UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
     MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
+    CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
     DieFaceLabels: "DieFaceLabels"
 } as const;
 export const CORE_NAME = 'core';
