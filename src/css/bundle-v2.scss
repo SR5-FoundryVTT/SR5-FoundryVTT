@@ -138,7 +138,7 @@
         // modify tabs to have a darkred background and light text
         // when selected, the tab inverts its colors to be a light background with darkred text
         .tabs {
-            padding-inline: .25rem;
+            padding-inline: 1px;
             margin-top: .5rem;
             border-top: none;
             border-bottom: 1px solid $darkred;

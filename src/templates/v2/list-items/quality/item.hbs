@@ -11,8 +11,12 @@
         </div>
 
         <div class="list-item-col skinny-col">
-            <label>
-                {{localizeOb item.system.type @root.config.qualityTypes}}
+            <label data-tooltip="{{localizeOb item.system.type @root.config.qualityTypes}}">
+                {{#if (eq item.system.type 'positive')}}
+                    <i class="fas fa-plus"></i>
+                {{else if (eq item.system.type 'negative')}}
+                    <i class="fas fa-minus"></i>
+                {{/if}}
             </label>
         </div>
         <div class="list-item-col rtg-col">

@@ -17,6 +17,7 @@
 
         &.list-item-subcategory {
             padding-left: .5rem;
+            border-left: 1px solid $silver;
         }
 
         .list-item {
@@ -218,9 +219,10 @@
             }
 
             &.matrix-network-col {
-                flex: 0 0 4rem;
+                flex: 0 0 5rem;
                 > label {
-                    width: 4rem;
+                    width: 5rem;
+                    text-align: center;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -250,6 +252,12 @@
             align-items: center;
             gap: 0.25rem;
             margin-right: 2px;
+
+            &.midd-icons {
+                width: 2.5rem;
+                min-width: 2.5rem;
+                max-width: 2.5rem;
+            }
 
             &.skinny-icons {
                 width: 1.5rem;

@@ -11,7 +11,7 @@
         </div>
 
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/item-rating-col.hbs' item }}
-        <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        <div class="list-item-icons">
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
             {{#if (isOwner item owner=@root.actor)}}

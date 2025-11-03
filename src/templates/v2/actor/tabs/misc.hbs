@@ -133,7 +133,7 @@
             <!-- Situational Modifiers Section -->
             {{#if situationModifiers}}
             <div>
-                <div class="list-item list-item-header">
+                <div class="list-item list-item-header header-for-scrollable">
                     <div class="list-item-start">
                         <label>
                             {{localize "SR5.SituationalModifiersApplication.Title"}}
@@ -145,7 +145,7 @@
                 </div>
                 {{#each situationModifiers}}
                 {{#if (not this.hidden)}}
-                    <div class="list-item">
+                    <div class="list-item header-for-scrollable">
                         <div class="list-item-start">
                             <label>{{localize this.label}}</label>
                         </div>
