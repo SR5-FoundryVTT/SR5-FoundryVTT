@@ -1,11 +1,9 @@
-import { SR5 } from "@/module/config";
 import { ParseData } from "./Types";
 import { CompendiumKey } from "../importer/Constants";
 import { DataImporter } from "../importer/DataImporter";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { BonusHelper as BH } from "../helper/BonusHelper";
 import * as IconAssign from "../../iconAssigner/iconAssign";
-import { ImportHelper as IH } from "../helper/ImportHelper";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
 
@@ -86,9 +84,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
     }
 
     protected setImporterFlags(entity: Actor.CreateData | Item.CreateData, jsonData: ParseData) {
-        let category = 'category' in jsonData ? IH.formatAsSlug(jsonData.category?._TEXT || '') : '';
-        if (category && !Object.keys(SR5.itemCategoryIconOverrides[this.parseType as string]).includes(category))
-            category = '';
+        const category = 'category' in jsonData ? jsonData.category?._TEXT || '' : '';
 
         entity.system!.importFlags = {
             category,

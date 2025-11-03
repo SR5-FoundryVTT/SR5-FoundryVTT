@@ -1,5 +1,6 @@
 import { SR5 } from "../../config";
 import { FLAGS, SYSTEM_NAME } from './../../constants';
+import { ImportHelper as IH } from "../itemImport/helper/ImportHelper";
 
 const DEFAULT_ICON = "icons/svg/item-bag.svg";
 const IMG_EXTENSIONS = ['.svg', '.webp', '.png', '.jpg', '.jpeg', '.avif'];
@@ -58,9 +59,9 @@ export function iconAssign(
     }
 
     const importFlags = system.importFlags;
-    const imgName = importFlags.name;
-    const imgType = doc.type as Actor.ConfiguredSubType | Item.ConfiguredSubType;
-    const imgCategory = importFlags.category;
+    const imgName = IH.formatAsSlug(importFlags.name || '');
+    const imgType = IH.formatAsSlug(doc.type);
+    const imgCategory = IH.formatAsSlug(importFlags.category || '');
     const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides);
     const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder)
                         || "systems/shadowrun5e/dist/icons/importer/";
@@ -68,7 +69,7 @@ export function iconAssign(
     let override = '';
     if (useOverrides) {
         const typeOverrides = SR5.itemCategoryIconOverrides[imgType];
-        if (typeof typeOverrides === 'object' && imgCategory && typeOverrides[imgCategory]) {
+        if (typeof typeOverrides === 'object' && typeOverrides[imgCategory]) {
             override = typeOverrides[imgCategory];
         } else if (typeof typeOverrides === 'string') {
             override = typeOverrides;

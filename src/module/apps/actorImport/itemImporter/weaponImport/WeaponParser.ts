@@ -139,18 +139,18 @@ export class WeaponParser extends Parser<'weapon'> {
     }
 
     protected override parseCategoryFlags(item: BlankItem<'weapon'>, itemData: ExtractItemType<'weapons', 'weapon'>) {
-        let subType = '';
+        let category = '';
         if (item.system.category)
-            subType = IH.formatAsSlug(item.system.category);
+            category = item.system.category;
 
-        const weaponCategory = IH.formatAsSlug(itemData.category_english);
-        if (!(subType && ( weaponCategory === 'gear')))
-            subType = weaponCategory;
+        const weaponCategory = itemData.category_english;
+        if (!(category && ( weaponCategory === 'gear')))
+            category = weaponCategory;
 
         if (weaponCategory === 'gear' && itemData.name_english.includes(':'))
-            subType = IH.formatAsSlug(itemData.name_english.split(':')[0]);
+            category = itemData.name_english.split(':')[0];
 
-        return subType;
+        return category;
     }
 
     override async getEmbeddedItems(itemData: ExtractItemType<'weapons', 'weapon'>): Promise<Item.Source[]> {
