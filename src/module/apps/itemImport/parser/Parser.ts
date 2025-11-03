@@ -42,6 +42,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         let bonusPromise: Promise<void> | undefined;
 
         const entity = {
+            img: undefined as string | undefined | null,
             name: jsonData.translate?._TEXT ?? jsonData.name._TEXT,
             type: this.parseType as any,
             system: this.getSanitizedSystem(jsonData),
@@ -55,6 +56,9 @@ export abstract class Parser<SubType extends SystemEntityType> {
             this.setTechnology(system.technology, jsonData);
 
         this.setImporterFlags(entity, jsonData);
+
+        if (DataImporter.iconSet)
+            entity.img = IconAssign.iconAssign(DataImporter.iconSet, entity);
 
         if ('bonus' in jsonData && jsonData.bonus)
             bonusPromise = BH.addBonus(entity as any, jsonData.bonus);
@@ -92,9 +96,6 @@ export abstract class Parser<SubType extends SystemEntityType> {
             name: jsonData.name._TEXT,
             sourceid: jsonData.id._TEXT,
         };
-
-        if (DataImporter.iconSet)
-            entity.img = IconAssign.iconAssign(DataImporter.iconSet, entity);
     }
 
     protected getBaseSystem(createData: SystemConstructorArgs<SubType> = {}) {

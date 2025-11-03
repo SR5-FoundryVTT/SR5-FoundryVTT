@@ -31,6 +31,14 @@ export class AmmoParser extends Parser<'ammo'> {
         return system;
     }
 
+    protected override setImporterFlags(entity: Actor.CreateData | Item.CreateData, jsonData: Gear) {
+        super.setImporterFlags(entity, jsonData);
+
+        if (entity.system!.importFlags!.category === 'Ammunition') {
+            entity.system!.importFlags!.category = entity.name.split(':')[0].trim();
+        }
+    }
+
     public override async Parse(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
         const item = await super.Parse(jsonData, compendiumKey) as Item.CreateData;
         const system = item.system as SystemType<'ammo'>;
