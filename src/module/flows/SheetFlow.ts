@@ -1,5 +1,4 @@
 import { formatStrict } from '@/module/utils/strings';
-import { SR5Item } from '@/module/item/SR5Item';
 import { LinksHelpers } from '@/module/utils/links';
 
 export const SheetFlow = {
@@ -81,52 +80,6 @@ export const SheetFlow = {
             items.push(this.templateBase(`list-items/${p}/item`));
             return items;
         }, [])
-    },
-
-    fromUuidSync(uuid: string) {
-        const parts = uuid.split('.');
-        // if the parts includes multiple 'Item' parts, we are dealing with an embedded item within an item
-        if (parts.filter(part => part === 'Item').length > 1) {
-            // get the parent item
-            const indexOfParentItem = parts.findIndex(part => part === 'Item') + 2;
-            const parentItemParts = parts.slice(0, indexOfParentItem);
-            const parentItemUuid = parentItemParts.join(".");
-            const item = SheetFlow.fromUuidSync(parentItemUuid);
-            if (item && item instanceof SR5Item) {
-                // now determine if this is an effect within an embedded item or just an embedded item
-                const finalParts = parts.slice(indexOfParentItem);
-                if (finalParts.includes('ActiveEffect')) {
-                    const finalItemId = finalParts[1];
-                    const finalItem = item.getOwnedItem(finalItemId);
-                    if (finalItem) {
-                        const effectId = finalParts[3];
-                        return finalItem.effects.get(effectId);
-                    } else {
-                        console.error('Shadowrun5e | Could not find item on parent item', item, finalItemId)
-                        return undefined;
-                    }
-                } else {
-                    const finalItemId = finalParts[1];
-                    return item.getOwnedItem(finalItemId);
-                }
-            } else {
-                console.error("Shadowrun5e | I was expecting an item but didn't get an item", item);
-                return undefined;
-            }
-        } else {
-
-            // fromUuidSync doesn't allow  retrieving embedded compendium documents, so manually retrieving each child document from the base document.
-            const { collection, embedded, documentId } = foundry.utils.parseUuid(uuid);
-            if (collection && embedded && documentId) {
-                let document = collection.get(documentId) as any;
-                while (document && (embedded.length > 1)) {
-                    const [embeddedName, embeddedId] = embedded.splice(0, 2);
-                    document = document.getEmbeddedDocument(embeddedName, embeddedId);
-                }
-                return document;
-            }
-            return fromUuidSync(uuid);
-        }
     },
 
     closestItemId(target) {

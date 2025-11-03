@@ -2,12 +2,11 @@ import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import { SR5Actor } from '../actor/SR5Actor';
 import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
-import { DataDefaults } from "../data/DataDefaults";
+import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
-import { TestCreator } from "../tests/TestCreator";
-import { HostPrep } from "./prep/HostPrep";
-import RollEvent = Shadowrun.RollEvent;
+import { TestCreator } from '../tests/TestCreator';
+import { HostPrep } from './prep/HostPrep';
 import { LinksHelpers } from '../utils/links';
 import { TechnologyPrep } from './prep/functions/TechnologyPrep';
 import { SinPrep } from './prep/SinPrep';
@@ -31,6 +30,9 @@ import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
+import RollEvent = Shadowrun.RollEvent;
+
+const { fromUuid } = foundry.utils;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -1505,6 +1507,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return await super._preDelete(...args);
     }
 
+    /**
+     * Override getEmbeddedDocument to support Nested Items
+     * @param embeddedName
+     * @param id
+     * @param options
+     */
     override getEmbeddedDocument(embeddedName, id, options) {
         if (embeddedName === 'Item') {
             return this.getOwnedItem(id);

@@ -7,13 +7,14 @@ import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
 import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
-
-import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
-import ActorAttribute = Shadowrun.ActorAttribute;
 import { NetworkManager } from '@/module/apps/NetworkManager';
+import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import ActorAttribute = Shadowrun.ActorAttribute;
+
+const { fromUuid, fromUuidSync } = foundry.utils;
 
 // Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
 type sheetAction = {
@@ -456,7 +457,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     override async _handleRollItem(item: SR5Item, event): Promise<void> {
         if (this.selectedMatrixTarget && item.hasActionCategory('matrix')) {
-            const document = SheetFlow.fromUuidSync(this.selectedMatrixTarget) as SR5Actor | SR5Item;
+            const document = await fromUuid(this.selectedMatrixTarget) as SR5Actor | SR5Item;
             if (!document) return;
             const test = await this.actor.testFromItem(item, { event });
             if (test) {
@@ -580,7 +581,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     informAboutOfflineSelection() {
         if (!this.selectedMatrixTarget) return;
 
-        const target = SheetFlow.fromUuidSync(this.selectedMatrixTarget);
+        const target = fromUuidSync(this.selectedMatrixTarget);
         if (!(target instanceof SR5Actor) || target?.hasPersona) return;
 
         ui.notifications.error('SR5.Errors.MarksCantBePlacedWithoutPersona', { localize: true });
@@ -662,7 +663,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
-        const target = SheetFlow.fromUuidSync(uuid) as SR5Item;
+        const target = fromUuidSync(uuid) as SR5Item;
         if (!target || !(target instanceof SR5Item)) return;
 
         await this.actor.connectNetwork(target);

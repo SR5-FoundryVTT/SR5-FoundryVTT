@@ -1,7 +1,7 @@
-import { SR5Actor } from "../../actor/SR5Actor";
-import { parseDropData } from "../../utils/sheets";
-import { SR5BaseItemSheetData, SR5ItemSheet } from "../SR5ItemSheet";
-import { SheetFlow } from '@/module/flows/SheetFlow';
+import { SR5Actor } from '../../actor/SR5Actor';
+import { SR5BaseItemSheetData, SR5ItemSheet } from '../SR5ItemSheet';
+
+const { fromUuidSync } = foundry.utils;
 
 
 interface SR5CallInActionSheetData extends SR5BaseItemSheetData {
@@ -64,7 +64,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
         if (!system.spirit.uuid)
             return null;
 
-        return SheetFlow.fromUuidSync(system.spirit.uuid) as SR5Actor;
+        return fromUuidSync(system.spirit.uuid) as SR5Actor;
     }
 
     /**
@@ -77,7 +77,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
         if (!system.sprite.uuid)
             return null;
 
-        return SheetFlow.fromUuidSync(system.sprite.uuid) as SR5Actor;
+        return fromUuidSync(system.sprite.uuid) as SR5Actor;
     }
     
     /**

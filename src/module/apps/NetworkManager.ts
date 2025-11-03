@@ -10,6 +10,7 @@ import { SR5 } from '@/module/config';
 import { TestCreator } from '@/module/tests/TestCreator';
 
 const { ApplicationV2 } = foundry.applications.api;
+const { fromUuid, fromUuidSync } = foundry.utils;
 
 export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
 
@@ -96,7 +97,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
      * Execute the chosen mark placement action test.
      */
     async executeMarkPlacementActionTest(targetUuid: string, category: string) {
-        const target = SheetFlow.fromUuidSync(targetUuid) as SR5Actor | SR5Item;
+        const target = await fromUuid(targetUuid) as SR5Actor | SR5Item;
         if (!target) {
             console.error('Shadowrun 5e | Could not find target with uuid', targetUuid);
             return;
@@ -159,7 +160,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         const uuid = SheetFlow.closestUuid(event.target);
         if(!uuid) return;
 
-        const network = SheetFlow.fromUuidSync(uuid) as SR5Item | null;
+        const network = fromUuidSync(uuid) as SR5Item | null;
         if (!network) return;
 
         await MatrixNetworkFlow.AskForNetworkMarkInvite(this.actor, network);
@@ -174,7 +175,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         const uuid = SheetFlow.closestUuid(event.target);
         if(!uuid) return;
 
-        const network = SheetFlow.fromUuidSync(uuid) as SR5Item | null;
+        const network = fromUuidSync(uuid) as SR5Item | null;
         if (!network) return;
 
         await this.actor.connectNetwork(network);

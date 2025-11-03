@@ -19,13 +19,14 @@ import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
 import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
 import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
+import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
-import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 const { TextEditor } = foundry.applications.ux;
+const { fromUuid, fromUuidSync } = foundry.utils;
 
 export interface InventorySheetDataByType {
     type: string;
@@ -339,8 +340,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const favorites: SR5Item[] = [];
         for (const idOrUuid of this.actor.system.favorites) {
             if (idOrUuid.includes('.')) {
-                let doc = SheetFlow.fromUuidSync(idOrUuid);
-                if (!doc) doc = await foundry.utils.fromUuid(idOrUuid);
+                const doc = await fromUuid(idOrUuid);
                 if (doc && doc instanceof SR5Item) favorites.push(doc);
             } else {
                 const item = this.actor.items.get(idOrUuid);
@@ -742,7 +742,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         } else {
             // check for uuid
             const uuid = SheetFlow.closestUuid(event.target);
-            const doc = SheetFlow.fromUuidSync(uuid);
+            const doc = await fromUuid(uuid);
             if (doc && doc instanceof SR5ActiveEffect) {
                 await doc.sheet?.render(true);
             }
@@ -759,7 +759,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             await item.update({disabled});
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
-            const doc = SheetFlow.fromUuidSync(uuid);
+            const doc = await fromUuid(uuid);
             if (doc && doc instanceof SR5ActiveEffect) {
                 const disabled = !doc.disabled;
                 await doc.update({disabled});
@@ -835,7 +835,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static async #rollItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const iid = SheetFlow.closestUuid(event.target);
-        const item = SheetFlow.fromUuidSync(iid) ?? await fromUuid(iid);
+        const item = await fromUuid(iid);
 
         if (!item || !(item instanceof SR5Item)) return;
         await this._handleRollItem(item, event);
@@ -1600,7 +1600,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.stopPropagation();
 
         const uuid = SheetFlow.closestUuid(event.target);
-        const item = SheetFlow.fromUuidSync(uuid);
+        const item = await fromUuid(uuid);
         if (!item || !(item instanceof SR5Item)) return;
 
         // iterate through the states of online -> silent -> offline
@@ -1934,12 +1934,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const item = this.actor.items.get(id);
                     if (item) return false;
                     const uuid = SheetFlow.closestUuid(target);
-                    const document = SheetFlow.fromUuidSync(uuid);
+                    const document = fromUuidSync(uuid);
                     return document && document instanceof SR5Item;
                 },
                 callback: async (target) => {
                     const uuid = SheetFlow.closestUuid(target);
-                    const document = SheetFlow.fromUuidSync(uuid);
+                    const document = await fromUuid(uuid);
                     if (document && document instanceof SR5Item) {
                         await document.sheet?.render(true)
                     }
@@ -2007,7 +2007,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const item = this.actor.effects.get(id);
                     if (item) return true;
                     const uuid = SheetFlow.closestUuid(target);
-                    const doc = SheetFlow.fromUuidSync(uuid);
+                    const doc = fromUuidSync(uuid);
                     return !!(doc && doc instanceof SR5ActiveEffect);
                 },
                 callback: async (target) => {
@@ -2017,7 +2017,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                         await item.sheet?.render(true)
                     } else {
                         const uuid = SheetFlow.closestUuid(target);
-                        const doc = SheetFlow.fromUuidSync(uuid);
+                        const doc = fromUuidSync(uuid);
                         if (doc && doc instanceof SR5ActiveEffect) {
                             await doc.sheet?.render(true);
                         }
@@ -2172,7 +2172,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         let item = this.actor.items.get(id);
         if (!item) {
             const uuid = SheetFlow.closestUuid(event.target);
-            item = SheetFlow.fromUuidSync(uuid);
+            item = fromUuidSync(uuid) as any;
         }
         if (item && item instanceof SR5Item) {
             const qty = item.getTechnologyData()?.quantity ?? 0;
@@ -2187,7 +2187,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         let item = this.actor.items.get(id);
         if (!item) {
             const uuid = SheetFlow.closestUuid(event.target);
-            item = SheetFlow.fromUuidSync(uuid);
+            item = fromUuidSync(uuid) as any;
         }
         if (item && item instanceof SR5Item) {
             const qty = item.getTechnologyData()?.quantity ?? 0;

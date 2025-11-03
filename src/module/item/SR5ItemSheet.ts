@@ -1,8 +1,8 @@
 import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
-import { SR5 } from "../config";
-import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from "../effects";
+import { SR5 } from '../config';
+import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from '../effects';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionFlow } from './flows/ActionFlow';
@@ -10,15 +10,16 @@ import { AmmunitionType, RangeType } from '../types/item/Weapon';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { MatrixRules } from '../rules/MatrixRules';
 import { SINFlow } from './flows/SINFlow';
+import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 import RenderContext = foundry.applications.sheets.ItemSheet.RenderContext;
-import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
-import { SheetFlow } from '@/module/flows/SheetFlow';
 
 const { ItemSheet } = foundry.applications.sheets;
 const { FilePicker } = foundry.applications.apps;
 const { DragDrop } = foundry.applications.ux
+const { fromUuid, fromUuidSync } = foundry.utils;
 
 /**
  * Shadowrun 5e ItemSheetData typing shared across all item types
@@ -909,7 +910,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await effect.sheet?.render(true);
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
-            const doc = SheetFlow.fromUuidSync(uuid);
+            const doc = fromUuidSync(uuid);
             if (doc && doc instanceof SR5ActiveEffect) {
                 await doc.sheet?.render(true);
             }
@@ -924,7 +925,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await effect.update({ disabled: !effect.disabled })
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
-            const doc = SheetFlow.fromUuidSync(uuid);
+            const doc = await fromUuid(uuid);
             if (doc && doc instanceof SR5ActiveEffect) {
                 await doc.update({ disabled: !doc.disabled })
             }
@@ -1000,7 +1001,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                         await item.sheet?.render(true)
                     } else {
                         const uuid = SheetFlow.closestUuid(target);
-                        const effect = SheetFlow.fromUuidSync(uuid);
+                        const effect = fromUuidSync(uuid);
                         if (effect && effect instanceof SR5ActiveEffect) {
                             await effect.sheet?.render(true);
                         }

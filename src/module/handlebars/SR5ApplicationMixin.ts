@@ -6,11 +6,11 @@ import { SR5 } from '@/module/config';
 import { LinksHelpers } from '@/module/utils/links';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
-
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 const { TextEditor } = foundry.applications.ux;
+const { fromUuid, fromUuidSync } = foundry.utils;
 
 export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
     return class SR5ApplicationMixin extends foundry.applications.api.HandlebarsApplicationMixin(base) {
@@ -106,7 +106,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
 
             context.expandedUuids = {};
             for (const uuid of this.expandedUuids) {
-                const document = SheetFlow.fromUuidSync(uuid);
+                const document = fromUuidSync(uuid);
                 if (document) {
                     if (document instanceof SR5Item || document instanceof SR5Actor) {
                         console.log('document', document);
@@ -169,7 +169,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             } else {
                 this.expandedUuids.add(uuid);
                 event.target.closest('.list-item-container').classList.add('expanded');
-                const document = SheetFlow.fromUuidSync(uuid);
+                const document = fromUuidSync(uuid);
                 let html;
                 if (document instanceof SR5Item || document instanceof SR5Actor) {
                     html = await TextEditor.enrichHTML((document as any).system.description.value, {
@@ -204,7 +204,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         static async #openUuid(event) {
             const uuid = SheetFlow.closestUuid(event.target);
             if (uuid) {
-                const document = SheetFlow.fromUuidSync(uuid);
+                const document = await fromUuid(uuid);
                 if (document && (document instanceof SR5Item || document instanceof SR5Actor || document instanceof SR5ActiveEffect)) {
                     await document.sheet?.render(true);
                 }
