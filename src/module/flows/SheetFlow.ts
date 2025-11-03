@@ -98,10 +98,6 @@ export const SheetFlow = {
         return target.closest('[data-action]');
     },
 
-    listItemId(target) {
-        return target.closest('.list-item[data-item-id]')?.dataset?.itemId;
-    },
-
     closestSource(target) {
         return target.closest('[data-source]')?.dataset?.source ?? '';
     },

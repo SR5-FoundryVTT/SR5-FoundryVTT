@@ -1520,7 +1520,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param event A DOM mouse/touch event
      */
     async _onListItemChangeQuantity(event) {
-        const iid = Helpers.listItemId(event);
+        const iid = SheetFlow.closestItemId(event.currentTarget);
         const item = this.actor.items.get(iid);
         const quantity = parseInt(event.currentTarget.value);
 
