@@ -12,6 +12,8 @@ export class KnowledgeSkillEditSheet extends LanguageSkillEditSheet {
         return systemFields.skills.fields.knowledge.fields[this.category].fields.value.element.fields;
     }
 
+    override readonly canBeNative: boolean = false;
+
     override _updateString() {
         return `system.skills.knowledge.${this.category}.value.${this.skillId}`;
     }

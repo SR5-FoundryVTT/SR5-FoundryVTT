@@ -16,6 +16,7 @@ export const SkillField = () => ({
     _delete: new BooleanField(), // Does it use it?
     specs: new ArrayField(new StringField({ required: true })),
     canDefault: new BooleanField({ initial: true }),
+    isNative: new BooleanField({ initial: false }), // this only actually applies to language skills
     id: new StringField({ required: true }),
     link: new StringField({ required: true }),
     group: new StringField({ required: true }),

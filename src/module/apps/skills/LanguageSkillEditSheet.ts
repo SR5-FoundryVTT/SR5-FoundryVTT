@@ -9,12 +9,15 @@ export class LanguageSkillEditSheet extends SkillEditSheet {
         return systemFields.skills.fields.language.fields.value.element.fields;
     }
 
-    override _prepareContext(options) {
+    override readonly canBeNative: boolean = true;
+
+    override async _prepareContext(options) {
         const data = super._prepareContext(options);
+        console.log('preparing language skill');
         return foundry.utils.mergeObject(data, {
             editable_name: true,
             editable_canDefault: false,
-            editable_attribute: false
+            editable_attribute: false,
         });
     }
 }

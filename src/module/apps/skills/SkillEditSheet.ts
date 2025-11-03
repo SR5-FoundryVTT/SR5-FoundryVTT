@@ -30,11 +30,14 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         data['editable_canDefault'] = true;
         data['editable_attribute'] = true;
         data['attributes'] = this._getSkillAttributesForSelect();
+        data['canBeNative'] = this.canBeNative;
 
         data.primaryTabs = this._prepareTabs('primary');
 
         return data;
     }
+
+    readonly canBeNative: boolean = false;
 
     _updateString() {
         return `system.skills.active.${this.skillId}`;

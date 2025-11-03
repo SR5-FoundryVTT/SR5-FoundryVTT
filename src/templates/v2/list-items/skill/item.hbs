@@ -1,17 +1,13 @@
 <div class="list-item-container {{cssClass}} {{#if (hasKey @root.expandedSkills id)}} expanded {{/if}}">
     <div class="list-item {{skillClass skill}}"
          data-skill-id="{{id}}"
-         data-category-id="{{category}}"
-         data-subcategory-id="{{subcategory}}">
+         data-category="{{category}}"
+         data-subcategory="{{subcategory}}">
         <div class="list-item-start">
             <button class="list-item-image-container icon sr5-icon"
                data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers'
                                         skip=@root.bindings.skip descr=@root.bindings.card}}"
-                {{#if @root.isPlayMode}}
-               data-action="rollSkill"
-                {{else}}
-               data-action="editSkill"
-                {{/if}}
+                {{#if @root.isPlayMode}} data-action="rollSkill" {{else}} data-action="editSkill" {{/if}}
                >
                 <img
                     {{#if skill.img}}
@@ -57,7 +53,11 @@
                 <input type="number" name="{{concat skillPath '.base'}}" class="short skinny" value="{{skill.base}}" data-skill="{{id}}" >
             {{else}}
                 <label data-skill-modifier-tooltip="{{id}}">
-                    {{skill.value}}
+                    {{#if skill.isNative}}
+                        {{localize "SR5.Skill.abbr.Native"}}
+                    {{else}}
+                        {{skill.value}}
+                    {{/if}}
                 </label>
             {{/if}}
         </div>

@@ -2138,6 +2138,9 @@
             "Total": "Result"
         },
         "Skill": {
+            "abbr": {
+                "Native": "N"
+            },
             "AeronauticsMechanic": "Aeronautics Mechanic",
             "Alchemy": "Alchemy",
             "AnimalHandling": "Animal Handling",
@@ -2185,6 +2188,7 @@
             "IndustrialMechanic": "Industrial Mechanic",
             "Instruction": "Instruction",
             "Intimidation": "Intimidation",
+            "Native": "Native",
             "Leadership": "Leadership",
             "Locksmith": "Locksmith",
             "Longarms": "Longarms",
