@@ -46,7 +46,6 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         },
         matrixActions: {
             template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
-            templates: SheetFlow.templateListItem('action'),
         },
         markedIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),

@@ -245,7 +245,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         },
         actions: {
             template: SheetFlow.templateBase('actor/tabs/actions'),
-            templates: SheetFlow.templateListItem('action'),
             scrollable: ['.scrollable']
         },
         effects: {

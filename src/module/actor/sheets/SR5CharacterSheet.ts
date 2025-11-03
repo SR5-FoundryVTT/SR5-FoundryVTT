@@ -87,28 +87,23 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             template: SheetFlow.templateBase('actor/tabs/magic'),
             templates: [
                 ...SheetFlow.templateActorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
-                ...SheetFlow.templateListItem('spell', 'ritual', 'call_in_action', 'adept_power')
                 ],
             scrollable: ['.scrollable']
         },
         critterPowers: {
             template: SheetFlow.templateBase('actor/tabs/critter-powers'),
-            templates: SheetFlow.templateListItem('critter_power'),
             scrollable: ['.scrollable']
         },
         inventory: {
             template: SheetFlow.templateBase('actor/tabs/inventory'),
-            templates: SheetFlow.templateListItem('ammo', 'armor', 'bioware', 'cyberware', 'device', 'equipment', 'modification', 'weapon'),
             scrollable: ['.scrollable']
         },
         social: {
             template: SheetFlow.templateBase('actor/tabs/social'),
-            templates: SheetFlow.templateListItem('sin', 'lifestyle', 'contact'),
             scrollable: ['.scrollable']
         },
         bio: {
             template: SheetFlow.templateBase('actor/tabs/bio'),
-            templates: SheetFlow.templateListItem('metamagic', 'echo', 'quality'),
             scrollable: ['#metamagics-scroll-list', '#quality-scroll-list', '#echoes-scroll-list'],
         },
     }

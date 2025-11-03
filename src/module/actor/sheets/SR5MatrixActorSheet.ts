@@ -143,7 +143,6 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         },
         matrixActions: {
             template: SheetFlow.templateBase('actor/tabs/matrix/matrix-actions'),
-            templates: SheetFlow.templateListItem('action'),
         },
         markedIcons: {
             template: SheetFlow.templateBase('actor/tabs/matrix/marked-icons'),
@@ -159,21 +158,18 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         },
         programs: {
             template: SheetFlow.templateBase('actor/tabs/matrix/programs'),
-            templates: SheetFlow.templateListItem('program'),
         },
         complexForms: {
             template: SheetFlow.templateBase('actor/tabs/matrix/complex-forms'),
-            templates: SheetFlow.templateListItem('complex_form'),
             scrollable: ['.scrollable']
         },
         compilations: {
             template: SheetFlow.templateBase('actor/tabs/matrix/compilations'),
-            templates: SheetFlow.templateListItem('call_in_action'),
             scrollable: ['.scrollable']
         },
         spritePowers: {
             template: SheetFlow.templateBase('actor/tabs/matrix/sprite-powers'),
-            templates: SheetFlow.templateListItem('sprite_power'),
+            scrollable: ['.scrollable']
         },
     };
 

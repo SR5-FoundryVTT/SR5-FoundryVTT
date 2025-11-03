@@ -56,20 +56,15 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         },
         magic: {
             template: SheetFlow.templateBase('actor/tabs/magic'),
-            templates: [
-                    ...SheetFlow.templateActorSystemParts('spells', 'rituals'),
-                    ...SheetFlow.templateListItem('spell', 'ritual')
-                ],
+            templates: SheetFlow.templateActorSystemParts('spells', 'rituals'),
             scrollable: ['.scrollable']
         },
         critterPowers: {
             template: SheetFlow.templateBase('actor/tabs/critter-powers'),
-            templates: SheetFlow.templateListItem('critter_power'),
             scrollable: ['.scrollable']
         },
         bio: {
             template: SheetFlow.templateBase('actor/tabs/bio'),
-            templates: SheetFlow.templateListItem('metamagic', 'echo', 'quality'),
             scrollable: ['#metamagics-scroll-list', '#quality-scroll-list', '#echoes-scroll-list'],
         },
     }

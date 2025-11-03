@@ -1,7 +1,7 @@
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 
-const { fromUuid, fromUuidSync } = foundry.utils;
+const { fromUuidSync } = foundry.utils;
 
 /**
  * ActorOwnershipFlow should handle the Ownership of items by actors

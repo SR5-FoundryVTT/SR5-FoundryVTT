@@ -1,9 +1,24 @@
+import { SR5 } from '@/module/config';
+
 export const preloadHandlebarsTemplates = async () => {
+
+    const templateBase = (path: string) => {
+        return `systems/shadowrun5e/dist/templates/v2/${path}.hbs`
+    }
+
+    const templateListItem = (...parts: string[]) => {
+        return parts.reduce<string[]>(( items, p) => {
+            items.push(templateBase(`list-items/${p}/header`));
+            items.push(templateBase(`list-items/${p}/item`));
+            return items;
+        }, [])
+    }
+
     const v2Path = (...paths: string[]) => {
-        return paths.map(path => `systems/shadowrun5e/dist/templates/v2/${path}.hbs`);
+        return paths.map(path => templateBase(path));
     }
     const v2AP = (...paths: string[]) => {
-        return paths.map(path => `systems/shadowrun5e/dist/templates/v2/actor/parts/${path}.hbs`);
+        return paths.map(path => templateBase(`actor/parts/${path}`));
     }
 
     const templatePaths = [
@@ -55,7 +70,6 @@ export const preloadHandlebarsTemplates = async () => {
             'fake-attribute',
             'language-and-knowledge-skills',
             'limits',
-            'skill',
             'matrix-attribute',
             'special-attributes',
         ),
@@ -98,12 +112,13 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs',
 
-        // Application - Matrix Network Hacking
-        'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs',
-
         // Application - Situational Modifiers
         'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
     ];
+
+    for (const type of Object.keys(SR5.itemTypes)) {
+        templatePaths.push(...templateListItem(type));
+    }
 
     return foundry.applications.handlebars.loadTemplates(templatePaths);
 };
