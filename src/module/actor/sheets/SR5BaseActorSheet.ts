@@ -123,30 +123,24 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this._setInventoryVisibility(true);
 
         // List to when a combatant is created for this actor to enable the roll initiative button
-        Hooks.on("createCombatant", () => {
-            const inCombat = this.actor.getToken()?.inCombat ?? this.actor.inCombat;
-            const selector = this.element.querySelector('button#roll-init-button');
-            if (selector) {
-                if (inCombat) {
-                    selector.removeAttribute('disabled');
-                } else {
-                    selector.setAttribute('disabled', '');
-                }
-            }
-        });
+        Hooks.on("createCombatant", this._updateInitiativeButton.bind(this));
 
         // Listen to when a combatant is deleted for this actor to disable the roll initiative button
-        Hooks.on("deleteCombatant", () => {
-            const inCombat = this.actor.getToken()?.inCombat ?? this.actor.inCombat;
-            const selector = this.element.querySelector('button#roll-init-button');
-            if (selector) {
-                if (inCombat) {
-                    selector.removeAttribute('disabled');
-                } else {
-                    selector.setAttribute('disabled', '');
-                }
+        Hooks.on("deleteCombatant", this._updateInitiativeButton.bind(this));
+    }
+
+    private _updateInitiativeButton() {
+        const inCombat = this.actor.getToken()?.inCombat ?? this.actor.inCombat;
+        const selector = this.element.querySelector<HTMLElement>('button#roll-init-button');
+        if (selector) {
+            if (inCombat) {
+                selector.removeAttribute('disabled');
+                selector.dataset.tooltip = game.i18n.localize("SR5.Tooltips.Actor.RollInitiative");
+            } else {
+                selector.setAttribute('disabled', '');
+                selector.dataset.tooltip = game.i18n.localize("SR5.Tooltips.Actor.NoCombatant");
             }
-        });
+        }
     }
 
     /**

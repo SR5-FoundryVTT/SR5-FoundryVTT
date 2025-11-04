@@ -28,7 +28,7 @@
             </div>
             <button id="roll-init-button" data-action="rollInitiative" type="button" class="short button sr5-button"
                     {{#unless @root.canRollInitiative}} disabled {{/unless}}
-                    data-tooltip="{{#if @root.canRollInitiative}}SR5.Tooltips.Actor.RollInitiative{{else}}SR5.Tooltips.Actor.NoActiveEncounter{{/if}}">
+                    data-tooltip="{{#if @root.canRollInitiative}}SR5.Tooltips.Actor.RollInitiative{{else}}SR5.Tooltips.Actor.NoCombatant{{/if}}">
                 <span>{{system.initiative.current.base.value}}&nbsp;+&nbsp;{{system.initiative.current.dice.value}}d6</span>
             </button>
         </div>
