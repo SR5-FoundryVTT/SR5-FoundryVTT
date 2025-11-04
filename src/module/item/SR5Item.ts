@@ -115,7 +115,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     static override migrateData(source: any) {
-        Migrator.migrate("Item", source);
+        Migrator.migrate('Item', source);
         return super.migrateData(source);
     }
 
@@ -233,7 +233,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             description: await this.getChatData(),
             item: this,
             previewTemplate: this.hasBlastTemplate,
-            tests: this.getActionTests()
+            tests: this.getActionTests(),
         };
         return createItemChatMessage(options);
     }
@@ -324,13 +324,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
             return {
                 radius: distance,
-                dropoff: 0
-            }
+                dropoff: 0,
+            };
 
         } else if (this.isGrenade()) {
             return {
                 radius: this.system.thrown.blast.radius,
-                dropoff: this.system.thrown.blast.dropoff
+                dropoff: this.system.thrown.blast.dropoff,
             };
         } else if (this.hasExplosiveAmmo) {
             const item = this.getEquippedAmmo();
@@ -343,7 +343,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
             return {
                 radius: distance,
-                dropoff
+                dropoff,
             };
         }
         return undefined;
@@ -442,8 +442,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
                 ammo: {
                     // update our ammo count to 0 on the weapon
                     current: { value: 0 },
-                }
-            }
+                },
+            },
         });
     }
 
@@ -464,7 +464,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Determine how many bullets can be reloaded based on clip type and agility.
         const maxPartial = RangedWeaponRules.partialReload(
             weapon.system.ammo.clip_type,
-            this.actor?.getAttribute('agility').value
+            this.actor?.getAttribute('agility').value,
         );
 
         // Fallback to full reload if there is no partial reload.
@@ -484,7 +484,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Validate ammunition and clip availability.
         if (weapon.system.ammo.spare_clips.value === 0 && weapon.system.ammo.spare_clips.max > 0) {
             // Should this ever be enforced, change info to warn.
-            ui.notifications?.info("SR5.Warnings.CantReloadWithoutSpareClip", { localize: true });
+            ui.notifications?.info('SR5.Warnings.CantReloadWithoutSpareClip', { localize: true });
         }
 
         const ammoQty = ammo?.system.technology.quantity ?? 0;
@@ -503,7 +503,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const reloaded = Math.min(
             missing,
             available,
-            isPartial ? partialAmount : Infinity
+            isPartial ? partialAmount : Infinity,
         );
 
         await this.update({
@@ -511,10 +511,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
                 ammo: {
                     current: { value: current + reloaded },
                     ...(weapon.system.ammo.spare_clips.max > 0 && {
-                        spare_clips: { value: Math.max(0, weapon.system.ammo.spare_clips.value - 1) }
-                    })
-                }
-            }
+                        spare_clips: { value: Math.max(0, weapon.system.ammo.spare_clips.value - 1) },
+                    }),
+                },
+            },
         });
 
         await ammo?.update({ system: { technology: { quantity: Math.max(0, ammoQty - reloaded) } } });
@@ -548,7 +548,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         await this.unloadAmmo();
         const equippedAmmo = this.getEquippedAmmo();
         if (equippedAmmo && id === equippedAmmo.id) {
-            await equippedAmmo.update({ system: { technology: { equipped: false }}});
+            await equippedAmmo.update({ system: { technology: { equipped: false } } });
         } else {
             // then equip the new ammo
             await this.equipNestedItem(id, 'ammo', { unequipOthers: true });
@@ -635,11 +635,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     getActionTests() {
-        if (!this.hasRoll) return []
+        if (!this.hasRoll) return [];
 
         return [{
             label: this.getActionTestName(),
-            uuid: this.uuid
+            uuid: this.uuid,
         }];
     }
 
@@ -873,6 +873,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         await this.update({ system: { technology: { condition_monitor: { value: toApply } } } });
     }
+
     /**
      * Set the matrix damage on a technology item
      *
@@ -906,7 +907,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     parseAvailibility(avail: string) {
-        return ItemAvailabilityFlow.parseAvailibility(avail)
+        return ItemAvailabilityFlow.parseAvailibility(avail);
     }
 
     async setMasterUuid(masterUuid: string | undefined): Promise<void> {
@@ -1020,6 +1021,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return essenceLoss * quantity;
     }
 
+    get ASDF() {
+        const device = this.asType('device');
+        if (device) {
+            const asdf = device.getASDF();
+            return Object.values(asdf).map(x => new Handlebars.SafeString(`${x.value || '-'}`));
+        }
+        return '';
+    }
+
     getASDF(this: SR5Item<'device'>) {
         // matrix attributes are set up as an object
         const matrix = {
@@ -1094,7 +1104,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             electricity: electricity ?? 0,
             cold: cold ?? 0,
             acid: acid ?? 0,
-            radiation: radiation ?? 0
+            radiation: radiation ?? 0,
         };
     }
 
@@ -1544,7 +1554,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Handle system specific things before this item is deleted
      * @param args
      */
-    override async _preDelete(...args: Parameters<Item["_preDelete"]>) {
+    override async _preDelete(...args: Parameters<Item['_preDelete']>) {
         await StorageFlow.deleteStorageReferences(this);
         return await super._preDelete(...args);
     }

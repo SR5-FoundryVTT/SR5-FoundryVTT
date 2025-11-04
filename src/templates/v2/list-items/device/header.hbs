@@ -3,10 +3,17 @@
      data-action="toggleExpanded"
      data-item-type="{{type}}"
     {{/unless}}>
-    <div class="list-item-start{{#unless isOpen}} label-collapsed{{/unless}}">
+    <div class="list-item-start {{#unless isOpen}} label-collapsed{{/unless}}">
         <label>
             {{localize label}}
         </label>
+    </div>
+
+    <div class="list-item-col asdf-col">
+        <label>{{localize "SR5.Labels.Matrix.AttackShort"}}</label>
+        <label>{{localize "SR5.Labels.Matrix.SleazeShort"}}</label>
+        <label>{{localize "SR5.Labels.Matrix.DataProcessingShort"}}</label>
+        <label>{{localize "SR5.Labels.Matrix.FirewallShort"}}</label>
     </div>
 
     <div class="list-item-col rtg-col">

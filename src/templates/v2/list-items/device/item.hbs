@@ -10,6 +10,12 @@
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
         </div>
 
+        <div class="list-item-col asdf-col">
+            {{#each item.ASDF}}
+                <label>{{this}}</label>
+            {{/each}}
+        </div>
+
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/item-rating-col.hbs' item }}
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/item-quantity-col.hbs' item }}
 

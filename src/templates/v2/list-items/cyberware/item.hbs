@@ -10,6 +10,12 @@
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
         </div>
 
+        <div class="list-item-col essence-col essence-calc-col">
+            {{#if item.system.technology.calculated.essence.value}}
+                <label>{{item.system.technology.calculated.essence.value}}</label>
+            {{/if}}
+        </div>
+
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/item-rating-col.hbs' item }}
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/item-quantity-col.hbs' item }}
 
