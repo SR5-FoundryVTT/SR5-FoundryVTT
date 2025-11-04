@@ -414,6 +414,45 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
+     * Unload the ammo within a weapon
+     * - this removes all the ammo within the weapon and loads it back into the equipped ammo
+     */
+    async unloadAmmo() {
+        const weapon = this.asType('weapon');
+        if (!weapon) return;
+
+        const ammo = this.getEquippedAmmo();
+
+        if (!ammo) return;
+        const current = weapon.system.ammo.current.value;
+
+        // don't bother unloading ammo that doesn't exist
+        if (current === 0) return;
+
+        const ammoQty = ammo.system.technology.quantity;
+
+        const newQty = ammoQty + current;
+
+        // update the ammo quantity to its previous value
+        await ammo.update({ system: { technology: { quantity: Math.max(0, newQty) } } });
+
+        await this.update({
+            system: {
+                ammo: {
+                    // update our ammo count to 0 on the weapon
+                    current: { value: 0 },
+                    // increment the number of spare clips available
+                    ...(weapon.system.ammo.spare_clips.max > 0 && {
+                        spare_clips: {
+                            value: Math.min(weapon.system.ammo.spare_clips.max, weapon.system.ammo.spare_clips.value + 1)
+                        }
+                    })
+                }
+            }
+        });
+    }
+
+    /**
      * Reload this weapon according to information in:
      * - its current clips
      * - its available spare clips (when given)
@@ -510,6 +549,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param id Item id of the to be exclusively equipped ammo item.
      */
     async equipAmmo(id) {
+        // first unload the current ammo
+        await this.unloadAmmo();
+        // then equip the new ammo
         await this.equipNestedItem(id, 'ammo', { unequipOthers: true });
     }
 

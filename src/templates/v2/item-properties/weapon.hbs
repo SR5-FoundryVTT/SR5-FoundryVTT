@@ -23,13 +23,14 @@
 {{/if}}
 
 {{#if (and (usesAmmo item) (hasAmmo item))}}
-    <span style="display: flex; flex-flow: row nowrap; gap: 2px; align-items: center;">
-        <img src="{{objValue (equippedAmmo item) 'img'}}" width="12px" height="12px">
-        <a data-action="openUuid" data-uuid="{{objValue (equippedAmmo item) 'uuid'}}">{{objValue (equippedAmmo item) 'name'}}</a>
+    <div class="basic-row">
+        <select class="select sr5-select weapon-ammo-select" data-item-id="{{item.id}}" data-item-id="{{item.uuid}}">
+            {{selectOptions (ammoOptions item) selected=(equippedAmmo item)}}
+        </select>
         <label>({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})</label>
-    </span>
+    </div>
     {{#if item.system.ammo.spare_clips.max}}
-            <label>{{localize "SR5.SpareClips"}}&nbsp;{{item.system.ammo.spare_clips.value}}/{{item.system.ammo.spare_clips.max}}</label>
+        <label>{{localize "SR5.Weapon.SpareReloads"}}&nbsp;{{item.system.ammo.spare_clips.value}}/{{item.system.ammo.spare_clips.max}}</label>
     {{/if}}
 {{/if}}
 

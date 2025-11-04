@@ -480,6 +480,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
+
+        html.find('select.weapon-ammo-select').on('change', this._onWeaponAmmoSelect.bind(this));
     }
 
     /**
@@ -1628,6 +1630,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             this.selectedInventory = inventory;
 
         this.render();
+    }
+
+    /**
+     * After selecting a new ammo for a weapon
+     * @param event
+     */
+    async _onWeaponAmmoSelect(event) {
+        const id = SheetFlow.closestItemId(event.currentTarget);
+        const item = this.actor.items.get(id);
+        if (!item || !item.isType('weapon')) return;
+        const newTarget = event.currentTarget.value;
+        if (!newTarget) return;
+        await item.equipAmmo(newTarget);
     }
 
     static async #reloadAmmo(this: SR5BaseActorSheet, event) {
