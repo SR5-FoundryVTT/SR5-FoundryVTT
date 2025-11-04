@@ -1,5 +1,6 @@
 import { formatStrict } from '@/module/utils/strings';
 import { LinksHelpers } from '@/module/utils/links';
+import { SR5Item } from '@/module/item/SR5Item';
 
 export const SheetFlow = {
     _getCreateItemText(type: string): string {
