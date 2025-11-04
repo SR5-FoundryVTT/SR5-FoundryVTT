@@ -26,10 +26,8 @@
                     {{/if}}
                 </a>
             </div>
-            <button data-action="rollInitiative" type="button" class="short">
-                <span>{{system.initiative.current.base.value}}</span>
-                <i class="fas fa-plus" style="font-size: 0.75em"></i>
-                <span>{{system.initiative.current.dice.value}}d6</span>
+            <button id="roll-init-button" data-action="rollInitiative" type="button" class="short button sr5-button">
+                <span>{{system.initiative.current.base.value}}&nbsp;+&nbsp;{{system.initiative.current.dice.value}}d6</span>
             </button>
         </div>
     </div>
