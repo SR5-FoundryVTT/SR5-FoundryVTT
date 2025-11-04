@@ -2855,6 +2855,22 @@
             "TokenSelectionNeeded": "One or more tokens need to be selected"
         },
         "Weapon": {
+            "AmmoCount": "Ammo Count",
+            "Category": {
+                "Melee": "Melee",
+                "Range": "Range",
+                "Thrown": "Thrown"
+            },
+            "Cliptype": {
+                "BeltFed": "Belt Fed",
+                "Bow": "Bow",
+                "BreakAction": "Break Action",
+                "Cylinder": "Cylinder",
+                "Drum": "Drum",
+                "InternalMagazin": "Internal Magazine",
+                "MuzzleLoader": "Muzzle Loader",
+                "RemovableClip": "Removable Clip"
+            },
             "FIELDS": {
                 "category": {
                     "label": "Weapon Type",
@@ -2956,22 +2972,6 @@
                         "hint": "Reach of the Weapon, this is used as a modifier in combat"
                     }
                 }
-            },
-            "AmmoCount": "Ammo Count",
-            "Category": {
-                "Melee": "Melee",
-                "Range": "Range",
-                "Thrown": "Thrown"
-            },
-            "Cliptype": {
-                "BeltFed": "Belt Fed",
-                "Bow": "Bow",
-                "BreakAction": "Break Action",
-                "Cylinder": "Cylinder",
-                "Drum": "Drum",
-                "InternalMagazin": "Internal Magazin",
-                "MuzzleLoader": "Muzzle Loader",
-                "RemovableClip": "Removable Clip"
             },
             "FullReload": "Full",
             "Mod": "Mod",

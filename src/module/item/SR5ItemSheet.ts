@@ -107,6 +107,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
             reload: SR5ItemSheet.#reloadAmmo,
             partialReload: SR5ItemSheet.#partialReloadAmmo,
+            resetSpareReloads: SR5ItemSheet.#resetSpareReloads,
 
             addOneMark: SR5ItemSheet.#addOneMark,
             removeOneMark: SR5ItemSheet.#removeOneMark,
@@ -674,6 +675,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #partialReloadAmmo(this: SR5ItemSheet, event) {
         event.preventDefault();
         await this.item.reloadAmmo(true);
+    }
+
+    static async #resetSpareReloads(this: SR5ItemSheet, event) {
+        event.preventDefault();
+        const spareClips = this.item.system.ammo?.spare_clips.max ?? 0;
+        await this.item.update({ system: { ammo: { spare_clips: { value: spareClips }}}});
     }
 
     async _onAmmoSelect(input) {

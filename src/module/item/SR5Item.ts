@@ -551,8 +551,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     async equipAmmo(id) {
         // first unload the current ammo
         await this.unloadAmmo();
-        // then equip the new ammo
-        await this.equipNestedItem(id, 'ammo', { unequipOthers: true });
+        const equippedAmmo = this.getEquippedAmmo();
+        if (id === equippedAmmo?.id) {
+            await equippedAmmo.update({ system: { technology: { equipped: false }}});
+        } else {
+            // then equip the new ammo
+            await this.equipNestedItem(id, 'ammo', { unequipOthers: true });
+        }
     }
 
     async addNewLicense() {

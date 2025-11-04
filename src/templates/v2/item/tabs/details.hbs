@@ -208,6 +208,25 @@
                     </div>
                     <div class="list-item">
                         <div class="list-item-start skinny">
+                            <label>
+                                {{localize "SR5.Weapon.AmmoCount"}}
+                            </label>
+                            {{#if (lt system.ammo.current.value system.ammo.current.max)}}
+                                <a data-action="reload" data-tooltip="SR5.Weapon.Reload">
+                                    <i class="fas fa-rotate"></i>
+                                </a>
+                            {{/if}}
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.ammo.fields.current.fields.value value=source.system.ammo.current.value
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                            /
+                            {{formInput systemFields.ammo.fields.current.fields.max value=source.system.ammo.current.max
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
                             <label data-tooltip="{{systemFields.ammo.fields.clip_type.hint}}">{{systemFields.ammo.fields.clip_type.label}}</label>
                         </div>
                         <div class="list-item-col">
@@ -218,6 +237,11 @@
                     <div class="list-item">
                         <div class="list-item-start skinny">
                             <label data-tooltip="{{systemFields.ammo.fields.spare_clips.fields.value.hint}}">{{localize "SR5.Weapon.SpareReloads"}}</label>
+                            {{#if (lt system.ammo.spare_clips.value system.ammo.spare_clips.max)}}
+                                <a data-action="resetSpareReloads" data-tooltip="SR5.Weapon.ResetSpareReloads">
+                                    <i class="fas fa-rotate"></i>
+                                </a>
+                            {{/if}}
                         </div>
                         <div class="list-item-col">
                             {{formInput systemFields.ammo.fields.spare_clips.fields.value value=source.system.ammo.spare_clips.value
@@ -486,7 +510,7 @@
                             {{#unless (and system.action.attribute2 (not system.action.skill))}}
                                 {{#if system.action.skill}}
                                     <a {{#if @root.isEditMode}} data-action="toggleActionSpecialization" {{else}} disabled {{/if}} data-tooltip="{{systemFields.action.fields.spec.label}}:&nbsp;{{systemFields.action.fields.spec.hint}}">
-                                        <i style="font-size: 1.1rem" {{#if system.action.spec}} class="fas fa-circle-s" {{else}} class="fa-light fa-circle-s" {{/if}}></i>
+                                        <i style="font-size: 1.1rem" {{#if system.action.spec}} class="fas fa-circle-star" {{else}} class="fa-light fa-circle-star" {{/if}}></i>
                                     </a>
                                     <label>+</label>
                                 {{/if}}
