@@ -31,7 +31,7 @@ export class AmmoParser extends Parser<'ammo'> {
         return system;
     }
 
-    protected override setImporterFlags(entity: Actor.CreateData | Item.CreateData, jsonData: Gear) {
+    protected override setImporterFlags(entity: Item.CreateData, jsonData: Gear) {
         super.setImporterFlags(entity, jsonData);
 
         if (entity.system!.importFlags!.category === 'Ammunition') {

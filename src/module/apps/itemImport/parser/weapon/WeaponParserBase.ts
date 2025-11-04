@@ -186,6 +186,14 @@ export class WeaponParserBase extends Parser<'weapon'> {
         };
     }
 
+    protected override setImporterFlags(entity: Item.CreateData, jsonData: Weapon): void {
+        super.setImporterFlags(entity, jsonData);
+
+        if (entity.system!.importFlags!.category === 'Gear') {
+            entity.system!.importFlags!.category = entity.name.split(':')[0].trim();
+        }
+    }
+
     protected override async getFolder(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
         const root = WeaponParserBase.GetWeaponType(jsonData).capitalize() ?? "Other";

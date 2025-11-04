@@ -21,6 +21,12 @@ export class WeaponModParser extends Parser<'modification'> {
         return system;
     }
 
+    protected override setImporterFlags(entity: Item.CreateData, jsonData: Accessory): void {
+        super.setImporterFlags(entity, jsonData);
+
+        entity.system!.importFlags!.category = jsonData.mount?._TEXT || "Other";
+    }
+
     protected override async getFolder(jsonData: Accessory, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.mount ? jsonData.mount._TEXT : "Other";
         const rootFolder = "Weapon-Mod";
