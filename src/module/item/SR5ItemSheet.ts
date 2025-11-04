@@ -220,6 +220,17 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     /**
+     * Prepare keybindings to be shown when hovering over a rolling icon
+     * in any list item view that has rolls.
+     */
+    _prepareKeybindings() {
+        return {
+            qtySome: game.keybindings.get('shadowrun5e', 'add-remove-some-qty').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+            qtyMany: game.keybindings.get('shadowrun5e', 'add-remove-many-qty').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+        }
+    }
+
+    /**
      * Configure the Tabs that are actually used
      * @param group
      * @protected
@@ -417,6 +428,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data.item = this.item;
 
         data.isNestedItem = this.item._isNestedItem;
+        data.bindings = this._prepareKeybindings();
 
         return data;
     }
@@ -600,9 +612,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const id = SheetFlow.closestItemId(event.target);
         const item = this.item.getOwnedItem(id);
         if (item) {
-            const qty = item.getTechnologyData()?.quantity ?? 0;
-            const newQty = event.shiftKey ? qty + 20 : event.ctrlKey ? qty + 50 : qty + 1;
-            await item.update({system: {technology: {quantity: newQty}}})
+            await SheetFlow.addToQuantity(item, event);
         }
     }
 
@@ -611,9 +621,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const id = SheetFlow.closestItemId(event.target);
         const item = this.item.getOwnedItem(id);
         if (item) {
-            const qty = item.getTechnologyData()?.quantity ?? 0;
-            const newQty = event.shiftKey ? qty - 20 : event.ctrlKey ? qty - 50 : qty - 1;
-            await item.update({system: { technology: { quantity: newQty}}})
+            await SheetFlow.removeFromQuantity(item, event);
         }
     }
 
@@ -759,16 +767,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     static async #addOneQty(this: SR5ItemSheet, event) {
         event.preventDefault();
-        const qty = this.item.getTechnologyData()?.quantity ?? 0;
-        const newQty = event.shiftKey ? qty + 20 : event.ctrlKey ? qty + 50 : qty + 1;
-        await this.item.update({system: { technology: { quantity: newQty}}})
+        await SheetFlow.addToQuantity(this.item, event);
     }
 
     static async #removeOneQty(this: SR5ItemSheet, event) {
         event.preventDefault();
-        const qty = this.item.getTechnologyData()?.quantity ?? 0;
-        const newQty = event.shiftKey ? qty - 20 : event.ctrlKey ? qty - 50 : qty - 1;
-        await this.item.update({system: { technology: { quantity: newQty}}})
+        await SheetFlow.removeFromQuantity(this.item, event);
     }
 
     static async #addOneMark(this: SR5ItemSheet, event) {

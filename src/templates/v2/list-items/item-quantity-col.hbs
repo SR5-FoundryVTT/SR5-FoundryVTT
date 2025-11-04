@@ -4,13 +4,13 @@
     {{else}}
         <a class="hover-show-button"
            data-action="removeItemQty"
-           data-tooltip="SR5.Tooltips.Actor.RemoveOneQty">
+           data-tooltip="{{localize 'SR5.Tooltips.Item.RemoveQuantity' qtySome=@root.bindings.qtySome qtyMany=@root.bindings.qtyMany}}">
             <i class="fas fa-minus-square"></i>
         </a>
         <label class="qty-label">{{this.system.technology.quantity}}</label>
         <a class="hover-show-button"
            data-action="addItemQty"
-           data-tooltip="SR5.Tooltips.Actor.AddOneQty">
+           data-tooltip="{{localize 'SR5.Tooltips.Item.AddQuantity' qtySome=@root.bindings.qtySome qtyMany=@root.bindings.qtyMany}}">
             <i class="fas fa-plus-square"></i>
         </a>
     {{/if}}

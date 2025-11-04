@@ -1785,6 +1785,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return {
             skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
             card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+            qtySome: game.keybindings.get('shadowrun5e', 'add-remove-some-qty').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+            qtyMany: game.keybindings.get('shadowrun5e', 'add-remove-many-qty').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
         }
     }
 
@@ -2186,12 +2188,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         let item = this.actor.items.get(id);
         if (!item) {
             const uuid = SheetFlow.closestUuid(event.target);
-            item = fromUuidSync(uuid) as any;
+            item = await fromUuid(uuid) as any;
         }
         if (item && item instanceof SR5Item) {
-            const qty = item.getTechnologyData()?.quantity ?? 0;
-            const newQty = event.shiftKey ? qty + 5 : event.ctrlKey ? qty + 20 : qty + 1;
-            await item.update({system: {technology: {quantity: newQty}}})
+            await SheetFlow.addToQuantity(item, event);
         }
     }
 
@@ -2201,12 +2201,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         let item = this.actor.items.get(id);
         if (!item) {
             const uuid = SheetFlow.closestUuid(event.target);
-            item = fromUuidSync(uuid) as any;
+            item = await fromUuid(uuid) as any;
         }
         if (item && item instanceof SR5Item) {
-            const qty = item.getTechnologyData()?.quantity ?? 0;
-            const newQty = event.shiftKey ? qty - 5 : event.ctrlKey ? qty - 20 : qty - 1;
-            await item.update({system: { technology: { quantity: newQty}}})
+            await SheetFlow.removeFromQuantity(item, event);
         }
     }
 

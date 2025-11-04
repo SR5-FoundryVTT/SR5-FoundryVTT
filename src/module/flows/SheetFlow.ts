@@ -120,5 +120,45 @@ export const SheetFlow = {
                 }
             }
         }
-    }
+    },
+
+    /**
+     * Add Quantity to an item based on the event
+     * @param item
+     * @param event
+     */
+    async addToQuantity(item: SR5Item, event) {
+        const qty = item.getTechnologyData()?.quantity ?? 0;
+        const someBindings = game.keybindings.get("shadowrun5e", "add-remove-some-qty");
+        const manyBindings = game.keybindings.get("shadowrun5e", "add-remove-many-qty");
+        let change = 1;
+        if (someBindings.some(binding => event[binding.key] === true)) {
+            change = 5;
+        }
+        if (manyBindings.some(binding => event[binding.key] === true)) {
+            change = 20;
+        }
+        const newQty = qty + change;
+        await item.update({system: { technology: { quantity: Math.max(newQty, 0)}}})
+    },
+
+    /**
+     * Remove Quantity from an item based on the event
+     * @param item
+     * @param event
+     */
+    async removeFromQuantity(item: SR5Item, event) {
+        const qty = item.getTechnologyData()?.quantity ?? 0;
+        const someBindings = game.keybindings.get("shadowrun5e", "add-remove-some-qty");
+        const manyBindings = game.keybindings.get("shadowrun5e", "add-remove-many-qty");
+        let change = -1;
+        if (someBindings.some(binding => event[binding.key] === true)) {
+            change = -5;
+        }
+        if (manyBindings.some(binding => event[binding.key] === true)) {
+            change = -20;
+        }
+        const newQty = qty + change;
+        await item.update({system: { technology: { quantity: Math.max(newQty, 0)}}})
+    },
 }

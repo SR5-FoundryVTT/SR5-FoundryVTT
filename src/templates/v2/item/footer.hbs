@@ -141,7 +141,8 @@
                             {{#if isEditable}}
                                 <a class="hover-show-button"
                                    data-action="removeOneQty"
-                                   data-tooltip="SR5.Tooltips.Item.RemoveOneQty">
+                                   data-tooltip="{{localize 'SR5.Tooltips.Item.RemoveQuantity'
+                                                            qtySome=@root.bindings.qtySome qtyMany=@root.bindings.qtyMany}}">
                                     <i class="fas fa-minus-square"></i>
                                 </a>
                             {{/if}}
@@ -149,7 +150,8 @@
                             {{#if isEditable}}
                                 <a class="hover-show-button"
                                    data-action="addOneQty"
-                                   data-tooltip="SR5.Tooltips.Item.AddOneQty">
+                                   data-tooltip="{{localize 'SR5.Tooltips.Item.AddQuantity'
+                                                            qtySome=@root.bindings.qtySome qtyMany=@root.bindings.qtyMany}}">
                                     <i class="fas fa-plus-square"></i>
                                 </a>
                             {{/if}}
