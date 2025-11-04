@@ -171,64 +171,6 @@
         },
         "ActiveSkills": "Active Skills",
         "Actor": {
-            "Attribute": {
-                "strength": {
-                    "short": "STR",
-                    "full": "Strength"
-                },
-                "agility": {
-                    "short": "AGI",
-                    "full": "Agility"
-                },
-                "body": {
-                    "short": "BOD",
-                    "full": "Body"
-                },
-                "reaction": {
-                    "short": "REA",
-                    "full": "Reaction"
-                },
-                "intuition": {
-                    "short": "INT",
-                    "full": "Intuition"
-                },
-                "willpower": {
-                    "short": "WIL",
-                    "full": "Willpower"
-                },
-                "logic": {
-                    "short": "LOG",
-                    "full": "Logic"
-                },
-                "charisma": {
-                    "short": "CHA",
-                    "full": "Charisma"
-                },
-                "resonance": {
-                    "short": "RES",
-                    "full": "Resonance"
-                },
-                "magic": {
-                    "short": "MAG",
-                    "full": "Magic"
-                },
-                "attack": {
-                    "short": "ATK",
-                    "full": "Attack"
-                },
-                "sleaze": {
-                    "short": "SLZ",
-                    "full": "Sleaze"
-                },
-                "firewall": {
-                    "short": "FIR",
-                    "full": "Firewall"
-                },
-                "data_processing": {
-                    "short": "DP",
-                    "full": "Data Processing"
-                }
-            },
             "FIELDS": {
                 "attributes": {
                     "edge": {
