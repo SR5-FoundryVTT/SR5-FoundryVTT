@@ -2605,9 +2605,11 @@
                 "MissingSummoner": "Missing Summoner",
                 "MissingTechnomancer": "Missing Technomancer",
                 "NetworksTab": "Grids & Hosts",
+                "NoActiveEncounter": "No Active Encounter to roll Initiative for",
                 "NPC": "Mark actor as NPC to get additional features",
                 "PlaceMark": "Action to be used to place marks on already marked targets",
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
+                "RollInitiative": "Roll Initiative",
                 "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"

@@ -121,6 +121,32 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Preselect default inventory.
         this.selectedInventory = this.actor.defaultInventory.name;
         this._setInventoryVisibility(true);
+
+        // List to when a combatant is created for this actor to enable the roll initiative button
+        Hooks.on("createCombatant", () => {
+            const inCombat = this.actor.getToken()?.inCombat ?? this.actor.inCombat;
+            const selector = this.element.querySelector('button#roll-init-button');
+            if (selector) {
+                if (inCombat) {
+                    selector.removeAttribute('disabled');
+                } else {
+                    selector.setAttribute('disabled', '');
+                }
+            }
+        });
+
+        // Listen to when a combatant is deleted for this actor to disable the roll initiative button
+        Hooks.on("deleteCombatant", () => {
+            const inCombat = this.actor.getToken()?.inCombat ?? this.actor.inCombat;
+            const selector = this.element.querySelector('button#roll-init-button');
+            if (selector) {
+                if (inCombat) {
+                    selector.removeAttribute('disabled');
+                } else {
+                    selector.setAttribute('disabled', '');
+                }
+            }
+        });
     }
 
     /**
@@ -302,6 +328,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.initiativePerception = this._prepareInitiativePresence();
 
         data.primaryTabs = this._prepareTabs('primary');
+
+        data.canRollInitiative = this.actor.getToken()?.inCombat ?? this.actor.inCombat;
 
         data.expandedSkills = {};
         for (const id of this.expandedSkills) {
@@ -2076,7 +2104,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return sheetActions.sort(Helpers.sortByName.bind(Helpers));
     }
 
-    static async #toggleInitiativeBlitz(this: SR5BaseActorSheet, event) { event.preventDefault();
+    static async #toggleInitiativeBlitz(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2088,7 +2116,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         event.stopPropagation();
         await this.actor.rollInitiative();
-        // TODO figure out how to roll initiative, probably want to prompt the GM to allow it?
     }
 
     static async #renameInventory(this: SR5BaseActorSheet, event) {

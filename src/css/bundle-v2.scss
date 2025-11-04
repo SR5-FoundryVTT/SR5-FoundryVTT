@@ -19,9 +19,13 @@
     button {
         color: $light;
         border-color: $light;
-        &:hover {
+        &:not(:disabled):hover {
             color: $white;
             background: $darkred;
+        }
+        &:disabled {
+            color: $yellow;
+            border-color: $yellow;
         }
     }
 
