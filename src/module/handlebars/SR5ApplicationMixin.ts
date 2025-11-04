@@ -10,7 +10,7 @@ import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 const { TextEditor } = foundry.applications.ux;
-const { fromUuid, fromUuidSync } = foundry.utils;
+const { fromUuid } = foundry.utils;
 
 export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
     return class SR5ApplicationMixin extends foundry.applications.api.HandlebarsApplicationMixin(base) {
@@ -106,7 +106,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
 
             context.expandedUuids = {};
             for (const uuid of this.expandedUuids) {
-                const document = fromUuidSync(uuid);
+                const document = await fromUuid(uuid);
                 if (document) {
                     if (document instanceof SR5Item || document instanceof SR5Actor) {
                         console.log('document', document);
@@ -169,7 +169,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             } else {
                 this.expandedUuids.add(uuid);
                 event.target.closest('.list-item-container').classList.add('expanded');
-                const document = fromUuidSync(uuid);
+                const document = await fromUuid(uuid);
                 let html;
                 if (document instanceof SR5Item || document instanceof SR5Actor) {
                     html = await TextEditor.enrichHTML((document as any).system.description.value, {
