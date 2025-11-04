@@ -552,7 +552,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // first unload the current ammo
         await this.unloadAmmo();
         const equippedAmmo = this.getEquippedAmmo();
-        if (id === equippedAmmo?.id) {
+        if (equippedAmmo && id === equippedAmmo.id) {
             await equippedAmmo.update({ system: { technology: { equipped: false }}});
         } else {
             // then equip the new ammo
