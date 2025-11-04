@@ -421,32 +421,27 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const weapon = this.asType('weapon');
         if (!weapon) return;
 
-        const ammo = this.getEquippedAmmo();
-
-        if (!ammo) return;
         const current = weapon.system.ammo.current.value;
 
         // don't bother unloading ammo that doesn't exist
         if (current === 0) return;
 
-        const ammoQty = ammo.system.technology.quantity;
+        const ammo = this.getEquippedAmmo();
 
-        const newQty = ammoQty + current;
+        if (ammo) {
+            const ammoQty = ammo.system.technology.quantity;
 
-        // update the ammo quantity to its previous value
-        await ammo.update({ system: { technology: { quantity: Math.max(0, newQty) } } });
+            const newQty = ammoQty + current;
+
+            // update the ammo quantity to its previous value
+            await ammo.update({ system: { technology: { quantity: Math.max(0, newQty) } } });
+        }
 
         await this.update({
             system: {
                 ammo: {
                     // update our ammo count to 0 on the weapon
                     current: { value: 0 },
-                    // increment the number of spare clips available
-                    ...(weapon.system.ammo.spare_clips.max > 0 && {
-                        spare_clips: {
-                            value: Math.min(weapon.system.ammo.spare_clips.max, weapon.system.ammo.spare_clips.value + 1)
-                        }
-                    })
                 }
             }
         });

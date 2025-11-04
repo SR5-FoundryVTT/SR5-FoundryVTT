@@ -22,10 +22,10 @@
     <label>{{localize "SR5.Reach"}}&nbsp;{{item.system.melee.reach}}</label>
 {{/if}}
 
-{{#if (and (usesAmmo item) (hasAmmo item))}}
+{{#if (and (usesAmmo item) (hasAmmo item) (equippedAmmo item))}}
     <div class="basic-row">
         <select class="select sr5-select weapon-ammo-select" data-item-id="{{item.id}}" data-item-id="{{item.uuid}}">
-            {{selectOptions (ammoOptions item) selected=(equippedAmmo item)}}
+            {{selectOptions (ammoOptions item) selected=(objValue (equippedAmmo item) 'id')}}
         </select>
         <label>({{item.system.ammo.current.value}}/{{item.system.ammo.current.max}})</label>
     </div>
