@@ -1027,7 +1027,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             const asdf = device.getASDF();
             return Object.values(asdf).map(x => new Handlebars.SafeString(`${x.value || '-'}`));
         }
-        return '';
+        return [];
     }
 
     getASDF(this: SR5Item<'device'>) {
