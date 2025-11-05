@@ -1,6 +1,7 @@
 import { SR5 } from "../config";
 import Template from "../template";
 import { Helpers } from "../helpers";
+import { SR5Die } from "../rolls/SR5Die";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { TestCreator } from "./TestCreator";
@@ -23,7 +24,6 @@ import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlo
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
 import { DeepPartial } from "fvtt-types/utils";
-
 export interface TestDocuments {
     // Legacy field that used be the source document.
     actor?: SR5Actor
@@ -345,20 +345,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Get the lowest side for a Shadowrun 5 die to count as a success
-     */
-    static get lowestSuccessSide(): number {
-        return Math.min(...SR.die.success);
-    }
-
-    /**
-     * Get the lowest side for a Shadowrun 5 die to count as a glitch.
-     */
-    static get lowestGlitchSide(): number {
-        return Math.min(...SR.die.glitch);
-    }
-
-    /**
      * Get a possible globally defined default action set for this test class.
      */
     static _getDefaultTestAction(): DeepPartial<MinimalActionType> {
@@ -435,9 +421,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @returns The complete formula string.
      */
     buildFormula(dice: number, explode: boolean): string {
-        // Apply dice explosion, removing the limit is done outside the roll.
-        const explodeFormula = explode ? 'x6' : '';
-        return `(${dice})d6cs>=${SuccessTest.lowestSuccessSide}${explodeFormula}`;
+        // Build the dice formula for a Shadowrun 5e test.
+        // - dice: number of ds (custom die) to roll
+        // - explode: whether to explode sixes (Edge rules)
+
+        const explodeModifier = explode ? 'x6' : '';
+        return `${dice}d${SR5Die.DENOMINATION}${explodeModifier}`;
     }
 
     /**
@@ -491,7 +480,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper method to create the main SR5Roll.
      */
     createRoll(): SR5Roll {
-        const roll = new SR5Roll(this.formula) as unknown as SR5Roll;
+        const roll = new SR5Roll(this.formula);
         this.rolls.push(roll);
         return roll;
     }
@@ -684,8 +673,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.usingManualRoll) {
             // Evaluate all rolls.
             for (const roll of this.rolls) {
-                // @ts-expect-error // foundry-vtt-types is missing evaluated.
-                if (!roll._evaluated)
+                if (!roll.evaluated())
                     await roll.evaluate();
             }
         }
@@ -1700,36 +1688,33 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
-    async rollDiceSoNice() {
-        if (!game.user || !game.users) return;
-
-        const dice3d = (game.modules.get("dice-so-nice") as any)?.api;
+    rollDiceSoNice() {
+        const dice3d = game.dice3d;
         if (!dice3d) return;
 
-        console.debug('Shadowrun5e | Initiating DiceSoNice throw');
-
         // Only roll the last dice rolled.
-        // This necessary when a test has been recast with second chance, and should only the re-rolled dice instead
-        // of all.
+        // This necessary when a test has been recast with second chance,
+        // and should only the re-rolled dice instead of all.
         const roll = this.rolls[this.rolls.length - 1];
 
         // Limit users to show dice to...
         let whisper: User[] | null = null;
+
         // ...for gmOnlyContent check permissions
         if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
             whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true);
         }
+
         // ...for rollMode include GM when GM roll
         if (this.data.options?.rollMode === 'gmroll' || this.data.options?.rollMode === "blindroll") {
-            whisper = whisper || [];
-            whisper = [...game.users.filter(user => user.isGM), ...whisper];
+            whisper = [...game.users.filter(user => user.isGM), ...(whisper || [])];
         }
 
         // Don't show dice to a user casting blind.
         const blind = this.data.options?.rollMode === 'blindroll';
         const synchronize = this.data.options?.rollMode === 'publicroll';
 
-        dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
+        void dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
 
     /**
@@ -1754,7 +1739,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.data.messageUuid = message.uuid;
         await this.saveToMessage();
 
-        await this.rollDiceSoNice();
+        this.rollDiceSoNice();
 
         return message;
     }
@@ -2131,7 +2116,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const card = $(event.currentTarget).closest('.chat-card');
         const element = card.find('.dice-rolls');
         if (element.is(':visible')) element.slideUp(200);
-        else element.slideDown(200);
+        else element.css('display', 'flex').hide().slideDown(200);
     }
 
     /**

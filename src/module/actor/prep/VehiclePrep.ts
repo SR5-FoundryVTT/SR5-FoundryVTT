@@ -157,17 +157,13 @@ export class VehiclePrep {
     }
 
     static prepareConditionMonitor(system: Actor.SystemOfType<'vehicle'>) {
-        const { track, attributes, matrix, isDrone, modifiers } = system;
+        const { track, attributes, matrix, isDrone, modifiers, category } = system;
 
         const halfBody = Math.ceil(Helpers.calcTotal(attributes.body) / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
-        if (isDrone) {
-            track.physical.base = 6 + halfBody;
-            track.physical.max = track.physical.base + (Number(modifiers['physical_track']) || 0);
-        } else {
-            track.physical.base = 12 + halfBody;
-            track.physical.max =  track.physical.base + (Number(modifiers['physical_track']) || 0);
-        }
+        // Anthro vehicles have condition monitor as 8 + (body/2). R5 pg 145
+        track.physical.base = (isDrone ? (category === 'anthro' ? 8 : 6) : 12) + halfBody;
+        track.physical.max =  track.physical.base + modifiers['physical_track'];
         track.physical.label = SR5.damageTypes.physical;
 
         // Prepare internal matrix condition monitor values
