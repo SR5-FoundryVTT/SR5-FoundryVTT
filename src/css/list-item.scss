@@ -206,6 +206,7 @@
             }
 
             &.asdf-col {
+                flex: 0 0 5rem;
                 justify-content: space-between;
                 font-family: monospace;
             }
@@ -224,7 +225,6 @@
             &.armor-col,
             &.ammo-col,
             &.cost-col,
-            &.asdf-col,
             &.essence-col,
             &.mod-category-col,
             &.matrix-icon-col {
@@ -236,9 +236,9 @@
             }
 
             &.matrix-network-col {
-                flex: 0 0 5rem;
+                flex: 0 0 4rem;
                 > label {
-                    width: 5rem;
+                    width: 4rem;
                     text-align: center;
                     white-space: nowrap;
                     overflow: hidden;
@@ -247,7 +247,7 @@
             }
 
             &.mark-input-col, &.qty-input-col {
-                flex: 0 0 5rem;
+                flex: 0 0 4rem;
                 gap: 0.25rem;
 
                 .mark-label {

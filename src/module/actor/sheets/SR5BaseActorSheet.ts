@@ -685,7 +685,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     _addInventoryTypes(inventory: InventorySheetData) {
         for (const type of this.getInventoryItemTypes()) {
-            if (inventory.types.hasOwnProperty(type)) continue;
+            if (Object.hasOwn(inventory.types, type)) continue;
 
             inventory.types[type] = {
                 type,
@@ -724,7 +724,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             type: 'contact' as Item.SubType,
             system: {linkedActor: actor.uuid }
         };
-        this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
+        await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
 
     static async #toggleInventoryVisibility(this: SR5BaseActorSheet, event) {
