@@ -9,7 +9,7 @@ import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
-const { TextEditor } = foundry.applications.ux;
+const { TextEditor, SearchFilter } = foundry.applications.ux;
 const { fromUuid } = foundry.utils;
 
 export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
@@ -18,6 +18,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         declare element: HTMLElement;
         declare window: ApplicationV2.Window;
         declare editIcon: HTMLElement;
+        declare wrenchIcon: HTMLElement;
         declare isEditable: boolean;
         declare options: typeof SR5ApplicationMixin.DEFAULT_OPTIONS;
 
@@ -46,14 +47,14 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         constructor(options) {
             // @ts-expect-error call super constructor
             super(options);
+            this._mode = options.mode ?? 'play';
             this.#filters = this.#createFilters();
         }
 
         #createFilters() {
             return (this.options as any)?.filters?.map((s) => {
                 s.callback = s.callback.bind(this);
-                // Add the 'foundry.applications.ux' namespace here
-                return new foundry.applications.ux.SearchFilter(s);
+                return new SearchFilter(s);
             }) ?? [];
         }
 
@@ -252,7 +253,9 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             Hooks.call('sr5_processTagifyElements', this.element);
 
             if (this.editIcon) {
-                this.editIcon.className = this.isEditMode ? 'fas fa-toggle-off' : 'fas fa-toggle-on';
+                this.editIcon.className = this.isEditMode ? 'fas fa-toggle-large-off fa-stack-2x'
+                                                            : 'fas fa-toggle-large-on fa-stack-2x';
+                this.wrenchIcon.style.visibility = this.isEditMode ? 'hidden' : 'visible';
             }
         }
 
@@ -261,13 +264,19 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             const frame = await super._renderFrame(options);
             if (this.isEditable) {
                 const button = document.createElement('button');
-                button.style.fontSize = '150%';
-                button.className = 'header-control icon';
+                button.className = 'header-control icon fa-stack';
+                button.style.fontSize = '.6rem';
                 button.dataset.tooltip = 'SR5.Tooltips.ToggleEditMode';
+                button.dataset.action = 'toggleEditMode';
+
                 this.editIcon = document.createElement('i');
                 button.appendChild(this.editIcon);
-                this.editIcon.className = this.isEditMode ? 'fas fa-toggle-off' : 'fas fa-toggle-on';
-                button.dataset.action = 'toggleEditMode';
+                this.editIcon.className = this.isEditMode ? 'fas fa-toggle-large-off fa-stack-2x'
+                                                            : 'fas fa-toggle-large-on fa-stack-2x';
+
+                this.wrenchIcon = document.createElement('i');
+                button.appendChild(this.wrenchIcon);
+                this.wrenchIcon.className = 'fas fa-wrench fa-stack-1x fa-rotate-270 edit-wrench-icon';
 
                 this.window?.header?.prepend(button);
             }

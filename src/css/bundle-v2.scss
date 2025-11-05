@@ -35,6 +35,18 @@
         border-bottom: none;
         height: 2rem;
         max-height: 2rem;
+
+        // change the edit mode wrench icon on the toggle switch
+        .edit-wrench-icon {
+            color: black;
+            vertical-align: middle;
+            margin-left: 1px;
+            width: auto;
+            text-shadow: 1px 1px 1px $white,
+                        1px -1px 1px $white,
+                        -1px -1px 1px $white,
+                        -1px 1px 1px $white;
+        }
     }
 
     // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
