@@ -285,6 +285,18 @@ export const registerSystemSettings = () => {
         default: []
     });
 
+    if (game.modules.get('dice-so-nice')?.active) {
+        game.settings.register(SYSTEM_NAME, FLAGS.DieFaceLabels, {
+            name: 'SETTINGS.DieFaceLabels',
+            hint: 'SETTINGS.DieFaceLabelsDescription',
+            scope: 'world',
+            config: true,
+            type: String,
+            default: '1,2,3,4,5,6',
+            requiresReload: true,
+        });
+    }
+
     /**
      * Select compendia to use for system porpuses like different action packs
      */

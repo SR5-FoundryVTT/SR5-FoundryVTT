@@ -1,9 +1,9 @@
-<div class="dice-rolls">
-    <div class="dice-roll-content">
-        {{#each roll.sides}}
-        <div class="dice-roll {{diceIcon this}}">
-            <div class="result-text">{{this}}</div>
-        </div>
+<div class="dice-tooltip">
+    <ol class="dice-rolls">
+        {{#each roll.results}}
+        <li class="roll {{dieResultCssClasses this}}">
+            {{this.result}}
+        </li>
         {{/each}}
-    </div>
+    </ol>
 </div>
