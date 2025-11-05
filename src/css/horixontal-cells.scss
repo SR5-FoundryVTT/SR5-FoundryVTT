@@ -1,4 +1,15 @@
 .sr5v2 {
+    .matrix-condition-monitor-property {
+        .icon-container {
+            font-size: 0.85rem !important;
+            width: 0.85rem !important;
+        }
+
+        .cell {
+            width: 20px !important;
+            height: 14px !important;
+        }
+    }
     .horizontal-cell-input {
         display: flex;
         flex-flow: row nowrap;

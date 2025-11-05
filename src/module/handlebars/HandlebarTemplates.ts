@@ -38,6 +38,7 @@ export const preloadHandlebarsTemplates = async () => {
             'list-items/item-name',
             'list-items/item-rating-col',
             'list-items/item-roll-image',
+            'list-items/matrix-condition-monitor',
             'list-items/matrix-icon-image',
             'list-items/open-source-icon',
             'list-items/toggle-expand-icon',

@@ -881,8 +881,21 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
 
         const target = event.target.closest('[data-action="modifyConditionMonitor"]');
-
         const track = target.dataset.id;
+
+        // if this is a matrix track for an item, handle it differently
+        const uuid = event.target.closest('[data-uuid]')?.dataset?.uuid ?? '';
+        if (track === 'matrix' && uuid) {
+            const document = await fromUuid(uuid);
+            if (document && document instanceof SR5Item) {
+                let value = Number(target.dataset.value);
+                if (document.getConditionMonitor().value === value) {
+                    value = 0;
+                }
+                return await document.setMatrixDamage(value);
+            }
+        }
+
         const data: Actor.UpdateData = {};
         let value = Number(target.dataset.value);
 
@@ -923,6 +936,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
 
         const track = event.target.closest('[data-id]').dataset.id;
+
+        const uuid = event.target.closest('[data-uuid]')?.dataset?.uuid ?? '';
+        if (track === 'matrix' && uuid) {
+            const document = await fromUuid(uuid);
+            if (document && document instanceof SR5Item) {
+                return await document.setMatrixDamage(0);
+            }
+        }
+
         const data = {};
         if (track === 'stun') {
             data[`system.track.stun.value`] = 0;
@@ -964,12 +986,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             case 'edge':
                 await this.actor.rollAttribute('edge', { event });
                 break;
-            case 'matrix':
-                if (this.actor.isType('character')) {
-                    await this.actor.getMatrixDevice()?.repairItem();
-                } else if (this.actor.isType('vehicle')) {
-
-                }
         }
     }
 

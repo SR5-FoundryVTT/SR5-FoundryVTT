@@ -13,7 +13,10 @@
     Stun [XX] [XX] [XX] [-1]     # tolernace 3, toleranceBase 1    
 --}}
 {{#if (not disabled)}}
-<div class="horizontal-cell-input {{id}}" data-id="{{id}}">
+<div class="horizontal-cell-input {{id}}"
+     data-id="{{id}}"
+    {{#if itemId}} data-item-id="{{itemId}}" {{/if}}
+    {{#if uuid}} data-uuid="{{uuid}}" {{/if}}>
     <div class="icon-container">
         <a data-tooltip="{{tooltip}}" data-action="rollConditionMonitor">
             {{#if (eq id 'physical')}}
@@ -23,7 +26,7 @@
             {{else if (eq id 'overflow')}}
                 <i class="fas fa-droplet"></i>
             {{else if (eq id 'matrix')}}
-                <i class="fas fa-heart-circle-bolt"></i>
+                <i class="fas fa-microchip"></i>
             {{else if (eq id 'edge')}}
                 <i class="fas fa-star-christmas"></i>
             {{else}}
