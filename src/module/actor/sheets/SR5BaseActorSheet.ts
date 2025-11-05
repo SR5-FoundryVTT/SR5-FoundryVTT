@@ -816,27 +816,30 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Unhide section it it was
         this._setInventoryTypeVisibility(type, true);
 
-        // TODO: Add translation for item names...
         const itemData = {
             type,
-            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`
+            name: `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes[type])}`
         };
-        const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
+        const items = await this.actor.createEmbeddedDocuments('Item', [itemData]);
         if (!items) return;
 
         // Add the item to the selected inventory.
-        if (this.selectedInventory !== this.actor.defaultInventory.name)
+        if (this.selectedInventory !== this.actor.defaultInventory.name) {
             await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
+        }
+        for (const item of items) {
+            await item.sheet?.render(true, { mode: 'edit' });
+        }
     }
 
     static async #editItem(this: SR5BaseActorSheet, event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);
-        if (item) await item.sheet?.render(true);
+        if (item) await item.sheet?.render(true, { mode: 'edit' });
     }
 
-    _handleDeleteItem(item: SR5Item) {
+    async _handleDeleteItem(item: SR5Item) {
         // remove from the inventory tracking system
         return this.actor.inventory.removeItem(item).then(() => {
             return this.actor.deleteEmbeddedDocuments('Item', [item.id!]);
@@ -852,7 +855,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);
         if (!item) return;
-        this._handleDeleteItem(item);
+        await this._handleDeleteItem(item);
     }
 
     static async #rollItem(this: SR5BaseActorSheet, event) {
@@ -1423,16 +1426,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (skillId) {
             if (!category || category === 'active') {
                 const app = new SkillEditSheet({document: this.actor}, skillId)
-                await app.render(true);
+                await app.render(true, {mode: 'edit'} as any);
             } else if (category === 'knowledge') {
                 const subcategory = closest?.dataset.subcategory;
                 if (subcategory) {
                     const app = new KnowledgeSkillEditSheet({document: this.actor}, skillId, subcategory)
-                    await app.render(true);
+                    await app.render(true, {mode: 'edit'} as any);
                 }
             } else if (category === 'language') {
                 const app = new LanguageSkillEditSheet({document: this.actor}, skillId)
-                await app.render(true);
+                await app.render(true, {mode: 'edit'} as any);
             }
         }
     }
@@ -1995,7 +1998,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     if (item) {
-                        await item.sheet?.render(true)
+                        await item.sheet?.render(true, { mode: 'edit' })
                     }
                 }
             },
@@ -2027,7 +2030,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     if (item) {
-                        this._handleDeleteItem(item);
+                        await this._handleDeleteItem(item);
                     }
                 }
             }

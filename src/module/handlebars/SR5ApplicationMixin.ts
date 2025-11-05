@@ -47,7 +47,6 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
         constructor(options) {
             // @ts-expect-error call super constructor
             super(options);
-            this._mode = options.mode ?? 'play';
             this.#filters = this.#createFilters();
         }
 
@@ -156,6 +155,15 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
 
             return partContext;
         }
+
+        /** @inheritdoc */
+        override _configureRenderOptions(options) {
+            super._configureRenderOptions(options);
+            if (options.mode && this.isEditable) this._mode = options.mode;
+            // New sheets should always start in edit mode
+            else if (options.renderContext === `create${this.document.documentName}`) this._mode = 'edit';
+        }
+
 
         /**
          * Show / hide the items description within a sheet item l ist.
