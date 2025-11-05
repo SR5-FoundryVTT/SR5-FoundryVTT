@@ -289,7 +289,11 @@
         .dice-rolls {
             display: none;
             border-bottom: $groove;
+            flex-flow: row wrap;
+            justify-content: center;
         }
+        // Legacy dice display, kept for compatibility with old chat messages.
+        // New messages should use the dice-rolls above.
         .dice-roll-content {
             padding: 0.5em 0.5em;
             display: flex;
@@ -303,7 +307,8 @@
                 text-align: center;
                 width: 24px;
                 line-height: 24px;
-                
+                color: #000;
+
                 // Consistent margin on top, if missing result boxes will clip.
                 margin-top: 5px;
 

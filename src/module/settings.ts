@@ -285,6 +285,18 @@ export const registerSystemSettings = () => {
         default: []
     });
 
+    if (game.modules.get('dice-so-nice')?.active) {
+        game.settings.register(SYSTEM_NAME, FLAGS.DieFaceLabels, {
+            name: 'SETTINGS.DieFaceLabels',
+            hint: 'SETTINGS.DieFaceLabelsDescription',
+            scope: 'world',
+            config: true,
+            type: String,
+            default: '1,2,3,4,5,6',
+            requiresReload: true,
+        });
+    }
+
     /**
      * Select compendia to use for system porpuses like different action packs
      */
@@ -333,9 +345,9 @@ export const registerSystemSettings = () => {
     game.settings.register(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, {
         name: "Actor Importer Compendium Order",
         hint: "The ordered list of compendium packs to search when importing items to an actor.",
-        scope: "world", // "world" scope makes it specific to this game world
-        config: false,  // "false" hides it from the core settings menu
+        scope: "world",
+        config: false,
         type: Array,
-        default: [],     // Default to an empty array
+        default: [],
     });
 };

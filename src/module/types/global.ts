@@ -50,6 +50,7 @@ import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerc
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
+import { DiceSoNice } from "../rolls/DiceSoNice";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -222,6 +223,7 @@ declare module "fvtt-types/configuration" {
             getChatMessageContextOptions: (args0: any, args1: any) => void;
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
+            diceSoNiceReady: (dice3d: DiceSoNice) => void;
         }
     }
 
@@ -261,13 +263,18 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.MatrixActionsPack": string;
         "shadowrun5e.ICActionsPack": string;
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
-        "shadowrun5e.importerCompendiumOrder": string[];
+        "shadowrun5e.ImporterCompendiumOrder": string[];
+        "shadowrun5e.DieFaceLabels": string;
     }
 }
 
 declare global {
     // eslint-disable-next-line no-var
     var routinglib: RoutingLib | null;
+
+    interface Game {
+        dice3d: DiceSoNice | undefined;
+    }
 
     // Use declaration merging to add strong typing to Foundry's game.i18n localize and format functions,
     // sourcing valid translation strings from this system's english translations file
