@@ -30,25 +30,29 @@
             </div>
         {{else if (not isLimited)}}
             <div>
+
                 {{#if (or isIC isSprite)}}
                     {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
                         id='matrix'
-                        track = system.track.matrix
+                        track=system.track.matrix
                         tooltip=(localize "SR5.Labels.ActorSheet.Matrix")
                     }}
                 {{/if}}
                 {{#if (or isCharacter isSpirit)}}
                     {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
                         id='stun'
-                        track = system.track.stun
+                        track=system.track.stun
+                        tooltip=(localize "SR5.Labels.ActorSheet.StunTrack")
                     }}
                 {{/if}}
                 {{#unless (or isIC isSprite)}}
                     {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
                         id='physical'
-                        track = system.track.physical
+                        track=system.track.physical
+                        tooltip=(localize "SR5.Labels.ActorSheet.PhysicalTrack")
                     }}
                 {{/unless}}
+
             </div>
         {{/if}}
     </div>

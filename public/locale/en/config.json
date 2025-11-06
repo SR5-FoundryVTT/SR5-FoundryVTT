@@ -1583,6 +1583,7 @@
                 "OwnedIcons": "Owned Icons",
                 "Persona": "Persona",
                 "PersonalInventory": "On Person",
+                "PhysicalTrack": "Physical Track",
                 "PublicAwarenessShort": "PA",
                 "RemoveOneMark": "Remove One Mark",
                 "ResetActorForNewRun": "New Run Reset",
@@ -1597,6 +1598,7 @@
                 "SpriteConfiguration": "Sprite Configuration",
                 "SpritePowers": "Sprite Powers",
                 "StreetCredShort": "SC",
+                "StunTrack": "Stun Track",
                 "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
                 "VehicleConfiguration": "Vehicle Configuration"
             },
