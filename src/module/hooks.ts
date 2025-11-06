@@ -25,6 +25,7 @@ import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
 import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
 
+import { SR5Die } from './rolls/SR5Die';
 import {SR5Roll} from "./rolls/SR5Roll";
 import {SuccessTest} from "./tests/SuccessTest";
 import {TeamworkTest} from "./actor/flows/TeamworkFlow";
@@ -80,6 +81,7 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 import { RoutingLibIntegration } from './integrations/routingLibIntegration';
+import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
 
@@ -124,6 +126,7 @@ import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
+import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -140,6 +143,10 @@ export class HooksManager {
             // See src/module/integartions for more information.
             if (game.modules.get('routinglib')?.active) {
                 RoutingLibIntegration.init();
+            }
+
+            if (game.modules.get('dice-so-nice')?.active) {
+                initDiceSoNice();
             }
         });
         Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
@@ -198,6 +205,11 @@ ___________________
              * check the Test implementations.
              */
             SR5Roll,
+
+            /**
+             * You want to open the compendium browser?
+             */
+            CompendiumBrowser,
 
             /**
              * You want to create a test from whatever source?
@@ -369,6 +381,7 @@ ___________________
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
         // Register general SR5Roll for JSON serialization support.
+        CONFIG.Dice.terms[SR5Die.DENOMINATION] = SR5Die;
         CONFIG.Dice.rolls.push(SR5Roll);
         // @ts-expect-error // Register the SR5Roll dnd5e style.
         CONFIG.Roll = SR5Roll;
@@ -376,6 +389,9 @@ ___________________
         // Add Shadowrun configuration onto general Foundry config for module access.
         // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
+
+        CONFIG.Actor.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
+        CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
 
         CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
 
@@ -547,6 +563,10 @@ ___________________
      * @returns 
      */
     static renderCompendiumDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
+        const browser = $('<button class="sr5 import-button"><i class="fa-solid fa-book-open-reader"></i><span>Open Compendium Browser</span></button>');
+        $(html).find('.header-actions').append(browser);
+        browser.on('click', () => { void new CompendiumBrowser().render({ force: true }); });
+
         if (!game.user?.isGM) {
             return;
         }

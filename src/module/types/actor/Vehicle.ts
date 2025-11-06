@@ -1,3 +1,4 @@
+import { SR5 } from "@/module/config";
 import { ActorBase, CommonData, CreateModifiers, PhysicalCombatValues } from './Common';
 import { AttributeChoices, AttributeField, Attributes } from '../template/Attributes';
 import { VehicleLimits } from '../template/Limits';
@@ -8,8 +9,6 @@ import { Initiative } from '../template/Initiative';
 import { MatrixData } from '../template/Matrix';
 import { VisibilityChecks } from '../template/Visibility';
 import { ModifiableField } from '../fields/ModifiableField';
-import { SR5 } from '@/module/config';
-
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const VehicleStats = () => ({
@@ -43,6 +42,11 @@ const VehicleData = () => ({
         required: true,
         initial: "speed",
         choices: SR5.vehicle.environments,
+    }),
+    category: new StringField({
+        required: true,
+        initial: "medium",
+        choices: Object.keys(SR5.vehicle.categories) as Array<keyof typeof SR5.vehicle.categories>,
     }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),

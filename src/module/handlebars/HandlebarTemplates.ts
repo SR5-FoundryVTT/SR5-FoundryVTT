@@ -113,6 +113,9 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs',
 
+        // Application - Compendium Browser
+        'systems/shadowrun5e/dist/templates/apps/compendium-browser/settings-folder.hbs',
+
         // Application - Situational Modifiers
         'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
     ];

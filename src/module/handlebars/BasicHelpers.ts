@@ -188,22 +188,6 @@ export const registerBasicHelpers = () => {
     });
 
     /**
-     * Allow to give two values and compare them with logical OR.
-     * 
-     * Uses JavaScript truthy/falsy values.
-     * 
-     * @param a The first value
-     * @param v The second value
-     * @returns true or false
-     */
-    Handlebars.registerHelper('or', function(...choices) {
-        choices.splice(choices.length - 1, 1); // delete the options object
-        return choices.reduce((acc, current) => {
-            return acc || current;
-        }, false);
-    });
-
-    /**
      * Allow using the first given value that's defined.
      * @params * A open list of parameters, from which the first defined value will be returned.
      */
