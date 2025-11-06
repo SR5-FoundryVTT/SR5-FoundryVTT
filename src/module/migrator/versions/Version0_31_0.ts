@@ -4,8 +4,8 @@ import { VersionMigration } from "../VersionMigration";
  * Update all dataSchema to their correct values choices.
  * Fixes a typo in the lifestyle type "luxory" -> "luxury"
  */
-export class Version0_30_7 extends VersionMigration {
-    readonly TargetVersion = "0.30.7";
+export class Version0_31_0 extends VersionMigration {
+    readonly TargetVersion = "0.31.0";
 
     override handlesActor(_actor: Readonly<any>) { return true; }
 
