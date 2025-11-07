@@ -833,7 +833,7 @@ export type ActorSchema = {
     lifestyles: MaybeEmpty<{
         lifestyle: OneOrMany<{
             guid: string;
-            sourceid: string;
+            sourceid: OneOrMany<string>;
             name: MaybeEmpty<string>;
             city: MaybeEmpty<string>;
             district: MaybeEmpty<string>;

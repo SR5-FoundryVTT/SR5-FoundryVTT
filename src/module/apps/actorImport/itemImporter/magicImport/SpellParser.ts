@@ -14,21 +14,24 @@ export class SpellParser extends Parser<'spell'> {
     }
 
     private prepareSystem(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
-        system.category = itemData.category_english.toLowerCase().replace(/\s/g, '_') as any;
-        system.type = itemData.type_english === 'M' ? 'mana' : 'physical';
-        system.range =
-            itemData.range_english === 'T'
-                ? 'touch'
-                : itemData.range_english
-                        .toLowerCase()
-                        .replace(/\s/g, '_')
-                        .replace('(', '')
-                        .replace(')', '') as any;
-        system.drain = parseInt(itemData.dv_english.replace(/[A-Z]*/g, ''));
+        system.category = itemData.category_english.toLowerCase().replace(/\s+/g, '_') as any;
+
+        const type = itemData.type_english ?? itemData.type;
+        system.type = type === 'M' ? 'mana' : 'physical';
+
+        const rangeRaw = itemData.range_english ?? itemData.range;
+        system.range = rangeRaw === 'T'
+            ? 'touch'
+            : rangeRaw.toLowerCase()
+                .replace(/\s+/g, '_')
+                .replace(/[()]/g, '') as any;
+
+        const dvRaw = itemData.dv_english ?? itemData.dv;
+        system.drain = parseInt(dvRaw.replace(/[A-Z]+/gi, ''), 10);
     }
 
     private parseDuration(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
-        const duration = itemData.duration_english.toLowerCase();
+        const duration = (itemData.duration_english ?? itemData.duration).toLowerCase();
         if (duration === 's')
             system.duration = 'sustained';
         else if (duration === 'i')

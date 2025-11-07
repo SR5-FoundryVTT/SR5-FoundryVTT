@@ -196,7 +196,7 @@ export class WeaponParser extends Parser<'weapon'> {
         range.rc.base = Number(this.getValues(itemData.rawrc)[0]) || 0;
 
         if (itemData.mode) {
-            const modes = itemData.mode_english_noammo!.toLowerCase();
+            const modes = (itemData.mode_english_noammo ?? itemData.mode_noammo)!.toLowerCase();
             range.modes = {
                 single_shot: modes.includes('ss'),
                 semi_auto: modes.includes('sa'),

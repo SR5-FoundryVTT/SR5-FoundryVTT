@@ -8,7 +8,7 @@ export type ItemSystems = SystemEntityType & Item.ConfiguredSubType;
 
 export type BaseType = {
     suid?: string;
-    sourceid?: string;
+    sourceid?: string | string[];
     name: string | null;
     name_english?: string;
     fullname?: string;
@@ -61,7 +61,7 @@ export abstract class Parser<T extends ItemSystems> {
      * Returns a blank item if not found.
      */
     protected async getItemFromCompendium(itemData: BaseType): Promise<BlankItem<T> | null> {
-        const guid = itemData.suid ?? itemData.sourceid ?? null;
+        const guid = itemData.suid ?? IH.getArray(itemData.sourceid)[0] ?? null;
         const itemIdFromGuid = guid ? IH.guidToId(guid) : null;
 
         for (const [packId, indexes] of Parser.compendiumCache.entries()) {
@@ -121,7 +121,7 @@ export abstract class Parser<T extends ItemSystems> {
     protected parseImportFlags(item: BlankItem<T>, itemData: BaseType) {
         item.system.importFlags = {
             isFreshImport: true,
-            sourceid: itemData.sourceid ?? '',
+            sourceid: itemData.suid ?? IH.getArray(itemData.sourceid)[0] ?? '',
             category: this.parseCategoryFlags(item, itemData),
             name: itemData.name_english ?? itemData.name ?? '',
         };
