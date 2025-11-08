@@ -99,9 +99,6 @@ export interface SR5BaseSheetDelays {
  *
  */
 export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> extends SR5ApplicationMixin(ActorSheetV2)<T> {
-    declare readonly isEditMode: boolean;
-    declare readonly isPlayMode: boolean;
-
     // If something needs filtering, store those filters here.
     _filters: SR5SheetFilters = {
         skills: '', // filter based on user input and skill name/label.
