@@ -799,14 +799,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return this.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
     }
 
-    /**
-     * Create a new item based on the Item Header creation action and the item type of that header.
-     * 
-     * @param event 
-     * @param data Optional additional data to be injected into the create item data.
-     */
-    static async #createItem(this: SR5BaseActorSheet, event) {
-        event.preventDefault();
+    protected async _handleCreateItem(event) {
         const type = SheetFlow.closestAction(event.target).dataset.itemType;
 
         // Unhide section it it was
@@ -826,6 +819,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         for (const item of items) {
             await item.sheet?.render(true, { mode: 'edit' });
         }
+    }
+
+    /**
+     * Create a new item based on the Item Header creation action and the item type of that header.
+     * 
+     * @param event 
+     */
+    static async #createItem(this: SR5BaseActorSheet, event) {
+        event.preventDefault();
+        return this._handleCreateItem(event);
     }
 
     static async #editItem(this: SR5BaseActorSheet, event) {
@@ -859,7 +862,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const iid = SheetFlow.closestUuid(event.target);
         const item = await fromUuid(iid);
 
-        if (!item || !(item instanceof SR5Item)) return;
+        if (!(item instanceof SR5Item)) return;
         await this._handleRollItem(item, event);
     }
 
@@ -883,12 +886,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const uuid = event.target.closest('[data-uuid]')?.dataset?.uuid ?? '';
         if (track === 'matrix' && uuid) {
             const document = await fromUuid(uuid);
-            if (document && document instanceof SR5Item) {
+            if (document instanceof SR5Item) {
                 let value = Number(target.dataset.value);
                 if (document.getConditionMonitor().value === value) {
                     value = 0;
                 }
-                return await document.setMatrixDamage(value);
+                return document.setMatrixDamage(value);
             }
         }
 
@@ -936,7 +939,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const uuid = event.target.closest('[data-uuid]')?.dataset?.uuid ?? '';
         if (track === 'matrix' && uuid) {
             const document = await fromUuid(uuid);
-            if (document && document instanceof SR5Item) {
+            if (document instanceof SR5Item) {
                 return await document.setMatrixDamage(0);
             }
         }
@@ -1607,7 +1610,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const item = this.actor.items.get(id);
         if (!item) return;
 
-        if (item.isType('critter_power') || item.isType('sprite_power')) {
+        if (item.isType('critter_power', 'sprite_power')) {
             switch (item.system.optional) {
                 case 'standard':
                     return;
@@ -1639,7 +1642,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         const uuid = SheetFlow.closestUuid(event.target);
         const item = await fromUuid(uuid);
-        if (!item || !(item instanceof SR5Item)) return;
+        if (!(item instanceof SR5Item)) return;
 
         // iterate through the states of online -> silent -> offline
         const newState = event.shiftKey ? 'none'
@@ -1993,7 +1996,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 callback: async (target) => {
                     const uuid = SheetFlow.closestUuid(target);
                     const document = await fromUuid(uuid);
-                    if (document && document instanceof SR5Item) {
+                    if (document instanceof SR5Item) {
                         await document.sheet?.render(true)
                     }
                 }

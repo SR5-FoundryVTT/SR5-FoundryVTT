@@ -90,7 +90,7 @@ export class SpritePrep {
 
         // Prepare internal matrix condition monitor values
         // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
-        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(level);
+        matrix.condition_monitor.max = modifiers['matrix_track'] + MatrixRules.getConditionMonitor(level);
 
         // Prepare user visible matrix track values
         track.matrix.base = MatrixRules.getConditionMonitor(level);

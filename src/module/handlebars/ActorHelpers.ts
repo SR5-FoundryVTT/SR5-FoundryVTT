@@ -3,6 +3,7 @@ import { SR5Item } from './../item/SR5Item';
 import { SR5Actor } from './../actor/SR5Actor';
 import { SR5 } from '@/module/config';
 import { SkillFieldType } from '@/module/types/template/Skills';
+import { MatrixAttributeType } from '@/module/types/template/Matrix';
 type ModificationCategoryType = Item.SystemOfType<'modification'>['modification_category'];
 
 export const registerActorHelpers = () => {
@@ -78,7 +79,7 @@ export const registerActorHelpers = () => {
         return slotSum;
     });
 
-    Handlebars.registerHelper('matrixChoices', (item, matrixAtt, options) => {
+    Handlebars.registerHelper('matrixChoices', (item: SR5Item<'device'>['system'], matrixAtt: MatrixAttributeType) => {
         const currentAtt = matrixAtt.device_att;
         const choices: {label: string, value: string}[] = [];
         let currentChoice: { label: string; value: string; } | undefined;

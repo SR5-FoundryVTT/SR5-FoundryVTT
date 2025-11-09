@@ -2297,18 +2297,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return super._preDelete(...args);
     }
 
-    async deleteItem(item: SR5Item | SR5ActiveEffect) {
-        if (item instanceof SR5Item) {
-            if (ActorOwnershipFlow._isOwnerOfItem(this, item)) {
-                if (item._id) {
-                    await this.deleteEmbeddedDocuments('Item', [item._id]);
-                } else {
-                    console.error("Could not find _id field item, cannot delete an unowned item by the actor");
-                }
-            }
-        }
-    }
-
     getSource() {
         return this.system.description.source ?? '';
     }
