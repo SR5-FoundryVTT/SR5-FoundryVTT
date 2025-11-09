@@ -29,7 +29,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
         wrenchIcon?: HTMLElement;
         document?: SR5Item | SR5Actor;
 
-        readonly #filters = this.#createFilters();
+        readonly #filters: any;
         private readonly expandedUuids = new Set<string>();
 
         static override DEFAULT_OPTIONS = {
@@ -49,6 +49,12 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
                 refresh: SR5ApplicationMixin.#refresh,
             },
         };
+
+        constructor(...args: any) {
+            //@ts-expect-error fvtt-types uses safe constructor typing
+            super(...args);
+            this.#filters = this.#createFilters();
+        }
 
         #createFilters() {
             return this.options?.filters?.map((s) => {
