@@ -84,8 +84,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
  * Extend the basic ItemSheet with some very simple modifications
  */
 export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
-    declare isEditMode: boolean;
-    #dragDrop: any;
+    readonly #dragDrop: any;
 
     static override DEFAULT_OPTIONS = {
         classes: ['item', 'named-sheet'],

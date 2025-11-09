@@ -12,22 +12,28 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 const { TextEditor, SearchFilter } = foundry.applications.ux;
 const { fromUuid } = foundry.utils;
 
-export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: BaseClass): HandlebarsApplicationMixin.Mix<BaseClass> => {
-    return class SR5ApplicationMixin extends foundry.applications.api.HandlebarsApplicationMixin(base) {
-        declare document: SR5Item | SR5Actor;
-        declare element: HTMLElement;
-        declare window: ApplicationV2.Window;
-        declare editIcon: HTMLElement;
-        declare wrenchIcon: HTMLElement;
-        declare isEditable: boolean;
-        declare options: typeof SR5ApplicationMixin.DEFAULT_OPTIONS;
+export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: BaseClass) {
+    type BaseType = InstanceType<
+        HandlebarsApplicationMixin.Mix<
+            typeof ApplicationV2<
+                ApplicationV2.RenderContext,
+                ApplicationV2.Configuration,
+                ApplicationV2.RenderOptions & { mode: "play" | "edit"; renderContext: string; }
+            >
+        >
+    >;
 
-        #filters: any;
+    return class SR5ApplicationMixin extends HandlebarsApplicationMixin(base) {
+        isEditable?: boolean;
+        editIcon?: HTMLElement;
+        wrenchIcon?: HTMLElement;
+        document?: SR5Item | SR5Actor;
 
+        readonly #filters: any;
         private readonly expandedUuids = new Set<string>();
 
-        static DEFAULT_OPTIONS = {
-            classes: [SR5_APPV2_CSS_CLASS],
+        static override DEFAULT_OPTIONS = {
+            classes: [SR5_APPV2_CSS_CLASS] as string[],
             form: {
                 submitOnChange: true,
                 closeOnSubmit: false,
@@ -44,14 +50,14 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             },
         };
 
-        constructor(options) {
-            // @ts-expect-error call super constructor
-            super(options);
+        constructor(...args: any) {
+            //@ts-expect-error fvtt-types uses safe constructor typing
+            super(...args);
             this.#filters = this.#createFilters();
         }
 
         #createFilters() {
-            return (this.options as any)?.filters?.map((s) => {
+            return this.options?.filters?.map((s) => {
                 s.callback = s.callback.bind(this);
                 return new SearchFilter(s);
             }) ?? [];
@@ -62,14 +68,12 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             event.stopPropagation();
             if (this.isEditable) {
                 if (this.isEditMode) {
-                    // @ts-expect-error submit exists
                     await this.submit();
                 }
                 this._mode = this.isEditMode ? 'play' : 'edit';
             } else {
                 this._mode = 'play';
             }
-            // @ts-expect-error render exists
             await this.render();
         }
 
@@ -83,8 +87,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             return this._mode === 'play';
         }
 
-        async _prepareContext(options) {
-            // @ts-expect-error mixin stuff
+        override async _prepareContext(options: Parameters<BaseType["_prepareContext"]>[0]) {
             const context = await super._prepareContext(options);
             context.isEditMode = this.isEditMode;
             context.isPlayMode = this.isPlayMode;
@@ -101,7 +104,7 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
 
             context.user = game.user;
             context.config = SR5;
-            context.isLimited = !game.user?.isGM && this.document.limited;
+            context.isLimited = !game.user?.isGM && this.document?.limited;
             context.isEditable = this.isEditable;
 
             context.expandedUuids = {};
@@ -133,9 +136,8 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             return context;
         }
 
-        protected _prepareTabs(group: string) {
-            // @ts-expect-error i will figure this out one day
-            const parts = super._prepareTabs(group) as Record<string, any>;
+        protected override _prepareTabs(group: string) {
+            const parts = super._prepareTabs(group);
             for (const part of Object.values(parts)) {
                 if (part.label) {
                     part.label = game.i18n.localize(part.label);
@@ -144,7 +146,9 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             return parts;
         }
 
-        override async _preparePartContext(partId, context, options) {
+        override async _preparePartContext(
+            ...[partId, context, options]: Parameters<BaseType["_preparePartContext"]>
+        ) {
             const partContext = await super._preparePartContext(partId, context, options);
 
             if (partContext?.primaryTabs) {
@@ -156,30 +160,29 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
             return partContext;
         }
 
-        /** @inheritdoc */
-        override _configureRenderOptions(options) {
+        override _configureRenderOptions(options: Parameters<BaseType["_configureRenderOptions"]>[0]) {
             super._configureRenderOptions(options);
             if (options.mode && this.isEditable) this._mode = options.mode;
             // New sheets should always start in edit mode
-            else if (options.renderContext === `create${this.document.documentName}`) this._mode = 'edit';
+            else if (options.renderContext === `create${this.document?.documentName}`) this._mode = 'edit';
         }
 
-
         /**
-         * Show / hide the items description within a sheet item l ist.
+         * Show / hide the items description within a sheet item list.
          */
-        static async #toggleListItemDescription(this: SR5ApplicationMixin, event) {
+        static async #toggleListItemDescription(this: SR5ApplicationMixin, event: Event) {
             event.preventDefault();
-            const uuid = SheetFlow.closestUuid(event.target);
+            const target = event.currentTarget as HTMLElement;
+            const uuid = SheetFlow.closestUuid(target);
             if (!uuid) return;
             if (this.expandedUuids.has(uuid)) {
                 this.expandedUuids.delete(uuid);
-                event.target.closest('.list-item-container').classList.remove('expanded');
+                target.closest('.list-item-container')?.classList.remove('expanded');
             } else {
                 this.expandedUuids.add(uuid);
-                event.target.closest('.list-item-container').classList.add('expanded');
+                target.closest('.list-item-container')?.classList.add('expanded');
                 const document = await fromUuid(uuid);
-                let html;
+                let html: string | null = null;
                 if (document instanceof SR5Item || document instanceof SR5Actor) {
                     html = await TextEditor.enrichHTML((document as any).system.description.value, {
                         secrets: document.isOwner,
@@ -191,30 +194,27 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
                     });
                 }
                 if (html) {
-                    event.target.closest('.list-item-container')
-                        .querySelector('.description-body')
-                        .innerHTML = html;
+                    target.closest('.list-item-container')!.querySelector('.description-body')!.innerHTML = html;
                 }
             }
         }
 
-        static async #refresh(this: SR5ApplicationMixin, event) {
-            // @ts-expect-error render will exist
+        static async #refresh(this: SR5ApplicationMixin, event: Event) {
             await this.render();
         }
 
-        static async #openSource(event) {
+        static async #openSource(event: Event) {
             const sourceId = SheetFlow.closestSource(event.target);
             if (sourceId) {
                 await LinksHelpers.openSource(sourceId);
             }
         }
 
-        static async #openUuid(event) {
+        static async #openUuid(event: Event) {
             const uuid = SheetFlow.closestUuid(event.target);
             if (uuid) {
                 const document = await fromUuid(uuid);
-                if (document && (document instanceof SR5Item || document instanceof SR5Actor || document instanceof SR5ActiveEffect)) {
+                if (document instanceof SR5Item || document instanceof SR5Actor || document instanceof SR5ActiveEffect) {
                     await document.sheet?.render(true);
                 }
             }
@@ -222,53 +222,46 @@ export default <BaseClass extends HandlebarsApplicationMixin.BaseClass>(base: Ba
 
         /**
          * Do any final preparations when rendering the sheet
-         * @param context
-         * @param options
          */
-        protected override async _renderHTML(context, options) {
+        protected override async _renderHTML(...[context, options]: Parameters<BaseType["_renderHTML"]>) {
             // push footer to the end of parts os it is rendered at the bottom
-            if (options.parts.includes('footer')) {
+            if (options.parts?.includes('footer')) {
                 const index = options.parts.indexOf('footer');
                 if (index !== options.parts.length - 1) {
                     options.parts.push(options.parts.splice(index, 1)[0]);
                 }
             }
-            if (options.parts.includes('header')) {
+            if (options.parts?.includes('header')) {
                 const index = options.parts.indexOf('header');
                 if (index !== 0) {
                     options.parts.unshift(options.parts.splice(index, 1)[0]);
                 }
             }
-            return await super._renderHTML(context, options);
+            return super._renderHTML(context, options) as any;
         }
 
-        async _onRender(context, options) {
+        override async _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
             this.#filters.forEach(d => d.bind(this.element));
-            // @ts-expect-error mixin issues
             return super._onRender(context, options);
         }
 
         /**
          * Handle anything needed after the sheet has been rendered
          * - register tagify inputs
-         * @param context
-         * @param options
          */
-        async _postRender(context, options) {
-            // @ts-expect-error mixin issues
+        override async _postRender(...[context, options]: Parameters<BaseType["_postRender"]>) {
             await super._postRender(context, options);
             // once we render, process the Tagify Elements to we rendered
             Hooks.call('sr5_processTagifyElements', this.element);
 
-            if (this.editIcon) {
+            if (this.editIcon && this.wrenchIcon) {
                 this.editIcon.className = this.isEditMode ? 'fas fa-toggle-large-off fa-stack-2x'
                                                             : 'fas fa-toggle-large-on fa-stack-2x';
                 this.wrenchIcon.style.visibility = this.isEditMode ? 'hidden' : 'visible';
             }
         }
 
-        async _renderFrame(options) {
-            // @ts-expect-error mixin issues
+        override async _renderFrame(options: Parameters<BaseType["_renderFrame"]>[0]) {
             const frame = await super._renderFrame(options);
             if (this.isEditable) {
                 const button = document.createElement('button');

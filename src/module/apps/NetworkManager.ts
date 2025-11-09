@@ -13,7 +13,6 @@ const { ApplicationV2 } = foundry.applications.api;
 const { fromUuid, fromUuidSync } = foundry.utils;
 
 export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
-
     static override PARTS = {
         details: {
             template: SheetFlow.templateBase('matrix/network-manager/details')
@@ -45,16 +44,13 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         }
     }
 
-    constructor(private actor: SR5Actor, options = {}) {
+    constructor(private readonly actor: SR5Actor, options = {}) {
         super(options);
+        this.document = actor;
     }
 
     override get title() {
         return game.i18n.localize("SR5.NetworkManager.Title");
-    }
-
-    get document() {
-        return this.actor;
     }
 
     override async _prepareContext(options) {
