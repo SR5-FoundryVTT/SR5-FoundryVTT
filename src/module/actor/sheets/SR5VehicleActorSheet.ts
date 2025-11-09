@@ -32,7 +32,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         ];
     }
 
-    static override DEFAULT_OPTIONS: any = {
+    static override DEFAULT_OPTIONS = {
         actions: {
             pickDriver: SR5VehicleActorSheet.#pickDriver,
             connectToDriver: SR5VehicleActorSheet.#connectToDriver,

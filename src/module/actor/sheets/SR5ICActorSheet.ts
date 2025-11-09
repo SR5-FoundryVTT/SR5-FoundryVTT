@@ -2,6 +2,7 @@ import {SR5Item} from "../../item/SR5Item";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 interface ICActorSheetData extends MatrixActorSheetData {
     disableMarksEdit: boolean;
@@ -31,7 +32,7 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         },
     }
 
-    static override PARTS: any = {
+    static override PARTS = {
         header: {
             template: SheetFlow.templateBase('actor/header'),
             templates: SheetFlow.templateActorSystemParts('initiative', 'common-rolls'),

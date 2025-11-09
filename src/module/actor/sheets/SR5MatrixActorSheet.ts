@@ -13,6 +13,7 @@ import { NetworkManager } from '@/module/apps/NetworkManager';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import ActorAttribute = Shadowrun.ActorAttribute;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 const { fromUuid, fromUuidSync } = foundry.utils;
 
@@ -56,7 +57,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         return data;
     }
 
-    static override DEFAULT_OPTIONS: any = {
+    static override DEFAULT_OPTIONS: typeof foundry.applications.sheets.ActorSheetV2.DEFAULT_OPTIONS = {
         actions: {
             toggleConnectedMatrixIcons: SR5MatrixActorSheet.#toggleConnectedMatrixIcons,
             selectMatrixTarget: SR5MatrixActorSheet.#selectMatrixTarget,
@@ -126,7 +127,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         return parts;
     }
 
-    static override PARTS = {
+    static override PARTS: Record<string, HandlebarsApplicationMixin.HandlebarsTemplatePart> = {
         ...super.PARTS,
         matrix: {
             template: SheetFlow.templateBase('actor/tabs/matrix'),

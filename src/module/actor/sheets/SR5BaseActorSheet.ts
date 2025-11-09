@@ -23,6 +23,7 @@ import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 const { TextEditor } = foundry.applications.ux;
@@ -178,7 +179,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Extend and override the default options used by the 5e Actor Sheet
      * @returns {Object}
      */
-    static override DEFAULT_OPTIONS: any = {
+    static override DEFAULT_OPTIONS: typeof foundry.applications.sheets.ActorSheetV2.DEFAULT_OPTIONS &
+        {
+            filters?: {
+                inputSelector: string,
+                callback: (...args: any[]) => Promise<void> | void,
+            }[]
+        } = {
         classes: ['actor', 'named-sheet'],
         position: {
             width: 700,
@@ -248,7 +255,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         },
     }
 
-    static override PARTS = {
+    static override PARTS: Record<string, HandlebarsApplicationMixin.HandlebarsTemplatePart> = {
         header: {
             template: SheetFlow.templateBase('actor/header'),
             templates: SheetFlow.templateActorSystemParts('movement', 'initiative'),
@@ -749,7 +756,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             origin: this.actor.uuid,
         }];
 
-        return this.actor.createEmbeddedDocuments('ActiveEffect', effect);
+        await this.actor.createEmbeddedDocuments('ActiveEffect', effect);
     }
 
     static async #editEffect(this: SR5BaseActorSheet, event) {
@@ -796,7 +803,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const item = this.actor.effects.get(id);
         if (!item) return;
 
-        return this.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
+        await this.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
     }
 
     protected async _handleCreateItem(event) {

@@ -9,7 +9,7 @@ export type SpriteActorSheetData = MatrixActorSheetData & {
 }
 
 export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetData> {
-    static override DEFAULT_OPTIONS: any = {
+    static override DEFAULT_OPTIONS = {
         actions: {
             pickTechnomancer: SR5SpriteActorSheet.#pickTechnomancer,
             removeTechnomancer: SR5SpriteActorSheet.#onRemoveTechnomancer,

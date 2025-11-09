@@ -28,7 +28,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
         declare isEditable?: boolean;
         declare document?: SR5Item | SR5Actor;
 
-        readonly #filters: any;
+        readonly #filters: SearchFilter[];
         private readonly expandedUuids = new Set<string>();
         private editIcon?: HTMLElement;
         private wrenchIcon?: HTMLElement;
