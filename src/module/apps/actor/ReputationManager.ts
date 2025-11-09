@@ -9,7 +9,7 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
     notorietyModifier = 0;
     publicAwarenessModifier = 0;
 
-    constructor(private actor: SR5Actor, options = {}) {
+    constructor(private readonly actor: SR5Actor, options = {}) {
         super(options);
     }
 

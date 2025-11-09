@@ -7,7 +7,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any> {
     karmaModifier = 0;
 
-    constructor(private actor: SR5Actor, options = {}) {
+    constructor(private readonly actor: SR5Actor, options = {}) {
         super(options);
     }
 

@@ -7,9 +7,9 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class InventoryRenameApp extends HandlebarsApplicationMixin(ApplicationV2)<any> {
     private newName = '';
 
-    constructor(private actor: SR5Actor,
-                private inventory: string,
-                private actionMode: 'edit' | 'create', options = {}) {
+    constructor(private readonly actor: SR5Actor,
+                private readonly inventory: string,
+                private readonly actionMode: 'edit' | 'create', options = {}) {
         super(options);
         this.newName = inventory;
     }

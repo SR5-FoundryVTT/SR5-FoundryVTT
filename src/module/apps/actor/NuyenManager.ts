@@ -11,7 +11,7 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         return this.actor.asType('character')?.system._source.nuyen ?? 0;
     }
 
-    constructor(private actor: SR5Actor, options = {}) {
+    constructor(private readonly actor: SR5Actor, options = {}) {
         super(options);
     }
 
