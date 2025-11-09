@@ -18,7 +18,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
             typeof ApplicationV2<
                 ApplicationV2.RenderContext,
                 ApplicationV2.Configuration,
-                ApplicationV2.RenderOptions & {mode: "play" | "edit"; renderContext: string;}
+                ApplicationV2.RenderOptions & { mode: "play" | "edit"; renderContext: string; }
             >
         >
     >;
@@ -29,7 +29,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
         wrenchIcon?: HTMLElement;
         document?: SR5Item | SR5Actor;
 
-        readonly #filters: any;
+        readonly #filters = this.#createFilters();
         private readonly expandedUuids = new Set<string>();
 
         static override DEFAULT_OPTIONS = {
@@ -49,12 +49,6 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
                 refresh: SR5ApplicationMixin.#refresh,
             },
         };
-
-        constructor(...args: any) {
-            //@ts-expect-error
-            super(...args);
-            this.#filters = this.#createFilters();
-        }
 
         #createFilters() {
             return this.options?.filters?.map((s) => {
