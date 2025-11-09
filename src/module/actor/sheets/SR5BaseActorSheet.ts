@@ -702,7 +702,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     async _onDropActiveEffect(event: DragEvent, effect: SR5ActiveEffect) {
-        console.log('onDropActiveEffect', event, effect);
         if (effect.actor?.uuid === this.actor.uuid) return;
         // if the effect is just supposed to apply to the item's test, it won't work on an actor
         if (effect.system.applyTo === 'test_item') {

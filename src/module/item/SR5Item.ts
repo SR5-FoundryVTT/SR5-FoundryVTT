@@ -31,6 +31,9 @@ import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import RollEvent = Shadowrun.RollEvent;
+import Document = foundry.abstract.Document;
+import GetEmbeddedDocumentOptions = Document.GetEmbeddedDocumentOptions;
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 const { fromUuid } = foundry.utils;
 
@@ -1561,8 +1564,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param id
      * @param options
      */
-    override getEmbeddedDocument(embeddedName, id, options) {
-        if (embeddedName === 'Item') {
+    // provide typescript overrides dependent on the embedded name -- this was to fix an issue with overriding this value from Item
+    override getEmbeddedDocument(embeddedName: 'ActiveEffect' | 'effects', id: string, options?: GetEmbeddedDocumentOptions): SR5ActiveEffect | undefined;
+    override getEmbeddedDocument(embeddedName: 'Item' | 'items', id: string, options?: GetEmbeddedDocumentOptions): SR5Item | undefined;
+    override getEmbeddedDocument<EmbeddedName extends 'ActiveEffect' | 'effects' | 'Item' | 'items'>(
+            embeddedName: EmbeddedName, id: string, options: GetEmbeddedDocumentOptions = {}) {
+        if (embeddedName === 'Item' || embeddedName === 'items') {
             return this.getOwnedItem(id);
         }
         return super.getEmbeddedDocument(embeddedName, id, options);
