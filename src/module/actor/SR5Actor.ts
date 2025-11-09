@@ -2318,7 +2318,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return new Set(this.system.hidden_items);
     }
 
-    hasItemOfType<ST extends readonly Item.ConfiguredSubType[]>(...types: ST): this is SR5Item<ST[number]> {
+    hasItemOfType(...types: Item.ConfiguredSubType[]): boolean {
         return this.items.filter(i => i.isType(...types)).length > 0;
     }
 }
