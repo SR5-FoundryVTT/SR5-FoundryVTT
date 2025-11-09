@@ -191,12 +191,13 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
     /**
      * Inject special case handling for call in action items, only usable by character actors.
      */
-    static async #createItem(this: SR5CharacterSheet, event) {
+    protected override async _handleCreateItem(event) {
         const type = event.target.dataset.itemType;
-        if (type !== 'summoning' && type !== 'compilation') return;
-        event.preventDefault();
-
-        return this._onCallInActionCreate(type);
+        if (type === 'summoning' || type === 'compilation') {
+            event.preventDefault();
+            return this._onCallInActionCreate(type);
+        }
+        return super._handleCreateItem(event);
     }
 
     /**
