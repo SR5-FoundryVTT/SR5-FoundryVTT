@@ -24,13 +24,14 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
     >;
 
     return class SR5ApplicationMixin extends HandlebarsApplicationMixin(base) {
-        isEditable?: boolean;
-        editIcon?: HTMLElement;
-        wrenchIcon?: HTMLElement;
-        document?: SR5Item | SR5Actor;
+        // isEditable and document will come from the classes
+        declare isEditable?: boolean;
+        declare document?: SR5Item | SR5Actor;
 
         readonly #filters: any;
         private readonly expandedUuids = new Set<string>();
+        private editIcon?: HTMLElement;
+        private wrenchIcon?: HTMLElement;
 
         static override DEFAULT_OPTIONS = {
             classes: [SR5_APPV2_CSS_CLASS] as string[],

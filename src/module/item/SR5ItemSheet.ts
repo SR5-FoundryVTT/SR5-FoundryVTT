@@ -213,8 +213,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    constructor(options) {
-        super(options);
+    constructor(...args: any) {
+        super(...args);
         this.#dragDrop = this.#createDragDropHandlers();
     }
 

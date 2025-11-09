@@ -112,8 +112,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     private readonly expandedSkills = new Set<string>();
 
-    constructor(options) {
-        super(options);
+    constructor(...args: any) {
+        super(...args);
 
         // Preselect default inventory.
         this.selectedInventory = this.actor.defaultInventory.name;
