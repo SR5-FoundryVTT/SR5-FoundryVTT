@@ -696,7 +696,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     async _onDropItem(event: DragEvent, item: SR5Item) {
         // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
         if (this.getHandledItemTypes().includes(item.type) || this.getInventoryItemTypes().includes(item.type)) {
-            // @ts-expect-error hates inheritance I guess
+            // @ts-expect-error missing from foundry types
             return super._onDropItem(event, item);
         }
     }
@@ -708,12 +708,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
             return;
         }
-        // @ts-expect-error hates inheritance I guess
+        // @ts-expect-error missing from foundry types
         super._onDropActiveEffect(event, effect);
     }
 
     async _onDropActor(event: DragEvent, actor: SR5Actor) {
-        //@ts-expect-error someday ill figure this out
+        //@ts-expect-error missing from foundry types
         super._onDropActor(event, actor);
         const itemData = {
             name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
