@@ -127,8 +127,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     private _updateInitiativeButton() {
-        const inCombat = this.actor.getToken()?.inCombat ?? this.actor.inCombat;
-        const selector = this.element.querySelector<HTMLElement>('button#roll-init-button');
+        const inCombat = this.actor.inCombat;
+        const selector = this.element?.querySelector<HTMLElement>('button#roll-init-button');
         if (selector) {
             if (inCombat) {
                 selector.removeAttribute('disabled');
@@ -320,7 +320,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         data.primaryTabs = this._prepareTabs('primary');
 
-        data.canRollInitiative = this.actor.getToken()?.inCombat ?? this.actor.inCombat;
+        data.canRollInitiative = this.actor.inCombat;
 
         data.expandedSkills = {};
         for (const id of this.expandedSkills) {
