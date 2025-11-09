@@ -1,4 +1,4 @@
-import { SR5BaseActorSheet } from './SR5BaseActorSheet';
+import { SR5ActorSheetData, SR5BaseActorSheet } from './SR5BaseActorSheet';
 import { Helpers } from '../../helpers';
 import { SR5Item } from '../../item/SR5Item';
 import { SR5Actor } from '../SR5Actor';
@@ -11,7 +11,6 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { NetworkManager } from '@/module/apps/NetworkManager';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
@@ -26,7 +25,6 @@ type sheetAction = {
 
 export interface MatrixActorSheetData extends SR5ActorSheetData {
     markedDocuments: Shadowrun.MarkedDocument[];
-    handledItemTypes: string[];
     network: SR5Item | null;
     matrixActions: sheetAction[];
     selectedMatrixTarget: string | undefined;
@@ -103,7 +101,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @param target
      * @protected
      */
-    protected moveTabs(tabs: any, parts: any, target: any) {
+    protected moveTabs(tabs: Record<string, any>[], parts: Record<string, HTMLElement>, target: HTMLElement) {
         for (const tab of tabs) {
             const key = tab.id;
             if (key in parts) {
@@ -113,8 +111,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         }
     }
 
-    protected override async _renderHTML(content, options) {
-        const parts = await super._renderHTML(content, options) as any;
+    protected override async _renderHTML(...[content, options]: Parameters<SR5BaseActorSheet["_renderHTML"]>) {
+        const parts = await super._renderHTML(content, options);
         const matrixLeftSideContent = parts.matrix?.querySelector('section.content.matrix-left-tab-content');
         if (matrixLeftSideContent) {
             this.moveTabs(SR5MatrixActorSheet.TABS.matrixLeft.tabs, parts, matrixLeftSideContent);
@@ -218,7 +216,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     }
 
     override async _preparePartContext(partId, context, options) {
-        const partContext = await super._preparePartContext(partId, context, options) as any;
+        const partContext = await super._preparePartContext(partId, context, options);
 
         if (partId === 'matrixActions') {
             partContext.matrixActions = await this._prepareMatrixActions();
@@ -319,7 +317,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     /**
      * Allow the user to select a matrix network to connect to.
      */
-    static async #manageNetwork(this: SR5MatrixActorSheet, event) {
+    static async #manageNetwork(this: SR5MatrixActorSheet, event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -337,6 +335,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #toggleConnectedMatrixIcons(this: SR5MatrixActorSheet, event) {
         event.stopPropagation();
+        console.log('event', event);
 
         const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
@@ -359,10 +358,9 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (matrixDevice) {
             console.debug('Shadowrun5e | Adding all equipped wireless devices to actor PAN ->', event);
             const progressBar = ui.notifications.info(game.i18n.localize('SR5.Notifications.AddDevicesToPAN.Starting'), { progress: true });
-            const allItems = this.actor.items;
             const filteredItems: SR5Item[] = [];
-            for (const item of allItems) {
-                if (item.isMatrixDevice && item.isWireless() && item.isEquipped() && item.id !== matrixDevice.id) {
+            for (const item of this.actor.wirelessDevices()) {
+                if (item.id !== matrixDevice.id) {
                     filteredItems.push(item);
                 }
             }

@@ -173,7 +173,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
          */
         static async #toggleListItemDescription(this: SR5ApplicationMixin, event: Event) {
             event.preventDefault();
-            const target = event.currentTarget as HTMLElement;
+            const target = event.target as HTMLElement;
             const uuid = SheetFlow.closestUuid(target);
             if (!uuid) return;
             if (this.expandedUuids.has(uuid)) {

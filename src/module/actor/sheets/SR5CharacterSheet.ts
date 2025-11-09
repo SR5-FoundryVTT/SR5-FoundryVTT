@@ -7,11 +7,6 @@ import { ReputationManager } from '@/module/apps/actor/ReputationManager';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
-    awakened: boolean
-    emerged: boolean
-    woundTolerance: number
-    handledItemTypes: string[]
-    inventory: Record<string, any>
     isCharacter: boolean;
 }
 

@@ -20,10 +20,11 @@ import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEdit
 import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
-import SR5SheetFilters = Shadowrun.SR5SheetFilters;
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+import RenderContext = foundry.applications.sheets.ActorSheetV2.RenderContext;
+import Tab = foundry.applications.api.ApplicationV2.Tab;
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 const { TextEditor } = foundry.applications.ux;
@@ -50,6 +51,35 @@ export interface InventorySheetData {
 }
 
 export type InventoriesSheetData = Record<string, InventorySheetData>;
+
+export interface SR5SheetFilters {
+    skills: string
+    showUntrainedSkills
+}
+
+export interface SR5ActorSheetData extends RenderContext {
+    config: typeof SR5CONFIG
+    system: Actor.Implementation['system']
+    filters: SR5SheetFilters
+    isCharacter: boolean
+    isSpirit: boolean
+    isCritter: boolean
+    isVehicle: boolean
+    awakened: boolean
+    emerged: boolean
+    woundTolerance: number
+    hasSkills: boolean
+    canAlterSpecial: boolean
+    hasFullDefense: boolean
+    effects: SR5ActiveEffect[]
+    handledItemTypes: string[]
+    inventories: InventoriesSheetData
+    inventory: InventorySheetData
+    spells: Record<string, SR5Item[]>
+
+    tab: Tab
+}
+
 
 /**
  * Sort a list of items by name in ascending alphabetical order.
@@ -293,7 +323,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     override async _prepareContext(options) {
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
-        const data = await super._prepareContext(options) as any;
+        const data = await super._prepareContext(options);
         data.actor = this.actor;
 
         // Sheet related general purpose fields. These aren't persistent.
@@ -342,7 +372,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     override async _preparePartContext(partId, context, options) {
-        const partContext = await super._preparePartContext(partId, context, options) as any;
+        const partContext = await super._preparePartContext(partId, context, options);
         if (partId === 'actions') {
             partContext.actions = await this._prepareActions();
         }
@@ -2236,7 +2266,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             const uuid = SheetFlow.closestUuid(event.target);
             item = await fromUuid(uuid) as any;
         }
-        if (item && item instanceof SR5Item) {
+        if (item instanceof SR5Item) {
             await SheetFlow.addToQuantity(item, event);
         }
     }
@@ -2249,7 +2279,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             const uuid = SheetFlow.closestUuid(event.target);
             item = await fromUuid(uuid) as any;
         }
-        if (item && item instanceof SR5Item) {
+        if (item instanceof SR5Item) {
             await SheetFlow.removeFromQuantity(item, event);
         }
     }

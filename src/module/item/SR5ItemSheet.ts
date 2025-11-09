@@ -298,7 +298,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     override async _prepareContext(options) {
-        const data = await super._prepareContext(options) as any;
+        const data = await super._prepareContext(options);
         const itemData = this.item.toObject(false).system as SR5Item['system'];
         data.actor = this.item.actorOwner;
 
@@ -1093,7 +1093,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @private
      */
     #createDragDropHandlers() {
-        return (this.options as any).dragDrop.map((d) => {
+        return this.options.dragDrop.map((d) => {
             d.permissions = {
                 dragstart: this._canDragStart.bind(this),
                 drop: this._canDragDrop.bind(this),
