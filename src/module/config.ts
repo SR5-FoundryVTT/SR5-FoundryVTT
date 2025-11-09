@@ -390,7 +390,6 @@ export const SR5 = {
         health: 'SR5.Spell.CatHealth',
         illusion: 'SR5.Spell.CatIllusion',
         manipulation: 'SR5.Spell.CatManipulation',
-        ritual: 'SR5.Spell.CatRitual'
     },
 
     spellTypes: {
