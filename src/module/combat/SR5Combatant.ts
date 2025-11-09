@@ -27,9 +27,13 @@ export class SR5Combatant extends Combatant<"base"> {
         return super.migrateData(source);
     }
 
-    /** Checks if the combatant can currently perform an action. */
+    /** Checks if the combatant can perform an action. */
     canAct(): boolean {
-        return this.initiative != null && this.initiative > 0 && !this.system.acted;
+        return this.initiative != null && this.initiative > 0;
+    }
+
+    acted(): boolean {
+        return this.system.acted;
     }
 
     /** Adjusts the combatant's initiative score by a given amount. */

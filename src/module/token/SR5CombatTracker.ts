@@ -42,6 +42,7 @@ export class SR5CombatTracker extends CombatTracker {
         _context: CombatTracker.RenderContext,
         _options: CombatTracker.RenderOptions
     ): void {
+        console.log(app, html, _context, _options);
         const $html = $(html);
 
         if (app.viewed?.round) {
@@ -63,7 +64,7 @@ export class SR5CombatTracker extends CombatTracker {
             this._addActedIndicator($li, combatant);
         });
 
-        $html.find('.combat-control[data-action="nextTurn"], .combat-control[data-action="previousTurn"]').on('contextmenu', (ev) => {
+        $html.find('.combat-control[data-action="nextPhase"], .combat-control[data-action="previousPhase"]').on('contextmenu', (ev) => {
             ev.preventDefault();
             ev.stopPropagation();
 
@@ -98,33 +99,47 @@ export class SR5CombatTracker extends CombatTracker {
                 $(document).off('mousedown.combatExtraMenu');
             }
         });
-
-        // Delegate click inside menus
-        $html.on('click', '.combat-extra-menu [data-action]', (ev) => {
-            ev.stopPropagation();
-            
-            // Clean up the global listener immediately
-            $(document).off('mousedown.combatExtraMenu');
-
-            const action = $(ev.currentTarget).data('action') as string;
-            $html.find('.combat-extra-menu').addClass('hidden');
-
-            try {
-                if (action === 'nextTurn') void game.combat?.nextTurn();
-                else if (action === 'previousTurn') void game.combat?.previousTurn();
-                else if (action === 'nextRound') void game.combat?.nextRound();
-                else if (action === 'previousRound') void game.combat?.previousRound();
-            } catch (err) {
-                console.error('Combat extra action failed', action, err);
-            }
-        });
+        
+        // Prevent duplicate bindings by tagging the container
+        if ($html.hasClass("sr5-bound")) return;
+        $html.addClass("sr5-bound");
 
         // Prevent clicks inside the menu from closing it
         $html.on('click', '.combat-extra-menu', ev => ev.stopPropagation());
 
-        // Prevent duplicate bindings by tagging the container
-        if ($html.hasClass("sr5-bound")) return;
-        $html.addClass("sr5-bound");
+        $html.on('click', '.combat-control[data-action="nextPhase"], .combat-control[data-action="previousPhase"]', (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            const action = $(ev.currentTarget).data('action') as string;
+
+            try {
+                if (action === 'nextPhase') void game.combat?.nextTurn();
+                else if (action === 'previousPhase') void game.combat?.previousTurn();
+            } catch (err) {
+                console.error('Combat action failed', action, err);
+            }
+        });
+
+        // Delegate click inside menus
+        $html.on('click', '.combat-extra-menu [data-action]', (ev) => {
+            ev.stopPropagation();
+
+            // Clean up the global listener immediately
+            $(document).off('mousedown.combatExtraMenu');
+
+            const action = $(ev.currentTarget).data('action') as string;
+            $html.find('.combat-time').addClass('hidden');
+
+            try {
+                if (action === 'nextPass') void game.combat?.nextPass();
+                else if (action === 'nextTurn') void game.combat?.nextRound();
+                else if (action === 'previousTurn') void game.combat?.previousRound();
+                // else if (action === 'previousPass') void game.combat?.previousPass();
+            } catch (err) {
+                console.error('Combat extra action failed', action, err);
+            }
+        });
 
         // GM-only click handler for toggling "acted" status
         $html.on("click", "[data-action='toggleActed']", (event: JQuery.ClickEvent) => {

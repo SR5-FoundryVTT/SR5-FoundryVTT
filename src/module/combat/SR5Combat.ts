@@ -131,19 +131,33 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
-        let nextTurn = this.nextTurnPosition();
-        const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
+        const nextTurn = this.turns.findIndex(combatant => {
+            if (this.settings.skipDefeated && combatant.isDefeated) return false;
+            if (combatant.id === this.combatant?.id) return false;
+            return combatant.canAct() && !combatant.acted();
+        });
 
         // Step to next combatant in current pass
-        if (nextTurn !== null) {
+        if (nextTurn !== -1) {
+            const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
             const combatants = this.combatant ? [{ _id: this.combatant.id!, system: { acted: true } }] : [];
             await this.update({ turn: nextTurn, combatants }, { direction: 1, worldTime: { delta: advanceTime } });
             return this;
         }
 
+        // End of Pass
+        return this.nextPass();
+    }
+
+    async nextPass(): Promise<this> {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextPass' });
+            return this;
+        }
+
         // End of initiative pass: check if another pass is needed
         // Determine if any combatant has enough initiative for another pass
-        nextTurn = this.turns.findIndex((c) => {
+        const nextTurn = this.turns.findIndex((c) => {
             if (this.settings.skipDefeated && c.isDefeated) return false;
             return c.initiative != null && CombatRules.initAfterPass(c.initiative) > 0;
         });
@@ -152,6 +166,7 @@ export class SR5Combat extends Combat<"base"> {
         if (nextTurn !== -1) {
             const initiativePass = this.initiativePass + 1;
             const combatants = this.combatants.map((c) => c.initPassUpdateData());
+            const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
             await this.update(
                 { turn: nextTurn, combatants, system: { initiativePass } },
                 { diff: false, direction: 1, worldTime: { delta: advanceTime } }
@@ -164,25 +179,8 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
-        // End of round
+        // End of initiative pass
         return this.nextRound();
-    }
-
-    /**
-     * Return the position in the current initiative pass of the next undefeated combatant.
-     */
-    nextTurnPosition(): number | null {
-        for (const [turnInPass, combatant] of this.turns.entries()) {
-            // Skip the current combatant.
-            if (combatant.id === this.combatant?.id) continue;
-            // Skip defeated combatants if the setting is active.
-            if (this.settings.skipDefeated && combatant.isDefeated) continue;
-
-            if (combatant.canAct()) return turnInPass;
-        }
-
-        // The current turn is the last undefeated combatant, so go to the end.
-        return null;
     }
 
     /**
