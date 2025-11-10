@@ -111,9 +111,10 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         return parts;
     }
 
-    override async _onDropActor(event, actor) {
-        if (!actor.isType('character')) return;
-        await this.document.addSummoner(actor);
+    override async _onDropActor(event: DragEvent, actor: Actor.Implementation) {
+        if (actor.isType('character'))
+            await this.document.addSummoner(actor);
+        return null;
     }
 
     /**

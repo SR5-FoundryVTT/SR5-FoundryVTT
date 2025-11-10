@@ -89,15 +89,18 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         });
     }
 
-    override async _onDropActor(event, actor) {
+    override async _onDropActor(event: DragEvent, actor: SR5Actor) {
         await this.actor.addVehicleDriver(actor.uuid);
+        return null
     }
 
-    override async _onDropItem(event, item) {
+    override async _onDropItem(event: DragEvent, item: SR5Item) {
         if (item.canBeMaster) {
-            return await this.actor.connectNetwork(item);
+            await this.actor.connectNetwork(item);
+            return null;
         }
-        await super._onDropItem(event, item);
+
+        return super._onDropItem(event, item);
     }
 
     _prepareVehicleFields() {

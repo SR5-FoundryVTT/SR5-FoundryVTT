@@ -70,8 +70,9 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         return data;
     }
 
-    override async _onDropActor(event, actor) {
+    override async _onDropActor(event: DragEvent, actor: SR5Actor) {
         await this.actor.addTechnomancer(actor);
+        return null;
     }
 
     /**

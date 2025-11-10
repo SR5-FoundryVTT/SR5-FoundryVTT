@@ -13,6 +13,8 @@ const { ApplicationV2 } = foundry.applications.api;
 const { fromUuid, fromUuidSync } = foundry.utils;
 
 export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
+    declare document: SR5Actor;
+
     static override PARTS = {
         details: {
             template: SheetFlow.templateBase('matrix/network-manager/details')

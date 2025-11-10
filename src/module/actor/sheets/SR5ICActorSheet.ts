@@ -138,8 +138,9 @@ export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
         // Handle item types that aren't handled but are still useable.
         if (item.isType('host')) {
             // We don't have to narrow down type here, the SR5Actor will handle this for us.
-            return this.actor.connectNetwork(item);
+            await this.actor.connectNetwork(item);
+            return null;
         }
-        await super._onDropItem(event, item);
+        return super._onDropItem(event, item);
     }
 }

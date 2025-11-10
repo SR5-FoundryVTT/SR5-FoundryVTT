@@ -1,5 +1,6 @@
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
+import { Identity } from 'fvtt-types/utils';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5 } from '@/module/config';
@@ -12,7 +13,9 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 const { TextEditor, SearchFilter } = foundry.applications.ux;
 const { fromUuid } = foundry.utils;
 
-export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: BaseClass) {
+declare abstract class AnyApplicationV2 extends ApplicationV2<any,any,any> { constructor(...args: any[]); }
+
+export default function <BaseClass extends Identity<typeof AnyApplicationV2>>(base: BaseClass) {
     type BaseType = InstanceType<
         HandlebarsApplicationMixin.Mix<
             typeof ApplicationV2<
@@ -51,8 +54,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
             },
         };
 
-        constructor(...args: any) {
-            //@ts-expect-error fvtt-types uses safe constructor typing
+        constructor(...args: any[]) {
             super(...args);
             this.#filters = this.#createFilters();
         }
@@ -88,7 +90,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
             return this._mode === 'play';
         }
 
-        override async _prepareContext(options: Parameters<BaseType["_prepareContext"]>[0]) {
+        protected override async _prepareContext(options: Parameters<BaseType["_prepareContext"]>[0]) {
             const context = await super._prepareContext(options);
             context.isEditMode = this.isEditMode;
             context.isPlayMode = this.isPlayMode;
@@ -147,7 +149,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
             return parts;
         }
 
-        override async _preparePartContext(
+        protected override async _preparePartContext(
             ...[partId, context, options]: Parameters<BaseType["_preparePartContext"]>
         ) {
             const partContext = await super._preparePartContext(partId, context, options);
@@ -161,7 +163,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
             return partContext;
         }
 
-        override _configureRenderOptions(options: Parameters<BaseType["_configureRenderOptions"]>[0]) {
+        protected override _configureRenderOptions(options: Parameters<BaseType["_configureRenderOptions"]>[0]) {
             super._configureRenderOptions(options);
             if (options.mode && this.isEditable) this._mode = options.mode;
             // New sheets should always start in edit mode
@@ -241,7 +243,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
             return super._renderHTML(context, options) as Promise<Record<string, HTMLElement>>;
         }
 
-        override async _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
+        protected override async _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
             this.#filters.forEach(d => d.bind(this.element));
             return super._onRender(context, options);
         }
@@ -250,7 +252,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
          * Handle anything needed after the sheet has been rendered
          * - register tagify inputs
          */
-        override async _postRender(...[context, options]: Parameters<BaseType["_postRender"]>) {
+        protected override async _postRender(...[context, options]: Parameters<BaseType["_postRender"]>) {
             await super._postRender(context, options);
             // once we render, process the Tagify Elements to we rendered
             Hooks.call('sr5_processTagifyElements', this.element);
@@ -262,7 +264,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
             }
         }
 
-        override async _renderFrame(options: Parameters<BaseType["_renderFrame"]>[0]) {
+        protected override async _renderFrame(options: Parameters<BaseType["_renderFrame"]>[0]) {
             const frame = await super._renderFrame(options);
             if (this.isEditable) {
                 const button = document.createElement('button');
@@ -285,5 +287,5 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
 
             return frame;
         }
-    }; // end of SR5ApplicationMixin
+    };
 }

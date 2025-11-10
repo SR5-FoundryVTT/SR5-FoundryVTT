@@ -731,34 +731,33 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    async _onDropItem(event: DragEvent, item: SR5Item) {
+    protected override async _onDropItem(event: DragEvent, item: SR5Item) {
         // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
         if (this.getHandledItemTypes().includes(item.type) || this.getInventoryItemTypes().includes(item.type)) {
-            // @ts-expect-error missing from foundry types
             return super._onDropItem(event, item);
         }
+        return null;
     }
 
-    async _onDropActiveEffect(event: DragEvent, effect: SR5ActiveEffect) {
-        if (effect.actor?.uuid === this.actor.uuid) return;
+    protected override async _onDropActiveEffect(event: DragEvent, effect: SR5ActiveEffect) {
+        if (effect.actor?.uuid === this.actor.uuid) return null;
         // if the effect is just supposed to apply to the item's test, it won't work on an actor
         if (effect.system.applyTo === 'test_item') {
             ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
-            return;
+            return null;
         }
-        // @ts-expect-error missing from foundry types
-        super._onDropActiveEffect(event, effect);
+        return super._onDropActiveEffect(event, effect);
     }
 
-    async _onDropActor(event: DragEvent, actor: SR5Actor) {
-        //@ts-expect-error missing from foundry types
-        super._onDropActor(event, actor);
+    protected override async _onDropActor(event: DragEvent, actor: SR5Actor) {
+        await super._onDropActor(event, actor);
         const itemData = {
             name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
             type: 'contact' as Item.SubType,
             system: {linkedActor: actor.uuid }
         };
         await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
+        return null;
     }
 
     static async #toggleInventoryVisibility(this: SR5BaseActorSheet, event: PointerEvent) {
