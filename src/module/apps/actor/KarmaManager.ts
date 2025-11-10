@@ -44,10 +44,11 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         return context;
     }
 
-    static async #increaseKarma(this: KarmaManager, event) {
+    static async #increaseKarma(this: KarmaManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        const amount = Number(event.target.closest('[data-amount]').dataset.amount);
+        if (!(event.target instanceof HTMLElement)) return;
+        const amount = Number(event.target.closest<HTMLElement>('[data-amount]')!.dataset.amount);
         this.karmaModifier += amount;
         if (this.getModifiedKarma() < 0) {
             this.karmaModifier = -this.getModifiedKarma();
@@ -58,7 +59,8 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
     static async #reduceKarma(this: KarmaManager, event) {
         event.preventDefault();
         event.stopPropagation();
-        const amount = Number(event.target.closest('[data-amount]').dataset.amount);
+        if (!(event.target instanceof HTMLElement)) return;
+        const amount = Number(event.target.closest('[data-amount]')!.dataset.amount);
         this.karmaModifier -= amount;
         if (this.getModifiedKarma() < 0) {
             this.karmaModifier = -this.getModifiedKarma();
@@ -69,6 +71,7 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
     static async #submitChanges(this: KarmaManager, event) {
         event.preventDefault();
         event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
         if (this.getModifiedKarma() < 0) {
             this.karmaModifier = -this.getModifiedKarma();
         }

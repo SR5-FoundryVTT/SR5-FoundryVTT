@@ -88,8 +88,9 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
 
     }
 
-    static async #editImage(this: SkillEditSheet, event) {
+    static async #editImage(this: SkillEditSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         await new FilePicker({
             type: 'image',
@@ -102,8 +103,9 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
             }}).render(true);
     }
 
-    static async #addBonus(this: SkillEditSheet, event) {
+    static async #addBonus(this: SkillEditSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const skill = this.document.getSkill(this.skillId);
         if (skill) {
             const bonus = skill.bonus.slice();
@@ -113,8 +115,9 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         }
     }
 
-    static async #removeBonus(this: SkillEditSheet, event) {
+    static async #removeBonus(this: SkillEditSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const canDelete = await Helpers.confirmDeletion();
         if (!canDelete) return;
@@ -129,8 +132,9 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         }
     }
 
-    static async #addSpecialization(this: SkillEditSheet, event) {
+    static async #addSpecialization(this: SkillEditSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const skill = this.document.getSkill(this.skillId);
         if (skill) {
             const specs = skill.specs.slice();
@@ -140,8 +144,9 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         }
     }
 
-    static async #removeSpecialization(this: SkillEditSheet, event) {
+    static async #removeSpecialization(this: SkillEditSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const canDelete = await Helpers.confirmDeletion();
         if (!canDelete) return;
@@ -156,9 +161,10 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         }
     }
 
-    static async #rollSkill(this: SkillEditSheet, event) {
+    static async #rollSkill(this: SkillEditSheet, event: PointerEvent) {
         event.preventDefault();
-        this.document.rollSkill(this.skillId);
+        if (!(event.target instanceof HTMLElement)) return;
+        await this.document.rollSkill(this.skillId);
     }
 
     async _onDrop(event) {
@@ -171,7 +177,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         const data = parseDropData(event);
         if (!data) return;
 
-        this.document.update({[`${this._updateString()}.link`]: data.uuid});
+        await this.document.update({[`${this._updateString()}.link`]: data.uuid});
     }
 
     /** Enhance attribute selection by an empty option to allow newly created skills to have no attribute selected.

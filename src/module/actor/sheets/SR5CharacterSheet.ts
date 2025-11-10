@@ -186,7 +186,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
     /**
      * Inject special case handling for call in action items, only usable by character actors.
      */
-    protected override async _handleCreateItem(event) {
+    protected override async _handleCreateItem(event: PointerEvent) {
+        if (!(event.target instanceof HTMLElement)) return;
         const type = event.target.dataset.itemType;
         if (type === 'summoning' || type === 'compilation') {
             event.preventDefault();
@@ -219,17 +220,17 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
 
-    static async #openKarmaManager(this: SR5CharacterSheet, event) {
+    static async #openKarmaManager(this: SR5CharacterSheet) {
         const app = new KarmaManager(this.actor);
         await app.render(true);
     }
 
-    static async #openNuyenManager(this: SR5CharacterSheet, event) {
+    static async #openNuyenManager(this: SR5CharacterSheet) {
         const app = new NuyenManager(this.actor);
         await app.render(true);
     }
 
-    static async #openReputationManager(this: SR5CharacterSheet, event) {
+    static async #openReputationManager(this: SR5CharacterSheet) {
         const app = new ReputationManager(this.actor);
         await app.render(true);
     }

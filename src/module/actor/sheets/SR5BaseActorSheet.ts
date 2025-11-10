@@ -24,7 +24,6 @@ import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import RenderContext = foundry.applications.sheets.ActorSheetV2.RenderContext;
-import Tab = foundry.applications.api.ApplicationV2.Tab;
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 const { TextEditor } = foundry.applications.ux;
@@ -77,7 +76,7 @@ export interface SR5ActorSheetData extends RenderContext {
     inventory: InventorySheetData
     spells: Record<string, SR5Item[]>
 
-    tab: Tab
+    tab: SR5Tab
 }
 
 
@@ -467,15 +466,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         dragDropFavorites.bind(this.element);
     }
 
-    _canDragStartFavorite(selector) {
+    _canDragStartFavorite() {
         return this.isEditable;
     }
 
-    _canDragDropFavorite(selector) {
+    _canDragDropFavorite() {
         return this.isEditable;
     }
 
-    async _onDragStartFavorite(event) {
+    // handle start dragging a favorite to reorder
+    async _onDragStartFavorite(event: DragEvent) {
         const target = event.currentTarget;
 
         const uuid = SheetFlow.closestUuid(target);
@@ -487,10 +487,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         // Set data transfer data
-        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+        event.dataTransfer?.setData("text/plain", JSON.stringify(dragData));
     }
 
-    async _onDragDropFavorite(event) {
+    async _onDragDropFavorite(event: DragEvent) {
         const target = event.target;
         const favorites = this.actor.system.favorites.slice();
         const data = TextEditor.getDragEventData(event) as any;
@@ -611,7 +611,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return controls;
     }
 
-    static async #favoriteItem(this: SR5BaseActorSheet, event) {
+    static async #favoriteItem(this: SR5BaseActorSheet, event: PointerEvent) {
+        if (!(event.target instanceof HTMLElement)) return;
         const uuid = SheetFlow.closestUuid(event.target);
         const itemId = SheetFlow.closestItemId(event.target);
 
@@ -760,10 +761,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
 
-    static async #toggleInventoryVisibility(this: SR5BaseActorSheet, event) {
+    static async #toggleInventoryVisibility(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const listHeader = $(event.target).closest('.list-item-header');
-        const type = listHeader.data().itemType;
+        if (!(event.target instanceof HTMLElement)) return;
+        const listHeader = event.target?.closest<HTMLElement>('.list-item-header');
+        const type = listHeader?.dataset?.itemType;
+        if (!type) return;
 
         const current = this._inventoryOpenClose[type] ?? true;
 
@@ -779,8 +782,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this._inventoryOpenClose[type] = isOpen
     }
 
-    static async #createEffect(this: SR5BaseActorSheet, event) {
+    static async #createEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const effect = [{
             name: game.i18n.localize("SR5.ActiveEffect.New"),
             origin: this.actor.uuid,
@@ -789,8 +793,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.createEmbeddedDocuments('ActiveEffect', effect);
     }
 
-    static async #editEffect(this: SR5BaseActorSheet, event) {
+    static async #editEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const id = SheetFlow.closestEffectId(event.target);
         const item = this.actor.effects.get(id);
         if (item) {
@@ -805,8 +810,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    static async #toggleEffect(this: SR5BaseActorSheet, event) {
+    static async #toggleEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const id = SheetFlow.closestEffectId(event.target);
         const item = this.actor.effects.get(id);
@@ -816,15 +822,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
             const doc = await fromUuid(uuid);
-            if (doc && doc instanceof SR5ActiveEffect) {
+            if (doc instanceof SR5ActiveEffect) {
                 const disabled = !doc.disabled;
                 await doc.update({disabled});
             }
         }
     }
 
-    static async #deleteEffect(this: SR5BaseActorSheet, event) {
+    static async #deleteEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -836,7 +843,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
     }
 
-    protected async _handleCreateItem(event) {
+    protected async _handleCreateItem(event: PointerEvent) {
+        if (!(event.target instanceof HTMLElement)) return;
         const type = SheetFlow.closestAction(event.target).dataset.itemType;
 
         // Unhide section it it was
@@ -863,13 +871,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * 
      * @param event 
      */
-    static async #createItem(this: SR5BaseActorSheet, event) {
+    static async #createItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         return this._handleCreateItem(event);
     }
 
-    static async #editItem(this: SR5BaseActorSheet, event) {
+    static async #editItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);
         if (item) await item.sheet?.render(true, { mode: 'edit' });
@@ -882,8 +892,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         })
     }
 
-    static async #deleteItem(this: SR5BaseActorSheet, event) {
+    static async #deleteItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -894,8 +905,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this._handleDeleteItem(item);
     }
 
-    static async #rollItem(this: SR5BaseActorSheet, event) {
+    static async #rollItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const iid = SheetFlow.closestUuid(event.target);
         const item = await fromUuid(iid);
 
@@ -903,7 +915,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this._handleRollItem(item, event);
     }
 
-    async _handleRollItem(item: SR5Item, event) {
+    async _handleRollItem(item: SR5Item, event: PointerEvent) {
+        if (!(event.target instanceof HTMLElement)) return;
         if (!Hooks.call('SR5_PreActorItemRoll', this.actor, item)) return;
         await item.castAction(event, this.actor);
     }
@@ -913,14 +926,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @event Most return a currentTarget with a value dataset
      */
-    static async #modifyConditionMonitor(this: SR5BaseActorSheet, event) {
+    static async #modifyConditionMonitor(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
-        const target = event.target.closest('[data-action="modifyConditionMonitor"]');
-        const track = target.dataset.id;
+        const target = event.target?.closest<HTMLElement>('[data-action="modifyConditionMonitor"]');
+        if (!target) return;
+        const track = target.dataset?.id;
 
         // if this is a matrix track for an item, handle it differently
-        const uuid = event.target.closest('[data-uuid]')?.dataset?.uuid ?? '';
+        const uuid = event.target?.closest<HTMLElement>('[data-uuid]')?.dataset?.uuid ?? '';
         if (track === 'matrix' && uuid) {
             const document = await fromUuid(uuid);
             if (document instanceof SR5Item) {
@@ -933,7 +948,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         const data: Actor.UpdateData = {};
-        let value = Number(target.dataset.value);
+        let value = Number(target.dataset.value as string);
 
         // if the clicked on cell is the current value for it's track, set the value to 0 to clear it
         if (track === 'stun' && this.actor.getStunTrack()?.value === value) {
@@ -968,12 +983,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Reset all condition tracks to zero values.
      * @param event
      */
-    static async #clearConditionMonitor(this: SR5BaseActorSheet, event) {
+    static async #clearConditionMonitor(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
-        const track = event.target.closest('[data-id]').dataset.id;
+        const track = event.target?.closest<HTMLElement>('[data-id]')?.dataset?.id;
 
-        const uuid = event.target.closest('[data-uuid]')?.dataset?.uuid ?? '';
+        const uuid = event.target?.closest<HTMLElement>('[data-uuid]')?.dataset?.uuid ?? '';
         if (track === 'matrix' && uuid) {
             const document = await fromUuid(uuid);
             if (document instanceof SR5Item) {
@@ -1008,9 +1024,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Handle interaction with a damage track title.
      * @param event
      */
-    static async #rollConditionMonitor(this: SR5BaseActorSheet, event) {
+    static async #rollConditionMonitor(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const track = event.target.closest('[data-id]').dataset.id;
+        if (!(event.target instanceof HTMLElement)) return;
+        const track = event.target?.closest<HTMLElement>('[data-id]')?.dataset?.id;
 
         switch (track) {
             case 'stun':
@@ -1381,11 +1398,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /** Setup untrained skill filter within getData */
-    static async #filterUntrainedSkills(this: SR5BaseActorSheet, event) {
+    static async #filterUntrainedSkills(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
-        event.target.closest('.active-skills-header')
-            .querySelector('.skill-rtg-label').innerText = new Handlebars.SafeString(game.i18n.localize(this._filters.showUntrainedSkills ? 'SR5.Rtg' : 'SR5.RtgAboveZero'));
+        event.target.closest<HTMLElement>('.active-skills-header')!
+            .querySelector<HTMLElement>('.skill-rtg-label')!
+            .innerText = game.i18n.localize(this._filters.showUntrainedSkills ? 'SR5.Rtg' : 'SR5.RtgAboveZero');
         this.#filterActiveSkillsElements();
     }
 
@@ -1492,12 +1511,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    static async #editSkill(this: SR5BaseActorSheet, event) {
+    static async #editSkill(this: SR5BaseActorSheet, event: PointerEvent) {
+        if (!(event.target instanceof HTMLElement)) return;
         await this._editSkill(event.target);
     }
 
-    static async #rollSkill(this: SR5BaseActorSheet, event) {
+    static async #rollSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const closest = this._closestSkillTarget(event.target);
         const skillId = closest?.dataset.skillId;
         if (skillId) {
@@ -1505,8 +1526,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    static async #rollSkillSpec(this: SR5BaseActorSheet, event) {
+    static async #rollSkillSpec(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const closest = this._closestSkillTarget(event.target);
         const skillId = closest?.dataset.skillId;
         if (skillId) {
@@ -1525,13 +1547,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await LinksHelpers.openSource(skill.link);
     }
 
-    static async #createLanguageSkill(this: SR5BaseActorSheet, event) {
+    static async #createLanguageSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         await this.actor.addLanguageSkill({ name: '' });
     }
 
-    static async #deleteLanguageSkill(this: SR5BaseActorSheet, event) {
+    static async #deleteLanguageSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -1540,15 +1564,17 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.removeLanguageSkill(skillId);
     }
 
-    static async #createKnowledgeSkill(this: SR5BaseActorSheet, event) {
+    static async #createKnowledgeSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const category = $(event.target).closest('a').data().skillType;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
     }
 
-    static async #deleteKnowledgeSkill(this: SR5BaseActorSheet, event) {
+    static async #deleteKnowledgeSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -1562,24 +1588,25 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event The HTML event from which the action resulted.
      */
-    static async #createActiveSkill(this: SR5BaseActorSheet, event) {
-        event.preventDefault();
+    static async #createActiveSkill(this: SR5BaseActorSheet) {
         await this.actor.addActiveSkill();
     }
 
-    static async #deleteActiveSkill(this: SR5BaseActorSheet, event) {
+    static async #deleteActiveSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = event.target.closest('[data-skill]').dataset.skill;
+        const skillId = event.target?.closest<HTMLElement>('[data-skill]')?.dataset?.skill ?? '';
         await this.actor.removeActiveSkill(skillId);
     }
 
-    static async #rollAttribute(this: SR5BaseActorSheet, event) {
+    static async #rollAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const attribute = event.target.closest('[data-attribute-id]').dataset.attributeId;
+        if (!(event.target instanceof HTMLElement)) return;
+        const attribute = event.target?.closest<HTMLElement>('[data-attribute-id]')?.dataset?.attributeId;
         if (attribute === 'rating') {
             await this.actor.rollDeviceRating();
         } else if (attribute) {
@@ -1587,9 +1614,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    async _onShowHiddenSkills(event) {
-        event.preventDefault();
-
+    async _onShowHiddenSkills() {
         await this.actor.showHiddenSkills();
     }
 
@@ -1617,8 +1642,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param event
      * @private
      */
-    static async #toggleItemVisible(this: SR5BaseActorSheet, event) {
+    static async #toggleItemVisible(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const uuid = SheetFlow.closestUuid(event.target);
         const itemId = SheetFlow.closestItemId(event.target);
         const effectId = SheetFlow.closestEffectId(event.target);
@@ -1641,8 +1667,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * Change the equipped status of an item shown within a sheet item list.
      */
-    static async #onToggleEquippedItem(this: SR5BaseActorSheet, event) {
+    static async #onToggleEquippedItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);
         if (!item) return;
@@ -1673,9 +1700,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Toggle the Wireless state of an item, iterating through the different states
      * @param event
      */
-    static async #toggleWirelessState(this: SR5BaseActorSheet, event) {
+    static async #toggleWirelessState(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const uuid = SheetFlow.closestUuid(event.target);
         const item = await fromUuid(uuid);
@@ -1722,15 +1750,17 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await item.equipAmmo(newTarget);
     }
 
-    static async #reloadAmmo(this: SR5BaseActorSheet, event) {
+    static async #reloadAmmo(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);
         if (item) return item.reloadAmmo(false);
     }
 
-    static async #partialReloadAmmo(this: SR5BaseActorSheet, event) {
+    static async #partialReloadAmmo(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);
         if (item) return item.reloadAmmo(true);
@@ -1765,8 +1795,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Open the Chummer Character import handling.
      * @param event
      */
-    static async #showImportCharacter(this: SR5BaseActorSheet, event) {
+    static async #showImportCharacter(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const options = {
             name: 'chummer-import',
             title: 'Chummer Import',
@@ -1823,7 +1854,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event
      */
-    _onShowSituationModifiersApplication(event) {
+    _onShowSituationModifiersApplication(event: PointerEvent) {
         new SituationModifiersApplication(this.actor).render(true);
     }
 
@@ -1832,7 +1863,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event
      */
-    async _toggleAllFreshImportFlags(event, onOff: boolean) {
+    async _toggleAllFreshImportFlags(event: PointerEvent, onOff: boolean) {
+        if (!(event.target instanceof HTMLElement)) return;
         const allItems = this.actor.items;
         console.debug('Toggling all importFlags on owned items to ->', onOff, event);
         for (const item of allItems) {
@@ -2228,38 +2260,39 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Move an item between two inventories.
      * @param event
      */
-    static async #moveItemToInventory(this: SR5BaseActorSheet, event) {
+    static async #moveItemToInventory(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         await this._moveItemToInventory(event.target);
     }
 
     /**
      * Show / hide the items description within a sheet item l ist.
      */
-    static async #toggleSkillDescription(this: SR5BaseActorSheet, event) {
+    static async #toggleSkillDescription(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const id = this._closestSkillTarget(event.target).dataset.skillId;
         if (!id) return;
         if (this.expandedSkills.has(id)) {
             this.expandedSkills.delete(id);
-            event.target.closest('.list-item-container').classList.remove('expanded');
+            event.target?.closest('.list-item-container')?.classList.remove('expanded');
         } else {
             this.expandedSkills.add(id);
-            event.target.closest('.list-item-container').classList.add('expanded');
+            event.target?.closest('.list-item-container')?.classList.add('expanded');
             const skill = this.actor.getSkill(id);
             if (skill) {
                 const html = await TextEditor.enrichHTML(skill.description, { secrets: this.actor.isOwner, });
                 if (html) {
-                    event.target.closest('.list-item-container')
-                        .querySelector('.description-body')
-                        .innerHTML = html;
+                    event.target.closest('.list-item-container')!.querySelector('.description-body')!.innerHTML = html;
                 }
             }
         }
     }
 
-    static async #addItemQty(this: SR5BaseActorSheet, event) {
+    static async #addItemQty(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         let item = this.actor.items.get(id);
         if (!item) {
@@ -2271,8 +2304,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    static async #removeItemQty(this: SR5BaseActorSheet, event) {
+    static async #removeItemQty(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         let item = this.actor.items.get(id);
         if (!item) {

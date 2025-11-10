@@ -171,7 +171,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
         /**
          * Show / hide the items description within a sheet item list.
          */
-        static async #toggleListItemDescription(this: SR5ApplicationMixin, event: Event) {
+        static async #toggleListItemDescription(this: SR5ApplicationMixin, event: PointerEvent) {
             event.preventDefault();
             const target = event.target as HTMLElement;
             const uuid = SheetFlow.closestUuid(target);
@@ -200,18 +200,18 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
             }
         }
 
-        static async #refresh(this: SR5ApplicationMixin, event: Event) {
+        static async #refresh(this: SR5ApplicationMixin) {
             await this.render();
         }
 
-        static async #openSource(event: Event) {
+        static async #openSource(event: PointerEvent) {
             const sourceId = SheetFlow.closestSource(event.target);
             if (sourceId) {
                 await LinksHelpers.openSource(sourceId);
             }
         }
 
-        static async #openUuid(event: Event) {
+        static async #openUuid(event: PointerEvent) {
             const uuid = SheetFlow.closestUuid(event.target);
             if (uuid) {
                 const document = await fromUuid(uuid);
@@ -238,7 +238,7 @@ export default function <BaseClass extends ApplicationV2.AnyConstructor>(base: B
                     options.parts.unshift(options.parts.splice(index, 1)[0]);
                 }
             }
-            return super._renderHTML(context, options) as any;
+            return super._renderHTML(context, options) as Promise<Record<string, HTMLElement>>;
         }
 
         override async _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {

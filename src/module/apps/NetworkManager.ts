@@ -121,9 +121,10 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
      *
      * @param event User clicked on something.
      */
-    static async #handleBruteForce(this: NetworkManager, event) {
+    static async #handleBruteForce(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const targetUuid = SheetFlow.closestUuid(event.target);
         if (!targetUuid) return;
@@ -135,9 +136,10 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
      *
      * @param event User clicked on something.
      */
-    static async #handleHackOnTheFly(this: NetworkManager, event) {
+    static async #handleHackOnTheFly(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const targetUuid = SheetFlow.closestUuid(event.target);
         if (!targetUuid) return;
@@ -149,9 +151,10 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
      *
      * @param event User triggered event.
      */
-    static async #handleMarkInvite(this: NetworkManager, event) {
+    static async #handleMarkInvite(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const uuid = SheetFlow.closestUuid(event.target);
         if(!uuid) return;
@@ -164,9 +167,10 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         await this.close();
     }
 
-    static async #connectToNetwork(this: NetworkManager, event) {
+    static async #connectToNetwork(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const uuid = SheetFlow.closestUuid(event.target);
         if(!uuid) return;
@@ -184,8 +188,9 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
      * Connect to the PAN of the Driver
      * @param event
      */
-    static async #connectToDriver(this: NetworkManager, event) {
+    static async #connectToDriver(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const driver = this.actor.getVehicleDriver();
         if (driver) {
             const device = driver.getMatrixDevice();

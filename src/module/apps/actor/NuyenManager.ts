@@ -27,25 +27,28 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         return context;
     }
 
-    static async #increaseNuyen(this: NuyenManager, event) {
+    static async #increaseNuyen(this: NuyenManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        const amount = Number(event.target.closest('[data-amount]').dataset.amount);
+        if (!(event.target instanceof HTMLElement)) return;
+        const amount = Number(event.target.closest<HTMLElement>('[data-amount]')!.dataset.amount);
         this.nuyenModifier += amount;
         await this.render();
     }
 
-    static async #reduceNuyen(this: NuyenManager, event) {
+    static async #reduceNuyen(this: NuyenManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        const amount = Number(event.target.closest('[data-amount]').dataset.amount);
+        if (!(event.target instanceof HTMLElement)) return;
+        const amount = Number(event.target.closest<HTMLElement>('[data-amount]')!.dataset.amount);
         this.nuyenModifier -= amount;
         await this.render();
     }
 
-    static async #submitChanges(this: NuyenManager, event) {
+    static async #submitChanges(this: NuyenManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
         const currentNuyen = this.getNuyen();
         const modifiedNuyen = currentNuyen + this.nuyenModifier;
         await this.actor.update({system: { nuyen: modifiedNuyen }});

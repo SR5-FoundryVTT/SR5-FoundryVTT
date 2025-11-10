@@ -158,8 +158,9 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
      * Connect to the PAN of the Driver
      * @param event
      */
-    static async #connectToDriver(this: SR5VehicleActorSheet, event) {
+    static async #connectToDriver(this: SR5VehicleActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const driver = this.actor.getVehicleDriver();
         if (driver) {
             const device = driver.getMatrixDevice();

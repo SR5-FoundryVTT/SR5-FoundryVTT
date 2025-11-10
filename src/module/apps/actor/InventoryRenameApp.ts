@@ -25,9 +25,7 @@ export class InventoryRenameApp extends HandlebarsApplicationMixin(ApplicationV2
         return context;
     }
 
-    static async #submitChanges(this: InventoryRenameApp, event) {
-        event.preventDefault();
-        event.stopPropagation();
+    static async #submitChanges(this: InventoryRenameApp) {
         if (this.actor.inventory.exists(this.newName)) {
             ui.notifications.warn("Inventory with that name already exists");
             return;
@@ -44,7 +42,7 @@ export class InventoryRenameApp extends HandlebarsApplicationMixin(ApplicationV2
         this.close();
     }
 
-    static async #cancel(this: InventoryRenameApp, event) {
+    static async #cancel(this: InventoryRenameApp) {
         this.close();
     }
 

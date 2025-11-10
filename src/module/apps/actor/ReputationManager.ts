@@ -59,10 +59,11 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         return super._onRender(context, options);
     }
 
-    static async #increase(this: ReputationManager, event) {
+    static async #increase(this: ReputationManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        const type = event.target.closest('[data-type]').dataset.type;
+        if (!(event.target instanceof HTMLElement)) return;
+        const type = event.target.closest<HTMLElement>('[data-type]')!.dataset.type;
         if (type === 'street_cred') {
             this.streetCredModifier += 1;
         } else if (type === 'notoriety') {
@@ -73,10 +74,11 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         await this.render();
     }
 
-    static async #reduce(this: ReputationManager, event) {
+    static async #reduce(this: ReputationManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        const type = event.target.closest('[data-type]').dataset.type;
+        if (!(event.target instanceof HTMLElement)) return;
+        const type = event.target.closest<HTMLElement>('[data-type]')!.dataset.type;
         if (type === 'street_cred') {
             this.streetCredModifier -= 1;
         } else if (type === 'notoriety') {
@@ -87,10 +89,7 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         await this.render();
     }
 
-    static async #submitChanges(this: ReputationManager, event) {
-        event.preventDefault();
-        event.stopPropagation();
-
+    static async #submitChanges(this: ReputationManager) {
         const updateData = {};
         if (this.streetCredModifier !== 0) {
             updateData['system.street_cred'] = this.getStreetCred() + this.streetCredModifier;
@@ -102,12 +101,12 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
             updateData['system.notoriety'] = this.getNotoriety() + this.notorietyModifier;
         }
         if (!isEmpty(updateData)) {
-            this.actor.update(updateData);
+            await this.actor.update(updateData);
         }
         this.close();
     }
 
-    static async #cancel(this: ReputationManager, event) {
+    static async #cancel(this: ReputationManager) {
         this.close();
     }
 

@@ -120,7 +120,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
      * Remove the summoner from this spirit actor.
      * @param event Any interaction event.
      */
-    static async #pickSummoner(this: SR5SpiritActorSheet, event) {
+    static async #pickSummoner(this: SR5SpiritActorSheet, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
         event.preventDefault();
@@ -137,7 +137,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
      * Remove the summoner from this spirit actor.
      * @param event Any interaction event.
      */
-    static async #removeSummoner(this: SR5SpiritActorSheet, event) {
+    static async #removeSummoner(this: SR5SpiritActorSheet, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
 
