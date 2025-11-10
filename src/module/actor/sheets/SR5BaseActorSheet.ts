@@ -23,11 +23,11 @@ import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
-import RenderContext = foundry.applications.sheets.ActorSheetV2.RenderContext;
 
 const { ActorSheetV2 } = foundry.applications.sheets;
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
+
 
 export interface InventorySheetDataByType {
     type: string;
@@ -56,7 +56,7 @@ export interface SR5SheetFilters {
     showUntrainedSkills
 }
 
-export interface SR5ActorSheetData extends RenderContext {
+export interface SR5ActorSheetData extends foundry.applications.sheets.ActorSheetV2.RenderContext {
     config: typeof SR5CONFIG
     system: Actor.Implementation['system']
     filters: SR5SheetFilters
