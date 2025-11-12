@@ -37,16 +37,9 @@ export class LifestyleParser {
         // Map the chummer lifestyle type to our sr5 foundry type.
         const chummerLifestyleType = chummerLifestyle.baselifestyle.toLowerCase();
         if ((chummerLifestyleType in SR5.lifestyleTypes)) {
-            system.type = chummerLifestyleType;
-        }
-        else {
-            // This is necessary because of a typo in SR5 config.
-            if (chummerLifestyleType === 'luxury') {
-                system.type = 'luxory';
-            }
-            else {
-                system.type = 'other';
-            }
+            system.type = chummerLifestyleType as typeof system.type;
+        } else {
+            system.type = 'other';
         }
 
         system.cost = Number(chummerLifestyle.totalmonthlycost) || 0;

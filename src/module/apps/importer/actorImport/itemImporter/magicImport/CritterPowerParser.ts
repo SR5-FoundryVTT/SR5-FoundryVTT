@@ -35,8 +35,8 @@ export class CritterPowerParser {
 
         system.rating = parseFloat(chummerCritterPower.extra);
         system.powerType = chummerCritterPower.type === "P" ? 'physical' : 'mana';
-        system.range = chummerCritterPower.range;
-        system.duration = chummerCritterPower.duration;
+        system.range = chummerCritterPower.range as typeof system.range;
+        system.duration = chummerCritterPower.duration as typeof system.duration;
 
         // Assign import flags
         system.importFlags = genImportFlags(formatAsSlug(chummerCritterPower.fullname), parserType);

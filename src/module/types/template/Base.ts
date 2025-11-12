@@ -1,11 +1,13 @@
+import { SR5 } from "@/module/config";
+
 const { SchemaField, NumberField, ArrayField, StringField } = foundry.data.fields;
 
 export const PhysicalAttribute = new StringField({
-    choices: ['body', 'agility', 'reaction', 'strength'],
+    choices: SR5.physicalAttributes,
 });
 
 export const MentalAttribute = new StringField({
-    choices: ['logic', 'intuition', 'charisma', 'willpower'],
+    choices: SR5.mentalAttributes,
 });
 
 export const SpecialAttribute = new StringField({
@@ -13,7 +15,7 @@ export const SpecialAttribute = new StringField({
 });
 
 export const MatrixAttribute = new StringField({
-    choices: ['attack', 'sleaze', 'data_processing', 'firewall'],
+    choices: SR5.matrixAttributes,
 });
 
 export const BaseValuePair = () => ({
@@ -57,7 +59,7 @@ export const ModifiableValueLinked = () => ({
     base_formula_operator: new StringField({
         required: false,
         initial: 'add',
-        choices: ['add', 'subtract', 'multiply', 'divide']
+        choices: SR5.actionDamageFormulaOperators
     }),
 });
 

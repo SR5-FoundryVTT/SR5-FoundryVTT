@@ -711,7 +711,7 @@ export const SR5 = {
         low: 'SR5.LifestyleLow',
         medium: 'SR5.LifestyleMiddle',
         high: 'SR5.LifestyleHigh',
-        luxory: 'SR5.LifestyleLuxory',
+        luxury: 'SR5.LifestyleLuxury',
         other: 'SR5.LifestyleOther',
     },
 

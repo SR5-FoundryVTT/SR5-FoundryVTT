@@ -1,9 +1,11 @@
+import { Typed } from "../typed";
+import { SR5 } from "@/module/config";
 import { ArmorPartData } from "./Armor";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
-export const CritterPowerCategories = ['mundane', 'paranormal', 'weakness', 'emergent', 'drake', 'shapeshifter', 'free_spirit', 'paranormal_infected', 'echoes'] as const;
+export const CritterPowerCategories = Typed.keys(SR5.critterPower.categories);
 
 const CritterPowerData = () => ({
     ...BaseItemData(),
@@ -13,14 +15,26 @@ const CritterPowerData = () => ({
     category: new StringField({
         blank: true,
         required: true,
-        choices: CritterPowerCategories,
+        choices: SR5.critterPower.categories,
     }),
     powerType: new StringField({ required: true }),
-    range: new StringField({ required: true }),
-    duration: new StringField({ required: true, initial: "always" }),
+    range: new StringField({
+        required: true,
+        initial: "los",
+        choices: SR5.critterPower.ranges
+    }),
+    duration: new StringField({
+        required: true,
+        initial: "always",
+        choices: SR5.critterPower.durations
+    }),
     karma: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-    optional: new StringField({ required: true, initial: "standard", choices: ['standard', 'enabled_option', 'disabled_option'] }),
+    optional: new StringField({
+        required: true,
+        initial: "standard",
+        choices: SR5.critterPower.optional
+    }),
     enabled: new BooleanField({ initial: true }),
 });
 

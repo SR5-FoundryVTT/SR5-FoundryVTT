@@ -10,7 +10,7 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
     protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();
 
-        system.spriteType = jsonData.name._TEXT.split(" ")[0].toLowerCase();
+        system.spriteType = jsonData.name._TEXT.split(" ")[0].toLowerCase() as typeof system.spriteType;
 
         return system;
     }
@@ -20,7 +20,7 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
         const powers = [...IH.getArray(jsonData.powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
         const translationMap: Record<string, string> = {};
 
-        powers.forEach(p => translationMap[p] = TH.getTranslation(p, { type: 'power' }));
+        powers.forEach(p => { translationMap[p] = TH.getTranslation(p, { type: 'power' }); });
 
         const allPowers = await IH.findItem('Critter_Power', powers.map(p => translationMap[p]));
         const name = jsonData.name._TEXT;
