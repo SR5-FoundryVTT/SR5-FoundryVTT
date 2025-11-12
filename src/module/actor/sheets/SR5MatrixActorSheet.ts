@@ -13,6 +13,7 @@ import { NetworkManager } from '@/module/apps/NetworkManager';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 
 const { fromUuid, fromUuidSync } = foundry.utils;
 
@@ -36,6 +37,9 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     matrixDevice: SR5Item | undefined;
     // Matrix ICONs that are owned by this actor
     ownedIcons: MatrixTargetDocument[];
+
+    matrixLeftTabs: Record<string, SR5Tab>;
+    matrixRightTabs: Record<string, SR5Tab>;
 }
 
 export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorSheetData> extends SR5BaseActorSheet<T> {
@@ -44,7 +48,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     selectedMatrixTarget: string | undefined;
     _connectedIconsOpenClose: Record<string, boolean> = {};
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<SR5BaseActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
 
         data.network = this.actor.network;
@@ -217,8 +221,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
     override async _preparePartContext(
         ...[partId, context, options]: Parameters<SR5BaseActorSheet["_preparePartContext"]>
-    ) {
-        const partContext = await super._preparePartContext(partId, context, options);
+    ): Promise<MatrixActorSheetData> {
+        const partContext = await super._preparePartContext(partId, context, options) as MatrixActorSheetData;
 
         if (partId === 'matrixActions') {
             partContext.matrixActions = await this._prepareMatrixActions();

@@ -1,43 +1,61 @@
 import { SR5 } from "../../config";
 import { parseDropData } from "../../utils/sheets";
-import { SR5ApplicationMixin } from '@/module/handlebars/SR5ApplicationMixin';
+import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { Helpers } from '@/module/helpers';
+import { DeepPartial } from "fvtt-types/utils";
+import { SkillFieldType } from "@/module/types/template/Skills";
+import DocumentSheetV2 = foundry.applications.api.DocumentSheetV2;
 
-const { DocumentSheetV2 } = foundry.applications.api;
 const { FilePicker } = foundry.applications.apps;
 
-export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Actor> {
+interface SkillEditSheetData extends 
+    SR5ApplicationMixinTypes.RenderContext,
+    DocumentSheetV2.RenderContext<Actor.Implementation>
+{
+    actor: SR5Actor;
+    skillFields: any;
+    system: Actor.Implementation['system'];
     skillId: string;
+    skill?: SkillFieldType;
+    skill_name: string;
+    editable_name: boolean;
+    editable_canDefault: boolean;
+    editable_attribute: boolean;
+    attributes: Record<string, string>;
+    canBeNative: boolean;
+};
+
+export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.Implementation, SkillEditSheetData> {
+    skillId: string;    
+    readonly canBeNative: boolean = false;
 
     constructor(options, skillId: string) {
         super(options);
         this.skillId = skillId;
     }
 
-    override async _prepareContext(options) {
-        const data = await super._prepareContext(options);
+    override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
+        const data = await super._prepareContext(options) as SkillEditSheetData;
         data.actor = this.document;
 
         data.skillFields = this._getSkillFields(data.systemFields);
 
         // skill property will hold a direct skill reference
-        data['skillId'] = this.skillId;
-        data['skill'] = this.document.getSkill(this.skillId);
-        data['skill_name'] = this._updateString();
-        data['editable_name'] = this._allowSkillNameEditing();
-        data['editable_canDefault'] = true;
-        data['editable_attribute'] = true;
-        data['attributes'] = this._getSkillAttributesForSelect();
-        data['canBeNative'] = this.canBeNative;
+        data.skillId = this.skillId;
+        data.skill = this.document.getSkill(this.skillId);
+        data.skill_name = this._updateString();
+        data.editable_name = this._allowSkillNameEditing();
+        data.editable_canDefault = true;
+        data.editable_attribute = true;
+        data.attributes = this._getSkillAttributesForSelect();
+        data.canBeNative = this.canBeNative;
 
         data.primaryTabs = this._prepareTabs('primary');
 
         return data;
     }
-
-    readonly canBeNative: boolean = false;
 
     _updateString() {
         return `system.skills.active.${this.skillId}`;

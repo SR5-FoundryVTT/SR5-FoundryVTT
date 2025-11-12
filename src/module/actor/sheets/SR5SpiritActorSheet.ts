@@ -1,8 +1,12 @@
-import { SR5BaseActorSheet } from "./SR5BaseActorSheet";
+import { SR5ActorSheetData, SR5BaseActorSheet } from "./SR5BaseActorSheet";
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { Helpers } from '@/module/helpers';
 
-export class SR5SpiritActorSheet extends SR5BaseActorSheet {
+interface SpiritActorSheetData extends SR5ActorSheetData {
+    summoner?: Actor.Implementation;
+}
+
+export class SR5SpiritActorSheet extends SR5BaseActorSheet<SpiritActorSheetData> {
     /**
      * Spirit actors will handle these item types specifically.
      *
@@ -71,15 +75,12 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
 
     /**
      * Spirit actors sheets deviate from base actors around the summoning workflows.
-     * 
-     * @param options 
-     * @returns 
      */
-    override async _prepareContext(options) {
-        const data = await super._prepareContext(options) as any;
+    override async _prepareContext(options: Parameters<SR5BaseActorSheet["_prepareContext"]>[0]) {
+        const data = await super._prepareContext(options);
 
         if (this.document.isType('spirit') && this.document.system.summonerUuid) {
-            data['summoner'] = await fromUuid(this.document.system.summonerUuid as any);
+            data.summoner = await fromUuid(this.document.system.summonerUuid) as Actor.Implementation;
         }
 
         data.isSpirit = true;

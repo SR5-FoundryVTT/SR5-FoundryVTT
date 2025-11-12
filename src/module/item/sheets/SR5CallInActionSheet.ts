@@ -27,7 +27,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
         },
     }
 
-    override async _prepareContext(options): Promise<SR5CallInActionSheetData> {
+    override async _prepareContext(options) {
         const data = await super._prepareContext(options);
 
         const system = data.system as Item.SystemOfType<'call_in_action'>;

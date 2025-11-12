@@ -24,7 +24,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): Item.ConfiguredSubType[] {
-        let itemTypes = super.getHandledItemTypes();
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -66,7 +66,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         ];
     }
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<SR5MatrixActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
 
         // Vehicle actor type specific fields.
@@ -169,7 +169,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             const device = driver.getMatrixDevice();
             if (device) {
                 await device.addSlave(this.actor);
-                this.render(false);
+                void this.render(false);
             } else {
                 ui.notifications.error("No Device found on Driver")
             }
@@ -185,7 +185,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             // pick the first controlled actor
             const actor = actors[0];
             await this.actor.addVehicleDriver(actor.uuid);
-            this.render();
+            void this.render();
         }
 
     }
@@ -193,7 +193,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     static async #removeVehicleDriver(this: SR5VehicleActorSheet, event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
-        this.render();
+        void this.render();
     }
 
     static async #toggleChaseEnvironment(this: SR5VehicleActorSheet, event) {

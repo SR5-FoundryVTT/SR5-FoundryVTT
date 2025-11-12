@@ -1,17 +1,23 @@
-import { RangedWeaponRules } from './../rules/RangedWeaponRules';
-import { Helpers } from '../helpers';
-import { SR5Item } from './SR5Item';
+import { DeepPartial } from 'fvtt-types/utils';
+
 import { SR5 } from '../config';
-import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from '../effects';
+import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
+import { SR5Item } from './SR5Item';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import { ActionFlow } from './flows/ActionFlow';
-import { AmmunitionType, RangeType } from '../types/item/Weapon';
-import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+
 import { MatrixRules } from '../rules/MatrixRules';
+import { RangedWeaponRules } from '../rules/RangedWeaponRules';
+
+import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from '../effects';
+
+import { ActionFlow } from './flows/ActionFlow';
 import { SINFlow } from './flows/SINFlow';
-import { SR5ApplicationMixin } from '@/module/handlebars/SR5ApplicationMixin';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
+
+import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
+import { AmmunitionType, RangeType } from '../types/item/Weapon';
 
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 import RenderContext = foundry.applications.sheets.ItemSheet.RenderContext;
@@ -24,13 +30,46 @@ const { fromUuid, fromUuidSync } = foundry.utils;
 /**
  * Shadowrun 5e ItemSheetData typing shared across all item types
  */
-export interface SR5BaseItemSheetData extends RenderContext {
+export interface SR5BaseItemSheetData extends RenderContext, SR5ApplicationMixinTypes.RenderContext {
     // SR5-FoundryVTT configuration
-    config: typeof SR5
-    effects: SR5ActiveEffect[]
-    itemEffects: SR5ActiveEffect[]
+    config: typeof SR5;
+
+    // Effects
+    effects: SR5ActiveEffect[];
+    itemEffects: SR5ActiveEffect[];
+
     // FoundryVTT rollmodes
-    rollModes: CONFIG.Dice.RollModes
+    rollModes: CONFIG.Dice.RollModes;
+
+    // Document references
+    actor?: SR5Actor;
+    item?: SR5Item;
+    slaves?: (SR5Item | SR5Actor)[];
+
+    // State flags
+    isNestedItem: boolean;
+    calculatedEssence?: boolean;
+    calculatedCost: boolean;
+    calculatedAvailability: boolean;
+    ratingForCalculation: boolean;
+    isUsingRangeCategory: boolean;
+
+    // Tests
+    tests: typeof game.shadowrun5e.tests;
+    opposedTests: typeof game.shadowrun5e.opposedTests;
+    activeTests: typeof game.shadowrun5e.activeTests;
+    resistTests: typeof game.shadowrun5e.resistTests;
+
+    // Description
+    descriptionHTML?: string;
+
+    // Source flags
+    sourceIsURL: boolean;
+    sourceIsPDF: boolean;
+    sourceIsUuid: boolean;
+
+    // Keybindings
+    bindings: { qtySome: string, qtyMany: string };
 }
 
 /**
@@ -297,8 +336,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * Prepare data for rendering the Item sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
-    override async _prepareContext(options) {
-        const data = await super._prepareContext(options);
+    override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
+        const data = await super._prepareContext(options) as T;
         const itemData = this.item.toObject(false).system as SR5Item['system'];
         data.actor = this.item.actorOwner;
 
@@ -1144,7 +1183,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!data) return;
         const item = this.item;
         const allowed = Hooks.call("dropItemSheetData", item, this, data);
-        if (allowed === false) return;
+        if (!allowed) return;
 
         // Dropped Documents
         const documentClass = foundry.utils.getDocumentClass(data.type);

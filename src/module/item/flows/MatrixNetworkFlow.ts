@@ -307,7 +307,7 @@ export class MatrixNetworkFlow {
      *
      * @param options.players If true, only networks visible to players are returned.
      */
-    static getNetworks(options = {players: false}): SR5Item[] {
+    static getNetworks(options = {players: false}) {
         const networks = (game.items as unknown as SR5Item[]).filter(item => item.isNetwork()) ?? [];
         if (options.players) return networks.filter(network => network.matrixIconVisibleToPlayer());
         return networks;
@@ -318,7 +318,7 @@ export class MatrixNetworkFlow {
      *
      * @param options.players If true, only networks visible to players are returned.
      */
-    static getPublicGrids(options = {players: false}): SR5Item[] {
+    static getPublicGrids(options = {players: false}) {
         return this.getGrids(options).filter(network => network.isPublicGrid());
     }
 
@@ -473,28 +473,32 @@ export class MatrixNetworkFlow {
     /**
      * Collect visible hosts for selection.
      */
-    static visibleHosts() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host') && item.matrixIconVisibleToPlayer()) ?? [];
+    static visibleHosts(): SR5Item<'host'>[] {
+        return (game.items as unknown as SR5Item[])?.filter(
+            item => item.isType('host') && item.matrixIconVisibleToPlayer()
+        ) as SR5Item<'host'>[] ?? [];
     }
 
     /**
      * Collect all hosts for selection.
      */
-    static allHosts() {
+    static allHosts(): SR5Item<'host'>[] {
         return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host')) ?? [];
     }
 
     /**
      * Collect visible grids for selection.
      */
-    static visibleGrids() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid') && item.matrixIconVisibleToPlayer()) ?? [];
+    static visibleGrids(): SR5Item<'grid'>[] {
+        return (game.items as unknown as SR5Item[]).filter(
+            item => item.isType('grid') && item.matrixIconVisibleToPlayer()
+        ) as SR5Item<'grid'>[] ?? [];
     }
 
     /**
      * Collect all grids for selection.
      */
-    static allGrids() {
+    static allGrids(): SR5Item<'grid'>[] {
         return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid')) ?? [];
     }
 

@@ -1,7 +1,8 @@
+import { DeepPartial } from 'fvtt-types/utils';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
-import { SR5ApplicationMixin } from '@/module/handlebars/SR5ApplicationMixin';
+import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Item } from '@/module/item/SR5Item';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 import { Helpers } from '@/module/helpers';
@@ -11,6 +12,16 @@ import { TestCreator } from '@/module/tests/TestCreator';
 
 const { ApplicationV2 } = foundry.applications.api;
 const { fromUuid, fromUuidSync } = foundry.utils;
+
+// Types for NetworkManager context data
+export interface NetworkManagerData extends SR5ApplicationMixinTypes.RenderContext {
+    selectable_networks: SR5Item[];
+    grids: SR5Item<'grid'>[];
+    hosts: SR5Item<'host'>[];
+    connected_network: SR5Item | null;
+    actor: SR5Actor;
+    driver?: SR5Actor;
+}
 
 export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
     declare document: SR5Actor;
@@ -55,8 +66,8 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         return game.i18n.localize("SR5.NetworkManager.Title");
     }
 
-    override async _prepareContext(options) {
-        const context = await super._prepareContext(options);
+    override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
+        const context = await super._prepareContext(options) as NetworkManagerData;
 
         context.selectable_networks = NetworkManager.selectableNetworks(this.actor);
 

@@ -2,7 +2,6 @@ import {SR5Item} from "../../item/SR5Item";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
-import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 interface ICActorSheetData extends MatrixActorSheetData {
     disableMarksEdit: boolean;
@@ -11,7 +10,7 @@ interface ICActorSheetData extends MatrixActorSheetData {
 
 export class SR5ICActorSheet extends SR5MatrixActorSheet<ICActorSheetData> {
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<SR5MatrixActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
         data.disableMarksEdit = this.actor.hasHost();
         data.isIC = true;

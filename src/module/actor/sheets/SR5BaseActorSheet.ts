@@ -1,26 +1,31 @@
 import { DeepPartial } from 'fvtt-types/utils';
-import { SituationModifier } from '../../rules/modifiers/SituationModifier';
-import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
-import { Helpers } from '../../helpers';
-import { SR5Item } from '../../item/SR5Item';
-import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
+
 import { SR5 } from '../../config';
+import { Helpers } from '../../helpers';
 import { SR5Actor } from '../SR5Actor';
+import { SR5Item } from '../../item/SR5Item';
+import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
+
+import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { ChummerImportForm } from '../../apps/chummer-import-form';
-import { LinksHelpers } from '../../utils/links';
-import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
-import { InventoryType } from 'src/module/types/actor/Common';
-import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
-
-import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
-import { SheetFlow } from '@/module/flows/SheetFlow';
-import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
 import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
 import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
-import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
+
+import { SituationModifier } from '../../rules/modifiers/SituationModifier';
+import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
+
+import { LinksHelpers } from '../../utils/links';
+
+import { InventoryType } from 'src/module/types/actor/Common';
+import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
+
+import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
+import { SheetFlow } from '@/module/flows/SheetFlow';
+import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
 
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
@@ -28,7 +33,6 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
-
 
 export interface InventorySheetDataByType {
     type: string;
@@ -57,27 +61,65 @@ export interface SR5SheetFilters {
     showUntrainedSkills: boolean
 }
 
-export interface SR5ActorSheetData extends ActorSheetV2.RenderContext {
-    config: typeof SR5CONFIG
-    system: Actor.Implementation['system']
-    filters: SR5SheetFilters
-    isCharacter: boolean
-    isSpirit: boolean
-    isCritter: boolean
-    isVehicle: boolean
-    awakened: boolean
-    emerged: boolean
-    woundTolerance: number
-    hasSkills: boolean
-    canAlterSpecial: boolean
-    hasFullDefense: boolean
-    effects: SR5ActiveEffect[]
-    handledItemTypes: string[]
-    inventories: InventoriesSheetData
-    inventory: InventorySheetData
-    spells: Record<string, SR5Item[]>
+export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5ApplicationMixinTypes.RenderContext {
+    actor: SR5Actor;
+    config: typeof SR5CONFIG;
+    system: SR5Actor['system'];
 
-    tab: SR5Tab
+    // Sheet filters
+    filters: SR5SheetFilters;
+
+    // Actor type flags
+    isCharacter: boolean;
+    isSpirit: boolean;
+    isCritter: boolean;
+    isVehicle: boolean;
+    awakened: boolean;
+    emerged: boolean;
+    canAlterSpecial: boolean;
+    hasSkills: boolean;
+    hasFullDefense: boolean;
+    woundTolerance: number;
+
+    // Effects
+    effects: SR5ActiveEffect[];
+    itemEffects: SR5ActiveEffect[];
+
+    // Items & Inventory
+    handledItemTypes: string[];
+    itemType: Record<string, SR5Item[]>;
+    inventories: InventoriesSheetData;
+    inventory: InventorySheetData;
+    hasInventory: boolean;
+    selectedInventory: string;
+    spells: Record<string, SR5Item[]>;
+    program_count: string;
+
+    // UI
+    tab: SR5Tab;
+    contentVisibility: Record<string, boolean>;
+    bindings: Record<string, string>;
+    expandedSkills: Record<string, { html: string }>;
+    canRollInitiative: boolean;
+    biographyHTML?: string;
+
+    // Actions & Favorites
+    actions?: sheetAction[];
+    favorites?: SR5Item[];
+
+    // Initiative
+    initiativePerception: {
+        value: string;
+        options: { label: string; value: string }[];
+    };
+
+    // Situation Modifiers
+    situationModifiers: {
+        category: string;
+        label: string;
+        value: number;
+        hidden: boolean;
+    }[];
 }
 
 
@@ -314,10 +356,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /** SheetData used by _all_ actor types! */
-    override async _prepareContext(options) {
+    override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
-        const data = await super._prepareContext(options);
+        const data = await super._prepareContext(options) as T;
         data.actor = this.actor;
 
         // Sheet related general purpose fields. These aren't persistent.
@@ -365,8 +407,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return data;
     }
 
-    override async _preparePartContext(partId, context, options) {
-        const partContext = await super._preparePartContext(partId, context, options);
+    override async _preparePartContext(
+        partId: string,
+        context: SR5ActorSheetData,
+        options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions>,
+    ): Promise<SR5ActorSheetData> {
+        const partContext = await super._preparePartContext(partId, context, options) as T;
         if (partId === 'actions') {
             partContext.actions = await this._prepareActions();
         }
@@ -418,7 +464,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return parts;
     }
 
-    protected override _configureRenderParts(options) {
+    protected override _configureRenderParts(options: SR5ApplicationMixinTypes.RenderOptions) {
         const retVal = super._configureRenderParts(options);
         if (!game.user?.isGM && this.actor.limited) {
             return {
@@ -1069,7 +1115,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             sorted[modifier] = Number(modifiers[modifier]) || '';
         }
 
-        sheetData.system.modifiers = sorted as any;
+        sheetData.system.modifiers = sorted as typeof modifiers;
         sheetData.woundTolerance = 3 + ('wound_tolerance' in modifiers ? modifiers.wound_tolerance : 0);
     }
 
@@ -1496,7 +1542,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 const app = new SkillEditSheet({document: this.actor}, skillId)
                 await app.render(true, {mode: 'edit'} as any);
             } else if (category === 'knowledge') {
-                const subcategory = closest?.dataset.subcategory;
+                const subcategory = closest?.dataset.subcategory as KnowledgeSkillCategory;
                 if (subcategory) {
                     const app = new KnowledgeSkillEditSheet({document: this.actor}, skillId, subcategory)
                     await app.render(true, {mode: 'edit'} as any);
@@ -2180,7 +2226,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return sheetActions.sort(Helpers.sortByName.bind(Helpers));
     }
 
-    static async #toggleInitiativeBlitz(this: SR5BaseActorSheet, event) {
+    static async #toggleInitiativeBlitz(this: SR5BaseActorSheet, event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2188,7 +2234,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.update({system: { initiative: { edge: !blitz }}});
     }
 
-    static async #rollInitiative(this: SR5BaseActorSheet, event) {
+    static async #rollInitiative(this: SR5BaseActorSheet, event: Event) {
         event.preventDefault();
         event.stopPropagation();
         await this.actor.rollInitiative();
