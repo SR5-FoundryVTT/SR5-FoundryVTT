@@ -1,3 +1,5 @@
+import { SR5 } from "@/module/config";
+
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const FireModeData = () => ({
@@ -9,7 +11,7 @@ export const FireModeData = () => ({
     mode: new StringField({
         required: true,
         initial: 'single_shot',
-        choices: ['single_shot', 'semi_auto', 'burst_fire', 'full_auto']
+        choices: SR5.rangeWeaponMode
     }),
     action: new StringField({
         required: true,

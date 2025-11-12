@@ -1,9 +1,9 @@
+import { SR5 } from "@/module/config";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ValueMaxPair, ModifiableValue } from "../template/Base";
-import { SR5 } from '@/module/config';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const BlastData = () => ({
@@ -27,7 +27,11 @@ export const RangeData = () => ({
     medium: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     long: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     extreme: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-    category: new StringField({ required: true, initial: 'manual', choices: SR5.weaponRangeCategories }),
+    category: new StringField({
+        required: true,
+        initial: 'manual',
+        choices: SR5.weaponRangeCategories
+    }),
     attribute: new StringField({ required: true }),
 });
 

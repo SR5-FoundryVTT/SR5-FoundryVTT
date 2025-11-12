@@ -1,6 +1,6 @@
+import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
-import { SR5 } from '@/module/config';
 const { NumberField, StringField } = foundry.data.fields;
 
 const ModificationData = () => ({

@@ -1,7 +1,7 @@
+import { SR5 } from "@/module/config";
 import { ArmorPartData } from "./Armor";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { SR5 } from '@/module/config';
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const AdeptPowerData = () => ({
@@ -10,7 +10,11 @@ const AdeptPowerData = () => ({
     ...ArmorPartData(),
 
     pp: new NumberField({ required: true, nullable: false, initial: 0, min: 0 }),
-    type: new StringField({ required: true, initial: 'passive', choices: SR5.adeptPower.types }),
+    type: new StringField({
+        required: true,
+        initial: 'passive',
+        choices: SR5.adeptPower.types
+    }),
     drain: new BooleanField(),
     level: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
